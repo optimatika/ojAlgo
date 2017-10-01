@@ -21,7 +21,6 @@
  */
 package org.ojalgo.access;
 
-import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.DoubleAdder;
@@ -31,10 +30,7 @@ import java.util.stream.StreamSupport;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -204,50 +200,6 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     }
 
-    /**
-     * @deprecated v44
-     */
-    @Deprecated
-    static Access1D<BigDecimal> asBig1D(final Access1D<?> access) {
-        return new Access1D<BigDecimal>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public BigDecimal get(final long index) {
-                return TypeUtils.toBigDecimal(access.get(index));
-            }
-
-        };
-    }
-
-    /**
-     * @deprecated v44
-     */
-    @Deprecated
-    static Access1D<ComplexNumber> asComplex1D(final Access1D<?> access) {
-        return new Access1D<ComplexNumber>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public ComplexNumber get(final long index) {
-                return ComplexNumber.valueOf(access.get(index));
-            }
-
-        };
-    }
-
     static Access1D<Double> asPrimitive1D(final Access1D<?> access) {
         return new Access1D<Double>() {
 
@@ -261,50 +213,6 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
             public Double get(final long index) {
                 return access.doubleValue(index);
-            }
-
-        };
-    }
-
-    /**
-     * @deprecated v44
-     */
-    @Deprecated
-    static Access1D<Quaternion> asQuaternion1D(final Access1D<?> access) {
-        return new Access1D<Quaternion>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public Quaternion get(final long index) {
-                return Quaternion.valueOf(access.get(index));
-            }
-
-        };
-    }
-
-    /**
-     * @deprecated v44
-     */
-    @Deprecated
-    static Access1D<RationalNumber> asRational1D(final Access1D<?> access) {
-        return new Access1D<RationalNumber>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public RationalNumber get(final long index) {
-                return RationalNumber.valueOf(access.get(index));
             }
 
         };

@@ -21,14 +21,8 @@
  */
 package org.ojalgo.access;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -88,82 +82,6 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
-    /**
-     * @deprecated v44
-     */
-    @Deprecated
-    static AccessAnyD<BigDecimal> asBigAnyD(final AccessAnyD<?> access) {
-        return new AccessAnyD<BigDecimal>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long count(final int dimension) {
-                return access.count(dimension);
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long[] ref) {
-                return access.doubleValue(ref);
-            }
-
-            public BigDecimal get(final long index) {
-                return TypeUtils.toBigDecimal(access.get(index));
-            }
-
-            public BigDecimal get(final long[] ref) {
-                return TypeUtils.toBigDecimal(access.get(ref));
-            }
-
-            public long[] shape() {
-                return access.shape();
-            }
-
-        };
-    }
-
-    /**
-     * @deprecated v44
-     */
-    @Deprecated
-    static AccessAnyD<ComplexNumber> asComplexAnyD(final AccessAnyD<?> access) {
-        return new AccessAnyD<ComplexNumber>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long count(final int dimension) {
-                return access.count(dimension);
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long[] ref) {
-                return access.doubleValue(ref);
-            }
-
-            public ComplexNumber get(final long index) {
-                return ComplexNumber.valueOf(access.get(index));
-            }
-
-            public ComplexNumber get(final long[] ref) {
-                return ComplexNumber.valueOf(access.get(ref));
-            }
-
-            public long[] shape() {
-                return access.shape();
-            }
-
-        };
-    }
-
     static AccessAnyD<Double> asPrimitiveAnyD(final AccessAnyD<?> access) {
         return new AccessAnyD<Double>() {
 
@@ -189,82 +107,6 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
             public Double get(final long[] ref) {
                 return access.doubleValue(ref);
-            }
-
-            public long[] shape() {
-                return access.shape();
-            }
-
-        };
-    }
-
-    /**
-     * @deprecated v44
-     */
-    @Deprecated
-    static AccessAnyD<Quaternion> asQuaternionAnyD(final AccessAnyD<?> access) {
-        return new AccessAnyD<Quaternion>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long count(final int dimension) {
-                return access.count(dimension);
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long[] ref) {
-                return access.doubleValue(ref);
-            }
-
-            public Quaternion get(final long index) {
-                return Quaternion.valueOf(access.get(index));
-            }
-
-            public Quaternion get(final long[] ref) {
-                return Quaternion.valueOf(access.get(ref));
-            }
-
-            public long[] shape() {
-                return access.shape();
-            }
-
-        };
-    }
-
-    /**
-     * @deprecated v44
-     */
-    @Deprecated
-    static AccessAnyD<RationalNumber> asRationalAnyD(final AccessAnyD<?> access) {
-        return new AccessAnyD<RationalNumber>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long count(final int dimension) {
-                return access.count(dimension);
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long[] ref) {
-                return access.doubleValue(ref);
-            }
-
-            public RationalNumber get(final long index) {
-                return RationalNumber.valueOf(access.get(index));
-            }
-
-            public RationalNumber get(final long[] ref) {
-                return RationalNumber.valueOf(access.get(ref));
             }
 
             public long[] shape() {

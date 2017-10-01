@@ -21,16 +21,11 @@
  */
 package org.ojalgo.access;
 
-import java.math.BigDecimal;
 import java.util.Iterator;
 
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -294,82 +289,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
-    /**
-     * @deprecated v44
-     */
-    @Deprecated
-    static Access2D<BigDecimal> asBig2D(final Access2D<?> access) {
-        return new Access2D<BigDecimal>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long countColumns() {
-                return access.countColumns();
-            }
-
-            public long countRows() {
-                return access.countRows();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return access.doubleValue(row, col);
-            }
-
-            public BigDecimal get(final long index) {
-                return TypeUtils.toBigDecimal(access.get(index));
-            }
-
-            public BigDecimal get(final long row, final long col) {
-                return TypeUtils.toBigDecimal(access.get(row, col));
-            }
-
-        };
-    }
-
-    /**
-     * @deprecated v44
-     */
-    @Deprecated
-    static Access2D<ComplexNumber> asComplex2D(final Access2D<?> access) {
-        return new Access2D<ComplexNumber>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long countColumns() {
-                return access.countColumns();
-            }
-
-            public long countRows() {
-                return access.countRows();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return access.doubleValue(row, col);
-            }
-
-            public ComplexNumber get(final long index) {
-                return ComplexNumber.valueOf(access.get(index));
-            }
-
-            public ComplexNumber get(final long row, final long col) {
-                return ComplexNumber.valueOf(access.get(row, col));
-            }
-
-        };
-    }
-
     static Access2D<Double> asPrimitive2D(final Access2D<?> access) {
         return new Access2D<Double>() {
 
@@ -399,82 +318,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
             public Double get(final long row, final long col) {
                 return access.doubleValue(row, col);
-            }
-
-        };
-    }
-
-    /**
-     * @deprecated v44
-     */
-    @Deprecated
-    static Access2D<Quaternion> asQuaternion2D(final Access2D<?> access) {
-        return new Access2D<Quaternion>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long countColumns() {
-                return access.countColumns();
-            }
-
-            public long countRows() {
-                return access.countRows();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return access.doubleValue(row, col);
-            }
-
-            public Quaternion get(final long index) {
-                return Quaternion.valueOf(access.get(index));
-            }
-
-            public Quaternion get(final long row, final long col) {
-                return Quaternion.valueOf(access.get(row, col));
-            }
-
-        };
-    }
-
-    /**
-     * @deprecated v44
-     */
-    @Deprecated
-    static Access2D<RationalNumber> asRational2D(final Access2D<?> access) {
-        return new Access2D<RationalNumber>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long countColumns() {
-                return access.countColumns();
-            }
-
-            public long countRows() {
-                return access.countRows();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return access.doubleValue(row, col);
-            }
-
-            public RationalNumber get(final long index) {
-                return RationalNumber.valueOf(access.get(index));
-            }
-
-            public RationalNumber get(final long row, final long col) {
-                return RationalNumber.valueOf(access.get(row, col));
             }
 
         };
