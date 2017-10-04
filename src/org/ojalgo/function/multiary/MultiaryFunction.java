@@ -97,6 +97,11 @@ public interface MultiaryFunction<N extends Number> extends BasicFunction<N>, Fu
          */
         MatrixStore<N> getHessian(Access1D<N> point);
 
+        /**
+         * @return The gradient at 0 (0-vector)
+         */
+        Access1D<N> getLinearFactors();
+
         FirstOrderApproximation<N> toFirstOrderApproximation(final Access1D<N> point);
 
         SecondOrderApproximation<N> toSecondOrderApproximation(final Access1D<N> point);

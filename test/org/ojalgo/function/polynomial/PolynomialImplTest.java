@@ -56,7 +56,7 @@ public class PolynomialImplTest extends FunctionPolynomialTests {
             final int tmpDegree = tmpSamples - 1;
             final PrimitivePolynomial tmpPoly = new PrimitivePolynomial(tmpDegree);
 
-            tmpPoly.estimate(Access1D.wrapAccess1D(x), Access1D.wrapAccess1D(y));
+            tmpPoly.estimate(Access1D.wrap(x), Access1D.wrap(y));
 
             final NumberContext tmpEquals = new NumberContext(7, 14);
             for (int i = 0; i < tmpSamples; i++) {

@@ -160,7 +160,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         public double getValue() {
-            final Access1D<?> tmpAccess = Access1D.wrapAccess1D(this.getPoint());
+            final Access1D<?> tmpAccess = Access1D.wrap(this.getPoint());
             return myObjFunc.getObjectiveFunction().invoke(Access1D.asPrimitive1D(tmpAccess)) + myObjFunc.getConstant();
         }
     }

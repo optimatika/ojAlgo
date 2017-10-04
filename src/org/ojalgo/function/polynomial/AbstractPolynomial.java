@@ -92,7 +92,7 @@ abstract class AbstractPolynomial<N extends Number> implements PolynomialFunctio
     }
 
     public final void estimate(final List<? extends Number> x, final List<? extends Number> y) {
-        this.estimate(Access1D.wrapAccess1D(x), Access1D.wrapAccess1D(y));
+        this.estimate(Access1D.wrap(x), Access1D.wrap(y));
     }
 
     public final void estimate(final NumberSeries<?> samples) {

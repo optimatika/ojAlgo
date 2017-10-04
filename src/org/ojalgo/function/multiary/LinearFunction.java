@@ -88,7 +88,6 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
 
     @Override
     public MatrixStore<N> getHessian(final Access1D<N> point) {
-        //return new ZeroStore<N>(myFactors.factory(), this.arity(), this.arity());
         return this.factory().builder().makeZero(this.arity(), this.arity()).get();
     }
 

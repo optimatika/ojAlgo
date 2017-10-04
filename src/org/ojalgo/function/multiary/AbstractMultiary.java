@@ -44,6 +44,10 @@ abstract class AbstractMultiary<N extends Number, F extends AbstractMultiary<N, 
         return this.getScalarConstant().getNumber();
     }
 
+    public Access1D<N> getLinearFactors() {
+        return this.getGradient(this.factory().builder().makeZero(this.arity(), 1).get());
+    }
+
     public final void setConstant(final Number constant) {
         myConstant = constant != null ? this.factory().scalar().convert(constant) : null;
     }

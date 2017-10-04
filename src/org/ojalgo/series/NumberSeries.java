@@ -44,11 +44,11 @@ public final class NumberSeries<N extends Number & Comparable<N>> extends TreeSe
     }
 
     public Access1D<N> accessKeys() {
-        return Access1D.wrapAccess1D(new ArrayList<>(this.keySet()));
+        return Access1D.wrap(new ArrayList<>(this.keySet()));
     }
 
     public Access1D<N> accessValues() {
-        return Access1D.wrapAccess1D(new ArrayList<>(this.values()));
+        return Access1D.wrap(new ArrayList<>(this.values()));
     }
 
     public N get(final long key) {

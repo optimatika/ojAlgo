@@ -57,6 +57,10 @@ abstract class ApproximateFunction<N extends Number> implements MultiaryFunction
         return true;
     }
 
+    public Access1D<N> getLinearFactors() {
+        return this.getGradient(this.factory().builder().makeZero(this.arity(), 1).get());
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

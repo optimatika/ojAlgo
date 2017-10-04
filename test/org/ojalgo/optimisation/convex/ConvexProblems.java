@@ -1186,7 +1186,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final int numElm = (int) result.count();
 
         final double[] expectedSolution = new double[] { -0.4, 0.12, -0.0196, -2.45785 };
-        tmpObj.invoke(Access1D.wrapAccess1D(expectedSolution));
+        tmpObj.invoke(Access1D.wrap(expectedSolution));
         tmpObj.invoke(Access1D.asPrimitive1D(result));
 
         JamaBI.subtract(JamaAI.multiply(PrimitiveDenseStore.FACTORY.columns(expectedSolution)));

@@ -23,6 +23,7 @@ package org.ojalgo.function.multiary;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 
 public final class FirstOrderApproximation<N extends Number> extends ApproximateFunction<N> {
@@ -93,6 +94,10 @@ public final class FirstOrderApproximation<N extends Number> extends Approximate
     @Override
     protected Factory<N, ?> factory() {
         return myDelegate.factory();
+    }
+
+    public PhysicalStore<N> linear() {
+        return myDelegate.linear();
     }
 
 }

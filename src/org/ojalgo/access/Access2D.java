@@ -365,7 +365,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         };
     }
 
-    static Access2D<Double> wrapAccess2D(final double[][] target) {
+    static Access2D<Double> wrap(final double[][] target) {
         return new Access2D<Double>() {
 
             public long count() {
@@ -391,7 +391,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         };
     }
 
-    static <N extends Number> Access2D<N> wrapAccess2D(final N[][] target) {
+    static <N extends Number> Access2D<N> wrap(final N[][] target) {
         return new Access2D<N>() {
 
             public long count() {
@@ -419,6 +419,22 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             }
 
         };
+    }
+
+    /**
+     * @deprecated v45 Use {@link #wrap(double[][])} instead
+     */
+    @Deprecated
+    static Access2D<Double> wrapAccess2D(final double[][] target) {
+        return Access2D.wrap(target);
+    }
+
+    /**
+     * @deprecated v45 Use {@link #wrap(N[][])} instead
+     */
+    @Deprecated
+    static <N extends Number> Access2D<N> wrapAccess2D(final N[][] target) {
+        return Access2D.wrap(target);
     }
 
     default <NN extends Number, R extends Mutate2D.Receiver<NN>> Collectable<NN, R> asCollectable2D() {

@@ -254,7 +254,7 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         return retVal;
     }
 
-    static Access1D<Double> wrapAccess1D(final double[] target) {
+    static Access1D<Double> wrap(final double[] target) {
         return new Access1D<Double>() {
 
             public long count() {
@@ -272,7 +272,7 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         };
     }
 
-    static <N extends Number> Access1D<N> wrapAccess1D(final List<? extends N> target) {
+    static <N extends Number> Access1D<N> wrap(final List<? extends N> target) {
         return new Access1D<N>() {
 
             public long count() {
@@ -290,7 +290,7 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         };
     }
 
-    static <N extends Number> Access1D<N> wrapAccess1D(final N[] target) {
+    static <N extends Number> Access1D<N> wrap(final N[] target) {
         return new Access1D<N>() {
 
             public long count() {
@@ -306,6 +306,30 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
             }
 
         };
+    }
+
+    /**
+     * @deprecated v45 Use {@link #wrap(double[])} instead
+     */
+    @Deprecated
+    static Access1D<Double> wrapAccess1D(final double[] target) {
+        return Access1D.wrap(target);
+    }
+
+    /**
+     * @deprecated v45 Use {@link #wrap(List<? extends N>)} instead
+     */
+    @Deprecated
+    static <N extends Number> Access1D<N> wrapAccess1D(final List<? extends N> target) {
+        return Access1D.wrap(target);
+    }
+
+    /**
+     * @deprecated v45 Use {@link #wrap(N[])} instead
+     */
+    @Deprecated
+    static <N extends Number> Access1D<N> wrapAccess1D(final N[] target) {
+        return Access1D.wrap(target);
     }
 
     /**

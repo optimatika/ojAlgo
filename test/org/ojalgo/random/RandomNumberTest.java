@@ -112,7 +112,7 @@ public class RandomNumberTest extends RandomTests {
             retVal1[i1] = someValues1[i1 + 1] / someValues1[i1];
         }
 
-        final SampleSet tmpQuotients = SampleSet.wrap(Access1D.wrapAccess1D(retVal1));
+        final SampleSet tmpQuotients = SampleSet.wrap(Access1D.wrap(retVal1));
         final double[] someValues = tmpSeries.asPrimitive().toRawCopy1D();
         final int tmpSize = someValues.length - 1;
 
@@ -121,7 +121,7 @@ public class RandomNumberTest extends RandomTests {
         for (int i = 0; i < tmpSize; i++) {
             retVal[i] = PrimitiveFunction.LOG.invoke(someValues[i + 1] / someValues[i]);
         }
-        final SampleSet tmpLogChanges = SampleSet.wrap(Access1D.wrapAccess1D(retVal));
+        final SampleSet tmpLogChanges = SampleSet.wrap(Access1D.wrap(retVal));
 
         // Quotient distribution parameters within 3% of the generating distribution
         TestUtils.assertEquals(ONE, tmpQuotients.getMean() / tmpRandomNumber.getExpected(), tmpAccuracy);
