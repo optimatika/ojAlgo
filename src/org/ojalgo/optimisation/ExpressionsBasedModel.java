@@ -343,7 +343,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      * @return A prefiltered stream of expressions that are constraints and have not been markes as redundant
      */
     public Stream<Expression> constraints() {
-        return myExpressions.values().stream().filter((final Expression c) -> c.isConstraint() && !c.isRedundant());
+        return myExpressions.values().stream().filter(c -> c.isConstraint() && !c.isRedundant());
     }
 
     public ExpressionsBasedModel copy() {
