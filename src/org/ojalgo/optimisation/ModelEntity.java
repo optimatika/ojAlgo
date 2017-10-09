@@ -168,6 +168,28 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return myName;
     }
 
+    public final double getUnadjustedLowerLimit() {
+
+        final BigDecimal tmpLowerLimit = this.getLowerLimit(false);
+
+        if (tmpLowerLimit != null) {
+            return tmpLowerLimit.doubleValue();
+        } else {
+            return Double.NEGATIVE_INFINITY;
+        }
+    }
+
+    public final double getUnadjustedUpperLimit() {
+
+        final BigDecimal tmpUpperLimit = this.getUpperLimit(false);
+
+        if (tmpUpperLimit != null) {
+            return tmpUpperLimit.doubleValue();
+        } else {
+            return Double.POSITIVE_INFINITY;
+        }
+    }
+
     public final BigDecimal getUpperLimit() {
         return this.getUpperLimit(false);
     }
