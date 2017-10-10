@@ -37,11 +37,22 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * An extremely simple/basic logging system that uses {@linkplain System#out}, {@linkplain System#err} or any
- * other {@linkplain PrintStream}. This is NOT a logging framework for your end application. It is primarly
- * used within ojAlgo when debugging. By supplying suitable {@linkplain PrintStream}:s you may connect this
- * with whatever logging framework you use, and thus get debug info from (for instance) the optimisation
- * algorithms in log files of your choice.
+ * BasicLogger is not meant to replace any other logging library. It is primarily used for debugging during
+ * development. ojAlgo has zero dependencies, and does not force any specific logging framework on you. But,
+ * that meant we had to create one for internal use.
+ * <ul>
+ * <li>If you want to redirect whatever ojAlgo outputs then set {@link BasicLogger#DEBUG} and
+ * {@link BasicLogger#ERROR} to something suitable. {@linkplain BasicLogger.Printer} is an interface so it
+ * should be possible to create some implememnation that wraps your logging system. ojAlgo supplies 3
+ * implementations of that interface.</li>
+ * <li>ojAlgo typically doesn't do much logging. There's really not much to redirect. The main/only area where
+ * BasicLogger is used is for debugging the various optimisation solvers. This is not intended to be "on" in
+ * production.</li>
+ * <li>The logging you need, you do in your code. ojAlgo's main contribution here is to have useful toString()
+ * methods.</li>
+ * <li>If you want to stop any/all possible output from ojAlgo then set {@link BasicLogger#DEBUG} and
+ * {@link BasicLogger#ERROR} to null.</li>
+ * </ul>
  *
  * @author apete
  */
@@ -55,10 +66,6 @@ public abstract class BasicLogger {
         public AppendablePrinter(final Appendable appendable) {
             super();
             myAppendable = appendable;
-        }
-
-        public void print(final boolean b) {
-            this.print(String.valueOf(b));
         }
 
         public void print(final char c) {
@@ -79,36 +86,12 @@ public abstract class BasicLogger {
             }
         }
 
-        public void print(final double d) {
-            this.print(String.valueOf(d));
-        }
-
-        public void print(final float f) {
-            this.print(String.valueOf(f));
-        }
-
-        public void print(final int i) {
-            this.print(String.valueOf(i));
-        }
-
-        public void print(final long l) {
-            this.print(String.valueOf(l));
-        }
-
-        public void print(final Object obj) {
-            this.print(String.valueOf(obj));
-        }
-
         public void print(final String str) {
             try {
                 myAppendable.append(String.valueOf(str));
             } catch (final IOException exception) {
                 exception.printStackTrace();
             }
-        }
-
-        public void print(final String message, final Object... args) {
-            this.print(TypeUtils.format(message, args));
         }
 
         public Printer printf(final Locale locale, final String format, final Object... args) {
@@ -141,68 +124,6 @@ public abstract class BasicLogger {
             } catch (final IOException exception) {
                 exception.printStackTrace();
             }
-        }
-
-        public void println(final boolean b) {
-            this.print(b);
-            this.println();
-        }
-
-        public void println(final char c) {
-            this.print(c);
-            this.println();
-        }
-
-        public void println(final char[] ca) {
-            this.print(ca);
-            this.println();
-        }
-
-        public void println(final double d) {
-            this.print(d);
-            this.println();
-        }
-
-        public void println(final float f) {
-            this.print(f);
-            this.println();
-        }
-
-        public void println(final int i) {
-            this.print(i);
-            this.println();
-        }
-
-        public void println(final long l) {
-            this.print(l);
-            this.println();
-        }
-
-        public void println(final Object obj) {
-            this.print(obj);
-            this.println();
-        }
-
-        public void println(final String str) {
-            this.print(str);
-            this.println();
-        }
-
-        public void println(final String message, final Object... args) {
-            this.print(message, args);
-            this.println();
-        }
-
-        public void printmtrx(final String message, final Access2D<?> matrix) {
-            this.printmtrx(message, matrix, MATRIX_ELEMENT_CONTEXT);
-
-        }
-
-        public void printmtrx(final String message, final Access2D<?> matrix, final NumberContext context) {
-            if (message != null) {
-                this.println(message);
-            }
-            BasicLogger.printmtrx(this, matrix, context);
         }
 
         /**
@@ -242,12 +163,6 @@ public abstract class BasicLogger {
     public static interface Printer {
 
         /**
-         * @see java.io.PrintWriter#print(boolean)
-         * @see java.io.PrintStream#print(boolean)
-         */
-        public abstract void print(boolean b);
-
-        /**
          * @see java.io.PrintWriter#print(char)
          * @see java.io.PrintStream#print(char)
          */
@@ -260,42 +175,10 @@ public abstract class BasicLogger {
         public abstract void print(char[] ca);
 
         /**
-         * @see java.io.PrintWriter#print(double)
-         * @see java.io.PrintStream#print(double)
-         */
-        public abstract void print(double d);
-
-        /**
-         * @see java.io.PrintWriter#print(float)
-         * @see java.io.PrintStream#print(float)
-         */
-        public abstract void print(float f);
-
-        /**
-         * @see java.io.PrintWriter#print(int)
-         * @see java.io.PrintStream#print(int)
-         */
-        public abstract void print(int i);
-
-        /**
-         * @see java.io.PrintWriter#print(long)
-         * @see java.io.PrintStream#print(long)
-         */
-        public abstract void print(long l);
-
-        /**
-         * @see java.io.PrintWriter#print(java.lang.Object)
-         * @see java.io.PrintStream#print(java.lang.Object)
-         */
-        public abstract void print(Object obj);
-
-        /**
          * @see java.io.PrintWriter#print(java.lang.String)
          * @see java.io.PrintStream#print(java.lang.String)
          */
         public abstract void print(String str);
-
-        public abstract void print(final String message, final Object... args);
 
         /**
          * @see java.io.PrintWriter#printf(java.util.Locale, java.lang.String, java.lang.Object[])
@@ -316,64 +199,154 @@ public abstract class BasicLogger {
         public abstract void println();
 
         /**
+         * @see java.io.PrintWriter#print(boolean)
+         * @see java.io.PrintStream#print(boolean)
+         */
+        default void print(final boolean b) {
+            this.print(String.valueOf(b));
+        }
+
+        /**
+         * @see java.io.PrintWriter#print(double)
+         * @see java.io.PrintStream#print(double)
+         */
+        default void print(final double d) {
+            this.print(String.valueOf(d));
+        }
+
+        /**
+         * @see java.io.PrintWriter#print(float)
+         * @see java.io.PrintStream#print(float)
+         */
+        default void print(final float f) {
+            this.print(String.valueOf(f));
+        }
+
+        /**
+         * @see java.io.PrintWriter#print(int)
+         * @see java.io.PrintStream#print(int)
+         */
+        default void print(final int i) {
+            this.print(String.valueOf(i));
+        }
+
+        /**
+         * @see java.io.PrintWriter#print(long)
+         * @see java.io.PrintStream#print(long)
+         */
+        default void print(final long l) {
+            this.print(String.valueOf(l));
+        }
+
+        /**
+         * @see java.io.PrintWriter#print(java.lang.Object)
+         * @see java.io.PrintStream#print(java.lang.Object)
+         */
+        default void print(final Object obj) {
+            this.print(String.valueOf(obj));
+        }
+
+        default void print(final String message, final Object... args) {
+            this.print(TypeUtils.format(message, args));
+        }
+
+        /**
          * @see java.io.PrintWriter#println(boolean)
          * @see java.io.PrintStream#println(boolean)
          */
-        public abstract void println(boolean b);
+        default void println(final boolean b) {
+            this.print(b);
+            this.println();
+        }
 
         /**
          * @see java.io.PrintWriter#println(char)
          * @see java.io.PrintStream#println(char)
          */
-        public abstract void println(char c);
+        default void println(final char c) {
+            this.print(c);
+            this.println();
+        }
 
         /**
          * @see java.io.PrintWriter#println(char[])
          * @see java.io.PrintStream#println(char[])
          */
-        public abstract void println(char[] ca);
+        default void println(final char[] ca) {
+            this.print(ca);
+            this.println();
+        }
 
         /**
          * @see java.io.PrintWriter#println(double)
          * @see java.io.PrintStream#println(double)
          */
-        public abstract void println(double d);
+        default void println(final double d) {
+            this.print(d);
+            this.println();
+        }
 
         /**
          * @see java.io.PrintWriter#println(float)
          * @see java.io.PrintStream#println(float)
          */
-        public abstract void println(float f);
+        default void println(final float f) {
+            this.print(f);
+            this.println();
+        }
 
         /**
          * @see java.io.PrintWriter#println(int)
          * @see java.io.PrintStream#println(int)
          */
-        public abstract void println(int i);
+        default void println(final int i) {
+            this.print(i);
+            this.println();
+        }
 
         /**
          * @see java.io.PrintWriter#println(long)
          * @see java.io.PrintStream#println(long)
          */
-        public abstract void println(long l);
+        default void println(final long l) {
+            this.print(l);
+            this.println();
+        }
 
         /**
          * @see java.io.PrintWriter#println(java.lang.Object)
          * @see java.io.PrintStream#println(java.lang.Object)
          */
-        public abstract void println(Object obj);
+        default void println(final Object obj) {
+            this.print(obj);
+            this.println();
+        }
 
         /**
          * @see java.io.PrintWriter#println(java.lang.String)
          * @see java.io.PrintStream#println(java.lang.String)
          */
-        public abstract void println(String str);
+        default void println(final String str) {
+            this.print(str);
+            this.println();
+        }
 
-        public abstract void println(final String message, final Object... args);
+        default void println(final String message, final Object... args) {
+            this.print(message, args);
+            this.println();
+        }
 
-        public abstract void printmtrx(final String message, final Access2D<?> matrix);
+        default void printmtrx(final String message, final Access2D<?> matrix) {
+            this.printmtrx(message, matrix, MATRIX_ELEMENT_CONTEXT);
 
-        public abstract void printmtrx(final String message, final Access2D<?> matrix, NumberContext context);
+        }
+
+        default void printmtrx(final String message, final Access2D<?> matrix, final NumberContext context) {
+            if (message != null) {
+                this.println(message);
+            }
+            BasicLogger.printmtrx(this, matrix, context);
+        }
 
     }
 
