@@ -334,14 +334,26 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
+     * <li>CBF (simu) 4 x Intel(R) Xeon(R) CPU E7-4809 v3 @ 2.00GHz
+     * <ul>
+     * <li>4 processors</li>
+     * <li>8 cores per processor (32 cores in total)</li>
+     * <li>2 threads per core (64 threads in total)</li>
+     * <li>===</li>
+     * <li>512GB system RAM</li>
+     * <li>20MB L3 cache per processor</li>
+     * <li>256kB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
      * </ul>
      */
-    static final Hardware X86_64__64 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(512L * K * K * K, 64), new BasicMachine(40L * K * K, 32),
+    static final Hardware X86_64__64 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(512L * K * K * K, 64), new BasicMachine(20L * K * K, 32),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     /**
      * <ul>
-     * <li>CBF (prod, guessing)
+     * <li>CBF (prod) 4 x Intel(R) Xeon(R) CPU E7-4830 v3 @ 2.10GHz
      * <ul>
      * <li>4 processors</li>
      * <li>12 cores per processor (48 cores in total)</li>
