@@ -458,7 +458,7 @@ public interface Optimisation {
 
         /**
          * There's an infinite number of feasible solutions and no bound on the objective function value.
-         * Please not that using this state indicator implies a feasible solution. If a feasible solution has
+         * Please note that using this state indicator implies a feasible solution. If a feasible solution has
          * not been been found you should instead use {@link #INFEASIBLE} or {@link #INVALID}.
          */
         UNBOUNDED(-32),
