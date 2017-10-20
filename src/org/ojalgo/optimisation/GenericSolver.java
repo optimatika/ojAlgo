@@ -63,7 +63,7 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
 
     @SuppressWarnings("unused")
     private GenericSolver() {
-        this(null);
+        this(new Optimisation.Options());
     }
 
     /**
@@ -72,12 +72,9 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
 
         super();
 
-        if (solverOptions != null) {
-            options = solverOptions;
-        } else {
-            options = new Optimisation.Options();
-        }
+        ProgrammingError.throwIfNull(solverOptions);
 
+        options = solverOptions;
     }
 
     protected Optimisation.Result buildResult() {

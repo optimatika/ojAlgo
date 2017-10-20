@@ -252,14 +252,20 @@ public interface Optimisation {
          */
         public boolean validate = false;
 
+        private Object myConfigurator = null;
+
         public Options() {
             super();
         }
 
+        /**
+         * @deprecated Since v45 Wont be Cloneable either
+         */
+        @Deprecated
         public Options copy() {
             try {
                 return (Options) this.clone();
-            } catch (final CloneNotSupportedException anException) {
+            } catch (final CloneNotSupportedException exception) {
                 return null;
             }
         }
@@ -276,7 +282,26 @@ public interface Optimisation {
             validate = solver != null ? true : false;
         }
 
+        @SuppressWarnings("unchecked")
+        public <T> Optional<T> getConfigurator(final Class<T> type) {
+            ProgrammingError.throwIfNull(type);
+            if ((myConfigurator != null) && type.isInstance(myConfigurator)) {
+                return Optional.of((T) myConfigurator);
+            } else {
+                return Optional.empty();
+            }
+        }
+
+        public void setConfigurator(final Object configurator) {
+            ProgrammingError.throwIfNull(configurator);
+            myConfigurator = configurator;
+        }
+
+        /**
+         * @deprecated Since v45 Don't copy or clone these, create them the waynyou need them.
+         */
         @Override
+        @Deprecated
         protected Object clone() throws CloneNotSupportedException {
             return super.clone();
         }
