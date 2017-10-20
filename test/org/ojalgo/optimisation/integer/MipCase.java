@@ -131,6 +131,7 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2013-12-08: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 412s</li>
      * <li>2015-08-28: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 411s</li>
      * <li>2015-11-07: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 372s</li>
+     * <li>2017-10-20: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 796s</li>
      * </ul>
      *
      * @see RelaxedLpCase#testPk1()
