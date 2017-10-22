@@ -108,7 +108,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
             final int numbVariables = model.countVariables();
 
-            if (this.isPruned()) {
+            if (this.isSolutionMapped()) {
 
                 final List<Variable> freeVariables = model.getFreeVariables();
                 final Set<IntIndex> fixedVariables = model.getFixedVariables();
@@ -128,7 +128,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                     modelSolution.set(freeIndex, solverState.doubleValue(f));
                 }
 
-                return new Result(solverState.getState(), solverState.getValue(), modelSolution);
+                return new Result(solverState.getState(), modelSolution);
 
             } else {
 
@@ -138,12 +138,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
                 return solverState;
             }
-
         }
 
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
 
-            if (this.isPruned()) {
+            if (this.isSolutionMapped()) {
 
                 final List<Variable> tmpFreeVariables = model.getFreeVariables();
                 final int numbFreeVars = tmpFreeVariables.size();
@@ -156,7 +155,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                     solverSolution.set(i, modelState.doubleValue(modelIndex));
                 }
 
-                return new Result(modelState.getState(), modelState.getValue(), solverSolution);
+                return new Result(modelState.getState(), solverSolution);
 
             } else {
 
@@ -165,9 +164,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         /**
-         * @return true If this Integration creates solvers that only deal with the "free" variables.
+         * @return true if the set of variables present in the solver is not precisely the same as in the
+         *         model. If fixed variables are omitted or if variables are split into a positive and
+         *         negative part, then this method must return true
          */
-        protected abstract boolean isPruned();
+        protected abstract boolean isSolutionMapped();
 
     }
 

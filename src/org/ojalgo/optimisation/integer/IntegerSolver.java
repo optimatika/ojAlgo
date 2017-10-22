@@ -54,7 +54,7 @@ public abstract class IntegerSolver extends GenericSolver {
         }
 
         @Override
-        protected boolean isPruned() {
+        protected boolean isSolutionMapped() {
             return false;
         }
 

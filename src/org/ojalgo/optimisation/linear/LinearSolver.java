@@ -171,7 +171,7 @@ public abstract class LinearSolver extends GenericSolver {
         }
 
         @Override
-        protected boolean isPruned() {
+        protected boolean isSolutionMapped() {
             return true;
         }
 

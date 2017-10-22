@@ -95,14 +95,16 @@ public interface Optimisation {
         boolean isCapable(M model);
 
         /**
-         * Convert solver state to model state. Transforming the solution (set of variables) is the main
-         * concern. Adjusting the objective function value is best handled elsewhere.
+         * Convert solver state to model state. Transforming the solution (set of variable values) is the main
+         * concern. Adjusting the objective function value (if needed) is best handled elsewhere, and is not
+         * required here.
          */
         Optimisation.Result toModelState(Optimisation.Result solverState, M model);
 
         /**
-         * Convert model state to solver state. Transforming the solution (set of variables) is the main
-         * concern. Adjusting the objective function value is best handled elsewhere.
+         * Convert model state to solver state. Transforming the solution (set of variable values) is the main
+         * concern. Adjusting the objective function value (if needed) is best handled elsewhere, and is not
+         * required here.
          */
         Optimisation.Result toSolverState(Optimisation.Result modelState, M model);
 

@@ -452,7 +452,7 @@ public abstract class ConvexSolver extends GenericSolver {
         }
 
         @Override
-        protected boolean isPruned() {
+        protected boolean isSolutionMapped() {
             return true;
         }
 
