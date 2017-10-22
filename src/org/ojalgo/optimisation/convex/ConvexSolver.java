@@ -451,6 +451,11 @@ public abstract class ConvexSolver extends GenericSolver {
             return !model.isAnyVariableInteger() && model.isAnyExpressionQuadratic();
         }
 
+        @Override
+        protected boolean isPruned() {
+            return true;
+        }
+
     }
 
     static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;

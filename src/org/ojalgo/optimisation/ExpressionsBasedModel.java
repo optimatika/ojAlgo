@@ -106,37 +106,68 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
-            final Primitive64Array tmpModelSolution = Primitive64Array.make(model.countVariables());
+            final int numbVariables = model.countVariables();
 
-            for (final IntIndex tmpFixed : model.getFixedVariables()) {
-                tmpModelSolution.set(tmpFixed.index, model.getVariable(tmpFixed.index).getValue().doubleValue());
+            if (this.isPruned()) {
+
+                final List<Variable> freeVariables = model.getFreeVariables();
+                final Set<IntIndex> fixedVariables = model.getFixedVariables();
+
+                if (solverState.count() != freeVariables.size()) {
+                    throw new IllegalStateException();
+                }
+
+                final Primitive64Array modelSolution = Primitive64Array.make(numbVariables);
+
+                for (final IntIndex fixedIndex : fixedVariables) {
+                    modelSolution.set(fixedIndex.index, model.getVariable(fixedIndex.index).getValue());
+                }
+
+                for (int f = 0; f < freeVariables.size(); f++) {
+                    final int freeIndex = model.indexOf(freeVariables.get(f));
+                    modelSolution.set(freeIndex, solverState.doubleValue(f));
+                }
+
+                return new Result(solverState.getState(), solverState.getValue(), modelSolution);
+
+            } else {
+
+                if (solverState.count() != numbVariables) {
+                    throw new IllegalStateException();
+                }
+
+                return solverState;
             }
 
-            final List<Variable> tmpFreeVariables = model.getFreeVariables();
-            for (int f = 0; f < tmpFreeVariables.size(); f++) {
-                final Variable tmpVariable = tmpFreeVariables.get(f);
-                final int tmpIndex = model.indexOf(tmpVariable);
-                tmpModelSolution.set(tmpIndex, solverState.doubleValue(f));
-            }
-
-            return new Result(solverState.getState(), solverState.getValue(), tmpModelSolution);
         }
 
         public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
 
-            final List<Variable> tmpFreeVariables = model.getFreeVariables();
+            if (this.isPruned()) {
 
-            final Primitive64Array tmpSolverSolution = Primitive64Array.make(tmpFreeVariables.size());
-            final double[] tmpData = tmpSolverSolution.data;
+                final List<Variable> tmpFreeVariables = model.getFreeVariables();
+                final int numbFreeVars = tmpFreeVariables.size();
 
-            for (int i = 0; i < tmpData.length; i++) {
-                final Variable tmpVariable = tmpFreeVariables.get(i);
-                final int tmpIndex = model.indexOf(tmpVariable);
-                tmpData[i] = modelState.doubleValue(tmpIndex);
+                final Primitive64Array solverSolution = Primitive64Array.make(numbFreeVars);
+
+                for (int i = 0; i < numbFreeVars; i++) {
+                    final Variable variable = tmpFreeVariables.get(i);
+                    final int modelIndex = model.indexOf(variable);
+                    solverSolution.set(i, modelState.doubleValue(modelIndex));
+                }
+
+                return new Result(modelState.getState(), modelState.getValue(), solverSolution);
+
+            } else {
+
+                return modelState;
             }
-
-            return new Result(modelState.getState(), modelState.getValue(), tmpSolverSolution);
         }
+
+        /**
+         * @return true If this Integration creates solvers that only deal with the "free" variables.
+         */
+        protected abstract boolean isPruned();
 
     }
 

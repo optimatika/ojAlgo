@@ -53,6 +53,11 @@ public abstract class IntegerSolver extends GenericSolver {
             return modelState;
         }
 
+        @Override
+        protected boolean isPruned() {
+            return false;
+        }
+
     }
 
     static final class NodeStatistics {

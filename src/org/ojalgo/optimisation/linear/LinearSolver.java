@@ -170,6 +170,11 @@ public abstract class LinearSolver extends GenericSolver {
             return new Result(modelState.getState(), modelState.getValue(), tmpSolverSolution);
         }
 
+        @Override
+        protected boolean isPruned() {
+            return true;
+        }
+
     }
 
     public static LinearSolver.Builder getBuilder() {
