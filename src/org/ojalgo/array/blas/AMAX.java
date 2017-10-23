@@ -74,13 +74,13 @@ public abstract class AMAX implements BLAS1 {
     public static int invoke(final double[] data, final int first, final int limit, final int step) {
 
         int retVal = first;
-        double tmpLargest = 0D;
-        double tmpValue;
+        double largest = 0D;
+        double candidate;
 
         for (int i = first; i < limit; i += step) {
-            tmpValue = PrimitiveFunction.ABS.invoke(data[i]);
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
+            candidate = PrimitiveFunction.ABS.invoke(data[i]);
+            if (candidate > largest) {
+                largest = candidate;
                 retVal = i;
             }
         }

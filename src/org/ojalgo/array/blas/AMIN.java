@@ -21,6 +21,9 @@
  */
 package org.ojalgo.array.blas;
 
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
+
 /**
  * Given a vector x, the i?amin functions return the position of the vector element x[i] that has the smallest
  * absolute value for real flavors, or the smallest sum |Re(x[i])|+|Im(x[i])| for complex flavors. If n is not
@@ -30,5 +33,21 @@ package org.ojalgo.array.blas;
  * @author apete
  */
 public abstract class AMIN implements BLAS1 {
+
+    public static int invoke(final double[] data, final int first, final int limit, final int step) {
+
+        int retVal = first;
+        double smallest = PrimitiveMath.POSITIVE_INFINITY;
+        double candidate;
+
+        for (int i = first; i < limit; i += step) {
+            candidate = PrimitiveFunction.ABS.invoke(data[i]);
+            if (candidate < smallest) {
+                smallest = candidate;
+                retVal = i;
+            }
+        }
+        return retVal;
+    }
 
 }

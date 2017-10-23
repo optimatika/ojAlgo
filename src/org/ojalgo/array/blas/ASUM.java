@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array.blas;
 
+import org.ojalgo.function.PrimitiveFunction;
+
 /**
  * The ?asum routine computes the sum of the magnitudes of elements of a real vector, or the sum of magnitudes
  * of the real and imaginary parts of elements of a complex vector: res = |Re x1| + |Im x1| + |Re x2| + |Im
@@ -29,5 +31,13 @@ package org.ojalgo.array.blas;
  * @author apete
  */
 public abstract class ASUM implements BLAS1 {
+
+    public static double invoke(final double[] data, final int first, final int limit, final int step) {
+        double retVal = 0D;
+        for (int i = first; i < limit; i += step) {
+            retVal += PrimitiveFunction.ABS.invoke(data[i]);
+        }
+        return retVal;
+    }
 
 }
