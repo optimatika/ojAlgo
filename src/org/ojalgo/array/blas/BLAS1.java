@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array.blas;
 
+import java.math.BigDecimal;
+
 import org.ojalgo.array.DenseArray;
 
 /**
@@ -40,5 +42,26 @@ import org.ojalgo.array.DenseArray;
  * @author apete
  */
 public interface BLAS1 {
+
+    static double fma(final double m1, final double m2, final double a) {
+        return (m1 * m2) + a;
+    }
+
+    @FunctionalInterface
+    public static interface DoubleToInt {
+
+        int invoke(final double[] data, final int first, final int limit, final int step);
+
+    }
+
+    @FunctionalInterface
+    public static interface GenericToInt<T> {
+
+        int invoke(final T[] data, final int first, final int limit, final int step);
+
+    }
+
+    public static final DoubleToInt DAMAX = AMAX::invoke;
+    public static final GenericToInt<BigDecimal> BAMAX = AMAX::invoke;
 
 }
