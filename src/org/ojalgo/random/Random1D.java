@@ -28,14 +28,13 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.type.Alternator;
 
 public class Random1D {
 
     public final int length;
 
-    private final Alternator<Random> myAlternator = RandomNumber.makeRandomAlternator();
     private final MatrixStore<Double> myCholeskiedCorrelations;
+    private final Random myRandom = new Random();
 
     public Random1D(final Access2D<?> correlations) {
 
@@ -103,12 +102,16 @@ public class Random1D {
         }
     }
 
+    public void setSeed(final long seed) {
+        myRandom.setSeed(seed);
+    }
+
     public int size() {
         return length;
     }
 
     protected Random random() {
-        return myAlternator.get();
+        return myRandom;
     }
 
 }

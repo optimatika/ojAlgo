@@ -27,7 +27,6 @@ import java.util.Random;
 
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.type.Alternator;
 
 /**
  * RandomNumber
@@ -36,14 +35,9 @@ import org.ojalgo.type.Alternator;
  */
 public abstract class RandomNumber extends Number implements Distribution, NullaryFunction<Double> {
 
-    private static final Random SEED = new Random();
     private static final long serialVersionUID = -5871398825698010936L;
 
-    static Alternator<Random> makeRandomAlternator() {
-        return new Alternator<>(new Random(SEED.nextLong()), new Random(SEED.nextLong()));
-    }
-
-    private final Alternator<Random> myAlternator = RandomNumber.makeRandomAlternator();
+    private final Random myRandom = new Random();
 
     protected RandomNumber() {
         super();
@@ -94,6 +88,10 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
         return (long) this.generate();
     }
 
+    public void setSeed(final long seed) {
+        myRandom.setSeed(seed);
+    }
+
     @Override
     public String toString() {
         return this.getExpected() + "±" + this.getStandardDeviation();
@@ -108,6 +106,6 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
     protected abstract double generate();
 
     protected final Random random() {
-        return myAlternator.get();
+        return myRandom;
     }
 }

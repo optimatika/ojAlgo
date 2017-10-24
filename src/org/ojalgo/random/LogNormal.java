@@ -118,6 +118,11 @@ public class LogNormal extends AbstractContinuous {
     }
 
     @Override
+    public void setSeed(final long seed) {
+        myNormal.setSeed(seed);
+    }
+
+    @Override
     protected double generate() {
         return PrimitiveFunction.EXP.invoke(myNormal.generate());
     }
