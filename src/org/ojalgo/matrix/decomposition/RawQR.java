@@ -320,7 +320,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
                 // Apply transformation to remaining columns.
                 for (int j = k + 1; j < n; j++) {
-                    AXPY.invoke(data[j], 0, 1, -(DOT.invoke(tmpColK, 0, data[j], 0, k, m) / tmpColK[k]), tmpColK, 0, 1, k, m);
+                    AXPY.invoke(data[j], 0, -(DOT.invoke(tmpColK, 0, data[j], 0, k, m) / tmpColK[k]), tmpColK, 0, k, m);
                 }
             }
             myDiagonalR[k] = -nrm;
@@ -367,7 +367,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
             for (int j = 0; j < s; j++) {
                 final double tmpVal = -(DOT.invoke(tmpColK, 0, tmpRHSdata, m * j, k, m) / tmpColK[k]);
-                AXPY.invoke(tmpRHSdata, m * j, 1, tmpVal, tmpColK, 0, 1, k, m);
+                AXPY.invoke(tmpRHSdata, m * j, tmpVal, tmpColK, 0, k, m);
             }
         }
 
@@ -379,7 +379,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
             for (int j = 0; j < s; j++) {
                 tmpRHSdata[k + (j * m)] /= tmpDiagK;
-                AXPY.invoke(tmpRHSdata, j * m, 1, -tmpRHSdata[k + (j * m)], tmpColK, 0, 1, 0, k);
+                AXPY.invoke(tmpRHSdata, j * m, -tmpRHSdata[k + (j * m)], tmpColK, 0, 0, k);
             }
         }
         return preallocated.logical().limits(n, (int) preallocated.countColumns()).get();

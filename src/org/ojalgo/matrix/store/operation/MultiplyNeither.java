@@ -23,6 +23,7 @@ package org.ojalgo.matrix.store.operation;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.DOT;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.PrimitiveMath;
@@ -676,6 +677,22 @@ public final class MultiplyNeither extends MatrixOperation {
 
             for (int j = 0; j < tmpColDim; j++) {
                 product[i + (j * tmpRowDim)] = DOT.invoke(tmpLeftRow, 0, right, j * complexity, 0, complexity);
+            }
+        }
+    }
+
+    static void invoke2(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {
+
+        final int tmpRowDim = left.length / complexity;
+
+        final int tmpIndexLimit = tmpRowDim * columnLimit;
+        for (int tmpIndex = tmpRowDim * firstColumn; tmpIndex < tmpIndexLimit; tmpIndex++) {
+            product[tmpIndex] = PrimitiveMath.ZERO;
+        }
+
+        for (int j = firstColumn; j < columnLimit; j++) {
+            for (int c = 0; c < complexity; c++) {
+                AXPY.invoke(product, j * tmpRowDim, right[c + (j * complexity)], left, c * tmpRowDim, 0, tmpRowDim);
             }
         }
     }

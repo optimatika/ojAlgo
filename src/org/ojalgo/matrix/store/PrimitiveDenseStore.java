@@ -586,7 +586,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     public void caxpy(final double aSclrA, final int aColX, final int aColY, final int aFirstRow) {
-        AXPY.invoke(data, (aColY * myRowDim) + aFirstRow, 1, aSclrA, data, (aColX * myRowDim) + aFirstRow, 1, 0, myRowDim - aFirstRow);
+        AXPY.invoke(data, (aColY * myRowDim) + aFirstRow, aSclrA, data, (aColX * myRowDim) + aFirstRow, 0, myRowDim - aFirstRow);
     }
 
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<Double> transformationCollector, final boolean eigenvalue) {

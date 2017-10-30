@@ -484,7 +484,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     f += e[j] * d[j];
                 }
                 val = f / (h + h);
-                AXPY.invoke(e, 0, 1, -val, d, 0, 1, 0, m);
+                AXPY.invoke(e, 0, -val, d, 0, 0, m);
                 for (int i = 0; i < m; i++) {
                     row = data[i];
                     f = d[i];
@@ -516,7 +516,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     }
                     for (int i = 0; i <= m; i++) {
                         val = DOT.invoke(row, 0, data[i], 0, 0, m + 1);
-                        AXPY.invoke(data[i], 0, 1, -val, d, 0, 1, 0, m + 1);
+                        AXPY.invoke(data[i], 0, -val, d, 0, 0, m + 1);
                     }
                 }
                 Arrays.fill(row, 0, m + 1, ZERO);

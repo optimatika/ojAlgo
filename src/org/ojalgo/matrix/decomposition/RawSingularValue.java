@@ -324,7 +324,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     for (int j = k + 1; j < n; j++) {
                         tmpVal = DOT.invoke(tmpArr, 0, input[j], 0, k, m);
                         tmpVal /= tmpArr[k];
-                        AXPY.invoke(input[j], 0, 1, -tmpVal, tmpArr, 0, 1, k, m);
+                        AXPY.invoke(input[j], 0, -tmpVal, tmpArr, 0, k, m);
                     }
                 }
                 s[k] = -nrm;
@@ -368,10 +368,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     }
                     // ... remining columns
                     for (int j = k + 1; j < n; j++) {
-                        AXPY.invoke(w, 0, 1, e[j], input[j], 0, 1, k + 1, m);
+                        AXPY.invoke(w, 0, e[j], input[j], 0, k + 1, m);
                     }
                     for (int j = k + 1; j < n; j++) {
-                        AXPY.invoke(input[j], 0, 1, -(e[j] / e[k + 1]), w, 0, 1, k + 1, m);
+                        AXPY.invoke(input[j], 0, -(e[j] / e[k + 1]), w, 0, k + 1, m);
                     }
                 }
                 e[k] = -nrm;
@@ -410,7 +410,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     for (int j = k + 1; j < n; j++) {
                         tmpVal = DOT.invoke(tmpArr, 0, myUt[j], 0, k, m);
                         tmpVal /= tmpArr[k];
-                        AXPY.invoke(myUt[j], 0, 1, -tmpVal, tmpArr, 0, 1, k, m);
+                        AXPY.invoke(myUt[j], 0, -tmpVal, tmpArr, 0, k, m);
                     }
                     for (int i = 0; i < k; i++) {
                         tmpArr[i] = ZERO;
@@ -436,7 +436,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     for (int j = k + 1; j < n; j++) {
                         tmpVal = DOT.invoke(tmpArr, 0, myVt[j], 0, k + 1, n);
                         tmpVal /= tmpArr[k + 1];
-                        AXPY.invoke(myVt[j], 0, 1, -tmpVal, tmpArr, 0, 1, k + 1, n);
+                        AXPY.invoke(myVt[j], 0, -tmpVal, tmpArr, 0, k + 1, n);
                     }
                 }
                 for (int i = 0; i < n; i++) {

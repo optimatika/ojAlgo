@@ -296,7 +296,7 @@ public final class HouseholderHermitian extends MatrixOperation {
                     f += e[j] * d[j];
                 }
                 tmpVal = f / (h + h);
-                AXPY.invoke(e, 0, 1, -tmpVal, d, 0, 1, 0, i);
+                AXPY.invoke(e, 0, -tmpVal, d, 0, 0, i);
                 for (int j = 0; j < i; j++) {
                     f = d[j];
                     g = e[j];

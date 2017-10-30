@@ -92,7 +92,7 @@ public final class HouseholderLeft extends MatrixOperation {
         for (int j = first; j < limit; j++) {
             tmpScale = DOT.invoke(data, j * structure, tmpHouseholderVector, 0, tmpFirstNonZero, structure);
             tmpScale *= tmpBeta;
-            AXPY.invoke(data, j * structure, 1, -tmpScale, tmpHouseholderVector, 0, 1, tmpFirstNonZero, structure);
+            AXPY.invoke(data, j * structure, -tmpScale, tmpHouseholderVector, 0, tmpFirstNonZero, structure);
         }
     }
 

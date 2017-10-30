@@ -44,10 +44,9 @@ public abstract class AXPY implements BLAS1 {
         }
     }
 
-    public static void invoke(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
-            final int first, final int limit) {
+    public static void invoke(final double[] y, final int basey, final double a, final double[] x, final int basex, final int first, final int limit) {
         for (int i = first; i < limit; i++) {
-            y[basey + (incy * i)] += a * x[basex + (incx * i)];
+            y[basey + i] += a * x[basex + i];
         }
     }
 

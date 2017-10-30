@@ -96,10 +96,10 @@ public final class HouseholderRight extends MatrixOperation {
         final double beta = householder.beta;
 
         for (int j = firstNonZero; j < numberOfColumns; j++) {
-            AXPY.invoke(work, 0, 1, beta * vector[j], data, j * structure, 1, firstRow, rowLimit);
+            AXPY.invoke(work, 0, beta * vector[j], data, j * structure, firstRow, rowLimit);
         }
         for (int j = firstNonZero; j < numberOfColumns; j++) {
-            AXPY.invoke(data, j * structure, 1, -vector[j], work, 0, 1, firstRow, rowLimit);
+            AXPY.invoke(data, j * structure, -vector[j], work, 0, firstRow, rowLimit);
         }
     }
 

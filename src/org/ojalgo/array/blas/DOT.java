@@ -62,6 +62,192 @@ public abstract class DOT implements BLAS1 {
         return retVal;
     }
 
+    public static double invoke2(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
+
+        double retVal = PrimitiveMath.ZERO;
+
+        int i = first;
+
+        for (; (i + 8) < limit; i += 8) {
+
+            final int base1 = offset1 + i;
+            final int base2 = offset2 + i;
+
+            final double m0 = array1[base1] * array2[base2];
+            final double m1 = array1[base1 + 1] * array2[base2 + 1];
+            final double m2 = array1[base1 + 2] * array2[base2 + 2];
+            final double m3 = array1[base1 + 3] * array2[base2 + 3];
+            final double m4 = array1[base1 + 4] * array2[base2 + 4];
+            final double m5 = array1[base1 + 5] * array2[base2 + 5];
+            final double m6 = array1[base1 + 6] * array2[base2 + 6];
+            final double m7 = array1[base1 + 7] * array2[base2 + 7];
+
+            final double s0 = m0 + m1;
+            final double s1 = m2 + m3;
+            final double s2 = m4 + m5;
+            final double s3 = m6 + m7;
+
+            final double a0 = s0 + s1;
+            final double a1 = s2 + s3;
+
+            retVal += (a0 + a1);
+        }
+
+        switch ((limit - first) % 8) {
+
+        case 7: {
+
+            final int base1 = offset1 + i;
+            final int base2 = offset2 + i;
+
+            final double m0 = array1[base1] * array2[base2];
+            final double m1 = array1[base1 + 1] * array2[base2 + 1];
+            final double m2 = array1[base1 + 2] * array2[base2 + 2];
+            final double m3 = array1[base1 + 3] * array2[base2 + 3];
+            final double m4 = array1[base1 + 4] * array2[base2 + 4];
+            final double m5 = array1[base1 + 5] * array2[base2 + 5];
+            final double m6 = array1[base1 + 6] * array2[base2 + 6];
+
+            final double s0 = m0 + m1;
+            final double s1 = m2 + m3;
+            final double s2 = m4 + m5;
+            final double s3 = m6;
+
+            final double a0 = s0 + s1;
+            final double a1 = s2 + s3;
+
+            retVal += (a0 + a1);
+        }
+
+            break;
+
+        case 6: {
+
+            final int base1 = offset1 + i;
+            final int base2 = offset2 + i;
+
+            final double m0 = array1[base1] * array2[base2];
+            final double m1 = array1[base1 + 1] * array2[base2 + 1];
+            final double m2 = array1[base1 + 2] * array2[base2 + 2];
+            final double m3 = array1[base1 + 3] * array2[base2 + 3];
+            final double m4 = array1[base1 + 4] * array2[base2 + 4];
+            final double m5 = array1[base1 + 5] * array2[base2 + 5];
+
+            final double s0 = m0 + m1;
+            final double s1 = m2 + m3;
+            final double s2 = m4 + m5;
+
+            final double a0 = s0 + s1;
+            final double a1 = s2;
+
+            retVal += (a0 + a1);
+        }
+
+            break;
+
+        case 5: {
+
+            final int base1 = offset1 + i;
+            final int base2 = offset2 + i;
+
+            final double m0 = array1[base1] * array2[base2];
+            final double m1 = array1[base1 + 1] * array2[base2 + 1];
+            final double m2 = array1[base1 + 2] * array2[base2 + 2];
+            final double m3 = array1[base1 + 3] * array2[base2 + 3];
+            final double m4 = array1[base1 + 4] * array2[base2 + 4];
+
+            final double s0 = m0 + m1;
+            final double s1 = m2 + m3;
+            final double s2 = m4;
+
+            final double a0 = s0 + s1;
+            final double a1 = s2;
+
+            retVal += (a0 + a1);
+        }
+
+            break;
+
+        case 4: {
+
+            final int base1 = offset1 + i;
+            final int base2 = offset2 + i;
+
+            final double m0 = array1[base1] * array2[base2];
+            final double m1 = array1[base1 + 1] * array2[base2 + 1];
+            final double m2 = array1[base1 + 2] * array2[base2 + 2];
+            final double m3 = array1[base1 + 3] * array2[base2 + 3];
+
+            final double s0 = m0 + m1;
+            final double s1 = m2 + m3;
+
+            final double a0 = s0 + s1;
+
+            retVal += a0;
+        }
+
+            break;
+
+        case 3: {
+
+            final int base1 = offset1 + i;
+            final int base2 = offset2 + i;
+
+            final double m0 = array1[base1] * array2[base2];
+            final double m1 = array1[base1 + 1] * array2[base2 + 1];
+            final double m2 = array1[base1 + 2] * array2[base2 + 2];
+
+            final double s0 = m0 + m1;
+            final double s1 = m2;
+
+            final double a0 = s0 + s1;
+
+            retVal += a0;
+        }
+
+            break;
+
+        case 2: {
+
+            final int base1 = offset1 + i;
+            final int base2 = offset2 + i;
+
+            final double m0 = array1[base1] * array2[base2];
+            final double m1 = array1[base1 + 1] * array2[base2 + 1];
+
+            final double s0 = m0 + m1;
+
+            final double a0 = s0;
+
+            retVal += a0;
+        }
+
+            break;
+
+        case 1: {
+
+            final int base1 = offset1 + i;
+            final int base2 = offset2 + i;
+
+            final double m0 = array1[base1] * array2[base2];
+
+            final double s0 = m0;
+
+            final double a0 = s0;
+
+            retVal += a0;
+        }
+
+            break;
+
+        default:
+
+            throw new IllegalStateException();
+        }
+
+        return retVal;
+    }
+
     public static <N extends Number & Scalar<N>> N invoke(final N[] array1, final int offset1, final N[] array2, final int offset2, final int first,
             final int limit, final Scalar.Factory<N> factory) {
         Scalar<N> retVal = factory.zero();

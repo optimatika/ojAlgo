@@ -718,7 +718,7 @@ public final class MultiplyRight extends MatrixOperation {
             final int tmpLimitOfColumn = MatrixUtils.limitOfColumn(right, j, complexity);
 
             for (int c = tmpFirstInColumn; c < tmpLimitOfColumn; c++) {
-                AXPY.invoke(product, j * tmpRowDim, 1, right.doubleValue(c + (j * complexity)), left, c * tmpRowDim, 1, 0, tmpRowDim);
+                AXPY.invoke(product, j * tmpRowDim, right.doubleValue(c + (j * complexity)), left, c * tmpRowDim, 0, tmpRowDim);
             }
         }
     }

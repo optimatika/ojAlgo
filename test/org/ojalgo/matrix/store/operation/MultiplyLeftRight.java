@@ -133,6 +133,21 @@ public class MultiplyLeftRight {
         }
     }
 
+    static void invokeCJIb(final double[] product, final double[] left, final int complexity, final double[] right) {
+
+        final int numbCols = right.length / complexity;
+        final int numbRows = product.length / numbCols;
+
+        for (int cj = 0; cj < right.length; cj++) {
+            final int c = cj % complexity;
+            final int j = cj / complexity;
+            final double val = right[cj];
+            for (int i = 0; i < numbRows; i++) {
+                product[i + (j * numbRows)] += left[i + (c * numbRows)] * val;
+            }
+        }
+    }
+
     static void invokeICJ(final double[] product, final double[] left, final int complexity, final double[] right) {
 
         final int numbCols = right.length / complexity;
@@ -155,6 +170,20 @@ public class MultiplyLeftRight {
         for (int i = 0; i < numbRows; i++) {
             for (int j = 0; j < numbCols; j++) {
                 for (int c = 0; c < complexity; c++) {
+                    product[i + (j * numbRows)] += left[i + (c * numbRows)] * right[c + (j * complexity)];
+                }
+            }
+        }
+    }
+
+    static void invokeIJCb(final double[] product, final double[] left, final int complexity, final double[] right) {
+
+        final int numbCols = right.length / complexity;
+        final int numbRows = product.length / numbCols;
+
+        for (int c = 0; c < complexity; c += 2) {
+            for (int i = 0; i < numbRows; i++) {
+                for (int j = 0; j < numbCols; j++) {
                     product[i + (j * numbRows)] += left[i + (c * numbRows)] * right[c + (j * complexity)];
                 }
             }
@@ -199,7 +228,6 @@ public class MultiplyLeftRight {
 
     public PrimitiveDenseStore right;
 
-    @Benchmark
     public PrimitiveDenseStore invokeCIJ() {
         MultiplyLeftRight.invokeCIJ(product.data, left.data, complexity, right.data);
         return product;
@@ -212,12 +240,16 @@ public class MultiplyLeftRight {
     };
 
     @Benchmark
+    public PrimitiveDenseStore invokeCJI2() {
+        MultiplyLeftRight.invokeCJIb(product.data, left.data, complexity, right.data);
+        return product;
+    };
+
     public PrimitiveDenseStore invokeICJ() {
         MultiplyLeftRight.invokeICJ(product.data, left.data, complexity, right.data);
         return product;
     };
 
-    @Benchmark
     public PrimitiveDenseStore invokeIJC() {
         MultiplyLeftRight.invokeIJC(product.data, left.data, complexity, right.data);
         return product;
@@ -229,7 +261,6 @@ public class MultiplyLeftRight {
         return product;
     };
 
-    @Benchmark
     public PrimitiveDenseStore invokeJIC() {
         MultiplyLeftRight.invokeJIC(product.data, left.data, complexity, right.data);
         return product;
