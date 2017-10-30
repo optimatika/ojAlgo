@@ -35,14 +35,14 @@ public final class ApplyLU extends MatrixOperation {
     public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int columnLimit, final BigDecimal[] multipliers,
             final int iterationPoint) {
         for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, 1, data[iterationPoint + (j * structure)].negate(), multipliers, 0, 1, iterationPoint + 1, structure);
+            AXPY.invoke(data, j * structure, data[iterationPoint + (j * structure)].negate(), multipliers, 0, iterationPoint + 1, structure);
         }
     }
 
     public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit, final ComplexNumber[] multipliers,
             final int iterationPoint) {
         for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, 1, data[iterationPoint + (j * structure)].negate(), multipliers, 0, 1, iterationPoint + 1, structure);
+            AXPY.invoke(data, j * structure, data[iterationPoint + (j * structure)].negate(), multipliers, 0, iterationPoint + 1, structure);
         }
     }
 

@@ -36,7 +36,7 @@ public final class ApplyLDL extends MatrixOperation {
             final int iterationPoint) {
         final BigDecimal tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, 1, tmpDiagVal.multiply(multipliers[j]).negate(), multipliers, 0, 1, j, structure);
+            AXPY.invoke(data, j * structure, tmpDiagVal.multiply(multipliers[j]).negate(), multipliers, 0, j, structure);
         }
     }
 
@@ -44,7 +44,7 @@ public final class ApplyLDL extends MatrixOperation {
             final int iterationPoint) {
         final ComplexNumber tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, 1, tmpDiagVal.multiply(multipliers[j].conjugate()).negate(), multipliers, 0, 1, j, structure);
+            AXPY.invoke(data, j * structure, tmpDiagVal.multiply(multipliers[j].conjugate()).negate(), multipliers, 0, j, structure);
         }
     }
 

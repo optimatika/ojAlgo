@@ -37,10 +37,10 @@ public abstract class AXPY implements BLAS1 {
 
     public static int THRESHOLD = 128;
 
-    public static void invoke(final BigDecimal[] y, final int basey, final int incy, final BigDecimal a, final BigDecimal[] x, final int basex, final int incx,
-            final int first, final int limit) {
+    public static void invoke(final BigDecimal[] y, final int basey, final BigDecimal a, final BigDecimal[] x, final int basex, final int first,
+            final int limit) {
         for (int i = first; i < limit; i++) {
-            y[basey + (incy * i)] = BigFunction.ADD.invoke(y[basey + (incy * i)], BigFunction.MULTIPLY.invoke(a, x[basex + (incx * i)])); // y += a*x
+            y[basey + i] = BigFunction.ADD.invoke(y[basey + i], BigFunction.MULTIPLY.invoke(a, x[basex + i])); // y += a*x
         }
     }
 
@@ -75,10 +75,10 @@ public abstract class AXPY implements BLAS1 {
         }
     }
 
-    public static <N extends Number & Scalar<N>> void invoke(final N[] y, final int basey, final int incy, final N a, final N[] x, final int basex,
-            final int incx, final int first, final int limit) {
+    public static <N extends Number & Scalar<N>> void invoke(final N[] y, final int basey, final N a, final N[] x, final int basex, final int first,
+            final int limit) {
         for (int i = first; i < limit; i++) {
-            y[basey + (incy * i)] = y[basey + (incy * i)].add(a.multiply(x[basex + (incx * i)])).getNumber();
+            y[basey + i] = y[basey + i].add(a.multiply(x[basex + i])).getNumber();
         }
     }
 

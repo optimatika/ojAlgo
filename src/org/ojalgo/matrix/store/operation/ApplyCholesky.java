@@ -34,14 +34,14 @@ public final class ApplyCholesky extends MatrixOperation {
 
     public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int columnLimit, final BigDecimal[] multipliers) {
         for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, 1, multipliers[j].negate(), multipliers, 0, 1, j, structure);
+            AXPY.invoke(data, j * structure, multipliers[j].negate(), multipliers, 0, j, structure);
         }
     }
 
     public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit,
             final ComplexNumber[] multipliers) {
         for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, 1, multipliers[j].conjugate().negate(), multipliers, 0, 1, j, structure);
+            AXPY.invoke(data, j * structure, multipliers[j].conjugate().negate(), multipliers, 0, j, structure);
         }
     }
 

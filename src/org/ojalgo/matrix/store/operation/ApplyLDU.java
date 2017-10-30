@@ -37,7 +37,7 @@ public final class ApplyLDU extends MatrixOperation {
         for (int j = firstColumn; j < columnLimit; j++) {
             final BigDecimal tmpScalar = hermitian ? multipliers[j] : data[iterationPoint + (j * structure)];
             final int tmpFirstRow = hermitian ? j : iterationPoint + 1;
-            AXPY.invoke(data, j * structure, 1, tmpScalar.negate(), multipliers, 0, 1, tmpFirstRow, structure);
+            AXPY.invoke(data, j * structure, tmpScalar.negate(), multipliers, 0, tmpFirstRow, structure);
         }
     }
 
@@ -46,7 +46,7 @@ public final class ApplyLDU extends MatrixOperation {
         for (int j = firstColumn; j < columnLimit; j++) {
             final ComplexNumber tmpScalar = hermitian ? multipliers[j].conjugate() : data[iterationPoint + (j * structure)];
             final int tmpFirstRow = hermitian ? j : iterationPoint + 1;
-            AXPY.invoke(data, j * structure, 1, tmpScalar.negate(), multipliers, 0, 1, tmpFirstRow, structure);
+            AXPY.invoke(data, j * structure, tmpScalar.negate(), multipliers, 0, tmpFirstRow, structure);
         }
     }
 
