@@ -47,14 +47,14 @@ import org.ojalgo.scalar.RationalNumber;
 public interface BLAS1 {
 
     @FunctionalInterface
-    public static interface DoubleToInt {
+    public static interface PrimitiveToInt {
 
         int invoke(final double[] data, final int first, final int limit, final int step);
 
     }
 
     @FunctionalInterface
-    public static interface DoubleToDouble {
+    public static interface PrimitiveToDouble {
 
         double invoke(final double[] data, final int first, final int limit, final int step);
 
@@ -71,9 +71,9 @@ public interface BLAS1 {
 
     public static final GenericToInt<ComplexNumber> CAMAX = AMAX::invoke;
 
-    public static final DoubleToInt DAMAX = AMAX::invoke;
-    public static final DoubleToInt DAMIN = AMIN::invoke;
-    public static final DoubleToDouble DASUM = ASUM::invoke;
+    public static final PrimitiveToInt DAMAX = AMAX::invoke;
+    public static final PrimitiveToInt DAMIN = AMIN::invoke;
+    public static final PrimitiveToDouble DASUM = ASUM::invoke;
 
     public static final GenericToInt<Quaternion> QAMAX = AMAX::invoke;
 

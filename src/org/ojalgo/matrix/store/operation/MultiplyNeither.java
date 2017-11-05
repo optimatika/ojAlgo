@@ -683,16 +683,11 @@ public final class MultiplyNeither extends MatrixOperation {
 
     static void invoke2(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {
 
-        final int tmpRowDim = left.length / complexity;
-
-        final int tmpIndexLimit = tmpRowDim * columnLimit;
-        for (int tmpIndex = tmpRowDim * firstColumn; tmpIndex < tmpIndexLimit; tmpIndex++) {
-            product[tmpIndex] = PrimitiveMath.ZERO;
-        }
+        final int structure = left.length / complexity;
 
         for (int j = firstColumn; j < columnLimit; j++) {
             for (int c = 0; c < complexity; c++) {
-                AXPY.invoke(product, j * tmpRowDim, right[c + (j * complexity)], left, c * tmpRowDim, 0, tmpRowDim);
+                AXPY.invoke(product, j * structure, right[c + (j * complexity)], left, c * structure, 0, structure);
             }
         }
     }

@@ -111,8 +111,9 @@ public class MultiplyLeftRight {
 
         for (int c = 0; c < complexity; c++) {
             for (int i = 0; i < numbRows; i++) {
+                final double a = left[i + (c * numbRows)];
                 for (int j = 0; j < numbCols; j++) {
-                    product[i + (j * numbRows)] += left[i + (c * numbRows)] * right[c + (j * complexity)];
+                    product[i + (j * numbRows)] += a * right[c + (j * complexity)];
                 }
             }
         }
@@ -125,9 +126,9 @@ public class MultiplyLeftRight {
 
         for (int c = 0; c < complexity; c++) {
             for (int j = 0; j < numbCols; j++) {
-                final double tmpD = right[c + (j * complexity)];
+                final double a = right[c + (j * complexity)];
                 for (int i = 0; i < numbRows; i++) {
-                    product[i + (j * numbRows)] += left[i + (c * numbRows)] * tmpD;
+                    product[i + (j * numbRows)] += left[i + (c * numbRows)] * a;
                 }
             }
         }
