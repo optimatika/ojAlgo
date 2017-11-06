@@ -187,7 +187,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
 
     public static NumberContext getPercent(final int scale, final Locale locale) {
 
-        final NumberFormat tmpFormat = NumberStyle.PERCENT.getFormat(Locale.getDefault());
+        final NumberFormat tmpFormat = NumberStyle.PERCENT.getFormat(locale);
         final int tmpPrecision = MathContext.DECIMAL32.getPrecision();
         final int tmpScale = scale;
         final RoundingMode tmpRoundingMode = MathContext.DECIMAL32.getRoundingMode();
