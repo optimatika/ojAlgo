@@ -45,7 +45,10 @@ import org.ojalgo.RecoverableCondition;
  * In terms of the newer API it most closely corresponds to an {@linkplain Instant}, but does not have its
  * nanosecond granularity. At one point the plan was to remove and replace this class with
  * {@linkplain Instant}, but working with a single long as an "instant" representation is very practical and
- * efficient. It has been retrofitted to implement the {@linkplain Temporal} interface.
+ * efficient.
+ * </p>
+ * <p>
+ * It has been retrofitted to implement the {@linkplain Temporal} interface.
  * </p>
  *
  * @see CalendarDateDuration

@@ -24,16 +24,16 @@ package org.ojalgo.scalar;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Mutate2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
 public final class Quaternion extends Number
-        implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, Access2D.Collectable<Double, PhysicalStore<Double>> {
+        implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public static final Scalar.Factory<Quaternion> FACTORY = new Scalar.Factory<Quaternion>() {
 
@@ -654,7 +654,7 @@ public final class Quaternion extends Number
         return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
     }
 
-    public void supplyTo(final PhysicalStore<Double> receiver) {
+    public void supplyTo(final Mutate2D.Receiver<Double> receiver) {
         receiver.set(0L, myScalar);
         receiver.set(1L, -i);
         receiver.set(2L, -j);

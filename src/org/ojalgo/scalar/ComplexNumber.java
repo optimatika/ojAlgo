@@ -25,9 +25,9 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Mutate2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -39,7 +39,7 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * @see org.ojalgo.function.ComplexFunction
  */
 public final class ComplexNumber extends Number
-        implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, Access2D.Collectable<Double, PhysicalStore<Double>> {
+        implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
 
@@ -460,7 +460,7 @@ public final class ComplexNumber extends Number
         return new ComplexNumber(myRealValue - arg, i);
     }
 
-    public void supplyTo(final PhysicalStore<Double> receiver) {
+    public void supplyTo(final Mutate2D.Receiver<Double> receiver) {
         receiver.set(0L, myRealValue);
         receiver.set(1L, i);
         receiver.set(2L, -i);

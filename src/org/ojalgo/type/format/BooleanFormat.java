@@ -29,7 +29,7 @@ import org.ojalgo.type.context.BooleanContext;
 
 /**
  * BooleanFormat doesn't do anything useful, but it was needed for {@linkplain BooleanContext} (that doesn't
- * do anything either).
+ * do much either).
  *
  * @author apete
  */
