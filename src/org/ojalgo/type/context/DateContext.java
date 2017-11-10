@@ -33,7 +33,8 @@ import org.ojalgo.type.format.DatePart;
 import org.ojalgo.type.format.DateStyle;
 
 /**
- * DateContext
+ * This {@link TypeContext} deals with the old {@link java.util.Date}. There is another implementation that
+ * tries to deal with the newer date time API – {@link org.ojalgo.type.context.TemporalContext}.
  *
  * @author apete
  */

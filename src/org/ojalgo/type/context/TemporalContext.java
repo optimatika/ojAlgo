@@ -25,7 +25,21 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjuster;
 
+/**
+ * An implementation of {@link TypeContext} that is implemented in terms of {@link DateTimeFormatter} and
+ * {@link TemporalAdjuster}.
+ *
+ * @author apete
+ */
 public final class TemporalContext<T extends Temporal> implements TypeContext<T>, TemporalAdjuster {
+
+    public static <T extends Temporal> TemporalContext<T> of(final DateTimeFormatter formatter) {
+        return new TemporalContext<T>(formatter);
+    }
+
+    public static <T extends Temporal> TemporalContext<T> of(final DateTimeFormatter formatter, final TemporalAdjuster adjuster) {
+        return new TemporalContext<T>(formatter, adjuster);
+    }
 
     private final TemporalAdjuster myAdjuster;
     private final DateTimeFormatter myFormatter;
@@ -52,7 +66,11 @@ public final class TemporalContext<T extends Temporal> implements TypeContext<T>
 
     @SuppressWarnings("unchecked")
     public T enforce(final T object) {
-        return (T) this.adjustInto(object);
+        if (myAdjuster != null) {
+            return (T) this.adjustInto(object);
+        } else {
+            return TypeContext.super.enforce(object);
+        }
     }
 
     public String format(final Object object) {
