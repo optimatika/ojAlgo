@@ -95,6 +95,34 @@ MultiplyLeftRight.invokeJIC           256  thrpt    5        17.652 ±      0.03
 MultiplyLeftRight.invokeJIC           512  thrpt    5         2.093 ±      0.017  ops/s
  * </pre>
  *
+ * <pre>
+# Run complete. Total time: 00:18:57
+
+Benchmark                             (complexity)   Mode  Cnt         Score        Error  Units
+MultiplyLeftRight.invokeNeitherMaybe             2  thrpt    7  20375281,540 ±  42461,680  ops/s
+MultiplyLeftRight.invokeNeitherMaybe             4  thrpt    7   5027033,478 ±   7302,907  ops/s
+MultiplyLeftRight.invokeNeitherMaybe             8  thrpt    7    960901,769 ±   8737,255  ops/s
+MultiplyLeftRight.invokeNeitherMaybe            16  thrpt    7    155271,403 ±    230,297  ops/s
+MultiplyLeftRight.invokeNeitherMaybe            32  thrpt    7     21926,140 ±     69,487  ops/s
+MultiplyLeftRight.invokeNeitherMaybe            64  thrpt    7      2866,150 ±      4,942  ops/s
+MultiplyLeftRight.invokeNeitherMaybe           128  thrpt    7       370,036 ±      1,453  ops/s
+MultiplyLeftRight.invokeNeitherMaybe           256  thrpt    7        45,928 ±      0,093  ops/s
+MultiplyLeftRight.invokeNeitherMaybe           512  thrpt    7         5,657 ±      0,029  ops/s
+MultiplyLeftRight.invokeNeitherMaybe          1024  thrpt    7         0,636 ±      0,005  ops/s
+MultiplyLeftRight.invokeNeitherMaybe          2048  thrpt    7         0,073 ±      0,001  ops/s
+MultiplyLeftRight.invokeNeitherNow               2  thrpt    7  15511005,733 ± 346365,718  ops/s
+MultiplyLeftRight.invokeNeitherNow               4  thrpt    7   4887105,906 ±  10721,266  ops/s
+MultiplyLeftRight.invokeNeitherNow               8  thrpt    7    991360,097 ±  22797,356  ops/s
+MultiplyLeftRight.invokeNeitherNow              16  thrpt    7    187765,133 ±   3854,363  ops/s
+MultiplyLeftRight.invokeNeitherNow              32  thrpt    7     27290,580 ±    183,830  ops/s
+MultiplyLeftRight.invokeNeitherNow              64  thrpt    7      3407,571 ±     87,240  ops/s
+MultiplyLeftRight.invokeNeitherNow             128  thrpt    7       406,031 ±      0,696  ops/s
+MultiplyLeftRight.invokeNeitherNow             256  thrpt    7        50,260 ±      0,066  ops/s
+MultiplyLeftRight.invokeNeitherNow             512  thrpt    7         6,033 ±      0,035  ops/s
+MultiplyLeftRight.invokeNeitherNow            1024  thrpt    7         0,667 ±      0,004  ops/s
+MultiplyLeftRight.invokeNeitherNow            2048  thrpt    7         0,078 ±      0,001  ops/s
+ * </pre>
+ *
  * @author apete
  */
 @State(Scope.Benchmark)
@@ -220,13 +248,11 @@ public class MultiplyLeftRight {
         }
     }
 
-    @Param({ "2", "4", "8", "16", "32", "64", "128", "256", "512" })
+    @Param({ "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048" })
     public int complexity;
 
     public PrimitiveDenseStore left;
-
     public PrimitiveDenseStore product;
-
     public PrimitiveDenseStore right;
 
     public PrimitiveDenseStore invokeCIJ() {
@@ -234,13 +260,11 @@ public class MultiplyLeftRight {
         return product;
     };
 
-    @Benchmark
     public PrimitiveDenseStore invokeCJI() {
         MultiplyLeftRight.invokeCJI(product.data, left.data, complexity, right.data);
         return product;
     };
 
-    @Benchmark
     public PrimitiveDenseStore invokeCJI2() {
         MultiplyLeftRight.invokeCJIb(product.data, left.data, complexity, right.data);
         return product;
@@ -256,9 +280,20 @@ public class MultiplyLeftRight {
         return product;
     };
 
-    @Benchmark
     public PrimitiveDenseStore invokeJCI() {
         MultiplyLeftRight.invokeJCI(product.data, left.data, complexity, right.data);
+        return product;
+    };
+
+    @Benchmark
+    public PrimitiveDenseStore invokeNeitherNow() {
+        MultiplyNeither.invoke(product.data, 0, complexity, left.data, complexity, right.data);
+        return product;
+    };
+
+    @Benchmark
+    public PrimitiveDenseStore invokeNeitherMaybe() {
+        MultiplyNeither.invoke2(product.data, 0, complexity, left.data, complexity, right.data);
         return product;
     };
 

@@ -31,7 +31,7 @@ import java.time.temporal.TemporalAdjuster;
  *
  * @author apete
  */
-public final class TemporalContext<T extends Temporal> implements TypeContext<T>, TemporalAdjuster {
+public final class TemporalContext<T extends Temporal> implements TypeContext<T> {
 
     public static <T extends Temporal> TemporalContext<T> of(final DateTimeFormatter formatter) {
         return new TemporalContext<T>(formatter);
@@ -56,20 +56,12 @@ public final class TemporalContext<T extends Temporal> implements TypeContext<T>
         myAdjuster = adjuster;
     }
 
-    public Temporal adjustInto(final Temporal temporal) {
-        if (myAdjuster != null) {
-            return myAdjuster.adjustInto(temporal);
-        } else {
-            return temporal;
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public T enforce(final T object) {
         if (myAdjuster != null) {
-            return (T) this.adjustInto(object);
+            return (T) myAdjuster.adjustInto(object);
         } else {
-            return TypeContext.super.enforce(object);
+            return object;
         }
     }
 
