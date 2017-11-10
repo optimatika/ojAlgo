@@ -98,14 +98,14 @@ abstract class FormatContext<T, F extends Format> implements TypeContext<T>, Ser
      */
     @Override
     @SuppressWarnings("unchecked")
-    public final T parse(final String string) {
+    public final T parse(final CharSequence string) {
 
         if (string != null) {
 
             try {
-                return (T) myFormat.parseObject(NBSP ? string.replace(ASCII.NBSP, ASCII.SP) : string);
+                return (T) myFormat.parseObject(NBSP ? string.toString().replace(ASCII.NBSP, ASCII.SP) : string.toString());
             } catch (final ParseException anException) {
-                return this.handleParseException(myFormat, string);
+                return this.handleParseException(myFormat, string.toString());
             }
 
         } else {
