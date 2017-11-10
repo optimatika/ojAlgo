@@ -77,6 +77,14 @@ public final class TemporalContext<T extends Temporal> implements TypeContext<T>
         return myFormatter.format((Temporal) object);
     }
 
+    public TemporalContext<T> newAdjuster(final TemporalAdjuster adjuster) {
+        return new TemporalContext<>(myFormatter, adjuster);
+    }
+
+    public TemporalContext<T> newFormatter(final DateTimeFormatter formatter) {
+        return new TemporalContext<>(formatter, myAdjuster);
+    }
+
     @SuppressWarnings("unchecked")
     public T parse(final CharSequence text) {
         return (T) myFormatter.parse(text);
