@@ -39,6 +39,10 @@ public final class BooleanContext extends FormatContext<Boolean, Format> {
         super(DEFAULT_FORMAT);
     }
 
+    public BooleanContext(String trueValue, String falseValue) {
+        super(new BooleanFormat(trueValue, falseValue));
+    }
+
     private BooleanContext(final Format format) {
         super(format);
         ProgrammingError.throwForIllegalInvocation();
@@ -46,7 +50,11 @@ public final class BooleanContext extends FormatContext<Boolean, Format> {
 
     @Override
     public Boolean enforce(final Boolean object) {
-        return object;
+        if (object == null) {
+            return Boolean.FALSE;
+        } else {
+            return object;
+        }
     }
 
     @Override
@@ -56,11 +64,11 @@ public final class BooleanContext extends FormatContext<Boolean, Format> {
 
     @Override
     protected String handleFormatException(final Format format, final Object object) {
-        return "";
+        return "?";
     }
 
     @Override
     protected Boolean handleParseException(final Format format, final String string) {
-        return false;
+        return Boolean.FALSE;
     }
 }

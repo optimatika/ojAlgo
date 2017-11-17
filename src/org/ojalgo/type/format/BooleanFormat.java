@@ -35,25 +35,47 @@ import org.ojalgo.type.context.BooleanContext;
  */
 public final class BooleanFormat extends Format {
 
+    private final String myFalseValue;
+    private final String myNullValue;
+    private final String myTrueValue;
+
     public BooleanFormat() {
+        this(Boolean.TRUE.toString(), Boolean.FALSE.toString());
+    }
+
+    public BooleanFormat(String trueValue, String falseValue) {
+        this(trueValue, falseValue, "?");
+    }
+
+    public BooleanFormat(String trueValue, String falseValue, String nullValue) {
         super();
+        myTrueValue = trueValue;
+        myFalseValue = falseValue;
+        myNullValue = nullValue;
     }
 
     @Override
-    public StringBuffer format(final Object anObject, final StringBuffer aBuffer, final FieldPosition aPosition) {
+    public StringBuffer format(final Object object, final StringBuffer buffer, final FieldPosition position) {
 
-        if ((anObject instanceof Boolean) && ((Boolean) anObject).booleanValue()) {
-            aBuffer.append(true);
+        if ((object == null) || !(object instanceof Boolean)) {
+            buffer.append(myNullValue);
+        } else if (((Boolean) object).booleanValue()) {
+            buffer.append(myTrueValue);
         } else {
-            aBuffer.append(false);
+            buffer.append(myFalseValue);
         }
 
-        return aBuffer;
+        return buffer;
     }
 
     @Override
-    public Boolean parseObject(final String aSource, final ParsePosition aPosition) {
-        return Boolean.valueOf(aSource);
+    public Boolean parseObject(final String source, final ParsePosition position) {
+
+        if (myTrueValue.equals(source)) {
+            return Boolean.TRUE;
+        } else {
+            return Boolean.FALSE;
+        }
     }
 
 }

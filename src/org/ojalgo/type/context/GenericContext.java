@@ -49,7 +49,7 @@ public final class GenericContext<T> extends FormatContext<T, Format> {
         if (myDelegate != null) {
             return myDelegate.enforce(object);
         } else {
-            return this.parse(this.format(object));
+            return super.enforce(object);
         }
     }
 
