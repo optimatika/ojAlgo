@@ -84,14 +84,14 @@ import org.ojalgo.type.context.NumberContext;
  * <li>It's the only way to access the integer solver.</li>
  * </ol>
  * <p>
- * There are some restrictions on the models you can create:
+ * Different solvers can be used, and ojAlgo comes with collection built in. The default built-in solvers can
+ * handle anythimng you can model with a couple of restrictions:
  * </p>
  * <ul>
- * <li>No quadratic constraints</li>
+ * <li>No quadratic constraints (The plan is that future versions should not have this limitation.)</li>
+ * <li>If you use quadratic expressions make sure they're convex. This is most likely a requirement even with
+ * 3:d party solvers.</li>
  * </ul>
- * <p>
- * The plan is that future versions should not have any restrictions like these.
- * </p>
  *
  * @author apete
  */
