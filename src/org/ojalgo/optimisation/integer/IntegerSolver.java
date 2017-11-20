@@ -40,7 +40,7 @@ public abstract class IntegerSolver extends GenericSolver {
         }
 
         public boolean isCapable(final ExpressionsBasedModel model) {
-            return true;
+            return !model.isAnyConstraintQuadratic();
         }
 
         @Override

@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Stream;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.access.Structure2D.IntRowColumn;
@@ -36,6 +37,7 @@ import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
+import org.ojalgo.optimisation.integer.IntegerSolver.ModelIntegration;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.context.NumberContext;
 
@@ -230,7 +232,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     }
 
+    private static final org.ojalgo.optimisation.convex.ConvexSolver.ModelIntegration CONVEX_INTEGRATION = new ConvexSolver.ModelIntegration();
+    private static final ModelIntegration INTEGER_INTEGRATION = new IntegerSolver.ModelIntegration();
     private static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
+    private static final org.ojalgo.optimisation.linear.LinearSolver.ModelIntegration LINEAR_INTEGRATION = new LinearSolver.ModelIntegration();
     private static final String NEW_LINE = "\n";
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
@@ -605,15 +610,40 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return this.indexOfPositiveVariable(this.indexOf(variable));
     }
 
+    public boolean isAnyConstraintQuadratic() {
+
+        boolean retVal = false;
+
+        for (final Expression value : myExpressions.values()) {
+            retVal |= (value.isAnyQuadraticFactorNonZero() && value.isConstraint() && !value.isRedundant());
+        }
+
+        return retVal;
+    }
+
     /**
      * Objective or any constraint has quadratic part.
+     *
+     * @deprecated v45 Use {@link #isAnyConstraintQuadratic()} or {@link #isAnyObjectiveQuadratic()} instead
      */
+    @Deprecated
     public boolean isAnyExpressionQuadratic() {
 
         boolean retVal = false;
 
         for (final Expression value : myExpressions.values()) {
             retVal |= value.isAnyQuadraticFactorNonZero() && (value.isConstraint() || value.isObjective());
+        }
+
+        return retVal;
+    }
+
+    public boolean isAnyObjectiveQuadratic() {
+
+        boolean retVal = false;
+
+        for (final Expression value : myExpressions.values()) {
+            retVal |= (value.isAnyQuadraticFactorNonZero() && value.isObjective());
         }
 
         return retVal;
@@ -642,13 +672,15 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public void limitObjective(final BigDecimal lower, final BigDecimal upper) {
 
-        Expression tmpEpression = myExpressions.get(OBJ_FUNC_AS_CONSTR_KEY);
-        if (tmpEpression == null) {
-            tmpEpression = this.objective().copy(this, false);
-            myExpressions.put(OBJ_FUNC_AS_CONSTR_KEY, tmpEpression);
-        }
+        // TODO Turned off because it may construct quadratic constraints
 
-        tmpEpression.lower(lower).upper(upper);
+        //        Expression tmpEpression = myExpressions.get(OBJ_FUNC_AS_CONSTR_KEY);
+        //        if (tmpEpression == null) {
+        //            tmpEpression = this.objective().copy(this, false);
+        //            myExpressions.put(OBJ_FUNC_AS_CONSTR_KEY, tmpEpression);
+        //        }
+        //
+        //        tmpEpression.lower(lower).upper(upper);
     }
 
     public Optimisation.Result maximise() {
@@ -1029,12 +1061,20 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         if (retVal == null) {
             if (this.isAnyVariableInteger()) {
-                retVal = new IntegerSolver.ModelIntegration();
-            } else if (this.isAnyExpressionQuadratic()) {
-                retVal = new ConvexSolver.ModelIntegration();
+                if (INTEGER_INTEGRATION.isCapable(this)) {
+                    retVal = INTEGER_INTEGRATION;
+                }
             } else {
-                retVal = new LinearSolver.ModelIntegration();
+                if (CONVEX_INTEGRATION.isCapable(this)) {
+                    retVal = CONVEX_INTEGRATION;
+                } else if (LINEAR_INTEGRATION.isCapable(this)) {
+                    retVal = LINEAR_INTEGRATION;
+                }
             }
+        }
+
+        if (retVal == null) {
+            throw new ProgrammingError("No solver integration available that can handle this model!");
         }
 
         return retVal;

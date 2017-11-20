@@ -448,7 +448,7 @@ public abstract class ConvexSolver extends GenericSolver {
         }
 
         public boolean isCapable(final ExpressionsBasedModel model) {
-            return !model.isAnyVariableInteger() && model.isAnyExpressionQuadratic();
+            return !model.isAnyVariableInteger() && model.isAnyObjectiveQuadratic() && !model.isAnyConstraintQuadratic();
         }
 
         @Override
