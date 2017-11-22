@@ -24,6 +24,7 @@ package org.ojalgo.matrix.store.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
@@ -629,6 +630,30 @@ public final class MultiplyBoth extends MatrixOperation {
             return PRIMITIVE_1XN;
         } else {
             return PRIMITIVE;
+        }
+    }
+
+    static void invoke(final double[] product, final int firstColumn, final int columnLimit, final Access1D<Double> left, final int complexity,
+            final Access1D<Double> right) {
+
+        final int structure = ((int) left.count()) / complexity;
+
+        final double[] leftColumn = new double[structure];
+        for (int c = 0; c < complexity; c++) {
+
+            final int firstInLeftColumn = MatrixUtils.firstInColumn(left, c, 0);
+            final int limitOfLeftColumn = MatrixUtils.limitOfColumn(left, c, structure);
+
+            for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
+                leftColumn[i] = left.doubleValue(i + (c * structure));
+            }
+
+            final int firstInRightRow = MatrixUtils.firstInRow(right, c, firstColumn);
+            final int limitOfRightRow = MatrixUtils.limitOfRow(right, c, columnLimit);
+
+            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
+                AXPY.invoke(product, j * structure, right.doubleValue(c + (j * complexity)), leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
+            }
         }
     }
 

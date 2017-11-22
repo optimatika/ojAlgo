@@ -39,8 +39,8 @@ public abstract class LinearAlgebraBenchmark {
     }
 
     protected static ChainedOptionsBuilder options() {
-        return new OptionsBuilder().forks(1).measurementIterations(7).warmupIterations(15).mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS)
-                .timeout(new TimeValue(1L, TimeUnit.HOURS)).jvmArgs("-server", "-Xmx6g");
+        return new OptionsBuilder().forks(1).measurementIterations(5).warmupIterations(9).mode(Mode.Throughput).timeUnit(TimeUnit.MINUTES)
+                .timeout(new TimeValue(1L, TimeUnit.HOURS)).jvmArgs("-Xmx6g");
     }
 
     protected BenchmarkContestant<?> contestant;

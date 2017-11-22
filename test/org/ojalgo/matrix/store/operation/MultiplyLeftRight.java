@@ -285,20 +285,14 @@ public class MultiplyLeftRight {
         return product;
     };
 
-    @Benchmark
-    public PrimitiveDenseStore invokeNeitherNow() {
-        MultiplyNeither.invoke(product.data, 0, complexity, left.data, complexity, right.data);
-        return product;
-    };
-
-    @Benchmark
-    public PrimitiveDenseStore invokeNeitherMaybe() {
-        MultiplyNeither.invoke2(product.data, 0, complexity, left.data, complexity, right.data);
-        return product;
-    };
-
     public PrimitiveDenseStore invokeJIC() {
         MultiplyLeftRight.invokeJIC(product.data, left.data, complexity, right.data);
+        return product;
+    };
+
+    @Benchmark
+    public PrimitiveDenseStore invokeNeitherMaybe3() {
+        MultiplyNeither.invoke(product.data, 0, complexity, left.data, complexity, right.data);
         return product;
     };
 

@@ -22,10 +22,11 @@
 package org.ojalgo.matrix.store.operation;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 import org.ojalgo.array.blas.AXPY;
-import org.ojalgo.array.blas.DOT;
 import org.ojalgo.concurrent.DivideAndConquer;
+import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyNeither;
 import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyNeither;
@@ -38,11 +39,17 @@ public final class MultiplyNeither extends MatrixOperation {
 
     public static int THRESHOLD = 32;
 
-    static final BigMultiplyNeither BIG = (product, left, complexity, right) -> MultiplyNeither.invoke(product, 0, left.length / complexity, left, complexity,
-            right);
+    static final BigMultiplyNeither BIG = (product, left, complexity, right) -> {
+
+        Arrays.fill(product, BigMath.ZERO);
+
+        MultiplyNeither.invoke(product, 0, right.length / complexity, left, complexity, right);
+    };
 
     static final BigMultiplyNeither BIG_MT = (product, left, complexity, right) -> {
 
+        Arrays.fill(product, BigMath.ZERO);
+
         final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
             @Override
@@ -51,14 +58,20 @@ public final class MultiplyNeither extends MatrixOperation {
             }
         };
 
-        tmpConquerer.invoke(0, left.length / complexity, THRESHOLD);
+        tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
     };
 
-    static final ComplexMultiplyNeither COMPLEX = (product, left, complexity, right) -> MultiplyNeither.invoke(product, 0, left.length / complexity, left,
-            complexity, right);
+    static final ComplexMultiplyNeither COMPLEX = (product, left, complexity, right) -> {
+
+        Arrays.fill(product, ComplexNumber.ZERO);
+
+        MultiplyNeither.invoke(product, 0, right.length / complexity, left, complexity, right);
+    };
 
     static final ComplexMultiplyNeither COMPLEX_MT = (product, left, complexity, right) -> {
 
+        Arrays.fill(product, ComplexNumber.ZERO);
+
         final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
             @Override
@@ -67,11 +80,15 @@ public final class MultiplyNeither extends MatrixOperation {
             }
         };
 
-        tmpConquerer.invoke(0, left.length / complexity, THRESHOLD);
+        tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE = (product, left, complexity, right) -> MultiplyNeither.invoke(product, 0, left.length / complexity, left,
-            complexity, right);
+    static final PrimitiveMultiplyNeither PRIMITIVE = (product, left, complexity, right) -> {
+
+        Arrays.fill(product, 0.0);
+
+        MultiplyNeither.invoke(product, 0, right.length / complexity, left, complexity, right);
+    };
 
     static final PrimitiveMultiplyNeither PRIMITIVE_0XN = (product, left, complexity, right) -> {
 
@@ -567,6 +584,8 @@ public final class MultiplyNeither extends MatrixOperation {
 
     static final PrimitiveMultiplyNeither PRIMITIVE_MT = (product, left, complexity, right) -> {
 
+        Arrays.fill(product, 0.0);
+
         final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
             @Override
@@ -575,7 +594,7 @@ public final class MultiplyNeither extends MatrixOperation {
             }
         };
 
-        tmpConquerer.invoke(0, left.length / complexity, THRESHOLD);
+        tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
     };
 
     public static BigMultiplyNeither getBig(final long rows, final long columns) {
@@ -622,72 +641,46 @@ public final class MultiplyNeither extends MatrixOperation {
         }
     }
 
-    static void invoke(final BigDecimal[] product, final int firstRow, final int rowLimit, final BigDecimal[] left, final int complexity,
+    static void invoke(final BigDecimal[] product, final int firstColumn, final int columnLimit, final BigDecimal[] left, final int complexity,
             final BigDecimal[] right) {
-
-        final int tmpColDim = right.length / complexity;
-        final int tmpRowDim = product.length / tmpColDim;
-
-        final BigDecimal[] tmpLeftRow = new BigDecimal[complexity];
-
-        for (int i = firstRow; i < rowLimit; i++) {
-
-            for (int c = 0; c < complexity; c++) {
-                tmpLeftRow[c] = left[i + (c * tmpRowDim)];
-            }
-
-            for (int j = 0; j < tmpColDim; j++) {
-                product[i + (j * tmpRowDim)] = DOT.invoke(tmpLeftRow, 0, right, j * complexity, 0, complexity);
-            }
-        }
-    }
-
-    static void invoke(final ComplexNumber[] product, final int firstRow, final int rowLimit, final ComplexNumber[] left, final int complexity,
-            final ComplexNumber[] right) {
-
-        final int tmpColDim = right.length / complexity;
-        final int tmpRowDim = product.length / tmpColDim;
-
-        final ComplexNumber[] tmpLeftRow = new ComplexNumber[complexity];
-
-        for (int i = firstRow; i < rowLimit; i++) {
-
-            for (int c = 0; c < complexity; c++) {
-                tmpLeftRow[c] = left[i + (c * tmpRowDim)];
-            }
-
-            for (int j = 0; j < tmpColDim; j++) {
-                product[i + (j * tmpRowDim)] = DOT.invoke(tmpLeftRow, 0, right, j * complexity, 0, complexity);
-            }
-        }
-    }
-
-    static void invoke(final double[] product, final int firstRow, final int rowLimit, final double[] left, final int complexity, final double[] right) {
-
-        final int tmpColDim = right.length / complexity;
-        final int tmpRowDim = product.length / tmpColDim;
-
-        final double[] tmpLeftRow = new double[complexity];
-
-        for (int i = firstRow; i < rowLimit; i++) {
-
-            for (int c = 0; c < complexity; c++) {
-                tmpLeftRow[c] = left[i + (c * tmpRowDim)];
-            }
-
-            for (int j = 0; j < tmpColDim; j++) {
-                product[i + (j * tmpRowDim)] = DOT.invoke(tmpLeftRow, 0, right, j * complexity, 0, complexity);
-            }
-        }
-    }
-
-    static void invoke2(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {
 
         final int structure = left.length / complexity;
 
-        for (int j = firstColumn; j < columnLimit; j++) {
-            for (int c = 0; c < complexity; c++) {
-                AXPY.invoke(product, j * structure, right[c + (j * complexity)], left, c * structure, 0, structure);
+        final BigDecimal[] leftColumn = new BigDecimal[structure];
+        for (int c = 0; c < complexity; c++) {
+            System.arraycopy(left, c * structure, leftColumn, 0, structure);
+
+            for (int j = firstColumn; j < columnLimit; j++) {
+                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, 0, structure);
+            }
+        }
+    }
+
+    static void invoke(final ComplexNumber[] product, final int firstColumn, final int columnLimit, final ComplexNumber[] left, final int complexity,
+            final ComplexNumber[] right) {
+
+        final int structure = left.length / complexity;
+
+        final ComplexNumber[] leftColumn = new ComplexNumber[structure];
+        for (int c = 0; c < complexity; c++) {
+            System.arraycopy(left, c * structure, leftColumn, 0, structure);
+
+            for (int j = firstColumn; j < columnLimit; j++) {
+                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, 0, structure);
+            }
+        }
+    }
+
+    static void invoke(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {
+
+        final int structure = left.length / complexity;
+
+        final double[] leftColumn = new double[structure];
+        for (int c = 0; c < complexity; c++) {
+            System.arraycopy(left, c * structure, leftColumn, 0, structure);
+
+            for (int j = firstColumn; j < columnLimit; j++) {
+                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, 0, structure);
             }
         }
     }
