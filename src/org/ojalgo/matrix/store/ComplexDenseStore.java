@@ -686,19 +686,19 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public void fillByMultiplying(final Access1D<ComplexNumber> left, final Access1D<ComplexNumber> right) {
 
-        final int tmpComplexity = ((int) left.count()) / myRowDim;
+        final int complexity = ((int) left.count()) / myRowDim;
 
         if (left instanceof ComplexDenseStore) {
             if (right instanceof ComplexDenseStore) {
-                multiplyNeither.invoke(data, ComplexDenseStore.cast(left).data, tmpComplexity, ComplexDenseStore.cast(right).data);
+                multiplyNeither.invoke(data, ComplexDenseStore.cast(left).data, complexity, ComplexDenseStore.cast(right).data);
             } else {
-                multiplyRight.invoke(data, ComplexDenseStore.cast(left).data, tmpComplexity, right);
+                multiplyRight.invoke(data, ComplexDenseStore.cast(left).data, complexity, right);
             }
         } else {
             if (right instanceof ComplexDenseStore) {
-                multiplyLeft.invoke(data, left, tmpComplexity, ComplexDenseStore.cast(right).data);
+                multiplyLeft.invoke(data, left, complexity, ComplexDenseStore.cast(right).data);
             } else {
-                multiplyBoth.invoke(this, left, tmpComplexity, right);
+                multiplyBoth.invoke(this, left, complexity, right);
             }
         }
     }

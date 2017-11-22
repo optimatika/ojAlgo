@@ -667,19 +667,19 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public void fillByMultiplying(final Access1D<BigDecimal> left, final Access1D<BigDecimal> right) {
 
-        final int tmpComplexity = ((int) left.count()) / myRowDim;
+        final int complexity = ((int) left.count()) / myRowDim;
 
         if (left instanceof BigDenseStore) {
             if (right instanceof BigDenseStore) {
-                multiplyNeither.invoke(data, BigDenseStore.cast(left).data, tmpComplexity, BigDenseStore.cast(right).data);
+                multiplyNeither.invoke(data, BigDenseStore.cast(left).data, complexity, BigDenseStore.cast(right).data);
             } else {
-                multiplyRight.invoke(data, BigDenseStore.cast(left).data, tmpComplexity, right);
+                multiplyRight.invoke(data, BigDenseStore.cast(left).data, complexity, right);
             }
         } else {
             if (right instanceof BigDenseStore) {
-                multiplyLeft.invoke(data, left, tmpComplexity, BigDenseStore.cast(right).data);
+                multiplyLeft.invoke(data, left, complexity, BigDenseStore.cast(right).data);
             } else {
-                multiplyBoth.invoke(this, left, tmpComplexity, right);
+                multiplyBoth.invoke(this, left, complexity, right);
             }
         }
     }

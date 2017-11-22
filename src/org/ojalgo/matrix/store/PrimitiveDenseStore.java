@@ -708,21 +708,19 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public void fillByMultiplying(final Access1D<Double> left, final Access1D<Double> right) {
 
-        final int tmpComplexity = ((int) left.count()) / myRowDim;
+        final int complexity = ((int) left.count()) / myRowDim;
 
         if (left instanceof PrimitiveDenseStore) {
             if (right instanceof PrimitiveDenseStore) {
-                multiplyNeither.invoke(data, PrimitiveDenseStore.cast(left).data, tmpComplexity, PrimitiveDenseStore.cast(right).data);
+                multiplyNeither.invoke(data, PrimitiveDenseStore.cast(left).data, complexity, PrimitiveDenseStore.cast(right).data);
             } else {
-                multiplyRight.invoke(data, PrimitiveDenseStore.cast(left).data, tmpComplexity, right);
+                multiplyRight.invoke(data, PrimitiveDenseStore.cast(left).data, complexity, right);
             }
         } else {
             if (right instanceof PrimitiveDenseStore) {
-                multiplyLeft.invoke(data, left, tmpComplexity, PrimitiveDenseStore.cast(right).data);
+                multiplyLeft.invoke(data, left, complexity, PrimitiveDenseStore.cast(right).data);
             } else {
-                // BasicLogger.debug("{} X {}", left.getClass().getSimpleName(),
-                // right.getClass().getSimpleName());
-                multiplyBoth.invoke(this, left, tmpComplexity, right);
+                multiplyBoth.invoke(this, left, complexity, right);
             }
         }
     }

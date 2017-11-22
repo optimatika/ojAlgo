@@ -37,7 +37,6 @@ import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
-import org.ojalgo.optimisation.integer.IntegerSolver.ModelIntegration;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.context.NumberContext;
 
@@ -232,10 +231,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     }
 
-    private static final org.ojalgo.optimisation.convex.ConvexSolver.ModelIntegration CONVEX_INTEGRATION = new ConvexSolver.ModelIntegration();
-    private static final ModelIntegration INTEGER_INTEGRATION = new IntegerSolver.ModelIntegration();
+    private static final ConvexSolver.ModelIntegration CONVEX_INTEGRATION = new ConvexSolver.ModelIntegration();
+    private static final IntegerSolver.ModelIntegration INTEGER_INTEGRATION = new IntegerSolver.ModelIntegration();
     private static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
-    private static final org.ojalgo.optimisation.linear.LinearSolver.ModelIntegration LINEAR_INTEGRATION = new LinearSolver.ModelIntegration();
+    private static final LinearSolver.ModelIntegration LINEAR_INTEGRATION = new LinearSolver.ModelIntegration();
     private static final String NEW_LINE = "\n";
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
