@@ -685,6 +685,21 @@ public final class MultiplyNeither extends MatrixOperation {
         }
     }
 
+    static void invoke2(final double[] product, final int first, final int limit, final double[] left, final int complexity, final double[] right) {
+
+        final int numbRows = left.length / complexity;
+        final int numbCols = right.length / complexity;
+
+        final double[] leftColumn = new double[numbRows];
+        for (int c = first; c < limit; c++) {
+            System.arraycopy(left, c * numbRows, leftColumn, 0, numbRows);
+
+            for (int j = 0; j < numbCols; j++) {
+                AXPY.invoke(product, j * numbRows, right[c + (j * complexity)], leftColumn, 0, 0, numbRows);
+            }
+        }
+    }
+
     private MultiplyNeither() {
         super();
     }
