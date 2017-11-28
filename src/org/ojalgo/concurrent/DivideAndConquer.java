@@ -60,19 +60,14 @@ public abstract class DivideAndConquer extends Object {
         if ((count > threshold) && (workers > 1)) {
 
             final int split = first + (count / 2);
-            final int tmpWorkers = workers / 2;
+            final int nextWorkers = workers / 2;
 
-            final Future<?> tmpFirstPart = DaemonPoolExecutor.INSTANCE.submit(() -> {
-                DivideAndConquer.this.divide(first, split, threshold, tmpWorkers);
-            });
-
-            final Future<?> tmpSecondPart = DaemonPoolExecutor.INSTANCE.submit(() -> {
-                DivideAndConquer.this.divide(split, limit, threshold, tmpWorkers);
-            });
+            final Future<?> firstPart = DaemonPoolExecutor.INSTANCE.submit(() -> this.divide(first, split, threshold, nextWorkers));
+            final Future<?> secondPart = DaemonPoolExecutor.INSTANCE.submit(() -> this.divide(split, limit, threshold, nextWorkers));
 
             try {
-                tmpFirstPart.get();
-                tmpSecondPart.get();
+                firstPart.get();
+                secondPart.get();
             } catch (final InterruptedException | ExecutionException exception) {
                 exception.printStackTrace();
                 throw new ProgrammingError(exception);
