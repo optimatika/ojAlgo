@@ -38,9 +38,11 @@ import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -53,6 +55,120 @@ import org.ojalgo.scalar.Scalar;
  */
 @Deprecated
 final class GenericDenseStore<N extends Number & Scalar<N>> implements PhysicalStore<N>, DecompositionStore<N> {
+
+    static class MyFactory<N extends Number & Scalar<N>> implements PhysicalStore.Factory<N, GenericDenseStore<N>> {
+
+        public GenericDenseStore<N> columns(final Access1D<?>... source) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> columns(final double[]... source) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> columns(final List<? extends Number>... source) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> columns(final Number[]... source) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> copy(final Access2D<?> source) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> makeEye(final long rows, final long columns) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> makeZero(final long rows, final long columns) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> rows(final Access1D<?>... source) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> rows(final double[]... source) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> rows(final List<? extends Number>... source) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> rows(final Number[]... source) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> transpose(final Access2D<?> source) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public Rotation<N> makeRotation(final int low, final int high, final N cos, final N sin) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public AggregatorSet<N> aggregator() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public org.ojalgo.array.DenseArray.Factory<N> array() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public org.ojalgo.matrix.store.MatrixStore.Factory<N> builder() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public GenericDenseStore<N> conjugate(final Access2D<?> source) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public FunctionSet<N> function() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public Householder<N> makeHouseholder(final int length) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public Rotation<N> makeRotation(final int low, final int high, final double cos, final double sin) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public org.ojalgo.scalar.Scalar.Factory<N> scalar() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+    }
 
     private final DenseArray<N> myDenseArray = null;
     private final long myStructure = 0L;
