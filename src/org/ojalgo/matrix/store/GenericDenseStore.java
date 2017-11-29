@@ -37,6 +37,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -44,6 +45,9 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
+import org.ojalgo.matrix.store.operation.FillConjugated;
+import org.ojalgo.matrix.store.operation.FillMatchingSingle;
+import org.ojalgo.matrix.store.operation.FillTransposed;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.ComplexNumber;
@@ -56,11 +60,71 @@ import org.ojalgo.scalar.Scalar;
 @Deprecated
 final class GenericDenseStore<N extends Number & Scalar<N>> implements PhysicalStore<N>, DecompositionStore<N> {
 
-    static class MyFactory<N extends Number & Scalar<N>> implements PhysicalStore.Factory<N, GenericDenseStore<N>> {
+    static final class MyFactory<N extends Number & Scalar<N>> implements PhysicalStore.Factory<N, GenericDenseStore<N>> {
+
+        private final DenseArray.Factory<N> myDenseArrayFactory;
+
+        MyFactory(final DenseArray.Factory<N> denseArrayFactory) {
+            super();
+            myDenseArrayFactory = denseArrayFactory;
+        }
+
+        public AggregatorSet<N> aggregator() {
+            return myDenseArrayFactory.aggregator();
+        }
+
+        public DenseArray.Factory<N> array() {
+            return myDenseArrayFactory;
+        }
+
+        public MatrixStore.Factory<ComplexNumber> builder() {
+            return MatrixStore.COMPLEX;
+        }
+
+        public org.ojalgo.matrix.store.MatrixStore.Factory<N> builder() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public ComplexDenseStore columns(final Access1D<?>... source) {
+
+            final int tmpRowDim = (int) source[0].count();
+            final int tmpColDim = source.length;
+
+            final ComplexNumber[] tmpData = new ComplexNumber[tmpRowDim * tmpColDim];
+
+            Access1D<?> tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf(tmpColumn.get(i));
+                }
+            }
+
+            return new ComplexDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
 
         public GenericDenseStore<N> columns(final Access1D<?>... source) {
             // TODO Auto-generated method stub
             return null;
+        }
+
+        public ComplexDenseStore columns(final double[]... source) {
+
+            final int tmpRowDim = source[0].length;
+            final int tmpColDim = source.length;
+
+            final ComplexNumber[] tmpData = new ComplexNumber[tmpRowDim * tmpColDim];
+
+            double[] tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf((Number) tmpColumn[i]);
+                }
+            }
+
+            return new ComplexDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
         public GenericDenseStore<N> columns(final double[]... source) {
@@ -68,9 +132,45 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements PhysicalS
             return null;
         }
 
+        public ComplexDenseStore columns(final List<? extends Number>... source) {
+
+            final int tmpRowDim = source[0].size();
+            final int tmpColDim = source.length;
+
+            final ComplexNumber[] tmpData = new ComplexNumber[tmpRowDim * tmpColDim];
+
+            List<? extends Number> tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf(tmpColumn.get(i));
+                }
+            }
+
+            return new ComplexDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
         public GenericDenseStore<N> columns(final List<? extends Number>... source) {
             // TODO Auto-generated method stub
             return null;
+        }
+
+        public ComplexDenseStore columns(final Number[]... source) {
+
+            final int tmpRowDim = source[0].length;
+            final int tmpColDim = source.length;
+
+            final ComplexNumber[] tmpData = new ComplexNumber[tmpRowDim * tmpColDim];
+
+            Number[] tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf(tmpColumn[i]);
+                }
+            }
+
+            return new ComplexDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
         public GenericDenseStore<N> columns(final Number[]... source) {
@@ -78,9 +178,106 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements PhysicalS
             return null;
         }
 
-        public GenericDenseStore<N> copy(final Access2D<?> source) {
+        public ComplexDenseStore conjugate(final Access2D<?> source) {
+
+            final ComplexDenseStore retVal = new ComplexDenseStore((int) source.countColumns(), (int) source.countRows());
+
+            final int tmpRowDim = retVal.getRowDim();
+            final int tmpColDim = retVal.getColDim();
+
+            if (tmpColDim > FillConjugated.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillConjugated.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillConjugated.THRESHOLD);
+
+            } else {
+
+                FillConjugated.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+            }
+
+            return retVal;
+        }
+
+        public GenericDenseStore<N> conjugate(final Access2D<?> source) {
             // TODO Auto-generated method stub
             return null;
+        }
+
+        public ComplexDenseStore copy(final Access2D<?> source) {
+
+            final int tmpRowDim = (int) source.countRows();
+            final int tmpColDim = (int) source.countColumns();
+
+            final ComplexDenseStore retVal = new ComplexDenseStore(tmpRowDim, tmpColDim);
+
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillMatchingSingle.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+            }
+
+            return retVal;
+        }
+
+        public GenericDenseStore<N> copy(final Access2D<?> source) {
+
+            final int tmpRowDim = (int) source.countRows();
+            final int tmpColDim = (int) source.countColumns();
+
+            final ComplexDenseStore retVal = new ComplexDenseStore(tmpRowDim, tmpColDim);
+
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillMatchingSingle.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+            }
+
+            return retVal;
+        }
+
+        public FunctionSet<N> function() {
+            return myDenseArrayFactory.function();
+        }
+
+        public ComplexDenseStore makeEye(final long rows, final long columns) {
+
+            final ComplexDenseStore retVal = this.makeZero(rows, columns);
+
+            retVal.myUtility.fillDiagonal(0, 0, ComplexNumber.ONE);
+
+            return retVal;
         }
 
         public GenericDenseStore<N> makeEye(final long rows, final long columns) {
@@ -88,37 +285,45 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements PhysicalS
             return null;
         }
 
+        public ComplexDenseStore makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
+
+            final int tmpRowDim = (int) rows;
+            final int tmpColDim = (int) columns;
+
+            final int tmpLength = tmpRowDim * tmpColDim;
+
+            final ComplexNumber[] tmpData = new ComplexNumber[tmpLength];
+
+            for (int i = 0; i < tmpLength; i++) {
+                tmpData[i] = ComplexNumber.valueOf(supplier.get());
+            }
+
+            return new ComplexDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
         public GenericDenseStore<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public GenericDenseStore<N> makeZero(final long rows, final long columns) {
+        public Householder.Complex makeHouseholder(final int length) {
+            return new Householder.Complex(length);
+        }
+
+        public Householder<N> makeHouseholder(final int length) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public GenericDenseStore<N> rows(final Access1D<?>... source) {
-            // TODO Auto-generated method stub
-            return null;
+        public Rotation.Complex makeRotation(final int low, final int high, final ComplexNumber cos, final ComplexNumber sin) {
+            return new Rotation.Complex(low, high, cos, sin);
         }
 
-        public GenericDenseStore<N> rows(final double[]... source) {
-            // TODO Auto-generated method stub
-            return null;
+        public Rotation.Complex makeRotation(final int low, final int high, final double cos, final double sin) {
+            return this.makeRotation(low, high, ComplexNumber.valueOf(cos), ComplexNumber.valueOf(sin));
         }
 
-        public GenericDenseStore<N> rows(final List<? extends Number>... source) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public GenericDenseStore<N> rows(final Number[]... source) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public GenericDenseStore<N> transpose(final Access2D<?> source) {
+        public Rotation<N> makeRotation(final int low, final int high, final double cos, final double sin) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -128,46 +333,148 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements PhysicalS
             return null;
         }
 
-        public AggregatorSet<N> aggregator() {
+        public ComplexDenseStore makeZero(final long rows, final long columns) {
+            return new ComplexDenseStore((int) rows, (int) columns);
+        }
+
+        public GenericDenseStore<N> makeZero(final long rows, final long columns) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public org.ojalgo.array.DenseArray.Factory<N> array() {
+        public ComplexDenseStore rows(final Access1D<?>... source) {
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = (int) source[0].count();
+
+            final ComplexNumber[] tmpData = new ComplexNumber[tmpRowDim * tmpColDim];
+
+            Access1D<?> tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf(tmpRow.get(j));
+                }
+            }
+
+            return new ComplexDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public GenericDenseStore<N> rows(final Access1D<?>... source) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public org.ojalgo.matrix.store.MatrixStore.Factory<N> builder() {
+        public ComplexDenseStore rows(final double[]... source) {
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = source[0].length;
+
+            final ComplexNumber[] tmpData = new ComplexNumber[tmpRowDim * tmpColDim];
+
+            double[] tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf((Number) tmpRow[j]);
+                }
+            }
+
+            return new ComplexDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public GenericDenseStore<N> rows(final double[]... source) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public GenericDenseStore<N> conjugate(final Access2D<?> source) {
+        public ComplexDenseStore rows(final List<? extends Number>... source) {
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = source[0].size();
+
+            final ComplexNumber[] tmpData = new ComplexNumber[tmpRowDim * tmpColDim];
+
+            List<? extends Number> tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf(tmpRow.get(j));
+                }
+            }
+
+            return new ComplexDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public GenericDenseStore<N> rows(final List<? extends Number>... source) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public FunctionSet<N> function() {
-            // TODO Auto-generated method stub
-            return null;
+        public ComplexDenseStore rows(final Number[]... source) {
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = source[0].length;
+
+            final ComplexNumber[] tmpData = new ComplexNumber[tmpRowDim * tmpColDim];
+
+            Number[] tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf(tmpRow[j]);
+                }
+            }
+
+            return new ComplexDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public Householder<N> makeHouseholder(final int length) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public Rotation<N> makeRotation(final int low, final int high, final double cos, final double sin) {
+        public GenericDenseStore<N> rows(final Number[]... source) {
             // TODO Auto-generated method stub
             return null;
         }
 
         public org.ojalgo.scalar.Scalar.Factory<N> scalar() {
+            return myDenseArrayFactory.scalar();
+        }
+
+        public ComplexDenseStore transpose(final Access2D<?> source) {
+
+            final ComplexDenseStore retVal = new ComplexDenseStore((int) source.countColumns(), (int) source.countRows());
+
+            final int tmpRowDim = retVal.getRowDim();
+            final int tmpColDim = retVal.getColDim();
+
+            if (tmpColDim > FillTransposed.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillTransposed.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillTransposed.THRESHOLD);
+
+            } else {
+
+                FillTransposed.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+            }
+
+            return retVal;
+        }
+
+        public GenericDenseStore<N> transpose(final Access2D<?> source) {
             // TODO Auto-generated method stub
             return null;
         }
 
+    }
+
+    public static <N extends Number & Scalar<N>> PhysicalStore.Factory<N, GenericDenseStore<N>> factory(final DenseArray.Factory<N> denseArrayFactory) {
+        return new MyFactory<N>(denseArrayFactory);
     }
 
     private final DenseArray<N> myDenseArray = null;
