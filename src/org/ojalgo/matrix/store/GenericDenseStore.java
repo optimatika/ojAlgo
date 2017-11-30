@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.ComplexFunction.*;
-
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
@@ -52,6 +50,7 @@ import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
+import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -391,28 +390,28 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         }
     }
 
-    private Householder.Complex cast(final Householder<N> transformation) {
-        if (transformation instanceof Householder.Complex) {
-            return (Householder.Complex) transformation;
+    private Householder.Generic<N> cast(final Householder<N> transformation) {
+        if (transformation instanceof Householder.Generic) {
+            return (Householder.Generic<N>) transformation;
         } else if (transformation instanceof HouseholderReference<?>) {
-            return ((Householder.Complex) ((HouseholderReference<N>) transformation).getWorker(myFactory)).copy(transformation);
+            return ((Householder.Generic<N>) ((HouseholderReference<N>) transformation).getWorker(myFactory)).copy(transformation);
         } else {
-            return new Householder.Complex(transformation);
+            return new Householder.Generic<N>(myFactory.scalar(), transformation);
         }
     }
 
-    private Rotation.Complex cast(final Rotation<N> transformation) {
-        if (transformation instanceof Rotation.Complex) {
-            return (Rotation.Complex) transformation;
+    private Rotation.Generic<N> cast(final Rotation<N> transformation) {
+        if (transformation instanceof Rotation.Generic) {
+            return (Rotation.Generic<N>) transformation;
         } else {
-            return new Rotation.Complex(transformation);
+            return new Rotation.Generic<N>(transformation);
         }
     }
 
-    private final GenericMultiplyBoth multiplyBoth;
-    private final GenericMultiplyLeft multiplyLeft;
-    private final GenericMultiplyNeither multiplyNeither;
-    private final GenericMultiplyRight multiplyRight;
+    private final GenericMultiplyBoth<N> multiplyBoth;
+    private final GenericMultiplyLeft<N> multiplyLeft;
+    private final GenericMultiplyNeither<N> multiplyNeither;
+    private final GenericMultiplyRight<N> multiplyRight;
     private final int myColDim;
     private final int myRowDim;
     private final Array2D<N> myUtility;
@@ -600,7 +599,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         return myUtility.asArray1D();
     }
 
-    public Array1D<N> computeInPlaceSchur(final PhysicalStore<N> transformationCollector, final boolean eigenvalue) {
+    public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<N> transformationCollector, final boolean eigenvalue) {
         ProgrammingError.throwForUnsupportedOptionalOperation();
         return null;
     }
@@ -694,13 +693,13 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
         if (left instanceof GenericDenseStore) {
             if (right instanceof GenericDenseStore) {
-                multiplyNeither.invoke(data, GenericDenseStore.cast(left).data, complexity, GenericDenseStore.cast(right).data);
+                multiplyNeither.invoke(data, this.cast(left).data, complexity, this.cast(right).data, myFactory.scalar());
             } else {
-                multiplyRight.invoke(data, GenericDenseStore.cast(left).data, complexity, right);
+                multiplyRight.invoke(data, this.cast(left).data, complexity, right, myFactory.scalar());
             }
         } else {
             if (right instanceof GenericDenseStore) {
-                multiplyLeft.invoke(data, left, complexity, GenericDenseStore.cast(right).data);
+                multiplyLeft.invoke(data, left, complexity, this.cast(right).data, myFactory.scalar());
             } else {
                 multiplyBoth.invoke(this, left, complexity, right);
             }
@@ -800,11 +799,11 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     public boolean generateApplyAndCopyHouseholderColumn(final int row, final int column, final Householder<N> destination) {
-        return GenerateApplyAndCopyHouseholderColumn.invoke(data, myRowDim, row, column, (Householder.Complex) destination);
+        return GenerateApplyAndCopyHouseholderColumn.invoke(data, myRowDim, row, column, (Householder.Generic<N>) destination, myFactory.scalar());
     }
 
     public boolean generateApplyAndCopyHouseholderRow(final int row, final int column, final Householder<N> destination) {
-        return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Complex) destination);
+        return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Generic<N>) destination, myFactory.scalar());
     }
 
     public final MatrixStore<N> get() {
@@ -913,9 +912,9 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         final GenericDenseStore retVal = this.physical().makeZero(myRowDim, right.count() / myColDim);
 
         if (right instanceof GenericDenseStore) {
-            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, GenericDenseStore.cast(right).data);
+            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, this.cast(right).data, myFactory.scalar());
         } else {
-            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
+            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right, myFactory.scalar());
         }
 
         return retVal;
@@ -936,10 +935,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     public void negateColumn(final int column) {
-        myUtility.modifyColumn(0, column, ComplexFunction.NEGATE);
+        myUtility.modifyColumn(0, column, myFactory.function().negate());
     }
 
-    public PhysicalStore.Factory<N, GenericDenseStore> physical() {
+    public PhysicalStore.Factory<N, GenericDenseStore<N>> physical() {
         return myFactory;
     }
 

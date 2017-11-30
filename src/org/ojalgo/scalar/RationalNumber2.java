@@ -72,9 +72,9 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
 
     private static final String DIVIDE = " / ";
     private static final String LEFT = "(";
-    private static final String RIGHT = ")";
+    private static final long LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE));
 
-    private static final long LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE));;
+    private static final String RIGHT = ")";;
 
     /**
      * Greatest Common Denominator

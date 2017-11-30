@@ -28,10 +28,12 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.ComplexFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Scalar;
 
 public abstract class Rotation<N extends Number> extends Object {
 
@@ -220,6 +222,11 @@ public abstract class Rotation<N extends Number> extends Object {
         return new Complex(aLowerIndex, aHigherIndex, ComplexFunction.COS.invoke(anAngle), ComplexFunction.SIN.invoke(anAngle));
     }
 
+    public static <N extends Number & Scalar<N>> Generic<N> makeComplex(final FunctionSet<N> functions, final int aLowerIndex, final int aHigherIndex,
+            final N anAngle) {
+        return new Generic<N>(aLowerIndex, aHigherIndex, functions.cos().invoke(anAngle), functions.sin().invoke(anAngle));
+    }
+
     public static Primitive makePrimitive(final int aLowerIndex, final int aHigherIndex, final double anAngle) {
         return new Primitive(aLowerIndex, aHigherIndex, PrimitiveFunction.COS.invoke(anAngle), PrimitiveFunction.SIN.invoke(anAngle));
     }
@@ -404,6 +411,62 @@ public abstract class Rotation<N extends Number> extends Object {
     @Override
     public String toString() {
         return "low=" + low + ", high=" + high + ", cos=" + this.getCosine() + ", sin=" + this.getSine();
+    }
+
+    public static final class Generic<N extends Number & Scalar<N>> extends Rotation<N> {
+
+        public final N cos;
+        public final N sin;
+
+        public Generic(final int index) {
+            this(index, index, null, null);
+        }
+
+        public Generic(final int aLowerIndex, final int aHigherIndex) {
+            this(aLowerIndex, aHigherIndex, null, null);
+        }
+
+        public Generic(final int aLowerIndex, final int aHigherIndex, final N aCosine, final N aSine) {
+
+            super(aLowerIndex, aHigherIndex);
+
+            cos = aCosine;
+            sin = aSine;
+        }
+
+        public Generic(final Rotation<N> aRotation) {
+
+            super(aRotation.low, aRotation.high);
+
+            cos = aRotation.getCosine();
+            sin = aRotation.getSine();
+        }
+
+        @Override
+        public double doubleCosineValue() {
+            return cos.doubleValue();
+        }
+
+        @Override
+        public double doubleSineValue() {
+            return sin.doubleValue();
+        }
+
+        @Override
+        public N getCosine() {
+            return cos;
+        }
+
+        @Override
+        public N getSine() {
+            return sin;
+        }
+
+        @Override
+        public Generic<N> invert() {
+            return new Generic<N>(high, low, cos, sin);
+        }
+
     }
 
 }

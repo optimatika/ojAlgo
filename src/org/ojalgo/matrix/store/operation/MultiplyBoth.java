@@ -21,8 +21,10 @@
  */
 package org.ojalgo.matrix.store.operation;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
@@ -31,7 +33,6 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyBoth;
-import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyBoth;
 import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
@@ -54,22 +55,6 @@ public final class MultiplyBoth extends MatrixOperation {
             @Override
             public void conquer(final int first, final int limit) {
                 MultiplyBoth.invokeBig(product, first, limit, left, complexity, right);
-            }
-        };
-
-        tmpConquerer.invoke(0, ((int) left.count()) / complexity, THRESHOLD);
-    };
-
-    static final ComplexMultiplyBoth COMPLEX = (product, left, complexity, right) -> MultiplyBoth.invokeComplex(product, 0, ((int) left.count()) / complexity,
-            left, complexity, right);
-
-    static final ComplexMultiplyBoth COMPLEX_MT = (product, left, complexity, right) -> {
-
-        final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-            @Override
-            public void conquer(final int first, final int limit) {
-                MultiplyBoth.invokeComplex(product, first, limit, left, complexity, right);
             }
         };
 
@@ -599,11 +584,26 @@ public final class MultiplyBoth extends MatrixOperation {
         }
     }
 
-    public static ComplexMultiplyBoth getComplex(final long rows, final long columns) {
+    public static <N extends Number & Scalar<N>> GenericMultiplyBoth<N> getGeneric(final long rows, final long columns) {
+
         if (rows > THRESHOLD) {
-            return COMPLEX_MT;
+
+            return (product, left, complexity, right) -> {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        MultiplyBoth.invokeGeneric(product, first, limit, left, complexity, right);
+                    }
+                };
+
+                tmpConquerer.invoke(0, ((int) left.count()) / complexity, THRESHOLD);
+            };
+
         } else {
-            return COMPLEX;
+
+            return (product, left, complexity, right) -> MultiplyBoth.invokeGeneric(product, 0, ((int) left.count()) / complexity, left, complexity, right);
         }
     }
 
@@ -697,12 +697,60 @@ public final class MultiplyBoth extends MatrixOperation {
 
     static void invokeComplex(final ElementsConsumer<ComplexNumber> product, final int firstRow, final int rowLimit, final Access1D<ComplexNumber> left,
             final int complexity, final Access1D<ComplexNumber> right) {
+        MultiplyBoth.invokeGeneric(product, firstRow, rowLimit, left, complexity, right);
+
+        //        final int tmpRowDim = (int) (left.count() / complexity);
+        //        final int tmpColDim = (int) (right.count() / complexity);
+        //
+        //        final ComplexNumber[] tmpLeftRow = new ComplexNumber[complexity];
+        //        ComplexNumber tmpVal;
+        //
+        //        int tmpFirst = 0;
+        //        int tmpLimit = complexity;
+        //
+        //        for (int i = firstRow; i < rowLimit; i++) {
+        //
+        //            final int tmpFirstInRow = MatrixUtils.firstInRow(left, i, 0);
+        //            final int tmpLimitOfRow = MatrixUtils.limitOfRow(left, i, complexity);
+        //
+        //            for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
+        //                tmpLeftRow[c] = left.get(i + (c * tmpRowDim));
+        //            }
+        //
+        //            for (int j = 0; j < tmpColDim; j++) {
+        //                final int tmpColBase = j * complexity;
+        //
+        //                tmpFirst = MatrixUtils.firstInColumn(right, j, tmpFirstInRow);
+        //                tmpLimit = MatrixUtils.limitOfColumn(right, j, tmpLimitOfRow);
+        //
+        //                tmpVal = ComplexNumber.ZERO;
+        //                for (int c = tmpFirst; c < tmpLimit; c++) {
+        //                    tmpVal = tmpVal.add(tmpLeftRow[c].multiply(right.get(c + tmpColBase)));
+        //                }
+        //                product.set(i, j, tmpVal);
+        //            }
+        //        }
+    }
+
+    static <N extends Number & Scalar<N>> void invokeGeneric(final ElementsConsumer<N> product, final int firstRow, final int rowLimit, final Access1D<N> left,
+            final int complexity, final Access1D<N> right) {
+
+        @SuppressWarnings("unchecked")
+        final Class<N> componenetType = (Class<N>) left.get(0L).getClass();
+        final N zero;
+        try {
+            zero = componenetType.newInstance();
+        } catch (InstantiationException | IllegalAccessException exception) {
+            exception.printStackTrace();
+            throw new ProgrammingError(exception);
+        }
 
         final int tmpRowDim = (int) (left.count() / complexity);
         final int tmpColDim = (int) (right.count() / complexity);
 
-        final ComplexNumber[] tmpLeftRow = new ComplexNumber[complexity];
-        ComplexNumber tmpVal;
+        @SuppressWarnings("unchecked")
+        final N[] tmpLeftRow = (N[]) Array.newInstance(componenetType, complexity);
+        N tmpVal;
 
         int tmpFirst = 0;
         int tmpLimit = complexity;
@@ -722,9 +770,9 @@ public final class MultiplyBoth extends MatrixOperation {
                 tmpFirst = MatrixUtils.firstInColumn(right, j, tmpFirstInRow);
                 tmpLimit = MatrixUtils.limitOfColumn(right, j, tmpLimitOfRow);
 
-                tmpVal = ComplexNumber.ZERO;
+                tmpVal = zero;
                 for (int c = tmpFirst; c < tmpLimit; c++) {
-                    tmpVal = tmpVal.add(tmpLeftRow[c].multiply(right.get(c + tmpColBase)));
+                    tmpVal = tmpVal.add(tmpLeftRow[c].multiply(right.get(c + tmpColBase))).getNumber();
                 }
                 product.set(i, j, tmpVal);
             }
@@ -774,14 +822,6 @@ public final class MultiplyBoth extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
-    }
-
-    public static <N extends Number & Scalar<N>> GenericMultiplyBoth<N> getGeneric(final long rows, final long columns) {
-        if (rows > THRESHOLD) {
-            return null;
-        } else {
-            return null;
-        }
     }
 
 }

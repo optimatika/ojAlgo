@@ -176,7 +176,7 @@ public final class ComplexNumber extends Number
     private final boolean myRealForSure;
     private final double myRealValue;
 
-    private ComplexNumber() {
+    public ComplexNumber() {
         this(PrimitiveMath.ZERO);
     }
 

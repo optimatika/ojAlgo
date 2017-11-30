@@ -115,7 +115,7 @@ final class Money extends Number implements Scalar<Money>, Enforceable<Money> {
 
     private final long myNumerator;
 
-    private Money() {
+    public Money() {
 
         super();
 

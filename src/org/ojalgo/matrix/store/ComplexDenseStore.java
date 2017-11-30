@@ -47,6 +47,10 @@ import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
+import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
+import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyLeft;
+import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyNeither;
+import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyRight;
 import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
@@ -61,28 +65,6 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public final class ComplexDenseStore extends ComplexArray implements PhysicalStore<ComplexNumber>, DecompositionStore<ComplexNumber> {
-
-    public static interface ComplexMultiplyBoth extends FillByMultiplying<ComplexNumber> {
-
-    }
-
-    public static interface ComplexMultiplyLeft {
-
-        void invoke(ComplexNumber[] product, Access1D<ComplexNumber> left, int complexity, ComplexNumber[] right);
-
-    }
-
-    public static interface ComplexMultiplyNeither {
-
-        void invoke(ComplexNumber[] product, ComplexNumber[] left, int complexity, ComplexNumber[] right);
-
-    }
-
-    public static interface ComplexMultiplyRight {
-
-        void invoke(ComplexNumber[] product, ComplexNumber[] left, int complexity, Access1D<ComplexNumber> right);
-
-    }
 
     public static final PhysicalStore.Factory<ComplexNumber, ComplexDenseStore> FACTORY = new PhysicalStore.Factory<ComplexNumber, ComplexDenseStore>() {
 
@@ -405,10 +387,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
-    private final ComplexMultiplyBoth multiplyBoth;
-    private final ComplexMultiplyLeft multiplyLeft;
-    private final ComplexMultiplyNeither multiplyNeither;
-    private final ComplexMultiplyRight multiplyRight;
+    private final GenericMultiplyBoth<ComplexNumber> multiplyBoth;
+    private final GenericMultiplyLeft<ComplexNumber> multiplyLeft;
+    private final GenericMultiplyNeither<ComplexNumber> multiplyNeither;
+    private final GenericMultiplyRight<ComplexNumber> multiplyRight;
     private final int myColDim;
     private final int myRowDim;
     private final Array2D<ComplexNumber> myUtility;
@@ -422,10 +404,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         myUtility = this.asArray2D(myRowDim);
 
-        multiplyBoth = MultiplyBoth.getComplex(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.getComplex(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.getComplex(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.getComplex(myRowDim, myColDim);
+        multiplyBoth = MultiplyBoth.getGeneric(myRowDim, myColDim);
+        multiplyLeft = MultiplyLeft.getGeneric(myRowDim, myColDim);
+        multiplyRight = MultiplyRight.getGeneric(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getGeneric(myRowDim, myColDim);
     }
 
     ComplexDenseStore(final int aLength) {
@@ -437,10 +419,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         myUtility = this.asArray2D(myRowDim);
 
-        multiplyBoth = MultiplyBoth.getComplex(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.getComplex(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.getComplex(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.getComplex(myRowDim, myColDim);
+        multiplyBoth = MultiplyBoth.getGeneric(myRowDim, myColDim);
+        multiplyLeft = MultiplyLeft.getGeneric(myRowDim, myColDim);
+        multiplyRight = MultiplyRight.getGeneric(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getGeneric(myRowDim, myColDim);
     }
 
     ComplexDenseStore(final int aRowDim, final int aColDim) {
@@ -452,10 +434,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         myUtility = this.asArray2D(myRowDim);
 
-        multiplyBoth = MultiplyBoth.getComplex(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.getComplex(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.getComplex(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.getComplex(myRowDim, myColDim);
+        multiplyBoth = MultiplyBoth.getGeneric(myRowDim, myColDim);
+        multiplyLeft = MultiplyLeft.getGeneric(myRowDim, myColDim);
+        multiplyRight = MultiplyRight.getGeneric(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getGeneric(myRowDim, myColDim);
     }
 
     ComplexDenseStore(final int aRowDim, final int aColDim, final ComplexNumber[] anArray) {
@@ -467,10 +449,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         myUtility = this.asArray2D(myRowDim);
 
-        multiplyBoth = MultiplyBoth.getComplex(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.getComplex(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.getComplex(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.getComplex(myRowDim, myColDim);
+        multiplyBoth = MultiplyBoth.getGeneric(myRowDim, myColDim);
+        multiplyLeft = MultiplyLeft.getGeneric(myRowDim, myColDim);
+        multiplyRight = MultiplyRight.getGeneric(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getGeneric(myRowDim, myColDim);
     }
 
     public void accept(final Access2D<?> supplied) {
@@ -690,13 +672,13 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         if (left instanceof ComplexDenseStore) {
             if (right instanceof ComplexDenseStore) {
-                multiplyNeither.invoke(data, ComplexDenseStore.cast(left).data, complexity, ComplexDenseStore.cast(right).data);
+                multiplyNeither.invoke(data, ComplexDenseStore.cast(left).data, complexity, ComplexDenseStore.cast(right).data, FACTORY.scalar());
             } else {
-                multiplyRight.invoke(data, ComplexDenseStore.cast(left).data, complexity, right);
+                multiplyRight.invoke(data, ComplexDenseStore.cast(left).data, complexity, right, FACTORY.scalar());
             }
         } else {
             if (right instanceof ComplexDenseStore) {
-                multiplyLeft.invoke(data, left, complexity, ComplexDenseStore.cast(right).data);
+                multiplyLeft.invoke(data, left, complexity, ComplexDenseStore.cast(right).data, FACTORY.scalar());
             } else {
                 multiplyBoth.invoke(this, left, complexity, right);
             }
@@ -909,9 +891,9 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         final ComplexDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
         if (right instanceof ComplexDenseStore) {
-            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, ComplexDenseStore.cast(right).data);
+            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, ComplexDenseStore.cast(right).data, FACTORY.scalar());
         } else {
-            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
+            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right, FACTORY.scalar());
         }
 
         return retVal;

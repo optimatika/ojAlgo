@@ -103,7 +103,7 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
 
     private final BigDecimal myNumber;
 
-    private BigScalar() {
+    public BigScalar() {
 
         super();
 

@@ -28,6 +28,7 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public interface Householder<N extends Number> extends Access1D<N> {
 
@@ -208,6 +209,113 @@ public interface Householder<N extends Number> extends Access1D<N> {
         }
 
         public ComplexNumber get(final long index) {
+            return vector[(int) index];
+        }
+
+        @Override
+        public String toString() {
+
+            final StringBuilder retVal = new StringBuilder("{");
+
+            final int tmpFirst = first;
+            final int tmpLength = vector.length;
+            for (int i = 0; i < tmpFirst; i++) {
+                retVal.append(ComplexNumber.ZERO);
+                retVal.append(", ");
+            }
+            for (int i = first; i < tmpLength; i++) {
+                retVal.append(vector[i]);
+                if ((i + 1) < tmpLength) {
+                    retVal.append(", ");
+                }
+            }
+            retVal.append("}");
+
+            return retVal.toString();
+        }
+
+    }
+
+    public static final class Generic<N extends Number & Scalar<N>> extends Object implements Householder<N> {
+
+        public N beta;
+        public int first;
+        public final N[] vector;
+
+        private final Scalar.Factory<N> myFactory;
+
+        public Generic(final Scalar.Factory<N> factory, final Householder<N> aTransf) {
+
+            this(factory, (int) aTransf.count());
+
+            this.copy(aTransf);
+        }
+
+        public Generic(final Scalar.Factory<N> factory, final int dim) {
+
+            super();
+
+            vector = factory.newArrayInstance(dim);
+            beta = factory.zero().getNumber();
+            first = 0;
+
+            myFactory = factory;
+        }
+
+        @SuppressWarnings("unused")
+        private Generic() {
+            this(null, 0);
+        }
+
+        public final Householder.Generic<N> copy(final Householder<N> source) {
+
+            first = source.first();
+
+            final N[] tmpVector = vector;
+            N tmpNmbr;
+            double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
+            final int tmpSize = (int) source.count();
+            for (int i = source.first(); i < tmpSize; i++) {
+                tmpNmbr = source.get(i);
+                tmpVal = tmpNmbr.norm();
+                tmpVal2 += tmpVal * tmpVal;
+                tmpVector[i] = tmpNmbr;
+            }
+
+            beta = myFactory.cast(PrimitiveMath.TWO / tmpVal2);
+
+            return this;
+        }
+
+        public final Householder.Generic<N> copy(final Householder<N> source, final N precalculatedBeta) {
+
+            first = source.first();
+
+            final N[] tmpVector = vector;
+
+            final int tmpSize = (int) source.count();
+            for (int i = source.first(); i < tmpSize; i++) {
+                tmpVector[i] = source.get(i);
+            }
+
+            beta = precalculatedBeta;
+
+            return this;
+        }
+
+        public long count() {
+            return vector.length;
+        }
+
+        public double doubleValue(final long anInd) {
+            return vector[(int) anInd].doubleValue();
+        }
+
+        public int first() {
+            return first;
+        }
+
+        public N get(final long index) {
             return vector[(int) index];
         }
 

@@ -91,7 +91,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         if (tmpType.equals(Double.class)) {
             myMultiplyer = (FillByMultiplying<N>) MultiplyBoth.getPrimitive(rowsCount, columnsCount);
         } else if (tmpType.equals(ComplexNumber.class)) {
-            myMultiplyer = (FillByMultiplying<N>) MultiplyBoth.getComplex(rowsCount, columnsCount);
+            myMultiplyer = (FillByMultiplying<N>) MultiplyBoth.getGeneric(rowsCount, columnsCount);
         } else if (tmpType.equals(BigDecimal.class)) {
             myMultiplyer = (FillByMultiplying<N>) MultiplyBoth.getBig(rowsCount, columnsCount);
         } else {

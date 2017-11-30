@@ -229,7 +229,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     private final BigInteger myDenominator;
     private final BigInteger myNumerator;
 
-    private RationalNumber() {
+    public RationalNumber() {
         this(BigInteger.ZERO, BigInteger.ONE);
     }
 

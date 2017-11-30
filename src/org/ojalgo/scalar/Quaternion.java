@@ -179,6 +179,20 @@ public final class Quaternion extends Number
     private final boolean myRealForSure;
     private final double myScalar;
 
+    public Quaternion() {
+
+        super();
+
+        myScalar = PrimitiveMath.ZERO;
+
+        myRealForSure = true;
+        myPureForSure = true;
+
+        i = PrimitiveMath.ZERO;
+        j = PrimitiveMath.ZERO;
+        k = PrimitiveMath.ZERO;
+    }
+
     private Quaternion(final double scalar) {
 
         super();
@@ -247,20 +261,6 @@ public final class Quaternion extends Number
         i = vector[0];
         j = vector[1];
         k = vector[2];
-    }
-
-    Quaternion() {
-
-        super();
-
-        myScalar = PrimitiveMath.ZERO;
-
-        myRealForSure = true;
-        myPureForSure = true;
-
-        i = PrimitiveMath.ZERO;
-        j = PrimitiveMath.ZERO;
-        k = PrimitiveMath.ZERO;
     }
 
     public Quaternion add(final double arg) {

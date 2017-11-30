@@ -112,7 +112,7 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
 
     private final double myValue;
 
-    private PrimitiveScalar() {
+    public PrimitiveScalar() {
 
         super();
 

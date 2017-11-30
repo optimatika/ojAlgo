@@ -31,6 +31,7 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Scalar;
 
 public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
 
@@ -131,6 +132,58 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
             }
 
             destination.beta = ComplexNumber.valueOf(tmpScale.norm() / tmpNorm2);
+        }
+
+        return retVal;
+    }
+
+    public static <N extends Number & Scalar<N>> boolean invoke(final N[] data, final int structure, final int row, final int col,
+            final Householder.Generic<N> destination, final Scalar.Factory<N> scalar) {
+
+        final int tmpColDim = data.length / structure;
+
+        final N[] tmpVector = destination.vector;
+        destination.first = col;
+
+        double tmpNormInf = PrimitiveMath.ZERO;
+        for (int j = col; j < tmpColDim; j++) {
+            tmpNormInf = PrimitiveFunction.MAX.invoke(tmpNormInf, (tmpVector[j] = data[row + (j * structure)]).norm());
+        }
+
+        boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
+        N tmpVal;
+        double tmpNorm2 = PrimitiveMath.ZERO;
+
+        if (retVal) {
+            for (int j = col + 1; j < tmpColDim; j++) {
+                tmpVal = tmpVector[j].divide(tmpNormInf).getNumber();
+                tmpNorm2 += tmpVal.norm() * tmpVal.norm();
+                tmpVector[j] = tmpVal;
+            }
+            final double value = tmpNorm2;
+            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
+        }
+
+        if (retVal) {
+
+            N tmpScale = tmpVector[col].divide(tmpNormInf).getNumber();
+            tmpNorm2 += tmpScale.norm() * tmpScale.norm();
+            tmpNorm2 = PrimitiveFunction.SQRT.invoke(tmpNorm2);
+
+            // data[(row + (col * structure))] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
+            data[(row + (col * structure))] = tmpScale.signum().multiply(tmpNorm2 * tmpNormInf).getNumber();
+            // tmpScale = tmpScale.subtract(ComplexNumber.makePolar(tmpNorm2, tmpScale.phase()));
+            tmpScale = tmpScale.subtract(tmpScale.signum().multiply(tmpNorm2)).getNumber();
+
+            tmpVector[col] = scalar.one().getNumber();
+
+            for (int j = col + 1; j < tmpColDim; j++) {
+                // data[row + (j * structure)] = tmpVector[j] = ComplexFunction.DIVIDE.invoke(tmpVector[j], tmpScale).conjugate();
+                data[row + (j * structure)] = tmpVector[j] = tmpVector[j].divide(tmpScale).conjugate().getNumber();
+            }
+
+            // destination.beta = ComplexNumber.valueOf(tmpScale.norm() / tmpNorm2);
+            destination.beta = scalar.cast(tmpScale.norm() / tmpNorm2);
         }
 
         return retVal;
