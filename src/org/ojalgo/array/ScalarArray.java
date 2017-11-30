@@ -31,10 +31,14 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-abstract class ScalarArray<N extends Number & Scalar<N>> extends ReferenceTypeArray<N> {
+public abstract class ScalarArray<N extends Number & Scalar<N>> extends ReferenceTypeArray<N> {
 
     protected ScalarArray(final N[] data) {
         super(data);
+    }
+
+    protected ScalarArray(final Class<N> componentType, final int length) {
+        super(componentType, length);
     }
 
     public final void axpy(final double a, final Mutate1D y) {

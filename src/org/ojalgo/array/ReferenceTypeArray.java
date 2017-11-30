@@ -21,6 +21,7 @@
  */
 package org.ojalgo.array;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -120,6 +121,14 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implem
         super(data.length);
 
         this.data = data;
+    }
+
+    @SuppressWarnings("unchecked")
+    ReferenceTypeArray(final Class<N> componentType, final int length) {
+
+        super(length);
+
+        data = (N[]) Array.newInstance(componentType, length);
     }
 
     @Override
