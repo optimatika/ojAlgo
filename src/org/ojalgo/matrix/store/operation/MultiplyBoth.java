@@ -776,9 +776,12 @@ public final class MultiplyBoth extends MatrixOperation {
         return THRESHOLD;
     }
 
-    public static <N extends Number & Scalar<N>> GenericMultiplyBoth<N> getGeneric(final int rowDim, final int colDim) {
-        // TODO Auto-generated method stub
-        return null;
+    public static <N extends Number & Scalar<N>> GenericMultiplyBoth<N> getGeneric(final long rows, final long columns) {
+        if (rows > THRESHOLD) {
+            return null;
+        } else {
+            return null;
+        }
     }
 
 }

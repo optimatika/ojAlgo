@@ -68,19 +68,19 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public static interface GenericMultiplyLeft<N extends Number & Scalar<N>> {
 
-        void invoke(N[] product, Access1D<N> left, int complexity, N[] right);
+        void invoke(N[] product, Access1D<N> left, int complexity, N[] right, Scalar.Factory<N> scalar);
 
     }
 
     public static interface GenericMultiplyNeither<N extends Number & Scalar<N>> {
 
-        void invoke(N[] product, N[] left, int complexity, N[] right);
+        void invoke(N[] product, N[] left, int complexity, N[] right, Scalar.Factory<N> scalar);
 
     }
 
     public static interface GenericMultiplyRight<N extends Number & Scalar<N>> {
 
-        void invoke(N[] product, N[] left, int complexity, Access1D<N> right);
+        void invoke(N[] product, N[] left, int complexity, Access1D<N> right, Scalar.Factory<N> scalar);
 
     }
 
