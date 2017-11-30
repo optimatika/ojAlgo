@@ -30,8 +30,10 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyNeither;
 import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyNeither;
+import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyNeither;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyNeither;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class MultiplyNeither extends MatrixOperation {
 
@@ -692,6 +694,11 @@ public final class MultiplyNeither extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static <N extends Number & Scalar<N>> GenericMultiplyNeither<N> getGeneric(final int rowDim, final int colDim) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
