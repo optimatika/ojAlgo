@@ -61,6 +61,11 @@ public interface Scalar<N extends Number> extends AccessScalar<N>, Field<Scalar<
 
         Scalar<N> convert(Number number);
 
+        @SuppressWarnings("unchecked")
+        default N[] newArrayInstance(final int length) {
+            return (N[]) Array.newInstance(this.zero().getNumber().getClass(), length);
+        }
+
         /**
          * @return The multiplicative identity element
          */
@@ -70,10 +75,6 @@ public interface Scalar<N extends Number> extends AccessScalar<N>, Field<Scalar<
          * @return The additive identity element
          */
         Scalar<N> zero();
-
-        default N[] newArrayInstance(final int length) {
-            return (N[]) Array.newInstance(this.zero().getNumber().getClass(), length);
-        }
 
     }
 
