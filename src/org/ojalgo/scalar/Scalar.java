@@ -21,6 +21,7 @@
  */
 package org.ojalgo.scalar;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.AccessScalar;
@@ -69,6 +70,10 @@ public interface Scalar<N extends Number> extends AccessScalar<N>, Field<Scalar<
          * @return The additive identity element
          */
         Scalar<N> zero();
+
+        default N[] newArrayInstance(final int length) {
+            return (N[]) Array.newInstance(this.zero().getNumber().getClass(), length);
+        }
 
     }
 
