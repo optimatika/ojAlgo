@@ -1211,7 +1211,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     public void transformSymmetric(final Householder<Double> transformation) {
-
         HouseholderHermitian.invoke(data, PrimitiveDenseStore.cast(transformation), this.getWorkerColumn());
     }
 
@@ -1235,6 +1234,15 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         myUtility.visitRow(row, col, visitor);
     }
 
+    private double[] getWorkerColumn() {
+        if (myWorkerColumn != null) {
+            Arrays.fill(myWorkerColumn, ZERO);
+        } else {
+            myWorkerColumn = new double[myRowDim];
+        }
+        return myWorkerColumn;
+    }
+
     int getColDim() {
         return myColDim;
     }
@@ -1249,15 +1257,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     int getRowDim() {
         return myRowDim;
-    }
-
-    double[] getWorkerColumn() {
-        if (myWorkerColumn != null) {
-            Arrays.fill(myWorkerColumn, ZERO);
-        } else {
-            myWorkerColumn = new double[myRowDim];
-        }
-        return myWorkerColumn;
     }
 
 }

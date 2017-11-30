@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
@@ -82,8 +83,6 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         void invoke(N[] product, N[] left, int complexity, Access1D<N> right, Scalar.Factory<N> scalar);
 
     }
-
-    private final MyFactory<N> myFactory = null;
 
     public static final class MyFactory<N extends Number & Scalar<N>> implements PhysicalStore.Factory<N, GenericDenseStore<N>> {
 
@@ -262,12 +261,12 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             return new Householder.Complex(length);
         }
 
-        public Rotation.Complex makeRotation(final int low, final int high, final N cos, final N sin) {
-            return new Rotation.Complex(low, high, cos, sin);
-        }
-
         public Rotation.Complex makeRotation(final int low, final int high, final double cos, final double sin) {
             return this.makeRotation(low, high, N.valueOf(cos), N.valueOf(sin));
+        }
+
+        public Rotation.Complex makeRotation(final int low, final int high, final N cos, final N sin) {
+            return new Rotation.Complex(low, high, cos, sin);
         }
 
         public GenericDenseStore makeZero(final long rows, final long columns) {
@@ -378,58 +377,21 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             return retVal;
         }
 
-    };
-
-    private GenericDenseStore<N> cast(final Access1D<N> matrix) {
-        if (matrix instanceof GenericDenseStore) {
-            return (GenericDenseStore<N>) matrix;
-        } else if (matrix instanceof Access2D<?>) {
-            return myFactory.copy((Access2D<?>) matrix);
-        } else {
-            return myFactory.columns(matrix);
-        }
     }
 
-    private Householder.Generic<N> cast(final Householder<N> transformation) {
-        if (transformation instanceof Householder.Generic) {
-            return (Householder.Generic<N>) transformation;
-        } else if (transformation instanceof HouseholderReference<?>) {
-            return ((Householder.Generic<N>) ((HouseholderReference<N>) transformation).getWorker(myFactory)).copy(transformation);
-        } else {
-            return new Householder.Generic<N>(myFactory.scalar(), transformation);
-        }
-    }
+    private final GenericMultiplyBoth<N> multiplyBoth;;
 
-    private Rotation.Generic<N> cast(final Rotation<N> transformation) {
-        if (transformation instanceof Rotation.Generic) {
-            return (Rotation.Generic<N>) transformation;
-        } else {
-            return new Rotation.Generic<N>(transformation);
-        }
-    }
-
-    private final GenericMultiplyBoth<N> multiplyBoth;
     private final GenericMultiplyLeft<N> multiplyLeft;
+
     private final GenericMultiplyNeither<N> multiplyNeither;
+
     private final GenericMultiplyRight<N> multiplyRight;
+
     private final int myColDim;
+    private final MyFactory<N> myFactory = null;
     private final int myRowDim;
     private final Array2D<N> myUtility;
-
-    GenericDenseStore(final N[] anArray) {
-
-        super(anArray);
-
-        myRowDim = anArray.length;
-        myColDim = 1;
-
-        myUtility = this.asArray2D(myRowDim);
-
-        multiplyBoth = MultiplyBoth.getGeneric(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.getGeneric(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.getGeneric(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.getGeneric(myRowDim, myColDim);
-    }
+    private transient N[] myWorkerColumn;
 
     GenericDenseStore(final Class<N> componentType, final int length) {
 
@@ -467,6 +429,21 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
         myRowDim = aRowDim;
         myColDim = aColDim;
+
+        myUtility = this.asArray2D(myRowDim);
+
+        multiplyBoth = MultiplyBoth.getGeneric(myRowDim, myColDim);
+        multiplyLeft = MultiplyLeft.getGeneric(myRowDim, myColDim);
+        multiplyRight = MultiplyRight.getGeneric(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getGeneric(myRowDim, myColDim);
+    }
+
+    GenericDenseStore(final N[] anArray) {
+
+        super(anArray);
+
+        myRowDim = anArray.length;
+        myColDim = 1;
 
         myUtility = this.asArray2D(myRowDim);
 
@@ -1161,7 +1138,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     public void transformSymmetric(final Householder<N> transformation) {
-        HouseholderHermitian.invoke(data, GenericDenseStore.cast(transformation), new N[(int) transformation.count()]);
+        HouseholderHermitian.invoke(data, this.cast(transformation), this.getWorkerColumn());
     }
 
     public MatrixStore<N> transpose() {
@@ -1182,6 +1159,45 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public void visitRow(final long row, final long col, final VoidFunction<N> visitor) {
         myUtility.visitRow(row, col, visitor);
+    }
+
+    private GenericDenseStore<N> cast(final Access1D<N> matrix) {
+        if (matrix instanceof GenericDenseStore) {
+            return (GenericDenseStore<N>) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return myFactory.copy((Access2D<?>) matrix);
+        } else {
+            return myFactory.columns(matrix);
+        }
+    }
+
+    private Householder.Generic<N> cast(final Householder<N> transformation) {
+        if (transformation instanceof Householder.Generic) {
+            return (Householder.Generic<N>) transformation;
+        } else if (transformation instanceof HouseholderReference<?>) {
+            return ((Householder.Generic<N>) ((HouseholderReference<N>) transformation).getWorker(myFactory)).copy(transformation);
+        } else {
+            return new Householder.Generic<N>(myFactory.scalar(), transformation);
+        }
+    }
+
+    private Rotation.Generic<N> cast(final Rotation<N> transformation) {
+        if (transformation instanceof Rotation.Generic) {
+            return (Rotation.Generic<N>) transformation;
+        } else {
+            return new Rotation.Generic<N>(transformation);
+        }
+    }
+
+    private N[] getWorkerColumn() {
+
+        if (myWorkerColumn == null) {
+            myWorkerColumn = myFactory.scalar().newArrayInstance(myRowDim);
+        }
+
+        Arrays.fill(myWorkerColumn, myFactory.scalar().zero().getNumber());
+
+        return myWorkerColumn;
     }
 
     int getColDim() {
