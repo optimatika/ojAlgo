@@ -33,10 +33,8 @@ import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyBoth;
 import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyBoth;
 import org.ojalgo.matrix.store.ElementsConsumer;
-import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Scalar;
 
 public final class MultiplyBoth extends MatrixOperation {
 
@@ -774,11 +772,6 @@ public final class MultiplyBoth extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
-    }
-
-    public static <N extends Number & Scalar<N>> GenericMultiplyBoth<N> getGeneric(final int rowDim, final int colDim) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

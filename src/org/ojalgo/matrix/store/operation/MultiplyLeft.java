@@ -32,10 +32,8 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyLeft;
 import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyLeft;
-import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyLeft;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyLeft;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Scalar;
 
 public final class MultiplyLeft extends MatrixOperation {
 
@@ -715,11 +713,6 @@ public final class MultiplyLeft extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
-    }
-
-    public static <N extends Number & Scalar<N>> GenericMultiplyLeft<N> getGeneric(final int rowDim, final int colDim) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

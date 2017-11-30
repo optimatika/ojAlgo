@@ -32,10 +32,8 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyRight;
 import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyRight;
-import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyRight;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyRight;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Scalar;
 
 public final class MultiplyRight extends MatrixOperation {
 
@@ -706,11 +704,6 @@ public final class MultiplyRight extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
-    }
-
-    public static <N extends Number & Scalar<N>> GenericMultiplyRight<N> getGeneric(final int rowDim, final int colDim) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }
