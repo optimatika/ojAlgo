@@ -84,7 +84,9 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     }
 
-    public static final class MyFactory<N extends Number & Scalar<N>> implements PhysicalStore.Factory<N, ComplexDenseStore2<N>> {
+    private final MyFactory<N> myFactory = null;
+
+    public static final class MyFactory<N extends Number & Scalar<N>> implements PhysicalStore.Factory<N, GenericDenseStore<N>> {
 
         private final DenseArray.Factory<N> myDenseArrayFactory = null;
 
@@ -100,7 +102,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             return MatrixStore.COMPLEX;
         }
 
-        public ComplexDenseStore2 columns(final Access1D<?>... source) {
+        public GenericDenseStore columns(final Access1D<?>... source) {
 
             final int tmpRowDim = (int) source[0].count();
             final int tmpColDim = source.length;
@@ -115,10 +117,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new ComplexDenseStore2(tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public ComplexDenseStore2 columns(final double[]... source) {
+        public GenericDenseStore columns(final double[]... source) {
 
             final int tmpRowDim = source[0].length;
             final int tmpColDim = source.length;
@@ -133,10 +135,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new ComplexDenseStore2(tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public ComplexDenseStore2 columns(final List<? extends Number>... source) {
+        public GenericDenseStore columns(final List<? extends Number>... source) {
 
             final int tmpRowDim = source[0].size();
             final int tmpColDim = source.length;
@@ -151,10 +153,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new ComplexDenseStore2(tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public ComplexDenseStore2 columns(final Number[]... source) {
+        public GenericDenseStore columns(final Number[]... source) {
 
             final int tmpRowDim = source[0].length;
             final int tmpColDim = source.length;
@@ -169,12 +171,12 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new ComplexDenseStore2(tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public ComplexDenseStore2 conjugate(final Access2D<?> source) {
+        public GenericDenseStore conjugate(final Access2D<?> source) {
 
-            final ComplexDenseStore2 retVal = new ComplexDenseStore2((int) source.countColumns(), (int) source.countRows());
+            final GenericDenseStore retVal = new GenericDenseStore((int) source.countColumns(), (int) source.countRows());
 
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
@@ -200,12 +202,12 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             return retVal;
         }
 
-        public ComplexDenseStore2 copy(final Access2D<?> source) {
+        public GenericDenseStore copy(final Access2D<?> source) {
 
             final int tmpRowDim = (int) source.countRows();
             final int tmpColDim = (int) source.countColumns();
 
-            final ComplexDenseStore2 retVal = new ComplexDenseStore2(tmpRowDim, tmpColDim);
+            final GenericDenseStore retVal = new GenericDenseStore(tmpRowDim, tmpColDim);
 
             if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
@@ -232,16 +234,16 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             return ComplexFunction.getSet();
         }
 
-        public ComplexDenseStore2 makeEye(final long rows, final long columns) {
+        public GenericDenseStore makeEye(final long rows, final long columns) {
 
-            final ComplexDenseStore2 retVal = this.makeZero(rows, columns);
+            final GenericDenseStore retVal = this.makeZero(rows, columns);
 
             retVal.myUtility.fillDiagonal(0, 0, N.ONE);
 
             return retVal;
         }
 
-        public ComplexDenseStore2 makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
+        public GenericDenseStore makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             final int tmpRowDim = (int) rows;
             final int tmpColDim = (int) columns;
@@ -254,7 +256,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 tmpData[i] = N.valueOf(supplier.get());
             }
 
-            return new ComplexDenseStore2(tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
         public Householder.Complex makeHouseholder(final int length) {
@@ -269,11 +271,11 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             return this.makeRotation(low, high, N.valueOf(cos), N.valueOf(sin));
         }
 
-        public ComplexDenseStore2 makeZero(final long rows, final long columns) {
-            return new ComplexDenseStore2((int) rows, (int) columns);
+        public GenericDenseStore makeZero(final long rows, final long columns) {
+            return new GenericDenseStore((int) rows, (int) columns);
         }
 
-        public ComplexDenseStore2 rows(final Access1D<?>... source) {
+        public GenericDenseStore rows(final Access1D<?>... source) {
 
             final int tmpRowDim = source.length;
             final int tmpColDim = (int) source[0].count();
@@ -288,10 +290,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new ComplexDenseStore2(tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public ComplexDenseStore2 rows(final double[]... source) {
+        public GenericDenseStore rows(final double[]... source) {
 
             final int tmpRowDim = source.length;
             final int tmpColDim = source[0].length;
@@ -306,10 +308,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new ComplexDenseStore2(tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public ComplexDenseStore2 rows(final List<? extends Number>... source) {
+        public GenericDenseStore rows(final List<? extends Number>... source) {
 
             final int tmpRowDim = source.length;
             final int tmpColDim = source[0].size();
@@ -324,10 +326,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new ComplexDenseStore2(tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public ComplexDenseStore2 rows(final Number[]... source) {
+        public GenericDenseStore rows(final Number[]... source) {
 
             final int tmpRowDim = source.length;
             final int tmpColDim = source[0].length;
@@ -342,16 +344,16 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new ComplexDenseStore2(tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
         public Scalar.Factory<N> scalar() {
             return N.FACTORY;
         }
 
-        public ComplexDenseStore2 transpose(final Access2D<?> source) {
+        public GenericDenseStore transpose(final Access2D<?> source) {
 
-            final ComplexDenseStore2 retVal = new ComplexDenseStore2((int) source.countColumns(), (int) source.countRows());
+            final GenericDenseStore retVal = new GenericDenseStore((int) source.countColumns(), (int) source.countRows());
 
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
@@ -383,9 +385,9 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         if (matrix instanceof GenericDenseStore) {
             return (GenericDenseStore<N>) matrix;
         } else if (matrix instanceof Access2D<?>) {
-            return FACTORY.copy((Access2D<?>) matrix);
+            return myFactory.copy((Access2D<?>) matrix);
         } else {
-            return FACTORY.columns(matrix);
+            return myFactory.columns(matrix);
         }
     }
 
@@ -393,7 +395,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         if (transformation instanceof Householder.Complex) {
             return (Householder.Complex) transformation;
         } else if (transformation instanceof HouseholderReference<?>) {
-            return ((Householder.Complex) ((HouseholderReference<N>) transformation).getWorker(FACTORY)).copy(transformation);
+            return ((Householder.Complex) ((HouseholderReference<N>) transformation).getWorker(myFactory)).copy(transformation);
         } else {
             return new Householder.Complex(transformation);
         }
@@ -507,7 +509,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
                     final AggregatorFunction<N> tmpPartAggr = aggregator.getFunction(ComplexAggregator.getSet());
 
-                    ComplexDenseStore2.this.visit(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, tmpPartAggr);
+                    GenericDenseStore.this.visit(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, tmpPartAggr);
 
                     synchronized (tmpMainAggr) {
                         tmpMainAggr.merge(tmpPartAggr.getNumber());
@@ -519,7 +521,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
         } else {
 
-            ComplexDenseStore2.this.visit(0, this.size(), 1, tmpMainAggr);
+            GenericDenseStore.this.visit(0, this.size(), 1, tmpMainAggr);
         }
 
         return tmpMainAggr.getNumber();
@@ -607,8 +609,8 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         return new ConjugatedStore<>(this);
     }
 
-    public ComplexDenseStore2 copy() {
-        return new ComplexDenseStore2(myRowDim, myColDim, this.copyOfData());
+    public GenericDenseStore copy() {
+        return new GenericDenseStore(myRowDim, myColDim, this.copyOfData());
     }
 
     public long countColumns() {
@@ -624,14 +626,14 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         final N[] tmpData = data;
         final int tmpRowDim = myRowDim;
 
-        final N[] tmpDestination = ((ComplexArray) destination).data;
+        final N[] tmpDestination = ((ScalarArray<N>) destination).data;
 
         int tmpIndex = row + (column * tmpRowDim);
         final N tmpDenominator = tmpData[tmpIndex];
 
         for (int i = row + 1; i < tmpRowDim; i++) {
             tmpIndex++;
-            tmpDestination[i] = tmpData[tmpIndex] = tmpData[tmpIndex].divide(tmpDenominator);
+            tmpDestination[i] = tmpData[tmpIndex] = tmpData[tmpIndex].divide(tmpDenominator).getNumber();
         }
     }
 
@@ -690,15 +692,15 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
         final int complexity = ((int) left.count()) / myRowDim;
 
-        if (left instanceof ComplexDenseStore2) {
-            if (right instanceof ComplexDenseStore2) {
-                multiplyNeither.invoke(data, ComplexDenseStore2.cast(left).data, complexity, ComplexDenseStore2.cast(right).data);
+        if (left instanceof GenericDenseStore) {
+            if (right instanceof GenericDenseStore) {
+                multiplyNeither.invoke(data, GenericDenseStore.cast(left).data, complexity, GenericDenseStore.cast(right).data);
             } else {
-                multiplyRight.invoke(data, ComplexDenseStore2.cast(left).data, complexity, right);
+                multiplyRight.invoke(data, GenericDenseStore.cast(left).data, complexity, right);
             }
         } else {
-            if (right instanceof ComplexDenseStore2) {
-                multiplyLeft.invoke(data, left, complexity, ComplexDenseStore2.cast(right).data);
+            if (right instanceof GenericDenseStore) {
+                multiplyLeft.invoke(data, left, complexity, GenericDenseStore.cast(right).data);
             } else {
                 multiplyBoth.invoke(this, left, complexity, right);
             }
@@ -736,7 +738,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
                 @Override
                 protected void conquer(final int aFirst, final int aLimit) {
-                    ComplexDenseStore2.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, aLeftArg, aFunc, aRightArg);
+                    GenericDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, aLeftArg, aFunc, aRightArg);
                 }
 
             };
@@ -760,7 +762,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
                 @Override
                 protected void conquer(final int aFirst, final int aLimit) {
-                    ComplexDenseStore2.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, aLeftArg, aFunc, aRightArg);
+                    GenericDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, aLeftArg, aFunc, aRightArg);
                 }
 
             };
@@ -858,7 +860,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    ComplexDenseStore2.this.modify(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, aFunc);
+                    GenericDenseStore.this.modify(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, aFunc);
                 }
 
             };
@@ -908,10 +910,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
-        final ComplexDenseStore2 retVal = this.physical().makeZero(myRowDim, right.count() / myColDim);
+        final GenericDenseStore retVal = this.physical().makeZero(myRowDim, right.count() / myColDim);
 
-        if (right instanceof ComplexDenseStore2) {
-            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, ComplexDenseStore2.cast(right).data);
+        if (right instanceof GenericDenseStore) {
+            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, GenericDenseStore.cast(right).data);
         } else {
             retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
         }
@@ -921,11 +923,11 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public N multiplyBoth(final Access1D<N> leftAndRight) {
 
-        final PhysicalStore<N> tmpStep1 = FACTORY.makeZero(1L, leftAndRight.count());
-        final PhysicalStore<N> tmpStep2 = FACTORY.makeZero(1L, 1L);
+        final PhysicalStore<N> tmpStep1 = myFactory.makeZero(1L, leftAndRight.count());
+        final PhysicalStore<N> tmpStep2 = myFactory.makeZero(1L, 1L);
 
-        final PhysicalStore<N> tmpLeft = FACTORY.rows(leftAndRight);
-        tmpLeft.modifyAll(FACTORY.function().conjugate());
+        final PhysicalStore<N> tmpLeft = myFactory.rows(leftAndRight);
+        tmpLeft.modifyAll(myFactory.function().conjugate());
         tmpStep1.fillByMultiplying(tmpLeft, this);
 
         tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
@@ -937,8 +939,8 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         myUtility.modifyColumn(0, column, ComplexFunction.NEGATE);
     }
 
-    public PhysicalStore.Factory<N, ComplexDenseStore2> physical() {
-        return FACTORY;
+    public PhysicalStore.Factory<N, GenericDenseStore> physical() {
+        return myFactory;
     }
 
     public final ElementsConsumer<N> regionByColumns(final int... columns) {
@@ -962,7 +964,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
-        RotateRight.invoke(data, myRowDim, aLow, aHigh, FACTORY.scalar().cast(aCos), FACTORY.scalar().cast(aSin));
+        RotateRight.invoke(data, myRowDim, aLow, aHigh, myFactory.scalar().cast(aCos), myFactory.scalar().cast(aSin));
     }
 
     public void set(final long aRow, final long aCol, final double aNmbr) {
@@ -1005,7 +1007,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteBackwards.invoke(ComplexDenseStore2.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, hermitian);
+                    SubstituteBackwards.invoke(GenericDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, hermitian);
                 }
 
             };
@@ -1029,7 +1031,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteForwards.invoke(ComplexDenseStore2.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, identity);
+                    SubstituteForwards.invoke(GenericDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, identity);
                 }
 
             };
@@ -1057,7 +1059,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public void transformLeft(final Householder<N> transformation, final int firstColumn) {
 
-        final Householder.Complex tmpTransf = ComplexDenseStore2.cast(transformation);
+        final Householder.Complex tmpTransf = GenericDenseStore.cast(transformation);
 
         final N[] tmpData = data;
 
@@ -1085,7 +1087,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public void transformLeft(final Rotation<N> transformation) {
 
-        final Rotation.Complex tmpTransf = ComplexDenseStore2.cast(transformation);
+        final Rotation.Complex tmpTransf = GenericDenseStore.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;
@@ -1109,7 +1111,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public void transformRight(final Householder<N> transformation, final int firstRow) {
 
-        final Householder.Complex tmpTransf = ComplexDenseStore2.cast(transformation);
+        final Householder.Complex tmpTransf = GenericDenseStore.cast(transformation);
 
         final N[] tmpData = data;
 
@@ -1137,7 +1139,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public void transformRight(final Rotation<N> transformation) {
 
-        final Rotation.Complex tmpTransf = ComplexDenseStore2.cast(transformation);
+        final Rotation.Complex tmpTransf = GenericDenseStore.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;
@@ -1160,7 +1162,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     public void transformSymmetric(final Householder<N> transformation) {
-        HouseholderHermitian.invoke(data, ComplexDenseStore2.cast(transformation), new N[(int) transformation.count()]);
+        HouseholderHermitian.invoke(data, GenericDenseStore.cast(transformation), new N[(int) transformation.count()]);
     }
 
     public MatrixStore<N> transpose() {
