@@ -28,6 +28,7 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class SubstituteBackwards extends MatrixOperation {
 
@@ -143,6 +144,40 @@ public final class SubstituteBackwards extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit,
+            final Access2D<N> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian, final Scalar.Factory<N> scalar) {
+
+        final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
+        final N[] tmpBodyRow = scalar.newArrayInstance(tmpDiagDim);
+        Scalar<N> tmpVal;
+        int tmpColBaseIndex;
+
+        final int tmpFirstRow = hermitian ? firstColumn : 0;
+        for (int i = tmpDiagDim - 1; i >= tmpFirstRow; i--) {
+
+            for (int j = i; j < tmpDiagDim; j++) {
+                tmpBodyRow[j] = conjugated ? body.get(j, i).conjugate().getNumber() : body.get(i, j);
+            }
+
+            final int tmpColumnLimit = hermitian ? Math.min(i + 1, columnLimit) : columnLimit;
+            for (int s = firstColumn; s < tmpColumnLimit; s++) {
+
+                tmpColBaseIndex = s * structure;
+
+                tmpVal = scalar.zero();
+                for (int j = i + 1; j < tmpDiagDim; j++) {
+                    tmpVal = tmpVal.add(tmpBodyRow[j].multiply(data[j + tmpColBaseIndex]));
+                }
+                tmpVal = data[i + tmpColBaseIndex].subtract(tmpVal);
+                if (!unitDiagonal) {
+                    tmpVal = tmpVal.divide(tmpBodyRow[i]);
+                }
+
+                data[i + tmpColBaseIndex] = tmpVal.getNumber();
+            }
+        }
     }
 
 }

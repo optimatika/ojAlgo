@@ -28,6 +28,7 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class SubstituteForwards extends MatrixOperation {
 
@@ -150,6 +151,42 @@ public final class SubstituteForwards extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit,
+            final Access2D<N> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity, final Scalar.Factory<N> scalar) {
+
+        final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
+        final N[] tmpBodyRow = scalar.newArrayInstance(tmpDiagDim);
+        Scalar<N> tmpVal;
+        int tmpColBaseIndex;
+
+        for (int i = 0; i < tmpDiagDim; i++) {
+
+            for (int j = 0; j <= i; j++) {
+                tmpBodyRow[j] = conjugated ? body.get(j, i).conjugate().getNumber() : body.get(i, j);
+            }
+
+            for (int s = firstColumn; s < columnLimit; s++) {
+                tmpColBaseIndex = s * structure;
+
+                tmpVal = scalar.zero();
+                for (int j = identity ? s : 0; j < i; j++) {
+                    tmpVal = tmpVal.add(tmpBodyRow[j].multiply(data[j + tmpColBaseIndex]));
+                }
+                if (identity) {
+                    tmpVal = i == s ? scalar.one().subtract(tmpVal) : tmpVal.negate();
+                } else {
+                    tmpVal = data[i + tmpColBaseIndex].subtract(tmpVal);
+                }
+
+                if (!unitDiagonal) {
+                    tmpVal = tmpVal.divide(tmpBodyRow[i]);
+                }
+
+                data[i + tmpColBaseIndex] = tmpVal.getNumber();
+            }
+        }
     }
 
 }

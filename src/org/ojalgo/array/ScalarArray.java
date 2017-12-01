@@ -37,8 +37,8 @@ public abstract class ScalarArray<N extends Number & Scalar<N>> extends Referenc
         super(data);
     }
 
-    protected ScalarArray(final Class<N> componentType, final int length) {
-        super(componentType, length);
+    protected ScalarArray(final int length, final N zero) {
+        super(length, zero);
     }
 
     public final void axpy(final double a, final Mutate1D y) {

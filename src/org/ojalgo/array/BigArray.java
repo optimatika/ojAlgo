@@ -88,16 +88,11 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     protected BigArray(final BigDecimal[] data) {
-
         super(data);
-
     }
 
     protected BigArray(final int size) {
-
-        super(new BigDecimal[size]);
-
-        this.fill(0, size, 1, ZERO);
+        super(size, ZERO);
     }
 
     public final void axpy(final double a, final Mutate1D y) {

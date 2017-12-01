@@ -29,6 +29,7 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class HouseholderLeft extends MatrixOperation {
 
@@ -103,6 +104,30 @@ public final class HouseholderLeft extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit,
+            final Householder.Generic<N> householder, final Scalar.Factory<N> scalar) {
+
+        final N[] tmpHouseholderVector = householder.vector;
+        final int tmpFirstNonZero = householder.first;
+        final N tmpBeta = householder.beta;
+
+        Scalar<N> tmpScale;
+        int tmpIndex;
+        for (int j = first; j < limit; j++) {
+            tmpScale = scalar.zero();
+            tmpIndex = tmpFirstNonZero + (j * structure);
+            for (int i = tmpFirstNonZero; i < structure; i++) {
+                tmpScale = tmpScale.add(tmpHouseholderVector[i].conjugate().multiply(data[tmpIndex++]));
+            }
+            tmpScale = tmpScale.multiply(tmpBeta);
+            tmpIndex = tmpFirstNonZero + (j * structure);
+            for (int i = tmpFirstNonZero; i < structure; i++) {
+                data[tmpIndex] = data[tmpIndex].subtract(tmpScale.multiply(tmpHouseholderVector[i])).getNumber();
+                tmpIndex++;
+            }
+        }
     }
 
 }

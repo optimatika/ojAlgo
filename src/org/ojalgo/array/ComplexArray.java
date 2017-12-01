@@ -81,16 +81,11 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
     }
 
     protected ComplexArray(final ComplexNumber[] data) {
-
         super(data);
-
     }
 
     protected ComplexArray(final int size) {
-
-        super(new ComplexNumber[size]);
-
-        this.fill(0, size, 1, ComplexNumber.ZERO);
+        super(size, ComplexNumber.ZERO);
     }
 
     @Override

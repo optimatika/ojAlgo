@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class ApplyLU extends MatrixOperation {
 
@@ -60,6 +61,13 @@ public final class ApplyLU extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit,
+            final N[] multipliers, final int iterationPoint) {
+        for (int j = firstColumn; j < columnLimit; j++) {
+            AXPY.invoke(data, j * structure, data[iterationPoint + (j * structure)].negate().getNumber(), multipliers, 0, iterationPoint + 1, structure);
+        }
     }
 
 }

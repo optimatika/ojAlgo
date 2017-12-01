@@ -81,16 +81,11 @@ public class RationalArray extends ScalarArray<RationalNumber> {
     }
 
     protected RationalArray(final int size) {
-
-        super(new RationalNumber[size]);
-
-        this.fill(0, size, 1, RationalNumber.ZERO);
+        super(size, RationalNumber.ZERO);
     }
 
     protected RationalArray(final RationalNumber[] data) {
-
         super(data);
-
     }
 
     @Override

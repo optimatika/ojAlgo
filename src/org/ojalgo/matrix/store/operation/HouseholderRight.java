@@ -29,6 +29,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class HouseholderRight extends MatrixOperation {
 
@@ -136,6 +137,33 @@ public final class HouseholderRight extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int first, final int limit, final int tmpColDim,
+            final Householder.Generic<N> householder, final Scalar.Factory<N> scalar) {
+
+        final N[] tmpHouseholderVector = householder.vector;
+        final int tmpFirstNonZero = householder.first;
+        final N tmpBeta = householder.beta;
+
+        final int tmpRowDim = data.length / tmpColDim;
+
+        Scalar<N> tmpScale;
+        int tmpIndex;
+        for (int i = first; i < limit; i++) {
+            tmpScale = scalar.zero();
+            tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
+            for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
+                tmpScale = tmpScale.add(tmpHouseholderVector[j].conjugate().multiply(data[tmpIndex].conjugate()));
+                tmpIndex += tmpRowDim;
+            }
+            tmpScale = tmpScale.multiply(tmpBeta);
+            tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
+            for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
+                data[tmpIndex] = data[tmpIndex].conjugate().subtract(tmpScale.multiply(tmpHouseholderVector[j])).conjugate().getNumber();
+                tmpIndex += tmpRowDim;
+            }
+        }
     }
 
 }

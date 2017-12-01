@@ -488,16 +488,16 @@ public final class HouseholderHermitian extends MatrixOperation {
             MultiplyHermitianAndVector.invoke(worker, tmpFirst, tmpLength, data, tmpVector, tmpFirst, scalar);
         }
 
-        Scalar<N> tmpVal = ComplexNumber.ZERO;
+        Scalar<N> tmpVal = scalar.zero();
         for (int c = tmpFirst; c < tmpLength; c++) {
             //tmpVal += tmpVector[c] * worker[c];
             tmpVal = tmpVal.add(tmpVector[c].conjugate().multiply(worker[c]));
         }
         //tmpVal *= (tmpBeta / TWO);
-        tmpVal = ComplexFunction.DIVIDE.invoke(tmpVal.multiply(tmpBeta), ComplexNumber.TWO);
+        tmpVal = tmpVal.multiply(tmpBeta).divide(PrimitiveMath.TWO);
         for (int c = tmpFirst; c < tmpLength; c++) {
             //worker[c] = tmpBeta * (worker[c] - (tmpVal * tmpVector[c]));
-            worker[c] = tmpBeta.multiply(worker[c].subtract(tmpVal.multiply(tmpVector[c])));
+            worker[c] = tmpBeta.multiply(worker[c].subtract(tmpVal.multiply(tmpVector[c]))).getNumber();
         }
 
         if (tmpCount > HermitianRank2Update.THRESHOLD) {

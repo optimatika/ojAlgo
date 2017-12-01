@@ -124,11 +124,13 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implem
     }
 
     @SuppressWarnings("unchecked")
-    ReferenceTypeArray(final Class<N> componentType, final int length) {
+    ReferenceTypeArray(final int length, final N zero) {
 
         super(length);
 
-        data = (N[]) Array.newInstance(componentType, length);
+        data = (N[]) Array.newInstance(zero.getClass(), length);
+
+        this.fill(0, length, 1, zero);
     }
 
     @Override

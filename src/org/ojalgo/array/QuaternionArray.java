@@ -81,10 +81,7 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
     }
 
     protected QuaternionArray(final int size) {
-
-        super(new Quaternion[size]);
-
-        this.fill(0, size, 1, Quaternion.ZERO);
+        super(size, Quaternion.ZERO);
     }
 
     protected QuaternionArray(final Quaternion[] data) {

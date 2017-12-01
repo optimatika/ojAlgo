@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class RotateRight extends MatrixOperation {
 
@@ -103,6 +104,27 @@ public final class RotateRight extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final N[] aData, final int aRowDim, final int aColA, final int aColB, final N aCos, final N aSin) {
+
+        N tmpOldA;
+        N tmpOldB;
+
+        int tmpIndexA = aColA * aRowDim;
+        int tmpIndexB = aColB * aRowDim;
+
+        for (int i = 0; i < aRowDim; i++) {
+
+            tmpOldA = aData[tmpIndexA];
+            tmpOldB = aData[tmpIndexB];
+
+            aData[tmpIndexA] = aCos.multiply(tmpOldA).subtract(aSin.multiply(tmpOldB)).getNumber();
+            aData[tmpIndexB] = aCos.multiply(tmpOldB).add(aSin.multiply(tmpOldA)).getNumber();
+
+            tmpIndexA++;
+            tmpIndexB++;
+        }
     }
 
 }
