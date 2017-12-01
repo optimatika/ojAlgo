@@ -21,7 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -35,6 +34,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.scalar.Scalar;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain java.lang.Number}.
@@ -116,21 +116,26 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implem
 
     public final N[] data;
 
-    ReferenceTypeArray(final N[] data) {
+    private final Scalar.Factory<N> myFactory;
+
+    ReferenceTypeArray(final int length, final Scalar.Factory<N> factory) {
+
+        super(length);
+
+        data = factory.newArrayInstance(length);
+
+        this.fill(0, length, 1, factory.zero().getNumber());
+
+        myFactory = factory;
+    }
+
+    ReferenceTypeArray(final N[] data, final Scalar.Factory<N> factory) {
 
         super(data.length);
 
         this.data = data;
-    }
 
-    @SuppressWarnings("unchecked")
-    ReferenceTypeArray(final int length, final N zero) {
-
-        super(length);
-
-        data = (N[]) Array.newInstance(zero.getClass(), length);
-
-        this.fill(0, length, 1, zero);
+        myFactory = factory;
     }
 
     @Override
@@ -139,6 +144,13 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implem
             return Arrays.equals(data, ((ReferenceTypeArray<?>) anObj).data);
         } else {
             return super.equals(anObj);
+        }
+    }
+
+    public final void fillMatching(final Access1D<?> values) {
+        final int limit = (int) FunctionUtils.min(this.count(), values.count());
+        for (int i = 0; i < limit; i++) {
+            data[i] = myFactory.cast(values.get(i));
         }
     }
 
@@ -315,8 +327,12 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implem
         data[intIndex] = function.invoke(data[intIndex]);
     }
 
-    protected abstract N valueOf(double value);
+    final N valueOf(final double value) {
+        return myFactory.cast(value);
+    }
 
-    protected abstract N valueOf(Number number);
+    final N valueOf(final Number number) {
+        return myFactory.cast(number);
+    }
 
 }

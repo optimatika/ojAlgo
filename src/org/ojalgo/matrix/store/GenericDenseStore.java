@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.store;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
@@ -84,12 +83,12 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public static final class MyFactory<N extends Number & Scalar<N>> implements PhysicalStore.Factory<N, GenericDenseStore<N>> {
 
+        private final DenseArray.Factory<N> myDenseArrayFactory;
+
         MyFactory(final DenseArray.Factory<N> denseArrayFactory) {
             super();
             myDenseArrayFactory = denseArrayFactory;
         }
-
-        private final DenseArray.Factory<N> myDenseArrayFactory;
 
         public AggregatorSet<N> aggregator() {
             return myDenseArrayFactory.aggregator();
@@ -398,26 +397,9 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     private final Array2D<N> myUtility;
     private transient N[] myWorkerColumn;
 
-    GenericDenseStore(final MyFactory<N> factory, final int length, final N zero) {
-
-        super(length, zero);
-
-        myFactory = factory;
-
-        myRowDim = length;
-        myColDim = 1;
-
-        myUtility = this.asArray2D(myRowDim);
-
-        multiplyBoth = MultiplyBoth.getGeneric(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.getGeneric(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.getGeneric(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.getGeneric(myRowDim, myColDim);
-    }
-
     GenericDenseStore(final MyFactory<N> factory, final int aRowDim, final int aColDim, final N zero) {
 
-        super(aRowDim * aColDim, zero);
+        super(aRowDim * aColDim, factory.scalar());
 
         myFactory = factory;
 
@@ -434,7 +416,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     GenericDenseStore(final MyFactory<N> factory, final int aRowDim, final int aColDim, final N[] anArray) {
 
-        super(anArray);
+        super(anArray, factory.scalar());
 
         myFactory = factory;
 
@@ -449,9 +431,26 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         multiplyNeither = MultiplyNeither.getGeneric(myRowDim, myColDim);
     }
 
+    GenericDenseStore(final MyFactory<N> factory, final int length, final N zero) {
+
+        super(length, factory.scalar());
+
+        myFactory = factory;
+
+        myRowDim = length;
+        myColDim = 1;
+
+        myUtility = this.asArray2D(myRowDim);
+
+        multiplyBoth = MultiplyBoth.getGeneric(myRowDim, myColDim);
+        multiplyLeft = MultiplyLeft.getGeneric(myRowDim, myColDim);
+        multiplyRight = MultiplyRight.getGeneric(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getGeneric(myRowDim, myColDim);
+    }
+
     GenericDenseStore(final MyFactory<N> factory, final N[] anArray) {
 
-        super(anArray);
+        super(anArray, factory.scalar());
 
         myFactory = factory;
 
@@ -899,7 +898,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
-        final GenericDenseStore retVal = this.physical().makeZero(myRowDim, right.count() / myColDim);
+        final GenericDenseStore<N> retVal = this.physical().makeZero(myRowDim, right.count() / myColDim);
 
         if (right instanceof GenericDenseStore) {
             retVal.multiplyNeither.invoke(retVal.data, data, myColDim, this.cast(right).data, myFactory.scalar());
@@ -1229,36 +1228,6 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     int getRowDim() {
         return myRowDim;
-    }
-
-    @Override
-    protected N valueOf(final double value) {
-        return myFactory.scalar().cast(value);
-    }
-
-    @Override
-    protected N valueOf(final Number number) {
-        return myFactory.scalar().cast(number);
-    }
-
-    @Override
-    protected final void add(final int index, final double addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)).getNumber());
-    }
-
-    @Override
-    protected final void add(final int index, final Number addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)).getNumber());
-    }
-
-    @Override
-    public final void sortAscending() {
-        Arrays.parallelSort(data);
-    }
-
-    @Override
-    public void sortDescending() {
-        Arrays.parallelSort(data, Comparator.reverseOrder());
     }
 
 }

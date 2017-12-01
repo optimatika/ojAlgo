@@ -22,12 +22,9 @@
 package org.ojalgo.array;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.machine.MemoryEstimator;
@@ -80,12 +77,20 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
         return new ComplexArray(data);
     }
 
+    private ComplexArray(final ComplexNumber[] data, final org.ojalgo.scalar.Scalar.Factory<ComplexNumber> factory) {
+        super(data, factory);
+    }
+
+    private ComplexArray(final int length, final org.ojalgo.scalar.Scalar.Factory<ComplexNumber> factory) {
+        super(length, factory);
+    }
+
     protected ComplexArray(final ComplexNumber[] data) {
-        super(data);
+        this(data, ComplexNumber.FACTORY);
     }
 
     protected ComplexArray(final int size) {
-        super(size, ComplexNumber.ZERO);
+        this(size, ComplexNumber.FACTORY);
     }
 
     @Override
@@ -97,56 +102,9 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
         }
     }
 
-    public final void fillMatching(final Access1D<?> values) {
-        final int tmpLimit = (int) FunctionUtils.min(this.count(), values.count());
-        for (int i = 0; i < tmpLimit; i++) {
-            data[i] = ComplexNumber.valueOf(values.get(i));
-        }
-    }
-
     @Override
     public int hashCode() {
         return Arrays.hashCode(data);
-    }
-
-    @Override
-    public final void sortAscending() {
-        Arrays.parallelSort(data);
-    }
-
-    @Override
-    public void sortDescending() {
-        Arrays.parallelSort(data, Comparator.reverseOrder());
-    }
-
-    @Override
-    protected final void add(final int index, final double addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
-    }
-
-    @Override
-    protected final void add(final int index, final Number addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
-    }
-
-    @Override
-    protected boolean isAbsolute(final int index) {
-        return ComplexNumber.isAbsolute(data[index]);
-    }
-
-    @Override
-    protected boolean isSmall(final int index, final double comparedTo) {
-        return ComplexNumber.isSmall(comparedTo, data[index]);
-    }
-
-    @Override
-    protected ComplexNumber valueOf(final double value) {
-        return ComplexNumber.valueOf(value);
-    }
-
-    @Override
-    protected ComplexNumber valueOf(final Number number) {
-        return ComplexNumber.valueOf(number);
     }
 
 }
