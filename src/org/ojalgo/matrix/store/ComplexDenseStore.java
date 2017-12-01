@@ -985,7 +985,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteBackwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, hermitian);
+                    SubstituteBackwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, hermitian,
+                            FACTORY.scalar());
                 }
 
             };
@@ -994,7 +995,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         } else {
 
-            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, hermitian);
+            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, hermitian, FACTORY.scalar());
         }
     }
 
@@ -1009,7 +1010,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteForwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, identity);
+                    SubstituteForwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, identity,
+                            FACTORY.scalar());
                 }
 
             };
@@ -1018,7 +1020,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         } else {
 
-            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
+            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity, FACTORY.scalar());
         }
     }
 
