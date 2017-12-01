@@ -118,7 +118,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
                 @Override
                 protected void conquer(final int first, final int limit) {
-                    MultiplyHermitianAndVector.invoke(worker, first, limit, data, tmpVector, tmpFirst);
+                    MultiplyHermitianAndVector.invoke(worker, first, limit, data, tmpVector, tmpFirst, ComplexNumber.FACTORY);
                 }
             };
 
@@ -126,7 +126,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
         } else {
 
-            MultiplyHermitianAndVector.invoke(worker, tmpFirst, tmpLength, data, tmpVector, tmpFirst);
+            MultiplyHermitianAndVector.invoke(worker, tmpFirst, tmpLength, data, tmpVector, tmpFirst, ComplexNumber.FACTORY);
         }
 
         ComplexNumber tmpVal = ComplexNumber.ZERO;

@@ -695,43 +695,6 @@ public final class MultiplyBoth extends MatrixOperation {
         }
     }
 
-    static void invokeComplex(final ElementsConsumer<ComplexNumber> product, final int firstRow, final int rowLimit, final Access1D<ComplexNumber> left,
-            final int complexity, final Access1D<ComplexNumber> right) {
-        MultiplyBoth.invokeGeneric(product, firstRow, rowLimit, left, complexity, right);
-
-        //        final int tmpRowDim = (int) (left.count() / complexity);
-        //        final int tmpColDim = (int) (right.count() / complexity);
-        //
-        //        final ComplexNumber[] tmpLeftRow = new ComplexNumber[complexity];
-        //        ComplexNumber tmpVal;
-        //
-        //        int tmpFirst = 0;
-        //        int tmpLimit = complexity;
-        //
-        //        for (int i = firstRow; i < rowLimit; i++) {
-        //
-        //            final int tmpFirstInRow = MatrixUtils.firstInRow(left, i, 0);
-        //            final int tmpLimitOfRow = MatrixUtils.limitOfRow(left, i, complexity);
-        //
-        //            for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
-        //                tmpLeftRow[c] = left.get(i + (c * tmpRowDim));
-        //            }
-        //
-        //            for (int j = 0; j < tmpColDim; j++) {
-        //                final int tmpColBase = j * complexity;
-        //
-        //                tmpFirst = MatrixUtils.firstInColumn(right, j, tmpFirstInRow);
-        //                tmpLimit = MatrixUtils.limitOfColumn(right, j, tmpLimitOfRow);
-        //
-        //                tmpVal = ComplexNumber.ZERO;
-        //                for (int c = tmpFirst; c < tmpLimit; c++) {
-        //                    tmpVal = tmpVal.add(tmpLeftRow[c].multiply(right.get(c + tmpColBase)));
-        //                }
-        //                product.set(i, j, tmpVal);
-        //            }
-        //        }
-    }
-
     static <N extends Number & Scalar<N>> void invokeGeneric(final ElementsConsumer<N> product, final int firstRow, final int rowLimit, final Access1D<N> left,
             final int complexity, final Access1D<N> right) {
 
