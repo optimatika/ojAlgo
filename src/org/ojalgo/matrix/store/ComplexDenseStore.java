@@ -193,7 +193,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
                     @Override
                     public void conquer(final int aFirst, final int aLimit) {
-                        FillMatchingSingle.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                        FillMatchingSingle.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source, FACTORY.scalar());
                     }
 
                 };
@@ -202,7 +202,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
             } else {
 
-                FillMatchingSingle.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+                FillMatchingSingle.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source, FACTORY.scalar());
             }
 
             return retVal;
