@@ -93,9 +93,9 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
         if (myPivot.signum() == -1) {
-            return tmpAggrFunc.toScalar().negate().getNumber();
+            return tmpAggrFunc.toScalar().negate().get();
         } else {
-            return tmpAggrFunc.getNumber();
+            return tmpAggrFunc.get();
         }
     }
 
@@ -103,7 +103,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
         if (myPivot.isModified()) {
-            preallocated.fillAll(this.scalar().zero().getNumber());
+            preallocated.fillAll(this.scalar().zero().get());
             final int[] tmpPivotOrder = myPivot.getOrder();
             final int tmpRowDim = this.getRowDim();
             for (int i = 0; i < tmpRowDim; i++) {

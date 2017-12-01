@@ -60,12 +60,12 @@ public abstract class ScalarArray<N extends Number & Scalar<N>> extends Referenc
 
     @Override
     protected final void add(final int index, final double addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)).getNumber());
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)).get());
     }
 
     @Override
     protected final void add(final int index, final Number addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)).getNumber());
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)).get());
     }
 
     @Override

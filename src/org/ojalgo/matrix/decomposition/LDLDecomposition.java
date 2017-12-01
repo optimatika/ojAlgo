@@ -141,9 +141,9 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
         if (myPivot.signum() == -1) {
-            return tmpAggrFunc.toScalar().negate().getNumber();
+            return tmpAggrFunc.toScalar().negate().get();
         } else {
-            return tmpAggrFunc.getNumber();
+            return tmpAggrFunc.get();
         }
     }
 
@@ -155,7 +155,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         final boolean tmpModified = myPivot.isModified();
 
         if (tmpModified) {
-            preallocated.fillAll(this.scalar().zero().getNumber());
+            preallocated.fillAll(this.scalar().zero().get());
             for (int i = 0; i < tmpRowDim; i++) {
                 preallocated.set(i, tmpOrder[i], PrimitiveMath.ONE);
             }

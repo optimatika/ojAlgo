@@ -342,7 +342,7 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
         return this.toBigDecimal().floatValue();
     }
 
-    public RationalNumber2 getNumber() {
+    public RationalNumber2 get() {
         return this;
     }
 

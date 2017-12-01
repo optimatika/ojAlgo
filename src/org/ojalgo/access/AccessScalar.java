@@ -24,17 +24,25 @@ package org.ojalgo.access;
 public interface AccessScalar<N extends Number> {
 
     default double doubleValue() {
-        return this.getNumber().doubleValue();
+        return this.get().doubleValue();
     }
 
-    N getNumber();
+    N get();
+
+    /**
+     * @deprecated v45 Use {@link #get()} instead
+     */
+    @Deprecated
+    default N getNumber() {
+        return this.get();
+    }
 
     default int intValue() {
-        return this.getNumber().intValue();
+        return this.get().intValue();
     }
 
     default long longValue() {
-        return this.getNumber().longValue();
+        return this.get().longValue();
     }
 
 }

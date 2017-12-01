@@ -177,7 +177,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         public GenericDenseStore<N> conjugate(final Access2D<?> source) {
 
             final GenericDenseStore<N> retVal = new GenericDenseStore<N>(this, (int) source.countColumns(), (int) source.countRows(),
-                    myDenseArrayFactory.scalar().zero().getNumber());
+                    myDenseArrayFactory.scalar().zero().get());
 
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
@@ -208,7 +208,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             final int tmpRowDim = (int) source.countRows();
             final int tmpColDim = (int) source.countColumns();
 
-            final GenericDenseStore<N> retVal = new GenericDenseStore<N>(this, tmpRowDim, tmpColDim, myDenseArrayFactory.scalar().zero().getNumber());
+            final GenericDenseStore<N> retVal = new GenericDenseStore<N>(this, tmpRowDim, tmpColDim, myDenseArrayFactory.scalar().zero().get());
 
             if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
@@ -239,7 +239,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
             final GenericDenseStore<N> retVal = this.makeZero(rows, columns);
 
-            retVal.myUtility.fillDiagonal(0, 0, myDenseArrayFactory.scalar().one().getNumber());
+            retVal.myUtility.fillDiagonal(0, 0, myDenseArrayFactory.scalar().one().get());
 
             return retVal;
         }
@@ -273,7 +273,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         }
 
         public GenericDenseStore<N> makeZero(final long rows, final long columns) {
-            return new GenericDenseStore<N>(this, (int) rows, (int) columns, myDenseArrayFactory.scalar().zero().getNumber());
+            return new GenericDenseStore<N>(this, (int) rows, (int) columns, myDenseArrayFactory.scalar().zero().get());
         }
 
         public GenericDenseStore<N> rows(final Access1D<?>... source) {
@@ -355,7 +355,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         public GenericDenseStore<N> transpose(final Access2D<?> source) {
 
             final GenericDenseStore<N> retVal = new GenericDenseStore<N>(this, (int) source.countColumns(), (int) source.countRows(),
-                    myDenseArrayFactory.scalar().zero().getNumber());
+                    myDenseArrayFactory.scalar().zero().get());
 
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
@@ -384,11 +384,8 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     private final GenericMultiplyBoth<N> multiplyBoth;;
-
     private final GenericMultiplyLeft<N> multiplyLeft;
-
     private final GenericMultiplyNeither<N> multiplyNeither;
-
     private final GenericMultiplyRight<N> multiplyRight;
 
     private final int myColDim;
@@ -500,7 +497,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                     GenericDenseStore.this.visit(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, tmpPartAggr);
 
                     synchronized (tmpMainAggr) {
-                        tmpMainAggr.merge(tmpPartAggr.getNumber());
+                        tmpMainAggr.merge(tmpPartAggr.get());
                     }
                 }
             };
@@ -512,7 +509,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             GenericDenseStore.this.visit(0, this.size(), 1, tmpMainAggr);
         }
 
-        return tmpMainAggr.getNumber();
+        return tmpMainAggr.get();
     }
 
     public void applyCholesky(final int iterationPoint, final BasicArray<N> multipliers) {
@@ -621,7 +618,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
         for (int i = row + 1; i < tmpRowDim; i++) {
             tmpIndex++;
-            tmpDestination[i] = tmpData[tmpIndex] = tmpData[tmpIndex].divide(tmpDenominator).getNumber();
+            tmpDestination[i] = tmpData[tmpIndex] = tmpData[tmpIndex].divide(tmpDenominator).get();
         }
     }
 
@@ -661,8 +658,8 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
         for (int ij = tmpMin + 1; ij < tmpMax; ij++) {
             tmpVal = this.get(ij, tmpMin);
-            this.set(ij, tmpMin, this.get(tmpMax, ij).conjugate().getNumber());
-            this.set(tmpMax, ij, tmpVal.conjugate().getNumber());
+            this.set(ij, tmpMin, this.get(tmpMax, ij).conjugate().get());
+            this.set(tmpMax, ij, tmpVal.conjugate().get());
         }
 
         for (int i = tmpMax + 1; i < myRowDim; i++) {
@@ -964,8 +961,8 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     public void setToIdentity(final int aCol) {
-        myUtility.set(aCol, aCol, myFactory.scalar().one().getNumber());
-        myUtility.fillColumn(aCol + 1, aCol, myFactory.scalar().zero().getNumber());
+        myUtility.set(aCol, aCol, myFactory.scalar().one().get());
+        myUtility.fillColumn(aCol + 1, aCol, myFactory.scalar().zero().get());
     }
 
     public Array1D<N> sliceColumn(final long row, final long col) {
@@ -1209,7 +1206,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             myWorkerColumn = myFactory.scalar().newArrayInstance(myRowDim);
         }
 
-        Arrays.fill(myWorkerColumn, myFactory.scalar().zero().getNumber());
+        Arrays.fill(myWorkerColumn, myFactory.scalar().zero().get());
 
         return myWorkerColumn;
     }

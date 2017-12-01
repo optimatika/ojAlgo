@@ -76,7 +76,7 @@ final class SuperimposedStore<N extends Number> extends ComposingStore<N> {
         N retVal = this.getBase().get(row, col);
 
         if (this.isCovered((int) row, (int) col)) {
-            retVal = myDiff.toScalar((int) row - myRowFirst, (int) col - myColFirst).add(retVal).getNumber();
+            retVal = myDiff.toScalar((int) row - myRowFirst, (int) col - myColFirst).add(retVal).get();
         }
 
         return retVal;

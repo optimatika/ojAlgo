@@ -124,7 +124,7 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implem
 
         data = factory.newArrayInstance(length);
 
-        this.fill(0, length, 1, factory.zero().getNumber());
+        this.fill(0, length, 1, factory.zero().get());
 
         myFactory = factory;
     }

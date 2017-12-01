@@ -254,7 +254,7 @@ public abstract class DOT implements BLAS1 {
         for (int i = first; i < limit; i++) {
             retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));
         }
-        return retVal.getNumber();
+        return retVal.get();
     }
 
 }

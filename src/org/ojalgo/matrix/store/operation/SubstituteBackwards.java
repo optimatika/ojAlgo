@@ -158,7 +158,7 @@ public final class SubstituteBackwards extends MatrixOperation {
         for (int i = tmpDiagDim - 1; i >= tmpFirstRow; i--) {
 
             for (int j = i; j < tmpDiagDim; j++) {
-                tmpBodyRow[j] = conjugated ? body.get(j, i).conjugate().getNumber() : body.get(i, j);
+                tmpBodyRow[j] = conjugated ? body.get(j, i).conjugate().get() : body.get(i, j);
             }
 
             final int tmpColumnLimit = hermitian ? Math.min(i + 1, columnLimit) : columnLimit;
@@ -175,7 +175,7 @@ public final class SubstituteBackwards extends MatrixOperation {
                     tmpVal = tmpVal.divide(tmpBodyRow[i]);
                 }
 
-                data[i + tmpColBaseIndex] = tmpVal.getNumber();
+                data[i + tmpColBaseIndex] = tmpVal.get();
             }
         }
     }

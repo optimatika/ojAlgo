@@ -490,7 +490,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
                     ComplexDenseStore.this.visit(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, tmpPartAggr);
 
                     synchronized (tmpMainAggr) {
-                        tmpMainAggr.merge(tmpPartAggr.getNumber());
+                        tmpMainAggr.merge(tmpPartAggr.get());
                     }
                 }
             };
@@ -502,7 +502,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             ComplexDenseStore.this.visit(0, this.size(), 1, tmpMainAggr);
         }
 
-        return tmpMainAggr.getNumber();
+        return tmpMainAggr.get();
     }
 
     public void applyCholesky(final int iterationPoint, final BasicArray<ComplexNumber> multipliers) {

@@ -102,7 +102,7 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
 
         retVal = retVal.add(tmpPreallocated.get(0, 0));
 
-        return retVal.getNumber();
+        return retVal.get();
     }
 
     public PhysicalStore<N> linear() {

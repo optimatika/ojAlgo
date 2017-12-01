@@ -156,7 +156,7 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
 
         if (retVal) {
             for (int j = col + 1; j < tmpColDim; j++) {
-                tmpVal = tmpVector[j].divide(tmpNormInf).getNumber();
+                tmpVal = tmpVector[j].divide(tmpNormInf).get();
                 tmpNorm2 += tmpVal.norm() * tmpVal.norm();
                 tmpVector[j] = tmpVal;
             }
@@ -166,20 +166,20 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
 
         if (retVal) {
 
-            N tmpScale = tmpVector[col].divide(tmpNormInf).getNumber();
+            N tmpScale = tmpVector[col].divide(tmpNormInf).get();
             tmpNorm2 += tmpScale.norm() * tmpScale.norm();
             tmpNorm2 = PrimitiveFunction.SQRT.invoke(tmpNorm2);
 
             // data[(row + (col * structure))] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
-            data[(row + (col * structure))] = tmpScale.signum().multiply(tmpNorm2 * tmpNormInf).getNumber();
+            data[(row + (col * structure))] = tmpScale.signum().multiply(tmpNorm2 * tmpNormInf).get();
             // tmpScale = tmpScale.subtract(ComplexNumber.makePolar(tmpNorm2, tmpScale.phase()));
-            tmpScale = tmpScale.subtract(tmpScale.signum().multiply(tmpNorm2)).getNumber();
+            tmpScale = tmpScale.subtract(tmpScale.signum().multiply(tmpNorm2)).get();
 
-            tmpVector[col] = scalar.one().getNumber();
+            tmpVector[col] = scalar.one().get();
 
             for (int j = col + 1; j < tmpColDim; j++) {
                 // data[row + (j * structure)] = tmpVector[j] = ComplexFunction.DIVIDE.invoke(tmpVector[j], tmpScale).conjugate();
-                data[row + (j * structure)] = tmpVector[j] = tmpVector[j].divide(tmpScale).conjugate().getNumber();
+                data[row + (j * structure)] = tmpVector[j] = tmpVector[j].divide(tmpScale).conjugate().get();
             }
 
             // destination.beta = ComplexNumber.valueOf(tmpScale.norm() / tmpNorm2);

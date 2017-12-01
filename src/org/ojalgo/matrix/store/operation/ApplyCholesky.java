@@ -64,7 +64,7 @@ public final class ApplyCholesky extends MatrixOperation {
     public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit,
             final N[] multipliers) {
         for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, multipliers[j].conjugate().negate().getNumber(), multipliers, 0, j, structure);
+            AXPY.invoke(data, j * structure, multipliers[j].conjugate().negate().get(), multipliers, 0, j, structure);
         }
     }
 

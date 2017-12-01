@@ -476,6 +476,10 @@ public final class Quaternion extends Number
         return (float) myScalar;
     }
 
+    public Quaternion get() {
+        return this;
+    }
+
     public Double get(final long index) {
         return this.doubleValue(index);
     }
@@ -490,10 +494,6 @@ public final class Quaternion extends Number
     public double getDeterminant() {
         final double tmpSumOfSquares = this.calculateSumOfSquaresAll();
         return tmpSumOfSquares * tmpSumOfSquares;
-    }
-
-    public Quaternion getNumber() {
-        return this;
     }
 
     /**

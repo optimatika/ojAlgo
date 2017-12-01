@@ -103,7 +103,7 @@ public final class QuadraticFunction<N extends Number> extends AbstractMultiary<
 
         retVal = retVal.add(myFactors.multiplyBoth(arg));
 
-        return retVal.getNumber();
+        return retVal.get();
     }
 
     public PhysicalStore<N> quadratic() {

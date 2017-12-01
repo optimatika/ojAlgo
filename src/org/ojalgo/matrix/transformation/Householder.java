@@ -256,7 +256,7 @@ public interface Householder<N extends Number> extends Access1D<N> {
             super();
 
             vector = factory.newArrayInstance(dim);
-            beta = factory.zero().getNumber();
+            beta = factory.zero().get();
             first = 0;
 
             myFactory = factory;

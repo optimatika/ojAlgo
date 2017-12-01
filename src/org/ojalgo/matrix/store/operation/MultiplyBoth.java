@@ -772,7 +772,7 @@ public final class MultiplyBoth extends MatrixOperation {
 
                 tmpVal = zero;
                 for (int c = tmpFirst; c < tmpLimit; c++) {
-                    tmpVal = tmpVal.add(tmpLeftRow[c].multiply(right.get(c + tmpColBase))).getNumber();
+                    tmpVal = tmpVal.add(tmpLeftRow[c].multiply(right.get(c + tmpColBase))).get();
                 }
                 product.set(i, j, tmpVal);
             }

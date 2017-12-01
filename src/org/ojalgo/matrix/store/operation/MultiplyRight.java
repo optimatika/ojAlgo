@@ -682,7 +682,7 @@ public final class MultiplyRight extends MatrixOperation {
 
             return (product, left, complexity, right, scalar) -> {
 
-                Arrays.fill(product, scalar.zero().getNumber());
+                Arrays.fill(product, scalar.zero().get());
 
                 final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -699,7 +699,7 @@ public final class MultiplyRight extends MatrixOperation {
 
             return (product, left, complexity, right, scalar) -> {
 
-                Arrays.fill(product, scalar.zero().getNumber());
+                Arrays.fill(product, scalar.zero().get());
 
                 MultiplyRight.invoke(product, 0, (int) (right.count() / complexity), left, complexity, right, scalar);
             };

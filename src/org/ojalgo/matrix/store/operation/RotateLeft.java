@@ -123,8 +123,8 @@ public final class RotateLeft extends MatrixOperation {
             tmpOldA = aData[tmpIndexA];
             tmpOldB = aData[tmpIndexB];
 
-            aData[tmpIndexA] = aCos.multiply(tmpOldA).add(aSin.multiply(tmpOldB)).getNumber();
-            aData[tmpIndexB] = aCos.multiply(tmpOldB).subtract(aSin.multiply(tmpOldA)).getNumber();
+            aData[tmpIndexA] = aCos.multiply(tmpOldA).add(aSin.multiply(tmpOldB)).get();
+            aData[tmpIndexB] = aCos.multiply(tmpOldB).subtract(aSin.multiply(tmpOldA)).get();
 
             tmpIndexA += tmpIndexStep;
             tmpIndexB += tmpIndexStep;

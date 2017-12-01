@@ -65,7 +65,7 @@ public final class FillConjugated extends MatrixOperation {
         for (int j = firstColumn; j < limitColumn; j++) {
             for (int i = 0; i < structure; i++) {
                 // data[tmpIndex++] = ComplexNumber.valueOf(source.get(j, i)).conjugate();
-                data[tmpIndex++] = scalar.cast(source.get(j, i)).conjugate().getNumber();
+                data[tmpIndex++] = scalar.cast(source.get(j, i)).conjugate().get();
             }
         }
     }

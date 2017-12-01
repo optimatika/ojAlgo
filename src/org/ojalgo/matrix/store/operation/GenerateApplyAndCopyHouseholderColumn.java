@@ -216,7 +216,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
             for (int i = row + 1; i < structure; i++) {
                 tmpVal = tmpVector[i].divide(tmpNormInf);
                 tmpNorm2 += tmpVal.norm() * tmpVal.norm();
-                tmpVector[i] = tmpVal.getNumber();
+                tmpVector[i] = tmpVal.get();
             }
             retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpNorm2);
         }
@@ -228,14 +228,14 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
             tmpNorm2 = PrimitiveFunction.SQRT.invoke(tmpNorm2);
 
             // data[row + tmpColBase] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
-            data[(row + (col * structure))] = tmpScale.signum().multiply(tmpNorm2 * tmpNormInf).getNumber();
+            data[(row + (col * structure))] = tmpScale.signum().multiply(tmpNorm2 * tmpNormInf).get();
             // tmpScale = tmpScale.subtract(ComplexNumber.makePolar(tmpNorm2, tmpScale.phase()));
-            tmpScale = tmpScale.subtract(tmpScale.signum().multiply(tmpNorm2)).getNumber();
+            tmpScale = tmpScale.subtract(tmpScale.signum().multiply(tmpNorm2)).get();
 
-            tmpVector[row] = scalar.one().getNumber();
+            tmpVector[row] = scalar.one().get();
 
             for (int i = row + 1; i < structure; i++) {
-                data[i + tmpColBase] = tmpVector[i] = tmpVector[i].divide(tmpScale).getNumber();
+                data[i + tmpColBase] = tmpVector[i] = tmpVector[i].divide(tmpScale).get();
             }
 
             destination.beta = scalar.cast(tmpScale.norm() / tmpNorm2);

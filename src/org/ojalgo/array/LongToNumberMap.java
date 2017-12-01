@@ -96,7 +96,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
 
     public boolean containsValue(final Object value) {
         for (final NonzeroView<N> tmpView : myStorage.nonzeros()) {
-            if (value.equals(tmpView.getNumber())) {
+            if (value.equals(tmpView.get())) {
                 return true;
             }
         }
@@ -140,7 +140,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
                             }
 
                             public N getValue() {
-                                return tmpNonzeros.getNumber();
+                                return tmpNonzeros.get();
                             }
 
                             public N setValue(final N value) {
@@ -257,7 +257,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
             }
         } else {
             for (final NonzeroView<N> tmpView : m.getStorage().nonzeros()) {
-                myStorage.set(tmpView.index(), tmpView.getNumber());
+                myStorage.set(tmpView.index(), tmpView.get());
             }
         }
     }
@@ -295,7 +295,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         for (final NonzeroView<N> tmpView : myStorage.nonzeros()) {
             tmpKey = tmpView.index();
             if ((fromKey <= tmpKey) && (tmpKey < toKey)) {
-                final N tmpValue = tmpView.getNumber();
+                final N tmpValue = tmpView.get();
                 retVal.put(tmpKey, tmpValue);
             }
         }
@@ -329,7 +329,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         for (;;) {
             final NonzeroView<N> entry = nz.next();
             final long key = entry.index();
-            final N value = entry.getNumber();
+            final N value = entry.get();
             builder.append(key);
             builder.append('=');
             builder.append(value);

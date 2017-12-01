@@ -118,7 +118,7 @@ public final class MultiplyHermitianAndVector extends MatrixOperation {
             for (int c = i; c < structure; c++) {
                 tmpVal = tmpVal.add(hermitianMatrix[c + (i * structure)].conjugate().multiply(rightVector[c]));
             }
-            productMatrix[i] = tmpVal.getNumber();
+            productMatrix[i] = tmpVal.get();
         }
     }
 

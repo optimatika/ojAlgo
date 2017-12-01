@@ -100,7 +100,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         this.getR().visitDiagonal(0, 0, tmpAggrFunc);
 
-        return tmpAggrFunc.getNumber();
+        return tmpAggrFunc.get();
     }
 
     public MatrixStore<Double> getInverse() {

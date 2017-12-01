@@ -95,7 +95,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
-        return tmpAggrFunc.getNumber();
+        return tmpAggrFunc.get();
     }
 
     @Override

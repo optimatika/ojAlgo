@@ -351,7 +351,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return this.toBigDecimal().floatValue();
     }
 
-    public RationalNumber getNumber() {
+    public RationalNumber get() {
         return this;
     }
 

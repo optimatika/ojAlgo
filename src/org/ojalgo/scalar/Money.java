@@ -178,7 +178,7 @@ final class Money extends Number implements Scalar<Money>, Enforceable<Money> {
         return (float) this.doubleValue();
     }
 
-    public Money getNumber() {
+    public Money get() {
         return this;
     }
 

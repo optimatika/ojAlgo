@@ -497,7 +497,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                     PrimitiveDenseStore.this.visit(tmpRowDim * first, tmpRowDim * limit, 1, tmpPartAggr);
 
                     synchronized (tmpMainAggr) {
-                        tmpMainAggr.merge(tmpPartAggr.getNumber());
+                        tmpMainAggr.merge(tmpPartAggr.get());
                     }
                 }
             };
@@ -509,7 +509,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             PrimitiveDenseStore.this.visit(0, this.size(), 1, tmpMainAggr);
         }
 
-        return tmpMainAggr.getNumber();
+        return tmpMainAggr.get();
     }
 
     public void applyCholesky(final int iterationPoint, final BasicArray<Double> multipliers) {

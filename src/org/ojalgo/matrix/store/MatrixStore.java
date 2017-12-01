@@ -464,7 +464,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         this.visitAll(tmpVisitor);
 
-        return tmpVisitor.getNumber();
+        return tmpVisitor.get();
     }
 
     default N aggregateColumn(final long row, final long col, final Aggregator aggregator) {
@@ -473,7 +473,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         this.visitColumn(row, col, tmpVisitor);
 
-        return tmpVisitor.getNumber();
+        return tmpVisitor.get();
     }
 
     default N aggregateDiagonal(final long row, final long col, final Aggregator aggregator) {
@@ -482,7 +482,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         this.visitDiagonal(row, col, tmpVisitor);
 
-        return tmpVisitor.getNumber();
+        return tmpVisitor.get();
     }
 
     default N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
@@ -491,7 +491,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         this.visitRange(first, limit, tmpVisitor);
 
-        return tmpVisitor.getNumber();
+        return tmpVisitor.get();
     }
 
     default N aggregateRow(final long row, final long col, final Aggregator aggregator) {
@@ -500,7 +500,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         this.visitRow(row, col, tmpVisitor);
 
-        return tmpVisitor.getNumber();
+        return tmpVisitor.get();
     }
 
     default MatrixStore<N> conjugate() {

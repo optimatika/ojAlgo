@@ -52,11 +52,11 @@ public class FundamentalScalarTest extends ScalarTests {
 
         final double tmpExp = value1 + value2;
 
-        BigScalar tmpBig = big1.add(big2.getNumber());
-        ComplexNumber tmpComplex = complex1.add(complex2.getNumber());
-        PrimitiveScalar tmpPrimitive = primitive1.add(primitive2.getNumber());
-        Quaternion tmpQuaternion = quaternion1.add(quaternion2.getNumber());
-        RationalNumber tmpRational = rational1.add(rational2.getNumber());
+        BigScalar tmpBig = big1.add(big2.get());
+        ComplexNumber tmpComplex = complex1.add(complex2.get());
+        PrimitiveScalar tmpPrimitive = primitive1.add(primitive2.get());
+        Quaternion tmpQuaternion = quaternion1.add(quaternion2.get());
+        RationalNumber tmpRational = rational1.add(rational2.get());
 
         this.assertEqual(tmpExp, tmpBig, tmpComplex, tmpPrimitive, tmpQuaternion, tmpRational);
 
@@ -86,11 +86,11 @@ public class FundamentalScalarTest extends ScalarTests {
 
         final double tmpExp = value1 / value2;
 
-        BigScalar tmpBig = big1.divide(big2.getNumber());
-        ComplexNumber tmpComplex = complex1.divide(complex2.getNumber());
-        PrimitiveScalar tmpPrimitive = primitive1.divide(primitive2.getNumber());
-        Quaternion tmpQuaternion = quaternion1.divide(quaternion2.getNumber());
-        RationalNumber tmpRational = rational1.divide(rational2.getNumber());
+        BigScalar tmpBig = big1.divide(big2.get());
+        ComplexNumber tmpComplex = complex1.divide(complex2.get());
+        PrimitiveScalar tmpPrimitive = primitive1.divide(primitive2.get());
+        Quaternion tmpQuaternion = quaternion1.divide(quaternion2.get());
+        RationalNumber tmpRational = rational1.divide(rational2.get());
 
         this.assertEqual(tmpExp, tmpBig, tmpComplex, tmpPrimitive, tmpQuaternion, tmpRational);
 
@@ -121,11 +121,11 @@ public class FundamentalScalarTest extends ScalarTests {
 
         final double tmpExp = value1 * value2;
 
-        BigScalar tmpBig = big1.multiply(big2.getNumber());
-        ComplexNumber tmpComplex = complex1.multiply(complex2.getNumber());
-        PrimitiveScalar tmpPrimitive = primitive1.multiply(primitive2.getNumber());
-        Quaternion tmpQuaternion = quaternion1.multiply(quaternion2.getNumber());
-        RationalNumber tmpRational = rational1.multiply(rational2.getNumber());
+        BigScalar tmpBig = big1.multiply(big2.get());
+        ComplexNumber tmpComplex = complex1.multiply(complex2.get());
+        PrimitiveScalar tmpPrimitive = primitive1.multiply(primitive2.get());
+        Quaternion tmpQuaternion = quaternion1.multiply(quaternion2.get());
+        RationalNumber tmpRational = rational1.multiply(rational2.get());
 
         this.assertEqual(tmpExp, tmpBig, tmpComplex, tmpPrimitive, tmpQuaternion, tmpRational);
 
@@ -155,11 +155,11 @@ public class FundamentalScalarTest extends ScalarTests {
 
         final double tmpExp = value1 - value2;
 
-        BigScalar tmpBig = big1.subtract(big2.getNumber());
-        ComplexNumber tmpComplex = complex1.subtract(complex2.getNumber());
-        PrimitiveScalar tmpPrimitive = primitive1.subtract(primitive2.getNumber());
-        Quaternion tmpQuaternion = quaternion1.subtract(quaternion2.getNumber());
-        RationalNumber tmpRational = rational1.subtract(rational2.getNumber());
+        BigScalar tmpBig = big1.subtract(big2.get());
+        ComplexNumber tmpComplex = complex1.subtract(complex2.get());
+        PrimitiveScalar tmpPrimitive = primitive1.subtract(primitive2.get());
+        Quaternion tmpQuaternion = quaternion1.subtract(quaternion2.get());
+        RationalNumber tmpRational = rational1.subtract(rational2.get());
 
         this.assertEqual(tmpExp, tmpBig, tmpComplex, tmpPrimitive, tmpQuaternion, tmpRational);
 

@@ -40,7 +40,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
         super(factory, rowsCount, columnsCount);
 
         myScalarZero = factory.scalar().zero();
-        myNumberZero = myScalarZero.getNumber();
+        myNumberZero = myScalarZero.get();
     }
 
     @Override
@@ -103,7 +103,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
 
     @Override
     public N multiplyBoth(final Access1D<N> leftAndRight) {
-        return this.physical().scalar().zero().getNumber();
+        return this.physical().scalar().zero().get();
     }
 
     public ZeroStore<N> premultiply(final Access1D<N> left) {

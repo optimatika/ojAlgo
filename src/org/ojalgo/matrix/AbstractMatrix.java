@@ -316,7 +316,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         myStore.visitDiagonal(0, 0, tmpAggr);
 
-        return myStore.physical().scalar().convert(tmpAggr.getNumber());
+        return myStore.physical().scalar().convert(tmpAggr.get());
     }
 
     public Scalar<N> getTraceNorm() {

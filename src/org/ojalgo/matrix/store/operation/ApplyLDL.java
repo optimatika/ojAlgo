@@ -70,7 +70,7 @@ public final class ApplyLDL extends MatrixOperation {
             final N[] multipliers, final int iterationPoint) {
         final Scalar<N> tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, tmpDiagVal.multiply(multipliers[j].conjugate()).negate().getNumber(), multipliers, 0, j, structure);
+            AXPY.invoke(data, j * structure, tmpDiagVal.multiply(multipliers[j].conjugate()).negate().get(), multipliers, 0, j, structure);
         }
     }
 

@@ -119,8 +119,8 @@ public final class RotateRight extends MatrixOperation {
             tmpOldA = aData[tmpIndexA];
             tmpOldB = aData[tmpIndexB];
 
-            aData[tmpIndexA] = aCos.multiply(tmpOldA).subtract(aSin.multiply(tmpOldB)).getNumber();
-            aData[tmpIndexB] = aCos.multiply(tmpOldB).add(aSin.multiply(tmpOldA)).getNumber();
+            aData[tmpIndexA] = aCos.multiply(tmpOldA).subtract(aSin.multiply(tmpOldB)).get();
+            aData[tmpIndexB] = aCos.multiply(tmpOldB).add(aSin.multiply(tmpOldA)).get();
 
             tmpIndexA++;
             tmpIndexB++;

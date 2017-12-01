@@ -87,7 +87,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         Arrays.fill(myFirsts, columnsCount);
         // Arrays.fill(myLimits, 0); // Behövs inte, redan 0
 
-        final Class<? extends Number> tmpType = factory.scalar().zero().getNumber().getClass();
+        final Class<? extends Number> tmpType = factory.scalar().zero().get().getClass();
         if (tmpType.equals(Double.class)) {
             myMultiplyer = (FillByMultiplying<N>) MultiplyBoth.getPrimitive(rowsCount, columnsCount);
         } else if (tmpType.equals(ComplexNumber.class)) {
@@ -273,7 +273,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
             final Scalar<N> sclr = this.physical().scalar().convert(scalar);
 
             for (final ElementView2D<N, ?> nonzero : this.nonzeros()) {
-                retVal.set(nonzero.index(), sclr.multiply(nonzero.getNumber()).getNumber());
+                retVal.set(nonzero.index(), sclr.multiply(nonzero.get()).get());
             }
         }
 
@@ -307,7 +307,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
             final Scalar<N> sclr = this.physical().scalar().convert(scalar);
 
             for (final ElementView2D<N, ?> nonzero : this.nonzeros()) {
-                retVal.set(nonzero.index(), sclr.multiply(nonzero.getNumber()).getNumber());
+                retVal.set(nonzero.index(), sclr.multiply(nonzero.get()).get());
             }
         }
 

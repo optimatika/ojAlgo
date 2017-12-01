@@ -156,8 +156,8 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             return myDelegate.estimateSize();
         }
 
-        public N getNumber() {
-            return myDelegate.getNumber();
+        public N get() {
+            return myDelegate.get();
         }
 
         public boolean hasNext() {

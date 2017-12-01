@@ -124,7 +124,7 @@ public final class HouseholderLeft extends MatrixOperation {
             tmpScale = tmpScale.multiply(tmpBeta);
             tmpIndex = tmpFirstNonZero + (j * structure);
             for (int i = tmpFirstNonZero; i < structure; i++) {
-                data[tmpIndex] = data[tmpIndex].subtract(tmpScale.multiply(tmpHouseholderVector[i])).getNumber();
+                data[tmpIndex] = data[tmpIndex].subtract(tmpScale.multiply(tmpHouseholderVector[i])).get();
                 tmpIndex++;
             }
         }

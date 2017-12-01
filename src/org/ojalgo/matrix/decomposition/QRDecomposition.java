@@ -102,7 +102,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
-        return tmpAggrFunc.getNumber();
+        return tmpAggrFunc.get();
     }
 
     @Override

@@ -176,7 +176,7 @@ abstract class DeferredTridiagonal<N extends Number> extends TridiagonalDecompos
 
     @Override
     final MatrixStore<N> makeD() {
-        return this.wrap(new DiagonalBasicArray<>(myDiagD, myDiagE, myDiagE, this.scalar().zero().getNumber())).get();
+        return this.wrap(new DiagonalBasicArray<>(myDiagD, myDiagE, myDiagE, this.scalar().zero().get())).get();
     }
 
     @Override

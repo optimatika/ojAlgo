@@ -160,7 +160,7 @@ public final class HouseholderRight extends MatrixOperation {
             tmpScale = tmpScale.multiply(tmpBeta);
             tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
             for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
-                data[tmpIndex] = data[tmpIndex].conjugate().subtract(tmpScale.multiply(tmpHouseholderVector[j])).conjugate().getNumber();
+                data[tmpIndex] = data[tmpIndex].conjugate().subtract(tmpScale.multiply(tmpHouseholderVector[j])).conjugate().get();
                 tmpIndex += tmpRowDim;
             }
         }

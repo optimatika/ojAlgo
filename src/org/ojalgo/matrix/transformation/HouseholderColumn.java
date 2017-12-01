@@ -43,9 +43,9 @@ final class HouseholderColumn<N extends Number> extends ColumnView<N> implements
         if (index > myFirst) {
             return myStore.get(index, this.column());
         } else if (index == myFirst) {
-            return myStore.physical().scalar().one().getNumber();
+            return myStore.physical().scalar().one().get();
         } else {
-            return myStore.physical().scalar().zero().getNumber();
+            return myStore.physical().scalar().zero().get();
         }
     }
 

@@ -584,7 +584,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             for (int i = 0; i < rank; i++) {
                 tmpValue = tmpSingulars.doubleValue(i);
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).conjugate().divide(tmpValue).getNumber());
+                    tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).conjugate().divide(tmpValue).get());
                 }
             }
 

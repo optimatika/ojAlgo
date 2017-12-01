@@ -497,7 +497,7 @@ public final class HouseholderHermitian extends MatrixOperation {
         tmpVal = tmpVal.multiply(tmpBeta).divide(PrimitiveMath.TWO);
         for (int c = tmpFirst; c < tmpLength; c++) {
             //worker[c] = tmpBeta * (worker[c] - (tmpVal * tmpVector[c]));
-            worker[c] = tmpBeta.multiply(worker[c].subtract(tmpVal.multiply(tmpVector[c]))).getNumber();
+            worker[c] = tmpBeta.multiply(worker[c].subtract(tmpVal.multiply(tmpVector[c]))).get();
         }
 
         if (tmpCount > HermitianRank2Update.THRESHOLD) {

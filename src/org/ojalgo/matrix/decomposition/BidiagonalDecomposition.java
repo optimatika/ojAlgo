@@ -278,7 +278,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
             tmpSub = tmpArray2D.sliceDiagonal(1, 0);
         }
 
-        return new DiagonalArray1D<>(tmpMain, tmpSuper, tmpSub, this.scalar().zero().getNumber());
+        return new DiagonalArray1D<>(tmpMain, tmpSuper, tmpSub, this.scalar().zero().get());
     }
 
     /**

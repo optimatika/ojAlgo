@@ -164,7 +164,7 @@ public final class SubstituteForwards extends MatrixOperation {
         for (int i = 0; i < tmpDiagDim; i++) {
 
             for (int j = 0; j <= i; j++) {
-                tmpBodyRow[j] = conjugated ? body.get(j, i).conjugate().getNumber() : body.get(i, j);
+                tmpBodyRow[j] = conjugated ? body.get(j, i).conjugate().get() : body.get(i, j);
             }
 
             for (int s = firstColumn; s < columnLimit; s++) {
@@ -184,7 +184,7 @@ public final class SubstituteForwards extends MatrixOperation {
                     tmpVal = tmpVal.divide(tmpBodyRow[i]);
                 }
 
-                data[i + tmpColBaseIndex] = tmpVal.getNumber();
+                data[i + tmpColBaseIndex] = tmpVal.get();
             }
         }
     }

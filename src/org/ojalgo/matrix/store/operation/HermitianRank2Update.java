@@ -127,7 +127,7 @@ public final class HermitianRank2Update extends MatrixOperation {
 
             tmpIndex = j + (j * structure);
             for (int i = j; i < structure; i++) {
-                data[tmpIndex] = data[tmpIndex].subtract(vector2[i].multiply(tmpVal1j).add(vector1[i].multiply(tmpVal2j))).getNumber();
+                data[tmpIndex] = data[tmpIndex].subtract(vector2[i].multiply(tmpVal1j).add(vector1[i].multiply(tmpVal2j))).get();
                 tmpIndex++;
             }
         }

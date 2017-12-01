@@ -205,7 +205,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
         this.getEigenvalues().visitAll(tmpVisitor);
 
-        return this.scalar().cast(tmpVisitor.getNumber());
+        return this.scalar().cast(tmpVisitor.get());
     }
 
     public void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
@@ -230,7 +230,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
             final PhysicalStore<N> tmpMtrx = tmpV.conjugate().copy();
 
-            final N tmpZero = this.scalar().zero().getNumber();
+            final N tmpZero = this.scalar().zero().get();
             final BinaryFunction<N> tmpDivide = this.function().divide();
 
             for (int i = 0; i < tmpDim; i++) {
@@ -260,7 +260,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
             //tmpMtrx.fillMatching(new TransposedStore<N>(tmpV));
             tmpMtrx.fillMatching(tmpV.transpose());
 
-            final N tmpZero = this.scalar().zero().getNumber();
+            final N tmpZero = this.scalar().zero().get();
             final BinaryFunction<N> tmpDivide = this.function().divide();
 
             for (int i = 0; i < tmpDim; i++) {
@@ -292,7 +292,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
         this.getEigenvalues().visitAll(tmpVisitor);
 
-        return tmpVisitor.getNumber();
+        return tmpVisitor.get();
     }
 
     public final MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {

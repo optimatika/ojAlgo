@@ -691,7 +691,7 @@ public final class MultiplyLeft extends MatrixOperation {
 
             return (product, left, complexity, right, scalar) -> {
 
-                Arrays.fill(product, scalar.zero().getNumber());
+                Arrays.fill(product, scalar.zero().get());
 
                 final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -708,7 +708,7 @@ public final class MultiplyLeft extends MatrixOperation {
 
             return (product, left, complexity, right, scalar) -> {
 
-                Arrays.fill(product, scalar.zero().getNumber());
+                Arrays.fill(product, scalar.zero().get());
 
                 MultiplyLeft.invoke(product, 0, right.length / complexity, left, complexity, right, scalar);
             };

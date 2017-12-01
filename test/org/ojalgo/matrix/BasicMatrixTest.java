@@ -316,12 +316,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         if (myBigAA.isSquare()) {
 
-            myExpNmbr = myBigAA.getDeterminant().getNumber();
+            myExpNmbr = myBigAA.getDeterminant().get();
 
-            myActNmbr = myComplexAA.getDeterminant().getNumber();
+            myActNmbr = myComplexAA.getDeterminant().get();
             TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-            myActNmbr = myPrimitiveAA.getDeterminant().getNumber();
+            myActNmbr = myPrimitiveAA.getDeterminant().get();
             TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
         }
@@ -332,12 +332,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
      */
     public void testGetInfinityNorm() {
 
-        myExpNmbr = myBigAA.getInfinityNorm().getNumber();
+        myExpNmbr = myBigAA.getInfinityNorm().get();
 
-        myActNmbr = myComplexAA.getInfinityNorm().getNumber();
+        myActNmbr = myComplexAA.getInfinityNorm().get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.getInfinityNorm().getNumber();
+        myActNmbr = myPrimitiveAA.getInfinityNorm().get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }
@@ -349,12 +349,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         final int tmpDegree = Uniform.randomInteger(1, (int) Math.min(myBigAA.countRows(), myBigAA.countColumns()));
 
-        myExpNmbr = myBigAA.getKyFanNorm(tmpDegree).getNumber();
+        myExpNmbr = myBigAA.getKyFanNorm(tmpDegree).get();
 
-        myActNmbr = myComplexAA.getKyFanNorm(tmpDegree).getNumber();
+        myActNmbr = myComplexAA.getKyFanNorm(tmpDegree).get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.getKyFanNorm(tmpDegree).getNumber();
+        myActNmbr = myPrimitiveAA.getKyFanNorm(tmpDegree).get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }
@@ -364,12 +364,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
      */
     public void testGetOneNorm() {
 
-        myExpNmbr = myBigAA.getOneNorm().getNumber();
+        myExpNmbr = myBigAA.getOneNorm().get();
 
-        myActNmbr = myComplexAA.getOneNorm().getNumber();
+        myActNmbr = myComplexAA.getOneNorm().get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.getOneNorm().getNumber();
+        myActNmbr = myPrimitiveAA.getOneNorm().get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }
@@ -379,12 +379,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
      */
     public void testGetOperatorNorm() {
 
-        myExpNmbr = myBigAA.getOperatorNorm().getNumber();
+        myExpNmbr = myBigAA.getOperatorNorm().get();
 
-        myActNmbr = myComplexAA.getOperatorNorm().getNumber();
+        myActNmbr = myComplexAA.getOperatorNorm().get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.getOperatorNorm().getNumber();
+        myActNmbr = myPrimitiveAA.getOperatorNorm().get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }
@@ -473,12 +473,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
      */
     public void testGetTrace() {
 
-        myExpNmbr = myBigAA.getTrace().getNumber();
+        myExpNmbr = myBigAA.getTrace().get();
 
-        myActNmbr = myComplexAA.getTrace().getNumber();
+        myActNmbr = myComplexAA.getTrace().get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.getTrace().getNumber();
+        myActNmbr = myPrimitiveAA.getTrace().get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }
@@ -488,12 +488,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
      */
     public void testGetTraceNorm() {
 
-        myExpNmbr = myBigAA.getTraceNorm().getNumber();
+        myExpNmbr = myBigAA.getTraceNorm().get();
 
-        myActNmbr = myComplexAA.getTraceNorm().getNumber();
+        myActNmbr = myComplexAA.getTraceNorm().get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.getTraceNorm().getNumber();
+        myActNmbr = myPrimitiveAA.getTraceNorm().get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }
@@ -1002,12 +1002,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        myExpNmbr = myBigAA.toScalar(tmpRow, tmpCol).getNumber();
+        myExpNmbr = myBigAA.toScalar(tmpRow, tmpCol).get();
 
-        myActNmbr = myComplexAA.toScalar(tmpRow, tmpCol).getNumber();
+        myActNmbr = myComplexAA.toScalar(tmpRow, tmpCol).get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.toScalar(tmpRow, tmpCol).getNumber();
+        myActNmbr = myPrimitiveAA.toScalar(tmpRow, tmpCol).get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }
@@ -1029,12 +1029,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     private void testGetVectorNormInt(final int tmpDegree) {
 
-        myExpNmbr = myBigAA.getVectorNorm(tmpDegree).getNumber();
+        myExpNmbr = myBigAA.getVectorNorm(tmpDegree).get();
 
-        myActNmbr = myComplexAA.getVectorNorm(tmpDegree).getNumber();
+        myActNmbr = myComplexAA.getVectorNorm(tmpDegree).get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.getVectorNorm(tmpDegree).getNumber();
+        myActNmbr = myPrimitiveAA.getVectorNorm(tmpDegree).get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }

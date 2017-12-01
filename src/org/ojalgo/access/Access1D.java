@@ -122,7 +122,7 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
             return myLastCursor - myCursor;
         }
 
-        public N getNumber() {
+        public N get() {
             return myValues.get(myCursor);
         }
 

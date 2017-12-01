@@ -41,10 +41,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private int myCount = 0;
 
                 public double doubleValue() {
-                    return this.getNumber().doubleValue();
+                    return this.get().doubleValue();
                 }
 
-                public BigDecimal getNumber() {
+                public BigDecimal get() {
                     return new BigDecimal(myCount);
                 }
 
@@ -76,7 +76,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return BigScalar.of(this.getNumber());
+                    return BigScalar.of(this.get());
                 }
 
             };
@@ -92,15 +92,15 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private BigDecimal myNumber = ZERO;
 
                 public double doubleValue() {
-                    return this.getNumber().doubleValue();
+                    return this.get().doubleValue();
                 }
 
-                public BigDecimal getNumber() {
+                public BigDecimal get() {
                     return myNumber;
                 }
 
                 public int intValue() {
-                    return this.getNumber().intValue();
+                    return this.get().intValue();
                 }
 
                 public void invoke(final BigDecimal anArg) {
@@ -125,7 +125,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return BigScalar.of(this.getNumber());
+                    return BigScalar.of(this.get());
                 }
             };
         }
@@ -140,15 +140,15 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private BigDecimal myNumber = ZERO;
 
                 public double doubleValue() {
-                    return this.getNumber().doubleValue();
+                    return this.get().doubleValue();
                 }
 
-                public BigDecimal getNumber() {
+                public BigDecimal get() {
                     return myNumber;
                 }
 
                 public int intValue() {
-                    return this.getNumber().intValue();
+                    return this.get().intValue();
                 }
 
                 public void invoke(final BigDecimal anArg) {
@@ -173,7 +173,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return BigScalar.of(this.getNumber());
+                    return BigScalar.of(this.get());
                 }
             };
         }
@@ -188,10 +188,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private BigDecimal myNumber = VERY_POSITIVE;
 
                 public double doubleValue() {
-                    return this.getNumber().doubleValue();
+                    return this.get().doubleValue();
                 }
 
-                public BigDecimal getNumber() {
+                public BigDecimal get() {
                     if (myNumber.compareTo(VERY_POSITIVE) == 0) {
                         return ZERO;
                     } else {
@@ -200,7 +200,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public int intValue() {
-                    return this.getNumber().intValue();
+                    return this.get().intValue();
                 }
 
                 public void invoke(final BigDecimal anArg) {
@@ -225,7 +225,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return BigScalar.of(this.getNumber());
+                    return BigScalar.of(this.get());
                 }
             };
         }
@@ -240,15 +240,15 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private BigDecimal myNumber = ZERO;
 
                 public double doubleValue() {
-                    return this.getNumber().doubleValue();
+                    return this.get().doubleValue();
                 }
 
-                public BigDecimal getNumber() {
+                public BigDecimal get() {
                     return myNumber;
                 }
 
                 public int intValue() {
-                    return this.getNumber().intValue();
+                    return this.get().intValue();
                 }
 
                 public void invoke(final BigDecimal anArg) {
@@ -273,7 +273,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return BigScalar.of(this.getNumber());
+                    return BigScalar.of(this.get());
                 }
             };
         }
@@ -288,15 +288,15 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private BigDecimal myNumber = ZERO;
 
                 public double doubleValue() {
-                    return this.getNumber().doubleValue();
+                    return this.get().doubleValue();
                 }
 
-                public BigDecimal getNumber() {
+                public BigDecimal get() {
                     return SQRT.invoke(myNumber);
                 }
 
                 public int intValue() {
-                    return this.getNumber().intValue();
+                    return this.get().intValue();
                 }
 
                 public void invoke(final BigDecimal anArg) {
@@ -321,7 +321,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return BigScalar.of(this.getNumber());
+                    return BigScalar.of(this.get());
                 }
             };
         }
@@ -336,15 +336,15 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private BigDecimal myNumber = ONE;
 
                 public double doubleValue() {
-                    return this.getNumber().doubleValue();
+                    return this.get().doubleValue();
                 }
 
-                public BigDecimal getNumber() {
+                public BigDecimal get() {
                     return myNumber;
                 }
 
                 public int intValue() {
-                    return this.getNumber().intValue();
+                    return this.get().intValue();
                 }
 
                 public void invoke(final BigDecimal anArg) {
@@ -369,7 +369,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return BigScalar.of(this.getNumber());
+                    return BigScalar.of(this.get());
                 }
             };
         }
@@ -384,15 +384,15 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private BigDecimal myNumber = ONE;
 
                 public double doubleValue() {
-                    return this.getNumber().doubleValue();
+                    return this.get().doubleValue();
                 }
 
-                public BigDecimal getNumber() {
+                public BigDecimal get() {
                     return myNumber;
                 }
 
                 public int intValue() {
-                    return this.getNumber().intValue();
+                    return this.get().intValue();
                 }
 
                 public void invoke(final BigDecimal anArg) {
@@ -417,7 +417,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return BigScalar.of(this.getNumber());
+                    return BigScalar.of(this.get());
                 }
             };
         }
@@ -432,10 +432,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private BigDecimal myNumber = VERY_POSITIVE;
 
                 public double doubleValue() {
-                    return this.getNumber().doubleValue();
+                    return this.get().doubleValue();
                 }
 
-                public BigDecimal getNumber() {
+                public BigDecimal get() {
                     if (myNumber.compareTo(VERY_POSITIVE) == 0) {
                         return ZERO;
                     } else {
@@ -444,7 +444,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public int intValue() {
-                    return this.getNumber().intValue();
+                    return this.get().intValue();
                 }
 
                 public void invoke(final BigDecimal anArg) {
@@ -471,7 +471,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return BigScalar.of(this.getNumber());
+                    return BigScalar.of(this.get());
                 }
             };
         }
@@ -486,15 +486,15 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private BigDecimal myNumber = ZERO;
 
                 public double doubleValue() {
-                    return this.getNumber().doubleValue();
+                    return this.get().doubleValue();
                 }
 
-                public BigDecimal getNumber() {
+                public BigDecimal get() {
                     return myNumber;
                 }
 
                 public int intValue() {
-                    return this.getNumber().intValue();
+                    return this.get().intValue();
                 }
 
                 public void invoke(final BigDecimal anArg) {
@@ -519,7 +519,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return BigScalar.of(this.getNumber());
+                    return BigScalar.of(this.get());
                 }
             };
         }
@@ -534,15 +534,15 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private BigDecimal myNumber = ZERO;
 
                 public double doubleValue() {
-                    return this.getNumber().doubleValue();
+                    return this.get().doubleValue();
                 }
 
-                public BigDecimal getNumber() {
+                public BigDecimal get() {
                     return myNumber;
                 }
 
                 public int intValue() {
-                    return this.getNumber().intValue();
+                    return this.get().intValue();
                 }
 
                 public void invoke(final BigDecimal anArg) {
@@ -567,7 +567,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return BigScalar.of(this.getNumber());
+                    return BigScalar.of(this.get());
                 }
             };
         }
