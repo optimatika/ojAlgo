@@ -315,8 +315,8 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implem
         data[intIndex] = function.invoke(data[intIndex]);
     }
 
-    abstract N valueOf(double value);
+    protected abstract N valueOf(double value);
 
-    abstract N valueOf(Number number);
+    protected abstract N valueOf(Number number);
 
 }

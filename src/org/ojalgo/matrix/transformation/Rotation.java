@@ -222,7 +222,7 @@ public abstract class Rotation<N extends Number> extends Object {
         return new Complex(aLowerIndex, aHigherIndex, ComplexFunction.COS.invoke(anAngle), ComplexFunction.SIN.invoke(anAngle));
     }
 
-    public static <N extends Number & Scalar<N>> Generic<N> makeComplex(final FunctionSet<N> functions, final int aLowerIndex, final int aHigherIndex,
+    public static <N extends Number & Scalar<N>> Generic<N> makeGeneric(final FunctionSet<N> functions, final int aLowerIndex, final int aHigherIndex,
             final N anAngle) {
         return new Generic<N>(aLowerIndex, aHigherIndex, functions.cos().invoke(anAngle), functions.sin().invoke(anAngle));
     }

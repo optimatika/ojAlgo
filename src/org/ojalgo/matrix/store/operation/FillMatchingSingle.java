@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
 public final class FillMatchingSingle extends MatrixOperation {
@@ -72,6 +73,18 @@ public final class FillMatchingSingle extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int limitColumn,
+            final Access1D<?> source, final Scalar.Factory<N> scalar) {
+        int tmpIndex = structure * firstColumn;
+        for (int j = firstColumn; j < limitColumn; j++) {
+            for (int i = 0; i < structure; i++) {
+                // data[tmpIndex] = ComplexNumber.valueOf(source.get(tmpIndex));
+                data[tmpIndex] = scalar.cast(source.get(tmpIndex));
+                tmpIndex++;
+            }
+        }
     }
 
 }

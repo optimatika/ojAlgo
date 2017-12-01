@@ -142,12 +142,12 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
     }
 
     @Override
-    final Quaternion valueOf(final double value) {
+    protected final Quaternion valueOf(final double value) {
         return Quaternion.valueOf(value);
     }
 
     @Override
-    final Quaternion valueOf(final Number number) {
+    protected final Quaternion valueOf(final Number number) {
         return Quaternion.valueOf(number);
     }
 }

@@ -156,12 +156,12 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    BigDecimal valueOf(final double value) {
+    protected BigDecimal valueOf(final double value) {
         return BigDecimal.valueOf(value);
     }
 
     @Override
-    BigDecimal valueOf(final Number number) {
+    protected BigDecimal valueOf(final Number number) {
         return TypeUtils.toBigDecimal(number);
     }
 

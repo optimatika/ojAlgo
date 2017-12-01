@@ -140,12 +140,12 @@ public class RationalArray extends ScalarArray<RationalNumber> {
     }
 
     @Override
-    final RationalNumber valueOf(final double value) {
+    protected final RationalNumber valueOf(final double value) {
         return RationalNumber.valueOf(value);
     }
 
     @Override
-    final RationalNumber valueOf(final Number number) {
+    protected final RationalNumber valueOf(final Number number) {
         return RationalNumber.valueOf(number);
     }
 

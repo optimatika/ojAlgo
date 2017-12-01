@@ -140,12 +140,12 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
     }
 
     @Override
-    ComplexNumber valueOf(final double value) {
+    protected ComplexNumber valueOf(final double value) {
         return ComplexNumber.valueOf(value);
     }
 
     @Override
-    ComplexNumber valueOf(final Number number) {
+    protected ComplexNumber valueOf(final Number number) {
         return ComplexNumber.valueOf(number);
     }
 
