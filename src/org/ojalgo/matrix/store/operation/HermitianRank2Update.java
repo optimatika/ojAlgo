@@ -23,7 +23,6 @@ package org.ojalgo.matrix.store.operation;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -60,27 +59,27 @@ public final class HermitianRank2Update extends MatrixOperation {
         }
     }
 
-    public static void invoke(final ComplexNumber[] data, final int firstColumn, final int columnLimit, final ComplexNumber[] vector1,
-            final ComplexNumber[] vector2) {
-
-        final int structure = vector1.length;
-
-        ComplexNumber tmpVal1j;
-        ComplexNumber tmpVal2j;
-
-        int tmpIndex;
-        for (int j = firstColumn; j < columnLimit; j++) {
-
-            tmpVal1j = vector1[j].conjugate();
-            tmpVal2j = vector2[j].conjugate();
-
-            tmpIndex = j + (j * structure);
-            for (int i = j; i < structure; i++) {
-                data[tmpIndex] = data[tmpIndex].subtract(vector2[i].multiply(tmpVal1j).add(vector1[i].multiply(tmpVal2j)));
-                tmpIndex++;
-            }
-        }
-    }
+    //    public static void invoke(final ComplexNumber[] data, final int firstColumn, final int columnLimit, final ComplexNumber[] vector1,
+    //            final ComplexNumber[] vector2) {
+    //
+    //        final int structure = vector1.length;
+    //
+    //        ComplexNumber tmpVal1j;
+    //        ComplexNumber tmpVal2j;
+    //
+    //        int tmpIndex;
+    //        for (int j = firstColumn; j < columnLimit; j++) {
+    //
+    //            tmpVal1j = vector1[j].conjugate();
+    //            tmpVal2j = vector2[j].conjugate();
+    //
+    //            tmpIndex = j + (j * structure);
+    //            for (int i = j; i < structure; i++) {
+    //                data[tmpIndex] = data[tmpIndex].subtract(vector2[i].multiply(tmpVal1j).add(vector1[i].multiply(tmpVal2j)));
+    //                tmpIndex++;
+    //            }
+    //        }
+    //    }
 
     public static void invoke(final double[] data, final int firstColumn, final int columnLimit, final double[] vector1, final double[] vector2) {
 
@@ -100,15 +99,6 @@ public final class HermitianRank2Update extends MatrixOperation {
                 data[tmpIndex++] -= ((vector2[i] * tmpVal1j) + (vector1[i] * tmpVal2j));
             }
         }
-    }
-
-    private HermitianRank2Update() {
-        super();
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
     public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int firstColumn, final int columnLimit, final N[] vector1,
@@ -131,6 +121,15 @@ public final class HermitianRank2Update extends MatrixOperation {
                 tmpIndex++;
             }
         }
+    }
+
+    private HermitianRank2Update() {
+        super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }
