@@ -24,7 +24,6 @@ package org.ojalgo.matrix.store.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.array.blas.AXPY;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 public final class ApplyCholesky extends MatrixOperation {
@@ -39,16 +38,16 @@ public final class ApplyCholesky extends MatrixOperation {
         }
     }
 
-    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit,
-            final ComplexNumber[] multipliers) {
-        for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, multipliers[j].conjugate().negate(), multipliers, 0, j, structure);
-        }
-    }
-
     public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers) {
         for (int j = firstColumn; j < columnLimit; j++) {
             AXPY.invoke(data, j * structure, -multipliers[j], multipliers, 0, j, structure);
+        }
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit,
+            final N[] multipliers) {
+        for (int j = firstColumn; j < columnLimit; j++) {
+            AXPY.invoke(data, j * structure, multipliers[j].conjugate().negate().get(), multipliers, 0, j, structure);
         }
     }
 
@@ -59,13 +58,6 @@ public final class ApplyCholesky extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
-    }
-
-    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit,
-            final N[] multipliers) {
-        for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, multipliers[j].conjugate().negate().get(), multipliers, 0, j, structure);
-        }
     }
 
 }

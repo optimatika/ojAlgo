@@ -24,7 +24,6 @@ package org.ojalgo.matrix.store.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.array.blas.AXPY;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 public final class ApplyLDL extends MatrixOperation {
@@ -38,14 +37,6 @@ public final class ApplyLDL extends MatrixOperation {
         final BigDecimal tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
             AXPY.invoke(data, j * structure, tmpDiagVal.multiply(multipliers[j]).negate(), multipliers, 0, j, structure);
-        }
-    }
-
-    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit, final ComplexNumber[] multipliers,
-            final int iterationPoint) {
-        final ComplexNumber tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
-        for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, tmpDiagVal.multiply(multipliers[j].conjugate()).negate(), multipliers, 0, j, structure);
         }
     }
 

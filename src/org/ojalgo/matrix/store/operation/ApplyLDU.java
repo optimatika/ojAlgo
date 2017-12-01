@@ -24,7 +24,7 @@ package org.ojalgo.matrix.store.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.array.blas.AXPY;
-import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class ApplyLDU extends MatrixOperation {
 
@@ -41,21 +41,21 @@ public final class ApplyLDU extends MatrixOperation {
         }
     }
 
-    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit, final ComplexNumber[] multipliers,
-            final int iterationPoint, final boolean hermitian) {
-        for (int j = firstColumn; j < columnLimit; j++) {
-            final ComplexNumber tmpScalar = hermitian ? multipliers[j].conjugate() : data[iterationPoint + (j * structure)];
-            final int tmpFirstRow = hermitian ? j : iterationPoint + 1;
-            AXPY.invoke(data, j * structure, tmpScalar.negate(), multipliers, 0, tmpFirstRow, structure);
-        }
-    }
-
     public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers,
             final int iterationPoint, final boolean hermitian) {
         for (int j = firstColumn; j < columnLimit; j++) {
             final double tmpScalar = hermitian ? multipliers[j] : data[iterationPoint + (j * structure)];
             final int tmpFirstRow = hermitian ? j : iterationPoint + 1;
             AXPY.invoke(data, j * structure, -tmpScalar, multipliers, 0, tmpFirstRow, structure);
+        }
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit,
+            final N[] multipliers, final int iterationPoint, final boolean hermitian) {
+        for (int j = firstColumn; j < columnLimit; j++) {
+            final Scalar<N> tmpScalar = hermitian ? multipliers[j].conjugate() : data[iterationPoint + (j * structure)];
+            final int tmpFirstRow = hermitian ? j : iterationPoint + 1;
+            AXPY.invoke(data, j * structure, tmpScalar.negate().get(), multipliers, 0, tmpFirstRow, structure);
         }
     }
 
