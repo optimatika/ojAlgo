@@ -941,8 +941,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return new TransposedRegion<>(this, multiplyBoth);
     }
 
-    public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
-        RotateRight.invoke(data, myRowDim, aLow, aHigh, FACTORY.scalar().cast(aCos), FACTORY.scalar().cast(aSin));
+    public void rotateRight(final int low, final int high, final double cos, final double sin) {
+        RotateRight.invoke(data, myRowDim, low, high, FACTORY.scalar().cast(cos), FACTORY.scalar().cast(sin));
     }
 
     public void set(final long aRow, final long aCol, final double aNmbr) {
@@ -1074,7 +1074,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         if (tmpLow != tmpHigh) {
             if ((tmpTransf.cos != null) && (tmpTransf.sin != null)) {
-                RotateLeft.invoke(data, myColDim, tmpLow, tmpHigh, tmpTransf.cos, tmpTransf.sin);
+                RotateLeft.invoke(data, myRowDim, tmpLow, tmpHigh, tmpTransf.cos, tmpTransf.sin);
             } else {
                 myUtility.exchangeRows(tmpLow, tmpHigh);
             }

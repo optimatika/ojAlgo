@@ -24,7 +24,6 @@ package org.ojalgo.matrix.store.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.function.BigFunction;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 public final class RotateLeft extends MatrixOperation {
@@ -33,70 +32,45 @@ public final class RotateLeft extends MatrixOperation {
 
     public static int THRESHOLD = 128;
 
-    public static void invoke(final BigDecimal[] aData, final int aColDim, final int aRowA, final int aRowB, final BigDecimal aCos, final BigDecimal aSin) {
+    public static void invoke(final BigDecimal[] data, final int structure, final int rowA, final int rowB, final BigDecimal cos, final BigDecimal sin) {
 
-        BigDecimal tmpOldA;
-        BigDecimal tmpOldB;
+        BigDecimal oldA;
+        BigDecimal oldB;
 
-        int tmpIndexA = aRowA;
-        int tmpIndexB = aRowB;
-        final int tmpIndexStep = aData.length / aColDim;
+        int indexA = rowA;
+        int indexB = rowB;
 
-        for (int j = 0; j < aColDim; j++) {
+        for (int j = 0, lim = data.length / structure; j < lim; j++) {
 
-            tmpOldA = aData[tmpIndexA];
-            tmpOldB = aData[tmpIndexB];
+            oldA = data[indexA];
+            oldB = data[indexB];
 
-            aData[tmpIndexA] = BigFunction.ADD.invoke(BigFunction.MULTIPLY.invoke(aCos, tmpOldA), BigFunction.MULTIPLY.invoke(aSin, tmpOldB));
-            aData[tmpIndexB] = BigFunction.SUBTRACT.invoke(BigFunction.MULTIPLY.invoke(aCos, tmpOldB), BigFunction.MULTIPLY.invoke(aSin, tmpOldA));
+            data[indexA] = BigFunction.ADD.invoke(BigFunction.MULTIPLY.invoke(cos, oldA), BigFunction.MULTIPLY.invoke(sin, oldB));
+            data[indexB] = BigFunction.SUBTRACT.invoke(BigFunction.MULTIPLY.invoke(cos, oldB), BigFunction.MULTIPLY.invoke(sin, oldA));
 
-            tmpIndexA += tmpIndexStep;
-            tmpIndexB += tmpIndexStep;
+            indexA += structure;
+            indexB += structure;
         }
     }
 
-    public static void invoke(final ComplexNumber[] aData, final int aColDim, final int aRowA, final int aRowB, final ComplexNumber aCos,
-            final ComplexNumber aSin) {
+    public static void invoke(final double[] data, final int structure, final int rowA, final int rowB, final double cos, final double sin) {
 
-        ComplexNumber tmpOldA;
-        ComplexNumber tmpOldB;
+        double oldA;
+        double oldB;
 
-        int tmpIndexA = aRowA;
-        int tmpIndexB = aRowB;
-        final int tmpIndexStep = aData.length / aColDim;
+        int indexA = rowA;
+        int indexB = rowB;
 
-        for (int j = 0; j < aColDim; j++) {
+        for (int j = 0, lim = data.length / structure; j < lim; j++) {
 
-            tmpOldA = aData[tmpIndexA];
-            tmpOldB = aData[tmpIndexB];
+            oldA = data[indexA];
+            oldB = data[indexB];
 
-            aData[tmpIndexA] = aCos.multiply(tmpOldA).add(aSin.multiply(tmpOldB));
-            aData[tmpIndexB] = aCos.multiply(tmpOldB).subtract(aSin.multiply(tmpOldA));
+            data[indexA] = (cos * oldA) + (sin * oldB);
+            data[indexB] = (cos * oldB) - (sin * oldA);
 
-            tmpIndexA += tmpIndexStep;
-            tmpIndexB += tmpIndexStep;
-        }
-    }
-
-    public static void invoke(final double[] aData, final int aColDim, final int aRowA, final int aRowB, final double aCos, final double aSin) {
-
-        double tmpOldA;
-        double tmpOldB;
-
-        int tmpIndexA = aRowA;
-        int tmpIndexB = aRowB;
-        final int tmpIndexStep = aData.length / aColDim;
-
-        for (int j = 0; j < aColDim; j++) {
-
-            tmpOldA = aData[tmpIndexA];
-            tmpOldB = aData[tmpIndexB];
-
-            aData[tmpIndexA] = (aCos * tmpOldA) + (aSin * tmpOldB);
-            aData[tmpIndexB] = (aCos * tmpOldB) - (aSin * tmpOldA);
-
-            tmpIndexA += tmpIndexStep;
-            tmpIndexB += tmpIndexStep;
+            indexA += structure;
+            indexB += structure;
         }
     }
 
@@ -109,25 +83,24 @@ public final class RotateLeft extends MatrixOperation {
         return THRESHOLD;
     }
 
-    public static <N extends Number & Scalar<N>> void invoke(final N[] aData, final int aColDim, final int aRowA, final int aRowB, final N aCos, final N aSin) {
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int rowA, final int rowB, final N cos, final N sin) {
 
-        N tmpOldA;
-        N tmpOldB;
+        N oldA;
+        N oldB;
 
-        int tmpIndexA = aRowA;
-        int tmpIndexB = aRowB;
-        final int tmpIndexStep = aData.length / aColDim;
+        int indexA = rowA;
+        int indexB = rowB;
 
-        for (int j = 0; j < aColDim; j++) {
+        for (int j = 0, lim = data.length / structure; j < lim; j++) {
 
-            tmpOldA = aData[tmpIndexA];
-            tmpOldB = aData[tmpIndexB];
+            oldA = data[indexA];
+            oldB = data[indexB];
 
-            aData[tmpIndexA] = aCos.multiply(tmpOldA).add(aSin.multiply(tmpOldB)).get();
-            aData[tmpIndexB] = aCos.multiply(tmpOldB).subtract(aSin.multiply(tmpOldA)).get();
+            data[indexA] = cos.multiply(oldA).add(sin.multiply(oldB)).get();
+            data[indexB] = cos.multiply(oldB).subtract(sin.multiply(oldA)).get();
 
-            tmpIndexA += tmpIndexStep;
-            tmpIndexB += tmpIndexStep;
+            indexA += structure;
+            indexB += structure;
         }
     }
 

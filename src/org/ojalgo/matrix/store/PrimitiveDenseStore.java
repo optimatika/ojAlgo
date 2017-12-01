@@ -1010,8 +1010,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return new TransposedRegion<>(this, multiplyBoth);
     }
 
-    public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
-        RotateRight.invoke(data, myRowDim, aLow, aHigh, aCos, aSin);
+    public void rotateRight(final int low, final int high, final double cos, final double sin) {
+        RotateRight.invoke(data, myRowDim, low, high, cos, sin);
     }
 
     public void set(final long aRow, final long aCol, final double aNmbr) {
@@ -1141,7 +1141,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         if (tmpLow != tmpHigh) {
             if (!Double.isNaN(tmpTransf.cos) && !Double.isNaN(tmpTransf.sin)) {
-                RotateLeft.invoke(data, myColDim, tmpLow, tmpHigh, tmpTransf.cos, tmpTransf.sin);
+                RotateLeft.invoke(data, myRowDim, tmpLow, tmpHigh, tmpTransf.cos, tmpTransf.sin);
             } else {
                 myUtility.exchangeRows(tmpLow, tmpHigh);
             }
