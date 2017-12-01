@@ -23,8 +23,25 @@ package org.ojalgo.access;
 
 public interface AccessScalar<N extends Number> {
 
+    /**
+     * @see Number#byteValue()
+     */
+    default byte byteValue() {
+        return this.get().byteValue();
+    }
+
+    /**
+     * @see Number#doubleValue()
+     */
     default double doubleValue() {
         return this.get().doubleValue();
+    }
+
+    /**
+     * @see Number#floatValue()
+     */
+    default float floatValue() {
+        return this.get().floatValue();
     }
 
     N get();
@@ -37,12 +54,25 @@ public interface AccessScalar<N extends Number> {
         return this.get();
     }
 
+    /**
+     * @see Number#intValue()
+     */
     default int intValue() {
         return this.get().intValue();
     }
 
+    /**
+     * @see Number#longValue()
+     */
     default long longValue() {
         return this.get().longValue();
+    }
+
+    /**
+     * @see Number#shortValue()
+     */
+    default short shortValue() {
+        return this.get().shortValue();
     }
 
 }
