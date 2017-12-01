@@ -30,7 +30,10 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.ComplexArray;
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.QuaternionArray;
+import org.ojalgo.array.RationalArray;
 import org.ojalgo.array.ScalarArray;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
@@ -49,6 +52,8 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -62,13 +67,11 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     public static interface GenericMultiplyBoth<N extends Number & Scalar<N>> extends FillByMultiplying<N> {
 
     }
-
     public static interface GenericMultiplyLeft<N extends Number & Scalar<N>> {
 
         void invoke(N[] product, Access1D<N> left, int complexity, N[] right, Scalar.Factory<N> scalar);
 
     }
-
     public static interface GenericMultiplyNeither<N extends Number & Scalar<N>> {
 
         void invoke(N[] product, N[] left, int complexity, N[] right, Scalar.Factory<N> scalar);
@@ -81,11 +84,11 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     }
 
-    public static final class MyFactory<N extends Number & Scalar<N>> implements PhysicalStore.Factory<N, GenericDenseStore<N>> {
+    static final class Factory<N extends Number & Scalar<N>> implements PhysicalStore.Factory<N, GenericDenseStore<N>> {
 
         private final DenseArray.Factory<N> myDenseArrayFactory;
 
-        MyFactory(final DenseArray.Factory<N> denseArrayFactory) {
+        Factory(final DenseArray.Factory<N> denseArrayFactory) {
             super();
             myDenseArrayFactory = denseArrayFactory;
         }
@@ -383,18 +386,23 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     }
 
+    public static final PhysicalStore.Factory<ComplexNumber, GenericDenseStore<ComplexNumber>> COMPLEX = new GenericDenseStore.Factory<>(ComplexArray.FACTORY);
+    public static final PhysicalStore.Factory<Quaternion, GenericDenseStore<Quaternion>> QUATERNION = new GenericDenseStore.Factory<>(QuaternionArray.FACTORY);
+    public static final PhysicalStore.Factory<RationalNumber, GenericDenseStore<RationalNumber>> RATIONAL = new GenericDenseStore.Factory<>(
+            RationalArray.FACTORY);
+
     private final GenericMultiplyBoth<N> multiplyBoth;;
     private final GenericMultiplyLeft<N> multiplyLeft;
     private final GenericMultiplyNeither<N> multiplyNeither;
     private final GenericMultiplyRight<N> multiplyRight;
 
     private final int myColDim;
-    private final MyFactory<N> myFactory;
+    private final GenericDenseStore.Factory<N> myFactory;
     private final int myRowDim;
     private final Array2D<N> myUtility;
     private transient N[] myWorkerColumn;
 
-    GenericDenseStore(final MyFactory<N> factory, final int aRowDim, final int aColDim, final N zero) {
+    GenericDenseStore(final GenericDenseStore.Factory<N> factory, final int aRowDim, final int aColDim, final N zero) {
 
         super(aRowDim * aColDim, factory.scalar());
 
@@ -411,7 +419,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         multiplyNeither = MultiplyNeither.getGeneric(myRowDim, myColDim);
     }
 
-    GenericDenseStore(final MyFactory<N> factory, final int aRowDim, final int aColDim, final N[] anArray) {
+    GenericDenseStore(final GenericDenseStore.Factory<N> factory, final int aRowDim, final int aColDim, final N[] anArray) {
 
         super(anArray, factory.scalar());
 
@@ -428,7 +436,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         multiplyNeither = MultiplyNeither.getGeneric(myRowDim, myColDim);
     }
 
-    GenericDenseStore(final MyFactory<N> factory, final int length, final N zero) {
+    GenericDenseStore(final GenericDenseStore.Factory<N> factory, final int length, final N zero) {
 
         super(length, factory.scalar());
 
@@ -445,7 +453,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         multiplyNeither = MultiplyNeither.getGeneric(myRowDim, myColDim);
     }
 
-    GenericDenseStore(final MyFactory<N> factory, final N[] anArray) {
+    GenericDenseStore(final GenericDenseStore.Factory<N> factory, final N[] anArray) {
 
         super(anArray, factory.scalar());
 
