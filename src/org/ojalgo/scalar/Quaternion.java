@@ -27,7 +27,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -295,7 +295,7 @@ public final class Quaternion extends Number
 
     public MatrixStore<ComplexNumber> asComplex2D() {
 
-        final ComplexDenseStore retVal = ComplexDenseStore.FACTORY.makeZero(2L, 2L);
+        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(2L, 2L);
 
         retVal.set(0L, ComplexNumber.of(myScalar, i));
         retVal.set(1L, ComplexNumber.of(-j, k));

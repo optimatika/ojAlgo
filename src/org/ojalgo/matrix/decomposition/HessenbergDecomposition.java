@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -46,7 +46,7 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
     static final class Complex extends HessenbergDecomposition<ComplexNumber> {
 
         Complex() {
-            super(ComplexDenseStore.FACTORY);
+            super(GenericDenseStore.COMPLEX);
         }
 
     }

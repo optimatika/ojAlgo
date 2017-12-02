@@ -64,7 +64,9 @@ import org.ojalgo.type.context.NumberContext;
  * A {@linkplain BigDecimal} implementation of {@linkplain PhysicalStore}.
  *
  * @author apete
+ * @deprecated v45 Use {@link GenericDenseStore} instead
  */
+@Deprecated
 public final class BigDenseStore extends BigArray implements PhysicalStore<BigDecimal>, DecompositionStore<BigDecimal> {
 
     public static interface BigMultiplyBoth extends FillByMultiplying<BigDecimal> {

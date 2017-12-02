@@ -25,6 +25,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.ElementsSupplier;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
@@ -38,7 +39,7 @@ import org.ojalgo.scalar.ComplexNumber;
  */
 public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMatrix> {
 
-    public static final BasicMatrix.Factory<ComplexMatrix> FACTORY = new MatrixFactory<>(ComplexMatrix.class, ComplexDenseStore.FACTORY);
+    public static final BasicMatrix.Factory<ComplexMatrix> FACTORY = new MatrixFactory<>(ComplexMatrix.class, GenericDenseStore.COMPLEX);
 
     /**
      * This method is for internal use only - YOU should NOT use it!

@@ -63,9 +63,15 @@ import org.ojalgo.type.context.NumberContext;
  * A {@linkplain ComplexNumber} implementation of {@linkplain PhysicalStore}.
  *
  * @author apete
+ * @deprecated v45 Use {@link GenericDenseStore} instead
  */
+@Deprecated
 public final class ComplexDenseStore extends ComplexArray implements PhysicalStore<ComplexNumber>, DecompositionStore<ComplexNumber> {
 
+    /**
+     * @deprecated v45 Use {@link GenericDenseStore#COMPLEX} instead
+     */
+    @Deprecated
     public static final PhysicalStore.Factory<ComplexNumber, ComplexDenseStore> FACTORY = new PhysicalStore.Factory<ComplexNumber, ComplexDenseStore>() {
 
         public AggregatorSet<ComplexNumber> aggregator() {

@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -49,11 +49,11 @@ public final class QuadraticFunction<N extends Number> extends AbstractMultiary<
     }
 
     public static QuadraticFunction<ComplexNumber> makeComplex(final Access2D<? extends Number> factors) {
-        return new QuadraticFunction<>(ComplexDenseStore.FACTORY.copy(factors));
+        return new QuadraticFunction<>(GenericDenseStore.COMPLEX.copy(factors));
     }
 
     public static QuadraticFunction<ComplexNumber> makeComplex(final int arity) {
-        return new QuadraticFunction<>(ComplexDenseStore.FACTORY.makeZero(arity, arity));
+        return new QuadraticFunction<>(GenericDenseStore.COMPLEX.makeZero(arity, arity));
     }
 
     public static QuadraticFunction<Double> makePrimitive(final Access2D<? extends Number> factors) {

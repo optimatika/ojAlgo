@@ -65,7 +65,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public static SparseStore<ComplexNumber> makeComplex(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(ComplexDenseStore.FACTORY, rowsCount, columnsCount);
+        return new SparseStore<>(GenericDenseStore.COMPLEX, rowsCount, columnsCount);
     }
 
     public static SparseStore<Double> makePrimitive(final int rowsCount, final int columnsCount) {

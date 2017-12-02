@@ -41,7 +41,7 @@ import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -73,7 +73,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     static final class Complex extends HermitianEvD<ComplexNumber> {
 
         Complex() {
-            super(ComplexDenseStore.FACTORY, new DeferredTridiagonal.Complex());
+            super(GenericDenseStore.COMPLEX, new DeferredTridiagonal.Complex());
         }
 
     }

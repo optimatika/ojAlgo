@@ -39,7 +39,7 @@ import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -61,7 +61,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     static final class Complex extends SingularValueDecomposition<ComplexNumber> {
 
         Complex() {
-            super(ComplexDenseStore.FACTORY, new BidiagonalDecomposition.Complex());
+            super(GenericDenseStore.COMPLEX, new BidiagonalDecomposition.Complex());
         }
 
     }
