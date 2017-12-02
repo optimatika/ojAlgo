@@ -36,9 +36,15 @@ import org.ojalgo.matrix.task.SolverTask;
  * BigMatrix
  *
  * @author apete
+ * @deprecated v45 Use {@link RationalMatrix} instead.
  */
+@Deprecated
 public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
 
+    /**
+     * @deprecated v45 Use {@link RationalMatrix#FACTORY} instead.
+     */
+    @Deprecated
     public static final BasicMatrix.Factory<BigMatrix> FACTORY = new MatrixFactory<>(BigMatrix.class, BigDenseStore.FACTORY);
 
     /**
