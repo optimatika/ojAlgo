@@ -45,6 +45,8 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -70,6 +72,22 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         Primitive() {
             super(PrimitiveDenseStore.FACTORY, new BidiagonalDecomposition.Primitive());
+        }
+
+    }
+
+    static final class Quat extends SingularValueDecomposition<Quaternion> {
+
+        Quat() {
+            super(GenericDenseStore.QUATERNION, new BidiagonalDecomposition.Quat());
+        }
+
+    }
+
+    static final class Rational extends SingularValueDecomposition<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL, new BidiagonalDecomposition.Rational());
         }
 
     }

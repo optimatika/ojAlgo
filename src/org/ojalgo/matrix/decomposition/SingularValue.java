@@ -29,6 +29,8 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -67,6 +69,10 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
             return new RawSingularValue();
         }
     };
+
+    public static final Factory<Quaternion> QUATERNION = typical -> new SingularValueDecomposition.Quat();
+
+    public static final Factory<RationalNumber> RATIONAL = typical -> new SingularValueDecomposition.Rational();
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> SingularValue<N> make(final Access2D<N> typical) {

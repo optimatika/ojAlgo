@@ -37,6 +37,7 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 
 /**
  * @author apete
@@ -51,6 +52,18 @@ abstract class DeferredTridiagonal<N extends Number> extends TridiagonalDecompos
 
         @Override
         Array1D<BigDecimal> makeReal(final BasicArray<BigDecimal> offDiagonal) {
+            return null;
+        }
+    }
+
+    static final class Rational extends DeferredTridiagonal<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL);
+        }
+
+        @Override
+        Array1D<RationalNumber> makeReal(final BasicArray<RationalNumber> offDiagonal) {
             return null;
         }
     }

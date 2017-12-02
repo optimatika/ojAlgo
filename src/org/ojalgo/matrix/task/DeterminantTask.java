@@ -29,6 +29,8 @@ import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 
 public interface DeterminantTask<N extends Number> extends MatrixTask<N> {
 
@@ -99,6 +101,32 @@ public interface DeterminantTask<N extends Number> extends MatrixTask<N> {
                 } else {
                     return LU.PRIMITIVE.make(template);
                 }
+            }
+        }
+
+    };
+
+    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+
+        @Override
+        public DeterminantTask<Quaternion> make(final MatrixStore<Quaternion> template, final boolean symmetric, final boolean positiveDefinite) {
+            if (symmetric && positiveDefinite) {
+                return Cholesky.QUATERNION.make(template);
+            } else {
+                return LU.QUATERNION.make(template);
+            }
+        }
+
+    };
+
+    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+
+        @Override
+        public DeterminantTask<RationalNumber> make(final MatrixStore<RationalNumber> template, final boolean symmetric, final boolean positiveDefinite) {
+            if (symmetric && positiveDefinite) {
+                return Cholesky.RATIONAL.make(template);
+            } else {
+                return LU.RATIONAL.make(template);
             }
         }
 

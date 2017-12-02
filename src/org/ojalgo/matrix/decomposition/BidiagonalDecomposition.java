@@ -35,6 +35,8 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 
 abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
 
@@ -143,6 +145,33 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
         @Override
         Array1D<Double>[] makeReal() {
+            return null;
+        }
+
+    }
+
+    static final class Quat extends BidiagonalDecomposition<Quaternion> {
+
+        Quat() {
+            super(GenericDenseStore.QUATERNION);
+        }
+
+        @Override
+        Array1D<Quaternion>[] makeReal() {
+            // TODO Implement something similr to what's in "Complex"
+            return null;
+        }
+
+    }
+
+    static final class Rational extends BidiagonalDecomposition<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL);
+        }
+
+        @Override
+        Array1D<RationalNumber>[] makeReal() {
             return null;
         }
 

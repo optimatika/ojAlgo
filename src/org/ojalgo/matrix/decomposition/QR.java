@@ -27,6 +27,8 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -68,6 +70,10 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
             return new RawQR();
         }
     };
+
+    public static final Factory<Quaternion> QUATERNION = typical -> new QRDecomposition.Quat();
+
+    public static final Factory<RationalNumber> RATIONAL = typical -> new QRDecomposition.Rational();
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> QR<N> make(final Access2D<N> typical) {

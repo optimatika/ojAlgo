@@ -91,6 +91,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     }
 
+    /**
+     * @deprecated v45 Use {@link GenericDenseStore#RATIONAL} instead
+     */
+    @Deprecated
     public static final PhysicalStore.Factory<BigDecimal, BigDenseStore> FACTORY = new PhysicalStore.Factory<BigDecimal, BigDenseStore>() {
 
         public AggregatorSet<BigDecimal> aggregator() {
