@@ -72,7 +72,6 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
 
     private static final String DIVIDE = " / ";
     private static final String LEFT = "(";
-    private static final long LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE));
 
     private static final String RIGHT = ")";;
 
@@ -145,15 +144,20 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
 
     public static RationalNumber2 of(final long numerator, final long denominator) {
 
-        if (numerator == 0L) {
-            return new RationalNumber2(numerator, 1L);
+        if (denominator == 0L) {
+            if (numerator > 0L) {
+                return POSITIVE_INFINITY;
+            } else if (numerator < 0L) {
+                return NEGATIVE_INFINITY;
+            } else {
+                return NaN;
+            }
+        } else if (numerator == 0L) {
+            return ZERO;
         }
 
-        long tmpGCD = RationalNumber2.gcd(numerator, denominator);
+        final long tmpGCD = RationalNumber2.gcd(numerator, denominator);
         if (tmpGCD != 1L) {
-            return new RationalNumber2(numerator / tmpGCD, denominator / tmpGCD);
-        } else if (denominator > LIMIT) {
-            tmpGCD = Math.round(SQRT.invoke(denominator));
             return new RationalNumber2(numerator / tmpGCD, denominator / tmpGCD);
         } else {
             return new RationalNumber2(numerator, denominator);
@@ -247,7 +251,7 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
     private final long myDenominator;
     private final long myNumerator;
 
-    private RationalNumber2() {
+    public RationalNumber2() {
         this(0L, 1L);
     }
 
@@ -256,15 +260,12 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
         super();
 
         if (denominator < 0L) {
-            throw new IllegalArgumentException();
+            myNumerator = -numerator;
+            myDenominator = -denominator;
+        } else {
+            myNumerator = numerator;
+            myDenominator = denominator;
         }
-
-        if (denominator > LIMIT) {
-            throw new IllegalArgumentException();
-        }
-
-        myNumerator = numerator;
-        myDenominator = denominator;
     }
 
     public RationalNumber2 add(final double arg) {
@@ -273,17 +274,32 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
 
     public RationalNumber2 add(final RationalNumber2 arg) {
 
-        if (myDenominator == arg.getDenominator()) {
+        final long retNumer = 0L;
+        final long retDenom = 0L;
 
-            return new RationalNumber2(myNumerator + arg.getNumerator(), myDenominator);
+        try {
 
-        } else {
+            if (myDenominator == arg.getDenominator()) {
 
-            final long tmpNumer = (myNumerator * arg.getDenominator()) + (arg.getNumerator() * myDenominator);
-            final long tmpDenom = myDenominator * arg.getDenominator();
+                retNumer = Math.addExact(myNumerator, arg.getNumerator());
+                retDenom = myDenominator;
 
-            return RationalNumber2.of(tmpNumer, tmpDenom);
+
+            } else {
+
+                final long tmpNumer = (myNumerator * arg.getDenominator()) + (arg.getNumerator() * myDenominator);
+                final long tmpDenom = myDenominator * arg.getDenominator();
+
+                return RationalNumber2.of(tmpNumer, tmpDenom);
+            }
+
+        } catch (final ArithmeticException exception) {
+            // TODO: handle exception
+        } finally {
+
+            return
         }
+
     }
 
     public int compareTo(final RationalNumber2 reference) {
