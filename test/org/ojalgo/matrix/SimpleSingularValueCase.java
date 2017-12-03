@@ -35,23 +35,23 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleSingularValueCase extends BasicMatrixTest {
 
-    public static BigMatrix getMatrixD() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, 3.0 }, { 0.0, 0.0 } });
+    public static RationalMatrix getMatrixD() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, 3.0 }, { 0.0, 0.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getMatrixQ1() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
+    public static RationalMatrix getMatrixQ1() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getMatrixQ2() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 } });
+    public static RationalMatrix getMatrixQ2() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getOriginal() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -3.0 }, { 0.0, 0.0 } });
+    public static RationalMatrix getOriginal() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -3.0 }, { 0.0, 0.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 

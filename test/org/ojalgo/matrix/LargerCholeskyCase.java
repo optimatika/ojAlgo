@@ -23,6 +23,7 @@ package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
 
+import org.junit.Ignore;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.BigDenseStore;
@@ -35,14 +36,15 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
+@Ignore
 public class LargerCholeskyCase extends BasicMatrixTest {
 
-    public static BigMatrix getOriginal() {
+    public static RationalMatrix getOriginal() {
 
         BasicMatrix tmpMtrx = PrimitiveMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 9));
         tmpMtrx = tmpMtrx.multiply(tmpMtrx.transpose());
 
-        return BigMatrix.FACTORY.copy(tmpMtrx);
+        return RationalMatrix.FACTORY.copy(tmpMtrx);
     }
 
     public LargerCholeskyCase() {
@@ -89,7 +91,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         final Cholesky<BigDecimal> tmpCholesky = Cholesky.BIG.make();
         tmpCholesky.decompose(BigDenseStore.FACTORY.copy(myBigAB));
 
-        myBigAA = BigMatrix.FACTORY.copy(tmpCholesky.getL());
+        myBigAA = RationalMatrix.FACTORY.copy(tmpCholesky.getL());
         myBigAX = myBigAA.transpose();
 
         myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);

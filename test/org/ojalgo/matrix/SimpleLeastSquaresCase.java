@@ -32,29 +32,29 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleLeastSquaresCase extends BasicMatrixTest {
 
-    public static BigMatrix getBody() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY
+    public static RationalMatrix getBody() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 }, { -1.0, 1.0, 0.0 }, { -1.0, 0.0, 1.0 }, { 0.0, -1.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getFactorR() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { -1.7321, 0.5774, 0.5774 }, { 0.0, -1.6330, 0.8165 }, { 0.0, 0.0, -1.4142 } });
+    public static RationalMatrix getFactorR() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { -1.7321, 0.5774, 0.5774 }, { 0.0, -1.6330, 0.8165 }, { 0.0, 0.0, -1.4142 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getRHS() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1237 }, { 1941 }, { 2417 }, { 711 }, { 1177 }, { 475 } });
+    public static RationalMatrix getRHS() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1237 }, { 1941 }, { 2417 }, { 711 }, { 1177 }, { 475 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getSolution() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1236 }, { 1943 }, { 2416 } });
+    public static RationalMatrix getSolution() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1236 }, { 1943 }, { 2416 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getTransformedRHS() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 376 }, { -1200 }, { -3417 } });
+    public static RationalMatrix getTransformedRHS() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 376 }, { -1200 }, { -3417 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 

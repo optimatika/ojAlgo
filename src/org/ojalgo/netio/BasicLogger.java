@@ -29,7 +29,7 @@ import java.util.Locale;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.BigMatrix;
+import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.ComplexMatrix;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
@@ -845,7 +845,7 @@ public abstract class BasicLogger {
             } else if (matrix.get(0, 0) instanceof ComplexNumber) {
                 BasicLogger.printmtrx(appender, ComplexMatrix.FACTORY.copy(matrix), context, false);
             } else {
-                BasicLogger.printmtrx(appender, BigMatrix.FACTORY.copy(matrix), context, true);
+                BasicLogger.printmtrx(appender, RationalMatrix.FACTORY.copy(matrix), context, true);
             }
         }
     }

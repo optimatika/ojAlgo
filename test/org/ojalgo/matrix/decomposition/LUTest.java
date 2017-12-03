@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.BigMatrix;
+import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
@@ -48,7 +48,7 @@ public class LUTest extends MatrixDecompositionTests {
 
     public void testP20061119Case() {
 
-        final BigMatrix tmpProblematic = P20061119Case.getProblematic();
+        final RationalMatrix tmpProblematic = P20061119Case.getProblematic();
 
         final LU<BigDecimal> tmpBig = LU.BIG.make();
         tmpBig.decompose(BigDenseStore.FACTORY.copy(tmpProblematic));

@@ -28,18 +28,18 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleEquationCase extends BasicMatrixTest {
 
-    public static BigMatrix getBody() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 2.0, 1.0, 1.0 }, { 4.0, -6.0, 0.0 }, { -2.0, 7.0, 2.0 } });
+    public static RationalMatrix getBody() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 1.0, 1.0 }, { 4.0, -6.0, 0.0 }, { -2.0, 7.0, 2.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getRHS() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 5.0 }, { -2.0 }, { 9.0 } });
+    public static RationalMatrix getRHS() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 5.0 }, { -2.0 }, { 9.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getSolution() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 2.0 } });
+    public static RationalMatrix getSolution() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 2.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 

@@ -120,7 +120,7 @@ public class P20050827Case extends BasicMatrixTest {
         DEFINITION = NumberContext.getGeneral(12);
         EVALUATION = NumberContext.getGeneral(6).newPrecision(12);
 
-        myBigAA = BigMatrix.FACTORY.copy(P20050827Case.getProblematic());
+        myBigAA = RationalMatrix.FACTORY.copy(P20050827Case.getProblematic());
         myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
         myBigAB = myBigAA;
 

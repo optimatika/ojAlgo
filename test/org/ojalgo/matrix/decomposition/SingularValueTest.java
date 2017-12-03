@@ -46,9 +46,9 @@ public class SingularValueTest extends MatrixDecompositionTests {
     private static final SingularValue<Double> IMPL_PRIMITIVE = new SingularValueDecomposition.Primitive();
     private static final SingularValue<Double> IMPL_RAW = new RawSingularValue();
 
-    private static final BasicMatrix MTRX_FAT = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(7, 9));
-    private static final BasicMatrix MTRX_SQUARE = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(8, 8));
-    private static final BasicMatrix MTRX_TALL = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 7));
+    private static final BasicMatrix MTRX_FAT = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(7, 9));
+    private static final BasicMatrix MTRX_SQUARE = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(8, 8));
+    private static final BasicMatrix MTRX_TALL = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 7));
 
     static final NumberContext CNTXT_CPLX_DECOMP = new NumberContext(7, 5);
     static final NumberContext CNTXT_CPLX_VALUES = new NumberContext(7, 7);

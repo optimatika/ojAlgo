@@ -22,7 +22,7 @@
 package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.BigMatrix;
+import org.ojalgo.matrix.RationalMatrix;
 
 /**
  * Qsd20030327P1Case
@@ -42,17 +42,17 @@ public class Qsd20030327P1Case extends GenericQPSolverTest {
     @Override
     protected BasicMatrix[] getMatrices() {
 
-        final BasicMatrix[] retVal = new BigMatrix[8];
+        final BasicMatrix[] retVal = new RationalMatrix[8];
 
         // Equations/Equalities
-        retVal[0] = BigMatrix.FACTORY
+        retVal[0] = RationalMatrix.FACTORY
                 .rows(new double[][] { { 1, 1, 1, 1, 1, 1, 1 }, { 0, 0, 0, 0, 1, 0, 0 }, { 0, 0, 0, 0, 0, 1, 0 }, { 0, 0, 0, 0, 0, 0, 1 } });
 
         // Levels/Values
-        retVal[1] = BigMatrix.FACTORY.rows(new double[][] { { 1 }, { 0.0000 }, { 0.0000 }, { 0.0000 } });
+        retVal[1] = RationalMatrix.FACTORY.rows(new double[][] { { 1 }, { 0.0000 }, { 0.0000 }, { 0.0000 } });
 
         // Quadratic
-        retVal[2] = BigMatrix.FACTORY.rows(new double[][] {
+        retVal[2] = RationalMatrix.FACTORY.rows(new double[][] {
                 { 1.000000000000000000000000, 0.000000000000000000000000, 0.000000000000000000000000, 0.000000000000000000000000, 0.000000000000000000000000,
                         0.000000000000000000000000, 0.000000000000000000000000 },
                 { 0.000000000000000000000000, 1.000000000000000000000000, 0.000000000000000000000000, 0.000000000000000000000000, 0.000000000000000000000000,
@@ -69,23 +69,23 @@ public class Qsd20030327P1Case extends GenericQPSolverTest {
                         0.000000000000000000000000, 1.000000000000000000000000 } });
 
         // Linear
-        retVal[3] = BigMatrix.FACTORY.rows(new double[][] { { -0.1100000000000000000000000000 }, { -0.1100000000000000000000000000 },
+        retVal[3] = RationalMatrix.FACTORY.rows(new double[][] { { -0.1100000000000000000000000000 }, { -0.1100000000000000000000000000 },
                 { -0.5000000000000000000000000000 }, { -0.2800000000000000000000000000 }, { 0.0000000000000000000000000000 },
                 { 0.0000000000000000000000000000 }, { 0.0000000000000000000000000000 } });
 
         // Inequalities/Differences
-        retVal[4] = BigMatrix.FACTORY.rows(new double[][] { { -1, 0, 0, 0, 0, 0, 0 }, { 0, -1, 0, 0, 0, 0, 0 }, { 0, 0, -1, 0, 0, 0, 0 },
+        retVal[4] = RationalMatrix.FACTORY.rows(new double[][] { { -1, 0, 0, 0, 0, 0, 0 }, { 0, -1, 0, 0, 0, 0, 0 }, { 0, 0, -1, 0, 0, 0, 0 },
                 { 0, 0, 0, -1, 0, 0, 0 }, { 1, 0, 0, 0, 0, 0, 0 }, { 0, 1, 0, 0, 0, 0, 0 }, { 0, 0, 1, 0, 0, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 } });
 
         // Limits
-        retVal[5] = BigMatrix.FACTORY
+        retVal[5] = RationalMatrix.FACTORY
                 .rows(new double[][] { { -0.0100 }, { -0.0100 }, { -0.4000 }, { -0.1600 }, { 0.2200 }, { 0.0668 }, { 0.6000 }, { 0.4000 } });
 
         // LagrangeSolver
         retVal[6] = retVal[3].negate();
 
         // ActiveSetSolver
-        retVal[7] = BigMatrix.FACTORY.rows(new double[][] { { 0.1244 }, { 0.0668 }, { 0.5144 }, { 0.2944 }, { 0.0000 }, { 0.0000 }, { 0.0000 } });
+        retVal[7] = RationalMatrix.FACTORY.rows(new double[][] { { 0.1244 }, { 0.0668 }, { 0.5144 }, { 0.2944 }, { 0.0000 }, { 0.0000 }, { 0.0000 } });
 
         return retVal;
     }

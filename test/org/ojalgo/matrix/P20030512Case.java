@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix;
 
+import org.junit.Ignore;
 import org.ojalgo.TestUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -30,10 +31,11 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  * @see org.ojalgo.matrix.P20030422Case
  */
+@Ignore
 public class P20030512Case extends BasicMatrixTest {
 
-    public static BigMatrix getProblematic() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] {
+    public static RationalMatrix getProblematic() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] {
                 { -0.9739496281920735, 0.13212842225762753, -0.009493226825028579, 0.05293424713580207, -0.06924760059060892, 0.015657944731764042,
                         -0.008564346745847575, 0.004549185362729688 },
                 { -0.006968800104298036, -0.8297418413337506, -0.0362355854907016, 0.16177736191417533, -0.2100891795366892, 0.047384677993178616,
@@ -68,7 +70,7 @@ public class P20030512Case extends BasicMatrixTest {
 
     @Override
     public void testInvert() {
-        // This is the problem, only BigMatrix can handle this
+        // This is the problem, only RationalMatrix can handle this
     }
 
     @Override
@@ -77,7 +79,7 @@ public class P20030512Case extends BasicMatrixTest {
         myExpMtrx = P20030512Case.getProblematic();
         myActMtrx = myExpMtrx.invert().invert();
 
-        // BigMatrix can do this, but not JamaMatrix and/or JampackMatrix
+        // RationalMatrix can do this, but not JamaMatrix and/or JampackMatrix
         TestUtils.assertEquals(myExpMtrx, myActMtrx, new NumberContext(7, 6));
     }
 

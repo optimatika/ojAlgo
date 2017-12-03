@@ -36,19 +36,19 @@ import org.ojalgo.matrix.store.MatrixStore;
  */
 public class SimpleQRCase extends BasicMatrixTest {
 
-    public static BigMatrix getFactorQ() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveFunction.SQRT.invoke(2.0) },
+    public static RationalMatrix getFactorQ() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveFunction.SQRT.invoke(2.0) },
                 { 2.0 / 3.0, -1.0 / PrimitiveFunction.SQRT.invoke(2.0) } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getFactorR() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveFunction.SQRT.invoke(2.0) } });
+    public static RationalMatrix getFactorR() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveFunction.SQRT.invoke(2.0) } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getOriginal() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
+    public static RationalMatrix getOriginal() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
@@ -64,8 +64,8 @@ public class SimpleQRCase extends BasicMatrixTest {
     public void testData() {
 
         myExpMtrx = SimpleQRCase.getOriginal();
-        final BigMatrix tmpFactorQ = SimpleQRCase.getFactorQ();
-        final BigMatrix tmpFactorR = SimpleQRCase.getFactorR();
+        final RationalMatrix tmpFactorQ = SimpleQRCase.getFactorQ();
+        final RationalMatrix tmpFactorR = SimpleQRCase.getFactorR();
         myActMtrx = tmpFactorQ.multiply(tmpFactorR);
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
@@ -83,21 +83,21 @@ public class SimpleQRCase extends BasicMatrixTest {
         final MatrixStore<BigDecimal> tmpR = tmpQR.getR();
 
         myExpMtrx = SimpleQRCase.getOriginal();
-        myActMtrx = BigMatrix.FACTORY.copy(tmpQ.multiply(tmpR));
+        myActMtrx = RationalMatrix.FACTORY.copy(tmpQ.multiply(tmpR));
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
         // Q
 
         myExpMtrx = SimpleQRCase.getFactorQ();
-        myActMtrx = BigMatrix.FACTORY.copy(tmpQ);
+        myActMtrx = RationalMatrix.FACTORY.copy(tmpQ);
 
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
 
         // R
 
         myExpMtrx = SimpleQRCase.getFactorR();
-        myActMtrx = BigMatrix.FACTORY.copy(tmpR);
+        myActMtrx = RationalMatrix.FACTORY.copy(tmpR);
 
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
     }

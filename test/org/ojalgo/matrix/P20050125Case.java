@@ -32,7 +32,7 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * There was a problem with the solve() method in the Jama Cholesky decomposition - it simply wasn't correct.
- * (This case tests that BigMatrix doesn't have the same problem.) Problem reported to jama(a)nist.gov
+ * (This case tests that RationalMatrix doesn't have the same problem.) Problem reported to jama(a)nist.gov
  *
  * @author apete
  */
@@ -40,8 +40,8 @@ public class P20050125Case extends BasicMatrixTest {
 
     private static int DIM = 3;
 
-    public static BigMatrix getProblematic() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.makeFilled(DIM, DIM * DIM, new Uniform());
+    public static RationalMatrix getProblematic() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeFilled(DIM, DIM * DIM, new Uniform());
         return tmpMtrx.multiply(tmpMtrx.transpose());
     }
 

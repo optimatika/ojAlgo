@@ -49,13 +49,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     public static NumberContext DEFINITION = NumberContext.getGeneral(9);
     public static NumberContext EVALUATION = NumberContext.getGeneral(9);
 
-    public static BigMatrix getIdentity(final long rows, final long columns, final NumberContext context) {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.makeEye(rows, columns);
+    public static RationalMatrix getIdentity(final long rows, final long columns, final NumberContext context) {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeEye(rows, columns);
         return tmpMtrx.enforce(context);
     }
 
-    public static BigMatrix getSafe(final long rows, final long columns, final NumberContext context) {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.makeFilled(rows, columns, new Uniform(PrimitiveMath.E, PrimitiveMath.PI));
+    public static RationalMatrix getSafe(final long rows, final long columns, final NumberContext context) {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeFilled(rows, columns, new Uniform(PrimitiveMath.E, PrimitiveMath.PI));
         return tmpMtrx.enforce(context);
     }
 
@@ -65,11 +65,11 @@ public abstract class BasicMatrixTest extends MatrixTests {
     Number myActNmbr;
     Scalar<?> myActSclr;
     double myActVal;
-    BigMatrix myBigAA;
-    BigMatrix myBigAB;
-    BigMatrix myBigAX;
-    BigMatrix myBigI;
-    BigMatrix myBigSafe;
+    RationalMatrix myBigAA;
+    RationalMatrix myBigAB;
+    RationalMatrix myBigAX;
+    RationalMatrix myBigI;
+    RationalMatrix myBigSafe;
     ComplexMatrix myComplexAA;
     ComplexMatrix myComplexAB;
     ComplexMatrix myComplexAX;
@@ -145,7 +145,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        final Builder<BigMatrix> tmpBigBuilder = myBigAA.copy();
+        final Builder<RationalMatrix> tmpBigBuilder = myBigAA.copy();
         tmpBigBuilder.add(tmpRow, tmpCol, myNmbr);
         myExpMtrx = tmpBigBuilder.build();
 
@@ -770,7 +770,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        final Builder<BigMatrix> tmpBigBuilder = myBigAA.copy();
+        final Builder<RationalMatrix> tmpBigBuilder = myBigAA.copy();
         tmpBigBuilder.set(tmpRow, tmpCol, myNmbr);
         myExpMtrx = tmpBigBuilder.build();
 
@@ -1059,23 +1059,23 @@ public abstract class BasicMatrixTest extends MatrixTests {
         return myBigSafe;
     }
 
-    protected final void setBigAA(final BigMatrix someBigAA) {
+    protected final void setBigAA(final RationalMatrix someBigAA) {
         myBigAA = someBigAA;
     }
 
-    protected final void setBigAB(final BigMatrix someBigAB) {
+    protected final void setBigAB(final RationalMatrix someBigAB) {
         myBigAB = someBigAB;
     }
 
-    protected final void setBigAX(final BigMatrix someBigAX) {
+    protected final void setBigAX(final RationalMatrix someBigAX) {
         myBigAX = someBigAX;
     }
 
-    protected final void setBigI(final BigMatrix someBigI) {
+    protected final void setBigI(final RationalMatrix someBigI) {
         myBigI = someBigI;
     }
 
-    protected final void setBigSafe(final BigMatrix someBigSafe) {
+    protected final void setBigSafe(final RationalMatrix someBigSafe) {
         myBigSafe = someBigSafe;
     }
 

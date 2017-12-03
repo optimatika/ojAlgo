@@ -79,12 +79,16 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
 
         final N tmpNumber = typical.get(0, 0);
 
-        if (tmpNumber instanceof BigDecimal) {
+        if (tmpNumber instanceof RationalNumber) {
+            return (SingularValue<N>) RATIONAL.make(typical);
+        } else if (tmpNumber instanceof BigDecimal) {
             return (SingularValue<N>) BIG.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
             return (SingularValue<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {
             return (SingularValue<N>) PRIMITIVE.make(typical);
+        } else if (tmpNumber instanceof Quaternion) {
+            return (SingularValue<N>) QUATERNION.make(typical);
         } else {
             throw new IllegalArgumentException();
         }

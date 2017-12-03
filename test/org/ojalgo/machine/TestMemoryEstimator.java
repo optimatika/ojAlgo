@@ -1,7 +1,7 @@
 package org.ojalgo.machine;
 
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.matrix.BigMatrix;
+import org.ojalgo.matrix.RationalMatrix;
 
 public class TestMemoryEstimator extends MachineTests {
 
@@ -13,9 +13,9 @@ public class TestMemoryEstimator extends MachineTests {
         super(someName);
     }
 
-    public void testBigMatrix() {
+    public void testRationalMatrix() {
 
-        final long tmpEstimate = MemoryEstimator.estimateObject(BigMatrix.class);
+        final long tmpEstimate = MemoryEstimator.estimateObject(RationalMatrix.class);
 
         final long tmpManually = 0L;
 
