@@ -27,11 +27,13 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * This problem is taken from example 2.21 of the Scientific Computing, An Introductory Survey.
+ * Random generated SPD.
  *
  * @author apete
  */
@@ -39,10 +41,9 @@ public class LargerCholeskyCase extends BasicMatrixTest {
 
     public static RationalMatrix getOriginal() {
 
-        BasicMatrix tmpMtrx = PrimitiveMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 9));
-        tmpMtrx = tmpMtrx.multiply(tmpMtrx.transpose());
+        final PhysicalStore<ComplexNumber> randomComplex = MatrixUtils.makeRandomComplexStore(9, 9);
 
-        return RationalMatrix.FACTORY.copy(tmpMtrx);
+        return RationalMatrix.FACTORY.copy(randomComplex.multiply(randomComplex.conjugate()));
     }
 
     public LargerCholeskyCase() {

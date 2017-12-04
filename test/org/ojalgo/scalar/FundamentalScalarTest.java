@@ -33,7 +33,7 @@ public class FundamentalScalarTest extends ScalarTests {
 
     private static final Uniform UNIFORM = new Uniform(0, 10);
 
-    static NumberContext CONTEXT = NumberContext.getGeneral(16);
+    static NumberContext CONTEXT = NumberContext.getMath(16);
 
     BigScalar big1;
     BigScalar big2;

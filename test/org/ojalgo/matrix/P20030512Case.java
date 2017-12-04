@@ -78,14 +78,14 @@ public class P20030512Case extends BasicMatrixTest {
         myActMtrx = myExpMtrx.invert().invert();
 
         // RationalMatrix can do this, but not JamaMatrix and/or JampackMatrix
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, new NumberContext(7, 6));
+        TestUtils.assertEquals(myExpMtrx, myActMtrx, DEFINITION);
     }
 
     @Override
     protected void setUp() throws Exception {
 
         DEFINITION = new NumberContext(7, 12);
-        EVALUATION = new NumberContext(7, 2);
+        EVALUATION = new NumberContext(5, 6);
 
         myBigAA = P20030512Case.getProblematic();
         myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
