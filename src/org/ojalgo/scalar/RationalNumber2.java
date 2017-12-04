@@ -274,8 +274,8 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
 
     public RationalNumber2 add(final RationalNumber2 arg) {
 
-        final long retNumer = 0L;
-        final long retDenom = 0L;
+        long retNumer = 0L;
+        long retDenom = 0L;
 
         try {
 
@@ -284,22 +284,17 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
                 retNumer = Math.addExact(myNumerator, arg.getNumerator());
                 retDenom = myDenominator;
 
-
             } else {
 
-                final long tmpNumer = (myNumerator * arg.getDenominator()) + (arg.getNumerator() * myDenominator);
-                final long tmpDenom = myDenominator * arg.getDenominator();
-
-                return RationalNumber2.of(tmpNumer, tmpDenom);
+                retNumer = Math.addExact(Math.multiplyExact(myNumerator, arg.getDenominator()), Math.multiplyExact(arg.getNumerator(), myDenominator));
+                retDenom = Math.multiplyExact(myDenominator, arg.getDenominator());
             }
 
         } catch (final ArithmeticException exception) {
             // TODO: handle exception
-        } finally {
-
-            return
         }
 
+        return RationalNumber2.of(retNumer, retDenom);
     }
 
     public int compareTo(final RationalNumber2 reference) {

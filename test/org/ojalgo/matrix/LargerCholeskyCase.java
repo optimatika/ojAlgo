@@ -23,7 +23,6 @@ package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
 
-import org.junit.Ignore;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.BigDenseStore;
@@ -36,7 +35,6 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-@Ignore
 public class LargerCholeskyCase extends BasicMatrixTest {
 
     public static RationalMatrix getOriginal() {

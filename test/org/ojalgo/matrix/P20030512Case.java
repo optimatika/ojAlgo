@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix;
 
-import org.junit.Ignore;
 import org.ojalgo.TestUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -31,7 +30,6 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  * @see org.ojalgo.matrix.P20030422Case
  */
-@Ignore
 public class P20030512Case extends BasicMatrixTest {
 
     public static RationalMatrix getProblematic() {

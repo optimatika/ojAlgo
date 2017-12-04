@@ -233,9 +233,21 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         this(BigInteger.ZERO, BigInteger.ONE);
     }
 
-    private RationalNumber(final BigInteger numerator, final BigInteger denominator) {
+    private RationalNumber(BigInteger numerator, BigInteger denominator) {
 
         super();
+
+        final BigInteger gcd = RationalNumber.gcd(numerator, denominator);
+
+        if (gcd.signum() == 1) {
+            numerator = numerator.divide(gcd);
+            denominator = denominator.divide(gcd);
+        }
+
+        while (numerator.abs().max(denominator.abs()).bitCount() > 64) {
+            numerator = numerator.divide(BigInteger.TEN);
+            denominator = denominator.divide(BigInteger.TEN);
+        }
 
         if (denominator.signum() >= 0) {
             myNumerator = numerator;
