@@ -63,8 +63,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     };
 
     public static final RationalNumber MAX = new RationalNumber(Long.MAX_VALUE, 1L);
-    public static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitCount();
-
+    public static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitLength();
     public static final RationalNumber MIN = new RationalNumber(Long.MIN_VALUE, 1L);
     public static final RationalNumber NaN = new RationalNumber(0L, 0L);
     public static final RationalNumber NEG = new RationalNumber(-1L, 1L);
