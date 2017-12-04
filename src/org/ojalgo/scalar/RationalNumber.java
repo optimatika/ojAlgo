@@ -237,13 +237,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
         super();
 
-        final BigInteger gcd = RationalNumber.gcd(numerator, denominator);
-
-        if (gcd.signum() == 1) {
-            numerator = numerator.divide(gcd);
-            denominator = denominator.divide(gcd);
-        }
-
         while (numerator.abs().max(denominator.abs()).bitCount() > 64) {
             numerator = numerator.divide(BigInteger.TEN);
             denominator = denominator.divide(BigInteger.TEN);

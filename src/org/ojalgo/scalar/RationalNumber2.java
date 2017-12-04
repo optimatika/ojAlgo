@@ -62,11 +62,16 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
 
     };
 
+    public static final RationalNumber2 MAX = new RationalNumber2(Long.MAX_VALUE, 1L);
+    public static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitCount();
+
+    public static final RationalNumber2 MIN = new RationalNumber2(Long.MIN_VALUE, 1L);
     public static final RationalNumber2 NaN = new RationalNumber2(0L, 0L);
     public static final RationalNumber2 NEG = new RationalNumber2(-1L, 1L);
     public static final RationalNumber2 NEGATIVE_INFINITY = new RationalNumber2(-1L, 0L);
     public static final RationalNumber2 ONE = new RationalNumber2(1L, 1L);
     public static final RationalNumber2 POSITIVE_INFINITY = new RationalNumber2(1L, 0L);
+    public static final long SAFE_LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE / 2L));
     public static final RationalNumber2 TWO = new RationalNumber2(2L, 1L);
     public static final RationalNumber2 ZERO = new RationalNumber2(0L, 1L);
 
@@ -156,9 +161,9 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
             return ZERO;
         }
 
-        final long tmpGCD = RationalNumber2.gcd(numerator, denominator);
-        if (tmpGCD != 1L) {
-            return new RationalNumber2(numerator / tmpGCD, denominator / tmpGCD);
+        final long gcd = RationalNumber2.gcd(numerator, denominator);
+        if (gcd != 1L) {
+            return new RationalNumber2(numerator / gcd, denominator / gcd);
         } else {
             return new RationalNumber2(numerator, denominator);
         }
@@ -212,17 +217,17 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
 
                 } else {
 
-                    final BigInteger tmpNumer = tmpBigDecimal.unscaledValue();
-                    final BigInteger tmpDenom = BigInteger.TEN.pow(tmpScale);
+                    final BigInteger retNumer = tmpBigDecimal.unscaledValue();
+                    final BigInteger retDenom = BigInteger.TEN.pow(tmpScale);
 
-                    final BigInteger tmpGCD = tmpNumer.gcd(tmpDenom);
+                    final BigInteger tmpGCD = retNumer.gcd(retDenom);
 
                     if (tmpGCD.compareTo(BigInteger.ONE) == 1) {
-                        tmpNumerator = tmpNumer.divide(tmpGCD);
-                        tmpDenominator = tmpDenom.divide(tmpGCD);
+                        tmpNumerator = retNumer.divide(tmpGCD);
+                        tmpDenominator = retDenom.divide(tmpGCD);
                     } else {
-                        tmpNumerator = tmpNumer;
-                        tmpDenominator = tmpDenom;
+                        tmpNumerator = retNumer;
+                        tmpDenominator = retDenom;
                     }
                 }
 
@@ -246,9 +251,125 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
         return retVal.append(RIGHT).toString();
     }
 
-    private transient BigDecimal myDecimal = null;
+    static RationalNumber2 add(final RationalNumber2 arg1, final RationalNumber2 arg2) {
 
+        final BigInteger numer1 = BigInteger.valueOf(arg1.getNumerator());
+        final BigInteger denom1 = BigInteger.valueOf(arg1.getDenominator());
+
+        final BigInteger numer2 = BigInteger.valueOf(arg2.getNumerator());
+        final BigInteger denom2 = BigInteger.valueOf(arg2.getDenominator());
+
+        BigInteger retNumer = numer1.multiply(denom2).add(numer2.multiply(denom1));
+        BigInteger retDenom = denom1.multiply(denom2);
+
+        final BigInteger gcd = denom1.multiply(denom2);
+
+        if (gcd.compareTo(BigInteger.ONE) == 1) {
+            retNumer = retNumer.divide(gcd);
+            retDenom = retDenom.divide(gcd);
+        }
+
+        final int bits = Math.max(retNumer.bitLength(), retDenom.bitLength());
+
+        if (bits > MAX_BITS) {
+            final int shift = bits - MAX_BITS;
+            retNumer = retNumer.shiftRight(shift);
+            retDenom = retDenom.shiftRight(shift);
+        }
+
+        return RationalNumber2.of(retNumer.longValueExact(), retDenom.longValueExact());
+    }
+
+    static RationalNumber2 divide(final RationalNumber2 arg1, final RationalNumber2 arg2) {
+
+        final BigInteger numer1 = BigInteger.valueOf(arg1.getNumerator());
+        final BigInteger denom1 = BigInteger.valueOf(arg1.getDenominator());
+
+        final BigInteger numer2 = BigInteger.valueOf(arg2.getNumerator());
+        final BigInteger denom2 = BigInteger.valueOf(arg2.getDenominator());
+
+        BigInteger retNumer = numer1.multiply(denom2);
+        BigInteger retDenom = denom1.multiply(numer2);
+
+        final BigInteger gcd = denom1.multiply(denom2);
+
+        if (gcd.compareTo(BigInteger.ONE) == 1) {
+            retNumer = retNumer.divide(gcd);
+            retDenom = retDenom.divide(gcd);
+        }
+
+        final int bits = Math.max(retNumer.bitLength(), retDenom.bitLength());
+
+        if (bits > MAX_BITS) {
+            final int shift = bits - MAX_BITS;
+            retNumer = retNumer.shiftRight(shift);
+            retDenom = retDenom.shiftRight(shift);
+        }
+
+        return RationalNumber2.of(retNumer.longValueExact(), retDenom.longValueExact());
+    }
+
+    static RationalNumber2 multiply(final RationalNumber2 arg1, final RationalNumber2 arg2) {
+
+        final BigInteger numer1 = BigInteger.valueOf(arg1.getNumerator());
+        final BigInteger denom1 = BigInteger.valueOf(arg1.getDenominator());
+
+        final BigInteger numer2 = BigInteger.valueOf(arg2.getNumerator());
+        final BigInteger denom2 = BigInteger.valueOf(arg2.getDenominator());
+
+        BigInteger retNumer = numer1.multiply(numer2);
+        BigInteger retDenom = denom1.multiply(denom2);
+
+        final BigInteger gcd = denom1.multiply(denom2);
+
+        if (gcd.compareTo(BigInteger.ONE) == 1) {
+            retNumer = retNumer.divide(gcd);
+            retDenom = retDenom.divide(gcd);
+        }
+
+        final int bits = Math.max(retNumer.bitLength(), retDenom.bitLength());
+
+        if (bits > MAX_BITS) {
+            final int shift = bits - MAX_BITS;
+            retNumer = retNumer.shiftRight(shift);
+            retDenom = retDenom.shiftRight(shift);
+        }
+
+        return RationalNumber2.of(retNumer.longValueExact(), retDenom.longValueExact());
+    }
+
+    static RationalNumber2 subtract(final RationalNumber2 arg1, final RationalNumber2 arg2) {
+
+        final BigInteger numer1 = BigInteger.valueOf(arg1.getNumerator());
+        final BigInteger denom1 = BigInteger.valueOf(arg1.getDenominator());
+
+        final BigInteger numer2 = BigInteger.valueOf(arg2.getNumerator());
+        final BigInteger denom2 = BigInteger.valueOf(arg2.getDenominator());
+
+        BigInteger retNumer = numer1.multiply(denom2).subtract(numer2.multiply(denom1));
+        BigInteger retDenom = denom1.multiply(denom2);
+
+        final BigInteger gcd = denom1.multiply(denom2);
+
+        if (gcd.compareTo(BigInteger.ONE) == 1) {
+            retNumer = retNumer.divide(gcd);
+            retDenom = retDenom.divide(gcd);
+        }
+
+        final int bits = Math.max(retNumer.bitLength(), retDenom.bitLength());
+
+        if (bits > MAX_BITS) {
+            final int shift = bits - MAX_BITS;
+            retNumer = retNumer.shiftRight(shift);
+            retDenom = retDenom.shiftRight(shift);
+        }
+
+        return RationalNumber2.of(retNumer.longValueExact(), retDenom.longValueExact());
+    }
+
+    private transient BigDecimal myDecimal = null;
     private final long myDenominator;
+
     private final long myNumerator;
 
     public RationalNumber2() {
@@ -274,27 +395,27 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
 
     public RationalNumber2 add(final RationalNumber2 arg) {
 
-        long retNumer = 0L;
-        long retDenom = 0L;
-
-        try {
+        if (Math.max(this.size(), arg.size()) <= SAFE_LIMIT) {
 
             if (myDenominator == arg.getDenominator()) {
 
-                retNumer = Math.addExact(myNumerator, arg.getNumerator());
-                retDenom = myDenominator;
+                final long retNumer = myNumerator + arg.getNumerator();
+                final long retDenom = myDenominator;
+
+                return RationalNumber2.of(retNumer, retDenom);
 
             } else {
 
-                retNumer = Math.addExact(Math.multiplyExact(myNumerator, arg.getDenominator()), Math.multiplyExact(arg.getNumerator(), myDenominator));
-                retDenom = Math.multiplyExact(myDenominator, arg.getDenominator());
+                final long retNumer = (myNumerator * arg.getDenominator()) + (arg.getNumerator() * myDenominator);
+                final long retDenom = myDenominator * arg.getDenominator();
+
+                return RationalNumber2.of(retNumer, retDenom);
             }
 
-        } catch (final ArithmeticException exception) {
-            // TODO: handle exception
-        }
+        } else {
 
-        return RationalNumber2.of(retNumer, retDenom);
+            return RationalNumber2.add(this, arg);
+        }
     }
 
     public int compareTo(final RationalNumber2 reference) {
@@ -311,11 +432,17 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
 
     public RationalNumber2 divide(final RationalNumber2 arg) {
 
-        final long tmpNumer = myNumerator * arg.getDenominator();
-        final long tmpDenom = myDenominator * arg.getNumerator();
+        if (Math.max(this.size(), arg.size()) <= SAFE_LIMIT) {
 
-        return RationalNumber2.of(tmpNumer, tmpDenom);
+            final long retNumer = myNumerator * arg.getDenominator();
+            final long retDenom = myDenominator * arg.getNumerator();
 
+            return RationalNumber2.of(retNumer, retDenom);
+
+        } else {
+
+            return RationalNumber2.divide(this, arg);
+        }
     }
 
     @Override
@@ -394,11 +521,17 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
 
     public RationalNumber2 multiply(final RationalNumber2 arg) {
 
-        final long tmpNumer = myNumerator * arg.getNumerator();
-        final long tmpDenom = myDenominator * arg.getDenominator();
+        if (Math.max(this.size(), arg.size()) <= SAFE_LIMIT) {
 
-        return RationalNumber2.of(tmpNumer, tmpDenom);
+            final long retNumer = myNumerator * arg.getNumerator();
+            final long retDenom = myDenominator * arg.getDenominator();
 
+            return RationalNumber2.of(retNumer, retDenom);
+
+        } else {
+
+            return RationalNumber2.multiply(this, arg);
+        }
     }
 
     public RationalNumber2 negate() {
@@ -425,16 +558,23 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
 
     public RationalNumber2 subtract(final RationalNumber2 arg) {
 
-        if (myDenominator == arg.getDenominator()) {
+        if (Math.max(this.size(), arg.size()) <= SAFE_LIMIT) {
 
-            return new RationalNumber2(myNumerator - arg.getNumerator(), myDenominator);
+            if (myDenominator == arg.getDenominator()) {
+
+                return new RationalNumber2(myNumerator - arg.getNumerator(), myDenominator);
+
+            } else {
+
+                final long retNumer = (myNumerator * arg.getDenominator()) - (arg.getNumerator() * myDenominator);
+                final long retDenom = myDenominator * arg.getDenominator();
+
+                return RationalNumber2.of(retNumer, retDenom);
+            }
 
         } else {
 
-            final long tmpNumer = (myNumerator * arg.getDenominator()) - (arg.getNumerator() * myDenominator);
-            final long tmpDenom = myDenominator * arg.getDenominator();
-
-            return RationalNumber2.of(tmpNumer, tmpDenom);
+            return RationalNumber2.subtract(this, arg);
         }
     }
 
@@ -462,6 +602,10 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
         } else {
             return 0;
         }
+    }
+
+    private long size() {
+        return Math.max(Math.abs(myNumerator), myDenominator);
     }
 
     private BigDecimal toBigDecimal(final MathContext context) {
