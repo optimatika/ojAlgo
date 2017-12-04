@@ -76,7 +76,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
     private static final String DIVIDE = " / ";
     private static final String LEFT = "(";
-
     private static final String RIGHT = ")";;
 
     /**
