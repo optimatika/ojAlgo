@@ -43,7 +43,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     return myCount;
                 }
 
-                public Double getNumber() {
+                public Double get() {
                     return Double.valueOf(this.doubleValue());
                 }
 
@@ -93,7 +93,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     return myValue;
                 }
 
-                public Double getNumber() {
+                public Double get() {
                     return Double.valueOf(this.doubleValue());
                 }
 
@@ -141,7 +141,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     return myValue;
                 }
 
-                public Double getNumber() {
+                public Double get() {
                     return Double.valueOf(this.doubleValue());
                 }
 
@@ -193,7 +193,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     }
                 }
 
-                public Double getNumber() {
+                public Double get() {
                     return Double.valueOf(this.doubleValue());
                 }
 
@@ -241,7 +241,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     return myValue;
                 }
 
-                public Double getNumber() {
+                public Double get() {
                     return Double.valueOf(this.doubleValue());
                 }
 
@@ -290,7 +290,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     return PrimitiveFunction.SQRT.invoke(myValue);
                 }
 
-                public Double getNumber() {
+                public Double get() {
                     return Double.valueOf(this.doubleValue());
                 }
 
@@ -339,7 +339,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     return myValue;
                 }
 
-                public Double getNumber() {
+                public Double get() {
                     return Double.valueOf(this.doubleValue());
                 }
 
@@ -387,7 +387,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     return myValue;
                 }
 
-                public Double getNumber() {
+                public Double get() {
                     return Double.valueOf(this.doubleValue());
                 }
 
@@ -439,7 +439,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     }
                 }
 
-                public Double getNumber() {
+                public Double get() {
                     return Double.valueOf(this.doubleValue());
                 }
 
@@ -491,7 +491,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     return myValue;
                 }
 
-                public Double getNumber() {
+                public Double get() {
                     return Double.valueOf(this.doubleValue());
                 }
 
@@ -539,7 +539,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     return myValue;
                 }
 
-                public Double getNumber() {
+                public Double get() {
                     return Double.valueOf(this.doubleValue());
                 }
 

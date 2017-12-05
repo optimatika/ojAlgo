@@ -23,18 +23,56 @@ package org.ojalgo.access;
 
 public interface AccessScalar<N extends Number> {
 
+    /**
+     * @see Number#byteValue()
+     */
+    default byte byteValue() {
+        return this.get().byteValue();
+    }
+
+    /**
+     * @see Number#doubleValue()
+     */
     default double doubleValue() {
-        return this.getNumber().doubleValue();
+        return this.get().doubleValue();
     }
 
-    N getNumber();
+    /**
+     * @see Number#floatValue()
+     */
+    default float floatValue() {
+        return this.get().floatValue();
+    }
 
+    N get();
+
+    /**
+     * @deprecated v45 Use {@link #get()} instead
+     */
+    @Deprecated
+    default N getNumber() {
+        return this.get();
+    }
+
+    /**
+     * @see Number#intValue()
+     */
     default int intValue() {
-        return this.getNumber().intValue();
+        return this.get().intValue();
     }
 
+    /**
+     * @see Number#longValue()
+     */
     default long longValue() {
-        return this.getNumber().longValue();
+        return this.get().longValue();
+    }
+
+    /**
+     * @see Number#shortValue()
+     */
+    default short shortValue() {
+        return this.get().shortValue();
     }
 
 }

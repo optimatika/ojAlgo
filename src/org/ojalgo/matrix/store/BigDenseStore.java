@@ -64,7 +64,9 @@ import org.ojalgo.type.context.NumberContext;
  * A {@linkplain BigDecimal} implementation of {@linkplain PhysicalStore}.
  *
  * @author apete
+ * @deprecated v45 Use {@link GenericDenseStore} instead
  */
+@Deprecated
 public final class BigDenseStore extends BigArray implements PhysicalStore<BigDecimal>, DecompositionStore<BigDecimal> {
 
     public static interface BigMultiplyBoth extends FillByMultiplying<BigDecimal> {
@@ -89,6 +91,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     }
 
+    /**
+     * @deprecated v45 Use {@link GenericDenseStore#RATIONAL} instead
+     */
+    @Deprecated
     public static final PhysicalStore.Factory<BigDecimal, BigDenseStore> FACTORY = new PhysicalStore.Factory<BigDecimal, BigDenseStore>() {
 
         public AggregatorSet<BigDecimal> aggregator() {
@@ -489,7 +495,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
                     BigDenseStore.this.visit(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, tmpPartAggr);
 
                     synchronized (tmpMainAggr) {
-                        tmpMainAggr.merge(tmpPartAggr.getNumber());
+                        tmpMainAggr.merge(tmpPartAggr.get());
                     }
                 }
             };
@@ -501,7 +507,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
             BigDenseStore.this.visit(0, this.size(), 1, tmpMainAggr);
         }
 
-        return tmpMainAggr.getNumber();
+        return tmpMainAggr.get();
     }
 
     public void applyCholesky(final int iterationPoint, final BasicArray<BigDecimal> multipliers) {
@@ -937,8 +943,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return new TransposedRegion<>(this, multiplyBoth);
     }
 
-    public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
-        RotateRight.invoke(data, myRowDim, aLow, aHigh, FACTORY.scalar().cast(aCos), FACTORY.scalar().cast(aSin));
+    public void rotateRight(final int low, final int high, final double cos, final double sin) {
+        RotateRight.invoke(data, myRowDim, low, high, FACTORY.scalar().cast(cos), FACTORY.scalar().cast(sin));
     }
 
     public void set(final long aRow, final long aCol, final double aNmbr) {
@@ -1068,7 +1074,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
         if (tmpLow != tmpHigh) {
             if ((tmpTransf.cos != null) && (tmpTransf.sin != null)) {
-                RotateLeft.invoke(data, myColDim, tmpLow, tmpHigh, tmpTransf.cos, tmpTransf.sin);
+                RotateLeft.invoke(data, myRowDim, tmpLow, tmpHigh, tmpTransf.cos, tmpTransf.sin);
             } else {
                 myUtility.exchangeRows(tmpLow, tmpHigh);
             }

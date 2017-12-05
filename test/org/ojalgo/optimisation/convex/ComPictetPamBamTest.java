@@ -28,7 +28,7 @@ import java.util.Arrays;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.matrix.BigMatrix;
+import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -190,7 +190,7 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
 
         final Optimisation.Result result = model.minimise();
 
-        if (BigMatrix.FACTORY.columns(result) != null) {
+        if (RationalMatrix.FACTORY.columns(result) != null) {
             final boolean validated = model.validate(result, model.options.slack);
             if (result.getState().isFeasible()) {
                 final String message = "State: " + result.getState() + ", validated: " + validated;

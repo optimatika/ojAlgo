@@ -63,7 +63,7 @@ public interface Scalar<N extends Number> extends AccessScalar<N>, Field<Scalar<
 
         @SuppressWarnings("unchecked")
         default N[] newArrayInstance(final int length) {
-            return (N[]) Array.newInstance(this.zero().getNumber().getClass(), length);
+            return (N[]) Array.newInstance(this.zero().get().getClass(), length);
         }
 
         /**
@@ -79,11 +79,11 @@ public interface Scalar<N extends Number> extends AccessScalar<N>, Field<Scalar<
     }
 
     default Scalar<N> add(final Scalar<N> addend) {
-        return this.add(addend.getNumber());
+        return this.add(addend.get());
     }
 
     default Scalar<N> divide(final Scalar<N> divisor) {
-        return this.divide(divisor.getNumber());
+        return this.divide(divisor.get());
     }
 
     /**
@@ -94,11 +94,11 @@ public interface Scalar<N extends Number> extends AccessScalar<N>, Field<Scalar<
     boolean isAbsolute();
 
     default Scalar<N> multiply(final Scalar<N> multiplicand) {
-        return this.multiply(multiplicand.getNumber());
+        return this.multiply(multiplicand.get());
     }
 
     default Scalar<N> subtract(final Scalar<N> subtrahend) {
-        return this.subtract(subtrahend.getNumber());
+        return this.subtract(subtrahend.get());
     }
 
     BigDecimal toBigDecimal();

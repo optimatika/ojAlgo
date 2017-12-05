@@ -31,7 +31,7 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
@@ -250,7 +250,7 @@ public interface Eigenvalue<N extends Number>
 
         final long tmpDimension = this.getV().countColumns();
 
-        final ComplexDenseStore retVal = ComplexDenseStore.FACTORY.makeZero(tmpDimension, 1L);
+        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(tmpDimension, 1L);
 
         this.copyEigenvector(index, retVal.sliceColumn(0, index));
 
@@ -310,7 +310,7 @@ public interface Eigenvalue<N extends Number>
 
         final long tmpDimension = this.getV().countColumns();
 
-        final ComplexDenseStore retVal = ComplexDenseStore.FACTORY.makeZero(tmpDimension, 1L);
+        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(tmpDimension, 1L);
 
         this.copyEigenvector(index, retVal.sliceColumn(0, index));
 
@@ -324,7 +324,7 @@ public interface Eigenvalue<N extends Number>
 
         final long tmpDimension = this.getV().countColumns();
 
-        final ComplexDenseStore retVal = ComplexDenseStore.FACTORY.makeZero(tmpDimension, tmpDimension);
+        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(tmpDimension, tmpDimension);
 
         for (int j = 0; j < tmpDimension; j++) {
             this.copyEigenvector(j, retVal.sliceColumn(0, j));

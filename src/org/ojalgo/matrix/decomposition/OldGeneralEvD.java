@@ -66,7 +66,7 @@ abstract class OldGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
 
         this.getEigenvalues().visitAll(tmpVisitor);
 
-        return this.scalar().cast(tmpVisitor.getNumber());
+        return this.scalar().cast(tmpVisitor.get());
     }
 
     public MatrixStore<N> getInverse() {
@@ -85,7 +85,7 @@ abstract class OldGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
 
         this.getEigenvalues().visitAll(tmpVisitor);
 
-        return tmpVisitor.getNumber();
+        return tmpVisitor.get();
     }
 
     public final boolean isHermitian() {
@@ -173,7 +173,7 @@ abstract class OldGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
 
         final PhysicalStore<N> tmpMtrx = tmpV.transpose().copy();
 
-        final N tmpZero = this.scalar().zero().getNumber();
+        final N tmpZero = this.scalar().zero().get();
         final BinaryFunction<N> tmpDivide = this.function().divide();
 
         for (int i = 0; i < tmpDim; i++) {

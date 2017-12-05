@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
@@ -48,11 +48,11 @@ public final class ConstantFunction<N extends Number> extends AbstractMultiary<N
     }
 
     public static ConstantFunction<ComplexNumber> makeComplex(final int arity) {
-        return new ConstantFunction<>(arity, ComplexDenseStore.FACTORY, null);
+        return new ConstantFunction<>(arity, GenericDenseStore.COMPLEX, null);
     }
 
     public static ConstantFunction<ComplexNumber> makeComplex(final int arity, final Number constant) {
-        return new ConstantFunction<>(arity, ComplexDenseStore.FACTORY, constant);
+        return new ConstantFunction<>(arity, GenericDenseStore.COMPLEX, constant);
     }
 
     public static ConstantFunction<Double> makePrimitive(final int arity) {

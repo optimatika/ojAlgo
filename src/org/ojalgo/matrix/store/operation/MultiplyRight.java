@@ -31,9 +31,9 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyRight;
-import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyRight;
+import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyRight;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyRight;
-import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class MultiplyRight extends MatrixOperation {
 
@@ -51,28 +51,6 @@ public final class MultiplyRight extends MatrixOperation {
     static final BigMultiplyRight BIG_MT = (product, left, complexity, right) -> {
 
         Arrays.fill(product, BigMath.ZERO);
-
-        final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-            @Override
-            public void conquer(final int first, final int limit) {
-                MultiplyRight.invoke(product, first, limit, left, complexity, right);
-            }
-        };
-
-        tmpConquerer.invoke(0, (int) (right.count() / complexity), THRESHOLD);
-    };
-
-    static final ComplexMultiplyRight COMPLEX = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, ComplexNumber.ZERO);
-
-        MultiplyRight.invoke(product, 0, (int) (right.count() / complexity), left, complexity, right);
-    };
-
-    static final ComplexMultiplyRight COMPLEX_MT = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, ComplexNumber.ZERO);
 
         final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -607,14 +585,6 @@ public final class MultiplyRight extends MatrixOperation {
         }
     }
 
-    public static ComplexMultiplyRight getComplex(final long rows, final long columns) {
-        if (columns > THRESHOLD) {
-            return COMPLEX_MT;
-        } else {
-            return COMPLEX;
-        }
-    }
-
     public static PrimitiveMultiplyRight getPrimitive(final long rows, final long columns) {
         if (columns > THRESHOLD) {
             return PRIMITIVE_MT;
@@ -661,12 +631,12 @@ public final class MultiplyRight extends MatrixOperation {
         }
     }
 
-    static void invoke(final ComplexNumber[] product, final int firstColumn, final int columnLimit, final ComplexNumber[] left, final int complexity,
-            final Access1D<ComplexNumber> right) {
+    static <N extends Number & Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
+            final Access1D<N> right, final Scalar.Factory<N> scalar) {
 
         final int structure = left.length / complexity;
 
-        final ComplexNumber[] leftColumn = new ComplexNumber[structure];
+        final N[] leftColumn = scalar.newArrayInstance(structure);
         for (int c = 0; c < complexity; c++) {
             System.arraycopy(left, c * structure, leftColumn, 0, structure);
 
@@ -704,6 +674,36 @@ public final class MultiplyRight extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static <N extends Number & Scalar<N>> GenericMultiplyRight<N> getGeneric(final long rows, final long columns) {
+
+        if (columns > THRESHOLD) {
+
+            return (product, left, complexity, right, scalar) -> {
+
+                Arrays.fill(product, scalar.zero().get());
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        MultiplyRight.invoke(product, first, limit, left, complexity, right, scalar);
+                    }
+                };
+
+                tmpConquerer.invoke(0, (int) (right.count() / complexity), THRESHOLD);
+            };
+
+        } else {
+
+            return (product, left, complexity, right, scalar) -> {
+
+                Arrays.fill(product, scalar.zero().get());
+
+                MultiplyRight.invoke(product, 0, (int) (right.count() / complexity), left, complexity, right, scalar);
+            };
+        }
     }
 
 }

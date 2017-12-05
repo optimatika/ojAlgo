@@ -35,18 +35,18 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleLUCase extends BasicMatrixTest {
 
-    public static BigMatrix getMtrxL() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 }, { 1.0, 1.0 } });
+    public static RationalMatrix getMtrxL() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 }, { 1.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getMtrxU() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 } });
+    public static RationalMatrix getMtrxU() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getOrginal() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
+    public static RationalMatrix getOrginal() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 

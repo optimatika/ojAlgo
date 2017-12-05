@@ -29,9 +29,10 @@ import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyNeither;
-import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyNeither;
+import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyNeither;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyNeither;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class MultiplyNeither extends MatrixOperation {
 
@@ -49,28 +50,6 @@ public final class MultiplyNeither extends MatrixOperation {
     static final BigMultiplyNeither BIG_MT = (product, left, complexity, right) -> {
 
         Arrays.fill(product, BigMath.ZERO);
-
-        final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-            @Override
-            public void conquer(final int first, final int limit) {
-                MultiplyNeither.invoke(product, first, limit, left, complexity, right);
-            }
-        };
-
-        tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
-    };
-
-    static final ComplexMultiplyNeither COMPLEX = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, ComplexNumber.ZERO);
-
-        MultiplyNeither.invoke(product, 0, right.length / complexity, left, complexity, right);
-    };
-
-    static final ComplexMultiplyNeither COMPLEX_MT = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, ComplexNumber.ZERO);
 
         final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -605,11 +584,33 @@ public final class MultiplyNeither extends MatrixOperation {
         }
     }
 
-    public static ComplexMultiplyNeither getComplex(final long rows, final long columns) {
+    public static <N extends Number & Scalar<N>> GenericMultiplyNeither<N> getGeneric(final long rows, final long columns) {
+
         if (rows > THRESHOLD) {
-            return COMPLEX_MT;
+
+            return (product, left, complexity, right, scalar) -> {
+
+                Arrays.fill(product, scalar.zero().get());
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        MultiplyNeither.invoke(product, first, limit, left, complexity, right, scalar);
+                    }
+                };
+
+                tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
+            };
+
         } else {
-            return COMPLEX;
+
+            return (product, left, complexity, right, scalar) -> {
+
+                Arrays.fill(product, scalar.zero().get());
+
+                MultiplyNeither.invoke(product, 0, right.length / complexity, left, complexity, right, scalar);
+            };
         }
     }
 
@@ -656,12 +657,11 @@ public final class MultiplyNeither extends MatrixOperation {
         }
     }
 
-    static void invoke(final ComplexNumber[] product, final int firstColumn, final int columnLimit, final ComplexNumber[] left, final int complexity,
-            final ComplexNumber[] right) {
+    static void invoke(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {
 
         final int structure = left.length / complexity;
 
-        final ComplexNumber[] leftColumn = new ComplexNumber[structure];
+        final double[] leftColumn = new double[structure];
         for (int c = 0; c < complexity; c++) {
             System.arraycopy(left, c * structure, leftColumn, 0, structure);
 
@@ -671,11 +671,12 @@ public final class MultiplyNeither extends MatrixOperation {
         }
     }
 
-    static void invoke(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {
+    static <N extends Number & Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
+            final N[] right, final Scalar.Factory<N> scalar) {
 
         final int structure = left.length / complexity;
 
-        final double[] leftColumn = new double[structure];
+        final N[] leftColumn = scalar.newArrayInstance(structure);
         for (int c = 0; c < complexity; c++) {
             System.arraycopy(left, c * structure, leftColumn, 0, structure);
 

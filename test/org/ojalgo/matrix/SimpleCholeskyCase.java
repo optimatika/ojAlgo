@@ -35,12 +35,12 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleCholeskyCase extends BasicMatrixTest {
 
-    public static BigMatrix getFactorL() {
-        return BigMatrix.FACTORY.rows(new double[][] { { 1.7321, 0.0, 0.0 }, { -0.5774, 1.6330, 0.0 }, { -0.5774, -0.8165, 1.4142 } }).enforce(DEFINITION);
+    public static RationalMatrix getFactorL() {
+        return RationalMatrix.FACTORY.rows(new double[][] { { 1.7321, 0.0, 0.0 }, { -0.5774, 1.6330, 0.0 }, { -0.5774, -0.8165, 1.4142 } }).enforce(DEFINITION);
     }
 
-    public static BigMatrix getFactorR() {
-        return BigMatrix.FACTORY.rows(new double[][] { { 1.7321, -0.5774, -0.5774 }, { 0.0, 1.6330, -0.8165 }, { 0.0, 0.0, 1.4142 } }).enforce(DEFINITION);
+    public static RationalMatrix getFactorR() {
+        return RationalMatrix.FACTORY.rows(new double[][] { { 1.7321, -0.5774, -0.5774 }, { 0.0, 1.6330, -0.8165 }, { 0.0, 0.0, 1.4142 } }).enforce(DEFINITION);
     }
 
     /**
@@ -48,8 +48,8 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
      *
      * @return The data00 value
      */
-    public static BigMatrix getOriginal() {
-        return BigMatrix.FACTORY.rows(new double[][] { { 3.0, -1.0, -1.0 }, { -1.0, 3.0, -1.0 }, { -1.0, -1.0, 3.0 } }).enforce(DEFINITION);
+    public static RationalMatrix getOriginal() {
+        return RationalMatrix.FACTORY.rows(new double[][] { { 3.0, -1.0, -1.0 }, { -1.0, 3.0, -1.0 }, { -1.0, -1.0, 3.0 } }).enforce(DEFINITION);
     }
 
     public SimpleCholeskyCase() {

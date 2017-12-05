@@ -174,7 +174,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
             final RawStore retVal = this.makeZero(rows, columns);
 
-            retVal.fillDiagonal(0, 0, this.scalar().one().getNumber());
+            retVal.fillDiagonal(0, 0, this.scalar().one().get());
 
             return retVal;
         }
@@ -649,7 +649,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
         this.visitAll(tmpVisitor);
 
-        return tmpVisitor.getNumber();
+        return tmpVisitor.get();
     }
 
     public List<Double> asList() {

@@ -21,6 +21,9 @@
  */
 package org.ojalgo.array;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.array.blas.AXPY;
@@ -33,16 +36,36 @@ import org.ojalgo.scalar.Scalar;
  */
 public abstract class ScalarArray<N extends Number & Scalar<N>> extends ReferenceTypeArray<N> {
 
-    protected ScalarArray(final N[] data) {
-        super(data);
+    protected ScalarArray(final int length, final Scalar.Factory<N> factory) {
+        super(length, factory);
     }
 
-    protected ScalarArray(final Class<N> componentType, final int length) {
-        super(componentType, length);
+    protected ScalarArray(final N[] data, final Scalar.Factory<N> factory) {
+        super(data, factory);
     }
 
     public final void axpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
+    }
+
+    @Override
+    public final void sortAscending() {
+        Arrays.parallelSort(data);
+    }
+
+    @Override
+    public final void sortDescending() {
+        Arrays.parallelSort(data, Comparator.reverseOrder());
+    }
+
+    @Override
+    protected final void add(final int index, final double addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)).get());
+    }
+
+    @Override
+    protected final void add(final int index, final Number addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)).get());
     }
 
     @Override
@@ -51,12 +74,12 @@ public abstract class ScalarArray<N extends Number & Scalar<N>> extends Referenc
     }
 
     @Override
-    protected boolean isAbsolute(final int index) {
+    protected final boolean isAbsolute(final int index) {
         return data[index].isAbsolute();
     }
 
     @Override
-    protected boolean isSmall(final int index, final double comparedTo) {
+    protected final boolean isSmall(final int index, final double comparedTo) {
         return data[index].isSmall(comparedTo);
     }
 

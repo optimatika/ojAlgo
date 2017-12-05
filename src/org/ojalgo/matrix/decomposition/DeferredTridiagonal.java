@@ -28,7 +28,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -37,6 +37,7 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 
 /**
  * @author apete
@@ -55,10 +56,22 @@ abstract class DeferredTridiagonal<N extends Number> extends TridiagonalDecompos
         }
     }
 
+    static final class Rational extends DeferredTridiagonal<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL);
+        }
+
+        @Override
+        Array1D<RationalNumber> makeReal(final BasicArray<RationalNumber> offDiagonal) {
+            return null;
+        }
+    }
+
     static final class Complex extends DeferredTridiagonal<ComplexNumber> {
 
         Complex() {
-            super(ComplexDenseStore.FACTORY);
+            super(GenericDenseStore.COMPLEX);
         }
 
         @Override
@@ -176,7 +189,7 @@ abstract class DeferredTridiagonal<N extends Number> extends TridiagonalDecompos
 
     @Override
     final MatrixStore<N> makeD() {
-        return this.wrap(new DiagonalBasicArray<>(myDiagD, myDiagE, myDiagE, this.scalar().zero().getNumber())).get();
+        return this.wrap(new DiagonalBasicArray<>(myDiagD, myDiagE, myDiagE, this.scalar().zero().get())).get();
     }
 
     @Override

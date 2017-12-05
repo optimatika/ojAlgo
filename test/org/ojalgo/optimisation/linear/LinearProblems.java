@@ -28,7 +28,7 @@ import java.math.BigDecimal;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Builder;
-import org.ojalgo.matrix.BigMatrix;
+import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -151,9 +151,9 @@ public class LinearProblems extends OptimisationLinearTests {
         TestUtils.assertEquals(true, tmpOddModel.validate(tmpOddResult, new NumberContext(7, 6)));
         TestUtils.assertEquals(true, tmpFullModel.validate(tmpFullResult, new NumberContext(7, 6)));
 
-        TestUtils.assertEquals(tmpEvenSolution, BigMatrix.FACTORY.columns(tmpEvenResult).selectRows(0, 1, 2), new NumberContext(7, 6));
-        TestUtils.assertEquals(tmpOddSolution, BigMatrix.FACTORY.columns(tmpOddResult).selectRows(0, 1, 2), new NumberContext(7, 6));
-        TestUtils.assertEquals(tmpFullSolution, BigMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5), new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpEvenSolution, RationalMatrix.FACTORY.columns(tmpEvenResult).selectRows(0, 1, 2), new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpOddSolution, RationalMatrix.FACTORY.columns(tmpOddResult).selectRows(0, 1, 2), new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpFullSolution, RationalMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5), new NumberContext(7, 6));
 
         final BigDecimal tmpEvenValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(
                 tmpEvenObjective.toFunction().invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpEvenResult).selectRows(0, 1, 2)))));
@@ -209,7 +209,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Optimisation.Result tmpResult11 = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResult11.getState());
         TestUtils.assertStateNotLessThanOptimal(tmpResult11);
-        TestUtils.assertEquals(tmpExpectedSolution, BigMatrix.FACTORY.columns(tmpResult11));
+        TestUtils.assertEquals(tmpExpectedSolution, RationalMatrix.FACTORY.columns(tmpResult11));
 
         tmpExprC2.set(0, NEG);
         tmpExprC2.set(1, ONE);
@@ -220,7 +220,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Optimisation.Result tmpResultN1 = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResultN1.getState());
         TestUtils.assertStateNotLessThanOptimal(tmpResultN1);
-        TestUtils.assertEquals(tmpExpectedSolution, BigMatrix.FACTORY.columns(tmpResultN1));
+        TestUtils.assertEquals(tmpExpectedSolution, RationalMatrix.FACTORY.columns(tmpResultN1));
 
         tmpExprC2.set(0, ONE);
         tmpExprC2.set(1, NEG);
@@ -231,7 +231,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Optimisation.Result tmpResult1N = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResult1N.getState());
         TestUtils.assertStateNotLessThanOptimal(tmpResult1N);
-        TestUtils.assertEquals(tmpExpectedSolution, BigMatrix.FACTORY.columns(tmpResult1N));
+        TestUtils.assertEquals(tmpExpectedSolution, RationalMatrix.FACTORY.columns(tmpResult1N));
 
         tmpExprC2.set(0, NEG);
         tmpExprC2.set(1, ONE);
@@ -242,7 +242,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Optimisation.Result tmpResultNN = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResultNN.getState());
         TestUtils.assertStateNotLessThanOptimal(tmpResultNN);
-        TestUtils.assertEquals(tmpExpectedSolution, BigMatrix.FACTORY.columns(tmpResultNN));
+        TestUtils.assertEquals(tmpExpectedSolution, RationalMatrix.FACTORY.columns(tmpResultNN));
     }
 
     /**

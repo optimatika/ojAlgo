@@ -31,9 +31,9 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyLeft;
-import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyLeft;
+import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyLeft;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyLeft;
-import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class MultiplyLeft extends MatrixOperation {
 
@@ -51,28 +51,6 @@ public final class MultiplyLeft extends MatrixOperation {
     static final BigMultiplyLeft BIG_MT = (product, left, complexity, right) -> {
 
         Arrays.fill(product, BigMath.ZERO);
-
-        final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-            @Override
-            public void conquer(final int first, final int limit) {
-                MultiplyLeft.invoke(product, first, limit, left, complexity, right);
-            }
-        };
-
-        tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
-    };
-
-    static final ComplexMultiplyLeft COMPLEX = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, ComplexNumber.ZERO);
-
-        MultiplyLeft.invoke(product, 0, right.length / complexity, left, complexity, right);
-    };
-
-    static final ComplexMultiplyLeft COMPLEX_MT = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, ComplexNumber.ZERO);
 
         final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -607,14 +585,6 @@ public final class MultiplyLeft extends MatrixOperation {
         }
     }
 
-    public static ComplexMultiplyLeft getComplex(final long rows, final long columns) {
-        if (rows > THRESHOLD) {
-            return COMPLEX_MT;
-        } else {
-            return COMPLEX;
-        }
-    }
-
     public static PrimitiveMultiplyLeft getPrimitive(final long rows, final long columns) {
         if (rows > THRESHOLD) {
             return PRIMITIVE_MT;
@@ -664,12 +634,12 @@ public final class MultiplyLeft extends MatrixOperation {
         }
     }
 
-    static void invoke(final ComplexNumber[] product, final int firstColumn, final int columnLimit, final Access1D<ComplexNumber> left, final int complexity,
-            final ComplexNumber[] right) {
+    static <N extends Number & Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final Access1D<N> left,
+            final int complexity, final N[] right, final Scalar.Factory<N> scalar) {
 
         final int structure = ((int) left.count()) / complexity;
 
-        final ComplexNumber[] leftColumn = new ComplexNumber[structure];
+        final N[] leftColumn = scalar.newArrayInstance(structure);
         for (int c = 0; c < complexity; c++) {
 
             final int firstInLeftColumn = MatrixUtils.firstInColumn(left, c, 0);
@@ -713,6 +683,36 @@ public final class MultiplyLeft extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static <N extends Number & Scalar<N>> GenericMultiplyLeft<N> getGeneric(final long rows, final long columns) {
+
+        if (rows > THRESHOLD) {
+
+            return (product, left, complexity, right, scalar) -> {
+
+                Arrays.fill(product, scalar.zero().get());
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        MultiplyLeft.invoke(product, first, limit, left, complexity, right, scalar);
+                    }
+                };
+
+                tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
+            };
+
+        } else {
+
+            return (product, left, complexity, right, scalar) -> {
+
+                Arrays.fill(product, scalar.zero().get());
+
+                MultiplyLeft.invoke(product, 0, right.length / complexity, left, complexity, right, scalar);
+            };
+        }
     }
 
 }

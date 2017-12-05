@@ -40,7 +40,7 @@ final class ConjugatedStore<N extends Number> extends TransjugatedStore<N> {
     }
 
     public N get(final long aRow, final long aCol) {
-        return this.getBase().toScalar((int) aCol, (int) aRow).conjugate().getNumber();
+        return this.getBase().toScalar((int) aCol, (int) aRow).conjugate().get();
     }
 
     @Override

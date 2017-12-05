@@ -63,7 +63,7 @@ final class LowerHessenbergStore<N extends Number> extends ShadingStore<N> {
 
     public N get(final long row, final long col) {
         if ((row + 1) < col) {
-            return this.physical().scalar().zero().getNumber();
+            return this.physical().scalar().zero().get();
         } else {
             return this.getBase().get(row, col);
         }

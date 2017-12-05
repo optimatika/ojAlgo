@@ -35,6 +35,8 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 
 public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
@@ -126,9 +128,47 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     };
 
+    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+
+        @Override
+        public InverterTask<Quaternion> make(final MatrixStore<Quaternion> template, final boolean symmetric, final boolean positiveDefinite) {
+            if (template.isSquare()) {
+                if (symmetric && positiveDefinite) {
+                    return Cholesky.QUATERNION.make(template);
+                } else {
+                    return LU.QUATERNION.make(template);
+                }
+            } else if (template.isTall()) {
+                return QR.QUATERNION.make(template);
+            } else {
+                return SingularValue.QUATERNION.make(template);
+            }
+        }
+
+    };
+
+    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+
+        @Override
+        public InverterTask<RationalNumber> make(final MatrixStore<RationalNumber> template, final boolean symmetric, final boolean positiveDefinite) {
+            if (template.isSquare()) {
+                if (symmetric && positiveDefinite) {
+                    return Cholesky.RATIONAL.make(template);
+                } else {
+                    return LU.RATIONAL.make(template);
+                }
+            } else if (template.isTall()) {
+                return QR.RATIONAL.make(template);
+            } else {
+                return SingularValue.RATIONAL.make(template);
+            }
+        }
+
+    };
+
     /**
      * The output must be a "right inverse" and a "generalised inverse".
-     * 
+     *
      * @throws RecoverableCondition TODO
      * @see BasicMatrix#invert()
      */

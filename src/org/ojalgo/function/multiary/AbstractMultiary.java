@@ -41,7 +41,7 @@ abstract class AbstractMultiary<N extends Number, F extends AbstractMultiary<N, 
     }
 
     public final N getConstant() {
-        return this.getScalarConstant().getNumber();
+        return this.getScalarConstant().get();
     }
 
     public Access1D<N> getLinearFactors() {

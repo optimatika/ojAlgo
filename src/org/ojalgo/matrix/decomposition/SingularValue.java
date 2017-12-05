@@ -29,6 +29,8 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -68,17 +70,25 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         }
     };
 
+    public static final Factory<Quaternion> QUATERNION = typical -> new SingularValueDecomposition.Quat();
+
+    public static final Factory<RationalNumber> RATIONAL = typical -> new SingularValueDecomposition.Rational();
+
     @SuppressWarnings("unchecked")
     public static <N extends Number> SingularValue<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
-        if (tmpNumber instanceof BigDecimal) {
+        if (tmpNumber instanceof RationalNumber) {
+            return (SingularValue<N>) RATIONAL.make(typical);
+        } else if (tmpNumber instanceof BigDecimal) {
             return (SingularValue<N>) BIG.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
             return (SingularValue<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {
             return (SingularValue<N>) PRIMITIVE.make(typical);
+        } else if (tmpNumber instanceof Quaternion) {
+            return (SingularValue<N>) QUATERNION.make(typical);
         } else {
             throw new IllegalArgumentException();
         }

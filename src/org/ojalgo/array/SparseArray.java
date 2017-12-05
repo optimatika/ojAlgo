@@ -86,7 +86,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             ElementView1D.super.forEachRemaining(action);
         }
 
-        public N getNumber() {
+        public N get() {
             return myValues.get(myCursor);
         }
 
@@ -186,7 +186,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         myValues = strategy.makeInitial();
 
         myZeroScalar = strategy.scalar().zero();
-        myZeroNumber = myZeroScalar.getNumber();
+        myZeroNumber = myZeroScalar.get();
         myZeroValue = myZeroNumber.doubleValue();
     }
 

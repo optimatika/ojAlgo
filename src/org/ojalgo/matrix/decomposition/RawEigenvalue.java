@@ -234,7 +234,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         this.getEigenvalues().visitAll(tmpVisitor);
 
-        return tmpVisitor.getNumber().doubleValue();
+        return tmpVisitor.get().doubleValue();
     }
 
     public Array1D<ComplexNumber> getEigenvalues() {
@@ -310,7 +310,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         this.getEigenvalues().visitAll(tmpVisitor);
 
-        return tmpVisitor.getNumber();
+        return tmpVisitor.get();
     }
 
     /**

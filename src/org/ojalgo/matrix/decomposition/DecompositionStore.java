@@ -73,8 +73,6 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N>, 
 
     boolean generateApplyAndCopyHouseholderRow(final int row, final int column, final Householder<N> destination);
 
-    void rotateRight(int aLow, int aHigh, double aCos, double aSin);
-
     void setToIdentity(int aCol);
 
     default Array1D<N> sliceColumn(final long col) {

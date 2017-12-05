@@ -33,12 +33,14 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.ElementsSupplier;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LU<N> {
@@ -54,7 +56,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
     static final class Complex extends LUDecomposition<ComplexNumber> {
 
         Complex() {
-            super(ComplexDenseStore.FACTORY);
+            super(GenericDenseStore.COMPLEX);
         }
 
     }
@@ -63,6 +65,22 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         Primitive() {
             super(PrimitiveDenseStore.FACTORY);
+        }
+
+    }
+
+    static final class Quat extends LUDecomposition<Quaternion> {
+
+        Quat() {
+            super(GenericDenseStore.QUATERNION);
+        }
+
+    }
+
+    static final class Rational extends LUDecomposition<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL);
         }
 
     }
@@ -93,9 +111,9 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
         if (myPivot.signum() == -1) {
-            return tmpAggrFunc.toScalar().negate().getNumber();
+            return tmpAggrFunc.toScalar().negate().get();
         } else {
-            return tmpAggrFunc.getNumber();
+            return tmpAggrFunc.get();
         }
     }
 
@@ -103,7 +121,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
         if (myPivot.isModified()) {
-            preallocated.fillAll(this.scalar().zero().getNumber());
+            preallocated.fillAll(this.scalar().zero().get());
             final int[] tmpPivotOrder = myPivot.getOrder();
             final int tmpRowDim = this.getRowDim();
             for (int i = 0; i < tmpRowDim; i++) {

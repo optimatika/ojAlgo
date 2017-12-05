@@ -24,7 +24,7 @@ package org.ojalgo.matrix.store.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.function.BigFunction;
-import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class RotateRight extends MatrixOperation {
 
@@ -32,67 +32,66 @@ public final class RotateRight extends MatrixOperation {
 
     public static int THRESHOLD = 128;
 
-    public static void invoke(final BigDecimal[] aData, final int aRowDim, final int aColA, final int aColB, final BigDecimal aCos, final BigDecimal aSin) {
+    public static void invoke(final BigDecimal[] data, final int structure, final int colA, final int colB, final BigDecimal cos, final BigDecimal sin) {
 
-        BigDecimal tmpOldA;
-        BigDecimal tmpOldB;
+        BigDecimal oldA;
+        BigDecimal oldB;
 
-        int tmpIndexA = aColA * aRowDim;
-        int tmpIndexB = aColB * aRowDim;
+        int indexA = colA * structure;
+        int indexB = colB * structure;
 
-        for (int i = 0; i < aRowDim; i++) {
+        for (int i = 0; i < structure; i++) {
 
-            tmpOldA = aData[tmpIndexA];
-            tmpOldB = aData[tmpIndexB];
+            oldA = data[indexA];
+            oldB = data[indexB];
 
-            aData[tmpIndexA] = BigFunction.SUBTRACT.invoke(BigFunction.MULTIPLY.invoke(aCos, tmpOldA), BigFunction.MULTIPLY.invoke(aSin, tmpOldB));
-            aData[tmpIndexB] = BigFunction.ADD.invoke(BigFunction.MULTIPLY.invoke(aCos, tmpOldB), BigFunction.MULTIPLY.invoke(aSin, tmpOldA));
+            data[indexA] = BigFunction.SUBTRACT.invoke(BigFunction.MULTIPLY.invoke(cos, oldA), BigFunction.MULTIPLY.invoke(sin, oldB));
+            data[indexB] = BigFunction.ADD.invoke(BigFunction.MULTIPLY.invoke(cos, oldB), BigFunction.MULTIPLY.invoke(sin, oldA));
 
-            tmpIndexA++;
-            tmpIndexB++;
+            indexA++;
+            indexB++;
         }
     }
 
-    public static void invoke(final ComplexNumber[] aData, final int aRowDim, final int aColA, final int aColB, final ComplexNumber aCos,
-            final ComplexNumber aSin) {
+    public static void invoke(final double[] data, final int structure, final int colA, final int colB, final double cos, final double sin) {
 
-        ComplexNumber tmpOldA;
-        ComplexNumber tmpOldB;
+        double oldA;
+        double oldB;
 
-        int tmpIndexA = aColA * aRowDim;
-        int tmpIndexB = aColB * aRowDim;
+        int indexA = colA * structure;
+        int indexB = colB * structure;
 
-        for (int i = 0; i < aRowDim; i++) {
+        for (int i = 0; i < structure; i++) {
 
-            tmpOldA = aData[tmpIndexA];
-            tmpOldB = aData[tmpIndexB];
+            oldA = data[indexA];
+            oldB = data[indexB];
 
-            aData[tmpIndexA] = aCos.multiply(tmpOldA).subtract(aSin.multiply(tmpOldB));
-            aData[tmpIndexB] = aCos.multiply(tmpOldB).add(aSin.multiply(tmpOldA));
+            data[indexA] = (cos * oldA) - (sin * oldB);
+            data[indexB] = (cos * oldB) + (sin * oldA);
 
-            tmpIndexA++;
-            tmpIndexB++;
+            indexA++;
+            indexB++;
         }
     }
 
-    public static void invoke(final double[] aData, final int aRowDim, final int aColA, final int aColB, final double aCos, final double aSin) {
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int colA, final int colB, final N cos, final N sin) {
 
-        double tmpOldA;
-        double tmpOldB;
+        N oldA;
+        N oldB;
 
-        int tmpIndexA = aColA * aRowDim;
-        int tmpIndexB = aColB * aRowDim;
+        int indexA = colA * structure;
+        int indexB = colB * structure;
 
-        for (int i = 0; i < aRowDim; i++) {
+        for (int i = 0; i < structure; i++) {
 
-            tmpOldA = aData[tmpIndexA];
-            tmpOldB = aData[tmpIndexB];
+            oldA = data[indexA];
+            oldB = data[indexB];
 
-            aData[tmpIndexA] = (aCos * tmpOldA) - (aSin * tmpOldB);
-            aData[tmpIndexB] = (aCos * tmpOldB) + (aSin * tmpOldA);
+            data[indexA] = cos.multiply(oldA).subtract(sin.multiply(oldB)).get();
+            data[indexB] = cos.multiply(oldB).add(sin.multiply(oldA)).get();
 
-            tmpIndexA++;
-            tmpIndexB++;
+            indexA++;
+            indexB++;
         }
     }
 

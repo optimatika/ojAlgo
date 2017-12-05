@@ -22,11 +22,8 @@
 package org.ojalgo.array;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.RationalFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.RationalAggregator;
@@ -80,17 +77,20 @@ public class RationalArray extends ScalarArray<RationalNumber> {
         return new RationalArray(data);
     }
 
+    private RationalArray(final int length, final Scalar.Factory<RationalNumber> factory) {
+        super(length, factory);
+    }
+
+    private RationalArray(final RationalNumber[] data, final Scalar.Factory<RationalNumber> factory) {
+        super(data, factory);
+    }
+
     protected RationalArray(final int size) {
-
-        super(new RationalNumber[size]);
-
-        this.fill(0, size, 1, RationalNumber.ZERO);
+        this(size, RationalNumber.FACTORY);
     }
 
     protected RationalArray(final RationalNumber[] data) {
-
-        super(data);
-
+        this(data, RationalNumber.FACTORY);
     }
 
     @Override
@@ -102,56 +102,9 @@ public class RationalArray extends ScalarArray<RationalNumber> {
         }
     }
 
-    public final void fillMatching(final Access1D<?> values) {
-        final int tmpLimit = (int) FunctionUtils.min(this.count(), values.count());
-        for (int i = 0; i < tmpLimit; i++) {
-            data[i] = RationalNumber.valueOf(values.get(i));
-        }
-    }
-
     @Override
     public int hashCode() {
         return Arrays.hashCode(data);
-    }
-
-    @Override
-    public final void sortAscending() {
-        Arrays.parallelSort(data);
-    }
-
-    @Override
-    public void sortDescending() {
-        Arrays.parallelSort(data, Comparator.reverseOrder());
-    }
-
-    @Override
-    protected final void add(final int index, final double addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
-    }
-
-    @Override
-    protected final void add(final int index, final Number addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
-    }
-
-    @Override
-    protected boolean isAbsolute(final int index) {
-        return RationalNumber.isAbsolute(data[index]);
-    }
-
-    @Override
-    protected boolean isSmall(final int index, final double comparedTo) {
-        return RationalNumber.isSmall(comparedTo, data[index]);
-    }
-
-    @Override
-    final RationalNumber valueOf(final double value) {
-        return RationalNumber.valueOf(value);
-    }
-
-    @Override
-    final RationalNumber valueOf(final Number number) {
-        return RationalNumber.valueOf(number);
     }
 
 }

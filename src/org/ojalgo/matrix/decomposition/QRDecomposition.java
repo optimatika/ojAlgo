@@ -29,13 +29,15 @@ import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 
 abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N> implements QR<N> {
 
@@ -50,7 +52,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     static final class Complex extends QRDecomposition<ComplexNumber> {
 
         Complex() {
-            super(ComplexDenseStore.FACTORY);
+            super(GenericDenseStore.COMPLEX);
         }
 
     }
@@ -59,6 +61,22 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         Primitive() {
             super(PrimitiveDenseStore.FACTORY);
+        }
+
+    }
+
+    static final class Quat extends QRDecomposition<Quaternion> {
+
+        Quat() {
+            super(GenericDenseStore.QUATERNION);
+        }
+
+    }
+
+    static final class Rational extends QRDecomposition<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL);
         }
 
     }
@@ -102,7 +120,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
-        return tmpAggrFunc.getNumber();
+        return tmpAggrFunc.get();
     }
 
     @Override

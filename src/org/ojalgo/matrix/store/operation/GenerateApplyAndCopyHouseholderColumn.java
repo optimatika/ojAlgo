@@ -31,6 +31,7 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Scalar;
 
 public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation {
 
@@ -192,6 +193,55 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static <N extends Number & Scalar<N>> boolean invoke(final N[] data, final int structure, final int row, final int col,
+            final Householder.Generic<N> destination, final Scalar.Factory<N> scalar) {
+
+        final int tmpColBase = col * structure;
+
+        final N[] tmpVector = destination.vector;
+        destination.first = row;
+
+        double tmpNormInf = PrimitiveMath.ZERO;
+        for (int i = row; i < structure; i++) {
+            tmpNormInf = PrimitiveFunction.MAX.invoke(tmpNormInf, (tmpVector[i] = data[i + tmpColBase]).norm());
+        }
+
+        boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
+        Scalar<N> tmpVal;
+        double tmpNorm2 = PrimitiveMath.ZERO;
+
+        if (retVal) {
+            for (int i = row + 1; i < structure; i++) {
+                tmpVal = tmpVector[i].divide(tmpNormInf);
+                tmpNorm2 += tmpVal.norm() * tmpVal.norm();
+                tmpVector[i] = tmpVal.get();
+            }
+            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpNorm2);
+        }
+
+        if (retVal) {
+
+            Scalar<N> tmpScale = tmpVector[row].divide(tmpNormInf);
+            tmpNorm2 += tmpScale.norm() * tmpScale.norm();
+            tmpNorm2 = PrimitiveFunction.SQRT.invoke(tmpNorm2);
+
+            // data[row + tmpColBase] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
+            data[(row + (col * structure))] = tmpScale.signum().multiply(tmpNorm2 * tmpNormInf).get();
+            // tmpScale = tmpScale.subtract(ComplexNumber.makePolar(tmpNorm2, tmpScale.phase()));
+            tmpScale = tmpScale.subtract(tmpScale.signum().multiply(tmpNorm2)).get();
+
+            tmpVector[row] = scalar.one().get();
+
+            for (int i = row + 1; i < structure; i++) {
+                data[i + tmpColBase] = tmpVector[i] = tmpVector[i].divide(tmpScale).get();
+            }
+
+            destination.beta = scalar.cast(tmpScale.norm() / tmpNorm2);
+        }
+
+        return retVal;
     }
 
 }

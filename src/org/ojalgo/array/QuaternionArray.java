@@ -22,11 +22,8 @@
 package org.ojalgo.array;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.QuaternionFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.QuaternionAggregator;
@@ -80,17 +77,20 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
         return new QuaternionArray(data);
     }
 
+    private QuaternionArray(final int length, final org.ojalgo.scalar.Scalar.Factory<Quaternion> factory) {
+        super(length, factory);
+    }
+
+    private QuaternionArray(final Quaternion[] data, final org.ojalgo.scalar.Scalar.Factory<Quaternion> factory) {
+        super(data, factory);
+    }
+
     protected QuaternionArray(final int size) {
-
-        super(new Quaternion[size]);
-
-        this.fill(0, size, 1, Quaternion.ZERO);
+        this(size, Quaternion.FACTORY);
     }
 
     protected QuaternionArray(final Quaternion[] data) {
-
-        super(data);
-
+        this(data, Quaternion.FACTORY);
     }
 
     @Override
@@ -102,55 +102,9 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
         }
     }
 
-    public final void fillMatching(final Access1D<?> values) {
-        final int tmpLimit = (int) FunctionUtils.min(this.count(), values.count());
-        for (int i = 0; i < tmpLimit; i++) {
-            data[i] = Quaternion.valueOf(values.get(i));
-        }
-    }
-
     @Override
     public int hashCode() {
         return Arrays.hashCode(data);
     }
 
-    @Override
-    public final void sortAscending() {
-        Arrays.parallelSort(data);
-    }
-
-    @Override
-    public void sortDescending() {
-        Arrays.parallelSort(data, Comparator.reverseOrder());
-    }
-
-    @Override
-    protected final void add(final int index, final double addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
-    }
-
-    @Override
-    protected final void add(final int index, final Number addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
-    }
-
-    @Override
-    protected boolean isAbsolute(final int index) {
-        return Quaternion.isAbsolute(data[index]);
-    }
-
-    @Override
-    protected boolean isSmall(final int index, final double comparedTo) {
-        return Quaternion.isSmall(comparedTo, data[index]);
-    }
-
-    @Override
-    final Quaternion valueOf(final double value) {
-        return Quaternion.valueOf(value);
-    }
-
-    @Override
-    final Quaternion valueOf(final Number number) {
-        return Quaternion.valueOf(number);
-    }
 }

@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.BigMatrix;
+import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
@@ -50,18 +50,18 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = BigMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
+        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<BigDecimal> tmpBigDecomp = LU.BIG.make();
         tmpBigDecomp.decompose(BigDenseStore.FACTORY.copy(tmpMtrxA));
         //        System.out.println("A: " + tmpMtrxA.enforce(tmpEvalContext));
-        //        System.out.println("P: " + new BigMatrix(tmpBigDecomp.getP()).enforce(tmpEvalContext));
-        //        System.out.println("L: " + new BigMatrix(tmpBigDecomp.getL()).enforce(tmpEvalContext));
-        //        System.out.println("PL: " + new BigMatrix(tmpBigDecomp.getP().multiplyRight(tmpBigDecomp.getL())).enforce(tmpEvalContext));
-        //        System.out.println("D: " + new BigMatrix(tmpBigDecomp.getD()).enforce(tmpEvalContext));
-        //        System.out.println("U: " + new BigMatrix(tmpBigDecomp.getU()).enforce(tmpEvalContext));
-        //        System.out.println("DU: " + new BigMatrix(tmpBigDecomp.getD().multiplyRight(tmpBigDecomp.getU())).enforce(tmpEvalContext));
+        //        System.out.println("P: " + new RationalMatrix(tmpBigDecomp.getP()).enforce(tmpEvalContext));
+        //        System.out.println("L: " + new RationalMatrix(tmpBigDecomp.getL()).enforce(tmpEvalContext));
+        //        System.out.println("PL: " + new RationalMatrix(tmpBigDecomp.getP().multiplyRight(tmpBigDecomp.getL())).enforce(tmpEvalContext));
+        //        System.out.println("D: " + new RationalMatrix(tmpBigDecomp.getD()).enforce(tmpEvalContext));
+        //        System.out.println("U: " + new RationalMatrix(tmpBigDecomp.getU()).enforce(tmpEvalContext));
+        //        System.out.println("DU: " + new RationalMatrix(tmpBigDecomp.getD().multiplyRight(tmpBigDecomp.getU())).enforce(tmpEvalContext));
         TestUtils.assertEquals(BigDenseStore.FACTORY.copy(tmpMtrxA), tmpBigDecomp, tmpEvalContext);
     }
 
@@ -69,7 +69,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = BigMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
+        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<ComplexNumber> tmpComplexDecomp = LU.COMPLEX.make();
@@ -88,7 +88,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = BigMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
+        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<Double> tmpDoubleDecomp = LU.PRIMITIVE.make();
@@ -107,7 +107,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = BigMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
+        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<Double> tmpDoubleDecomp = new RawLU();
@@ -126,7 +126,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = BigMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
+        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<Double> tmpDoubleDecomp = LU.PRIMITIVE.make();

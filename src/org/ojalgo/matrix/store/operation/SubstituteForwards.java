@@ -27,7 +27,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
-import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public final class SubstituteForwards extends MatrixOperation {
 
@@ -35,7 +35,7 @@ public final class SubstituteForwards extends MatrixOperation {
 
     public static int THRESHOLD = 64;
 
-    public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int columnLimit, final Access2D<BigDecimal> body,
+    public static void invoke(final BigDecimal[] data, final int structure, final int first, final int limit, final Access2D<BigDecimal> body,
             final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
 
         final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
@@ -49,7 +49,7 @@ public final class SubstituteForwards extends MatrixOperation {
                 tmpBodyRow[j] = conjugated ? body.get(j, i) : body.get(i, j);
             }
 
-            for (int s = firstColumn; s < columnLimit; s++) {
+            for (int s = first; s < limit; s++) {
                 tmpColBaseIndex = s * structure;
 
                 tmpVal = BigMath.ZERO;
@@ -71,43 +71,7 @@ public final class SubstituteForwards extends MatrixOperation {
         }
     }
 
-    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit, final Access2D<ComplexNumber> body,
-            final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
-
-        final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
-        final ComplexNumber[] tmpBodyRow = new ComplexNumber[tmpDiagDim];
-        ComplexNumber tmpVal;
-        int tmpColBaseIndex;
-
-        for (int i = 0; i < tmpDiagDim; i++) {
-
-            for (int j = 0; j <= i; j++) {
-                tmpBodyRow[j] = conjugated ? body.get(j, i).conjugate() : body.get(i, j);
-            }
-
-            for (int s = firstColumn; s < columnLimit; s++) {
-                tmpColBaseIndex = s * structure;
-
-                tmpVal = ComplexNumber.ZERO;
-                for (int j = identity ? s : 0; j < i; j++) {
-                    tmpVal = tmpVal.add(tmpBodyRow[j].multiply(data[j + tmpColBaseIndex]));
-                }
-                if (identity) {
-                    tmpVal = i == s ? ComplexNumber.ONE.subtract(tmpVal) : tmpVal.negate();
-                } else {
-                    tmpVal = data[i + tmpColBaseIndex].subtract(tmpVal);
-                }
-
-                if (!unitDiagonal) {
-                    tmpVal = tmpVal.divide(tmpBodyRow[i]);
-                }
-
-                data[i + tmpColBaseIndex] = tmpVal;
-            }
-        }
-    }
-
-    public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final Access2D<Double> body,
+    public static void invoke(final double[] data, final int structure, final int first, final int limit, final Access2D<Double> body,
             final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
 
         final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
@@ -121,7 +85,7 @@ public final class SubstituteForwards extends MatrixOperation {
                 tmpBodyRow[j] = conjugated ? body.doubleValue(j, i) : body.doubleValue(i, j);
             }
 
-            for (int s = firstColumn; s < columnLimit; s++) {
+            for (int s = first; s < limit; s++) {
                 tmpColBaseIndex = s * structure;
 
                 tmpVal = PrimitiveMath.ZERO;
@@ -139,6 +103,42 @@ public final class SubstituteForwards extends MatrixOperation {
                 }
 
                 data[i + tmpColBaseIndex] = tmpVal;
+            }
+        }
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Access2D<N> body,
+            final boolean unitDiagonal, final boolean conjugated, final boolean identity, final Scalar.Factory<N> scalar) {
+
+        final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
+        final N[] tmpBodyRow = scalar.newArrayInstance(tmpDiagDim);
+        Scalar<N> tmpVal;
+        int tmpColBaseIndex;
+
+        for (int i = 0; i < tmpDiagDim; i++) {
+
+            for (int j = 0; j <= i; j++) {
+                tmpBodyRow[j] = conjugated ? body.get(j, i).conjugate().get() : body.get(i, j);
+            }
+
+            for (int s = first; s < limit; s++) {
+                tmpColBaseIndex = s * structure;
+
+                tmpVal = scalar.zero();
+                for (int j = identity ? s : 0; j < i; j++) {
+                    tmpVal = tmpVal.add(tmpBodyRow[j].multiply(data[j + tmpColBaseIndex]));
+                }
+                if (identity) {
+                    tmpVal = i == s ? scalar.one().subtract(tmpVal) : tmpVal.negate();
+                } else {
+                    tmpVal = data[i + tmpColBaseIndex].subtract(tmpVal);
+                }
+
+                if (!unitDiagonal) {
+                    tmpVal = tmpVal.divide(tmpBodyRow[i]);
+                }
+
+                data[i + tmpColBaseIndex] = tmpVal.get();
             }
         }
     }

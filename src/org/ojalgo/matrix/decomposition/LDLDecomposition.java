@@ -34,13 +34,14 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LDL<N> {
@@ -56,7 +57,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     static final class Complex extends LDLDecomposition<ComplexNumber> {
 
         Complex() {
-            super(ComplexDenseStore.FACTORY);
+            super(GenericDenseStore.COMPLEX);
         }
 
     }
@@ -65,6 +66,14 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
         Primitive() {
             super(PrimitiveDenseStore.FACTORY);
+        }
+
+    }
+
+    static final class Rational extends LDLDecomposition<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL);
         }
 
     }
@@ -141,9 +150,9 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
         if (myPivot.signum() == -1) {
-            return tmpAggrFunc.toScalar().negate().getNumber();
+            return tmpAggrFunc.toScalar().negate().get();
         } else {
-            return tmpAggrFunc.getNumber();
+            return tmpAggrFunc.get();
         }
     }
 
@@ -155,7 +164,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         final boolean tmpModified = myPivot.isModified();
 
         if (tmpModified) {
-            preallocated.fillAll(this.scalar().zero().getNumber());
+            preallocated.fillAll(this.scalar().zero().get());
             for (int i = 0; i < tmpRowDim; i++) {
                 preallocated.set(i, tmpOrder[i], PrimitiveMath.ONE);
             }

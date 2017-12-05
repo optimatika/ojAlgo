@@ -96,7 +96,7 @@ public class P20050827Case extends BasicMatrixTest {
             TestUtils.assertTrue(tmpBig.toScalar(ij, ij).toString(), tmpBig.get(ij, ij).isReal());
         }
 
-        TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpBigTrace.getNumber(), tmpSmallTrace.getNumber(), EVALUATION);
+        TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpBigTrace.get(), tmpSmallTrace.get(), EVALUATION);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class P20050827Case extends BasicMatrixTest {
         final ComplexMatrix tmpProblematic = P20050827Case.getProblematic();
 
         final ComplexMatrix tmpMtrx = tmpProblematic.multiply(tmpProblematic.conjugate());
-        final ComplexNumber tmpVal = tmpMtrx.getTrace().getNumber();
+        final ComplexNumber tmpVal = tmpMtrx.getTrace().get();
         final ComplexNumber tmpExpected = ComplexFunction.ROOT.invoke(tmpVal, 2);
         final ComplexNumber tmpActual = ComplexNumber.valueOf(tmpProblematic.norm());
 
@@ -120,7 +120,7 @@ public class P20050827Case extends BasicMatrixTest {
         DEFINITION = NumberContext.getGeneral(12);
         EVALUATION = NumberContext.getGeneral(6).newPrecision(12);
 
-        myBigAA = BigMatrix.FACTORY.copy(P20050827Case.getProblematic());
+        myBigAA = RationalMatrix.FACTORY.copy(P20050827Case.getProblematic());
         myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
         myBigAB = myBigAA;
 

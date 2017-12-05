@@ -21,25 +21,20 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.constant.BigMath.*;
-
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain java.math.BigDecimal}.
@@ -87,17 +82,20 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         return new BigArray(data);
     }
 
+    private BigArray(final BigDecimal[] data, final Scalar.Factory<BigDecimal> factory) {
+        super(data, factory);
+    }
+
+    private BigArray(final int length, final Scalar.Factory<BigDecimal> factory) {
+        super(length, factory);
+    }
+
     protected BigArray(final BigDecimal[] data) {
-
-        super(data);
-
+        this(data, BigScalar.FACTORY);
     }
 
     protected BigArray(final int size) {
-
-        super(new BigDecimal[size]);
-
-        this.fill(0, size, 1, ZERO);
+        this(size, BigScalar.FACTORY);
     }
 
     public final void axpy(final double a, final Mutate1D y) {
@@ -110,13 +108,6 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
             return Arrays.equals(data, ((BigArray) other).data);
         } else {
             return super.equals(other);
-        }
-    }
-
-    public final void fillMatching(final Access1D<?> values) {
-        final int tmpLimit = (int) FunctionUtils.min(this.count(), values.count());
-        for (int i = 0; i < tmpLimit; i++) {
-            data[i] = TypeUtils.toBigDecimal(values.get(i));
         }
     }
 
@@ -158,16 +149,6 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
         return BigScalar.isSmall(comparedTo, data[index]);
-    }
-
-    @Override
-    BigDecimal valueOf(final double value) {
-        return BigDecimal.valueOf(value);
-    }
-
-    @Override
-    BigDecimal valueOf(final Number number) {
-        return TypeUtils.toBigDecimal(number);
     }
 
 }

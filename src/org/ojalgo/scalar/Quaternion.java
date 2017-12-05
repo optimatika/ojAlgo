@@ -27,7 +27,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -179,6 +179,20 @@ public final class Quaternion extends Number
     private final boolean myRealForSure;
     private final double myScalar;
 
+    public Quaternion() {
+
+        super();
+
+        myScalar = PrimitiveMath.ZERO;
+
+        myRealForSure = true;
+        myPureForSure = true;
+
+        i = PrimitiveMath.ZERO;
+        j = PrimitiveMath.ZERO;
+        k = PrimitiveMath.ZERO;
+    }
+
     private Quaternion(final double scalar) {
 
         super();
@@ -249,20 +263,6 @@ public final class Quaternion extends Number
         k = vector[2];
     }
 
-    Quaternion() {
-
-        super();
-
-        myScalar = PrimitiveMath.ZERO;
-
-        myRealForSure = true;
-        myPureForSure = true;
-
-        i = PrimitiveMath.ZERO;
-        j = PrimitiveMath.ZERO;
-        k = PrimitiveMath.ZERO;
-    }
-
     public Quaternion add(final double arg) {
 
         if (this.isReal()) {
@@ -295,7 +295,7 @@ public final class Quaternion extends Number
 
     public MatrixStore<ComplexNumber> asComplex2D() {
 
-        final ComplexDenseStore retVal = ComplexDenseStore.FACTORY.makeZero(2L, 2L);
+        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(2L, 2L);
 
         retVal.set(0L, ComplexNumber.of(myScalar, i));
         retVal.set(1L, ComplexNumber.of(-j, k));
@@ -476,6 +476,10 @@ public final class Quaternion extends Number
         return (float) myScalar;
     }
 
+    public Quaternion get() {
+        return this;
+    }
+
     public Double get(final long index) {
         return this.doubleValue(index);
     }
@@ -490,10 +494,6 @@ public final class Quaternion extends Number
     public double getDeterminant() {
         final double tmpSumOfSquares = this.calculateSumOfSquaresAll();
         return tmpSumOfSquares * tmpSumOfSquares;
-    }
-
-    public Quaternion getNumber() {
-        return this;
     }
 
     /**

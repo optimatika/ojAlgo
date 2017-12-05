@@ -176,7 +176,7 @@ public final class ComplexNumber extends Number
     private final boolean myRealForSure;
     private final double myRealValue;
 
-    private ComplexNumber() {
+    public ComplexNumber() {
         this(PrimitiveMath.ZERO);
     }
 
@@ -339,6 +339,10 @@ public final class ComplexNumber extends Number
         return (float) this.doubleValue();
     }
 
+    public ComplexNumber get() {
+        return this;
+    }
+
     public Double get(final long index) {
         return this.doubleValue(index);
     }
@@ -357,10 +361,6 @@ public final class ComplexNumber extends Number
 
     public double getModulus() {
         return this.norm();
-    }
-
-    public ComplexNumber getNumber() {
-        return this;
     }
 
     public double getReal() {

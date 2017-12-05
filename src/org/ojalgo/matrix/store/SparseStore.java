@@ -65,7 +65,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public static SparseStore<ComplexNumber> makeComplex(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(ComplexDenseStore.FACTORY, rowsCount, columnsCount);
+        return new SparseStore<>(GenericDenseStore.COMPLEX, rowsCount, columnsCount);
     }
 
     public static SparseStore<Double> makePrimitive(final int rowsCount, final int columnsCount) {
@@ -87,11 +87,11 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         Arrays.fill(myFirsts, columnsCount);
         // Arrays.fill(myLimits, 0); // Behövs inte, redan 0
 
-        final Class<? extends Number> tmpType = factory.scalar().zero().getNumber().getClass();
+        final Class<? extends Number> tmpType = factory.scalar().zero().get().getClass();
         if (tmpType.equals(Double.class)) {
             myMultiplyer = (FillByMultiplying<N>) MultiplyBoth.getPrimitive(rowsCount, columnsCount);
         } else if (tmpType.equals(ComplexNumber.class)) {
-            myMultiplyer = (FillByMultiplying<N>) MultiplyBoth.getComplex(rowsCount, columnsCount);
+            myMultiplyer = (FillByMultiplying<N>) MultiplyBoth.getGeneric(rowsCount, columnsCount);
         } else if (tmpType.equals(BigDecimal.class)) {
             myMultiplyer = (FillByMultiplying<N>) MultiplyBoth.getBig(rowsCount, columnsCount);
         } else {
@@ -273,7 +273,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
             final Scalar<N> sclr = this.physical().scalar().convert(scalar);
 
             for (final ElementView2D<N, ?> nonzero : this.nonzeros()) {
-                retVal.set(nonzero.index(), sclr.multiply(nonzero.getNumber()).getNumber());
+                retVal.set(nonzero.index(), sclr.multiply(nonzero.get()).get());
             }
         }
 
@@ -307,7 +307,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
             final Scalar<N> sclr = this.physical().scalar().convert(scalar);
 
             for (final ElementView2D<N, ?> nonzero : this.nonzeros()) {
-                retVal.set(nonzero.index(), sclr.multiply(nonzero.getNumber()).getNumber());
+                retVal.set(nonzero.index(), sclr.multiply(nonzero.get()).get());
             }
         }
 

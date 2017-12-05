@@ -28,7 +28,6 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Factory2D;
 import org.ojalgo.access.Mutate2D;
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
@@ -37,7 +36,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyBoth;
-import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyBoth;
+import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.matrix.transformation.Householder;
@@ -142,8 +141,8 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
 
             if (multiplier instanceof PrimitiveMultiplyBoth) {
                 myMultiplier = (FillByMultiplying<N>) MultiplyBoth.getPrimitive(rows, columns);
-            } else if (multiplier instanceof ComplexMultiplyBoth) {
-                myMultiplier = (FillByMultiplying<N>) MultiplyBoth.getComplex(rows, columns);
+            } else if (multiplier instanceof GenericMultiplyBoth) {
+                myMultiplier = (FillByMultiplying<N>) MultiplyBoth.getGeneric(rows, columns);
             } else if (multiplier instanceof BigMultiplyBoth) {
                 myMultiplier = (FillByMultiplying<N>) MultiplyBoth.getBig(rows, columns);
             } else {

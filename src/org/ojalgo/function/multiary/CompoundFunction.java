@@ -114,7 +114,7 @@ public final class CompoundFunction<N extends Number> extends AbstractMultiary<N
 
         retVal = retVal.add(myQuadratic.invoke(arg));
 
-        return retVal.getNumber();
+        return retVal.get();
     }
 
     public PhysicalStore<N> linear() {

@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
@@ -49,11 +49,11 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
     }
 
     public static LinearFunction<ComplexNumber> makeComplex(final Access1D<? extends Number> factors) {
-        return new LinearFunction<>(ComplexDenseStore.FACTORY.rows(factors));
+        return new LinearFunction<>(GenericDenseStore.COMPLEX.rows(factors));
     }
 
     public static LinearFunction<ComplexNumber> makeComplex(final int arity) {
-        return new LinearFunction<>(ComplexDenseStore.FACTORY.makeZero(1, arity));
+        return new LinearFunction<>(GenericDenseStore.COMPLEX.makeZero(1, arity));
     }
 
     public static LinearFunction<Double> makePrimitive(final Access1D<? extends Number> factors) {
@@ -102,7 +102,7 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
 
         retVal = retVal.add(tmpPreallocated.get(0, 0));
 
-        return retVal.getNumber();
+        return retVal.get();
     }
 
     public PhysicalStore<N> linear() {

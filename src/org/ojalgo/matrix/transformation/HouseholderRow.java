@@ -43,9 +43,9 @@ final class HouseholderRow<N extends Number> extends RowView<N> implements House
         if (index > myFirst) {
             return myStore.get(this.row(), index);
         } else if (index == myFirst) {
-            return myStore.physical().scalar().one().getNumber();
+            return myStore.physical().scalar().one().get();
         } else {
-            return myStore.physical().scalar().zero().getNumber();
+            return myStore.physical().scalar().zero().get();
         }
     }
 

@@ -36,8 +36,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20030528Case extends BasicMatrixTest {
 
-    public static BigMatrix getProblematic() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY
+    public static RationalMatrix getProblematic() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
                 .rows(new double[][] { { 1, 0, 0, 0, 0, 0, 1 }, { 0, 1, 0, 0, 0, 1, 0 }, { 0, 0, 1, 0, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
@@ -53,7 +53,7 @@ public class P20030528Case extends BasicMatrixTest {
     @Override
     public void testData() {
 
-        final BigMatrix tmpProb = P20030528Case.getProblematic();
+        final RationalMatrix tmpProb = P20030528Case.getProblematic();
 
         TestUtils.assertFalse(tmpProb.isEmpty());
         TestUtils.assertTrue(tmpProb.isFat());

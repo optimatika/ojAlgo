@@ -497,7 +497,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                     PrimitiveDenseStore.this.visit(tmpRowDim * first, tmpRowDim * limit, 1, tmpPartAggr);
 
                     synchronized (tmpMainAggr) {
-                        tmpMainAggr.merge(tmpPartAggr.getNumber());
+                        tmpMainAggr.merge(tmpPartAggr.get());
                     }
                 }
             };
@@ -509,7 +509,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             PrimitiveDenseStore.this.visit(0, this.size(), 1, tmpMainAggr);
         }
 
-        return tmpMainAggr.getNumber();
+        return tmpMainAggr.get();
     }
 
     public void applyCholesky(final int iterationPoint, final BasicArray<Double> multipliers) {
@@ -1010,8 +1010,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return new TransposedRegion<>(this, multiplyBoth);
     }
 
-    public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
-        RotateRight.invoke(data, myRowDim, aLow, aHigh, aCos, aSin);
+    public void rotateRight(final int low, final int high, final double cos, final double sin) {
+        RotateRight.invoke(data, myRowDim, low, high, cos, sin);
     }
 
     public void set(final long aRow, final long aCol, final double aNmbr) {
@@ -1141,7 +1141,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         if (tmpLow != tmpHigh) {
             if (!Double.isNaN(tmpTransf.cos) && !Double.isNaN(tmpTransf.sin)) {
-                RotateLeft.invoke(data, myColDim, tmpLow, tmpHigh, tmpTransf.cos, tmpTransf.sin);
+                RotateLeft.invoke(data, myRowDim, tmpLow, tmpHigh, tmpTransf.cos, tmpTransf.sin);
             } else {
                 myUtility.exchangeRows(tmpLow, tmpHigh);
             }
@@ -1211,7 +1211,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     public void transformSymmetric(final Householder<Double> transformation) {
-
         HouseholderHermitian.invoke(data, PrimitiveDenseStore.cast(transformation), this.getWorkerColumn());
     }
 
@@ -1235,6 +1234,15 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         myUtility.visitRow(row, col, visitor);
     }
 
+    private double[] getWorkerColumn() {
+        if (myWorkerColumn != null) {
+            Arrays.fill(myWorkerColumn, ZERO);
+        } else {
+            myWorkerColumn = new double[myRowDim];
+        }
+        return myWorkerColumn;
+    }
+
     int getColDim() {
         return myColDim;
     }
@@ -1249,15 +1257,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     int getRowDim() {
         return myRowDim;
-    }
-
-    double[] getWorkerColumn() {
-        if (myWorkerColumn != null) {
-            Arrays.fill(myWorkerColumn, ZERO);
-        } else {
-            myWorkerColumn = new double[myRowDim];
-        }
-        return myWorkerColumn;
     }
 
 }

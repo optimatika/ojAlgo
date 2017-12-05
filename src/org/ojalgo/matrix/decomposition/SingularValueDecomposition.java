@@ -39,12 +39,14 @@ import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -61,7 +63,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     static final class Complex extends SingularValueDecomposition<ComplexNumber> {
 
         Complex() {
-            super(ComplexDenseStore.FACTORY, new BidiagonalDecomposition.Complex());
+            super(GenericDenseStore.COMPLEX, new BidiagonalDecomposition.Complex());
         }
 
     }
@@ -70,6 +72,22 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         Primitive() {
             super(PrimitiveDenseStore.FACTORY, new BidiagonalDecomposition.Primitive());
+        }
+
+    }
+
+    static final class Quat extends SingularValueDecomposition<Quaternion> {
+
+        Quat() {
+            super(GenericDenseStore.QUATERNION, new BidiagonalDecomposition.Quat());
+        }
+
+    }
+
+    static final class Rational extends SingularValueDecomposition<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL, new BidiagonalDecomposition.Rational());
         }
 
     }
@@ -584,7 +602,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             for (int i = 0; i < rank; i++) {
                 tmpValue = tmpSingulars.doubleValue(i);
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).conjugate().divide(tmpValue).getNumber());
+                    tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).conjugate().divide(tmpValue).get());
                 }
             }
 

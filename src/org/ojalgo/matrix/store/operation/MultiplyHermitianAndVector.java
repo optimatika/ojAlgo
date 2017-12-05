@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 /**
  * Multiplies an hermitian (square symmetric) matrix with a vector. Will only read from the lower/left
@@ -58,24 +59,6 @@ public final class MultiplyHermitianAndVector extends MatrixOperation {
         }
     }
 
-    public static void invoke(final ComplexNumber[] productMatrix, final int firstRow, final int rowLimit, final ComplexNumber[] hermitianMatrix,
-            final ComplexNumber[] rightVector, final int firstColumn) {
-
-        final int structure = rightVector.length;
-
-        ComplexNumber tmpVal;
-        for (int i = firstRow; i < rowLimit; i++) {
-            tmpVal = ComplexNumber.ZERO;
-            for (int c = firstColumn; c < i; c++) {
-                tmpVal = tmpVal.add(hermitianMatrix[i + (c * structure)].multiply(rightVector[c]));
-            }
-            for (int c = i; c < structure; c++) {
-                tmpVal = tmpVal.add(hermitianMatrix[c + (i * structure)].conjugate().multiply(rightVector[c]));
-            }
-            productMatrix[i] = tmpVal;
-        }
-    }
-
     public static void invoke(final double[] productMatrix, final int firstRow, final int rowLimit, final double[] hermitianMatrix, final double[] rightVector,
             final int firstColumn) {
 
@@ -101,6 +84,24 @@ public final class MultiplyHermitianAndVector extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final N[] productMatrix, final int firstRow, final int rowLimit, final N[] hermitianMatrix,
+            final N[] rightVector, final int firstColumn, final Scalar.Factory<N> scalar) {
+
+        final int structure = rightVector.length;
+
+        Scalar<N> tmpVal;
+        for (int i = firstRow; i < rowLimit; i++) {
+            tmpVal = scalar.zero();
+            for (int c = firstColumn; c < i; c++) {
+                tmpVal = tmpVal.add(hermitianMatrix[i + (c * structure)].multiply(rightVector[c]));
+            }
+            for (int c = i; c < structure; c++) {
+                tmpVal = tmpVal.add(hermitianMatrix[c + (i * structure)].conjugate().multiply(rightVector[c]));
+            }
+            productMatrix[i] = tmpVal.get();
+        }
     }
 
 }

@@ -34,6 +34,8 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 
 public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
@@ -146,6 +148,46 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
             } else {
 
                 return SingularValue.PRIMITIVE.make(templateBody);
+            }
+        }
+
+    };
+
+    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+
+        @Override
+        public SolverTask<Quaternion> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
+                final boolean positiveDefinite) {
+            if (templateBody.isSquare()) {
+                if (symmetric && positiveDefinite) {
+                    return Cholesky.QUATERNION.make(templateBody);
+                } else {
+                    return LU.QUATERNION.make(templateBody);
+                }
+            } else if (templateBody.isTall()) {
+                return QR.QUATERNION.make(templateBody);
+            } else {
+                return SingularValue.QUATERNION.make(templateBody);
+            }
+        }
+
+    };
+
+    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+
+        @Override
+        public SolverTask<RationalNumber> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
+                final boolean positiveDefinite) {
+            if (templateBody.isSquare()) {
+                if (symmetric && positiveDefinite) {
+                    return Cholesky.RATIONAL.make(templateBody);
+                } else {
+                    return LU.RATIONAL.make(templateBody);
+                }
+            } else if (templateBody.isTall()) {
+                return QR.RATIONAL.make(templateBody);
+            } else {
+                return SingularValue.RATIONAL.make(templateBody);
             }
         }
 

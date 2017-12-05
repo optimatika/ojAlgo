@@ -36,6 +36,7 @@ import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -117,7 +118,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
                 @Override
                 protected void conquer(final int first, final int limit) {
-                    MultiplyHermitianAndVector.invoke(worker, first, limit, data, tmpVector, tmpFirst);
+                    MultiplyHermitianAndVector.invoke(worker, first, limit, data, tmpVector, tmpFirst, ComplexNumber.FACTORY);
                 }
             };
 
@@ -125,7 +126,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
         } else {
 
-            MultiplyHermitianAndVector.invoke(worker, tmpFirst, tmpLength, data, tmpVector, tmpFirst);
+            MultiplyHermitianAndVector.invoke(worker, tmpFirst, tmpLength, data, tmpVector, tmpFirst, ComplexNumber.FACTORY);
         }
 
         ComplexNumber tmpVal = ComplexNumber.ZERO;
@@ -459,6 +460,62 @@ public final class HouseholderHermitian extends MatrixOperation {
     @Override
     public int threshold() {
         return Math.min(MultiplyHermitianAndVector.THRESHOLD, HermitianRank2Update.THRESHOLD);
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final Householder.Generic<N> householder, final N[] worker,
+            final Scalar.Factory<N> scalar) {
+
+        final N[] tmpVector = householder.vector;
+        final int tmpFirst = householder.first;
+        final int tmpLength = tmpVector.length;
+        final N tmpBeta = householder.beta;
+        final int tmpCount = tmpLength - tmpFirst;
+
+        if (tmpCount > MultiplyHermitianAndVector.THRESHOLD) {
+
+            final DivideAndConquer tmpConqurer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    MultiplyHermitianAndVector.invoke(worker, first, limit, data, tmpVector, tmpFirst, scalar);
+                }
+            };
+
+            tmpConqurer.invoke(tmpFirst, tmpLength, MultiplyHermitianAndVector.THRESHOLD);
+
+        } else {
+
+            MultiplyHermitianAndVector.invoke(worker, tmpFirst, tmpLength, data, tmpVector, tmpFirst, scalar);
+        }
+
+        Scalar<N> tmpVal = scalar.zero();
+        for (int c = tmpFirst; c < tmpLength; c++) {
+            //tmpVal += tmpVector[c] * worker[c];
+            tmpVal = tmpVal.add(tmpVector[c].conjugate().multiply(worker[c]));
+        }
+        //tmpVal *= (tmpBeta / TWO);
+        tmpVal = tmpVal.multiply(tmpBeta).divide(PrimitiveMath.TWO);
+        for (int c = tmpFirst; c < tmpLength; c++) {
+            //worker[c] = tmpBeta * (worker[c] - (tmpVal * tmpVector[c]));
+            worker[c] = tmpBeta.multiply(worker[c].subtract(tmpVal.multiply(tmpVector[c]))).get();
+        }
+
+        if (tmpCount > HermitianRank2Update.THRESHOLD) {
+
+            final DivideAndConquer tmpConqurer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    HermitianRank2Update.invoke(data, first, limit, tmpVector, worker);
+                }
+            };
+
+            tmpConqurer.invoke(tmpFirst, tmpLength, HermitianRank2Update.THRESHOLD);
+
+        } else {
+
+            HermitianRank2Update.invoke(data, tmpFirst, tmpLength, tmpVector, worker);
+        }
     }
 
 }

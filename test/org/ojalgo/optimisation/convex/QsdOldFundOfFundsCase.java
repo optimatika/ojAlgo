@@ -22,7 +22,7 @@
 package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.BigMatrix;
+import org.ojalgo.matrix.RationalMatrix;
 
 /**
  * @author apete
@@ -40,22 +40,22 @@ public class QsdOldFundOfFundsCase extends GenericQPSolverTest {
     @Override
     protected BasicMatrix[] getMatrices() {
 
-        final BasicMatrix[] retVal = new BigMatrix[8];
+        final BasicMatrix[] retVal = new RationalMatrix[8];
 
         // Equations/Equalities
-        retVal[0] = BigMatrix.FACTORY
+        retVal[0] = RationalMatrix.FACTORY
                 .rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.069575, 0.0738, 0.1288 }, { 1.0, 0.0, 0.0, 0.0, 0.0 },
                         { 0.0, 1.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 1.0 } });
 
         // Levels/Values
-        retVal[1] = BigMatrix.FACTORY.rows(new double[][] { { 1.0 }, { 0.069575 }, { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
+        retVal[1] = RationalMatrix.FACTORY.rows(new double[][] { { 1.0 }, { 0.069575 }, { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
 
         // Quadratic
-        retVal[2] = BigMatrix.FACTORY.rows(new double[][] { { 2.0, -0.0, 0.0, -0.0, -0.0 }, { -0.0, 2.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 2.0, 0.0, 0.0 },
+        retVal[2] = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, -0.0, 0.0, -0.0, -0.0 }, { -0.0, 2.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 2.0, 0.0, 0.0 },
                 { -0.0, 0.0, 0.0, 2.0, 0.0 }, { -0.0, 0.0, 0.0, 0.0, 2.0 } });
 
         // Linear
-        retVal[3] = BigMatrix.FACTORY.rows(new double[][] { { -0.5 }, { -0.5 }, { -0.0 }, { -0.5 }, { -0.5 } });
+        retVal[3] = RationalMatrix.FACTORY.rows(new double[][] { { -0.5 }, { -0.5 }, { -0.0 }, { -0.5 }, { -0.5 } });
 
         // Inequalities/Differences
         retVal[4] = null;
@@ -64,10 +64,10 @@ public class QsdOldFundOfFundsCase extends GenericQPSolverTest {
         retVal[5] = null;
 
         // LagrangeSolver
-        retVal[6] = BigMatrix.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
+        retVal[6] = RationalMatrix.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
 
         // ActiveSetSolver
-        retVal[7] = BigMatrix.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
+        retVal[7] = RationalMatrix.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
 
         return retVal;
     }

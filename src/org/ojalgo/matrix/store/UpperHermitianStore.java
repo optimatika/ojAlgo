@@ -47,7 +47,7 @@ final class UpperHermitianStore<N extends Number> extends ShadingStore<N> {
     }
 
     public N get(final long row, final long col) {
-        return this.toScalar(row, col).getNumber();
+        return this.toScalar(row, col).get();
     }
 
     public Scalar<N> toScalar(final long row, final long col) {

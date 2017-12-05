@@ -37,7 +37,7 @@ import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Factory;
-import org.ojalgo.matrix.BigMatrix;
+import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -302,7 +302,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             tmpVariables[i].upper(new BigDecimal("0.80"));
         }
 
-        final BigMatrix tmpExpected = BigMatrix.FACTORY
+        final RationalMatrix tmpExpected = RationalMatrix.FACTORY
                 .rows(new double[][] { { 0.02 }, { 0.02 }, { 0.02 }, { 0.02 }, { 0.80 }, { 0.06 }, { 0.02 }, { 0.02 }, { 0.02 } });
 
         ConvexProblems.doEarly2008(tmpVariables, tmpCovariances, tmpExpected);
@@ -354,7 +354,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             tmpVariables[i].upper(new BigDecimal("0.35"));
         }
 
-        final BigMatrix tmpExpected = BigMatrix.FACTORY
+        final RationalMatrix tmpExpected = RationalMatrix.FACTORY
                 .rows(new double[][] { { 0.35 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.25 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 } });
 
         ConvexProblems.doEarly2008(tmpVariables, covarianceMatrix, tmpExpected);
@@ -426,7 +426,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             // tmpVariables[i].setUpperLimit(new BigDecimal("1.00"));
         }
 
-        final BigMatrix tmpExpected = BigMatrix.FACTORY
+        final RationalMatrix tmpExpected = RationalMatrix.FACTORY
                 .rows(new double[][] { { 0.3166116715239731 }, { 0.050000000001624065 }, { 0.04999999999827016 }, { 0.05000000000034928 },
                         { 0.049999999999891145 }, { 0.049999999997416125 }, { 0.08338832846287945 }, { 0.05000000000178943 }, { 0.05000000000085164 },
                         { 0.04999999999937388 }, { 0.050000000012470555 }, { 0.04999999999966884 }, { 0.050000000000484546 }, { 0.049999999995857476 } });
@@ -479,7 +479,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         }
 
         // exception here...
-        final BigMatrix tmpExpected = BigMatrix.FACTORY.rows(
+        final RationalMatrix tmpExpected = RationalMatrix.FACTORY.rows(
                 new double[][] { { 0.08000000000000602 }, { 0.12000000000002384 }, { 0.08000000000000054 }, { 0.10643232489190736 }, { 0.12000000000002252 },
                         { 0.11999999999979595 }, { 0.09356767510776097 }, { 0.11999999999998154 }, { 0.07999999999999653 }, { 0.08000000000000498 } });
 
@@ -532,7 +532,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         }
 
         // exception here...
-        final BigMatrix tmpExpected = BigMatrix.FACTORY.rows(
+        final RationalMatrix tmpExpected = RationalMatrix.FACTORY.rows(
                 new double[][] { { 0.07999999999998897 }, { 0.1199999999999636 }, { 0.07999999999999526 }, { 0.08000000000004488 }, { 0.11999999999999084 },
                         { 0.12000000000018606 }, { 0.11999999999996151 }, { 0.12000000000000167 }, { 0.08000000000001738 }, { 0.08000000000005617 } });
 
@@ -601,7 +601,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
-        TestUtils.assertEquals(tmpMatrices[6], BigMatrix.FACTORY.columns(tmpResult), tmpEvalCntxt);
+        TestUtils.assertEquals(tmpMatrices[6], RationalMatrix.FACTORY.columns(tmpResult), tmpEvalCntxt);
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null);
     }
@@ -843,7 +843,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        final PhysicalStore<BigDecimal> tmpSolution = BigDenseStore.FACTORY.copy(BigMatrix.FACTORY.columns(tmpResult));
+        final PhysicalStore<BigDecimal> tmpSolution = BigDenseStore.FACTORY.copy(RationalMatrix.FACTORY.columns(tmpResult));
         tmpSolution.modifyAll(new NumberContext(7, 6).getFunction(BigFunction.getSet()));
         for (final BigDecimal tmpBigDecimal : tmpSolution.asList()) {
             if ((tmpBigDecimal.compareTo(BigMath.ZERO) == -1) || (tmpBigDecimal.compareTo(BigMath.ONE) == 1)) {
@@ -918,7 +918,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
             TestUtils.assertEquals(PrimitiveMatrix.FACTORY.rows(new double[][] { { 0.68888888888888888 }, { 0.311111111111111111 }, { 0.0 } }),
-                    BigMatrix.FACTORY.columns(tmpResult));
+                    RationalMatrix.FACTORY.columns(tmpResult));
         }
     }
 

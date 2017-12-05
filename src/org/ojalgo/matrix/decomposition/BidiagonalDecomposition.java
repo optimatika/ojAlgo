@@ -27,7 +27,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -35,6 +35,8 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 
 abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
 
@@ -54,7 +56,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
     static final class Complex extends BidiagonalDecomposition<ComplexNumber> {
 
         Complex() {
-            super(ComplexDenseStore.FACTORY);
+            super(GenericDenseStore.COMPLEX);
         }
 
         @Override
@@ -143,6 +145,33 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
         @Override
         Array1D<Double>[] makeReal() {
+            return null;
+        }
+
+    }
+
+    static final class Quat extends BidiagonalDecomposition<Quaternion> {
+
+        Quat() {
+            super(GenericDenseStore.QUATERNION);
+        }
+
+        @Override
+        Array1D<Quaternion>[] makeReal() {
+            // TODO Implement something similr to what's in "Complex"
+            return null;
+        }
+
+    }
+
+    static final class Rational extends BidiagonalDecomposition<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL);
+        }
+
+        @Override
+        Array1D<RationalNumber>[] makeReal() {
             return null;
         }
 
@@ -278,7 +307,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
             tmpSub = tmpArray2D.sliceDiagonal(1, 0);
         }
 
-        return new DiagonalArray1D<>(tmpMain, tmpSuper, tmpSub, this.scalar().zero().getNumber());
+        return new DiagonalArray1D<>(tmpMain, tmpSuper, tmpSub, this.scalar().zero().get());
     }
 
     /**

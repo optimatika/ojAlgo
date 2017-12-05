@@ -36,11 +36,13 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 
 abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Cholesky<N> {
 
@@ -55,7 +57,15 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
     static final class Complex extends CholeskyDecomposition<ComplexNumber> {
 
         Complex() {
-            super(ComplexDenseStore.FACTORY);
+            super(GenericDenseStore.COMPLEX);
+        }
+
+    }
+
+    static final class Quat extends CholeskyDecomposition<Quaternion> {
+
+        Quat() {
+            super(GenericDenseStore.QUATERNION);
         }
 
     }
@@ -68,9 +78,17 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
     }
 
-    private boolean mySPD = false;
+    static final class Rational extends CholeskyDecomposition<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL);
+        }
+
+    }
+
     private double myMaxDiag = ONE;
     private double myMinDiag = ZERO;
+    private boolean mySPD = false;
 
     protected CholeskyDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
@@ -95,7 +113,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
-        return tmpAggrFunc.getNumber();
+        return tmpAggrFunc.get();
     }
 
     @Override

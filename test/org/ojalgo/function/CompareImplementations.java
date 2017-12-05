@@ -233,7 +233,7 @@ public class CompareImplementations extends FunctionTests {
 
     public void testEXP() {
 
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, HUNDRED);
+        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, TEN);
 
         this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, PI);
         this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, E);

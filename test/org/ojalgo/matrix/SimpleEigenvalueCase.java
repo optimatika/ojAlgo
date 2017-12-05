@@ -34,18 +34,18 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleEigenvalueCase extends BasicMatrixTest {
 
-    public static BigMatrix getMatrixD() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -1.0 } });
+    public static RationalMatrix getMatrixD() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getMatrixV() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 5.0, 1.0 }, { 2.0, 1.0 } });
+    public static RationalMatrix getMatrixV() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 5.0, 1.0 }, { 2.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static BigMatrix getOriginal() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 4.0, -5.0 }, { 2.0, -3.0 } });
+    public static RationalMatrix getOriginal() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 4.0, -5.0 }, { 2.0, -3.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
@@ -81,7 +81,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        final BigMatrix tmpExpV = SimpleEigenvalueCase.getMatrixV();
+        final RationalMatrix tmpExpV = SimpleEigenvalueCase.getMatrixV();
         final PrimitiveMatrix tmpActV = PrimitiveMatrix.FACTORY.copy(tmpV);
 
         final BasicMatrix tmpMtrx = tmpExpV.divideElements(tmpActV);
