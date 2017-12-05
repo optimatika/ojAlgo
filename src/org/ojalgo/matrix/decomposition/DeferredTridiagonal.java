@@ -37,6 +37,7 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 
 /**
@@ -52,18 +53,6 @@ abstract class DeferredTridiagonal<N extends Number> extends TridiagonalDecompos
 
         @Override
         Array1D<BigDecimal> makeReal(final BasicArray<BigDecimal> offDiagonal) {
-            return null;
-        }
-    }
-
-    static final class Rational extends DeferredTridiagonal<RationalNumber> {
-
-        Rational() {
-            super(GenericDenseStore.RATIONAL);
-        }
-
-        @Override
-        Array1D<RationalNumber> makeReal(final BasicArray<RationalNumber> offDiagonal) {
             return null;
         }
     }
@@ -115,6 +104,54 @@ abstract class DeferredTridiagonal<N extends Number> extends TridiagonalDecompos
             return null;
         }
 
+    }
+
+    static final class Quat extends DeferredTridiagonal<Quaternion> {
+
+        Quat() {
+            super(GenericDenseStore.QUATERNION);
+        }
+
+        @Override
+        Array1D<Quaternion> makeReal(final BasicArray<Quaternion> offDiagonal) {
+
+            final Array1D<Quaternion> retVal = Array1D.QUATERNION.makeZero(offDiagonal.count());
+            retVal.fillAll(Quaternion.ONE);
+
+            final BasicArray<Quaternion> tmpSubdiagonal = offDiagonal; // superDiagonal should be the conjugate of this but it is set to the same value
+
+            Quaternion tmpVal = null;
+            for (int i = 0; i < tmpSubdiagonal.count(); i++) {
+
+                tmpVal = tmpSubdiagonal.get(i).signum();
+
+                if (!tmpVal.isReal()) {
+
+                    tmpSubdiagonal.set(i, tmpSubdiagonal.get(i).divide(tmpVal));
+
+                    if ((i + 1) < tmpSubdiagonal.count()) {
+                        tmpSubdiagonal.set(i + 1, tmpSubdiagonal.get(i + 1).multiply(tmpVal));
+                    }
+
+                    retVal.set(i + 1, tmpVal);
+                }
+            }
+
+            return retVal;
+        }
+
+    }
+
+    static final class Rational extends DeferredTridiagonal<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL);
+        }
+
+        @Override
+        Array1D<RationalNumber> makeReal(final BasicArray<RationalNumber> offDiagonal) {
+            return null;
+        }
     }
 
     private transient BasicArray<N> myDiagD = null;

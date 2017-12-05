@@ -34,6 +34,8 @@ import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -165,6 +167,10 @@ public interface Eigenvalue<N extends Number>
         }
 
     };
+
+    public static final Factory<Quaternion> QUATERNION = (typical, hermitian) -> hermitian ? new HermitianEvD.Quat() : null;
+
+    public static final Factory<RationalNumber> RATIONAL = (typical, hermitian) -> hermitian ? new HermitianEvD.Rational() : null;
 
     public static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical) {
         return Eigenvalue.make(typical, MatrixUtils.isHermitian(typical));

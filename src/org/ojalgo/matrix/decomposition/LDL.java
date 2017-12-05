@@ -27,6 +27,8 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -66,6 +68,10 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
             return new RawLDL();
         }
     };
+
+    public static final Factory<Quaternion> QUATERNION = typical -> new LDLDecomposition.Quat();
+
+    public static final Factory<RationalNumber> RATIONAL = typical -> new LDLDecomposition.Rational();
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> LDL<N> make(final Access2D<N> typical) {

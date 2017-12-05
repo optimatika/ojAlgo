@@ -26,6 +26,8 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -48,6 +50,10 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
     public static final Factory<ComplexNumber> COMPLEX = typical -> new DeferredTridiagonal.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> new DeferredTridiagonal.Primitive();
+
+    public static final Factory<Quaternion> QUATERNION = typical -> new DeferredTridiagonal.Quat();
+
+    public static final Factory<RationalNumber> RATIONAL = typical -> new DeferredTridiagonal.Rational();
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Tridiagonal<N> make(final Access2D<N> typical) {

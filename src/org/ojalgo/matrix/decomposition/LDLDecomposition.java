@@ -41,6 +41,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -66,6 +67,14 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
         Primitive() {
             super(PrimitiveDenseStore.FACTORY);
+        }
+
+    }
+
+    static final class Quat extends LDLDecomposition<Quaternion> {
+
+        Quat() {
+            super(GenericDenseStore.QUATERNION);
         }
 
     }

@@ -46,6 +46,8 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 
 /**
  * Eigenvalues and eigenvectors of a real matrix.
@@ -82,6 +84,22 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
         DeferredPrimitive() {
             super(PrimitiveDenseStore.FACTORY, new DeferredTridiagonal.Primitive());
+        }
+
+    }
+
+    static final class Quat extends HermitianEvD<Quaternion> {
+
+        Quat() {
+            super(GenericDenseStore.QUATERNION, new DeferredTridiagonal.Quat());
+        }
+
+    }
+
+    static final class Rational extends HermitianEvD<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL, new DeferredTridiagonal.Rational());
         }
 
     }

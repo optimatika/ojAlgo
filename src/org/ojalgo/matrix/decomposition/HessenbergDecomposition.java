@@ -32,6 +32,8 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 
 abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Hessenberg<N> {
 
@@ -55,6 +57,22 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
 
         Primitive() {
             super(PrimitiveDenseStore.FACTORY);
+        }
+
+    }
+
+    static final class Quat extends HessenbergDecomposition<Quaternion> {
+
+        Quat() {
+            super(GenericDenseStore.QUATERNION);
+        }
+
+    }
+
+    static final class Rational extends HessenbergDecomposition<RationalNumber> {
+
+        Rational() {
+            super(GenericDenseStore.RATIONAL);
         }
 
     }

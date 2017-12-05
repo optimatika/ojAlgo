@@ -27,6 +27,8 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -50,6 +52,10 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
     public static final Factory<ComplexNumber> COMPLEX = typical -> new HessenbergDecomposition.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> new HessenbergDecomposition.Primitive();
+
+    public static final Factory<Quaternion> QUATERNION = typical -> new HessenbergDecomposition.Quat();
+
+    public static final Factory<RationalNumber> RATIONAL = typical -> new HessenbergDecomposition.Rational();
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Hessenberg<N> make(final Access2D<N> typical) {
