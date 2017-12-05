@@ -31,7 +31,7 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class OldRationalNumber extends Number implements Scalar<OldRationalNumber>, Enforceable<OldRationalNumber> {
+final class OldRationalNumber extends Number implements Scalar<OldRationalNumber>, Enforceable<OldRationalNumber> {
 
     public static final Scalar.Factory<OldRationalNumber> FACTORY = new Scalar.Factory<OldRationalNumber>() {
 
