@@ -218,47 +218,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         this.visit(first, limit, 1L, visitor);
     }
 
-    /**
-     * <p>
-     * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray}
-     * as a one-dimensional array. Note that you will modify the actual array by accessing it through this
-     * facade.
-     * </p>
-     * <p>
-     * Disregards the array structure, and simply treats it as one-domensional.
-     * </p>
-     */
-    protected final Array1D<N> asArray1D() {
-        return new Array1D<>(this);
-    }
-
-    /**
-     * <p>
-     * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray}
-     * as a two-dimensional array. Note that you will modify the actual array by accessing it through this
-     * facade.
-     * </p>
-     * <p>
-     * If "this" has more than two dimensions then only the first plane of the first cube of the first... is
-     * used/accessed. If this only has one dimension then everything is assumed to be in the first column of
-     * the first plane of the first cube...
-     * </p>
-     */
-    protected final Array2D<N> asArray2D(final long structure) {
-        return new Array2D<>(this, structure);
-    }
-
-    /**
-     * <p>
-     * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray}
-     * as a multi-dimensional array. Note that you will modify the actual array by accessing it through this
-     * facade.
-     * </p>
-     */
-    protected final ArrayAnyD<N> asArrayAnyD(final long[] structure) {
-        return new ArrayAnyD<>(this, structure);
-    }
-
     protected abstract void exchange(long firstA, long firstB, long step, long count);
 
     protected abstract void fill(long first, long limit, long step, N value);
@@ -278,6 +237,33 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     protected abstract void modify(long first, long limit, long step, UnaryFunction<N> function);
 
     protected abstract void visit(long first, long limit, long step, VoidFunction<N> visitor);
+
+    /**
+     * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray}
+     * as a one-dimensional array. Note that you will modify the actual array by accessing it through this
+     * facade.
+     */
+    protected final Array1D<N> wrapInArray1D() {
+        return new Array1D<>(this);
+    }
+
+    /**
+     * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray}
+     * as a two-dimensional array. Note that you will modify the actual array by accessing it through this
+     * facade.
+     */
+    protected final Array2D<N> wrapInArray2D(final long structure) {
+        return new Array2D<>(this, structure);
+    }
+
+    /**
+     * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray}
+     * as a multi-dimensional array. Note that you will modify the actual array by accessing it through this
+     * facade.
+     */
+    protected final ArrayAnyD<N> wrapInArrayAnyD(final long[] structure) {
+        return new ArrayAnyD<>(this, structure);
+    }
 
     /**
      * Safe to cast as DenseArray.

@@ -407,7 +407,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         myRowDim = anArray.length;
         myColDim = 1;
 
-        myUtility = this.asArray2D(myRowDim);
+        myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.getBig(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getBig(myRowDim, myColDim);
@@ -422,7 +422,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         myRowDim = aLength;
         myColDim = 1;
 
-        myUtility = this.asArray2D(myRowDim);
+        myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.getBig(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getBig(myRowDim, myColDim);
@@ -437,7 +437,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         myRowDim = aRowDim;
         myColDim = aColDim;
 
-        myUtility = this.asArray2D(myRowDim);
+        myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.getBig(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getBig(myRowDim, myColDim);
@@ -452,7 +452,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         myRowDim = aRowDim;
         myColDim = aColDim;
 
-        myUtility = this.asArray2D(myRowDim);
+        myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.getBig(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getBig(myRowDim, myColDim);

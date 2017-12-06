@@ -402,14 +402,24 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     private transient double[] myWorkerColumn;
 
-    PrimitiveDenseStore(final double[] anArray) {
+    @SuppressWarnings("unused")
+    private PrimitiveDenseStore(final double[] dataArray) {
+        this(dataArray.length, 1, dataArray);
+    }
 
-        super(anArray);
+    @SuppressWarnings("unused")
+    private PrimitiveDenseStore(final int numbRows) {
+        this(numbRows, 1);
+    }
 
-        myRowDim = anArray.length;
-        myColDim = 1;
+    PrimitiveDenseStore(final int numbRows, final int numbCols) {
 
-        myUtility = this.asArray2D(myRowDim);
+        super(numbRows * numbCols);
+
+        myRowDim = numbRows;
+        myColDim = numbCols;
+
+        myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.getPrimitive(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getPrimitive(myRowDim, myColDim);
@@ -417,44 +427,14 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         multiplyNeither = MultiplyNeither.getPrimitive(myRowDim, myColDim);
     }
 
-    PrimitiveDenseStore(final int aLength) {
+    PrimitiveDenseStore(final int numbRows, final int numbCols, final double[] dataArray) {
 
-        super(aLength);
+        super(dataArray);
 
-        myRowDim = aLength;
-        myColDim = 1;
+        myRowDim = numbRows;
+        myColDim = numbCols;
 
-        myUtility = this.asArray2D(myRowDim);
-
-        multiplyBoth = MultiplyBoth.getPrimitive(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.getPrimitive(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.getPrimitive(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.getPrimitive(myRowDim, myColDim);
-    }
-
-    PrimitiveDenseStore(final int aRowDim, final int aColDim) {
-
-        super(aRowDim * aColDim);
-
-        myRowDim = aRowDim;
-        myColDim = aColDim;
-
-        myUtility = this.asArray2D(myRowDim);
-
-        multiplyBoth = MultiplyBoth.getPrimitive(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.getPrimitive(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.getPrimitive(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.getPrimitive(myRowDim, myColDim);
-    }
-
-    PrimitiveDenseStore(final int aRowDim, final int aColDim, final double[] anArray) {
-
-        super(anArray);
-
-        myRowDim = aRowDim;
-        myColDim = aColDim;
-
-        myUtility = this.asArray2D(myRowDim);
+        myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.getPrimitive(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getPrimitive(myRowDim, myColDim);

@@ -70,19 +70,19 @@ public final class Array1D<N extends Number> extends AbstractList<N>
         }
 
         public final Array1D<N> copy(final Access1D<?> source) {
-            return myDelegate.copy(source).asArray1D();
+            return myDelegate.copy(source).wrapInArray1D();
         }
 
         public final Array1D<N> copy(final double... source) {
-            return myDelegate.copy(source).asArray1D();
+            return myDelegate.copy(source).wrapInArray1D();
         }
 
         public final Array1D<N> copy(final List<? extends Number> source) {
-            return myDelegate.copy(source).asArray1D();
+            return myDelegate.copy(source).wrapInArray1D();
         }
 
         public final Array1D<N> copy(final Number... source) {
-            return myDelegate.copy(source).asArray1D();
+            return myDelegate.copy(source).wrapInArray1D();
         }
 
         @Override
@@ -91,11 +91,11 @@ public final class Array1D<N extends Number> extends AbstractList<N>
         }
 
         public final Array1D<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
-            return myDelegate.makeFilled(count, supplier).asArray1D();
+            return myDelegate.makeFilled(count, supplier).wrapInArray1D();
         }
 
         public final Array1D<N> makeZero(final long count) {
-            return myDelegate.makeZero(count).asArray1D();
+            return myDelegate.makeZero(count).wrapInArray1D();
         }
 
         @Override
@@ -104,7 +104,7 @@ public final class Array1D<N extends Number> extends AbstractList<N>
         }
 
         public final Array1D<N> wrap(final BasicArray<N> array) {
-            return array.asArray1D();
+            return array.wrapInArray1D();
         }
 
     }

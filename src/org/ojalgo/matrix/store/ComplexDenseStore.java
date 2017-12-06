@@ -408,7 +408,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         myRowDim = anArray.length;
         myColDim = 1;
 
-        myUtility = this.asArray2D(myRowDim);
+        myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.getGeneric(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getGeneric(myRowDim, myColDim);
@@ -423,7 +423,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         myRowDim = aLength;
         myColDim = 1;
 
-        myUtility = this.asArray2D(myRowDim);
+        myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.getGeneric(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getGeneric(myRowDim, myColDim);
@@ -438,7 +438,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         myRowDim = aRowDim;
         myColDim = aColDim;
 
-        myUtility = this.asArray2D(myRowDim);
+        myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.getGeneric(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getGeneric(myRowDim, myColDim);
@@ -453,7 +453,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         myRowDim = aRowDim;
         myColDim = aColDim;
 
-        myUtility = this.asArray2D(myRowDim);
+        myUtility = this.wrapInArray2D(myRowDim);
 
         multiplyBoth = MultiplyBoth.getGeneric(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getGeneric(myRowDim, myColDim);

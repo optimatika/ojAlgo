@@ -89,7 +89,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 }
             }
 
-            return tmpDelegate.asArray2D(tmpRows);
+            return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
         public final Array2D<N> columns(final double[]... source) {
@@ -107,7 +107,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 }
             }
 
-            return tmpDelegate.asArray2D(tmpRows);
+            return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
         @SafeVarargs
@@ -126,7 +126,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 }
             }
 
-            return tmpDelegate.asArray2D(tmpRows);
+            return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
         public final Array2D<N> columns(final Number[]... source) {
@@ -144,11 +144,11 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 }
             }
 
-            return tmpDelegate.asArray2D(tmpRows);
+            return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
         public final Array2D<N> copy(final Access2D<?> source) {
-            return myDelegate.copy(source).asArray2D(source.countRows());
+            return myDelegate.copy(source).wrapInArray2D(source.countRows());
         }
 
         @Override
@@ -167,7 +167,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 tmpDelegate.set(ij * tmpIncr, 1.0);
             }
 
-            return tmpDelegate.asArray2D(rows);
+            return tmpDelegate.wrapInArray2D(rows);
         }
 
         public final Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
@@ -181,11 +181,11 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 }
             }
 
-            return tmpDelegate.asArray2D(rows);
+            return tmpDelegate.wrapInArray2D(rows);
         }
 
         public final Array2D<N> makeZero(final long rows, final long columns) {
-            return myDelegate.makeStructuredZero(rows, columns).asArray2D(rows);
+            return myDelegate.makeStructuredZero(rows, columns).wrapInArray2D(rows);
         }
 
         public final Array2D<N> rows(final Access1D<?>... source) {
@@ -211,7 +211,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 }
             }
 
-            return tmpDelegate.asArray2D(tmpRows);
+            return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
         public final Array2D<N> rows(final double[]... source) {
@@ -228,7 +228,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 }
             }
 
-            return tmpDelegate.asArray2D(tmpRows);
+            return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
         @SuppressWarnings("unchecked")
@@ -246,7 +246,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 }
             }
 
-            return tmpDelegate.asArray2D(tmpRows);
+            return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
         public final Array2D<N> rows(final Number[]... source) {
@@ -263,7 +263,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 }
             }
 
-            return tmpDelegate.asArray2D(tmpRows);
+            return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
         @Override
@@ -329,7 +329,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
      */
     @Deprecated
     public Array1D<N> asArray1D() {
-        return myDelegate.asArray1D();
+        return myDelegate.wrapInArray1D();
     }
 
     public void clear() {
@@ -643,7 +643,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     public Array1D<N> sliceRange(final long first, final long limit) {
-        return myDelegate.asArray1D().sliceRange(first, limit);
+        return myDelegate.wrapInArray1D().sliceRange(first, limit);
     }
 
     public Array1D<N> sliceRow(final long row) {

@@ -65,7 +65,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         }
 
         public final ArrayAnyD<N> copy(final AccessAnyD<?> source) {
-            return myDelegate.copy(source).asArrayAnyD(source.shape());
+            return myDelegate.copy(source).wrapInArrayAnyD(source.shape());
         }
 
         @Override
@@ -74,11 +74,11 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         }
 
         public final ArrayAnyD<N> makeFilled(final long[] structure, final NullaryFunction<?> supplier) {
-            return myDelegate.makeFilled(StructureAnyD.count(structure), supplier).asArrayAnyD(structure);
+            return myDelegate.makeFilled(StructureAnyD.count(structure), supplier).wrapInArrayAnyD(structure);
         }
 
         public final ArrayAnyD<N> makeZero(final long... structure) {
-            return myDelegate.makeStructuredZero(structure).asArrayAnyD(structure);
+            return myDelegate.makeStructuredZero(structure).wrapInArrayAnyD(structure);
         }
 
         @Override
@@ -141,7 +141,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
      */
     @Deprecated
     public Array1D<N> asArray1D() {
-        return myDelegate.asArray1D();
+        return myDelegate.wrapInArray1D();
     }
 
     public void clear() {
@@ -353,7 +353,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public Array1D<N> sliceRange(final long first, final long limit) {
-        return myDelegate.asArray1D().sliceRange(first, limit);
+        return myDelegate.wrapInArray1D().sliceRange(first, limit);
     }
 
     @Override

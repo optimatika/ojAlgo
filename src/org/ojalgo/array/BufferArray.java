@@ -186,15 +186,15 @@ public abstract class BufferArray extends PlainArray<Double> {
     static final long FLOAT_ELEMENT_SIZE = JavaType.FLOAT.memory();
 
     public static Array1D<Double> make(final File file, final long count) {
-        return BufferArray.create(file, count).asArray1D();
+        return BufferArray.create(file, count).wrapInArray1D();
     }
 
     public static ArrayAnyD<Double> make(final File file, final long... structure) {
-        return BufferArray.create(file, structure).asArrayAnyD(structure);
+        return BufferArray.create(file, structure).wrapInArrayAnyD(structure);
     }
 
     public static Array2D<Double> make(final File file, final long rows, final long columns) {
-        return BufferArray.create(file, rows, columns).asArray2D(rows);
+        return BufferArray.create(file, rows, columns).wrapInArray2D(rows);
     }
 
     public static BufferArray make(final int capacity) {
