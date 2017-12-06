@@ -45,7 +45,7 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * <p>
- * PhysicalStore:s, as opposed to MatrixStore:s, are mutable. The vast majorty of the methods defined here
+ * PhysicalStore:s, as opposed to MatrixStore:s, are mutable. The vast majority of the methods defined here
  * return void and none return {@linkplain PhysicalStore} or {@linkplain MatrixStore}.
  * </p>
  * <p>
