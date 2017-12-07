@@ -28,6 +28,8 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.transformation.MatrixTransformation;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -38,8 +40,8 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * @author apete
  * @see org.ojalgo.function.ComplexFunction
  */
-public final class ComplexNumber extends Number
-        implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+public final class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, MatrixTransformation<Double>,
+        Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
 
@@ -511,6 +513,11 @@ public final class ComplexNumber extends Number
         retVal.append(tmpIm.abs().toString());
 
         return retVal.append(RIGHT).toString();
+    }
+
+    public void transform(final PhysicalStore<Double> matrix) {
+        // TODO Auto-generated method stub
+
     }
 
 }

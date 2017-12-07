@@ -29,11 +29,13 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.transformation.MatrixTransformation;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class Quaternion extends Number
-        implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+public final class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, MatrixTransformation<Double>,
+        Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public static final Scalar.Factory<Quaternion> FACTORY = new Scalar.Factory<Quaternion>() {
 
@@ -775,6 +777,11 @@ public final class Quaternion extends Number
 
     private double calculateSumOfSquaresVector() {
         return (i * i) + (j * j) + (k * k);
+    }
+
+    public void transform(final PhysicalStore<Double> matrix) {
+        // TODO Auto-generated method stub
+
     }
 
 }
