@@ -503,6 +503,13 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return tmpVisitor.get();
     }
 
+    /**
+     * Returns the conjugate transpose of this matrix. The conjugate transpose is also known as adjoint
+     * matrix, adjugate matrix, hermitian adjoint or hermitian transpose. (The conjugate matrix is the complex
+     * conjugate of each element. This NOT what is returned here!)
+     *
+     * @see org.ojalgo.algebra.VectorSpace#conjugate()
+     */
     default MatrixStore<N> conjugate() {
         return new ConjugatedStore<>(this);
     }

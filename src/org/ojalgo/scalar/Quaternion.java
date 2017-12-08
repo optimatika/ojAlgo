@@ -30,6 +30,7 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.MatrixTransformation;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -303,6 +304,96 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         retVal.set(1L, ComplexNumber.of(-j, k));
         retVal.set(2L, ComplexNumber.of(j, k));
         retVal.set(3L, ComplexNumber.of(myScalar, -i));
+
+        return retVal;
+    }
+
+    public MatrixStore<Double> asReal2D() {
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(4L, 4L);
+
+        retVal.set(0L, myScalar);
+        retVal.set(1L, i);
+        retVal.set(2L, j);
+        retVal.set(3L, k);
+        retVal.set(4L, -i);
+        retVal.set(5L, myScalar);
+        retVal.set(6L, k);
+        retVal.set(7L, -j);
+        retVal.set(8L, -j);
+        retVal.set(9L, -k);
+        retVal.set(10L, myScalar);
+        retVal.set(11L, i);
+        retVal.set(12L, -k);
+        retVal.set(13L, j);
+        retVal.set(14L, -i);
+        retVal.set(15L, myScalar);
+
+        return retVal;
+    }
+
+    public MatrixStore<Double> asRealOrthogonal2D() {
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(3L, 3L);
+
+        final double sqw = myScalar * myScalar;
+        final double sqx = i * i;
+        final double sqy = j * j;
+        final double sqz = k * k;
+
+        // invs (inverse square length) is only required if quaternion is not already normalised
+        final double invs = 1 / (sqx + sqy + sqz + sqw);
+        // since sqw + sqx + sqy + sqz =1/invs*invs
+        final double m22 = ((-sqx - sqy) + sqz + sqw) * invs;
+
+        double tmp1 = i * j;
+        double tmp2 = k * myScalar;
+        tmp1 = i * k;
+        tmp2 = j * myScalar;
+        tmp1 = j * k;
+        tmp2 = i * myScalar;
+        retVal.set(0L, ((sqx - sqy - sqz) + sqw) * invs);
+        retVal.set(1L, 2.0 * (tmp1 + tmp2) * invs);
+        retVal.set(2L, 2.0 * (tmp1 - tmp2) * invs);
+        retVal.set(3L, 2.0 * (tmp1 - tmp2) * invs);
+        retVal.set(4L, (((-sqx + sqy) - sqz) + sqw) * invs);
+        retVal.set(5L, 2.0 * (tmp1 + tmp2) * invs);
+        retVal.set(6L, 2.0 * (tmp1 + tmp2) * invs);
+        retVal.set(7L, 2.0 * (tmp1 - tmp2) * invs);
+        retVal.set(8L, m22);
+
+        return retVal;
+    }
+
+    public MatrixStore<Double> asRealRotation2D() {
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(3L, 3L);
+
+        final double ii = i * i;
+        final double jj = j * j;
+        final double kk = k * k;
+
+        retVal.set(0L, 1.0 - (2.0 * jj) - (2.0 * kk));
+        retVal.set(1L, (2.0 * i * j) + (2.0 * k * myScalar));
+        retVal.set(2L, (2.0 * i * k) - (2.0 * j * myScalar));
+        retVal.set(3L, (2.0 * i * j) - (2.0 * k * myScalar));
+        retVal.set(4L, 1.0 - (2.0 * ii) - (2.0 * kk));
+        retVal.set(5L, (2.0 * j * k) + (2.0 * i * myScalar));
+        retVal.set(6L, (2.0 * i * k) + (2.0 * j * myScalar));
+        retVal.set(7L, (2.0 * j * k) - (2.0 * i * myScalar));
+        retVal.set(8L, 1.0 - (2.0 * ii) - (2.0 * jj));
+
+        return retVal;
+    }
+
+    public MatrixStore<Double> asReal1D() {
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(4L, 1L);
+
+        retVal.set(0L, myScalar);
+        retVal.set(1L, i);
+        retVal.set(2L, j);
+        retVal.set(3L, k);
 
         return retVal;
     }
@@ -754,6 +845,11 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         return retVal.toString();
     }
 
+    public void transform(final PhysicalStore<Double> matrix) {
+        // TODO Auto-generated method stub
+
+    }
+
     public double[] unit() {
         final double tmpLength = this.getVectorLength();
         if (tmpLength > 0.0) {
@@ -777,11 +873,6 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
 
     private double calculateSumOfSquaresVector() {
         return (i * i) + (j * j) + (k * k);
-    }
-
-    public void transform(final PhysicalStore<Double> matrix) {
-        // TODO Auto-generated method stub
-
     }
 
 }

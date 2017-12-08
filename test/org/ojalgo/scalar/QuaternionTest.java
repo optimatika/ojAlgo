@@ -24,6 +24,8 @@ package org.ojalgo.scalar;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.QuaternionFunction;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public class QuaternionTest extends ScalarTests {
 
@@ -232,6 +234,53 @@ public class QuaternionTest extends ScalarTests {
                 }
             }
         }
+    }
+
+    public void testMultiplication() {
+
+        Math.random();
+
+        final Quaternion normalizedRandomRotation = Quaternion.of(Math.random(), Math.random(), Math.random(), Math.random()).signum();
+
+        final Quaternion randomVector = Quaternion.of(0D, Math.random(), Math.random(), Math.random()).signum();
+
+        final Quaternion result1 = normalizedRandomRotation.multiply(randomVector);
+
+        final MatrixStore<Double> result2 = normalizedRandomRotation.asReal2D().multiply(randomVector.asReal1D());
+
+        TestUtils.assertEquals(result2, result1.asReal1D());
+
+    }
+
+    public void testRotation() {
+
+        Math.random();
+
+        final Quaternion normalizedRandomRotation = Quaternion.of(Math.random(), Math.random(), Math.random(), Math.random()).signum();
+
+        final Quaternion randomVector = Quaternion.of(0D, Math.random(), Math.random(), Math.random()).signum();
+
+        final Quaternion result1 = normalizedRandomRotation.multiply(randomVector).multiply(normalizedRandomRotation.conjugate());
+
+        final MatrixStore<Double> result3 = normalizedRandomRotation.asRealRotation2D().multiply(randomVector.asReal1D().logical().offsets(1, 0).get());
+
+        final MatrixStore<Double> tmpExpected3 = result1.asReal1D().logical().offsets(1, 0).get();
+        TestUtils.assertEquals(tmpExpected3, result3);
+
+    }
+
+    public void testRotationMatrixMathWorksExample() {
+
+        final double nmbr = 1.0 / Math.sqrt(2.0);
+
+        final Quaternion rotQuat = Quaternion.of(nmbr, nmbr, 0.0, 0.0);
+
+        final PrimitiveDenseStore expected = PrimitiveDenseStore.FACTORY.columns(new double[][] { { 1, 0, 0 }, { 0, 0, 1 }, { 0, -1, 0 } });
+
+        final MatrixStore<Double> actual = rotQuat.asRealRotation2D();
+
+        TestUtils.assertEquals(expected, actual);
+
     }
 
 }
