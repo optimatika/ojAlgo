@@ -81,6 +81,127 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         }
 
         @Override
+        public MatrixStore<Double> toRotationMatrix() {
+
+            final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(3L, 3L);
+
+            final double s = this.doubleValue();
+
+            final double ss = s * s;
+            final double ii = i * i;
+            final double jj = j * j;
+            final double kk = k * k;
+
+            double tmp1;
+            double tmp2;
+
+            final double r00 = ((ii + ss) - (jj + kk));
+            final double r11 = ((jj + ss) - (ii + kk));
+            final double r22 = ((kk + ss) - (ii + jj));
+
+            tmp1 = i * j;
+            tmp2 = k * s;
+            final double r10 = 2.0 * (tmp1 + tmp2);
+            final double r01 = 2.0 * (tmp1 - tmp2);
+
+            tmp1 = i * k;
+            tmp2 = j * s;
+            final double r20 = 2.0 * (tmp1 - tmp2);
+            final double r02 = 2.0 * (tmp1 + tmp2);
+
+            tmp1 = j * k;
+            tmp2 = i * s;
+            final double r21 = 2.0 * (tmp1 + tmp2);
+            final double r12 = 2.0 * (tmp1 - tmp2);
+
+            retVal.set(0L, r00);
+            retVal.set(1L, r10);
+            retVal.set(2L, r20);
+            retVal.set(3L, r01);
+            retVal.set(4L, r11);
+            retVal.set(5L, r21);
+            retVal.set(6L, r02);
+            retVal.set(7L, r12);
+            retVal.set(8L, r22);
+
+            return retVal;
+        }
+
+        @Override
+        public void transform(final PhysicalStore<Double> matrix) {
+
+            final double s = this.doubleValue();
+
+            final double ss = s * s;
+            final double ii = i * i;
+            final double jj = j * j;
+            final double kk = k * k;
+
+            double tmp1;
+            double tmp2;
+
+            final double r00 = ((ii + ss) - (jj + kk));
+            final double r11 = ((jj + ss) - (ii + kk));
+            final double r22 = ((kk + ss) - (ii + jj));
+
+            tmp1 = i * j;
+            tmp2 = k * s;
+            final double r10 = 2.0 * (tmp1 + tmp2);
+            final double r01 = 2.0 * (tmp1 - tmp2);
+
+            tmp1 = i * k;
+            tmp2 = j * s;
+            final double r20 = 2.0 * (tmp1 - tmp2);
+            final double r02 = 2.0 * (tmp1 + tmp2);
+
+            tmp1 = j * k;
+            tmp2 = i * s;
+            final double r21 = 2.0 * (tmp1 + tmp2);
+            final double r12 = 2.0 * (tmp1 - tmp2);
+
+            if (matrix.count() == 3L) {
+
+                final double x = matrix.doubleValue(0);
+                final double y = matrix.doubleValue(1);
+                final double z = matrix.doubleValue(2);
+
+                matrix.set(0, (r00 * x) + (r01 * y) + (r02 * z));
+                matrix.set(1, (r10 * x) + (r11 * y) + (r12 * z));
+                matrix.set(2, (r20 * x) + (r21 * y) + (r22 * z));
+
+            } else if (matrix.countRows() == 3L) {
+
+                for (long j = 0L, limit = matrix.countColumns(); j < limit; j++) {
+
+                    final double x = matrix.doubleValue(0, j);
+                    final double y = matrix.doubleValue(1, j);
+                    final double z = matrix.doubleValue(2, j);
+
+                    matrix.set(0, j, (r00 * x) + (r01 * y) + (r02 * z));
+                    matrix.set(1, j, (r10 * x) + (r11 * y) + (r12 * z));
+                    matrix.set(2, j, (r20 * x) + (r21 * y) + (r22 * z));
+                }
+
+            } else if (matrix.countColumns() == 3L) {
+
+                for (long i = 0L, limit = matrix.countRows(); i < limit; i++) {
+
+                    final double x = matrix.doubleValue(i, 0);
+                    final double y = matrix.doubleValue(i, 1);
+                    final double z = matrix.doubleValue(i, 2);
+
+                    matrix.set(i, 0, (r00 * x) + (r01 * y) + (r02 * z));
+                    matrix.set(i, 1, (r10 * x) + (r11 * y) + (r12 * z));
+                    matrix.set(i, 2, (r20 * x) + (r21 * y) + (r22 * z));
+                }
+
+            } else {
+
+                throw new ProgrammingError("Only works for 3D stuff!");
+            }
+        }
+
+        @Override
         public Versor versor() {
             return this;
         }
@@ -380,108 +501,6 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
     public double angle() {
         return PrimitiveFunction.ACOS.invoke(myScalar / this.norm());
-    }
-
-    public MatrixStore<ComplexNumber> asComplex2D() {
-
-        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(2L, 2L);
-
-        retVal.set(0L, ComplexNumber.of(myScalar, i));
-        retVal.set(1L, ComplexNumber.of(-j, k));
-        retVal.set(2L, ComplexNumber.of(j, k));
-        retVal.set(3L, ComplexNumber.of(myScalar, -i));
-
-        return retVal;
-    }
-
-    public MatrixStore<Double> asReal1D() {
-
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(4L, 1L);
-
-        retVal.set(0L, myScalar);
-        retVal.set(1L, i);
-        retVal.set(2L, j);
-        retVal.set(3L, k);
-
-        return retVal;
-    }
-
-    public MatrixStore<Double> asReal2D() {
-
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(4L, 4L);
-
-        retVal.set(0L, myScalar);
-        retVal.set(1L, i);
-        retVal.set(2L, j);
-        retVal.set(3L, k);
-        retVal.set(4L, -i);
-        retVal.set(5L, myScalar);
-        retVal.set(6L, k);
-        retVal.set(7L, -j);
-        retVal.set(8L, -j);
-        retVal.set(9L, -k);
-        retVal.set(10L, myScalar);
-        retVal.set(11L, i);
-        retVal.set(12L, -k);
-        retVal.set(13L, j);
-        retVal.set(14L, -i);
-        retVal.set(15L, myScalar);
-
-        return retVal;
-    }
-
-    public MatrixStore<Double> asRealOrthogonal2D() {
-
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(3L, 3L);
-
-        final double sqw = myScalar * myScalar;
-        final double sqx = i * i;
-        final double sqy = j * j;
-        final double sqz = k * k;
-
-        // invs (inverse square length) is only required if quaternion is not already normalised
-        final double invs = 1 / (sqx + sqy + sqz + sqw);
-        // since sqw + sqx + sqy + sqz =1/invs*invs
-        final double m22 = ((-sqx - sqy) + sqz + sqw) * invs;
-
-        double tmp1 = i * j;
-        double tmp2 = k * myScalar;
-        tmp1 = i * k;
-        tmp2 = j * myScalar;
-        tmp1 = j * k;
-        tmp2 = i * myScalar;
-        retVal.set(0L, ((sqx - sqy - sqz) + sqw) * invs);
-        retVal.set(1L, 2.0 * (tmp1 + tmp2) * invs);
-        retVal.set(2L, 2.0 * (tmp1 - tmp2) * invs);
-        retVal.set(3L, 2.0 * (tmp1 - tmp2) * invs);
-        retVal.set(4L, (((-sqx + sqy) - sqz) + sqw) * invs);
-        retVal.set(5L, 2.0 * (tmp1 + tmp2) * invs);
-        retVal.set(6L, 2.0 * (tmp1 + tmp2) * invs);
-        retVal.set(7L, 2.0 * (tmp1 - tmp2) * invs);
-        retVal.set(8L, m22);
-
-        return retVal;
-    }
-
-    public MatrixStore<Double> getRotationMatrix() {
-
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(3L, 3L);
-
-        final double ii = i * i;
-        final double jj = j * j;
-        final double kk = k * k;
-
-        retVal.set(0L, 1.0 - (2.0 * jj) - (2.0 * kk));
-        retVal.set(1L, (2.0 * i * j) + (2.0 * k * myScalar));
-        retVal.set(2L, (2.0 * i * k) - (2.0 * j * myScalar));
-        retVal.set(3L, (2.0 * i * j) - (2.0 * k * myScalar));
-        retVal.set(4L, 1.0 - (2.0 * ii) - (2.0 * kk));
-        retVal.set(5L, (2.0 * j * k) + (2.0 * i * myScalar));
-        retVal.set(6L, (2.0 * i * k) + (2.0 * j * myScalar));
-        retVal.set(7L, (2.0 * j * k) - (2.0 * i * myScalar));
-        retVal.set(8L, 1.0 - (2.0 * ii) - (2.0 * jj));
-
-        return retVal;
     }
 
     public int compareTo(final Quaternion reference) {
@@ -856,6 +875,82 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         return new BigDecimal(myScalar, PrimitiveScalar.CONTEXT.getMathContext());
     }
 
+    public MatrixStore<ComplexNumber> toComplexMatrix() {
+
+        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(2L, 2L);
+
+        retVal.set(0L, ComplexNumber.of(myScalar, i));
+        retVal.set(1L, ComplexNumber.of(-j, k));
+        retVal.set(2L, ComplexNumber.of(j, k));
+        retVal.set(3L, ComplexNumber.of(myScalar, -i));
+
+        return retVal;
+    }
+
+    public MatrixStore<Double> toMultiplicationMatrix() {
+        return PrimitiveDenseStore.FACTORY.copy(this);
+    }
+
+    public MatrixStore<Double> toMultiplicationVector() {
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(4L, 1L);
+
+        retVal.set(0L, myScalar);
+        retVal.set(1L, i);
+        retVal.set(2L, j);
+        retVal.set(3L, k);
+
+        return retVal;
+    }
+
+    public MatrixStore<Double> toRotationMatrix() {
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(3L, 3L);
+
+        final double s = myScalar;
+
+        final double ss = s * s;
+        final double ii = i * i;
+        final double jj = j * j;
+        final double kk = k * k;
+
+        double tmp1;
+        double tmp2;
+
+        final double invs = 1.0 / (ii + jj + kk + ss);
+
+        final double r00 = ((ii + ss) - (jj + kk)) * invs;
+        final double r11 = ((jj + ss) - (ii + kk)) * invs;
+        final double r22 = ((kk + ss) - (ii + jj)) * invs;
+
+        tmp1 = i * j;
+        tmp2 = k * s;
+        final double r10 = 2.0 * (tmp1 + tmp2) * invs;
+        final double r01 = 2.0 * (tmp1 - tmp2) * invs;
+
+        tmp1 = i * k;
+        tmp2 = j * s;
+        final double r20 = 2.0 * (tmp1 - tmp2) * invs;
+        final double r02 = 2.0 * (tmp1 + tmp2) * invs;
+
+        tmp1 = j * k;
+        tmp2 = i * s;
+        final double r21 = 2.0 * (tmp1 + tmp2) * invs;
+        final double r12 = 2.0 * (tmp1 - tmp2) * invs;
+
+        retVal.set(0L, r00);
+        retVal.set(1L, r10);
+        retVal.set(2L, r20);
+        retVal.set(3L, r01);
+        retVal.set(4L, r11);
+        retVal.set(5L, r21);
+        retVal.set(6L, r02);
+        retVal.set(7L, r12);
+        retVal.set(8L, r22);
+
+        return retVal;
+    }
+
     /**
      * @see java.lang.Object#toString()
      */
@@ -933,21 +1028,36 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
     public void transform(final PhysicalStore<Double> matrix) {
 
+        final double s = myScalar;
+
+        final double ss = s * s;
         final double ii = i * i;
         final double jj = j * j;
         final double kk = k * k;
 
-        final double r00 = 1.0 - (2.0 * jj) - (2.0 * kk);
-        final double r10 = (2.0 * i * j) + (2.0 * k * myScalar);
-        final double r20 = (2.0 * i * k) - (2.0 * j * myScalar);
+        double tmp1;
+        double tmp2;
 
-        final double r01 = (2.0 * i * j) - (2.0 * k * myScalar);
-        final double r11 = 1.0 - (2.0 * ii) - (2.0 * kk);
-        final double r21 = (2.0 * j * k) + (2.0 * i * myScalar);
+        final double invs = 1.0 / (ii + jj + kk + ss);
 
-        final double r02 = (2.0 * i * k) + (2.0 * j * myScalar);
-        final double r12 = (2.0 * j * k) - (2.0 * i * myScalar);
-        final double r22 = 1.0 - (2.0 * ii) - (2.0 * jj);
+        final double r00 = ((ii + ss) - (jj + kk)) * invs;
+        final double r11 = ((jj + ss) - (ii + kk)) * invs;
+        final double r22 = ((kk + ss) - (ii + jj)) * invs;
+
+        tmp1 = i * j;
+        tmp2 = k * s;
+        final double r10 = 2.0 * (tmp1 + tmp2) * invs;
+        final double r01 = 2.0 * (tmp1 - tmp2) * invs;
+
+        tmp1 = i * k;
+        tmp2 = j * s;
+        final double r20 = 2.0 * (tmp1 - tmp2) * invs;
+        final double r02 = 2.0 * (tmp1 + tmp2) * invs;
+
+        tmp1 = j * k;
+        tmp2 = i * s;
+        final double r21 = 2.0 * (tmp1 + tmp2) * invs;
+        final double r12 = 2.0 * (tmp1 - tmp2) * invs;
 
         if (matrix.count() == 3L) {
 
