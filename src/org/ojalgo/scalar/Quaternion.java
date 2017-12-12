@@ -23,6 +23,7 @@ package org.ojalgo.scalar;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -35,8 +36,56 @@ import org.ojalgo.matrix.transformation.MatrixTransformation;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, MatrixTransformation<Double>,
+public class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, MatrixTransformation<Double>,
         Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+
+    public static enum RotationAxis {
+
+        X(0, new double[] { 1.0, 0.0, 0.0 }), Y(1, new double[] { 0.0, 1.0, 0.0 }), Z(2, new double[] { 0.0, 0.0, 1.0 });
+
+        private final int myIndex;
+        private final double[] myVector;
+
+        private RotationAxis(final int index, final double[] axis) {
+            myIndex = index;
+            myVector = axis;
+        }
+
+        int index() {
+            return myIndex;
+        }
+
+        double[] vector() {
+            return myVector;
+        }
+
+    }
+
+    public static final class Versor extends Quaternion {
+
+        Versor(final double scalar) {
+            super(scalar);
+        }
+
+        Versor(final double i, final double j, final double k) {
+            super(i, j, k);
+        }
+
+        Versor(final double scalar, final double i, final double j, final double k) {
+            super(scalar, i, j, k);
+        }
+
+        @Override
+        public double norm() {
+            return PrimitiveMath.ONE;
+        }
+
+        @Override
+        public Versor versor() {
+            return this;
+        }
+
+    }
 
     public static final Scalar.Factory<Quaternion> FACTORY = new Scalar.Factory<Quaternion>() {
 
@@ -66,13 +115,13 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
 
     };
 
-    public static final Quaternion I = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
+    public static final Quaternion I = new Versor(PrimitiveMath.ONE, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
     public static final Quaternion IJK = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ONE, PrimitiveMath.ONE).versor();
-    public static final Quaternion INFINITY = Quaternion.makePolar(Double.POSITIVE_INFINITY, IJK.vector(), PrimitiveMath.ZERO);
-    public static final Quaternion J = new Quaternion(PrimitiveMath.ZERO, PrimitiveMath.ONE, PrimitiveMath.ZERO);
-    public static final Quaternion K = new Quaternion(PrimitiveMath.ZERO, PrimitiveMath.ZERO, PrimitiveMath.ONE);
-    public static final Quaternion NEG = new Quaternion(PrimitiveMath.NEG);
-    public static final Quaternion ONE = new Quaternion(PrimitiveMath.ONE);
+    public static final Quaternion INFINITY = Quaternion.makePolar(Double.POSITIVE_INFINITY, IJK.vector().toRawCopy1D(), PrimitiveMath.ZERO);
+    public static final Quaternion J = new Versor(PrimitiveMath.ZERO, PrimitiveMath.ONE, PrimitiveMath.ZERO);
+    public static final Quaternion K = new Versor(PrimitiveMath.ZERO, PrimitiveMath.ZERO, PrimitiveMath.ONE);
+    public static final Quaternion NEG = new Versor(PrimitiveMath.NEG);
+    public static final Quaternion ONE = new Versor(PrimitiveMath.ONE);
     public static final Quaternion ZERO = new Quaternion();
 
     private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * PrimitiveScalar.CONTEXT.epsilon();
@@ -142,6 +191,43 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
 
     }
 
+    public static Versor makeRotation(final RotationAxis axis, final double angle) {
+
+        final double tmpScalar = PrimitiveFunction.COS.invoke(angle);
+
+        double tmpI = PrimitiveMath.ZERO;
+        double tmpJ = PrimitiveMath.ZERO;
+        double tmpK = PrimitiveMath.ZERO;
+
+        switch (axis) {
+
+        case X:
+
+            tmpI = PrimitiveFunction.SIN.invoke(angle);
+            break;
+
+        case Y:
+
+            tmpJ = PrimitiveFunction.SIN.invoke(angle);
+            break;
+
+        case Z:
+
+            tmpK = PrimitiveFunction.SIN.invoke(angle);
+            break;
+
+        default:
+
+            throw new ProgrammingError("How could this happen?");
+        }
+
+        return new Versor(tmpScalar, tmpI, tmpJ, tmpK);
+    }
+
+    public static Quaternion of(final double i, final double j, final double k) {
+        return new Quaternion(0.0, i, j, k);
+    }
+
     public static Quaternion of(final double scalar, final double i, final double j, final double k) {
         return new Quaternion(scalar, i, j, k);
     }
@@ -196,48 +282,6 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         k = PrimitiveMath.ZERO;
     }
 
-    private Quaternion(final double scalar) {
-
-        super();
-
-        myScalar = scalar;
-
-        myRealForSure = true;
-        myPureForSure = false;
-
-        i = PrimitiveMath.ZERO;
-        j = PrimitiveMath.ZERO;
-        k = PrimitiveMath.ZERO;
-    }
-
-    private Quaternion(final double i, final double j, final double k) {
-
-        super();
-
-        myScalar = PrimitiveMath.ZERO;
-
-        myRealForSure = false;
-        myPureForSure = true;
-
-        this.i = i;
-        this.j = j;
-        this.k = k;
-    }
-
-    private Quaternion(final double scalar, final double i, final double j, final double k) {
-
-        super();
-
-        myScalar = scalar;
-
-        myRealForSure = false;
-        myPureForSure = false;
-
-        this.i = i;
-        this.j = j;
-        this.k = k;
-    }
-
     private Quaternion(final double scalar, final double[] vector) {
 
         super();
@@ -264,6 +308,48 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         i = vector[0];
         j = vector[1];
         k = vector[2];
+    }
+
+    Quaternion(final double scalar) {
+
+        super();
+
+        myScalar = scalar;
+
+        myRealForSure = true;
+        myPureForSure = false;
+
+        i = PrimitiveMath.ZERO;
+        j = PrimitiveMath.ZERO;
+        k = PrimitiveMath.ZERO;
+    }
+
+    Quaternion(final double i, final double j, final double k) {
+
+        super();
+
+        myScalar = PrimitiveMath.ZERO;
+
+        myRealForSure = false;
+        myPureForSure = true;
+
+        this.i = i;
+        this.j = j;
+        this.k = k;
+    }
+
+    Quaternion(final double scalar, final double i, final double j, final double k) {
+
+        super();
+
+        myScalar = scalar;
+
+        myRealForSure = false;
+        myPureForSure = false;
+
+        this.i = i;
+        this.j = j;
+        this.k = k;
     }
 
     public Quaternion add(final double arg) {
@@ -304,6 +390,18 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         retVal.set(1L, ComplexNumber.of(-j, k));
         retVal.set(2L, ComplexNumber.of(j, k));
         retVal.set(3L, ComplexNumber.of(myScalar, -i));
+
+        return retVal;
+    }
+
+    public MatrixStore<Double> asReal1D() {
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(4L, 1L);
+
+        retVal.set(0L, myScalar);
+        retVal.set(1L, i);
+        retVal.set(2L, j);
+        retVal.set(3L, k);
 
         return retVal;
     }
@@ -365,7 +463,7 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         return retVal;
     }
 
-    public MatrixStore<Double> asRealRotation2D() {
+    public MatrixStore<Double> getRotationMatrix() {
 
         final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(3L, 3L);
 
@@ -382,18 +480,6 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         retVal.set(6L, (2.0 * i * k) + (2.0 * j * myScalar));
         retVal.set(7L, (2.0 * j * k) - (2.0 * i * myScalar));
         retVal.set(8L, 1.0 - (2.0 * ii) - (2.0 * jj));
-
-        return retVal;
-    }
-
-    public MatrixStore<Double> asReal1D() {
-
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(4L, 1L);
-
-        retVal.set(0L, myScalar);
-        retVal.set(1L, i);
-        retVal.set(2L, j);
-        retVal.set(3L, k);
 
         return retVal;
     }
@@ -485,13 +571,13 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         case 0:
             return myScalar;
         case 1:
-            return -i;
-        case 2:
-            return -j;
-        case 3:
-            return -k;
-        case 4:
             return i;
+        case 2:
+            return j;
+        case 3:
+            return k;
+        case 4:
+            return -i;
         case 5:
             return myScalar;
         case 6:
@@ -499,7 +585,7 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         case 7:
             return -j;
         case 8:
-            return j;
+            return -j;
         case 9:
             return -k;
         case 10:
@@ -507,7 +593,7 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         case 11:
             return i;
         case 12:
-            return k;
+            return -k;
         case 13:
             return j;
         case 14:
@@ -651,8 +737,8 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
     }
 
     public boolean isReal() {
-        final NumberContext tmpCntxt = PrimitiveScalar.CONTEXT;
-        return myRealForSure || (tmpCntxt.isSmall(myScalar, i) && tmpCntxt.isSmall(myScalar, j) && tmpCntxt.isSmall(myScalar, k));
+        final NumberContext cntxt = PrimitiveScalar.CONTEXT;
+        return myRealForSure || (cntxt.isSmall(myScalar, i) && cntxt.isSmall(myScalar, j) && cntxt.isSmall(myScalar, k));
     }
 
     public boolean isSmall(final double comparedTo) {
@@ -724,7 +810,7 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         return myScalar;
     }
 
-    public Quaternion signum() {
+    public Versor signum() {
         return this.versor();
     }
 
@@ -846,8 +932,63 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
     }
 
     public void transform(final PhysicalStore<Double> matrix) {
-        // TODO Auto-generated method stub
 
+        final double ii = i * i;
+        final double jj = j * j;
+        final double kk = k * k;
+
+        final double r00 = 1.0 - (2.0 * jj) - (2.0 * kk);
+        final double r10 = (2.0 * i * j) + (2.0 * k * myScalar);
+        final double r20 = (2.0 * i * k) - (2.0 * j * myScalar);
+
+        final double r01 = (2.0 * i * j) - (2.0 * k * myScalar);
+        final double r11 = 1.0 - (2.0 * ii) - (2.0 * kk);
+        final double r21 = (2.0 * j * k) + (2.0 * i * myScalar);
+
+        final double r02 = (2.0 * i * k) + (2.0 * j * myScalar);
+        final double r12 = (2.0 * j * k) - (2.0 * i * myScalar);
+        final double r22 = 1.0 - (2.0 * ii) - (2.0 * jj);
+
+        if (matrix.count() == 3L) {
+
+            final double x = matrix.doubleValue(0);
+            final double y = matrix.doubleValue(1);
+            final double z = matrix.doubleValue(2);
+
+            matrix.set(0, (r00 * x) + (r01 * y) + (r02 * z));
+            matrix.set(1, (r10 * x) + (r11 * y) + (r12 * z));
+            matrix.set(2, (r20 * x) + (r21 * y) + (r22 * z));
+
+        } else if (matrix.countRows() == 3L) {
+
+            for (long j = 0L, limit = matrix.countColumns(); j < limit; j++) {
+
+                final double x = matrix.doubleValue(0, j);
+                final double y = matrix.doubleValue(1, j);
+                final double z = matrix.doubleValue(2, j);
+
+                matrix.set(0, j, (r00 * x) + (r01 * y) + (r02 * z));
+                matrix.set(1, j, (r10 * x) + (r11 * y) + (r12 * z));
+                matrix.set(2, j, (r20 * x) + (r21 * y) + (r22 * z));
+            }
+
+        } else if (matrix.countColumns() == 3L) {
+
+            for (long i = 0L, limit = matrix.countRows(); i < limit; i++) {
+
+                final double x = matrix.doubleValue(i, 0);
+                final double y = matrix.doubleValue(i, 1);
+                final double z = matrix.doubleValue(i, 2);
+
+                matrix.set(i, 0, (r00 * x) + (r01 * y) + (r02 * z));
+                matrix.set(i, 1, (r10 * x) + (r11 * y) + (r12 * z));
+                matrix.set(i, 2, (r20 * x) + (r21 * y) + (r22 * z));
+            }
+
+        } else {
+
+            throw new ProgrammingError("Only works for 3D stuff!");
+        }
     }
 
     public double[] unit() {
@@ -855,16 +996,32 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         if (tmpLength > 0.0) {
             return new double[] { i / tmpLength, j / tmpLength, k / tmpLength };
         } else {
-            return IJK.vector();
+            return new double[] { IJK.i, IJK.j, IJK.k };
         }
     }
 
-    public double[] vector() {
-        return new double[] { i, j, k };
+    public PhysicalStore<Double> vector() {
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(3L, 1L);
+
+        retVal.set(0L, i);
+        retVal.set(1L, j);
+        retVal.set(2L, k);
+
+        return retVal;
     }
 
-    public Quaternion versor() {
-        return this.divide(this.norm());
+    public Versor versor() {
+
+        final double norm = this.norm();
+
+        if (this.isReal()) {
+            return new Versor(myScalar / norm);
+        } else if (this.isPure()) {
+            return new Versor(i / norm, j / norm, k / norm);
+        } else {
+            return new Versor(myScalar / norm, i / norm, j / norm, k / norm);
+        }
     }
 
     private double calculateSumOfSquaresAll() {

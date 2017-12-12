@@ -40,8 +40,26 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * @author apete
  * @see org.ojalgo.function.ComplexFunction
  */
-public final class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, MatrixTransformation<Double>,
+public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, MatrixTransformation<Double>,
         Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+
+    public static final class Normalised extends ComplexNumber {
+
+        Normalised(final double real, final double imaginary) {
+            super(real, imaginary);
+        }
+
+        @Override
+        public double norm() {
+            return PrimitiveMath.ONE;
+        }
+
+        @Override
+        public Normalised signum() {
+            return this;
+        }
+
+    }
 
     public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
 
@@ -142,6 +160,10 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         }
     }
 
+    public static Normalised makeRotation(final double angle) {
+        return new Normalised(PrimitiveFunction.COS.invoke(angle), PrimitiveFunction.SIN.invoke(angle));
+    }
+
     public static ComplexNumber of(final double real, final double imaginary) {
         if (PrimitiveScalar.CONTEXT.isSmall(real, imaginary)) {
             return new ComplexNumber(real);
@@ -193,7 +215,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         i = PrimitiveMath.ZERO;
     }
 
-    private ComplexNumber(final double real, final double imaginary) {
+    ComplexNumber(final double real, final double imaginary) {
 
         super();
 
@@ -445,11 +467,11 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         return Math.atan2(i, myRealValue);
     }
 
-    public ComplexNumber signum() {
+    public ComplexNumber.Normalised signum() {
         if (ComplexNumber.isSmall(PrimitiveMath.ONE, this)) {
-            return ComplexNumber.makePolar(PrimitiveMath.ONE, PrimitiveMath.ZERO);
+            return ComplexNumber.makeRotation(PrimitiveMath.ZERO);
         } else {
-            return ComplexNumber.makePolar(PrimitiveMath.ONE, this.phase());
+            return ComplexNumber.makeRotation(this.phase());
         }
     }
 

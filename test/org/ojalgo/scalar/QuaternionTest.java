@@ -21,11 +21,15 @@
  */
 package org.ojalgo.scalar;
 
+import java.math.RoundingMode;
+
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.QuaternionFunction;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.type.context.NumberContext;
 
 public class QuaternionTest extends ScalarTests {
 
@@ -236,37 +240,40 @@ public class QuaternionTest extends ScalarTests {
         }
     }
 
-    public void testMultiplication() {
-
-        Math.random();
+    public void testRandomMultiplication() {
 
         final Quaternion normalizedRandomRotation = Quaternion.of(Math.random(), Math.random(), Math.random(), Math.random()).signum();
 
-        final Quaternion randomVector = Quaternion.of(0D, Math.random(), Math.random(), Math.random()).signum();
+        final Quaternion randomQuat = Quaternion.of(Math.random(), Math.random(), Math.random());
 
-        final Quaternion result1 = normalizedRandomRotation.multiply(randomVector);
+        final Quaternion quatResult = normalizedRandomRotation.multiply(randomQuat);
+        final MatrixStore<Double> multiplicationMatrix = normalizedRandomRotation.asReal2D();
+        final MatrixStore<Double> vctrResult = multiplicationMatrix.multiply(randomQuat.asReal1D());
 
-        final MatrixStore<Double> result2 = normalizedRandomRotation.asReal2D().multiply(randomVector.asReal1D());
+        TestUtils.assertEquals(vctrResult, quatResult.asReal1D());
 
-        TestUtils.assertEquals(result2, result1.asReal1D());
+        TestUtils.assertEquals(normalizedRandomRotation, normalizedRandomRotation.asReal2D());
 
     }
 
-    public void testRotation() {
-
-        Math.random();
+    public void testRandomRotation() {
 
         final Quaternion normalizedRandomRotation = Quaternion.of(Math.random(), Math.random(), Math.random(), Math.random()).signum();
 
-        final Quaternion randomVector = Quaternion.of(0D, Math.random(), Math.random(), Math.random()).signum();
+        final Quaternion randomPureQuat = Quaternion.of(Math.random(), Math.random(), Math.random());
 
-        final Quaternion result1 = normalizedRandomRotation.multiply(randomVector).multiply(normalizedRandomRotation.conjugate());
+        final Quaternion quatResult = normalizedRandomRotation.multiply(randomPureQuat).multiply(normalizedRandomRotation.conjugate());
 
-        final MatrixStore<Double> result3 = normalizedRandomRotation.asRealRotation2D().multiply(randomVector.asReal1D().logical().offsets(1, 0).get());
+        final MatrixStore<Double> rotationMatrix = normalizedRandomRotation.getRotationMatrix();
+        final MatrixStore<Double> vctrResult = rotationMatrix.multiply(randomPureQuat.vector());
 
-        final MatrixStore<Double> tmpExpected3 = result1.asReal1D().logical().offsets(1, 0).get();
-        TestUtils.assertEquals(tmpExpected3, result3);
+        TestUtils.assertEquals(quatResult, Quaternion.of(vctrResult.doubleValue(0), vctrResult.doubleValue(1), vctrResult.doubleValue(2)));
+        TestUtils.assertEquals(vctrResult, quatResult.vector());
 
+        final PhysicalStore<Double> vct3 = randomPureQuat.vector();
+        vct3.transform(normalizedRandomRotation);
+
+        TestUtils.assertEquals(quatResult.vector(), vct3, new NumberContext(8, 12, RoundingMode.HALF_EVEN));
     }
 
     public void testRotationMatrixMathWorksExample() {
@@ -277,7 +284,7 @@ public class QuaternionTest extends ScalarTests {
 
         final PrimitiveDenseStore expected = PrimitiveDenseStore.FACTORY.columns(new double[][] { { 1, 0, 0 }, { 0, 0, 1 }, { 0, -1, 0 } });
 
-        final MatrixStore<Double> actual = rotQuat.asRealRotation2D();
+        final MatrixStore<Double> actual = rotQuat.getRotationMatrix();
 
         TestUtils.assertEquals(expected, actual);
 
