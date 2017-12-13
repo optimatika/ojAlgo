@@ -854,18 +854,18 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
     public void supplyTo(final Mutate2D.Receiver<Double> receiver) {
         receiver.set(0L, myScalar);
-        receiver.set(1L, -i);
-        receiver.set(2L, -j);
-        receiver.set(3L, -k);
-        receiver.set(4L, i);
+        receiver.set(1L, i);
+        receiver.set(2L, j);
+        receiver.set(3L, k);
+        receiver.set(4L, -i);
         receiver.set(5L, myScalar);
         receiver.set(6L, k);
         receiver.set(7L, -j);
-        receiver.set(8L, j);
+        receiver.set(8L, -j);
         receiver.set(9L, -k);
         receiver.set(10L, myScalar);
         receiver.set(11L, i);
-        receiver.set(12L, k);
+        receiver.set(12L, -k);
         receiver.set(13L, j);
         receiver.set(14L, -i);
         receiver.set(15L, myScalar);
@@ -888,7 +888,9 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
     }
 
     public MatrixStore<Double> toMultiplicationMatrix() {
-        return PrimitiveDenseStore.FACTORY.copy(this);
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(this);
+        this.supplyTo(retVal);
+        return retVal;
     }
 
     public MatrixStore<Double> toMultiplicationVector() {

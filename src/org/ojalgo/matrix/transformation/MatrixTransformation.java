@@ -21,8 +21,17 @@
  */
 package org.ojalgo.matrix.transformation;
 
+import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.PhysicalStore;
 
+/**
+ * Represents an in-place matrix transformation – the matrix/vector operated on is mutated. A
+ * MatrixTransformation instance represents an implied transformation matrix (to be premultiplied). Through
+ * the {@link Access2D} and {@link Access2D.Collectabl} the elements of that matrix can be access and
+ * collected.
+ *
+ * @author apete
+ */
 public interface MatrixTransformation<N extends Number> {
 
     void transform(PhysicalStore<N> matrix);

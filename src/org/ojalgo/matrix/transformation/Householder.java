@@ -27,6 +27,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
@@ -445,5 +446,9 @@ public interface Householder<N extends Number> extends Access1D<N> {
      * treated as if they are, zero.
      */
     int first();
+
+    default void transform(final PhysicalStore<N> matrix) {
+        matrix.transformLeft(this, 0);
+    }
 
 }

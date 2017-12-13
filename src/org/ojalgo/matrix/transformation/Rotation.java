@@ -470,8 +470,7 @@ public abstract class Rotation<N extends Number> implements MatrixTransformation
     }
 
     public void transform(final PhysicalStore<N> matrix) {
-        // TODO Auto-generated method stub
-
+        matrix.transformLeft(this);
     }
 
 }
