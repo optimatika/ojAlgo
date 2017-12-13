@@ -35,7 +35,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
-public abstract class Rotation<N extends Number> extends Object {
+public abstract class Rotation<N extends Number> implements MatrixTransformation<N> {
 
     public static final class Big extends Rotation<BigDecimal> {
 
@@ -466,6 +466,11 @@ public abstract class Rotation<N extends Number> extends Object {
         public Generic<N> invert() {
             return new Generic<N>(high, low, cos, sin);
         }
+
+    }
+
+    public void transform(final PhysicalStore<N> matrix) {
+        // TODO Auto-generated method stub
 
     }
 
