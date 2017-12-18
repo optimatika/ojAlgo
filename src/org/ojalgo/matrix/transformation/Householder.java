@@ -31,7 +31,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
-public interface Householder<N extends Number> extends Access1D<N> {
+public interface Householder<N extends Number> extends MatrixTransformation<N>, Access1D<N> {
 
     public static final class Big extends Object implements Householder<BigDecimal> {
 
