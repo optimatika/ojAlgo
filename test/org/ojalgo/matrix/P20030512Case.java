@@ -78,7 +78,7 @@ public class P20030512Case extends BasicMatrixTest {
         myActMtrx = myExpMtrx.invert().invert();
 
         // RationalMatrix can do this, but not JamaMatrix and/or JampackMatrix
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, DEFINITION);
+        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     @Override
