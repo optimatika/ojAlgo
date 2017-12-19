@@ -31,7 +31,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class FundamentalScalarTest extends ScalarTests {
 
-    private static final Uniform UNIFORM = new Uniform(0, 10);
+    private static final Uniform UNIFORM = new Uniform(0, 4);
 
     static NumberContext CONTEXT = NumberContext.getMath(16);
 
