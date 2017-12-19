@@ -24,12 +24,28 @@ package org.ojalgo.matrix.transformation;
 import org.ojalgo.matrix.store.PhysicalStore;
 
 /**
+ * <p>
  * Represents an in-place matrix transformation – the matrix/vector operated on is mutated. A
  * MatrixTransformation instance represents an implied transformation matrix (to be used as the input argument
  * to the {@link PhysicalStore#multiply(org.ojalgo.matrix.store.MatrixStore)} or
  * {@link PhysicalStore#premultiply(org.ojalgo.access.Access1D)} methods). But, this interface does not
  * require you to disclose the size and shape of that matrix, nor to be able to explicitly access any of the
  * individual elements.
+ * </p>
+ * <p>
+ * A vector transfomation is normally defind as:
+ *
+ * <pre>
+ * [transformed vector/matrix] = [transformation matrix] x [original vector/matrix]
+ * </pre>
+ *
+ * Here we make 2 changes to that definition (1 specialisation and 1 generalisation):
+ * <ol>
+ * <li>The target vector/matrix is transformed in-place.</li>
+ * <li>Not restricted to transformations that can be expressed as premultiplication by some matrix - you can
+ * transform the target vector/matrix any way you want.</li>
+ * </ol>
+ * </p>
  *
  * @author apete
  */
