@@ -1,10 +1,8 @@
-# oj! Algorithms
+# oj! Algorithms [![Build Status](https://travis-ci.org/optimatika/ojAlgo.svg?branch=master)](https://travis-ci.org/optimatika/ojAlgo)
 
 oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.
 
 General information about ojAlgo is available at the project web site: http://ojalgo.org/
-
-Source code status: [![Build Status](https://travis-ci.org/optimatika/ojAlgo.svg?branch=master)](https://travis-ci.org/optimatika/ojAlgo)
 
 ### Artifacts
 
