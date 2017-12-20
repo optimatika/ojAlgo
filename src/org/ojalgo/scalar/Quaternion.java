@@ -171,28 +171,28 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
             } else if (matrix.countRows() == 3L) {
 
-                for (long j = 0L, limit = matrix.countColumns(); j < limit; j++) {
+                for (long c = 0L, limit = matrix.countColumns(); c < limit; c++) {
 
-                    final double x = matrix.doubleValue(0, j);
-                    final double y = matrix.doubleValue(1, j);
-                    final double z = matrix.doubleValue(2, j);
+                    final double x = matrix.doubleValue(0, c);
+                    final double y = matrix.doubleValue(1, c);
+                    final double z = matrix.doubleValue(2, c);
 
-                    matrix.set(0, j, (r00 * x) + (r01 * y) + (r02 * z));
-                    matrix.set(1, j, (r10 * x) + (r11 * y) + (r12 * z));
-                    matrix.set(2, j, (r20 * x) + (r21 * y) + (r22 * z));
+                    matrix.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
+                    matrix.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
+                    matrix.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
                 }
 
             } else if (matrix.countColumns() == 3L) {
 
-                for (long i = 0L, limit = matrix.countRows(); i < limit; i++) {
+                for (long r = 0L, limit = matrix.countRows(); r < limit; r++) {
 
-                    final double x = matrix.doubleValue(i, 0);
-                    final double y = matrix.doubleValue(i, 1);
-                    final double z = matrix.doubleValue(i, 2);
+                    final double x = matrix.doubleValue(r, 0);
+                    final double y = matrix.doubleValue(r, 1);
+                    final double z = matrix.doubleValue(r, 2);
 
-                    matrix.set(i, 0, (r00 * x) + (r01 * y) + (r02 * z));
-                    matrix.set(i, 1, (r10 * x) + (r11 * y) + (r12 * z));
-                    matrix.set(i, 2, (r20 * x) + (r21 * y) + (r22 * z));
+                    matrix.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
+                    matrix.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
+                    matrix.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
                 }
 
             } else {

@@ -24,11 +24,14 @@ package org.ojalgo.scalar;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.MatrixTransformation;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -57,6 +60,53 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         @Override
         public Normalised signum() {
             return this;
+        }
+
+        @Override
+        public void transform(final PhysicalStore<Double> matrix) {
+
+            final double s = this.doubleValue();
+
+            final double ss = s * s;
+            final double ii = i * i;
+
+            final double r00 = (ii + ss);
+            final double r11 = (ss - ii);
+
+            if (matrix.count() == 2L) {
+
+                final double x = matrix.doubleValue(0);
+                final double y = matrix.doubleValue(1);
+
+                matrix.set(0, r00 * x);
+                matrix.set(1, r11 * y);
+
+            } else if (matrix.countRows() == 2L) {
+
+                for (long c = 0L, limit = matrix.countColumns(); c < limit; c++) {
+
+                    final double x = matrix.doubleValue(0, c);
+                    final double y = matrix.doubleValue(1, c);
+
+                    matrix.set(0, c, r00 * x);
+                    matrix.set(1, c, r11 * y);
+                }
+
+            } else if (matrix.countColumns() == 2L) {
+
+                for (long r = 0L, limit = matrix.countRows(); r < limit; r++) {
+
+                    final double x = matrix.doubleValue(r, 0);
+                    final double y = matrix.doubleValue(r, 1);
+
+                    matrix.set(r, 0, r00 * x);
+                    matrix.set(r, 1, r11 * y);
+                }
+
+            } else {
+
+                throw new ProgrammingError("Only works for 2D stuff!");
+            }
         }
 
     }
@@ -495,6 +545,42 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return new BigDecimal(this.doubleValue(), MathContext.DECIMAL64);
     }
 
+    public MatrixStore<Double> toMultiplicationMatrix() {
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(this);
+        this.supplyTo(retVal);
+        return retVal;
+    }
+
+    public MatrixStore<Double> toMultiplicationVector() {
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(2L, 1L);
+
+        retVal.set(0L, myRealValue);
+        retVal.set(1L, i);
+
+        return retVal;
+    }
+
+    public MatrixStore<Double> toRotationMatrix() {
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(2L, 2L);
+
+        final double s = myRealValue;
+
+        final double ss = s * s;
+        final double ii = i * i;
+
+        final double invs = 1.0 / (ii + ss);
+
+        final double r00 = (ii + ss) * invs;
+        final double r11 = (ss - ii) * invs;
+
+        retVal.set(0L, r00);
+        retVal.set(3L, r11);
+
+        return retVal;
+    }
+
     /**
      * @see java.lang.Object#toString()
      */
@@ -538,8 +624,51 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     }
 
     public void transform(final PhysicalStore<Double> matrix) {
-        // TODO Auto-generated method stub
 
+        final double s = myRealValue;
+
+        final double ss = s * s;
+        final double ii = i * i;
+
+        final double invs = 1.0 / (ii + ss);
+
+        final double r00 = (ii + ss) * invs;
+        final double r11 = (ss - ii) * invs;
+
+        if (matrix.count() == 2L) {
+
+            final double x = matrix.doubleValue(0);
+            final double y = matrix.doubleValue(1);
+
+            matrix.set(0, r00 * x);
+            matrix.set(1, r11 * y);
+
+        } else if (matrix.countRows() == 2L) {
+
+            for (long c = 0L, limit = matrix.countColumns(); c < limit; c++) {
+
+                final double x = matrix.doubleValue(0, c);
+                final double y = matrix.doubleValue(1, c);
+
+                matrix.set(0, c, r00 * x);
+                matrix.set(1, c, r11 * y);
+            }
+
+        } else if (matrix.countColumns() == 2L) {
+
+            for (long r = 0L, limit = matrix.countRows(); r < limit; r++) {
+
+                final double x = matrix.doubleValue(r, 0);
+                final double y = matrix.doubleValue(r, 1);
+
+                matrix.set(r, 0, r00 * x);
+                matrix.set(r, 1, r11 * y);
+            }
+
+        } else {
+
+            throw new ProgrammingError("Only works for 2D stuff!");
+        }
     }
 
 }
