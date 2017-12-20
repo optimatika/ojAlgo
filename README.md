@@ -4,7 +4,7 @@ oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathemati
 
 General information about ojAlgo is available at the project web site: http://ojalgo.org/
 
-[![Build Status](https://travis-ci.org/optimatika/ojAlgo.svg?branch=master)](https://travis-ci.org/optimatika/ojAlgo)
+Source code status: [![Build Status](https://travis-ci.org/optimatika/ojAlgo.svg?branch=master)](https://travis-ci.org/optimatika/ojAlgo)
 
 ### Artifacts
 
