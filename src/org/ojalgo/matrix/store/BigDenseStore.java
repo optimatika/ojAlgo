@@ -69,7 +69,7 @@ import org.ojalgo.type.context.NumberContext;
 @Deprecated
 public final class BigDenseStore extends BigArray implements PhysicalStore<BigDecimal>, DecompositionStore<BigDecimal> {
 
-    public static interface BigMultiplyBoth extends FillByMultiplying<BigDecimal> {
+    public static interface BigMultiplyBoth extends ElementsConsumer.FillByMultiplying<BigDecimal> {
 
     }
 
@@ -924,23 +924,23 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
     }
 
     public final ElementsConsumer<BigDecimal> regionByColumns(final int... columns) {
-        return new ColumnsRegion<>(this, multiplyBoth, columns);
+        return new ElementsConsumer.ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
     public final ElementsConsumer<BigDecimal> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
+        return new ElementsConsumer.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
     public final ElementsConsumer<BigDecimal> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
+        return new ElementsConsumer.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
     public final ElementsConsumer<BigDecimal> regionByRows(final int... rows) {
-        return new RowsRegion<>(this, multiplyBoth, rows);
+        return new ElementsConsumer.RowsRegion<>(this, multiplyBoth, rows);
     }
 
     public final ElementsConsumer<BigDecimal> regionByTransposing() {
-        return new TransposedRegion<>(this, multiplyBoth);
+        return new ElementsConsumer.TransposedRegion<>(this, multiplyBoth);
     }
 
     public void rotateRight(final int low, final int high, final double cos, final double sin) {

@@ -64,14 +64,16 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class GenericDenseStore<N extends Number & Scalar<N>> extends ScalarArray<N> implements PhysicalStore<N>, DecompositionStore<N> {
 
-    public static interface GenericMultiplyBoth<N extends Number & Scalar<N>> extends FillByMultiplying<N> {
+    public static interface GenericMultiplyBoth<N extends Number & Scalar<N>> extends ElementsConsumer.FillByMultiplying<N> {
 
     }
+
     public static interface GenericMultiplyLeft<N extends Number & Scalar<N>> {
 
         void invoke(N[] product, Access1D<N> left, int complexity, N[] right, Scalar.Factory<N> scalar);
 
     }
+
     public static interface GenericMultiplyNeither<N extends Number & Scalar<N>> {
 
         void invoke(N[] product, N[] left, int complexity, N[] right, Scalar.Factory<N> scalar);
@@ -929,23 +931,23 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     public final ElementsConsumer<N> regionByColumns(final int... columns) {
-        return new ColumnsRegion<>(this, multiplyBoth, columns);
+        return new ElementsConsumer.ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
     public final ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
+        return new ElementsConsumer.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
     public final ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
+        return new ElementsConsumer.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
     public final ElementsConsumer<N> regionByRows(final int... rows) {
-        return new RowsRegion<>(this, multiplyBoth, rows);
+        return new ElementsConsumer.RowsRegion<>(this, multiplyBoth, rows);
     }
 
     public final ElementsConsumer<N> regionByTransposing() {
-        return new TransposedRegion<>(this, multiplyBoth);
+        return new ElementsConsumer.TransposedRegion<>(this, multiplyBoth);
     }
 
     public void rotateRight(final int low, final int high, final double cos, final double sin) {

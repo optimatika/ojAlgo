@@ -32,11 +32,11 @@ interface GeometryMatrix<MT extends GeometryMatrix<? super MT>> extends MatrixSt
     double doubleValue(int row, int col);
 
     default double doubleValue(final long row, final long col) {
-        return MatrixStore.super.doubleValue((int) row, (int) col);
+        return this.doubleValue((int) row, (int) col);
     }
 
     default Double get(final long row, final long col) {
-        return MatrixStore.super.doubleValue((int) row, (int) col);
+        return this.doubleValue((int) row, (int) col);
     }
 
     @SuppressWarnings("unchecked")
@@ -46,10 +46,15 @@ interface GeometryMatrix<MT extends GeometryMatrix<? super MT>> extends MatrixSt
         return retVal;
     }
 
+    /**
+     * Will set this to be the negated input matrix
+     *
+     * @param matrix The matrix to negate
+     */
     void negate(MT matrix);
 
     /**
-     * package private
+     * protected
      */
     @SuppressWarnings("unchecked")
     @Deprecated
@@ -72,6 +77,11 @@ interface GeometryMatrix<MT extends GeometryMatrix<? super MT>> extends MatrixSt
         return retVal;
     }
 
+    /**
+     * Will set this to be the transposed input matrix
+     *
+     * @param matrix The matrix to transpose
+     */
     void transpose(MT matrix);
 
 }

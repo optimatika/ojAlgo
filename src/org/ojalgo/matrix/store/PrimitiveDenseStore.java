@@ -69,7 +69,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class PrimitiveDenseStore extends Primitive64Array implements PhysicalStore<Double>, DecompositionStore<Double> {
 
-    public static interface PrimitiveMultiplyBoth extends FillByMultiplying<Double> {
+    public static interface PrimitiveMultiplyBoth extends ElementsConsumer.FillByMultiplying<Double> {
 
     }
 
@@ -971,23 +971,23 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     public final ElementsConsumer<Double> regionByColumns(final int... columns) {
-        return new ColumnsRegion<>(this, multiplyBoth, columns);
+        return new ElementsConsumer.ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
     public final ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
+        return new ElementsConsumer.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
     public final ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
+        return new ElementsConsumer.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
     public final ElementsConsumer<Double> regionByRows(final int... rows) {
-        return new RowsRegion<>(this, multiplyBoth, rows);
+        return new ElementsConsumer.RowsRegion<>(this, multiplyBoth, rows);
     }
 
     public final ElementsConsumer<Double> regionByTransposing() {
-        return new TransposedRegion<>(this, multiplyBoth);
+        return new ElementsConsumer.TransposedRegion<>(this, multiplyBoth);
     }
 
     public void rotateRight(final int low, final int high, final double cos, final double sin) {

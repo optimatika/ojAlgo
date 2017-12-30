@@ -23,8 +23,12 @@ package org.ojalgo.matrix.geometry;
 
 import java.io.Serializable;
 
-import org.ojalgo.access.Structure1D;
+import org.ojalgo.matrix.store.ElementsConsumer;
 
-interface GeometryVector extends Structure1D, Serializable {
+abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> implements Serializable {
+
+    GeometryVector(final FillByMultiplying<Double> multiplier, final long rows, final long columns) {
+        super(multiplier, rows, columns);
+    }
 
 }

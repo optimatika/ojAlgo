@@ -35,12 +35,12 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.PhysicalStore.ColumnsRegion;
-import org.ojalgo.matrix.store.PhysicalStore.FillByMultiplying;
-import org.ojalgo.matrix.store.PhysicalStore.LimitRegion;
-import org.ojalgo.matrix.store.PhysicalStore.OffsetRegion;
-import org.ojalgo.matrix.store.PhysicalStore.RowsRegion;
-import org.ojalgo.matrix.store.PhysicalStore.TransposedRegion;
+import org.ojalgo.matrix.store.ElementsConsumer.ColumnsRegion;
+import org.ojalgo.matrix.store.ElementsConsumer.FillByMultiplying;
+import org.ojalgo.matrix.store.ElementsConsumer.LimitRegion;
+import org.ojalgo.matrix.store.ElementsConsumer.OffsetRegion;
+import org.ojalgo.matrix.store.ElementsConsumer.RowsRegion;
+import org.ojalgo.matrix.store.ElementsConsumer.TransposedRegion;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
@@ -75,7 +75,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     private final SparseArray<N> myElements;
     private final int[] myFirsts;
     private final int[] myLimits;
-    private final FillByMultiplying<N> myMultiplyer;
+    private final ElementsConsumer.FillByMultiplying<N> myMultiplyer;
 
     SparseStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
 
@@ -89,11 +89,11 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
         final Class<? extends Number> tmpType = factory.scalar().zero().get().getClass();
         if (tmpType.equals(Double.class)) {
-            myMultiplyer = (FillByMultiplying<N>) MultiplyBoth.getPrimitive(rowsCount, columnsCount);
+            myMultiplyer = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getPrimitive(rowsCount, columnsCount);
         } else if (tmpType.equals(ComplexNumber.class)) {
-            myMultiplyer = (FillByMultiplying<N>) MultiplyBoth.getGeneric(rowsCount, columnsCount);
+            myMultiplyer = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getGeneric(rowsCount, columnsCount);
         } else if (tmpType.equals(BigDecimal.class)) {
-            myMultiplyer = (FillByMultiplying<N>) MultiplyBoth.getBig(rowsCount, columnsCount);
+            myMultiplyer = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getBig(rowsCount, columnsCount);
         } else {
             myMultiplyer = null;
         }
@@ -330,23 +330,23 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public ElementsConsumer<N> regionByColumns(final int... columns) {
-        return new ColumnsRegion<>(this, myMultiplyer, columns);
+        return new ElementsConsumer.ColumnsRegion<>(this, myMultiplyer, columns);
     }
 
     public ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new LimitRegion<>(this, myMultiplyer, rowLimit, columnLimit);
+        return new ElementsConsumer.LimitRegion<>(this, myMultiplyer, rowLimit, columnLimit);
     }
 
     public ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new OffsetRegion<>(this, myMultiplyer, rowOffset, columnOffset);
+        return new ElementsConsumer.OffsetRegion<>(this, myMultiplyer, rowOffset, columnOffset);
     }
 
     public ElementsConsumer<N> regionByRows(final int... rows) {
-        return new RowsRegion<>(this, myMultiplyer, rows);
+        return new ElementsConsumer.RowsRegion<>(this, myMultiplyer, rows);
     }
 
     public ElementsConsumer<N> regionByTransposing() {
-        return new TransposedRegion<>(this, myMultiplyer);
+        return new ElementsConsumer.TransposedRegion<>(this, myMultiplyer);
     }
 
     public void reset() {

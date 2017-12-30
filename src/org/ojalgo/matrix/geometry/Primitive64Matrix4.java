@@ -1,5 +1,7 @@
 package org.ojalgo.matrix.geometry;
 
+import org.ojalgo.matrix.MatrixUtils;
+
 public class Primitive64Matrix4 implements GeometryMatrix<Primitive64Matrix4> {
 
     /**
@@ -33,15 +35,15 @@ public class Primitive64Matrix4 implements GeometryMatrix<Primitive64Matrix4> {
         this.m33 = m33;
     }
 
-    public long countColumns() {
+    public final long countColumns() {
         return 4L;
     }
 
-    public long countRows() {
+    public final long countRows() {
         return 4L;
     }
 
-    public double doubleValue(final int row, final int col) {
+    public final double doubleValue(final int row, final int col) {
         switch (col) {
         case 0:
             switch (row) {
@@ -102,7 +104,7 @@ public class Primitive64Matrix4 implements GeometryMatrix<Primitive64Matrix4> {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public final boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -165,7 +167,7 @@ public class Primitive64Matrix4 implements GeometryMatrix<Primitive64Matrix4> {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         final int prime = 31;
         int result = 1;
         long temp;
@@ -204,7 +206,7 @@ public class Primitive64Matrix4 implements GeometryMatrix<Primitive64Matrix4> {
         return result;
     }
 
-    public void negate(final Primitive64Matrix4 matrix) {
+    public final void negate(final Primitive64Matrix4 matrix) {
 
         m00 = -matrix.m00;
         m01 = -matrix.m01;
@@ -227,7 +229,7 @@ public class Primitive64Matrix4 implements GeometryMatrix<Primitive64Matrix4> {
         m33 = -matrix.m33;
     }
 
-    public void transpose(final Primitive64Matrix4 matrix) {
+    public final void transpose(final Primitive64Matrix4 matrix) {
 
         m00 = matrix.m00;
         m01 = matrix.m10;
@@ -248,6 +250,11 @@ public class Primitive64Matrix4 implements GeometryMatrix<Primitive64Matrix4> {
         m31 = matrix.m13;
         m32 = matrix.m23;
         m33 = matrix.m33;
+    }
+
+    @Override
+    public final String toString() {
+        return MatrixUtils.toString(this);
     }
 
 }

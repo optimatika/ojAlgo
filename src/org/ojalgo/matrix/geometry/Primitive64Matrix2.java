@@ -1,5 +1,7 @@
 package org.ojalgo.matrix.geometry;
 
+import org.ojalgo.matrix.MatrixUtils;
+
 public class Primitive64Matrix2 implements GeometryMatrix<Primitive64Matrix2> {
 
     /**
@@ -11,15 +13,15 @@ public class Primitive64Matrix2 implements GeometryMatrix<Primitive64Matrix2> {
         super();
     }
 
-    public long countColumns() {
+    public final long countColumns() {
         return 2L;
     }
 
-    public long countRows() {
+    public final long countRows() {
         return 2L;
     }
 
-    public double doubleValue(final int row, final int col) {
+    public final double doubleValue(final int row, final int col) {
         switch (col) {
         case 0:
             switch (row) {
@@ -46,7 +48,7 @@ public class Primitive64Matrix2 implements GeometryMatrix<Primitive64Matrix2> {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public final boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -73,7 +75,7 @@ public class Primitive64Matrix2 implements GeometryMatrix<Primitive64Matrix2> {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         final int prime = 31;
         int result = 1;
         long temp;
@@ -88,7 +90,7 @@ public class Primitive64Matrix2 implements GeometryMatrix<Primitive64Matrix2> {
         return result;
     }
 
-    public void negate(final Primitive64Matrix2 matrix) {
+    public final void negate(final Primitive64Matrix2 matrix) {
 
         m00 = -matrix.m00;
         m01 = -matrix.m01;
@@ -97,13 +99,18 @@ public class Primitive64Matrix2 implements GeometryMatrix<Primitive64Matrix2> {
         m11 = -matrix.m11;
     }
 
-    public void transpose(final Primitive64Matrix2 matrix) {
+    public final void transpose(final Primitive64Matrix2 matrix) {
 
         m00 = matrix.m00;
         m01 = matrix.m10;
 
         m10 = matrix.m01;
         m11 = matrix.m11;
+    }
+
+    @Override
+    public final String toString() {
+        return MatrixUtils.toString(this);
     }
 
 }
