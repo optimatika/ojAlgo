@@ -1,7 +1,5 @@
 package org.ojalgo.matrix.geometry;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 
@@ -23,8 +21,39 @@ public class Primitive32Vector3 extends GeometryVector {
         this.v2 = v2;
     }
 
+    @Override
+    public final void add(final int row, final double addend) {
+        switch (row) {
+        case 0:
+            v0 += addend;
+            break;
+        case 1:
+            v1 += addend;
+            break;
+        case 2:
+            v2 += addend;
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
     public final long count() {
         return 3L;
+    }
+
+    @Override
+    public final double doubleValue(final int index) {
+        switch (index) {
+        case 0:
+            return v0;
+        case 1:
+            return v1;
+        case 2:
+            return v2;
+        default:
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override
@@ -61,53 +90,37 @@ public class Primitive32Vector3 extends GeometryVector {
         return result;
     }
 
-    public void add(final long row, final long col, final double addend) {
-        // TODO Auto-generated method stub
-
+    @Override
+    public final void modifyOne(final int row, final UnaryFunction<Double> modifier) {
+        switch (row) {
+        case 0:
+            v0 = (float) modifier.invoke(v0);
+            break;
+        case 1:
+            v1 = (float) modifier.invoke(v1);
+            break;
+        case 2:
+            v2 = (float) modifier.invoke(v2);
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
     }
 
-    public void add(final long row, final long col, final Number addend) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void set(final long row, final long col, final double value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void set(final long row, final long col, final Number value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public long countColumns() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public long countRows() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void fillOne(final long row, final long col, final Double value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void modifyOne(final long row, final long col, final UnaryFunction<Double> modifier) {
-        // TODO Auto-generated method stub
-
+    @Override
+    public final void set(final int row, final double value) {
+        switch (row) {
+        case 0:
+            v0 = (float) value;
+            break;
+        case 1:
+            v1 = (float) value;
+            break;
+        case 2:
+            v2 = (float) value;
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
     }
 }

@@ -1,10 +1,6 @@
 package org.ojalgo.matrix.geometry;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 
 public class Primitive32Vector2 extends GeometryVector {
@@ -24,28 +20,34 @@ public class Primitive32Vector2 extends GeometryVector {
         this.v1 = v1;
     }
 
-    public void add(final long row, final long col, final double addend) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void add(final long row, final long col, final Number addend) {
-        // TODO Auto-generated method stub
-
+    @Override
+    public final void add(final int row, final double addend) {
+        switch (row) {
+        case 0:
+            v0 += addend;
+            break;
+        case 1:
+            v1 += addend;
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
     }
 
     public final long count() {
         return 2L;
     }
 
-    public long countColumns() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public long countRows() {
-        // TODO Auto-generated method stub
-        return 0;
+    @Override
+    public final double doubleValue(final int index) {
+        switch (index) {
+        case 0:
+            return v0;
+        case 1:
+            return v1;
+        default:
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override
@@ -69,21 +71,6 @@ public class Primitive32Vector2 extends GeometryVector {
         return true;
     }
 
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void fillOne(final long row, final long col, final Double value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
-        // TODO Auto-generated method stub
-
-    }
-
     @Override
     public final int hashCode() {
         final int prime = 31;
@@ -94,36 +81,31 @@ public class Primitive32Vector2 extends GeometryVector {
     }
 
     @Override
-    public void modifyMatching(final Access1D<Double> left, final BinaryFunction<Double> function) {
-        // TODO Auto-generated method stub
-
+    public final void modifyOne(final int row, final UnaryFunction<Double> modifier) {
+        switch (row) {
+        case 0:
+            v0 = (float) modifier.invoke(v0);
+            break;
+        case 1:
+            v1 = (float) modifier.invoke(v1);
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override
-    public void modifyMatching(final BinaryFunction<Double> function, final Access1D<Double> right) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void modifyOne(final long row, final long col, final UnaryFunction<Double> modifier) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public ElementsConsumer<Double> regionByTransposing() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void set(final long row, final long col, final double value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void set(final long row, final long col, final Number value) {
-        // TODO Auto-generated method stub
-
+    public final void set(final int row, final double value) {
+        switch (row) {
+        case 0:
+            v0 = (float) value;
+            break;
+        case 1:
+            v1 = (float) value;
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
     }
 
 }

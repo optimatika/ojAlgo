@@ -21,14 +21,71 @@
  */
 package org.ojalgo.matrix.geometry;
 
-import java.io.Serializable;
-
+import org.ojalgo.access.Access1D;
+import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.ElementsConsumer;
 
-abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> implements Serializable {
+abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> implements Access1D<Double> {
 
     GeometryVector(final FillByMultiplying<Double> multiplier, final long rows, final long columns) {
         super(multiplier, rows, columns);
+    }
+
+    public abstract void add(int row, double addend);
+
+    public final void add(final long row, final long col, final double addend) {
+        this.add((int) row, addend);
+    }
+
+    public final void add(final long row, final long col, final Number addend) {
+        this.add((int) row, addend.doubleValue());
+    }
+
+    public final long countColumns() {
+        return 1L;
+    }
+
+    public final long countRows() {
+        return this.count();
+    }
+
+    public final void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+        this.set((int) row, values.doubleValue(valueIndex));
+    }
+
+    public final void fillOne(final long row, final long col, final Double value) {
+        this.set((int) row, value.doubleValue());
+    }
+
+    public final void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
+        this.set((int) row, supplier.doubleValue());
+    }
+
+    public abstract void set(int row, double value);
+
+    public final void set(final long row, final long col, final double value) {
+        this.set((int) row, value);
+    }
+
+    public final void set(final long row, final long col, final Number value) {
+        this.set((int) row, value.doubleValue());
+    }
+
+    public abstract void modifyOne(int row, UnaryFunction<Double> modifier);
+
+    public final void modifyOne(final long row, final long col, final UnaryFunction<Double> modifier) {
+        this.modifyOne((int) row, modifier);
+    }
+
+    public abstract double doubleValue(int index);
+
+    public final double doubleValue(final long index) {
+        return this.doubleValue((int) index);
+    }
+
+    public final Double get(final long index) {
+        return this.doubleValue((int) index);
     }
 
 }

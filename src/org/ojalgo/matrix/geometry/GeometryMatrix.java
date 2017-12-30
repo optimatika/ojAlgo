@@ -21,13 +21,11 @@
  */
 package org.ojalgo.matrix.geometry;
 
-import java.io.Serializable;
-
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
-interface GeometryMatrix<MT extends GeometryMatrix<? super MT>> extends MatrixStore<Double>, Serializable {
+interface GeometryMatrix<MT extends GeometryMatrix<? super MT>> extends MatrixStore<Double> {
 
     double doubleValue(int row, int col);
 
