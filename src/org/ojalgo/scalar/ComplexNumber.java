@@ -32,7 +32,7 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.transformation.MatrixTransformation;
+import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -43,7 +43,7 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * @author apete
  * @see org.ojalgo.function.ComplexFunction
  */
-public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, MatrixTransformation<Double>,
+public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, TransformationMatrix<Double>,
         Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public static final class Normalised extends ComplexNumber {

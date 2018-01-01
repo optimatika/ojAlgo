@@ -35,7 +35,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
-public abstract class Rotation<N extends Number> implements MatrixTransformation<N> {
+public abstract class Rotation<N extends Number> implements TransformationMatrix<N> {
 
     public static final class Big extends Rotation<BigDecimal> {
 

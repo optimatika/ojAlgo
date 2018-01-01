@@ -32,7 +32,7 @@ import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.transformation.Householder;
-import org.ojalgo.matrix.transformation.MatrixTransformation;
+import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
 
@@ -137,7 +137,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      */
     void transformLeft(Rotation<N> transformation);
 
-    default void transform(final MatrixTransformation<N> transformation) {
+    default void transform(final TransformationMatrix<N> transformation) {
         transformation.transform(this);
     }
 

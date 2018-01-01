@@ -32,11 +32,11 @@ import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.transformation.MatrixTransformation;
+import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, MatrixTransformation<Double>,
+public class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, TransformationMatrix<Double>,
         Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public static enum RotationAxis {
