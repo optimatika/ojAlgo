@@ -36,11 +36,12 @@ import org.ojalgo.matrix.store.PhysicalStore;
  * A vector transfomation is normally defind as:
  *
  * <pre>
- * [transformed vector/matrix] = [transformation matrix] x [original vector/matrix]
+ * [transformed vector] = [transformation matrix] x [original vector]
  * </pre>
  *
- * Here we make 2 changes to that definition (1 specialisation and 1 generalisation):
+ * Here we make some specialisation and generalisation to that definition:
  * <ol>
+ * <li>The target vector/matrix is not restricted to be a vector - it can be a matrix of any size/shape.</li>
  * <li>The target vector/matrix is transformed in-place.</li>
  * <li>Not restricted to transformations that can be expressed as premultiplication by some matrix - you can
  * transform the target vector/matrix any way you want.</li>
