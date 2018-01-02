@@ -1,8 +1,9 @@
 package org.ojalgo.matrix.geometry;
 
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.transformation.TransformationMatrix;
 
-public class Primitive64Matrix3 implements GeometryMatrix<Primitive64Matrix3> {
+public class Primitive64Matrix3 implements GeometryMatrix<Primitive64Matrix3>, TransformationMatrix<Double, Primitive64Vector3> {
 
     /**
      * The matrix elements
@@ -159,6 +160,20 @@ public class Primitive64Matrix3 implements GeometryMatrix<Primitive64Matrix3> {
         m22 = -matrix.m22;
     }
 
+    @Override
+    public final String toString() {
+        return MatrixUtils.toString(this);
+    }
+
+    public void transform(final Primitive64Vector3 transformable) {
+
+        final double tmp0 = transformable.v0, tmp1 = transformable.v1, tmp2 = transformable.v2;
+
+        transformable.v0 = (m00 * tmp0) + (m01 * tmp1) + (m02 * tmp2);
+        transformable.v1 = (m10 * tmp0) + (m11 * tmp1) + (m12 * tmp2);
+        transformable.v2 = (m20 * tmp0) + (m21 * tmp1) + (m22 * tmp2);
+    }
+
     public final void transpose(final Primitive64Matrix3 matrix) {
 
         m00 = matrix.m00;
@@ -172,11 +187,6 @@ public class Primitive64Matrix3 implements GeometryMatrix<Primitive64Matrix3> {
         m20 = matrix.m02;
         m21 = matrix.m12;
         m22 = matrix.m22;
-    }
-
-    @Override
-    public final String toString() {
-        return MatrixUtils.toString(this);
     }
 
 }

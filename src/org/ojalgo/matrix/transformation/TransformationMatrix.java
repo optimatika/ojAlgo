@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.transformation;
 
-import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.transformation.TransformationMatrix.Transformable;
 
 /**
  * <p>
@@ -49,8 +49,17 @@ import org.ojalgo.matrix.store.PhysicalStore;
  * @author apete
  */
 @FunctionalInterface
-public interface TransformationMatrix<N extends Number> {
+public interface TransformationMatrix<N extends Number, T extends Transformable<N>> {
 
-    void transform(PhysicalStore<N> transformable);
+    interface Transformable<N extends Number> {
+
+        @SuppressWarnings("unchecked")
+        default <T extends Transformable<N>> void transform(final TransformationMatrix<N, T> transformation) {
+            transformation.transform((T) this);
+        }
+
+    }
+
+    void transform(T transformable);
 
 }

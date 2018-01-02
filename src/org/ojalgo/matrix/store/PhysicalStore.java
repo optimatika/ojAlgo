@@ -32,8 +32,8 @@ import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.transformation.Householder;
-import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.matrix.transformation.Rotation;
+import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -47,7 +47,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2D.IndexOf, ElementsConsumer<N>, Mutate2D.Exchangeable {
+public interface PhysicalStore<N extends Number>
+        extends MatrixStore<N>, Access2D.IndexOf, ElementsConsumer<N>, Mutate2D.Exchangeable, TransformationMatrix.Transformable<N> {
 
     public static interface Factory<N extends Number, I extends PhysicalStore<N>> extends Factory2D<I>, Serializable {
 
@@ -136,10 +137,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * @see #transformRight(Rotation)
      */
     void transformLeft(Rotation<N> transformation);
-
-    default void transform(final TransformationMatrix<N> transformation) {
-        transformation.transform(this);
-    }
 
     void transformRight(Householder<N> transformation, int firstRow);
 

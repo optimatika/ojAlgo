@@ -1,8 +1,9 @@
 package org.ojalgo.matrix.geometry;
 
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.transformation.TransformationMatrix;
 
-public class Primitive32Matrix2 implements GeometryMatrix<Primitive32Matrix2> {
+public class Primitive32Matrix2 implements GeometryMatrix<Primitive32Matrix2>, TransformationMatrix<Double, Primitive32Vector2> {
 
     /**
      * The matrix elements
@@ -102,6 +103,19 @@ public class Primitive32Matrix2 implements GeometryMatrix<Primitive32Matrix2> {
         m11 = -matrix.m11;
     }
 
+    @Override
+    public final String toString() {
+        return MatrixUtils.toString(this);
+    }
+
+    public void transform(final Primitive32Vector2 transformable) {
+
+        final float tmp0 = transformable.v0, tmp1 = transformable.v1;
+
+        transformable.v0 = (m00 * tmp0) + (m01 * tmp1);
+        transformable.v1 = (m10 * tmp0) + (m11 * tmp1);
+    }
+
     public final void transpose(final Primitive32Matrix2 matrix) {
 
         m00 = matrix.m00;
@@ -109,11 +123,6 @@ public class Primitive32Matrix2 implements GeometryMatrix<Primitive32Matrix2> {
 
         m10 = matrix.m01;
         m11 = matrix.m11;
-    }
-
-    @Override
-    public final String toString() {
-        return MatrixUtils.toString(this);
     }
 
 }

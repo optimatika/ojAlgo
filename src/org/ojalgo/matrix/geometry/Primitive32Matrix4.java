@@ -1,8 +1,9 @@
 package org.ojalgo.matrix.geometry;
 
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.transformation.TransformationMatrix;
 
-public class Primitive32Matrix4 implements GeometryMatrix<Primitive32Matrix4> {
+public class Primitive32Matrix4 implements GeometryMatrix<Primitive32Matrix4>, TransformationMatrix<Double, Primitive32Vector4> {
 
     /**
      * The matrix elements
@@ -212,6 +213,21 @@ public class Primitive32Matrix4 implements GeometryMatrix<Primitive32Matrix4> {
         m33 = -matrix.m33;
     }
 
+    @Override
+    public final String toString() {
+        return MatrixUtils.toString(this);
+    }
+
+    public void transform(final Primitive32Vector4 transformable) {
+
+        final float tmp0 = transformable.v0, tmp1 = transformable.v1, tmp2 = transformable.v2, tmp3 = transformable.v3;
+
+        transformable.v0 = (m00 * tmp0) + (m01 * tmp1) + (m02 * tmp2) + (m03 * tmp3);
+        transformable.v1 = (m10 * tmp0) + (m11 * tmp1) + (m12 * tmp2) + (m13 * tmp3);
+        transformable.v2 = (m20 * tmp0) + (m21 * tmp1) + (m22 * tmp2) + (m23 * tmp3);
+        transformable.v3 = (m30 * tmp0) + (m31 * tmp1) + (m32 * tmp2) + (m33 * tmp3);
+    }
+
     public final void transpose(final Primitive32Matrix4 matrix) {
 
         m00 = matrix.m00;
@@ -233,11 +249,6 @@ public class Primitive32Matrix4 implements GeometryMatrix<Primitive32Matrix4> {
         m31 = matrix.m13;
         m32 = matrix.m23;
         m33 = matrix.m33;
-    }
-
-    @Override
-    public final String toString() {
-        return MatrixUtils.toString(this);
     }
 
 }

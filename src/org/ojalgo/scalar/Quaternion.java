@@ -36,8 +36,8 @@ import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, TransformationMatrix<Double>,
-        Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+public class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>,
+        TransformationMatrix<Double, PhysicalStore<Double>>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public static enum RotationAxis {
 

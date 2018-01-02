@@ -25,8 +25,9 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.ElementsConsumer;
+import org.ojalgo.matrix.transformation.TransformationMatrix;
 
-abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> implements Access1D<Double> {
+abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> implements Access1D<Double>, TransformationMatrix.Transformable<Double> {
 
     GeometryVector(final FillByMultiplying<Double> multiplier, final long rows, final long columns) {
         super(multiplier, rows, columns);
