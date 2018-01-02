@@ -108,7 +108,7 @@ public class Primitive32Matrix2 implements GeometryMatrix<Primitive32Matrix2>, T
         return MatrixUtils.toString(this);
     }
 
-    public void transform(final Primitive32Vector2 transformable) {
+    public final void transform(final Primitive32Vector2 transformable) {
 
         final float tmp0 = transformable.v0, tmp1 = transformable.v1;
 

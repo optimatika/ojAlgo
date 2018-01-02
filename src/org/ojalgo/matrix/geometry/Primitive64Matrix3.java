@@ -165,7 +165,7 @@ public class Primitive64Matrix3 implements GeometryMatrix<Primitive64Matrix3>, T
         return MatrixUtils.toString(this);
     }
 
-    public void transform(final Primitive64Vector3 transformable) {
+    public final void transform(final Primitive64Vector3 transformable) {
 
         final double tmp0 = transformable.v0, tmp1 = transformable.v1, tmp2 = transformable.v2;
 
