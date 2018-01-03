@@ -94,6 +94,14 @@ public class Primitive32Matrix2 implements GeometryMatrix<Primitive32Matrix2>, T
         return result;
     }
 
+    public final void multiply(final Primitive32Vector2 right, final Primitive32Vector2 product) {
+
+        final float right0 = right.v0, right1 = right.v1;
+
+        product.v0 = (m00 * right0) + (m01 * right1);
+        product.v1 = (m10 * right0) + (m11 * right1);
+    }
+
     public final void negate(final Primitive32Matrix2 matrix) {
 
         m00 = -matrix.m00;
@@ -109,11 +117,7 @@ public class Primitive32Matrix2 implements GeometryMatrix<Primitive32Matrix2>, T
     }
 
     public final void transform(final Primitive32Vector2 transformable) {
-
-        final float tmp0 = transformable.v0, tmp1 = transformable.v1;
-
-        transformable.v0 = (m00 * tmp0) + (m01 * tmp1);
-        transformable.v1 = (m10 * tmp0) + (m11 * tmp1);
+        this.multiply(transformable, transformable);
     }
 
     public final void transpose(final Primitive32Matrix2 matrix) {

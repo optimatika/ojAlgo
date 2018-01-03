@@ -91,6 +91,14 @@ public class Primitive64Matrix2 implements GeometryMatrix<Primitive64Matrix2>, T
         return result;
     }
 
+    public final void multiply(final Primitive64Vector2 right, final Primitive64Vector2 product) {
+
+        final double right0 = right.v0, right1 = right.v1;
+
+        product.v0 = (m00 * right0) + (m01 * right1);
+        product.v1 = (m10 * right0) + (m11 * right1);
+    }
+
     public final void negate(final Primitive64Matrix2 matrix) {
 
         m00 = -matrix.m00;
@@ -106,11 +114,7 @@ public class Primitive64Matrix2 implements GeometryMatrix<Primitive64Matrix2>, T
     }
 
     public final void transform(final Primitive64Vector2 transformable) {
-
-        final double tmp0 = transformable.v0, tmp1 = transformable.v1;
-
-        transformable.v0 = (m00 * tmp0) + (m01 * tmp1);
-        transformable.v1 = (m10 * tmp0) + (m11 * tmp1);
+        this.multiply(transformable, transformable);
     }
 
     public final void transpose(final Primitive64Matrix2 matrix) {

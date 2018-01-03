@@ -190,6 +190,25 @@ public class Primitive32Matrix4 implements GeometryMatrix<Primitive32Matrix4>, T
         return result;
     }
 
+    public final void multiply(final Primitive32Vector3 right, final float right3, final Primitive32Vector3 product) {
+
+        final float right0 = right.v0, right1 = right.v1, right2 = right.v2;
+
+        product.v0 = (m00 * right0) + (m01 * right1) + (m02 * right2) + (m03 * right3);
+        product.v1 = (m10 * right0) + (m11 * right1) + (m12 * right2) + (m13 * right3);
+        product.v2 = (m20 * right0) + (m21 * right1) + (m22 * right2) + (m23 * right3);
+    }
+
+    public final void multiply(final Primitive32Vector4 right, final Primitive32Vector4 product) {
+
+        final float right0 = right.v0, right1 = right.v1, right2 = right.v2, right3 = right.v3;
+
+        product.v0 = (m00 * right0) + (m01 * right1) + (m02 * right2) + (m03 * right3);
+        product.v1 = (m10 * right0) + (m11 * right1) + (m12 * right2) + (m13 * right3);
+        product.v2 = (m20 * right0) + (m21 * right1) + (m22 * right2) + (m23 * right3);
+        product.v3 = (m30 * right0) + (m31 * right1) + (m32 * right2) + (m33 * right3);
+    }
+
     public final void negate(final Primitive32Matrix4 matrix) {
 
         m00 = -matrix.m00;
@@ -218,14 +237,12 @@ public class Primitive32Matrix4 implements GeometryMatrix<Primitive32Matrix4>, T
         return MatrixUtils.toString(this);
     }
 
+    public final void transform(final Primitive32Vector3 transformable, final float v3) {
+        this.multiply(transformable, v3, transformable);
+    }
+
     public final void transform(final Primitive32Vector4 transformable) {
-
-        final float tmp0 = transformable.v0, tmp1 = transformable.v1, tmp2 = transformable.v2, tmp3 = transformable.v3;
-
-        transformable.v0 = (m00 * tmp0) + (m01 * tmp1) + (m02 * tmp2) + (m03 * tmp3);
-        transformable.v1 = (m10 * tmp0) + (m11 * tmp1) + (m12 * tmp2) + (m13 * tmp3);
-        transformable.v2 = (m20 * tmp0) + (m21 * tmp1) + (m22 * tmp2) + (m23 * tmp3);
-        transformable.v3 = (m30 * tmp0) + (m31 * tmp1) + (m32 * tmp2) + (m33 * tmp3);
+        this.multiply(transformable, transformable);
     }
 
     public final void transpose(final Primitive32Matrix4 matrix) {

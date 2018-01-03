@@ -135,6 +135,23 @@ public class Primitive32Matrix3 implements GeometryMatrix<Primitive32Matrix3>, T
         return result;
     }
 
+    public final void multiply(final Primitive32Vector2 right, final float right2, final Primitive32Vector2 product) {
+
+        final float right0 = right.v0, right1 = right.v1;
+
+        product.v0 = (m00 * right0) + (m01 * right1) + (m02 * right2);
+        product.v1 = (m10 * right0) + (m11 * right1) + (m12 * right2);
+    }
+
+    public final void multiply(final Primitive32Vector3 right, final Primitive32Vector3 product) {
+
+        final float right0 = right.v0, right1 = right.v1, right2 = right.v2;
+
+        product.v0 = (m00 * right0) + (m01 * right1) + (m02 * right2);
+        product.v1 = (m10 * right0) + (m11 * right1) + (m12 * right2);
+        product.v2 = (m20 * right0) + (m21 * right1) + (m22 * right2);
+    }
+
     public final void negate(final Primitive32Matrix3 matrix) {
 
         m00 = -matrix.m00;
@@ -155,13 +172,12 @@ public class Primitive32Matrix3 implements GeometryMatrix<Primitive32Matrix3>, T
         return MatrixUtils.toString(this);
     }
 
+    public final void transform(final Primitive32Vector2 transformable, final float v2) {
+        this.multiply(transformable, v2, transformable);
+    }
+
     public final void transform(final Primitive32Vector3 transformable) {
-
-        final float tmp0 = transformable.v0, tmp1 = transformable.v1, tmp2 = transformable.v2;
-
-        transformable.v0 = (m00 * tmp0) + (m01 * tmp1) + (m02 * tmp2);
-        transformable.v1 = (m10 * tmp0) + (m11 * tmp1) + (m12 * tmp2);
-        transformable.v2 = (m20 * tmp0) + (m21 * tmp1) + (m22 * tmp2);
+        this.multiply(transformable, transformable);
     }
 
     public final void transpose(final Primitive32Matrix3 matrix) {
