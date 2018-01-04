@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.transformation;
 
+import org.ojalgo.access.Access1D;
+import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.transformation.TransformationMatrix.Transformable;
 
 /**
@@ -51,7 +53,7 @@ import org.ojalgo.matrix.transformation.TransformationMatrix.Transformable;
 @FunctionalInterface
 public interface TransformationMatrix<N extends Number, T extends Transformable<N>> {
 
-    interface Transformable<N extends Number> {
+    interface Transformable<N extends Number> extends Access1D<N>, ElementsConsumer<N> {
 
         @SuppressWarnings("unchecked")
         default <T extends Transformable<N>> void transform(final TransformationMatrix<N, T> transformation) {
