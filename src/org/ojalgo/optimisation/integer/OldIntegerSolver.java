@@ -183,15 +183,24 @@ public final class OldIntegerSolver extends IntegerSolver {
                         final BranchAndBoundNodeTask tmpLowerBranchTask = this.createLowerBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);
                         final BranchAndBoundNodeTask tmpUpperBranchTask = this.createUpperBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);
 
-                        //   return tmpLowerBranchTask.compute() && tmpUpperBranchTask.compute();
+                        final BranchAndBoundNodeTask thisBranchTask;
+                        final BranchAndBoundNodeTask forkedBranchTask;
 
-                        tmpUpperBranchTask.fork();
+                        if ((tmpVariableValue - Math.floor(tmpVariableValue)) > 0.5) {
+                            thisBranchTask = tmpUpperBranchTask;
+                            forkedBranchTask = tmpLowerBranchTask;
+                        } else {
+                            thisBranchTask = tmpLowerBranchTask;
+                            forkedBranchTask = tmpUpperBranchTask;
+                        }
 
-                        final boolean tmpLowerBranchValue = tmpLowerBranchTask.compute();
+                        forkedBranchTask.fork();
 
-                        final boolean tmpUpperBranchValue = tmpUpperBranchTask.join();
+                        final boolean thisBranchReturn = thisBranchTask.compute();
 
-                        return tmpLowerBranchValue & tmpUpperBranchValue;
+                        final boolean forkedBranchReturn = forkedBranchTask.join();
+
+                        return thisBranchReturn & forkedBranchReturn;
 
                         //                        if (tmpLowerBranchValue) {
                         //
@@ -407,23 +416,33 @@ public final class OldIntegerSolver extends IntegerSolver {
 
         int retVal = -1;
 
-        double tmpFraction;
-        double tmpScale;
-        double tmpMaxFraction = ZERO;
+        double fraction;
+        double compareFraction = ZERO;
+        double gradientScale;
+        double maxFraction = ZERO;
 
         for (int i = 0; i < myIntegerIndeces.length; i++) {
 
-            tmpFraction = nodeKey.getFraction(i, nodeResult.doubleValue(myIntegerIndeces[i]));
+            fraction = nodeKey.getFraction(i, nodeResult.doubleValue(myIntegerIndeces[i]));
+
             if (this.isIntegerSolutionFound()) {
-                final MatrixStore<Double> tmpGradient = this.getGradient(Access1D.asPrimitive1D(nodeResult));
-                if ((tmpScale = tmpGradient.aggregateAll(Aggregator.LARGEST)) > ZERO) {
-                    tmpFraction *= (ONE + (ABS.invoke(tmpGradient.doubleValue(myIntegerIndeces[i])) / tmpScale));
+                // If an integer solution is already found
+                // then scale the fraction by its relative gradient impact
+
+                final MatrixStore<Double> gradient = this.getGradient(Access1D.asPrimitive1D(nodeResult));
+
+                if ((gradientScale = gradient.aggregateAll(Aggregator.LARGEST)) > ZERO) {
+                    compareFraction = fraction * (ONE + (ABS.invoke(gradient.doubleValue(myIntegerIndeces[i])) / gradientScale));
                 }
+
+            } else {
+
+                compareFraction = 1.0 - fraction;
             }
 
-            if ((tmpFraction > tmpMaxFraction) && !options.integer.isZero(tmpFraction)) {
+            if ((compareFraction > maxFraction) && !options.integer.isZero(fraction)) {
                 retVal = i;
-                tmpMaxFraction = tmpFraction;
+                maxFraction = compareFraction;
             }
         }
 

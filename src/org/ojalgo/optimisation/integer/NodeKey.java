@@ -237,9 +237,9 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
     double getFraction(final int index, final double value) {
 
-        final double tmpFeasibleValue = this.feasible(index, value);
+        final double feasibleValue = this.feasible(index, value);
 
-        return PrimitiveFunction.ABS.invoke(tmpFeasibleValue - PrimitiveFunction.RINT.invoke(tmpFeasibleValue));
+        return PrimitiveFunction.ABS.invoke(feasibleValue - PrimitiveFunction.RINT.invoke(feasibleValue));
     }
 
     BigDecimal getLowerBound(final int index) {
