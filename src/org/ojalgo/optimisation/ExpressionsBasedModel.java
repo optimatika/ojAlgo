@@ -673,13 +673,19 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         // TODO Turned off because it may construct quadratic constraints
 
-        //        Expression tmpEpression = myExpressions.get(OBJ_FUNC_AS_CONSTR_KEY);
-        //        if (tmpEpression == null) {
-        //            tmpEpression = this.objective().copy(this, false);
-        //            myExpressions.put(OBJ_FUNC_AS_CONSTR_KEY, tmpEpression);
-        //        }
-        //
-        //        tmpEpression.lower(lower).upper(upper);
+        Expression tmpEpression = myExpressions.get(OBJ_FUNC_AS_CONSTR_KEY);
+
+        if (tmpEpression == null) {
+            final Expression tmpObjective = this.objective();
+            if (!tmpObjective.isAnyQuadraticFactorNonZero()) {
+                tmpEpression = tmpObjective.copy(this, false);
+                myExpressions.put(OBJ_FUNC_AS_CONSTR_KEY, tmpEpression);
+            }
+        }
+
+        if (tmpEpression != null) {
+            tmpEpression.lower(lower).upper(upper);
+        }
     }
 
     public Optimisation.Result maximise() {

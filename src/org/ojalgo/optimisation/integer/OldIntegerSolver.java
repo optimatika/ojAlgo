@@ -186,7 +186,7 @@ public final class OldIntegerSolver extends IntegerSolver {
                         final BranchAndBoundNodeTask thisBranchTask;
                         final BranchAndBoundNodeTask forkedBranchTask;
 
-                        if ((tmpVariableValue - Math.floor(tmpVariableValue)) > 0.5) {
+                        if ((tmpVariableValue - Math.floor(tmpVariableValue)) > HALF) {
                             thisBranchTask = tmpUpperBranchTask;
                             forkedBranchTask = tmpLowerBranchTask;
                         } else {
@@ -438,7 +438,7 @@ public final class OldIntegerSolver extends IntegerSolver {
 
             } else {
                 // If not yet found integer solution
-                // then compare the remaining/reversed fraction
+                // then compare the remaining/reversed (larger) fraction
 
                 compareFraction = ONE - fraction;
                 // [0.5, 1.0]
