@@ -424,6 +424,7 @@ public final class OldIntegerSolver extends IntegerSolver {
         for (int i = 0; i < myIntegerIndeces.length; i++) {
 
             fraction = nodeKey.getFraction(i, nodeResult.doubleValue(myIntegerIndeces[i]));
+            // [0, 0.5]
 
             if (this.isIntegerSolutionFound()) {
                 // If an integer solution is already found
@@ -436,8 +437,11 @@ public final class OldIntegerSolver extends IntegerSolver {
                 }
 
             } else {
+                // If not yet found integer solution
+                // then compare the remaining/reversed fraction
 
-                compareFraction = 1.0 - fraction;
+                compareFraction = ONE - fraction;
+                // [0.5, 1.0]
             }
 
             if ((compareFraction > maxFraction) && !options.integer.isZero(fraction)) {
