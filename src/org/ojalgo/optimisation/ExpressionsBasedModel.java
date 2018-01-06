@@ -671,20 +671,18 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public void limitObjective(final BigDecimal lower, final BigDecimal upper) {
 
-        // TODO Turned off because it may construct quadratic constraints
+        Expression constrExpr = myExpressions.get(OBJ_FUNC_AS_CONSTR_KEY);
 
-        Expression tmpEpression = myExpressions.get(OBJ_FUNC_AS_CONSTR_KEY);
-
-        if (tmpEpression == null) {
-            final Expression tmpObjective = this.objective();
-            if (!tmpObjective.isAnyQuadraticFactorNonZero()) {
-                tmpEpression = tmpObjective.copy(this, false);
-                myExpressions.put(OBJ_FUNC_AS_CONSTR_KEY, tmpEpression);
+        if (constrExpr == null) {
+            final Expression objExpr = this.objective();
+            if (!objExpr.isAnyQuadraticFactorNonZero()) {
+                constrExpr = objExpr.copy(this, false);
+                myExpressions.put(OBJ_FUNC_AS_CONSTR_KEY, constrExpr);
             }
         }
 
-        if (tmpEpression != null) {
-            tmpEpression.lower(lower).upper(upper);
+        if (constrExpr != null) {
+            constrExpr.lower(lower).upper(upper);
         }
     }
 
