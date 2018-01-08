@@ -191,8 +191,8 @@ final class IterativeASS extends ActiveSetSolver {
     protected void performIteration() {
 
         if (this.isDebug()) {
-            this.debug("\nPerformIteration {}", 1 + this.countIterations());
-            this.debug(this.toActivatorString());
+            this.log("\nPerformIteration {}", 1 + this.countIterations());
+            this.log(this.toActivatorString());
         }
 
         final int toInclude = this.getConstraintToInclude();
@@ -227,7 +227,7 @@ final class IterativeASS extends ActiveSetSolver {
                 final double tmpRelativeError = myS.resolve(this.getSolutionL());
 
                 if (this.isDebug()) {
-                    this.debug("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(incl));
+                    this.log("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(incl));
                 }
 
                 final ElementsSupplier<Double> tmpRHS = this.getIterationL(incl).premultiply(this.getIterationA().transpose())

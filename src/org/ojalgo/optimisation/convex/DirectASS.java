@@ -54,8 +54,8 @@ final class DirectASS extends ActiveSetSolver {
     protected void performIteration() {
 
         if (this.isDebug()) {
-            this.debug("\nPerformIteration {}", 1 + this.countIterations());
-            this.debug(this.toActivatorString());
+            this.log("\nPerformIteration {}", 1 + this.countIterations());
+            this.log(this.toActivatorString());
         }
 
         this.getConstraintToInclude();
@@ -104,7 +104,7 @@ final class DirectASS extends ActiveSetSolver {
                     this.getSolutionGeneral(this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB), iterL);
 
                     if (this.isDebug()) {
-                        this.debug("Relative error {} in solution for L={}", PrimitiveMath.NaN, iterL);
+                        this.log("Relative error {} in solution for L={}", PrimitiveMath.NaN, iterL);
                     }
 
                     final ElementsSupplier<Double> tmpRHS = iterL.premultiply(iterA.transpose()).operateOnMatching(iterC, SUBTRACT);

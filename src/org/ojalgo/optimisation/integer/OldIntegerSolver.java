@@ -26,10 +26,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
@@ -82,6 +79,10 @@ public final class OldIntegerSolver extends IntegerSolver {
 
         @Override
         protected Boolean compute() {
+            return this.compute(null);
+        }
+
+        protected Boolean compute(final ExpressionsBasedModel parentModel) {
 
             if (this.isNodeDebug()) {
                 myPrinter.println("\nBranch&Bound Node");
@@ -92,7 +93,7 @@ public final class OldIntegerSolver extends IntegerSolver {
             if (!OldIntegerSolver.this.isIterationAllowed() || !OldIntegerSolver.this.isIterationNecessary()) {
                 if (this.isNodeDebug()) {
                     myPrinter.println("Reached iterations or time limit - stop!");
-                    this.flush(OldIntegerSolver.this.getModel().options.debug_appender);
+                    this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
                 }
                 return false;
             }
@@ -100,7 +101,7 @@ public final class OldIntegerSolver extends IntegerSolver {
             if (OldIntegerSolver.this.isExplored(this)) {
                 if (this.isNodeDebug()) {
                     myPrinter.println("Node previously explored!");
-                    this.flush(OldIntegerSolver.this.getModel().options.debug_appender);
+                    this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
                 }
                 return true;
             } else {
@@ -110,12 +111,12 @@ public final class OldIntegerSolver extends IntegerSolver {
             if (!OldIntegerSolver.this.isGoodEnoughToContinueBranching(myKey.objective)) {
                 if (this.isNodeDebug()) {
                     myPrinter.println("No longer a relevant node!");
-                    this.flush(OldIntegerSolver.this.getModel().options.debug_appender);
+                    this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
                 }
                 return true;
             }
 
-            ExpressionsBasedModel tmpNodeModel = this.getModel();
+            ExpressionsBasedModel tmpNodeModel = this.getModel(parentModel);
             final Result tmpBestResultSoFar = OldIntegerSolver.this.getBestResultSoFar();
             final Optimisation.Result tmpNodeResult = tmpNodeModel.solve(tmpBestResultSoFar);
 
@@ -138,7 +139,7 @@ public final class OldIntegerSolver extends IntegerSolver {
 
                     tmpNodeModel.validate(tmpNodeResult, myPrinter);
 
-                    this.flush(OldIntegerSolver.this.getModel().options.debug_appender);
+                    this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
 
                     return false;
                 }
@@ -160,7 +161,7 @@ public final class OldIntegerSolver extends IntegerSolver {
                         BasicLogger.debug();
                         BasicLogger.debug(OldIntegerSolver.this.toString());
                         // BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
-                        this.flush(OldIntegerSolver.this.getModel().options.debug_appender);
+                        this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
                     }
 
                 } else {
@@ -174,7 +175,7 @@ public final class OldIntegerSolver extends IntegerSolver {
                         if (this.isNodeDebug()) {
                             myPrinter.println("Still hope, branching on {} @ {} >>> {}", tmpBranchIndex, tmpVariableValue,
                                     tmpNodeModel.getVariable(OldIntegerSolver.this.getGlobalIndex(tmpBranchIndex)));
-                            this.flush(OldIntegerSolver.this.getModel().options.debug_appender);
+                            this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
                         }
 
                         tmpNodeModel.dispose();
@@ -196,7 +197,7 @@ public final class OldIntegerSolver extends IntegerSolver {
 
                         forkedBranchTask.fork();
 
-                        final boolean thisBranchReturn = thisBranchTask.compute();
+                        final boolean thisBranchReturn = thisBranchTask.compute(tmpNodeModel);
 
                         final boolean forkedBranchReturn = forkedBranchTask.join();
 
@@ -215,7 +216,7 @@ public final class OldIntegerSolver extends IntegerSolver {
                     } else {
                         if (this.isNodeDebug()) {
                             myPrinter.println("Can't find better integer solutions - stop this branch!");
-                            this.flush(OldIntegerSolver.this.getModel().options.debug_appender);
+                            this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
                         }
                     }
                 }
@@ -223,7 +224,7 @@ public final class OldIntegerSolver extends IntegerSolver {
             } else {
                 if (this.isNodeDebug()) {
                     myPrinter.println("Failed to solve node problem - stop this branch!");
-                    this.flush(OldIntegerSolver.this.getModel().options.debug_appender);
+                    this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
                 }
             }
 
@@ -254,9 +255,9 @@ public final class OldIntegerSolver extends IntegerSolver {
             return myKey;
         }
 
-        ExpressionsBasedModel getModel() {
+        ExpressionsBasedModel getModel(final ExpressionsBasedModel parentModel) {
 
-            final ExpressionsBasedModel retVal = OldIntegerSolver.this.getModel().relax(false);
+            final ExpressionsBasedModel retVal = parentModel != null ? parentModel : OldIntegerSolver.this.getModel().relax(false);
 
             //            if (retVal.options.debug_appender != null) {
             //                retVal.options.debug_appender = new CharacterRing().asPrinter();
@@ -299,7 +300,7 @@ public final class OldIntegerSolver extends IntegerSolver {
 
     }
 
-    private final Set<NodeKey> myExploredNodes = Collections.synchronizedSet(new HashSet<NodeKey>());
+    // private final Set<NodeKey> myExploredNodes = Collections.synchronizedSet(new HashSet<NodeKey>());
     private final int[] myIntegerIndeces;
 
     OldIntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
@@ -397,7 +398,8 @@ public final class OldIntegerSolver extends IntegerSolver {
     }
 
     int countExploredNodes() {
-        return myExploredNodes.size();
+        // return myExploredNodes.size();
+        return 0;
     }
 
     int getGlobalIndex(final int integerIndex) {
@@ -454,11 +456,13 @@ public final class OldIntegerSolver extends IntegerSolver {
     }
 
     boolean isExplored(final BranchAndBoundNodeTask aNodeTask) {
-        return myExploredNodes.contains(aNodeTask.getKey());
+        // return myExploredNodes.contains(aNodeTask.getKey());
+        return false;
     }
 
     void markAsExplored(final BranchAndBoundNodeTask aNodeTask) {
-        myExploredNodes.add(aNodeTask.getKey());
+
+        // myExploredNodes.add(aNodeTask.getKey());
     }
 
 }

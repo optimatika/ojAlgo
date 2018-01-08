@@ -63,16 +63,10 @@ abstract class MipLibCase extends OptimisationIntegerTests {
             }
         }
 
-        tmpModel.options.time_suffice = 4L * CalendarDateUnit.HOUR.size();
-        tmpModel.options.time_abort = 8L * CalendarDateUnit.HOUR.size();
+        tmpModel.options.time_suffice = 5L * CalendarDateUnit.MINUTE.size();
+        tmpModel.options.time_abort = 1L * CalendarDateUnit.HOUR.size();
 
-        //        tmpModel.options.slack = tmpModel.options.slack.newScale(16);
-        //        tmpModel.options.problem = tmpModel.options.problem.newScale(16);
-
-        //        tmpModel.options.solution = tmpModel.options.solution.newScale(30);
-        //        tmpModel.options.solution = tmpModel.options.solution.newPrecision(30);
-
-        // tmpModel.options.debug(LinearSolver.class);
+        tmpModel.options.progress(IntegerSolver.class);
 
         TestUtils.assertTrue(tmpModel.validate());
 

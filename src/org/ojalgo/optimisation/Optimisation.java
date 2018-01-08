@@ -155,18 +155,6 @@ public interface Optimisation {
     public static final class Options implements Optimisation, Cloneable {
 
         /**
-         * If this is null nothing is printed, if it is not null then debug statements are printed to that
-         * {@linkplain org.ojalgo.netio.BasicLogger.Printer}.
-         */
-        public BasicLogger.Printer debug_appender = null;
-
-        /**
-         * Which {@linkplain Solver} to debug. Null means NO solvers. This setting is only relevant if
-         * {@link #debug_appender} has been set.
-         */
-        public Class<? extends Optimisation.Solver> debug_solver = null;
-
-        /**
          * Used to determine if a variable value is integer or not.
          */
         public NumberContext integer = new NumberContext(12, 7, RoundingMode.HALF_EVEN);
@@ -183,6 +171,23 @@ public interface Optimisation {
          * {@linkplain IntegerSolver}.
          */
         public int iterations_suffice = Integer.MAX_VALUE;
+
+        /**
+         * If this is null nothing is printed, if it is not null then progress/debug messages are printed to
+         * that {@linkplain org.ojalgo.netio.BasicLogger.Printer}.
+         */
+        public BasicLogger.Printer logger_appender = null;
+
+        /**
+         * Detailed (debug) logging or not.
+         */
+        public boolean logger_detailed = true;
+
+        /**
+         * Which {@linkplain Solver} to debug. Null means NO solvers. This setting is only relevant if
+         * {@link #logger_appender} has been set.
+         */
+        public Class<? extends Optimisation.Solver> logger_solver = null;
 
         /**
          * The (relative) MIP gap is the difference between the best integer solution found so far and a
@@ -275,15 +280,27 @@ public interface Optimisation {
         }
 
         /**
-         * Will set {@link #debug_appender} to BasicLogger#DEBUG, {@link #debug_solver} to solver and
-         * {@link #validate} to true.
+         * Will configure detailed dubug logging and validation
          *
          * @param solver
          */
         public void debug(final Class<? extends Optimisation.Solver> solver) {
-            debug_appender = solver != null ? BasicLogger.DEBUG : null;
-            debug_solver = solver;
+            logger_solver = solver;
+            logger_appender = solver != null ? BasicLogger.DEBUG : null;
+            logger_detailed = solver != null ? true : false;
             validate = solver != null ? true : false;
+        }
+
+        /**
+         * Will configure high level (low volume) progress logging
+         *
+         * @param solver
+         */
+        public void progress(final Class<? extends Optimisation.Solver> solver) {
+            logger_solver = solver;
+            logger_appender = solver != null ? BasicLogger.DEBUG : null;
+            logger_detailed = false;
+            validate = false;
         }
 
         @SuppressWarnings("unchecked")

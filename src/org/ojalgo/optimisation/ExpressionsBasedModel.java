@@ -862,22 +862,22 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         boolean retVal = true;
 
         for (final Variable tmpVariable : myVariables) {
-            retVal &= tmpVariable.validate(options.debug_appender);
+            retVal &= tmpVariable.validate(options.logger_appender);
         }
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            retVal &= tmpExpression.validate(options.debug_appender);
+            retVal &= tmpExpression.validate(options.logger_appender);
         }
 
         return retVal;
     }
 
     public boolean validate(final Access1D<BigDecimal> solution) {
-        return this.validate(solution, options.slack, options.debug_appender);
+        return this.validate(solution, options.slack, options.logger_appender);
     }
 
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context) {
-        return this.validate(solution, context, options.debug_appender);
+        return this.validate(solution, context, options.logger_appender);
     }
 
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final Printer appender) {

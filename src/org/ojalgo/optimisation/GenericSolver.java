@@ -94,15 +94,15 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         return System.currentTimeMillis() - myResetTime;
     }
 
-    protected final void debug(final String descripttion, final Access2D<?> matrix) {
-        if (options.debug_appender != null) {
-            options.debug_appender.printmtrx(descripttion, matrix, options.print);
+    protected final void log(final String descripttion, final Access2D<?> matrix) {
+        if (options.logger_appender != null) {
+            options.logger_appender.printmtrx(descripttion, matrix, options.print);
         }
     }
 
-    protected final void debug(final String messagePattern, final Object... arguments) {
-        if (options.debug_appender != null) {
-            options.debug_appender.println(messagePattern, arguments);
+    protected final void log(final String messagePattern, final Object... arguments) {
+        if (options.logger_appender != null) {
+            options.logger_appender.println(messagePattern, arguments);
         }
     }
 
@@ -130,7 +130,11 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
     }
 
     protected final boolean isDebug() {
-        return (options.debug_appender != null) && (options.debug_solver.isAssignableFrom(this.getClass()));
+        return options.logger_detailed && this.isProgress();
+    }
+
+    protected final boolean isProgress() {
+        return (options.logger_appender != null) && (options.logger_solver.isAssignableFrom(this.getClass()));
     }
 
     /**

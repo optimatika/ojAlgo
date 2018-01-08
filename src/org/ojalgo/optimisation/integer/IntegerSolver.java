@@ -267,6 +267,11 @@ public abstract class IntegerSolver extends GenericSolver {
 
     protected synchronized void markInteger(final NodeKey node, final Optimisation.Result result) {
 
+        if (this.isProgress()) {
+            this.log("New integer solution {}", result);
+            this.log("\tat node {}", node);
+        }
+
         final Optimisation.Result tmpCurrentlyTheBest = myBestResultSoFar;
 
         if (tmpCurrentlyTheBest == null) {
@@ -280,6 +285,12 @@ public abstract class IntegerSolver extends GenericSolver {
         } else if (!myMinimisation && (result.getValue() > tmpCurrentlyTheBest.getValue())) {
 
             myBestResultSoFar = result;
+
+        } else {
+
+            if (this.isDebug()) {
+                this.log("Previously best {}", myBestResultSoFar);
+            }
         }
 
         myIntegerSolutionsCount.incrementAndGet();

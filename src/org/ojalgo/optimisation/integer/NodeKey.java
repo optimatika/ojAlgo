@@ -80,26 +80,25 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
         super();
 
-        final List<Variable> tmpIntegerVariables = integerModel.getIntegerVariables();
-        final int tmpLength = tmpIntegerVariables.size();
+        final List<Variable> integerVariables = integerModel.getIntegerVariables();
+        final int numberOfIntegerVariables = integerVariables.size();
 
-        myLowerBounds = new int[tmpLength];
-        myUpperBounds = new int[tmpLength];
+        myLowerBounds = new int[numberOfIntegerVariables];
+        myUpperBounds = new int[numberOfIntegerVariables];
         Arrays.fill(myLowerBounds, Integer.MIN_VALUE);
         Arrays.fill(myUpperBounds, Integer.MAX_VALUE);
 
-        for (int i = 0; i < tmpLength; i++) {
+        for (int i = 0; i < numberOfIntegerVariables; i++) {
+            final Variable variable = integerVariables.get(i);
 
-            final Variable tmpVariable = tmpIntegerVariables.get(i);
-
-            final BigDecimal tmpLowerLimit = tmpVariable.getLowerLimit();
-            if (tmpLowerLimit != null) {
-                myLowerBounds[i] = tmpLowerLimit.intValue();
+            final BigDecimal lowerLimit = variable.getLowerLimit();
+            if (lowerLimit != null) {
+                myLowerBounds[i] = lowerLimit.intValue();
             }
 
-            final BigDecimal tmpUpperLimit = tmpVariable.getUpperLimit();
-            if (tmpUpperLimit != null) {
-                myUpperBounds[i] = tmpUpperLimit.intValue();
+            final BigDecimal upperLimit = variable.getUpperLimit();
+            if (upperLimit != null) {
+                myUpperBounds[i] = upperLimit.intValue();
             }
         }
 

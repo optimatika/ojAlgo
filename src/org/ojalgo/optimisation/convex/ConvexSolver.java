@@ -833,9 +833,9 @@ public abstract class ConvexSolver extends GenericSolver {
             return true;
         } else {
             if (this.isDebug()) {
-                options.debug_appender.println("KKT system unsolvable!");
-                options.debug_appender.printmtrx("KKT", this.getIterationKKT().collect(FACTORY));
-                options.debug_appender.printmtrx("RHS", this.getIterationRHS().collect(FACTORY));
+                options.logger_appender.println("KKT system unsolvable!");
+                options.logger_appender.printmtrx("KKT", this.getIterationKKT().collect(FACTORY));
+                options.logger_appender.printmtrx("RHS", this.getIterationRHS().collect(FACTORY));
             }
             return false;
         }
@@ -866,7 +866,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         if (!MatrixUtils.isHermitian(tmpQ)) {
             if (this.isDebug()) {
-                this.debug("Q not symmetric!", tmpQ);
+                this.log("Q not symmetric!", tmpQ);
             }
             throw new IllegalArgumentException("Q must be symmetric!");
         }
@@ -885,8 +885,8 @@ public abstract class ConvexSolver extends GenericSolver {
             for (final ComplexNumber tmpValue : tmpEigenvalues) {
                 if ((tmpValue.doubleValue() < ZERO) || !tmpValue.isReal()) {
                     if (this.isDebug()) {
-                        this.debug("Q not positive semidefinite!");
-                        this.debug("The eigenvalues are: {}", tmpEigenvalues);
+                        this.log("Q not positive semidefinite!");
+                        this.log("The eigenvalues are: {}", tmpEigenvalues);
                     }
                     throw new IllegalArgumentException("Q must be positive semidefinite!");
                 }

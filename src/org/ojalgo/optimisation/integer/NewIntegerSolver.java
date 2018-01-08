@@ -175,21 +175,21 @@ public final class NewIntegerSolver extends IntegerSolver {
     void compute(final NodeKey nodeKey) {
 
         if (NewIntegerSolver.this.isDebug()) {
-            NewIntegerSolver.this.debug("\nBranch&Bound Node");
-            NewIntegerSolver.this.debug(nodeKey.toString());
-            NewIntegerSolver.this.debug(NewIntegerSolver.this.toString());
+            NewIntegerSolver.this.log("\nBranch&Bound Node");
+            NewIntegerSolver.this.log(nodeKey.toString());
+            NewIntegerSolver.this.log(NewIntegerSolver.this.toString());
         }
 
         if (!NewIntegerSolver.this.isIterationAllowed() || !NewIntegerSolver.this.isIterationNecessary()) {
             if (NewIntegerSolver.this.isDebug()) {
-                NewIntegerSolver.this.debug("Reached iterations or time limit - stop!");
+                NewIntegerSolver.this.log("Reached iterations or time limit - stop!");
             }
             normal &= false;
         }
 
         if (!NewIntegerSolver.this.isGoodEnoughToContinueBranching(nodeKey.objective)) {
             if (NewIntegerSolver.this.isDebug()) {
-                NewIntegerSolver.this.debug("No longer a relevant node!");
+                NewIntegerSolver.this.log("No longer a relevant node!");
             }
             normal &= true;
         }
@@ -199,19 +199,19 @@ public final class NewIntegerSolver extends IntegerSolver {
 
         NewIntegerSolver.this.incrementIterationsCount();
 
-        if ((tmpModel.options.debug_appender != null) && (tmpModel.options.debug_appender instanceof PrinterBuffer)) {
-            if (NewIntegerSolver.this.getModel().options.debug_appender != null) {
-                ((PrinterBuffer) tmpModel.options.debug_appender).flush(NewIntegerSolver.this.getModel().options.debug_appender);
+        if ((tmpModel.options.logger_appender != null) && (tmpModel.options.logger_appender instanceof PrinterBuffer)) {
+            if (NewIntegerSolver.this.getModel().options.logger_appender != null) {
+                ((PrinterBuffer) tmpModel.options.logger_appender).flush(NewIntegerSolver.this.getModel().options.logger_appender);
             }
         }
         if (tmpResult.getState().isOptimal()) {
             if (NewIntegerSolver.this.isDebug()) {
-                NewIntegerSolver.this.debug("Node solved to optimality!");
+                NewIntegerSolver.this.log("Node solved to optimality!");
             }
 
             if (NewIntegerSolver.this.options.validate && !tmpModel.validate(tmpResult)) {
                 // This should not be possible. There is a bug somewhere.
-                NewIntegerSolver.this.debug("Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!");
+                NewIntegerSolver.this.log("Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!");
                 //                    IntegerSolver.this.logDebug(myKey.toString());
                 //                    IntegerSolver.this.logDebug(tmpModel.toString());
                 //                    final GenericSolver tmpDefaultSolver = tmpModel.getDefaultSolver();
@@ -225,7 +225,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
             if (tmpBranchIndex == -1) {
                 if (NewIntegerSolver.this.isDebug()) {
-                    NewIntegerSolver.this.debug("Integer solution! Store it among the others, and stop this branch!");
+                    NewIntegerSolver.this.log("Integer solution! Store it among the others, and stop this branch!");
                 }
 
                 final Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, tmpSolutionValue, tmpResult);
@@ -233,7 +233,7 @@ public final class NewIntegerSolver extends IntegerSolver {
                 NewIntegerSolver.this.markInteger(nodeKey, tmpIntegerSolutionResult);
 
                 if (NewIntegerSolver.this.isDebug()) {
-                    NewIntegerSolver.this.debug(NewIntegerSolver.this.getBestResultSoFar().toString());
+                    NewIntegerSolver.this.log(NewIntegerSolver.this.getBestResultSoFar().toString());
                 }
 
                 BasicLogger.debug();
@@ -242,14 +242,14 @@ public final class NewIntegerSolver extends IntegerSolver {
 
             } else {
                 if (NewIntegerSolver.this.isDebug()) {
-                    NewIntegerSolver.this.debug("Not an Integer Solution: " + tmpSolutionValue);
+                    NewIntegerSolver.this.log("Not an Integer Solution: " + tmpSolutionValue);
                 }
 
                 final double tmpVariableValue = tmpResult.doubleValue(NewIntegerSolver.this.getGlobalIndex(tmpBranchIndex));
 
                 if (NewIntegerSolver.this.isGoodEnoughToContinueBranching(tmpSolutionValue)) {
                     if (NewIntegerSolver.this.isDebug()) {
-                        NewIntegerSolver.this.debug("Still hope, branching on {} @ {} >>> {}", tmpBranchIndex, tmpVariableValue,
+                        NewIntegerSolver.this.log("Still hope, branching on {} @ {} >>> {}", tmpBranchIndex, tmpVariableValue,
                                 tmpModel.getVariable(NewIntegerSolver.this.getGlobalIndex(tmpBranchIndex)));
                     }
 
@@ -270,14 +270,14 @@ public final class NewIntegerSolver extends IntegerSolver {
 
                 } else {
                     if (NewIntegerSolver.this.isDebug()) {
-                        NewIntegerSolver.this.debug("Can't find better integer solutions - stop this branch!");
+                        NewIntegerSolver.this.log("Can't find better integer solutions - stop this branch!");
                     }
                 }
             }
 
         } else {
             if (NewIntegerSolver.this.isDebug()) {
-                NewIntegerSolver.this.debug("Failed to solve problem - stop this branch!");
+                NewIntegerSolver.this.log("Failed to solve problem - stop this branch!");
             }
         }
 

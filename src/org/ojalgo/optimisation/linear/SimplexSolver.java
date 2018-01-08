@@ -487,7 +487,7 @@ public final class SimplexSolver extends LinearSolver {
     }
 
     private final void logDebugTableau(final String message) {
-        this.debug(message + "; Basics: " + Arrays.toString(myTableau.getBasis()), myTableau);
+        this.log(message + "; Basics: " + Arrays.toString(myTableau.getBasis()), myTableau);
         // this.debug("New/alt " + message + "; Basics: " + Arrays.toString(myBasis), myTableau);
     }
 
@@ -539,7 +539,7 @@ public final class SimplexSolver extends LinearSolver {
     protected boolean needsAnotherIteration() {
 
         if (this.isDebug()) {
-            this.debug("\nNeeds Another Iteration? Phase={} Artificials={} Objective={}", this.phase(), myTableau.countBasisDeficit(), this.objective());
+            this.log("\nNeeds Another Iteration? Phase={} Artificials={} Objective={}", this.phase(), myTableau.countBasisDeficit(), this.objective());
         }
 
         boolean retVal = false;
@@ -553,7 +553,7 @@ public final class SimplexSolver extends LinearSolver {
             if (!myTableau.isBasicArtificials() || options.objective.isZero(tmpPhaseOneValue)) {
 
                 if (this.isDebug()) {
-                    this.debug("\nSwitching to Phase2 with {} artificial variable(s) still in the basis.\n", myTableau.countBasicArtificials());
+                    this.log("\nSwitching to Phase2 with {} artificial variable(s) still in the basis.\n", myTableau.countBasicArtificials());
                     // this.debug("Reduced artificial costs:\n{}", this.sliceTableauRow(myPoint.getRowObjective()).copy(this.getExcluded()));
                 }
 
@@ -601,9 +601,9 @@ public final class SimplexSolver extends LinearSolver {
 
         if (this.isDebug()) {
             if (retVal) {
-                this.debug("\n==>>\tRow: {},\tExit: {},\tColumn/Enter: {}.\n", myPoint.row, myTableau.getBasis(myPoint.row), myPoint.col);
+                this.log("\n==>>\tRow: {},\tExit: {},\tColumn/Enter: {}.\n", myPoint.row, myTableau.getBasis(myPoint.row), myPoint.col);
             } else {
-                this.debug("\n==>>\tNo more iterations needed/possible.\n");
+                this.log("\n==>>\tNo more iterations needed/possible.\n");
             }
         }
 
@@ -624,10 +624,10 @@ public final class SimplexSolver extends LinearSolver {
 
         if (this.isDebug()) {
             if (options.validate) {
-                this.debug("\nfindNextPivotCol (index of most negative value) among these:\n{}",
+                this.log("\nfindNextPivotCol (index of most negative value) among these:\n{}",
                         Array1D.PRIMITIVE64.copy(myTableau.sliceTableauRow(this.getRowObjective())).copy(tmpExcluded));
             } else {
-                this.debug("\nfindNextPivotCol");
+                this.log("\nfindNextPivotCol");
             }
         }
 
@@ -647,7 +647,7 @@ public final class SimplexSolver extends LinearSolver {
                 retVal = tmpCol;
                 tmpMinVal = tmpVal;
                 if (this.isDebug()) {
-                    this.debug("Col: {}\t=>\tReduced Contribution Weight: {}.", tmpCol, tmpVal);
+                    this.log("Col: {}\t=>\tReduced Contribution Weight: {}.", tmpCol, tmpVal);
                 }
             }
         }
@@ -666,10 +666,10 @@ public final class SimplexSolver extends LinearSolver {
                 final Access1D<Double> tmpDenominators = myTableau.sliceTableauColumn(tmpDenomCol);
                 final Array1D<Double> tmpRatios = Array1D.PRIMITIVE64.copy(tmpNumerators);
                 tmpRatios.modifyMatching(DIVIDE, tmpDenominators);
-                this.debug("\nfindNextPivotRow (smallest positive ratio) among these:\nNumerators={}\nDenominators={}\nRatios={}", tmpNumerators,
+                this.log("\nfindNextPivotRow (smallest positive ratio) among these:\nNumerators={}\nDenominators={}\nRatios={}", tmpNumerators,
                         tmpDenominators, tmpRatios);
             } else {
-                this.debug("\nfindNextPivotRow");
+                this.log("\nfindNextPivotRow");
             }
         }
 
@@ -716,7 +716,7 @@ public final class SimplexSolver extends LinearSolver {
                 tmpMinRatio = tmpRatio;
 
                 if (this.isDebug()) {
-                    this.debug("Row: {}\t=>\tRatio: {},\tNumerator/RHS: {}, \tDenominator/Pivot: {}.", i, tmpRatio, tmpNumer, tmpDenom);
+                    this.log("Row: {}\t=>\tRatio: {},\tNumerator/RHS: {}, \tDenominator/Pivot: {}.", i, tmpRatio, tmpNumer, tmpDenom);
                 }
             }
         }
@@ -733,7 +733,7 @@ public final class SimplexSolver extends LinearSolver {
         myTableau.pivot(pivot);
 
         if (this.isDebug()) {
-            this.debug("Iteration Point <{},{}>\tPivot: {} => {}\tRHS: {} => {}.", pivot.row, pivot.col, tmpPivotElement,
+            this.log("Iteration Point <{},{}>\tPivot: {} => {}\tRHS: {} => {}.", pivot.row, pivot.col, tmpPivotElement,
                     myTableau.doubleValue(pivot.row, pivot.col), tmpPivotRHS, myTableau.doubleValue(pivot.row, tmpColRHS));
         }
 
@@ -747,9 +747,9 @@ public final class SimplexSolver extends LinearSolver {
             final double tmpMinVal = tmpMinAggr.doubleValue();
 
             if ((tmpMinVal < ZERO) && !options.problem.isZero(tmpMinVal)) {
-                this.debug("\nNegative RHS! {}", tmpMinVal);
+                this.log("\nNegative RHS! {}", tmpMinVal);
                 if (this.isDebug()) {
-                    this.debug("Entire RHS columns: {}\n", tmpRHS);
+                    this.log("Entire RHS columns: {}\n", tmpRHS);
                 }
             }
 
