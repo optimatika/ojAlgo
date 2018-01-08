@@ -21,15 +21,21 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
+
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Variable;
 
 public abstract class IntegerSolver extends GenericSolver {
 
@@ -165,6 +171,8 @@ public abstract class IntegerSolver extends GenericSolver {
 
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
 
+    private final int[] myIntegerIndices;
+
     protected IntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
 
         super(solverOptions);
@@ -173,6 +181,12 @@ public abstract class IntegerSolver extends GenericSolver {
         myFunction = model.objective().toFunction();
 
         myMinimisation = model.isMinimisation();
+
+        final List<Variable> integerVariables = model.getIntegerVariables();
+        myIntegerIndices = new int[integerVariables.size()];
+        for (int i = 0; i < myIntegerIndices.length; i++) {
+            myIntegerIndices[i] = model.indexOf(integerVariables.get(i));
+        }
     }
 
     protected int countIntegerSolutions() {
@@ -309,5 +323,58 @@ public abstract class IntegerSolver extends GenericSolver {
      * @return Is the solver instance valid?
      */
     protected abstract boolean validate();
+
+    final int getGlobalIndex(final int integerIndex) {
+        return myIntegerIndices[integerIndex];
+    }
+
+    final int[] getIntegerIndices() {
+        return myIntegerIndices;
+    }
+
+    /**
+     * Should return the index of the (best) variable to branch on. Returning a negative index means an
+     * integer solition has been found (no further branching).
+     */
+    final int identifyNonIntegerVariable(final Optimisation.Result nodeResult, final NodeKey nodeKey) {
+
+        int retVal = -1;
+
+        double fraction;
+        double compareFraction = ZERO;
+        double gradientScale;
+        double maxFraction = ZERO;
+
+        for (int i = 0; i < myIntegerIndices.length; i++) {
+
+            fraction = nodeKey.getFraction(i, nodeResult.doubleValue(myIntegerIndices[i]));
+            // [0, 0.5]
+
+            if (this.isIntegerSolutionFound()) {
+                // If an integer solution is already found
+                // then scale the fraction by its relative gradient impact
+
+                final MatrixStore<Double> gradient = this.getGradient(Access1D.asPrimitive1D(nodeResult));
+
+                if ((gradientScale = gradient.aggregateAll(Aggregator.LARGEST)) > ZERO) {
+                    compareFraction = fraction * (ONE + (ABS.invoke(gradient.doubleValue(myIntegerIndices[i])) / gradientScale));
+                }
+
+            } else {
+                // If not yet found integer solution
+                // then compare the remaining/reversed (larger) fraction
+
+                compareFraction = ONE - fraction;
+                // [0.5, 1.0]
+            }
+
+            if ((compareFraction > maxFraction) && !options.integer.isZero(fraction)) {
+                retVal = i;
+                maxFraction = compareFraction;
+            }
+        }
+
+        return retVal;
+    }
 
 }

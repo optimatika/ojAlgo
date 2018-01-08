@@ -85,8 +85,6 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
         myLowerBounds = new int[numberOfIntegerVariables];
         myUpperBounds = new int[numberOfIntegerVariables];
-        Arrays.fill(myLowerBounds, Integer.MIN_VALUE);
-        Arrays.fill(myUpperBounds, Integer.MAX_VALUE);
 
         for (int i = 0; i < numberOfIntegerVariables; i++) {
             final Variable variable = integerVariables.get(i);
@@ -94,11 +92,15 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
             final BigDecimal lowerLimit = variable.getLowerLimit();
             if (lowerLimit != null) {
                 myLowerBounds[i] = lowerLimit.intValue();
+            } else {
+                myLowerBounds[i] = Integer.MIN_VALUE;
             }
 
             final BigDecimal upperLimit = variable.getUpperLimit();
             if (upperLimit != null) {
                 myUpperBounds[i] = upperLimit.intValue();
+            } else {
+                myUpperBounds[i] = Integer.MAX_VALUE;
             }
         }
 
@@ -184,6 +186,30 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
     private double feasible(final int index, final double value) {
         return PrimitiveFunction.MIN.invoke(PrimitiveFunction.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
+    }
+
+    void bound(final ExpressionsBasedModel model, final int[] integerIndices) {
+
+        for (int i = 0; i < integerIndices.length; i++) {
+
+            final BigDecimal lowerBound = this.getLowerBound(i);
+            final BigDecimal upperBound = this.getUpperBound(i);
+
+            final Variable variable = model.getVariable(integerIndices[i]);
+            variable.lower(lowerBound);
+            variable.upper(upperBound);
+
+            BigDecimal value = variable.getValue();
+            if (value != null) {
+                if (lowerBound != null) {
+                    value = value.max(lowerBound);
+                }
+                if (upperBound != null) {
+                    value = value.min(upperBound);
+                }
+                variable.setValue(value);
+            }
+        }
     }
 
     long calculateTreeSize() {

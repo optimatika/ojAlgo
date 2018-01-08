@@ -21,8 +21,6 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -66,7 +64,6 @@ public final class NewIntegerSolver extends IntegerSolver {
 
     private final PriorityBlockingQueue<NodeKey> myNodesToTry = new PriorityBlockingQueue<>();
 
-    private final int[] myIntegerIndeces;
     private final double[] myIntegerSignificances;
 
     boolean normal = true;
@@ -77,13 +74,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
         final List<Variable> tmpIntegerVariables = model.getIntegerVariables();
 
-        myIntegerIndeces = new int[tmpIntegerVariables.size()];
         myIntegerSignificances = new double[tmpIntegerVariables.size()];
-
-        for (int i = 0; i < myIntegerIndeces.length; i++) {
-            final Variable tmpVariable = tmpIntegerVariables.get(i);
-            myIntegerIndeces[i] = model.indexOf(tmpVariable);
-        }
 
         //options.debug = System.out;
     }
@@ -288,14 +279,6 @@ public final class NewIntegerSolver extends IntegerSolver {
         return this.countIterations();
     }
 
-    int getGlobalIndex(final int integerIndex) {
-        return myIntegerIndeces[integerIndex];
-    }
-
-    int[] getIntegerIndeces() {
-        return myIntegerIndeces;
-    }
-
     double getIntegerSignificance(final int index) {
         return myIntegerSignificances[index];
     }
@@ -313,30 +296,6 @@ public final class NewIntegerSolver extends IntegerSolver {
         //        }
     }
 
-    int identifyNonIntegerVariable(final Optimisation.Result nodeResult, final NodeKey nodeKey) {
-
-        int retVal = -1;
-
-        double tmpFraction, tmpImpact;
-        double tmpMaxImpact = ZERO;
-
-        for (int i = 0; i < myIntegerIndeces.length; i++) {
-
-            tmpFraction = nodeKey.getFraction(i, nodeResult.doubleValue(myIntegerIndeces[i]));
-
-            //tmpImpact = (ONE - tmpFraction) * this.getIntegerSignificance(i);
-            tmpImpact = tmpFraction * this.getIntegerSignificance(i);
-
-            if ((tmpImpact > tmpMaxImpact) && !options.integer.isZero(tmpFraction)) {
-                retVal = i;
-                tmpMaxImpact = tmpImpact;
-            }
-
-        }
-
-        return retVal;
-    }
-
     boolean isStillNodesToTry() {
         return !myNodesToTry.isEmpty();
     }
@@ -345,7 +304,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
         final ExpressionsBasedModel retVal = this.getModel().relax(false);
 
-        final int[] tmpIntegerIndeces = this.getIntegerIndeces();
+        final int[] tmpIntegerIndeces = this.getIntegerIndices();
         for (int i = 0; i < tmpIntegerIndeces.length; i++) {
 
             final BigDecimal tmpLowerBound = nodeKey.getLowerBound(i);

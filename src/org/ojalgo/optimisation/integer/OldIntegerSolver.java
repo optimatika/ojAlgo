@@ -24,14 +24,10 @@ package org.ojalgo.optimisation.integer;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -39,7 +35,6 @@ import org.ojalgo.netio.CharacterRing;
 import org.ojalgo.netio.CharacterRing.PrinterBuffer;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.TypeUtils;
 
 /**
@@ -263,27 +258,7 @@ public final class OldIntegerSolver extends IntegerSolver {
             //                retVal.options.debug_appender = new CharacterRing().asPrinter();
             //            }
 
-            final int[] tmpIntegerIndeces = OldIntegerSolver.this.getIntegerIndeces();
-            for (int i = 0; i < tmpIntegerIndeces.length; i++) {
-
-                final BigDecimal tmpLowerBound = myKey.getLowerBound(i);
-                final BigDecimal tmpUpperBound = myKey.getUpperBound(i);
-
-                final Variable tmpVariable = retVal.getVariable(tmpIntegerIndeces[i]);
-                tmpVariable.lower(tmpLowerBound);
-                tmpVariable.upper(tmpUpperBound);
-
-                BigDecimal tmpValue = tmpVariable.getValue();
-                if (tmpValue != null) {
-                    if (tmpLowerBound != null) {
-                        tmpValue = tmpValue.max(tmpLowerBound);
-                    }
-                    if (tmpUpperBound != null) {
-                        tmpValue = tmpValue.min(tmpUpperBound);
-                    }
-                    tmpVariable.setValue(tmpValue);
-                }
-            }
+            myKey.bound(retVal, OldIntegerSolver.this.getIntegerIndices());
 
             if (OldIntegerSolver.this.isIntegerSolutionFound()) {
                 final double tmpBestValue = OldIntegerSolver.this.getBestResultSoFar().getValue();
@@ -301,20 +276,10 @@ public final class OldIntegerSolver extends IntegerSolver {
     }
 
     // private final Set<NodeKey> myExploredNodes = Collections.synchronizedSet(new HashSet<NodeKey>());
-    private final int[] myIntegerIndeces;
 
     OldIntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
 
         super(model, solverOptions);
-
-        final List<Variable> tmpIntegerVariables = model.getIntegerVariables();
-
-        myIntegerIndeces = new int[tmpIntegerVariables.size()];
-
-        for (int i = 0; i < myIntegerIndeces.length; i++) {
-            final Variable tmpVariable = tmpIntegerVariables.get(i);
-            myIntegerIndeces[i] = model.indexOf(tmpVariable);
-        }
 
         //options.debug = System.out;
     }
@@ -400,59 +365,6 @@ public final class OldIntegerSolver extends IntegerSolver {
     int countExploredNodes() {
         // return myExploredNodes.size();
         return 0;
-    }
-
-    int getGlobalIndex(final int integerIndex) {
-        return myIntegerIndeces[integerIndex];
-    }
-
-    final int[] getIntegerIndeces() {
-        return myIntegerIndeces;
-    }
-
-    /**
-     * Should return the index of the (best) variable to branch on. Returning a negative index means an
-     * integer solition has been found (no further branching).
-     */
-    int identifyNonIntegerVariable(final Optimisation.Result nodeResult, final NodeKey nodeKey) {
-
-        int retVal = -1;
-
-        double fraction;
-        double compareFraction = ZERO;
-        double gradientScale;
-        double maxFraction = ZERO;
-
-        for (int i = 0; i < myIntegerIndeces.length; i++) {
-
-            fraction = nodeKey.getFraction(i, nodeResult.doubleValue(myIntegerIndeces[i]));
-            // [0, 0.5]
-
-            if (this.isIntegerSolutionFound()) {
-                // If an integer solution is already found
-                // then scale the fraction by its relative gradient impact
-
-                final MatrixStore<Double> gradient = this.getGradient(Access1D.asPrimitive1D(nodeResult));
-
-                if ((gradientScale = gradient.aggregateAll(Aggregator.LARGEST)) > ZERO) {
-                    compareFraction = fraction * (ONE + (ABS.invoke(gradient.doubleValue(myIntegerIndeces[i])) / gradientScale));
-                }
-
-            } else {
-                // If not yet found integer solution
-                // then compare the remaining/reversed (larger) fraction
-
-                compareFraction = ONE - fraction;
-                // [0.5, 1.0]
-            }
-
-            if ((compareFraction > maxFraction) && !options.integer.isZero(fraction)) {
-                retVal = i;
-                maxFraction = compareFraction;
-            }
-        }
-
-        return retVal;
     }
 
     boolean isExplored(final BranchAndBoundNodeTask aNodeTask) {
