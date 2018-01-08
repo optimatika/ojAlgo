@@ -877,7 +877,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context) {
-        return this.validate(solution, context, options.logger_appender);
+        return this.validate(solution, context, options.logger_detailed ? options.logger_appender : null);
     }
 
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final Printer appender) {
