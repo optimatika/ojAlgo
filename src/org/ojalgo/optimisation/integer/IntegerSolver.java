@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.integer;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -163,15 +164,13 @@ public abstract class IntegerSolver extends GenericSolver {
     }
 
     private volatile Optimisation.Result myBestResultSoFar = null;
-
     private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
+    private final int[] myIntegerIndices;
+    private final double[] myIntegerSignificances;
     private final AtomicInteger myIntegerSolutionsCount = new AtomicInteger();
     private final boolean myMinimisation;
     private final ExpressionsBasedModel myModel;
-
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
-
-    private final int[] myIntegerIndices;
 
     protected IntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
 
@@ -187,6 +186,9 @@ public abstract class IntegerSolver extends GenericSolver {
         for (int i = 0; i < myIntegerIndices.length; i++) {
             myIntegerIndices[i] = model.indexOf(integerVariables.get(i));
         }
+
+        myIntegerSignificances = new double[integerVariables.size()];
+        Arrays.fill(myIntegerSignificances, ONE);
     }
 
     protected int countIntegerSolutions() {
@@ -307,6 +309,29 @@ public abstract class IntegerSolver extends GenericSolver {
             }
         }
 
+        if (tmpCurrentlyTheBest != null) {
+
+            final double objDiff = ABS.invoke(result.getValue() - tmpCurrentlyTheBest.getValue());
+
+            for (int i = 0; i < myIntegerIndices.length; i++) {
+                final double varDiff = ABS.invoke(result.doubleValue(myIntegerIndices[i]) - tmpCurrentlyTheBest.doubleValue(myIntegerIndices[i]));
+                if (!options.integer.isZero(varDiff)) {
+                    this.addIntegerSignificance(i, objDiff / varDiff);
+                }
+            }
+
+        } else {
+
+            final MatrixStore<Double> gradient = this.getGradient(Access1D.asPrimitive1D(result));
+            final double largest = gradient.aggregateAll(Aggregator.LARGEST);
+
+            if (largest > ZERO) {
+                for (int i = 0; i < result.size(); i++) {
+                    this.addIntegerSignificance(i, ABS.invoke(gradient.doubleValue(myIntegerIndices[i])) / largest);
+                }
+            }
+        }
+
         myIntegerSolutionsCount.incrementAndGet();
     }
 
@@ -324,12 +349,20 @@ public abstract class IntegerSolver extends GenericSolver {
      */
     protected abstract boolean validate();
 
+    void addIntegerSignificance(final int index, final double significance) {
+        myIntegerSignificances[index] += significance;
+    }
+
     final int getGlobalIndex(final int integerIndex) {
         return myIntegerIndices[integerIndex];
     }
 
     final int[] getIntegerIndices() {
         return myIntegerIndices;
+    }
+
+    double getIntegerSignificance(final int index) {
+        return myIntegerSignificances[index];
     }
 
     /**
@@ -342,7 +375,6 @@ public abstract class IntegerSolver extends GenericSolver {
 
         double fraction;
         double compareFraction = ZERO;
-        double gradientScale;
         double maxFraction = ZERO;
 
         for (int i = 0; i < myIntegerIndices.length; i++) {
@@ -350,28 +382,29 @@ public abstract class IntegerSolver extends GenericSolver {
             fraction = nodeKey.getFraction(i, nodeResult.doubleValue(myIntegerIndices[i]));
             // [0, 0.5]
 
-            if (this.isIntegerSolutionFound()) {
-                // If an integer solution is already found
-                // then scale the fraction by its relative gradient impact
+            if (!options.integer.isZero(fraction)) {
 
-                final MatrixStore<Double> gradient = this.getGradient(Access1D.asPrimitive1D(nodeResult));
+                if (this.isIntegerSolutionFound()) {
+                    // If an integer solution is already found
+                    // then scale the fraction by its significane
 
-                if ((gradientScale = gradient.aggregateAll(Aggregator.LARGEST)) > ZERO) {
-                    compareFraction = fraction * (ONE + (ABS.invoke(gradient.doubleValue(myIntegerIndices[i])) / gradientScale));
+                    compareFraction = fraction * this.getIntegerSignificance(myIntegerIndices[i]);
+
+                } else {
+                    // If not yet found integer solution
+                    // then compare the remaining/reversed (larger) fraction
+
+                // [0.5, 1.0]
+                    compareFraction = ONE - fraction;
+                    // [0.5, 1.0]
                 }
 
-            } else {
-                // If not yet found integer solution
-                // then compare the remaining/reversed (larger) fraction
-
-                compareFraction = ONE - fraction;
-                // [0.5, 1.0]
+                if (compareFraction > maxFraction) {
+                    retVal = i;
+                    maxFraction = compareFraction;
+                }
             }
 
-            if ((compareFraction > maxFraction) && !options.integer.isZero(fraction)) {
-                retVal = i;
-                maxFraction = compareFraction;
-            }
         }
 
         return retVal;

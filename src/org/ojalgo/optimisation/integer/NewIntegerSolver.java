@@ -64,19 +64,10 @@ public final class NewIntegerSolver extends IntegerSolver {
 
     private final PriorityBlockingQueue<NodeKey> myNodesToTry = new PriorityBlockingQueue<>();
 
-    private final double[] myIntegerSignificances;
-
     boolean normal = true;
 
     NewIntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
-
         super(model, solverOptions);
-
-        final List<Variable> tmpIntegerVariables = model.getIntegerVariables();
-
-        myIntegerSignificances = new double[tmpIntegerVariables.size()];
-
-        //options.debug = System.out;
     }
 
     public Result solve(final Result kickStarter) {
@@ -279,10 +270,6 @@ public final class NewIntegerSolver extends IntegerSolver {
         return this.countIterations();
     }
 
-    double getIntegerSignificance(final int index) {
-        return myIntegerSignificances[index];
-    }
-
     NodeKey getNextNode() {
         return myNodesToTry.poll();
         //        if (myMinimisation) {
@@ -347,10 +334,6 @@ public final class NewIntegerSolver extends IntegerSolver {
         //            final SortedSet<NodeKey> tmpHead = myNodesToTry.headSet(integerNode);
         //            myNodesToTry.removeAll(tmpHead);
         //        }
-    }
-
-    void setIntegerSignificance(final int index, final double significance) {
-        myIntegerSignificances[index] = significance;
     }
 
     void setup() {
@@ -425,7 +408,8 @@ public final class NewIntegerSolver extends IntegerSolver {
             tmpScale = PrimitiveMath.ONE;
         }
         for (int i = 0; i < tmpSignificance.length; i++) {
-            NewIntegerSolver.this.setIntegerSignificance(i, 0.5 + (tmpSignificance[i] / tmpScale));
+            final int index = i;
+            NewIntegerSolver.this.addIntegerSignificance(NewIntegerSolver.this.getGlobalIndex(index), 0.5 + (tmpSignificance[i] / tmpScale));
         }
 
         if ((retVal[0] != null) && (retVal[1] != null)) {
