@@ -1107,6 +1107,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     final void presolve() {
 
+        myExpressions.values().forEach(expr -> expr.setRedundant(false));
+
         boolean tmpNeedToRepeat = false;
 
         do {

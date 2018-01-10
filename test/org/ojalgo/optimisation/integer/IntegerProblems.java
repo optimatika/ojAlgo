@@ -282,6 +282,8 @@ public class IntegerProblems extends OptimisationIntegerTests {
             }
         }
 
+        // tmpModel.options.debug(IntegerSolver.class);
+
         final Result tmpResult = tmpModel.minimise();
 
         if (OptimisationIntegerTests.DEBUG) {

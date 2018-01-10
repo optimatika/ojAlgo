@@ -283,7 +283,7 @@ public abstract class IntegerSolver extends GenericSolver {
 
         if (this.isProgress()) {
             this.log("New integer solution {}", result);
-            this.log("\tat node {}", node);
+            this.log("\t@ node {}", node);
         }
 
         final Optimisation.Result tmpCurrentlyTheBest = myBestResultSoFar;

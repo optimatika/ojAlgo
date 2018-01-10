@@ -74,13 +74,27 @@ public final class OldIntegerSolver extends IntegerSolver {
 
         @Override
         protected Boolean compute() {
-            return this.compute(null);
+
+            final ExpressionsBasedModel nodeModel = OldIntegerSolver.this.getModel().relax(false);
+
+            if (OldIntegerSolver.this.isIntegerSolutionFound()) {
+                final double tmpBestValue = OldIntegerSolver.this.getBestResultSoFar().getValue();
+                final double tmpGap = ABS.invoke(tmpBestValue * OldIntegerSolver.this.options.mip_gap);
+                if (nodeModel.isMinimisation()) {
+                    nodeModel.limitObjective(null, TypeUtils.toBigDecimal(tmpBestValue - tmpGap, OldIntegerSolver.this.options.problem));
+                } else {
+                    nodeModel.limitObjective(TypeUtils.toBigDecimal(tmpBestValue + tmpGap, OldIntegerSolver.this.options.problem), null);
+                }
+            }
+
+            return this.compute(nodeModel);
         }
 
-        protected Boolean compute(final ExpressionsBasedModel parentModel) {
+        protected Boolean compute(final ExpressionsBasedModel nodeModel) {
 
             if (this.isNodeDebug()) {
-                myPrinter.println("\nBranch&Bound Node");
+                myPrinter.println();
+                myPrinter.println("Branch&Bound Node");
                 myPrinter.println(myKey.toString());
                 myPrinter.println(OldIntegerSolver.this.toString());
             }
@@ -111,9 +125,10 @@ public final class OldIntegerSolver extends IntegerSolver {
                 return true;
             }
 
-            ExpressionsBasedModel tmpNodeModel = this.getModel(parentModel);
+            myKey.bound(nodeModel, OldIntegerSolver.this.getIntegerIndices());
+
             final Result tmpBestResultSoFar = OldIntegerSolver.this.getBestResultSoFar();
-            final Optimisation.Result tmpNodeResult = tmpNodeModel.solve(tmpBestResultSoFar);
+            final Optimisation.Result tmpNodeResult = nodeModel.solve(tmpBestResultSoFar);
 
             if (this.isNodeDebug()) {
                 myPrinter.println("Node Result: {}", tmpNodeResult);
@@ -126,13 +141,13 @@ public final class OldIntegerSolver extends IntegerSolver {
                     myPrinter.println("Node solved to optimality!");
                 }
 
-                if (OldIntegerSolver.this.options.validate && !tmpNodeModel.validate(tmpNodeResult)) {
+                if (OldIntegerSolver.this.options.validate && !nodeModel.validate(tmpNodeResult)) {
                     // This should not be possible. There is a bug somewhere.
                     myPrinter.println("Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!");
                     myPrinter.println("Lower bounds: {}", Arrays.toString(myKey.getLowerBounds()));
                     myPrinter.println("Upper bounds: {}", Arrays.toString(myKey.getUpperBounds()));
 
-                    tmpNodeModel.validate(tmpNodeResult, myPrinter);
+                    nodeModel.validate(tmpNodeResult, myPrinter);
 
                     this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
 
@@ -159,6 +174,9 @@ public final class OldIntegerSolver extends IntegerSolver {
                         this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
                     }
 
+                    nodeModel.dispose();
+                    return true;
+
                 } else {
                     if (this.isNodeDebug()) {
                         myPrinter.println("Not an Integer Solution: " + tmpSolutionValue);
@@ -167,52 +185,39 @@ public final class OldIntegerSolver extends IntegerSolver {
                     final double tmpVariableValue = tmpNodeResult.doubleValue(OldIntegerSolver.this.getGlobalIndex(tmpBranchIndex));
 
                     if (OldIntegerSolver.this.isGoodEnoughToContinueBranching(tmpSolutionValue)) {
+
                         if (this.isNodeDebug()) {
                             myPrinter.println("Still hope, branching on {} @ {} >>> {}", tmpBranchIndex, tmpVariableValue,
-                                    tmpNodeModel.getVariable(OldIntegerSolver.this.getGlobalIndex(tmpBranchIndex)));
+                                    nodeModel.getVariable(OldIntegerSolver.this.getGlobalIndex(tmpBranchIndex)));
                             this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
                         }
 
-                        tmpNodeModel.dispose();
-                        tmpNodeModel = null;
+                        final BranchAndBoundNodeTask lowerBranch = this.createLowerBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);
+                        final BranchAndBoundNodeTask upperBranch = this.createUpperBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);
 
-                        final BranchAndBoundNodeTask tmpLowerBranchTask = this.createLowerBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);
-                        final BranchAndBoundNodeTask tmpUpperBranchTask = this.createUpperBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);
-
-                        final BranchAndBoundNodeTask thisBranchTask;
-                        final BranchAndBoundNodeTask forkedBranchTask;
+                        final BranchAndBoundNodeTask nextTask;
+                        final BranchAndBoundNodeTask forkedTask;
 
                         if ((tmpVariableValue - Math.floor(tmpVariableValue)) > HALF) {
-                            thisBranchTask = tmpUpperBranchTask;
-                            forkedBranchTask = tmpLowerBranchTask;
+                            nextTask = upperBranch;
+                            forkedTask = lowerBranch;
                         } else {
-                            thisBranchTask = tmpLowerBranchTask;
-                            forkedBranchTask = tmpUpperBranchTask;
+                            nextTask = lowerBranch;
+                            forkedTask = upperBranch;
                         }
 
-                        forkedBranchTask.fork();
+                        forkedTask.fork();
 
-                        final boolean thisBranchReturn = thisBranchTask.compute(tmpNodeModel);
-
-                        final boolean forkedBranchReturn = forkedBranchTask.join();
-
-                        return thisBranchReturn & forkedBranchReturn;
-
-                        //                        if (tmpLowerBranchValue) {
-                        //
-                        //
-                        //                            return tmpUpperBranchValue;
-                        //                        } else {
-                        //                            tmpUpperBranchTask.tryUnfork();
-                        //                            tmpUpperBranchTask.cancel(true);
-                        //                            return false;
-                        //                        }
+                        return nextTask.compute(nodeModel) && forkedTask.join();
 
                     } else {
                         if (this.isNodeDebug()) {
                             myPrinter.println("Can't find better integer solutions - stop this branch!");
                             this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
                         }
+
+                        nodeModel.dispose();
+                        return true;
                     }
                 }
 
@@ -221,9 +226,11 @@ public final class OldIntegerSolver extends IntegerSolver {
                     myPrinter.println("Failed to solve node problem - stop this branch!");
                     this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
                 }
+
+                nodeModel.dispose();
+                return true;
             }
 
-            return true;
         }
 
         BranchAndBoundNodeTask createLowerBranch(final int branchIndex, final double nonIntegerValue, final double parentObjectiveValue) {
@@ -240,7 +247,7 @@ public final class OldIntegerSolver extends IntegerSolver {
             return new BranchAndBoundNodeTask(tmpKey);
         }
 
-        void flush(final BasicLogger.Printer receiver) {
+        private void flush(final BasicLogger.Printer receiver) {
             if ((myPrinter != null) && (receiver != null)) {
                 myPrinter.flush(receiver);
             }
@@ -248,29 +255,6 @@ public final class OldIntegerSolver extends IntegerSolver {
 
         NodeKey getKey() {
             return myKey;
-        }
-
-        ExpressionsBasedModel getModel(final ExpressionsBasedModel parentModel) {
-
-            final ExpressionsBasedModel retVal = parentModel != null ? parentModel : OldIntegerSolver.this.getModel().relax(false);
-
-            //            if (retVal.options.debug_appender != null) {
-            //                retVal.options.debug_appender = new CharacterRing().asPrinter();
-            //            }
-
-            myKey.bound(retVal, OldIntegerSolver.this.getIntegerIndices());
-
-            if (OldIntegerSolver.this.isIntegerSolutionFound()) {
-                final double tmpBestValue = OldIntegerSolver.this.getBestResultSoFar().getValue();
-                final double tmpGap = ABS.invoke(tmpBestValue * OldIntegerSolver.this.options.mip_gap);
-                if (retVal.isMinimisation()) {
-                    retVal.limitObjective(null, TypeUtils.toBigDecimal(tmpBestValue - tmpGap, OldIntegerSolver.this.options.problem));
-                } else {
-                    retVal.limitObjective(TypeUtils.toBigDecimal(tmpBestValue + tmpGap, OldIntegerSolver.this.options.problem), null);
-                }
-            }
-
-            return retVal;
         }
 
     }
@@ -294,30 +278,25 @@ public final class OldIntegerSolver extends IntegerSolver {
 
         this.resetIterationsCount();
 
-        final BranchAndBoundNodeTask tmpNodeTask = new BranchAndBoundNodeTask();
+        final BranchAndBoundNodeTask rootNodeTask = new BranchAndBoundNodeTask();
 
-        final boolean tmpNormalExit = ForkJoinPool.commonPool().invoke(tmpNodeTask);
+        final boolean normalExit = ForkJoinPool.commonPool().invoke(rootNodeTask);
 
-        Optimisation.Result retVal = this.getBestResultSoFar();
+        final Optimisation.Result bestSolutionFound = this.getBestResultSoFar();
 
-        if (retVal.getState().isFeasible()) {
-
-            if (tmpNormalExit) {
-                retVal = new Optimisation.Result(State.OPTIMAL, retVal);
+        if (bestSolutionFound.getState().isFeasible()) {
+            if (normalExit) {
+                return new Optimisation.Result(State.OPTIMAL, bestSolutionFound);
             } else {
-                retVal = new Optimisation.Result(State.FEASIBLE, retVal);
+                return new Optimisation.Result(State.FEASIBLE, bestSolutionFound);
             }
-
         } else {
-
-            if (tmpNormalExit) {
-                retVal = new Optimisation.Result(State.INFEASIBLE, retVal);
+            if (normalExit) {
+                return new Optimisation.Result(State.INFEASIBLE, bestSolutionFound);
             } else {
-                retVal = new Optimisation.Result(State.FAILED, retVal);
+                return new Optimisation.Result(State.FAILED, bestSolutionFound);
             }
         }
-
-        return retVal;
     }
 
     @Override

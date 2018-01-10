@@ -27,6 +27,8 @@ public final class MipCase extends OptimisationIntegerTests {
     /**
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal solution after 4h</li>
+     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 2.0 rather than 1.0 after
+     * 5min</li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare_5_0()
@@ -39,6 +41,8 @@ public final class MipCase extends OptimisationIntegerTests {
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with integer solution 6.0 rather than 1.0 after 4h
      * expected:<1.0> but was:<5.999999999999929></li>
+     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 5.0 rather than 1.0 after
+     * 5min</li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare1()
@@ -51,6 +55,8 @@ public final class MipCase extends OptimisationIntegerTests {
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with integer solution 14.0 rather than 1.0
      * solution after 4h expected:<1.0> but was:<14.000000000000192></li>
+     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 19.0 rather than 1.0 after
+     * 5min</li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare2()
@@ -68,6 +74,7 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2013-12-10: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 29min</li>
      * <li>2015-08-28: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 97min</li>
      * <li>2015-11-07: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 107min</li>
+     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
      * </ul>
      *
      * @see RelaxedLpCase#testMas76()
@@ -80,6 +87,8 @@ public final class MipCase extends OptimisationIntegerTests {
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<2.07405081E7> but was:
      * <2.2769621121583242E7></li>
+     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 2.626301334355273E7 rather
+     * than 2.07405081E7 after 5min</li>
      * </ul>
      *
      * @see RelaxedLpCase#testModglob()
@@ -104,6 +113,7 @@ public final class MipCase extends OptimisationIntegerTests {
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 4h</li>
      * <li>2013-11-29: MacPro (suffice=4h abort=8h) Stopped after 4h: expected:<-41.0> but was:<-40.0></li>
+     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
      * </ul>
      *
      * @see RelaxedLpCase#testNoswot()
@@ -132,6 +142,7 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2015-08-28: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 411s</li>
      * <li>2015-11-07: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 372s</li>
      * <li>2017-10-20: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 796s</li>
+     * <li>2017-10-20: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
      * </ul>
      *
      * @see RelaxedLpCase#testPk1()
@@ -181,6 +192,7 @@ public final class MipCase extends OptimisationIntegerTests {
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<13.75> but was:<20.25></li>
      * <li>2013-11-24: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<13.75> but was:<16.5></li>
+     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped after 5min expected:<13.75> but was:<16.25></li>
      * </ul>
      *
      * @see RelaxedLpCase#testVpm2()
