@@ -107,16 +107,6 @@ public final class OldIntegerSolver extends IntegerSolver {
                 return false;
             }
 
-            if (OldIntegerSolver.this.isExplored(this)) {
-                if (this.isNodeDebug()) {
-                    myPrinter.println("Node previously explored!");
-                    this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
-                }
-                return true;
-            } else {
-                OldIntegerSolver.this.markAsExplored(this);
-            }
-
             if (!OldIntegerSolver.this.isGoodEnoughToContinueBranching(myKey.objective)) {
                 if (this.isNodeDebug()) {
                     myPrinter.println("No longer a relevant node!");
@@ -128,41 +118,42 @@ public final class OldIntegerSolver extends IntegerSolver {
             myKey.bound(nodeModel, OldIntegerSolver.this.getIntegerIndices());
 
             final Result tmpBestResultSoFar = OldIntegerSolver.this.getBestResultSoFar();
-            final Optimisation.Result tmpNodeResult = nodeModel.solve(tmpBestResultSoFar);
+            final Optimisation.Result nodeResult = nodeModel.solve(tmpBestResultSoFar);
 
-            if (this.isNodeDebug()) {
-                myPrinter.println("Node Result: {}", tmpNodeResult);
-            }
-
+            // Increment when/if an iteration was actually performed
             OldIntegerSolver.this.incrementIterationsCount();
 
-            if (tmpNodeResult.getState().isOptimal()) {
+            if (this.isNodeDebug()) {
+                myPrinter.println("Node Result: {}", nodeResult);
+            }
+
+            if (nodeResult.getState().isOptimal()) {
                 if (this.isNodeDebug()) {
                     myPrinter.println("Node solved to optimality!");
                 }
 
-                if (OldIntegerSolver.this.options.validate && !nodeModel.validate(tmpNodeResult)) {
+                if (OldIntegerSolver.this.options.validate && !nodeModel.validate(nodeResult)) {
                     // This should not be possible. There is a bug somewhere.
                     myPrinter.println("Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!");
                     myPrinter.println("Lower bounds: {}", Arrays.toString(myKey.getLowerBounds()));
                     myPrinter.println("Upper bounds: {}", Arrays.toString(myKey.getUpperBounds()));
 
-                    nodeModel.validate(tmpNodeResult, myPrinter);
+                    nodeModel.validate(nodeResult, myPrinter);
 
                     this.flush(OldIntegerSolver.this.getModel().options.logger_appender);
 
                     return false;
                 }
 
-                final int tmpBranchIndex = OldIntegerSolver.this.identifyNonIntegerVariable(tmpNodeResult, myKey);
-                final double tmpSolutionValue = OldIntegerSolver.this.evaluateFunction(tmpNodeResult);
+                final int tmpBranchIndex = OldIntegerSolver.this.identifyNonIntegerVariable(nodeResult, myKey);
+                final double tmpSolutionValue = OldIntegerSolver.this.evaluateFunction(nodeResult);
 
                 if (tmpBranchIndex == -1) {
                     if (this.isNodeDebug()) {
                         myPrinter.println("Integer solution! Store it among the others, and stop this branch!");
                     }
 
-                    final Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, tmpSolutionValue, tmpNodeResult);
+                    final Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, tmpSolutionValue, nodeResult);
 
                     OldIntegerSolver.this.markInteger(myKey, tmpIntegerSolutionResult);
 
@@ -182,7 +173,7 @@ public final class OldIntegerSolver extends IntegerSolver {
                         myPrinter.println("Not an Integer Solution: " + tmpSolutionValue);
                     }
 
-                    final double tmpVariableValue = tmpNodeResult.doubleValue(OldIntegerSolver.this.getGlobalIndex(tmpBranchIndex));
+                    final double tmpVariableValue = nodeResult.doubleValue(OldIntegerSolver.this.getGlobalIndex(tmpBranchIndex));
 
                     if (OldIntegerSolver.this.isGoodEnoughToContinueBranching(tmpSolutionValue)) {
 
