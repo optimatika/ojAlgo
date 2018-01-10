@@ -394,7 +394,6 @@ public abstract class IntegerSolver extends GenericSolver {
                     // If not yet found integer solution
                     // then compare the remaining/reversed (larger) fraction
 
-                // [0.5, 1.0]
                     compareFraction = ONE - fraction;
                     // [0.5, 1.0]
                 }
