@@ -63,6 +63,7 @@ abstract class MipLibCase extends OptimisationIntegerTests {
             }
         }
 
+        tmpModel.options.mip_gap = 0.01;
         tmpModel.options.time_suffice = 5L * CalendarDateUnit.MINUTE.size();
         tmpModel.options.time_abort = 1L * CalendarDateUnit.HOUR.size();
 

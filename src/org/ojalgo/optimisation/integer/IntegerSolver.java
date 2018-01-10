@@ -311,7 +311,7 @@ public abstract class IntegerSolver extends GenericSolver {
 
         if (tmpCurrentlyTheBest != null) {
 
-            final double objDiff = ABS.invoke(result.getValue() - tmpCurrentlyTheBest.getValue());
+            final double objDiff = ABS.invoke((result.getValue() - tmpCurrentlyTheBest.getValue()) / tmpCurrentlyTheBest.getValue());
 
             for (int i = 0; i < myIntegerIndices.length; i++) {
                 final double varDiff = ABS.invoke(result.doubleValue(myIntegerIndices[i]) - tmpCurrentlyTheBest.doubleValue(myIntegerIndices[i]));
@@ -326,7 +326,7 @@ public abstract class IntegerSolver extends GenericSolver {
             final double largest = gradient.aggregateAll(Aggregator.LARGEST);
 
             if (largest > ZERO) {
-                for (int i = 0; i < result.size(); i++) {
+                for (int i = 0; i < myIntegerIndices.length; i++) {
                     this.addIntegerSignificance(i, ABS.invoke(gradient.doubleValue(myIntegerIndices[i])) / largest);
                 }
             }
@@ -388,7 +388,7 @@ public abstract class IntegerSolver extends GenericSolver {
                     // If an integer solution is already found
                     // then scale the fraction by its significane
 
-                    compareFraction = fraction * this.getIntegerSignificance(myIntegerIndices[i]);
+                    compareFraction = fraction * this.getIntegerSignificance(i);
 
                 } else {
                     // If not yet found integer solution
