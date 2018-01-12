@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -663,6 +664,22 @@ public final class Expression extends ModelEntity<Expression> {
 
     int countQuadraticFactors() {
         return myQuadratic.size();
+    }
+
+    Set<Variable> getBinaryVariables(final Set<IntIndex> fixedVariables) {
+
+        final HashSet<Variable> retVal = new HashSet<Variable>();
+
+        for (final IntIndex varInd : myLinear.keySet()) {
+            if (!fixedVariables.contains(varInd)) {
+                final Variable variable = myModel.getVariable(varInd.index);
+                if (variable.isBinary()) {
+                    retVal.add(variable);
+                }
+            }
+        }
+
+        return retVal;
     }
 
     CompoundFunction<Double> getCompoundFunction() {

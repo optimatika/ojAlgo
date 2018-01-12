@@ -35,6 +35,58 @@ import org.ojalgo.access.Structure1D.IntIndex;
 public abstract class Presolvers {
 
     /**
+     * If an expression contains at least 1 binary varibale and all non-fixed variable weights are of the sign
+     * (positive or negative) then it is possible the check the validity of "1" for each of the binary
+     * variables.
+     */
+    public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
+
+        @Override
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables) {
+
+            boolean didFixVariable = false;
+
+            final Set<Variable> binaryVariables = expression.getBinaryVariables(fixedVariables);
+
+            if (binaryVariables.size() > 0) {
+
+                final BigDecimal fixedValue = expression.calculateFixedValue(fixedVariables);
+
+                BigDecimal compLowLim = expression.getLowerLimit();
+                if ((compLowLim != null) && (fixedValue.signum() != 0)) {
+                    compLowLim = compLowLim.subtract(fixedValue);
+                }
+
+                BigDecimal compUppLim = expression.getUpperLimit();
+                if ((compUppLim != null) && (fixedValue.signum() != 0)) {
+                    compUppLim = compUppLim.subtract(fixedValue);
+                }
+
+                if ((compUppLim != null) && expression.isPositive(fixedVariables)) {
+                    for (final Variable binVar : binaryVariables) {
+                        if (expression.get(binVar.getIndex()).compareTo(compUppLim) > 0) {
+                            binVar.upper(ZERO);
+                            didFixVariable = true;
+                        }
+                    }
+                }
+
+                if ((compLowLim != null) && expression.isNegative(fixedVariables)) {
+                    for (final Variable binVar : binaryVariables) {
+                        if (expression.get(binVar.getIndex()).compareTo(compLowLim) < 0) {
+                            binVar.upper(ZERO);
+                            didFixVariable = true;
+                        }
+                    }
+                }
+            }
+
+            return didFixVariable;
+        }
+
+    };
+
+    /**
      * Checks the sign of the limits and the sign of the expression parameters to deduce variables that in
      * fact can only zero.
      */
