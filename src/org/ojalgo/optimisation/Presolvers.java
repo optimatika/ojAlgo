@@ -35,9 +35,9 @@ import org.ojalgo.access.Structure1D.IntIndex;
 public abstract class Presolvers {
 
     /**
-     * If an expression contains at least 1 binary varibale and all non-fixed variable weights are of the sign
-     * (positive or negative) then it is possible the check the validity of "1" for each of the binary
-     * variables.
+     * If an expression contains at least 1 binary varibale and all non-fixed variable weights are of the same
+     * sign (positive or negative) then it is possible the check the validity of "1" for each of the binary
+     * variables. (Doesn't seem to work and/or is not effcetive.)
      */
     public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
 
@@ -53,29 +53,31 @@ public abstract class Presolvers {
                 final BigDecimal fixedValue = expression.calculateFixedValue(fixedVariables);
 
                 BigDecimal compLowLim = expression.getLowerLimit();
-                if ((compLowLim != null) && (fixedValue.signum() != 0)) {
-                    compLowLim = compLowLim.subtract(fixedValue);
-                }
-
-                BigDecimal compUppLim = expression.getUpperLimit();
-                if ((compUppLim != null) && (fixedValue.signum() != 0)) {
-                    compUppLim = compUppLim.subtract(fixedValue);
-                }
-
-                if ((compUppLim != null) && expression.isPositive(fixedVariables)) {
-                    for (final Variable binVar : binaryVariables) {
-                        if (expression.get(binVar.getIndex()).compareTo(compUppLim) > 0) {
-                            binVar.upper(ZERO);
-                            didFixVariable = true;
+                if (compLowLim != null) {
+                    if (fixedValue.signum() != 0) {
+                        compLowLim = compLowLim.subtract(fixedValue);
+                    }
+                    if (expression.isNegative(fixedVariables)) {
+                        for (final Variable binVar : binaryVariables) {
+                            if (expression.get(binVar).compareTo(compLowLim) < 0) {
+                                binVar.upper(ZERO);
+                                didFixVariable = true;
+                            }
                         }
                     }
                 }
 
-                if ((compLowLim != null) && expression.isNegative(fixedVariables)) {
-                    for (final Variable binVar : binaryVariables) {
-                        if (expression.get(binVar.getIndex()).compareTo(compLowLim) < 0) {
-                            binVar.upper(ZERO);
-                            didFixVariable = true;
+                BigDecimal compUppLim = expression.getUpperLimit();
+                if (compUppLim != null) {
+                    if (fixedValue.signum() != 0) {
+                        compUppLim = compUppLim.subtract(fixedValue);
+                    }
+                    if (expression.isPositive(fixedVariables)) {
+                        for (final Variable binVar : binaryVariables) {
+                            if (expression.get(binVar).compareTo(compUppLim) > 0) {
+                                binVar.upper(ZERO);
+                                didFixVariable = true;
+                            }
                         }
                     }
                 }
@@ -95,20 +97,20 @@ public abstract class Presolvers {
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables) {
 
-            boolean tmpDidFixVariable = false;
+            boolean didFixVariable = false;
 
-            final ExpressionsBasedModel tmpModel = expression.getModel();
+            final ExpressionsBasedModel model = expression.getModel();
 
-            final BigDecimal tmpFixedValue = expression.calculateFixedValue(fixedVariables);
+            final BigDecimal fixedValue = expression.calculateFixedValue(fixedVariables);
 
             BigDecimal tmpCompLowLim = expression.getLowerLimit();
-            if ((tmpCompLowLim != null) && (tmpFixedValue.signum() != 0)) {
-                tmpCompLowLim = tmpCompLowLim.subtract(tmpFixedValue);
+            if ((tmpCompLowLim != null) && (fixedValue.signum() != 0)) {
+                tmpCompLowLim = tmpCompLowLim.subtract(fixedValue);
             }
 
             BigDecimal tmpCompUppLim = expression.getUpperLimit();
-            if ((tmpCompUppLim != null) && (tmpFixedValue.signum() != 0)) {
-                tmpCompUppLim = tmpCompUppLim.subtract(tmpFixedValue);
+            if ((tmpCompUppLim != null) && (fixedValue.signum() != 0)) {
+                tmpCompUppLim = tmpCompUppLim.subtract(fixedValue);
             }
 
             if ((tmpCompLowLim != null) && (tmpCompLowLim.signum() >= 0) && expression.isNegative(fixedVariables)) {
@@ -117,16 +119,16 @@ public abstract class Presolvers {
 
                     for (final IntIndex tmpLinear : expression.getLinearKeySet()) {
                         if (!fixedVariables.contains(tmpLinear)) {
-                            final Variable tmpFreeVariable = tmpModel.getVariable(tmpLinear.index);
+                            final Variable tmpFreeVariable = model.getVariable(tmpLinear.index);
 
-                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, tmpModel.options.slack,
-                                    tmpModel.options.logger_detailed ? tmpModel.options.logger_appender : null);
+                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.slack,
+                                    model.options.logger_detailed ? model.options.logger_appender : null);
                             expression.setInfeasible(!tmpValid);
 
                             if (tmpValid) {
                                 tmpFreeVariable.level(ZERO);
                                 tmpFreeVariable.setValue(ZERO);
-                                tmpDidFixVariable = true;
+                                didFixVariable = true;
                             }
                         }
                     }
@@ -145,16 +147,16 @@ public abstract class Presolvers {
 
                     for (final IntIndex tmpLinear : expression.getLinearKeySet()) {
                         if (!fixedVariables.contains(tmpLinear)) {
-                            final Variable tmpFreeVariable = tmpModel.getVariable(tmpLinear.index);
+                            final Variable tmpFreeVariable = model.getVariable(tmpLinear.index);
 
-                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, tmpModel.options.slack,
-                                    tmpModel.options.logger_detailed ? tmpModel.options.logger_appender : null);
+                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.slack,
+                                    model.options.logger_detailed ? model.options.logger_appender : null);
                             expression.setInfeasible(!tmpValid);
 
                             if (tmpValid) {
                                 tmpFreeVariable.level(ZERO);
                                 tmpFreeVariable.setValue(ZERO);
-                                tmpDidFixVariable = true;
+                                didFixVariable = true;
                             }
                         }
                     }
@@ -167,7 +169,7 @@ public abstract class Presolvers {
                 }
             }
 
-            return tmpDidFixVariable;
+            return didFixVariable;
         }
 
     };
@@ -181,31 +183,31 @@ public abstract class Presolvers {
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables) {
 
-            boolean tmpDidFixVariable = false;
+            boolean didFixVariable = false;
 
             if (expression.countLinearFactors() <= (fixedVariables.size() + 2)) {
                 // This constraint can possibly be reduced to 0, 1 or 2 remaining linear factors
 
-                final BigDecimal tmpFixedValue = expression.calculateFixedValue(fixedVariables);
+                final BigDecimal fixedValue = expression.calculateFixedValue(fixedVariables);
 
-                final HashSet<IntIndex> tmpRemainingLinear = new HashSet<>(expression.getLinearKeySet());
-                tmpRemainingLinear.removeAll(fixedVariables);
+                final HashSet<IntIndex> remainingLinear = new HashSet<>(expression.getLinearKeySet());
+                remainingLinear.removeAll(fixedVariables);
 
-                switch (tmpRemainingLinear.size()) {
+                switch (remainingLinear.size()) {
 
                 case 0:
 
-                    tmpDidFixVariable = Presolvers.doCase0(expression, tmpFixedValue, tmpRemainingLinear);
+                    didFixVariable = Presolvers.doCase0(expression, fixedValue, remainingLinear);
                     break;
 
                 case 1:
 
-                    tmpDidFixVariable = Presolvers.doCase1(expression, tmpFixedValue, tmpRemainingLinear);
+                    didFixVariable = Presolvers.doCase1(expression, fixedValue, remainingLinear);
                     break;
 
                 case 2:
 
-                    tmpDidFixVariable = Presolvers.doCase2(expression, tmpFixedValue, tmpRemainingLinear);
+                    didFixVariable = Presolvers.doCase2(expression, fixedValue, remainingLinear);
                     break;
 
                 default:
@@ -215,7 +217,7 @@ public abstract class Presolvers {
 
             }
 
-            return tmpDidFixVariable;
+            return didFixVariable;
         }
 
     };

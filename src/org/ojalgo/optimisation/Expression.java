@@ -668,7 +668,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     Set<Variable> getBinaryVariables(final Set<IntIndex> fixedVariables) {
 
-        final HashSet<Variable> retVal = new HashSet<Variable>();
+        final HashSet<Variable> retVal = new HashSet<>();
 
         for (final IntIndex varInd : myLinear.keySet()) {
             if (!fixedVariables.contains(varInd)) {
