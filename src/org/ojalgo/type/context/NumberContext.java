@@ -115,10 +115,10 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
     }
 
-    public static NumberContext getGeneral(final int aPrecision, final int scale) {
+    public static NumberContext getGeneral(final int precision, final int scale) {
 
         final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
-        final int tmpPrecision = aPrecision;
+        final int tmpPrecision = precision;
         final int tmpScale = scale;
         final RoundingMode tmpRoundingMode = DEFAULT_MATH.getRoundingMode();
 
@@ -479,7 +479,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         if (retVal.signum() == 0) {
             return BigMath.ZERO;
         } else {
-            return retVal;
+            return retVal.stripTrailingZeros();
         }
     }
 
