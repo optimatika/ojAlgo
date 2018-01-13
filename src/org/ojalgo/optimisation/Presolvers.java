@@ -29,6 +29,7 @@ import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.ojalgo.access.Structure1D.IntIndex;
 
@@ -42,7 +43,7 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final Function<IntIndex, Variable> variableResolver) {
 
             boolean didFixVariable = false;
 
@@ -95,7 +96,7 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver OPPOSITE_SIGN = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final Function<IntIndex, Variable> variableResolver) {
 
             boolean didFixVariable = false;
 
@@ -119,7 +120,8 @@ public abstract class Presolvers {
 
                     for (final IntIndex tmpLinear : expression.getLinearKeySet()) {
                         if (!fixedVariables.contains(tmpLinear)) {
-                            final Variable tmpFreeVariable = model.getVariable(tmpLinear.index);
+
+                            final Variable tmpFreeVariable = variableResolver.apply(tmpLinear);
 
                             final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.slack,
                                     model.options.logger_detailed ? model.options.logger_appender : null);
@@ -181,7 +183,7 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver ZERO_ONE_TWO = new ExpressionsBasedModel.Presolver(10) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final Function<IntIndex, Variable> variableResolver) {
 
             boolean didFixVariable = false;
 
@@ -197,17 +199,17 @@ public abstract class Presolvers {
 
                 case 0:
 
-                    didFixVariable = Presolvers.doCase0(expression, fixedValue, remainingLinear);
+                    didFixVariable = Presolvers.doCase0(expression, fixedValue, remainingLinear, variableResolver);
                     break;
 
                 case 1:
 
-                    didFixVariable = Presolvers.doCase1(expression, fixedValue, remainingLinear);
+                    didFixVariable = Presolvers.doCase1(expression, fixedValue, remainingLinear, variableResolver);
                     break;
 
                 case 2:
 
-                    didFixVariable = Presolvers.doCase2(expression, fixedValue, remainingLinear);
+                    didFixVariable = Presolvers.doCase2(expression, fixedValue, remainingLinear, variableResolver);
                     break;
 
                 default:
@@ -225,7 +227,8 @@ public abstract class Presolvers {
     /**
      * This constraint expression has 0 remaining free variable. It is entirely redundant.
      */
-    static boolean doCase0(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining) {
+    static boolean doCase0(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
+            final Function<IntIndex, Variable> variableResolver) {
 
         expression.setRedundant(true);
 
@@ -247,12 +250,13 @@ public abstract class Presolvers {
      * This constraint expression has 1 remaining free variable. The lower/upper limits can be transferred to
      * that variable, and the expression marked as redundant.
      */
-    static boolean doCase1(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining) {
+    static boolean doCase1(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
+            final Function<IntIndex, Variable> variableResolver) {
 
         final ExpressionsBasedModel tmpModel = expression.getModel();
 
         final IntIndex tmpIndex = remaining.iterator().next();
-        final Variable tmpVariable = tmpModel.getVariable(tmpIndex.index);
+        final Variable tmpVariable = variableResolver.apply(tmpIndex);
         final BigDecimal tmpFactor = expression.get(tmpIndex);
 
         if (expression.isEqualityConstraint()) {
@@ -334,20 +338,19 @@ public abstract class Presolvers {
         }
     }
 
-    static boolean doCase2(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining) {
-
-        final ExpressionsBasedModel tmpModel = expression.getModel();
+    static boolean doCase2(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
+            final Function<IntIndex, Variable> variableResolver) {
 
         final Iterator<IntIndex> tmpIterator = remaining.iterator();
 
         final IntIndex tmpIndexA = tmpIterator.next();
-        final Variable tmpVariableA = tmpModel.getVariable(tmpIndexA.index);
+        final Variable tmpVariableA = variableResolver.apply(tmpIndexA);
         final BigDecimal tmpFactorA = expression.get(tmpIndexA);
         BigDecimal tmpLowerA = tmpVariableA.getLowerLimit();
         BigDecimal tmpUpperA = tmpVariableA.getUpperLimit();
 
         final IntIndex tmpIndexB = tmpIterator.next();
-        final Variable tmpVariableB = tmpModel.getVariable(tmpIndexB.index);
+        final Variable tmpVariableB = variableResolver.apply(tmpIndexB);
         final BigDecimal tmpFactorB = expression.get(tmpIndexB);
         BigDecimal tmpLowerB = tmpVariableB.getLowerLimit();
         BigDecimal tmpUpperB = tmpVariableB.getUpperLimit();

@@ -26,6 +26,7 @@ import static org.ojalgo.function.BigFunction.*;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.ojalgo.ProgrammingError;
@@ -183,12 +184,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             myExecutionOrder = executionOrder;
         }
 
-        public int compareTo(final Presolver reference) {
+        public final int compareTo(final Presolver reference) {
             return Integer.compare(myExecutionOrder, reference.getExecutionOrder());
         }
 
         @Override
-        public boolean equals(final Object obj) {
+        public final boolean equals(final Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -210,7 +211,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         @Override
-        public int hashCode() {
+        public final int hashCode() {
             final int prime = 31;
             int result = 1;
             result = (prime * result) + ((myUUID == null) ? 0 : myUUID.hashCode());
@@ -220,10 +221,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         /**
          * @param expression
          * @param fixedVariables
+         * @param variableResolver TODO
          * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
          *         typically when/if a variable was fixed.
          */
-        public abstract boolean simplify(Expression expression, Set<IntIndex> fixedVariables);
+        public abstract boolean simplify(Expression expression, Set<IntIndex> fixedVariables, Function<IntIndex, Variable> variableResolver);
 
         final int getExecutionOrder() {
             return myExecutionOrder;
@@ -350,7 +352,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public void addVariable(final Variable variable) {
         if (myWorkCopy) {
-            throw new IllegalStateException("This model is a copy - its set of variables cannot be modified!");
+            throw new IllegalStateException("This model is a work copy - its set of variables cannot be modified!");
         } else {
             myVariables.add(variable);
             variable.setIndex(new IntIndex(myVariables.size() - 1));
@@ -478,6 +480,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public Variable getVariable(final int index) {
         return myVariables.get(index);
+    }
+
+    public Variable getVariable(final IntIndex index) {
+        return myVariables.get(index.index);
     }
 
     public List<Variable> getVariables() {
@@ -691,9 +697,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         this.setMaximisation();
 
-        final Result tmpSolverResult = this.solve(this.getVariableValues());
+        final Result solverResult = this.solve(this.getVariableValues());
 
-        return this.handleResult(tmpSolverResult);
+        return this.handleResult(solverResult);
     }
 
     public Optimisation.Result minimise() {
@@ -1110,22 +1116,22 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         myExpressions.values().forEach(expr -> expr.setRedundant(false));
 
-        boolean tmpNeedToRepeat = false;
+        boolean needToRepeat = false;
 
         do {
 
-            final Set<IntIndex> tmpFixedVariables = this.identifyFixedVariables();
-            tmpNeedToRepeat = false;
+            final Set<IntIndex> fixedVariables = this.identifyFixedVariables();
+            needToRepeat = false;
 
-            for (final Expression tmpExpr : this.getExpressions()) {
-                if (!tmpNeedToRepeat && tmpExpr.isConstraint() && !tmpExpr.isInfeasible() && !tmpExpr.isRedundant() && (tmpExpr.countQuadraticFactors() == 0)) {
-                    for (final Presolver tmpPreS : PRESOLVERS) {
-                        tmpNeedToRepeat |= tmpPreS.simplify(tmpExpr, tmpFixedVariables);
+            for (final Expression expr : this.getExpressions()) {
+                if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
+                    for (final Presolver presolver : PRESOLVERS) {
+                        needToRepeat |= presolver.simplify(expr, fixedVariables, this::getVariable);
                     }
                 }
             }
 
-        } while (tmpNeedToRepeat);
+        } while (needToRepeat);
 
         this.categoriseVariables();
     }

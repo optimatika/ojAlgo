@@ -67,7 +67,7 @@ import org.ojalgo.type.context.NumberContext;
  * {@linkplain Expression#level(Number)}. An expression is made part of (contributing to) the objective
  * function by setting a contribution weight. Use {@linkplain Expression#weight(Number)}. The contribution
  * weight can be set to anything except zero (0.0). Often you may just want to set it to one (1.0). Other
- * values can be used to balance multiple expressions Contributing to the objective function.
+ * values can be used to balance multiple expressions contributing to the objective function.
  * </p>
  *
  * @author apete
