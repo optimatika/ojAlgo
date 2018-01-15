@@ -28,6 +28,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -63,20 +64,20 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     };
 
     public static final RationalNumber MAX = new RationalNumber(Long.MAX_VALUE, 1L);
-    private static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitLength();
     public static final RationalNumber MIN = new RationalNumber(Long.MIN_VALUE, 1L);
     public static final RationalNumber NaN = new RationalNumber(0L, 0L);
     public static final RationalNumber NEG = new RationalNumber(-1L, 1L);
     public static final RationalNumber NEGATIVE_INFINITY = new RationalNumber(-1L, 0L);
     public static final RationalNumber ONE = new RationalNumber(1L, 1L);
     public static final RationalNumber POSITIVE_INFINITY = new RationalNumber(1L, 0L);
-    public static final long SAFE_LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE / 2L));
     public static final RationalNumber TWO = new RationalNumber(2L, 1L);
     public static final RationalNumber ZERO = new RationalNumber(0L, 1L);
 
     private static final String DIVIDE = " / ";
     private static final String LEFT = "(";
-    private static final String RIGHT = ")";;
+    private static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitLength();
+    private static final String RIGHT = ")";
+    private static final long SAFE_LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE / 2L));;
 
     /**
      * Greatest Common Denominator
@@ -384,6 +385,46 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
 
         return RationalNumber.of(retNumer.longValueExact(), retDenom.longValueExact());
+    }
+
+    static RationalNumber valueOf2(final double value) {
+
+        if (Double.isNaN(value)) {
+            return NaN;
+        } else if (value == Double.POSITIVE_INFINITY) {
+            return POSITIVE_INFINITY;
+        } else if (value == Double.NEGATIVE_INFINITY) {
+            return NEGATIVE_INFINITY;
+        } else if (NumberContext.compare(value, 0.0) == 0) {
+            return ZERO;
+        } else if (NumberContext.compare(value, 1.0) == 0) {
+            return ONE;
+        } else if (NumberContext.compare(value, -1.0) == 0) {
+            return NEG;
+        } else if (NumberContext.compare(value, 2.0) == 0) {
+            return TWO;
+        }
+
+        final long numer;
+        final long denom;
+
+        if (Math.abs(value) > 1.0) {
+            numer = Long.MAX_VALUE;
+            denom = Math.round(numer / value);
+            if (denom == 0L) {
+                BasicLogger.debug();
+            }
+        } else {
+            denom = Long.MAX_VALUE;
+            numer = Math.round(denom * value);
+        }
+
+        final long gcd = RationalNumber.gcd(numer, denom);
+        if (gcd != 1L) {
+            return new RationalNumber(numer / gcd, denom / gcd);
+        } else {
+            return new RationalNumber(numer, denom);
+        }
     }
 
     private transient BigDecimal myDecimal = null;
