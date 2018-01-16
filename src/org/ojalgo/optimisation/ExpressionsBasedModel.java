@@ -341,12 +341,26 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
+    public Expression addExpression() {
+        return this.addExpression("EXPR" + myExpressions.size());
+    }
+
     public Expression addExpression(final String name) {
 
         final Expression retVal = new Expression(name, this);
 
         myExpressions.put(name, retVal);
 
+        return retVal;
+    }
+
+    public Variable addVariable() {
+        return this.addVariable("X" + myVariables.size());
+    }
+
+    public Variable addVariable(final String name) {
+        final Variable retVal = new Variable(name);
+        this.addVariable(retVal);
         return retVal;
     }
 
@@ -491,7 +505,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     public Optimisation.Result getVariableValues() {
-        return this.getVariableValues(options.slack);
+        return this.getVariableValues(options.feasibility);
     }
 
     /**
@@ -880,7 +894,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     public boolean validate(final Access1D<BigDecimal> solution) {
-        return this.validate(solution, options.slack, options.logger_appender);
+        return this.validate(solution, options.feasibility, options.logger_appender);
     }
 
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context) {
@@ -905,7 +919,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     public boolean validate(final Access1D<BigDecimal> solution, final Printer appender) {
-        return this.validate(solution, options.slack, appender);
+        return this.validate(solution, options.feasibility, appender);
     }
 
     public boolean validate(final NumberContext context) {

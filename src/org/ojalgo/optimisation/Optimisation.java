@@ -155,9 +155,10 @@ public interface Optimisation {
     public static final class Options implements Optimisation, Cloneable {
 
         /**
-         * Used to determine if a variable value is integer or not.
+         * Used to determine/validate feasibility. Are the constraints violated or not? Are the variable
+         * values integer or not?
          */
-        public NumberContext integer = new NumberContext(12, 7, RoundingMode.HALF_EVEN);
+        public NumberContext feasibility = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
 
         /**
          * The maximmum number of iterations allowed for the solve() command.
@@ -198,41 +199,9 @@ public interface Optimisation {
         public double mip_gap = 1.0E-4;
 
         /**
-         * Used to compare/check objective function values (incl. temporary, phase 1, objectives). The most
-         * importatnt use of this parameter is, with the linear (simplex) solver, to determine if the phase 1
-         * objective function value is zero or not. Thus it is used to determine if the problem is feasible or
-         * not.
-         * <ul>
-         * <li>2015-01-30: Changed from 12,7 to 12,8 to be able to handle LinearProblems.testP20150127()</li>
-         * </ul>
-         */
-        public NumberContext objective = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
-
-        /**
          * For display only!
          */
         public NumberContext print = NumberContext.getGeneral(8, 10);
-
-        /**
-         * Problem parameters; constraints and objectives The numbers used to state/describe the problem,
-         * incl. when/if these are transformed during the solution algorithm.
-         * <ul>
-         * <li>2014-09-29: Changed from 11,9 to 12,8</li>
-         * </ul>
-         */
-        public NumberContext problem = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
-
-        /**
-         * Used to determine if a constraint is violated or not. Essentially this context determines if the
-         * various validate(...) methods will return true or false. Calculate the slack - zero if the
-         * constraint is "active" - and check the sign.
-         * <ul>
-         * <li>2015-09-05: Changed from 14,8 to 12,8 (the "8" can/should probably be increased)</li>
-         * <li>2015-09-09: Changed from 12,8 to 10,8 (the "8" can only be increased if some test cases are
-         * rewritten)</li>
-         * </ul>
-         */
-        public NumberContext slack = new NumberContext(10, 8, RoundingMode.HALF_DOWN);
 
         /**
          * Used when copying the solver's solution back to the model (converting from double to BigDecimal).

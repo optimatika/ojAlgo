@@ -123,7 +123,7 @@ public abstract class Presolvers {
 
                             final Variable tmpFreeVariable = variableResolver.apply(tmpLinear);
 
-                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.slack,
+                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.feasibility,
                                     model.options.logger_detailed ? model.options.logger_appender : null);
                             expression.setInfeasible(!tmpValid);
 
@@ -151,7 +151,7 @@ public abstract class Presolvers {
                         if (!fixedVariables.contains(tmpLinear)) {
                             final Variable tmpFreeVariable = model.getVariable(tmpLinear.index);
 
-                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.slack,
+                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.feasibility,
                                     model.options.logger_detailed ? model.options.logger_appender : null);
                             expression.setInfeasible(!tmpValid);
 
@@ -234,7 +234,7 @@ public abstract class Presolvers {
 
         final ExpressionsBasedModel tmpModel = expression.getModel();
 
-        final boolean tmpValid = expression.validate(fixedValue, tmpModel.options.slack,
+        final boolean tmpValid = expression.validate(fixedValue, tmpModel.options.feasibility,
                 tmpModel.options.logger_detailed ? tmpModel.options.logger_appender : null);
         if (tmpValid) {
             expression.setInfeasible(false);
@@ -267,7 +267,7 @@ public abstract class Presolvers {
 
             expression.setRedundant(true);
 
-            final boolean tmpValid = tmpVariable.validate(tmpSolutionValue, tmpModel.options.slack,
+            final boolean tmpValid = tmpVariable.validate(tmpSolutionValue, tmpModel.options.feasibility,
                     tmpModel.options.logger_detailed ? tmpModel.options.logger_appender : null);
             if (tmpValid) {
                 expression.setInfeasible(false);

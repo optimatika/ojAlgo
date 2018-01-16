@@ -95,7 +95,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (this.hasEqualityConstraints()) {
                 final MatrixStore<Double> tmpSE = this.getSE();
                 for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
-                    if (!options.slack.isZero(tmpSE.doubleValue(i))) {
+                    if (!options.feasibility.isZero(tmpSE.doubleValue(i))) {
                         retVal = false;
                     }
                 }
@@ -106,7 +106,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final MatrixStore<Double> tmpSI = this.getSlackI();
                 for (int i = 0; retVal && (i < tmpIncluded.length); i++) {
                     final double tmpSlack = tmpSI.doubleValue(tmpIncluded[i]);
-                    if ((tmpSlack < ZERO) && !options.slack.isZero(tmpSlack)) {
+                    if ((tmpSlack < ZERO) && !options.feasibility.isZero(tmpSlack)) {
                         retVal = false;
                     }
                 }
@@ -119,7 +119,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             final MatrixStore<Double> tmpSI = this.getSlackI();
             for (int e = 0; retVal && (e < tmpExcluded.length); e++) {
                 final double tmpSlack = tmpSI.doubleValue(tmpExcluded[e]);
-                if ((tmpSlack < ZERO) && !options.slack.isZero(tmpSlack)) {
+                if ((tmpSlack < ZERO) && !options.feasibility.isZero(tmpSlack)) {
                     retVal = false;
                 }
             }
@@ -479,7 +479,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                         final double tmpN = slack.doubleValue(excluded[i]); // Current slack
                         final double tmpD = excludedInequalityRow.dot(iterX); // Proposed slack change
-                        final double tmpVal = options.slack.isSmall(tmpD, tmpN) ? ZERO : tmpN / tmpD;
+                        final double tmpVal = options.feasibility.isSmall(tmpD, tmpN) ? ZERO : tmpN / tmpD;
 
                         if ((tmpD > ZERO) && (tmpVal >= ZERO) && (tmpVal < stepLength) && !options.solution.isSmall(normStepX, tmpD)) {
                             stepLength = tmpVal;
@@ -573,13 +573,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.log("\tL: {}", this.getSolutionL().asList());
             if ((this.getMatrixAE() != null) && (this.getMatrixAE().count() > 0)) {
                 this.log("\tE-slack: {}", this.getSE().copy().asList());
-                if (!options.slack.isZero(this.getSE().aggregateAll(Aggregator.LARGEST).doubleValue())) {
+                if (!options.feasibility.isZero(this.getSE().aggregateAll(Aggregator.LARGEST).doubleValue())) {
                     // throw new IllegalStateException("E-slack!");
                 }
             }
 
             this.log("\tI-slack: {}", mySlackI.copy().asList());
-            if (!options.slack.isZero(mySlackI.aggregateAll(Aggregator.LARGEST).doubleValue())) {
+            if (!options.feasibility.isZero(mySlackI.aggregateAll(Aggregator.LARGEST).doubleValue())) {
                 // throw new IllegalStateException("I-slack!");
             }
 
@@ -598,7 +598,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             final int[] excl = this.getExcluded();
 
             for (int i = 0; i < excl.length; i++) {
-                if (options.slack.isZero(slack.doubleValue(excl[i])) && (!options.solution.isZero(this.getSolutionL().doubleValue(numbEqus + excl[i])))) {
+                if (options.feasibility.isZero(slack.doubleValue(excl[i])) && (!options.solution.isZero(this.getSolutionL().doubleValue(numbEqus + excl[i])))) {
                     this.include(excl[i]);
                 }
             }

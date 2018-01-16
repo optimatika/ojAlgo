@@ -191,7 +191,7 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         final Optimisation.Result result = model.minimise();
 
         if (RationalMatrix.FACTORY.columns(result) != null) {
-            final boolean validated = model.validate(result, model.options.slack);
+            final boolean validated = model.validate(result, model.options.feasibility);
             if (result.getState().isFeasible()) {
                 final String message = "State: " + result.getState() + ", validated: " + validated;
                 TestUtils.assertTrue(message, validated);

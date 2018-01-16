@@ -315,7 +315,7 @@ public abstract class IntegerSolver extends GenericSolver {
 
             for (int i = 0; i < myIntegerIndices.length; i++) {
                 final double varDiff = ABS.invoke(result.doubleValue(myIntegerIndices[i]) - tmpCurrentlyTheBest.doubleValue(myIntegerIndices[i]));
-                if (!options.integer.isZero(varDiff)) {
+                if (!options.feasibility.isZero(varDiff)) {
                     this.addIntegerSignificance(i, objDiff / varDiff);
                 }
             }
@@ -382,7 +382,7 @@ public abstract class IntegerSolver extends GenericSolver {
             fraction = nodeKey.getFraction(i, nodeResult.doubleValue(myIntegerIndices[i]));
             // [0, 0.5]
 
-            if (!options.integer.isZero(fraction)) {
+            if (!options.feasibility.isZero(fraction)) {
 
                 if (this.isIntegerSolutionFound()) {
                     // If an integer solution is already found

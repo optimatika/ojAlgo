@@ -81,9 +81,9 @@ public final class OldIntegerSolver extends IntegerSolver {
                 final double tmpBestValue = OldIntegerSolver.this.getBestResultSoFar().getValue();
                 final double tmpGap = ABS.invoke(tmpBestValue * OldIntegerSolver.this.options.mip_gap);
                 if (nodeModel.isMinimisation()) {
-                    nodeModel.limitObjective(null, TypeUtils.toBigDecimal(tmpBestValue - tmpGap, OldIntegerSolver.this.options.problem));
+                    nodeModel.limitObjective(null, TypeUtils.toBigDecimal(tmpBestValue - tmpGap, OldIntegerSolver.this.options.feasibility));
                 } else {
-                    nodeModel.limitObjective(TypeUtils.toBigDecimal(tmpBestValue + tmpGap, OldIntegerSolver.this.options.problem), null);
+                    nodeModel.limitObjective(TypeUtils.toBigDecimal(tmpBestValue + tmpGap, OldIntegerSolver.this.options.feasibility), null);
                 }
             }
 

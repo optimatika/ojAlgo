@@ -86,7 +86,7 @@ public class ComPictetPamBamTest extends OptimisationLinearTests {
 
         final Optimisation.Result tmpResult = linearModel.minimise();
 
-        final boolean validated = linearModel.validate(tmpResult, linearModel.options.slack);
+        final boolean validated = linearModel.validate(tmpResult, linearModel.options.feasibility);
         if (tmpResult.getState().isFeasible()) {
             final String message = "State: " + tmpResult.getState() + ", validated: " + validated;
             TestUtils.assertTrue(message, validated);

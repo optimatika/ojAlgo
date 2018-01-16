@@ -317,9 +317,9 @@ public final class NewIntegerSolver extends IntegerSolver {
             final double tmpBestValue = this.getBestResultSoFar().getValue();
             final double tmpGap = PrimitiveFunction.ABS.invoke(tmpBestValue * options.mip_gap);
             if (retVal.isMinimisation()) {
-                retVal.limitObjective(null, TypeUtils.toBigDecimal(tmpBestValue - tmpGap, options.problem));
+                retVal.limitObjective(null, TypeUtils.toBigDecimal(tmpBestValue - tmpGap, options.feasibility));
             } else {
-                retVal.limitObjective(TypeUtils.toBigDecimal(tmpBestValue + tmpGap, options.problem), null);
+                retVal.limitObjective(TypeUtils.toBigDecimal(tmpBestValue + tmpGap, options.feasibility), null);
             }
         }
 

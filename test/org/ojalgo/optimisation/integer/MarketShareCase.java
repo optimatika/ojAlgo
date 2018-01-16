@@ -224,7 +224,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
         for (int i = 0; i < tmpResult.size(); i++) {
             final double tmpValue = tmpResult.doubleValue(i);
-            TestUtils.assertTrue(!tmpOptions.integer.isDifferent(0.0, tmpValue) || !tmpOptions.integer.isDifferent(1.0, tmpValue));
+            TestUtils.assertTrue(!tmpOptions.feasibility.isDifferent(0.0, tmpValue) || !tmpOptions.feasibility.isDifferent(1.0, tmpValue));
         }
 
     }
@@ -249,10 +249,10 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         final Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertTrue(tmpModel.validate(tmpModel.options.slack));
-        TestUtils.assertTrue(tmpModel.validate(tmpResult, tmpModel.options.slack));
+        TestUtils.assertTrue(tmpModel.validate(tmpModel.options.feasibility));
+        TestUtils.assertTrue(tmpModel.validate(tmpResult, tmpModel.options.feasibility));
 
-        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), tmpModel.options.objective);
+        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), tmpModel.options.feasibility);
 
         final NumberContext tmpContext = tmpModel.options.solution.newScale(13);
         for (final Variable tmpVariable : tmpModel.getVariables()) {
@@ -365,7 +365,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
         for (int i = 0; i < tmpResult.size(); i++) {
             final double tmpValue = tmpResult.doubleValue(i);
-            TestUtils.assertTrue(!tmpOptions.integer.isDifferent(0.0, tmpValue) || !tmpOptions.integer.isDifferent(1.0, tmpValue));
+            TestUtils.assertTrue(!tmpOptions.feasibility.isDifferent(0.0, tmpValue) || !tmpOptions.feasibility.isDifferent(1.0, tmpValue));
         }
 
     }

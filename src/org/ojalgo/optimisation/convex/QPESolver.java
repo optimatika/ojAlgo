@@ -57,7 +57,7 @@ final class QPESolver extends ConstrainedSolver {
 
         final MatrixStore<Double> tmpSE = this.getSE();
         for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
-            if (!options.slack.isZero(tmpSE.doubleValue(i))) {
+            if (!options.feasibility.isZero(tmpSE.doubleValue(i))) {
                 retVal = false;
             }
         }

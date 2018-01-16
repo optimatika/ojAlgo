@@ -550,7 +550,7 @@ public final class SimplexSolver extends LinearSolver {
             // final double tmpPhaseOneValue = myTransposedTableau.doubleValue(this.countConstraints() + this.countVariables(), myPoint.getRowObjective());
             final double tmpPhaseOneValue = myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
 
-            if (!myTableau.isBasicArtificials() || options.objective.isZero(tmpPhaseOneValue)) {
+            if (!myTableau.isBasicArtificials() || options.feasibility.isZero(tmpPhaseOneValue)) {
 
                 if (this.isDebug()) {
                     this.log("\nSwitching to Phase2 with {} artificial variable(s) still in the basis.\n", myTableau.countBasicArtificials());
@@ -634,7 +634,7 @@ public final class SimplexSolver extends LinearSolver {
         int retVal = -1;
 
         double tmpVal;
-        double tmpMinVal = myPoint.isPhase2() ? -options.problem.epsilon() : ZERO;
+        double tmpMinVal = myPoint.isPhase2() ? -options.feasibility.epsilon() : ZERO;
         //double tmpMinVal = ZERO;
 
         int tmpCol;
@@ -666,8 +666,8 @@ public final class SimplexSolver extends LinearSolver {
                 final Access1D<Double> tmpDenominators = myTableau.sliceTableauColumn(tmpDenomCol);
                 final Array1D<Double> tmpRatios = Array1D.PRIMITIVE64.copy(tmpNumerators);
                 tmpRatios.modifyMatching(DIVIDE, tmpDenominators);
-                this.log("\nfindNextPivotRow (smallest positive ratio) among these:\nNumerators={}\nDenominators={}\nRatios={}", tmpNumerators,
-                        tmpDenominators, tmpRatios);
+                this.log("\nfindNextPivotRow (smallest positive ratio) among these:\nNumerators={}\nDenominators={}\nRatios={}", tmpNumerators, tmpDenominators,
+                        tmpRatios);
             } else {
                 this.log("\nfindNextPivotRow");
             }
@@ -693,14 +693,14 @@ public final class SimplexSolver extends LinearSolver {
             // tmpNumer = PrimitiveFunction.ABS.invoke(myTransposedTableau.doubleValue(tmpNumerCol, i));
             tmpNumer = PrimitiveFunction.ABS.invoke(myTableau.doubleValue(i, tmpNumerCol));
 
-            if (options.problem.isSmall(tmpNumer, tmpDenom)) {
+            if (options.feasibility.isSmall(tmpNumer, tmpDenom)) {
 
                 tmpRatio = MACHINE_LARGEST;
 
             } else {
 
                 if (tmpSpecialCase) {
-                    if (options.problem.isSmall(tmpDenom, tmpNumer)) {
+                    if (options.feasibility.isSmall(tmpDenom, tmpNumer)) {
                         tmpRatio = MACHINE_EPSILON;
                     } else {
                         tmpRatio = MACHINE_LARGEST;
@@ -746,7 +746,7 @@ public final class SimplexSolver extends LinearSolver {
             tmpRHS.visitAll(tmpMinAggr);
             final double tmpMinVal = tmpMinAggr.doubleValue();
 
-            if ((tmpMinVal < ZERO) && !options.problem.isZero(tmpMinVal)) {
+            if ((tmpMinVal < ZERO) && !options.feasibility.isZero(tmpMinVal)) {
                 this.log("\nNegative RHS! {}", tmpMinVal);
                 if (this.isDebug()) {
                     this.log("Entire RHS columns: {}\n", tmpRHS);
