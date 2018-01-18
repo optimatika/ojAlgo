@@ -358,6 +358,31 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return this.addVariable("X" + myVariables.size());
     }
 
+    public void addSpecialOrderedSet(final Collection<Variable> orderedSet, final int type) {
+        this.addSpecialOrderedSet(orderedSet.toArray(new Variable[orderedSet.size()]), type);
+    }
+
+    public void addSpecialOrderedSet(final Variable[] orderedSet, final int type) {
+
+        final IntIndex[] sequence = new IntIndex[orderedSet.length];
+        for (int i = 0; i < sequence.length; i++) {
+            final Variable variable = orderedSet[i];
+            if ((variable == null) || !variable.isBinary() || (variable.getIndex() == null)) {
+                throw new ProgrammingError("Variables must be binary and already inserted to the model!");
+            } else {
+                sequence[i] = variable.getIndex();
+            }
+        }
+
+        final String name = "SOS" + type + "-" + Arrays.toString(sequence);
+
+        final Expression expr = this.addExpression(name);
+
+        final SpecialOrderedSet pres = new SpecialOrderedSet(sequence, type, expr, false);
+
+        ExpressionsBasedModel.addPresolver(pres);
+    }
+
     public Variable addVariable(final String name) {
         final Variable retVal = new Variable(name);
         this.addVariable(retVal);

@@ -41,6 +41,10 @@ final class FunctionsBasedModel extends AbstractModel<GenericSolver> {
             super(name);
         }
 
+        public final int compareTo(final Function obj) {
+            return this.getName().compareTo(obj.getName());
+        }
+
     }
 
     private final int myNumberOfVariables;

@@ -154,6 +154,10 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
+    public final int compareTo(final Expression obj) {
+        return this.getName().compareTo(obj.getName());
+    }
+
     /**
      * Will return an Expression with factors corresponding to fixed variables removed, and lower/upper limits
      * compensated for the fixed part of the expression. Factors corresponding to bilinear variables, where

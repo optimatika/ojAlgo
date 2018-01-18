@@ -106,10 +106,6 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         ProgrammingError.throwIfNull(name);
     }
 
-    public final int compareTo(final ME obj) {
-        return myName.compareTo(obj.getName());
-    }
-
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */

@@ -74,6 +74,10 @@ public final class Variable extends ModelEntity<Variable> {
         return this.lower(ZERO).upper(ONE).integer(true);
     }
 
+    public final int compareTo(final Variable obj) {
+        return this.getIndex().compareTo(obj.getIndex());
+    }
+
     public Variable copy() {
         return new Variable(this);
     }
