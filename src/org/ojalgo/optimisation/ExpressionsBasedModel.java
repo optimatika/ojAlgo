@@ -355,58 +355,73 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     /**
-     * @see #addSpecialOrderedSet(Variable[], int, int)
+     * Creates a special ordered set (SOS) presolver instance and links that to the supplied expression.
+     * When/if the presolver concludes that the SOS "constraints" are not possible the linked expression is
+     * marked as infeasible.
      */
-    public void addSpecialOrderedSet(final Collection<Variable> orderedSet, final int type) {
-        this.addSpecialOrderedSet(orderedSet.toArray(new Variable[orderedSet.size()]), type);
-    }
+    public void addSpecialOrderedSet(final Collection<Variable> orderedSet, final int type, final Expression linkedTo) {
 
-    /**
-     * @see #addSpecialOrderedSet(Variable[], int, int)
-     */
-    public void addSpecialOrderedSet(final Variable[] orderedSet, final int type) {
-        this.addSpecialOrderedSet(orderedSet, type, 0);
+        if (type <= 0) {
+            throw new ProgrammingError("Invalid SOS type!");
+        }
+
+        if (linkedTo.isConstraint()) {
+            throw new ProgrammingError("The linked to expression needs to be a constraint!");
+        }
+
+        final IntIndex[] sequence = new IntIndex[orderedSet.size()];
+        int index = 0;
+        for (final Variable variable : orderedSet) {
+            if ((variable == null) || (variable.getIndex() == null)) {
+                throw new ProgrammingError("Variables must be already inserted in the model!");
+            } else {
+                sequence[index++] = variable.getIndex();
+            }
+        }
+
+        ExpressionsBasedModel.addPresolver(new SpecialOrderedSet(sequence, type, linkedTo));
     }
 
     /**
      * Calling this method will create 2 things:
      * <ol>
      * <li>A simple expression meassuring the sum of the (binary) variable values (the number of binary
-     * variables that are "on"). The upper, and optionally lower, limits are set as defined by the
-     * <code>type</code> and <code>min</code> parameter values.</li>
+     * variables that are "ON"). The upper, and optionally lower, limits are set as defined by the
+     * <code>max</code> and <code>min</code> parameter values.</li>
      * <li>A custom presolver (specific to this SOS) to be used by the MIP solver. This presolver help to keep
      * track of which combinations of variable values or feasible, and is the only thing that enforces the
      * order.</li>
      * </ol>
      *
      * @param orderedSet The set members in correct order. Each of these variables must be binary.
-     * @param type The SOS type or maximum number of binary varibales in the set that may be "on"
-     * @param min The minimum number of binary varibales in the set that must be "on" (Set this to 0 if there
+     * @param min The minimum number of binary varibales in the set that must be "ON" (Set this to 0 if there
      *        is no minimum.)
+     * @param max The SOS type or maximum number of binary varibales in the set that may be "ON"
      */
-    public void addSpecialOrderedSet(final Variable[] orderedSet, final int type, final int min) {
+    public void addSpecialOrderedSet(final Collection<Variable> orderedSet, final int min, final int max) {
 
-        if ((type <= 0) || (min > type)) {
-            throw new ProgrammingError("Invalid SOS type or lower/upper boundaries!");
+        if ((max <= 0) || (min > max)) {
+            throw new ProgrammingError("Invalid min/max number of ON variables!");
         }
 
-        final IntIndex[] sequence = new IntIndex[orderedSet.length];
-        for (int i = 0; i < sequence.length; i++) {
-            final Variable variable = orderedSet[i];
-            if ((variable == null) || !variable.isBinary() || (variable.getIndex() == null)) {
-                throw new ProgrammingError("Variables must be binary and already inserted to the model!");
-            } else {
-                sequence[i] = variable.getIndex();
-            }
-        }
-
-        final String name = "SOS" + type + "-" + Arrays.toString(sequence);
+        final String name = "SOS" + max + "-" + orderedSet.toString();
 
         final Expression expression = this.addExpression(name);
 
-        final SpecialOrderedSet presolver = new SpecialOrderedSet(min, sequence, type, expression);
+        for (final Variable variable : orderedSet) {
+            if ((variable == null) || (variable.getIndex() == null) || !variable.isBinary()) {
+                throw new ProgrammingError("Variables must be binary and already inserted in the model!");
+            } else {
+                expression.set(variable.getIndex(), ONE);
+            }
+        }
 
-        ExpressionsBasedModel.addPresolver(presolver);
+        expression.upper(BigDecimal.valueOf(max));
+        if (min > 0) {
+            expression.lower(BigDecimal.valueOf(min));
+        }
+
+        this.addSpecialOrderedSet(orderedSet, max, expression);
     }
 
     public Variable addVariable() {

@@ -29,27 +29,22 @@ import org.ojalgo.access.Structure1D.IntIndex;
 
 class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
 
-    private final IntIndex[] mySequence;
     private final Expression myExpression;
+    private final IntIndex[] mySequence;
     private final int myType;
 
-    SpecialOrderedSet(final int min, final IntIndex[] sequence, final int max, final Expression expression) {
+    SpecialOrderedSet(final IntIndex[] sequence, final int type, final Expression expression) {
 
         super(0);
 
         mySequence = sequence;
-        myType = max;
+        myType = type;
         myExpression = expression;
-
-        for (int i = 0; i < sequence.length; i++) {
-            expression.set(sequence[i], BigDecimal.ONE);
-        }
-        expression.upper(BigDecimal.valueOf(max));
-        if (min > 0) {
-            expression.lower(BigDecimal.valueOf(min));
-        }
     }
 
+    /**
+     * The program logic here does not assume variables to be binary or even integer
+     */
     @Override
     public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final Function<IntIndex, Variable> variableResolver) {
 
@@ -64,13 +59,11 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
         int first = -1, limit = -1;
         for (int i = 0; i < mySequence.length; i++) {
             final IntIndex index = mySequence[1];
-            if (fixedVariables.contains(index) && (variableResolver.apply(index).getValue().compareTo(BigDecimal.ONE) == 0)) {
+            if (fixedVariables.contains(index) && (variableResolver.apply(index).getValue().compareTo(BigDecimal.ZERO) != 0)) {
                 if (first == -1) {
                     first = i;
-                    limit = i + 1;
-                } else if (first >= 0) {
-                    limit = i + 1;
                 }
+                limit = i + 1;
             }
         }
 
@@ -82,7 +75,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
 
         boolean didFixVariable = false;
 
-        for (int i = first; i < limit; i++) {
+        for (int i = first + 1; i < limit; i++) {
             final IntIndex index = mySequence[i];
             final Variable variable = variableResolver.apply(index);
             if (fixedVariables.contains(index)) {
@@ -90,9 +83,11 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
                     expression.setInfeasible(true);
                 }
             } else {
-                variable.level(BigDecimal.ONE);
-                variable.setValue(BigDecimal.ONE);
-                didFixVariable = true;
+                if (variable.isInteger()) {
+                    variable.lower(BigDecimal.ONE);
+                    variable.setValue(BigDecimal.ONE);
+                    didFixVariable = true;
+                }
             }
         }
 
@@ -102,7 +97,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
                 final IntIndex index = mySequence[i];
                 final Variable variable = variableResolver.apply(index);
                 if (fixedVariables.contains(index)) {
-                    if (variable.getValue().compareTo(BigDecimal.ONE) == 0) {
+                    if (variable.getValue().compareTo(BigDecimal.ZERO) != 0) {
                         expression.setInfeasible(true);
                     }
                 } else {
@@ -115,7 +110,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
                 final IntIndex index = mySequence[i];
                 final Variable variable = variableResolver.apply(index);
                 if (fixedVariables.contains(index)) {
-                    if (variable.getValue().compareTo(BigDecimal.ONE) == 0) {
+                    if (variable.getValue().compareTo(BigDecimal.ZERO) != 0) {
                         expression.setInfeasible(true);
                     }
                 } else {
