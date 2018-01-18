@@ -33,21 +33,20 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
     private final Expression myExpression;
     private final int myType;
 
-    SpecialOrderedSet(final IntIndex[] sequence, final int type, final Expression expression, final boolean alwaysRequire) {
+    SpecialOrderedSet(final int min, final IntIndex[] sequence, final int max, final Expression expression) {
 
         super(0);
 
         mySequence = sequence;
-        myType = type;
+        myType = max;
         myExpression = expression;
 
         for (int i = 0; i < sequence.length; i++) {
             expression.set(sequence[i], BigDecimal.ONE);
         }
-        final BigDecimal tmpTypeBound = BigDecimal.valueOf(type);
-        expression.upper(tmpTypeBound);
-        if (alwaysRequire) {
-            expression.lower(tmpTypeBound);
+        expression.upper(BigDecimal.valueOf(max));
+        if (min > 0) {
+            expression.lower(BigDecimal.valueOf(min));
         }
     }
 
@@ -75,7 +74,8 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
             }
         }
 
-        if ((limit - first) > myType) {
+        final int count = limit - first;
+        if (count > myType) {
             expression.setInfeasible(true);
             return false;
         }
@@ -83,7 +83,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
         boolean didFixVariable = false;
 
         for (int i = first; i < limit; i++) {
-            final IntIndex index = mySequence[1];
+            final IntIndex index = mySequence[i];
             final Variable variable = variableResolver.apply(index);
             if (fixedVariables.contains(index)) {
                 if (variable.getValue().compareTo(BigDecimal.ZERO) == 0) {
@@ -93,6 +93,36 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
                 variable.level(BigDecimal.ONE);
                 variable.setValue(BigDecimal.ONE);
                 didFixVariable = true;
+            }
+        }
+
+        final int remaining = myType - count;
+        if ((count > 0) && (remaining > 0)) {
+            for (int i = 0, lim = first - remaining; i < lim; i++) {
+                final IntIndex index = mySequence[i];
+                final Variable variable = variableResolver.apply(index);
+                if (fixedVariables.contains(index)) {
+                    if (variable.getValue().compareTo(BigDecimal.ONE) == 0) {
+                        expression.setInfeasible(true);
+                    }
+                } else {
+                    variable.level(BigDecimal.ZERO);
+                    variable.setValue(BigDecimal.ZERO);
+                    didFixVariable = true;
+                }
+            }
+            for (int i = limit + remaining, lim = mySequence.length; i < lim; i++) {
+                final IntIndex index = mySequence[i];
+                final Variable variable = variableResolver.apply(index);
+                if (fixedVariables.contains(index)) {
+                    if (variable.getValue().compareTo(BigDecimal.ONE) == 0) {
+                        expression.setInfeasible(true);
+                    }
+                } else {
+                    variable.level(BigDecimal.ZERO);
+                    variable.setValue(BigDecimal.ZERO);
+                    didFixVariable = true;
+                }
             }
         }
 

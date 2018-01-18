@@ -354,15 +354,41 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
-    public Variable addVariable() {
-        return this.addVariable("X" + myVariables.size());
-    }
-
+    /**
+     * @see #addSpecialOrderedSet(Variable[], int, int)
+     */
     public void addSpecialOrderedSet(final Collection<Variable> orderedSet, final int type) {
         this.addSpecialOrderedSet(orderedSet.toArray(new Variable[orderedSet.size()]), type);
     }
 
+    /**
+     * @see #addSpecialOrderedSet(Variable[], int, int)
+     */
     public void addSpecialOrderedSet(final Variable[] orderedSet, final int type) {
+        this.addSpecialOrderedSet(orderedSet, type, 0);
+    }
+
+    /**
+     * Calling this method will create 2 things:
+     * <ol>
+     * <li>A simple expression meassuring the sum of the (binary) variable values (the number of binary
+     * variables that are "on"). The upper, and optionally lower, limits are set as defined by the
+     * <code>type</code> and <code>min</code> parameter values.</li>
+     * <li>A custom presolver (specific to this SOS) to be used by the MIP solver. This presolver help to keep
+     * track of which combinations of variable values or feasible, and is the only thing that enforces the
+     * order.</li>
+     * </ol>
+     *
+     * @param orderedSet The set members in correct order. Each of these variables must be binary.
+     * @param type The SOS type or maximum number of binary varibales in the set that may be "on"
+     * @param min The minimum number of binary varibales in the set that must be "on" (Set this to 0 if there
+     *        is no minimum.)
+     */
+    public void addSpecialOrderedSet(final Variable[] orderedSet, final int type, final int min) {
+
+        if ((type <= 0) || (min > type)) {
+            throw new ProgrammingError("Invalid SOS type or lower/upper boundaries!");
+        }
 
         final IntIndex[] sequence = new IntIndex[orderedSet.length];
         for (int i = 0; i < sequence.length; i++) {
@@ -376,11 +402,15 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         final String name = "SOS" + type + "-" + Arrays.toString(sequence);
 
-        final Expression expr = this.addExpression(name);
+        final Expression expression = this.addExpression(name);
 
-        final SpecialOrderedSet pres = new SpecialOrderedSet(sequence, type, expr, false);
+        final SpecialOrderedSet presolver = new SpecialOrderedSet(min, sequence, type, expression);
 
-        ExpressionsBasedModel.addPresolver(pres);
+        ExpressionsBasedModel.addPresolver(presolver);
+    }
+
+    public Variable addVariable() {
+        return this.addVariable("X" + myVariables.size());
     }
 
     public Variable addVariable(final String name) {
