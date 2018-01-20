@@ -28,7 +28,6 @@ import java.math.BigInteger;
 import java.math.MathContext;
 
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -440,10 +439,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
         if (Math.abs(value) > 1.0) {
             numer = Long.MAX_VALUE;
-            denom = Math.round(numer / value);
-            if (denom == 0L) {
-                BasicLogger.debug();
-            }
+            denom = Math.max(Math.round(numer / value), 1L);
         } else {
             denom = Long.MAX_VALUE;
             numer = Math.round(denom * value);
