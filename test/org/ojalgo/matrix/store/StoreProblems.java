@@ -26,6 +26,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
 public class StoreProblems extends AbstractMatrixStoreTest {
@@ -106,4 +107,24 @@ public class StoreProblems extends AbstractMatrixStoreTest {
         TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
     }
 
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/55
+     */
+    public void testP20180121() {
+
+        final SparseStore<Double> m = SparseStore.PRIMITIVE.make(3, 2);
+        final PrimitiveDenseStore mAdd = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 0.0 }, { 0.0, 0.0 } });
+        final MatrixStore<Double> n = m.add(mAdd);
+
+        final SparseStore<Double> eye = SparseStore.PRIMITIVE.make(2, 2);
+        eye.set(0, 0, 1.0);
+        eye.set(1, 1, 1.0);
+
+        final MatrixStore<Double> prod = n.multiply(eye);
+
+        BasicLogger.debug("n", n);
+        BasicLogger.debug("eye", eye);
+        BasicLogger.debug("prod", prod);
+
+    }
 }
