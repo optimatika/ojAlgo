@@ -356,7 +356,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     public long limitOfRange(final long rangeFirst, final long rangeLimit) {
         int tmpFoundAt = this.index(rangeLimit - 1L);
         if (tmpFoundAt < 0) {
-            tmpFoundAt = -tmpFoundAt;
+            tmpFoundAt = -(tmpFoundAt + 2);
         }
         if (tmpFoundAt >= myActualLength) {
             return rangeFirst;
