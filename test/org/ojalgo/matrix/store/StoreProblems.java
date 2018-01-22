@@ -26,7 +26,6 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
 public class StoreProblems extends AbstractMatrixStoreTest {
@@ -129,10 +128,6 @@ public class StoreProblems extends AbstractMatrixStoreTest {
 
         TestUtils.assertEquals(mAdd, m2.multiply(eye));
         TestUtils.assertEquals(mAdd, eye.premultiply(m2).get());
-
-        BasicLogger.debug("n", n);
-        BasicLogger.debug("eye", eye);
-        BasicLogger.debug("prod", prod);
-
     }
+
 }
