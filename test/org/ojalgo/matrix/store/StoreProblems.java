@@ -122,6 +122,14 @@ public class StoreProblems extends AbstractMatrixStoreTest {
 
         final MatrixStore<Double> prod = n.multiply(eye);
 
+        TestUtils.assertEquals(mAdd, prod);
+
+        final SparseStore<Double> m2 = SparseStore.PRIMITIVE.make(3, 2);
+        m2.set(0, 0, 1.0);
+
+        TestUtils.assertEquals(mAdd, m2.multiply(eye));
+        TestUtils.assertEquals(mAdd, eye.premultiply(m2).get());
+
         BasicLogger.debug("n", n);
         BasicLogger.debug("eye", eye);
         BasicLogger.debug("prod", prod);
