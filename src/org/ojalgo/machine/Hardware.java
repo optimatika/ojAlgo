@@ -269,6 +269,18 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
+     * <li>Google Cloud Platform Compute Engine n1-standard-8 (8 vCPUs, 30 GB memory, Skylake)
+     * <ul>
+     * <li>1 processor</li>
+     * <li>4 cores per processor</li>
+     * <li>2 threads per core (8 threads in total)</li>
+     * <li>===</li>
+     * <li>30GB system RAM</li>
+     * <li>8.25MB L3 cache per processor</li>
+     * <li>1MB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
      * </ul>
      */
     static final Hardware X86_64__08 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(32L * K * K * K, 8), new BasicMachine(8L * K * K, 8),
