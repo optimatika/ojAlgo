@@ -884,38 +884,40 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     public Optimisation.Result solve(final Optimisation.Result initialSolution) {
 
         Optimisation.Result retVal = null;
+        
+        if (!PRESOLVERS.isEmpty()) {
+            this.presolve();
 
-        this.presolve();
+            if (this.isInfeasible()) {
 
-        if (this.isInfeasible()) {
+                final Optimisation.Result tmpSolution = this.getVariableValues();
 
-            final Optimisation.Result tmpSolution = this.getVariableValues();
+                retVal = new Optimisation.Result(State.INFEASIBLE, tmpSolution);
 
-            retVal = new Optimisation.Result(State.INFEASIBLE, tmpSolution);
+            } else if (this.isUnbounded()) {
 
-        } else if (this.isUnbounded()) {
+                final Optimisation.Result tmpSolution = this.getVariableValues();
 
-            final Optimisation.Result tmpSolution = this.getVariableValues();
+                retVal = new Optimisation.Result(State.UNBOUNDED, tmpSolution);
 
-            retVal = new Optimisation.Result(State.UNBOUNDED, tmpSolution);
+            } else if (this.isFixed()) {
 
-        } else if (this.isFixed()) {
+                final Optimisation.Result tmpSolution = this.getVariableValues();
 
-            final Optimisation.Result tmpSolution = this.getVariableValues();
+                if (tmpSolution.getState().isFeasible()) {
 
-            if (tmpSolution.getState().isFeasible()) {
+                    retVal = new Result(State.DISTINCT, tmpSolution);
 
-                retVal = new Result(State.DISTINCT, tmpSolution);
+                } else {
 
-            } else {
+                    retVal = new Result(State.INVALID, tmpSolution);
+                }
 
-                retVal = new Result(State.INVALID, tmpSolution);
             }
-
-        } else {
-
-            // this.flushCaches();
-
+        }else {
+            this.categoriseVariables();
+        }
+        if (retVal==null) {
             final Integration<?> tmpIntegration = this.getIntegration();
             final Solver tmpSolver = tmpIntegration.build(this);
             retVal = tmpIntegration.toSolverState(initialSolution, this);
