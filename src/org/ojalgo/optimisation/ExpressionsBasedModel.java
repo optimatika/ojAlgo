@@ -797,6 +797,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         this.setMaximisation();
 
+        this.scanForUncorrelatedVariables();
+
         final Result solverResult = this.solve(this.getVariableValues());
 
         return this.handleResult(solverResult);
@@ -805,6 +807,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     public Optimisation.Result minimise() {
 
         this.setMinimisation();
+
+        this.scanForUncorrelatedVariables();
 
         final Result tmpSolverResult = this.solve(this.getVariableValues());
 
@@ -1187,8 +1191,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     final void presolve() {
 
         myExpressions.values().forEach(expr -> expr.setRedundant(false));
-
-        this.scanForUncorrelatedVariables();
 
         boolean needToRepeat = false;
 
