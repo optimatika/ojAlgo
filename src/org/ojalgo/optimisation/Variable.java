@@ -129,6 +129,9 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     public BigDecimal getValue() {
+        if ((myValue == null) && this.isEqualityConstraint()) {
+            myValue = this.getLowerLimit();
+        }
         return myValue;
     }
 
@@ -194,7 +197,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     public void setValue(final Number value) {
-        myValue = TypeUtils.toBigDecimal(value);
+        myValue = value != null ? TypeUtils.toBigDecimal(value) : null;
     }
 
     @Override

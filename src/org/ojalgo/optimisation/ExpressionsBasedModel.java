@@ -337,7 +337,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         if (myWorkCopy = workCopy) {
-            myFixedVariables.addAll(modelToCopy.getFixedVariables());
+            // myFixedVariables.addAll(modelToCopy.getFixedVariables());
         }
     }
 
@@ -508,6 +508,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     public Set<IntIndex> getFixedVariables() {
+        myFixedVariables.clear();
+        for (final Variable tmpVar : myVariables) {
+            if (tmpVar.isFixed()) {
+                myFixedVariables.add(tmpVar.getIndex());
+            }
+        }
         return Collections.unmodifiableSet(myFixedVariables);
     }
 
@@ -740,7 +746,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     public boolean isAnyVariableFixed() {
-        return myFixedVariables.size() >= 1;
+        return myVariables.stream().anyMatch(v -> v.isFixed());
     }
 
     public boolean isAnyVariableInteger() {
@@ -1027,7 +1033,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
             final Variable tmpVariable = myVariables.get(i);
 
-            if (!myFixedVariables.contains(tmpVariable.getIndex())) {
+            if (!tmpVariable.isFixed()) {
 
                 myFreeVariables.add(tmpVariable);
                 myFreeIndices[i] = myFreeVariables.size() - 1;
@@ -1057,7 +1063,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         final int tmpSize = myVariables.size();
         for (int i = 0; i < tmpSize; i++) {
             final Variable tmpVariable = myVariables.get(i);
-            if (!myFixedVariables.contains(tmpVariable.getIndex())) {
+            if (!tmpVariable.isFixed()) {
                 tmpVariable.setValue(tmpSolutionContext.enforce(solverResult.get(i)));
             }
         }
@@ -1175,7 +1181,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     boolean isFixed() {
-        return myFixedVariables.size() == myVariables.size();
+        return myVariables.stream().allMatch(v -> v.isFixed());
     }
 
     boolean isInfeasible() {
@@ -1204,7 +1210,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         do {
 
-            final Set<IntIndex> fixedVariables = this.identifyFixedVariables();
+            final Set<IntIndex> fixedVariables = this.getFixedVariables();
             needToRepeat = false;
 
             for (final Expression expr : this.getExpressions()) {
@@ -1216,6 +1222,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             }
 
         } while (needToRepeat);
+
+        this.identifyFixedVariables();
 
         this.categoriseVariables();
     }
