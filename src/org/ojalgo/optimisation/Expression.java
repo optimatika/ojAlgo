@@ -757,9 +757,9 @@ public final class Expression extends ModelEntity<Expression> {
 
     boolean includes(final Variable variable) {
         final IntIndex tmpVarInd = variable.getIndex();
-        return myLinear.containsKey(tmpVarInd) || myQuadratic.keySet().stream().anyMatch(k -> {
+        return myLinear.containsKey(tmpVarInd) || ((myQuadratic.size() > 0) && myQuadratic.keySet().stream().anyMatch(k -> {
             return (k.row == tmpVarInd.index) || (k.column == tmpVarInd.index);
-        });
+        }));
     }
 
     @Override
