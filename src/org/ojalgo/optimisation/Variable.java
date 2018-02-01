@@ -258,8 +258,16 @@ public final class Variable extends ModelEntity<Variable> {
         return myIndex;
     }
 
+    boolean isFixed() {
+        return this.isEqualityConstraint();
+    }
+
     boolean isUnbounded() {
         return myUnbounded;
+    }
+
+    void setFixed(final BigDecimal value) {
+        this.level(value).setValue(value);
     }
 
     void setIndex(final IntIndex index) {
