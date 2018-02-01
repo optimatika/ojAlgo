@@ -484,8 +484,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     @Override
     public void dispose() {
 
-        this.flushCaches();
-
         for (final Expression tmpExprerssion : myExpressions.values()) {
             tmpExprerssion.destroy();
         }
@@ -497,6 +495,18 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myVariables.clear();
 
         myFixedVariables.clear();
+
+        myFreeVariables.clear();
+        myFreeIndices = null;
+
+        myPositiveVariables.clear();
+        myPositiveIndices = null;
+
+        myNegativeVariables.clear();
+        myNegativeIndices = null;
+
+        myIntegerVariables.clear();
+        myIntegerIndices = null;
     }
 
     public Expression getExpression(final String name) {
@@ -1079,49 +1089,38 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return new Optimisation.Result(tmpState, tmpValue, tmpSolution);
     }
 
-    private Set<IntIndex> identifyFixedVariables() {
+    private void scanForUncorrelatedVariables() {
 
-        final int tmpLength = myVariables.size();
-        for (int i = 0; i < tmpLength; i++) {
-            final Variable tmpVariable = myVariables.get(i);
+        for (final Variable tmpVariable : myVariables) {
 
-            if (tmpVariable.isEqualityConstraint()) {
+            if (tmpVariable.isObjective() && !tmpVariable.isFixed() && !tmpVariable.isUnbounded()) {
 
-                tmpVariable.setValue(tmpVariable.getLowerLimit());
-                myFixedVariables.add(tmpVariable.getIndex());
+                final boolean includedAnywhere = myExpressions.values().stream().anyMatch(e -> e.includes(tmpVariable));
+                if (!includedAnywhere) {
 
-            } else if (tmpVariable.isObjective() && !tmpVariable.isUnbounded()) {
+                    final int weightSignum = tmpVariable.getContributionWeight().signum();
 
-                final boolean tmpIncludedAnywhere = myExpressions.values().stream().anyMatch(e -> e.includes(tmpVariable));
-                if (!tmpIncludedAnywhere) {
-
-                    final int tmpWeightSignum = tmpVariable.getContributionWeight().signum();
-
-                    if (this.isMaximisation() && (tmpWeightSignum == -1)) {
+                    if (this.isMaximisation() && (weightSignum == -1)) {
                         if (tmpVariable.isLowerLimitSet()) {
-                            tmpVariable.setValue(tmpVariable.getLowerLimit());
-                            myFixedVariables.add(tmpVariable.getIndex());
+                            tmpVariable.setFixed(tmpVariable.getLowerLimit());
                         } else {
                             tmpVariable.setUnbounded(true);
                         }
-                    } else if (this.isMinimisation() && (tmpWeightSignum == 1)) {
+                    } else if (this.isMinimisation() && (weightSignum == 1)) {
                         if (tmpVariable.isLowerLimitSet()) {
-                            tmpVariable.setValue(tmpVariable.getLowerLimit());
-                            myFixedVariables.add(tmpVariable.getIndex());
+                            tmpVariable.setFixed(tmpVariable.getLowerLimit());
                         } else {
                             tmpVariable.setUnbounded(true);
                         }
-                    } else if (this.isMaximisation() && (tmpWeightSignum == 1)) {
+                    } else if (this.isMaximisation() && (weightSignum == 1)) {
                         if (tmpVariable.isUpperLimitSet()) {
-                            tmpVariable.setValue(tmpVariable.getUpperLimit());
-                            myFixedVariables.add(tmpVariable.getIndex());
+                            tmpVariable.setFixed(tmpVariable.getUpperLimit());
                         } else {
                             tmpVariable.setUnbounded(true);
                         }
-                    } else if (this.isMinimisation() && (tmpWeightSignum == -1)) {
+                    } else if (this.isMinimisation() && (weightSignum == -1)) {
                         if (tmpVariable.isUpperLimitSet()) {
-                            tmpVariable.setValue(tmpVariable.getUpperLimit());
-                            myFixedVariables.add(tmpVariable.getIndex());
+                            tmpVariable.setFixed(tmpVariable.getUpperLimit());
                         } else {
                             tmpVariable.setUnbounded(true);
                         }
@@ -1129,23 +1128,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                 }
             }
         }
-
-        return this.getFixedVariables();
-    }
-
-    protected void flushCaches() {
-
-        myFreeVariables.clear();
-        myFreeIndices = null;
-
-        myPositiveVariables.clear();
-        myPositiveIndices = null;
-
-        myNegativeVariables.clear();
-        myNegativeIndices = null;
-
-        myIntegerVariables.clear();
-        myIntegerIndices = null;
     }
 
     ExpressionsBasedModel.Integration<?> getIntegration() {
@@ -1206,6 +1188,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         myExpressions.values().forEach(expr -> expr.setRedundant(false));
 
+        this.scanForUncorrelatedVariables();
+
         boolean needToRepeat = false;
 
         do {
@@ -1222,8 +1206,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             }
 
         } while (needToRepeat);
-
-        this.identifyFixedVariables();
 
         this.categoriseVariables();
     }
