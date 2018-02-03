@@ -1095,38 +1095,41 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     private void scanForUncorrelatedVariables() {
 
-        for (final Variable tmpVariable : myVariables) {
+        if (PRESOLVERS.size() > 0) {
 
-            if (tmpVariable.isObjective() && !tmpVariable.isFixed() && !tmpVariable.isUnbounded()) {
+            for (final Variable tmpVariable : myVariables) {
 
-                final boolean includedAnywhere = myExpressions.values().stream().anyMatch(e -> e.includes(tmpVariable));
-                if (!includedAnywhere) {
+                if (tmpVariable.isObjective() && !tmpVariable.isFixed() && !tmpVariable.isUnbounded()) {
 
-                    final int weightSignum = tmpVariable.getContributionWeight().signum();
+                    final boolean includedAnywhere = myExpressions.values().stream().anyMatch(e -> e.includes(tmpVariable));
+                    if (!includedAnywhere) {
 
-                    if (this.isMaximisation() && (weightSignum == -1)) {
-                        if (tmpVariable.isLowerLimitSet()) {
-                            tmpVariable.setFixed(tmpVariable.getLowerLimit());
-                        } else {
-                            tmpVariable.setUnbounded(true);
-                        }
-                    } else if (this.isMinimisation() && (weightSignum == 1)) {
-                        if (tmpVariable.isLowerLimitSet()) {
-                            tmpVariable.setFixed(tmpVariable.getLowerLimit());
-                        } else {
-                            tmpVariable.setUnbounded(true);
-                        }
-                    } else if (this.isMaximisation() && (weightSignum == 1)) {
-                        if (tmpVariable.isUpperLimitSet()) {
-                            tmpVariable.setFixed(tmpVariable.getUpperLimit());
-                        } else {
-                            tmpVariable.setUnbounded(true);
-                        }
-                    } else if (this.isMinimisation() && (weightSignum == -1)) {
-                        if (tmpVariable.isUpperLimitSet()) {
-                            tmpVariable.setFixed(tmpVariable.getUpperLimit());
-                        } else {
-                            tmpVariable.setUnbounded(true);
+                        final int weightSignum = tmpVariable.getContributionWeight().signum();
+
+                        if (this.isMaximisation() && (weightSignum == -1)) {
+                            if (tmpVariable.isLowerLimitSet()) {
+                                tmpVariable.setFixed(tmpVariable.getLowerLimit());
+                            } else {
+                                tmpVariable.setUnbounded(true);
+                            }
+                        } else if (this.isMinimisation() && (weightSignum == 1)) {
+                            if (tmpVariable.isLowerLimitSet()) {
+                                tmpVariable.setFixed(tmpVariable.getLowerLimit());
+                            } else {
+                                tmpVariable.setUnbounded(true);
+                            }
+                        } else if (this.isMaximisation() && (weightSignum == 1)) {
+                            if (tmpVariable.isUpperLimitSet()) {
+                                tmpVariable.setFixed(tmpVariable.getUpperLimit());
+                            } else {
+                                tmpVariable.setUnbounded(true);
+                            }
+                        } else if (this.isMinimisation() && (weightSignum == -1)) {
+                            if (tmpVariable.isUpperLimitSet()) {
+                                tmpVariable.setFixed(tmpVariable.getUpperLimit());
+                            } else {
+                                tmpVariable.setUnbounded(true);
+                            }
                         }
                     }
                 }
