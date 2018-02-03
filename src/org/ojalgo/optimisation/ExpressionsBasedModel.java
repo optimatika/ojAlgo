@@ -365,7 +365,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             throw new ProgrammingError("Invalid SOS type!");
         }
 
-        if (linkedTo.isConstraint()) {
+        if (!linkedTo.isConstraint()) {
             throw new ProgrammingError("The linked to expression needs to be a constraint!");
         }
 
