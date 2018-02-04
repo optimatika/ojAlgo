@@ -36,7 +36,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.access.Structure2D.IntRowColumn;
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -48,9 +47,7 @@ import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.QuadraticFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.TypeUtils;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
@@ -564,25 +561,6 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    private double evaluateBody(final Access1D<?> point) {
-
-        double retVal = PrimitiveMath.ZERO;
-
-        double tmpAdjustedFactor;
-
-        for (final IntRowColumn tmpKey : this.getQuadraticKeySet()) {
-            tmpAdjustedFactor = this.getAdjustedQuadraticFactor(tmpKey);
-            retVal += point.doubleValue(tmpKey.row) * tmpAdjustedFactor * point.doubleValue(tmpKey.column);
-        }
-
-        for (final IntIndex tmpKey : this.getLinearKeySet()) {
-            tmpAdjustedFactor = this.getAdjustedLinearFactor(tmpKey);
-            retVal += point.doubleValue(tmpKey.index) * tmpAdjustedFactor;
-        }
-
-        return retVal;
-    }
-
     protected void appendMiddlePart(final StringBuilder builder, final Access1D<BigDecimal> currentSolution) {
 
         builder.append(this.getName());
@@ -605,13 +583,6 @@ public final class Expression extends ModelEntity<Expression> {
             myLinear.clear();
             myQuadratic.clear();
         }
-    }
-
-    protected boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final BasicLogger.Printer appender) {
-
-        final BigDecimal tmpValue = this.evaluate(solution);
-
-        return this.validate(tmpValue, context, appender);
     }
 
     void appendToString(final StringBuilder aStringBuilder, final Access1D<BigDecimal> aCurrentState) {
@@ -757,9 +728,9 @@ public final class Expression extends ModelEntity<Expression> {
 
     boolean includes(final Variable variable) {
         final IntIndex tmpVarInd = variable.getIndex();
-        return myLinear.containsKey(tmpVarInd) || myQuadratic.keySet().stream().anyMatch(k -> {
+        return myLinear.containsKey(tmpVarInd) || ((myQuadratic.size() > 0) && myQuadratic.keySet().stream().anyMatch(k -> {
             return (k.row == tmpVarInd.index) || (k.column == tmpVarInd.index);
-        });
+        }));
     }
 
     @Override

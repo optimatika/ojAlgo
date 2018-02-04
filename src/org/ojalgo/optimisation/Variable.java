@@ -129,6 +129,9 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     public BigDecimal getValue() {
+        if ((myValue == null) && this.isEqualityConstraint()) {
+            myValue = this.getLowerLimit();
+        }
         return myValue;
     }
 
@@ -194,7 +197,17 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     public void setValue(final Number value) {
-        myValue = TypeUtils.toBigDecimal(value);
+        BigDecimal tmpValue = null;
+        if (value != null) {
+            tmpValue = TypeUtils.toBigDecimal(value);
+            if (this.isUpperLimitSet()) {
+                tmpValue = tmpValue.min(this.getUpperLimit());
+            }
+            if (this.isLowerLimitSet()) {
+                tmpValue = tmpValue.max(this.getLowerLimit());
+            }
+        }
+        myValue = tmpValue;
     }
 
     @Override
@@ -240,18 +253,6 @@ public final class Variable extends ModelEntity<Variable> {
         }
 
         return retVal;
-    }
-
-    protected boolean validate(final NumberContext context, final BasicLogger.Printer appender) {
-
-        if (myValue != null) {
-
-            return this.validate(myValue, context, appender);
-
-        } else {
-
-            return false;
-        }
     }
 
     IntIndex getIndex() {
