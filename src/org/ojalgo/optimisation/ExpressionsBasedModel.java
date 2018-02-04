@@ -35,6 +35,7 @@ import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.access.Structure2D.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
@@ -797,7 +798,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         this.setMaximisation();
 
-        this.scanForUncorrelatedVariables();
+        if (PRESOLVERS.size() > 0) {
+            this.scanForUncorrelatedVariables();
+        }
 
         final Result solverResult = this.solve(this.getVariableValues());
 
@@ -808,7 +811,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         this.setMinimisation();
 
-        this.scanForUncorrelatedVariables();
+        if (PRESOLVERS.size() > 0) {
+            this.scanForUncorrelatedVariables();
+        }
 
         final Result tmpSolverResult = this.solve(this.getVariableValues());
 
@@ -968,52 +973,84 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return retVal.append(START_END).toString();
     }
 
+    /**
+     * This methods validtes model construction only. All the other validate(...) method validates the
+     * solution (one way or another).
+     *
+     * @see org.ojalgo.optimisation.Optimisation.Model#validate()
+     */
     public boolean validate() {
+
+        final Printer appender = options.logger_detailed ? options.logger_appender : BasicLogger.NULL;
 
         boolean retVal = true;
 
         for (final Variable tmpVariable : myVariables) {
-            retVal &= tmpVariable.validate(options.logger_appender);
+            retVal &= tmpVariable.validate(appender);
         }
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            retVal &= tmpExpression.validate(options.logger_appender);
+            retVal &= tmpExpression.validate(appender);
         }
 
         return retVal;
     }
 
     public boolean validate(final Access1D<BigDecimal> solution) {
-        return this.validate(solution, options.feasibility, options.logger_appender);
+        final NumberContext context = options.feasibility;
+        final Printer appender = (options.logger_detailed && (options.logger_appender != null)) ? options.logger_appender : BasicLogger.NULL;
+        return this.validate(solution, context, appender);
     }
 
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context) {
-        return this.validate(solution, context, options.logger_detailed ? options.logger_appender : null);
+        final Printer appender = (options.logger_detailed && (options.logger_appender != null)) ? options.logger_appender : BasicLogger.NULL;
+        return this.validate(solution, context, appender);
     }
 
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final Printer appender) {
 
-        final int tmpSize = myVariables.size();
+        ProgrammingError.throwIfNull(solution, context, appender);
 
-        boolean retVal = tmpSize == solution.count();
+        final int size = myVariables.size();
 
-        for (int i = 0; retVal && (i < tmpSize); i++) {
-            retVal &= myVariables.get(i).validate(solution.get(i), context, appender);
+        boolean retVal = size == solution.count();
+
+        for (int i = 0; retVal && (i < size); i++) {
+            final Variable tmpVariable = myVariables.get(i);
+            final BigDecimal value = solution.get(i);
+            retVal &= tmpVariable.validate(value, context, appender);
         }
 
-        for (final Expression tmpExpression : myExpressions.values()) {
-            retVal &= retVal && tmpExpression.validate(solution, context, appender);
+        if (retVal) {
+            for (final Expression tmpExpression : myExpressions.values()) {
+                final BigDecimal value = tmpExpression.evaluate(solution);
+                retVal &= tmpExpression.validate(value, context, appender);
+            }
         }
 
         return retVal;
     }
 
     public boolean validate(final Access1D<BigDecimal> solution, final Printer appender) {
-        return this.validate(solution, options.feasibility, appender);
+        final NumberContext context = options.feasibility;
+        return this.validate(solution, context, appender);
     }
 
     public boolean validate(final NumberContext context) {
-        return this.getVariableValues(context).getState().isFeasible();
+        final Result solution = this.getVariableValues(context);
+        final Printer appender = (options.logger_detailed && (options.logger_appender != null)) ? options.logger_appender : BasicLogger.NULL;
+        return this.validate(solution, context, appender);
+    }
+
+    public boolean validate(final NumberContext context, final Printer appender) {
+        final Access1D<BigDecimal> solution = this.getVariableValues(context);
+        return this.validate(solution, context, appender);
+    }
+
+    public boolean validate(final Printer appender) {
+        final NumberContext context = options.feasibility;
+        final Result solution = this.getVariableValues(context);
+        return this.validate(solution, context, appender);
     }
 
     /**
@@ -1070,66 +1107,62 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
+    /**
+     * Copy the solution back to the model variables, and evaluate the objective function as specidied in the
+     * model.
+     */
     private Optimisation.Result handleResult(final Result solverResult) {
 
-        final NumberContext tmpSolutionContext = options.solution;
+        final NumberContext solutionContext = options.solution;
 
-        final int tmpSize = myVariables.size();
-        for (int i = 0; i < tmpSize; i++) {
+        for (int i = 0, limit = myVariables.size(); i < limit; i++) {
             final Variable tmpVariable = myVariables.get(i);
             if (!tmpVariable.isFixed()) {
-                tmpVariable.setValue(tmpSolutionContext.enforce(solverResult.get(i)));
+                tmpVariable.setValue(solutionContext.enforce(solverResult.get(i)));
             }
         }
 
-        final Access1D<BigDecimal> tmpSolution = this.getVariableValues();
-        final Optimisation.State tmpState = solverResult.getState();
-        final double tmpValue = this.objective().evaluate(tmpSolution).doubleValue();
+        final Access1D<BigDecimal> retSolution = this.getVariableValues();
+        final Optimisation.State retState = solverResult.getState();
+        final double retValue = this.objective().evaluate(retSolution).doubleValue();
 
-        if (options.validate) {
-            // TODO && this.validate(tmpSolution, options.slack)
-        }
-
-        return new Optimisation.Result(tmpState, tmpValue, tmpSolution);
+        return new Optimisation.Result(retState, retValue, retSolution);
     }
 
     private void scanForUncorrelatedVariables() {
 
-        if (PRESOLVERS.size() > 0) {
+        for (final Variable tmpVariable : myVariables) {
 
-            for (final Variable tmpVariable : myVariables) {
+            if (tmpVariable.isObjective() && !tmpVariable.isFixed() && !tmpVariable.isUnbounded()) {
 
-                if (tmpVariable.isObjective() && !tmpVariable.isFixed() && !tmpVariable.isUnbounded()) {
+                final boolean includedAnywhere = myExpressions.values().stream().anyMatch(expr -> expr.includes(tmpVariable));
+                if (!includedAnywhere) {
 
-                    final boolean includedAnywhere = myExpressions.values().stream().anyMatch(e -> e.includes(tmpVariable));
-                    if (!includedAnywhere) {
+                    final int weightSignum = tmpVariable.getContributionWeight().signum();
 
-                        final int weightSignum = tmpVariable.getContributionWeight().signum();
-
-                        if (this.isMaximisation() && (weightSignum == -1)) {
-                            if (tmpVariable.isLowerLimitSet()) {
-                                tmpVariable.setFixed(tmpVariable.getLowerLimit());
-                            } else {
-                                tmpVariable.setUnbounded(true);
-                            }
-                        } else if (this.isMinimisation() && (weightSignum == 1)) {
-                            if (tmpVariable.isLowerLimitSet()) {
-                                tmpVariable.setFixed(tmpVariable.getLowerLimit());
-                            } else {
-                                tmpVariable.setUnbounded(true);
-                            }
-                        } else if (this.isMaximisation() && (weightSignum == 1)) {
-                            if (tmpVariable.isUpperLimitSet()) {
-                                tmpVariable.setFixed(tmpVariable.getUpperLimit());
-                            } else {
-                                tmpVariable.setUnbounded(true);
-                            }
-                        } else if (this.isMinimisation() && (weightSignum == -1)) {
-                            if (tmpVariable.isUpperLimitSet()) {
-                                tmpVariable.setFixed(tmpVariable.getUpperLimit());
-                            } else {
-                                tmpVariable.setUnbounded(true);
-                            }
+                    if (this.isMaximisation() && (weightSignum == -1)) {
+                        if (tmpVariable.isLowerLimitSet()) {
+                            tmpVariable.setFixed(tmpVariable.getLowerLimit());
+                        } else {
+                            tmpVariable.setUnbounded(true);
+                        }
+                    } else if (this.isMinimisation() && (weightSignum == 1)) {
+                        if (tmpVariable.isLowerLimitSet()) {
+                            tmpVariable.setFixed(tmpVariable.getLowerLimit());
+                        } else {
+                            tmpVariable.setUnbounded(true);
+                        }
+                    } else if (this.isMaximisation() && (weightSignum == 1)) {
+                        if (tmpVariable.isUpperLimitSet()) {
+                            tmpVariable.setFixed(tmpVariable.getUpperLimit());
+                        } else {
+                            tmpVariable.setUnbounded(true);
+                        }
+                    } else if (this.isMinimisation() && (weightSignum == -1)) {
+                        if (tmpVariable.isUpperLimitSet()) {
+                            tmpVariable.setFixed(tmpVariable.getUpperLimit());
+                        } else {
+                            tmpVariable.setUnbounded(true);
                         }
                     }
                 }

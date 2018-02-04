@@ -29,8 +29,8 @@ import java.util.Locale;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.ComplexMatrix;
+import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
@@ -729,6 +729,30 @@ public abstract class BasicLogger {
     public static Printer DEBUG = new PrintStreamPrinter(System.out);
 
     public static Printer ERROR = new PrintStreamPrinter(System.err);
+
+    public static final BasicLogger.Printer NULL = new BasicLogger.Printer() {
+
+        public void print(final char c) {
+        }
+
+        public void print(final char[] ca) {
+        }
+
+        public void print(final String str) {
+        }
+
+        public Printer printf(final Locale locale, final String format, final Object... args) {
+            return this;
+        }
+
+        public Printer printf(final String format, final Object... args) {
+            return this;
+        }
+
+        public void println() {
+        }
+
+    };
 
     static final NumberContext MATRIX_ELEMENT_CONTEXT = NumberContext.getGeneral(6);
 

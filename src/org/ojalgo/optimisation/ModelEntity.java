@@ -365,7 +365,10 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return myAdjustmentExponent;
     }
 
-    protected boolean validate(final BasicLogger.Printer appender) {
+    /**
+     * Validate model parameters, like lower and upper limits. Does not validate the solution/value.
+     */
+    protected final boolean validate(final BasicLogger.Printer appender) {
 
         boolean retVal = true;
 
