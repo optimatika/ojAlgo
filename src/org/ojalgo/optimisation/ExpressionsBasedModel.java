@@ -249,6 +249,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
         ExpressionsBasedModel.addPresolver(Presolvers.OPPOSITE_SIGN);
         // ExpressionsBasedModel.addPresolver(Presolvers.BINARY_VALUE);
+        // ExpressionsBasedModel.addPresolver(Presolvers.BIGSTUFF);
+
     }
 
     public static boolean addIntegration(final Integration<?> integration) {

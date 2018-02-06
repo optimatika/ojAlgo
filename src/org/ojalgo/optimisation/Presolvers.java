@@ -26,12 +26,17 @@ import static org.ojalgo.function.BigFunction.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 
 import org.ojalgo.access.Structure1D.IntIndex;
+import org.ojalgo.constant.BigMath;
+import org.ojalgo.function.BigFunction;
 
 public abstract class Presolvers {
 
@@ -86,6 +91,96 @@ public abstract class Presolvers {
             }
 
             return didFixVariable;
+        }
+
+    };
+
+    public static final ExpressionsBasedModel.Presolver BIGSTUFF = new ExpressionsBasedModel.Presolver(99) {
+
+        @Override
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final Function<IntIndex, Variable> variableResolver) {
+
+            final Map<IntIndex, BigDecimal> max = new HashMap<>();
+            final Map<IntIndex, BigDecimal> min = new HashMap<>();
+
+            BigDecimal totMax = BigMath.ZERO;
+            BigDecimal totMin = BigMath.ZERO;
+
+            for (final Entry<IntIndex, BigDecimal> tmpEntry : expression.getLinearEntrySet()) {
+                final IntIndex tmpIndex = tmpEntry.getKey();
+                final Variable tmpVariable = variableResolver.apply(tmpIndex);
+                final BigDecimal tmpFactor = tmpEntry.getValue();
+                if (tmpVariable.isFixed()) {
+                    final BigDecimal fixed = tmpVariable.getValue().multiply(tmpFactor);
+                    max.put(tmpIndex, fixed);
+                    min.put(tmpIndex, fixed);
+                } else {
+                    final BigDecimal tmpUL = tmpVariable.getUpperLimit();
+                    final BigDecimal tmpLL = tmpVariable.getLowerLimit();
+                    if (tmpFactor.signum() == 1) {
+                        final BigDecimal tmpMaxVal = tmpUL != null ? tmpUL.multiply(tmpFactor) : BigMath.VERY_POSITIVE;
+                        final BigDecimal tmpMinVal = tmpLL != null ? tmpLL.multiply(tmpFactor) : BigMath.VERY_NEGATIVE;
+                        max.put(tmpIndex, tmpMaxVal);
+                        totMax = totMax.add(tmpMaxVal);
+                        min.put(tmpIndex, tmpMinVal);
+                        totMin = totMin.add(tmpMinVal);
+                    } else {
+                        final BigDecimal tmpMaxVal = tmpLL != null ? tmpLL.multiply(tmpFactor) : BigMath.VERY_POSITIVE;
+                        final BigDecimal tmpMinVal = tmpUL != null ? tmpUL.multiply(tmpFactor) : BigMath.VERY_NEGATIVE;
+                        max.put(tmpIndex, tmpMaxVal);
+                        totMax = totMax.add(tmpMaxVal);
+                        min.put(tmpIndex, tmpMinVal);
+                        totMin = totMin.add(tmpMinVal);
+                    }
+                }
+            }
+
+            BigDecimal tmpExprU = expression.getUpperLimit();
+            if (tmpExprU == null) {
+                tmpExprU = BigMath.VERY_POSITIVE;
+            }
+
+            BigDecimal tmpExprL = expression.getLowerLimit();
+            if (tmpExprL == null) {
+                tmpExprL = BigMath.VERY_NEGATIVE;
+            }
+
+            for (final Entry<IntIndex, BigDecimal> tmpEntry : expression.getLinearEntrySet()) {
+                final IntIndex tmpIndex = tmpEntry.getKey();
+                final Variable tmpVariable = variableResolver.apply(tmpIndex);
+                final BigDecimal tmpFactor = tmpEntry.getValue();
+
+                final BigDecimal tmpRemU = tmpExprU.subtract(totMin).add(min.get(tmpIndex));
+                final BigDecimal tmpRemL = tmpExprL.subtract(totMax).add(max.get(tmpIndex));
+
+                BigDecimal tmpVarU = expression.getUpperLimit();
+                if (tmpVarU == null) {
+                    tmpVarU = BigMath.VERY_POSITIVE;
+                }
+
+                BigDecimal tmpVarL = expression.getLowerLimit();
+                if (tmpVarL == null) {
+                    tmpVarL = BigMath.VERY_NEGATIVE;
+                }
+
+                if (tmpFactor.signum() == 1) {
+                    tmpVarU = tmpVarU.min(BigFunction.DIVIDE.invoke(tmpRemU, tmpFactor));
+                    tmpVarL = tmpVarL.max(BigFunction.DIVIDE.invoke(tmpRemL, tmpFactor));
+                } else {
+                    tmpVarU = tmpVarU.min(BigFunction.DIVIDE.invoke(tmpRemL, tmpFactor));
+                    tmpVarL = tmpVarL.max(BigFunction.DIVIDE.invoke(tmpRemU, tmpFactor));
+                }
+
+                if (tmpVarU.compareTo(BigMath.VERY_POSITIVE) < 0) {
+                    tmpVariable.upper(tmpVarU);
+                }
+
+                if (tmpVarL.compareTo(BigMath.VERY_NEGATIVE) > 0) {
+                    tmpVariable.lower(tmpVarL);
+                }
+            }
+
+            return false;
         }
 
     };
