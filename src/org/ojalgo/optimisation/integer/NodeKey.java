@@ -199,14 +199,9 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
             variable.lower(lowerBound);
             variable.upper(upperBound);
 
-            BigDecimal value = variable.getValue();
+            final BigDecimal value = variable.getValue();
             if (value != null) {
-                if (lowerBound != null) {
-                    value = value.max(lowerBound);
-                }
-                if (upperBound != null) {
-                    value = value.min(upperBound);
-                }
+                // Re-setting will ensure the new bounds are not violated
                 variable.setValue(value);
             }
         }

@@ -166,17 +166,17 @@ public abstract class IntegerSolver extends GenericSolver {
     private volatile Optimisation.Result myBestResultSoFar = null;
     private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     private final int[] myIntegerIndices;
+    private final ExpressionsBasedModel myIntegerModel;
     private final double[] myIntegerSignificances;
     private final AtomicInteger myIntegerSolutionsCount = new AtomicInteger();
     private final boolean myMinimisation;
-    private final ExpressionsBasedModel myModel;
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
 
     protected IntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
 
         super(solverOptions);
 
-        myModel = model;
+        myIntegerModel = model;
         myFunction = model.objective().toFunction();
 
         myMinimisation = model.isMinimisation();
@@ -216,7 +216,7 @@ public abstract class IntegerSolver extends GenericSolver {
 
             final State tmpSate = State.INVALID;
             final double tmpValue = myMinimisation ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-            final MatrixStore<Double> tmpSolution = MatrixStore.PRIMITIVE.makeZero(this.getModel().countVariables(), 1).get();
+            final MatrixStore<Double> tmpSolution = MatrixStore.PRIMITIVE.makeZero(this.getIntegerModel().countVariables(), 1).get();
 
             return new Optimisation.Result(tmpSate, tmpValue, tmpSolution);
         }
@@ -226,8 +226,12 @@ public abstract class IntegerSolver extends GenericSolver {
         return myFunction.getGradient(solution);
     }
 
-    protected final ExpressionsBasedModel getModel() {
-        return myModel;
+    protected ExpressionsBasedModel getIntegerModel() {
+        return myIntegerModel;
+    }
+
+    protected final ExpressionsBasedModel getRelaxedModel() {
+        return myIntegerModel.relax(false);
     }
 
     protected abstract boolean initialise(Result kickStarter);
@@ -278,14 +282,14 @@ public abstract class IntegerSolver extends GenericSolver {
     }
 
     protected final boolean isModelSet() {
-        return myModel != null;
+        return myIntegerModel != null;
     }
 
-    protected synchronized void markInteger(final NodeKey node, final Optimisation.Result result) {
+    protected synchronized void markInteger(final NodeKey key, final ExpressionsBasedModel model, final Optimisation.Result result) {
 
         if (this.isProgress()) {
             this.log("New integer solution {}", result);
-            this.log("\t@ node {}", node);
+            this.log("\t@ node {}", key);
         }
 
         final Optimisation.Result tmpCurrentlyTheBest = myBestResultSoFar;

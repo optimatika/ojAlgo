@@ -394,6 +394,34 @@ public final class Expression extends ModelEntity<Expression> {
         return !this.isAnyQuadraticFactorNonZero() && !this.isAnyLinearFactorNonZero();
     }
 
+    /**
+     * @return Are all the (linear) variables binary
+     */
+    public boolean isLinearAndAllBinary() {
+        return (myQuadratic.size() == 0) && (myLinear.size() > 0) && myLinear.keySet().stream().allMatch(i -> myModel.getVariable(i).isBinary());
+    }
+
+    /**
+     * @return Are all the (linear) variables integer
+     */
+    public boolean isLinearAndAllInteger() {
+        return (myQuadratic.size() == 0) && (myLinear.size() > 0) && myLinear.keySet().stream().allMatch(i -> myModel.getVariable(i).isInteger());
+    }
+
+    /**
+     * @return Are any of the (linear) variables binary
+     */
+    public boolean isLinearAndAnyBinary() {
+        return (myQuadratic.size() == 0) && (myLinear.size() > 0) && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isBinary());
+    }
+
+    /**
+     * @return Are any of the (linear) variables integer
+     */
+    public boolean isLinearAndAnyInteger() {
+        return (myQuadratic.size() == 0) && (myLinear.size() > 0) && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isInteger());
+    }
+
     public Expression set(final int row, final int column, final Number value) {
         return this.set(new IntRowColumn(row, column), value);
     }

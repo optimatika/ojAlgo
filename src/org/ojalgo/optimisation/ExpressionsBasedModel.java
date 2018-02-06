@@ -35,6 +35,7 @@ import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.access.Structure2D.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.optimisation.convex.ConvexSolver;
@@ -791,6 +792,74 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         if (constrExpr != null) {
             constrExpr.lower(lower).upper(upper);
+        }
+    }
+
+    /**
+     * @param constraints Linear constraints with all binary variables
+     */
+    private void generateCuts(final Set<Expression> constraints) {
+
+        if ((constraints != null) && (constraints.size() > 0)) {
+
+            final List<Variable> posBinVar = new ArrayList<>();
+            final List<Variable> negBinVar = new ArrayList<>();
+
+            final Set<IntIndex> indices = new HashSet<>();
+            final Set<IntIndex> fixedVariables = this.getFixedVariables();
+
+            for (final Expression tmpExpression : constraints) {
+
+                posBinVar.clear();
+                negBinVar.clear();
+
+                indices.clear();
+                indices.addAll(tmpExpression.getLinearKeySet());
+
+                final int countExprVars = indices.size();
+
+                indices.removeAll(fixedVariables);
+
+                for (final IntIndex tmpIndex : indices) {
+                    final Variable tmpVariable = this.getVariable(tmpIndex);
+                    if (tmpVariable.isBinary()) {
+                        final BigDecimal tmpFactor = tmpExpression.get(tmpIndex);
+                        if (tmpFactor.signum() == 1) {
+                            posBinVar.add(tmpVariable);
+                        } else if (tmpFactor.signum() == -1) {
+                            negBinVar.add(tmpVariable);
+                        }
+
+                    }
+                }
+
+                if ((posBinVar.size() == indices.size()) && (posBinVar.size() != countExprVars) && (posBinVar.size() != 0)) {
+                    // All remaining (not fixed) variables are binary with positive constraint factors
+                    final BigDecimal ul = tmpExpression.getUpperLimit();
+                    if ((ul != null) && (ul.signum() != -1)) {
+                        posBinVar.sort((v1, v2) -> tmpExpression.get(v1.getIndex()).compareTo(tmpExpression.get(v2.getIndex())));
+                        BigDecimal accum = BigMath.ZERO;
+                        int count = 0;
+                        for (final Variable tmpVariable : posBinVar) {
+                            accum = accum.add(tmpExpression.get(tmpVariable));
+                            if (accum.compareTo(ul) > 0) {
+                                final Expression tmpNewCut = this.addExpression("Cut-" + tmpExpression.getName());
+                                tmpNewCut.setLinearFactorsSimple(posBinVar);
+                                tmpNewCut.upper(new BigDecimal(count));
+                                break;
+                            }
+                            count++;
+                        }
+                    }
+
+                }
+
+                if (posBinVar.size() == indices.size()) {
+                    // All remaining (not fixed) variables are binary with negative constraint factors
+
+                }
+
+            }
         }
     }
 

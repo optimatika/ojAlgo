@@ -74,8 +74,8 @@ public final class NewIntegerSolver extends IntegerSolver {
 
         // Must verify that it actually is an integer solution
         // The kickStarter may be user-supplied
-        if ((kickStarter != null) && kickStarter.getState().isFeasible() && this.getModel().validate(kickStarter)) {
-            this.markInteger(null, kickStarter);
+        if ((kickStarter != null) && kickStarter.getState().isFeasible() && this.getIntegerModel().validate(kickStarter)) {
+            this.markInteger(null, null, kickStarter);
         }
 
         this.resetIterationsCount();
@@ -136,7 +136,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
         try {
 
-            if (!(retVal = this.getModel().validate())) {
+            if (!(retVal = this.getIntegerModel().validate())) {
                 retVal = false;
                 this.setState(State.INVALID);
             }
@@ -182,8 +182,8 @@ public final class NewIntegerSolver extends IntegerSolver {
         NewIntegerSolver.this.incrementIterationsCount();
 
         if ((tmpModel.options.logger_appender != null) && (tmpModel.options.logger_appender instanceof PrinterBuffer)) {
-            if (NewIntegerSolver.this.getModel().options.logger_appender != null) {
-                ((PrinterBuffer) tmpModel.options.logger_appender).flush(NewIntegerSolver.this.getModel().options.logger_appender);
+            if (NewIntegerSolver.this.getIntegerModel().options.logger_appender != null) {
+                ((PrinterBuffer) tmpModel.options.logger_appender).flush(NewIntegerSolver.this.getIntegerModel().options.logger_appender);
             }
         }
         if (tmpResult.getState().isOptimal()) {
@@ -212,7 +212,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
                 final Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, tmpSolutionValue, tmpResult);
 
-                NewIntegerSolver.this.markInteger(nodeKey, tmpIntegerSolutionResult);
+                NewIntegerSolver.this.markInteger(nodeKey, null, tmpIntegerSolutionResult);
 
                 if (NewIntegerSolver.this.isDebug()) {
                     NewIntegerSolver.this.log(NewIntegerSolver.this.getBestResultSoFar().toString());
@@ -289,7 +289,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
     ExpressionsBasedModel makeNodeModel(final NodeKey nodeKey) {
 
-        final ExpressionsBasedModel retVal = this.getModel().relax(false);
+        final ExpressionsBasedModel retVal = this.getIntegerModel().relax(false);
 
         final int[] tmpIntegerIndeces = this.getIntegerIndices();
         for (int i = 0; i < tmpIntegerIndeces.length; i++) {
@@ -342,7 +342,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
         final NodeKey[] retVal = new NodeKey[2];
 
-        final ExpressionsBasedModel tmpIntegerModel = NewIntegerSolver.this.getModel();
+        final ExpressionsBasedModel tmpIntegerModel = NewIntegerSolver.this.getIntegerModel();
         final List<Variable> tmpIntegerVariables = tmpIntegerModel.getIntegerVariables();
         NodeKey myKey;
         myKey = new NodeKey(tmpIntegerModel);
