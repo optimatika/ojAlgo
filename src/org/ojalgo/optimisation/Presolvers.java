@@ -53,35 +53,36 @@ public abstract class Presolvers {
 
                 final BigDecimal fixedValue = expression.calculateFixedValue(fixedVariables);
 
-                BigDecimal compLowLim = expression.getLowerLimit();
-                if (compLowLim != null) {
-                    if (fixedValue.signum() != 0) {
-                        compLowLim = compLowLim.subtract(fixedValue);
-                    }
-                    if (expression.isNegative(fixedVariables)) {
-                        for (final Variable binVar : binaryVariables) {
-                            if (expression.get(binVar).compareTo(compLowLim) < 0) {
-                                binVar.upper(ZERO);
-                                didFixVariable = true;
-                            }
-                        }
-                    }
-                }
-
                 BigDecimal compUppLim = expression.getUpperLimit();
                 if (compUppLim != null) {
                     if (fixedValue.signum() != 0) {
                         compUppLim = compUppLim.subtract(fixedValue);
                     }
-                    if (expression.isPositive(fixedVariables)) {
-                        for (final Variable binVar : binaryVariables) {
-                            if (expression.get(binVar).compareTo(compUppLim) > 0) {
-                                binVar.upper(ZERO);
-                                didFixVariable = true;
-                            }
+                }
+
+                BigDecimal compLowLim = expression.getLowerLimit();
+                if (compLowLim != null) {
+                    if (fixedValue.signum() != 0) {
+                        compLowLim = compLowLim.subtract(fixedValue);
+                    }
+                }
+
+                if ((compUppLim != null) && expression.isPositive(fixedVariables)) {
+                    for (final Variable binVar : binaryVariables) {
+                        if (expression.get(binVar).compareTo(compUppLim) > 0) {
+                            binVar.setFixed(ZERO);
+                            didFixVariable = true;
+                        }
+                    }
+                } else if ((compLowLim != null) && expression.isNegative(fixedVariables)) {
+                    for (final Variable binVar : binaryVariables) {
+                        if (expression.get(binVar).compareTo(compLowLim) < 0) {
+                            binVar.setFixed(ZERO);
+                            didFixVariable = true;
                         }
                     }
                 }
+
             }
 
             return didFixVariable;
@@ -128,8 +129,7 @@ public abstract class Presolvers {
                             expression.setInfeasible(!tmpValid);
 
                             if (tmpValid) {
-                                tmpFreeVariable.level(ZERO);
-                                tmpFreeVariable.setValue(ZERO);
+                                tmpFreeVariable.setFixed(ZERO);
                                 didFixVariable = true;
                             }
                         }
@@ -156,8 +156,7 @@ public abstract class Presolvers {
                             expression.setInfeasible(!tmpValid);
 
                             if (tmpValid) {
-                                tmpFreeVariable.level(ZERO);
-                                tmpFreeVariable.setValue(ZERO);
+                                tmpFreeVariable.setFixed(ZERO);
                                 didFixVariable = true;
                             }
                         }

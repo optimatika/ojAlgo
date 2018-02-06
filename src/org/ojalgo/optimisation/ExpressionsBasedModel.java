@@ -1307,7 +1307,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             for (final Expression expr : this.getExpressions()) {
                 if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
                     for (final Presolver presolver : PRESOLVERS) {
-                        needToRepeat |= presolver.simplify(expr, fixedVariables, this::getVariable);
+                        if (!needToRepeat) {
+                            needToRepeat |= presolver.simplify(expr, fixedVariables, this::getVariable);
+                        }
                     }
                 }
             }
