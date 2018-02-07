@@ -42,10 +42,12 @@ abstract class MipLibCase extends OptimisationIntegerTests {
     protected static void assertMinMaxVal(final String modelName, final BigDecimal expMinVal, final BigDecimal expMaxVal, final boolean relax,
             final Map<String, BigDecimal> solution) {
 
-        BasicLogger.DEBUG.println();
-        BasicLogger.DEBUG.println();
-        BasicLogger.DEBUG.println(modelName);
-        BasicLogger.DEBUG.println();
+        if (DEBUG) {
+            BasicLogger.DEBUG.println();
+            BasicLogger.DEBUG.println();
+            BasicLogger.DEBUG.println(modelName);
+            BasicLogger.DEBUG.println();
+        }
 
         final File tmpFile = new File(PATH + modelName);
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
