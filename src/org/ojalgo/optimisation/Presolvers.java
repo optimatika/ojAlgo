@@ -48,15 +48,14 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final Function<IntIndex, Variable> variableResolver) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
+                final Function<IntIndex, Variable> variableResolver) {
 
             boolean didFixVariable = false;
 
             final Set<Variable> binaryVariables = expression.getBinaryVariables(fixedVariables);
 
             if (binaryVariables.size() > 0) {
-
-                final BigDecimal fixedValue = expression.calculateFixedValue(fixedVariables);
 
                 BigDecimal compUppLim = expression.getUpperLimit();
                 if (compUppLim != null) {
@@ -98,7 +97,8 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver BIGSTUFF = new ExpressionsBasedModel.Presolver(99) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final Function<IntIndex, Variable> variableResolver) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
+                final Function<IntIndex, Variable> variableResolver) {
 
             if (expression.getLinearEntrySet().size() > 3333) {
 
@@ -196,13 +196,12 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver OPPOSITE_SIGN = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final Function<IntIndex, Variable> variableResolver) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
+                final Function<IntIndex, Variable> variableResolver) {
 
             boolean didFixVariable = false;
 
             final ExpressionsBasedModel model = expression.getModel();
-
-            final BigDecimal fixedValue = expression.calculateFixedValue(fixedVariables);
 
             BigDecimal tmpCompLowLim = expression.getLowerLimit();
             if ((tmpCompLowLim != null) && (fixedValue.signum() != 0)) {
@@ -223,8 +222,7 @@ public abstract class Presolvers {
 
                             final Variable tmpFreeVariable = variableResolver.apply(tmpLinear);
 
-                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.feasibility,
-                                    model.options.logger_detailed ? model.options.logger_appender : null);
+                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.feasibility, null);
                             expression.setInfeasible(!tmpValid);
 
                             if (tmpValid) {
@@ -250,8 +248,7 @@ public abstract class Presolvers {
                         if (!fixedVariables.contains(tmpLinear)) {
                             final Variable tmpFreeVariable = model.getVariable(tmpLinear.index);
 
-                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.feasibility,
-                                    model.options.logger_detailed ? model.options.logger_appender : null);
+                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.feasibility, null);
                             expression.setInfeasible(!tmpValid);
 
                             if (tmpValid) {
@@ -281,14 +278,13 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver ZERO_ONE_TWO = new ExpressionsBasedModel.Presolver(10) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final Function<IntIndex, Variable> variableResolver) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
+                final Function<IntIndex, Variable> variableResolver) {
 
             boolean didFixVariable = false;
 
             if (expression.countLinearFactors() <= (fixedVariables.size() + 2)) {
                 // This constraint can possibly be reduced to 0, 1 or 2 remaining linear factors
-
-                final BigDecimal fixedValue = expression.calculateFixedValue(fixedVariables);
 
                 final HashSet<IntIndex> remainingLinear = new HashSet<>(expression.getLinearKeySet());
                 remainingLinear.removeAll(fixedVariables);

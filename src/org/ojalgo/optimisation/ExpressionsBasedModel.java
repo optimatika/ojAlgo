@@ -223,11 +223,13 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         /**
          * @param expression
          * @param fixedVariables
+         * @param fixedValue TODO
          * @param variableResolver TODO
          * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
          *         typically when/if a variable was fixed.
          */
-        public abstract boolean simplify(Expression expression, Set<IntIndex> fixedVariables, Function<IntIndex, Variable> variableResolver);
+        public abstract boolean simplify(Expression expression, Set<IntIndex> fixedVariables, BigDecimal fixedValue,
+                Function<IntIndex, Variable> variableResolver);
 
         final int getExecutionOrder() {
             return myExecutionOrder;
@@ -1304,13 +1306,16 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         do {
 
             final Set<IntIndex> fixedVariables = this.getFixedVariables();
+            BigDecimal fixedValue;
+
             needToRepeat = false;
 
             for (final Expression expr : this.getExpressions()) {
                 if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
+                    fixedValue = expr.calculateFixedValue(fixedVariables);
                     for (final Presolver presolver : PRESOLVERS) {
                         if (!needToRepeat) {
-                            needToRepeat |= presolver.simplify(expr, fixedVariables, this::getVariable);
+                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable);
                         }
                     }
                 }

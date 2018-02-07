@@ -46,7 +46,8 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
      * The program logic here does not assume variables to be binary or even integer
      */
     @Override
-    public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final Function<IntIndex, Variable> variableResolver) {
+    public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
+            final Function<IntIndex, Variable> variableResolver) {
 
         if (!expression.equals(myExpression)) {
             return false;
@@ -59,7 +60,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
         int first = -1, limit = -1;
         for (int i = 0; i < mySequence.length; i++) {
             final IntIndex index = mySequence[1];
-            if (fixedVariables.contains(index) && (variableResolver.apply(index).getValue().compareTo(BigDecimal.ZERO) != 0)) {
+            if (fixedVariables.contains(index) && (variableResolver.apply(index).getValue().signum() != 0)) {
                 if (first == -1) {
                     first = i;
                 }
@@ -79,13 +80,12 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
             final IntIndex index = mySequence[i];
             final Variable variable = variableResolver.apply(index);
             if (fixedVariables.contains(index)) {
-                if (variable.getValue().compareTo(BigDecimal.ZERO) == 0) {
+                if (variable.getValue().signum() == 0) {
                     expression.setInfeasible(true);
                 }
             } else {
                 if (variable.isInteger()) {
-                    variable.lower(BigDecimal.ONE);
-                    variable.setValue(BigDecimal.ONE);
+                    variable.setFixed(BigDecimal.ONE);
                     didFixVariable = true;
                 }
             }
@@ -97,12 +97,11 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
                 final IntIndex index = mySequence[i];
                 final Variable variable = variableResolver.apply(index);
                 if (fixedVariables.contains(index)) {
-                    if (variable.getValue().compareTo(BigDecimal.ZERO) != 0) {
+                    if (variable.getValue().signum() != 0) {
                         expression.setInfeasible(true);
                     }
                 } else {
-                    variable.level(BigDecimal.ZERO);
-                    variable.setValue(BigDecimal.ZERO);
+                    variable.setFixed(BigDecimal.ZERO);
                     didFixVariable = true;
                 }
             }
@@ -110,12 +109,11 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
                 final IntIndex index = mySequence[i];
                 final Variable variable = variableResolver.apply(index);
                 if (fixedVariables.contains(index)) {
-                    if (variable.getValue().compareTo(BigDecimal.ZERO) != 0) {
+                    if (variable.getValue().signum() != 0) {
                         expression.setInfeasible(true);
                     }
                 } else {
-                    variable.level(BigDecimal.ZERO);
-                    variable.setValue(BigDecimal.ZERO);
+                    variable.setFixed(BigDecimal.ZERO);
                     didFixVariable = true;
                 }
             }
