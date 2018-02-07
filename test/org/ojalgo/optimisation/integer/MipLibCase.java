@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.MathProgSysModel;
 import org.ojalgo.optimisation.Variable;
@@ -40,6 +41,11 @@ abstract class MipLibCase extends OptimisationIntegerTests {
 
     protected static void assertMinMaxVal(final String modelName, final BigDecimal expMinVal, final BigDecimal expMaxVal, final boolean relax,
             final Map<String, BigDecimal> solution) {
+
+        BasicLogger.DEBUG.println();
+        BasicLogger.DEBUG.println();
+        BasicLogger.DEBUG.println(modelName);
+        BasicLogger.DEBUG.println();
 
         final File tmpFile = new File(PATH + modelName);
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
@@ -65,7 +71,7 @@ abstract class MipLibCase extends OptimisationIntegerTests {
 
         tmpModel.options.mip_gap = 0.001;
         tmpModel.options.time_suffice = 5L * CalendarDateUnit.MINUTE.size();
-        tmpModel.options.time_abort = 1L * CalendarDateUnit.HOUR.size();
+        tmpModel.options.time_abort = 15L * CalendarDateUnit.MINUTE.size();
 
         tmpModel.options.progress(IntegerSolver.class);
 
