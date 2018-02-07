@@ -24,10 +24,12 @@ package org.ojalgo.optimisation.integer;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -80,14 +82,23 @@ public final class OldIntegerSolver extends IntegerSolver {
             final ExpressionsBasedModel nodeModel = OldIntegerSolver.this.getRelaxedModel();
 
             if (OldIntegerSolver.this.isIntegerSolutionFound()) {
+
+                final double mip_gap = OldIntegerSolver.this.options.mip_gap;
+
                 final double bestIntegerSolutionValue = OldIntegerSolver.this.getBestResultSoFar().getValue();
                 final double parentRelaxedSolutionValue = myKey.objective;
-                final double absolute_gap = ABS.invoke(bestIntegerSolutionValue - parentRelaxedSolutionValue);
-                final double smallFractionOfTheGap = absolute_gap * OldIntegerSolver.this.options.mip_gap;
+
+                final double absoluteValue = ABS.invoke(bestIntegerSolutionValue);
+                final double absoluteGap = ABS.invoke(absoluteValue - parentRelaxedSolutionValue);
+
+                final double small = FunctionUtils.max(mip_gap, absoluteGap * mip_gap, absoluteValue * mip_gap);
+
                 if (nodeModel.isMinimisation()) {
-                    nodeModel.limitObjective(null, TypeUtils.toBigDecimal(bestIntegerSolutionValue - smallFractionOfTheGap, OldIntegerSolver.this.options.feasibility));
+                    final BigDecimal upperLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue - small, OldIntegerSolver.this.options.feasibility);
+                    nodeModel.limitObjective(null, upperLimit);
                 } else {
-                    nodeModel.limitObjective(TypeUtils.toBigDecimal(bestIntegerSolutionValue + smallFractionOfTheGap, OldIntegerSolver.this.options.feasibility), null);
+                    final BigDecimal lowerLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue + small, OldIntegerSolver.this.options.feasibility);
+                    nodeModel.limitObjective(lowerLimit, null);
                 }
             }
 

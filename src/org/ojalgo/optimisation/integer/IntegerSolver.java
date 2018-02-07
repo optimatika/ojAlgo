@@ -240,24 +240,25 @@ public abstract class IntegerSolver extends GenericSolver {
         return myFunction != null;
     }
 
-    protected boolean isGoodEnoughToContinueBranching(final double nonIntegerValue) {
+    protected boolean isGoodEnoughToContinueBranching(final double relaxedNodeValue) {
 
-        final Result tmpCurrentlyTheBest = myBestResultSoFar;
+        final Result bestResultSoFar = myBestResultSoFar;
 
-        if ((tmpCurrentlyTheBest == null) || Double.isNaN(nonIntegerValue)) {
+        if ((bestResultSoFar == null) || Double.isNaN(relaxedNodeValue)) {
 
             return true;
 
         } else {
 
-            final double tmpBestIntegerValue = tmpCurrentlyTheBest.getValue();
+            final double bestIntegerValue = bestResultSoFar.getValue();
 
-            final double tmpMipGap = PrimitiveFunction.ABS.invoke(tmpBestIntegerValue - nonIntegerValue) / PrimitiveFunction.ABS.invoke(tmpBestIntegerValue);
+            final double absoluteGap = PrimitiveFunction.ABS.invoke(bestIntegerValue - relaxedNodeValue);
+            final double relativeGap = PrimitiveFunction.ABS.invoke(absoluteGap / bestIntegerValue);
 
             if (myMinimisation) {
-                return (nonIntegerValue < tmpBestIntegerValue) && (tmpMipGap > options.mip_gap);
+                return (relaxedNodeValue < bestIntegerValue) && (relativeGap > options.mip_gap) && (absoluteGap > options.mip_gap);
             } else {
-                return (nonIntegerValue > tmpBestIntegerValue) && (tmpMipGap > options.mip_gap);
+                return (relaxedNodeValue > bestIntegerValue) && (relativeGap > options.mip_gap) && (absoluteGap > options.mip_gap);
             }
         }
     }
