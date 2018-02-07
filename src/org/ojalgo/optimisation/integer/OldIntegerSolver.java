@@ -80,12 +80,14 @@ public final class OldIntegerSolver extends IntegerSolver {
             final ExpressionsBasedModel nodeModel = OldIntegerSolver.this.getRelaxedModel();
 
             if (OldIntegerSolver.this.isIntegerSolutionFound()) {
-                final double tmpBestValue = OldIntegerSolver.this.getBestResultSoFar().getValue();
-                final double tmpGap = ABS.invoke(tmpBestValue * OldIntegerSolver.this.options.mip_gap);
+                final double bestIntegerSolutionValue = OldIntegerSolver.this.getBestResultSoFar().getValue();
+                final double parentRelaxedSolutionValue = myKey.objective;
+                final double absolute_gap = ABS.invoke(bestIntegerSolutionValue - parentRelaxedSolutionValue);
+                final double smallFractionOfTheGap = absolute_gap * OldIntegerSolver.this.options.mip_gap;
                 if (nodeModel.isMinimisation()) {
-                    nodeModel.limitObjective(null, TypeUtils.toBigDecimal(tmpBestValue - tmpGap, OldIntegerSolver.this.options.feasibility));
+                    nodeModel.limitObjective(null, TypeUtils.toBigDecimal(bestIntegerSolutionValue - smallFractionOfTheGap, OldIntegerSolver.this.options.feasibility));
                 } else {
-                    nodeModel.limitObjective(TypeUtils.toBigDecimal(tmpBestValue + tmpGap, OldIntegerSolver.this.options.feasibility), null);
+                    nodeModel.limitObjective(TypeUtils.toBigDecimal(bestIntegerSolutionValue + smallFractionOfTheGap, OldIntegerSolver.this.options.feasibility), null);
                 }
             }
 

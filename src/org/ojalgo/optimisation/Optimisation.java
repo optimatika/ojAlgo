@@ -192,9 +192,9 @@ public interface Optimisation {
 
         /**
          * The (relative) MIP gap is the difference between the best integer solution found so far and a
-         * node's non-integer solution, relative to the optimal value. If the gap is smaller than this value,
-         * then the corresponding branch i terminated as it is deemed unlikely or too "expensive" to find
-         * better integer solutions there.
+         * node's non-integer solution, relative to the optimal value (approximated by the currently best
+         * integer solution). If the gap is smaller than this value, then the corresponding branch i
+         * terminated as it is deemed unlikely or too "expensive" to find better integer solutions there.
          */
         public double mip_gap = 1.0E-4;
 
