@@ -27,6 +27,7 @@ import static org.ojalgo.function.BigFunction.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -873,7 +874,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         this.setMaximisation();
 
         if (PRESOLVERS.size() > 0) {
-            this.scanForUncorrelatedVariables();
+            this.scanEntities();
         }
 
         final Result solverResult = this.solve(this.getVariableValues());
@@ -886,7 +887,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         this.setMinimisation();
 
         if (PRESOLVERS.size() > 0) {
-            this.scanForUncorrelatedVariables();
+            this.scanEntities();
         }
 
         final Result tmpSolverResult = this.solve(this.getVariableValues());
@@ -1203,7 +1204,49 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return new Optimisation.Result(retState, retValue, retSolution);
     }
 
-    private void scanForUncorrelatedVariables() {
+    private void scanEntities() {
+
+        for (final Expression tmpExpression : myExpressions.values()) {
+
+            if (tmpExpression.isObjective() && tmpExpression.isFunctionLinear()) {
+
+                final BigDecimal exprWeight = tmpExpression.getContributionWeight();
+
+                Variable tmpVariable;
+                BigDecimal varWeight;
+                BigDecimal contribution;
+                for (final Entry<IntIndex, BigDecimal> entry : tmpExpression.getLinearEntrySet()) {
+                    tmpVariable = this.getVariable(entry.getKey());
+                    varWeight = tmpVariable.getContributionWeight();
+                    contribution = exprWeight.multiply(entry.getValue());
+                    varWeight = varWeight != null ? varWeight.add(contribution) : contribution;
+                    tmpVariable.weight(varWeight);
+                }
+
+                tmpExpression.weight(null);
+            }
+
+            //            if (tmpExpression.isConstraint() && tmpExpression.isFunctionLinear() && (tmpExpression.countLinearFactors() == 1)) {
+            //
+            //                final IntIndex index = tmpExpression.getLinearKeySet().iterator().next();
+            //                final Variable tmpVariable = this.getVariable(index);
+            //
+            //                final BigDecimal expUppLim = tmpExpression.getUpperLimit();
+            //                if (expUppLim != null) {
+            //                    final BigDecimal varUppLim = tmpVariable.getUpperLimit();
+            //                    tmpVariable.upper(varUppLim != null ? varUppLim.min(expUppLim) : expUppLim);
+            //                }
+            //
+            //                final BigDecimal expLowLim = tmpExpression.getLowerLimit();
+            //                if (expLowLim != null) {
+            //                    final BigDecimal varLowLim = tmpVariable.getLowerLimit();
+            //                    tmpVariable.lower(varLowLim != null ? varLowLim.max(expLowLim) : expLowLim);
+            //                }
+            //
+            //                tmpExpression.lower(null).upper(null);
+            //            }
+
+        }
 
         for (final Variable tmpVariable : myVariables) {
 
