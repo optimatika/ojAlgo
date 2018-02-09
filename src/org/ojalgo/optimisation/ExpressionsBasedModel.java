@@ -25,6 +25,7 @@ import static org.ojalgo.constant.BigMath.*;
 import static org.ojalgo.function.BigFunction.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -1205,6 +1206,16 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private void scanForUncorrelatedVariables() {
 
         for (final Variable tmpVariable : myVariables) {
+
+            if (tmpVariable.isInteger()) {
+                BigDecimal tmpLimit;
+                if (((tmpLimit = tmpVariable.getUpperLimit()) != null) && (tmpLimit.scale() > 0)) {
+                    tmpVariable.upper(tmpLimit.setScale(0, RoundingMode.FLOOR));
+                }
+                if (((tmpLimit = tmpVariable.getLowerLimit()) != null) && (tmpLimit.scale() > 0)) {
+                    tmpVariable.lower(tmpLimit.setScale(0, RoundingMode.CEILING));
+                }
+            }
 
             if (tmpVariable.isObjective() && !tmpVariable.isFixed() && !tmpVariable.isUnbounded()) {
 
