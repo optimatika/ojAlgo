@@ -38,6 +38,7 @@ import org.ojalgo.access.Structure2D.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.BigMath;
+import org.ojalgo.function.BigFunction;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.optimisation.convex.ConvexSolver;
@@ -1226,25 +1227,37 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                 tmpExpression.weight(null);
             }
 
-            //            if (tmpExpression.isConstraint() && tmpExpression.isFunctionLinear() && (tmpExpression.countLinearFactors() == 1)) {
-            //
-            //                final IntIndex index = tmpExpression.getLinearKeySet().iterator().next();
-            //                final Variable tmpVariable = this.getVariable(index);
-            //
-            //                final BigDecimal expUppLim = tmpExpression.getUpperLimit();
-            //                if (expUppLim != null) {
-            //                    final BigDecimal varUppLim = tmpVariable.getUpperLimit();
-            //                    tmpVariable.upper(varUppLim != null ? varUppLim.min(expUppLim) : expUppLim);
-            //                }
-            //
-            //                final BigDecimal expLowLim = tmpExpression.getLowerLimit();
-            //                if (expLowLim != null) {
-            //                    final BigDecimal varLowLim = tmpVariable.getLowerLimit();
-            //                    tmpVariable.lower(varLowLim != null ? varLowLim.max(expLowLim) : expLowLim);
-            //                }
-            //
-            //                tmpExpression.lower(null).upper(null);
-            //            }
+            if (tmpExpression.isConstraint() && tmpExpression.isFunctionLinear() && (tmpExpression.countLinearFactors() == 1)) {
+
+                final Entry<IntIndex, BigDecimal> entry = tmpExpression.getLinearEntrySet().iterator().next();
+                final Variable tmpVariable = this.getVariable(entry.getKey());
+                final BigDecimal factor = entry.getValue();
+
+                final BigDecimal expUppLim = tmpExpression.getUpperLimit();
+                final BigDecimal expLowLim = tmpExpression.getLowerLimit();
+
+                BigDecimal newUppLim;
+                BigDecimal newLowLim;
+                if (factor.signum() == 1) {
+                    newUppLim = expUppLim != null ? BigFunction.DIVIDE.invoke(expUppLim, factor) : null;
+                    newLowLim = expLowLim != null ? BigFunction.DIVIDE.invoke(expLowLim, factor) : null;
+                } else {
+                    newUppLim = expLowLim != null ? BigFunction.DIVIDE.invoke(expLowLim, factor) : null;
+                    newLowLim = expUppLim != null ? BigFunction.DIVIDE.invoke(expUppLim, factor) : null;
+                }
+
+                if (newUppLim != null) {
+                    final BigDecimal varUppLim = tmpVariable.getUpperLimit();
+                    tmpVariable.upper(varUppLim != null ? varUppLim.min(newUppLim) : newUppLim);
+                }
+
+                if (newLowLim != null) {
+                    final BigDecimal varLowLim = tmpVariable.getLowerLimit();
+                    tmpVariable.lower(varLowLim != null ? varLowLim.max(newLowLim) : newLowLim);
+                }
+
+                tmpExpression.lower(null).upper(null);
+            }
 
         }
 
