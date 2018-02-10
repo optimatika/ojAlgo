@@ -95,9 +95,11 @@ public final class OldIntegerSolver extends IntegerSolver {
 
                 if (nodeModel.isMinimisation()) {
                     final BigDecimal upperLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue - small, OldIntegerSolver.this.options.feasibility);
+                    // final BigDecimal lowerLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, OldIntegerSolver.this.options.feasibility);
                     nodeModel.limitObjective(null, upperLimit);
                 } else {
                     final BigDecimal lowerLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue + small, OldIntegerSolver.this.options.feasibility);
+                    // final BigDecimal upperLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, OldIntegerSolver.this.options.feasibility);
                     nodeModel.limitObjective(lowerLimit, null);
                 }
             }

@@ -176,15 +176,15 @@ public abstract class IntegerSolver extends GenericSolver {
 
         super(solverOptions);
 
-        myIntegerModel = model;
-        myFunction = model.objective().toFunction();
+        myIntegerModel = model.simplify();
+        myFunction = myIntegerModel.objective().toFunction();
 
-        myMinimisation = model.isMinimisation();
+        myMinimisation = myIntegerModel.isMinimisation();
 
-        final List<Variable> integerVariables = model.getIntegerVariables();
+        final List<Variable> integerVariables = myIntegerModel.getIntegerVariables();
         myIntegerIndices = new int[integerVariables.size()];
         for (int i = 0; i < myIntegerIndices.length; i++) {
-            myIntegerIndices[i] = model.indexOf(integerVariables.get(i));
+            myIntegerIndices[i] = myIntegerModel.indexOf(integerVariables.get(i));
         }
 
         myIntegerSignificances = new double[integerVariables.size()];

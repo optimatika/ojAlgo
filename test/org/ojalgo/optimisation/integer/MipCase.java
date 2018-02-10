@@ -134,7 +134,7 @@ public final class MipCase extends OptimisationIntegerTests {
 
     /**
      * <ul>
-     * <li>2013-11-13: Never attempted</li>
+     * <li>Doesn't work</li>
      * </ul>
      *
      * @see RelaxedLpCase#testP2m2p1m1p0n100()

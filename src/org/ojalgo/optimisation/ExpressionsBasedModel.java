@@ -331,7 +331,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myWorkCopy = false;
     }
 
-    ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean workCopy) {
+    ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean workCopy, final boolean allEntities) {
 
         super(modelToCopy.options);
 
@@ -342,12 +342,14 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         for (final Expression tmpExpression : modelToCopy.getExpressions()) {
-            myExpressions.put(tmpExpression.getName(), tmpExpression.copy(this, !workCopy));
+            if (allEntities || tmpExpression.isObjective() || (tmpExpression.isConstraint() && !tmpExpression.isRedundant())) {
+                myExpressions.put(tmpExpression.getName(), tmpExpression.copy(this, !workCopy));
+            } else {
+                BasicLogger.DEBUG.println("Discarding expression: {}", tmpExpression);
+            }
         }
 
-        if (myWorkCopy = workCopy) {
-            // myFixedVariables.addAll(modelToCopy.getFixedVariables());
-        }
+        myWorkCopy = workCopy;
     }
 
     public Expression addExpression() {
@@ -479,7 +481,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     public ExpressionsBasedModel copy() {
-        return new ExpressionsBasedModel(this, false);
+        return new ExpressionsBasedModel(this, false, true);
     }
 
     public int countExpressions() {
@@ -953,9 +955,20 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
+    public ExpressionsBasedModel simplify() {
+
+        this.scanEntities();
+
+        this.presolve();
+
+        final ExpressionsBasedModel retVal = new ExpressionsBasedModel(this, true, false);
+
+        return retVal;
+    }
+
     public ExpressionsBasedModel relax(final boolean inPlace) {
 
-        final ExpressionsBasedModel retVal = inPlace ? this : new ExpressionsBasedModel(this, true);
+        final ExpressionsBasedModel retVal = inPlace ? this : new ExpressionsBasedModel(this, true, true);
 
         for (final Variable tmpVariable : retVal.getVariables()) {
             tmpVariable.relax();
