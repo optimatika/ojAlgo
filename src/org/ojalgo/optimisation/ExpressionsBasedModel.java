@@ -487,10 +487,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return myExpressions.values().stream().filter(c -> c.isConstraint() && !c.isRedundant());
     }
 
-    public Stream<Expression> expressions() {
-        return myExpressions.values().stream();
-    }
-
     public ExpressionsBasedModel copy() {
         return new ExpressionsBasedModel(this, false, true);
     }
@@ -1272,6 +1268,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         for (final Variable tmpVariable : myVariables) {
             Presolvers.V_SCAN.simplify(tmpVariable, this);
         }
+    }
+
+    Stream<Expression> expressions() {
+        return myExpressions.values().stream();
     }
 
     ExpressionsBasedModel.Integration<?> getIntegration() {
