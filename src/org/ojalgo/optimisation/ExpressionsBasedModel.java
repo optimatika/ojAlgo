@@ -25,9 +25,7 @@ import static org.ojalgo.constant.BigMath.*;
 import static org.ojalgo.function.BigFunction.*;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -38,7 +36,6 @@ import org.ojalgo.access.Structure2D.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.optimisation.convex.ConvexSolver;
@@ -179,7 +176,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     }
 
-    public static abstract class Presolver implements Comparable<Presolver> {
+    public static abstract class Presolver extends Simplifier<Presolver> {
 
         private final int myExecutionOrder;
         private final UUID myUUID = UUID.randomUUID();
@@ -237,6 +234,16 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         final int getExecutionOrder() {
             return myExecutionOrder;
         }
+
+    }
+
+    static abstract class Simplifier<S extends Simplifier<?>> implements Comparable<S> {
+
+    }
+
+    static abstract class VariableAnalyser extends Simplifier<VariableAnalyser> {
+
+        public abstract boolean simplify(Variable variable, ExpressionsBasedModel model);
 
     }
 
@@ -345,7 +352,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             if (allEntities || tmpExpression.isObjective() || (tmpExpression.isConstraint() && !tmpExpression.isRedundant())) {
                 myExpressions.put(tmpExpression.getName(), tmpExpression.copy(this, !workCopy));
             } else {
-                BasicLogger.DEBUG.println("Discarding expression: {}", tmpExpression);
+                // BasicLogger.DEBUG.println("Discarding expression: {}", tmpExpression);
             }
         }
 
@@ -480,6 +487,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return myExpressions.values().stream().filter(c -> c.isConstraint() && !c.isRedundant());
     }
 
+    public Stream<Expression> expressions() {
+        return myExpressions.values().stream();
+    }
+
     public ExpressionsBasedModel copy() {
         return new ExpressionsBasedModel(this, false, true);
     }
@@ -518,6 +529,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         myIntegerVariables.clear();
         myIntegerIndices = null;
+    }
+
+    public Expression generateCut(final Expression constraint, final Optimisation.Result solution) {
+
+        return null;
     }
 
     public Expression getExpression(final String name) {
@@ -825,79 +841,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
-    public Expression generateCut(final Expression constraint, final Optimisation.Result solution) {
-
-        return null;
-    }
-
-    /**
-     * @param constraints Linear constraints with all binary variables
-     */
-    private void generateCuts(final Set<Expression> constraints) {
-
-        if ((constraints != null) && (constraints.size() > 0)) {
-
-            final List<Variable> posBinVar = new ArrayList<>();
-            final List<Variable> negBinVar = new ArrayList<>();
-
-            final Set<IntIndex> indices = new HashSet<>();
-            final Set<IntIndex> fixedVariables = this.getFixedVariables();
-
-            for (final Expression tmpExpression : constraints) {
-
-                posBinVar.clear();
-                negBinVar.clear();
-
-                indices.clear();
-                indices.addAll(tmpExpression.getLinearKeySet());
-
-                final int countExprVars = indices.size();
-
-                indices.removeAll(fixedVariables);
-
-                for (final IntIndex tmpIndex : indices) {
-                    final Variable tmpVariable = this.getVariable(tmpIndex);
-                    if (tmpVariable.isBinary()) {
-                        final BigDecimal tmpFactor = tmpExpression.get(tmpIndex);
-                        if (tmpFactor.signum() == 1) {
-                            posBinVar.add(tmpVariable);
-                        } else if (tmpFactor.signum() == -1) {
-                            negBinVar.add(tmpVariable);
-                        }
-
-                    }
-                }
-
-                if ((posBinVar.size() == indices.size()) && (posBinVar.size() != countExprVars) && (posBinVar.size() != 0)) {
-                    // All remaining (not fixed) variables are binary with positive constraint factors
-                    final BigDecimal ul = tmpExpression.getUpperLimit();
-                    if ((ul != null) && (ul.signum() != -1)) {
-                        posBinVar.sort((v1, v2) -> tmpExpression.get(v1.getIndex()).compareTo(tmpExpression.get(v2.getIndex())));
-                        BigDecimal accum = BigMath.ZERO;
-                        int count = 0;
-                        for (final Variable tmpVariable : posBinVar) {
-                            accum = accum.add(tmpExpression.get(tmpVariable));
-                            if (accum.compareTo(ul) > 0) {
-                                final Expression tmpNewCut = this.addExpression("Cut-" + tmpExpression.getName());
-                                tmpNewCut.setLinearFactorsSimple(posBinVar);
-                                tmpNewCut.upper(new BigDecimal(count));
-                                break;
-                            }
-                            count++;
-                        }
-                    }
-
-                }
-
-                if (posBinVar.size() == indices.size()) {
-                    // All remaining (not fixed) variables are binary with negative constraint factors
-
-                }
-
-            }
-        }
-    }
-
     public Optimisation.Result maximise() {
 
         this.setMaximisation();
@@ -981,17 +924,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
-    public ExpressionsBasedModel simplify() {
-
-        this.scanEntities();
-
-        this.presolve();
-
-        final ExpressionsBasedModel retVal = new ExpressionsBasedModel(this, true, false);
-
-        return retVal;
-    }
-
     public ExpressionsBasedModel relax(final boolean inPlace) {
 
         final ExpressionsBasedModel retVal = inPlace ? this : new ExpressionsBasedModel(this, true, true);
@@ -999,6 +931,17 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         for (final Variable tmpVariable : retVal.getVariables()) {
             tmpVariable.relax();
         }
+
+        return retVal;
+    }
+
+    public ExpressionsBasedModel simplify() {
+
+        this.scanEntities();
+
+        this.presolve();
+
+        final ExpressionsBasedModel retVal = new ExpressionsBasedModel(this, true, false);
 
         return retVal;
     }
@@ -1231,6 +1174,74 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     /**
+     * @param constraints Linear constraints with all binary variables
+     */
+    private void generateCuts(final Set<Expression> constraints) {
+
+        if ((constraints != null) && (constraints.size() > 0)) {
+
+            final List<Variable> posBinVar = new ArrayList<>();
+            final List<Variable> negBinVar = new ArrayList<>();
+
+            final Set<IntIndex> indices = new HashSet<>();
+            final Set<IntIndex> fixedVariables = this.getFixedVariables();
+
+            for (final Expression tmpExpression : constraints) {
+
+                posBinVar.clear();
+                negBinVar.clear();
+
+                indices.clear();
+                indices.addAll(tmpExpression.getLinearKeySet());
+
+                final int countExprVars = indices.size();
+
+                indices.removeAll(fixedVariables);
+
+                for (final IntIndex tmpIndex : indices) {
+                    final Variable tmpVariable = this.getVariable(tmpIndex);
+                    if (tmpVariable.isBinary()) {
+                        final BigDecimal tmpFactor = tmpExpression.get(tmpIndex);
+                        if (tmpFactor.signum() == 1) {
+                            posBinVar.add(tmpVariable);
+                        } else if (tmpFactor.signum() == -1) {
+                            negBinVar.add(tmpVariable);
+                        }
+
+                    }
+                }
+
+                if ((posBinVar.size() == indices.size()) && (posBinVar.size() != countExprVars) && (posBinVar.size() != 0)) {
+                    // All remaining (not fixed) variables are binary with positive constraint factors
+                    final BigDecimal ul = tmpExpression.getUpperLimit();
+                    if ((ul != null) && (ul.signum() != -1)) {
+                        posBinVar.sort((v1, v2) -> tmpExpression.get(v1.getIndex()).compareTo(tmpExpression.get(v2.getIndex())));
+                        BigDecimal accum = BigMath.ZERO;
+                        int count = 0;
+                        for (final Variable tmpVariable : posBinVar) {
+                            accum = accum.add(tmpExpression.get(tmpVariable));
+                            if (accum.compareTo(ul) > 0) {
+                                final Expression tmpNewCut = this.addExpression("Cut-" + tmpExpression.getName());
+                                tmpNewCut.setLinearFactorsSimple(posBinVar);
+                                tmpNewCut.upper(new BigDecimal(count));
+                                break;
+                            }
+                            count++;
+                        }
+                    }
+
+                }
+
+                if (posBinVar.size() == indices.size()) {
+                    // All remaining (not fixed) variables are binary with negative constraint factors
+
+                }
+
+            }
+        }
+    }
+
+    /**
      * Copy the solution back to the model variables, and evaluate the objective function as specidied in the
      * model.
      */
@@ -1255,105 +1266,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private void scanEntities() {
 
         for (final Expression tmpExpression : myExpressions.values()) {
-
-            if (tmpExpression.isObjective() && tmpExpression.isFunctionLinear()) {
-
-                final BigDecimal exprWeight = tmpExpression.getContributionWeight();
-
-                Variable tmpVariable;
-                BigDecimal varWeight;
-                BigDecimal contribution;
-                for (final Entry<IntIndex, BigDecimal> entry : tmpExpression.getLinearEntrySet()) {
-                    tmpVariable = this.getVariable(entry.getKey());
-                    varWeight = tmpVariable.getContributionWeight();
-                    contribution = exprWeight.multiply(entry.getValue());
-                    varWeight = varWeight != null ? varWeight.add(contribution) : contribution;
-                    tmpVariable.weight(varWeight);
-                }
-
-                tmpExpression.weight(null);
-            }
-
-            if (tmpExpression.isConstraint() && tmpExpression.isFunctionLinear() && (tmpExpression.countLinearFactors() == 1)) {
-
-                final Entry<IntIndex, BigDecimal> entry = tmpExpression.getLinearEntrySet().iterator().next();
-                final Variable tmpVariable = this.getVariable(entry.getKey());
-                final BigDecimal factor = entry.getValue();
-
-                final BigDecimal expUppLim = tmpExpression.getUpperLimit();
-                final BigDecimal expLowLim = tmpExpression.getLowerLimit();
-
-                BigDecimal newUppLim;
-                BigDecimal newLowLim;
-                if (factor.signum() == 1) {
-                    newUppLim = expUppLim != null ? BigFunction.DIVIDE.invoke(expUppLim, factor) : null;
-                    newLowLim = expLowLim != null ? BigFunction.DIVIDE.invoke(expLowLim, factor) : null;
-                } else {
-                    newUppLim = expLowLim != null ? BigFunction.DIVIDE.invoke(expLowLim, factor) : null;
-                    newLowLim = expUppLim != null ? BigFunction.DIVIDE.invoke(expUppLim, factor) : null;
-                }
-
-                if (newUppLim != null) {
-                    final BigDecimal varUppLim = tmpVariable.getUpperLimit();
-                    tmpVariable.upper(varUppLim != null ? varUppLim.min(newUppLim) : newUppLim);
-                }
-
-                if (newLowLim != null) {
-                    final BigDecimal varLowLim = tmpVariable.getLowerLimit();
-                    tmpVariable.lower(varLowLim != null ? varLowLim.max(newLowLim) : newLowLim);
-                }
-
-                tmpExpression.lower(null).upper(null);
-            }
-
+            Presolvers.E_SCAN.simplify(tmpExpression, Collections.emptySet(), BigMath.ZERO, this::getVariable);
         }
 
         for (final Variable tmpVariable : myVariables) {
-
-            if (tmpVariable.isInteger()) {
-                BigDecimal tmpLimit;
-                if (((tmpLimit = tmpVariable.getUpperLimit()) != null) && (tmpLimit.scale() > 0)) {
-                    tmpVariable.upper(tmpLimit.setScale(0, RoundingMode.FLOOR));
-                }
-                if (((tmpLimit = tmpVariable.getLowerLimit()) != null) && (tmpLimit.scale() > 0)) {
-                    tmpVariable.lower(tmpLimit.setScale(0, RoundingMode.CEILING));
-                }
-            }
-
-            if (tmpVariable.isObjective() && !tmpVariable.isFixed() && !tmpVariable.isUnbounded()) {
-
-                final boolean includedAnywhere = myExpressions.values().stream().anyMatch(expr -> expr.includes(tmpVariable));
-                if (!includedAnywhere) {
-
-                    final int weightSignum = tmpVariable.getContributionWeight().signum();
-
-                    if (this.isMaximisation() && (weightSignum == -1)) {
-                        if (tmpVariable.isLowerLimitSet()) {
-                            tmpVariable.setFixed(tmpVariable.getLowerLimit());
-                        } else {
-                            tmpVariable.setUnbounded(true);
-                        }
-                    } else if (this.isMinimisation() && (weightSignum == 1)) {
-                        if (tmpVariable.isLowerLimitSet()) {
-                            tmpVariable.setFixed(tmpVariable.getLowerLimit());
-                        } else {
-                            tmpVariable.setUnbounded(true);
-                        }
-                    } else if (this.isMaximisation() && (weightSignum == 1)) {
-                        if (tmpVariable.isUpperLimitSet()) {
-                            tmpVariable.setFixed(tmpVariable.getUpperLimit());
-                        } else {
-                            tmpVariable.setUnbounded(true);
-                        }
-                    } else if (this.isMinimisation() && (weightSignum == -1)) {
-                        if (tmpVariable.isUpperLimitSet()) {
-                            tmpVariable.setFixed(tmpVariable.getUpperLimit());
-                        } else {
-                            tmpVariable.setUnbounded(true);
-                        }
-                    }
-                }
-            }
+            Presolvers.V_SCAN.simplify(tmpVariable, this);
         }
     }
 
