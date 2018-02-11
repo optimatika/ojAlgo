@@ -176,7 +176,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     }
 
-    public static abstract class Presolver extends Simplifier<Presolver> {
+    public static abstract class Presolver extends Simplifier<Expression, Presolver> {
 
         private final int myExecutionOrder;
         private final UUID myUUID = UUID.randomUUID();
@@ -235,15 +235,31 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             return myExecutionOrder;
         }
 
+        @Override
+        boolean isApplicable(final Expression target) {
+            return target.isConstraint() && !target.isInfeasible() && !target.isRedundant() && (target.countQuadraticFactors() == 0);
+        }
+
     }
 
-    static abstract class Simplifier<S extends Simplifier<?>> implements Comparable<S> {
+    static abstract class Simplifier<ME extends ModelEntity<?>, S extends Simplifier<?, ?>> implements Comparable<S> {
+
+        Simplifier() {
+            super();
+        }
+
+        abstract boolean isApplicable(final ME target);
 
     }
 
-    static abstract class VariableAnalyser extends Simplifier<VariableAnalyser> {
+    static abstract class VariableAnalyser extends Simplifier<Variable, VariableAnalyser> {
 
         public abstract boolean simplify(Variable variable, ExpressionsBasedModel model);
+
+        @Override
+        boolean isApplicable(final Variable target) {
+            return true;
+        }
 
     }
 
@@ -1261,8 +1277,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     private void scanEntities() {
 
+        final Set<IntIndex> fixedVariables = Collections.emptySet();
+        final BigDecimal fixedValue = BigMath.ZERO;
+
         for (final Expression tmpExpression : myExpressions.values()) {
-            Presolvers.E_SCAN.simplify(tmpExpression, Collections.emptySet(), BigMath.ZERO, this::getVariable);
+            Presolvers.E_SCAN.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable);
         }
 
         for (final Variable tmpVariable : myVariables) {
