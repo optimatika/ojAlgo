@@ -37,7 +37,6 @@ import java.util.function.Function;
 import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
-import org.ojalgo.optimisation.ExpressionsBasedModel.VariableAnalyser;
 
 public abstract class Presolvers {
 
@@ -272,12 +271,7 @@ public abstract class Presolvers {
 
     };
 
-    public static final ExpressionsBasedModel.VariableAnalyser V_SCAN = new ExpressionsBasedModel.VariableAnalyser() {
-
-        public int compareTo(final VariableAnalyser o) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
+    public static final ExpressionsBasedModel.VariableAnalyser V_SCAN = new ExpressionsBasedModel.VariableAnalyser(4) {
 
         @Override
         public boolean simplify(final Variable variable, final ExpressionsBasedModel model) {
