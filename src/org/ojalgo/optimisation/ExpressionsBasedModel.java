@@ -1285,11 +1285,15 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         final BigDecimal fixedValue = BigMath.ZERO;
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            Presolvers.E_SCAN.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable);
+            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable);
+            if (tmpExpression.isConstraint()) {
+                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable);
+
+            }
         }
 
         for (final Variable tmpVariable : myVariables) {
-            Presolvers.V_SCAN.simplify(tmpVariable, this);
+            Presolvers.FIXED_OR_UNBOUNDED.simplify(tmpVariable, this);
         }
     }
 

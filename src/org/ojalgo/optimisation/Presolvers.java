@@ -40,60 +40,6 @@ import org.ojalgo.function.BigFunction;
 
 public abstract class Presolvers {
 
-    /**
-     * If an expression contains at least 1 binary varibale and all non-fixed variable weights are of the same
-     * sign (positive or negative) then it is possible the check the validity of "1" for each of the binary
-     * variables. (Doesn't seem to work and/or is not effcetive.)
-     */
-    public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
-
-        @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver) {
-
-            boolean didFixVariable = false;
-
-            final Set<Variable> binaryVariables = expression.getBinaryVariables(fixedVariables);
-
-            if (binaryVariables.size() > 0) {
-
-                BigDecimal compUppLim = expression.getUpperLimit();
-                if (compUppLim != null) {
-                    if (fixedValue.signum() != 0) {
-                        compUppLim = compUppLim.subtract(fixedValue);
-                    }
-                }
-
-                BigDecimal compLowLim = expression.getLowerLimit();
-                if (compLowLim != null) {
-                    if (fixedValue.signum() != 0) {
-                        compLowLim = compLowLim.subtract(fixedValue);
-                    }
-                }
-
-                if ((compUppLim != null) && expression.isPositive(fixedVariables)) {
-                    for (final Variable binVar : binaryVariables) {
-                        if (expression.get(binVar).compareTo(compUppLim) > 0) {
-                            binVar.setFixed(ZERO);
-                            didFixVariable = true;
-                        }
-                    }
-                } else if ((compLowLim != null) && expression.isNegative(fixedVariables)) {
-                    for (final Variable binVar : binaryVariables) {
-                        if (expression.get(binVar).compareTo(compLowLim) < 0) {
-                            binVar.setFixed(ZERO);
-                            didFixVariable = true;
-                        }
-                    }
-                }
-
-            }
-
-            return didFixVariable;
-        }
-
-    };
-
     public static final ExpressionsBasedModel.Presolver BIGSTUFF = new ExpressionsBasedModel.Presolver(99) {
 
         @Override
@@ -190,6 +136,144 @@ public abstract class Presolvers {
     };
 
     /**
+     * If an expression contains at least 1 binary varibale and all non-fixed variable weights are of the same
+     * sign (positive or negative) then it is possible the check the validity of "1" for each of the binary
+     * variables. (Doesn't seem to work and/or is not effcetive.)
+     */
+    public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
+
+        @Override
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
+                final Function<IntIndex, Variable> variableResolver) {
+
+            boolean didFixVariable = false;
+
+            final Set<Variable> binaryVariables = expression.getBinaryVariables(fixedVariables);
+
+            if (binaryVariables.size() > 0) {
+
+                BigDecimal compUppLim = expression.getUpperLimit();
+                if (compUppLim != null) {
+                    if (fixedValue.signum() != 0) {
+                        compUppLim = compUppLim.subtract(fixedValue);
+                    }
+                }
+
+                BigDecimal compLowLim = expression.getLowerLimit();
+                if (compLowLim != null) {
+                    if (fixedValue.signum() != 0) {
+                        compLowLim = compLowLim.subtract(fixedValue);
+                    }
+                }
+
+                if ((compUppLim != null) && expression.isPositive(fixedVariables)) {
+                    for (final Variable binVar : binaryVariables) {
+                        if (expression.get(binVar).compareTo(compUppLim) > 0) {
+                            binVar.setFixed(ZERO);
+                            didFixVariable = true;
+                        }
+                    }
+                } else if ((compLowLim != null) && expression.isNegative(fixedVariables)) {
+                    for (final Variable binVar : binaryVariables) {
+                        if (expression.get(binVar).compareTo(compLowLim) < 0) {
+                            binVar.setFixed(ZERO);
+                            didFixVariable = true;
+                        }
+                    }
+                }
+
+            }
+
+            return didFixVariable;
+        }
+
+    };
+
+    public static final ExpressionsBasedModel.VariableAnalyser FIXED_OR_UNBOUNDED = new ExpressionsBasedModel.VariableAnalyser(4) {
+
+        @Override
+        public boolean simplify(final Variable variable, final ExpressionsBasedModel model) {
+
+            if (variable.isInteger()) {
+                BigDecimal tmpLimit;
+                if (((tmpLimit = variable.getUpperLimit()) != null) && (tmpLimit.scale() > 0)) {
+                    variable.upper(tmpLimit.setScale(0, RoundingMode.FLOOR));
+                }
+                if (((tmpLimit = variable.getLowerLimit()) != null) && (tmpLimit.scale() > 0)) {
+                    variable.lower(tmpLimit.setScale(0, RoundingMode.CEILING));
+                }
+            }
+
+            if (variable.isObjective() && !variable.isFixed() && !variable.isUnbounded()) {
+
+                final boolean includedAnywhere = model.expressions().anyMatch(expr -> expr.includes(variable));
+                if (!includedAnywhere) {
+
+                    final int weightSignum = variable.getContributionWeight().signum();
+
+                    if (model.isMaximisation() && (weightSignum == -1)) {
+                        if (variable.isLowerLimitSet()) {
+                            variable.setFixed(variable.getLowerLimit());
+                        } else {
+                            variable.setUnbounded(true);
+                        }
+                    } else if (model.isMinimisation() && (weightSignum == 1)) {
+                        if (variable.isLowerLimitSet()) {
+                            variable.setFixed(variable.getLowerLimit());
+                        } else {
+                            variable.setUnbounded(true);
+                        }
+                    } else if (model.isMaximisation() && (weightSignum == 1)) {
+                        if (variable.isUpperLimitSet()) {
+                            variable.setFixed(variable.getUpperLimit());
+                        } else {
+                            variable.setUnbounded(true);
+                        }
+                    } else if (model.isMinimisation() && (weightSignum == -1)) {
+                        if (variable.isUpperLimitSet()) {
+                            variable.setFixed(variable.getUpperLimit());
+                        } else {
+                            variable.setUnbounded(true);
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+    };
+
+    public static final ExpressionsBasedModel.Presolver LINEAR_OBJECTIVE = new ExpressionsBasedModel.Presolver(10) {
+
+        @Override
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
+                final Function<IntIndex, Variable> variableResolver) {
+
+            if (expression.isObjective() && expression.isFunctionLinear()) {
+
+                final BigDecimal exprWeight = expression.getContributionWeight();
+
+                Variable tmpVariable;
+                BigDecimal varWeight;
+                BigDecimal contribution;
+                for (final Entry<IntIndex, BigDecimal> entry : expression.getLinearEntrySet()) {
+                    tmpVariable = variableResolver.apply(entry.getKey());
+                    varWeight = tmpVariable.getContributionWeight();
+                    contribution = exprWeight.multiply(entry.getValue());
+                    varWeight = varWeight != null ? varWeight.add(contribution) : contribution;
+                    tmpVariable.weight(varWeight);
+                }
+
+                expression.weight(null);
+            }
+
+            return false;
+        }
+
+    };
+
+    /**
      * Checks the sign of the limits and the sign of the expression parameters to deduce variables that in
      * fact can only zero.
      */
@@ -267,122 +351,6 @@ public abstract class Presolvers {
             }
 
             return didFixVariable;
-        }
-
-    };
-
-    public static final ExpressionsBasedModel.VariableAnalyser V_SCAN = new ExpressionsBasedModel.VariableAnalyser(4) {
-
-        @Override
-        public boolean simplify(final Variable variable, final ExpressionsBasedModel model) {
-
-            if (variable.isInteger()) {
-                BigDecimal tmpLimit;
-                if (((tmpLimit = variable.getUpperLimit()) != null) && (tmpLimit.scale() > 0)) {
-                    variable.upper(tmpLimit.setScale(0, RoundingMode.FLOOR));
-                }
-                if (((tmpLimit = variable.getLowerLimit()) != null) && (tmpLimit.scale() > 0)) {
-                    variable.lower(tmpLimit.setScale(0, RoundingMode.CEILING));
-                }
-            }
-
-            if (variable.isObjective() && !variable.isFixed() && !variable.isUnbounded()) {
-
-                final boolean includedAnywhere = model.expressions().anyMatch(expr -> expr.includes(variable));
-                if (!includedAnywhere) {
-
-                    final int weightSignum = variable.getContributionWeight().signum();
-
-                    if (model.isMaximisation() && (weightSignum == -1)) {
-                        if (variable.isLowerLimitSet()) {
-                            variable.setFixed(variable.getLowerLimit());
-                        } else {
-                            variable.setUnbounded(true);
-                        }
-                    } else if (model.isMinimisation() && (weightSignum == 1)) {
-                        if (variable.isLowerLimitSet()) {
-                            variable.setFixed(variable.getLowerLimit());
-                        } else {
-                            variable.setUnbounded(true);
-                        }
-                    } else if (model.isMaximisation() && (weightSignum == 1)) {
-                        if (variable.isUpperLimitSet()) {
-                            variable.setFixed(variable.getUpperLimit());
-                        } else {
-                            variable.setUnbounded(true);
-                        }
-                    } else if (model.isMinimisation() && (weightSignum == -1)) {
-                        if (variable.isUpperLimitSet()) {
-                            variable.setFixed(variable.getUpperLimit());
-                        } else {
-                            variable.setUnbounded(true);
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-
-    };
-
-    public static final ExpressionsBasedModel.Presolver E_SCAN = new ExpressionsBasedModel.Presolver(10) {
-
-        @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver) {
-
-            if (expression.isObjective() && expression.isFunctionLinear()) {
-
-                final BigDecimal exprWeight = expression.getContributionWeight();
-
-                Variable tmpVariable;
-                BigDecimal varWeight;
-                BigDecimal contribution;
-                for (final Entry<IntIndex, BigDecimal> entry : expression.getLinearEntrySet()) {
-                    tmpVariable = variableResolver.apply(entry.getKey());
-                    varWeight = tmpVariable.getContributionWeight();
-                    contribution = exprWeight.multiply(entry.getValue());
-                    varWeight = varWeight != null ? varWeight.add(contribution) : contribution;
-                    tmpVariable.weight(varWeight);
-                }
-
-                expression.weight(null);
-            }
-
-            if (expression.isConstraint() && expression.isFunctionLinear() && (expression.countLinearFactors() == 1)) {
-
-                final Entry<IntIndex, BigDecimal> entry = expression.getLinearEntrySet().iterator().next();
-                final Variable tmpVariable = variableResolver.apply(entry.getKey());
-                final BigDecimal factor = entry.getValue();
-
-                final BigDecimal expUppLim = expression.getUpperLimit();
-                final BigDecimal expLowLim = expression.getLowerLimit();
-
-                BigDecimal newUppLim;
-                BigDecimal newLowLim;
-                if (factor.signum() == 1) {
-                    newUppLim = expUppLim != null ? BigFunction.DIVIDE.invoke(expUppLim, factor) : null;
-                    newLowLim = expLowLim != null ? BigFunction.DIVIDE.invoke(expLowLim, factor) : null;
-                } else {
-                    newUppLim = expLowLim != null ? BigFunction.DIVIDE.invoke(expLowLim, factor) : null;
-                    newLowLim = expUppLim != null ? BigFunction.DIVIDE.invoke(expUppLim, factor) : null;
-                }
-
-                if (newUppLim != null) {
-                    final BigDecimal varUppLim = tmpVariable.getUpperLimit();
-                    tmpVariable.upper(varUppLim != null ? varUppLim.min(newUppLim) : newUppLim);
-                }
-
-                if (newLowLim != null) {
-                    final BigDecimal varLowLim = tmpVariable.getLowerLimit();
-                    tmpVariable.lower(varLowLim != null ? varLowLim.max(newLowLim) : newLowLim);
-                }
-
-                expression.lower(null).upper(null);
-            }
-
-            return false;
         }
 
     };
