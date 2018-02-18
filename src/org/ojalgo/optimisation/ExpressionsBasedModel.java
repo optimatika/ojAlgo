@@ -1288,7 +1288,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable);
             if (tmpExpression.isConstraint()) {
                 Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable);
-
             }
         }
 
