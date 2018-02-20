@@ -47,7 +47,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
             final Structure2D templateBody = new Structure2D() {
 
                 public long countColumns() {
-                    return numberOfEquations;
+                    return numberOfVariables;
                 }
 
                 public long countRows() {
@@ -58,11 +58,11 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
             final Structure2D templateRHS = new Structure2D() {
 
                 public long countColumns() {
-                    return numberOfEquations;
+                    return numberOfSolutions;
                 }
 
                 public long countRows() {
-                    return numberOfSolutions;
+                    return numberOfEquations;
                 }
             };
 
@@ -226,7 +226,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
         final Structure2D templateBody = new Structure2D() {
 
             public long countColumns() {
-                return numberOfEquations;
+                return numberOfVariables;
             }
 
             public long countRows() {
@@ -237,11 +237,11 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
         final Structure2D templateRHS = new Structure2D() {
 
             public long countColumns() {
-                return numberOfEquations;
+                return numberOfSolutions;
             }
 
             public long countRows() {
-                return numberOfSolutions;
+                return numberOfEquations;
             }
         };
 

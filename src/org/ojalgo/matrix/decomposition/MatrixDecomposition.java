@@ -95,6 +95,19 @@ public interface MatrixDecomposition<N extends Number> {
             return this.make(TYPICAL);
         }
 
+        default D make(final int numberOfRows, final int numberOfColumns) {
+            return this.make(new Structure2D() {
+
+                public long countColumns() {
+                    return numberOfColumns;
+                }
+
+                public long countRows() {
+                    return numberOfRows;
+                }
+            });
+        }
+
         D make(Structure2D typical);
 
     }
