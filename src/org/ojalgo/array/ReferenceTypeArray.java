@@ -147,9 +147,8 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implem
         }
     }
 
-    public final void fillMatching(final Access1D<?> values) {
-        final int limit = (int) FunctionUtils.min(this.count(), values.count());
-        for (int i = 0; i < limit; i++) {
+    public void fillMatching(final Access1D<?> values) {
+        for (int i = 0, limit = (int) Math.min(this.count(), values.count()); i < limit; i++) {
             data[i] = myFactory.cast(values.get(i));
         }
     }

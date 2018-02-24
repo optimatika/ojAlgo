@@ -393,7 +393,7 @@ public class Primitive64Array extends PrimitiveArray {
         }
     }
 
-    public final void fillMatching(final Access1D<?> values) {
+    public void fillMatching(final Access1D<?> values) {
         Primitive64Array.fill(data, values);
     }
 

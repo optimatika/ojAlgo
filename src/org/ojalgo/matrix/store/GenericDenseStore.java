@@ -714,6 +714,57 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         myUtility.fillDiagonal(row, col, supplier);
     }
 
+    @Override
+    public void fillMatching(final Access1D<?> values) {
+
+        if (values instanceof ConjugatedStore) {
+            final TransjugatedStore<?> conjugated = (ConjugatedStore<?>) values;
+
+            if (myColDim > FillConjugated.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        FillConjugated.invoke(data, myRowDim, first, limit, conjugated.getOriginal(), myFactory.scalar());
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, myColDim, FillTransposed.THRESHOLD);
+
+            } else {
+
+                FillConjugated.invoke(data, myRowDim, 0, myColDim, conjugated.getOriginal(), myFactory.scalar());
+            }
+
+        } else if (values instanceof TransposedStore) {
+            final TransjugatedStore<?> transposed = (TransposedStore<?>) values;
+
+            if (myColDim > FillTransposed.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        FillTransposed.invoke(data, myRowDim, first, limit, transposed.getOriginal(), myFactory.scalar());
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, myColDim, FillTransposed.THRESHOLD);
+
+            } else {
+
+                FillTransposed.invoke(data, myRowDim, 0, myColDim, transposed.getOriginal(), myFactory.scalar());
+            }
+
+        } else {
+
+            super.fillMatching(values);
+        }
+    }
+
     public void fillMatching(final Access1D<N> aLeftArg, final BinaryFunction<N> aFunc, final N aRightArg) {
 
         final int tmpRowDim = myRowDim;

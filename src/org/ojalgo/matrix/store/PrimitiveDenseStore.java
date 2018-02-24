@@ -773,13 +773,11 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         }
     }
 
-    /**
-     * @deprecated v42 Temporary method until redesign of transpose() and conjugate() related functionality
-     */
-    @Deprecated
-    public void fillMatching(final MatrixStore<Double> source) {
+    @Override
+    public void fillMatching(final Access1D<?> values) {
 
-        if (source instanceof TransjugatedStore) {
+        if (values instanceof TransjugatedStore) {
+            final TransjugatedStore<?> transposed = (TransjugatedStore<?>) values;
 
             if (myColDim > FillTransposed.THRESHOLD) {
 
@@ -787,7 +785,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
                     @Override
                     public void conquer(final int first, final int limit) {
-                        FillTransposed.invoke(data, myRowDim, first, limit, source);
+                        FillTransposed.invoke(data, myRowDim, first, limit, transposed.getOriginal());
                     }
 
                 };
@@ -796,12 +794,12 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
             } else {
 
-                FillTransposed.invoke(data, myRowDim, 0, myColDim, source);
+                FillTransposed.invoke(data, myRowDim, 0, myColDim, transposed.getOriginal());
             }
 
         } else {
 
-            super.fillMatching(source);
+            super.fillMatching(values);
         }
     }
 
