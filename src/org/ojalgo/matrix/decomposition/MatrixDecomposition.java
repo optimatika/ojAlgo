@@ -309,10 +309,6 @@ public interface MatrixDecomposition<N extends Number> {
      */
     boolean isComputed();
 
-    /**
-     * @deprecated v39 Use {@link MatrixUtils} instead
-     */
-    @Deprecated
     MatrixStore<N> reconstruct();
 
     /**

@@ -263,7 +263,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     }
 
     public PhysicalStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.allocate(templateRHS.countRows(), templateRHS.countColumns());
+        return this.allocate(templateBody.countRows(), templateRHS.countColumns());
     }
 
     public void setFullSize(final boolean fullSize) {

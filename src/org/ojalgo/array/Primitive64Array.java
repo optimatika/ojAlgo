@@ -368,7 +368,7 @@ public class Primitive64Array extends PrimitiveArray {
         data = new double[size];
     }
 
-    public final void axpy(final double a, final Mutate1D y) {
+    public void axpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
     }
 
@@ -377,8 +377,7 @@ public class Primitive64Array extends PrimitiveArray {
 
         double retVal = ZERO;
 
-        final int tmpLength = Math.min(data.length, (int) vector.count());
-        for (int i = 0; i < tmpLength; i++) {
+        for (int i = 0, limit = Math.min(data.length, (int) vector.count()); i < limit; i++) {
             retVal += data[i] * vector.doubleValue(i);
         }
 
