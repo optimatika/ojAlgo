@@ -389,16 +389,16 @@ public class Primitive32Array extends PrimitiveArray {
         }
     }
 
-    public final void fillMatching(final Access1D<?> values) {
+    public void fillMatching(final Access1D<?> values) {
         Primitive32Array.fill(data, values);
     }
 
-    public final void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
+    public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
         final int tmpLimit = (int) FunctionUtils.min(this.count(), left.count(), right.count());
         Primitive32Array.invoke(data, 0, tmpLimit, 1, left, function, right);
     }
 
-    public final void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
+    public void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
         final int tmpLimit = (int) FunctionUtils.min(this.count(), arguments.count());
         Primitive32Array.invoke(data, 0, tmpLimit, 1, arguments, function);
     }

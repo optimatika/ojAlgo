@@ -70,6 +70,14 @@ public interface Mutate1D extends Structure1D {
             Structure1D.loopMatching(this, values, i -> this.fillOne(i, values, i));
         }
 
+        default void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
+            Structure1D.loopMatching(left, right, i -> this.fillOne(i, function.invoke(left.get(i), right.get(i))));
+        }
+
+        default void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
+            Structure1D.loopMatching(this, arguments, i -> this.fillOne(i, function.invoke(arguments.get(i))));
+        }
+
         void fillOne(long index, final Access1D<?> values, long valueIndex);
 
         void fillOne(long index, N value);

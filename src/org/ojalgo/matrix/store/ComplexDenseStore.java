@@ -165,22 +165,22 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
 
-            if (tmpColDim > FillConjugated.THRESHOLD) {
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
                 final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                     @Override
                     public void conquer(final int aFirst, final int aLimit) {
-                        FillConjugated.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source, FACTORY.scalar());
+                        FillMatchingSingle.conjugate(retVal.data, tmpRowDim, aFirst, aLimit, source, FACTORY.scalar());
                     }
 
                 };
 
-                tmpConquerer.invoke(0, tmpColDim, FillConjugated.THRESHOLD);
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
 
             } else {
 
-                FillConjugated.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source, FACTORY.scalar());
+                FillMatchingSingle.conjugate(retVal.data, tmpRowDim, 0, tmpColDim, source, FACTORY.scalar());
             }
 
             return retVal;
@@ -199,7 +199,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
                     @Override
                     public void conquer(final int aFirst, final int aLimit) {
-                        FillMatchingSingle.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source, FACTORY.scalar());
+                        FillMatchingSingle.copy(retVal.data, tmpRowDim, aFirst, aLimit, source, FACTORY.scalar());
                     }
 
                 };
@@ -208,7 +208,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
             } else {
 
-                FillMatchingSingle.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source, FACTORY.scalar());
+                FillMatchingSingle.copy(retVal.data, tmpRowDim, 0, tmpColDim, source, FACTORY.scalar());
             }
 
             return retVal;
@@ -342,22 +342,22 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
 
-            if (tmpColDim > FillTransposed.THRESHOLD) {
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
                 final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                     @Override
                     public void conquer(final int aFirst, final int aLimit) {
-                        FillTransposed.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source, FACTORY.scalar());
+                        FillMatchingSingle.transpose(retVal.data, tmpRowDim, aFirst, aLimit, source, FACTORY.scalar());
                     }
 
                 };
 
-                tmpConquerer.invoke(0, tmpColDim, FillTransposed.THRESHOLD);
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
 
             } else {
 
-                FillTransposed.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source, FACTORY.scalar());
+                FillMatchingSingle.transpose(retVal.data, tmpRowDim, 0, tmpColDim, source, FACTORY.scalar());
             }
 
             return retVal;
@@ -709,54 +709,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public void fillDiagonal(final long row, final long col, final NullaryFunction<ComplexNumber> supplier) {
         myUtility.fillDiagonal(row, col, supplier);
-    }
-
-    public void fillMatching(final Access1D<ComplexNumber> aLeftArg, final BinaryFunction<ComplexNumber> aFunc, final ComplexNumber aRightArg) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillMatchingLeft.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    ComplexDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, aLeftArg, aFunc, aRightArg);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingLeft.THRESHOLD);
-
-        } else {
-
-            this.fill(0, tmpRowDim * tmpColDim, aLeftArg, aFunc, aRightArg);
-        }
-    }
-
-    public void fillMatching(final ComplexNumber aLeftArg, final BinaryFunction<ComplexNumber> aFunc, final Access1D<ComplexNumber> aRightArg) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillMatchingRight.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    ComplexDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, aLeftArg, aFunc, aRightArg);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingRight.THRESHOLD);
-
-        } else {
-
-            this.fill(0, tmpRowDim * tmpColDim, aLeftArg, aFunc, aRightArg);
-        }
     }
 
     public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {

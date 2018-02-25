@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.LinearAlgebraBenchmark;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.operation.FillMatchingLeft;
+import org.ojalgo.matrix.store.operation.FillMatchingDual;
 import org.ojalgo.random.Uniform;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -80,7 +80,7 @@ public class ThresholdFillMatchingLeft extends AbstractThresholdTuner {
     @Setup
     public void setup() {
 
-        FillMatchingLeft.THRESHOLD = dim / z;
+        FillMatchingDual.THRESHOLD = dim / z;
 
         final Uniform tmpSupplier = new Uniform();
 

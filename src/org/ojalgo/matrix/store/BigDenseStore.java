@@ -198,7 +198,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
                     @Override
                     public void conquer(final int aFirst, final int aLimit) {
-                        FillMatchingSingle.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                        FillMatchingSingle.copy(retVal.data, tmpRowDim, aFirst, aLimit, source);
                     }
 
                 };
@@ -207,7 +207,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
             } else {
 
-                FillMatchingSingle.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+                FillMatchingSingle.copy(retVal.data, tmpRowDim, 0, tmpColDim, source);
             }
 
             return retVal;
@@ -341,22 +341,22 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
 
-            if (tmpColDim > FillTransposed.THRESHOLD) {
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
                 final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                     @Override
                     public void conquer(final int aFirst, final int aLimit) {
-                        FillTransposed.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                        FillMatchingSingle.transpose(retVal.data, tmpRowDim, aFirst, aLimit, source);
                     }
 
                 };
 
-                tmpConquerer.invoke(0, tmpColDim, FillTransposed.THRESHOLD);
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
 
             } else {
 
-                FillTransposed.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+                FillMatchingSingle.transpose(retVal.data, tmpRowDim, 0, tmpColDim, source);
             }
 
             return retVal;
@@ -708,54 +708,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public void fillDiagonal(final long row, final long col, final NullaryFunction<BigDecimal> supplier) {
         myUtility.fillDiagonal(row, col, supplier);
-    }
-
-    public void fillMatching(final Access1D<BigDecimal> aLeftArg, final BinaryFunction<BigDecimal> aFunc, final BigDecimal aRightArg) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillMatchingLeft.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    BigDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, aLeftArg, aFunc, aRightArg);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingLeft.THRESHOLD);
-
-        } else {
-
-            this.fill(0, tmpRowDim * tmpColDim, aLeftArg, aFunc, aRightArg);
-        }
-    }
-
-    public void fillMatching(final BigDecimal aLeftArg, final BinaryFunction<BigDecimal> aFunc, final Access1D<BigDecimal> aRightArg) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillMatchingRight.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    BigDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, aLeftArg, aFunc, aRightArg);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingRight.THRESHOLD);
-
-        } else {
-
-            this.fill(0, tmpRowDim * tmpColDim, aLeftArg, aFunc, aRightArg);
-        }
     }
 
     public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {

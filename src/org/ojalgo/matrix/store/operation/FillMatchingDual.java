@@ -21,9 +21,9 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-public final class FillMatchingRight extends MatrixOperation {
+public final class FillMatchingDual extends MatrixOperation {
 
-    public static final FillMatchingRight SETUP = new FillMatchingRight();
+    public static final FillMatchingDual SETUP = new FillMatchingDual();
 
     /**
      * 2013-10-22: Was set to 128 (based on calibration) but I saw a dip in relative performance (java matrix
@@ -31,7 +31,7 @@ public final class FillMatchingRight extends MatrixOperation {
      */
     public static int THRESHOLD = 256;
 
-    private FillMatchingRight() {
+    private FillMatchingDual() {
         super();
     }
 
