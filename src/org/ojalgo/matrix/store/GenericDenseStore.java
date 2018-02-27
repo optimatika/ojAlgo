@@ -27,14 +27,7 @@ import java.util.List;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Array2D;
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.ComplexArray;
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.QuaternionArray;
-import org.ojalgo.array.RationalArray;
-import org.ojalgo.array.ScalarArray;
+import org.ojalgo.array.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
@@ -715,6 +708,30 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     @Override
+    public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
+
+        final int matchingCount = (int) FunctionUtils.min(this.count(), left.count(), right.count());
+
+        if (matchingCount > FillMatchingDual.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    ReferenceTypeArray.invoke(data, first, limit, 1, left, function, right);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, matchingCount, FillMatchingDual.THRESHOLD);
+
+        } else {
+
+            ReferenceTypeArray.invoke(data, 0, matchingCount, 1, left, function, right);
+        }
+    }
+
+    @Override
     public void fillMatching(final Access1D<?> values) {
 
         if (values instanceof ConjugatedStore) {
@@ -762,6 +779,30 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         } else {
 
             super.fillMatching(values);
+        }
+    }
+
+    @Override
+    public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
+
+        final int matchingCount = (int) FunctionUtils.min(this.count(), arguments.count());
+
+        if (myColDim > FillMatchingSingle.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    ReferenceTypeArray.invoke(data, first, limit, 1, arguments, function);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, matchingCount, FillMatchingSingle.THRESHOLD);
+
+        } else {
+
+            ReferenceTypeArray.invoke(data, 0, matchingCount, 1, arguments, function);
         }
     }
 

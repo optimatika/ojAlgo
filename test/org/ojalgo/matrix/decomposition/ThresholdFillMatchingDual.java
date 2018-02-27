@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.LinearAlgebraBenchmark;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.operation.FillMatchingDual;
@@ -39,31 +40,31 @@ import org.openjdk.jmh.runner.RunnerException;
  * <pre>
  * </pre>
  *
- * MacBook Air. 2015-06-27 => 512
+ * MacBook Air. 2015-06-26 => 512
  *
  * <pre>
 # Run complete. Total time: 00:01:26
 
-Benchmark                        (dim)  (z)   Mode  Cnt        Score         Error    Units
-ThresholdFillMatchingRight.tune    128    1  thrpt    3  8135207,951 ± 2741386,864  ops/min
-ThresholdFillMatchingRight.tune    128    2  thrpt    3  1014091,828 ±  224318,819  ops/min
-ThresholdFillMatchingRight.tune    256    1  thrpt    3  1352907,045 ±  499973,719  ops/min
-ThresholdFillMatchingRight.tune    256    2  thrpt    3   726391,231 ±  369047,778  ops/min
-ThresholdFillMatchingRight.tune    512    1  thrpt    3   157381,736 ±   59341,751  ops/min
-ThresholdFillMatchingRight.tune    512    2  thrpt    3   138109,426 ±   90177,318  ops/min
-ThresholdFillMatchingRight.tune   1024    1  thrpt    3    31918,693 ±   22068,158  ops/min
-ThresholdFillMatchingRight.tune   1024    2  thrpt    3    35042,770 ±     526,916  ops/min
-ThresholdFillMatchingRight.tune   2048    1  thrpt    3     8190,369 ±    3164,707  ops/min
-ThresholdFillMatchingRight.tune   2048    2  thrpt    3     8453,745 ±    1194,325  ops/min
+Benchmark                       (dim)  (z)   Mode  Cnt        Score         Error    Units
+ThresholdFillMatchingLeft.tune    128    1  thrpt    3  7992286,830 ± 3317290,978  ops/min
+ThresholdFillMatchingLeft.tune    128    2  thrpt    3  1036970,177 ±  120596,694  ops/min
+ThresholdFillMatchingLeft.tune    256    1  thrpt    3  1330731,871 ±  249897,655  ops/min
+ThresholdFillMatchingLeft.tune    256    2  thrpt    3   763934,514 ±  233037,987  ops/min
+ThresholdFillMatchingLeft.tune    512    1  thrpt    3   160204,493 ±   48410,164  ops/min
+ThresholdFillMatchingLeft.tune    512    2  thrpt    3   144239,895 ±   30524,578  ops/min
+ThresholdFillMatchingLeft.tune   1024    1  thrpt    3    33640,979 ±    2456,084  ops/min
+ThresholdFillMatchingLeft.tune   1024    2  thrpt    3    34657,438 ±    1534,592  ops/min
+ThresholdFillMatchingLeft.tune   2048    1  thrpt    3     8430,484 ±    3957,855  ops/min
+ThresholdFillMatchingLeft.tune   2048    2  thrpt    3     9055,332 ±    1506,639  ops/min
  * </pre>
  *
  * @author apete
  */
 @State(Scope.Benchmark)
-public class ThresholdFillMatchingRight extends AbstractThresholdTuner {
+public class ThresholdFillMatchingDual extends AbstractThresholdTuner {
 
     public static void main(final String[] args) throws RunnerException {
-        LinearAlgebraBenchmark.run(ThresholdFillMatchingRight.class);
+        LinearAlgebraBenchmark.run(ThresholdFillMatchingDual.class);
     }
 
     @Param({ "128", "256", "512", "1024", "2048" })
@@ -72,7 +73,7 @@ public class ThresholdFillMatchingRight extends AbstractThresholdTuner {
     @Param({ "1", "2" })
     public int z;
 
-    Double left;
+    PhysicalStore<Double> left;
     PhysicalStore<Double> right;
     PhysicalStore<Double> target;
 
@@ -84,7 +85,7 @@ public class ThresholdFillMatchingRight extends AbstractThresholdTuner {
 
         final Uniform tmpSupplier = new Uniform();
 
-        left = tmpSupplier.doubleValue();
+        left = PrimitiveDenseStore.FACTORY.makeFilled(dim, dim, tmpSupplier);
         right = PrimitiveDenseStore.FACTORY.makeFilled(dim, dim, tmpSupplier);
         target = PrimitiveDenseStore.FACTORY.makeZero(dim, dim);
     }
@@ -92,8 +93,8 @@ public class ThresholdFillMatchingRight extends AbstractThresholdTuner {
     @Override
     @Benchmark
     public Object tune() {
-        // target.fillMatching(left, PrimitiveFunction.MULTIPLY, right);
+        target.fillMatching(left, PrimitiveFunction.MULTIPLY, right);
         return target;
-    }
+    };
 
 }
