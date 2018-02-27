@@ -635,8 +635,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         }
     }
 
-    public double doubleValue(final long aRow, final long aCol) {
-        return myUtility.doubleValue(aRow, aCol);
+    public double doubleValue(final long row, final long col) {
+        return myUtility.doubleValue(row, col);
     }
 
     @SuppressWarnings("unchecked")
@@ -839,8 +839,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return this;
     }
 
-    public Double get(final long aRow, final long aCol) {
-        return myUtility.get(aRow, aCol);
+    public Double get(final long row, final long col) {
+        return myUtility.get(row, col);
     }
 
     @Override
@@ -992,17 +992,17 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         RotateRight.invoke(data, myRowDim, low, high, cos, sin);
     }
 
-    public void set(final long aRow, final long aCol, final double aNmbr) {
-        myUtility.set(aRow, aCol, aNmbr);
+    public void set(final long row, final long col, final double value) {
+        myUtility.set(row, col, value);
     }
 
-    public void set(final long aRow, final long aCol, final Number aNmbr) {
-        myUtility.set(aRow, aCol, aNmbr);
+    public void set(final long row, final long col, final Number value) {
+        myUtility.set(row, col, value);
     }
 
-    public void setToIdentity(final int aCol) {
-        myUtility.set(aCol, aCol, ONE);
-        myUtility.fillColumn(aCol + 1, aCol, ZERO);
+    public void setToIdentity(final int col) {
+        myUtility.set(col, col, ONE);
+        myUtility.fillColumn(col + 1, col, ZERO);
     }
 
     public Array1D<Double> sliceColumn(final long row, final long col) {
@@ -1078,7 +1078,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return MatrixUtils.toString(this);
     }
 
