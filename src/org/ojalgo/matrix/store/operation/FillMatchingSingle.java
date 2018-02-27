@@ -31,7 +31,7 @@ public final class FillMatchingSingle extends MatrixOperation {
 
     public static final FillMatchingSingle SETUP = new FillMatchingSingle();
 
-    public static int THRESHOLD = 64;
+    public static int THRESHOLD = 256;
 
     public static void conjugate(final BigDecimal[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source) {
         FillMatchingSingle.transpose(data, structure, firstColumn, limitColumn, source);

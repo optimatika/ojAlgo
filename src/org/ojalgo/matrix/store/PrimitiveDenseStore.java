@@ -760,7 +760,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         final int matchingCount = (int) FunctionUtils.min(this.count(), left.count(), right.count());
 
-        if (matchingCount > FillMatchingDual.THRESHOLD) {
+        if (myColDim > FillMatchingDual.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -771,7 +771,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
             };
 
-            tmpConquerer.invoke(0, matchingCount, FillMatchingDual.THRESHOLD);
+            tmpConquerer.invoke(0, matchingCount, FillMatchingDual.THRESHOLD * FillMatchingDual.THRESHOLD);
 
         } else {
 
@@ -795,7 +795,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
             };
 
-            tmpConquerer.invoke(0, matchingCount, FillMatchingSingle.THRESHOLD);
+            tmpConquerer.invoke(0, matchingCount, FillMatchingSingle.THRESHOLD * FillMatchingSingle.THRESHOLD);
 
         } else {
 
