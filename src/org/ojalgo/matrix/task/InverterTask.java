@@ -195,6 +195,20 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
      */
     MatrixStore<N> invert(Access2D<?> original, PhysicalStore<N> preallocated) throws RecoverableCondition;
 
+    default PhysicalStore<N> preallocate(final int numberOfRows, final int numberOfColumns) {
+        return this.preallocate(new Structure2D() {
+
+            public long countColumns() {
+                return numberOfColumns;
+            }
+
+            public long countRows() {
+                return numberOfRows;
+            }
+
+        });
+    }
+
     /**
      * <p>
      * Will create a {@linkplain PhysicalStore} instance suitable for use with

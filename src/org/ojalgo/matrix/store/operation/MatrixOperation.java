@@ -49,12 +49,8 @@ public abstract class MatrixOperation {
         AggregateAll.THRESHOLD = Math.min(maxValue, AggregateAll.THRESHOLD);
         ApplyCholesky.THRESHOLD = Math.min(maxValue, ApplyCholesky.THRESHOLD);
         ApplyLU.THRESHOLD = Math.min(maxValue, ApplyLU.THRESHOLD);
-        FillMatchingBoth.THRESHOLD = Math.min(maxValue, FillMatchingBoth.THRESHOLD);
-        FillConjugated.THRESHOLD = Math.min(maxValue, FillConjugated.THRESHOLD);
-        FillMatchingLeft.THRESHOLD = Math.min(maxValue, FillMatchingLeft.THRESHOLD);
-        FillMatchingRight.THRESHOLD = Math.min(maxValue, FillMatchingRight.THRESHOLD);
+        FillMatchingDual.THRESHOLD = Math.min(maxValue, FillMatchingDual.THRESHOLD);
         FillMatchingSingle.THRESHOLD = Math.min(maxValue, FillMatchingSingle.THRESHOLD);
-        FillTransposed.THRESHOLD = Math.min(maxValue, FillTransposed.THRESHOLD);
         GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.min(maxValue, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
         GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.min(maxValue, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
         HermitianRank2Update.THRESHOLD = Math.min(maxValue, HermitianRank2Update.THRESHOLD);
@@ -82,12 +78,8 @@ public abstract class MatrixOperation {
         AggregateAll.THRESHOLD = Math.max(minValue, AggregateAll.THRESHOLD);
         ApplyCholesky.THRESHOLD = Math.max(minValue, ApplyCholesky.THRESHOLD);
         ApplyLU.THRESHOLD = Math.max(minValue, ApplyLU.THRESHOLD);
-        FillMatchingBoth.THRESHOLD = Math.max(minValue, FillMatchingBoth.THRESHOLD);
-        FillConjugated.THRESHOLD = Math.max(minValue, FillConjugated.THRESHOLD);
-        FillMatchingLeft.THRESHOLD = Math.max(minValue, FillMatchingLeft.THRESHOLD);
-        FillMatchingRight.THRESHOLD = Math.max(minValue, FillMatchingRight.THRESHOLD);
+        FillMatchingDual.THRESHOLD = Math.max(minValue, FillMatchingDual.THRESHOLD);
         FillMatchingSingle.THRESHOLD = Math.max(minValue, FillMatchingSingle.THRESHOLD);
-        FillTransposed.THRESHOLD = Math.max(minValue, FillTransposed.THRESHOLD);
         GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.max(minValue, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
         GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.max(minValue, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
         HermitianRank2Update.THRESHOLD = Math.max(minValue, HermitianRank2Update.THRESHOLD);

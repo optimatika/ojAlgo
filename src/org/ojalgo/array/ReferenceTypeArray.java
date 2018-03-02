@@ -41,7 +41,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implements Mutate1D.Sortable {
+public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implements Mutate1D.Sortable {
 
     protected static <N extends Number> void exchange(final N[] data, final int firstA, final int firstB, final int step, final int aCount) {
 
@@ -147,21 +147,20 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implem
         }
     }
 
-    public final void fillMatching(final Access1D<?> values) {
-        final int limit = (int) FunctionUtils.min(this.count(), values.count());
-        for (int i = 0; i < limit; i++) {
+    public void fillMatching(final Access1D<?> values) {
+        for (int i = 0, limit = (int) Math.min(this.count(), values.count()); i < limit; i++) {
             data[i] = myFactory.cast(values.get(i));
         }
     }
 
-    public final void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
+    public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
         final int tmpLimit = (int) FunctionUtils.min(this.count(), left.count(), right.count());
         for (int i = 0; i < tmpLimit; i++) {
             data[i] = function.invoke(left.get(i), right.get(i));
         }
     }
 
-    public final void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
+    public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
         final int tmpLimit = (int) FunctionUtils.min(this.count(), arguments.count());
         for (int i = 0; i < tmpLimit; i++) {
             data[i] = function.invoke(arguments.get(i));

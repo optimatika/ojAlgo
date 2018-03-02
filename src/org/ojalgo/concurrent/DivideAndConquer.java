@@ -45,10 +45,9 @@ public abstract class DivideAndConquer extends Object {
      */
     public final void invoke(final int first, final int limit, final int threshold) {
 
-        final int modifiedThreshold = Math.max(1, (threshold * threshold) / (limit - first));
         final int availableWorkers = OjAlgoUtils.ENVIRONMENT.threads - (DaemonPoolExecutor.INSTANCE.getActiveCount() / 2);
 
-        this.divide(first, limit, modifiedThreshold, availableWorkers);
+        this.divide(first, limit, threshold, availableWorkers);
     }
 
     protected abstract void conquer(final int first, final int limit);

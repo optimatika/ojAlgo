@@ -41,6 +41,34 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
     public static abstract class Factory<N extends Number> {
 
+        public final SolverTask<N> make(final int numberOfEquations, final int numberOfVariables, final int numberOfSolutions, final boolean symmetric,
+                final boolean positiveDefinite) {
+
+            final Structure2D templateBody = new Structure2D() {
+
+                public long countColumns() {
+                    return numberOfVariables;
+                }
+
+                public long countRows() {
+                    return numberOfEquations;
+                }
+            };
+
+            final Structure2D templateRHS = new Structure2D() {
+
+                public long countColumns() {
+                    return numberOfSolutions;
+                }
+
+                public long countRows() {
+                    return numberOfEquations;
+                }
+            };
+
+            return this.make(templateBody, templateRHS, symmetric, positiveDefinite);
+        }
+
         public final SolverTask<N> make(final MatrixStore<N> templateBody, final MatrixStore<N> templateRHS) {
             return this.make(templateBody, templateRHS, MatrixUtils.isHermitian(templateBody), false);
         }
@@ -192,6 +220,33 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
         }
 
     };
+
+    default PhysicalStore<N> preallocate(final int numberOfEquations, final int numberOfVariables, final int numberOfSolutions) {
+
+        final Structure2D templateBody = new Structure2D() {
+
+            public long countColumns() {
+                return numberOfVariables;
+            }
+
+            public long countRows() {
+                return numberOfEquations;
+            }
+        };
+
+        final Structure2D templateRHS = new Structure2D() {
+
+            public long countColumns() {
+                return numberOfSolutions;
+            }
+
+            public long countRows() {
+                return numberOfEquations;
+            }
+        };
+
+        return this.preallocate(templateBody, templateRHS);
+    }
 
     /**
      * <p>

@@ -176,17 +176,45 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     }
 
-    public static abstract class Presolver extends Simplifier<Presolver> {
+    public static abstract class Presolver extends Simplifier<Expression, Presolver> {
+
+        protected Presolver(final int executionOrder) {
+            super(executionOrder);
+        }
+
+        /**
+         * @param expression
+         * @param fixedVariables
+         * @param fixedValue TODO
+         * @param variableResolver TODO
+         * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
+         *         typically when/if a variable was fixed.
+         */
+        public abstract boolean simplify(Expression expression, Set<IntIndex> fixedVariables, BigDecimal fixedValue,
+                Function<IntIndex, Variable> variableResolver);
+
+        @Override
+        boolean isApplicable(final Expression target) {
+            return target.isConstraint() && !target.isInfeasible() && !target.isRedundant() && (target.countQuadraticFactors() == 0);
+        }
+
+    }
+
+    static abstract class Simplifier<ME extends ModelEntity<?>, S extends Simplifier<?, ?>> implements Comparable<S> {
 
         private final int myExecutionOrder;
         private final UUID myUUID = UUID.randomUUID();
 
-        protected Presolver(final int executionOrder) {
+        final int getExecutionOrder() {
+            return myExecutionOrder;
+        }
+
+        Simplifier(final int executionOrder) {
             super();
             myExecutionOrder = executionOrder;
         }
 
-        public final int compareTo(final Presolver reference) {
+        public final int compareTo(final S reference) {
             return Integer.compare(myExecutionOrder, reference.getExecutionOrder());
         }
 
@@ -198,10 +226,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             if (obj == null) {
                 return false;
             }
-            if (!(obj instanceof Presolver)) {
+            if (!(obj instanceof Simplifier)) {
                 return false;
             }
-            final Presolver other = (Presolver) obj;
+            final Simplifier<?, ?> other = (Simplifier<?, ?>) obj;
             if (myUUID == null) {
                 if (other.myUUID != null) {
                     return false;
@@ -220,30 +248,22 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             return result;
         }
 
-        /**
-         * @param expression
-         * @param fixedVariables
-         * @param fixedValue TODO
-         * @param variableResolver TODO
-         * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
-         *         typically when/if a variable was fixed.
-         */
-        public abstract boolean simplify(Expression expression, Set<IntIndex> fixedVariables, BigDecimal fixedValue,
-                Function<IntIndex, Variable> variableResolver);
+        abstract boolean isApplicable(final ME target);
 
-        final int getExecutionOrder() {
-            return myExecutionOrder;
+    }
+
+    static abstract class VariableAnalyser extends Simplifier<Variable, VariableAnalyser> {
+
+        protected VariableAnalyser(final int executionOrder) {
+            super(executionOrder);
         }
 
-    }
-
-    static abstract class Simplifier<S extends Simplifier<?>> implements Comparable<S> {
-
-    }
-
-    static abstract class VariableAnalyser extends Simplifier<VariableAnalyser> {
-
         public abstract boolean simplify(Variable variable, ExpressionsBasedModel model);
+
+        @Override
+        boolean isApplicable(final Variable target) {
+            return true;
+        }
 
     }
 
@@ -485,10 +505,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      */
     public Stream<Expression> constraints() {
         return myExpressions.values().stream().filter(c -> c.isConstraint() && !c.isRedundant());
-    }
-
-    public Stream<Expression> expressions() {
-        return myExpressions.values().stream();
     }
 
     public ExpressionsBasedModel copy() {
@@ -1265,13 +1281,23 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     private void scanEntities() {
 
+        final Set<IntIndex> fixedVariables = Collections.emptySet();
+        final BigDecimal fixedValue = BigMath.ZERO;
+
         for (final Expression tmpExpression : myExpressions.values()) {
-            Presolvers.E_SCAN.simplify(tmpExpression, Collections.emptySet(), BigMath.ZERO, this::getVariable);
+            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable);
+            if (tmpExpression.isConstraint()) {
+                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable);
+            }
         }
 
         for (final Variable tmpVariable : myVariables) {
-            Presolvers.V_SCAN.simplify(tmpVariable, this);
+            Presolvers.FIXED_OR_UNBOUNDED.simplify(tmpVariable, this);
         }
+    }
+
+    Stream<Expression> expressions() {
+        return myExpressions.values().stream();
     }
 
     ExpressionsBasedModel.Integration<?> getIntegration() {

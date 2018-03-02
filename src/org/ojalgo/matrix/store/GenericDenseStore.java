@@ -27,14 +27,7 @@ import java.util.List;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Array2D;
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.ComplexArray;
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.QuaternionArray;
-import org.ojalgo.array.RationalArray;
-import org.ojalgo.array.ScalarArray;
+import org.ojalgo.array.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
@@ -204,22 +197,22 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
 
-            if (tmpColDim > FillConjugated.THRESHOLD) {
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
                 final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                     @Override
                     public void conquer(final int aFirst, final int aLimit) {
-                        FillConjugated.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source, myDenseArrayFactory.scalar());
+                        FillMatchingSingle.conjugate(retVal.data, tmpRowDim, aFirst, aLimit, source, myDenseArrayFactory.scalar());
                     }
 
                 };
 
-                tmpConquerer.invoke(0, tmpColDim, FillConjugated.THRESHOLD);
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
 
             } else {
 
-                FillConjugated.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source, myDenseArrayFactory.scalar());
+                FillMatchingSingle.conjugate(retVal.data, tmpRowDim, 0, tmpColDim, source, myDenseArrayFactory.scalar());
             }
 
             return retVal;
@@ -238,7 +231,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
                     @Override
                     public void conquer(final int aFirst, final int aLimit) {
-                        FillMatchingSingle.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source, myDenseArrayFactory.scalar());
+                        FillMatchingSingle.copy(retVal.data, tmpRowDim, aFirst, aLimit, source, myDenseArrayFactory.scalar());
                     }
 
                 };
@@ -247,7 +240,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
             } else {
 
-                FillMatchingSingle.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source, myDenseArrayFactory.scalar());
+                FillMatchingSingle.copy(retVal.data, tmpRowDim, 0, tmpColDim, source, myDenseArrayFactory.scalar());
             }
 
             return retVal;
@@ -381,22 +374,22 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
 
-            if (tmpColDim > FillTransposed.THRESHOLD) {
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
                 final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                     @Override
                     public void conquer(final int aFirst, final int aLimit) {
-                        FillTransposed.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source, myDenseArrayFactory.scalar());
+                        FillMatchingSingle.transpose(retVal.data, tmpRowDim, aFirst, aLimit, source, myDenseArrayFactory.scalar());
                     }
 
                 };
 
-                tmpConquerer.invoke(0, tmpColDim, FillTransposed.THRESHOLD);
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
 
             } else {
 
-                FillTransposed.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source, myDenseArrayFactory.scalar());
+                FillMatchingSingle.transpose(retVal.data, tmpRowDim, 0, tmpColDim, source, myDenseArrayFactory.scalar());
             }
 
             return retVal;
@@ -624,8 +617,8 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         }
     }
 
-    public double doubleValue(final long aRow, final long aCol) {
-        return this.doubleValue(aRow + (aCol * myRowDim));
+    public double doubleValue(final long row, final long col) {
+        return this.doubleValue(row + (col * myRowDim));
     }
 
     @SuppressWarnings("unchecked")
@@ -714,51 +707,102 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         myUtility.fillDiagonal(row, col, supplier);
     }
 
-    public void fillMatching(final Access1D<N> aLeftArg, final BinaryFunction<N> aFunc, final N aRightArg) {
+    @Override
+    public void fillMatching(final Access1D<?> values) {
 
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
+        if (values instanceof ConjugatedStore) {
+            final TransjugatedStore<?> conjugated = (ConjugatedStore<?>) values;
 
-        if (tmpColDim > FillMatchingLeft.THRESHOLD) {
+            if (myColDim > FillMatchingSingle.THRESHOLD) {
 
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
-                @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    GenericDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, aLeftArg, aFunc, aRightArg);
-                }
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        FillMatchingSingle.conjugate(data, myRowDim, first, limit, conjugated.getOriginal(), myFactory.scalar());
+                    }
 
-            };
+                };
 
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingLeft.THRESHOLD);
+                tmpConquerer.invoke(0, myColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.conjugate(data, myRowDim, 0, myColDim, conjugated.getOriginal(), myFactory.scalar());
+            }
+
+        } else if (values instanceof TransposedStore) {
+            final TransjugatedStore<?> transposed = (TransposedStore<?>) values;
+
+            if (myColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        FillMatchingSingle.transpose(data, myRowDim, first, limit, transposed.getOriginal(), myFactory.scalar());
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, myColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.transpose(data, myRowDim, 0, myColDim, transposed.getOriginal(), myFactory.scalar());
+            }
 
         } else {
 
-            this.fill(0, tmpRowDim * tmpColDim, aLeftArg, aFunc, aRightArg);
+            super.fillMatching(values);
         }
     }
 
-    public void fillMatching(final N aLeftArg, final BinaryFunction<N> aFunc, final Access1D<N> aRightArg) {
+    @Override
+    public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
 
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
+        final int matchingCount = (int) FunctionUtils.min(this.count(), left.count(), right.count());
 
-        if (tmpColDim > FillMatchingRight.THRESHOLD) {
+        if (myColDim > FillMatchingDual.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    GenericDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, aLeftArg, aFunc, aRightArg);
+                protected void conquer(final int first, final int limit) {
+                    ReferenceTypeArray.invoke(data, first, limit, 1, left, function, right);
                 }
 
             };
 
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingRight.THRESHOLD);
+            tmpConquerer.invoke(0, matchingCount, FillMatchingDual.THRESHOLD * FillMatchingDual.THRESHOLD);
 
         } else {
 
-            this.fill(0, tmpRowDim * tmpColDim, aLeftArg, aFunc, aRightArg);
+            ReferenceTypeArray.invoke(data, 0, matchingCount, 1, left, function, right);
+        }
+    }
+
+    @Override
+    public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
+
+        final int matchingCount = (int) FunctionUtils.min(this.count(), arguments.count());
+
+        if (myColDim > FillMatchingSingle.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    ReferenceTypeArray.invoke(data, first, limit, 1, arguments, function);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, matchingCount, FillMatchingSingle.THRESHOLD * FillMatchingSingle.THRESHOLD);
+
+        } else {
+
+            ReferenceTypeArray.invoke(data, 0, matchingCount, 1, arguments, function);
         }
     }
 
@@ -798,8 +842,8 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         return this;
     }
 
-    public N get(final long aRow, final long aCol) {
-        return myUtility.get(aRow, aCol);
+    public N get(final long row, final long col) {
+        return myUtility.get(row, col);
     }
 
     @Override
@@ -954,17 +998,17 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         RotateRight.invoke(data, myRowDim, low, high, myFactory.scalar().cast(cos), myFactory.scalar().cast(sin));
     }
 
-    public void set(final long aRow, final long aCol, final double aNmbr) {
-        myUtility.set(aRow, aCol, aNmbr);
+    public void set(final long row, final long col, final double value) {
+        myUtility.set(row, col, value);
     }
 
-    public void set(final long aRow, final long aCol, final Number aNmbr) {
-        myUtility.set(aRow, aCol, aNmbr);
+    public void set(final long row, final long col, final Number value) {
+        myUtility.set(row, col, value);
     }
 
-    public void setToIdentity(final int aCol) {
-        myUtility.set(aCol, aCol, myFactory.scalar().one().get());
-        myUtility.fillColumn(aCol + 1, aCol, myFactory.scalar().zero().get());
+    public void setToIdentity(final int col) {
+        myUtility.set(col, col, myFactory.scalar().one().get());
+        myUtility.fillColumn(col + 1, col, myFactory.scalar().zero().get());
     }
 
     public Array1D<N> sliceColumn(final long row, final long col) {

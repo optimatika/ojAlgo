@@ -194,7 +194,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
                     @Override
                     public void conquer(final int aFirst, final int aLimit) {
-                        FillMatchingSingle.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                        FillMatchingSingle.copy(retVal.data, tmpRowDim, aFirst, aLimit, source);
                     }
 
                 };
@@ -203,7 +203,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
             } else {
 
-                FillMatchingSingle.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+                FillMatchingSingle.copy(retVal.data, tmpRowDim, 0, tmpColDim, source);
             }
 
             return retVal;
@@ -337,22 +337,22 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
 
-            if (tmpColDim > FillTransposed.THRESHOLD) {
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
                 final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                     @Override
                     public void conquer(final int first, final int limit) {
-                        FillTransposed.invoke(retVal.data, tmpRowDim, first, limit, source);
+                        FillMatchingSingle.transpose(retVal.data, tmpRowDim, first, limit, source);
                     }
 
                 };
 
-                tmpConquerer.invoke(0, tmpColDim, FillTransposed.THRESHOLD);
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
 
             } else {
 
-                FillTransposed.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+                FillMatchingSingle.transpose(retVal.data, tmpRowDim, 0, tmpColDim, source);
             }
 
             return retVal;
@@ -635,8 +635,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         }
     }
 
-    public double doubleValue(final long aRow, final long aCol) {
-        return myUtility.doubleValue(aRow, aCol);
+    public double doubleValue(final long row, final long col) {
+        return myUtility.doubleValue(row, col);
     }
 
     @SuppressWarnings("unchecked")
@@ -725,83 +725,81 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         myUtility.fillDiagonal(row, col, supplier);
     }
 
-    public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
+    @Override
+    public void fillMatching(final Access1D<?> values) {
 
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
+        if (values instanceof TransjugatedStore) {
+            final TransjugatedStore<?> transposed = (TransjugatedStore<?>) values;
 
-        if (tmpColDim > FillMatchingLeft.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    PrimitiveDenseStore.this.fill(tmpRowDim * first, tmpRowDim * limit, left, function, right);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingLeft.THRESHOLD);
-
-        } else {
-
-            this.fill(0, tmpRowDim * tmpColDim, left, function, right);
-        }
-    }
-
-    public void fillMatching(final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillMatchingRight.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    PrimitiveDenseStore.this.fill(tmpRowDim * first, tmpRowDim * limit, left, function, right);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingRight.THRESHOLD);
-
-        } else {
-
-            this.fill(0, tmpRowDim * tmpColDim, left, function, right);
-        }
-    }
-
-    /**
-     * @deprecated v42 Temporary method until redesign of transpose() and conjugate() related functionality
-     */
-    @Deprecated
-    public void fillMatching(final MatrixStore<Double> source) {
-
-        if (source instanceof TransjugatedStore) {
-
-            if (myColDim > FillTransposed.THRESHOLD) {
+            if (myColDim > FillMatchingSingle.THRESHOLD) {
 
                 final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                     @Override
                     public void conquer(final int first, final int limit) {
-                        FillTransposed.invoke(data, myRowDim, first, limit, source);
+                        FillMatchingSingle.transpose(data, myRowDim, first, limit, transposed.getOriginal());
                     }
 
                 };
 
-                tmpConquerer.invoke(0, myColDim, FillTransposed.THRESHOLD);
+                tmpConquerer.invoke(0, myColDim, FillMatchingSingle.THRESHOLD);
 
             } else {
 
-                FillTransposed.invoke(data, myRowDim, 0, myColDim, source);
+                FillMatchingSingle.transpose(data, myRowDim, 0, myColDim, transposed.getOriginal());
             }
 
         } else {
 
-            super.fillMatching(source);
+            super.fillMatching(values);
+        }
+    }
+
+    @Override
+    public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
+
+        final int matchingCount = (int) FunctionUtils.min(this.count(), left.count(), right.count());
+
+        if (myColDim > FillMatchingDual.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    Primitive64Array.invoke(data, first, limit, 1, left, function, right);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, matchingCount, FillMatchingDual.THRESHOLD * FillMatchingDual.THRESHOLD);
+
+        } else {
+
+            Primitive64Array.invoke(data, 0, matchingCount, 1, left, function, right);
+        }
+    }
+
+    @Override
+    public void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
+
+        final int matchingCount = (int) FunctionUtils.min(this.count(), arguments.count());
+
+        if (myColDim > FillMatchingSingle.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    Primitive64Array.invoke(data, first, limit, 1, arguments, function);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, matchingCount, FillMatchingSingle.THRESHOLD * FillMatchingSingle.THRESHOLD);
+
+        } else {
+
+            Primitive64Array.invoke(data, 0, matchingCount, 1, arguments, function);
         }
     }
 
@@ -841,8 +839,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return this;
     }
 
-    public Double get(final long aRow, final long aCol) {
-        return myUtility.get(aRow, aCol);
+    public Double get(final long row, final long col) {
+        return myUtility.get(row, col);
     }
 
     @Override
@@ -994,17 +992,17 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         RotateRight.invoke(data, myRowDim, low, high, cos, sin);
     }
 
-    public void set(final long aRow, final long aCol, final double aNmbr) {
-        myUtility.set(aRow, aCol, aNmbr);
+    public void set(final long row, final long col, final double value) {
+        myUtility.set(row, col, value);
     }
 
-    public void set(final long aRow, final long aCol, final Number aNmbr) {
-        myUtility.set(aRow, aCol, aNmbr);
+    public void set(final long row, final long col, final Number value) {
+        myUtility.set(row, col, value);
     }
 
-    public void setToIdentity(final int aCol) {
-        myUtility.set(aCol, aCol, ONE);
-        myUtility.fillColumn(aCol + 1, aCol, ZERO);
+    public void setToIdentity(final int col) {
+        myUtility.set(col, col, ONE);
+        myUtility.fillColumn(col + 1, col, ZERO);
     }
 
     public Array1D<Double> sliceColumn(final long row, final long col) {
@@ -1080,7 +1078,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return MatrixUtils.toString(this);
     }
 

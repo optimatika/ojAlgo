@@ -364,7 +364,7 @@ public class Primitive32Array extends PrimitiveArray {
         data = new float[size];
     }
 
-    public final void axpy(final double a, final Mutate1D y) {
+    public void axpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
     }
 
@@ -373,8 +373,7 @@ public class Primitive32Array extends PrimitiveArray {
 
         double retVal = ZERO;
 
-        final int tmpLength = Math.min(data.length, (int) vector.count());
-        for (int i = 0; i < tmpLength; i++) {
+        for (int i = 0, limit = Math.min(data.length, (int) vector.count()); i < limit; i++) {
             retVal += data[i] * vector.doubleValue(i);
         }
 
@@ -390,16 +389,16 @@ public class Primitive32Array extends PrimitiveArray {
         }
     }
 
-    public final void fillMatching(final Access1D<?> values) {
+    public void fillMatching(final Access1D<?> values) {
         Primitive32Array.fill(data, values);
     }
 
-    public final void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
+    public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
         final int tmpLimit = (int) FunctionUtils.min(this.count(), left.count(), right.count());
         Primitive32Array.invoke(data, 0, tmpLimit, 1, left, function, right);
     }
 
-    public final void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
+    public void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
         final int tmpLimit = (int) FunctionUtils.min(this.count(), arguments.count());
         Primitive32Array.invoke(data, 0, tmpLimit, 1, arguments, function);
     }

@@ -269,30 +269,32 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         final int tmpDim = Uniform.randomInteger(2, 6);
 
-        final PhysicalStore<ComplexNumber> tmpTall = MatrixUtils.makeRandomComplexStore(tmpDim + tmpDim, tmpDim);
-        final PhysicalStore<ComplexNumber> tmpExpected = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
-        MatrixStore<ComplexNumber> tmpActual;
+        final PhysicalStore<ComplexNumber> original = MatrixUtils.makeRandomComplexStore(tmpDim + tmpDim, tmpDim);
+        final PhysicalStore<ComplexNumber> identity = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
+        MatrixStore<ComplexNumber> solution;
 
         @SuppressWarnings("unchecked")
-        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] {
-                Bidiagonal.COMPLEX.make()/*
-                                          * , LUDecomposition . makeComplex ( )
-                                          */, QR.COMPLEX.make(), SingularValue.COMPLEX.make() };
+        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { QR.COMPLEX.make(), SingularValue.COMPLEX.make(),
+                Bidiagonal.COMPLEX.make() };
 
-        for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
-            tmpDecomposition.decompose(tmpTall);
+        for (final MatrixDecomposition<ComplexNumber> decomp : tmpCmplxDecomps) {
+
+            decomp.decompose(original);
+
             if (MatrixDecompositionTests.DEBUG) {
-                BasicLogger.debug(tmpDecomposition.toString());
-                BasicLogger.debug("Original", tmpTall);
-                BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
+                BasicLogger.debug(decomp.toString());
+                BasicLogger.debug("Original", original);
+                BasicLogger.debug("Recretaed", decomp.reconstruct());
             }
-            TestUtils.assertEquals(tmpDecomposition.toString(), tmpTall, tmpDecomposition.reconstruct(), new NumberContext(7, 5));
-            if ((tmpDecomposition instanceof MatrixDecomposition.Solver<?>) && ((Solver) tmpDecomposition).isSolvable()) {
-                tmpActual = ((Solver) tmpDecomposition).getSolution(tmpTall);
+            TestUtils.assertEquals(decomp.toString(), original, decomp.reconstruct(), new NumberContext(7, 5));
+
+            if ((decomp instanceof MatrixDecomposition.Solver<?>) && ((Solver<ComplexNumber>) decomp).isSolvable()) {
+
+                solution = ((Solver<ComplexNumber>) decomp).getSolution(original);
                 if (MatrixDecompositionTests.DEBUG) {
-                    BasicLogger.debug("Actual", tmpActual);
+                    BasicLogger.debug("Actual", solution);
                 }
-                TestUtils.assertEquals(tmpDecomposition.toString(), tmpExpected, tmpActual, new NumberContext(7, 6));
+                TestUtils.assertEquals(decomp.toString(), identity, solution, new NumberContext(7, 6));
             }
         }
     }
