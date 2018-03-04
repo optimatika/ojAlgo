@@ -34,7 +34,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro. 2015-06-24 => 256
+ * Mac Pro. 2018-02-27 => 256
  *
  * <pre>
 # Run complete. Total time: 00:03:31
