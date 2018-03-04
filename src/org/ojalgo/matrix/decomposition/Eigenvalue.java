@@ -124,6 +124,20 @@ public interface Eigenvalue<N extends Number>
             return this.make(TYPICAL, hermitian);
         }
 
+        default Eigenvalue<N> make(final int dimension, final boolean hermitian) {
+            return this.make(new Structure2D() {
+
+                public long countColumns() {
+                    return dimension;
+                }
+
+                public long countRows() {
+                    return dimension;
+                }
+
+            }, hermitian);
+        }
+
         default Eigenvalue<N> make(final Structure2D typical) {
             if (typical instanceof Access2D) {
                 return this.make(typical, MatrixUtils.isHermitian((Access2D<?>) typical));
