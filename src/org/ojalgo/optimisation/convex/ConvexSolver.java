@@ -317,10 +317,6 @@ public abstract class ConvexSolver extends GenericSolver {
 
             ProgrammingError.throwIfNull(mtrxQ);
 
-            if (mtrxQ == null) {
-                throw new IllegalArgumentException();
-            }
-
             if (mtrxQ instanceof PhysicalStore) {
                 myQ = (PhysicalStore<Double>) mtrxQ;
             } else {
