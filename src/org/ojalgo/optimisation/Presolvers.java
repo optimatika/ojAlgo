@@ -521,109 +521,117 @@ public abstract class Presolvers {
 
         final Iterator<IntIndex> tmpIterator = remaining.iterator();
 
-        final IntIndex tmpIndexA = tmpIterator.next();
-        final Variable tmpVariableA = variableResolver.apply(tmpIndexA);
-        final BigDecimal tmpFactorA = expression.get(tmpIndexA);
-        BigDecimal tmpLowerA = tmpVariableA.getLowerLimit();
-        BigDecimal tmpUpperA = tmpVariableA.getUpperLimit();
+        final IntIndex indexA = tmpIterator.next();
+        final Variable variableA = variableResolver.apply(indexA);
+        final BigDecimal factorA = expression.get(indexA);
+        BigDecimal lowerA = variableA.getLowerLimit();
+        BigDecimal upperA = variableA.getUpperLimit();
 
-        final IntIndex tmpIndexB = tmpIterator.next();
-        final Variable tmpVariableB = variableResolver.apply(tmpIndexB);
-        final BigDecimal tmpFactorB = expression.get(tmpIndexB);
-        BigDecimal tmpLowerB = tmpVariableB.getLowerLimit();
-        BigDecimal tmpUpperB = tmpVariableB.getUpperLimit();
+        final IntIndex indexB = tmpIterator.next();
+        final Variable variableB = variableResolver.apply(indexB);
+        final BigDecimal factorB = expression.get(indexB);
+        BigDecimal lowerB = variableB.getLowerLimit();
+        BigDecimal upperB = variableB.getUpperLimit();
 
-        final BigDecimal tmpLowerLimit = expression.getLowerLimit() != null ? SUBTRACT.invoke(expression.getLowerLimit(), fixedValue)
-                : expression.getLowerLimit();
-        final BigDecimal tmpUpperLimit = expression.getUpperLimit() != null ? SUBTRACT.invoke(expression.getUpperLimit(), fixedValue)
-                : expression.getUpperLimit();
+        final BigDecimal lowerE = expression.getLowerLimit() != null ? SUBTRACT.invoke(expression.getLowerLimit(), fixedValue) : expression.getLowerLimit();
+        final BigDecimal upperE = expression.getUpperLimit() != null ? SUBTRACT.invoke(expression.getUpperLimit(), fixedValue) : expression.getUpperLimit();
 
-        if (tmpLowerLimit != null) {
+        if (lowerE != null) {
 
-            final BigDecimal tmpOtherUpperA = tmpFactorB.signum() == 1 ? tmpVariableB.getUpperLimit() : tmpVariableB.getLowerLimit();
-            final BigDecimal tmpOtherUpperB = tmpFactorA.signum() == 1 ? tmpVariableA.getUpperLimit() : tmpVariableA.getLowerLimit();
+            final BigDecimal otherUpperA = factorB.signum() == 1 ? upperB : lowerB;
+            if (otherUpperA != null) {
 
-            if (tmpOtherUpperA != null) {
+                BigDecimal newLimit = DIVIDE.invoke(lowerE.subtract(factorB.multiply(otherUpperA)), factorA);
 
-                final BigDecimal tmpNewLimit = DIVIDE.invoke(tmpLowerLimit.subtract(tmpFactorB.multiply(tmpOtherUpperA)), tmpFactorA);
+                newLimit = lowerA != null ? lowerA.max(newLimit) : newLimit;
+                newLimit = upperA != null ? upperA.min(newLimit) : newLimit;
 
-                if (tmpFactorA.signum() == 1) {
+                if (factorA.signum() == 1) {
                     // New lower limit on A
-                    tmpLowerA = tmpLowerA != null ? tmpLowerA.max(tmpNewLimit) : tmpNewLimit;
+                    lowerA = newLimit;
                 } else {
                     // New upper limit on A
-                    tmpUpperA = tmpUpperA != null ? tmpUpperA.min(tmpNewLimit) : tmpNewLimit;
+                    upperA = newLimit;
                 }
             }
 
-            if (tmpOtherUpperB != null) {
+            final BigDecimal otherUpperB = factorA.signum() == 1 ? upperA : lowerA;
+            if (otherUpperB != null) {
 
-                final BigDecimal tmpNewLimit = DIVIDE.invoke(tmpLowerLimit.subtract(tmpFactorA.multiply(tmpOtherUpperB)), tmpFactorB);
+                BigDecimal newLimit = DIVIDE.invoke(lowerE.subtract(factorA.multiply(otherUpperB)), factorB);
 
-                if (tmpFactorB.signum() == 1) {
+                newLimit = lowerB != null ? lowerB.max(newLimit) : newLimit;
+                newLimit = upperB != null ? upperB.min(newLimit) : newLimit;
+
+                if (factorB.signum() == 1) {
                     // New lower limit on B
-                    tmpLowerB = tmpLowerB != null ? tmpLowerB.max(tmpNewLimit) : tmpNewLimit;
+                    lowerB = newLimit;
                 } else {
                     // New upper limit on B
-                    tmpUpperB = tmpUpperB != null ? tmpUpperB.min(tmpNewLimit) : tmpNewLimit;
+                    upperB = newLimit;
                 }
             }
         }
 
-        if (tmpUpperLimit != null) {
+        if (upperE != null) {
 
-            final BigDecimal tmpOtherLowerA = tmpFactorB.signum() == 1 ? tmpVariableB.getLowerLimit() : tmpVariableB.getUpperLimit();
-            final BigDecimal tmpOtherLowerB = tmpFactorA.signum() == 1 ? tmpVariableA.getLowerLimit() : tmpVariableA.getUpperLimit();
+            final BigDecimal otherLowerA = factorB.signum() == 1 ? lowerB : upperB;
+            if (otherLowerA != null) {
 
-            if (tmpOtherLowerA != null) {
+                BigDecimal newLimit = DIVIDE.invoke(upperE.subtract(factorB.multiply(otherLowerA)), factorA);
 
-                final BigDecimal tmpNewLimit = DIVIDE.invoke(tmpUpperLimit.subtract(tmpFactorB.multiply(tmpOtherLowerA)), tmpFactorA);
+                newLimit = lowerA != null ? lowerA.max(newLimit) : newLimit;
+                newLimit = upperA != null ? upperA.min(newLimit) : newLimit;
 
-                if (tmpFactorA.signum() == 1) {
+                if (factorA.signum() == 1) {
                     // New upper limit on A
-                    tmpUpperA = tmpUpperA != null ? tmpUpperA.min(tmpNewLimit) : tmpNewLimit;
+                    upperA = newLimit;
                 } else {
                     // New lower limit on A
-                    tmpLowerA = tmpLowerA != null ? tmpLowerA.max(tmpNewLimit) : tmpNewLimit;
+                    lowerA = newLimit;
                 }
             }
 
-            if (tmpOtherLowerB != null) {
+            final BigDecimal otherLowerB = factorA.signum() == 1 ? lowerA : upperA;
+            if (otherLowerB != null) {
 
-                final BigDecimal tmpNewLimit = DIVIDE.invoke(tmpUpperLimit.subtract(tmpFactorA.multiply(tmpOtherLowerB)), tmpFactorB);
+                BigDecimal newLimit = DIVIDE.invoke(upperE.subtract(factorA.multiply(otherLowerB)), factorB);
 
-                if (tmpFactorB.signum() == 1) {
+                newLimit = lowerB != null ? lowerB.max(newLimit) : newLimit;
+                newLimit = upperB != null ? upperB.min(newLimit) : newLimit;
+
+                if (factorB.signum() == 1) {
                     // New upper limit on B
-                    tmpUpperB = tmpUpperB != null ? tmpUpperB.min(tmpNewLimit) : tmpNewLimit;
+                    upperB = newLimit;
                 } else {
                     // New lower limit on B
-                    tmpLowerB = tmpLowerB != null ? tmpLowerB.max(tmpNewLimit) : tmpNewLimit;
+                    lowerB = newLimit;
                 }
             }
         }
 
-        if (tmpVariableA.isInteger()) {
-            if (tmpLowerA != null) {
-                tmpLowerA = tmpLowerA.setScale(0, RoundingMode.CEILING);
+        if (variableA.isInteger()) {
+            if (lowerA != null) {
+                lowerA = lowerA.setScale(0, RoundingMode.CEILING);
             }
-            if (tmpUpperA != null) {
-                tmpUpperA = tmpUpperA.setScale(0, RoundingMode.FLOOR);
-            }
-        }
-
-        if (tmpVariableB.isInteger()) {
-            if (tmpLowerB != null) {
-                tmpLowerB = tmpLowerB.setScale(0, RoundingMode.CEILING);
-            }
-            if (tmpUpperB != null) {
-                tmpUpperB = tmpUpperB.setScale(0, RoundingMode.FLOOR);
+            if (upperA != null) {
+                upperA = upperA.setScale(0, RoundingMode.FLOOR);
             }
         }
 
-        tmpVariableA.lower(tmpLowerA).upper(tmpUpperA);
-        tmpVariableB.lower(tmpLowerB).upper(tmpUpperB);
+        if (variableB.isInteger()) {
+            if (lowerB != null) {
+                lowerB = lowerB.setScale(0, RoundingMode.CEILING);
+            }
+            if (upperB != null) {
+                upperB = upperB.setScale(0, RoundingMode.FLOOR);
+            }
+        }
 
-        return tmpVariableA.isEqualityConstraint() || tmpVariableB.isEqualityConstraint();
+        variableA.lower(lowerA).upper(upperA);
+        variableB.lower(lowerB).upper(upperB);
+
+        return variableA.isEqualityConstraint() || variableB.isEqualityConstraint();
     }
 
 }

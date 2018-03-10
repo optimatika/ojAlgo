@@ -205,10 +205,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         private final int myExecutionOrder;
         private final UUID myUUID = UUID.randomUUID();
 
-        final int getExecutionOrder() {
-            return myExecutionOrder;
-        }
-
         Simplifier(final int executionOrder) {
             super();
             myExecutionOrder = executionOrder;
@@ -246,6 +242,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             int result = 1;
             result = (prime * result) + ((myUUID == null) ? 0 : myUUID.hashCode());
             return result;
+        }
+
+        final int getExecutionOrder() {
+            return myExecutionOrder;
         }
 
         abstract boolean isApplicable(final ME target);
@@ -861,26 +861,14 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         this.setMaximisation();
 
-        if (PRESOLVERS.size() > 0) {
-            this.scanEntities();
-        }
-
-        final Result solverResult = this.solve(this.getVariableValues());
-
-        return this.handleResult(solverResult);
+        return this.optimise();
     }
 
     public Optimisation.Result minimise() {
 
         this.setMinimisation();
 
-        if (PRESOLVERS.size() > 0) {
-            this.scanEntities();
-        }
-
-        final Result tmpSolverResult = this.solve(this.getVariableValues());
-
-        return this.handleResult(tmpSolverResult);
+        return this.optimise();
     }
 
     /**
@@ -1352,6 +1340,19 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     boolean isUnbounded() {
         return myVariables.stream().anyMatch(v -> v.isUnbounded());
+    }
+
+    Optimisation.Result optimise() {
+
+        if (PRESOLVERS.size() > 0) {
+            this.scanEntities();
+        }
+
+        final Result current = this.getVariableValues();
+        final Result solver = this.solve(current);
+        final Result output = this.handleResult(solver);
+
+        return output;
     }
 
     final void presolve() {

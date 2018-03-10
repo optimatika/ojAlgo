@@ -26,10 +26,12 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.BigArray;
+import org.ojalgo.constant.BigMath;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Builder;
-import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.Expression;
@@ -262,6 +264,56 @@ public class LinearProblems extends OptimisationLinearTests {
 
         TestUtils.assertStateLessThanFeasible(tmpResult); // Should be infeasible
         TestUtils.assertFalse(tmpModel.validate(tmpResult));
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/61
+     */
+    public void testP20180310_61() {
+
+        final Variable x = Variable.make("x").lower(0);
+        final Variable y = Variable.make("y").lower(0);
+
+        final ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.addVariable(x);
+        model.addVariable(y);
+
+        model.addExpression("first").set(x, 2).set(y, 3).upper(1);
+        model.addExpression("second").set(x, -2).set(y, 3).lower(1);
+
+        final BigArray expected = BigArray.wrap(new BigDecimal[] { BigMath.ZERO, BigMath.THIRD });
+
+        final Optimisation.Result resultPre = model.maximise();
+        TestUtils.assertEquals(expected, resultPre);
+        TestUtils.assertStateNotLessThanOptimal(resultPre);
+
+        ExpressionsBasedModel.clearPresolvers();
+
+        final Optimisation.Result resultClear = model.maximise();
+        TestUtils.assertEquals(expected, resultClear);
+        TestUtils.assertStateNotLessThanOptimal(resultClear);
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/62
+     */
+    public void testP20180310_62() {
+
+        final Variable x = Variable.make("x").lower(0).weight(1);
+        final Variable y = Variable.make("y").lower(0).weight(0);
+
+        final ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.addVariable(x);
+        model.addVariable(y);
+
+        model.addExpression("first").set(x, 0).set(y, 1).lower(1);
+        model.addExpression("second").set(x, 0).set(y, 1).upper(-1);
+
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, model.maximise().getState());
+
+        ExpressionsBasedModel.clearPresolvers();
+
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, model.maximise().getState());
     }
 
 }
