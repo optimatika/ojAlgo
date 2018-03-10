@@ -144,11 +144,5 @@
             <version>[2.9.0,)</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-generator-annprocess</artifactId>
-            <version>[1.19,)</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>
