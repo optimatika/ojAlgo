@@ -281,7 +281,7 @@ public class LinearProblems extends OptimisationLinearTests {
         model.addExpression("first").set(x, 2).set(y, 3).upper(1);
         model.addExpression("second").set(x, -2).set(y, 3).lower(1);
 
-        final BigArray expected = BigArray.wrap(new BigDecimal[] { BigMath.ZERO, BigMath.THIRD });
+        final BigArray expected = BigArray.wrap(BigMath.ZERO, BigMath.THIRD);
 
         final Optimisation.Result resultPre = model.maximise();
         TestUtils.assertEquals(expected, resultPre);
@@ -314,6 +314,34 @@ public class LinearProblems extends OptimisationLinearTests {
         ExpressionsBasedModel.clearPresolvers();
 
         TestUtils.assertEquals(Optimisation.State.INFEASIBLE, model.maximise().getState());
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/64
+     */
+    public void testP20180311_64() {
+
+        final Variable x = Variable.make("x").lower(0).weight(3);
+        final Variable y = Variable.make("y").lower(0).weight(-2);
+
+        final ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.addVariable(x);
+        model.addVariable(y);
+
+        model.addExpression().set(x, -1).set(y, 0).lower(0);
+        model.addExpression().set(x, -1).set(y, 3).level(2);
+
+        final BigArray expected = BigArray.wrap(BigMath.ZERO, BigMath.TWO.multiply(BigMath.THIRD));
+
+        final Optimisation.Result resultPre = model.maximise();
+        TestUtils.assertEquals(expected, resultPre);
+        TestUtils.assertStateNotLessThanOptimal(resultPre);
+
+        ExpressionsBasedModel.clearPresolvers();
+
+        final Optimisation.Result resultClear = model.maximise();
+        TestUtils.assertEquals(expected, resultClear);
+        TestUtils.assertStateNotLessThanOptimal(resultClear);
     }
 
 }

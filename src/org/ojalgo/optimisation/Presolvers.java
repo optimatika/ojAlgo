@@ -521,115 +521,119 @@ public abstract class Presolvers {
 
         final Iterator<IntIndex> tmpIterator = remaining.iterator();
 
-        final IntIndex indexA = tmpIterator.next();
-        final Variable variableA = variableResolver.apply(indexA);
-        final BigDecimal factorA = expression.get(indexA);
-        BigDecimal lowerA = variableA.getLowerLimit();
-        BigDecimal upperA = variableA.getUpperLimit();
+        final Variable variableA = variableResolver.apply(tmpIterator.next());
+        final BigDecimal varAfactor = expression.get(variableA);
+        final BigDecimal varAlowerOrg = variableA.getLowerLimit();
+        final BigDecimal varAupperOrg = variableA.getUpperLimit();
 
-        final IntIndex indexB = tmpIterator.next();
-        final Variable variableB = variableResolver.apply(indexB);
-        final BigDecimal factorB = expression.get(indexB);
-        BigDecimal lowerB = variableB.getLowerLimit();
-        BigDecimal upperB = variableB.getUpperLimit();
+        BigDecimal varAlowerNew = varAlowerOrg;
+        BigDecimal varAupperNew = varAupperOrg;
 
-        final BigDecimal lowerE = expression.getLowerLimit() != null ? SUBTRACT.invoke(expression.getLowerLimit(), fixedValue) : expression.getLowerLimit();
-        final BigDecimal upperE = expression.getUpperLimit() != null ? SUBTRACT.invoke(expression.getUpperLimit(), fixedValue) : expression.getUpperLimit();
+        final Variable variableB = variableResolver.apply(tmpIterator.next());
+        final BigDecimal varBfactor = expression.get(variableB);
+        final BigDecimal varBlowerOrg = variableB.getLowerLimit();
+        final BigDecimal varBupperOrg = variableB.getUpperLimit();
 
-        if (lowerE != null) {
+        BigDecimal varBlowerNew = varBlowerOrg;
+        BigDecimal varBupperNew = varBupperOrg;
 
-            final BigDecimal otherUpperA = factorB.signum() == 1 ? upperB : lowerB;
-            if (otherUpperA != null) {
+        final BigDecimal exprLower = expression.getLowerLimit() != null ? SUBTRACT.invoke(expression.getLowerLimit(), fixedValue) : expression.getLowerLimit();
+        final BigDecimal exprUpper = expression.getUpperLimit() != null ? SUBTRACT.invoke(expression.getUpperLimit(), fixedValue) : expression.getUpperLimit();
 
-                BigDecimal newLimit = DIVIDE.invoke(lowerE.subtract(factorB.multiply(otherUpperA)), factorA);
+        if (exprLower != null) {
 
-                newLimit = lowerA != null ? lowerA.max(newLimit) : newLimit;
-                newLimit = upperA != null ? upperA.min(newLimit) : newLimit;
+            final BigDecimal varBlimit = varBfactor.signum() == 1 ? varBupperOrg : varBlowerOrg;
+            if (varBlimit != null) {
 
-                if (factorA.signum() == 1) {
+                BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varBfactor.multiply(varBlimit)), varAfactor);
+
+                newLimit = varAlowerOrg != null ? varAlowerOrg.max(newLimit) : newLimit;
+                newLimit = varAupperOrg != null ? varAupperOrg.min(newLimit) : newLimit;
+
+                if (varAfactor.signum() == 1) {
                     // New lower limit on A
-                    lowerA = newLimit;
+                    varAlowerNew = newLimit;
                 } else {
                     // New upper limit on A
-                    upperA = newLimit;
+                    varAupperNew = newLimit;
                 }
             }
 
-            final BigDecimal otherUpperB = factorA.signum() == 1 ? upperA : lowerA;
-            if (otherUpperB != null) {
+            final BigDecimal varAlimit = varAfactor.signum() == 1 ? varAupperOrg : varAlowerOrg;
+            if (varAlimit != null) {
 
-                BigDecimal newLimit = DIVIDE.invoke(lowerE.subtract(factorA.multiply(otherUpperB)), factorB);
+                BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varAfactor.multiply(varAlimit)), varBfactor);
 
-                newLimit = lowerB != null ? lowerB.max(newLimit) : newLimit;
-                newLimit = upperB != null ? upperB.min(newLimit) : newLimit;
+                newLimit = varBlowerOrg != null ? varBlowerOrg.max(newLimit) : newLimit;
+                newLimit = varBupperOrg != null ? varBupperOrg.min(newLimit) : newLimit;
 
-                if (factorB.signum() == 1) {
+                if (varBfactor.signum() == 1) {
                     // New lower limit on B
-                    lowerB = newLimit;
+                    varBlowerNew = newLimit;
                 } else {
                     // New upper limit on B
-                    upperB = newLimit;
+                    varBupperNew = newLimit;
                 }
             }
         }
 
-        if (upperE != null) {
+        if (exprUpper != null) {
 
-            final BigDecimal otherLowerA = factorB.signum() == 1 ? lowerB : upperB;
-            if (otherLowerA != null) {
+            final BigDecimal varBlimit = varBfactor.signum() == 1 ? varBlowerOrg : varBupperOrg;
+            if (varBlimit != null) {
 
-                BigDecimal newLimit = DIVIDE.invoke(upperE.subtract(factorB.multiply(otherLowerA)), factorA);
+                BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varBfactor.multiply(varBlimit)), varAfactor);
 
-                newLimit = lowerA != null ? lowerA.max(newLimit) : newLimit;
-                newLimit = upperA != null ? upperA.min(newLimit) : newLimit;
+                newLimit = varAlowerOrg != null ? varAlowerOrg.max(newLimit) : newLimit;
+                newLimit = varAupperOrg != null ? varAupperOrg.min(newLimit) : newLimit;
 
-                if (factorA.signum() == 1) {
+                if (varAfactor.signum() == 1) {
                     // New upper limit on A
-                    upperA = newLimit;
+                    varAupperNew = newLimit;
                 } else {
                     // New lower limit on A
-                    lowerA = newLimit;
+                    varAlowerNew = newLimit;
                 }
             }
 
-            final BigDecimal otherLowerB = factorA.signum() == 1 ? lowerA : upperA;
-            if (otherLowerB != null) {
+            final BigDecimal varAlimit = varAfactor.signum() == 1 ? varAlowerOrg : varAupperOrg;
+            if (varAlimit != null) {
 
-                BigDecimal newLimit = DIVIDE.invoke(upperE.subtract(factorA.multiply(otherLowerB)), factorB);
+                BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varAfactor.multiply(varAlimit)), varBfactor);
 
-                newLimit = lowerB != null ? lowerB.max(newLimit) : newLimit;
-                newLimit = upperB != null ? upperB.min(newLimit) : newLimit;
+                newLimit = varBlowerOrg != null ? varBlowerOrg.max(newLimit) : newLimit;
+                newLimit = varBupperOrg != null ? varBupperOrg.min(newLimit) : newLimit;
 
-                if (factorB.signum() == 1) {
+                if (varBfactor.signum() == 1) {
                     // New upper limit on B
-                    upperB = newLimit;
+                    varBupperNew = newLimit;
                 } else {
                     // New lower limit on B
-                    lowerB = newLimit;
+                    varBlowerNew = newLimit;
                 }
             }
         }
 
         if (variableA.isInteger()) {
-            if (lowerA != null) {
-                lowerA = lowerA.setScale(0, RoundingMode.CEILING);
+            if (varAlowerNew != null) {
+                varAlowerNew = varAlowerNew.setScale(0, RoundingMode.CEILING);
             }
-            if (upperA != null) {
-                upperA = upperA.setScale(0, RoundingMode.FLOOR);
+            if (varAupperNew != null) {
+                varAupperNew = varAupperNew.setScale(0, RoundingMode.FLOOR);
             }
         }
 
         if (variableB.isInteger()) {
-            if (lowerB != null) {
-                lowerB = lowerB.setScale(0, RoundingMode.CEILING);
+            if (varBlowerNew != null) {
+                varBlowerNew = varBlowerNew.setScale(0, RoundingMode.CEILING);
             }
-            if (upperB != null) {
-                upperB = upperB.setScale(0, RoundingMode.FLOOR);
+            if (varBupperNew != null) {
+                varBupperNew = varBupperNew.setScale(0, RoundingMode.FLOOR);
             }
         }
 
-        variableA.lower(lowerA).upper(upperA);
-        variableB.lower(lowerB).upper(upperB);
+        variableA.lower(varAlowerNew).upper(varAupperNew);
+        variableB.lower(varBlowerNew).upper(varBupperNew);
 
         return variableA.isEqualityConstraint() || variableB.isEqualityConstraint();
     }

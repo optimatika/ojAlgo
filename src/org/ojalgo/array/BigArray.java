@@ -78,7 +78,7 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         return new BigArray(size);
     }
 
-    public static final BigArray wrap(final BigDecimal[] data) {
+    public static final BigArray wrap(final BigDecimal... data) {
         return new BigArray(data);
     }
 

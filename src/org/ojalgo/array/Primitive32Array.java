@@ -88,7 +88,7 @@ public class Primitive32Array extends PrimitiveArray {
         return new Primitive32Array(size);
     }
 
-    public static final Primitive32Array wrap(final float[] data) {
+    public static final Primitive32Array wrap(final float... data) {
         return new Primitive32Array(data);
     }
 

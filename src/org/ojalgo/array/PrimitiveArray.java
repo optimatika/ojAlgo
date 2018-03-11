@@ -30,8 +30,12 @@ public abstract class PrimitiveArray extends PlainArray<Double> implements Mutat
         return Primitive64Array.make(size);
     }
 
-    public static PrimitiveArray wrap(final double[] data) {
+    public static PrimitiveArray wrap(final double... data) {
         return Primitive64Array.wrap(data);
+    }
+
+    public static PrimitiveArray wrap(final float... data) {
+        return Primitive32Array.wrap(data);
     }
 
     PrimitiveArray(final int size) {
