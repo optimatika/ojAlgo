@@ -316,4 +316,26 @@ public class LinearProblems extends OptimisationLinearTests {
         TestUtils.assertEquals(Optimisation.State.INFEASIBLE, model.maximise().getState());
     }
 
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/64
+     */
+    public void testP20180311_64() {
+
+        final Variable x = Variable.make("x").lower(0).weight(3);
+        final Variable y = Variable.make("y").lower(0).weight(-2);
+
+        final ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.addVariable(x);
+        model.addVariable(y);
+
+        model.addExpression().set(x, -1).set(y, 0).lower(0);
+        model.addExpression().set(x, -1).set(y, 3).level(2);
+
+        // model.options.debug(LinearSolver.class);
+        final BigArray propsed = BigArray.wrap(BigMath.ZERO, BigMath.THIRD);
+        TestUtils.assertFalse(model.validate(propsed));
+
+        TestUtils.assertEquals(Optimisation.State.INFEASIBLE, model.maximise().getState());
+    }
+
 }

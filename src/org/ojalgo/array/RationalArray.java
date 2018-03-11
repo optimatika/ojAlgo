@@ -73,7 +73,7 @@ public class RationalArray extends ScalarArray<RationalNumber> {
         return new RationalArray(size);
     }
 
-    public static final RationalArray wrap(final RationalNumber[] data) {
+    public static final RationalArray wrap(final RationalNumber... data) {
         return new RationalArray(data);
     }
 

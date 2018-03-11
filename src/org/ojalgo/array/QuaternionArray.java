@@ -73,7 +73,7 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
         return new QuaternionArray(size);
     }
 
-    public static final QuaternionArray wrap(final Quaternion[] data) {
+    public static final QuaternionArray wrap(final Quaternion... data) {
         return new QuaternionArray(data);
     }
 

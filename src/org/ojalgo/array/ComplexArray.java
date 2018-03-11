@@ -73,7 +73,7 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
         return new ComplexArray(size);
     }
 
-    public static final ComplexArray wrap(final ComplexNumber[] data) {
+    public static final ComplexArray wrap(final ComplexNumber... data) {
         return new ComplexArray(data);
     }
 

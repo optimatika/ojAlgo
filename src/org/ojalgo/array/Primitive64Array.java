@@ -92,7 +92,7 @@ public class Primitive64Array extends PrimitiveArray {
         return new Primitive64Array(size);
     }
 
-    public static final Primitive64Array wrap(final double[] data) {
+    public static final Primitive64Array wrap(final double... data) {
         return new Primitive64Array(data);
     }
 
