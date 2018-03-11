@@ -307,11 +307,11 @@ public abstract class Presolvers {
                             final Variable tmpFreeVariable = variableResolver.apply(tmpLinear);
 
                             final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.feasibility, null);
-                            expression.setInfeasible(!tmpValid);
-
                             if (tmpValid) {
                                 tmpFreeVariable.setFixed(ZERO);
                                 didFixVariable = true;
+                            } else if (!expression.isInfeasible()) {
+                                expression.setInfeasible(true);
                             }
                         }
                     }
@@ -333,11 +333,11 @@ public abstract class Presolvers {
                             final Variable tmpFreeVariable = model.getVariable(tmpLinear.index);
 
                             final boolean tmpValid = tmpFreeVariable.validate(ZERO, model.options.feasibility, null);
-                            expression.setInfeasible(!tmpValid);
-
                             if (tmpValid) {
                                 tmpFreeVariable.setFixed(ZERO);
                                 didFixVariable = true;
+                            } else if (!expression.isInfeasible()) {
+                                expression.setInfeasible(true);
                             }
                         }
                     }
@@ -546,6 +546,7 @@ public abstract class Presolvers {
             if (varBlimit != null) {
 
                 BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varBfactor.multiply(varBlimit)), varAfactor);
+                //variableA.validate(newLimit, expression.getModel().options.feasibility, BasicLogger.DEBUG);
 
                 newLimit = varAlowerOrg != null ? varAlowerOrg.max(newLimit) : newLimit;
                 newLimit = varAupperOrg != null ? varAupperOrg.min(newLimit) : newLimit;
@@ -563,6 +564,7 @@ public abstract class Presolvers {
             if (varAlimit != null) {
 
                 BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varAfactor.multiply(varAlimit)), varBfactor);
+                //variableA.validate(newLimit, expression.getModel().options.feasibility, BasicLogger.DEBUG);
 
                 newLimit = varBlowerOrg != null ? varBlowerOrg.max(newLimit) : newLimit;
                 newLimit = varBupperOrg != null ? varBupperOrg.min(newLimit) : newLimit;
@@ -583,6 +585,7 @@ public abstract class Presolvers {
             if (varBlimit != null) {
 
                 BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varBfactor.multiply(varBlimit)), varAfactor);
+                //variableA.validate(newLimit, expression.getModel().options.feasibility, BasicLogger.DEBUG);
 
                 newLimit = varAlowerOrg != null ? varAlowerOrg.max(newLimit) : newLimit;
                 newLimit = varAupperOrg != null ? varAupperOrg.min(newLimit) : newLimit;
@@ -600,6 +603,7 @@ public abstract class Presolvers {
             if (varAlimit != null) {
 
                 BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varAfactor.multiply(varAlimit)), varBfactor);
+                //variableA.validate(newLimit, expression.getModel().options.feasibility, BasicLogger.DEBUG);
 
                 newLimit = varBlowerOrg != null ? varBlowerOrg.max(newLimit) : newLimit;
                 newLimit = varBupperOrg != null ? varBupperOrg.min(newLimit) : newLimit;
