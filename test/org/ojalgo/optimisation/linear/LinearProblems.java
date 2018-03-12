@@ -21,7 +21,18 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.constant.BigMath.EIGHT;
+import static org.ojalgo.constant.BigMath.FIVE;
+import static org.ojalgo.constant.BigMath.FOUR;
+import static org.ojalgo.constant.BigMath.NEG;
+import static org.ojalgo.constant.BigMath.ONE;
+import static org.ojalgo.constant.BigMath.SEVEN;
+import static org.ojalgo.constant.BigMath.SIX;
+import static org.ojalgo.constant.BigMath.TEN;
+import static org.ojalgo.constant.BigMath.TENTH;
+import static org.ojalgo.constant.BigMath.THREE;
+import static org.ojalgo.constant.BigMath.TWO;
+import static org.ojalgo.constant.BigMath.ZERO;
 
 import java.math.BigDecimal;
 
@@ -350,11 +361,8 @@ public class LinearProblems extends OptimisationLinearTests {
 
         final Optimisation.Result result = model.maximise();
 
-        model.options.debug(LinearSolver.class);
-        System.out.println(model.validate(result));
-
         TestUtils.assertEquals(Optimisation.State.INFEASIBLE, result.getState());
-
+        TestUtils.assertFalse(model.validate(result));
     }
 
 }
