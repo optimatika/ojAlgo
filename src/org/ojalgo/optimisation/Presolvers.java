@@ -21,9 +21,8 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.ZERO;
-import static org.ojalgo.function.BigFunction.DIVIDE;
-import static org.ojalgo.function.BigFunction.SUBTRACT;
+import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.function.BigFunction.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -46,7 +45,7 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, NumberContext feasibility) {
+                final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
 
             if (expression.getLinearEntrySet().size() > 3333) {
 
@@ -146,7 +145,7 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, NumberContext feasibility) {
+                final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
 
             boolean didFixVariable = false;
 
@@ -250,7 +249,7 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, NumberContext feasibility) {
+                final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
 
             if (expression.isObjective() && expression.isFunctionLinear()) {
 
@@ -283,11 +282,9 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, NumberContext feasibility) {
+                final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
 
             boolean didFixVariable = false;
-
-
 
             BigDecimal tmpCompLowLim = expression.getLowerLimit();
             if ((tmpCompLowLim != null) && (fixedValue.signum() != 0)) {
@@ -365,7 +362,7 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, NumberContext feasibility) {
+                final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
 
             boolean didFixVariable = false;
 
@@ -408,11 +405,9 @@ public abstract class Presolvers {
      * This constraint expression has 0 remaining free variable. It is entirely redundant.
      */
     static boolean doCase0(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
-            final Function<IntIndex, Variable> variableResolver, NumberContext feasibility) {
+            final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
 
         expression.setRedundant(true);
-
-
 
         final boolean tmpValid = expression.validate(fixedValue, feasibility, null);
         if (tmpValid) {
@@ -430,9 +425,7 @@ public abstract class Presolvers {
      * that variable, and the expression marked as redundant.
      */
     static boolean doCase1(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
-            final Function<IntIndex, Variable> variableResolver, NumberContext feasibility) {
-
-
+            final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
 
         final IntIndex tmpIndex = remaining.iterator().next();
         final Variable tmpVariable = variableResolver.apply(tmpIndex);
@@ -517,7 +510,7 @@ public abstract class Presolvers {
     }
 
     static boolean doCase2(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
-            final Function<IntIndex, Variable> variableResolver, NumberContext feasibility) {
+            final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
 
         final Iterator<IntIndex> tmpIterator = remaining.iterator();
 
@@ -525,7 +518,15 @@ public abstract class Presolvers {
         final BigDecimal varAfactor = expression.get(variableA);
         final BigDecimal varAlowerOrg = variableA.getLowerLimit();
         final BigDecimal varAupperOrg = variableA.getUpperLimit();
-
+        final BigDecimal varAmax;
+        final BigDecimal varAmin;
+        if (varAfactor.signum() == 1) {
+            varAmax = varAupperOrg != null ? varAfactor.multiply(varAupperOrg) : null;
+            varAmin = varAlowerOrg != null ? varAfactor.multiply(varAlowerOrg) : null;
+        } else {
+            varAmin = varAupperOrg != null ? varAfactor.multiply(varAupperOrg) : null;
+            varAmax = varAlowerOrg != null ? varAfactor.multiply(varAlowerOrg) : null;
+        }
         BigDecimal varAlowerNew = varAlowerOrg;
         BigDecimal varAupperNew = varAupperOrg;
 
@@ -533,12 +534,27 @@ public abstract class Presolvers {
         final BigDecimal varBfactor = expression.get(variableB);
         final BigDecimal varBlowerOrg = variableB.getLowerLimit();
         final BigDecimal varBupperOrg = variableB.getUpperLimit();
-
+        final BigDecimal varBmax;
+        final BigDecimal varBmin;
+        if (varBfactor.signum() == 1) {
+            varBmax = varBupperOrg != null ? varBfactor.multiply(varBupperOrg) : null;
+            varBmin = varBlowerOrg != null ? varBfactor.multiply(varBlowerOrg) : null;
+        } else {
+            varBmin = varBupperOrg != null ? varBfactor.multiply(varBupperOrg) : null;
+            varBmax = varBlowerOrg != null ? varBfactor.multiply(varBlowerOrg) : null;
+        }
         BigDecimal varBlowerNew = varBlowerOrg;
         BigDecimal varBupperNew = varBupperOrg;
 
         final BigDecimal exprLower = expression.getLowerLimit() != null ? SUBTRACT.invoke(expression.getLowerLimit(), fixedValue) : expression.getLowerLimit();
         final BigDecimal exprUpper = expression.getUpperLimit() != null ? SUBTRACT.invoke(expression.getUpperLimit(), fixedValue) : expression.getUpperLimit();
+
+        if ((exprLower != null) && (varAmax != null) && (varBmax != null) && (varAmax.add(varBmax, feasibility.getMathContext()).compareTo(exprLower) == -1)) {
+            expression.setInfeasible(true);
+        }
+        if ((exprUpper != null) && (varAmin != null) && (varBmin != null) && (varAmin.add(varBmin, feasibility.getMathContext()).compareTo(exprUpper) == 1)) {
+            expression.setInfeasible(true);
+        }
 
         if (exprLower != null) {
 
@@ -546,7 +562,6 @@ public abstract class Presolvers {
             if (varBlimit != null) {
 
                 BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varBfactor.multiply(varBlimit)), varAfactor);
-                //variableA.validate(newLimit, expression.getModel().options.feasibility, BasicLogger.DEBUG);
 
                 newLimit = varAlowerOrg != null ? varAlowerOrg.max(newLimit) : newLimit;
                 newLimit = varAupperOrg != null ? varAupperOrg.min(newLimit) : newLimit;
@@ -558,13 +573,13 @@ public abstract class Presolvers {
                     // New upper limit on A
                     varAupperNew = newLimit;
                 }
+
             }
 
             final BigDecimal varAlimit = varAfactor.signum() == 1 ? varAupperOrg : varAlowerOrg;
             if (varAlimit != null) {
 
                 BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varAfactor.multiply(varAlimit)), varBfactor);
-                //variableA.validate(newLimit, expression.getModel().options.feasibility, BasicLogger.DEBUG);
 
                 newLimit = varBlowerOrg != null ? varBlowerOrg.max(newLimit) : newLimit;
                 newLimit = varBupperOrg != null ? varBupperOrg.min(newLimit) : newLimit;
@@ -576,6 +591,7 @@ public abstract class Presolvers {
                     // New upper limit on B
                     varBupperNew = newLimit;
                 }
+
             }
         }
 
@@ -585,7 +601,6 @@ public abstract class Presolvers {
             if (varBlimit != null) {
 
                 BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varBfactor.multiply(varBlimit)), varAfactor);
-                //variableA.validate(newLimit, expression.getModel().options.feasibility, BasicLogger.DEBUG);
 
                 newLimit = varAlowerOrg != null ? varAlowerOrg.max(newLimit) : newLimit;
                 newLimit = varAupperOrg != null ? varAupperOrg.min(newLimit) : newLimit;
@@ -597,13 +612,13 @@ public abstract class Presolvers {
                     // New lower limit on A
                     varAlowerNew = newLimit;
                 }
+
             }
 
             final BigDecimal varAlimit = varAfactor.signum() == 1 ? varAlowerOrg : varAupperOrg;
             if (varAlimit != null) {
 
                 BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varAfactor.multiply(varAlimit)), varBfactor);
-                //variableA.validate(newLimit, expression.getModel().options.feasibility, BasicLogger.DEBUG);
 
                 newLimit = varBlowerOrg != null ? varBlowerOrg.max(newLimit) : newLimit;
                 newLimit = varBupperOrg != null ? varBupperOrg.min(newLimit) : newLimit;
@@ -615,6 +630,7 @@ public abstract class Presolvers {
                     // New lower limit on B
                     varBlowerNew = newLimit;
                 }
+
             }
         }
 
