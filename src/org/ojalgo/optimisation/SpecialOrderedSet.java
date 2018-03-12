@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.ojalgo.access.Structure1D.IntIndex;
+import org.ojalgo.type.context.NumberContext;
 
 class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
 
@@ -47,7 +48,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
      */
     @Override
     public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-            final Function<IntIndex, Variable> variableResolver) {
+            final Function<IntIndex, Variable> variableResolver, NumberContext feasibility) {
 
         if (!expression.equals(myExpression)) {
             return false;

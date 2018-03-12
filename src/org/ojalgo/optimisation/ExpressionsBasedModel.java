@@ -187,11 +187,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
          * @param fixedVariables
          * @param fixedValue TODO
          * @param variableResolver TODO
+         * @param feasibility TODO
          * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
          *         typically when/if a variable was fixed.
          */
         public abstract boolean simplify(Expression expression, Set<IntIndex> fixedVariables, BigDecimal fixedValue,
-                Function<IntIndex, Variable> variableResolver);
+                Function<IntIndex, Variable> variableResolver, NumberContext feasibility);
 
         @Override
         boolean isApplicable(final Expression target) {
@@ -1273,9 +1274,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         final BigDecimal fixedValue = BigMath.ZERO;
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable);
+            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
             if (tmpExpression.isConstraint()) {
-                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable);
+                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
             }
         }
 
@@ -1373,7 +1374,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                     fixedValue = expr.calculateFixedValue(fixedVariables);
                     for (final Presolver presolver : PRESOLVERS) {
                         if (!needToRepeat) {
-                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable);
+                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.feasibility);
                         }
                     }
                 }
