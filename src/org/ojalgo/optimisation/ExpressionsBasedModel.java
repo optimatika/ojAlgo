@@ -969,20 +969,20 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      * <li>The solution is not validated by the model</li>
      * </ul>
      */
-    public Optimisation.Result solve(final Optimisation.Result initialSolution) {
+    public Optimisation.Result solve(final Optimisation.Result candidate) {
 
         this.presolve();
 
         if (this.isInfeasible()) {
 
-            final Optimisation.Result solution = initialSolution != null ? initialSolution : this.getVariableValues();
+            final Optimisation.Result solution = candidate != null ? candidate : this.getVariableValues();
 
             return new Optimisation.Result(State.INFEASIBLE, solution);
 
         } else if (this.isUnbounded()) {
 
-            if ((initialSolution != null) && this.validate(initialSolution)) {
-                return new Optimisation.Result(State.UNBOUNDED, initialSolution);
+            if ((candidate != null) && this.validate(candidate)) {
+                return new Optimisation.Result(State.UNBOUNDED, candidate);
             }
 
             final Optimisation.Result derivedSolution = this.getVariableValues();
@@ -1003,7 +1003,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         final Integration<?> tmpIntegration = this.getIntegration();
         final Solver tmpSolver = tmpIntegration.build(this);
-        Optimisation.Result retVal = tmpIntegration.toSolverState(initialSolution, this);
+        Optimisation.Result retVal = tmpIntegration.toSolverState(candidate != null ? candidate : this.getVariableValues(), this);
         retVal = tmpSolver.solve(retVal);
         retVal = tmpIntegration.toModelState(retVal, this);
 
@@ -1337,8 +1337,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             this.scanEntities();
         }
 
-        final Result current = this.getVariableValues();
-        final Result solver = this.solve(current);
+        final Result solver = this.solve(null);
         final Result output = this.handleResult(solver);
 
         return output;
