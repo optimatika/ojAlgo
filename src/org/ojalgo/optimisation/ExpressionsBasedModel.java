@@ -1234,28 +1234,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
-    /**
-     * Copy the solution back to the model variables, and evaluate the objective function as specidied in the
-     * model.
-     */
-    private Optimisation.Result handleResult(final Result solverResult) {
-
-        final NumberContext solutionContext = options.solution;
-
-        for (int i = 0, limit = myVariables.size(); i < limit; i++) {
-            final Variable tmpVariable = myVariables.get(i);
-            if (!tmpVariable.isFixed()) {
-                tmpVariable.setValue(solutionContext.enforce(solverResult.get(i)));
-            }
-        }
-
-        final Access1D<BigDecimal> retSolution = this.getVariableValues();
-        final Optimisation.State retState = solverResult.getState();
-        final double retValue = this.objective().evaluate(retSolution).doubleValue();
-
-        return new Optimisation.Result(retState, retValue, retSolution);
-    }
-
     private void scanEntities() {
 
         final Set<IntIndex> fixedVariables = Collections.emptySet();
@@ -1338,7 +1316,18 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         final Result solver = this.solve(null);
-        final Result output = this.handleResult(solver);
+
+        for (int i = 0, limit = myVariables.size(); i < limit; i++) {
+            final Variable tmpVariable = myVariables.get(i);
+            if (!tmpVariable.isFixed()) {
+                tmpVariable.setValue(options.solution.enforce(solver.get(i)));
+            }
+        }
+
+        final Access1D<BigDecimal> retSolution = this.getVariableValues();
+        final Optimisation.State retState = solver.getState();
+        final double retValue = this.objective().evaluate(retSolution).doubleValue();
+        final Result output = new Optimisation.Result(retState, retValue, retSolution);
 
         return output;
     }
