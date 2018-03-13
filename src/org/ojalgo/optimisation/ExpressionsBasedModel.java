@@ -971,55 +971,43 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      */
     public Optimisation.Result solve(final Optimisation.Result initialSolution) {
 
-        //        final Expression tmpObjective = this.objective();
-        //        BasicLogger.DEBUG.println("Any integer: {}", tmpObjective.isLinearAndAnyInteger());
-        //        BasicLogger.DEBUG.println("Any binary: {}", tmpObjective.isLinearAndAnyBinary());
-        //        BasicLogger.DEBUG.println("All integer: {}", tmpObjective.isLinearAndAllInteger());
-        //        BasicLogger.DEBUG.println("All binary: {}", tmpObjective.isLinearAndAllBinary());
-        //        BasicLogger.DEBUG.println("Positive: {}", tmpObjective.isPositive(this.getFixedVariables()));
-        //        BasicLogger.DEBUG.println("Negative: {}", tmpObjective.isNegative(this.getFixedVariables()));
-
-        Optimisation.Result retVal = null;
-
         this.presolve();
 
         if (this.isInfeasible()) {
 
-            final Optimisation.Result tmpSolution = this.getVariableValues();
+            final Optimisation.Result solution = initialSolution != null ? initialSolution : this.getVariableValues();
 
-            retVal = new Optimisation.Result(State.INFEASIBLE, tmpSolution);
+            return new Optimisation.Result(State.INFEASIBLE, solution);
 
         } else if (this.isUnbounded()) {
 
-            final Optimisation.Result tmpSolution = this.getVariableValues();
+            if ((initialSolution != null) && this.validate(initialSolution)) {
+                return new Optimisation.Result(State.UNBOUNDED, initialSolution);
+            }
 
-            retVal = new Optimisation.Result(State.UNBOUNDED, tmpSolution);
+            final Optimisation.Result derivedSolution = this.getVariableValues();
+            if (derivedSolution.getState().isFeasible()) {
+                return new Optimisation.Result(State.UNBOUNDED, derivedSolution);
+            }
 
         } else if (this.isFixed()) {
 
-            final Optimisation.Result tmpSolution = this.getVariableValues();
+            final Optimisation.Result derivedSolution = this.getVariableValues();
 
-            if (tmpSolution.getState().isFeasible()) {
-
-                retVal = new Result(State.DISTINCT, tmpSolution);
-
+            if (derivedSolution.getState().isFeasible()) {
+                return new Result(State.DISTINCT, derivedSolution);
             } else {
-
-                retVal = new Result(State.INVALID, tmpSolution);
+                return new Result(State.INVALID, derivedSolution);
             }
-
-        } else {
-
-            // this.flushCaches();
-
-            final Integration<?> tmpIntegration = this.getIntegration();
-            final Solver tmpSolver = tmpIntegration.build(this);
-            retVal = tmpIntegration.toSolverState(initialSolution, this);
-            retVal = tmpSolver.solve(retVal);
-            retVal = tmpIntegration.toModelState(retVal, this);
-
-            tmpSolver.dispose();
         }
+
+        final Integration<?> tmpIntegration = this.getIntegration();
+        final Solver tmpSolver = tmpIntegration.build(this);
+        Optimisation.Result retVal = tmpIntegration.toSolverState(initialSolution, this);
+        retVal = tmpSolver.solve(retVal);
+        retVal = tmpIntegration.toModelState(retVal, this);
+
+        tmpSolver.dispose();
 
         return retVal;
     }
