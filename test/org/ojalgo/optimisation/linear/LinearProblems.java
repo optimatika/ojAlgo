@@ -21,7 +21,18 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.constant.BigMath.EIGHT;
+import static org.ojalgo.constant.BigMath.FIVE;
+import static org.ojalgo.constant.BigMath.FOUR;
+import static org.ojalgo.constant.BigMath.NEG;
+import static org.ojalgo.constant.BigMath.ONE;
+import static org.ojalgo.constant.BigMath.SEVEN;
+import static org.ojalgo.constant.BigMath.SIX;
+import static org.ojalgo.constant.BigMath.TEN;
+import static org.ojalgo.constant.BigMath.TENTH;
+import static org.ojalgo.constant.BigMath.THREE;
+import static org.ojalgo.constant.BigMath.TWO;
+import static org.ojalgo.constant.BigMath.ZERO;
 
 import java.math.BigDecimal;
 
@@ -378,6 +389,31 @@ public class LinearProblems extends OptimisationLinearTests {
         TestUtils.assertFalse(model.validate(result));
         TestUtils.assertEquals(Optimisation.State.INFEASIBLE, result.getState());
 
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/70
+     */
+    public void testP20180314_70() {
+
+        Variable x = Variable.make("x").lower(0).weight(-2);
+        Variable y = Variable.make("y").lower(0).weight(-2);
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.addVariable(x);
+        model.addVariable(y);
+
+        model.addExpression().set(x, 3).set(y, 0).lower(2);
+        model.addExpression().set(x, 1).set(y, 2).lower(-5);
+        model.addExpression().set(x, 3).set(y, 1).upper(2);
+
+        final BigArray expected = BigArray.wrap(BigMath.TWO.multiply(BigMath.THIRD), BigMath.ZERO);
+        TestUtils.assertTrue(model.validate(expected));
+
+        Optimisation.Result solution = model.maximise();
+        TestUtils.assertTrue(model.validate(solution));
+
+        TestUtils.assertStateNotLessThanOptimal(solution);
     }
 
 }

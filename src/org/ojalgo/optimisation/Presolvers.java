@@ -21,8 +21,9 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.*;
-import static org.ojalgo.function.BigFunction.*;
+import static org.ojalgo.constant.BigMath.ZERO;
+import static org.ojalgo.function.BigFunction.DIVIDE;
+import static org.ojalgo.function.BigFunction.SUBTRACT;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -427,22 +428,21 @@ public abstract class Presolvers {
     static boolean doCase1(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
             final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
 
-        final IntIndex tmpIndex = remaining.iterator().next();
-        final Variable tmpVariable = variableResolver.apply(tmpIndex);
-        final BigDecimal tmpFactor = expression.get(tmpIndex);
+        final IntIndex index = remaining.iterator().next();
+        final Variable variable = variableResolver.apply(index);
+        final BigDecimal factor = expression.get(index);
+
+        final BigDecimal expLower = expression.getLowerLimit();
+        final BigDecimal expUpper = expression.getUpperLimit();
 
         if (expression.isEqualityConstraint()) {
             // Simple case with equality constraint
 
-            final BigDecimal tmpCompensatedLevel = SUBTRACT.invoke(expression.getUpperLimit(), fixedValue);
-            final BigDecimal tmpSolutionValue = DIVIDE.invoke(tmpCompensatedLevel, tmpFactor);
+            final BigDecimal compLevel = SUBTRACT.invoke(expUpper, fixedValue);
+            final BigDecimal solution = DIVIDE.invoke(compLevel, factor);
 
-            expression.setRedundant(true);
-
-            final boolean tmpValid = tmpVariable.validate(tmpSolutionValue, feasibility, null);
-            if (tmpValid) {
-                expression.setInfeasible(false);
-                tmpVariable.level(tmpSolutionValue);
+            if (variable.validate(solution, feasibility, null)) {
+                variable.level(solution);
             } else {
                 expression.setInfeasible(true);
             }
@@ -450,59 +450,59 @@ public abstract class Presolvers {
         } else {
             // More general case
 
-            final BigDecimal tmpLowerLimit = expression.getLowerLimit();
-            final BigDecimal tmpUpperLimit = expression.getUpperLimit();
+            final BigDecimal compLower = expLower != null ? SUBTRACT.invoke(expLower, fixedValue) : expLower;
+            final BigDecimal compUpper = expUpper != null ? SUBTRACT.invoke(expUpper, fixedValue) : expUpper;
 
-            final BigDecimal tmpCompensatedLower = tmpLowerLimit != null ? SUBTRACT.invoke(tmpLowerLimit, fixedValue) : tmpLowerLimit;
-            final BigDecimal tmpCompensatedUpper = tmpUpperLimit != null ? SUBTRACT.invoke(tmpUpperLimit, fixedValue) : tmpUpperLimit;
-
-            BigDecimal tmpLowerSolution = tmpCompensatedLower != null ? DIVIDE.invoke(tmpCompensatedLower, tmpFactor) : tmpCompensatedLower;
-            BigDecimal tmpUpperSolution = tmpCompensatedUpper != null ? DIVIDE.invoke(tmpCompensatedUpper, tmpFactor) : tmpCompensatedUpper;
-            if (tmpFactor.signum() < 0) {
-                final BigDecimal tmpVal = tmpLowerSolution;
-                tmpLowerSolution = tmpUpperSolution;
-                tmpUpperSolution = tmpVal;
+            BigDecimal solutionLower = compLower != null ? DIVIDE.invoke(compLower, factor) : compLower;
+            BigDecimal solutionUpper = compUpper != null ? DIVIDE.invoke(compUpper, factor) : compUpper;
+            if (factor.signum() < 0) {
+                final BigDecimal tmpVal = solutionLower;
+                solutionLower = solutionUpper;
+                solutionUpper = tmpVal;
             }
 
-            final BigDecimal tmpOldLower = tmpVariable.getLowerLimit();
-            final BigDecimal tmpOldUpper = tmpVariable.getUpperLimit();
+            final BigDecimal oldLower = variable.getLowerLimit();
+            final BigDecimal oldUpper = variable.getUpperLimit();
 
-            BigDecimal tmpNewLower = tmpOldLower;
-            if (tmpLowerSolution != null) {
-                if (tmpOldLower != null) {
-                    tmpNewLower = tmpOldLower.max(tmpLowerSolution);
+            BigDecimal newLower = oldLower;
+            if (solutionLower != null) {
+                if (oldLower != null) {
+                    newLower = oldLower.max(solutionLower);
                 } else {
-                    tmpNewLower = tmpLowerSolution;
+                    newLower = solutionLower;
                 }
             }
 
-            BigDecimal tmpNewUpper = tmpOldUpper;
-            if (tmpUpperSolution != null) {
-                if (tmpOldUpper != null) {
-                    tmpNewUpper = tmpOldUpper.min(tmpUpperSolution);
+            BigDecimal newUpper = oldUpper;
+            if (solutionUpper != null) {
+                if (oldUpper != null) {
+                    newUpper = oldUpper.min(solutionUpper);
                 } else {
-                    tmpNewUpper = tmpUpperSolution;
+                    newUpper = solutionUpper;
                 }
             }
 
-            if (tmpVariable.isInteger()) {
-                if (tmpNewLower != null) {
-                    tmpNewLower = tmpNewLower.setScale(0, RoundingMode.CEILING);
+            if (variable.isInteger()) {
+                if (newLower != null) {
+                    newLower = newLower.setScale(0, RoundingMode.CEILING);
                 }
-                if (tmpNewUpper != null) {
-                    tmpNewUpper = tmpNewUpper.setScale(0, RoundingMode.FLOOR);
+                if (newUpper != null) {
+                    newUpper = newUpper.setScale(0, RoundingMode.FLOOR);
                 }
             }
 
-            tmpVariable.lower(tmpNewLower).upper(tmpNewUpper);
-            expression.setRedundant(true);
+            variable.lower(newLower).upper(newUpper);
 
-            final boolean tmpInfeasible = (tmpNewLower != null) && (tmpNewUpper != null) && (tmpNewLower.compareTo(tmpNewUpper) > 0);
-            expression.setInfeasible(tmpInfeasible);
+            final boolean tmpInfeasible = (newLower != null) && (newUpper != null) && (newLower.compareTo(newUpper) > 0);
+            if (tmpInfeasible) {
+                expression.setInfeasible(tmpInfeasible);
+            }
         }
 
-        if (tmpVariable.isEqualityConstraint()) {
-            tmpVariable.setValue(tmpVariable.getLowerLimit());
+        expression.setRedundant(true);
+
+        if (variable.isEqualityConstraint()) {
+            variable.setValue(variable.getLowerLimit());
             return true;
         } else {
             return false;
@@ -654,6 +654,22 @@ public abstract class Presolvers {
 
         variableA.lower(varAlowerNew).upper(varAupperNew);
         variableB.lower(varBlowerNew).upper(varBupperNew);
+
+        //        if ((varAlowerOrg == null && varAlowerNew != null) || (varAlowerOrg != null && varAlowerOrg.compareTo(varAlowerNew) != 0)) {
+        //            return true;
+        //        }
+        //        if ((varAupperOrg == null && varAupperNew != null) || (varAupperOrg != null && varAupperOrg.compareTo(varAupperNew) != 0)) {
+        //            return true;
+        //        }
+        //
+        //        if ((varBlowerOrg == null && varBlowerNew != null) || (varBlowerOrg != null && varBlowerOrg.compareTo(varBlowerNew) != 0)) {
+        //            return true;
+        //        }
+        //        if ((varBupperOrg == null && varBupperNew != null) || (varBupperOrg != null && varBupperOrg.compareTo(varBupperNew) != 0)) {
+        //            return true;
+        //        }
+        //
+        //        return false;
 
         return variableA.isEqualityConstraint() || variableB.isEqualityConstraint();
     }
