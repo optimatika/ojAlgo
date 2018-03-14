@@ -177,50 +177,41 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             return NEGATIVE_INFINITY;
         }
 
-        //        final long valBits = Double.doubleToLongBits(value);
-        //
-        //        final int sign = ((valBits >> 63) == 0 ? 1 : -1);
-        //        int exponent = (int) ((valBits >> 52) & 0x7ffL);
-        //        final long significand = (exponent == 0 ? (valBits & ((1L << 52) - 1)) << 1 : (valBits & ((1L << 52) - 1)) | (1L << 52));
-        //        exponent -= 1075;
-        //
-        //        if (exponent < 0) {
-        //            return RationalNumber.of(sign * significand, 1L << exponent);
-        //        } else {
-        //            return RationalNumber.of(sign * significand * (1L << exponent), 1L);
-        //        }
+        final long bits = Double.doubleToLongBits(value);
 
-        // Code below doesn't work for 0 and NaN - just check before
+        final long sign = bits >>> 63;
+        final long exponent = ((bits >>> 52) ^ (sign << 11)) - 1023;
+        final long fraction = bits << 12; // bits are "reversed" but that's not a problem
 
-        //        final long bits = Double.doubleToLongBits(value);
-        //
-        //        final long sign = bits >>> 63;
-        //        final long exponent = ((bits >>> 52) ^ (sign << 11)) - 1023;
-        //        final long fraction = bits << 12; // bits are "reversed" but that's not a problem
-        //
-        //        long a = 1L;
-        //        long b = 1L;
-        //
-        //        for (int i = 63; i >= 12; i--) {
-        //            a = (a * 2) + ((fraction >>> i) & 1);
-        //            b *= 2;
-        //        }
-        //
-        //        if (exponent > 0) {
-        //            a *= 1 << exponent;
-        //        } else {
-        //            b *= 1 << -exponent;
-        //        }
-        //
-        //        if (sign == 1) {
-        //            a *= -1;
-        //        }
-        //
-        //        // Here you have to simplify the fraction
-        //
-        //        System.out.println(a + "/" + b);
+        long a = 1L;
+        long b = 1L;
 
-        return RationalNumber.valueOf(BigDecimal.valueOf(value));
+        for (int i = 63; i >= 12; i--) {
+            a = (a * 2) + ((fraction >>> i) & 1);
+            b *= 2;
+        }
+
+        long f = gcd(a, b);
+        a /= f;
+        b /= f;
+
+        if (exponent > 0) {
+            int a1 = 1 << exponent;
+            long g = gcd(a1, b);
+            a *= a1 / g;
+            b /= g;
+        } else {
+            int b1 = 1 << -exponent;
+            long g = gcd(b1, a);
+            b *= b1 / g;
+            a /= g;
+        }
+
+        if (sign == 1) {
+            a *= -1;
+        }
+
+        return new RationalNumber(a, b);
     }
 
     public static RationalNumber valueOf(final Number number) {
@@ -231,9 +222,9 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
                 return (RationalNumber) number;
 
-                //            } else if (number instanceof Double) {
-                //
-                //                return RationalNumber.valueOf(number.doubleValue());
+            } else if (number instanceof Double) {
+
+                return RationalNumber.valueOf(number.doubleValue());
 
             } else {
 
