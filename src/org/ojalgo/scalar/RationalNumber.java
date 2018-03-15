@@ -77,7 +77,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     private static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitLength();
     private static final String RIGHT = ")";
     private static final long SAFE_LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE / 2L));
-    ;
 
     /**
      * Greatest Common Denominator
@@ -186,7 +185,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         long m = (e == 0) ?
                 (bits & 0xfffffffffffffL) << 1 :
                 (bits & 0xfffffffffffffL) | 0x10000000000000L;
-        // Now we're looking for s * m * 2^{e -1075}, 1075 being bias of 1023 plus 52 positions of binary fraction
+        // Now we're looking for s * m * 2^{e - 1075}, 1075 being bias of 1023 plus 52 positions of binary fraction
 
         long exponent = e - 1075;
 
