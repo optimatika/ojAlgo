@@ -180,23 +180,25 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
         final long bits = Double.doubleToLongBits(value);
 
+        // Please refer to {@link Double#doubleToLongBits(long)} javadoc
         final int s = ((bits >> 63) == 0) ? 1 : -1;
         final int e = (int) ((bits >> 52) & 0x7ffL);
-        long a = (e == 0) ?
+        long m = (e == 0) ?
                 (bits & 0xfffffffffffffL) << 1 :
                 (bits & 0xfffffffffffffL) | 0x10000000000000L;
+        // Now we're looking for s * m * 2^{e -1075}, 1075 being bias of 1023 plus 52 positions of binary fraction
 
-        long exponent = e - 1075; // bias of 1023 plus 52 positions of binary fraction
+        long exponent = e - 1075;
 
         if (exponent >= 0) {
-            return new RationalNumber(s * (a << exponent), 1);
+            return new RationalNumber(s * (m << exponent), 1);
         }
 
-        while ((a & 1) == 0 && exponent < 0) {
-            a >>= 1;
+        while ((m & 1) == 0 && exponent < 0) {
+            m >>= 1;
             exponent++;
         }
-        return new RationalNumber(s * a, 1L << -exponent);
+        return new RationalNumber(s * m, 1L << -exponent);
     }
 
     public static RationalNumber valueOf(final Number number) {
