@@ -71,7 +71,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
 
         final int count = limit - first;
         if (count > myType) {
-            expression.setInfeasible(true);
+            expression.setInfeasible();
             return false;
         }
 
@@ -82,7 +82,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
             final Variable variable = variableResolver.apply(index);
             if (fixedVariables.contains(index)) {
                 if (variable.getValue().signum() == 0) {
-                    expression.setInfeasible(true);
+                    expression.setInfeasible();
                 }
             } else {
                 if (variable.isInteger()) {
@@ -99,7 +99,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
                 final Variable variable = variableResolver.apply(index);
                 if (fixedVariables.contains(index)) {
                     if (variable.getValue().signum() != 0) {
-                        expression.setInfeasible(true);
+                        expression.setInfeasible();
                     }
                 } else {
                     variable.setFixed(BigDecimal.ZERO);
@@ -111,7 +111,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
                 final Variable variable = variableResolver.apply(index);
                 if (fixedVariables.contains(index)) {
                     if (variable.getValue().signum() != 0) {
-                        expression.setInfeasible(true);
+                        expression.setInfeasible();
                     }
                 } else {
                     variable.setFixed(BigDecimal.ZERO);

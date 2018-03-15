@@ -21,9 +21,8 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.ZERO;
-import static org.ojalgo.function.BigFunction.DIVIDE;
-import static org.ojalgo.function.BigFunction.SUBTRACT;
+import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.function.BigFunction.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -306,12 +305,11 @@ public abstract class Presolvers {
 
                             final Variable tmpFreeVariable = variableResolver.apply(tmpLinear);
 
-                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, feasibility, null);
-                            if (tmpValid) {
+                            if (tmpFreeVariable.validate(ZERO, feasibility, null)) {
                                 tmpFreeVariable.setFixed(ZERO);
                                 didFixVariable = true;
-                            } else if (!expression.isInfeasible()) {
-                                expression.setInfeasible(true);
+                            } else {
+                                expression.setInfeasible();
                             }
                         }
                     }
@@ -320,7 +318,7 @@ public abstract class Presolvers {
 
                 } else {
 
-                    expression.setInfeasible(true);
+                    expression.setInfeasible();
                 }
             }
 
@@ -332,12 +330,11 @@ public abstract class Presolvers {
                         if (!fixedVariables.contains(tmpLinear)) {
                             final Variable tmpFreeVariable = variableResolver.apply(tmpLinear);
 
-                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, feasibility, null);
-                            if (tmpValid) {
+                            if (tmpFreeVariable.validate(ZERO, feasibility, null)) {
                                 tmpFreeVariable.setFixed(ZERO);
                                 didFixVariable = true;
-                            } else if (!expression.isInfeasible()) {
-                                expression.setInfeasible(true);
+                            } else {
+                                expression.setInfeasible();
                             }
                         }
                     }
@@ -346,7 +343,7 @@ public abstract class Presolvers {
 
                 } else {
 
-                    expression.setInfeasible(true);
+                    expression.setInfeasible();
                 }
             }
 
@@ -410,12 +407,10 @@ public abstract class Presolvers {
 
         expression.setRedundant(true);
 
-        final boolean tmpValid = expression.validate(fixedValue, feasibility, null);
-        if (tmpValid) {
-            expression.setInfeasible(false);
+        if (expression.validate(fixedValue, feasibility, null)) {
             expression.level(fixedValue);
         } else {
-            expression.setInfeasible(true);
+            expression.setInfeasible();
         }
 
         return false;
@@ -442,9 +437,9 @@ public abstract class Presolvers {
             final BigDecimal solution = DIVIDE.invoke(compLevel, factor);
 
             if (variable.validate(solution, feasibility, null)) {
-                variable.level(solution);
+                variable.setFixed(solution);
             } else {
-                expression.setInfeasible(true);
+                expression.setInfeasible();
             }
 
         } else {
@@ -495,7 +490,7 @@ public abstract class Presolvers {
 
             final boolean tmpInfeasible = (newLower != null) && (newUpper != null) && (newLower.compareTo(newUpper) > 0);
             if (tmpInfeasible) {
-                expression.setInfeasible(tmpInfeasible);
+                expression.setInfeasible();
             }
         }
 
@@ -550,10 +545,10 @@ public abstract class Presolvers {
         final BigDecimal exprUpper = expression.getUpperLimit() != null ? SUBTRACT.invoke(expression.getUpperLimit(), fixedValue) : expression.getUpperLimit();
 
         if ((exprLower != null) && (varAmax != null) && (varBmax != null) && (varAmax.add(varBmax, feasibility.getMathContext()).compareTo(exprLower) == -1)) {
-            expression.setInfeasible(true);
+            expression.setInfeasible();
         }
         if ((exprUpper != null) && (varAmin != null) && (varBmin != null) && (varAmin.add(varBmin, feasibility.getMathContext()).compareTo(exprUpper) == 1)) {
-            expression.setInfeasible(true);
+            expression.setInfeasible();
         }
 
         if (exprLower != null) {
