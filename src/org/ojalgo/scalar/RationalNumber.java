@@ -187,7 +187,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
                 (bits & 0xfffffffffffffL) | 0x10000000000000L;
         // Now we're looking for s * m * 2^{e - 1075}, 1075 being bias of 1023 plus 52 positions of binary fraction
 
-        long exponent = e - 1075;
+        int exponent = e - 1075;
 
         if (exponent >= 0) {
             return new RationalNumber(s * (m << exponent), 1);
@@ -343,7 +343,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         BigInteger retNumer = numer1.multiply(numer2);
         BigInteger retDenom = denom1.multiply(denom2);
 
-        if (retDenom.signum() > 0) {
+        if (retDenom.signum() < 0) {
             retNumer = retNumer.negate();
             retDenom = retDenom.negate();
         }
