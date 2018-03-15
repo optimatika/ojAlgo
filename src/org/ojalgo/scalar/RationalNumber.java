@@ -440,9 +440,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     private RationalNumber(final long numerator, final long denominator) {
-
-        super();
-
         if (denominator < 0L) {
             myNumerator = -numerator;
             myDenominator = -denominator;
@@ -452,7 +449,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
 
         if ((denominator == 0L) && (Math.abs(numerator) > 1L)) {
-            throw new ArithmeticException();
+            throw new ArithmeticException("n / 0, where abs(n) > 1");
         }
     }
 
