@@ -76,7 +76,8 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     private static final String LEFT = "(";
     private static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitLength();
     private static final String RIGHT = ")";
-    private static final long SAFE_LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE / 2L));;
+    private static final long SAFE_LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE / 2L));
+    ;
 
     /**
      * Greatest Common Denominator
@@ -179,39 +180,23 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
         final long bits = Double.doubleToLongBits(value);
 
-        final long sign = bits >>> 63;
-        final long exponent = ((bits >>> 52) ^ (sign << 11)) - 1023;
-        final long fraction = bits << 12; // bits are "reversed" but that's not a problem
+        final int s = ((bits >> 63) == 0) ? 1 : -1;
+        final int e = (int) ((bits >> 52) & 0x7ffL);
+        long a = (e == 0) ?
+                (bits & 0xfffffffffffffL) << 1 :
+                (bits & 0xfffffffffffffL) | 0x10000000000000L;
 
-        long a = 1L;
-        long b = 1L;
+        long exponent = e - 1075; // bias of 1023 plus 52 positions of binary fraction
 
-        for (int i = 63; i >= 12; i--) {
-            a = (a * 2) + ((fraction >>> i) & 1);
-            b *= 2;
+        if (exponent >= 0) {
+            return new RationalNumber(s * (a << exponent), 1);
         }
 
-        long f = gcd(a, b);
-        a /= f;
-        b /= f;
-
-        if (exponent > 0) {
-            int a1 = 1 << exponent;
-            long g = gcd(a1, b);
-            a *= a1 / g;
-            b /= g;
-        } else {
-            int b1 = 1 << -exponent;
-            long g = gcd(b1, a);
-            b *= b1 / g;
-            a /= g;
+        while ((a & 1) == 0 && exponent < 0) {
+            a >>= 1;
+            exponent++;
         }
-
-        if (sign == 1) {
-            a *= -1;
-        }
-
-        return new RationalNumber(a, b);
+        return new RationalNumber(s * a, 1L << -exponent);
     }
 
     public static RationalNumber valueOf(final Number number) {
