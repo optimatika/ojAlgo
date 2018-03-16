@@ -134,11 +134,11 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public static boolean isInfinite(final RationalNumber value) {
-        return ((value.getNumerator() != 0L) && (value.getDenominator() == 0L));
+        return value.getNumerator() != 0L && value.getDenominator() == 0L;
     }
 
     public static boolean isNaN(final RationalNumber value) {
-        return ((value.getNumerator() == 0L) && (value.getDenominator() == 0L));
+        return value.getNumerator() == 0L && value.getDenominator() == 0L;
     }
 
     public static boolean isSmall(final double comparedTo, final RationalNumber value) {
@@ -670,6 +670,9 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     private BigDecimal toBigDecimal(final MathContext context) {
+        if(RationalNumber.isNaN(this)) {
+            return BigDecimal.valueOf(Double.POSITIVE_INFINITY);
+        }
         return new BigDecimal(myNumerator).divide(new BigDecimal(myDenominator), context);
     }
 
