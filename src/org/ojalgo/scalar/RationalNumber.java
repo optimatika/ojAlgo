@@ -68,6 +68,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     public static final RationalNumber NEG = new RationalNumber(-1L, 1L);
     public static final RationalNumber NEGATIVE_INFINITY = new RationalNumber(-1L, 0L);
     public static final RationalNumber ONE = new RationalNumber(1L, 1L);
+    public static final RationalNumber MINUS_ONE = ONE.negate();
     public static final RationalNumber POSITIVE_INFINITY = new RationalNumber(1L, 0L);
     public static final RationalNumber TWO = new RationalNumber(2L, 1L);
     public static final RationalNumber ZERO = new RationalNumber(0L, 1L);
@@ -458,6 +459,17 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber add(final RationalNumber arg) {
+        if (isNaN(this) || isNaN(arg)) {
+            return NaN;
+        }
+
+        if (isInfinite(this)) {
+            if (!isInfinite(arg) || this.sign() == arg.sign()) {
+                return this;
+            } else {
+                return NaN;
+            }
+        }
 
         if (Math.max(this.size(), arg.size()) <= SAFE_LIMIT) {
 
@@ -508,6 +520,12 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
     @Override
     public double doubleValue() {
+        if (isNaN(this)) {
+            return Double.NaN;
+        }
+        if (isInfinite(this)) {
+            return this.sign() > 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+        }
         return this.toBigDecimal().doubleValue();
     }
 
@@ -604,10 +622,10 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber signum() {
-        if (RationalNumber.isSmall(PrimitiveMath.ONE, this)) {
+        if (!isInfinite(this) && RationalNumber.isSmall(PrimitiveMath.ONE, this)) {
             return ZERO;
         } else if (this.sign() == -1) {
-            return ONE.negate();
+            return MINUS_ONE;
         } else {
             return ONE;
         }
@@ -656,13 +674,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     private int sign() {
-        if (myNumerator < 0L) {
-            return -1;
-        } else if (myNumerator > 0L) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return Long.compare(myNumerator, 0L);
     }
 
     private long size() {

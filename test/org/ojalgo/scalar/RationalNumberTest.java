@@ -44,12 +44,16 @@ public class RationalNumberTest extends FunctionalityTest {
     }
 
     public void testNaN() {
+        assertEquals(Double.doubleToLongBits(RationalNumber.NaN.doubleValue()),
+                Double.doubleToLongBits(Double.NaN));
         assertTrue(RationalNumber.isNaN(RationalNumber.NaN.add(RationalNumber.NaN)));
         assertTrue(RationalNumber.isNaN(RationalNumber.ONE.add(RationalNumber.NaN)));
         assertTrue(RationalNumber.isNaN(RationalNumber.NaN.add(RationalNumber.ONE)));
     }
 
     public void testInfinity() {
+        assertEquals(RationalNumber.POSITIVE_INFINITY.doubleValue(), Double.POSITIVE_INFINITY);
+        assertEquals(RationalNumber.NEGATIVE_INFINITY.doubleValue(), Double.NEGATIVE_INFINITY);
         assertTrue(RationalNumber.isInfinite(RationalNumber.POSITIVE_INFINITY.add(RationalNumber.POSITIVE_INFINITY)));
     }
 }
