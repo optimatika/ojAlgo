@@ -134,7 +134,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
         final long gcd = RationalNumber.gcd(numerator, denominator);
         if (gcd != 1L) {
-            return new RationalNumber(numerator/ gcd, denominator / gcd);
+            return new RationalNumber(numerator / gcd, denominator / gcd);
         } else {
             return new RationalNumber(numerator, denominator);
         }
