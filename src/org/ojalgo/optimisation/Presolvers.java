@@ -601,10 +601,8 @@ public abstract class Presolvers {
                 newLimit = varAupperOrg != null ? varAupperOrg.min(newLimit) : newLimit;
 
                 if (varAfactor.signum() == 1) {
-                    // New upper limit on A
                     varAupperNew = newLimit;
                 } else {
-                    // New lower limit on A
                     varAlowerNew = newLimit;
                 }
 
@@ -619,10 +617,8 @@ public abstract class Presolvers {
                 newLimit = varBupperOrg != null ? varBupperOrg.min(newLimit) : newLimit;
 
                 if (varBfactor.signum() == 1) {
-                    // New upper limit on B
                     varBupperNew = newLimit;
                 } else {
-                    // New lower limit on B
                     varBlowerNew = newLimit;
                 }
 
@@ -649,22 +645,6 @@ public abstract class Presolvers {
 
         variableA.lower(varAlowerNew).upper(varAupperNew);
         variableB.lower(varBlowerNew).upper(varBupperNew);
-
-        //        if ((varAlowerOrg == null && varAlowerNew != null) || (varAlowerOrg != null && varAlowerOrg.compareTo(varAlowerNew) != 0)) {
-        //            return true;
-        //        }
-        //        if ((varAupperOrg == null && varAupperNew != null) || (varAupperOrg != null && varAupperOrg.compareTo(varAupperNew) != 0)) {
-        //            return true;
-        //        }
-        //
-        //        if ((varBlowerOrg == null && varBlowerNew != null) || (varBlowerOrg != null && varBlowerOrg.compareTo(varBlowerNew) != 0)) {
-        //            return true;
-        //        }
-        //        if ((varBupperOrg == null && varBupperNew != null) || (varBupperOrg != null && varBupperOrg.compareTo(varBupperNew) != 0)) {
-        //            return true;
-        //        }
-        //
-        //        return false;
 
         return variableA.isEqualityConstraint() || variableB.isEqualityConstraint();
     }
