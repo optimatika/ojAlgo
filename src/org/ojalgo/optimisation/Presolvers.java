@@ -314,8 +314,6 @@ public abstract class Presolvers {
                         }
                     }
 
-                    expression.setRedundant(true);
-
                 } else {
 
                     expression.setInfeasible();
@@ -338,8 +336,6 @@ public abstract class Presolvers {
                             }
                         }
                     }
-
-                    expression.setRedundant(true);
 
                 } else {
 
