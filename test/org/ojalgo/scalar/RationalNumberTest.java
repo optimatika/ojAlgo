@@ -17,8 +17,9 @@ public class RationalNumberTest extends FunctionalityTest {
         double test_values[] = {
                 //                 seeeeeeeeeemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
                 longBitsToDouble(0b011111110111001100110011001100110011001100110011001100110011010L), // 0.1
-                longBitsToDouble(0b011111100111111111111111111111111111111111111111111111111111111L), // MAX_BITS
-                longBitsToDouble(0b011111101001111111111111111111111111111111111111111111111111111L), // MAX_BITS + 1
+                longBitsToDouble(0b011111101011111111111111111111111111111111111111111111111111111L), // * 2^{-62}
+                longBitsToDouble(0b011111101001111111111111111111111111111111111111111111111111111L), // * 2^{-63}
+                longBitsToDouble(0b011111100111111111111111111111111111111111111111111111111111111L), // * 2^{-64}
                 0.3,
                 0.25,
                 1e7,
