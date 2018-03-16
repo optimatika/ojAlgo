@@ -201,7 +201,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         final Optimisation.Result tmpResult = tmpModel.minimise();
 
-        TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        TestUtils.assertStateNotLessThanOptimal(tmpResult);
 
         final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.00 }, { 3.00 } });
 

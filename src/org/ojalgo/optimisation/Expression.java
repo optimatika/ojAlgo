@@ -824,8 +824,8 @@ public final class Expression extends ModelEntity<Expression> {
         return myRedundant;
     }
 
-    void setInfeasible(final boolean infeasible) {
-        myInfeasible = infeasible;
+    void setInfeasible() {
+        myInfeasible = true;
     }
 
     void setRedundant(final boolean redundant) {

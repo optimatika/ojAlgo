@@ -187,11 +187,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
          * @param fixedVariables
          * @param fixedValue TODO
          * @param variableResolver TODO
+         * @param precision TODO
          * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
          *         typically when/if a variable was fixed.
          */
         public abstract boolean simplify(Expression expression, Set<IntIndex> fixedVariables, BigDecimal fixedValue,
-                Function<IntIndex, Variable> variableResolver);
+                Function<IntIndex, Variable> variableResolver, NumberContext precision);
 
         @Override
         boolean isApplicable(final Expression target) {
@@ -968,57 +969,45 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      * <li>The solution is not validated by the model</li>
      * </ul>
      */
-    public Optimisation.Result solve(final Optimisation.Result initialSolution) {
-
-        //        final Expression tmpObjective = this.objective();
-        //        BasicLogger.DEBUG.println("Any integer: {}", tmpObjective.isLinearAndAnyInteger());
-        //        BasicLogger.DEBUG.println("Any binary: {}", tmpObjective.isLinearAndAnyBinary());
-        //        BasicLogger.DEBUG.println("All integer: {}", tmpObjective.isLinearAndAllInteger());
-        //        BasicLogger.DEBUG.println("All binary: {}", tmpObjective.isLinearAndAllBinary());
-        //        BasicLogger.DEBUG.println("Positive: {}", tmpObjective.isPositive(this.getFixedVariables()));
-        //        BasicLogger.DEBUG.println("Negative: {}", tmpObjective.isNegative(this.getFixedVariables()));
-
-        Optimisation.Result retVal = null;
+    public Optimisation.Result solve(final Optimisation.Result candidate) {
 
         this.presolve();
 
         if (this.isInfeasible()) {
 
-            final Optimisation.Result tmpSolution = this.getVariableValues();
+            final Optimisation.Result solution = candidate != null ? candidate : this.getVariableValues();
 
-            retVal = new Optimisation.Result(State.INFEASIBLE, tmpSolution);
+            return new Optimisation.Result(State.INFEASIBLE, solution);
 
         } else if (this.isUnbounded()) {
 
-            final Optimisation.Result tmpSolution = this.getVariableValues();
+            if ((candidate != null) && this.validate(candidate)) {
+                return new Optimisation.Result(State.UNBOUNDED, candidate);
+            }
 
-            retVal = new Optimisation.Result(State.UNBOUNDED, tmpSolution);
+            final Optimisation.Result derivedSolution = this.getVariableValues();
+            if (derivedSolution.getState().isFeasible()) {
+                return new Optimisation.Result(State.UNBOUNDED, derivedSolution);
+            }
 
         } else if (this.isFixed()) {
 
-            final Optimisation.Result tmpSolution = this.getVariableValues();
+            final Optimisation.Result derivedSolution = this.getVariableValues();
 
-            if (tmpSolution.getState().isFeasible()) {
-
-                retVal = new Result(State.DISTINCT, tmpSolution);
-
+            if (derivedSolution.getState().isFeasible()) {
+                return new Result(State.DISTINCT, derivedSolution);
             } else {
-
-                retVal = new Result(State.INVALID, tmpSolution);
+                return new Result(State.INVALID, derivedSolution);
             }
-
-        } else {
-
-            // this.flushCaches();
-
-            final Integration<?> tmpIntegration = this.getIntegration();
-            final Solver tmpSolver = tmpIntegration.build(this);
-            retVal = tmpIntegration.toSolverState(initialSolution, this);
-            retVal = tmpSolver.solve(retVal);
-            retVal = tmpIntegration.toModelState(retVal, this);
-
-            tmpSolver.dispose();
         }
+
+        final Integration<?> tmpIntegration = this.getIntegration();
+        final Solver tmpSolver = tmpIntegration.build(this);
+        Optimisation.Result retVal = tmpIntegration.toSolverState(candidate != null ? candidate : this.getVariableValues(), this);
+        retVal = tmpSolver.solve(retVal);
+        retVal = tmpIntegration.toModelState(retVal, this);
+
+        tmpSolver.dispose();
 
         return retVal;
     }
@@ -1245,37 +1234,15 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
-    /**
-     * Copy the solution back to the model variables, and evaluate the objective function as specidied in the
-     * model.
-     */
-    private Optimisation.Result handleResult(final Result solverResult) {
-
-        final NumberContext solutionContext = options.solution;
-
-        for (int i = 0, limit = myVariables.size(); i < limit; i++) {
-            final Variable tmpVariable = myVariables.get(i);
-            if (!tmpVariable.isFixed()) {
-                tmpVariable.setValue(solutionContext.enforce(solverResult.get(i)));
-            }
-        }
-
-        final Access1D<BigDecimal> retSolution = this.getVariableValues();
-        final Optimisation.State retState = solverResult.getState();
-        final double retValue = this.objective().evaluate(retSolution).doubleValue();
-
-        return new Optimisation.Result(retState, retValue, retSolution);
-    }
-
     private void scanEntities() {
 
         final Set<IntIndex> fixedVariables = Collections.emptySet();
         final BigDecimal fixedValue = BigMath.ZERO;
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable);
+            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
             if (tmpExpression.isConstraint()) {
-                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable);
+                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
             }
         }
 
@@ -1348,9 +1315,19 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             this.scanEntities();
         }
 
-        final Result current = this.getVariableValues();
-        final Result solver = this.solve(current);
-        final Result output = this.handleResult(solver);
+        final Result solver = this.solve(null);
+
+        for (int i = 0, limit = myVariables.size(); i < limit; i++) {
+            final Variable tmpVariable = myVariables.get(i);
+            if (!tmpVariable.isFixed()) {
+                tmpVariable.setValue(options.solution.enforce(solver.get(i)));
+            }
+        }
+
+        final Access1D<BigDecimal> retSolution = this.getVariableValues();
+        final Optimisation.State retState = solver.getState();
+        final double retValue = this.objective().evaluate(retSolution).doubleValue();
+        final Result output = new Optimisation.Result(retState, retValue, retSolution);
 
         return output;
     }
@@ -1370,10 +1347,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
             for (final Expression expr : this.getExpressions()) {
                 if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
-                    fixedValue = expr.calculateFixedValue(fixedVariables);
+                    fixedValue = options.solution.enforce(expr.calculateFixedValue(fixedVariables));
                     for (final Presolver presolver : PRESOLVERS) {
                         if (!needToRepeat) {
-                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable);
+                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.solution);
                         }
                     }
                 }
