@@ -62,8 +62,8 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
     };
 
-    public static final RationalNumber MAX = new RationalNumber(Long.MAX_VALUE, 1L);
-    public static final RationalNumber MIN = new RationalNumber(Long.MIN_VALUE, 1L);
+    public static final RationalNumber MAX_VALUE = new RationalNumber(Long.MAX_VALUE, 1L);
+    public static final RationalNumber MIN_VALUE = new RationalNumber(Long.MIN_VALUE, 1L);
     public static final RationalNumber NaN = new RationalNumber(0L, 0L);
     public static final RationalNumber NEGATIVE_INFINITY = new RationalNumber(-1L, 0L);
     public static final RationalNumber ONE = new RationalNumber(1L, 1L);
@@ -186,7 +186,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         int exponent = e - 1075;
 
         if (exponent >= 0) {
-            // TODO: Check for MAX_BITS
+            // TODO: Check for MAX_BITS and report infinity or throw
             return new RationalNumber(s * (m << exponent), 1L);
         }
 
@@ -265,7 +265,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return LEFT + aNmbr.getNumerator() + DIVIDE + aNmbr.getDenominator() + RIGHT;
     }
 
-    static RationalNumber add(final RationalNumber arg1, final RationalNumber arg2) {
+    private static RationalNumber add(final RationalNumber arg1, final RationalNumber arg2) {
 
         final BigInteger numer1 = BigInteger.valueOf(arg1.getNumerator());
         final BigInteger denom1 = BigInteger.valueOf(arg1.getDenominator());
@@ -279,7 +279,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return of(retNumer, retDenom);
     }
 
-    static RationalNumber divide(final RationalNumber arg1, final RationalNumber arg2) {
+    private static RationalNumber divide(final RationalNumber arg1, final RationalNumber arg2) {
 
         final BigInteger numer1 = BigInteger.valueOf(arg1.getNumerator());
         final BigInteger denom1 = BigInteger.valueOf(arg1.getDenominator());
@@ -293,7 +293,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return of(retNumer, retDenom);
     }
 
-    static RationalNumber multiply(final RationalNumber arg1, final RationalNumber arg2) {
+    private static RationalNumber multiply(final RationalNumber arg1, final RationalNumber arg2) {
 
         final BigInteger numer1 = BigInteger.valueOf(arg1.getNumerator());
         final BigInteger denom1 = BigInteger.valueOf(arg1.getDenominator());
@@ -307,7 +307,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return of(retNumer, retDenom);
     }
 
-    static RationalNumber subtract(final RationalNumber arg1, final RationalNumber arg2) {
+    private static RationalNumber subtract(final RationalNumber arg1, final RationalNumber arg2) {
 
         final BigInteger numer1 = BigInteger.valueOf(arg1.getNumerator());
         final BigInteger denom1 = BigInteger.valueOf(arg1.getDenominator());
@@ -325,10 +325,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     private final long myDenominator;
 
     private final long myNumerator;
-
-    public RationalNumber() {
-        this(0L, 1L);
-    }
 
     private RationalNumber(final long numerator, final long denominator) {
         if (denominator < 0L) {
