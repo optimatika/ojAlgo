@@ -45,7 +45,7 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
+                final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
             if (expression.getLinearEntrySet().size() > 3333) {
 
@@ -145,7 +145,7 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
+                final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
             boolean didFixVariable = false;
 
@@ -249,7 +249,7 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
+                final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
             if (expression.isObjective() && expression.isFunctionLinear()) {
 
@@ -282,7 +282,7 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
+                final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
             boolean didFixVariable = false;
 
@@ -305,7 +305,7 @@ public abstract class Presolvers {
 
                             final Variable tmpFreeVariable = variableResolver.apply(tmpLinear);
 
-                            if (tmpFreeVariable.validate(ZERO, feasibility, null)) {
+                            if (tmpFreeVariable.validate(ZERO, precision, null)) {
                                 tmpFreeVariable.setFixed(ZERO);
                                 didFixVariable = true;
                             } else {
@@ -330,7 +330,7 @@ public abstract class Presolvers {
                         if (!fixedVariables.contains(tmpLinear)) {
                             final Variable tmpFreeVariable = variableResolver.apply(tmpLinear);
 
-                            if (tmpFreeVariable.validate(ZERO, feasibility, null)) {
+                            if (tmpFreeVariable.validate(ZERO, precision, null)) {
                                 tmpFreeVariable.setFixed(ZERO);
                                 didFixVariable = true;
                             } else {
@@ -360,7 +360,7 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
+                final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
             boolean didFixVariable = false;
 
@@ -374,17 +374,17 @@ public abstract class Presolvers {
 
                 case 0:
 
-                    didFixVariable = Presolvers.doCase0(expression, fixedValue, remainingLinear, variableResolver, feasibility);
+                    didFixVariable = Presolvers.doCase0(expression, fixedValue, remainingLinear, variableResolver, precision);
                     break;
 
                 case 1:
 
-                    didFixVariable = Presolvers.doCase1(expression, fixedValue, remainingLinear, variableResolver, feasibility);
+                    didFixVariable = Presolvers.doCase1(expression, fixedValue, remainingLinear, variableResolver, precision);
                     break;
 
                 case 2:
 
-                    didFixVariable = Presolvers.doCase2(expression, fixedValue, remainingLinear, variableResolver, feasibility);
+                    didFixVariable = Presolvers.doCase2(expression, fixedValue, remainingLinear, variableResolver, precision);
                     break;
 
                 default:
@@ -403,11 +403,11 @@ public abstract class Presolvers {
      * This constraint expression has 0 remaining free variable. It is entirely redundant.
      */
     static boolean doCase0(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
-            final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
+            final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
         expression.setRedundant(true);
 
-        if (expression.validate(fixedValue, feasibility, null)) {
+        if (expression.validate(fixedValue, precision, null)) {
             expression.level(fixedValue);
         } else {
             expression.setInfeasible();
@@ -421,7 +421,7 @@ public abstract class Presolvers {
      * that variable, and the expression marked as redundant.
      */
     static boolean doCase1(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
-            final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
+            final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
         final IntIndex index = remaining.iterator().next();
         final Variable variable = variableResolver.apply(index);
@@ -436,7 +436,7 @@ public abstract class Presolvers {
             final BigDecimal compLevel = SUBTRACT.invoke(expUpper, fixedValue);
             final BigDecimal solution = DIVIDE.invoke(compLevel, factor);
 
-            if (variable.validate(solution, feasibility, null)) {
+            if (variable.validate(solution, precision, null)) {
                 variable.setFixed(solution);
             } else {
                 expression.setInfeasible();
@@ -505,7 +505,7 @@ public abstract class Presolvers {
     }
 
     static boolean doCase2(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
-            final Function<IntIndex, Variable> variableResolver, final NumberContext feasibility) {
+            final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
         final Iterator<IntIndex> tmpIterator = remaining.iterator();
 
@@ -544,10 +544,10 @@ public abstract class Presolvers {
         final BigDecimal exprLower = expression.getLowerLimit() != null ? SUBTRACT.invoke(expression.getLowerLimit(), fixedValue) : expression.getLowerLimit();
         final BigDecimal exprUpper = expression.getUpperLimit() != null ? SUBTRACT.invoke(expression.getUpperLimit(), fixedValue) : expression.getUpperLimit();
 
-        if ((exprLower != null) && (varAmax != null) && (varBmax != null) && (varAmax.add(varBmax, feasibility.getMathContext()).compareTo(exprLower) == -1)) {
+        if ((exprLower != null) && (varAmax != null) && (varBmax != null) && (varAmax.add(varBmax, precision.getMathContext()).compareTo(exprLower) == -1)) {
             expression.setInfeasible();
         }
-        if ((exprUpper != null) && (varAmin != null) && (varBmin != null) && (varAmin.add(varBmin, feasibility.getMathContext()).compareTo(exprUpper) == 1)) {
+        if ((exprUpper != null) && (varAmin != null) && (varBmin != null) && (varAmin.add(varBmin, precision.getMathContext()).compareTo(exprUpper) == 1)) {
             expression.setInfeasible();
         }
 

@@ -187,12 +187,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
          * @param fixedVariables
          * @param fixedValue TODO
          * @param variableResolver TODO
-         * @param feasibility TODO
+         * @param precision TODO
          * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
          *         typically when/if a variable was fixed.
          */
         public abstract boolean simplify(Expression expression, Set<IntIndex> fixedVariables, BigDecimal fixedValue,
-                Function<IntIndex, Variable> variableResolver, NumberContext feasibility);
+                Function<IntIndex, Variable> variableResolver, NumberContext precision);
 
         @Override
         boolean isApplicable(final Expression target) {
@@ -1350,7 +1350,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                     fixedValue = options.solution.enforce(expr.calculateFixedValue(fixedVariables));
                     for (final Presolver presolver : PRESOLVERS) {
                         if (!needToRepeat) {
-                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.feasibility);
+                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.solution);
                         }
                     }
                 }

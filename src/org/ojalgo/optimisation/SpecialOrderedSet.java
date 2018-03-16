@@ -48,7 +48,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
      */
     @Override
     public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-            final Function<IntIndex, Variable> variableResolver, NumberContext feasibility) {
+            final Function<IntIndex, Variable> variableResolver, NumberContext precision) {
 
         if (!expression.equals(myExpression)) {
             return false;
