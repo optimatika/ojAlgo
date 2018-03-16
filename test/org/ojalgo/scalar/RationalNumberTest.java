@@ -6,6 +6,8 @@ import org.ojalgo.constant.PrimitiveMath;
 
 import java.math.BigDecimal;
 
+import static java.lang.Double.longBitsToDouble;
+
 public class RationalNumberTest extends FunctionalityTest {
 
     private final double myDiff = PrimitiveMath.MACHINE_EPSILON;
@@ -13,7 +15,10 @@ public class RationalNumberTest extends FunctionalityTest {
     public void testValueOf() {
 
         double test_values[] = {
-                0.1,
+                //                 seeeeeeeeeemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+                longBitsToDouble(0b011111110111001100110011001100110011001100110011001100110011010L), // 0.1
+                longBitsToDouble(0b011111100111111111111111111111111111111111111111111111111111111L), // MAX_BITS
+                longBitsToDouble(0b011111101001111111111111111111111111111111111111111111111111111L), // MAX_BITS + 1
                 0.3,
                 0.25,
                 1e7,
@@ -32,6 +37,7 @@ public class RationalNumberTest extends FunctionalityTest {
             final RationalNumber direct = RationalNumber.valueOf(d);
             final RationalNumber viaBigDecimal = RationalNumber.valueOf(BigDecimal.valueOf(d));
 
+            TestUtils.assertEquals(d, direct.doubleValue(), myDiff);
             TestUtils.assertEquals(viaBigDecimal.doubleValue(), direct.doubleValue(), myDiff);
         }
     }

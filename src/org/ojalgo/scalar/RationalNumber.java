@@ -80,7 +80,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
     /**
      * Greatest Common Denominator
-     *
+     * <p>
      * It uses Python-style gcd, with the sign of gcd equal to sign of b;
      * that enables us to simplify fractions in one step
      */
@@ -194,9 +194,10 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             m >>= 1;
             exponent++;
         }
-        if (-exponent > MAX_BITS) {
-            m >>= -exponent - MAX_BITS;
-            return new RationalNumber(s * m, 1L << MAX_BITS);
+        if (-exponent >= MAX_BITS) {
+            int shift = MAX_BITS - 1;
+            m >>= -exponent - shift;
+            return new RationalNumber(s * m, 1L << shift);
         }
         return new RationalNumber(s * m, 1L << -exponent);
     }
@@ -327,13 +328,9 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     private final long myNumerator;
 
     private RationalNumber(final long numerator, final long denominator) {
-        if (denominator < 0L) {
-            myNumerator = -numerator;
-            myDenominator = -denominator;
-        } else {
-            myNumerator = numerator;
-            myDenominator = denominator;
-        }
+        assert denominator >= 0;
+        myNumerator = numerator;
+        myDenominator = denominator;
 
         if (denominator == 0L && Math.abs(numerator) > 1L) {
             ArithmeticException exception = new ArithmeticException("n / 0, where abs(n) > 1");
@@ -475,7 +472,9 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber invert() {
-        return new RationalNumber(myDenominator, myNumerator);
+        return sign() >= 0 ?
+                new RationalNumber(myDenominator, myNumerator) :
+                new RationalNumber(-myDenominator, -myNumerator);
     }
 
     public boolean isAbsolute() {
