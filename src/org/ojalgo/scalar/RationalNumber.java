@@ -75,6 +75,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     private static final String DIVIDE = " / ";
     private static final String LEFT = "(";
     private static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitLength();
+    private static final long LARGEST_POWER_OF_2 = 1L << (MAX_BITS - 1);
     private static final String RIGHT = ")";
     private static final long SAFE_LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE / 2L));
 
@@ -186,8 +187,11 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         int exponent = e - 1075;
 
         if (exponent >= 0) {
-            // TODO: Check for MAX_BITS and report infinity or throw
-            return new RationalNumber(s * (m << exponent), 1L);
+            long numerator = m << exponent;
+            if (numerator >> exponent != m) {
+                return s > 0 ? RationalNumber.POSITIVE_INFINITY : RationalNumber.NEGATIVE_INFINITY;
+            }
+            return new RationalNumber(s * numerator, 1L);
         }
 
         // Since denominator is a power of 2, GCD can only be power of two, so we simplify by dividing by 2 repeatedly
@@ -195,11 +199,10 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             m >>= 1;
             exponent++;
         }
-        // Avoiding the the denominator overflow by dividing the numerator
+        // Avoiding the the denominator overflow
         if (-exponent >= MAX_BITS) {
-            int shift = -exponent - MAX_BITS + 1;
-            m >>= shift;
-            exponent += shift;
+            m >>= -exponent - MAX_BITS + 1;
+            return new RationalNumber(s * m, LARGEST_POWER_OF_2);
         }
         return new RationalNumber(s * m, 1L << -exponent);
     }

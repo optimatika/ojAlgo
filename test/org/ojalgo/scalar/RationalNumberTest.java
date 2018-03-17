@@ -38,8 +38,10 @@ public class RationalNumberTest extends FunctionalityTest {
             final RationalNumber direct = RationalNumber.valueOf(d);
             final RationalNumber viaBigDecimal = RationalNumber.valueOf(BigDecimal.valueOf(d));
 
-            TestUtils.assertEquals(d, direct.doubleValue(), myDiff);
-            TestUtils.assertEquals(viaBigDecimal.doubleValue(), direct.doubleValue(), myDiff);
+            double viaDirect = direct.doubleValue();
+            TestUtils.assertEquals(d, viaDirect, myDiff);
+            double expected = viaBigDecimal.doubleValue();
+            TestUtils.assertEquals(expected, viaDirect, myDiff);
         }
     }
 
