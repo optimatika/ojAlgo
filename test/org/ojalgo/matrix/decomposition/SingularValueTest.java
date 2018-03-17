@@ -64,11 +64,11 @@ public class SingularValueTest extends MatrixDecompositionTests {
     }
 
     public void _testBasicMatrixP20030422Case() {
-        this.doTestTypes(P20030422Case.getProblematic());
+        this.doTestTypes(P20030422CaseTest.getProblematic());
     }
 
     public void _testBasicMatrixP20030512Case() {
-        this.doTestTypes(P20030512Case.getProblematic());
+        this.doTestTypes(P20030512CaseTest.getProblematic());
     }
 
     public void _testBasicMatrixP20050827Case() {

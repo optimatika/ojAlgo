@@ -27,7 +27,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.P20030422Case;
+import org.ojalgo.matrix.P20030422CaseTest;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -191,7 +191,7 @@ public class QRTest extends MatrixDecompositionTests {
 
     public void testP20030422Case() {
 
-        final RationalMatrix tmpOriginal = P20030422Case.getProblematic();
+        final RationalMatrix tmpOriginal = P20030422CaseTest.getProblematic();
 
         final QR<BigDecimal> tmpBigDecomp = QR.BIG.make();
         final QR<ComplexNumber> tmpComplexDecomp = QR.COMPLEX.make();
