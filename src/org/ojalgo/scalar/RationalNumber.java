@@ -190,14 +190,16 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             return new RationalNumber(s * (m << exponent), 1L);
         }
 
+        // Since denominator is a power of 2, GCD can only be power of two, so we simplify by dividing by 2 repeatedly
         while ((m & 1) == 0 && exponent < 0) {
             m >>= 1;
             exponent++;
         }
+        // Avoiding the the denominator overflow by dividing the numerator
         if (-exponent >= MAX_BITS) {
-            int shift = MAX_BITS - 1;
-            m >>= -exponent - shift;
-            return new RationalNumber(s * m, 1L << shift);
+            int shift = -exponent - MAX_BITS + 1;
+            m >>= shift;
+            exponent += shift;
         }
         return new RationalNumber(s * m, 1L << -exponent);
     }
