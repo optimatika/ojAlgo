@@ -454,37 +454,30 @@ public abstract class Presolvers {
             final BigDecimal oldLower = variable.getLowerLimit();
             final BigDecimal oldUpper = variable.getUpperLimit();
 
-            BigDecimal newLower = oldLower;
+            final BigDecimal newLower;
             if (solLower != null) {
-                if (oldLower != null) {
-                    newLower = oldLower.max(solLower);
-                } else {
-                    newLower = solLower;
+                solLower = oldLower != null ? oldLower.max(solLower) : solLower;
+                if (variable.isInteger()) {
+                    solLower = solLower.setScale(0, RoundingMode.CEILING);
                 }
+                newLower = solLower;
+            } else {
+                newLower = oldLower;
             }
 
-            BigDecimal newUpper = oldUpper;
+            final BigDecimal newUpper;
             if (solUpper != null) {
-                if (oldUpper != null) {
-                    newUpper = oldUpper.min(solUpper);
-                } else {
-                    newUpper = solUpper;
+                solUpper = oldUpper != null ? oldUpper.min(solUpper) : solUpper;
+                if (variable.isInteger()) {
+                    solUpper = solUpper.setScale(0, RoundingMode.FLOOR);
                 }
-            }
-
-            if (variable.isInteger()) {
-                if (newLower != null) {
-                    newLower = newLower.setScale(0, RoundingMode.CEILING);
-                }
-                if (newUpper != null) {
-                    newUpper = newUpper.setScale(0, RoundingMode.FLOOR);
-                }
+                newUpper = solUpper;
+            } else {
+                newUpper = oldUpper;
             }
 
             variable.lower(newLower).upper(newUpper);
-
-            final boolean tmpInfeasible = (newLower != null) && (newUpper != null) && (newLower.compareTo(newUpper) > 0);
-            if (tmpInfeasible) {
+            if (variable.isInfeasible()) {
                 expression.setInfeasible();
             }
         }

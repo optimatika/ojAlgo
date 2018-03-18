@@ -293,7 +293,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
 
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
 
-        TestUtils.assertTrue(tmpModel.validate(tmpResult, DEBUG ? BasicLogger.DEBUG : null));
+        TestUtils.assertTrue(tmpModel.validate(tmpResult));
     }
 
     public void testP20150127full() {
