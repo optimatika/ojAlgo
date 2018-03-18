@@ -422,15 +422,34 @@ public abstract class Presolvers {
         final IntIndex index = remaining.iterator().next();
         final Variable variable = variableResolver.apply(index);
         final BigDecimal factor = expression.get(index);
+        final BigDecimal oldLower = variable.getLowerLimit();
+        final BigDecimal oldUpper = variable.getUpperLimit();
+        final BigDecimal varMax;
+        final BigDecimal varMin;
+        if (factor.signum() == 1) {
+            varMax = oldUpper != null ? factor.multiply(oldUpper) : null;
+            varMin = oldLower != null ? factor.multiply(oldLower) : null;
+        } else {
+            varMin = oldUpper != null ? factor.multiply(oldUpper) : null;
+            varMax = oldLower != null ? factor.multiply(oldLower) : null;
+        }
 
-        final BigDecimal expLower = expression.getLowerLimit();
-        final BigDecimal expUpper = expression.getUpperLimit();
+        final BigDecimal exprLower = expression.getLowerLimit() != null ? expression.getLowerLimit().subtract(fixedValue) : null;
+        if ((exprLower != null) && (varMax != null) && precision.isLessThan(exprLower, varMax)) {
+            expression.setInfeasible();
+            return false;
+        }
+
+        final BigDecimal exprUpper = expression.getUpperLimit() != null ? expression.getUpperLimit().subtract(fixedValue) : null;
+        if ((exprUpper != null) && (varMin != null) && precision.isMoreThan(exprUpper, varMin)) {
+            expression.setInfeasible();
+            return false;
+        }
 
         if (expression.isEqualityConstraint()) {
             // Simple case with equality constraint
 
-            final BigDecimal compLevel = SUBTRACT.invoke(expUpper, fixedValue);
-            final BigDecimal solution = DIVIDE.invoke(compLevel, factor);
+            final BigDecimal solution = DIVIDE.invoke(exprUpper, factor);
 
             if (variable.validate(solution, precision, null)) {
                 variable.setFixed(solution);
@@ -441,51 +460,38 @@ public abstract class Presolvers {
         } else {
             // More general case
 
-            final BigDecimal compLower = expLower != null ? SUBTRACT.invoke(expLower, fixedValue) : expLower;
-            final BigDecimal compUpper = expUpper != null ? SUBTRACT.invoke(expUpper, fixedValue) : expUpper;
-
-            BigDecimal solutionLower = compLower != null ? DIVIDE.invoke(compLower, factor) : compLower;
-            BigDecimal solutionUpper = compUpper != null ? DIVIDE.invoke(compUpper, factor) : compUpper;
+            BigDecimal solLower = exprLower != null ? DIVIDE.invoke(exprLower, factor) : null;
+            BigDecimal solUpper = exprUpper != null ? DIVIDE.invoke(exprUpper, factor) : null;
             if (factor.signum() < 0) {
-                final BigDecimal tmpVal = solutionLower;
-                solutionLower = solutionUpper;
-                solutionUpper = tmpVal;
+                final BigDecimal tmpVal = solLower;
+                solLower = solUpper;
+                solUpper = tmpVal;
             }
 
-            final BigDecimal oldLower = variable.getLowerLimit();
-            final BigDecimal oldUpper = variable.getUpperLimit();
-
-            BigDecimal newLower = oldLower;
-            if (solutionLower != null) {
-                if (oldLower != null) {
-                    newLower = oldLower.max(solutionLower);
-                } else {
-                    newLower = solutionLower;
+            final BigDecimal newLower;
+            if (solLower != null) {
+                solLower = oldLower != null ? oldLower.max(solLower) : solLower;
+                if (variable.isInteger()) {
+                    solLower = solLower.setScale(0, RoundingMode.CEILING);
                 }
+                newLower = solLower;
+            } else {
+                newLower = oldLower;
             }
 
-            BigDecimal newUpper = oldUpper;
-            if (solutionUpper != null) {
-                if (oldUpper != null) {
-                    newUpper = oldUpper.min(solutionUpper);
-                } else {
-                    newUpper = solutionUpper;
+            final BigDecimal newUpper;
+            if (solUpper != null) {
+                solUpper = oldUpper != null ? oldUpper.min(solUpper) : solUpper;
+                if (variable.isInteger()) {
+                    solUpper = solUpper.setScale(0, RoundingMode.FLOOR);
                 }
-            }
-
-            if (variable.isInteger()) {
-                if (newLower != null) {
-                    newLower = newLower.setScale(0, RoundingMode.CEILING);
-                }
-                if (newUpper != null) {
-                    newUpper = newUpper.setScale(0, RoundingMode.FLOOR);
-                }
+                newUpper = solUpper;
+            } else {
+                newUpper = oldUpper;
             }
 
             variable.lower(newLower).upper(newUpper);
-
-            final boolean tmpInfeasible = (newLower != null) && (newUpper != null) && (newLower.compareTo(newUpper) > 0);
-            if (tmpInfeasible) {
+            if (variable.isInfeasible()) {
                 expression.setInfeasible();
             }
         }
@@ -537,14 +543,16 @@ public abstract class Presolvers {
         BigDecimal varBlowerNew = varBlowerOrg;
         BigDecimal varBupperNew = varBupperOrg;
 
-        final BigDecimal exprLower = expression.getLowerLimit() != null ? SUBTRACT.invoke(expression.getLowerLimit(), fixedValue) : expression.getLowerLimit();
-        final BigDecimal exprUpper = expression.getUpperLimit() != null ? SUBTRACT.invoke(expression.getUpperLimit(), fixedValue) : expression.getUpperLimit();
-
-        if ((exprLower != null) && (varAmax != null) && (varBmax != null) && (varAmax.add(varBmax, precision.getMathContext()).compareTo(exprLower) == -1)) {
+        final BigDecimal exprLower = expression.getLowerLimit() != null ? expression.getLowerLimit().subtract(fixedValue) : null;
+        if ((exprLower != null) && (varAmax != null) && (varBmax != null) && precision.isLessThan(exprLower, varAmax.add(varBmax))) {
             expression.setInfeasible();
+            return false;
         }
-        if ((exprUpper != null) && (varAmin != null) && (varBmin != null) && (varAmin.add(varBmin, precision.getMathContext()).compareTo(exprUpper) == 1)) {
+
+        final BigDecimal exprUpper = expression.getUpperLimit() != null ? expression.getUpperLimit().subtract(fixedValue) : null;
+        if ((exprUpper != null) && (varAmin != null) && (varBmin != null) && precision.isMoreThan(exprUpper, varAmin.add(varBmin))) {
             expression.setInfeasible();
+            return false;
         }
 
         if (exprLower != null) {
