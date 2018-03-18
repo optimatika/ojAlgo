@@ -429,8 +429,7 @@ public abstract class Presolvers {
         if (expression.isEqualityConstraint()) {
             // Simple case with equality constraint
 
-            final BigDecimal compLevel = SUBTRACT.invoke(expUpper, fixedValue);
-            final BigDecimal solution = DIVIDE.invoke(compLevel, factor);
+            final BigDecimal solution = DIVIDE.invoke(expUpper.subtract(fixedValue), factor);
 
             if (variable.validate(solution, precision, null)) {
                 variable.setFixed(solution);
@@ -441,35 +440,35 @@ public abstract class Presolvers {
         } else {
             // More general case
 
-            final BigDecimal compLower = expLower != null ? SUBTRACT.invoke(expLower, fixedValue) : expLower;
-            final BigDecimal compUpper = expUpper != null ? SUBTRACT.invoke(expUpper, fixedValue) : expUpper;
+            final BigDecimal compLower = expLower != null ? expLower.subtract(fixedValue) : null;
+            final BigDecimal compUpper = expUpper != null ? expUpper.subtract(fixedValue) : null;
 
-            BigDecimal solutionLower = compLower != null ? DIVIDE.invoke(compLower, factor) : compLower;
-            BigDecimal solutionUpper = compUpper != null ? DIVIDE.invoke(compUpper, factor) : compUpper;
+            BigDecimal solLower = compLower != null ? DIVIDE.invoke(compLower, factor) : null;
+            BigDecimal solUpper = compUpper != null ? DIVIDE.invoke(compUpper, factor) : null;
             if (factor.signum() < 0) {
-                final BigDecimal tmpVal = solutionLower;
-                solutionLower = solutionUpper;
-                solutionUpper = tmpVal;
+                final BigDecimal tmpVal = solLower;
+                solLower = solUpper;
+                solUpper = tmpVal;
             }
 
             final BigDecimal oldLower = variable.getLowerLimit();
             final BigDecimal oldUpper = variable.getUpperLimit();
 
             BigDecimal newLower = oldLower;
-            if (solutionLower != null) {
+            if (solLower != null) {
                 if (oldLower != null) {
-                    newLower = oldLower.max(solutionLower);
+                    newLower = oldLower.max(solLower);
                 } else {
-                    newLower = solutionLower;
+                    newLower = solLower;
                 }
             }
 
             BigDecimal newUpper = oldUpper;
-            if (solutionUpper != null) {
+            if (solUpper != null) {
                 if (oldUpper != null) {
-                    newUpper = oldUpper.min(solutionUpper);
+                    newUpper = oldUpper.min(solUpper);
                 } else {
-                    newUpper = solutionUpper;
+                    newUpper = solUpper;
                 }
             }
 
