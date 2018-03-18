@@ -532,10 +532,10 @@ public abstract class Presolvers {
         final BigDecimal exprLower = expression.getLowerLimit() != null ? SUBTRACT.invoke(expression.getLowerLimit(), fixedValue) : expression.getLowerLimit();
         final BigDecimal exprUpper = expression.getUpperLimit() != null ? SUBTRACT.invoke(expression.getUpperLimit(), fixedValue) : expression.getUpperLimit();
 
-        if ((exprLower != null) && (varAmax != null) && (varBmax != null) && (varAmax.add(varBmax, precision.getMathContext()).compareTo(exprLower) == -1)) {
+        if ((exprLower != null) && (varAmax != null) && (varBmax != null) && precision.isLessThan(exprLower, varAmax.add(varBmax))) {
             expression.setInfeasible();
         }
-        if ((exprUpper != null) && (varAmin != null) && (varBmin != null) && (varAmin.add(varBmin, precision.getMathContext()).compareTo(exprUpper) == 1)) {
+        if ((exprUpper != null) && (varAmin != null) && (varBmin != null) && precision.isMoreThan(exprUpper, varAmin.add(varBmin))) {
             expression.setInfeasible();
         }
 

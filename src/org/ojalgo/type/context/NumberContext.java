@@ -386,6 +386,14 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         return !this.isSmall(expected, actual - expected);
     }
 
+    public boolean isLessThan(final BigDecimal reference, final BigDecimal value) {
+        return (value.compareTo(reference) == -1) && this.isDifferent(reference.doubleValue(), value.doubleValue());
+    }
+
+    public boolean isMoreThan(final BigDecimal reference, final BigDecimal value) {
+        return (value.compareTo(reference) == 1) && this.isDifferent(reference.doubleValue(), value.doubleValue());
+    }
+
     public boolean isSmall(final double comparedTo, final double value) {
         final double tmpComparedTo = PrimitiveFunction.ABS.invoke(comparedTo);
         if (NumberContext.isZero(tmpComparedTo, myZeroError)) {
