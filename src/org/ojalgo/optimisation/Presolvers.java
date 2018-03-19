@@ -21,8 +21,8 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.ZERO;
-import static org.ojalgo.function.BigFunction.DIVIDE;
+import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.function.BigFunction.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -468,10 +468,8 @@ public abstract class Presolvers {
 
         if (exprLower != null) {
 
-            final BigDecimal varBlimit = factorB.signum() == 1 ? oldUpperB : oldLowerB;
-            if (varBlimit != null) {
-
-                BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(factorB.multiply(varBlimit)), factorA);
+            if ((varMaxContrB != null) && (varMaxContrB.compareTo(exprLower) < 0)) {
+                BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varMaxContrB), factorA);
 
                 newLimit = oldLowerA != null ? oldLowerA.max(newLimit) : newLimit;
                 newLimit = oldUpperA != null ? oldUpperA.min(newLimit) : newLimit;
@@ -483,10 +481,8 @@ public abstract class Presolvers {
                 }
             }
 
-            final BigDecimal varAlimit = factorA.signum() == 1 ? oldUpperA : oldLowerA;
-            if (varAlimit != null) {
-
-                BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(factorA.multiply(varAlimit)), factorB);
+            if ((varMaxContrA != null) && (varMaxContrA.compareTo(exprLower) < 0)) {
+                BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varMaxContrA), factorB);
 
                 newLimit = oldLowerB != null ? oldLowerB.max(newLimit) : newLimit;
                 newLimit = oldUpperB != null ? oldUpperB.min(newLimit) : newLimit;
@@ -501,10 +497,8 @@ public abstract class Presolvers {
 
         if (exprUpper != null) {
 
-            final BigDecimal varBlimit = factorB.signum() == 1 ? oldLowerB : oldUpperB;
-            if (varBlimit != null) {
-
-                BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(factorB.multiply(varBlimit)), factorA);
+            if ((varMinContrB != null) && (varMinContrB.compareTo(exprUpper) > 0)) {
+                BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varMinContrB), factorA);
 
                 newLimit = oldLowerA != null ? oldLowerA.max(newLimit) : newLimit;
                 newLimit = oldUpperA != null ? oldUpperA.min(newLimit) : newLimit;
@@ -516,10 +510,8 @@ public abstract class Presolvers {
                 }
             }
 
-            final BigDecimal varAlimit = factorA.signum() == 1 ? oldLowerA : oldUpperA;
-            if (varAlimit != null) {
-
-                BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(factorA.multiply(varAlimit)), factorB);
+            if (varMinContrA != null && (varMinContrA.compareTo(exprUpper) > 0)) {
+                BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varMinContrA), factorB);
 
                 newLimit = oldLowerB != null ? oldLowerB.max(newLimit) : newLimit;
                 newLimit = oldUpperB != null ? oldUpperB.min(newLimit) : newLimit;
