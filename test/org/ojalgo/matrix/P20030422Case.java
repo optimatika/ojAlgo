@@ -28,9 +28,9 @@ import org.ojalgo.type.context.NumberContext;
  * The problem was/is to calculate a numerically correct (6 decimals) inverse. Reported to jama@nist.gov
  *
  * @author apete
- * @see P20030512CaseTest
+ * @see P20030512Case
  */
-public class P20030422CaseTest extends BasicMatrixTest {
+public class P20030422Case extends BasicMatrixTest {
 
     public static RationalMatrix getProblematic() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
@@ -45,11 +45,11 @@ public class P20030422CaseTest extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public P20030422CaseTest() {
+    public P20030422Case() {
         super();
     }
 
-    public P20030422CaseTest(final String arg0) {
+    public P20030422Case(final String arg0) {
         super(arg0);
     }
 
@@ -61,7 +61,7 @@ public class P20030422CaseTest extends BasicMatrixTest {
     @Override
     public void testProblem() {
 
-        myExpMtrx = P20030422CaseTest.getProblematic();
+        myExpMtrx = P20030422Case.getProblematic();
         myActMtrx = myExpMtrx.invert().invert();
 
         // The RationalMatrix implementation can do this do 6 decimals, but not the others
@@ -74,7 +74,7 @@ public class P20030422CaseTest extends BasicMatrixTest {
         DEFINITION = new NumberContext(7, 6);
         EVALUATION = new NumberContext(7, 3);
 
-        myBigAA = P20030422CaseTest.getProblematic();
+        myBigAA = P20030422Case.getProblematic();
         myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
         myBigAB = myBigAA;
 
