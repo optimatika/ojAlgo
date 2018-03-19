@@ -75,7 +75,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     private static final String DIVIDE = " / ";
     private static final String LEFT = "(";
     private static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitLength();
-    private static final long LARGEST_POWER_OF_2 = 1L << (MAX_BITS - 1);
     private static final String RIGHT = ")";
     private static final long SAFE_LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE / 2L));
 
@@ -201,8 +200,13 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
         // Avoiding the the denominator overflow
         if (-exponent >= MAX_BITS) {
-            m >>= -exponent - MAX_BITS + 1;
-            return new RationalNumber(s * m, LARGEST_POWER_OF_2);
+            BigInteger denom = BigInteger.ONE.shiftLeft(-exponent);
+            BigInteger maxlong = BigInteger.valueOf(Long.MAX_VALUE);
+            BigInteger factor = denom.divide(maxlong);
+            if (factor.compareTo(maxlong) > 0) {
+                return ZERO;
+            }
+            return new RationalNumber(s * m / factor.longValueExact(), Long.MAX_VALUE);
         }
         return new RationalNumber(s * m, 1L << -exponent);
     }
