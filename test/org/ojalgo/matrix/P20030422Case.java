@@ -28,7 +28,7 @@ import org.ojalgo.type.context.NumberContext;
  * The problem was/is to calculate a numerically correct (6 decimals) inverse. Reported to jama@nist.gov
  *
  * @author apete
- * @see P20030512Case
+ * @see org.ojalgo.matrix.P20030512Case
  */
 public class P20030422Case extends BasicMatrixTest {
 
