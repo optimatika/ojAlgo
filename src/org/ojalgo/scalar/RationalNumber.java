@@ -108,11 +108,11 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public static boolean isInfinite(final RationalNumber value) {
-        return value.getNumerator() != 0L && value.getDenominator() == 0L;
+        return ((value.getNumerator() != 0L) && (value.getDenominator() == 0L));
     }
 
     public static boolean isNaN(final RationalNumber value) {
-        return value.getNumerator() == 0L && value.getDenominator() == 0L;
+        return ((value.getNumerator() == 0L) && (value.getDenominator() == 0L));
     }
 
     public static boolean isSmall(final double comparedTo, final RationalNumber value) {
@@ -120,6 +120,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public static RationalNumber of(final long numerator, final long denominator) {
+
         if (denominator == 0L) {
             if (numerator > 0L) {
                 return POSITIVE_INFINITY;
@@ -243,7 +244,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
                     retDenom = BigInteger.TEN.pow(scale);
 
                     final BigInteger gcd = retNumer.gcd(retDenom);
-                    if (gcd.compareTo(BigInteger.ONE) > 0) {
+                    if (gcd.compareTo(BigInteger.ONE) == 1) {
                         retNumer = retNumer.divide(gcd);
                         retDenom = retDenom.divide(gcd);
                     }
@@ -272,7 +273,14 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     private static String toString(final RationalNumber aNmbr) {
-        return LEFT + aNmbr.getNumerator() + DIVIDE + aNmbr.getDenominator() + RIGHT;
+
+        final StringBuilder retVal = new StringBuilder(LEFT);
+
+        retVal.append(aNmbr.getNumerator());
+        retVal.append(DIVIDE);
+        retVal.append(aNmbr.getDenominator());
+
+        return retVal.append(RIGHT).toString();
     }
 
     private static RationalNumber add(final RationalNumber arg1, final RationalNumber arg2) {
@@ -341,10 +349,8 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         myNumerator = numerator;
         myDenominator = denominator;
 
-        if (denominator == 0L && Math.abs(numerator) > 1L) {
-            ArithmeticException exception = new ArithmeticException("n / 0, where abs(n) > 1");
-            exception.printStackTrace();
-            throw exception;
+        if ((denominator == 0L) && (Math.abs(numerator) > 1L)) {
+            throw new ArithmeticException("n / 0, where abs(n) > 1");
         }
     }
 
@@ -454,7 +460,13 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             return false;
         }
         final RationalNumber other = (RationalNumber) obj;
-        return myDenominator == other.myDenominator && myNumerator == other.myNumerator;
+        if (myDenominator != other.myDenominator) {
+            return false;
+        }
+        if (myNumerator != other.myNumerator) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -620,11 +632,11 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return new BigDecimal(myNumerator).divide(new BigDecimal(myDenominator), context);
     }
 
-    private long getDenominator() {
+    long getDenominator() {
         return myDenominator;
     }
 
-    private long getNumerator() {
+    long getNumerator() {
         return myNumerator;
     }
 
