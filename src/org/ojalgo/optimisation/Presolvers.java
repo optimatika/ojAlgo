@@ -566,13 +566,10 @@ public abstract class Presolvers {
                 newLimit = varAupperOrg != null ? varAupperOrg.min(newLimit) : newLimit;
 
                 if (varAfactor.signum() == 1) {
-                    // New lower limit on A
                     varAlowerNew = newLimit;
                 } else {
-                    // New upper limit on A
                     varAupperNew = newLimit;
                 }
-
             }
 
             final BigDecimal varAlimit = varAfactor.signum() == 1 ? varAupperOrg : varAlowerOrg;
@@ -584,13 +581,10 @@ public abstract class Presolvers {
                 newLimit = varBupperOrg != null ? varBupperOrg.min(newLimit) : newLimit;
 
                 if (varBfactor.signum() == 1) {
-                    // New lower limit on B
                     varBlowerNew = newLimit;
                 } else {
-                    // New upper limit on B
                     varBupperNew = newLimit;
                 }
-
             }
         }
 
@@ -609,7 +603,6 @@ public abstract class Presolvers {
                 } else {
                     varAlowerNew = newLimit;
                 }
-
             }
 
             final BigDecimal varAlimit = varAfactor.signum() == 1 ? varAlowerOrg : varAupperOrg;
@@ -625,7 +618,6 @@ public abstract class Presolvers {
                 } else {
                     varBlowerNew = newLimit;
                 }
-
             }
         }
 
