@@ -21,18 +21,12 @@
  */
 package org.ojalgo.matrix.store;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 
 public class SuppliersAndConsumers extends AbstractMatrixStoreTest {
 
-    public SuppliersAndConsumers() {
-        super();
-    }
-
-    public SuppliersAndConsumers(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testMultiplyingAndTransposing() {
 
         final PrimitiveDenseStore tmpMtrxA = PrimitiveDenseStore.FACTORY.makeZero(10, 5);

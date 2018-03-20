@@ -12,22 +12,13 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import org.ojalgo.FunctionalityTest;
-
 /**
  * OptimisationLinearPackageTests
  *
  * @author apete
  */
-public abstract class OptimisationLinearTests extends FunctionalityTest {
+abstract class OptimisationLinearTests {
 
     static final boolean DEBUG = false;
 
-    protected OptimisationLinearTests() {
-        super();
-    }
-
-    protected OptimisationLinearTests(final String name) {
-        super(name);
-    }
 }

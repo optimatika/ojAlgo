@@ -51,8 +51,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test
-    public void testData() {
+    @Test public void testData() {
 
         myExpMtrx = SimpleEigenvalueCase.getOriginal().multiply(SimpleEigenvalueCase.getMatrixV());
 
@@ -61,8 +60,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Test
-    public void testProblem() {
+    @Test public void testProblem() {
 
         final Eigenvalue<Double> tmpEigen = Eigenvalue.PRIMITIVE.make();
         tmpEigen.decompose(PrimitiveDenseStore.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));

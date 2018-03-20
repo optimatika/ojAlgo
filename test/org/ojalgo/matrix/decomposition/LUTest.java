@@ -23,6 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.P20061119Case;
@@ -36,16 +38,14 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class LUTest extends MatrixDecompositionTests {
+public class LUTest {
 
-    public LUTest() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public LUTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testP20061119Case() {
 
         final RationalMatrix tmpProblematic = P20061119Case.getProblematic();

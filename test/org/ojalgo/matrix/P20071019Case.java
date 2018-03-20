@@ -44,16 +44,14 @@ public class P20071019Case extends BasicMatrixTest {
         return SimpleLeastSquaresCase.getBody();
     }
 
-    @Test
-    public void testData() {
+    @Test public void testData() {
 
         TestUtils.assertEquals(true, P20071019Case.getFatProblematic().isFat());
 
         TestUtils.assertEquals(true, P20071019Case.getTallProblematic().isTall());
     }
 
-    @Test
-    public void testProblem() {
+    @Test public void testProblem() {
 
         final LU<Double> tmpJamaLU = LU.PRIMITIVE.make();
         final LU<Double> tmpDenseLU = LU.PRIMITIVE.make();

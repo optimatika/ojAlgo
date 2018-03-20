@@ -23,20 +23,15 @@ package org.ojalgo.array;
 
 import java.util.Arrays;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 
-@Tags({@Tag("functionality"), @Tag("array")})
 public class SetGetTest extends BasicArrayTest {
 
     @Override
     void doTest(final BasicArray<Double> array) {
 
-        for (long INDEX : INDICES) {
-            array.set(INDEX, 1.0);
-        }
+        setMultiple(array, INDICES);
 
         for (long i = 0L; i < COUNT; i++) {
 
@@ -54,8 +49,8 @@ public class SetGetTest extends BasicArrayTest {
             }
         }
 
-        for (int i = 0; i < INDICES.length; i++) {
-            TestUtils.assertEquals(1.0, array.doubleValue(INDICES[i]), PrimitiveMath.MACHINE_EPSILON);
+        for (long INDICE : INDICES) {
+            TestUtils.assertEquals(1.0, array.doubleValue(INDICE), PrimitiveMath.MACHINE_EPSILON);
         }
 
     }

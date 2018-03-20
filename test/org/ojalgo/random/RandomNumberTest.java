@@ -23,6 +23,8 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Primitive64Array;
@@ -38,7 +40,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  * @author Chris Lucas
  */
-public class RandomNumberTest extends RandomTests {
+public class RandomNumberTest {
 
     // A wrapper for two-parameter random numbers to make it easier to generalize tests. Easy to extend to single-parameter random numbers,
     // or just apply as-is by having one throw-away parameter.
@@ -84,15 +86,9 @@ public class RandomNumberTest extends RandomTests {
         }
     }
 
-    public RandomNumberTest() {
-        super();
-    }
-
-    public RandomNumberTest(final String someName) {
-        super(someName);
-    }
-
-    public void _testLogNormal() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testLogNormal() {
 
         final double tmpAccuracy = TENTH / THREE;
 
@@ -139,6 +135,7 @@ public class RandomNumberTest extends RandomTests {
      * Tests that the error function implementation returns correct confidence intervals for +/- 6 standard
      * deviations. They are all correct to at least 10 decimal places.
      */
+    @Test
     public void testERF() {
 
         double tmpStdDevCount;
@@ -183,6 +180,7 @@ public class RandomNumberTest extends RandomTests {
         TestUtils.assertEquals(-tmpConfidence, RandomUtils.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
     }
 
+    @Test
     public void testERFandERFI() {
 
         final double tmpError = 1E-14 / PrimitiveMath.THREE;
@@ -199,6 +197,7 @@ public class RandomNumberTest extends RandomTests {
         }
     }
 
+    @Test
     public void testERFI() {
 
         double tmpConfidenceLevel;
@@ -238,6 +237,7 @@ public class RandomNumberTest extends RandomTests {
         TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
     }
 
+    @Test
     public void testErlang() {
         // Erlang is a special case of the gamma where the count is an integer -- verify that this is true for current implementation.
         for (double theta = .01; theta <= 10.0; theta = theta * 10.0) {
@@ -249,14 +249,16 @@ public class RandomNumberTest extends RandomTests {
             }
         }
         // param 1 is cast to integers by Dist2Erlang
-        this.testDist2(new Dist2Erlang(), new double[] { 1, .01 }, new double[] { 5, 10 }, new double[] { 5, 100 }, 2500000, .05);
+        this.testDist2(new Dist2Erlang(), new double[]{1, .01}, new double[]{5, 10}, new double[]{5, 100}, 2500000, .05);
     }
 
+    @Test
     public void testGamma() {
         // TODO 15% error seems a little high
-        this.testDist2(new Dist2Gamma(), new double[] { .01, .01 }, new double[] { 10, 10 }, new double[] { 100, 100 }, 200000, .15);
+        this.testDist2(new Dist2Gamma(), new double[]{.01, .01}, new double[]{10, 10}, new double[]{100, 100}, 200000, .15);
     }
 
+    @Test
     public void testGammaFunction() {
 
         final double tmpEps = 0.000005;
@@ -309,6 +311,7 @@ public class RandomNumberTest extends RandomTests {
 
     }
 
+    @Test
     public void testGeometricMeanAndStandardDeviation() {
 
         final int tmpSize = 1000;
@@ -359,14 +362,16 @@ public class RandomNumberTest extends RandomTests {
     // Sample means differ from expectation by an amount greater than anticipated given the large samples. May be due to
     // rounding error. For comparison, matlab's estimates for the mean of the normal for large samples tend to be
     // within 2 percent of the mean.
+    @Test
     public void testNorm2() {
-        this.testDist2(new Dist2Norm(), new double[] { .01, .01 }, new double[] { 10, 10 }, new double[] { 100, 100 }, 1500000, .05);
+        this.testDist2(new Dist2Norm(), new double[]{.01, .01}, new double[]{10, 10}, new double[]{100, 100}, 1500000, .05);
     }
 
+    @Test
     public void testNormal() {
 
-        final double[] tmpStdDevCount = new double[] { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX }; // ± this number of std devs
-        final double[] tmpConfidence = new double[] { ZERO, 0.682689492137, 0.954499736104, 0.997300203937, 0.999936657516, 0.999999426697, 0.999999998027 };
+        final double[] tmpStdDevCount = new double[]{ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX}; // ± this number of std devs
+        final double[] tmpConfidence = new double[]{ZERO, 0.682689492137, 0.954499736104, 0.997300203937, 0.999936657516, 0.999999426697, 0.999999998027};
 
         final Normal tmpDistribution = new Normal(TEN, PI);
 
@@ -385,10 +390,11 @@ public class RandomNumberTest extends RandomTests {
 
     }
 
+    @Test
     public void testSampledMean() {
 
-        final RandomNumber[] tmpRndNmbrs = new RandomNumber[] { new Exponential(), new LogNormal(), new Normal(), new Uniform(), new Binomial(),
-                new Geometric(), new Poisson(), new Erlang(), new Gamma(), new Weibull() };
+        final RandomNumber[] tmpRndNmbrs = new RandomNumber[]{new Exponential(), new LogNormal(), new Normal(), new Uniform(), new Binomial(),
+                new Geometric(), new Poisson(), new Erlang(), new Gamma(), new Weibull()};
 
         for (int d = 0; d < tmpRndNmbrs.length; d++) {
 
@@ -411,6 +417,7 @@ public class RandomNumberTest extends RandomTests {
 
     }
 
+    @Test
     public void testVariance() {
 
         final double tmpStdDev = TEN;
@@ -438,6 +445,7 @@ public class RandomNumberTest extends RandomTests {
         TestUtils.assertEquals(tmpExpectedVar, tmpActualVar, THOUSAND * (1E-14 / THREE)); // TODO Large numerical difference, which is better?
     }
 
+    @Test
     public void testWeibull() {
         for (double i = .01; i <= 10.0; i = i * 10) {
             for (double j = .01; j <= 100.0; j = j * 10) {
@@ -448,9 +456,10 @@ public class RandomNumberTest extends RandomTests {
                 TestUtils.assertEquals("Weibull distribution's variance should be deterministic and precise.", w0.getVariance(), w1.getVariance());
             }
         }
-        this.testDist2(new Dist2Weibull(), new double[] { .01, .5 }, new double[] { 10, 2 }, new double[] { 100, 4 }, 2500000, .05);
+        this.testDist2(new Dist2Weibull(), new double[]{.01, .5}, new double[]{10, 2}, new double[]{100, 4}, 2500000, .05);
     }
 
+    @Test
     public void testWeibullWithShape1() {
 
         // Weibull with shape=1.0 shoud be equivalent to Exponential with the same lambda

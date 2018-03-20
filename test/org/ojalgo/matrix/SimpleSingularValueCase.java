@@ -57,8 +57,7 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test
-    public void testData() {
+    @Test public void testData() {
 
         final PhysicalStore<Double> tmpExp = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getOriginal())
                 .multiply(PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getMatrixQ2())).copy();
@@ -69,8 +68,7 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
         TestUtils.assertEquals(tmpExp, tmpAct, EVALUATION);
     }
 
-    @Test
-    public void testProblem() {
+    @Test public void testProblem() {
 
         final MatrixStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getOriginal());
 
@@ -79,12 +77,6 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
 
         //tmpSVD.equals(tmpA, EVALUATION);
         TestUtils.assertEquals(tmpA, tmpSVD, EVALUATION);
-    }
-
-    @Test
-    @Override
-    public void testSolveBasicMatrix() {
-        super.testSolveBasicMatrix();
     }
 
     @Before

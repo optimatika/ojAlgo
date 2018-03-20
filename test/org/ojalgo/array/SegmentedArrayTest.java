@@ -21,6 +21,7 @@
  */
 package org.ojalgo.array;
 
+import org.junit.Test;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
 
@@ -29,10 +30,9 @@ import org.junit.jupiter.api.Tags;
  *
  * @author apete
  */
-@Tags({@Tag("functionality"), @Tag("array")})
-public class SegmentedArrayTest extends ArrayTests {
+public class SegmentedArrayTest  {
 
-    public void testRandomSetAndGetBackPrimitive64() {
+    @Test public void testRandomSetAndGetBackPrimitive64() {
 
         final long tmpCount = 5000L;
 
@@ -41,7 +41,7 @@ public class SegmentedArrayTest extends ArrayTests {
         ArrayTests.doTestRandomSetAndGetBack(tmpArray, tmpCount);
     }
 
-    public void testVeryLargeRandomSetAndGetBackBasic() {
+    @Test public void testVeryLargeRandomSetAndGetBackBasic() {
 
         final long tmpCount = Long.MAX_VALUE;
 

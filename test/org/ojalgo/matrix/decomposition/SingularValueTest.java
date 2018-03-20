@@ -23,6 +23,9 @@ package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
@@ -39,7 +42,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-public class SingularValueTest extends MatrixDecompositionTests {
+public class SingularValueTest {
 
     private static final SingularValue<BigDecimal> IMPL_BIG = SingularValue.BIG.make();
     private static final SingularValue<ComplexNumber> IMPL_COMPLEX = SingularValue.COMPLEX.make();
@@ -55,42 +58,51 @@ public class SingularValueTest extends MatrixDecompositionTests {
     static final NumberContext CNTXT_REAL_DECOMP = new NumberContext(4, 6);
     static final NumberContext CNTXT_REAL_VALUES = new NumberContext(7, 10);
 
-    public SingularValueTest() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public SingularValueTest(final String arg0) {
-        super(arg0);
-    }
-
-    public void _testBasicMatrixP20030422Case() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testBasicMatrixP20030422Case() {
         this.doTestTypes(P20030422Case.getProblematic());
     }
 
-    public void _testBasicMatrixP20030512Case() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testBasicMatrixP20030512Case() {
         this.doTestTypes(P20030512Case.getProblematic());
     }
 
-    public void _testBasicMatrixP20050827Case() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testBasicMatrixP20050827Case() {
         this.doTestTypes(PrimitiveMatrix.FACTORY.copy(PrimitiveDenseStore.FACTORY.copy(P20050827Case.getProblematic())));
     }
 
-    public void _testBasicMatrixP20061119Case() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testBasicMatrixP20061119Case() {
         this.doTestTypes(P20061119Case.getProblematic());
     }
 
+    @Test
     public void testBasicMatrixP20030528Case() {
         this.doTestTypes(P20030528Case.getProblematic());
     }
 
+    @Test
     public void testBasicMatrixP20050125Case() {
         this.doTestTypes(P20050125Case.getProblematic());
     }
 
+    @Test
     public void testBasicMatrixP20071019FatCase() {
         this.doTestTypes(P20071019Case.getFatProblematic());
     }
 
+    @Test
     public void testBasicMatrixP20071019TallCase() {
         this.doTestTypes(P20071019Case.getTallProblematic());
     }
@@ -98,6 +110,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
     /**
      * http://en.wikipedia.org/wiki/Singular_value_decomposition
      */
+    @Test
     public void testComplexNumberVersionOfWikipediaCase() {
 
         final PhysicalStore<Double> tmpBaseMtrx = PrimitiveDenseStore.FACTORY
@@ -112,16 +125,16 @@ public class SingularValueTest extends MatrixDecompositionTests {
         final Bidiagonal<ComplexNumber> tmpBidiagonal = Bidiagonal.COMPLEX.make();
         final SingularValue<ComplexNumber> tmpSVD = SingularValue.COMPLEX.make();
 
-        for (int s = 0; s < tmpScales.length; s++) {
+        for (ComplexNumber tmpScale : tmpScales) {
 
             final PhysicalStore<ComplexNumber> tmpOriginalMtrx = ComplexDenseStore.FACTORY.transpose(tmpBaseMtrx);
-            tmpOriginalMtrx.modifyAll(ComplexFunction.MULTIPLY.first(tmpScales[s]));
+            tmpOriginalMtrx.modifyAll(ComplexFunction.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx);
             final MatrixStore<ComplexNumber> tmpReconstructed = tmpBidiagonal.reconstruct();
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug();
-                BasicLogger.debug("Scale = {}", tmpScales[s]);
+                BasicLogger.debug("Scale = {}", tmpScale);
                 BasicLogger.debug("A", tmpOriginalMtrx);
                 BasicLogger.debug("Q1", tmpBidiagonal.getQ1());
                 BasicLogger.debug("D", tmpBidiagonal.getD());
@@ -131,15 +144,15 @@ public class SingularValueTest extends MatrixDecompositionTests {
             TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, new NumberContext(7, 6));
         }
 
-        for (int s = 0; s < tmpScales.length; s++) {
+        for (ComplexNumber tmpScale : tmpScales) {
 
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug();
-                BasicLogger.debug("Scale = {}", tmpScales[s]);
+                BasicLogger.debug("Scale = {}", tmpScale);
             }
 
             final PhysicalStore<ComplexNumber> tmpOriginalMtrx = ComplexDenseStore.FACTORY.copy(tmpBaseMtrx);
-            tmpOriginalMtrx.modifyAll(ComplexFunction.MULTIPLY.first(tmpScales[s]));
+            tmpOriginalMtrx.modifyAll(ComplexFunction.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx.conjugate());
             tmpSVD.setFullSize(false);
@@ -162,6 +175,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
     }
 
+    @Test
     public void testRandomActuallyComplexCase() {
 
         final PhysicalStore<ComplexNumber> tmpOriginal = MatrixUtils.makeRandomComplexStore(4, 4);
@@ -197,18 +211,22 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
     }
 
+    @Test
     public void testRandomFatCase() {
         this.doTestTypes(MTRX_FAT);
     }
 
+    @Test
     public void testRandomSquareCase() {
         this.doTestTypes(MTRX_SQUARE);
     }
 
+    @Test
     public void testRandomTallCase() {
         this.doTestTypes(MTRX_TALL);
     }
 
+    @Test
     public void testRecreationFat() {
 
         final PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_FAT);
@@ -216,6 +234,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
         this.testRecreation(tmpOriginal);
     }
 
+    @Test
     public void testRecreationSquare() {
 
         final PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_SQUARE);
@@ -223,6 +242,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
         this.testRecreation(tmpOriginal);
     }
 
+    @Test
     public void testRecreationTall() {
 
         final PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_TALL);
@@ -340,27 +360,27 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
     }
 
-    void testRecreation(final PhysicalStore<Double> aMtrx) {
+    private void testRecreation(final PhysicalStore<Double> aMtrx) {
 
         final SingularValue<Double>[] tmpImpls = MatrixDecompositionTests.getSingularValuePrimitive();
 
-        for (int i = 0; i < tmpImpls.length; i++) {
+        for (SingularValue<Double> tmpImpl : tmpImpls) {
 
-            tmpImpls[i].decompose(aMtrx);
-            final MatrixStore<Double> tmpReconstructed = SingularValue.reconstruct(tmpImpls[i]);
+            tmpImpl.decompose(aMtrx);
+            final MatrixStore<Double> tmpReconstructed = SingularValue.reconstruct(tmpImpl);
             if (!Access2D.equals(aMtrx, tmpReconstructed, new NumberContext(7, 6))) {
-                BasicLogger.error("Recreation failed for: {}", tmpImpls[i].getClass().getName());
+                BasicLogger.error("Recreation failed for: {}", tmpImpl.getClass().getName());
             }
-            if (!SingularValue.equals(aMtrx, tmpImpls[i], new NumberContext(7, 6))) {
-                BasicLogger.error("Decomposition not correct for: {}", tmpImpls[i].getClass().getName());
+            if (!SingularValue.equals(aMtrx, tmpImpl, new NumberContext(7, 6))) {
+                BasicLogger.error("Decomposition not correct for: {}", tmpImpl.getClass().getName());
             }
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug();
-                BasicLogger.debug(tmpImpls[i].toString());
+                BasicLogger.debug(tmpImpl.toString());
                 BasicLogger.debug("Original", aMtrx);
-                BasicLogger.debug("Q1", tmpImpls[i].getQ1());
-                BasicLogger.debug("D", tmpImpls[i].getD());
-                BasicLogger.debug("Q2", tmpImpls[i].getQ2());
+                BasicLogger.debug("Q1", tmpImpl.getQ1());
+                BasicLogger.debug("D", tmpImpl.getD());
+                BasicLogger.debug("Q2", tmpImpl.getQ2());
                 BasicLogger.debug("Reconstructed", tmpReconstructed);
                 final PhysicalStore<Double> tmpCopy = aMtrx.copy();
                 // tmpCopy.maxpy(-1.0, tmpReconstructed);

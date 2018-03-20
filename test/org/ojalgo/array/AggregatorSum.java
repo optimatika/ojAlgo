@@ -21,22 +21,17 @@
  */
 package org.ojalgo.array;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 
-@Tags({@Tag("functionality"), @Tag("array")})
 public class AggregatorSum extends BasicArrayTest {
 
     @Override
     void doTest(final BasicArray<Double> array) {
 
-        for (long INDEX : INDICES) {
-            array.set(INDEX, 1.0);
-        }
+        setMultiple(array, INDICES);
 
         final AggregatorFunction<Double> tmpVisitor = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
 

@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
@@ -33,16 +35,14 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class HessenbergTest extends MatrixDecompositionTests {
+public class HessenbergTest {
 
-    public HessenbergTest() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public HessenbergTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testSquareEye() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.makeEye(5, 5);
@@ -50,6 +50,7 @@ public class HessenbergTest extends MatrixDecompositionTests {
         this.doTestCorrect(tmpMatrix);
     }
 
+    @Test
     public void testSquareRandom() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(5, 5));

@@ -54,8 +54,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test
-    public void testData() {
+    @Test public void testData() {
 
         myExpMtrx = SimpleQRCase.getOriginal();
         final RationalMatrix tmpFactorQ = SimpleQRCase.getFactorQ();
@@ -65,8 +64,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Test
-    public void testProblem() {
+    @Test public void testProblem() {
 
         // QR
 

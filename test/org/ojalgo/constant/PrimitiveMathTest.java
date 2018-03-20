@@ -21,37 +21,27 @@
  */
 package org.ojalgo.constant;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.type.context.NumberContext;
 
-public class PrimitiveMathTest extends ConstantTests {
+public class PrimitiveMathTest {
 
-    static void compare(final String id, final double arg0, final double arg1) {
+    private static void compare(final double arg0, final double arg1) {
 
         if (arg0 == arg1) {
-            if (NumberContext.compare(arg0, arg1) == 0) {
-                ;
-            } else {
+            if (NumberContext.compare(arg0, arg1) != 0) {
                 TestUtils.fail();
             }
         } else {
-            if (NumberContext.compare(arg0, arg1) == 0) {
-                TestUtils.fail();
-            } else {
-                TestUtils.fail();
-            }
+            //noinspection ResultOfMethodCallIgnored
+            NumberContext.compare(arg0, arg1);
+            TestUtils.fail();
         }
 
     }
 
-    public PrimitiveMathTest() {
-        super();
-    }
-
-    public PrimitiveMathTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testCompareToZeros() {
 
         final double negDbl = -0.0;
@@ -59,23 +49,24 @@ public class PrimitiveMathTest extends ConstantTests {
         final double posDbl = 0.0;
         final double negInt = -0;
 
-        PrimitiveMathTest.compare("negDbl <-> posInt", negDbl, posInt);
-        PrimitiveMathTest.compare("negDbl <-> posDbl", negDbl, posDbl);
-        PrimitiveMathTest.compare("negDbl <-> negInt", negDbl, negInt);
+        PrimitiveMathTest.compare(negDbl, posInt);
+        PrimitiveMathTest.compare(negDbl, posDbl);
+        PrimitiveMathTest.compare(negDbl, negInt);
 
-        PrimitiveMathTest.compare("posInt <-> negDbl", posInt, negDbl);
-        PrimitiveMathTest.compare("posInt <-> posDbl", posInt, posDbl);
-        PrimitiveMathTest.compare("posInt <-> negInt", posInt, negInt);
+        PrimitiveMathTest.compare(posInt, negDbl);
+        PrimitiveMathTest.compare(posInt, posDbl);
+        PrimitiveMathTest.compare(posInt, negInt);
 
-        PrimitiveMathTest.compare("posDbl <-> negDbl", posDbl, negDbl);
-        PrimitiveMathTest.compare("posDbl <-> posInt", posDbl, posInt);
-        PrimitiveMathTest.compare("posDbl <-> negInt", posDbl, negInt);
+        PrimitiveMathTest.compare(posDbl, negDbl);
+        PrimitiveMathTest.compare(posDbl, posInt);
+        PrimitiveMathTest.compare(posDbl, negInt);
 
-        PrimitiveMathTest.compare("negInt <-> negDbl", negInt, negDbl);
-        PrimitiveMathTest.compare("negInt <-> posInt", negInt, posInt);
-        PrimitiveMathTest.compare("negInt <-> posDbl", negInt, posDbl);
+        PrimitiveMathTest.compare(negInt, negDbl);
+        PrimitiveMathTest.compare(negInt, posInt);
+        PrimitiveMathTest.compare(negInt, posDbl);
     }
 
+    @Test
     public void testPowersOf2() {
 
         long tmpPrev = PrimitiveMath.POWERS_OF_2[0];

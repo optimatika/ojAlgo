@@ -35,48 +35,39 @@ import org.ojalgo.random.Uniform;
 
 public final class SolverTest extends AbstractMatrixDecompositionTaskTest {
 
-    @Test
-    public void testFull2X2() {
+    @Test public void testFull2X2() {
         this.doCompare(AbstractSolver.FULL_2X2, 2);
     }
 
-    @Test
-    public void testFull3X3() {
+    @Test public void testFull3X3() {
         this.doCompare(AbstractSolver.FULL_3X3, 3);
     }
 
-    @Test
-    public void testFull4X4() {
+    @Test public void testFull4X4() {
         this.doCompare(AbstractSolver.FULL_4X4, 4);
     }
 
-    @Test
-    public void testFull5X5() {
+    @Test public void testFull5X5() {
         this.doCompare(AbstractSolver.FULL_5X5, 5);
     }
 
-    @Test
-    public void testSymmetric1X1() {
+    @Test public void testSymmetric1X1() {
         this.doCompare(AbstractSolver.FULL_1X1, 1);
     }
 
-    @Test
-    public void testSymmetric2X2() {
+    @Test public void testSymmetric2X2() {
         this.doCompare(AbstractSolver.SYMMETRIC_2X2, 2);
     }
 
-    @Test
-    public void testSymmetric3X3() {
+    @Test public void testSymmetric3X3() {
         this.doCompare(AbstractSolver.SYMMETRIC_3X3, 3);
     }
 
-    @Test
-    public void testSymmetric4X4() {
+    @Test public void testSymmetric4X4() {
         this.doCompare(AbstractSolver.SYMMETRIC_4X4, 4);
     }
 
-    @Test
-    public void testSymmetric5X5() {
+    @Test public void testSymmetric5X5() {
         this.doCompare(AbstractSolver.SYMMETRIC_5X5, 5);
     }
 

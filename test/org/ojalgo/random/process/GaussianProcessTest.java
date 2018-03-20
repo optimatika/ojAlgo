@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.util.Collection;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -36,16 +37,9 @@ import org.ojalgo.type.keyvalue.ComparableToDouble;
 /**
  * @author apete
  */
-public class GaussianProcessTest extends RandomProcessTests {
+public class GaussianProcessTest {
 
-    public GaussianProcessTest() {
-        super();
-    }
-
-    public GaussianProcessTest(final String someName) {
-        super(someName);
-    }
-
+    @Test
     public void testTutorial() {
 
         final GaussianField.Covariance<Double> tmpCovar = new GaussianField.Covariance<Double>() {
@@ -53,7 +47,7 @@ public class GaussianProcessTest extends RandomProcessTests {
             public void calibrate(final Collection<ComparableToDouble<Double>> observations, final Mean<Double> mean) {
             }
 
-            public double invoke(final double anArg1, final double anArg2) {
+            double invoke(final double anArg1, final double anArg2) {
 
                 final double tmpSF = 1.27;
                 final double tmpSN = 0.3;

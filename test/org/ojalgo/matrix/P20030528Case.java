@@ -44,8 +44,7 @@ public class P20030528Case extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test
-    public void testData() {
+    @Test public void testData() {
 
         final RationalMatrix tmpProb = P20030528Case.getProblematic();
 
@@ -53,8 +52,7 @@ public class P20030528Case extends BasicMatrixTest {
         TestUtils.assertTrue(tmpProb.isFat());
     }
 
-    @Test
-    public void testProblem() {
+    @Test public void testProblem() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(P20030528Case.getProblematic());
 

@@ -26,6 +26,7 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.optimisation.Expression;
@@ -79,10 +80,9 @@ public class KnapsackTest extends OptimisationIntegerTests {
 
     }
 
-    ExpressionsBasedModel model;
-
+    @Test
     public void testVaryingMaxWeight0() {
-        model = new KnapsackProblemBuilder(3d).addItem(20, 2).addItem(30, 4).build();
+        ExpressionsBasedModel model = new KnapsackProblemBuilder(3d).addItem(20, 2).addItem(30, 4).build();
         //        model.options.debug(IntegerSolver.class);
         model.maximise();
         //Expected: just first item
@@ -91,33 +91,39 @@ public class KnapsackTest extends OptimisationIntegerTests {
 
     }
 
+    @Test
     public void testVaryingMaxWeight1() {
-        model = new KnapsackProblemBuilder(1.1d).addItem(20, 2).addItem(30, 4).build();
+        ExpressionsBasedModel model = new KnapsackProblemBuilder(1.1d).addItem(20, 2).addItem(30, 4).build();
         model.maximise();
         //Expected: nothing
         this.assertZero(model.getVariables().get(0));
         this.assertZero(model.getVariables().get(1));
     }
 
+    @Test
     public void testVaryingMaxWeight2() {
-        model = new KnapsackProblemBuilder(0d).addItem(20, 2).addItem(30, 4).build();
+        ExpressionsBasedModel model = new KnapsackProblemBuilder(0d).addItem(20, 2).addItem(30, 4).build();
         model.maximise();
         //Expected: nothing
         this.assertZero(model.getVariables().get(0));
         this.assertZero(model.getVariables().get(1));
     }
 
+    @Test
     public void testVaryingMaxWeight3() {
-        model = new KnapsackProblemBuilder(10d).addItem(20, 2).addItem(30, 4).build();
+        ExpressionsBasedModel model = new KnapsackProblemBuilder(10d).addItem(20, 2).addItem(30, 4).build();
         model.maximise();
         //Expected: both
         this.assertOne(model.getVariables().get(0));
         this.assertOne(model.getVariables().get(1));
     }
 
+    @Test
     public void testVaryingMaxWeight4() {
 
-        model = new KnapsackProblemBuilder(5d).addItem(20, 2).addItem(30, 4).build();
+        ExpressionsBasedModel model = new KnapsackProblemBuilder(5d)
+                .addItem(20, 2)
+                .addItem(30, 4).build();
 
         // model.options.debug(IntegerSolver.class);
 
@@ -127,11 +133,11 @@ public class KnapsackTest extends OptimisationIntegerTests {
         this.assertZero(model.getVariables().get(0));
     }
 
-    void assertOne(final Variable v) {
+    private void assertOne(final Variable v) {
         TestUtils.assertEquals(BigMath.ONE, v.getValue(), new NumberContext(7, 6));
     }
 
-    void assertZero(final Variable v) {
+    private void assertZero(final Variable v) {
         TestUtils.assertEquals(BigMath.ZERO, v.getValue(), new NumberContext(7, 6));
     }
 

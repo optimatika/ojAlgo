@@ -23,6 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access2D;
@@ -42,16 +44,14 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class DesignCase extends MatrixDecompositionTests {
+public class DesignCase {
 
-    public DesignCase() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public DesignCase(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testCholeskySolveInverse() {
 
         final PhysicalStore<ComplexNumber> tmpRandomComplexStore = MatrixUtils.makeRandomComplexStore(4, 9);
@@ -61,6 +61,7 @@ public class DesignCase extends MatrixDecompositionTests {
         this.doTestSolveInverse(Cholesky.PRIMITIVE.make(), tmpMtrx);
     }
 
+    @Test
     public void testLuSolveInverse() {
 
         final PhysicalStore<ComplexNumber> tmpRandomComplexStore = MatrixUtils.makeRandomComplexStore(4, 9);
@@ -70,6 +71,7 @@ public class DesignCase extends MatrixDecompositionTests {
         this.doTestSolveInverse(LU.PRIMITIVE.make(), tmpMtrx);
     }
 
+    @Test
     public void testRandomUnderdetermined() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.makeFilled(3, 9, new Normal());
@@ -87,6 +89,7 @@ public class DesignCase extends MatrixDecompositionTests {
 
     }
 
+    @Test
     public void testSolveIdentity() {
 
         final Access2D<?> tmpIdentity = MatrixStore.PRIMITIVE.makeIdentity(9).get();
@@ -105,6 +108,7 @@ public class DesignCase extends MatrixDecompositionTests {
         }
     }
 
+    @Test
     public void testTridiagonal() {
 
         final Tridiagonal<Double> tmpDecomposition = Tridiagonal.PRIMITIVE.make();
@@ -121,6 +125,7 @@ public class DesignCase extends MatrixDecompositionTests {
     /**
      * http://en.wikipedia.org/wiki/Kernel_%28matrix%29
      */
+    @Test
     public void testWikipediaNullspace() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2, 3, 5 }, { -4, 2, 3 } });
@@ -152,6 +157,7 @@ public class DesignCase extends MatrixDecompositionTests {
     /**
      * http://en.wikipedia.org/wiki/Singular_value_decomposition
      */
+    @Test
     public void testWikipediaSVD() {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY

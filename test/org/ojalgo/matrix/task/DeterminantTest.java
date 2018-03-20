@@ -21,50 +21,57 @@
  */
 package org.ojalgo.matrix.task;
 
-import java.util.List;
-
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
 
-@Tags({@Tag("functionality"), @Tag("matrix"), @Tag("decomposition")})
+import java.util.List;
+
 public final class DeterminantTest extends AbstractMatrixDecompositionTaskTest {
 
+    @Test
     public void testFull2X2() {
         this.doFull(AbstractDeterminator.FULL_2X2, 2);
     }
 
+    @Test
     public void testFull3X3() {
         this.doFull(AbstractDeterminator.FULL_3X3, 3);
     }
 
+    @Test
     public void testFull4X4() {
         this.doFull(AbstractDeterminator.FULL_4X4, 4);
     }
 
+    @Test
     public void testFull5X5() {
         this.doFull(AbstractDeterminator.FULL_5X5, 5);
     }
 
+    @Test
     public void testSymmetric1X1() {
         this.doSymmetric(AbstractDeterminator.FULL_1X1, 1);
     }
 
+    @Test
     public void testSymmetric2X2() {
         this.doSymmetric(AbstractDeterminator.SYMMETRIC_2X2, 2);
     }
 
+    @Test
     public void testSymmetric3X3() {
         this.doSymmetric(AbstractDeterminator.SYMMETRIC_3X3, 3);
     }
 
+    @Test
     public void testSymmetric4X4() {
         this.doSymmetric(AbstractDeterminator.SYMMETRIC_4X4, 4);
     }
 
+    @Test
     public void testSymmetric5X5() {
         this.doSymmetric(AbstractDeterminator.SYMMETRIC_5X5, 5);
     }

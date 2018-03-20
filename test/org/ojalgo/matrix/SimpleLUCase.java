@@ -52,8 +52,7 @@ public class SimpleLUCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test
-    public void testData() {
+    @Test public void testData() {
 
         myExpMtrx = SimpleLUCase.getOrginal();
         myActMtrx = SimpleLUCase.getMtrxL().multiply(SimpleLUCase.getMtrxU());
@@ -61,8 +60,7 @@ public class SimpleLUCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Test
-    public void testProblem() {
+    @Test public void testProblem() {
 
         // PLDU
 

@@ -21,6 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
@@ -36,20 +39,19 @@ import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-public class DecompositionProblems extends MatrixDecompositionTests {
+public class DecompositionProblems {
 
-    public DecompositionProblems() {
-        super();
-    }
-
-    public DecompositionProblems(final String arg0) {
-        super(arg0);
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
     /**
      * A user reported problems solving complex valued (overdetermined) equation systemes.
      */
-    public void _testP20111213square() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testP20111213square() {
 
         final int tmpDim = Uniform.randomInteger(2, 6);
 
@@ -58,8 +60,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         final PhysicalStore<ComplexNumber> tmpExpected = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> tmpActual;
 
-        @SuppressWarnings("unchecked")
-        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
+        @SuppressWarnings("unchecked") final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[]{Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
                 Eigenvalue.COMPLEX.make(MatrixDecomposition.TYPICAL,
                         true)/*
                               * , HessenbergDecomposition. makeComplex()
@@ -67,7 +68,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 LU.COMPLEX.make(), QR.COMPLEX.make(),
                 SingularValue.COMPLEX.make() /*
                                               * , TridiagonalDecomposition . makeComplex ( )
-                                              */ };
+                                              */};
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
             tmpDecomposition.decompose(tmpHermitian);
@@ -90,7 +91,9 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * A user reported problems related to calculating the pseudoinverse for large (2000x2000) matrices.
      */
-    public void _testP20160419() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testP20160419() {
 
         final PrimitiveDenseStore tmpOrg = PrimitiveDenseStore.FACTORY.makeFilled(2000, 2000, new Normal());
 
@@ -112,7 +115,9 @@ public class DecompositionProblems extends MatrixDecompositionTests {
      * A user discovered that some large (relatively uniform) matrices causes the algorithm to never finsh
      * https://github.com/optimatika/ojAlgo/issues/22
      */
-    public void _testP20160510InvertLargeMatrix() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testP20160510InvertLargeMatrix() {
 
         final double[][] data = new double[3000][3000];
         for (int i = 0; i < data.length; i++) {
@@ -138,10 +143,11 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * http://en.wikipedia.org/wiki/Singular_value_decomposition There is no problem...
      */
+    @Test
     public void testP20090923() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
-                .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
+                .rows(new double[][]{{1.0, 0.0, 0.0, 0.0, 2.0}, {0.0, 0.0, 3.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 4.0, 0.0, 0.0, 0.0}});
 
         final SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make();
         tmpSVD.decompose(tmpA);
@@ -158,6 +164,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * Fat matrices were not QR-decomposed correctly ("R" was not created correctly).
      */
+    @Test
     public void testP20091012() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(5, 9));
@@ -171,12 +178,13 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * Fat matrices were not QR-decomposed correctly ("R" was not created correctly).
      */
+    @Test
     public void testP20091012fixed() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
-                .rows(new double[][] { { 1.5686711899234411, 5.857030526629094, 2.1798778832593637, 1.4901137152515287, 5.640993583029061 },
-                        { 4.890945865607895, 4.2576454398997265, 1.0251822439318778, 0.8623492557631138, 5.7457253685285545 },
-                        { 1.6397137349990025, 0.6795594856277076, 4.7101325736711095, 2.0823473021899517, 2.2159317240940233 } });
+                .rows(new double[][]{{1.5686711899234411, 5.857030526629094, 2.1798778832593637, 1.4901137152515287, 5.640993583029061},
+                        {4.890945865607895, 4.2576454398997265, 1.0251822439318778, 0.8623492557631138, 5.7457253685285545},
+                        {1.6397137349990025, 0.6795594856277076, 4.7101325736711095, 2.0823473021899517, 2.2159317240940233}});
 
         final QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.decompose(tmpA);
@@ -184,10 +192,11 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpA, tmpQR, new NumberContext(7, 6));
     }
 
+    @Test
     public void testP20100512a() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
-                .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
+                .rows(new double[][]{{0.2845, 0.3597, 0.9544}, {0.3597, 0.6887, 0.0782}, {0.9544, 0.0782, 0.1140}});
 
         final Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
         tmpPrimitive.decompose(tmpA);
@@ -195,10 +204,11 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpA, tmpPrimitive, new NumberContext(7, 6));
     }
 
+    @Test
     public void testP20100512b() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
-                .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
+                .rows(new double[][]{{0.2845, 0.3597, 0.9544}, {0.3597, 0.6887, 0.0782}, {0.9544, 0.0782, 0.1140}});
 
         final Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
         tmpPrimitive.decompose(tmpA);
@@ -206,6 +216,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpA, tmpPrimitive, new NumberContext(7, 6));
     }
 
+    @Test
     public void testP20110126() {
 
         final int tmpDim = 5;
@@ -232,6 +243,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
      * to recreate the problem. ... The problem turned out to be a pure bug related to creating the inverse
      * (applied the pivot row order, to the identity matrix, incorrectly).
      */
+    @Test
     public void testP20110223() {
 
         final NumberContext tmpEqualsNumberContext = new NumberContext(7, 11);
@@ -265,6 +277,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * A user reported problems solving complex valued (overdetermined) equation systemes.
      */
+    @Test
     public void testP20111213tall() {
 
         final int tmpDim = Uniform.randomInteger(2, 6);
@@ -273,9 +286,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         final PhysicalStore<ComplexNumber> identity = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> solution;
 
-        @SuppressWarnings("unchecked")
-        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { QR.COMPLEX.make(), SingularValue.COMPLEX.make(),
-                Bidiagonal.COMPLEX.make() };
+        @SuppressWarnings("unchecked") final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[]{QR.COMPLEX.make(), SingularValue.COMPLEX.make(),
+                Bidiagonal.COMPLEX.make()};
 
         for (final MatrixDecomposition<ComplexNumber> decomp : tmpCmplxDecomps) {
 

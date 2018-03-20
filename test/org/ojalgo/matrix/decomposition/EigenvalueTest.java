@@ -26,6 +26,8 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.MathContext;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
@@ -44,7 +46,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class EigenvalueTest extends MatrixDecompositionTests {
+public class EigenvalueTest {
 
     static final class EvD {
 
@@ -54,14 +56,12 @@ public class EigenvalueTest extends MatrixDecompositionTests {
 
     }
 
-    public EigenvalueTest() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public EigenvalueTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testP20050125Case() {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.copy(P20050125Case.getProblematic());
@@ -69,33 +69,34 @@ public class EigenvalueTest extends MatrixDecompositionTests {
         TestUtils.assertTrue(MatrixUtils.isHermitian(tmpOriginalMatrix));
 
         final Eigenvalue<Double>[] tmpDecomps = MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric();
-        for (int d = 0; d < tmpDecomps.length; d++) {
-            tmpDecomps[d].decompose(tmpOriginalMatrix);
+        for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
+            tmpDecomp.decompose(tmpOriginalMatrix);
         }
 
         if (MatrixDecompositionTests.DEBUG) {
 
             BasicLogger.debug("Eigenvalues");
-            for (int d = 0; d < tmpDecomps.length; d++) {
-                BasicLogger.debug(tmpDecomps[d].getClass().getName() + ": " + tmpDecomps[d].getEigenvalues().toString());
+            for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
+                BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + tmpDecomp.getEigenvalues().toString());
             }
 
             BasicLogger.debug("D");
-            for (int d = 0; d < tmpDecomps.length; d++) {
-                BasicLogger.debug(tmpDecomps[d].getClass().getName() + ": " + PrimitiveDenseStore.FACTORY.copy(tmpDecomps[d].getD()));
+            for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
+                BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + PrimitiveDenseStore.FACTORY.copy(tmpDecomp.getD()));
             }
 
             BasicLogger.debug("V");
-            for (int d = 0; d < tmpDecomps.length; d++) {
-                BasicLogger.debug(tmpDecomps[d].getClass().getName() + ": " + PrimitiveDenseStore.FACTORY.copy(tmpDecomps[d].getV()));
+            for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
+                BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + PrimitiveDenseStore.FACTORY.copy(tmpDecomp.getV()));
             }
         }
 
-        for (int d = 0; d < tmpDecomps.length; d++) {
-            TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomps[d], new NumberContext(7, 6));
+        for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
+            TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp, new NumberContext(7, 6));
         }
     }
 
+    @Test
     public void testP20061119Case() {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.copy(P20061119Case.getProblematic());
@@ -106,7 +107,7 @@ public class EigenvalueTest extends MatrixDecompositionTests {
         final ComplexNumber tmp33 = ComplexNumber.ZERO;
         final ComplexNumber tmp44 = tmp33;
 
-        final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33, tmp44 });
+        final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[]{tmp00, tmp11, tmp22, tmp33, tmp44});
         final NumberContext accuracyContext = new NumberContext(7, 6);
 
         MatrixStore<Double> tmpRecreatedMatrix;
@@ -140,9 +141,10 @@ public class EigenvalueTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpExpectedDiagonal, tmpEigenvaluesOnly, accuracyContext);
     }
 
+    @Test
     public void testPaulsMathNote() {
 
-        final double[][] tmpData = new double[][] { { 3, -9 }, { 4, -3 } };
+        final double[][] tmpData = new double[][]{{3, -9}, {4, -3}};
         final PrimitiveDenseStore tmpA = PrimitiveDenseStore.FACTORY.rows(tmpData);
         final int tmpLength = tmpData.length;
 
@@ -198,9 +200,10 @@ public class EigenvalueTest extends MatrixDecompositionTests {
 
     }
 
+    @Test
     public void testPrimitiveAsComplex() {
 
-        final double[][] tmpData = new double[][] { { 1, 0, 3 }, { 0, 4, 1 }, { -5, 1, 0 } };
+        final double[][] tmpData = new double[][]{{1, 0, 3}, {0, 4, 1}, {-5, 1, 0}};
         final PrimitiveDenseStore tmpA = PrimitiveDenseStore.FACTORY.rows(tmpData);
 
         final int tmpLength = tmpData.length;
@@ -242,9 +245,10 @@ public class EigenvalueTest extends MatrixDecompositionTests {
     /**
      * A matrix that has been problematic for another library...
      */
+    @Test
     public void testProblemFoundInTheWild() {
 
-        final PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
+        final PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][]{{1, 0, 0}, {0.01, 0, -1}, {0.01, 1, 0}});
 
         for (final Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getEigenvaluePrimitiveGeneral()) {
 
@@ -261,6 +265,7 @@ public class EigenvalueTest extends MatrixDecompositionTests {
         }
     }
 
+    @Test
     public void testRandomSymmetricValuesOnly() {
 
         final NumberContext evaluationContext = NumberContext.getGeneral(MathContext.DECIMAL32);

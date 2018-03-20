@@ -21,17 +21,8 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.FunctionalityTest;
-
-public abstract class MatrixStoreTests extends FunctionalityTest {
+public abstract class MatrixStoreTests {
 
     static final boolean DEBUG = false;
 
-    protected MatrixStoreTests() {
-        super();
-    }
-
-    protected MatrixStoreTests(final String name) {
-        super(name);
-    }
 }

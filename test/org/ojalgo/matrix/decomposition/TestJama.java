@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.SimpleCholeskyCase;
 import org.ojalgo.matrix.SimpleEigenvalueCase;
@@ -36,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public class TestJama extends MatrixDecompositionTests {
+public class TestJama {
 
     private static Cholesky<Double> CHOLESKY = new RawCholesky();
     private static Eigenvalue<Double> EIGENVALUE = new RawEigenvalue.Dynamic();
@@ -45,14 +47,12 @@ public class TestJama extends MatrixDecompositionTests {
     private static QR<Double> QR = new RawQR();
     private static SingularValue<Double> SINGULAR_VALUE = new RawSingularValue();
 
-    public TestJama() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public TestJama(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testSimpleCholeskyCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleCholeskyCase.getOriginal());
@@ -60,6 +60,7 @@ public class TestJama extends MatrixDecompositionTests {
         this.computeAndTest(tmpMtrxA);
     }
 
+    @Test
     public void testSimpleEigenvalueCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleEigenvalueCase.getOriginal());
@@ -67,6 +68,7 @@ public class TestJama extends MatrixDecompositionTests {
         this.computeAndTest(tmpMtrxA);
     }
 
+    @Test
     public void testSimpleLUCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleLUCase.getOrginal());
@@ -74,6 +76,7 @@ public class TestJama extends MatrixDecompositionTests {
         this.computeAndTest(tmpMtrxA);
     }
 
+    @Test
     public void testSimpleQRCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleQRCase.getOriginal());
@@ -81,6 +84,7 @@ public class TestJama extends MatrixDecompositionTests {
         this.computeAndTest(tmpMtrxA);
     }
 
+    @Test
     public void testSimpleSingularValueCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getOriginal());

@@ -34,8 +34,7 @@ public class RationalScalarTest {
     private final double myDiff = PrimitiveMath.MACHINE_EPSILON;
     private double myExp;
 
-    @Test
-    public void testAdd() {
+    @Test public void testAdd() {
 
         final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
         final RationalNumber tmpVal2 = RationalNumber.valueOf(3.75);
@@ -47,8 +46,7 @@ public class RationalScalarTest {
         TestUtils.assertEquals(myExp, myAct, myDiff);
     }
 
-    @Test
-    public void testDivide() {
+    @Test public void testDivide() {
 
         final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
         final RationalNumber tmpVal2 = RationalNumber.valueOf(0.25);
@@ -60,8 +58,7 @@ public class RationalScalarTest {
         TestUtils.assertEquals(myExp, myAct, myDiff);
     }
 
-    @Test
-    public void testInvert() {
+    @Test public void testInvert() {
 
         final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
 
@@ -72,8 +69,7 @@ public class RationalScalarTest {
         TestUtils.assertEquals(myExp, myAct, myDiff);
     }
 
-    @Test
-    public void testMultiply() {
+    @Test public void testMultiply() {
 
         final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
         final RationalNumber tmpVal2 = RationalNumber.valueOf(4);
@@ -85,8 +81,7 @@ public class RationalScalarTest {
         TestUtils.assertEquals(myExp, myAct, myDiff);
     }
 
-    @Test
-    public void testNegate() {
+    @Test public void testNegate() {
 
         final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
 
@@ -97,8 +92,7 @@ public class RationalScalarTest {
         TestUtils.assertEquals(myExp, myAct, myDiff);
     }
 
-    @Test
-    public void testRationalNumber() {
+    @Test public void testRationalNumber() {
 
         final RationalNumber tmpRat1 = RationalNumber.of(5, 1);
         final RationalNumber tmpRat2 = RationalNumber.of(2, 1);
@@ -111,8 +105,7 @@ public class RationalScalarTest {
         }
     }
 
-    @Test
-    public void testSubtract() {
+    @Test public void testSubtract() {
 
         final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
         final RationalNumber tmpVal2 = RationalNumber.valueOf(-3.75);

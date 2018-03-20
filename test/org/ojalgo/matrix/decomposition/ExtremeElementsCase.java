@@ -24,6 +24,9 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
@@ -40,12 +43,19 @@ import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
+import static org.ojalgo.matrix.decomposition.MatrixDecompositionTests.DEBUG;
+
 /**
  * @author apete
  */
-public class ExtremeElementsCase extends MatrixDecompositionTests {
+public class ExtremeElementsCase {
 
-    static final NumberContext PRECISION = new NumberContext().newPrecision(12).newScale(148);
+    private static final NumberContext PRECISION = new NumberContext().newPrecision(12).newScale(148);
+
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
+    }
 
     private static void performInvertTest(final PrimitiveDenseStore original, final InverterTask<Double> task, final NumberContext context) {
 
@@ -65,7 +75,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
     }
 
     private static void performSolveTest(final PrimitiveDenseStore body, final PrimitiveDenseStore rhs, final SolverTask<Double> task,
-            final NumberContext context) {
+                                         final NumberContext context) {
 
         try {
 
@@ -172,23 +182,21 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         return tmpRndm.transpose().multiply(tmpRndm).multiply(1E-150);
     }
 
-    public ExtremeElementsCase() {
-        super();
-    }
-
-    public ExtremeElementsCase(final String arg0) {
-        super(arg0);
-    }
-
-    public void _testInvertOverflow() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testInvertOverflow() {
         ExtremeElementsCase.doTestInvert(true);
     }
 
-    public void _testInvertUnderflow() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testInvertUnderflow() {
         ExtremeElementsCase.doTestInvert(true);
     }
 
-    public void _testLU() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testLU() {
 
         final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
 
@@ -202,7 +210,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
         TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
 
-        if (MatrixDecompositionTests.DEBUG) {
+        if (DEBUG) {
             BasicLogger.debug("Big.L", tmpBig.getL());
             BasicLogger.debug("Complex.L", tmpComplex.getL());
             BasicLogger.debug("Primitive.L", tmpPrimitive.getL());
@@ -232,7 +240,9 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
     }
 
-    public void _testQR() {
+    @Ignore("Undescored before JUnit 5")
+    @Test
+    public void testQR() {
 
         final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
 
@@ -246,7 +256,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
         TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
 
-        if (MatrixDecompositionTests.DEBUG) {
+        if (DEBUG) {
             BasicLogger.debug("Big Q", tmpBig.getQ());
             BasicLogger.debug("Complex Q", tmpComplex.getQ());
             BasicLogger.debug("Primitive Q", tmpPrimitive.getQ());
@@ -268,14 +278,19 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
     }
 
-    public void _testSolveOverflow() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testSolveOverflow() {
         ExtremeElementsCase.doTestSolve(true);
     }
 
-    public void _testSolveUnderflow() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testSolveUnderflow() {
         ExtremeElementsCase.doTestSolve(false);
     }
 
+    @Test
     public void testEvD() {
 
         final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
@@ -290,7 +305,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
         TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
 
-        if (MatrixDecompositionTests.DEBUG) {
+        if (DEBUG) {
             BasicLogger.debug("Big: {}", tmpBig.getEigenvalues());
             BasicLogger.debug("Complex: {}", tmpComplex.getEigenvalues());
             BasicLogger.debug("Primitive: {}", tmpPrimitive.getEigenvalues());
@@ -320,6 +335,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
     }
 
+    @Test
     public void testInvertEvD_10_307_1() {
 
         final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] {
@@ -352,6 +368,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
     }
 
+    @Test
     public void testInvertEvD_3_155_1() {
 
         final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.509726074514643, 0.6439543946598099, 1.2096354379603502 },
@@ -365,6 +382,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
     }
 
+    @Test
     public void testInvertSVD_6_307_2() {
 
         final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(
@@ -383,6 +401,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
     }
 
+    @Test
     public void testInvertSVD_7_307_1() {
 
         final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] {
@@ -406,6 +425,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
     }
 
+    @Test
     public void testInvertTask_2_155_1() {
 
         final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY
@@ -419,6 +439,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
     }
 
+    @Test
     public void testSolveLU_1_16_1() {
 
         final PrimitiveDenseStore tmpBody = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.7259687987824925 } });

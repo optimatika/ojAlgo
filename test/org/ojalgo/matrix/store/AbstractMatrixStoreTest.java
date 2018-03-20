@@ -21,24 +21,12 @@
  */
 package org.ojalgo.matrix.store;
 
+import org.junit.Before;
 import org.ojalgo.TestUtils;
 
 abstract class AbstractMatrixStoreTest extends MatrixStoreTests {
-
-    protected AbstractMatrixStoreTest() {
-        super();
-    }
-
-    protected AbstractMatrixStoreTest(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-
-        super.setUp();
-
+    @Before
+    public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }
-
 }

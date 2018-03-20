@@ -54,8 +54,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
         return RationalMatrix.FACTORY.rows(new double[][]{{3.0, -1.0, -1.0}, {-1.0, 3.0, -1.0}, {-1.0, -1.0, 3.0}}).enforce(DEFINITION);
     }
 
-    @Test
-    public void testData() {
+    @Test public void testData() {
 
         final BasicMatrix tmpA = SimpleCholeskyCase.getOriginal();
         final BasicMatrix tmpL = SimpleCholeskyCase.getFactorL();
@@ -75,8 +74,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     /**
      * @see org.ojalgo.matrix.BasicMatrixTest#testProblem()
      */
-    @Test
-    public void testProblem() {
+    @Test public void testProblem() {
 
         final BasicMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
         final Cholesky<BigDecimal> tmpDecomp = Cholesky.BIG.make();
@@ -87,7 +85,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
 
 //    @Test
 //    @Ignore("Was commented uot before JUnit 5 transition")
-//    public void testSolve() {
+//    @Test public void testSolve() {
 //
 //        BasicMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
 //        Cholesky<BigDecimal> tmpDecomp = ArbitraryCholesky.makeBig();

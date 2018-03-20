@@ -21,15 +21,12 @@
  */
 package org.ojalgo.array;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 
-@Tags({@Tag("functionality"), @Tag("array")})
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class DirectCleanupTest {
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
@@ -61,9 +58,4 @@ public class DirectCleanupTest {
         }
 
     }
-
-    public DirectCleanupTest() {
-        super();
-    }
-
 }

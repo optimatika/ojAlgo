@@ -21,6 +21,7 @@
  */
 package org.ojalgo.function.multiary;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
@@ -29,18 +30,9 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
 
-public class ApproximationCase extends FunctionMultiaryTests {
+public class ApproximationCase {
 
-    @Override
-    public void setUp() throws Exception {
-
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-
-    }
-
+    @Test
     public void testFirstOrderApproximation() {
 
         final int tmpArity = 9;
@@ -57,6 +49,7 @@ public class ApproximationCase extends FunctionMultiaryTests {
         TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), new NumberContext(7, 14));
     }
 
+    @Test
     public void testSecondOrderApproximation() {
 
         final int tmpArity = 9;

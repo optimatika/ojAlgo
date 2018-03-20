@@ -12,7 +12,6 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import org.ojalgo.FunctionalityTest;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -21,13 +20,9 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public abstract class OptimisationConvexTests extends FunctionalityTest {
+public abstract class OptimisationConvexTests {
 
     static final boolean DEBUG = false;
-
-    protected static void assertDirectAndIterativeEquals(final ConvexSolver.Builder builder) {
-        OptimisationConvexTests.assertDirectAndIterativeEquals(builder, null);
-    }
 
     protected static void assertDirectAndIterativeEquals(final ConvexSolver.Builder builder, final NumberContext accuracy) {
 
@@ -74,14 +69,6 @@ public abstract class OptimisationConvexTests extends FunctionalityTest {
         ConvexSolver.copy(model, builder);
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(builder, accuracy);
-    }
-
-    protected OptimisationConvexTests() {
-        super();
-    }
-
-    protected OptimisationConvexTests(final String name) {
-        super(name);
     }
 
 }

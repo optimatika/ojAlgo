@@ -23,25 +23,19 @@ package org.ojalgo.optimisation.integer;
 
 import java.util.ArrayList;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 
-public class DesignCase extends OptimisationIntegerTests {
-
-    public DesignCase() {
-        super();
-    }
-
-    public DesignCase(final String arg0) {
-        super(arg0);
-    }
+public class DesignCase {
 
     /**
      * http://www.ohio.edu/people/melkonia/math3050/slides/IPextendedintro.ppt Slide 8
      */
+    @Test
     public void testFacilityLocation() {
 
         final ArrayList<Variable> tmpVariables = new ArrayList<>();

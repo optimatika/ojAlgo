@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -36,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class SchurTest extends MatrixDecompositionTests {
+public class SchurTest {
 
     private static void doTest(final PhysicalStore<Double> originalMatrix, final Array1D<ComplexNumber> expectedDiagonal, final NumberContext accuracyContext) {
 
@@ -67,14 +69,12 @@ public class SchurTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(expectedDiagonal, tmpDiagonal, accuracyContext);
     }
 
-    public SchurTest() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public SchurTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testDiagonalCase() {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
@@ -93,21 +93,23 @@ public class SchurTest extends MatrixDecompositionTests {
     /**
      * http://mathworld.wolfram.com/SchurDecomposition.html
      */
+    @Test
     public void testMathWorldCase() {
 
-        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 3, 2, 1 }, { 4, 2, 1 }, { 4, 4, 0 } });
+        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][]{{3, 2, 1}, {4, 2, 1}, {4, 4, 0}});
         final double tmp00 = 3.0 + PrimitiveFunction.SQRT.invoke(13.0);
         final double tmp11 = 3.0 - PrimitiveFunction.SQRT.invoke(13.0);
         final double tmp22 = -1.0;
         final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX
-                .copy(new ComplexNumber[] { ComplexNumber.valueOf(tmp00), ComplexNumber.valueOf(tmp11), ComplexNumber.valueOf(tmp22) });
+                .copy(new ComplexNumber[]{ComplexNumber.valueOf(tmp00), ComplexNumber.valueOf(tmp11), ComplexNumber.valueOf(tmp22)});
 
         SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, new NumberContext(7, 3));
 
-        PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.49857, 0.76469, 0.40825 }, { 0.57405, 0.061628, -0.81650 }, { 0.64953, -0.64144, 0.40825 } });
-        PrimitiveDenseStore.FACTORY.rows(new double[][] { { tmp00, 4.4907, -0.82632 }, { 0.0, tmp11, 1.0726 }, { 0.0, 0.0, tmp22 } });
+        PrimitiveDenseStore.FACTORY.rows(new double[][]{{0.49857, 0.76469, 0.40825}, {0.57405, 0.061628, -0.81650}, {0.64953, -0.64144, 0.40825}});
+        PrimitiveDenseStore.FACTORY.rows(new double[][]{{tmp00, 4.4907, -0.82632}, {0.0, tmp11, 1.0726}, {0.0, 0.0, tmp22}});
     }
 
+    @Test
     public void testP20061119Case() {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.copy(P20061119Case.getProblematic());
@@ -118,7 +120,7 @@ public class SchurTest extends MatrixDecompositionTests {
         final ComplexNumber tmp33 = ComplexNumber.ZERO;
         final ComplexNumber tmp44 = tmp33;
 
-        final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33, tmp44 });
+        final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[]{tmp00, tmp11, tmp22, tmp33, tmp44});
 
         SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, new NumberContext(7, 6));
     }
@@ -126,16 +128,17 @@ public class SchurTest extends MatrixDecompositionTests {
     /**
      * http://planetmath.org/encyclopedia/AnExampleForSchurDecomposition.html
      */
+    @Test
     public void testPlanetMathCase() {
 
-        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 5, 7 }, { -2, -4 } });
+        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][]{{5, 7}, {-2, -4}});
         PrimitiveDenseStore.FACTORY.rows(
-                new double[][] { { 1 / PrimitiveMath.SQRT_TWO, 1 / PrimitiveMath.SQRT_TWO }, { -1 / PrimitiveMath.SQRT_TWO, 1 / PrimitiveMath.SQRT_TWO } });
+                new double[][]{{1 / PrimitiveMath.SQRT_TWO, 1 / PrimitiveMath.SQRT_TWO}, {-1 / PrimitiveMath.SQRT_TWO, 1 / PrimitiveMath.SQRT_TWO}});
         final double tmp00 = -2;
         final double tmp11 = 3.0;
         final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX
-                .copy(new ComplexNumber[] { ComplexNumber.valueOf(tmp00), ComplexNumber.valueOf(tmp11) });
-        PrimitiveDenseStore.FACTORY.rows(new double[][] { { tmp00, 9 }, { 0.0, tmp11 } });
+                .copy(new ComplexNumber[]{ComplexNumber.valueOf(tmp00), ComplexNumber.valueOf(tmp11)});
+        PrimitiveDenseStore.FACTORY.rows(new double[][]{{tmp00, 9}, {0.0, tmp11}});
 
         SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, new NumberContext(7, 5));
     }

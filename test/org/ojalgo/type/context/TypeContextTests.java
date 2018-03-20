@@ -21,23 +21,13 @@
  */
 package org.ojalgo.type.context;
 
-import org.ojalgo.FunctionalityTest;
 
 /**
  * TypeContextPackageTests
  *
  * @author apete
  */
-public abstract class TypeContextTests extends FunctionalityTest {
+abstract class TypeContextTests {
 
-    static final boolean DEBUG = false;
-
-    protected TypeContextTests() {
-        super();
-    }
-
-    protected TypeContextTests(final String name) {
-        super(name);
-    }
 
 }

@@ -21,18 +21,13 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 
 public final class RelaxedLpCase extends MipLibCase {
-
-    public RelaxedLpCase() {
-        super();
-    }
-
-    public RelaxedLpCase(final String someName) {
-        super(someName);
-    }
 
     /**
      * <p>
@@ -48,7 +43,9 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: 1.10000000e+01
      * </p>
      */
-    public void _testPk1() {
+    @Test
+    @Ignore("Undescored before JUnit 5")
+    public void testPk1() {
 
         // Solution obtained from lp_solve_5.5.2.0 with relaxed integer constraints
         // apete$ lp_solve -noint -mps ./pk1.mps
@@ -158,6 +155,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: 1.00000000e+00
      * </p>
      */
+    @Test
     public void testMarkshare_5_0() {
         MipLibCase.assertMinMaxVal("markshare_5_0.mps", new BigDecimal("0.00000000e+00"), null, true, null);
     }
@@ -176,6 +174,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: 1.00000000e+00
      * </p>
      */
+    @Test
     public void testMarkshare1() {
         MipLibCase.assertMinMaxVal("markshare1.mps", new BigDecimal("0.00000000e+00"), null, true, null);
     }
@@ -194,6 +193,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: 1.00000000e+00
      * </p>
      */
+    @Test
     public void testMarkshare2() {
         MipLibCase.assertMinMaxVal("markshare2.mps", new BigDecimal("0.00000000e+00"), null, true, null);
     }
@@ -212,6 +212,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: 4.00050541e+04
      * </p>
      */
+    @Test
     public void testMas76() {
         MipLibCase.assertMinMaxVal("mas76.mps", new BigDecimal("3.88939036e+04"), null, true, null);
     }
@@ -230,6 +231,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: 2.07405081e+07
      * </p>
      */
+    @Test
     public void testModglob() {
         MipLibCase.assertMinMaxVal("modglob.mps", new BigDecimal("2.04309476e+07"), null, true, null);
     }
@@ -248,6 +250,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: 54.76
      * </p>
      */
+    @Test
     public void testNeos911880() {
         MipLibCase.assertMinMaxVal("neos-911880.mps", new BigDecimal("23.26"), null, true, null);
     }
@@ -266,6 +269,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: -4.10000000e+01
      * </p>
      */
+    @Test
     public void testNoswot() {
         MipLibCase.assertMinMaxVal("noswot.mps", new BigDecimal("-43.0"), null, true, null);
 
@@ -285,6 +289,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: Infeasible
      * </p>
      */
+    @Test
     public void testP2m2p1m1p0n100() {
         MipLibCase.assertMinMaxVal("p2m2p1m1p0n100.mps", new BigDecimal("80424"), null, true, null);
     }
@@ -303,6 +308,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: 7.35000000e+03
      * </p>
      */
+    @Test
     public void testPp08a() {
         MipLibCase.assertMinMaxVal("pp08a.mps", new BigDecimal("2.74834524e+03"), null, true, null);
     }
@@ -321,6 +327,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: 7.35000000e+03
      * </p>
      */
+    @Test
     public void testPp08aCUTS() {
         MipLibCase.assertMinMaxVal("pp08aCUTS.mps", new BigDecimal("5.48060616e+03"), null, true, null);
     }
@@ -339,6 +346,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: 764772
      * </p>
      */
+    @Test
     public void testTimtab1() {
         MipLibCase.assertMinMaxVal("timtab1.mps", new BigDecimal("2.86940000e+04"), null, true, null);
     }
@@ -357,6 +365,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * MIP: 1.37500000e+01
      * </p>
      */
+    @Test
     public void testVpm2() {
         MipLibCase.assertMinMaxVal("vpm2.mps", new BigDecimal("9.88926460e+00"), null, true, null);
     }

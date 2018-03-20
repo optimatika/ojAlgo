@@ -50,8 +50,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-@Tags({@Tag("functionality"), @Tag("matrix")})
-public abstract class BasicMatrixTest extends MatrixTests {
+public abstract class BasicMatrixTest {
 
     public static NumberContext DEFINITION = NumberContext.getGeneral(9);
     public static NumberContext EVALUATION = NumberContext.getGeneral(9);
@@ -229,7 +228,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testDotAccess1D() {
 
-        final int[] tmpCol = new int[] { (int) Uniform.randomInteger(myBigAA.countColumns()) };
+        final int[] tmpCol = new int[]{(int) Uniform.randomInteger(myBigAA.countColumns())};
 
         myExpNmbr = myBigAA.selectColumns(tmpCol).dot(myBigSafe.selectColumns(tmpCol));
 
@@ -242,7 +241,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#doubleValue(long,long)
+     * @see org.ojalgo.matrix.BasicMatrix#doubleValue(long, long)
      */
     @Test
     public void testDoubleValueIntInt() {
@@ -892,7 +891,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#toBigDecimal(int,int)
+     * @see org.ojalgo.matrix.BasicMatrix#toBigDecimal(int, int)
      */
     @Test
     public void testToBigDecimalIntInt() {
@@ -928,7 +927,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#toComplexNumber(int,int)
+     * @see org.ojalgo.matrix.BasicMatrix#toComplexNumber(int, int)
      */
     @Test
     public void testToComplexNumberIntInt() {

@@ -1,19 +1,12 @@
 package org.ojalgo.machine;
 
+import org.junit.Test;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.matrix.RationalMatrix;
 
-public class TestMemoryEstimator extends MachineTests {
+public class TestMemoryEstimator {
 
-    public TestMemoryEstimator() {
-        super();
-    }
-
-    public TestMemoryEstimator(final String someName) {
-        super(someName);
-    }
-
-    public void testRationalMatrix() {
+    @Test public void testRationalMatrix() {
 
         final long tmpEstimate = MemoryEstimator.estimateObject(RationalMatrix.class);
 
@@ -25,7 +18,7 @@ public class TestMemoryEstimator extends MachineTests {
 
     }
 
-    public void testPrimitiveArray() {
+    @Test public void testPrimitiveArray() {
 
         final long tmpEstimate = MemoryEstimator.estimateObject(Primitive64Array.class);
 

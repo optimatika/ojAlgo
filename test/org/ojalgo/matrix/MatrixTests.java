@@ -24,7 +24,6 @@ package org.ojalgo.matrix;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
 
-@Tags({@Tag("functionality"), @Tag("matrix")})
 public abstract class MatrixTests {
     static final boolean DEBUG = false;
 }

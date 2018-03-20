@@ -47,8 +47,7 @@ public class P20030422Case extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test
-    public void testProblem() {
+    @Test public void testProblem() {
 
         myExpMtrx = P20030422Case.getProblematic();
         myActMtrx = myExpMtrx.invert().invert();
