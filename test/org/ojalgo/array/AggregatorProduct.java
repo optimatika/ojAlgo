@@ -28,10 +28,10 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 
 public class AggregatorProduct extends BasicArrayTest {
 
-   @Override
+    @Override
     void doTest(final BasicArray<Double> array) {
 
-       setMultiple(array, INDICES);
+        setMultiple(array, INDICES);
 
         final AggregatorFunction<Double> tmpVisitor = Aggregator.PRODUCT.getFunction(PrimitiveAggregator.getSet());
 
