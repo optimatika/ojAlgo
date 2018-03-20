@@ -64,13 +64,13 @@ public class SingularValueTest {
     }
 
     @Test
-    @Ignore("Undescored before JUnit 5")
+    @Ignore("Underscored before JUnit 5")
     public void _testBasicMatrixP20030422Case() {
         this.doTestTypes(P20030422Case.getProblematic());
     }
 
     @Test
-    @Ignore("Undescored before JUnit 5")
+    @Ignore("Underscored before JUnit 5")
     public void _testBasicMatrixP20030512Case() {
         this.doTestTypes(P20030512Case.getProblematic());
     }
@@ -82,7 +82,7 @@ public class SingularValueTest {
     }
 
     @Test
-    @Ignore("Undescored before JUnit 5")
+    @Ignore("Underscored before JUnit 5")
     public void _testBasicMatrixP20061119Case() {
         this.doTestTypes(P20061119Case.getProblematic());
     }

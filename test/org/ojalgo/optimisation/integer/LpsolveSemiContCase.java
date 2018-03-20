@@ -36,8 +36,8 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
     private static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
     @Test
-    @Ignore("Undescored before JUnit 5")
-    public void testSemiContNot() {
+    @Ignore("Underscored before JUnit 5")
+    public void _testSemiContNot() {
 
         final File tmpFile = new File(PATH + "lpsolve_sc_not.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
@@ -58,8 +58,8 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
     }
 
     @Test
-    @Ignore("Undescored before JUnit 5")
-    public void testSemiContOrg() {
+    @Ignore("Underscored before JUnit 5")
+    public void _testSemiContOrg() {
 
         final File tmpFile = new File(PATH + "lpsolve_sc_org.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);

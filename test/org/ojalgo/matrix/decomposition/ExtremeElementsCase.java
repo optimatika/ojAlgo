@@ -183,19 +183,19 @@ public class ExtremeElementsCase {
     }
 
     @Test
-    @Ignore("Undescored before JUnit 5")
+    @Ignore("Underscored before JUnit 5")
     public void _testInvertOverflow() {
         ExtremeElementsCase.doTestInvert(true);
     }
 
     @Test
-    @Ignore("Undescored before JUnit 5")
+    @Ignore("Underscored before JUnit 5")
     public void _testInvertUnderflow() {
         ExtremeElementsCase.doTestInvert(true);
     }
 
     @Test
-    @Ignore("Undescored before JUnit 5")
+    @Ignore("Underscored before JUnit 5")
     public void _testLU() {
 
         final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
@@ -240,7 +240,7 @@ public class ExtremeElementsCase {
 
     }
 
-    @Ignore("Undescored before JUnit 5")
+    @Ignore("Underscored before JUnit 5")
     @Test
     public void _testQR() {
 
@@ -279,13 +279,13 @@ public class ExtremeElementsCase {
     }
 
     @Test
-    @Ignore("Undescored before JUnit 5")
+    @Ignore("Underscored before JUnit 5")
     public void _testSolveOverflow() {
         ExtremeElementsCase.doTestSolve(true);
     }
 
     @Test
-    @Ignore("Undescored before JUnit 5")
+    @Ignore("Underscored before JUnit 5")
     public void _testSolveUnderflow() {
         ExtremeElementsCase.doTestSolve(false);
     }

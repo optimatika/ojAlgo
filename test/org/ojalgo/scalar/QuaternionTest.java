@@ -23,8 +23,6 @@ package org.ojalgo.scalar;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.QuaternionFunction;
@@ -32,7 +30,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
-@Tags({@Tag("functionality"), @Tag("scalar"), @Tag("quaternion")})
 public class QuaternionTest {
     @Test
     @Ignore("Was underscored before JUnit 5 transition")

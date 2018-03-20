@@ -44,8 +44,8 @@ public final class RelaxedLpCase extends MipLibCase {
      * </p>
      */
     @Test
-    @Ignore("Undescored before JUnit 5")
-    public void testPk1() {
+    @Ignore("Underscored before JUnit 5")
+    public void _testPk1() {
 
         // Solution obtained from lp_solve_5.5.2.0 with relaxed integer constraints
         // apete$ lp_solve -noint -mps ./pk1.mps
