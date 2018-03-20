@@ -21,8 +21,8 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.*;
-import static org.ojalgo.function.BigFunction.*;
+import static org.ojalgo.constant.BigMath.ZERO;
+import static org.ojalgo.function.BigFunction.DIVIDE;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -416,6 +416,10 @@ public abstract class Presolvers {
         }
     }
 
+    /**
+     * Checks if bounds on either of the variables (together with the expressions's bounds) implies tighter
+     * bounds on the other variable.
+     */
     static boolean doCase2(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
             final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
