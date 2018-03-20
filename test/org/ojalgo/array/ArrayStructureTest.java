@@ -22,8 +22,6 @@
 package org.ojalgo.array;
 
 import org.junit.Test;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.StructureAnyD;
 
@@ -107,12 +105,13 @@ public class ArrayStructureTest extends ArrayTests {
         }
     }
 
-    @Test public void testGetIndexintArray() {
+    @Test
+    public void testGetIndexintArray() {
 
-        final int[] tmpRef1 = new int[]{1};
-        final int[] tmpRef2 = new int[]{2, 0};
-        final int[] tmpRef3 = new int[]{3, 0, 1};
-        final int[] tmpRef4 = new int[]{4, 0, 2, 1};
+        final int[] tmpRef1 = new int[] { 1 };
+        final int[] tmpRef2 = new int[] { 2, 0 };
+        final int[] tmpRef3 = new int[] { 3, 0, 1 };
+        final int[] tmpRef4 = new int[] { 4, 0, 2, 1 };
 
         TestUtils.assertEquals(1, StructureAnyD.index(STRUCTURE_1D, tmpRef1));
         TestUtils.assertEquals(2, StructureAnyD.index(STRUCTURE_2D, tmpRef2));
@@ -120,7 +119,8 @@ public class ArrayStructureTest extends ArrayTests {
         TestUtils.assertEquals(104, StructureAnyD.index(STRUCTURE_4D, tmpRef4));
     }
 
-    @Test public void testGetNumberOfDimensions() {
+    @Test
+    public void testGetNumberOfDimensions() {
 
         TestUtils.assertEquals(1, STRUCTURE_1D.length);
         TestUtils.assertEquals(2, STRUCTURE_2D.length);
@@ -128,7 +128,8 @@ public class ArrayStructureTest extends ArrayTests {
         TestUtils.assertEquals(4, STRUCTURE_4D.length);
     }
 
-    @Test public void testGetNumberOfElements() {
+    @Test
+    public void testGetNumberOfElements() {
 
         TestUtils.assertEquals(2, ARRAY_1D.size());
         TestUtils.assertEquals(6, ARRAY_2D.size());

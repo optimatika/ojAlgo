@@ -6,7 +6,8 @@ import org.ojalgo.matrix.RationalMatrix;
 
 public class TestMemoryEstimator {
 
-    @Test public void testRationalMatrix() {
+    @Test
+    public void testRationalMatrix() {
 
         final long tmpEstimate = MemoryEstimator.estimateObject(RationalMatrix.class);
 
@@ -18,7 +19,8 @@ public class TestMemoryEstimator {
 
     }
 
-    @Test public void testPrimitiveArray() {
+    @Test
+    public void testPrimitiveArray() {
 
         final long tmpEstimate = MemoryEstimator.estimateObject(Primitive64Array.class);
 

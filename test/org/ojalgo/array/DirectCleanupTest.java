@@ -21,16 +21,16 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.random.Uniform;
-
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.random.Uniform;
+
 public class DirectCleanupTest {
 
-    private static final AtomicInteger COUNTER = new AtomicInteger();
-    private static final int SIZE = 134_217_728;
+    static final AtomicInteger COUNTER = new AtomicInteger();
+    static final int SIZE = 134_217_728;
 
     public static void main(final String[] args) {
 
@@ -58,4 +58,9 @@ public class DirectCleanupTest {
         }
 
     }
+
+    public DirectCleanupTest() {
+        super();
+    }
+
 }

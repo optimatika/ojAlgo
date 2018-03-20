@@ -50,7 +50,7 @@ import static org.ojalgo.matrix.decomposition.MatrixDecompositionTests.DEBUG;
  */
 public class ExtremeElementsCase {
 
-    private static final NumberContext PRECISION = new NumberContext().newPrecision(12).newScale(148);
+    static final NumberContext PRECISION = new NumberContext().newPrecision(12).newScale(148);
 
     @Before
     public void minimiseAllBranchLimits() {
@@ -75,7 +75,7 @@ public class ExtremeElementsCase {
     }
 
     private static void performSolveTest(final PrimitiveDenseStore body, final PrimitiveDenseStore rhs, final SolverTask<Double> task,
-                                         final NumberContext context) {
+            final NumberContext context) {
 
         try {
 
@@ -184,19 +184,19 @@ public class ExtremeElementsCase {
 
     @Test
     @Ignore("Undescored before JUnit 5")
-    public void testInvertOverflow() {
+    public void _testInvertOverflow() {
         ExtremeElementsCase.doTestInvert(true);
     }
 
     @Test
     @Ignore("Undescored before JUnit 5")
-    public void testInvertUnderflow() {
+    public void _testInvertUnderflow() {
         ExtremeElementsCase.doTestInvert(true);
     }
 
     @Test
     @Ignore("Undescored before JUnit 5")
-    public void testLU() {
+    public void _testLU() {
 
         final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
 
@@ -242,7 +242,7 @@ public class ExtremeElementsCase {
 
     @Ignore("Undescored before JUnit 5")
     @Test
-    public void testQR() {
+    public void _testQR() {
 
         final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
 
@@ -256,7 +256,7 @@ public class ExtremeElementsCase {
         TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
         TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
 
-        if (DEBUG) {
+        if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("Big Q", tmpBig.getQ());
             BasicLogger.debug("Complex Q", tmpComplex.getQ());
             BasicLogger.debug("Primitive Q", tmpPrimitive.getQ());
@@ -280,13 +280,13 @@ public class ExtremeElementsCase {
 
     @Test
     @Ignore("Undescored before JUnit 5")
-    public void testSolveOverflow() {
+    public void _testSolveOverflow() {
         ExtremeElementsCase.doTestSolve(true);
     }
 
     @Test
     @Ignore("Undescored before JUnit 5")
-    public void testSolveUnderflow() {
+    public void _testSolveUnderflow() {
         ExtremeElementsCase.doTestSolve(false);
     }
 
@@ -305,7 +305,7 @@ public class ExtremeElementsCase {
         TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
         TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
 
-        if (DEBUG) {
+        if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("Big: {}", tmpBig.getEigenvalues());
             BasicLogger.debug("Complex: {}", tmpComplex.getEigenvalues());
             BasicLogger.debug("Primitive: {}", tmpPrimitive.getEigenvalues());

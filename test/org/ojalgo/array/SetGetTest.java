@@ -49,8 +49,8 @@ public class SetGetTest extends BasicArrayTest {
             }
         }
 
-        for (long INDICE : INDICES) {
-            TestUtils.assertEquals(1.0, array.doubleValue(INDICE), PrimitiveMath.MACHINE_EPSILON);
+        for (long i : INDICES) {
+            TestUtils.assertEquals(1.0, array.doubleValue(i), PrimitiveMath.MACHINE_EPSILON);
         }
 
     }

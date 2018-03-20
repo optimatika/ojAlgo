@@ -33,12 +33,11 @@ public class AggregatorProduct extends BasicArrayTest {
 
        setMultiple(array, INDICES);
 
-       final AggregatorFunction<Double> tmpVisitor = Aggregator.PRODUCT.getFunction(PrimitiveAggregator.getSet());
+        final AggregatorFunction<Double> tmpVisitor = Aggregator.PRODUCT.getFunction(PrimitiveAggregator.getSet());
 
         array.visitAll(tmpVisitor);
 
         TestUtils.assertEquals(0.0, tmpVisitor.intValue());
     }
-
 
 }

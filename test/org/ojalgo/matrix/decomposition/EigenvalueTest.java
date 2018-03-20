@@ -107,7 +107,7 @@ public class EigenvalueTest {
         final ComplexNumber tmp33 = ComplexNumber.ZERO;
         final ComplexNumber tmp44 = tmp33;
 
-        final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[]{tmp00, tmp11, tmp22, tmp33, tmp44});
+        final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33, tmp44 });
         final NumberContext accuracyContext = new NumberContext(7, 6);
 
         MatrixStore<Double> tmpRecreatedMatrix;
@@ -144,7 +144,7 @@ public class EigenvalueTest {
     @Test
     public void testPaulsMathNote() {
 
-        final double[][] tmpData = new double[][]{{3, -9}, {4, -3}};
+        final double[][] tmpData = new double[][] { { 3, -9 }, { 4, -3 } };
         final PrimitiveDenseStore tmpA = PrimitiveDenseStore.FACTORY.rows(tmpData);
         final int tmpLength = tmpData.length;
 
@@ -203,7 +203,7 @@ public class EigenvalueTest {
     @Test
     public void testPrimitiveAsComplex() {
 
-        final double[][] tmpData = new double[][]{{1, 0, 3}, {0, 4, 1}, {-5, 1, 0}};
+        final double[][] tmpData = new double[][] { { 1, 0, 3 }, { 0, 4, 1 }, { -5, 1, 0 } };
         final PrimitiveDenseStore tmpA = PrimitiveDenseStore.FACTORY.rows(tmpData);
 
         final int tmpLength = tmpData.length;
@@ -248,7 +248,7 @@ public class EigenvalueTest {
     @Test
     public void testProblemFoundInTheWild() {
 
-        final PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][]{{1, 0, 0}, {0.01, 0, -1}, {0.01, 1, 0}});
+        final PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
 
         for (final Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getEigenvaluePrimitiveGeneral()) {
 

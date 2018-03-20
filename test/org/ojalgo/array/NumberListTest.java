@@ -21,17 +21,11 @@
  */
 package org.ojalgo.array;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import org.junit.Test;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.type.context.NumberContext;
+
+import java.util.*;
 
 /**
  * NumberListTest
@@ -43,7 +37,8 @@ public class NumberListTest {
     private static final NumberContext CONTEXT = new NumberContext();
     private static final Random RANDOM = new Random();
 
-    @Test public void testCompareWithArrayList() {
+    @Test
+    public void testCompareWithArrayList() {
 
         final NumberList<Double> primit64List = NumberList.factory(Primitive64Array.FACTORY).make();
         final NumberList<Double> direct64List = NumberList.factory(BufferArray.DIRECT64).make();
@@ -113,7 +108,8 @@ public class NumberListTest {
 
     }
 
-    @Test public void testGrowCapacity() {
+    @Test
+    public void testGrowCapacity() {
 
         final DenseCapacityStrategy<Double> tmpStrategy = new DenseCapacityStrategy<>(Primitive64Array.FACTORY);
         final long initial = tmpStrategy.initial();

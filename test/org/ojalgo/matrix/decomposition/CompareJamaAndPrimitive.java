@@ -54,7 +54,8 @@ public class CompareJamaAndPrimitive {
         TestUtils.minimiseAllBranchLimits();
     }
 
-    @Test public void testSimpleCholeskyCase() {
+    @Test
+    public void testSimpleCholeskyCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleCholeskyCase.getOriginal());
 
@@ -73,7 +74,8 @@ public class CompareJamaAndPrimitive {
         }
     }
 
-    @Test public void testSimpleEigenvalueCase() {
+    @Test
+    public void testSimpleEigenvalueCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleEigenvalueCase.getOriginal());
 
@@ -91,7 +93,8 @@ public class CompareJamaAndPrimitive {
         TestUtils.assertEquals(JAMA_EvD.getEigenvalues(), PRIMITIVE_EvD.getEigenvalues());
     }
 
-    @Test public void testSimpleLUCase() {
+    @Test
+    public void testSimpleLUCase() {
 
         // Dense
 
@@ -130,7 +133,8 @@ public class CompareJamaAndPrimitive {
         }
     }
 
-    @Test public void testSimpleQRCase() {
+    @Test
+    public void testSimpleQRCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleQRCase.getOriginal());
         final int tmpMinDim = (int) Math.min(tmpMtrxA.countRows(), tmpMtrxA.countColumns());
@@ -151,7 +155,8 @@ public class CompareJamaAndPrimitive {
         }
     }
 
-    @Test public void testSimpleSingularValueCase() {
+    @Test
+    public void testSimpleSingularValueCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getOriginal());
 

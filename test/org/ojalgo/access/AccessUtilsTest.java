@@ -34,7 +34,7 @@ public class AccessUtilsTest {
         final long tmpCountColumns = 1 + Uniform.randomInteger(10);
         final long tmpCount = tmpCountRows * tmpCountColumns;
 
-        final long[] tmpStructure = new long[]{tmpCountRows, tmpCountColumns};
+        final long[] tmpStructure = new long[] { tmpCountRows, tmpCountColumns };
         TestUtils.assertEquals(tmpCount, StructureAnyD.count(tmpStructure));
 
         final long tmpExpIndex = Uniform.randomInteger(tmpCount);
@@ -42,7 +42,7 @@ public class AccessUtilsTest {
         final long tmpRow = Structure2D.row(tmpExpIndex, tmpStructure);
         final long tmpColumn = Structure2D.column(tmpExpIndex, tmpStructure);
 
-        final long[] tmpReference = new long[]{tmpRow, tmpColumn};
+        final long[] tmpReference = new long[] { tmpRow, tmpColumn };
         TestUtils.assertEquals(tmpReference, StructureAnyD.reference(tmpExpIndex, tmpStructure));
 
         TestUtils.assertEquals(tmpExpIndex, StructureAnyD.index(tmpStructure, tmpReference));
@@ -62,25 +62,25 @@ public class AccessUtilsTest {
     @Test
     public void accessAnyD() {
 
-        final long[] tmpStructure = new long[]{3, 3, 4, 2};
+        final long[] tmpStructure = new long[] { 3, 3, 4, 2 };
 
         final long tmpExpCount = 72;
         TestUtils.assertEquals(tmpExpCount, StructureAnyD.count(tmpStructure));
 
         final long tmpMatchingInd1 = 50;
-        final long[] tmpMatchingRef1 = new long[]{2, 1, 1, 1};
+        final long[] tmpMatchingRef1 = new long[] { 2, 1, 1, 1 };
 
         TestUtils.assertEquals(tmpMatchingInd1, StructureAnyD.index(tmpStructure, tmpMatchingRef1));
         TestUtils.assertEquals(tmpMatchingRef1, StructureAnyD.reference(tmpMatchingInd1, tmpStructure));
 
         final long tmpMatchingInd2 = 49;
-        final long[] tmpMatchingRef2 = new long[]{1, 1, 1, 1};
+        final long[] tmpMatchingRef2 = new long[] { 1, 1, 1, 1 };
 
         TestUtils.assertEquals(tmpMatchingInd2, StructureAnyD.index(tmpStructure, tmpMatchingRef2));
         TestUtils.assertEquals(tmpMatchingRef2, StructureAnyD.reference(tmpMatchingInd2, tmpStructure));
 
         final long tmpMatchingInd3 = 71; // 1x36 + 3x9 + 2x3 + 2x1 == 36 + 27 + 6 +2 == 71
-        final long[] tmpMatchingRef3 = new long[]{2, 2, 3, 1};
+        final long[] tmpMatchingRef3 = new long[] { 2, 2, 3, 1 };
 
         TestUtils.assertEquals(tmpMatchingInd3, StructureAnyD.index(tmpStructure, tmpMatchingRef3));
         TestUtils.assertEquals(tmpMatchingRef3, StructureAnyD.reference(tmpMatchingInd3, tmpStructure));

@@ -37,14 +37,16 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class BidiagonalTest {
 
-    @Test public void testCaseFromMatrixComputations() {
+    @Test
+    public void testCaseFromMatrixComputations() {
 
-        final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][]{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12}});
+        final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 10, 11, 12 } });
 
         this.doTestCorrect(tmpMatrix);
     }
 
-    @Test public void testComplexSquareCase() {
+    @Test
+    public void testComplexSquareCase() {
 
         final PhysicalStore<ComplexNumber> tmpOriginal = MatrixUtils.makeRandomComplexStore(4, 4);
 
@@ -75,50 +77,57 @@ public class BidiagonalTest {
         TestUtils.assertEquals(tmpOriginal, tmpReconstructed, new NumberContext(7, 6));
     }
 
-    @Test public void testFatEye() {
+    @Test
+    public void testFatEye() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.makeEye(4, 6);
 
         this.doTestCorrect(tmpMatrix);
     }
 
-    @Test public void testFatRandom() {
+    @Test
+    public void testFatRandom() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(4, 6));
 
         this.doTestCorrect(tmpMatrix);
     }
 
-    @Test public void testSquareBidiagonal() {
+    @Test
+    public void testSquareBidiagonal() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY
-                .rows(new double[][]{{1, 4, 0, 0}, {0, 4, 1, 0}, {0, 0, 3, 4}, {0, 0, 0, 3}});
+                .rows(new double[][] { { 1, 4, 0, 0 }, { 0, 4, 1, 0 }, { 0, 0, 3, 4 }, { 0, 0, 0, 3 } });
 
         this.doTestCorrect(tmpMatrix);
     }
 
-    @Test public void testSquareEye() {
+    @Test
+    public void testSquareEye() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.makeEye(5, 5);
 
         this.doTestCorrect(tmpMatrix);
     }
 
-    @Test public void testSquareRandom() {
+    @Test
+    public void testSquareRandom() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(5, 5));
 
         this.doTestCorrect(tmpMatrix);
     }
 
-    @Test public void testTallEye() {
+    @Test
+    public void testTallEye() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.makeEye(6, 4);
 
         this.doTestCorrect(tmpMatrix);
     }
 
-    @Test public void testTallRandom() {
+    @Test
+    public void testTallRandom() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(6, 4));
 
@@ -157,6 +166,10 @@ public class BidiagonalTest {
         }
 
         TestUtils.assertEquals(aMatrix, tmpDecomposition, new NumberContext(7, 6));
+    }
+
+    private PrimitiveDenseStore makeEye(final int aRowDim, final int aColDim) {
+        return PrimitiveDenseStore.FACTORY.makeEye(aRowDim, aColDim);
     }
 
 }

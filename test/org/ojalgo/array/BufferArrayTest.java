@@ -22,8 +22,6 @@
 package org.ojalgo.array;
 
 import org.junit.Test;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 
@@ -34,7 +32,8 @@ import org.ojalgo.random.Uniform;
  */
 public class BufferArrayTest extends ArrayTests {
 
-    @Test public void testRandomGetSet() {
+    @Test
+    public void testRandomGetSet() {
 
         final int tmpCount = 5000;
 

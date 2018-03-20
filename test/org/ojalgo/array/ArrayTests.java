@@ -56,8 +56,9 @@ public abstract class ArrayTests {
         }
 
         for (final Entry<Long, Double> pair : pairs.entrySet()) {
-            TestUtils.assertEquals(pair.getValue().doubleValue(), array.doubleValue(pair.getKey()));
+            TestUtils.assertEquals(pair.getValue().doubleValue(), array.doubleValue(pair.getKey().longValue()));
         }
 
     }
+
 }

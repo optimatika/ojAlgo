@@ -68,7 +68,7 @@ public class DecompositionProblems {
                 LU.COMPLEX.make(), QR.COMPLEX.make(),
                 SingularValue.COMPLEX.make() /*
                                               * , TridiagonalDecomposition . makeComplex ( )
-                                              */};
+                                              */ };
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
             tmpDecomposition.decompose(tmpHermitian);
@@ -147,7 +147,7 @@ public class DecompositionProblems {
     public void testP20090923() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
-                .rows(new double[][]{{1.0, 0.0, 0.0, 0.0, 2.0}, {0.0, 0.0, 3.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 4.0, 0.0, 0.0, 0.0}});
+                .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
         final SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make();
         tmpSVD.decompose(tmpA);
@@ -182,9 +182,9 @@ public class DecompositionProblems {
     public void testP20091012fixed() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
-                .rows(new double[][]{{1.5686711899234411, 5.857030526629094, 2.1798778832593637, 1.4901137152515287, 5.640993583029061},
-                        {4.890945865607895, 4.2576454398997265, 1.0251822439318778, 0.8623492557631138, 5.7457253685285545},
-                        {1.6397137349990025, 0.6795594856277076, 4.7101325736711095, 2.0823473021899517, 2.2159317240940233}});
+                .rows(new double[][] { { 1.5686711899234411, 5.857030526629094, 2.1798778832593637, 1.4901137152515287, 5.640993583029061 },
+                        { 4.890945865607895, 4.2576454398997265, 1.0251822439318778, 0.8623492557631138, 5.7457253685285545 },
+                        { 1.6397137349990025, 0.6795594856277076, 4.7101325736711095, 2.0823473021899517, 2.2159317240940233 } });
 
         final QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.decompose(tmpA);
@@ -196,7 +196,7 @@ public class DecompositionProblems {
     public void testP20100512a() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
-                .rows(new double[][]{{0.2845, 0.3597, 0.9544}, {0.3597, 0.6887, 0.0782}, {0.9544, 0.0782, 0.1140}});
+                .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
 
         final Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
         tmpPrimitive.decompose(tmpA);
@@ -208,7 +208,7 @@ public class DecompositionProblems {
     public void testP20100512b() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
-                .rows(new double[][]{{0.2845, 0.3597, 0.9544}, {0.3597, 0.6887, 0.0782}, {0.9544, 0.0782, 0.1140}});
+                .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
 
         final Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
         tmpPrimitive.decompose(tmpA);
@@ -286,8 +286,9 @@ public class DecompositionProblems {
         final PhysicalStore<ComplexNumber> identity = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> solution;
 
-        @SuppressWarnings("unchecked") final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[]{QR.COMPLEX.make(), SingularValue.COMPLEX.make(),
-                Bidiagonal.COMPLEX.make()};
+        @SuppressWarnings("unchecked")
+        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { QR.COMPLEX.make(), SingularValue.COMPLEX.make(),
+                Bidiagonal.COMPLEX.make() };
 
         for (final MatrixDecomposition<ComplexNumber> decomp : tmpCmplxDecomps) {
 
