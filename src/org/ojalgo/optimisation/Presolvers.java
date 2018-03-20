@@ -26,120 +26,21 @@ import static org.ojalgo.function.BigFunction.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 
 import org.ojalgo.access.Structure1D.IntIndex;
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.type.context.NumberContext;
 
 public abstract class Presolvers {
 
-    public static final ExpressionsBasedModel.Presolver BIGSTUFF = new ExpressionsBasedModel.Presolver(99) {
-
-        @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
-
-            if (expression.getLinearEntrySet().size() > 3333) {
-
-                final Map<IntIndex, BigDecimal> max = new HashMap<>();
-                final Map<IntIndex, BigDecimal> min = new HashMap<>();
-
-                BigDecimal totMax = BigMath.ZERO;
-                BigDecimal totMin = BigMath.ZERO;
-
-                for (final Entry<IntIndex, BigDecimal> tmpEntry : expression.getLinearEntrySet()) {
-                    final IntIndex tmpIndex = tmpEntry.getKey();
-                    final Variable tmpVariable = variableResolver.apply(tmpIndex);
-                    final BigDecimal tmpFactor = tmpEntry.getValue();
-                    if (tmpVariable.isFixed()) {
-                        final BigDecimal fixed = tmpVariable.getValue().multiply(tmpFactor);
-                        max.put(tmpIndex, fixed);
-                        min.put(tmpIndex, fixed);
-                    } else {
-                        final BigDecimal tmpUL = tmpVariable.getUpperLimit();
-                        final BigDecimal tmpLL = tmpVariable.getLowerLimit();
-                        if (tmpFactor.signum() == 1) {
-                            final BigDecimal tmpMaxVal = tmpUL != null ? tmpUL.multiply(tmpFactor) : BigMath.VERY_POSITIVE;
-                            final BigDecimal tmpMinVal = tmpLL != null ? tmpLL.multiply(tmpFactor) : BigMath.VERY_NEGATIVE;
-                            max.put(tmpIndex, tmpMaxVal);
-                            totMax = totMax.add(tmpMaxVal);
-                            min.put(tmpIndex, tmpMinVal);
-                            totMin = totMin.add(tmpMinVal);
-                        } else {
-                            final BigDecimal tmpMaxVal = tmpLL != null ? tmpLL.multiply(tmpFactor) : BigMath.VERY_POSITIVE;
-                            final BigDecimal tmpMinVal = tmpUL != null ? tmpUL.multiply(tmpFactor) : BigMath.VERY_NEGATIVE;
-                            max.put(tmpIndex, tmpMaxVal);
-                            totMax = totMax.add(tmpMaxVal);
-                            min.put(tmpIndex, tmpMinVal);
-                            totMin = totMin.add(tmpMinVal);
-                        }
-                    }
-                }
-
-                BigDecimal tmpExprU = expression.getUpperLimit();
-                if (tmpExprU == null) {
-                    tmpExprU = BigMath.VERY_POSITIVE;
-                }
-
-                BigDecimal tmpExprL = expression.getLowerLimit();
-                if (tmpExprL == null) {
-                    tmpExprL = BigMath.VERY_NEGATIVE;
-                }
-
-                for (final Entry<IntIndex, BigDecimal> tmpEntry : expression.getLinearEntrySet()) {
-                    final IntIndex tmpIndex = tmpEntry.getKey();
-                    final Variable tmpVariable = variableResolver.apply(tmpIndex);
-                    final BigDecimal tmpFactor = tmpEntry.getValue();
-
-                    final BigDecimal tmpRemU = tmpExprU.subtract(totMin).add(min.get(tmpIndex));
-                    final BigDecimal tmpRemL = tmpExprL.subtract(totMax).add(max.get(tmpIndex));
-
-                    BigDecimal tmpVarU = tmpVariable.getUpperLimit();
-                    if (tmpVarU == null) {
-                        tmpVarU = BigMath.VERY_POSITIVE;
-                    }
-
-                    BigDecimal tmpVarL = tmpVariable.getLowerLimit();
-                    if (tmpVarL == null) {
-                        tmpVarL = BigMath.VERY_NEGATIVE;
-                    }
-
-                    if (tmpFactor.signum() == 1) {
-                        tmpVarU = tmpVarU.min(BigFunction.DIVIDE.invoke(tmpRemU, tmpFactor));
-                        tmpVarL = tmpVarL.max(BigFunction.DIVIDE.invoke(tmpRemL, tmpFactor));
-                    } else {
-                        tmpVarU = tmpVarU.min(BigFunction.DIVIDE.invoke(tmpRemL, tmpFactor));
-                        tmpVarL = tmpVarL.max(BigFunction.DIVIDE.invoke(tmpRemU, tmpFactor));
-                    }
-
-                    if (tmpVarU.compareTo(BigMath.VERY_POSITIVE) < 0) {
-                        tmpVariable.upper(tmpVarU);
-                    }
-
-                    if (tmpVarL.compareTo(BigMath.VERY_NEGATIVE) > 0) {
-                        tmpVariable.lower(tmpVarL);
-                    }
-                }
-
-            }
-
-            return false;
-        }
-
-    };
-
     /**
-     * If an expression contains at least 1 binary varibale and all non-fixed variable weights are of the same
+     * If an expression contains at least 1 binary variable and all non-fixed variable weights are of the same
      * sign (positive or negative) then it is possible the check the validity of "1" for each of the binary
-     * variables. (Doesn't seem to work and/or is not effcetive.)
+     * variables. (Doesn't seem to work and/or is not effective.)
      */
     public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
 
@@ -190,6 +91,11 @@ public abstract class Presolvers {
 
     };
 
+    /**
+     * Verifies that the variable is actually referenced/used in some expression. If not then that variable
+     * can either be fixed or marked as unbounded. Also makes sure integer variables have integer lower/upper
+     * bounds (if they exist).
+     */
     public static final ExpressionsBasedModel.VariableAnalyser FIXED_OR_UNBOUNDED = new ExpressionsBasedModel.VariableAnalyser(4) {
 
         @Override
@@ -245,6 +151,10 @@ public abstract class Presolvers {
 
     };
 
+    /**
+     * If the expression is linear and contributes to the objective function, then the contributions are
+     * transferred to the variables and the weight of the expression set to null.
+     */
     public static final ExpressionsBasedModel.Presolver LINEAR_OBJECTIVE = new ExpressionsBasedModel.Presolver(10) {
 
         @Override
@@ -276,7 +186,7 @@ public abstract class Presolvers {
 
     /**
      * Checks the sign of the limits and the sign of the expression parameters to deduce variables that in
-     * fact can only zero.
+     * fact can only be zero.
      */
     public static final ExpressionsBasedModel.Presolver OPPOSITE_SIGN = new ExpressionsBasedModel.Presolver(20) {
 
@@ -424,24 +334,24 @@ public abstract class Presolvers {
         final BigDecimal factor = expression.get(index);
         final BigDecimal oldLower = variable.getLowerLimit();
         final BigDecimal oldUpper = variable.getUpperLimit();
-        final BigDecimal varMax;
-        final BigDecimal varMin;
+        final BigDecimal varMaxContr;
+        final BigDecimal varMinContr;
         if (factor.signum() == 1) {
-            varMax = oldUpper != null ? factor.multiply(oldUpper) : null;
-            varMin = oldLower != null ? factor.multiply(oldLower) : null;
+            varMaxContr = oldUpper != null ? factor.multiply(oldUpper) : null;
+            varMinContr = oldLower != null ? factor.multiply(oldLower) : null;
         } else {
-            varMin = oldUpper != null ? factor.multiply(oldUpper) : null;
-            varMax = oldLower != null ? factor.multiply(oldLower) : null;
+            varMinContr = oldUpper != null ? factor.multiply(oldUpper) : null;
+            varMaxContr = oldLower != null ? factor.multiply(oldLower) : null;
         }
 
         final BigDecimal exprLower = expression.getLowerLimit() != null ? expression.getLowerLimit().subtract(fixedValue) : null;
-        if ((exprLower != null) && (varMax != null) && precision.isLessThan(exprLower, varMax)) {
+        if ((exprLower != null) && (varMaxContr != null) && precision.isLessThan(exprLower, varMaxContr)) {
             expression.setInfeasible();
             return false;
         }
 
         final BigDecimal exprUpper = expression.getUpperLimit() != null ? expression.getUpperLimit().subtract(fixedValue) : null;
-        if ((exprUpper != null) && (varMin != null) && precision.isMoreThan(exprUpper, varMin)) {
+        if ((exprUpper != null) && (varMinContr != null) && precision.isMoreThan(exprUpper, varMinContr)) {
             expression.setInfeasible();
             return false;
         }
@@ -460,32 +370,32 @@ public abstract class Presolvers {
         } else {
             // More general case
 
-            BigDecimal solLower = exprLower != null ? DIVIDE.invoke(exprLower, factor) : null;
-            BigDecimal solUpper = exprUpper != null ? DIVIDE.invoke(exprUpper, factor) : null;
+            BigDecimal solutionLower = exprLower != null ? DIVIDE.invoke(exprLower, factor) : null;
+            BigDecimal solutionUpper = exprUpper != null ? DIVIDE.invoke(exprUpper, factor) : null;
             if (factor.signum() < 0) {
-                final BigDecimal tmpVal = solLower;
-                solLower = solUpper;
-                solUpper = tmpVal;
+                final BigDecimal tmpVal = solutionLower;
+                solutionLower = solutionUpper;
+                solutionUpper = tmpVal;
             }
 
             final BigDecimal newLower;
-            if (solLower != null) {
-                solLower = oldLower != null ? oldLower.max(solLower) : solLower;
+            if (solutionLower != null) {
+                solutionLower = oldLower != null ? oldLower.max(solutionLower) : solutionLower;
                 if (variable.isInteger()) {
-                    solLower = solLower.setScale(0, RoundingMode.CEILING);
+                    solutionLower = solutionLower.setScale(0, RoundingMode.CEILING);
                 }
-                newLower = solLower;
+                newLower = solutionLower;
             } else {
                 newLower = oldLower;
             }
 
             final BigDecimal newUpper;
-            if (solUpper != null) {
-                solUpper = oldUpper != null ? oldUpper.min(solUpper) : solUpper;
+            if (solutionUpper != null) {
+                solutionUpper = oldUpper != null ? oldUpper.min(solutionUpper) : solutionUpper;
                 if (variable.isInteger()) {
-                    solUpper = solUpper.setScale(0, RoundingMode.FLOOR);
+                    solutionUpper = solutionUpper.setScale(0, RoundingMode.FLOOR);
                 }
-                newUpper = solUpper;
+                newUpper = solutionUpper;
             } else {
                 newUpper = oldUpper;
             }
@@ -512,143 +422,128 @@ public abstract class Presolvers {
         final Iterator<IntIndex> tmpIterator = remaining.iterator();
 
         final Variable variableA = variableResolver.apply(tmpIterator.next());
-        final BigDecimal varAfactor = expression.get(variableA);
-        final BigDecimal varAlowerOrg = variableA.getLowerLimit();
-        final BigDecimal varAupperOrg = variableA.getUpperLimit();
-        final BigDecimal varAmax;
-        final BigDecimal varAmin;
-        if (varAfactor.signum() == 1) {
-            varAmax = varAupperOrg != null ? varAfactor.multiply(varAupperOrg) : null;
-            varAmin = varAlowerOrg != null ? varAfactor.multiply(varAlowerOrg) : null;
+        final BigDecimal factorA = expression.get(variableA);
+        final BigDecimal oldLowerA = variableA.getLowerLimit();
+        final BigDecimal oldUpperA = variableA.getUpperLimit();
+        final BigDecimal varMaxContrA;
+        final BigDecimal varMinContrA;
+        if (factorA.signum() == 1) {
+            varMaxContrA = oldUpperA != null ? factorA.multiply(oldUpperA) : null;
+            varMinContrA = oldLowerA != null ? factorA.multiply(oldLowerA) : null;
         } else {
-            varAmin = varAupperOrg != null ? varAfactor.multiply(varAupperOrg) : null;
-            varAmax = varAlowerOrg != null ? varAfactor.multiply(varAlowerOrg) : null;
+            varMinContrA = oldUpperA != null ? factorA.multiply(oldUpperA) : null;
+            varMaxContrA = oldLowerA != null ? factorA.multiply(oldLowerA) : null;
         }
-        BigDecimal varAlowerNew = varAlowerOrg;
-        BigDecimal varAupperNew = varAupperOrg;
 
         final Variable variableB = variableResolver.apply(tmpIterator.next());
-        final BigDecimal varBfactor = expression.get(variableB);
-        final BigDecimal varBlowerOrg = variableB.getLowerLimit();
-        final BigDecimal varBupperOrg = variableB.getUpperLimit();
-        final BigDecimal varBmax;
-        final BigDecimal varBmin;
-        if (varBfactor.signum() == 1) {
-            varBmax = varBupperOrg != null ? varBfactor.multiply(varBupperOrg) : null;
-            varBmin = varBlowerOrg != null ? varBfactor.multiply(varBlowerOrg) : null;
+        final BigDecimal factorB = expression.get(variableB);
+        final BigDecimal oldLowerB = variableB.getLowerLimit();
+        final BigDecimal oldUpperB = variableB.getUpperLimit();
+        final BigDecimal varMaxContrB;
+        final BigDecimal varMinContrB;
+        if (factorB.signum() == 1) {
+            varMaxContrB = oldUpperB != null ? factorB.multiply(oldUpperB) : null;
+            varMinContrB = oldLowerB != null ? factorB.multiply(oldLowerB) : null;
         } else {
-            varBmin = varBupperOrg != null ? varBfactor.multiply(varBupperOrg) : null;
-            varBmax = varBlowerOrg != null ? varBfactor.multiply(varBlowerOrg) : null;
+            varMinContrB = oldUpperB != null ? factorB.multiply(oldUpperB) : null;
+            varMaxContrB = oldLowerB != null ? factorB.multiply(oldLowerB) : null;
         }
-        BigDecimal varBlowerNew = varBlowerOrg;
-        BigDecimal varBupperNew = varBupperOrg;
 
         final BigDecimal exprLower = expression.getLowerLimit() != null ? expression.getLowerLimit().subtract(fixedValue) : null;
-        if ((exprLower != null) && (varAmax != null) && (varBmax != null) && precision.isLessThan(exprLower, varAmax.add(varBmax))) {
+        if ((exprLower != null) && (varMaxContrA != null) && (varMaxContrB != null) && precision.isLessThan(exprLower, varMaxContrA.add(varMaxContrB))) {
             expression.setInfeasible();
             return false;
         }
 
         final BigDecimal exprUpper = expression.getUpperLimit() != null ? expression.getUpperLimit().subtract(fixedValue) : null;
-        if ((exprUpper != null) && (varAmin != null) && (varBmin != null) && precision.isMoreThan(exprUpper, varAmin.add(varBmin))) {
+        if ((exprUpper != null) && (varMinContrA != null) && (varMinContrB != null) && precision.isMoreThan(exprUpper, varMinContrA.add(varMinContrB))) {
             expression.setInfeasible();
             return false;
         }
 
+        BigDecimal newLowerA = oldLowerA;
+        BigDecimal newUpperA = oldUpperA;
+        BigDecimal newLowerB = oldLowerB;
+        BigDecimal newUpperB = oldUpperB;
+
         if (exprLower != null) {
 
-            final BigDecimal varBlimit = varBfactor.signum() == 1 ? varBupperOrg : varBlowerOrg;
-            if (varBlimit != null) {
+            if ((varMaxContrB != null) && (varMaxContrB.compareTo(exprLower) < 0)) {
+                BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varMaxContrB), factorA);
 
-                BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varBfactor.multiply(varBlimit)), varAfactor);
+                newLimit = oldLowerA != null ? oldLowerA.max(newLimit) : newLimit;
+                newLimit = oldUpperA != null ? oldUpperA.min(newLimit) : newLimit;
 
-                newLimit = varAlowerOrg != null ? varAlowerOrg.max(newLimit) : newLimit;
-                newLimit = varAupperOrg != null ? varAupperOrg.min(newLimit) : newLimit;
-
-                if (varAfactor.signum() == 1) {
-                    // New lower limit on A
-                    varAlowerNew = newLimit;
+                if (factorA.signum() == 1) {
+                    newLowerA = newLimit;
                 } else {
-                    // New upper limit on A
-                    varAupperNew = newLimit;
+                    newUpperA = newLimit;
                 }
-
             }
 
-            final BigDecimal varAlimit = varAfactor.signum() == 1 ? varAupperOrg : varAlowerOrg;
-            if (varAlimit != null) {
+            if ((varMaxContrA != null) && (varMaxContrA.compareTo(exprLower) < 0)) {
+                BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varMaxContrA), factorB);
 
-                BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varAfactor.multiply(varAlimit)), varBfactor);
+                newLimit = oldLowerB != null ? oldLowerB.max(newLimit) : newLimit;
+                newLimit = oldUpperB != null ? oldUpperB.min(newLimit) : newLimit;
 
-                newLimit = varBlowerOrg != null ? varBlowerOrg.max(newLimit) : newLimit;
-                newLimit = varBupperOrg != null ? varBupperOrg.min(newLimit) : newLimit;
-
-                if (varBfactor.signum() == 1) {
-                    // New lower limit on B
-                    varBlowerNew = newLimit;
+                if (factorB.signum() == 1) {
+                    newLowerB = newLimit;
                 } else {
-                    // New upper limit on B
-                    varBupperNew = newLimit;
+                    newUpperB = newLimit;
                 }
-
             }
         }
 
         if (exprUpper != null) {
 
-            final BigDecimal varBlimit = varBfactor.signum() == 1 ? varBlowerOrg : varBupperOrg;
-            if (varBlimit != null) {
+            if ((varMinContrB != null) && (varMinContrB.compareTo(exprUpper) > 0)) {
+                BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varMinContrB), factorA);
 
-                BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varBfactor.multiply(varBlimit)), varAfactor);
+                newLimit = oldLowerA != null ? oldLowerA.max(newLimit) : newLimit;
+                newLimit = oldUpperA != null ? oldUpperA.min(newLimit) : newLimit;
 
-                newLimit = varAlowerOrg != null ? varAlowerOrg.max(newLimit) : newLimit;
-                newLimit = varAupperOrg != null ? varAupperOrg.min(newLimit) : newLimit;
-
-                if (varAfactor.signum() == 1) {
-                    varAupperNew = newLimit;
+                if (factorA.signum() == 1) {
+                    newUpperA = newLimit;
                 } else {
-                    varAlowerNew = newLimit;
+                    newLowerA = newLimit;
                 }
-
             }
 
-            final BigDecimal varAlimit = varAfactor.signum() == 1 ? varAlowerOrg : varAupperOrg;
-            if (varAlimit != null) {
+            if (varMinContrA != null && (varMinContrA.compareTo(exprUpper) > 0)) {
+                BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varMinContrA), factorB);
 
-                BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varAfactor.multiply(varAlimit)), varBfactor);
+                newLimit = oldLowerB != null ? oldLowerB.max(newLimit) : newLimit;
+                newLimit = oldUpperB != null ? oldUpperB.min(newLimit) : newLimit;
 
-                newLimit = varBlowerOrg != null ? varBlowerOrg.max(newLimit) : newLimit;
-                newLimit = varBupperOrg != null ? varBupperOrg.min(newLimit) : newLimit;
-
-                if (varBfactor.signum() == 1) {
-                    varBupperNew = newLimit;
+                if (factorB.signum() == 1) {
+                    newUpperB = newLimit;
                 } else {
-                    varBlowerNew = newLimit;
+                    newLowerB = newLimit;
                 }
-
             }
         }
 
         if (variableA.isInteger()) {
-            if (varAlowerNew != null) {
-                varAlowerNew = varAlowerNew.setScale(0, RoundingMode.CEILING);
+            if (newLowerA != null) {
+                newLowerA = newLowerA.setScale(0, RoundingMode.CEILING);
             }
-            if (varAupperNew != null) {
-                varAupperNew = varAupperNew.setScale(0, RoundingMode.FLOOR);
+            if (newUpperA != null) {
+                newUpperA = newUpperA.setScale(0, RoundingMode.FLOOR);
             }
         }
 
         if (variableB.isInteger()) {
-            if (varBlowerNew != null) {
-                varBlowerNew = varBlowerNew.setScale(0, RoundingMode.CEILING);
+            if (newLowerB != null) {
+                newLowerB = newLowerB.setScale(0, RoundingMode.CEILING);
             }
-            if (varBupperNew != null) {
-                varBupperNew = varBupperNew.setScale(0, RoundingMode.FLOOR);
+            if (newUpperB != null) {
+                newUpperB = newUpperB.setScale(0, RoundingMode.FLOOR);
             }
         }
 
-        variableA.lower(varAlowerNew).upper(varAupperNew);
-        variableB.lower(varBlowerNew).upper(varBupperNew);
+        variableA.lower(newLowerA).upper(newUpperA);
+        variableB.lower(newLowerB).upper(newUpperB);
 
         return variableA.isEqualityConstraint() || variableB.isEqualityConstraint();
     }
