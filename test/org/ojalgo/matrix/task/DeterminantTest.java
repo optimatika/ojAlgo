@@ -23,20 +23,15 @@ package org.ojalgo.matrix.task;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
 
+@Tags({@Tag("functionality"), @Tag("matrix"), @Tag("decomposition")})
 public final class DeterminantTest extends AbstractMatrixDecompositionTaskTest {
-
-    public DeterminantTest() {
-        super();
-    }
-
-    public DeterminantTest(final String arg0) {
-        super(arg0);
-    }
 
     public void testFull2X2() {
         this.doFull(AbstractDeterminator.FULL_2X2, 2);

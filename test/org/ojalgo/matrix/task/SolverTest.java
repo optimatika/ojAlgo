@@ -23,6 +23,7 @@ package org.ojalgo.matrix.task;
 
 import java.util.List;
 
+import org.junit.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
@@ -34,51 +35,52 @@ import org.ojalgo.random.Uniform;
 
 public final class SolverTest extends AbstractMatrixDecompositionTaskTest {
 
-    public SolverTest() {
-        super();
-    }
-
-    public SolverTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testFull2X2() {
         this.doCompare(AbstractSolver.FULL_2X2, 2);
     }
 
+    @Test
     public void testFull3X3() {
         this.doCompare(AbstractSolver.FULL_3X3, 3);
     }
 
+    @Test
     public void testFull4X4() {
         this.doCompare(AbstractSolver.FULL_4X4, 4);
     }
 
+    @Test
     public void testFull5X5() {
         this.doCompare(AbstractSolver.FULL_5X5, 5);
     }
 
+    @Test
     public void testSymmetric1X1() {
         this.doCompare(AbstractSolver.FULL_1X1, 1);
     }
 
+    @Test
     public void testSymmetric2X2() {
         this.doCompare(AbstractSolver.SYMMETRIC_2X2, 2);
     }
 
+    @Test
     public void testSymmetric3X3() {
         this.doCompare(AbstractSolver.SYMMETRIC_3X3, 3);
     }
 
+    @Test
     public void testSymmetric4X4() {
         this.doCompare(AbstractSolver.SYMMETRIC_4X4, 4);
     }
 
+    @Test
     public void testSymmetric5X5() {
         this.doCompare(AbstractSolver.SYMMETRIC_5X5, 5);
     }
 
-    void doCompare(final SolverTask<Double> fixed, final int dimension) {
+    private void doCompare(final SolverTask<Double> fixed, final int dimension) {
 
         try {
 
@@ -90,8 +92,7 @@ public final class SolverTest extends AbstractMatrixDecompositionTaskTest {
             final List<MatrixDecomposition<Double>> tmpList = MatrixDecompositionTests.getAllPrimitive();
             for (final MatrixDecomposition<Double> tmpDecomp : tmpList) {
                 if (tmpDecomp instanceof SolverTask) {
-                    @SuppressWarnings("unchecked")
-                    final SolverTask<Double> tmpTask = (SolverTask<Double>) tmpDecomp;
+                    @SuppressWarnings("unchecked") final SolverTask<Double> tmpTask = (SolverTask<Double>) tmpDecomp;
                     final MatrixStore<Double> tmpActSol = tmpTask.solve(tmpBody, tmpRHS);
                     TestUtils.assertEquals(tmpDecomp.getClass().getName(), tmpExpSol, tmpActSol);
                 }
@@ -102,11 +103,11 @@ public final class SolverTest extends AbstractMatrixDecompositionTaskTest {
         }
     }
 
-    MatrixStore<Double> makeRHS(final int dim) {
+    private MatrixStore<Double> makeRHS(final int dim) {
         return PrimitiveDenseStore.FACTORY.makeFilled(dim, 1L, new Uniform());
     }
 
-    MatrixStore<Double> makeSPD(final int dim) {
+    private MatrixStore<Double> makeSPD(final int dim) {
         return MatrixUtils.makeSPD(dim);
     }
 

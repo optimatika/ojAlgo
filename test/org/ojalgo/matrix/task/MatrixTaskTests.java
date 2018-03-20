@@ -21,72 +21,49 @@
  */
 package org.ojalgo.matrix.task;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.ojalgo.FunctionalityTest;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
- * MatrixDecompositionPackageTests
- *
  * @author apete
  */
-public abstract class MatrixTaskTests extends FunctionalityTest {
+@Tags({@Tag("functionality"), @Tag("matrix"), @Tag("task")})
+public abstract class MatrixTaskTests {
 
     static final boolean DEBUG = false;
 
-    public static final List<DeterminantTask<Double>> getPrimitiveFull() {
+    public static List<DeterminantTask<Double>> getPrimitiveFull() {
 
         final ArrayList<DeterminantTask<Double>> retVal = new ArrayList<>();
 
-        for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionTests.getLUPrimitive()) {
-            retVal.add(tmpDeterminantTask);
-        }
+        Collections.addAll(retVal, MatrixDecompositionTests.getLUPrimitive());
 
-        for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionTests.getEigenvaluePrimitiveGeneral()) {
-            retVal.add(tmpDeterminantTask);
-        }
+        Collections.addAll(retVal, MatrixDecompositionTests.getEigenvaluePrimitiveGeneral());
 
-        //        for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionPackageTests.getQRPrimitive()) {
-        //            retVal.add(tmpDeterminantTask);
-        //        }
+//        Collections.addAll(retVal, MatrixDecompositionTests.getQRPrimitive());
 
         return retVal;
     }
 
-    public static final List<DeterminantTask<Double>> getPrimitiveSymmetric() {
+    public static List<DeterminantTask<Double>> getPrimitiveSymmetric() {
 
         final ArrayList<DeterminantTask<Double>> retVal = new ArrayList<>();
 
-        for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionTests.getCholeskyPrimitive()) {
-            retVal.add(tmpDeterminantTask);
-        }
+        Collections.addAll(retVal, MatrixDecompositionTests.getCholeskyPrimitive());
 
-        for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric()) {
-            retVal.add(tmpDeterminantTask);
-        }
+        Collections.addAll(retVal, MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric());
 
-        for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionTests.getLUPrimitive()) {
-            retVal.add(tmpDeterminantTask);
-        }
+        Collections.addAll(retVal, MatrixDecompositionTests.getLUPrimitive());
 
-        for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionTests.getEigenvaluePrimitiveGeneral()) {
-            retVal.add(tmpDeterminantTask);
-        }
+        Collections.addAll(retVal, MatrixDecompositionTests.getEigenvaluePrimitiveGeneral());
 
-        //        for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionPackageTests.getQRPrimitive()) {
-        //            retVal.add(tmpDeterminantTask);
-        //        }
+//        Collections.addAll(retVal, MatrixDecompositionTests.getQRPrimitive());
 
         return retVal;
-    }
-
-    protected MatrixTaskTests() {
-        super();
-    }
-
-    protected MatrixTaskTests(final String name) {
-        super(name);
     }
 }

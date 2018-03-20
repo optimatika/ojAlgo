@@ -24,13 +24,16 @@ package org.ojalgo.array;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 
+@Tags({@Tag("functionality"), @Tag("array")})
 public class DirectCleanupTest {
 
-    static final AtomicInteger COUNTER = new AtomicInteger();
-    static final int SIZE = 134_217_728;
+    private static final AtomicInteger COUNTER = new AtomicInteger();
+    private static final int SIZE = 134_217_728;
 
     public static void main(final String[] args) {
 

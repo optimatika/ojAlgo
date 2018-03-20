@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.StructureAnyD;
 
@@ -29,6 +31,7 @@ import org.ojalgo.access.StructureAnyD;
  *
  * @author apete
  */
+@Tags({@Tag("functionality"), @Tag("array")})
 public class ArrayStructureTest extends ArrayTests {
 
     private static Primitive64Array ARRAY_1D;
@@ -102,14 +105,6 @@ public class ArrayStructureTest extends ArrayTests {
         for (int i = 0; i < ARRAY_4D.size(); i++) {
             ARRAY_4D.set(i, Double.valueOf(i));
         }
-    }
-
-    public ArrayStructureTest() {
-        super();
-    }
-
-    public ArrayStructureTest(final String aName) {
-        super(aName);
     }
 
     public void testGetIndexintArray() {

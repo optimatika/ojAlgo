@@ -23,6 +23,10 @@ package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.BigDenseStore;
@@ -37,6 +41,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
+@Tags({@Tag("functionality"), @Tag("matrix")})
 public class LargerCholeskyCase extends BasicMatrixTest {
 
     public static RationalMatrix getOriginal() {
@@ -46,18 +51,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         return RationalMatrix.FACTORY.copy(randomComplex.multiply(randomComplex.conjugate()));
     }
 
-    public LargerCholeskyCase() {
-        super();
-    }
-
-    public LargerCholeskyCase(final String arg0) {
-        super(arg0);
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrixTest#testData()
-     */
-    @Override
+    @Test
     public void testData() {
 
         final MatrixStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY.copy(LargerCholeskyCase.getOriginal());
@@ -66,10 +60,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         TestUtils.assertEquals(true, tmpDecomp.isSolvable());
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrixTest#testProblem()
-     */
-    @Override
+    @Test
     public void testProblem() {
 
         final BasicMatrix tmpMtrx = LargerCholeskyCase.getOriginal();
@@ -79,8 +70,9 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpMtrx), tmpDecomp, EVALUATION);
     }
 
+    @Before
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() {
 
         DEFINITION = new NumberContext(7, 4);
         EVALUATION = new NumberContext(7, 3);

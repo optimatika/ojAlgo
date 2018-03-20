@@ -21,20 +21,16 @@
  */
 package org.ojalgo.array;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
+
 /**
  * AbstractArrayTest
  *
  * @author apete
  */
+@Tags({@Tag("functionality"), @Tag("array")})
 public class SegmentedArrayTest extends ArrayTests {
-
-    public SegmentedArrayTest() {
-        super();
-    }
-
-    public SegmentedArrayTest(final String aName) {
-        super(aName);
-    }
 
     public void testRandomSetAndGetBackPrimitive64() {
 

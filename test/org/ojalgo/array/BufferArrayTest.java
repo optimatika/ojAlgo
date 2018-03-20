@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 
@@ -29,15 +31,8 @@ import org.ojalgo.random.Uniform;
  *
  * @author apete
  */
+@Tags({@Tag("functionality"), @Tag("array")})
 public class BufferArrayTest extends ArrayTests {
-
-    public BufferArrayTest() {
-        super();
-    }
-
-    public BufferArrayTest(final String aName) {
-        super(aName);
-    }
 
     public void testRandomGetSet() {
 

@@ -23,6 +23,8 @@ package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.BigDenseStore;
@@ -38,22 +40,13 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20050125Case extends BasicMatrixTest {
 
-    private static int DIM = 3;
-
     public static RationalMatrix getProblematic() {
+        int DIM = 3;
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeFilled(DIM, DIM * DIM, new Uniform());
         return tmpMtrx.multiply(tmpMtrx.transpose());
     }
 
-    public P20050125Case() {
-        super();
-    }
-
-    public P20050125Case(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
+    @Test
     public void testData() {
 
         final Cholesky<BigDecimal> tmpDelegate = Cholesky.BIG.make();
@@ -62,7 +55,7 @@ public class P20050125Case extends BasicMatrixTest {
         TestUtils.assertEquals(BigDenseStore.FACTORY.copy(myBigAA), tmpDelegate, EVALUATION);
     }
 
-    @Override
+    @Test
     public void testProblem() {
 
         final Cholesky<BigDecimal> tmpDelegate = Cholesky.BIG.make();
@@ -81,8 +74,9 @@ public class P20050125Case extends BasicMatrixTest {
         super.testSolveBasicMatrix();
     }
 
+    @Before
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() {
 
         DEFINITION = new NumberContext(7, 9);
         EVALUATION = new NumberContext(7, 6);

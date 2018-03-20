@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -35,18 +37,11 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
+@Tags({@Tag("functionality"), @Tag("array")})
 public class NumberListTest extends ArrayTests {
 
     private static final NumberContext CONTEXT = new NumberContext();
-    static final Random RANDOM = new Random();
-
-    public NumberListTest() {
-        super();
-    }
-
-    public NumberListTest(final String aName) {
-        super(aName);
-    }
+    private static final Random RANDOM = new Random();
 
     public void testCompareWithArrayList() {
 

@@ -23,6 +23,8 @@ package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.decomposition.QR;
@@ -36,31 +38,23 @@ import org.ojalgo.matrix.store.MatrixStore;
  */
 public class SimpleQRCase extends BasicMatrixTest {
 
-    public static RationalMatrix getFactorQ() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveFunction.SQRT.invoke(2.0) },
-                { 2.0 / 3.0, -1.0 / PrimitiveFunction.SQRT.invoke(2.0) } });
+    private static RationalMatrix getFactorQ() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0 / 3.0, 0.0}, {2.0 / 3.0, 1.0 / PrimitiveFunction.SQRT.invoke(2.0)},
+                {2.0 / 3.0, -1.0 / PrimitiveFunction.SQRT.invoke(2.0)}});
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static RationalMatrix getFactorR() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveFunction.SQRT.invoke(2.0) } });
+    private static RationalMatrix getFactorR() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{3.0, 3.0}, {0.0, PrimitiveFunction.SQRT.invoke(2.0)}});
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static RationalMatrix getOriginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0, 1.0}, {2.0, 3.0}, {2.0, 1.0}});
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public SimpleQRCase() {
-        super();
-    }
-
-    public SimpleQRCase(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
+    @Test
     public void testData() {
 
         myExpMtrx = SimpleQRCase.getOriginal();
@@ -71,7 +65,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Override
+    @Test
     public void testProblem() {
 
         // QR
@@ -102,8 +96,9 @@ public class SimpleQRCase extends BasicMatrixTest {
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
     }
 
+    @Before
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() {
 
         DEFINITION = DEFINITION.newScale(18);
         EVALUATION = EVALUATION.newScale(9).newPrecision(15);

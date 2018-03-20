@@ -26,6 +26,8 @@ import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;
@@ -35,18 +37,11 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
+@Tags({@Tag("functionality"), @Tag("array")})
 public class LongToNumberMapTest extends ArrayTests {
 
-    static final NumberContext CONTEXT = new NumberContext();
-    static final Random RANDOM = new Random();
-
-    public LongToNumberMapTest() {
-        super();
-    }
-
-    public LongToNumberMapTest(final String aName) {
-        super(aName);
-    }
+    private static final NumberContext CONTEXT = new NumberContext();
+    private static final Random RANDOM = new Random();
 
     public void testAlignCapacity() {
         TestUtils.assertEquals(1, 1L << PrimitiveMath.powerOf2Larger(-1L));

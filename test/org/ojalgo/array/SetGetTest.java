@@ -23,24 +23,19 @@ package org.ojalgo.array;
 
 import java.util.Arrays;
 
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 
+@Tags({@Tag("functionality"), @Tag("array")})
 public class SetGetTest extends BasicArrayTest {
-
-    public SetGetTest() {
-        super();
-    }
-
-    public SetGetTest(final String aName) {
-        super(aName);
-    }
 
     @Override
     void doTest(final BasicArray<Double> array) {
 
-        for (int i = 0; i < INDICES.length; i++) {
-            array.set(INDICES[i], 1.0);
+        for (long INDEX : INDICES) {
+            array.set(INDEX, 1.0);
         }
 
         for (long i = 0L; i < COUNT; i++) {

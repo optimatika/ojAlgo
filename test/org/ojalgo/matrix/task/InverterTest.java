@@ -23,6 +23,7 @@ package org.ojalgo.matrix.task;
 
 import java.util.List;
 
+import org.junit.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
@@ -32,51 +33,52 @@ import org.ojalgo.matrix.store.MatrixStore;
 
 public final class InverterTest extends AbstractMatrixDecompositionTaskTest {
 
-    public InverterTest() {
-        super();
-    }
-
-    public InverterTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testFull2X2() {
         this.doCompare(AbstractInverter.FULL_2X2, 2);
     }
 
+    @Test
     public void testFull3X3() {
         this.doCompare(AbstractInverter.FULL_3X3, 3);
     }
 
+    @Test
     public void testFull4X4() {
         this.doCompare(AbstractInverter.FULL_4X4, 4);
     }
 
+    @Test
     public void testFull5X5() {
         this.doCompare(AbstractInverter.FULL_5X5, 5);
     }
 
+    @Test
     public void testSymmetric1X1() {
         this.doCompare(AbstractInverter.FULL_1X1, 1);
     }
 
+    @Test
     public void testSymmetric2X2() {
         this.doCompare(AbstractInverter.SYMMETRIC_2X2, 2);
     }
 
+    @Test
     public void testSymmetric3X3() {
         this.doCompare(AbstractInverter.SYMMETRIC_3X3, 3);
     }
 
+    @Test
     public void testSymmetric4X4() {
         this.doCompare(AbstractInverter.SYMMETRIC_4X4, 4);
     }
 
+    @Test
     public void testSymmetric5X5() {
         this.doCompare(AbstractInverter.SYMMETRIC_5X5, 5);
     }
 
-    void doCompare(final InverterTask<Double> fixed, final int dimension) {
+    private void doCompare(final InverterTask<Double> fixed, final int dimension) {
 
         try {
 
@@ -99,7 +101,7 @@ public final class InverterTest extends AbstractMatrixDecompositionTaskTest {
         }
     }
 
-    MatrixStore<Double> makeSPD(final int dim) {
+    private MatrixStore<Double> makeSPD(final int dim) {
         return MatrixUtils.makeSPD(dim);
     }
 

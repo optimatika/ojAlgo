@@ -21,21 +21,18 @@
  */
 package org.ojalgo.array;
 
+import org.junit.Test;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 
 /**
  * @author apete
  */
+@Tags({@Tag("functionality"), @Tag("array")})
 public class Array1DTest extends ArrayTests {
 
-    public Array1DTest() {
-        super();
-    }
-
-    public Array1DTest(final String aName) {
-        super(aName);
-    }
-
+    @Test
     public void testSortingEvenSizedArrayAscending() {
 
         final double[][] tmpRows = new double[][] { { 4, 5, 6, 7, 8, 9 }, { 9, 8, 7, 6, 5, 4 }, { 9, 5, 7, 6, 8, 4 }, { 4, 8, 6, 7, 5, 9 } };
@@ -43,6 +40,7 @@ public class Array1DTest extends ArrayTests {
         this.doSortTest(tmpRows);
     }
 
+    @Test
     public void testSortingEvenSizedArrayDescending() {
 
         final double[][] tmpRows = new double[][] { { 9, 8, 7, 6, 5, 4 }, { 4, 5, 6, 7, 8, 9 }, { 9, 5, 7, 6, 8, 4 }, { 4, 8, 6, 7, 5, 9 } };
@@ -50,6 +48,7 @@ public class Array1DTest extends ArrayTests {
         this.doSortTest(tmpRows);
     }
 
+    @Test
     public void testSortingOddSizedArrayAscending() {
 
         final double[][] tmpRows = new double[][] { { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 8, 1, 2, 3, 4, 5, 6, 7, 9 }, { 7, 8, 1, 2, 3, 4, 5, 6, 9 },
@@ -59,6 +58,7 @@ public class Array1DTest extends ArrayTests {
         this.doSortTest(tmpRows);
     }
 
+    @Test
     public void testSortingOddSizedArrayDescending() {
 
         final double[][] tmpRows = new double[][] { { 9, 8, 7, 6, 5, 4, 3, 2, 1 }, { 8, 1, 2, 3, 4, 5, 6, 7, 9 }, { 7, 8, 1, 2, 3, 4, 5, 6, 9 },

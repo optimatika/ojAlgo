@@ -21,15 +21,20 @@
  */
 package org.ojalgo.scalar;
 
+import org.junit.Test;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 
-public class RationalScalarTest extends ScalarTests {
+@Tags({@Tag("functionality"), @Tag("scalar")})
+public class RationalScalarTest {
 
     private double myAct;
     private final double myDiff = PrimitiveMath.MACHINE_EPSILON;
     private double myExp;
 
+    @Test
     public void testAdd() {
 
         final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
@@ -42,6 +47,7 @@ public class RationalScalarTest extends ScalarTests {
         TestUtils.assertEquals(myExp, myAct, myDiff);
     }
 
+    @Test
     public void testDivide() {
 
         final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
@@ -54,6 +60,7 @@ public class RationalScalarTest extends ScalarTests {
         TestUtils.assertEquals(myExp, myAct, myDiff);
     }
 
+    @Test
     public void testInvert() {
 
         final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
@@ -65,6 +72,7 @@ public class RationalScalarTest extends ScalarTests {
         TestUtils.assertEquals(myExp, myAct, myDiff);
     }
 
+    @Test
     public void testMultiply() {
 
         final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
@@ -77,6 +85,7 @@ public class RationalScalarTest extends ScalarTests {
         TestUtils.assertEquals(myExp, myAct, myDiff);
     }
 
+    @Test
     public void testNegate() {
 
         final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
@@ -88,6 +97,7 @@ public class RationalScalarTest extends ScalarTests {
         TestUtils.assertEquals(myExp, myAct, myDiff);
     }
 
+    @Test
     public void testRationalNumber() {
 
         final RationalNumber tmpRat1 = RationalNumber.of(5, 1);
@@ -101,6 +111,7 @@ public class RationalScalarTest extends ScalarTests {
         }
     }
 
+    @Test
     public void testSubtract() {
 
         final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);

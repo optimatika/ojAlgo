@@ -21,6 +21,9 @@
  */
 package org.ojalgo.matrix.task;
 
+import org.junit.Test;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -33,16 +36,9 @@ import org.ojalgo.matrix.task.iterative.JacobiSolver;
  *
  * @author apete
  */
+@Tags({@Tag("functionality"), @Tag("matrix"), @Tag("task")})
 public class JacobiSolverTest extends AbstractMatrixDecompositionTaskTest {
-
-    public JacobiSolverTest() {
-        super();
-    }
-
-    public JacobiSolverTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testExampleWikipediA() {
 
         final MatrixStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4, 1 }, { 1, 3 } });
@@ -60,6 +56,7 @@ public class JacobiSolverTest extends AbstractMatrixDecompositionTaskTest {
         TestUtils.assertEquals(tmpExpected, tmpConjugateGradientSolver.solve(tmpA, tmpB).get());
     }
 
+    @Test
     public void testLinAlg34PDF() {
 
         final MatrixStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4, 2, 3 }, { 3, -5, 2 }, { -2, 3, 8 } });
@@ -74,5 +71,4 @@ public class JacobiSolverTest extends AbstractMatrixDecompositionTaskTest {
         TestUtils.assertEquals(tmpExpected, tmpGaussSeidelSolver.solve(tmpA, tmpB).get());
 
     }
-
 }

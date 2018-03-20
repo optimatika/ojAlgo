@@ -21,12 +21,14 @@
  */
 package org.ojalgo.matrix;
 
-import java.math.BigDecimal;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.type.context.NumberContext;
+
+import java.math.BigDecimal;
 
 /**
  * Gilbert Strang, Linear Algebra and its Applications III, Problem 3.6.15
@@ -35,30 +37,22 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleLUCase extends BasicMatrixTest {
 
-    public static RationalMatrix getMtrxL() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 }, { 1.0, 1.0 } });
+    private static RationalMatrix getMtrxL() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0, 0.0}, {0.0, 1.0}, {1.0, 1.0}});
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static RationalMatrix getMtrxU() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 } });
+    private static RationalMatrix getMtrxU() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0, -1.0, 0.0}, {0.0, 1.0, -1.0}});
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static RationalMatrix getOrginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0, -1.0, 0.0}, {0.0, 1.0, -1.0}, {1.0, 0.0, -1.0}});
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public SimpleLUCase() {
-        super();
-    }
-
-    public SimpleLUCase(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
+    @Test
     public void testData() {
 
         myExpMtrx = SimpleLUCase.getOrginal();
@@ -67,7 +61,7 @@ public class SimpleLUCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Override
+    @Test
     public void testProblem() {
 
         // PLDU
@@ -78,8 +72,9 @@ public class SimpleLUCase extends BasicMatrixTest {
         TestUtils.assertEquals(BigDenseStore.FACTORY.copy(SimpleLUCase.getOrginal()), tmpLU, EVALUATION);
     }
 
+    @Before
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() {
 
         DEFINITION = new NumberContext(7, 1);
         EVALUATION = new NumberContext(7, 9);

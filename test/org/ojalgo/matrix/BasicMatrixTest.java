@@ -24,6 +24,12 @@ package org.ojalgo.matrix;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.ColumnView;
 import org.ojalgo.access.RowView;
@@ -44,6 +50,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
+@Tags({@Tag("functionality"), @Tag("matrix")})
 public abstract class BasicMatrixTest extends MatrixTests {
 
     public static NumberContext DEFINITION = NumberContext.getGeneral(9);
@@ -88,18 +95,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
     PrimitiveMatrix myPrimitiveI;
     PrimitiveMatrix myPrimitiveSafe;
 
-    public BasicMatrixTest() {
-        super();
-    }
-
-    public BasicMatrixTest(final String arg0) {
-        super(arg0);
-    }
-
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getEigenvalues()
      */
-    public void _testGetEigenvalues() {
+    @Test
+    @Ignore("Was called _testGetEigenvalues() before JUnit 5 migration")
+    public void testGetEigenvalues() {
 
         if (myBigAA.isSquare()) {
 
@@ -125,6 +126,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#add(org.ojalgo.matrix.BasicMatrix)
      */
+    @Test
     public void testAddBasicMatrix() {
 
         myExpMtrx = myBigAA.add(myBigSafe);
@@ -140,6 +142,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see BasicMatrix.Builder#add(long, long, Number)
      */
+    @Test
     public void testAddIntIntNumber() {
 
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
@@ -165,6 +168,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#add(java.lang.Number)
      */
+    @Test
     public void testAddNumber() {
 
         myExpMtrx = myBigAA.add(myNmbr);
@@ -180,6 +184,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#conjugate()
      */
+    @Test
     public void testConjugate() {
 
         myExpMtrx = myBigAA.conjugate();
@@ -192,8 +197,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    abstract public void testData();
-
+    @Test
     public void testDivideElementsBasicMatrix() {
 
         myExpMtrx = myBigAA.divideElements(myBigSafe);
@@ -209,6 +213,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#divide(java.lang.Number)
      */
+    @Test
     public void testDivideNumber() {
 
         myExpMtrx = myBigAA.divide(myNmbr);
@@ -221,6 +226,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
+    @Test
     public void testDotAccess1D() {
 
         final int[] tmpCol = new int[] { (int) Uniform.randomInteger(myBigAA.countColumns()) };
@@ -238,17 +244,18 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#doubleValue(long,long)
      */
+    @Test
     public void testDoubleValueIntInt() {
 
         final int tmpRow = (int) Uniform.randomInteger(myBigAA.countRows());
         final int tmpCol = (int) Uniform.randomInteger(myBigAA.countColumns());
 
-        myExpNmbr = new Double(myBigAA.doubleValue(tmpRow, tmpCol));
+        myExpNmbr = myBigAA.doubleValue(tmpRow, tmpCol);
 
-        myActNmbr = new Double(myComplexAA.doubleValue(tmpRow, tmpCol));
+        myActNmbr = myComplexAA.doubleValue(tmpRow, tmpCol);
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = new Double(myPrimitiveAA.doubleValue(tmpRow, tmpCol));
+        myActNmbr = myPrimitiveAA.doubleValue(tmpRow, tmpCol);
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }
@@ -256,6 +263,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#countColumns()
      */
+    @Test
     public void testGetColDim() {
 
         myExpInt = (int) myBigAA.countColumns();
@@ -271,6 +279,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#selectColumns(int[])
      */
+    @Test
     public void testGetColumnsIntArray() {
 
         final int[] tmpArr = new int[(int) (1 + Uniform.randomInteger(myBigAA.countColumns()))];
@@ -292,6 +301,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getCondition()
      */
+    @Test
     public void testGetCondition() {
 
         if (myBigAA.isFullRank()) {
@@ -312,6 +322,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getDeterminant()
      */
+    @Test
     public void testGetDeterminant() {
 
         if (myBigAA.isSquare()) {
@@ -330,6 +341,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getInfinityNorm()
      */
+    @Test
     public void testGetInfinityNorm() {
 
         myExpNmbr = myBigAA.getInfinityNorm().get();
@@ -345,6 +357,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getKyFanNorm(int)
      */
+    @Test
     public void testGetKyFanNormInt() {
 
         final int tmpDegree = Uniform.randomInteger(1, (int) Math.min(myBigAA.countRows(), myBigAA.countColumns()));
@@ -362,6 +375,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getOneNorm()
      */
+    @Test
     public void testGetOneNorm() {
 
         myExpNmbr = myBigAA.getOneNorm().get();
@@ -377,6 +391,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getOperatorNorm()
      */
+    @Test
     public void testGetOperatorNorm() {
 
         myExpNmbr = myBigAA.getOperatorNorm().get();
@@ -392,6 +407,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getRank()
      */
+    @Test
     public void testGetRank() {
 
         myExpInt = myBigAA.getRank();
@@ -407,6 +423,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#countRows()
      */
+    @Test
     public void testGetRowDim() {
 
         myExpInt = (int) myBigAA.countRows();
@@ -422,6 +439,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#selectRows(int[])
      */
+    @Test
     public void testGetRowsIntArray() {
 
         final int[] tmpArr = new int[(int) (1 + Uniform.randomInteger(myBigAA.countRows()))];
@@ -443,6 +461,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getSingularValues()
      */
+    @Test
     public void testGetSingularValues() {
 
         final List<? extends Number> tmpExpStore = myBigAA.getSingularValues();
@@ -471,6 +490,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getTrace()
      */
+    @Test
     public void testGetTrace() {
 
         myExpNmbr = myBigAA.getTrace().get();
@@ -486,6 +506,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getTraceNorm()
      */
+    @Test
     public void testGetTraceNorm() {
 
         myExpNmbr = myBigAA.getTraceNorm().get();
@@ -501,6 +522,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getVectorNorm(int)
      */
+    @Test
     public void testGetVectorNorm0() {
         this.testGetVectorNormInt(0);
     }
@@ -508,6 +530,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getVectorNorm(int)
      */
+    @Test
     public void testGetVectorNorm1() {
         this.testGetVectorNormInt(1);
     }
@@ -515,6 +538,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getVectorNorm(int)
      */
+    @Test
     public void testGetVectorNorm2() {
         this.testGetVectorNormInt(2);
     }
@@ -522,6 +546,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#getVectorNorm(int)
      */
+    @Test
     public void testGetVectorNormI() {
         this.testGetVectorNormInt(Integer.MAX_VALUE);
     }
@@ -529,6 +554,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#invert()
      */
+    @Test
     public void testInvert() {
 
         if (myBigAA.isSquare() && (myBigAA.getRank() >= myBigAA.countColumns())) {
@@ -547,6 +573,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#isEmpty()
      */
+    @Test
     public void testIsEmpty() {
 
         myExpBool = myBigAA.isEmpty();
@@ -562,6 +589,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#isFat()
      */
+    @Test
     public void testIsFat() {
 
         myExpBool = myBigAA.isFat();
@@ -577,6 +605,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#isFullRank()
      */
+    @Test
     public void testIsFullRank() {
 
         myExpBool = myBigAA.isFullRank();
@@ -592,6 +621,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#isHermitian()
      */
+    @Test
     public void testIsHermitian() {
 
         myExpBool = myBigAA.isHermitian();
@@ -607,6 +637,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#isSquare()
      */
+    @Test
     public void testIsSquare() {
 
         myExpBool = myBigAA.isSquare();
@@ -622,6 +653,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#isSymmetric()
      */
+    @Test
     public void testIsSymmetric() {
 
         myExpBool = myBigAA.isSymmetric();
@@ -637,6 +669,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#isTall()
      */
+    @Test
     public void testIsTall() {
 
         myExpBool = myBigAA.isTall();
@@ -652,6 +685,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#isVector()
      */
+    @Test
     public void testIsVector() {
 
         myExpBool = myBigAA.isVector();
@@ -664,6 +698,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
+    @Test
     public void testMergeColumnsBasicMatrix() {
 
         myExpMtrx = myBigAA.mergeColumns(myBigSafe);
@@ -676,6 +711,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
+    @Test
     public void testMergeRowsBasicMatrix() {
 
         myExpMtrx = myBigAA.mergeRows(myBigSafe);
@@ -691,6 +727,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#multiply(org.ojalgo.matrix.BasicMatrix)
      */
+    @Test
     public void testMultiplyBasicMatrix() {
 
         myExpMtrx = myBigAA.multiply(myBigAX);
@@ -703,6 +740,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
+    @Test
     public void testMultiplyElementsBasicMatrix() {
 
         myExpMtrx = myBigAA.multiplyElements(myBigSafe);
@@ -718,6 +756,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#multiply(java.lang.Number)
      */
+    @Test
     public void testMultiplyNumber() {
 
         myExpMtrx = myBigAA.multiply(myNmbr);
@@ -733,6 +772,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#negate()
      */
+    @Test
     public void testNegate() {
 
         myExpMtrx = myBigAA.negate();
@@ -748,6 +788,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#norm()
      */
+    @Test
     public void testNorm() {
 
         myExpVal = myBigAA.norm();
@@ -760,11 +801,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    abstract public void testProblem();
-
     /**
      * @see BasicMatrix.Builder#set(long, long, Number)
      */
+    @Test
     public void testSetIntIntNumber() {
 
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
@@ -787,6 +827,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
+    @Test
     public void testSize() {
 
         myExpInt = (int) myBigAA.count();
@@ -802,6 +843,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#solve(org.ojalgo.access.Access2D)
      */
+    @Test
     public void testSolveBasicMatrix() {
 
         if (myBigAA.isSquare() && (myBigAA.getRank() >= myBigAA.countColumns())) {
@@ -820,6 +862,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#subtract(org.ojalgo.matrix.BasicMatrix)
      */
+    @Test
     public void testSubtractBasicMatrix() {
 
         myExpMtrx = myBigAA.subtract(myBigSafe);
@@ -835,6 +878,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#subtract(java.lang.Number)
      */
+    @Test
     public void testSubtractNumber() {
 
         myExpMtrx = myBigAA.subtract(myNmbr);
@@ -850,6 +894,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#toBigDecimal(int,int)
      */
+    @Test
     public void testToBigDecimalIntInt() {
 
         final int tmpRow = (int) Uniform.randomInteger(myBigAA.countRows());
@@ -868,6 +913,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#toBigStore()
      */
+    @Test
     public void testToBigStore() {
 
         final PhysicalStore<BigDecimal> tmpExpStore = BigDenseStore.FACTORY.copy(myBigAA);
@@ -884,6 +930,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#toComplexNumber(int,int)
      */
+    @Test
     public void testToComplexNumberIntInt() {
 
         final int tmpRow = (int) Uniform.randomInteger(myBigAA.countRows());
@@ -902,6 +949,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#toComplexStore()
      */
+    @Test
     public void testToComplexStore() {
 
         final PhysicalStore<ComplexNumber> tmpExpStore = ComplexDenseStore.FACTORY.copy(myBigAA);
@@ -918,6 +966,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#columns()
      */
+    @Test
     public void testToListOfColumns() {
 
         final Iterable<ColumnView<Number>> tmpColumns = myBigAA.columns();
@@ -934,6 +983,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#rows()
      */
+    @Test
     public void testToListOfRows() {
 
         final Iterable<RowView<Number>> tmpRows = myBigAA.rows();
@@ -950,6 +1000,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#toPrimitiveStore()
      */
+    @Test
     public void testToPrimitiveStore() {
 
         final PhysicalStore<Double> tmpExpStore = PrimitiveDenseStore.FACTORY.copy(myBigAA);
@@ -966,6 +1017,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#toRawCopy1D()
      */
+    @Test
     public void testToRawCopy1D() {
 
         final double[] tmpExpStore = myBigAA.toRawCopy1D();
@@ -997,6 +1049,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#toScalar(long, long)
      */
+    @Test
     public void testToScalarIntInt() {
 
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
@@ -1015,6 +1068,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#transpose()
      */
+    @Test
     public void testTranspose() {
 
         myExpMtrx = myBigAA.transpose();
@@ -1039,53 +1093,11 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    protected final BasicMatrix getBigAA() {
-        return myBigAA;
-    }
-
-    protected final BasicMatrix getBigAB() {
-        return myBigAB;
-    }
-
-    protected final BasicMatrix getBigAX() {
-        return myBigAX;
-    }
-
-    protected final BasicMatrix getBigI() {
-        return myBigI;
-    }
-
-    protected final BasicMatrix getBigSafe() {
-        return myBigSafe;
-    }
-
-    protected final void setBigAA(final RationalMatrix someBigAA) {
-        myBigAA = someBigAA;
-    }
-
-    protected final void setBigAB(final RationalMatrix someBigAB) {
-        myBigAB = someBigAB;
-    }
-
-    protected final void setBigAX(final RationalMatrix someBigAX) {
-        myBigAX = someBigAX;
-    }
-
-    protected final void setBigI(final RationalMatrix someBigI) {
-        myBigI = someBigI;
-    }
-
-    protected final void setBigSafe(final RationalMatrix someBigSafe) {
-        myBigSafe = someBigSafe;
-    }
-
     /**
      * @see junit.framework.TestCase#setUp()
      */
-    @Override
-    protected void setUp() throws Exception {
-
-        super.setUp();
+    @Before
+    public void setUp() {
 
         TestUtils.minimiseAllBranchLimits();
 
@@ -1104,11 +1116,8 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myNmbr = new BigDecimal(Math.random());
     }
 
-    @Override
-    protected final void tearDown() throws Exception {
-
-        super.tearDown();
-
+    @After
+    public void tearDown() {
         DEFINITION = NumberContext.getGeneral(9);
         EVALUATION = NumberContext.getGeneral(9);
     }

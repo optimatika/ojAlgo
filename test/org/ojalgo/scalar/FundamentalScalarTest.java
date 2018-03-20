@@ -21,6 +21,10 @@
  */
 package org.ojalgo.scalar;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.random.Uniform;
@@ -29,7 +33,8 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class FundamentalScalarTest extends ScalarTests {
+@Tags({@Tag("functionality"), @Tag("scalar")})
+public class FundamentalScalarTest {
 
     private static final Uniform UNIFORM = new Uniform(0, 4);
 
@@ -48,6 +53,7 @@ public class FundamentalScalarTest extends ScalarTests {
     double value1;
     double value2;
 
+    @Test
     public void testAdd() {
 
         final double tmpExp = value1 + value2;
@@ -69,6 +75,7 @@ public class FundamentalScalarTest extends ScalarTests {
         this.assertEqual(tmpExp, tmpBig, tmpComplex, tmpPrimitive, tmpQuaternion, tmpRational);
     }
 
+    @Test
     public void testConjugate() {
 
         final double tmpExp = value1;
@@ -82,6 +89,7 @@ public class FundamentalScalarTest extends ScalarTests {
         this.assertEqual(tmpExp, tmpBig, tmpComplex, tmpPrimitive, tmpQuaternion, tmpRational);
     }
 
+    @Test
     public void testDivide() {
 
         final double tmpExp = value1 / value2;
@@ -104,6 +112,7 @@ public class FundamentalScalarTest extends ScalarTests {
 
     }
 
+    @Test
     public void testInvert() {
 
         final double tmpExp = 1.0 / value1;
@@ -117,6 +126,7 @@ public class FundamentalScalarTest extends ScalarTests {
         this.assertEqual(tmpExp, tmpBig, tmpComplex, tmpPrimitive, tmpQuaternion, tmpRational);
     }
 
+    @Test
     public void testMultiply() {
 
         final double tmpExp = value1 * value2;
@@ -138,6 +148,7 @@ public class FundamentalScalarTest extends ScalarTests {
         this.assertEqual(tmpExp, tmpBig, tmpComplex, tmpPrimitive, tmpQuaternion, tmpRational);
     }
 
+    @Test
     public void testNegate() {
 
         final double tmpExp = -value1;
@@ -151,6 +162,7 @@ public class FundamentalScalarTest extends ScalarTests {
         this.assertEqual(tmpExp, tmpBig, tmpComplex, tmpPrimitive, tmpQuaternion, tmpRational);
     }
 
+    @Test
     public void testSubtract() {
 
         final double tmpExp = value1 - value2;
@@ -172,11 +184,8 @@ public class FundamentalScalarTest extends ScalarTests {
         this.assertEqual(tmpExp, tmpBig, tmpComplex, tmpPrimitive, tmpQuaternion, tmpRational);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-
-        super.setUp();
-
+    @Before
+    public void setUp() {
         value1 = this.makeRandom();
         big1 = BigScalar.valueOf(value1);
         complex1 = ComplexNumber.valueOf(value1);
@@ -192,8 +201,8 @@ public class FundamentalScalarTest extends ScalarTests {
         rational2 = RationalNumber.valueOf(value2);
     }
 
-    void assertEqual(final double expected, final BigScalar big, final ComplexNumber complex, final PrimitiveScalar primitive, final Quaternion quaternion,
-            final RationalNumber rational) {
+    private void assertEqual(final double expected, final BigScalar big, final ComplexNumber complex, final PrimitiveScalar primitive, final Quaternion quaternion,
+                             final RationalNumber rational) {
         TestUtils.assertEquals("Big", expected, big.doubleValue(), CONTEXT);
         TestUtils.assertEquals("Complex", expected, complex.doubleValue(), CONTEXT);
         TestUtils.assertEquals("Primitive", expected, primitive.doubleValue(), CONTEXT);
@@ -201,7 +210,7 @@ public class FundamentalScalarTest extends ScalarTests {
         TestUtils.assertEquals("Rational", expected, rational.doubleValue(), CONTEXT);
     }
 
-    double makeRandom() {
+    private double makeRandom() {
 
         final double tmpbase = UNIFORM.doubleValue();
         final double tmpExp = UNIFORM.doubleValue();

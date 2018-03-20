@@ -59,17 +59,8 @@ public abstract class ArrayTests extends FunctionalityTest {
         }
 
         for (final Entry<Long, Double> pair : pairs.entrySet()) {
-            TestUtils.assertEquals(pair.getValue().doubleValue(), array.doubleValue(pair.getKey().longValue()));
+            TestUtils.assertEquals(pair.getValue().doubleValue(), array.doubleValue(pair.getKey()));
         }
 
     }
-
-    protected ArrayTests() {
-        super();
-    }
-
-    protected ArrayTests(final String name) {
-        super(name);
-    }
-
 }
