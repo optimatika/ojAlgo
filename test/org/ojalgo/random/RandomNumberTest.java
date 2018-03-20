@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.api.Tag;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Primitive64Array;

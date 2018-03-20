@@ -26,6 +26,7 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 
 import org.junit.Test;
+import org.junit.jupiter.api.Tag;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;
@@ -108,6 +109,7 @@ public class IntegerProblems {
      * solution is in fact feasible/valid.
      */
     @Test
+    @Tag("slow")
     public void testP20130225() {
 
         final ExpressionsBasedModel tmpIntegerModel = P20130225.makeModel();
@@ -248,6 +250,7 @@ public class IntegerProblems {
      * <a href="http://bugzilla.optimatika.se/show_bug.cgi?id=211">BugZilla-211</a>
      */
     @Test
+    @Tag("slow")
     public void testP20140819() {
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
