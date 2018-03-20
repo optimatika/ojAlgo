@@ -140,10 +140,7 @@
                 <version>2.19.1</version>
                 <configuration>
                     <includes>
-                        <include>**/Test*.java</include>
-                        <include>**/*Test.java</include>
-                        <include>**/*Tests.java</include>
-                        <include>**/*TestCase.java</include>
+                        <include>**/*.java</include>
                     </includes>
                     <properties>
                         <!-- <includeTags>fast</includeTags> -->
