@@ -21,18 +21,15 @@
  */
 package org.ojalgo.matrix.task;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
-import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
+
 /**
  * @author apete
  */
-@Tags({@Tag("functionality"), @Tag("matrix"), @Tag("task")})
 public abstract class MatrixTaskTests {
 
     static final boolean DEBUG = false;

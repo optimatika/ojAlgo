@@ -22,12 +22,9 @@
 package org.ojalgo.matrix.task;
 
 import org.junit.Before;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 
-@Tags({@Tag("functionality"), @Tag("matrix"), @Tag("decomposition")})
-abstract class AbstractMatrixDecompositionTaskTest extends MatrixTaskTests {
+public abstract class AbstractMatrixDecompositionTaskTest extends MatrixTaskTests {
     @Before
     public void setUp() {
        TestUtils.minimiseAllBranchLimits();

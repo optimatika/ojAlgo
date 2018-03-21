@@ -24,7 +24,7 @@ package org.ojalgo.matrix.store;
 import org.junit.Before;
 import org.ojalgo.TestUtils;
 
-abstract class AbstractMatrixStoreTest extends MatrixStoreTests {
+public abstract class AbstractMatrixStoreTest extends MatrixStoreTests {
     @Before
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
