@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -38,7 +40,7 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static RationalMatrix getFactorR() {
+    private static RationalMatrix getFactorR() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { -1.7321, 0.5774, 0.5774 }, { 0.0, -1.6330, 0.8165 }, { 0.0, 0.0, -1.4142 } });
         return tmpMtrx.enforce(DEFINITION);
     }
@@ -53,21 +55,12 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static RationalMatrix getTransformedRHS() {
+    private static RationalMatrix getTransformedRHS() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 376 }, { -1200 }, { -3417 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public SimpleLeastSquaresCase() {
-        super();
-    }
-
-    public SimpleLeastSquaresCase(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
-    public void testData() {
+    @Test public void testData() {
 
         myExpMtrx = SimpleLeastSquaresCase.getTransformedRHS();
         myActMtrx = SimpleLeastSquaresCase.getFactorR().multiply(SimpleLeastSquaresCase.getSolution());
@@ -75,8 +68,7 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Override
-    public void testProblem() {
+    @Test public void testProblem() {
 
         // Solve
 
@@ -86,8 +78,9 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
+    @Before
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() {
 
         DEFINITION = new NumberContext(7, 4);
         EVALUATION = new NumberContext(4, 4); // TODO Something must be wrong here!

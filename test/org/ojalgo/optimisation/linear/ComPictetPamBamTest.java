@@ -23,6 +23,7 @@ package org.ojalgo.optimisation.linear;
 
 import java.math.BigDecimal;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.matrix.RationalMatrix;
@@ -44,6 +45,7 @@ public class ComPictetPamBamTest extends OptimisationLinearTests {
     BigDecimal[] point;
     Variable[] vars;
 
+    @Test
     public void test1() {
         this.setupModel();
         vars[0].level(new BigDecimal(10.0));
@@ -52,6 +54,7 @@ public class ComPictetPamBamTest extends OptimisationLinearTests {
         TestUtils.assertTrue(solution != null);
     }
 
+    @Test
     public void test2() {
         this.setupModel();
         vars[0].lower(BigMath.ZERO).upper(BigMath.HUNDRED);

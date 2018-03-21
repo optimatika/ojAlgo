@@ -26,6 +26,7 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.matrix.RationalMatrix;
@@ -39,24 +40,17 @@ import org.ojalgo.optimisation.Variable;
  */
 public class ComPictetPamBamTest extends OptimisationConvexTests {
 
-    public static ExpressionsBasedModel buildModel() {
+    private ExpressionsBasedModel model;
+    private BigDecimal[] point;
+    private Variable[] vars;
 
-        final ComPictetPamBamTest tmpTestInstance = new ComPictetPamBamTest();
-
-        tmpTestInstance.setupModel(6);
-
-        return tmpTestInstance.model;
-    }
-
-    ExpressionsBasedModel model;
-    BigDecimal[] point;
-    Variable[] vars;
-
+    @Test
     public void test1() {
         this.setupModel(6);
         this.solve();
     }
 
+    @Test
     public void test2() {
         this.setupModel(6);
         vars[3].level(new BigDecimal(40.0));
@@ -64,6 +58,7 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         this.solve();
     }
 
+    @Test
     public void test3() {
         this.setupModel(6);
         vars[3].level(new BigDecimal(48.0));
@@ -72,11 +67,13 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         this.solve();
     }
 
+    @Test
     public void test4() {
         this.setupModel(42);
         this.solve();
     }
 
+    @Test
     public void test5() {
         this.setupModel(42);
         vars[3].level(new BigDecimal(40.0));
@@ -84,6 +81,7 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         this.solve();
     }
 
+    @Test
     public void test6() {
         this.setupModel(42);
         vars[3].level(new BigDecimal(40.0));

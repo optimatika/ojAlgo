@@ -23,6 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
@@ -39,14 +41,11 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class TridiagonalizeCase extends MatrixDecompositionTests {
+public class TridiagonalizeCase {
 
-    public TridiagonalizeCase() {
-        super();
-    }
-
-    public TridiagonalizeCase(final String arg0) {
-        super(arg0);
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
     /**
@@ -54,6 +53,7 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
      * http://math.fullerton.edu/mathews/n2003/householder/HouseholderMod/Links/HouseholderMod_lnk_2.html
      * http://math.fullerton.edu/mathews/n2003/householder/HouseholderMod/Links/HouseholderMod_lnk_3.html
      */
+    @Test
     public void testFullertonExample1and2() {
 
         final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY
@@ -68,6 +68,7 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
      * http://math.fullerton.edu/mathews/n2003/HouseholderMod.html
      * http://math.fullerton.edu/mathews/n2003/householder/HouseholderMod/Links/HouseholderMod_lnk_4.html
      */
+    @Test
     public void testFullertonExercise3() {
 
         final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 5.0, 1.0, 2.0, 2.0, 4.0 }, { 1.0, 1.0, 2.0, 1.0, 0.0 },
@@ -84,6 +85,7 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
      * http://math.fullerton.edu/mathews/n2003/householder/HouseholderMod/Links/HouseholderMod_lnk_5.html
      * http://math.fullerton.edu/mathews/n2003/householder/HouseholderMod/Links/HouseholderMod_lnk_6.html
      */
+    @Test
     public void testFullertonExercise4and5() {
 
         final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY
@@ -97,6 +99,7 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
         this.doTheTest(tmpMtrxA, tmpMtrxD);
     }
 
+    @Test
     public void testRandomBigComplexPrimitive() {
 
         BasicMatrix tmpSymmetricRandoml = PrimitiveMatrix.FACTORY.makeFilled(9, 9, new Normal());
@@ -139,6 +142,7 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
     /**
      * http://en.wikipedia.org/wiki/Householder_transformation#Tridiagonalization
      */
+    @Test
     public void testWikipediaExample() {
 
         final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY

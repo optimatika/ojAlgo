@@ -12,22 +12,13 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import org.ojalgo.FunctionalityTest;
-
 /**
  * OptimisationIntegerPackageTests
  *
  * @author apete
  */
-public abstract class OptimisationIntegerTests extends FunctionalityTest {
+public abstract class OptimisationIntegerTests {
 
     static final boolean DEBUG = false;
 
-    protected OptimisationIntegerTests() {
-        super();
-    }
-
-    protected OptimisationIntegerTests(final String name) {
-        super(name);
-    }
 }

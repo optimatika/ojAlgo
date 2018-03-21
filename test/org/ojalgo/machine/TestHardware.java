@@ -1,22 +1,17 @@
 package org.ojalgo.machine;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 
-public class TestHardware extends MachineTests {
+public class TestHardware {
 
-    public TestHardware() {
-        super();
-    }
-
-    public TestHardware(final String someName) {
-        super(someName);
-    }
-
+    @Test
     public void testCompare() {
         TestUtils.assertTrue(Hardware.X86_64__04_2.compareTo(Hardware.X86_64__04_1_L2) < 0);
         TestUtils.assertTrue(Hardware.X86_64__04_1_L3.compareTo(Hardware.X86_64__04_1_L2) > 0);
     }
 
+    @Test
     public void testPPC__01() {
 
         final Hardware tmpHardware = Hardware.PPC__01;
@@ -28,6 +23,7 @@ public class TestHardware extends MachineTests {
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
     }
 
+    @Test
     public void testX86__01() {
 
         final Hardware tmpHardware = Hardware.X86__01;
@@ -39,6 +35,7 @@ public class TestHardware extends MachineTests {
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
     }
 
+    @Test
     public void testX86__02() {
 
         final Hardware tmpHardware = Hardware.X86__02;
@@ -50,6 +47,7 @@ public class TestHardware extends MachineTests {
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
     }
 
+    @Test
     public void testX86_64__02() {
 
         final Hardware tmpHardware = Hardware.X86_64__02;
@@ -61,6 +59,7 @@ public class TestHardware extends MachineTests {
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
     }
 
+    @Test
     public void testX86_64__04_1_L2() {
 
         final Hardware tmpHardware = Hardware.X86_64__04_1_L2;
@@ -72,6 +71,7 @@ public class TestHardware extends MachineTests {
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
     }
 
+    @Test
     public void testX86_64__04_1_L3() {
 
         final Hardware tmpHardware = Hardware.X86_64__04_1_L3;
@@ -83,6 +83,7 @@ public class TestHardware extends MachineTests {
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
     }
 
+    @Test
     public void testX86_64__04_2() {
 
         final Hardware tmpHardware = Hardware.X86_64__04_2;
@@ -94,6 +95,7 @@ public class TestHardware extends MachineTests {
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
     }
 
+    @Test
     public void testX86_64__08() {
 
         final Hardware tmpHardware = Hardware.X86_64__08;
@@ -105,6 +107,7 @@ public class TestHardware extends MachineTests {
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
     }
 
+    @Test
     public void testX86_64__12() {
 
         final Hardware tmpHardware = Hardware.X86_64__12;
@@ -116,6 +119,7 @@ public class TestHardware extends MachineTests {
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
     }
 
+    @Test
     public void testX86_64__16() {
 
         final Hardware tmpHardware = Hardware.X86_64__16;

@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -42,24 +44,14 @@ public class P20071019Case extends BasicMatrixTest {
         return SimpleLeastSquaresCase.getBody();
     }
 
-    public P20071019Case() {
-        super();
-    }
-
-    public P20071019Case(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
-    public void testData() {
+    @Test public void testData() {
 
         TestUtils.assertEquals(true, P20071019Case.getFatProblematic().isFat());
 
         TestUtils.assertEquals(true, P20071019Case.getTallProblematic().isTall());
     }
 
-    @Override
-    public void testProblem() {
+    @Test public void testProblem() {
 
         final LU<Double> tmpJamaLU = LU.PRIMITIVE.make();
         final LU<Double> tmpDenseLU = LU.PRIMITIVE.make();
@@ -82,8 +74,9 @@ public class P20071019Case extends BasicMatrixTest {
 
     }
 
+    @Before
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() {
 
         EVALUATION = EVALUATION.newPrecision(14);
 

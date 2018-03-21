@@ -23,6 +23,7 @@ package org.ojalgo.optimisation.integer;
 
 import java.io.File;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -32,14 +33,7 @@ import org.ojalgo.optimisation.Optimisation.State;
 
 public final class SpecificBranchCase extends MipLibCase {
 
-    public SpecificBranchCase() {
-        super();
-    }
-
-    public SpecificBranchCase(final String someName) {
-        super(someName);
-    }
-
+    @Test
     public void testVpm2FirstBranch() {
 
         final File tmpFile = new File(MipLibCase.PATH + "vpm2.mps");

@@ -21,33 +21,23 @@
  */
 package org.ojalgo.array;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.type.context.NumberContext;
+
+import java.util.*;
 
 /**
  * NumberListTest
  *
  * @author apete
  */
-public class NumberListTest extends ArrayTests {
+public class NumberListTest {
 
     private static final NumberContext CONTEXT = new NumberContext();
-    static final Random RANDOM = new Random();
+    private static final Random RANDOM = new Random();
 
-    public NumberListTest() {
-        super();
-    }
-
-    public NumberListTest(final String aName) {
-        super(aName);
-    }
-
+    @Test
     public void testCompareWithArrayList() {
 
         final NumberList<Double> primit64List = NumberList.factory(Primitive64Array.FACTORY).make();
@@ -118,6 +108,7 @@ public class NumberListTest extends ArrayTests {
 
     }
 
+    @Test
     public void testGrowCapacity() {
 
         final DenseCapacityStrategy<Double> tmpStrategy = new DenseCapacityStrategy<>(Primitive64Array.FACTORY);

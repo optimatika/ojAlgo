@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -28,16 +30,14 @@ import org.ojalgo.matrix.store.RawStore;
 /**
  * @author apete
  */
-public class LDLTest extends MatrixDecompositionTests {
+public class LDLTest {
 
-    public LDLTest() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public LDLTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testWikipediaCase() {
 
         final RawStore tmpA = new RawStore(new double[][] { { 4, 12, -16 }, { 12, 37, -43 }, { -16, -43, 98 } });

@@ -25,6 +25,7 @@ import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
+import org.junit.Test;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.BigFunction;
@@ -41,8 +42,8 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
 
     public static final class P20170508 {
 
-        public static final PrimitiveMatrix COVARIANCES;
-        public static final PrimitiveMatrix RETURNS;
+        static final PrimitiveMatrix COVARIANCES;
+        static final PrimitiveMatrix RETURNS;
 
         static {
 
@@ -64,7 +65,7 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
 
     }
 
-    static ExpressionsBasedModel buildModel(final BasicMatrix covariances, final BasicMatrix returns, final BigDecimal riskAversion) {
+    private static ExpressionsBasedModel buildModel(final BasicMatrix covariances, final BasicMatrix returns, final BigDecimal riskAversion) {
 
         ProgrammingError.throwIfNotSquare(covariances);
         ProgrammingError.throwIfNotEqualRowDimensions(covariances, returns);
@@ -95,19 +96,12 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
         return retVal;
     }
 
-    public FinancePortfolioProblem() {
-        super();
-    }
-
-    public FinancePortfolioProblem(final String name) {
-        super(name);
-    }
-
     /**
      * There were several problems (symptoms) related to this case. This test primarily tests that the
      * returned solution is actually valid. There was a problem (among others) that a subproblem from the
      * Markowitz model class (set up this way) did not produce a valid/feasible solution.
      */
+    @Test
     public void testP20170508() {
 
         final BigDecimal raf = BigDecimal.valueOf(177.82794100389228);

@@ -23,6 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.RationalMatrix;
@@ -36,16 +38,14 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class DegenerateLUCase extends MatrixDecompositionTests {
+public class DegenerateLUCase {
 
-    public DegenerateLUCase() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public DegenerateLUCase(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testBig() {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
@@ -65,6 +65,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         TestUtils.assertEquals(BigDenseStore.FACTORY.copy(tmpMtrxA), tmpBigDecomp, tmpEvalContext);
     }
 
+    @Test
     public void testComplex() {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
@@ -84,6 +85,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         TestUtils.assertEquals(ComplexDenseStore.FACTORY.copy(tmpMtrxA), tmpComplexDecomp, tmpEvalContext);
     }
 
+    @Test
     public void testDensePrimitive() {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
@@ -103,6 +105,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpMtrxA), tmpDoubleDecomp, tmpEvalContext);
     }
 
+    @Test
     public void testJama() {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
@@ -122,6 +125,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpMtrxA), tmpDoubleDecomp, tmpEvalContext);
     }
 
+    @Test
     public void testRawPrimitive() {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);

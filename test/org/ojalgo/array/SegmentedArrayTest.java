@@ -21,21 +21,16 @@
  */
 package org.ojalgo.array;
 
+import org.junit.Test;
+
 /**
  * AbstractArrayTest
  *
  * @author apete
  */
-public class SegmentedArrayTest extends ArrayTests {
+public class SegmentedArrayTest {
 
-    public SegmentedArrayTest() {
-        super();
-    }
-
-    public SegmentedArrayTest(final String aName) {
-        super(aName);
-    }
-
+    @Test
     public void testRandomSetAndGetBackPrimitive64() {
 
         final long tmpCount = 5000L;
@@ -45,6 +40,7 @@ public class SegmentedArrayTest extends ArrayTests {
         ArrayTests.doTestRandomSetAndGetBack(tmpArray, tmpCount);
     }
 
+    @Test
     public void testVeryLargeRandomSetAndGetBackBasic() {
 
         final long tmpCount = Long.MAX_VALUE;

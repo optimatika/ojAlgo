@@ -3,12 +3,13 @@ package org.ojalgo.type;
 import java.time.Instant;
 import java.time.ZoneId;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Structure1D.IndexMapper;
 
-public class TimeIndexTest extends TypeTests {
+public class TimeIndexTest {
 
-    static final ZoneId SYS_DEF_ZONE = ZoneId.systemDefault();
+    private static final ZoneId SYS_DEF_ZONE = ZoneId.systemDefault();
 
     static <T extends Comparable<? super T>> void doTestFrom(final TimeIndex<T> mapperFactory, final T keyToTest, final T referenceKey) {
 
@@ -54,14 +55,7 @@ public class TimeIndexTest extends TypeTests {
         TestUtils.assertEquals(implementation, expected, actual);
     }
 
-    public TimeIndexTest() {
-        super();
-    }
-
-    public TimeIndexTest(final String name) {
-        super(name);
-    }
-
+    @Test
     public void testFrom() {
 
         // ms precision (strip micros and nanos)
@@ -87,6 +81,7 @@ public class TimeIndexTest extends TypeTests {
                 CalendarDate.toZonedDateTime(reference, SYS_DEF_ZONE));
     }
 
+    @Test
     public void testPlain() {
 
         // ms precision (strip micros and nanos)

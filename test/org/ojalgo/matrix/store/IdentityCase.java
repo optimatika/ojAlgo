@@ -21,23 +21,13 @@
  */
 package org.ojalgo.matrix.store;
 
+import org.junit.Before;
 import org.ojalgo.random.Uniform;
 
 public class IdentityCase extends NonPhysicalTest {
 
-    public IdentityCase() {
-        super();
-    }
-
-    public IdentityCase(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-
-        super.setUp();
-
+    @Before
+    public void setUp() {
         final int tmpDim = Uniform.randomInteger(1, 9);
 
         myBigStore = new IdentityStore<>(BigDenseStore.FACTORY, tmpDim);

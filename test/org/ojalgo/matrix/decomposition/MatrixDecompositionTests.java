@@ -21,24 +21,24 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.junit.Before;
+import org.ojalgo.TestUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.ojalgo.FunctionalityTest;
-import org.ojalgo.TestUtils;
 
 /**
  * MatrixDecompositionPackageTests
  *
  * @author apete
  */
-public abstract class MatrixDecompositionTests extends FunctionalityTest {
+public abstract class MatrixDecompositionTests {
 
     static final boolean DEBUG = false;
 
-    public static final List<MatrixDecomposition<Double>> getAllPrimitive() {
+    public static List<MatrixDecomposition<Double>> getAllPrimitive() {
 
         final List<MatrixDecomposition<Double>> retVal = new ArrayList<>();
 
@@ -88,14 +88,14 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     @SuppressWarnings("unchecked")
-    public static final Eigenvalue<Double>[] getEigenvaluePrimitiveGeneral() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new NewGeneralEvD.Primitive(), new RawEigenvalue.Dynamic(), new OldGeneralEvD.Primitive() };
+    public static Eigenvalue<Double>[] getEigenvaluePrimitiveGeneral() {
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[]{new NewGeneralEvD.Primitive(), new RawEigenvalue.Dynamic(), new OldGeneralEvD.Primitive()};
     }
 
     @SuppressWarnings("unchecked")
-    public static final Eigenvalue<Double>[] getEigenvaluePrimitiveSymmetric() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(),
-                new RawEigenvalue.Symmetric() };
+    public static Eigenvalue<Double>[] getEigenvaluePrimitiveSymmetric() {
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[]{new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(),
+                new RawEigenvalue.Symmetric()};
     }
 
     public static final Hessenberg<?>[] getHessenbergAll() {
@@ -155,19 +155,8 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
         return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new DeferredTridiagonal.Primitive(), new SimultaneousTridiagonal() };
     }
 
-    protected MatrixDecompositionTests() {
-        super();
-    }
-
-    protected MatrixDecompositionTests(final String name) {
-        super(name);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-
-        super.setUp();
-
+    @Before
+    public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }
 

@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Locale;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 
 /**
@@ -32,16 +33,9 @@ import org.ojalgo.TestUtils;
  *
  * @author apete
  */
-public class NumberContextTest extends TypeContextTests {
+public class NumberContextTest {
 
-    public NumberContextTest() {
-        super();
-    }
-
-    public NumberContextTest(final String someName) {
-        super(someName);
-    }
-
+    @Test
     public void testPercentContext() {
 
         final NumberContext tmpNC = NumberContext.getPercent(Locale.US);

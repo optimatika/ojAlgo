@@ -21,6 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.PrimitiveFunction;
@@ -33,19 +36,18 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class SVDbyEvD extends MatrixDecompositionTests {
+public class SVDbyEvD {
 
-    public SVDbyEvD() {
-        super();
-    }
-
-    public SVDbyEvD(final String arg0) {
-        super(arg0);
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
     /**
      * Data from example 3.15 in Scientific Computing by Michael T. Heath
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testHeath() {
 
         final PhysicalStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 10, 11, 12 } });
@@ -59,11 +61,12 @@ public class SVDbyEvD extends MatrixDecompositionTests {
      * http://www.miislita.com/information-retrieval-tutorial/singular-value-decomposition-fast-track-tutorial
      * .pdf
      */
+    @Test
     public void testSmall2x2() {
 
-        final PhysicalStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, 0.0 }, { 3.0, -5.0 } });
+        final PhysicalStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY.rows(new double[][]{{4.0, 0.0}, {3.0, -5.0}});
 
-        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 6.324555320336759, 3.1622776601683795 });
+        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[]{6.324555320336759, 3.1622776601683795});
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }
@@ -71,12 +74,13 @@ public class SVDbyEvD extends MatrixDecompositionTests {
     /**
      * http://en.wikipedia.org/wiki/Singular_value_decomposition
      */
+    @Test
     public void testWikipedia() {
 
         final PhysicalStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY
-                .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
+                .rows(new double[][]{{1.0, 0.0, 0.0, 0.0, 2.0}, {0.0, 0.0, 3.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 4.0, 0.0, 0.0, 0.0}});
 
-        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveFunction.SQRT.invoke(5.0), 0.0 });
+        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[]{4.0, 3.0, PrimitiveFunction.SQRT.invoke(5.0), 0.0});
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }

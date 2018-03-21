@@ -106,12 +106,4 @@ abstract class MipLibCase extends OptimisationIntegerTests {
         }
     }
 
-    public MipLibCase() {
-        super();
-    }
-
-    public MipLibCase(final String someName) {
-        super(someName);
-    }
-
 }

@@ -26,14 +26,6 @@ import org.ojalgo.matrix.RationalMatrix;
 
 public class Qsd20030409P1Case extends GenericQPSolverTest {
 
-    public Qsd20030409P1Case() {
-        super();
-    }
-
-    public Qsd20030409P1Case(final String arg0) {
-        super(arg0);
-    }
-
     @Override
     protected BasicMatrix[] getMatrices() {
 

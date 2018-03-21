@@ -24,6 +24,7 @@ package org.ojalgo.function;
 import static org.ojalgo.function.ComplexFunction.*;
 import static org.ojalgo.scalar.ComplexNumber.*;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 
 /**
@@ -32,36 +33,34 @@ import org.ojalgo.TestUtils;
  *
  * @author apete
  */
-public class ComplexCase extends FunctionTests {
+public class ComplexCase {
 
-    public ComplexCase() {
-        super();
-    }
-
-    public ComplexCase(final String name) {
-        super(name);
-    }
-
+    @Test
     public void testDIVIDE() {
         TestUtils.assertEquals(ONE, DIVIDE.invoke(I, I));
     }
 
+    @Test
     public void testMULTIPLY() {
         TestUtils.assertEquals(NEG, MULTIPLY.invoke(I, I));
     }
 
+    @Test
     public void testPOWER() {
         TestUtils.assertEquals(NEG, POWER.invoke(I, 2));
     }
 
+    @Test
     public void testROOT() {
         TestUtils.assertEquals(I, ROOT.invoke(NEG, 2));
     }
 
+    @Test
     public void testSQRT() {
         TestUtils.assertEquals(I, SQRT.invoke(NEG));
     }
 
+    @Test
     public void testSUBTRACT() {
         TestUtils.assertEquals(ZERO, SUBTRACT.invoke(I, I));
     }

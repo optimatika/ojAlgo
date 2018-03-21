@@ -21,22 +21,16 @@
  */
 package org.ojalgo.function.polynomial;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
 
-public class PolynomialImplTest extends FunctionPolynomialTests {
+public class PolynomialImplTest {
 
-    public PolynomialImplTest() {
-        super();
-    }
-
-    public PolynomialImplTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testEstimation() {
 
         final int tmpMaxSamples = 9;
@@ -65,6 +59,7 @@ public class PolynomialImplTest extends FunctionPolynomialTests {
         }
     }
 
+    @Test
     public void testEvaluation() {
 
         final int tmpDegree = 10;

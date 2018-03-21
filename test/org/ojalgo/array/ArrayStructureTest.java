@@ -21,6 +21,7 @@
  */
 package org.ojalgo.array;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.StructureAnyD;
 
@@ -104,14 +105,7 @@ public class ArrayStructureTest extends ArrayTests {
         }
     }
 
-    public ArrayStructureTest() {
-        super();
-    }
-
-    public ArrayStructureTest(final String aName) {
-        super(aName);
-    }
-
+    @Test
     public void testGetIndexintArray() {
 
         final int[] tmpRef1 = new int[] { 1 };
@@ -125,6 +119,7 @@ public class ArrayStructureTest extends ArrayTests {
         TestUtils.assertEquals(104, StructureAnyD.index(STRUCTURE_4D, tmpRef4));
     }
 
+    @Test
     public void testGetNumberOfDimensions() {
 
         TestUtils.assertEquals(1, STRUCTURE_1D.length);
@@ -133,6 +128,7 @@ public class ArrayStructureTest extends ArrayTests {
         TestUtils.assertEquals(4, STRUCTURE_4D.length);
     }
 
+    @Test
     public void testGetNumberOfElements() {
 
         TestUtils.assertEquals(2, ARRAY_1D.size());
