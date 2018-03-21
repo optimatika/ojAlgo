@@ -31,14 +31,6 @@ import org.ojalgo.matrix.RationalMatrix;
  */
 public class QsdOldNormalCase extends GenericQPSolverTest {
 
-    public QsdOldNormalCase() {
-        super();
-    }
-
-    public QsdOldNormalCase(final String arg0) {
-        super(arg0);
-    }
-
     @Override
     protected BasicMatrix[] getMatrices() {
 

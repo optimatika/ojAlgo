@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -36,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class SchurTest extends MatrixDecompositionTests {
+public class SchurTest {
 
     private static void doTest(final PhysicalStore<Double> originalMatrix, final Array1D<ComplexNumber> expectedDiagonal, final NumberContext accuracyContext) {
 
@@ -67,14 +69,12 @@ public class SchurTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(expectedDiagonal, tmpDiagonal, accuracyContext);
     }
 
-    public SchurTest() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public SchurTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testDiagonalCase() {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
@@ -93,6 +93,7 @@ public class SchurTest extends MatrixDecompositionTests {
     /**
      * http://mathworld.wolfram.com/SchurDecomposition.html
      */
+    @Test
     public void testMathWorldCase() {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 3, 2, 1 }, { 4, 2, 1 }, { 4, 4, 0 } });
@@ -108,6 +109,7 @@ public class SchurTest extends MatrixDecompositionTests {
         PrimitiveDenseStore.FACTORY.rows(new double[][] { { tmp00, 4.4907, -0.82632 }, { 0.0, tmp11, 1.0726 }, { 0.0, 0.0, tmp22 } });
     }
 
+    @Test
     public void testP20061119Case() {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.copy(P20061119Case.getProblematic());
@@ -126,6 +128,7 @@ public class SchurTest extends MatrixDecompositionTests {
     /**
      * http://planetmath.org/encyclopedia/AnExampleForSchurDecomposition.html
      */
+    @Test
     public void testPlanetMathCase() {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 5, 7 }, { -2, -4 } });

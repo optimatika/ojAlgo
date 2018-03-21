@@ -21,22 +21,13 @@
  */
 package org.ojalgo.random;
 
-import org.ojalgo.FunctionalityTest;
-
 /**
  * RandomPackageTests
  *
  * @author apete
  */
-public abstract class RandomTests extends FunctionalityTest {
+public abstract class RandomTests {
 
     static final boolean DEBUG = false;
 
-    protected RandomTests() {
-        super();
-    }
-
-    protected RandomTests(final String name) {
-        super(name);
-    }
 }

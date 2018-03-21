@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.SimpleEquationCase;
@@ -33,21 +35,19 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class TestSolveAndInvert extends MatrixDecompositionTests {
+public class TestSolveAndInvert {
 
     static MatrixDecomposition.Solver<Double>[] getAllSquare() {
-        return (MatrixDecomposition.Solver<Double>[]) new MatrixDecomposition.Solver<?>[] { LU.PRIMITIVE.make(), new RawLU(), QR.PRIMITIVE.make(), new RawQR(),
-                SingularValue.PRIMITIVE.make(), new RawSingularValue()/* , new SVDold30.Primitive() */ };
+        return (MatrixDecomposition.Solver<Double>[]) new MatrixDecomposition.Solver<?>[]{LU.PRIMITIVE.make(), new RawLU(), QR.PRIMITIVE.make(), new RawQR(),
+                SingularValue.PRIMITIVE.make(), new RawSingularValue()/* , new SVDold30.Primitive() */};
     }
 
-    public TestSolveAndInvert() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public TestSolveAndInvert(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testInverseOfRandomCase() {
 
         final NumberContext tmpEqualsNumberContext = new NumberContext(7, 10);
@@ -79,6 +79,7 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
         }
     }
 
+    @Test
     public void testSimpleEquationCase() {
 
         final MatrixStore<Double> tmpBody = PrimitiveDenseStore.FACTORY.copy(SimpleEquationCase.getBody());
@@ -91,7 +92,7 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
     }
 
     private void doTest(final MatrixDecomposition.Solver<Double> decomposition, final MatrixStore<Double> body, final MatrixStore<Double> rhs,
-            final MatrixStore<Double> solution, final NumberContext accuracy) {
+                        final MatrixStore<Double> solution, final NumberContext accuracy) {
 
         decomposition.decompose(body);
 

@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.function.ComplexFunction;
@@ -59,16 +61,7 @@ public class P20050827Case extends BasicMatrixTest {
         return ComplexMatrix.FACTORY.copy(tmpArray).enforce(DEFINITION);
     }
 
-    public P20050827Case() {
-        super();
-    }
-
-    public P20050827Case(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
-    public void testData() {
+    @Test public void testData() {
 
         // 3x5
         final ComplexMatrix tmpProblematic = P20050827Case.getProblematic();
@@ -99,8 +92,7 @@ public class P20050827Case extends BasicMatrixTest {
         TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpBigTrace.get(), tmpSmallTrace.get(), EVALUATION);
     }
 
-    @Override
-    public void testProblem() {
+    @Test public void testProblem() {
 
         final ComplexMatrix tmpProblematic = P20050827Case.getProblematic();
 
@@ -114,8 +106,9 @@ public class P20050827Case extends BasicMatrixTest {
 
     }
 
+    @Before
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() {
 
         DEFINITION = NumberContext.getGeneral(12);
         EVALUATION = NumberContext.getGeneral(6).newPrecision(12);

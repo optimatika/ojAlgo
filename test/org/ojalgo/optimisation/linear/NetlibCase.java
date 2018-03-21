@@ -15,6 +15,7 @@ package org.ojalgo.optimisation.linear;
 import java.io.File;
 import java.math.BigDecimal;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.MathProgSysModel;
@@ -27,22 +28,14 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class NetlibCase extends OptimisationLinearTests {
 
-    private static final String COMPOSITION_NOT_VALID = " Composition not valid!";
     private static final String PATH = "./test/org/ojalgo/optimisation/linear/";
     private static final NumberContext PRECISION = new NumberContext(7, 6);
     private static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
-    public NetlibCase() {
-        super();
-    }
-
-    public NetlibCase(final String someName) {
-        super(someName);
-    }
-
     /**
      * OK! 2010-04-19 lp_solve => -30.81214985
      */
+    @Test
     public void testBlend() {
 
         final File tmpFile = new File(PATH + "blend.mps");
@@ -60,6 +53,7 @@ public class NetlibCase extends OptimisationLinearTests {
     /**
      * OK! 2010-04-19 lp_solve => -315.01872802
      */
+    @Test
     public void testBoeing2() {
 
         final File tmpFile = new File(PATH + "boeing2.mps");
@@ -72,6 +66,7 @@ public class NetlibCase extends OptimisationLinearTests {
     /**
      * OK! 2010-04-19 lp_solve => -1749.90012991
      */
+    @Test
     public void testKb2() {
 
         final File tmpFile = new File(PATH + "kb2.mps");
@@ -84,6 +79,7 @@ public class NetlibCase extends OptimisationLinearTests {
     /**
      * OK! 2010-04-19 lp_solve => -70.00000000
      */
+    @Test
     public void testSc50b() {
 
         final File tmpFile = new File(PATH + "sc50b.mps");
@@ -96,6 +92,7 @@ public class NetlibCase extends OptimisationLinearTests {
     /**
      * OK! 2010-04-19 lp_solve => -415.73224074
      */
+    @Test
     public void testShare2b() {
 
         final File tmpFile = new File(PATH + "share2b.mps");

@@ -12,17 +12,12 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.math.BigDecimal;
 
 public final class MipCase extends OptimisationIntegerTests {
-
-    public MipCase() {
-        super();
-    }
-
-    public MipCase(final String someName) {
-        super(someName);
-    }
 
     /**
      * <ul>
@@ -34,6 +29,8 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testMarkshare_5_0()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testMarkshare_5_0() {
         MipLibCase.assertMinMaxVal("markshare_5_0.mps", new BigDecimal("1.00000000e+00"), null, false, null);
     }
@@ -50,6 +47,8 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testMarkshare1()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testMarkshare1() {
         MipLibCase.assertMinMaxVal("markshare1.mps", new BigDecimal("1.00000000e+00"), null, false, null);
     }
@@ -66,6 +65,8 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testMarkshare2()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testMarkshare2() {
         MipLibCase.assertMinMaxVal("markshare2.mps", new BigDecimal("1.00000000e+00"), null, false, null);
     }
@@ -85,6 +86,8 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testMas76()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testMas76() {
         MipLibCase.assertMinMaxVal("mas76.mps", new BigDecimal("4.00050541e+04"), null, false, null);
     }
@@ -101,6 +104,8 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testModglob()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testModglob() {
         MipLibCase.assertMinMaxVal("modglob.mps", new BigDecimal("2.07405081e+07"), null, false, null);
     }
@@ -114,6 +119,8 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testNeos911880()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testNeos911880() {
         MipLibCase.assertMinMaxVal("neos-911880.mps", new BigDecimal("54.76"), null, false, null);
     }
@@ -128,6 +135,8 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testNoswot()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testNoswot() {
         MipLibCase.assertMinMaxVal("noswot.mps", new BigDecimal("-4.10000000e+01"), null, false, null);
     }
@@ -139,6 +148,8 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testP2m2p1m1p0n100()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testP2m2p1m1p0n100() {
         MipLibCase.assertMinMaxVal("p2m2p1m1p0n100.mps", new BigDecimal("Infeasible"), null, true, null);
     }
@@ -156,6 +167,8 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testPk1()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testPk1() {
         MipLibCase.assertMinMaxVal("pk1.mps", new BigDecimal("1.10000000e+01"), null, false, null);
     }
@@ -170,6 +183,8 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testPp08a()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testPp08a() {
         MipLibCase.assertMinMaxVal("pp08a.mps", new BigDecimal("7.35000000e+03"), null, false, null);
     }
@@ -183,6 +198,8 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testPp08aCUTS()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testPp08aCUTS() {
         MipLibCase.assertMinMaxVal("pp08aCUTS.mps", new BigDecimal("7.35000000e+03"), null, false, null);
     }
@@ -196,6 +213,8 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testTimtab1()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testTimtab1() {
         MipLibCase.assertMinMaxVal("timtab1.mps", new BigDecimal("7.64772000e+05"), null, false, null);
     }
@@ -211,10 +230,13 @@ public final class MipCase extends OptimisationIntegerTests {
      *
      * @see RelaxedLpCase#testVpm2()
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testVpm2() {
         MipLibCase.assertMinMaxVal("vpm2.mps", new BigDecimal("1.37500000e+01"), null, false, null);
     }
 
+    @Test
     public void testDummy() {
     }
 

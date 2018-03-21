@@ -36,6 +36,7 @@ import static org.ojalgo.constant.BigMath.ZERO;
 
 import java.math.BigDecimal;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;
@@ -58,14 +59,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public class LinearProblems extends OptimisationLinearTests {
 
-    public LinearProblems() {
-        super();
-    }
-
-    public LinearProblems(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testMath286() {
 
         final Variable tmpX1 = new Variable("X1").weight(TENTH.multiply(EIGHT)).lower(TEN);
@@ -75,9 +69,9 @@ public class LinearProblems extends OptimisationLinearTests {
         final Variable tmpX5 = new Variable("X5").weight(TENTH.multiply(SIX)).lower(FIVE);
         final Variable tmpX6 = new Variable("X6").weight(TENTH.multiply(FOUR)).lower(ZERO);
 
-        final Variable[] tmpFullVars = new Variable[] { tmpX1.copy(), tmpX2.copy(), tmpX3.copy(), tmpX4.copy(), tmpX5.copy(), tmpX6.copy() };
-        final Variable[] tmpOddVars = new Variable[] { tmpX1.copy(), tmpX3.copy(), tmpX5.copy() };
-        final Variable[] tmpEvenVars = new Variable[] { tmpX2.copy(), tmpX4.copy(), tmpX6.copy() };
+        final Variable[] tmpFullVars = new Variable[]{tmpX1.copy(), tmpX2.copy(), tmpX3.copy(), tmpX4.copy(), tmpX5.copy(), tmpX6.copy()};
+        final Variable[] tmpOddVars = new Variable[]{tmpX1.copy(), tmpX3.copy(), tmpX5.copy()};
+        final Variable[] tmpEvenVars = new Variable[]{tmpX2.copy(), tmpX4.copy(), tmpX6.copy()};
 
         final ExpressionsBasedModel tmpFullModel = new ExpressionsBasedModel(tmpFullVars);
         //tmpFullModel.setMaximisation();
@@ -98,7 +92,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression retVal = tmpFullModel.addExpression("C1");
 
         for (int i = 0; i < tmpLength; i++) {
-            retVal.set(i, new BigDecimal[] { ONE, ZERO, ONE, ZERO, ONE, ZERO }[i]);
+            retVal.set(i, new BigDecimal[]{ONE, ZERO, ONE, ZERO, ONE, ZERO}[i]);
         }
 
         final Expression tmpAddWeightExpression = retVal;
@@ -108,7 +102,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression retVal1 = tmpOddModel.addExpression("C1");
 
         for (int i = 0; i < tmpLength1; i++) {
-            retVal1.set(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
+            retVal1.set(i, new BigDecimal[]{ONE, ONE, ONE}[i]);
         }
         final Expression tmpAddWeightExpression2 = retVal1;
         tmpAddWeightExpression2.level(tmpRHS);
@@ -117,7 +111,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression retVal2 = tmpFullModel.addExpression("C2");
 
         for (int i = 0; i < tmpLength2; i++) {
-            retVal2.set(i, new BigDecimal[] { ZERO, ONE, ZERO, ONE, ZERO, ONE }[i]);
+            retVal2.set(i, new BigDecimal[]{ZERO, ONE, ZERO, ONE, ZERO, ONE}[i]);
         }
 
         final Expression tmpAddWeightExpression3 = retVal2;
@@ -127,7 +121,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression retVal3 = tmpEvenModel.addExpression("C2");
 
         for (int i = 0; i < tmpLength3; i++) {
-            retVal3.set(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
+            retVal3.set(i, new BigDecimal[]{ONE, ONE, ONE}[i]);
         }
         final Expression tmpAddWeightExpression4 = retVal3;
         tmpAddWeightExpression4.level(tmpRHS);
@@ -182,6 +176,7 @@ public class LinearProblems extends OptimisationLinearTests {
     /**
      * Didn't recognise this as an infeasible problem.
      */
+    @Test
     public void testP20100412() {
 
         final ExpressionsBasedModel tmpModel = OptimisationIntegerData.buildModelForP20100412().relax(true);
@@ -197,10 +192,11 @@ public class LinearProblems extends OptimisationLinearTests {
      * Depending on how the constraints were constructed the solver could fail to solve and report the problem
      * to be unbounded.
      */
+    @Test
     public void testP20111010() {
 
-        final Variable[] tmpVariables = new Variable[] { new Variable("X").lower(ZERO).weight(ONE), new Variable("Y").lower(ZERO).weight(ZERO),
-                new Variable("Z").lower(ZERO).weight(ZERO) };
+        final Variable[] tmpVariables = new Variable[]{new Variable("X").lower(ZERO).weight(ONE), new Variable("Y").lower(ZERO).weight(ZERO),
+                new Variable("Z").lower(ZERO).weight(ZERO)};
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
@@ -263,6 +259,7 @@ public class LinearProblems extends OptimisationLinearTests {
      * LinearSolver med att identifiera och returnerade en felaktig lösning som OPTIMAL. Detta testfall
      * motsvarar
      */
+    @Test
     public void testP20150127() {
 
         final ExpressionsBasedModel tmpModel = P20150127b.getModel(true, true);
@@ -280,6 +277,7 @@ public class LinearProblems extends OptimisationLinearTests {
     /**
      * https://github.com/optimatika/ojAlgo/issues/61
      */
+    @Test
     public void testP20180310_61() {
 
         final Variable x = Variable.make("x").lower(0);
@@ -303,6 +301,7 @@ public class LinearProblems extends OptimisationLinearTests {
     /**
      * https://github.com/optimatika/ojAlgo/issues/62
      */
+    @Test
     public void testP20180310_62() {
 
         final Variable x = Variable.make("x").lower(0).weight(1);
@@ -322,6 +321,7 @@ public class LinearProblems extends OptimisationLinearTests {
     /**
      * https://github.com/optimatika/ojAlgo/issues/64
      */
+    @Test
     public void testP20180311_64() {
 
         final Variable x = Variable.make("x").lower(0).weight(3);
@@ -345,6 +345,7 @@ public class LinearProblems extends OptimisationLinearTests {
     /**
      * https://github.com/optimatika/ojAlgo/issues/66
      */
+    @Test
     public void testP20180311_66() {
 
         final Variable x = Variable.make("x").lower(0).weight(2);
@@ -368,6 +369,7 @@ public class LinearProblems extends OptimisationLinearTests {
     /**
      * https://github.com/optimatika/ojAlgo/issues/69
      */
+    @Test
     public void testP20180312_69() {
 
         final Variable x = Variable.make("x").lower(0).weight(3);
@@ -394,6 +396,7 @@ public class LinearProblems extends OptimisationLinearTests {
     /**
      * https://github.com/optimatika/ojAlgo/issues/70
      */
+    @Test
     public void testP20180314_70() {
 
         Variable x = Variable.make("x").lower(0).weight(-2);

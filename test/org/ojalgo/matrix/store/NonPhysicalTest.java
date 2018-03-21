@@ -23,6 +23,9 @@ package org.ojalgo.matrix.store;
 
 import java.math.BigDecimal;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.BasicMatrix;
@@ -36,7 +39,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
 
-    protected static NumberContext CNTXT = StandardType.DECIMAL_032;
+    private static NumberContext CNTXT = StandardType.DECIMAL_032;
 
     private static void testAggregation(final MatrixStore<?> aStore) {
 
@@ -103,55 +106,53 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
     MatrixStore<ComplexNumber> myComplexStore;
     MatrixStore<Double> myPrimitiveStore;
 
-    public NonPhysicalTest() {
-        super();
-    }
-
-    public NonPhysicalTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testBigAggregator() {
         NonPhysicalTest.testAggregation(myBigStore);
     }
 
+    @Test
     public void testBigElements() {
         NonPhysicalTest.testElements(myBigStore);
     }
 
+    @Test
     public void testBigMultiplication() {
         NonPhysicalTest.testMultiplication(myBigStore);
     }
 
+    @Test
     public void testComplexAggregator() {
         NonPhysicalTest.testAggregation(myComplexStore);
     }
 
+    @Test
     public void testComplexElements() {
         NonPhysicalTest.testElements(myComplexStore);
     }
 
+    @Test
     public void testComplexMultiplication() {
         NonPhysicalTest.testMultiplication(myComplexStore);
     }
 
+    @Test
     public void testPrimitiveAggregator() {
         NonPhysicalTest.testAggregation(myPrimitiveStore);
     }
 
+    @Test
     public void testPrimitiveElements() {
         NonPhysicalTest.testElements(myPrimitiveStore);
     }
 
+    @Test
     public void testPrimitiveMultiplication() {
         NonPhysicalTest.testMultiplication(myPrimitiveStore);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-
-        super.tearDown();
-
+    @After
+    public void tearDown() {
         myBigStore = null;
         myComplexStore = null;
         myPrimitiveStore = null;

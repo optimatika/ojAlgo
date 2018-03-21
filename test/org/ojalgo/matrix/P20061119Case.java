@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -55,21 +56,11 @@ public class P20061119Case extends BasicMatrixTest {
         return retVal.enforce(DEFINITION);
     }
 
-    public P20061119Case() {
-        super();
-    }
-
-    public P20061119Case(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
-    public void testData() {
+    @Test public void testData() {
         TestUtils.assertEquals(true, P20061119Case.getProblematic().isSquare());
     }
 
-    @Override
-    public void testProblem() {
+    @Test public void testProblem() {
 
         final BasicMatrix tmpMatrix = P20061119Case.getProblematic();
 
@@ -81,7 +72,7 @@ public class P20061119Case extends BasicMatrixTest {
     }
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() {
 
         DEFINITION = new NumberContext(7, 2);
         EVALUATION = NumberContext.getGeneral(8).newPrecision(14);

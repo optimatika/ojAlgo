@@ -29,14 +29,6 @@ import org.ojalgo.matrix.RationalMatrix;
  */
 public class MostBasicCase extends GenericQPSolverTest {
 
-    public MostBasicCase() {
-        super();
-    }
-
-    public MostBasicCase(final String arg0) {
-        super(arg0);
-    }
-
     @Override
     protected BasicMatrix[] getMatrices() {
 

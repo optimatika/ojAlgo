@@ -17,6 +17,7 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
@@ -24,31 +25,24 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Variable;
 
-public class StrategyMixer extends OptimisationIntegerTests {
-
-    public StrategyMixer() {
-        super();
-    }
-
-    public StrategyMixer(final String someName) {
-        super(someName);
-    }
+public class StrategyMixer {
 
     /**
      * This is test case using a reimplementation of the algorithm in {@link PortfolioMixer}.
      */
+    @Test
     public void testStratCombQuadraticExpressionModel() {
 
-        final BigDecimal[] tmpTarget = new BigDecimal[] { THIRD, THIRD, THIRD };
+        final BigDecimal[] tmpTarget = new BigDecimal[]{THIRD, THIRD, THIRD};
 
-        final BigDecimal[] tmpStrat1 = new BigDecimal[] { HALF, HALF, ZERO };
-        final BigDecimal[] tmpStrat2 = new BigDecimal[] { HALF, ZERO, HALF };
-        final BigDecimal[] tmpStrat3 = new BigDecimal[] { ZERO, HALF, HALF };
+        final BigDecimal[] tmpStrat1 = new BigDecimal[]{HALF, HALF, ZERO};
+        final BigDecimal[] tmpStrat2 = new BigDecimal[]{HALF, ZERO, HALF};
+        final BigDecimal[] tmpStrat3 = new BigDecimal[]{ZERO, HALF, HALF};
 
-        final BigDecimal[][] tmpStrats = new BigDecimal[][] { tmpStrat1, tmpStrat2, tmpStrat3 };
+        final BigDecimal[][] tmpStrats = new BigDecimal[][]{tmpStrat1, tmpStrat2, tmpStrat3};
 
-        final Variable[] tmpVars = new Variable[] { new Variable("S1"), new Variable("S2"), new Variable("S3"), Variable.makeBinary("B1"),
-                Variable.makeBinary("B2"), Variable.makeBinary("B3") };
+        final Variable[] tmpVars = new Variable[]{new Variable("S1"), new Variable("S2"), new Variable("S3"), Variable.makeBinary("B1"),
+                Variable.makeBinary("B2"), Variable.makeBinary("B3")};
 
         for (int s = 0; s < 3; s++) {
 
@@ -124,7 +118,7 @@ public class StrategyMixer extends OptimisationIntegerTests {
         int tmpUseCount = 0;
         double tmpTotalWeight = 0D;
 
-        final Variable[] tmpSolution = new Variable[] { tmpVars[0], tmpVars[1], tmpVars[2] };
+        final Variable[] tmpSolution = new Variable[]{tmpVars[0], tmpVars[1], tmpVars[2]};
         for (final Variable tmpWeight : tmpSolution) {
             if (tmpWeight.getValue().signum() != 0) {
                 tmpUseCount++;

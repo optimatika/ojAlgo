@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix;
 
+import org.junit.Before;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -29,45 +30,23 @@ import org.ojalgo.type.context.NumberContext;
 public class SimpleEquationCase extends BasicMatrixTest {
 
     public static RationalMatrix getBody() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 1.0, 1.0 }, { 4.0, -6.0, 0.0 }, { -2.0, 7.0, 2.0 } });
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{2.0, 1.0, 1.0}, {4.0, -6.0, 0.0}, {-2.0, 7.0, 2.0}});
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static RationalMatrix getRHS() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 5.0 }, { -2.0 }, { 9.0 } });
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{5.0}, {-2.0}, {9.0}});
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static RationalMatrix getSolution() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 2.0 } });
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0}, {1.0}, {2.0}});
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public SimpleEquationCase() {
-        super();
-    }
-
-    public SimpleEquationCase(final String arg0) {
-        super(arg0);
-    }
-
+    @Before
     @Override
-    public void testData() {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrixTest#testProblem()
-     */
-    @Override
-    public void testProblem() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void setUp() throws Exception {
+    public void setUp() {
 
         DEFINITION = new NumberContext(7, 1);
         EVALUATION = new NumberContext(7, 9);

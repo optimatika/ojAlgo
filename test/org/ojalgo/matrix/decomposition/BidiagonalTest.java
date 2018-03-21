@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
@@ -34,16 +35,9 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class BidiagonalTest extends MatrixDecompositionTests {
+public class BidiagonalTest {
 
-    public BidiagonalTest() {
-        super();
-    }
-
-    public BidiagonalTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testCaseFromMatrixComputations() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 10, 11, 12 } });
@@ -51,6 +45,7 @@ public class BidiagonalTest extends MatrixDecompositionTests {
         this.doTestCorrect(tmpMatrix);
     }
 
+    @Test
     public void testComplexSquareCase() {
 
         final PhysicalStore<ComplexNumber> tmpOriginal = MatrixUtils.makeRandomComplexStore(4, 4);
@@ -82,6 +77,7 @@ public class BidiagonalTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpOriginal, tmpReconstructed, new NumberContext(7, 6));
     }
 
+    @Test
     public void testFatEye() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.makeEye(4, 6);
@@ -89,6 +85,7 @@ public class BidiagonalTest extends MatrixDecompositionTests {
         this.doTestCorrect(tmpMatrix);
     }
 
+    @Test
     public void testFatRandom() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(4, 6));
@@ -96,6 +93,7 @@ public class BidiagonalTest extends MatrixDecompositionTests {
         this.doTestCorrect(tmpMatrix);
     }
 
+    @Test
     public void testSquareBidiagonal() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY
@@ -104,6 +102,7 @@ public class BidiagonalTest extends MatrixDecompositionTests {
         this.doTestCorrect(tmpMatrix);
     }
 
+    @Test
     public void testSquareEye() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.makeEye(5, 5);
@@ -111,6 +110,7 @@ public class BidiagonalTest extends MatrixDecompositionTests {
         this.doTestCorrect(tmpMatrix);
     }
 
+    @Test
     public void testSquareRandom() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(5, 5));
@@ -118,6 +118,7 @@ public class BidiagonalTest extends MatrixDecompositionTests {
         this.doTestCorrect(tmpMatrix);
     }
 
+    @Test
     public void testTallEye() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.makeEye(6, 4);
@@ -125,6 +126,7 @@ public class BidiagonalTest extends MatrixDecompositionTests {
         this.doTestCorrect(tmpMatrix);
     }
 
+    @Test
     public void testTallRandom() {
 
         final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(6, 4));

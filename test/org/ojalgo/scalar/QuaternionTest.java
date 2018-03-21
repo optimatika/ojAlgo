@@ -21,6 +21,8 @@
  */
 package org.ojalgo.scalar;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.QuaternionFunction;
@@ -28,26 +30,19 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
-public class QuaternionTest extends ScalarTests {
-
-    public QuaternionTest() {
-        super();
-    }
-
-    public QuaternionTest(final String name) {
-        super(name);
-    }
-
-    public void _testCosAndBackAgain() {
+public class QuaternionTest {
+    @Test
+    @Ignore("Was underscored before JUnit 5 transition")
+    public void cosAndBackAgain() {
 
         final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
-        for (int s = 0; s < tmpArguments.length; s++) {
-            for (int i = 0; i < tmpArguments.length; i++) {
-                for (int j = 0; j < tmpArguments.length; j++) {
-                    for (int k = 0; k < tmpArguments.length; k++) {
+        for (double s : tmpArguments) {
+            for (double i : tmpArguments) {
+                for (double j : tmpArguments) {
+                    for (double k : tmpArguments) {
 
-                        final Quaternion tmpOriginal = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpOriginal = Quaternion.of(s, i, j, k);
 
                         final Quaternion tmpOp = QuaternionFunction.COS.invoke(tmpOriginal);
                         final Quaternion tmpInv = QuaternionFunction.ACOS.invoke(tmpOriginal);
@@ -63,16 +58,18 @@ public class QuaternionTest extends ScalarTests {
         }
     }
 
-    public void _testCoshAndBackAgain() {
+    @Test
+    @Ignore("Was underscored before JUnit 5 transition")
+    public void coshAndBackAgain() {
 
         final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
-        for (int s = 0; s < tmpArguments.length; s++) {
-            for (int i = 0; i < tmpArguments.length; i++) {
-                for (int j = 0; j < tmpArguments.length; j++) {
-                    for (int k = 0; k < tmpArguments.length; k++) {
+        for (double s : tmpArguments) {
+            for (double i : tmpArguments) {
+                for (double j : tmpArguments) {
+                    for (double k : tmpArguments) {
 
-                        final Quaternion tmpOriginal = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpOriginal = Quaternion.of(s, i, j, k);
 
                         final Quaternion tmpOp = QuaternionFunction.COSH.invoke(tmpOriginal);
                         final Quaternion tmpInv = QuaternionFunction.ACOSH.invoke(tmpOriginal);
@@ -88,16 +85,18 @@ public class QuaternionTest extends ScalarTests {
         }
     }
 
-    public void _testSinAndBackAgain() {
+    @Test
+    @Ignore("Was underscored before JUnit 5 transition")
+    public void sinAndBackAgain() {
 
         final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
-        for (int s = 0; s < tmpArguments.length; s++) {
-            for (int i = 0; i < tmpArguments.length; i++) {
-                for (int j = 0; j < tmpArguments.length; j++) {
-                    for (int k = 0; k < tmpArguments.length; k++) {
+        for (double s : tmpArguments) {
+            for (double i : tmpArguments) {
+                for (double j : tmpArguments) {
+                    for (double k : tmpArguments) {
 
-                        final Quaternion tmpOriginal = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpOriginal = Quaternion.of(s, i, j, k);
 
                         final Quaternion tmpOp = QuaternionFunction.SIN.invoke(tmpOriginal);
                         final Quaternion tmpInv = QuaternionFunction.ASIN.invoke(tmpOriginal);
@@ -113,16 +112,18 @@ public class QuaternionTest extends ScalarTests {
         }
     }
 
-    public void _testSinhAndBackAgain() {
+    @Test
+    @Ignore("Was underscored before JUnit 5 transition")
+    public void sinhAndBackAgain() {
 
         final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
-        for (int s = 0; s < tmpArguments.length; s++) {
-            for (int i = 0; i < tmpArguments.length; i++) {
-                for (int j = 0; j < tmpArguments.length; j++) {
-                    for (int k = 0; k < tmpArguments.length; k++) {
+        for (double s : tmpArguments) {
+            for (double i : tmpArguments) {
+                for (double j : tmpArguments) {
+                    for (double k : tmpArguments) {
 
-                        final Quaternion tmpOriginal = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpOriginal = Quaternion.of(s, i, j, k);
 
                         final Quaternion tmpOp = QuaternionFunction.SINH.invoke(tmpOriginal);
                         final Quaternion tmpInv = QuaternionFunction.ASINH.invoke(tmpOriginal);
@@ -138,16 +139,18 @@ public class QuaternionTest extends ScalarTests {
         }
     }
 
-    public void _testTanAndBackAgain() {
+@Test
+    @Ignore("Was underscored before JUnit 5 transition")
+    public void tanAndBackAgain() {
 
         final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
-        for (int s = 0; s < tmpArguments.length; s++) {
-            for (int i = 0; i < tmpArguments.length; i++) {
-                for (int j = 0; j < tmpArguments.length; j++) {
-                    for (int k = 0; k < tmpArguments.length; k++) {
+        for (double s : tmpArguments) {
+            for (double i : tmpArguments) {
+                for (double j : tmpArguments) {
+                    for (double k : tmpArguments) {
 
-                        final Quaternion tmpOriginal = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpOriginal = Quaternion.of(s, i, j, k);
 
                         final Quaternion tmpOp = QuaternionFunction.TAN.invoke(tmpOriginal);
                         final Quaternion tmpInv = QuaternionFunction.ATAN.invoke(tmpOriginal);
@@ -163,16 +166,18 @@ public class QuaternionTest extends ScalarTests {
         }
     }
 
-    public void _testTanhAndBackAgain() {
+    @Test
+    @Ignore("Was underscored before JUnit 5 transition")
+    public void tanhAndBackAgain() {
 
         final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
-        for (int s = 0; s < tmpArguments.length; s++) {
-            for (int i = 0; i < tmpArguments.length; i++) {
-                for (int j = 0; j < tmpArguments.length; j++) {
-                    for (int k = 0; k < tmpArguments.length; k++) {
+        for (double s : tmpArguments) {
+            for (double i : tmpArguments) {
+                for (double j : tmpArguments) {
+                    for (double k : tmpArguments) {
 
-                        final Quaternion tmpOriginal = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpOriginal = Quaternion.of(s, i, j, k);
 
                         final Quaternion tmpOp = QuaternionFunction.TANH.invoke(tmpOriginal);
                         final Quaternion tmpInv = QuaternionFunction.ATANH.invoke(tmpOriginal);
@@ -188,16 +193,17 @@ public class QuaternionTest extends ScalarTests {
         }
     }
 
-    public void testLogExpAndBackAgain() {
+
+    @Test public void testLogExpAndBackAgain() {
 
         final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
-        for (int s = 0; s < tmpArguments.length; s++) {
-            for (int i = 0; i < tmpArguments.length; i++) {
-                for (int j = 0; j < tmpArguments.length; j++) {
-                    for (int k = 0; k < tmpArguments.length; k++) {
+        for (double s : tmpArguments) {
+            for (double i : tmpArguments) {
+                for (double j : tmpArguments) {
+                    for (double k : tmpArguments) {
 
-                        final Quaternion tmpQuaternion = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpQuaternion = Quaternion.of(s, i, j, k);
 
                         final Quaternion tmpLog = QuaternionFunction.LOG.invoke(tmpQuaternion);
                         final Quaternion tmpExp = QuaternionFunction.EXP.invoke(tmpQuaternion);
@@ -213,16 +219,16 @@ public class QuaternionTest extends ScalarTests {
         }
     }
 
-    public void testPolarForm() {
+    @Test public void testPolarForm() {
 
         final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
-        for (int s = 0; s < tmpArguments.length; s++) {
-            for (int i = 0; i < tmpArguments.length; i++) {
-                for (int j = 0; j < tmpArguments.length; j++) {
-                    for (int k = 0; k < tmpArguments.length; k++) {
+        for (double s : tmpArguments) {
+            for (double i : tmpArguments) {
+                for (double j : tmpArguments) {
+                    for (double k : tmpArguments) {
 
-                        final Quaternion tmpExpected = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpExpected = Quaternion.of(s, i, j, k);
 
                         final double tmpNorm = tmpExpected.norm();
                         final double[] tmpUnit = tmpExpected.unit();
@@ -237,7 +243,7 @@ public class QuaternionTest extends ScalarTests {
         }
     }
 
-    public void testRandomMultiplication() {
+    @Test public void testRandomMultiplication() {
 
         final Quaternion normalizedRandomRotation = Quaternion.of(Math.random(), Math.random(), Math.random(), Math.random()).signum();
 
@@ -252,7 +258,7 @@ public class QuaternionTest extends ScalarTests {
         TestUtils.assertEquals(vctrResult, quatResult.toMultiplicationVector());
     }
 
-    public void testRandomRotation() {
+    @Test public void testRandomRotation() {
 
         final Quaternion normalizedRandomRotation = Quaternion.of(Math.random(), Math.random(), Math.random(), Math.random()).signum();
 
@@ -270,7 +276,7 @@ public class QuaternionTest extends ScalarTests {
         TestUtils.assertEquals(vctrResult, vector);
     }
 
-    public void testRotationMatrixMathWorksExample() {
+    @Test public void testRotationMatrixMathWorksExample() {
 
         final double nmbr = 1.0 / Math.sqrt(2.0);
 

@@ -21,21 +21,15 @@
  */
 package org.ojalgo.constant;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
 
-public class PrimitivePrefixTest extends ConstantTests {
+public class PrimitivePrefixTest {
 
     private final double myTolerance = PrimitiveMath.MACHINE_EPSILON;
 
-    public PrimitivePrefixTest() {
-        super();
-    }
-
-    public PrimitivePrefixTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testPrefixes() {
 
         final double tmpTen = PrimitivePrefix.DEKA;

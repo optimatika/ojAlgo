@@ -23,6 +23,7 @@ package org.ojalgo.random.process;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
@@ -42,14 +43,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class GeometricBrownianMotionTest extends RandomProcessTests {
 
-    public GeometricBrownianMotionTest() {
-        super();
-    }
-
-    public GeometricBrownianMotionTest(final String someName) {
-        super(someName);
-    }
-
+    @Test
     public void testConfidenceIntervals() {
 
         for (int c = 1; c < 20; c++) {
@@ -92,6 +86,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         }
     }
 
+    @Test
     public void testDistributionConsistency() {
 
         final double tmpError = new NumberContext(7, 9).epsilon();
@@ -135,6 +130,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         }
     }
 
+    @Test
     public void testLogNormal() {
 
         final int tmpPeriods = 10000;
@@ -223,6 +219,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         TestUtils.assertEquals(ONE, tmpGeometrVal / tmpFactoryVal, tmpDeltaFinal);
     }
 
+    @Test
     public void testWikipediaCases() {
 
         new GeometricBrownianMotion(1.0, 0.2);

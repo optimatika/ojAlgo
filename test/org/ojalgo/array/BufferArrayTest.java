@@ -21,6 +21,7 @@
  */
 package org.ojalgo.array;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 
@@ -31,14 +32,7 @@ import org.ojalgo.random.Uniform;
  */
 public class BufferArrayTest extends ArrayTests {
 
-    public BufferArrayTest() {
-        super();
-    }
-
-    public BufferArrayTest(final String aName) {
-        super(aName);
-    }
-
+    @Test
     public void testRandomGetSet() {
 
         final int tmpCount = 5000;

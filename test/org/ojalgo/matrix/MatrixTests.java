@@ -21,17 +21,9 @@
  */
 package org.ojalgo.matrix;
 
-import org.ojalgo.FunctionalityTest;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 
-public abstract class MatrixTests extends FunctionalityTest {
-
+public abstract class MatrixTests {
     static final boolean DEBUG = false;
-
-    protected MatrixTests() {
-        super();
-    }
-
-    protected MatrixTests(final String name) {
-        super(name);
-    }
 }

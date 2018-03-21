@@ -21,6 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
@@ -36,19 +39,18 @@ import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-public class DecompositionProblems extends MatrixDecompositionTests {
+public class DecompositionProblems {
 
-    public DecompositionProblems() {
-        super();
-    }
-
-    public DecompositionProblems(final String arg0) {
-        super(arg0);
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
     /**
      * A user reported problems solving complex valued (overdetermined) equation systemes.
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testP20111213square() {
 
         final int tmpDim = Uniform.randomInteger(2, 6);
@@ -58,8 +60,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         final PhysicalStore<ComplexNumber> tmpExpected = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> tmpActual;
 
-        @SuppressWarnings("unchecked")
-        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
+        @SuppressWarnings("unchecked") final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[]{Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
                 Eigenvalue.COMPLEX.make(MatrixDecomposition.TYPICAL,
                         true)/*
                               * , HessenbergDecomposition. makeComplex()
@@ -90,6 +91,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * A user reported problems related to calculating the pseudoinverse for large (2000x2000) matrices.
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testP20160419() {
 
         final PrimitiveDenseStore tmpOrg = PrimitiveDenseStore.FACTORY.makeFilled(2000, 2000, new Normal());
@@ -112,6 +115,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
      * A user discovered that some large (relatively uniform) matrices causes the algorithm to never finsh
      * https://github.com/optimatika/ojAlgo/issues/22
      */
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testP20160510InvertLargeMatrix() {
 
         final double[][] data = new double[3000][3000];
@@ -138,6 +143,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * http://en.wikipedia.org/wiki/Singular_value_decomposition There is no problem...
      */
+    @Test
     public void testP20090923() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
@@ -158,6 +164,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * Fat matrices were not QR-decomposed correctly ("R" was not created correctly).
      */
+    @Test
     public void testP20091012() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(5, 9));
@@ -171,6 +178,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * Fat matrices were not QR-decomposed correctly ("R" was not created correctly).
      */
+    @Test
     public void testP20091012fixed() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
@@ -184,6 +192,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpA, tmpQR, new NumberContext(7, 6));
     }
 
+    @Test
     public void testP20100512a() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
@@ -195,6 +204,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpA, tmpPrimitive, new NumberContext(7, 6));
     }
 
+    @Test
     public void testP20100512b() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
@@ -206,6 +216,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpA, tmpPrimitive, new NumberContext(7, 6));
     }
 
+    @Test
     public void testP20110126() {
 
         final int tmpDim = 5;
@@ -232,6 +243,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
      * to recreate the problem. ... The problem turned out to be a pure bug related to creating the inverse
      * (applied the pivot row order, to the identity matrix, incorrectly).
      */
+    @Test
     public void testP20110223() {
 
         final NumberContext tmpEqualsNumberContext = new NumberContext(7, 11);
@@ -265,6 +277,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * A user reported problems solving complex valued (overdetermined) equation systemes.
      */
+    @Test
     public void testP20111213tall() {
 
         final int tmpDim = Uniform.randomInteger(2, 6);

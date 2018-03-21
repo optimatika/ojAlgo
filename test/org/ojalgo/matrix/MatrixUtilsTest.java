@@ -21,27 +21,22 @@
  */
 package org.ojalgo.matrix;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.FunctionUtils;
 
 /**
  * @author apete
  */
-public class MatrixUtilsTest extends MatrixTests {
+public class MatrixUtilsTest {
 
-    public MatrixUtilsTest() {
-        super();
-    }
-
-    public MatrixUtilsTest(final String newName) {
-        super(newName);
-    }
-
+    @Test
     public void testMax() {
         TestUtils.assertEquals(9, FunctionUtils.max(9, 0, -9));
         TestUtils.assertEquals(9, FunctionUtils.max(-9, 0, 9));
     }
 
+    @Test
     public void testMin() {
         TestUtils.assertEquals(-9, FunctionUtils.min(9, 0, -9));
         TestUtils.assertEquals(-9, FunctionUtils.min(-9, 0, 9));

@@ -21,16 +21,17 @@
  */
 package org.ojalgo.function;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-
-import java.math.BigDecimal;
-
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
+
+import java.math.BigDecimal;
+
+import static org.ojalgo.constant.PrimitiveMath.*;
 
 /**
  * Checks that {@linkplain org.ojalgo.function.BigFunction}, {@linkplain org.ojalgo.function.ComplexFunction},
@@ -40,20 +41,19 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public class CompareImplementations extends FunctionTests {
+public class CompareImplementations {
 
     private static final Uniform AROUND_ZERO = new Uniform(NEG, TWO);
     private static final NumberContext CONTEXT = new NumberContext(7, 14);
     private static final Uniform POSITIVE = new Uniform(E - TWO, TWO);
 
-    public CompareImplementations(final String arg0) {
-        super(arg0);
-    }
 
+    @Test
     public void testABS() {
         this.assertUnary(BigFunction.ABS, ComplexFunction.ABS, PrimitiveFunction.ABS, QuaternionFunction.ABS, RationalFunction.ABS, AROUND_ZERO.doubleValue());
     }
 
+    @Test
     public void testACOS() {
 
         this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, NEG);
@@ -66,6 +66,7 @@ public class CompareImplementations extends FunctionTests {
 
     }
 
+    @Test
     public void testACOSH() {
 
         //        this.assertUnary(BigFunction.ACOSH, ComplexFunction.ACOSH, PrimitiveFunction.ACOSH, RationalFunction.ACOSH, POSITIVE.doubleValue());
@@ -77,11 +78,13 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.ACOSH, ComplexFunction.ACOSH, PrimitiveFunction.ACOSH, QuaternionFunction.ACOSH, RationalFunction.ACOSH, ONE);
     }
 
+    @Test
     public void testADD() {
         this.assertBinary(BigFunction.ADD, ComplexFunction.ADD, PrimitiveFunction.ADD, QuaternionFunction.ADD, RationalFunction.ADD, POSITIVE.doubleValue(),
                 POSITIVE.doubleValue());
     }
 
+    @Test
     public void testASIN() {
 
         this.assertUnary(BigFunction.ASIN, ComplexFunction.ASIN, PrimitiveFunction.ASIN, QuaternionFunction.ASIN, RationalFunction.ASIN,
@@ -92,6 +95,7 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.ASIN, ComplexFunction.ASIN, PrimitiveFunction.ASIN, QuaternionFunction.ASIN, RationalFunction.ASIN, NEG);
     }
 
+    @Test
     public void testASINH() {
 
         this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH,
@@ -112,6 +116,7 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH, -PI);
     }
 
+    @Test
     public void testATAN() {
 
         this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN,
@@ -135,6 +140,7 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, MACHINE_SMALLEST);
     }
 
+    @Test
     public void testATAN2() {
 
         this.assertBinary(BigFunction.ATAN2, ComplexFunction.ATAN2, PrimitiveFunction.ATAN2, QuaternionFunction.ATAN2, RationalFunction.ATAN2, ONE, TWO);
@@ -146,6 +152,7 @@ public class CompareImplementations extends FunctionTests {
 
     }
 
+    @Test
     public void testATANH() {
 
         this.assertUnary(BigFunction.ATANH, ComplexFunction.ATANH, PrimitiveFunction.ATANH, QuaternionFunction.ATANH, RationalFunction.ATANH,
@@ -156,11 +163,13 @@ public class CompareImplementations extends FunctionTests {
         //  this.assertUnary(BigFunction.ATANH, ComplexFunction.ATANH, PrimitiveFunction.ATANH, RationalFunction.ATANH, NEG);
     }
 
+    @Test
     public void testCARDINALITY() {
         this.assertUnary(BigFunction.CARDINALITY, ComplexFunction.CARDINALITY, PrimitiveFunction.CARDINALITY, QuaternionFunction.CARDINALITY,
                 RationalFunction.CARDINALITY, AROUND_ZERO.doubleValue());
     }
 
+    @Test
     public void testCBRT() {
 
         this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT,
@@ -175,6 +184,7 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, ZERO);
     }
 
+    @Test
     public void testCEIL() {
         this.assertUnary(BigFunction.CEIL, ComplexFunction.CEIL, PrimitiveFunction.CEIL, QuaternionFunction.CEIL, RationalFunction.CEIL,
                 AROUND_ZERO.doubleValue());
@@ -182,11 +192,13 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.CEIL, ComplexFunction.CEIL, PrimitiveFunction.CEIL, QuaternionFunction.CEIL, RationalFunction.CEIL, -HALF);
     }
 
+    @Test
     public void testCONJUGATE() {
         this.assertUnary(BigFunction.CONJUGATE, ComplexFunction.CONJUGATE, PrimitiveFunction.CONJUGATE, QuaternionFunction.CONJUGATE,
                 RationalFunction.CONJUGATE, AROUND_ZERO.doubleValue());
     }
 
+    @Test
     public void testCOS() {
 
         this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, AROUND_ZERO.doubleValue());
@@ -206,6 +218,7 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, -PI);
     }
 
+    @Test
     public void testCOSH() {
 
         this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH,
@@ -226,11 +239,13 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH, -PI);
     }
 
+    @Test
     public void testDIVIDE() {
         this.assertBinary(BigFunction.DIVIDE, ComplexFunction.DIVIDE, PrimitiveFunction.DIVIDE, QuaternionFunction.DIVIDE, RationalFunction.DIVIDE,
                 POSITIVE.doubleValue(), POSITIVE.doubleValue());
     }
 
+    @Test
     public void testEXP() {
 
         this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, TEN);
@@ -257,11 +272,13 @@ public class CompareImplementations extends FunctionTests {
 
     }
 
+    @Test
     public void testEXPM1() {
         this.assertUnary(BigFunction.EXPM1, ComplexFunction.EXPM1, PrimitiveFunction.EXPM1, QuaternionFunction.EXPM1, RationalFunction.EXPM1,
                 AROUND_ZERO.doubleValue());
     }
 
+    @Test
     public void testFLOOR() {
         this.assertUnary(BigFunction.FLOOR, ComplexFunction.FLOOR, PrimitiveFunction.FLOOR, QuaternionFunction.FLOOR, RationalFunction.FLOOR,
                 AROUND_ZERO.doubleValue());
@@ -269,16 +286,19 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.FLOOR, ComplexFunction.FLOOR, PrimitiveFunction.FLOOR, QuaternionFunction.FLOOR, RationalFunction.FLOOR, -HALF);
     }
 
+    @Test
     public void testHYPOT() {
         this.assertBinary(BigFunction.HYPOT, ComplexFunction.HYPOT, PrimitiveFunction.HYPOT, QuaternionFunction.HYPOT, RationalFunction.HYPOT,
                 POSITIVE.doubleValue(), POSITIVE.doubleValue());
     }
 
+    @Test
     public void testINVERT() {
         this.assertUnary(BigFunction.INVERT, ComplexFunction.INVERT, PrimitiveFunction.INVERT, QuaternionFunction.INVERT, RationalFunction.INVERT,
                 POSITIVE.doubleValue());
     }
 
+    @Test
     public void testLOG() {
 
         this.assertUnary(BigFunction.LOG, ComplexFunction.LOG, PrimitiveFunction.LOG, QuaternionFunction.LOG, RationalFunction.LOG, THOUSAND);
@@ -291,36 +311,43 @@ public class CompareImplementations extends FunctionTests {
 
     }
 
+    @Test
     public void testLOG10() {
         this.assertUnary(BigFunction.LOG10, ComplexFunction.LOG10, PrimitiveFunction.LOG10, QuaternionFunction.LOG10, RationalFunction.LOG10,
                 POSITIVE.doubleValue());
     }
 
+    @Test
     public void testLOG1P() {
         this.assertUnary(BigFunction.LOG1P, ComplexFunction.LOG1P, PrimitiveFunction.LOG1P, QuaternionFunction.LOG1P, RationalFunction.LOG1P,
                 POSITIVE.doubleValue());
     }
 
+    @Test
     public void testMAX() {
         this.assertBinary(BigFunction.MAX, ComplexFunction.MAX, PrimitiveFunction.MAX, QuaternionFunction.MAX, RationalFunction.MAX, AROUND_ZERO.doubleValue(),
                 POSITIVE.doubleValue());
     }
 
+    @Test
     public void testMIN() {
         this.assertBinary(BigFunction.MIN, ComplexFunction.MIN, PrimitiveFunction.MIN, QuaternionFunction.MIN, RationalFunction.MIN, AROUND_ZERO.doubleValue(),
                 POSITIVE.doubleValue());
     }
 
+    @Test
     public void testMULTIPLY() {
         this.assertBinary(BigFunction.MULTIPLY, ComplexFunction.MULTIPLY, PrimitiveFunction.MULTIPLY, QuaternionFunction.MULTIPLY, RationalFunction.MULTIPLY,
                 AROUND_ZERO.doubleValue(), POSITIVE.doubleValue());
     }
 
+    @Test
     public void testNEGATE() {
         this.assertUnary(BigFunction.NEGATE, ComplexFunction.NEGATE, PrimitiveFunction.NEGATE, QuaternionFunction.NEGATE, RationalFunction.NEGATE,
                 AROUND_ZERO.doubleValue());
     }
 
+    @Test
     public void testPOW() {
 
         // Only defined for non-negative (absolute) first aruments
@@ -347,6 +374,7 @@ public class CompareImplementations extends FunctionTests {
 
     }
 
+    @Test
     public void testPOWER() {
 
         //        this.assertParameter(BigFunction.POWER, ComplexFunction.POWER, PrimitiveFunction.POWER, QuaternionFunction.POWER, RationalFunction.POWER,
@@ -361,6 +389,7 @@ public class CompareImplementations extends FunctionTests {
         this.assertParameter(BigFunction.POWER, ComplexFunction.POWER, PrimitiveFunction.POWER, QuaternionFunction.POWER, RationalFunction.POWER, ZERO, 7);
     }
 
+    @Test
     public void testRINT() {
 
         this.assertUnary(BigFunction.RINT, ComplexFunction.RINT, PrimitiveFunction.RINT, QuaternionFunction.RINT, RationalFunction.RINT,
@@ -376,21 +405,25 @@ public class CompareImplementations extends FunctionTests {
 
     }
 
+    @Test
     public void testROOT() {
         this.assertParameter(BigFunction.ROOT, ComplexFunction.ROOT, PrimitiveFunction.ROOT, QuaternionFunction.ROOT, RationalFunction.ROOT,
                 POSITIVE.doubleValue(), Uniform.randomInteger(1, 10));
     }
 
+    @Test
     public void testSCALE() {
         this.assertParameter(BigFunction.SCALE, ComplexFunction.SCALE, PrimitiveFunction.SCALE, QuaternionFunction.SCALE, RationalFunction.SCALE,
                 AROUND_ZERO.doubleValue(), Uniform.randomInteger(1, 10));
     }
 
+    @Test
     public void testSIGNUM() {
         this.assertUnary(BigFunction.SIGNUM, ComplexFunction.SIGNUM, PrimitiveFunction.SIGNUM, QuaternionFunction.SIGNUM, RationalFunction.SIGNUM,
                 AROUND_ZERO.doubleValue());
     }
 
+    @Test
     public void testSIN() {
 
         this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, AROUND_ZERO.doubleValue());
@@ -410,6 +443,7 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, -PI);
     }
 
+    @Test
     public void testSINH() {
 
         this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH,
@@ -430,6 +464,7 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH, -PI);
     }
 
+    @Test
     public void testSQRT() {
 
         this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT,
@@ -444,16 +479,19 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT, ZERO);
     }
 
+    @Test
     public void testSQRT1PX2() {
         this.assertUnary(BigFunction.SQRT1PX2, ComplexFunction.SQRT1PX2, PrimitiveFunction.SQRT1PX2, QuaternionFunction.SQRT1PX2, RationalFunction.SQRT1PX2,
                 POSITIVE.doubleValue());
     }
 
+    @Test
     public void testSUBTRACT() {
         this.assertBinary(BigFunction.SUBTRACT, ComplexFunction.SUBTRACT, PrimitiveFunction.SUBTRACT, QuaternionFunction.SUBTRACT, RationalFunction.SUBTRACT,
                 POSITIVE.doubleValue(), POSITIVE.doubleValue());
     }
 
+    @Test
     public void testTAN() {
 
         this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, QuaternionFunction.TAN, RationalFunction.TAN, AROUND_ZERO.doubleValue());
@@ -473,6 +511,7 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, QuaternionFunction.TAN, RationalFunction.TAN, -PI);
     }
 
+    @Test
     public void testTANH() {
 
         this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH,
@@ -493,13 +532,14 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH, -PI);
     }
 
+    @Test
     public void testVALUE() {
         this.assertUnary(BigFunction.VALUE, ComplexFunction.VALUE, PrimitiveFunction.VALUE, QuaternionFunction.VALUE, RationalFunction.VALUE,
                 AROUND_ZERO.doubleValue());
     }
 
-    void assertBinary(final BinaryFunction<BigDecimal> big, final BinaryFunction<ComplexNumber> complex, final BinaryFunction<Double> primitive,
-            final BinaryFunction<Quaternion> quaternion, final BinaryFunction<RationalNumber> rational, final double arg1, final double arg2) {
+    private void assertBinary(final BinaryFunction<BigDecimal> big, final BinaryFunction<ComplexNumber> complex, final BinaryFunction<Double> primitive,
+                              final BinaryFunction<Quaternion> quaternion, final BinaryFunction<RationalNumber> rational, final double arg1, final double arg2) {
 
         TestUtils.assertEquals("Big vs Complex, " + arg1 + ", " + arg2, big.invoke(arg1, arg2), complex.invoke(arg1, arg2), CONTEXT);
         TestUtils.assertEquals("Complex vs Primitive, " + arg1 + ", " + arg2, complex.invoke(arg1, arg2), primitive.invoke(arg1, arg2), CONTEXT);
@@ -508,8 +548,8 @@ public class CompareImplementations extends FunctionTests {
         TestUtils.assertEquals("Rational vs Big, " + arg1 + ", " + arg2, rational.invoke(arg1, arg2), big.invoke(arg1, arg2), CONTEXT);
     }
 
-    void assertParameter(final ParameterFunction<BigDecimal> big, final ParameterFunction<ComplexNumber> complex, final ParameterFunction<Double> primitive,
-            final ParameterFunction<Quaternion> quaternion, final ParameterFunction<RationalNumber> rational, final double arg, final int param) {
+    private void assertParameter(final ParameterFunction<BigDecimal> big, final ParameterFunction<ComplexNumber> complex, final ParameterFunction<Double> primitive,
+                                 final ParameterFunction<Quaternion> quaternion, final ParameterFunction<RationalNumber> rational, final double arg, final int param) {
 
         TestUtils.assertEquals("Big vs Complex", big.invoke(arg, param), complex.invoke(arg, param), CONTEXT);
         TestUtils.assertEquals("Complex vs Primitive", complex.invoke(arg, param), primitive.invoke(arg, param), CONTEXT);
@@ -518,8 +558,8 @@ public class CompareImplementations extends FunctionTests {
         TestUtils.assertEquals("Rational vs Big", rational.invoke(arg, param), big.invoke(arg, param), CONTEXT);
     }
 
-    void assertUnary(final UnaryFunction<BigDecimal> big, final UnaryFunction<ComplexNumber> complex, final UnaryFunction<Double> primitive,
-            final UnaryFunction<Quaternion> quaternion, final UnaryFunction<RationalNumber> rational, final double arg) {
+    private void assertUnary(final UnaryFunction<BigDecimal> big, final UnaryFunction<ComplexNumber> complex, final UnaryFunction<Double> primitive,
+                             final UnaryFunction<Quaternion> quaternion, final UnaryFunction<RationalNumber> rational, final double arg) {
 
         TestUtils.assertEquals("Big vs Complex, " + arg, big.invoke(arg), complex.invoke(arg), CONTEXT);
         TestUtils.assertEquals("Complex vs Primitive, " + arg, complex.invoke(arg), primitive.invoke(arg), CONTEXT);
