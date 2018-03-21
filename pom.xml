@@ -9,9 +9,7 @@
     <packaging>jar</packaging>
     <name>ojAlgo</name>
     <url>http://ojalgo.org</url>
-    <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and
-        optimisation.
-    </description>
+    <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>4.12</junit.version>
@@ -178,6 +176,12 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
             <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
