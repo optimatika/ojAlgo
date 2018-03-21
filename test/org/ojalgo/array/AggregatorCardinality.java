@@ -28,20 +28,10 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 
 public class AggregatorCardinality extends BasicArrayTest {
 
-    public AggregatorCardinality() {
-        super();
-    }
-
-    public AggregatorCardinality(final String aName) {
-        super(aName);
-    }
-
     @Override
     void doTest(final BasicArray<Double> array) {
 
-        for (int i = 0; i < INDICES.length; i++) {
-            array.set(INDICES[i], 1.0);
-        }
+        setMultiple(array, INDICES);
 
         final AggregatorFunction<Double> tmpVisitor = Aggregator.CARDINALITY.getFunction(PrimitiveAggregator.getSet());
 

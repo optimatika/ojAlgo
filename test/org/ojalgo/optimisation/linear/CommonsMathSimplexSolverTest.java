@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.BigMath;
@@ -50,12 +51,16 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     /**
      * Copied/stolen from Commons Math to simplify "copying" the test cases
      */
-    static enum GoalType implements Serializable {
+    enum GoalType implements Serializable {
 
-        /** Maximization goal. */
+        /**
+         * Maximization goal.
+         */
         MAXIMIZE,
 
-        /** Minimization goal. */
+        /**
+         * Minimization goal.
+         */
         MINIMIZE
 
     }
@@ -138,13 +143,13 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         private final LinearObjectiveFunction myObjFunc;
         private final Optimisation.Result myResult;
 
-        public PointValuePair(final LinearObjectiveFunction objFunc, final Result result) {
+        PointValuePair(final LinearObjectiveFunction objFunc, final Result result) {
             super();
             myObjFunc = objFunc;
             myResult = result;
         }
 
-        public double[] getPoint() {
+        double[] getPoint() {
 
             final double[] retVal = new double[myResult.size()];
             for (int i = 0; i < retVal.length; i++) {
@@ -175,24 +180,27 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * also the smallest normalized number 2<sup>-1022</sup>: {@value} .
          */
         public static final double SAFE_MIN = 0x1.0p-1022;
-        /** Offset to order signed double numbers lexicographically. */
+        /**
+         * Offset to order signed double numbers lexicographically.
+         */
         private static final long SGN_MASK = 0x8000000000000000L;
-        /** Offset to order signed double numbers lexicographically. */
+        /**
+         * Offset to order signed double numbers lexicographically.
+         */
         private static final int SGN_MASK_FLOAT = 0x80000000;
 
         /**
          * Compares two numbers given some amount of allowed error.
          *
-         * @param x the first number
-         * @param y the second number
+         * @param x   the first number
+         * @param y   the second number
          * @param eps the amount of error to allow when checking for equality
-         * @return
-         *         <ul>
-         *         <li>0 if {@link #equals(double, double, double) equals(x, y, eps)}</li>
-         *         <li>&lt; 0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x &lt;
-         *         y</li>
-         *         <li>>0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x > y</li>
-         *         </ul>
+         * @return <ul>
+         * <li>0 if {@link #equals(double, double, double) equals(x, y, eps)}</li>
+         * <li>&lt; 0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x &lt;
+         * y</li>
+         * <li>>0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x > y</li>
+         * </ul>
          */
         public static int compareTo(final double x, final double y, final double eps) {
             if (Precision.equals(x, y, eps)) {
@@ -210,17 +218,16 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * <a href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce
          * Dawson</a>
          *
-         * @param x first value
-         * @param y second value
+         * @param x       first value
+         * @param y       second value
          * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and
-         *        {@code y}.
-         * @return
-         *         <ul>
-         *         <li>0 if {@link #equals(double, double, int) equals(x, y, maxUlps)}</li>
-         *         <li>&lt; 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x &lt;
-         *         y</li>
-         *         <li>>0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x > y</li>
-         *         </ul>
+         *                {@code y}.
+         * @return <ul>
+         * <li>0 if {@link #equals(double, double, int) equals(x, y, maxUlps)}</li>
+         * <li>&lt; 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x &lt;
+         * y</li>
+         * <li>>0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x > y</li>
+         * </ul>
          */
         public static int compareTo(final double x, final double y, final int maxUlps) {
             if (Precision.equals(x, y, maxUlps)) {
@@ -232,7 +239,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         /**
-         * Returns true iff they are equal as defined by {@link #equals(double,double,int) equals(x, y, 1)}.
+         * Returns true iff they are equal as defined by {@link #equals(double, double, int) equals(x, y, 1)}.
          *
          * @param x first value
          * @param y second value
@@ -246,11 +253,11 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * Returns {@code true} if there is no double value strictly between the arguments or the difference
          * between them is within the range of allowed error (inclusive).
          *
-         * @param x First value.
-         * @param y Second value.
+         * @param x   First value.
+         * @param y   Second value.
          * @param eps Amount of allowed absolute error.
          * @return {@code true} if the values are two adjacent floating point numbers or they are within range
-         *         of each other.
+         * of each other.
          */
         public static boolean equals(final double x, final double y, final double eps) {
             return Precision.equals(x, y, 1) || (PrimitiveFunction.ABS.invoke(y - x) <= eps);
@@ -263,12 +270,12 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * <a href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce
          * Dawson</a>
          *
-         * @param x first value
-         * @param y second value
+         * @param x       first value
+         * @param y       second value
          * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and
-         *        {@code y}.
+         *                {@code y}.
          * @return {@code true} if there are fewer than {@code maxUlps} floating point values between
-         *         {@code x} and {@code y}.
+         * {@code x} and {@code y}.
          */
         public static boolean equals(final double x, final double y, final int maxUlps) {
             long xInt = Double.doubleToLongBits(x);
@@ -288,7 +295,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         /**
-         * Returns true iff they are equal as defined by {@link #equals(float,float,int) equals(x, y, 1)}.
+         * Returns true iff they are equal as defined by {@link #equals(float, float, int) equals(x, y, 1)}.
          *
          * @param x first value
          * @param y second value
@@ -301,8 +308,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         /**
          * Returns true if both arguments are equal or within the range of allowed error (inclusive).
          *
-         * @param x first value
-         * @param y second value
+         * @param x   first value
+         * @param y   second value
          * @param eps the amount of absolute error to allow.
          * @return {@code true} if the values are equal or within range of each other.
          * @since 2.2
@@ -318,12 +325,12 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * <a href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce
          * Dawson</a>
          *
-         * @param x first value
-         * @param y second value
+         * @param x       first value
+         * @param y       second value
          * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and
-         *        {@code y}.
+         *                {@code y}.
          * @return {@code true} if there are fewer than {@code maxUlps} floating point values between
-         *         {@code x} and {@code y}.
+         * {@code x} and {@code y}.
          * @since 2.2
          */
         public static boolean equals(final float x, final float y, final int maxUlps) {
@@ -345,7 +352,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Returns true if both arguments are NaN or neither is NaN and they are equal as defined by
-         * {@link #equals(double,double) equals(x, y, 1)}.
+         * {@link #equals(double, double) equals(x, y, 1)}.
          *
          * @param x first value
          * @param y second value
@@ -360,8 +367,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * Returns true if both arguments are NaN or are equal or within the range of allowed error
          * (inclusive).
          *
-         * @param x first value
-         * @param y second value
+         * @param x   first value
+         * @param y   second value
          * @param eps the amount of absolute error to allow.
          * @return {@code true} if the values are equal or within range of each other, or both are NaN.
          * @since 2.2
@@ -372,14 +379,14 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Returns true if both arguments are NaN or if they are equal as defined by
-         * {@link #equals(double,double,int) equals(x, y, maxUlps)}.
+         * {@link #equals(double, double, int) equals(x, y, maxUlps)}.
          *
-         * @param x first value
-         * @param y second value
+         * @param x       first value
+         * @param y       second value
          * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and
-         *        {@code y}.
+         *                {@code y}.
          * @return {@code true} if both arguments are NaN or if there are less than {@code maxUlps} floating
-         *         point values between {@code x} and {@code y}.
+         * point values between {@code x} and {@code y}.
          * @since 2.2
          */
         public static boolean equalsIncludingNaN(final double x, final double y, final int maxUlps) {
@@ -388,7 +395,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Returns true if both arguments are NaN or neither is NaN and they are equal as defined by
-         * {@link #equals(float,float) equals(x, y, 1)}.
+         * {@link #equals(float, float) equals(x, y, 1)}.
          *
          * @param x first value
          * @param y second value
@@ -403,8 +410,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * Returns true if both arguments are NaN or are equal or within the range of allowed error
          * (inclusive).
          *
-         * @param x first value
-         * @param y second value
+         * @param x   first value
+         * @param y   second value
          * @param eps the amount of absolute error to allow.
          * @return {@code true} if the values are equal or within range of each other, or both are NaN.
          * @since 2.2
@@ -415,14 +422,14 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Returns true if both arguments are NaN or if they are equal as defined by
-         * {@link #equals(float,float,int) equals(x, y, maxUlps)}.
+         * {@link #equals(float, float, int) equals(x, y, maxUlps)}.
          *
-         * @param x first value
-         * @param y second value
+         * @param x       first value
+         * @param y       second value
          * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and
-         *        {@code y}.
+         *                {@code y}.
          * @return {@code true} if both arguments are NaN or if there are less than {@code maxUlps} floating
-         *         point values between {@code x} and {@code y}.
+         * point values between {@code x} and {@code y}.
          * @since 2.2
          */
         public static boolean equalsIncludingNaN(final float x, final float y, final int maxUlps) {
@@ -431,20 +438,20 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Computes a number {@code delta} close to {@code originalDelta} with the property that
-         *
+         * <p>
          * <pre>
          * <code>
          *   x + delta - x
          * </code>
          * </pre>
-         *
+         * <p>
          * is exactly machine-representable. This is useful when computing numerical derivatives, in order to
          * reduce roundoff errors.
          *
-         * @param x Value.
+         * @param x             Value.
          * @param originalDelta Offset value.
          * @return a number {@code delta} so that {@code x + delta} and {@code x} differ by a representable
-         *         floating number.
+         * floating number.
          */
         public static double representableDelta(final double x, final double originalDelta) {
             return (x + originalDelta) - x;
@@ -454,7 +461,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * Rounds the given value to the specified number of decimal places. The value is rounded using the
          * {@link BigDecimal#ROUND_HALF_UP} method.
          *
-         * @param x Value to round.
+         * @param x     Value to round.
          * @param scale Number of digits to the right of the decimal point.
          * @return the rounded value.
          * @since 1.1 (previously in {@code MathUtils}, moved as of version 3.0)
@@ -468,14 +475,14 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * given method which is any method defined in {@link BigDecimal}. If {@code x} is infinite or
          * {@code NaN}, then the value of {@code x} is returned unchanged, regardless of the other parameters.
          *
-         * @param x Value to round.
-         * @param scale Number of digits to the right of the decimal point.
+         * @param x              Value to round.
+         * @param scale          Number of digits to the right of the decimal point.
          * @param roundingMethod Rounding method as defined in {@link BigDecimal}.
          * @return the rounded value.
-         * @throws ArithmeticException if {@code roundingMethod == ROUND_UNNECESSARY} and the specified
-         *         scaling operation would require rounding.
+         * @throws ArithmeticException      if {@code roundingMethod == ROUND_UNNECESSARY} and the specified
+         *                                  scaling operation would require rounding.
          * @throws IllegalArgumentException if {@code roundingMethod} does not represent a valid rounding
-         *         mode.
+         *                                  mode.
          * @since 1.1 (previously in {@code MathUtils}, moved as of version 3.0)
          */
         public static double round(final double x, final int scale, final int roundingMethod) {
@@ -494,7 +501,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * Rounds the given value to the specified number of decimal places. The value is rounded using the
          * {@link BigDecimal#ROUND_HALF_UP} method.
          *
-         * @param x Value to round.
+         * @param x     Value to round.
          * @param scale Number of digits to the right of the decimal point.
          * @return the rounded value.
          * @since 1.1 (previously in {@code MathUtils}, moved as of version 3.0)
@@ -507,8 +514,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * Rounds the given value to the specified number of decimal places. The value is rounded using the
          * given method which is any method defined in {@link BigDecimal}.
          *
-         * @param x Value to round.
-         * @param scale Number of digits to the right of the decimal point.
+         * @param x              Value to round.
+         * @param scale          Number of digits to the right of the decimal point.
          * @param roundingMethod Rounding method as defined in {@link BigDecimal}.
          * @return the rounded value.
          * @since 1.1 (previously in {@code MathUtils}, moved as of version 3.0)
@@ -523,78 +530,78 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * Rounds the given non-negative value to the "nearest" integer. Nearest is determined by the rounding
          * method specified. Rounding methods are defined in {@link BigDecimal}.
          *
-         * @param unscaled Value to round.
-         * @param sign Sign of the original, scaled value.
+         * @param unscaled       Value to round.
+         * @param sign           Sign of the original, scaled value.
          * @param roundingMethod Rounding method, as defined in {@link BigDecimal}.
          * @return the rounded value.
-         * @throws MathIllegalArgumentException if {@code roundingMethod} is not a valid rounding method.
+         * @throws RuntimeException if {@code roundingMethod} is not a valid rounding method.
          * @since 1.1 (previously in {@code MathUtils}, moved as of version 3.0)
          */
         private static double roundUnscaled(double unscaled, final double sign, final int roundingMethod) {
             switch (roundingMethod) {
-            case BigDecimal.ROUND_CEILING:
-                if (sign == -1) {
-                    unscaled = PrimitiveFunction.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
-                } else {
-                    unscaled = PrimitiveFunction.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
-                }
-                break;
-            case BigDecimal.ROUND_DOWN:
-                unscaled = PrimitiveFunction.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
-                break;
-            case BigDecimal.ROUND_FLOOR:
-                if (sign == -1) {
-                    unscaled = PrimitiveFunction.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
-                } else {
-                    unscaled = PrimitiveFunction.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
-                }
-                break;
-            case BigDecimal.ROUND_HALF_DOWN: {
-                unscaled = Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY);
-                final double fraction = unscaled - PrimitiveFunction.FLOOR.invoke(unscaled);
-                if (fraction > 0.5) {
-                    unscaled = PrimitiveFunction.CEIL.invoke(unscaled);
-                } else {
-                    unscaled = PrimitiveFunction.FLOOR.invoke(unscaled);
-                }
-                break;
-            }
-            case BigDecimal.ROUND_HALF_EVEN: {
-                final double fraction = unscaled - PrimitiveFunction.FLOOR.invoke(unscaled);
-                if (fraction > 0.5) {
-                    unscaled = PrimitiveFunction.CEIL.invoke(unscaled);
-                } else if (fraction < 0.5) {
-                    unscaled = PrimitiveFunction.FLOOR.invoke(unscaled);
-                } else {
-                    // The following equality test is intentional and needed for rounding purposes
-                    if ((PrimitiveFunction.FLOOR.invoke(unscaled) / 2.0) == PrimitiveFunction.FLOOR.invoke(PrimitiveFunction.FLOOR.invoke(unscaled) / 2.0)) { // even
-                        unscaled = PrimitiveFunction.FLOOR.invoke(unscaled);
-                    } else { // odd
-                        unscaled = PrimitiveFunction.CEIL.invoke(unscaled);
+                case BigDecimal.ROUND_CEILING:
+                    if (sign == -1) {
+                        unscaled = PrimitiveFunction.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
+                    } else {
+                        unscaled = PrimitiveFunction.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
                     }
+                    break;
+                case BigDecimal.ROUND_DOWN:
+                    unscaled = PrimitiveFunction.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
+                    break;
+                case BigDecimal.ROUND_FLOOR:
+                    if (sign == -1) {
+                        unscaled = PrimitiveFunction.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
+                    } else {
+                        unscaled = PrimitiveFunction.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
+                    }
+                    break;
+                case BigDecimal.ROUND_HALF_DOWN: {
+                    unscaled = Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY);
+                    final double fraction = unscaled - PrimitiveFunction.FLOOR.invoke(unscaled);
+                    if (fraction > 0.5) {
+                        unscaled = PrimitiveFunction.CEIL.invoke(unscaled);
+                    } else {
+                        unscaled = PrimitiveFunction.FLOOR.invoke(unscaled);
+                    }
+                    break;
                 }
-                break;
-            }
-            case BigDecimal.ROUND_HALF_UP: {
-                unscaled = Math.nextAfter(unscaled, Double.POSITIVE_INFINITY);
-                final double fraction = unscaled - PrimitiveFunction.FLOOR.invoke(unscaled);
-                if (fraction >= 0.5) {
-                    unscaled = PrimitiveFunction.CEIL.invoke(unscaled);
-                } else {
-                    unscaled = PrimitiveFunction.FLOOR.invoke(unscaled);
+                case BigDecimal.ROUND_HALF_EVEN: {
+                    final double fraction = unscaled - PrimitiveFunction.FLOOR.invoke(unscaled);
+                    if (fraction > 0.5) {
+                        unscaled = PrimitiveFunction.CEIL.invoke(unscaled);
+                    } else if (fraction < 0.5) {
+                        unscaled = PrimitiveFunction.FLOOR.invoke(unscaled);
+                    } else {
+                        // The following equality test is intentional and needed for rounding purposes
+                        if ((PrimitiveFunction.FLOOR.invoke(unscaled) / 2.0) == PrimitiveFunction.FLOOR.invoke(PrimitiveFunction.FLOOR.invoke(unscaled) / 2.0)) { // even
+                            unscaled = PrimitiveFunction.FLOOR.invoke(unscaled);
+                        } else { // odd
+                            unscaled = PrimitiveFunction.CEIL.invoke(unscaled);
+                        }
+                    }
+                    break;
                 }
-                break;
-            }
-            case BigDecimal.ROUND_UNNECESSARY:
-                if (unscaled != PrimitiveFunction.FLOOR.invoke(unscaled)) {
+                case BigDecimal.ROUND_HALF_UP: {
+                    unscaled = Math.nextAfter(unscaled, Double.POSITIVE_INFINITY);
+                    final double fraction = unscaled - PrimitiveFunction.FLOOR.invoke(unscaled);
+                    if (fraction >= 0.5) {
+                        unscaled = PrimitiveFunction.CEIL.invoke(unscaled);
+                    } else {
+                        unscaled = PrimitiveFunction.FLOOR.invoke(unscaled);
+                    }
+                    break;
+                }
+                case BigDecimal.ROUND_UNNECESSARY:
+                    if (unscaled != PrimitiveFunction.FLOOR.invoke(unscaled)) {
+                        throw new RuntimeException();
+                    }
+                    break;
+                case BigDecimal.ROUND_UP:
+                    unscaled = PrimitiveFunction.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
+                    break;
+                default:
                     throw new RuntimeException();
-                }
-                break;
-            case BigDecimal.ROUND_UP:
-                unscaled = PrimitiveFunction.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
-                break;
-            default:
-                throw new RuntimeException();
             }
             return unscaled;
         }
@@ -611,16 +618,24 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
      */
     static enum Relationship {
 
-        /** Equality relationship. */
+        /**
+         * Equality relationship.
+         */
         EQ("="),
 
-        /** Greater than or equal relationship. */
+        /**
+         * Greater than or equal relationship.
+         */
         GEQ(">="),
 
-        /** Lesser than or equal relationship. */
+        /**
+         * Lesser than or equal relationship.
+         */
         LEQ("<=");
 
-        /** Display string for the relationship. */
+        /**
+         * Display string for the relationship.
+         */
         private final String stringValue;
 
         /**
@@ -639,16 +654,18 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          */
         public Relationship oppositeRelationship() {
             switch (this) {
-            case LEQ:
-                return GEQ;
-            case GEQ:
-                return LEQ;
-            default:
-                return EQ;
+                case LEQ:
+                    return GEQ;
+                case GEQ:
+                    return LEQ;
+                default:
+                    return EQ;
             }
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             return stringValue;
@@ -658,8 +675,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     static final class SimplexSolver {
 
-        public PointValuePair optimize(final LinearObjectiveFunction model, final Collection<LinearConstraint> constraints, final GoalType minOrMax,
-                final boolean positiveOnlyVariables) {
+        PointValuePair optimize(final LinearObjectiveFunction model, final Collection<LinearConstraint> constraints, final GoalType minOrMax,
+                                final boolean positiveOnlyVariables) {
 
             if (positiveOnlyVariables) {
                 for (final Variable tmpVariable : model.getVariables()) {
@@ -674,15 +691,15 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                     tmpExpression.set(i, tmpFactors[i]);
                 }
                 switch (tmpLinearConstraint.getType()) {
-                case GEQ:
-                    tmpExpression.lower(new BigDecimal(tmpLinearConstraint.getRhs()));
-                    break;
-                case LEQ:
-                    tmpExpression.upper(new BigDecimal(tmpLinearConstraint.getRhs()));
-                    break;
-                default:
-                    tmpExpression.level(new BigDecimal(tmpLinearConstraint.getRhs()));
-                    break;
+                    case GEQ:
+                        tmpExpression.lower(new BigDecimal(tmpLinearConstraint.getRhs()));
+                        break;
+                    case LEQ:
+                        tmpExpression.upper(new BigDecimal(tmpLinearConstraint.getRhs()));
+                        break;
+                    default:
+                        tmpExpression.level(new BigDecimal(tmpLinearConstraint.getRhs()));
+                        break;
                 }
             }
 
@@ -700,32 +717,26 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     }
 
-    public CommonsMathSimplexSolverTest() {
-        super();
-    }
-
-    public CommonsMathSimplexSolverTest(final String name) {
-        super(name);
-    }
-
+    @Test
     public void testDegeneracy() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.8, 0.7 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{0.8, 0.7}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.LEQ, 18.0));
-        constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.GEQ, 10.0));
-        constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.GEQ, 8.0));
+        constraints.add(new LinearConstraint(new double[]{1, 1}, Relationship.LEQ, 18.0));
+        constraints.add(new LinearConstraint(new double[]{1, 0}, Relationship.GEQ, 10.0));
+        constraints.add(new LinearConstraint(new double[]{0, 1}, Relationship.GEQ, 8.0));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
         TestUtils.assertEquals(13.6, solution.getValue(), .0000001);
     }
 
+    @Test
     public void testEpsilon() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 10, 5, 1 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{10, 5, 1}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 9, 8, 0 }, Relationship.EQ, 17));
-        constraints.add(new LinearConstraint(new double[] { 0, 7, 8 }, Relationship.LEQ, 7));
-        constraints.add(new LinearConstraint(new double[] { 10, 0, 2 }, Relationship.LEQ, 10));
+        constraints.add(new LinearConstraint(new double[]{9, 8, 0}, Relationship.EQ, 17));
+        constraints.add(new LinearConstraint(new double[]{0, 7, 8}, Relationship.LEQ, 7));
+        constraints.add(new LinearConstraint(new double[]{10, 0, 2}, Relationship.LEQ, 10));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
@@ -737,23 +748,25 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     }
 
     //@Test(expected = NoFeasibleSolutionException.class)
+    @Test
     public void testInfeasibleSolution() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{15}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1 }, Relationship.LEQ, 1));
-        constraints.add(new LinearConstraint(new double[] { 1 }, Relationship.GEQ, 3));
+        constraints.add(new LinearConstraint(new double[]{1}, Relationship.LEQ, 1));
+        constraints.add(new LinearConstraint(new double[]{1}, Relationship.GEQ, 3));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair tmpResult = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
         TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
     }
 
+    @Test
     public void testLargeModel() {
-        final double[] objective = new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        final double[] objective = new double[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1,
                 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
         final LinearObjectiveFunction f = new LinearObjectiveFunction(objective, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
@@ -856,12 +869,13 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(7518.0, solution.getValue(), .0000001);
     }
 
+    @Test
     public void testMath272() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 2, 2, 1 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{2, 2, 1}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 1, 0 }, Relationship.GEQ, 1));
-        constraints.add(new LinearConstraint(new double[] { 1, 0, 1 }, Relationship.GEQ, 1));
-        constraints.add(new LinearConstraint(new double[] { 0, 1, 0 }, Relationship.GEQ, 1));
+        constraints.add(new LinearConstraint(new double[]{1, 1, 0}, Relationship.GEQ, 1));
+        constraints.add(new LinearConstraint(new double[]{1, 0, 1}, Relationship.GEQ, 1));
+        constraints.add(new LinearConstraint(new double[]{0, 1, 0}, Relationship.GEQ, 1));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
@@ -872,14 +886,15 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(3.0, solution.getValue(), .0000001);
     }
 
+    @Test
     public void testMath286() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.8, 0.2, 0.7, 0.3, 0.6, 0.4 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{0.8, 0.2, 0.7, 0.3, 0.6, 0.4}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 0, 1, 0, 1, 0 }, Relationship.EQ, 23.0));
-        constraints.add(new LinearConstraint(new double[] { 0, 1, 0, 1, 0, 1 }, Relationship.EQ, 23.0));
-        constraints.add(new LinearConstraint(new double[] { 1, 0, 0, 0, 0, 0 }, Relationship.GEQ, 10.0));
-        constraints.add(new LinearConstraint(new double[] { 0, 0, 1, 0, 0, 0 }, Relationship.GEQ, 8.0));
-        constraints.add(new LinearConstraint(new double[] { 0, 0, 0, 0, 1, 0 }, Relationship.GEQ, 5.0));
+        constraints.add(new LinearConstraint(new double[]{1, 0, 1, 0, 1, 0}, Relationship.EQ, 23.0));
+        constraints.add(new LinearConstraint(new double[]{0, 1, 0, 1, 0, 1}, Relationship.EQ, 23.0));
+        constraints.add(new LinearConstraint(new double[]{1, 0, 0, 0, 0, 0}, Relationship.GEQ, 10.0));
+        constraints.add(new LinearConstraint(new double[]{0, 0, 1, 0, 0, 0}, Relationship.GEQ, 8.0));
+        constraints.add(new LinearConstraint(new double[]{0, 0, 0, 0, 1, 0}, Relationship.GEQ, 5.0));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
@@ -892,24 +907,26 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertTrue(solution.getPoint()[4] >= (5.0 - 0.0000001));
     }
 
+    @Test
     public void testMath288() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 7, 3, 0, 0 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{7, 3, 0, 0}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 3, 0, -5, 0 }, Relationship.LEQ, 0.0));
-        constraints.add(new LinearConstraint(new double[] { 2, 0, 0, -5 }, Relationship.LEQ, 0.0));
-        constraints.add(new LinearConstraint(new double[] { 0, 3, 0, -5 }, Relationship.LEQ, 0.0));
-        constraints.add(new LinearConstraint(new double[] { 1, 0, 0, 0 }, Relationship.LEQ, 1.0));
-        constraints.add(new LinearConstraint(new double[] { 0, 1, 0, 0 }, Relationship.LEQ, 1.0));
+        constraints.add(new LinearConstraint(new double[]{3, 0, -5, 0}, Relationship.LEQ, 0.0));
+        constraints.add(new LinearConstraint(new double[]{2, 0, 0, -5}, Relationship.LEQ, 0.0));
+        constraints.add(new LinearConstraint(new double[]{0, 3, 0, -5}, Relationship.LEQ, 0.0));
+        constraints.add(new LinearConstraint(new double[]{1, 0, 0, 0}, Relationship.LEQ, 1.0));
+        constraints.add(new LinearConstraint(new double[]{0, 1, 0, 0}, Relationship.LEQ, 1.0));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
         TestUtils.assertEquals(10.0, solution.getValue(), .0000001);
     }
 
+    @Test
     public void testMath290GEQ() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1, 5 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{1, 5}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 2, 0 }, Relationship.GEQ, -1.0));
+        constraints.add(new LinearConstraint(new double[]{2, 0}, Relationship.GEQ, -1.0));
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
         TestUtils.assertEquals(0, solution.getValue(), .0000001);
@@ -918,10 +935,11 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     }
 
     //@Test(expected = NoFeasibleSolutionException.class)
+    @Test
     public void testMath290LEQ() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1, 5 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{1, 5}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 2, 0 }, Relationship.LEQ, -1.0));
+        constraints.add(new LinearConstraint(new double[]{2, 0}, Relationship.LEQ, -1.0));
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair tmpResult = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
         TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
@@ -930,14 +948,15 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     /**
      * https://issues.apache.org/jira/browse/MATH-293
      */
+    @Test
     public void testMath293() {
-        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.8, 0.2, 0.7, 0.3, 0.4, 0.6 }, 0);
+        LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{0.8, 0.2, 0.7, 0.3, 0.4, 0.6}, 0);
         Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 0, 1, 0, 1, 0 }, Relationship.EQ, 30.0));
-        constraints.add(new LinearConstraint(new double[] { 0, 1, 0, 1, 0, 1 }, Relationship.EQ, 30.0));
-        constraints.add(new LinearConstraint(new double[] { 0.8, 0.2, 0.0, 0.0, 0.0, 0.0 }, Relationship.GEQ, 10.0));
-        constraints.add(new LinearConstraint(new double[] { 0.0, 0.0, 0.7, 0.3, 0.0, 0.0 }, Relationship.GEQ, 10.0));
-        constraints.add(new LinearConstraint(new double[] { 0.0, 0.0, 0.0, 0.0, 0.4, 0.6 }, Relationship.GEQ, 10.0));
+        constraints.add(new LinearConstraint(new double[]{1, 0, 1, 0, 1, 0}, Relationship.EQ, 30.0));
+        constraints.add(new LinearConstraint(new double[]{0, 1, 0, 1, 0, 1}, Relationship.EQ, 30.0));
+        constraints.add(new LinearConstraint(new double[]{0.8, 0.2, 0.0, 0.0, 0.0, 0.0}, Relationship.GEQ, 10.0));
+        constraints.add(new LinearConstraint(new double[]{0.0, 0.0, 0.7, 0.3, 0.0, 0.0}, Relationship.GEQ, 10.0));
+        constraints.add(new LinearConstraint(new double[]{0.0, 0.0, 0.0, 0.0, 0.4, 0.6}, Relationship.GEQ, 10.0));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution1 = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
@@ -954,23 +973,24 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         final double valB = (0.7 * solution1.getPoint()[2]) + (0.3 * solution1.getPoint()[3]);
         final double valC = (0.4 * solution1.getPoint()[4]) + (0.6 * solution1.getPoint()[5]);
 
-        f = new LinearObjectiveFunction(new double[] { 0.8, 0.2, 0.7, 0.3, 0.4, 0.6 }, 0);
+        f = new LinearObjectiveFunction(new double[]{0.8, 0.2, 0.7, 0.3, 0.4, 0.6}, 0);
         constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 0, 1, 0, 1, 0 }, Relationship.EQ, 30.0));
-        constraints.add(new LinearConstraint(new double[] { 0, 1, 0, 1, 0, 1 }, Relationship.EQ, 30.0));
-        constraints.add(new LinearConstraint(new double[] { 0.8, 0.2, 0.0, 0.0, 0.0, 0.0 }, Relationship.GEQ, valA));
-        constraints.add(new LinearConstraint(new double[] { 0.0, 0.0, 0.7, 0.3, 0.0, 0.0 }, Relationship.GEQ, valB));
-        constraints.add(new LinearConstraint(new double[] { 0.0, 0.0, 0.0, 0.0, 0.4, 0.6 }, Relationship.GEQ, valC));
+        constraints.add(new LinearConstraint(new double[]{1, 0, 1, 0, 1, 0}, Relationship.EQ, 30.0));
+        constraints.add(new LinearConstraint(new double[]{0, 1, 0, 1, 0, 1}, Relationship.EQ, 30.0));
+        constraints.add(new LinearConstraint(new double[]{0.8, 0.2, 0.0, 0.0, 0.0, 0.0}, Relationship.GEQ, valA));
+        constraints.add(new LinearConstraint(new double[]{0.0, 0.0, 0.7, 0.3, 0.0, 0.0}, Relationship.GEQ, valB));
+        constraints.add(new LinearConstraint(new double[]{0.0, 0.0, 0.0, 0.0, 0.4, 0.6}, Relationship.GEQ, valC));
 
         final PointValuePair solution2 = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
         TestUtils.assertEquals(40.57143, solution2.getValue(), .0001);
     }
 
+    @Test
     public void testMath434NegativeVariable() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.0, 0.0, 1.0 }, 0.0d);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{0.0, 0.0, 1.0}, 0.0d);
         final ArrayList<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 1, 0 }, Relationship.EQ, 5));
-        constraints.add(new LinearConstraint(new double[] { 0, 0, 1 }, Relationship.GEQ, -10));
+        constraints.add(new LinearConstraint(new double[]{1, 1, 0}, Relationship.EQ, 5));
+        constraints.add(new LinearConstraint(new double[]{0, 0, 1}, Relationship.GEQ, -10));
 
         final double epsilon = 1e-6;
         final SimplexSolver solver = new SimplexSolver();
@@ -982,13 +1002,14 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     }
 
+    @Test
     public void testMath434PivotRowSelection() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1.0 }, 0.0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{1.0}, 0.0);
 
         final double epsilon = 1e-6;
         final ArrayList<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 200 }, Relationship.GEQ, 1));
-        constraints.add(new LinearConstraint(new double[] { 100 }, Relationship.GEQ, 0.499900001));
+        constraints.add(new LinearConstraint(new double[]{200}, Relationship.GEQ, 1));
+        constraints.add(new LinearConstraint(new double[]{100}, Relationship.GEQ, 0.499900001));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, false);
@@ -997,19 +1018,20 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(0.0050, solution.getValue(), epsilon);
     }
 
+    @Test
     public void testMath434PivotRowSelection2() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.0d, 1.0d, 1.0d, 0.0d, 0.0d, 0.0d, 0.0d }, 0.0d);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{0.0d, 1.0d, 1.0d, 0.0d, 0.0d, 0.0d, 0.0d}, 0.0d);
 
         final ArrayList<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1.0d, -0.1d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d }, Relationship.EQ, -0.1d));
-        constraints.add(new LinearConstraint(new double[] { 1.0d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d }, Relationship.GEQ, -1e-18d));
-        constraints.add(new LinearConstraint(new double[] { 0.0d, 1.0d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d }, Relationship.GEQ, 0.0d));
-        constraints.add(new LinearConstraint(new double[] { 0.0d, 0.0d, 0.0d, 1.0d, 0.0d, -0.0128588d, 1e-5d }, Relationship.EQ, 0.0d));
-        constraints.add(new LinearConstraint(new double[] { 0.0d, 0.0d, 0.0d, 0.0d, 1.0d, 1e-5d, -0.0128586d }, Relationship.EQ, 1e-10d));
-        constraints.add(new LinearConstraint(new double[] { 0.0d, 0.0d, 1.0d, -1.0d, 0.0d, 0.0d, 0.0d }, Relationship.GEQ, 0.0d));
-        constraints.add(new LinearConstraint(new double[] { 0.0d, 0.0d, 1.0d, 1.0d, 0.0d, 0.0d, 0.0d }, Relationship.GEQ, 0.0d));
-        constraints.add(new LinearConstraint(new double[] { 0.0d, 0.0d, 1.0d, 0.0d, -1.0d, 0.0d, 0.0d }, Relationship.GEQ, 0.0d));
-        constraints.add(new LinearConstraint(new double[] { 0.0d, 0.0d, 1.0d, 0.0d, 1.0d, 0.0d, 0.0d }, Relationship.GEQ, 0.0d));
+        constraints.add(new LinearConstraint(new double[]{1.0d, -0.1d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d}, Relationship.EQ, -0.1d));
+        constraints.add(new LinearConstraint(new double[]{1.0d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d}, Relationship.GEQ, -1e-18d));
+        constraints.add(new LinearConstraint(new double[]{0.0d, 1.0d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d}, Relationship.GEQ, 0.0d));
+        constraints.add(new LinearConstraint(new double[]{0.0d, 0.0d, 0.0d, 1.0d, 0.0d, -0.0128588d, 1e-5d}, Relationship.EQ, 0.0d));
+        constraints.add(new LinearConstraint(new double[]{0.0d, 0.0d, 0.0d, 0.0d, 1.0d, 1e-5d, -0.0128586d}, Relationship.EQ, 1e-10d));
+        constraints.add(new LinearConstraint(new double[]{0.0d, 0.0d, 1.0d, -1.0d, 0.0d, 0.0d, 0.0d}, Relationship.GEQ, 0.0d));
+        constraints.add(new LinearConstraint(new double[]{0.0d, 0.0d, 1.0d, 1.0d, 0.0d, 0.0d, 0.0d}, Relationship.GEQ, 0.0d));
+        constraints.add(new LinearConstraint(new double[]{0.0d, 0.0d, 1.0d, 0.0d, -1.0d, 0.0d, 0.0d}, Relationship.GEQ, 0.0d));
+        constraints.add(new LinearConstraint(new double[]{0.0d, 0.0d, 1.0d, 0.0d, 1.0d, 0.0d, 0.0d}, Relationship.GEQ, 0.0d));
 
         final double epsilon = 1e-7;
         final SimplexSolver simplex = new SimplexSolver();
@@ -1022,13 +1044,14 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     }
 
     //@Test(expected = NoFeasibleSolutionException.class)
+    @Test
     public void testMath434UnfeasibleSolution() {
         final double epsilon = 1e-6;
 
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1.0, 0.0 }, 0.0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{1.0, 0.0}, 0.0);
         final ArrayList<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { epsilon / 2, 0.5 }, Relationship.EQ, 0));
-        constraints.add(new LinearConstraint(new double[] { 1e-3, 0.1 }, Relationship.EQ, 10));
+        constraints.add(new LinearConstraint(new double[]{epsilon / 2, 0.5}, Relationship.EQ, 0));
+        constraints.add(new LinearConstraint(new double[]{1e-3, 0.1}, Relationship.EQ, 10));
 
         final SimplexSolver solver = new SimplexSolver();
         // allowing only non-negative values, no feasible solution shall be found
@@ -1036,10 +1059,11 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
     }
 
+    @Test
     public void testMath713NegativeVariable() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1.0, 1.0 }, 0.0d);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{1.0, 1.0}, 0.0d);
         final ArrayList<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.EQ, 1));
+        constraints.add(new LinearConstraint(new double[]{1, 0}, Relationship.EQ, 1));
 
         final double epsilon = 1e-6;
         final SimplexSolver solver = new SimplexSolver();
@@ -1049,12 +1073,13 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertTrue(Precision.compareTo(solution.getPoint()[1], 0.0d, epsilon) >= 0);
     }
 
+    @Test
     public void testMinimization() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { -2, 1 }, -5);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{-2, 1}, -5);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 2 }, Relationship.LEQ, 6));
-        constraints.add(new LinearConstraint(new double[] { 3, 2 }, Relationship.LEQ, 12));
-        constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.GEQ, 0));
+        constraints.add(new LinearConstraint(new double[]{1, 2}, Relationship.LEQ, 6));
+        constraints.add(new LinearConstraint(new double[]{3, 2}, Relationship.LEQ, 12));
+        constraints.add(new LinearConstraint(new double[]{0, 1}, Relationship.GEQ, 0));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, false);
@@ -1067,12 +1092,13 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
      * With no artificial variables needed (no equals and no greater than constraints) we can go straight to
      * Phase 2.
      */
+    @Test
     public void testModelWithNoArtificialVars() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{15, 10}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.LEQ, 2));
-        constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.LEQ, 3));
-        constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.LEQ, 4));
+        constraints.add(new LinearConstraint(new double[]{1, 0}, Relationship.LEQ, 2));
+        constraints.add(new LinearConstraint(new double[]{0, 1}, Relationship.LEQ, 3));
+        constraints.add(new LinearConstraint(new double[]{1, 1}, Relationship.LEQ, 4));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
@@ -1081,14 +1107,15 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(50.0, solution.getValue(), 0.0);
     }
 
+    @Test
     public void testRestrictVariablesToNonNegative() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 409, 523, 70, 204, 339 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{409, 523, 70, 204, 339}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 43, 56, 345, 56, 5 }, Relationship.LEQ, 4567456));
-        constraints.add(new LinearConstraint(new double[] { 12, 45, 7, 56, 23 }, Relationship.LEQ, 56454));
-        constraints.add(new LinearConstraint(new double[] { 8, 768, 0, 34, 7456 }, Relationship.LEQ, 1923421));
-        constraints.add(new LinearConstraint(new double[] { 12342, 2342, 34, 678, 2342 }, Relationship.GEQ, 4356));
-        constraints.add(new LinearConstraint(new double[] { 45, 678, 76, 52, 23 }, Relationship.EQ, 456356));
+        constraints.add(new LinearConstraint(new double[]{43, 56, 345, 56, 5}, Relationship.LEQ, 4567456));
+        constraints.add(new LinearConstraint(new double[]{12, 45, 7, 56, 23}, Relationship.LEQ, 56454));
+        constraints.add(new LinearConstraint(new double[]{8, 768, 0, 34, 7456}, Relationship.LEQ, 1923421));
+        constraints.add(new LinearConstraint(new double[]{12342, 2342, 34, 678, 2342}, Relationship.GEQ, 4356));
+        constraints.add(new LinearConstraint(new double[]{45, 678, 76, 52, 23}, Relationship.EQ, 456356));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
@@ -1100,12 +1127,13 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(1438556.7491409, solution.getValue(), .000001); // TODO 2013-12-01 Minskade delta från .0000001 till .000001
     }
 
+    @Test
     public void testSimplexSolver() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 7);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{15, 10}, 7);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.LEQ, 2));
-        constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.LEQ, 3));
-        constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.EQ, 4));
+        constraints.add(new LinearConstraint(new double[]{1, 0}, Relationship.LEQ, 2));
+        constraints.add(new LinearConstraint(new double[]{0, 1}, Relationship.LEQ, 3));
+        constraints.add(new LinearConstraint(new double[]{1, 1}, Relationship.EQ, 4));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
@@ -1114,10 +1142,11 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(57.0, solution.getValue(), 0.0);
     }
 
+    @Test
     public void testSingleVariableAndConstraint() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 3 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{3}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1 }, Relationship.LEQ, 10));
+        constraints.add(new LinearConstraint(new double[]{1}, Relationship.LEQ, 10));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
@@ -1125,11 +1154,12 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(30.0, solution.getValue(), 0.0);
     }
 
+    @Test
     public void testSolutionWithNegativeDecisionVariable() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { -2, 1 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{-2, 1}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.GEQ, 6));
-        constraints.add(new LinearConstraint(new double[] { 1, 2 }, Relationship.LEQ, 14));
+        constraints.add(new LinearConstraint(new double[]{1, 1}, Relationship.GEQ, 6));
+        constraints.add(new LinearConstraint(new double[]{1, 2}, Relationship.LEQ, 14));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
@@ -1139,10 +1169,11 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(12.0, solution.getValue(), tmpError);
     }
 
+    @Test
     public void testTrivialModel() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1, 1 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{1, 1}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.EQ, 0));
+        constraints.add(new LinearConstraint(new double[]{1, 1}, Relationship.EQ, 0));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, true);
@@ -1150,10 +1181,11 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     }
 
     //@Test(expected = UnboundedSolutionException.class)
+    @Test
     public void testUnboundedSolution() {
-        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 0);
+        final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[]{15, 10}, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<>();
-        constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.EQ, 2));
+        constraints.add(new LinearConstraint(new double[]{1, 0}, Relationship.EQ, 2));
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair tmpResult = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);

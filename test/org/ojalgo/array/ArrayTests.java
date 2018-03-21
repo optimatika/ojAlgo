@@ -21,22 +21,19 @@
  */
 package org.ojalgo.array;
 
+import org.ojalgo.TestUtils;
+import org.ojalgo.random.Uniform;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.ojalgo.FunctionalityTest;
-import org.ojalgo.TestUtils;
-import org.ojalgo.random.Uniform;
 
 /**
  * ArrayPackageTests
  *
  * @author apete
  */
-public abstract class ArrayTests extends FunctionalityTest {
-
-    static final boolean DEBUG = false;
+public abstract class ArrayTests {
 
     static void doTestRandomSetAndGetBack(final BasicArray<Double> array, final long expectedCount) {
 
@@ -62,14 +59,6 @@ public abstract class ArrayTests extends FunctionalityTest {
             TestUtils.assertEquals(pair.getValue().doubleValue(), array.doubleValue(pair.getKey().longValue()));
         }
 
-    }
-
-    protected ArrayTests() {
-        super();
-    }
-
-    protected ArrayTests(final String name) {
-        super(name);
     }
 
 }

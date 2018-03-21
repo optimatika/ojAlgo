@@ -21,12 +21,14 @@
  */
 package org.ojalgo.matrix;
 
-import java.math.BigDecimal;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.type.context.NumberContext;
+
+import java.math.BigDecimal;
 
 /**
  * This problem is taken from example 2.21 of the Scientific Computing, An Introductory Survey.
@@ -35,12 +37,12 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleCholeskyCase extends BasicMatrixTest {
 
-    public static RationalMatrix getFactorL() {
-        return RationalMatrix.FACTORY.rows(new double[][] { { 1.7321, 0.0, 0.0 }, { -0.5774, 1.6330, 0.0 }, { -0.5774, -0.8165, 1.4142 } }).enforce(DEFINITION);
+    private static RationalMatrix getFactorL() {
+        return RationalMatrix.FACTORY.rows(new double[][]{{1.7321, 0.0, 0.0}, {-0.5774, 1.6330, 0.0}, {-0.5774, -0.8165, 1.4142}}).enforce(DEFINITION);
     }
 
-    public static RationalMatrix getFactorR() {
-        return RationalMatrix.FACTORY.rows(new double[][] { { 1.7321, -0.5774, -0.5774 }, { 0.0, 1.6330, -0.8165 }, { 0.0, 0.0, 1.4142 } }).enforce(DEFINITION);
+    private static RationalMatrix getFactorR() {
+        return RationalMatrix.FACTORY.rows(new double[][]{{1.7321, -0.5774, -0.5774}, {0.0, 1.6330, -0.8165}, {0.0, 0.0, 1.4142}}).enforce(DEFINITION);
     }
 
     /**
@@ -49,22 +51,10 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
      * @return The data00 value
      */
     public static RationalMatrix getOriginal() {
-        return RationalMatrix.FACTORY.rows(new double[][] { { 3.0, -1.0, -1.0 }, { -1.0, 3.0, -1.0 }, { -1.0, -1.0, 3.0 } }).enforce(DEFINITION);
+        return RationalMatrix.FACTORY.rows(new double[][]{{3.0, -1.0, -1.0}, {-1.0, 3.0, -1.0}, {-1.0, -1.0, 3.0}}).enforce(DEFINITION);
     }
 
-    public SimpleCholeskyCase() {
-        super();
-    }
-
-    public SimpleCholeskyCase(final String arg0) {
-        super(arg0);
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrixTest#testData()
-     */
-    @Override
-    public void testData() {
+    @Test public void testData() {
 
         final BasicMatrix tmpA = SimpleCholeskyCase.getOriginal();
         final BasicMatrix tmpL = SimpleCholeskyCase.getFactorL();
@@ -84,8 +74,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     /**
      * @see org.ojalgo.matrix.BasicMatrixTest#testProblem()
      */
-    @Override
-    public void testProblem() {
+    @Test public void testProblem() {
 
         final BasicMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
         final Cholesky<BigDecimal> tmpDecomp = Cholesky.BIG.make();
@@ -94,27 +83,30 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
         TestUtils.assertEquals(BigDenseStore.FACTORY.copy(tmpMtrx), tmpDecomp, EVALUATION);
     }
 
-    //    public void testSolve() {
-    //
-    //        BasicMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
-    //        Cholesky<BigDecimal> tmpDecomp = ArbitraryCholesky.makeBig();
-    //        tmpDecomp.compute(tmpMtrx.toBigStore());
-    //
-    //        BasicMatrix tmpL = SimpleCholeskyCase.getFactorL();
-    //        BasicMatrix tmpR = SimpleCholeskyCase.getFactorR();
-    //
-    //        PhysicalStore<BigDecimal> tmpXY = dbI.toBigStore().copy();
-    //        tmpXY.substituteForwards(tmpL.toBigStore(), false);
-    //        tmpXY.substituteBackwards(tmpR.toBigStore(), false);
-    //
-    //        MatrixStore<BigDecimal> tmpExpMtrx = dbI.toBigStore();
-    //        MatrixStore<BigDecimal> tmpActMtrx = tmpMtrx.toBigStore().multiplyRight(tmpXY);
-    //
-    //        JUnitUtils.assertEquals(tmpExpMtrx, tmpActMtrx, EVAL_CNTXT);
-    //    }
+//    @Test
+//    @Ignore("Was commented uot before JUnit 5 transition")
+//    @Test public void testSolve() {
+//
+//        BasicMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
+//        Cholesky<BigDecimal> tmpDecomp = ArbitraryCholesky.makeBig();
+//        tmpDecomp.compute(tmpMtrx.toBigStore());
+//
+//        BasicMatrix tmpL = SimpleCholeskyCase.getFactorL();
+//        BasicMatrix tmpR = SimpleCholeskyCase.getFactorR();
+//
+//        PhysicalStore<BigDecimal> tmpXY = dbI.toBigStore().copy();
+//        tmpXY.substituteForwards(tmpL.toBigStore(), false);
+//        tmpXY.substituteBackwards(tmpR.toBigStore(), false);
+//
+//        MatrixStore<BigDecimal> tmpExpMtrx = dbI.toBigStore();
+//        MatrixStore<BigDecimal> tmpActMtrx = tmpMtrx.toBigStore().multiplyRight(tmpXY);
+//
+//        JUnitUtils.assertEquals(tmpExpMtrx, tmpActMtrx, EVAL_CNTXT);
+//    }
 
+    @Before
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() {
 
         DEFINITION = new NumberContext(7, 4);
         EVALUATION = new NumberContext(4, 3);

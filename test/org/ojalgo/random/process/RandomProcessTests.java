@@ -21,22 +21,13 @@
  */
 package org.ojalgo.random.process;
 
-import org.ojalgo.FunctionalityTest;
-
 /**
  * RandomProcessPackageTests
  *
  * @author apete
  */
-public abstract class RandomProcessTests extends FunctionalityTest {
+public abstract class RandomProcessTests  {
 
     static final boolean DEBUG = false;
 
-    protected RandomProcessTests() {
-        super();
-    }
-
-    protected RandomProcessTests(final String name) {
-        super(name);
-    }
 }

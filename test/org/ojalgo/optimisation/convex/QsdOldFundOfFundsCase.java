@@ -29,14 +29,6 @@ import org.ojalgo.matrix.RationalMatrix;
  */
 public class QsdOldFundOfFundsCase extends GenericQPSolverTest {
 
-    public QsdOldFundOfFundsCase() {
-        super();
-    }
-
-    public QsdOldFundOfFundsCase(final String arg0) {
-        super(arg0);
-    }
-
     @Override
     protected BasicMatrix[] getMatrices() {
 

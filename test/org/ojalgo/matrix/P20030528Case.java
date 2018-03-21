@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -38,20 +40,11 @@ public class P20030528Case extends BasicMatrixTest {
 
     public static RationalMatrix getProblematic() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
-                .rows(new double[][] { { 1, 0, 0, 0, 0, 0, 1 }, { 0, 1, 0, 0, 0, 1, 0 }, { 0, 0, 1, 0, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 } });
+                .rows(new double[][]{{1, 0, 0, 0, 0, 0, 1}, {0, 1, 0, 0, 0, 1, 0}, {0, 0, 1, 0, 1, 0, 0}, {0, 0, 0, 1, 0, 0, 0}});
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public P20030528Case() {
-        super();
-    }
-
-    public P20030528Case(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
-    public void testData() {
+    @Test public void testData() {
 
         final RationalMatrix tmpProb = P20030528Case.getProblematic();
 
@@ -59,8 +52,7 @@ public class P20030528Case extends BasicMatrixTest {
         TestUtils.assertTrue(tmpProb.isFat());
     }
 
-    @Override
-    public void testProblem() {
+    @Test public void testProblem() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(P20030528Case.getProblematic());
 
@@ -71,8 +63,9 @@ public class P20030528Case extends BasicMatrixTest {
         TestUtils.assertEquals(tmpA, tmpSVD, EVALUATION);
     }
 
+    @Before
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() {
 
         DEFINITION = new NumberContext(7, 1);
         EVALUATION = new NumberContext(7, 9);

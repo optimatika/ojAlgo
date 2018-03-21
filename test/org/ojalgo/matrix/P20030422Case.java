@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -45,21 +47,7 @@ public class P20030422Case extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public P20030422Case() {
-        super();
-    }
-
-    public P20030422Case(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
-    public void testData() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void testProblem() {
+    @Test public void testProblem() {
 
         myExpMtrx = P20030422Case.getProblematic();
         myActMtrx = myExpMtrx.invert().invert();
@@ -68,8 +56,9 @@ public class P20030422Case extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, DEFINITION);
     }
 
+    @Before
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() {
 
         DEFINITION = new NumberContext(7, 6);
         EVALUATION = new NumberContext(7, 3);

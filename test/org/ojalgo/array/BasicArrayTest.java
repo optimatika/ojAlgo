@@ -23,6 +23,7 @@ package org.ojalgo.array;
 
 import java.util.Arrays;
 
+import org.junit.Test;
 import org.ojalgo.random.Uniform;
 
 /**
@@ -30,7 +31,7 @@ import org.ojalgo.random.Uniform;
  *
  * @author apete
  */
-public abstract class BasicArrayTest extends ArrayTests {
+public abstract class BasicArrayTest {
 
     static final int COUNT = 100;
     static final long[] INDICES = new long[10];
@@ -42,36 +43,40 @@ public abstract class BasicArrayTest extends ArrayTests {
         Arrays.sort(INDICES);
     }
 
-    public BasicArrayTest() {
-        super();
+    static void setMultiple(BasicArray<Double> array, long[] indices) {
+        for (long i : indices) {
+            array.set(i, 1.0);
+        }
     }
 
-    public BasicArrayTest(final String aName) {
-        super(aName);
-    }
-
+    @Test
     public void testHugeSparse() {
         this.doTest(SparseArray.factory(Primitive64Array.FACTORY, Long.MAX_VALUE).initial(COUNT).make());
     }
 
+    @Test
     public void testPrimitive32() {
         this.doTest(Primitive32Array.make(COUNT));
     }
 
+    @Test
     public void testPrimitive64() {
         this.doTest(Primitive64Array.make(COUNT));
     }
 
+    @Test
     public void testSegmentedPrimitive() {
         //this.doTest(SegmentedArray.make(PrimitiveArray.FACTORY, COUNT));
         this.doTest(Primitive64Array.FACTORY.makeSegmented((long) COUNT));
     }
 
+    @Test
     public void testSegmentedSparse() {
         //this.doTest(SparseArray.makePrimitiveSegmented(COUNT));
         this.doTest(BasicArray.factory(Primitive64Array.FACTORY).makeSegmented(COUNT));
     }
 
+    @Test
     public void testSparse() {
         final long count = COUNT;
         this.doTest(SparseArray.factory(Primitive64Array.FACTORY, count).initial(DenseCapacityStrategy.capacity(count)).make());

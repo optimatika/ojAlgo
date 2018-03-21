@@ -23,6 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.RationalMatrix;
@@ -42,7 +44,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class QRTest extends MatrixDecompositionTests {
+public class QRTest {
 
     private static final int DIMENSION = 4;
 
@@ -55,18 +57,16 @@ public class QRTest extends MatrixDecompositionTests {
         return tmpBase.multiply(tmpBase.conjugate());
     }
 
-    public QRTest() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public QRTest(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testDiagonalCase() {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
-                .rows(new double[][] { { 4.0, 3.0, 2.0, 1.0 }, { 0.0, 3.0, 2.0, 1.0 }, { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
+                .rows(new double[][]{{4.0, 3.0, 2.0, 1.0}, {0.0, 3.0, 2.0, 1.0}, {0.0, 0.0, 2.0, 1.0}, {0.0, 0.0, 0.0, 1.0}});
 
         final QR<Double> tmpDecomp = QR.PRIMITIVE.make();
         tmpDecomp.decompose(tmpOriginalMatrix);
@@ -82,6 +82,7 @@ public class QRTest extends MatrixDecompositionTests {
         //        TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp.getR(), new NumberContext(7, 6));
     }
 
+    @Test
     public void testHermitian() {
 
         final int tmpLim = DIMENSION - 1;
@@ -158,6 +159,7 @@ public class QRTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpDecompR, tmpForwardR, new NumberContext(7, 6));
     }
 
+    @Test
     public void testLeastSquaresInvert() {
 
         MatrixOperation.setThresholdsMinValue(100000);
@@ -189,6 +191,7 @@ public class QRTest extends MatrixDecompositionTests {
 
     }
 
+    @Test
     public void testP20030422Case() {
 
         final RationalMatrix tmpOriginal = P20030422Case.getProblematic();

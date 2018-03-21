@@ -23,6 +23,7 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.netio.BasicLogger;
@@ -32,16 +33,9 @@ import org.ojalgo.netio.BasicLogger;
  *
  * @author apete
  */
-public class QuantileTest extends RandomTests {
+public class QuantileTest {
 
-    public QuantileTest() {
-        super();
-    }
-
-    public QuantileTest(final String someName) {
-        super(someName);
-    }
-
+    @Test
     public void testExponential() {
 
         for (int e = -2; e <= 2; e++) {
@@ -52,6 +46,7 @@ public class QuantileTest extends RandomTests {
         }
     }
 
+    @Test
     public void testLogNormal() {
 
         for (int m = -2; m <= 2; m++) {
@@ -65,6 +60,7 @@ public class QuantileTest extends RandomTests {
         }
     }
 
+    @Test
     public void testNormal() {
 
         for (int m = -2; m <= 2; m++) {
@@ -78,6 +74,7 @@ public class QuantileTest extends RandomTests {
         }
     }
 
+    @Test
     public void testUniform() {
 
         for (int m = -2; m <= 2; m++) {
@@ -91,7 +88,7 @@ public class QuantileTest extends RandomTests {
         }
     }
 
-    void doTest(final ContinuousDistribution aDistribution) {
+    private void doTest(final ContinuousDistribution aDistribution) {
 
         double tmpReveresed;
         double tmpQuantile;

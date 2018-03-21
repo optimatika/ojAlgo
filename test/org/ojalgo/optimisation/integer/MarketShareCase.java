@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.constant.PrimitiveMath;
@@ -39,9 +41,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class MarketShareCase extends OptimisationIntegerTests {
 
-    public static final BigDecimal OBJECTIVE_LP = new BigDecimal(0);
-    public static final BigDecimal OBJECTIVE_MIP = new BigDecimal(1);
-    public static final Map<String, BigDecimal> SOLUTION;
+    private static final BigDecimal OBJECTIVE_MIP = new BigDecimal(1);
+    private static final Map<String, BigDecimal> SOLUTION;
 
     static {
 
@@ -96,7 +97,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         SOLUTION = Collections.unmodifiableMap(tmpSolution);
     }
 
-    public static ExpressionsBasedModel makeModel() {
+    private static ExpressionsBasedModel makeModel() {
 
         final File tmpFile = new File(MipLibCase.PATH + "markshare_5_0.mps");
 
@@ -105,14 +106,8 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         return tmpMPS.getExpressionsBasedModel();
     }
 
-    public MarketShareCase() {
-        super();
-    }
-
-    public MarketShareCase(final String name) {
-        super(name);
-    }
-
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testFullMIP() {
 
         final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
@@ -131,6 +126,8 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         }
     }
 
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testMipButLinearConstrainedToOptimal() {
 
         final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
@@ -152,6 +149,8 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         }
     }
 
+    @Test
+    @Ignore("Underscored before JUnit 5")
     public void _testSpecificBranch_20_25() {
 
         final PrimitiveDenseStore tmpAE = PrimitiveDenseStore.FACTORY.rows(new double[][] {
@@ -229,6 +228,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
     }
 
+    @Test
     public void testMipButSomeConstainedToOptimatl() {
 
         final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
@@ -263,26 +263,32 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         }
     }
 
+    @Test
     public void testRedundantC1() {
         this.testRedundant("C1_");
     }
 
+    @Test
     public void testRedundantC2() {
         this.testRedundant("C2_");
     }
 
+    @Test
     public void testRedundantC3() {
         this.testRedundant("C3_");
     }
 
+    @Test
     public void testRedundantC4() {
         this.testRedundant("C4_");
     }
 
+    @Test
     public void testRedundantC5() {
         this.testRedundant("C5_");
     }
 
+    @Test
     public void testRelaxedButAllConstrainedToOptimal() {
 
         final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
@@ -303,6 +309,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
     }
 
+    @Test
     public void testRelaxedButIntegerConstrainedToOptimal() {
 
         final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
@@ -325,6 +332,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         }
     }
 
+    @Test
     public void testSpecificBranch_37_8() {
 
         final PrimitiveDenseStore tmpAE = PrimitiveDenseStore.FACTORY
@@ -370,7 +378,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
     }
 
-    void testRedundant(final String constraint) {
+    private void testRedundant(final String constraint) {
 
         final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
 

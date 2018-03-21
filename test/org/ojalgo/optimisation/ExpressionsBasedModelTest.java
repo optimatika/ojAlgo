@@ -21,50 +21,43 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.*;
-
-import java.math.BigDecimal;
-
-import org.ojalgo.FunctionalityTest;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation.Result;
 
-public class ExpressionsBasedModelTest extends FunctionalityTest {
+import java.math.BigDecimal;
 
-    public ExpressionsBasedModelTest() {
-        super();
-    }
+import static org.ojalgo.constant.BigMath.*;
 
-    public ExpressionsBasedModelTest(final String someName) {
-        super(someName);
-    }
+public class ExpressionsBasedModelTest {
 
+    @Test
     public void testMPStestprob() {
 
         final Variable tmpXONE = new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
         final Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
         final Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
 
-        final Variable[] tmpVariables = new Variable[] { tmpXONE, tmpYTWO, tmpZTHREE };
+        final Variable[] tmpVariables = new Variable[]{tmpXONE, tmpYTWO, tmpZTHREE};
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
-        final BigDecimal[] tmpFactorsLIM1 = new BigDecimal[] { ONE, ONE, ZERO };
+        final BigDecimal[] tmpFactorsLIM1 = new BigDecimal[]{ONE, ONE, ZERO};
         final Expression tmpLIM1 = tmpModel.addExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM1.set(v, tmpFactorsLIM1[v]);
         }
         tmpLIM1.upper(FIVE.add(TENTH));
 
-        final BigDecimal[] tmpFactorsLIM2 = new BigDecimal[] { ONE, ZERO, ONE };
+        final BigDecimal[] tmpFactorsLIM2 = new BigDecimal[]{ONE, ZERO, ONE};
         final Expression tmpLIM2 = tmpModel.addExpression("LIM2");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM2.set(v, tmpFactorsLIM2[v]);
         }
         tmpLIM2.lower(TEN.add(TENTH));
 
-        final BigDecimal[] tmpFactorsMYEQN = new BigDecimal[] { ZERO, ONE.negate(), ONE };
+        final BigDecimal[] tmpFactorsMYEQN = new BigDecimal[]{ZERO, ONE.negate(), ONE};
         final Expression tmpMYEQN = tmpModel.addExpression("MYEQN");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpMYEQN.set(v, tmpFactorsMYEQN[v]);

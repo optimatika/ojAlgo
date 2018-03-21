@@ -12,11 +12,7 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.constant.BigMath.*;
-
-import java.io.File;
-import java.math.BigDecimal;
-
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.optimisation.Expression;
@@ -26,6 +22,11 @@ import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
+import java.io.File;
+import java.math.BigDecimal;
+
+import static org.ojalgo.constant.BigMath.*;
+
 /**
  * A collection of datasets found here: http://people.sc.fsu.edu/~burkardt/datasets/mps/mps.html
  *
@@ -33,18 +34,9 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
-    private static final String COMPOSITION_NOT_VALID = " Composition not valid!";
     private static final String PATH = "./test/org/ojalgo/optimisation/linear/";
     private static final NumberContext PRECISION = new NumberContext(7, 6);
     private static final String SOLUTION_NOT_VALID = "Solution not valid!";
-
-    public BurkardtDatasetsMps() {
-        super();
-    }
-
-    public BurkardtDatasetsMps(final String someName) {
-        super(someName);
-    }
 
     /**
      * Defines a problem of 57 rows and 97 columns. Seems to be the same model as adlittle at netlib. Netlib
@@ -57,6 +49,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
      * problem through CPLEX and lp_solve does again return a solution without any warnings." FAIL: Hittar
      * bara en lösning 0.0, oavsett om jag minimerrar eller maximerar. 2010-04-19 lp_solve => 225494.96316238
      */
+    @Test
     public void testMPSadlittle() {
 
         final File tmpFile = new File(PATH + "adlittle.mps");
@@ -83,6 +76,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
      * <a href="http://www-new.mcs.anl.gov/otc/Guide/TestProblems/LPtest/netlib/afiro.html">afiro@netlib</a>
      * OK! 2010-04-19 lp_solve => -464.75314286
      */
+    @Test
     public void testMPSafiro() {
 
         final File tmpFile = new File(PATH + "afiro.mps");
@@ -104,6 +98,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
      * A simple test file primarily useful for checking the compression and decompression programs. Don't
      * think this model was designed to be solved; so I don't try to.
      */
+    @Test
     public void testMPSempstest() {
 
         final File tmpFile = new File(PATH + "empstest.mps");
@@ -118,6 +113,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
      * named maros at netlib, but that's a different much larger model. ERROR: Något tar lång tid, och sedan
      * blir det ArithmaticError. 2010-04-19 lp_solve => 128.33333333
      */
+    @Test
     public void testMPSmaros() {
 
         final File tmpFile = new File(PATH + "maros.mps");
@@ -131,6 +127,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
      * An example taken from Nazareth, which defines a problem of 3 rows and 3 column. OK! 2010-04-19 lp_solve
      * => This problem is unbounded (maximisation seems OK.)
      */
+    @Test
     public void testMPSnazareth() {
 
         final File tmpFile = new File(PATH + "nazareth.mps");
@@ -145,31 +142,32 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
      * names): <a href="http://en.wikipedia.org/wiki/MPS_(format)">testprob@wikipedia</a> and/or
      * <a href="http://lpsolve.sourceforge.net/5.5/mps-format.htm">testprob@lpsolve</a>
      */
+    @Test
     public void testMPStestprob() {
 
         final Variable tmpXONE = new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
         final Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
         final Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
 
-        final Variable[] tmpVariables = new Variable[] { tmpXONE, tmpYTWO, tmpZTHREE };
+        final Variable[] tmpVariables = new Variable[]{tmpXONE, tmpYTWO, tmpZTHREE};
 
         final ExpressionsBasedModel tmpExpModel = new ExpressionsBasedModel(tmpVariables);
 
         final Expression tmpLIM1 = tmpExpModel.addExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {
-            tmpLIM1.set(v, new BigDecimal[] { ONE, ONE, ZERO }[v]);
+            tmpLIM1.set(v, new BigDecimal[]{ONE, ONE, ZERO}[v]);
         }
         tmpLIM1.upper(FIVE);
 
         final Expression tmpLIM2 = tmpExpModel.addExpression("LIM2");
         for (int v = 0; v < tmpVariables.length; v++) {
-            tmpLIM2.set(v, new BigDecimal[] { ONE, ZERO, ONE }[v]);
+            tmpLIM2.set(v, new BigDecimal[]{ONE, ZERO, ONE}[v]);
         }
         tmpLIM2.lower(TEN);
 
         final Expression tmpMYEQN = tmpExpModel.addExpression("MYEQN");
         for (int v = 0; v < tmpVariables.length; v++) {
-            tmpMYEQN.set(v, new BigDecimal[] { ZERO, ONE.negate(), ONE }[v]);
+            tmpMYEQN.set(v, new BigDecimal[]{ZERO, ONE.negate(), ONE}[v]);
         }
         tmpMYEQN.level(SEVEN);
 

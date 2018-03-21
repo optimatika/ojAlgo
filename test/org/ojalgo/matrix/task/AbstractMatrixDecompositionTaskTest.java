@@ -21,24 +21,12 @@
  */
 package org.ojalgo.matrix.task;
 
+import org.junit.Before;
 import org.ojalgo.TestUtils;
 
-abstract class AbstractMatrixDecompositionTaskTest extends MatrixTaskTests {
-
-    protected AbstractMatrixDecompositionTaskTest() {
-        super();
+public abstract class AbstractMatrixDecompositionTaskTest extends MatrixTaskTests {
+    @Before
+    public void setUp() {
+       TestUtils.minimiseAllBranchLimits();
     }
-
-    protected AbstractMatrixDecompositionTaskTest(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-
-        super.setUp();
-
-        TestUtils.minimiseAllBranchLimits();
-    }
-
 }

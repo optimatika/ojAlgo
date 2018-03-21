@@ -21,21 +21,14 @@
  */
 package org.ojalgo.access;
 
-import org.ojalgo.FunctionalityTest;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 
-public class AccessUtilsTest extends FunctionalityTest {
+public class AccessUtilsTest {
 
-    public AccessUtilsTest() {
-        super();
-    }
-
-    public AccessUtilsTest(final String name) {
-        super(name);
-    }
-
-    public void testAccess2D() {
+    @Test
+    public void access2D() {
 
         final long tmpCountRows = 1 + Uniform.randomInteger(10);
         final long tmpCountColumns = 1 + Uniform.randomInteger(10);
@@ -66,7 +59,8 @@ public class AccessUtilsTest extends FunctionalityTest {
         TestUtils.assertEquals(tmpExpColumn, Structure2D.column(tmpIndex1, tmpStructure));
     }
 
-    public void testAccessAnyD() {
+    @Test
+    public void accessAnyD() {
 
         final long[] tmpStructure = new long[] { 3, 3, 4, 2 };
 

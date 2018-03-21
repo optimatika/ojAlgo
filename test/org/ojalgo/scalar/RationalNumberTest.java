@@ -1,25 +1,27 @@
 package org.ojalgo.scalar;
 
-import org.ojalgo.FunctionalityTest;
-import org.ojalgo.TestUtils;
+import org.junit.Test;
 import org.ojalgo.constant.PrimitiveMath;
 
 import java.math.BigDecimal;
 
 import static java.lang.Double.longBitsToDouble;
+import static org.ojalgo.TestUtils.assertEquals;
+import static org.ojalgo.TestUtils.assertTrue;
 
-public class RationalNumberTest extends FunctionalityTest {
+public class RationalNumberTest {
 
     private final double myDiff = PrimitiveMath.MACHINE_EPSILON;
 
+    @Test
     public void testValueOf() {
 
         double test_values[] = {
-                //                 seeeeeeeeeemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
-                longBitsToDouble(0b011111110111001100110011001100110011001100110011001100110011010L), // 0.1
-                longBitsToDouble(0b011111101011111111111111111111111111111111111111111111111111111L), // * 2^{-62}
-                longBitsToDouble(0b011111101001111111111111111111111111111111111111111111111111111L), // * 2^{-63}
-                longBitsToDouble(0b011111100111111111111111111111111111111111111111111111111111111L), // * 2^{-64}
+                //                 s eeeeeeeeee mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+                longBitsToDouble(0b0_1111111011_1001100110011001100110011001100110011001100110011010L), // 0.1
+                longBitsToDouble(0b0_1111110101_1111111111111111111111111111111111111111111111111111L), // * 2^{-62}
+                longBitsToDouble(0b0_1111110100_1111111111111111111111111111111111111111111111111111L), // * 2^{-63}
+                longBitsToDouble(0b0_1111110011_1111111111111111111111111111111111111111111111111111L), // * 2^{-64}
                 0.3,
                 0.25,
                 1e7,
@@ -39,19 +41,21 @@ public class RationalNumberTest extends FunctionalityTest {
             final RationalNumber viaBigDecimal = RationalNumber.valueOf(BigDecimal.valueOf(d));
 
             double viaDirect = direct.doubleValue();
-            TestUtils.assertEquals(d, viaDirect, myDiff);
+            assertEquals(d, viaDirect, myDiff);
             double expected = viaBigDecimal.doubleValue();
-            TestUtils.assertEquals(expected, viaDirect, myDiff);
+            assertEquals(expected, viaDirect, myDiff);
         }
     }
 
+    @Test
     public void testMultiplication() {
         RationalNumber a = RationalNumber.valueOf(0.04919653065050689);
         RationalNumber b = RationalNumber.valueOf(1.2325077080153841);
 
-        TestUtils.assertEquals(a.multiply(b).doubleValue(), a.doubleValue() * b.doubleValue(), myDiff);
+        assertEquals(a.multiply(b).doubleValue(), a.doubleValue() * b.doubleValue(), myDiff);
     }
 
+    @Test
     public void testNaN() {
         assertEquals(Double.doubleToLongBits(RationalNumber.NaN.doubleValue()),
                 Double.doubleToLongBits(Double.NaN));
@@ -60,9 +64,12 @@ public class RationalNumberTest extends FunctionalityTest {
         assertTrue(RationalNumber.isNaN(RationalNumber.NaN.add(RationalNumber.ONE)));
     }
 
+    @Test
     public void testInfinity() {
-        assertEquals(RationalNumber.POSITIVE_INFINITY.doubleValue(), Double.POSITIVE_INFINITY);
-        assertEquals(RationalNumber.NEGATIVE_INFINITY.doubleValue(), Double.NEGATIVE_INFINITY);
+        assertTrue(Double.isInfinite(RationalNumber.POSITIVE_INFINITY.doubleValue()));
+        assertTrue(RationalNumber.POSITIVE_INFINITY.doubleValue() > 0.0);
+        assertTrue(Double.isInfinite(RationalNumber.NEGATIVE_INFINITY.doubleValue()));
+        assertTrue(RationalNumber.NEGATIVE_INFINITY.doubleValue() < 0.0);
         assertTrue(RationalNumber.isInfinite(RationalNumber.POSITIVE_INFINITY.add(RationalNumber.POSITIVE_INFINITY)));
     }
 }

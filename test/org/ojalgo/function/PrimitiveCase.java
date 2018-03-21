@@ -24,6 +24,7 @@ package org.ojalgo.function;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 
 /**
@@ -32,31 +33,26 @@ import org.ojalgo.TestUtils;
  *
  * @author apete
  */
-public class PrimitiveCase extends FunctionTests {
+public class PrimitiveCase {
 
-    /**
-     * Constructor for PrimitiveUtilsTest.
-     *
-     * @param arg0
-     */
-    public PrimitiveCase(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testACOSH() {
         TestUtils.assertEquals(ZERO, ACOSH.invoke(ONE), MACHINE_EPSILON);
     }
 
+    @Test
     public void testASINH() {
         TestUtils.assertEquals(ZERO, ASINH.invoke(ZERO), MACHINE_EPSILON);
     }
 
+    @Test
     public void testATANH() {
         TestUtils.assertEquals(ZERO, ATANH.invoke(ZERO), MACHINE_EPSILON);
         TestUtils.assertEquals(POSITIVE_INFINITY, ATANH.invoke(ONE), MACHINE_EPSILON);
         TestUtils.assertEquals(NEGATIVE_INFINITY, ATANH.invoke(NEG), MACHINE_EPSILON);
     }
 
+    @Test
     public void testMinMax() {
 
         TestUtils.assertEquals(Math.min(2, -78), FunctionUtils.min(2, -78));
@@ -85,6 +81,7 @@ public class PrimitiveCase extends FunctionTests {
 
     }
 
+    @Test
     public void testPOWER() {
 
         TestUtils.assertEquals(ONE, POWER.invoke(ZERO, 0), MACHINE_EPSILON);

@@ -28,20 +28,10 @@ import org.ojalgo.constant.PrimitiveMath;
 
 public class SetGetTest extends BasicArrayTest {
 
-    public SetGetTest() {
-        super();
-    }
-
-    public SetGetTest(final String aName) {
-        super(aName);
-    }
-
     @Override
     void doTest(final BasicArray<Double> array) {
 
-        for (int i = 0; i < INDICES.length; i++) {
-            array.set(INDICES[i], 1.0);
-        }
+        setMultiple(array, INDICES);
 
         for (long i = 0L; i < COUNT; i++) {
 
@@ -59,8 +49,8 @@ public class SetGetTest extends BasicArrayTest {
             }
         }
 
-        for (int i = 0; i < INDICES.length; i++) {
-            TestUtils.assertEquals(1.0, array.doubleValue(INDICES[i]), PrimitiveMath.MACHINE_EPSILON);
+        for (long i : INDICES) {
+            TestUtils.assertEquals(1.0, array.doubleValue(i), PrimitiveMath.MACHINE_EPSILON);
         }
 
     }

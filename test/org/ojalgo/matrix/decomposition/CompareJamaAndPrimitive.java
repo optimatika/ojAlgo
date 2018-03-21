@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.SimpleCholeskyCase;
@@ -32,7 +34,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.type.context.NumberContext;
 
-public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
+public class CompareJamaAndPrimitive {
 
     private static NumberContext COMPARE_CONTEXT = NumberContext.getGeneral(8);
     private static Cholesky<Double> JAMA_CHOLESKY = new RawCholesky();
@@ -47,14 +49,12 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
     private static LU<Double> PRIMITIVE_RAW_LU = LU.PRIMITIVE.make();
     private static SingularValue<Double> PRIMITIVE_SVD = SingularValue.PRIMITIVE.make();
 
-    public CompareJamaAndPrimitive() {
-        super();
+    @Before
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
-    public CompareJamaAndPrimitive(final String arg0) {
-        super(arg0);
-    }
-
+    @Test
     public void testSimpleCholeskyCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleCholeskyCase.getOriginal());
@@ -74,6 +74,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         }
     }
 
+    @Test
     public void testSimpleEigenvalueCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleEigenvalueCase.getOriginal());
@@ -92,6 +93,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         TestUtils.assertEquals(JAMA_EvD.getEigenvalues(), PRIMITIVE_EvD.getEigenvalues());
     }
 
+    @Test
     public void testSimpleLUCase() {
 
         // Dense
@@ -131,6 +133,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         }
     }
 
+    @Test
     public void testSimpleQRCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleQRCase.getOriginal());
@@ -152,6 +155,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         }
     }
 
+    @Test
     public void testSimpleSingularValueCase() {
 
         final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getOriginal());

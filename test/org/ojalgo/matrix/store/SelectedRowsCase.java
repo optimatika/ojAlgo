@@ -21,23 +21,14 @@
  */
 package org.ojalgo.matrix.store;
 
+import org.junit.Before;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
 
 public class SelectedRowsCase extends NonPhysicalTest {
 
-    public SelectedRowsCase() {
-        super();
-    }
-
-    public SelectedRowsCase(final String arg0) {
-        super(arg0);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-
-        super.setUp();
+    @Before
+    public void setUp() {
 
         final int tmpRowDim = Uniform.randomInteger(1, 9);
         final int tmpColDim = Uniform.randomInteger(1, 9);

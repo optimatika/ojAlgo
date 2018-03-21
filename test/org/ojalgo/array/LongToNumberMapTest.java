@@ -21,6 +21,7 @@
  */
 package org.ojalgo.array;
 
+import org.junit.Test;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.SortedMap;
@@ -35,19 +36,12 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public class LongToNumberMapTest extends ArrayTests {
+public class LongToNumberMapTest {
 
-    static final NumberContext CONTEXT = new NumberContext();
-    static final Random RANDOM = new Random();
+    private static final NumberContext CONTEXT = new NumberContext();
+    private static final Random RANDOM = new Random();
 
-    public LongToNumberMapTest() {
-        super();
-    }
-
-    public LongToNumberMapTest(final String aName) {
-        super(aName);
-    }
-
+    @Test
     public void testAlignCapacity() {
         TestUtils.assertEquals(1, 1L << PrimitiveMath.powerOf2Larger(-1L));
         TestUtils.assertEquals(16, 1L << PrimitiveMath.powerOf2Larger(16L));
@@ -55,6 +49,7 @@ public class LongToNumberMapTest extends ArrayTests {
         TestUtils.assertEquals(16_384, 1L << PrimitiveMath.powerOf2Larger(16_384L));
     }
 
+    @Test
     public void testCompareWithTreeMap() {
 
         final LongToNumberMap<Double> primit64Map = LongToNumberMap.factory(Primitive64Array.FACTORY).make();
@@ -109,6 +104,7 @@ public class LongToNumberMapTest extends ArrayTests {
 
     }
 
+    @Test
     public void testSubmap() {
 
         final LongToNumberMap<Double> tmpMap = LongToNumberMap.factory(Primitive64Array.FACTORY).make();
