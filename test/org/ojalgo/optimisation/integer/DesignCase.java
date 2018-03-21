@@ -33,7 +33,6 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.linear.LinearSolver;
 
 public class DesignCase {
 
@@ -72,33 +71,47 @@ public class DesignCase {
         TestUtils.assertEquals(1.0, tmpResult.doubleValue(3));
     }
 
+    @Test
     public void testSOS() {
 
         final ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        final List<Expression> activities = new ArrayList<>();
+        final List<Variable> starts = new ArrayList<>();
+        final List<Variable> works = new ArrayList<>();
+
+        final Set<Variable> orderedSet = new HashSet<Variable>();
+
         for (int h = 0; h < 24; h++) {
-            final Expression expr = model.addExpression("Only1@" + h).upper(1);
-            activities.add(expr);
 
-        }
-        for (int a = 0; a < 10; a++) {
+            final Variable start = model.addVariable("S" + h).binary();
+            starts.add(start);
 
-            for (int h = 0; h < 24; h++) {
+            final Variable work = model.addVariable("W" + h).binary().weight(Math.random());
+            works.add(work);
 
-                final Set<Variable> orderedSet = new HashSet<Variable>();
-
-                // Activity 'a' is "on" at hour 'h', or not
-                final Variable variable = model.addVariable("A" + a + "-H" + h).binary().weight(Math.abs(12 - h));
-                orderedSet.add(variable);
-
-                model.addSpecialOrderedSet(orderedSet, 0, 3);
-
-                activities.get(h).set(variable, 1);
-            }
+            orderedSet.add(work);
         }
 
-        model.options.debug(LinearSolver.class);
+        model.addSpecialOrderedSet(orderedSet, 3, 3);
+
+        for (int h = 0; h < 21; h++) {
+
+            final Expression expr = model.addExpression("Start" + h);
+            expr.upper(0);
+
+            expr.set(starts.get(h), 3);
+
+            expr.set(works.get(h), -1);
+            expr.set(works.get(h + 1), -1);
+            expr.set(works.get(h + 2), -1);
+        }
+        for (int h = 21; h < 24; h++) {
+            starts.get(h).level(0);
+        }
+
+        model.addExpression("One start").level(1).setLinearFactorsSimple(starts);
+
+        model.options.debug(IntegerSolver.class);
 
         final Result result = model.minimise();
 
