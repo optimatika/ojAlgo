@@ -22,12 +22,17 @@
 package org.ojalgo.optimisation.integer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.ojalgo.TestUtils;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.linear.LinearSolver;
 
 public class DesignCase extends OptimisationIntegerTests {
 
@@ -71,6 +76,41 @@ public class DesignCase extends OptimisationIntegerTests {
         TestUtils.assertEquals(1.0, tmpResult.doubleValue(1));
         TestUtils.assertEquals(1.0, tmpResult.doubleValue(2));
         TestUtils.assertEquals(1.0, tmpResult.doubleValue(3));
+    }
+
+    public void testSOS() {
+
+        final ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        final List<Expression> activities = new ArrayList<>();
+        for (int h = 0; h < 24; h++) {
+            final Expression expr = model.addExpression("Only1@" + h).upper(1);
+            activities.add(expr);
+
+        }
+        for (int a = 0; a < 10; a++) {
+
+            for (int h = 0; h < 24; h++) {
+
+                final Set<Variable> orderedSet = new HashSet<Variable>();
+
+                // Activity 'a' is "on" at hour 'h', or not
+                final Variable variable = model.addVariable("A" + a + "-H" + h).binary().weight(Math.abs(12 - h));
+                orderedSet.add(variable);
+
+                model.addSpecialOrderedSet(orderedSet, 0, 3);
+
+                activities.get(h).set(variable, 1);
+            }
+        }
+
+        model.options.debug(LinearSolver.class);
+
+        final Result result = model.minimise();
+
+        BasicLogger.debug(result);
+        BasicLogger.debug(model);
+
     }
 
 }
