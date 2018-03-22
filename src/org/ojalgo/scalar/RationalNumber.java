@@ -28,8 +28,6 @@ import java.math.BigInteger;
 import java.math.MathContext;
 
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.RationalFunction;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -52,11 +50,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
         public RationalNumber convert(final Number number) {
             return RationalNumber.valueOf(number);
-        }
-
-        @Override
-        public FunctionSet<RationalNumber> function() {
-            return RationalFunction.getSet();
         }
 
         public RationalNumber one() {

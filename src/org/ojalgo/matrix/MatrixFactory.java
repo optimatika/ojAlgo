@@ -30,7 +30,6 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -189,11 +188,6 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
         myPhysicalFactory = factory;
         myConstructor = (Constructor<I>) MatrixFactory.getConstructor(template);
-    }
-
-    @Override
-    public final AggregatorSet<N> aggregator() {
-        return myPhysicalFactory.aggregator();
     }
 
     public I columns(final Access1D<?>... source) {

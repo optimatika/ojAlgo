@@ -28,7 +28,6 @@ import org.ojalgo.access.AccessScalar;
 import org.ojalgo.algebra.Field;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.ScalarOperation;
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -61,8 +60,6 @@ public interface Scalar<N extends Number> extends AccessScalar<N>, Field<Scalar<
         Scalar<N> convert(double value);
 
         Scalar<N> convert(Number number);
-
-        FunctionSet<N> function();
 
         @SuppressWarnings("unchecked")
         default N[] newArrayInstance(final int length) {

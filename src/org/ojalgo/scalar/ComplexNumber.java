@@ -28,8 +28,6 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.ComplexFunction;
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -129,11 +127,6 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
         public ComplexNumber convert(final Number number) {
             return ComplexNumber.valueOf(number);
-        }
-
-        @Override
-        public FunctionSet<ComplexNumber> function() {
-            return ComplexFunction.getSet();
         }
 
         public ComplexNumber one() {

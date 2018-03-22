@@ -24,7 +24,6 @@ package org.ojalgo.scalar;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -55,12 +54,6 @@ final class Money extends Number implements Scalar<Money>, Enforceable<Money> {
 
         public Money zero() {
             return ZERO;
-        }
-
-        @Override
-        public FunctionSet<Money> function() {
-            // TODO Auto-generated method stub
-            return null;
         }
 
     };

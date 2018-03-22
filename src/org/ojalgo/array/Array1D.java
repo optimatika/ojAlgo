@@ -40,7 +40,6 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -62,11 +61,6 @@ public final class Array1D<N extends Number> extends AbstractList<N>
         Factory(final DenseArray.Factory<N> denseArray) {
             super();
             myDelegate = BasicArray.factory(denseArray);
-        }
-
-        @Override
-        public final AggregatorSet<N> aggregator() {
-            return myDelegate.aggregator();
         }
 
         public final Array1D<N> copy(final Access1D<?> source) {

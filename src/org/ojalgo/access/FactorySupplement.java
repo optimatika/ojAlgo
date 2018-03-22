@@ -22,12 +22,9 @@
 package org.ojalgo.access;
 
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.scalar.Scalar;
 
 interface FactorySupplement {
-
-    AggregatorSet<?> aggregator();
 
     FunctionSet<?> function();
 
