@@ -26,6 +26,7 @@ import java.math.MathContext;
 
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -49,6 +50,11 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
 
         public BigScalar convert(final Number number) {
             return BigScalar.valueOf(number);
+        }
+
+        @Override
+        public FunctionSet<BigDecimal> function() {
+            return BigFunction.getSet();
         }
 
         public BigScalar one() {

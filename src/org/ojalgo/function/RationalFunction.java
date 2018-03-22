@@ -23,6 +23,8 @@ package org.ojalgo.function;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.RationalAggregator;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -566,6 +568,11 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     @Override
     public BinaryFunction<RationalNumber> add() {
         return ADD;
+    }
+
+    @Override
+    public AggregatorSet<RationalNumber> aggregator() {
+        return RationalAggregator.getSet();
     }
 
     @Override

@@ -27,7 +27,9 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.QuaternionFunction;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -224,6 +226,11 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
         public Quaternion convert(final Number number) {
             return Quaternion.valueOf(number);
+        }
+
+        @Override
+        public FunctionSet<Quaternion> function() {
+            return QuaternionFunction.getSet();
         }
 
         public Quaternion one() {

@@ -26,6 +26,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -57,6 +58,12 @@ final class OldRationalNumber extends Number implements Scalar<OldRationalNumber
 
         public OldRationalNumber zero() {
             return ZERO;
+        }
+
+        @Override
+        public FunctionSet<OldRationalNumber> function() {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     };

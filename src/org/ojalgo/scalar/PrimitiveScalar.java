@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -47,6 +48,11 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
 
         public PrimitiveScalar convert(final Number number) {
             return PrimitiveScalar.valueOf(number);
+        }
+
+        @Override
+        public FunctionSet<Double> function() {
+            return PrimitiveFunction.getSet();
         }
 
         public PrimitiveScalar one() {
