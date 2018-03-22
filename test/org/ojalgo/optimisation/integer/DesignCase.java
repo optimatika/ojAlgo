@@ -70,6 +70,9 @@ public class DesignCase {
         TestUtils.assertEquals(1.0, tmpResult.doubleValue(3));
     }
 
+    /**
+     * Essentilly this test case just verifies that the SOS presolver doesn't screw things up.
+     */
     @Test
     public void testSOS() {
 
@@ -138,14 +141,19 @@ public class DesignCase {
         model.addExpression("Only start activity A once").level(1).setLinearFactorsSimple(starts1);
         model.addExpression("Only start activity B once").level(1).setLinearFactorsSimple(starts2);
 
-        final Result result = model.maximise();
+        final Result resultMin = model.minimise();
 
-        TestUtils.assertStateNotLessThanOptimal(result);
-        TestUtils.assertTrue(result.getValue() >= 0.0);
-        TestUtils.assertTrue(result.getValue() <= 6.0);
+        TestUtils.assertStateNotLessThanOptimal(resultMin);
+        TestUtils.assertTrue(resultMin.getValue() >= 0.0);
+        TestUtils.assertTrue(resultMin.getValue() <= 6.0);
 
-        //        BasicLogger.DEBUG.print(result);
-        //        BasicLogger.DEBUG.print(model);
+        final Result resultMax = model.maximise();
+
+        TestUtils.assertStateNotLessThanOptimal(resultMax);
+        TestUtils.assertTrue(resultMax.getValue() >= 0.0);
+        TestUtils.assertTrue(resultMax.getValue() <= 6.0);
+
+        TestUtils.assertTrue(resultMin.getValue() <= resultMax.getValue());
     }
 
 }
