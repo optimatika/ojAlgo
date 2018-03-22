@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
@@ -76,48 +75,77 @@ public class DesignCase {
 
         final ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        final List<Variable> starts = new ArrayList<>();
-        final List<Variable> works = new ArrayList<>();
+        final List<Variable> starts1 = new ArrayList<>();
+        final List<Variable> works1 = new ArrayList<>();
 
-        final Set<Variable> orderedSet = new HashSet<Variable>();
+        final List<Variable> starts2 = new ArrayList<>();
+        final List<Variable> works2 = new ArrayList<>();
+
+        final Set<Variable> orderedSet1 = new HashSet<Variable>();
+
+        final Set<Variable> orderedSet2 = new HashSet<Variable>();
 
         for (int h = 0; h < 24; h++) {
 
-            final Variable start = model.addVariable("S" + h).binary();
-            starts.add(start);
+            final Variable start1 = model.addVariable("Start activity A at " + h).binary();
+            starts1.add(start1);
 
-            final Variable work = model.addVariable("W" + h).binary().weight(Math.random());
-            works.add(work);
+            final Variable start2 = model.addVariable("Start activity B at " + h).binary();
+            starts2.add(start2);
 
-            orderedSet.add(work);
+            final Variable work1 = model.addVariable("Activity A ongoing at " + h).binary().weight(Math.random());
+            works1.add(work1);
+
+            orderedSet1.add(work1);
+
+            final Variable work2 = model.addVariable("Activity B ongoing at " + h).binary().weight(Math.random());
+            works2.add(work2);
+
+            orderedSet2.add(work2);
+
+            model.addExpression("Maximum one ongoing activity at " + h).upper(1).set(work1, 1).set(work2, 1);
         }
 
-        model.addSpecialOrderedSet(orderedSet, 3, 3);
+        model.addSpecialOrderedSet(orderedSet1, 3, 3);
+        model.addSpecialOrderedSet(orderedSet2, 3, 3);
 
         for (int h = 0; h < 21; h++) {
 
-            final Expression expr = model.addExpression("Start" + h);
-            expr.upper(0);
+            final Expression expr1 = model.addExpression("Finish A when started at " + h);
+            expr1.upper(0);
 
-            expr.set(starts.get(h), 3);
+            expr1.set(starts1.get(h), 3);
 
-            expr.set(works.get(h), -1);
-            expr.set(works.get(h + 1), -1);
-            expr.set(works.get(h + 2), -1);
+            expr1.set(works1.get(h), -1);
+            expr1.set(works1.get(h + 1), -1);
+            expr1.set(works1.get(h + 2), -1);
+
+            final Expression expr2 = model.addExpression("Finish B when started at " + h);
+            expr2.upper(0);
+
+            expr2.set(starts2.get(h), 3);
+
+            expr2.set(works2.get(h), -1);
+            expr2.set(works2.get(h + 1), -1);
+            expr2.set(works2.get(h + 2), -1);
+
         }
         for (int h = 21; h < 24; h++) {
-            starts.get(h).level(0);
+            starts1.get(h).level(0);
+            starts2.get(h).level(0);
         }
 
-        model.addExpression("One start").level(1).setLinearFactorsSimple(starts);
+        model.addExpression("Only start activity A once").level(1).setLinearFactorsSimple(starts1);
+        model.addExpression("Only start activity B once").level(1).setLinearFactorsSimple(starts2);
 
-        model.options.debug(IntegerSolver.class);
+        final Result result = model.maximise();
 
-        final Result result = model.minimise();
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertTrue(result.getValue() >= 0.0);
+        TestUtils.assertTrue(result.getValue() <= 6.0);
 
-        BasicLogger.debug(result);
-        BasicLogger.debug(model);
-
+        //        BasicLogger.DEBUG.print(result);
+        //        BasicLogger.DEBUG.print(model);
     }
 
 }
