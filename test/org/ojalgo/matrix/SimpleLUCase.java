@@ -21,14 +21,14 @@
  */
 package org.ojalgo.matrix;
 
+import java.math.BigDecimal;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.type.context.NumberContext;
-
-import java.math.BigDecimal;
 
 /**
  * Gilbert Strang, Linear Algebra and its Applications III, Problem 3.6.15
@@ -38,21 +38,22 @@ import java.math.BigDecimal;
 public class SimpleLUCase extends BasicMatrixTest {
 
     private static RationalMatrix getMtrxL() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0, 0.0}, {0.0, 1.0}, {1.0, 1.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 }, { 1.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     private static RationalMatrix getMtrxU() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0, -1.0, 0.0}, {0.0, 1.0, -1.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static RationalMatrix getOrginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0, -1.0, 0.0}, {0.0, 1.0, -1.0}, {1.0, 0.0, -1.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test public void testData() {
+    @Test
+    public void testData() {
 
         myExpMtrx = SimpleLUCase.getOrginal();
         myActMtrx = SimpleLUCase.getMtrxL().multiply(SimpleLUCase.getMtrxU());
@@ -60,7 +61,8 @@ public class SimpleLUCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Test public void testProblem() {
+    @Test
+    public void testProblem() {
 
         // PLDU
 

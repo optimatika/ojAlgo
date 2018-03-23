@@ -24,7 +24,6 @@ package org.ojalgo.matrix.store;
 import java.math.BigDecimal;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;

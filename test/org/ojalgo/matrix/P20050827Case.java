@@ -61,7 +61,8 @@ public class P20050827Case extends BasicMatrixTest {
         return ComplexMatrix.FACTORY.copy(tmpArray).enforce(DEFINITION);
     }
 
-    @Test public void testData() {
+    @Test
+    public void testData() {
 
         // 3x5
         final ComplexMatrix tmpProblematic = P20050827Case.getProblematic();
@@ -92,7 +93,8 @@ public class P20050827Case extends BasicMatrixTest {
         TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpBigTrace.get(), tmpSmallTrace.get(), EVALUATION);
     }
 
-    @Test public void testProblem() {
+    @Test
+    public void testProblem() {
 
         final ComplexMatrix tmpProblematic = P20050827Case.getProblematic();
 

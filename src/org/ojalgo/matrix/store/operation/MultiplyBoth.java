@@ -36,7 +36,6 @@ import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyBoth;
 import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 public final class MultiplyBoth extends MatrixOperation {

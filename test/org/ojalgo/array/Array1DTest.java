@@ -32,7 +32,7 @@ public class Array1DTest {
     @Test
     public void testSortingEvenSizedArrayAscending() {
 
-        final double[][] tmpRows = new double[][]{{4, 5, 6, 7, 8, 9}, {9, 8, 7, 6, 5, 4}, {9, 5, 7, 6, 8, 4}, {4, 8, 6, 7, 5, 9}};
+        final double[][] tmpRows = new double[][] { { 4, 5, 6, 7, 8, 9 }, { 9, 8, 7, 6, 5, 4 }, { 9, 5, 7, 6, 8, 4 }, { 4, 8, 6, 7, 5, 9 } };
 
         this.doSortTest(tmpRows);
     }

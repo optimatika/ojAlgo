@@ -46,7 +46,8 @@ public class P20050125Case extends BasicMatrixTest {
         return tmpMtrx.multiply(tmpMtrx.transpose());
     }
 
-    @Test public void testData() {
+    @Test
+    public void testData() {
 
         final Cholesky<BigDecimal> tmpDelegate = Cholesky.BIG.make();
         tmpDelegate.decompose(BigDenseStore.FACTORY.copy(myBigAA));
@@ -54,7 +55,8 @@ public class P20050125Case extends BasicMatrixTest {
         TestUtils.assertEquals(BigDenseStore.FACTORY.copy(myBigAA), tmpDelegate, EVALUATION);
     }
 
-    @Test public void testProblem() {
+    @Test
+    public void testProblem() {
 
         final Cholesky<BigDecimal> tmpDelegate = Cholesky.BIG.make();
         tmpDelegate.decompose(BigDenseStore.FACTORY.copy(myBigAA));
@@ -68,7 +70,8 @@ public class P20050125Case extends BasicMatrixTest {
     }
 
     @Override
-    @Test public void testSolveBasicMatrix() {
+    @Test
+    public void testSolveBasicMatrix() {
         super.testSolveBasicMatrix();
     }
 

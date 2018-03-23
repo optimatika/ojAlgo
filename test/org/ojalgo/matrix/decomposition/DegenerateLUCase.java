@@ -50,7 +50,8 @@ public class DegenerateLUCase {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
+        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY
+                .makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<BigDecimal> tmpBigDecomp = LU.BIG.make();
@@ -70,7 +71,8 @@ public class DegenerateLUCase {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
+        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY
+                .makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<ComplexNumber> tmpComplexDecomp = LU.COMPLEX.make();
@@ -90,7 +92,8 @@ public class DegenerateLUCase {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
+        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY
+                .makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<Double> tmpDoubleDecomp = LU.PRIMITIVE.make();
@@ -110,7 +113,8 @@ public class DegenerateLUCase {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
+        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY
+                .makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<Double> tmpDoubleDecomp = new RawLU();
@@ -130,7 +134,8 @@ public class DegenerateLUCase {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
+        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY
+                .makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<Double> tmpDoubleDecomp = LU.PRIMITIVE.make();

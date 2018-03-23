@@ -31,6 +31,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public class QuaternionTest {
+
     @Test
     @Ignore("Was underscored before JUnit 5 transition")
     public void cosAndBackAgain() {
@@ -139,7 +140,7 @@ public class QuaternionTest {
         }
     }
 
-@Test
+    @Test
     @Ignore("Was underscored before JUnit 5 transition")
     public void tanAndBackAgain() {
 
@@ -193,8 +194,8 @@ public class QuaternionTest {
         }
     }
 
-
-    @Test public void testLogExpAndBackAgain() {
+    @Test
+    public void testLogExpAndBackAgain() {
 
         final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
@@ -219,7 +220,8 @@ public class QuaternionTest {
         }
     }
 
-    @Test public void testPolarForm() {
+    @Test
+    public void testPolarForm() {
 
         final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
 
@@ -243,7 +245,8 @@ public class QuaternionTest {
         }
     }
 
-    @Test public void testRandomMultiplication() {
+    @Test
+    public void testRandomMultiplication() {
 
         final Quaternion normalizedRandomRotation = Quaternion.of(Math.random(), Math.random(), Math.random(), Math.random()).signum();
 
@@ -258,7 +261,8 @@ public class QuaternionTest {
         TestUtils.assertEquals(vctrResult, quatResult.toMultiplicationVector());
     }
 
-    @Test public void testRandomRotation() {
+    @Test
+    public void testRandomRotation() {
 
         final Quaternion normalizedRandomRotation = Quaternion.of(Math.random(), Math.random(), Math.random(), Math.random()).signum();
 
@@ -276,7 +280,8 @@ public class QuaternionTest {
         TestUtils.assertEquals(vctrResult, vector);
     }
 
-    @Test public void testRotationMatrixMathWorksExample() {
+    @Test
+    public void testRotationMatrixMathWorksExample() {
 
         final double nmbr = 1.0 / Math.sqrt(2.0);
 

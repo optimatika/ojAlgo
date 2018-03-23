@@ -41,7 +41,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-@Tags({@Tag("functionality"), @Tag("matrix")})
+@Tags({ @Tag("functionality"), @Tag("matrix") })
 public class LargerCholeskyCase extends BasicMatrixTest {
 
     public static RationalMatrix getOriginal() {
@@ -51,7 +51,8 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         return RationalMatrix.FACTORY.copy(randomComplex.multiply(randomComplex.conjugate()));
     }
 
-    @Test public void testData() {
+    @Test
+    public void testData() {
 
         final MatrixStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY.copy(LargerCholeskyCase.getOriginal());
         final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
@@ -59,7 +60,8 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         TestUtils.assertEquals(true, tmpDecomp.isSolvable());
     }
 
-    @Test public void testProblem() {
+    @Test
+    public void testProblem() {
 
         final BasicMatrix tmpMtrx = LargerCholeskyCase.getOriginal();
         final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();

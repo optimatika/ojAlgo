@@ -64,9 +64,9 @@ public class SVDbyEvD {
     @Test
     public void testSmall2x2() {
 
-        final PhysicalStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY.rows(new double[][]{{4.0, 0.0}, {3.0, -5.0}});
+        final PhysicalStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, 0.0 }, { 3.0, -5.0 } });
 
-        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[]{6.324555320336759, 3.1622776601683795});
+        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 6.324555320336759, 3.1622776601683795 });
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }
@@ -78,9 +78,9 @@ public class SVDbyEvD {
     public void testWikipedia() {
 
         final PhysicalStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY
-                .rows(new double[][]{{1.0, 0.0, 0.0, 0.0, 2.0}, {0.0, 0.0, 3.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 4.0, 0.0, 0.0, 0.0}});
+                .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[]{4.0, 3.0, PrimitiveFunction.SQRT.invoke(5.0), 0.0});
+        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveFunction.SQRT.invoke(5.0), 0.0 });
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }

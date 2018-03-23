@@ -21,10 +21,7 @@
  */
 package org.ojalgo.function;
 
-import static org.ojalgo.constant.PrimitiveMath.ONE;
-import static org.ojalgo.constant.PrimitiveMath.TEN;
-import static org.ojalgo.constant.PrimitiveMath.TWO;
-import static org.ojalgo.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;

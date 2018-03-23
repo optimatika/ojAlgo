@@ -21,10 +21,7 @@
  */
 package org.ojalgo.function;
 
-import static org.ojalgo.constant.PrimitiveMath.HALF;
-import static org.ojalgo.constant.PrimitiveMath.ONE;
-import static org.ojalgo.constant.PrimitiveMath.THIRD;
-import static org.ojalgo.constant.PrimitiveMath.TWO;
+import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.ComplexAggregator;

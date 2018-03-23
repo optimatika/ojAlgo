@@ -21,11 +21,11 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
+
+import org.junit.Ignore;
+import org.junit.Test;
 
 public final class RelaxedLpCase extends MipLibCase {
 

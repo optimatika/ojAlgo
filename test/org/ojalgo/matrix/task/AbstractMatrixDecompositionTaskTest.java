@@ -25,8 +25,9 @@ import org.junit.Before;
 import org.ojalgo.TestUtils;
 
 public abstract class AbstractMatrixDecompositionTaskTest extends MatrixTaskTests {
+
     @Before
     public void setUp() {
-       TestUtils.minimiseAllBranchLimits();
+        TestUtils.minimiseAllBranchLimits();
     }
 }

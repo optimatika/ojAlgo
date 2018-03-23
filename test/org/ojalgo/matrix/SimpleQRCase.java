@@ -39,22 +39,23 @@ import org.ojalgo.matrix.store.MatrixStore;
 public class SimpleQRCase extends BasicMatrixTest {
 
     private static RationalMatrix getFactorQ() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0 / 3.0, 0.0}, {2.0 / 3.0, 1.0 / PrimitiveFunction.SQRT.invoke(2.0)},
-                {2.0 / 3.0, -1.0 / PrimitiveFunction.SQRT.invoke(2.0)}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveFunction.SQRT.invoke(2.0) },
+                { 2.0 / 3.0, -1.0 / PrimitiveFunction.SQRT.invoke(2.0) } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     private static RationalMatrix getFactorR() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{3.0, 3.0}, {0.0, PrimitiveFunction.SQRT.invoke(2.0)}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveFunction.SQRT.invoke(2.0) } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static RationalMatrix getOriginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0, 1.0}, {2.0, 3.0}, {2.0, 1.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test public void testData() {
+    @Test
+    public void testData() {
 
         myExpMtrx = SimpleQRCase.getOriginal();
         final RationalMatrix tmpFactorQ = SimpleQRCase.getFactorQ();
@@ -64,7 +65,8 @@ public class SimpleQRCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Test public void testProblem() {
+    @Test
+    public void testProblem() {
 
         // QR
 

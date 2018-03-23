@@ -60,7 +60,8 @@ public class DecompositionProblems {
         final PhysicalStore<ComplexNumber> tmpExpected = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> tmpActual;
 
-        @SuppressWarnings("unchecked") final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[]{Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
+        @SuppressWarnings("unchecked")
+        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
                 Eigenvalue.COMPLEX.make(MatrixDecomposition.TYPICAL,
                         true)/*
                               * , HessenbergDecomposition. makeComplex()

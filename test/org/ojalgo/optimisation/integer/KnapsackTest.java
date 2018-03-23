@@ -121,9 +121,7 @@ public class KnapsackTest extends OptimisationIntegerTests {
     @Test
     public void testVaryingMaxWeight4() {
 
-        ExpressionsBasedModel model = new KnapsackProblemBuilder(5d)
-                .addItem(20, 2)
-                .addItem(30, 4).build();
+        ExpressionsBasedModel model = new KnapsackProblemBuilder(5d).addItem(20, 2).addItem(30, 4).build();
 
         // model.options.debug(IntegerSolver.class);
 

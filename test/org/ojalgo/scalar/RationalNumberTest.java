@@ -1,33 +1,25 @@
 package org.ojalgo.scalar;
 
+import static org.ojalgo.TestUtils.*;
+
+import java.math.BigDecimal;
+
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.ojalgo.constant.PrimitiveMath;
-
-import java.math.BigDecimal;
-
-import static org.ojalgo.TestUtils.assertEquals;
-import static org.ojalgo.TestUtils.assertTrue;
 
 public class RationalNumberTest {
 
     private final double myDiff = PrimitiveMath.MACHINE_EPSILON;
 
     @ParameterizedTest(name = "#{index} valueOf({arguments})")
-    @ValueSource(doubles = {
-            0.3,
-            0.25,
-            1e7,
-            5e8,
-            -25.22e-4,
-            0.04919653065050689,
-            1.2325077080153841
-//                ,
-//                4223372036854775807.0,
-//                -4223372036854775808.0,
-//                9223372036854775807.0,
-//                -9223372036854775808.0
+    @ValueSource(doubles = { 0.3, 0.25, 1e7, 5e8, -25.22e-4, 0.04919653065050689, 1.2325077080153841
+            //                ,
+            //                4223372036854775807.0,
+            //                -4223372036854775808.0,
+            //                9223372036854775807.0,
+            //                -9223372036854775808.0
     })
     public void testValueOf(double d) {
 
@@ -63,8 +55,7 @@ public class RationalNumberTest {
 
     @Test
     public void testNaN() {
-        assertEquals(Double.doubleToLongBits(RationalNumber.NaN.doubleValue()),
-                Double.doubleToLongBits(Double.NaN));
+        assertEquals(Double.doubleToLongBits(RationalNumber.NaN.doubleValue()), Double.doubleToLongBits(Double.NaN));
         assertTrue(RationalNumber.isNaN(RationalNumber.NaN.add(RationalNumber.NaN)));
         assertTrue(RationalNumber.isNaN(RationalNumber.ONE.add(RationalNumber.NaN)));
         assertTrue(RationalNumber.isNaN(RationalNumber.NaN.add(RationalNumber.ONE)));

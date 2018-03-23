@@ -28,8 +28,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.ColumnView;
 import org.ojalgo.access.RowView;
@@ -228,7 +226,7 @@ public abstract class BasicMatrixTest {
     @Test
     public void testDotAccess1D() {
 
-        final int[] tmpCol = new int[]{(int) Uniform.randomInteger(myBigAA.countColumns())};
+        final int[] tmpCol = new int[] { (int) Uniform.randomInteger(myBigAA.countColumns()) };
 
         myExpNmbr = myBigAA.selectColumns(tmpCol).dot(myBigSafe.selectColumns(tmpCol));
 

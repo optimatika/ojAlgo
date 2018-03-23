@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import static org.ojalgo.matrix.decomposition.MatrixDecompositionTests.*;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -42,8 +44,6 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
-
-import static org.ojalgo.matrix.decomposition.MatrixDecompositionTests.DEBUG;
 
 /**
  * @author apete

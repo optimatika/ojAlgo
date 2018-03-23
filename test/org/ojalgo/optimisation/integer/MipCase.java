@@ -12,10 +12,10 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import java.math.BigDecimal;
+
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.math.BigDecimal;
 
 public final class MipCase extends OptimisationIntegerTests {
 

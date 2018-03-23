@@ -27,7 +27,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 public final class SubstituteBackwards extends MatrixOperation {

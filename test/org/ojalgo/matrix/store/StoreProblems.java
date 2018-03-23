@@ -42,9 +42,9 @@ public class StoreProblems extends AbstractMatrixStoreTest {
 
         BasicMatrix A, Bu, K, sx, currentState;
 
-        final double[][] a = {{1, 2}, {3, 4}};
+        final double[][] a = { { 1, 2 }, { 3, 4 } };
         A = PrimitiveMatrix.FACTORY.rows(a);
-        final double[][] bu = {{1, 0}, {0, 1}};
+        final double[][] bu = { { 1, 0 }, { 0, 1 } };
         Bu = PrimitiveMatrix.FACTORY.rows(bu);
         PrimitiveMatrix.FACTORY.makeEye(2, 2);
         K = PrimitiveMatrix.FACTORY.makeEye(2, 2);
@@ -109,7 +109,7 @@ public class StoreProblems extends AbstractMatrixStoreTest {
     public void testP20180121() {
 
         final SparseStore<Double> m = SparseStore.PRIMITIVE.make(3, 2);
-        final PrimitiveDenseStore mAdd = PrimitiveDenseStore.FACTORY.rows(new double[][]{{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}});
+        final PrimitiveDenseStore mAdd = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 0.0 }, { 0.0, 0.0 } });
         final MatrixStore<Double> n = m.add(mAdd);
 
         final SparseStore<Double> eye = SparseStore.PRIMITIVE.make(2, 2);

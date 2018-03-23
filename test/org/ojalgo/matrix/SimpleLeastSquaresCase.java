@@ -41,7 +41,8 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
     }
 
     private static RationalMatrix getFactorR() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { -1.7321, 0.5774, 0.5774 }, { 0.0, -1.6330, 0.8165 }, { 0.0, 0.0, -1.4142 } });
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
+                .rows(new double[][] { { -1.7321, 0.5774, 0.5774 }, { 0.0, -1.6330, 0.8165 }, { 0.0, 0.0, -1.4142 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
@@ -60,7 +61,8 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test public void testData() {
+    @Test
+    public void testData() {
 
         myExpMtrx = SimpleLeastSquaresCase.getTransformedRHS();
         myActMtrx = SimpleLeastSquaresCase.getFactorR().multiply(SimpleLeastSquaresCase.getSolution());
@@ -68,7 +70,8 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Test public void testProblem() {
+    @Test
+    public void testProblem() {
 
         // Solve
 

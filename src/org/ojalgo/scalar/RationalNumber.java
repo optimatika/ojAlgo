@@ -21,7 +21,7 @@
  */
 package org.ojalgo.scalar;
 
-import static org.ojalgo.function.PrimitiveFunction.ABS;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -131,9 +131,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         // Please refer to {@link Double#doubleToLongBits(long)} javadoc
         final int s = ((bits >> 63) == 0) ? 1 : -1;
         final int e = (int) ((bits >> 52) & 0x7ffL);
-        long m = (e == 0) ?
-                (bits & 0xfffffffffffffL) << 1 :
-                (bits & 0xfffffffffffffL) | 0x10000000000000L;
+        long m = (e == 0) ? (bits & 0xfffffffffffffL) << 1 : (bits & 0xfffffffffffffL) | 0x10000000000000L;
         // Now we're looking for s * m * 2^{e - 1075}, 1075 being bias of 1023 plus 52 positions of binary fraction
 
         int exponent = e - 1075;
@@ -489,9 +487,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber invert() {
-        return this.sign() >= 0 ?
-                new RationalNumber(myDenominator, myNumerator) :
-                new RationalNumber(-myDenominator, -myNumerator);
+        return this.sign() >= 0 ? new RationalNumber(myDenominator, myNumerator) : new RationalNumber(-myDenominator, -myNumerator);
     }
 
     public boolean isAbsolute() {
@@ -625,8 +621,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             return BigDecimal.valueOf(Double.POSITIVE_INFINITY); // TODO: really?!
         }
         if (this.isInfinite()) {
-            return this.sign() > 0 ?
-                    BigDecimal.valueOf(Double.POSITIVE_INFINITY) : // TODO: really?!
+            return this.sign() > 0 ? BigDecimal.valueOf(Double.POSITIVE_INFINITY) : // TODO: really?!
                     BigDecimal.valueOf(Double.NEGATIVE_INFINITY); // TODO: really?!
         }
         return new BigDecimal(myNumerator).divide(new BigDecimal(myDenominator), context);

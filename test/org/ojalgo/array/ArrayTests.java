@@ -21,12 +21,12 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.TestUtils;
-import org.ojalgo.random.Uniform;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.ojalgo.TestUtils;
+import org.ojalgo.random.Uniform;
 
 /**
  * ArrayPackageTests

@@ -22,11 +22,11 @@
 package org.ojalgo.matrix.store;
 
 import org.junit.Before;
-import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
 
 public class ConjugatedCase extends NonPhysicalTest {
+
     @Before
     public void setUp() {
 

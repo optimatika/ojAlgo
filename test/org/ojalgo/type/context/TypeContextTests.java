@@ -21,13 +21,11 @@
  */
 package org.ojalgo.type.context;
 
-
 /**
  * TypeContextPackageTests
  *
  * @author apete
  */
 abstract class TypeContextTests {
-
 
 }
