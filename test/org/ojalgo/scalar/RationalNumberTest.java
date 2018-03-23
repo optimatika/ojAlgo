@@ -1,20 +1,22 @@
 package org.ojalgo.scalar;
 
-import static org.ojalgo.TestUtils.*;
-
-import java.math.BigDecimal;
-
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.ojalgo.constant.PrimitiveMath;
+
+import java.math.BigDecimal;
+
+import static org.ojalgo.TestUtils.assertEquals;
+import static org.ojalgo.TestUtils.assertTrue;
+import static org.ojalgo.scalar.RationalNumber.of;
 
 public class RationalNumberTest {
 
     private final double myDiff = PrimitiveMath.MACHINE_EPSILON;
 
     @ParameterizedTest(name = "#{index} valueOf({arguments})")
-    @ValueSource(doubles = { 0.3, 0.25, 1e7, 5e8, -25.22e-4, 0.04919653065050689, 1.2325077080153841
+    @ValueSource(doubles = {0.3, 0.25, 1e7, 5e8, -25.22e-4, 0.04919653065050689, 1.2325077080153841
             //                ,
             //                4223372036854775807.0,
             //                -4223372036854775808.0,
@@ -24,10 +26,12 @@ public class RationalNumberTest {
     public void testValueOf(double d) {
 
         final RationalNumber direct = RationalNumber.valueOf(d);
+        final RationalNumber approximation = RationalNumber.valueOf(d);
         final RationalNumber viaBigDecimal = RationalNumber.valueOf(BigDecimal.valueOf(d));
 
         double viaDirect = direct.doubleValue();
         assertEquals(d, viaDirect, myDiff);
+        assertEquals(d, approximation.doubleValue(), myDiff);
         assertEquals(d >= 0.0, direct.isAbsolute());
         double expected = viaBigDecimal.doubleValue();
         assertEquals(expected, viaDirect, myDiff);
@@ -68,5 +72,10 @@ public class RationalNumberTest {
         assertTrue(Double.isInfinite(RationalNumber.NEGATIVE_INFINITY.doubleValue()));
         assertTrue(RationalNumber.NEGATIVE_INFINITY.doubleValue() < 0.0);
         assertTrue(RationalNumber.isInfinite(RationalNumber.POSITIVE_INFINITY.add(RationalNumber.POSITIVE_INFINITY)));
+    }
+
+    @Test
+    public void testRational() {
+        assertEquals(of(1, 10), RationalNumber.rational(0.1));
     }
 }

@@ -21,16 +21,16 @@
  */
 package org.ojalgo.scalar;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.type.TypeUtils;
+import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.context.NumberContext.Enforceable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.type.TypeUtils;
-import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.context.NumberContext.Enforceable;
+import static org.ojalgo.function.PrimitiveFunction.ABS;
 
 public final class RationalNumber extends Number implements Scalar<RationalNumber>, Enforceable<RationalNumber> {
 
@@ -160,6 +160,25 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             return new RationalNumber(s * m / factor.longValueExact(), Long.MAX_VALUE);
         }
         return new RationalNumber(s * m, 1L << -exponent);
+    }
+
+    public static RationalNumber rational(final double d) {
+        final boolean negative = d < 0;
+        double g = Math.abs(d);
+
+        long[] ds = new long[21]; // TODO: 4alf: Worst-case, they say
+
+        for (int i = 0; i < ds.length; i++) {
+            ds[i] = (long) Math.floor(g); // TODO: 4alf: overflow!
+            double remainder = g - ds[i];
+            g = 1.0 / remainder;
+        }
+
+        RationalNumber approximation = of(1L, ds[ds.length - 1]);
+        for (int i = ds.length - 1; --i >= 0; ) {
+            approximation = of(ds[i], 1L).add(approximation.invert());
+        }
+        return negative ? approximation.negate() : approximation;
     }
 
     public static RationalNumber valueOf(final Number number) {
