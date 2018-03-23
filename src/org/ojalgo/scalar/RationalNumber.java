@@ -21,7 +21,7 @@
  */
 package org.ojalgo.scalar;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.PrimitiveFunction.ABS;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -67,41 +67,16 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     public static final RationalNumber NaN = new RationalNumber(0L, 0L);
     public static final RationalNumber NEGATIVE_INFINITY = new RationalNumber(-1L, 0L);
     public static final RationalNumber ONE = new RationalNumber(1L, 1L);
-    private static final RationalNumber MINUS_ONE = ONE.negate();
     public static final RationalNumber POSITIVE_INFINITY = new RationalNumber(1L, 0L);
     public static final RationalNumber TWO = new RationalNumber(2L, 1L);
     public static final RationalNumber ZERO = new RationalNumber(0L, 1L);
-
     private static final String DIVIDE = " / ";
+
     private static final String LEFT = "(";
     private static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitLength();
+    private static final RationalNumber MINUS_ONE = ONE.negate();
     private static final String RIGHT = ")";
     private static final long SAFE_LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE / 2L));
-
-    /**
-     * Greatest Common Denominator
-     * <p>
-     * It uses Python-style gcd, with the sign of gcd equal to sign of b;
-     * that enables us to simplify fractions in one step
-     */
-    private static long gcd(final long a, final long b) {
-
-        long retVal = 1L;
-
-        long value1 = Math.abs(a);
-        long value2 = Math.abs(b);
-
-        long tmpMax = Math.max(value1, value2);
-        long tmpMin = Math.min(value1, value2);
-
-        while (tmpMin != 0L) {
-            retVal = tmpMin;
-            tmpMin = tmpMax % tmpMin;
-            tmpMax = retVal;
-        }
-
-        return b < 0 ? -retVal : retVal;
-    }
 
     public static boolean isAbsolute(final RationalNumber value) {
         return value.isAbsolute();
@@ -139,29 +114,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         } else {
             return new RationalNumber(numerator, denominator);
         }
-    }
-
-    private static RationalNumber of(BigInteger numer, BigInteger denom) {
-        final BigInteger gcd = numer.gcd(denom);
-        if (gcd.compareTo(BigInteger.ONE) > 0) {
-            numer = numer.divide(gcd);
-            denom = denom.divide(gcd);
-        }
-
-        if (denom.signum() == -1) {
-            numer = numer.negate();
-            denom = denom.negate();
-        }
-
-        final int bits = Math.max(numer.bitLength(), denom.bitLength());
-
-        if (bits > MAX_BITS) {
-            final int shift = bits - MAX_BITS;
-            numer = numer.shiftRight(shift);
-            denom = denom.shiftRight(shift);
-        }
-
-        return RationalNumber.of(numer.longValueExact(), denom.longValueExact());
     }
 
     public static RationalNumber valueOf(final double value) {
@@ -272,17 +224,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
     }
 
-    private static String toString(final RationalNumber aNmbr) {
-
-        final StringBuilder retVal = new StringBuilder(LEFT);
-
-        retVal.append(aNmbr.getNumerator());
-        retVal.append(DIVIDE);
-        retVal.append(aNmbr.getDenominator());
-
-        return retVal.append(RIGHT).toString();
-    }
-
     private static RationalNumber add(final RationalNumber arg1, final RationalNumber arg2) {
 
         final BigInteger numer1 = BigInteger.valueOf(arg1.getNumerator());
@@ -294,7 +235,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         BigInteger retNumer = numer1.multiply(denom2).add(numer2.multiply(denom1));
         BigInteger retDenom = denom1.multiply(denom2);
 
-        return of(retNumer, retDenom);
+        return RationalNumber.of(retNumer, retDenom);
     }
 
     private static RationalNumber divide(final RationalNumber arg1, final RationalNumber arg2) {
@@ -308,7 +249,32 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         BigInteger retNumer = numer1.multiply(denom2);
         BigInteger retDenom = denom1.multiply(numer2);
 
-        return of(retNumer, retDenom);
+        return RationalNumber.of(retNumer, retDenom);
+    }
+
+    /**
+     * Greatest Common Denominator
+     * <p>
+     * It uses Python-style gcd, with the sign of gcd equal to sign of b; that enables us to simplify
+     * fractions in one step
+     */
+    private static long gcd(final long a, final long b) {
+
+        long retVal = 1L;
+
+        long value1 = Math.abs(a);
+        long value2 = Math.abs(b);
+
+        long tmpMax = Math.max(value1, value2);
+        long tmpMin = Math.min(value1, value2);
+
+        while (tmpMin != 0L) {
+            retVal = tmpMin;
+            tmpMin = tmpMax % tmpMin;
+            tmpMax = retVal;
+        }
+
+        return b < 0 ? -retVal : retVal;
     }
 
     private static RationalNumber multiply(final RationalNumber arg1, final RationalNumber arg2) {
@@ -322,7 +288,30 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         BigInteger retNumer = numer1.multiply(numer2);
         BigInteger retDenom = denom1.multiply(denom2);
 
-        return of(retNumer, retDenom);
+        return RationalNumber.of(retNumer, retDenom);
+    }
+
+    private static RationalNumber of(BigInteger numer, BigInteger denom) {
+        final BigInteger gcd = numer.gcd(denom);
+        if (gcd.compareTo(BigInteger.ONE) > 0) {
+            numer = numer.divide(gcd);
+            denom = denom.divide(gcd);
+        }
+
+        if (denom.signum() == -1) {
+            numer = numer.negate();
+            denom = denom.negate();
+        }
+
+        final int bits = Math.max(numer.bitLength(), denom.bitLength());
+
+        if (bits > MAX_BITS) {
+            final int shift = bits - MAX_BITS;
+            numer = numer.shiftRight(shift);
+            denom = denom.shiftRight(shift);
+        }
+
+        return RationalNumber.of(numer.longValueExact(), denom.longValueExact());
     }
 
     private static RationalNumber subtract(final RationalNumber arg1, final RationalNumber arg2) {
@@ -336,7 +325,18 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         BigInteger retNumer = numer1.multiply(denom2).subtract(numer2.multiply(denom1));
         BigInteger retDenom = denom1.multiply(denom2);
 
-        return of(retNumer, retDenom);
+        return RationalNumber.of(retNumer, retDenom);
+    }
+
+    private static String toString(final RationalNumber aNmbr) {
+
+        final StringBuilder retVal = new StringBuilder(LEFT);
+
+        retVal.append(aNmbr.getNumerator());
+        retVal.append(DIVIDE);
+        retVal.append(aNmbr.getDenominator());
+
+        return retVal.append(RIGHT).toString();
     }
 
     private transient BigDecimal myDecimal = null;
@@ -359,12 +359,12 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber add(final RationalNumber arg) {
-        if (isNaN() || arg.isNaN()) {
+        if (this.isNaN() || arg.isNaN()) {
             return NaN;
         }
 
-        if (isInfinite()) {
-            if (!isInfinite(arg) || this.sign() == arg.sign()) {
+        if (this.isInfinite()) {
+            if (!RationalNumber.isInfinite(arg) || this.sign() == arg.sign()) {
                 return this;
             } else {
                 return NaN;
@@ -391,10 +391,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
     }
 
-    private boolean isNaN() {
-        return isNaN(this);
-    }
-
     public int compareTo(final RationalNumber reference) {
         return this.toBigDecimal().compareTo(reference.toBigDecimal());
     }
@@ -408,12 +404,12 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber divide(final RationalNumber arg) {
-        if (isNaN() || arg.isNaN()) {
+        if (this.isNaN() || arg.isNaN()) {
             return NaN;
         }
 
-        if (isInfinite()) {
-            if (!isInfinite(arg)) {
+        if (this.isInfinite()) {
+            if (!RationalNumber.isInfinite(arg)) {
                 return arg.sign() > 0 ? this : this.negate();
             } else {
                 return NaN;
@@ -435,10 +431,10 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
     @Override
     public double doubleValue() {
-        if (isNaN()) {
+        if (this.isNaN()) {
             return Double.NaN;
         }
-        if (isInfinite()) {
+        if (this.isInfinite()) {
             return this.sign() > 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
         }
         return this.toBigDecimal().doubleValue();
@@ -493,7 +489,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber invert() {
-        return sign() >= 0 ?
+        return this.sign() >= 0 ?
                 new RationalNumber(myDenominator, myNumerator) :
                 new RationalNumber(-myDenominator, -myNumerator);
     }
@@ -516,11 +512,11 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber multiply(final RationalNumber arg) {
-        if (isNaN() || arg.isNaN()) {
+        if (this.isNaN() || arg.isNaN()) {
             return NaN;
         }
 
-        if (isInfinite()) {
+        if (this.isInfinite()) {
             return arg.sign() > 0 ? this : this.negate();
         }
 
@@ -537,10 +533,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
     }
 
-    private boolean isInfinite() {
-        return isInfinite(this);
-    }
-
     public RationalNumber negate() {
         return new RationalNumber(-myNumerator, myDenominator);
     }
@@ -550,7 +542,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber signum() {
-        if (!isInfinite() && RationalNumber.isSmall(PrimitiveMath.ONE, this)) {
+        if (!this.isInfinite() && RationalNumber.isSmall(PrimitiveMath.ONE, this)) {
             return ZERO;
         } else if (this.sign() == -1) {
             return MINUS_ONE;
@@ -564,11 +556,11 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber subtract(final RationalNumber arg) {
-        if (isNaN() || arg.isNaN()) {
+        if (this.isNaN() || arg.isNaN()) {
             return NaN;
         }
 
-        if (isInfinite()) {
+        if (this.isInfinite()) {
             if (!arg.isInfinite() || this.sign() != arg.sign()) {
                 return this;
             } else {
@@ -612,6 +604,14 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return RationalNumber.toString(this.enforce(context));
     }
 
+    private boolean isInfinite() {
+        return RationalNumber.isInfinite(this);
+    }
+
+    private boolean isNaN() {
+        return RationalNumber.isNaN(this);
+    }
+
     private int sign() {
         return Long.compare(myNumerator, 0L);
     }
@@ -621,11 +621,11 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     private BigDecimal toBigDecimal(final MathContext context) {
-        if (isNaN()) {
+        if (this.isNaN()) {
             return BigDecimal.valueOf(Double.POSITIVE_INFINITY); // TODO: really?!
         }
-        if (isInfinite()) {
-            return sign() > 0 ?
+        if (this.isInfinite()) {
+            return this.sign() > 0 ?
                     BigDecimal.valueOf(Double.POSITIVE_INFINITY) : // TODO: really?!
                     BigDecimal.valueOf(Double.NEGATIVE_INFINITY); // TODO: really?!
         }

@@ -21,12 +21,16 @@
  */
 package org.ojalgo.function;
 
-import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.constant.BigMath.ONE;
+import static org.ojalgo.constant.BigMath.TWO;
+import static org.ojalgo.constant.BigMath.ZERO;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -521,6 +525,11 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     @Override
     public BinaryFunction<BigDecimal> add() {
         return ADD;
+    }
+
+    @Override
+    public AggregatorSet<BigDecimal> aggregator() {
+        return BigAggregator.getSet();
     }
 
     @Override

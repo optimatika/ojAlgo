@@ -21,6 +21,7 @@
  */
 package org.ojalgo.function;
 
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -50,6 +51,8 @@ public abstract class FunctionSet<N extends Number> {
      * +
      */
     public abstract BinaryFunction<N> add();
+
+    public abstract AggregatorSet<N> aggregator();
 
     /**
      * @see Math#asin(double)

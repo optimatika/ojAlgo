@@ -21,8 +21,13 @@
  */
 package org.ojalgo.function;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.constant.PrimitiveMath.HALF;
+import static org.ojalgo.constant.PrimitiveMath.ONE;
+import static org.ojalgo.constant.PrimitiveMath.THIRD;
+import static org.ojalgo.constant.PrimitiveMath.TWO;
 
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
@@ -562,6 +567,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     @Override
     public BinaryFunction<ComplexNumber> add() {
         return ADD;
+    }
+
+    @Override
+    public AggregatorSet<ComplexNumber> aggregator() {
+        return ComplexAggregator.getSet();
     }
 
     @Override

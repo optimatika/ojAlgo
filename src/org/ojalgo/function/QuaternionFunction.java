@@ -22,6 +22,8 @@
 package org.ojalgo.function;
 
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.QuaternionAggregator;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.type.context.NumberContext;
@@ -567,6 +569,11 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     @Override
     public BinaryFunction<Quaternion> add() {
         return ADD;
+    }
+
+    @Override
+    public AggregatorSet<Quaternion> aggregator() {
+        return QuaternionAggregator.getSet();
     }
 
     @Override

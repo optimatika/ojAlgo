@@ -21,10 +21,15 @@
  */
 package org.ojalgo.function;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.constant.PrimitiveMath.ONE;
+import static org.ojalgo.constant.PrimitiveMath.TEN;
+import static org.ojalgo.constant.PrimitiveMath.TWO;
+import static org.ojalgo.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -501,6 +506,11 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     @Override
     public BinaryFunction<Double> add() {
         return ADD;
+    }
+
+    @Override
+    public AggregatorSet<Double> aggregator() {
+        return PrimitiveAggregator.getSet();
     }
 
     @Override
