@@ -99,8 +99,6 @@ public class RationalNumberTest {
 
         int i;
         for (i = 0; i < ds.length && error > PrimitiveMath.MACHINE_EPSILON; i++) {
-            System.out.println("d = " + g);
-            System.out.println("error = " + error);
             if (g > Long.MAX_VALUE) {
                 throw new ArithmeticException("Cannot fit a double into long!");
             }
