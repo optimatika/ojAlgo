@@ -117,7 +117,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public static RationalNumber valueOf(final long value) {
-        return of(value, 1L);
+        return fromLong(value);
     }
 
     public static RationalNumber valueOf(final double value) {
@@ -174,19 +174,30 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         final boolean negative = d < 0;
         double g = Math.abs(d);
 
-        long[] ds = new long[21]; // TODO: 4alf: Worst-case, they say
+        long[] ds = new long[40]; // TODO: 4alf: Isn't it too big?
+        double error = 1.0;
 
-        for (int i = 0; i < ds.length; i++) {
-            ds[i] = (long) Math.floor(g); // TODO: 4alf: overflow!
+        int i;
+        for (i = 0; i < ds.length && error > PrimitiveMath.MACHINE_EPSILON; i++) {
+            if (g > Long.MAX_VALUE) {
+                throw new ArithmeticException("Cannot fit a double into long!");
+            }
+            ds[i] = (long) Math.floor(g);
             double remainder = g - ds[i];
             g = 1.0 / remainder;
+            error *= remainder;
         }
+        i--;
 
-        RationalNumber approximation = of(1L, ds[ds.length - 1]);
-        for (int i = ds.length - 1; --i >= 0; ) {
-            approximation = of(ds[i], 1L).add(approximation.invert());
+        RationalNumber approximation = fromLong(ds[i]);
+        for (; --i >= 0; ) {
+            approximation = fromLong(ds[i]).add(approximation.invert());
         }
         return negative ? approximation.negate() : approximation;
+    }
+
+    private static RationalNumber fromLong(long d) {
+        return of(d, 1L);
     }
 
     public static RationalNumber valueOf(final Number number) {
