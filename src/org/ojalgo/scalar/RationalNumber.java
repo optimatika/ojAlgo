@@ -131,69 +131,31 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
 
         return rational(value);
-//
-//final long bits = Double.doubleToLongBits(value);
-//
-        // //Please refer to {@link Double#doubleToLongBits(long)} javadoc
-//        final int s = ((bits >> 63) == 0) ? 1 : -1;
-//        final int e = (int) ((bits >> 52) & 0x7ffL);
-//        long m = (e == 0) ?
-               // (bits & 0xfffffffffffffL) << 1 :
-               // (bits & 0xfffffffffffffL) | 0x10000000000000L;
-        // //Now we're looking for s * m * 2^{e - 1075}, 1075 being bias of 1023 plus 52 positions of binary fraction
-//
-//        int exponent = e - 1075;
-//
-//        if (exponent >= 0) {
-//            long numerator = m << exponent;
-//            if (numerator >> exponent != m) {
-//                return s > 0 ? RationalNumber.POSITIVE_INFINITY : RationalNumber.NEGATIVE_INFINITY;
-//            }
-//            return new RationalNumber(s * numerator, 1L);
-//        }
-//
-        // //Since denominator is a power of 2, GCD can only be power of two, so we simplify by dividing by 2 repeatedly
-//        while ((m & 1) == 0 && exponent < 0) {
-//            m >>= 1;
-//            exponent++;
-//        }
-        // //Avoiding the the denominator overflow
-//        if (-exponent >= MAX_BITS) {
-//            BigInteger denom = BigInteger.ONE.shiftLeft(-exponent);
-//            BigInteger maxlong = BigInteger.valueOf(Long.MAX_VALUE);
-//            BigInteger factor = denom.divide(maxlong);
-//            if (factor.compareTo(maxlong) > 0) {
-//                return ZERO;
-//            }
-//            return new RationalNumber(s * m / factor.longValueExact(), Long.MAX_VALUE);
-//        }
-//        return new RationalNumber(s * m, 1L << -exponent);
     }
 
     public static RationalNumber rational(final double d) {
-        final boolean negative = d < 0;
-        double g = Math.abs(d);
-
-        long[] ds = new long[40]; // TODO: 4alf: Isn't it too big?
-        double error = 1.0;
-
-        int i;
-        for (i = 0; i < ds.length && error > PrimitiveMath.MACHINE_EPSILON; i++) {
-            if (g > Long.MAX_VALUE) {
-                throw new ArithmeticException("Cannot fit a double into long!");
-            }
-            ds[i] = (long) Math.floor(g);
-            double remainder = g - ds[i];
-            g = 1.0 / remainder;
-            error *= remainder;
+        if (d < 0) {
+            return rational(-d, 1.0, 39).negate();
+        } else {
+            return rational(d, 1.0, 39);
         }
-        i--;
+    }
 
-        RationalNumber approximation = fromLong(ds[i]);
-        for (; --i >= 0; ) {
-            approximation = fromLong(ds[i]).add(approximation.invert());
+    private static RationalNumber rational(double d, double error, int depthLimit) {
+        assert (d >= 0);
+        if (d > Long.MAX_VALUE) {
+            throw new ArithmeticException("Cannot fit a double into long!");
         }
-        return negative ? approximation.negate() : approximation;
+        final double a = Math.floor(d);
+        RationalNumber approximation = fromLong((long) a);
+        double remainder = d - a;
+        double newError = error * remainder;
+        if (newError > PrimitiveMath.MACHINE_EPSILON && depthLimit > 0) {
+            RationalNumber rationalRemainder = rational(1.0 / remainder, newError, depthLimit - 1).invert();
+            return approximation.add(rationalRemainder);
+        } else {
+            return approximation;
+        }
     }
 
     private static RationalNumber fromLong(long d) {

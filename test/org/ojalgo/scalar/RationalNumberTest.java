@@ -1,15 +1,17 @@
 package org.ojalgo.scalar;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.ojalgo.constant.PrimitiveMath;
 
 import java.math.BigDecimal;
+import java.util.Random;
 
 import static org.ojalgo.TestUtils.assertEquals;
 import static org.ojalgo.TestUtils.assertTrue;
-import static org.ojalgo.scalar.RationalNumber.of;
+import static org.ojalgo.scalar.RationalNumber.*;
 
 public class RationalNumberTest {
 
@@ -25,9 +27,9 @@ public class RationalNumberTest {
     })
     public void testValueOf(double d) {
 
-        final RationalNumber direct = RationalNumber.valueOf(d);
-        final RationalNumber approximation = RationalNumber.valueOf(d);
-        final RationalNumber viaBigDecimal = RationalNumber.valueOf(BigDecimal.valueOf(d));
+        final RationalNumber direct = valueOf(d);
+        final RationalNumber approximation = valueOf(d);
+        final RationalNumber viaBigDecimal = valueOf(BigDecimal.valueOf(d));
 
         double viaDirect = direct.doubleValue();
         assertEquals(d, viaDirect, myDiff);
@@ -51,8 +53,8 @@ public class RationalNumberTest {
 
     @Test
     public void testMultiplication() {
-        RationalNumber a = RationalNumber.valueOf(0.04919653065050689);
-        RationalNumber b = RationalNumber.valueOf(1.2325077080153841);
+        RationalNumber a = valueOf(0.04919653065050689);
+        RationalNumber b = valueOf(1.2325077080153841);
 
         assertEquals(a.multiply(b).doubleValue(), a.doubleValue() * b.doubleValue(), myDiff);
     }
@@ -76,6 +78,45 @@ public class RationalNumberTest {
 
     @Test
     public void testRational() {
-        assertEquals(of(1, 10), RationalNumber.rational(0.1));
+        assertEquals(of(1, 10), rational(0.1));
     }
+
+    @Test
+    public void testRationals() {
+        Random r = new Random();
+        for (int i = 0; i < 100; i++) {
+            double d = r.nextGaussian();
+            Assert.assertEquals("Failing for " + d, rational2(d), rational(d));
+        }
+    }
+
+    private static RationalNumber rational2(final double d) {
+        final boolean negative = d < 0;
+        double g = Math.abs(d);
+
+        long[] ds = new long[40]; // TODO: 4alf: Isn't it too big? Or too small?
+        double error = 1.0;
+
+        int i;
+        for (i = 0; i < ds.length && error > PrimitiveMath.MACHINE_EPSILON; i++) {
+            System.out.println("d = " + g);
+            System.out.println("error = " + error);
+            if (g > Long.MAX_VALUE) {
+                throw new ArithmeticException("Cannot fit a double into long!");
+            }
+            ds[i] = (long) Math.floor(g);
+            double remainder = g - ds[i];
+            g = 1.0 / remainder;
+            error *= remainder;
+        }
+        i--;
+
+        RationalNumber approximation = valueOf(ds[i]);
+        for (; --i >= 0; ) {
+            approximation = valueOf(ds[i]).add(approximation.invert());
+        }
+        return negative ? approximation.negate() : approximation;
+    }
+
+
 }
