@@ -1,7 +1,9 @@
 package org.ojalgo.type;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 import org.junit.Test;
 import org.ojalgo.TestUtils;
@@ -80,6 +82,11 @@ public class TimeIndexTest {
 
         TimeIndexTest.doTestFrom(TimeIndex.ZONED_DATE_TIME, CalendarDate.toZonedDateTime(instant, SYS_DEF_ZONE),
                 CalendarDate.toZonedDateTime(reference, SYS_DEF_ZONE));
+
+        final ZoneOffset refSysOffset = OffsetDateTime.ofInstant(reference, SYS_DEF_ZONE).getOffset();
+
+        TimeIndexTest.doTestFrom(TimeIndex.ZONED_DATE_TIME, CalendarDate.toZonedDateTime(instant, refSysOffset),
+                CalendarDate.toZonedDateTime(reference, refSysOffset));
     }
 
     @Test

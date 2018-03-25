@@ -168,6 +168,10 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate>, S
         return OffsetDateTime.ofInstant(instant, zone).withOffsetSameInstant(OffsetDateTime.ofInstant(zoneToOffsetConversionInstant, zone).getOffset());
     }
 
+    public static OffsetDateTime toOffsetDateTime(final Instant instant, final ZoneOffset offset) {
+        return OffsetDateTime.ofInstant(instant, ZoneId.systemDefault()).withOffsetSameInstant(offset);
+    }
+
     public static ZonedDateTime toZonedDateTime(final Instant instant, final ZoneId zone) {
         return ZonedDateTime.ofInstant(instant, zone);
     }
