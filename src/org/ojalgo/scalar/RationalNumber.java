@@ -21,16 +21,16 @@
  */
 package org.ojalgo.scalar;
 
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.type.TypeUtils;
-import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.context.NumberContext.Enforceable;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
-import static org.ojalgo.function.PrimitiveFunction.ABS;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.type.TypeUtils;
+import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.type.context.NumberContext.Enforceable;
 
 public final class RationalNumber extends Number implements Scalar<RationalNumber>, Enforceable<RationalNumber> {
 
@@ -135,9 +135,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         // Please refer to {@link Double#doubleToLongBits(long)} javadoc
         final int s = ((bits >> 63) == 0) ? 1 : -1;
         final int e = (int) ((bits >> 52) & 0x7ffL);
-        long m = (e == 0) ?
-                (bits & 0xfffffffffffffL) << 1 :
-                (bits & 0xfffffffffffffL) | 0x10000000000000L;
+        long m = (e == 0) ? (bits & 0xfffffffffffffL) << 1 : (bits & 0xfffffffffffffL) | 0x10000000000000L;
         // Now we're looking for s * m * 2^{e - 1075}, 1075 being bias of 1023 plus 52 positions of binary fraction
 
         int exponent = e - 1075;

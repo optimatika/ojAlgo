@@ -1,24 +1,23 @@
 package org.ojalgo.scalar;
 
+import static org.ojalgo.TestUtils.*;
+import static org.ojalgo.scalar.RationalNumber.*;
+
+import java.math.BigDecimal;
+import java.util.Random;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.ojalgo.constant.PrimitiveMath;
 
-import java.math.BigDecimal;
-import java.util.Random;
-
-import static org.ojalgo.TestUtils.assertEquals;
-import static org.ojalgo.TestUtils.assertTrue;
-import static org.ojalgo.scalar.RationalNumber.*;
-
 public class RationalNumberTest {
 
     private final double myDiff = PrimitiveMath.MACHINE_EPSILON;
 
     @ParameterizedTest(name = "#{index} valueOf({arguments})")
-    @ValueSource(doubles = {0.3, 0.25, 1e7, 5e8, -25.22e-4, 0.04919653065050689, 1.2325077080153841
+    @ValueSource(doubles = { 0.3, 0.25, 1e7, 5e8, -25.22e-4, 0.04919653065050689, 1.2325077080153841
             //                ,
             //                4223372036854775807.0,
             //                -4223372036854775808.0,
@@ -110,11 +109,10 @@ public class RationalNumberTest {
         i--;
 
         RationalNumber approximation = valueOf(ds[i]);
-        for (; --i >= 0; ) {
+        for (; --i >= 0;) {
             approximation = valueOf(ds[i]).add(approximation.invert());
         }
         return negative ? approximation.negate() : approximation;
     }
-
 
 }
