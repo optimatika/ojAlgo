@@ -22,11 +22,11 @@
 package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.ColumnView;
@@ -96,27 +96,25 @@ public abstract class BasicMatrixTest {
      * @see org.ojalgo.matrix.BasicMatrix#getEigenvalues()
      */
     @Test
-    @Ignore("Was called _testGetEigenvalues() before JUnit 5 migration")
     public void testGetEigenvalues() {
 
-        if (myBigAA.isSquare()) {
+        if (myBigAA.isSquare() && MatrixUtils.isHermitian(myBigAA)) {
 
-            final List<ComplexNumber> tmpExpStore = myPrimitiveAA.getEigenvalues();
-            List<ComplexNumber> tmpActStore;
+            final List<ComplexNumber> expected = myPrimitiveAA.getEigenvalues();
+            Collections.sort(expected);
+            List<ComplexNumber> actual;
 
-            if (MatrixUtils.isHermitian(PrimitiveDenseStore.FACTORY.copy(myBigAA))) {
-
-                tmpActStore = myBigAA.getEigenvalues();
-                for (int i = 0; i < tmpExpStore.size(); i++) {
-                    TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
-                }
-
-                tmpActStore = myComplexAA.getEigenvalues();
-                for (int i = 0; i < tmpExpStore.size(); i++) {
-                    TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
-                }
+            actual = myBigAA.getEigenvalues();
+            Collections.sort(actual);
+            for (int i = 0; i < expected.size(); i++) {
+                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i), actual.get(i), EVALUATION);
             }
 
+            actual = myComplexAA.getEigenvalues();
+            Collections.sort(actual);
+            for (int i = 0; i < expected.size(); i++) {
+                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i), actual.get(i), EVALUATION);
+            }
         }
     }
 

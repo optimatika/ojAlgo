@@ -196,6 +196,10 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate>, S
         }
     }
 
+    /**
+     * An "instant" with ms precision. Equivalent to what is returned by {@link Instant#toEpochMilli()} and/or
+     * {@link System#currentTimeMillis()}.
+     */
     public final long millis;
 
     public CalendarDate() {
