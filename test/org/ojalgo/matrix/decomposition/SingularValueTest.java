@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access2D;
@@ -64,13 +63,11 @@ public class SingularValueTest {
     }
 
     @Test
-    @Ignore("Underscored before JUnit 5")
     public void testBasicMatrixP20030422Case() {
         this.doTestTypes(P20030422Case.getProblematic());
     }
 
     @Test
-    @Ignore("Underscored before JUnit 5")
     public void testBasicMatrixP20030512Case() {
         this.doTestTypes(P20030512Case.getProblematic());
     }
@@ -123,7 +120,7 @@ public class SingularValueTest {
         final Bidiagonal<ComplexNumber> tmpBidiagonal = Bidiagonal.COMPLEX.make();
         final SingularValue<ComplexNumber> tmpSVD = SingularValue.COMPLEX.make();
 
-        for (ComplexNumber tmpScale : tmpScales) {
+        for (final ComplexNumber tmpScale : tmpScales) {
 
             final PhysicalStore<ComplexNumber> tmpOriginalMtrx = ComplexDenseStore.FACTORY.transpose(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexFunction.MULTIPLY.first(tmpScale));
@@ -142,7 +139,7 @@ public class SingularValueTest {
             TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, new NumberContext(7, 6));
         }
 
-        for (ComplexNumber tmpScale : tmpScales) {
+        for (final ComplexNumber tmpScale : tmpScales) {
 
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug();
@@ -353,7 +350,6 @@ public class SingularValueTest {
             BasicLogger.debug("Direc inverse", IMPL_PRIMITIVE.getInverse());
         }
 
-
         TestUtils.assertEquals(tmpBigStore, IMPL_BIG, CNTXT_REAL_DECOMP);
         TestUtils.assertEquals(tmpComplexStore, IMPL_COMPLEX, CNTXT_CPLX_DECOMP); // Fails too often...
         TestUtils.assertEquals(tmpPrimitiveStore, IMPL_RAW, CNTXT_REAL_DECOMP);
@@ -364,7 +360,7 @@ public class SingularValueTest {
 
         final SingularValue<Double>[] tmpImpls = MatrixDecompositionTests.getSingularValuePrimitive();
 
-        for (SingularValue<Double> tmpImpl : tmpImpls) {
+        for (final SingularValue<Double> tmpImpl : tmpImpls) {
 
             tmpImpl.decompose(aMtrx);
             final MatrixStore<Double> tmpReconstructed = SingularValue.reconstruct(tmpImpl);

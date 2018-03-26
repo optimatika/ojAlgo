@@ -22,8 +22,8 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.api.Tag;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
@@ -50,8 +50,7 @@ public class DecompositionProblems {
      * A user reported problems solving complex valued (overdetermined) equation systemes.
      */
     @Test
-    @Ignore("Underscored before JUnit 5")
-    public void _testP20111213square() {
+    public void testP20111213square() {
 
         final int tmpDim = Uniform.randomInteger(2, 6);
 
@@ -93,8 +92,8 @@ public class DecompositionProblems {
      * A user reported problems related to calculating the pseudoinverse for large (2000x2000) matrices.
      */
     @Test
-    @Ignore("Underscored before JUnit 5")
-    public void _testP20160419() {
+    @Tag("slow")
+    public void testP20160419() {
 
         final PrimitiveDenseStore tmpOrg = PrimitiveDenseStore.FACTORY.makeFilled(2000, 2000, new Normal());
 
@@ -117,8 +116,8 @@ public class DecompositionProblems {
      * https://github.com/optimatika/ojAlgo/issues/22
      */
     @Test
-    @Ignore("Underscored before JUnit 5")
-    public void _testP20160510InvertLargeMatrix() {
+    @Tag("slow")
+    public void testP20160510InvertLargeMatrix() {
 
         final double[][] data = new double[3000][3000];
         for (int i = 0; i < data.length; i++) {
