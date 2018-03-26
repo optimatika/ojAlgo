@@ -53,9 +53,9 @@ public class SingularValueTest {
     private static final BasicMatrix MTRX_SQUARE = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(8, 8));
     private static final BasicMatrix MTRX_TALL = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 7));
 
-    static final NumberContext CNTXT_CPLX_DECOMP = new NumberContext(7, 5);
+    static final NumberContext CNTXT_CPLX_DECOMP = new NumberContext(3, 2);
     static final NumberContext CNTXT_CPLX_VALUES = new NumberContext(7, 7);
-    static final NumberContext CNTXT_REAL_DECOMP = new NumberContext(4, 6);
+    static final NumberContext CNTXT_REAL_DECOMP = new NumberContext(3, 2);
     static final NumberContext CNTXT_REAL_VALUES = new NumberContext(7, 10);
 
     @Before
@@ -65,25 +65,23 @@ public class SingularValueTest {
 
     @Test
     @Ignore("Underscored before JUnit 5")
-    public void _testBasicMatrixP20030422Case() {
+    public void testBasicMatrixP20030422Case() {
         this.doTestTypes(P20030422Case.getProblematic());
     }
 
     @Test
     @Ignore("Underscored before JUnit 5")
-    public void _testBasicMatrixP20030512Case() {
+    public void testBasicMatrixP20030512Case() {
         this.doTestTypes(P20030512Case.getProblematic());
     }
 
     @Test
-    @Ignore("Underscored before JUnit 5")
-    public void _testBasicMatrixP20050827Case() {
+    public void testBasicMatrixP20050827Case() {
         this.doTestTypes(PrimitiveMatrix.FACTORY.copy(PrimitiveDenseStore.FACTORY.copy(P20050827Case.getProblematic())));
     }
 
     @Test
-    @Ignore("Underscored before JUnit 5")
-    public void _testBasicMatrixP20061119Case() {
+    public void testBasicMatrixP20061119Case() {
         this.doTestTypes(P20061119Case.getProblematic());
     }
 
@@ -294,7 +292,6 @@ public class SingularValueTest {
             BasicLogger.debug("Cmplx D", IMPL_COMPLEX.getD());
             BasicLogger.debug("Jama  D", IMPL_RAW.getD());
             BasicLogger.debug("Direc D", IMPL_PRIMITIVE.getD());
-
         }
 
         if (MatrixDecompositionTests.DEBUG) {
@@ -303,7 +300,6 @@ public class SingularValueTest {
             BasicLogger.debug("Cmplx Q1", IMPL_COMPLEX.getQ1());
             BasicLogger.debug("Jama  Q1", IMPL_RAW.getQ1());
             BasicLogger.debug("Direc Q1", IMPL_PRIMITIVE.getQ1());
-
         }
 
         if (MatrixDecompositionTests.DEBUG) {
@@ -312,7 +308,6 @@ public class SingularValueTest {
             BasicLogger.debug("Cmplx Q1 unitary", IMPL_COMPLEX.getQ1().logical().conjugate().get().multiply(IMPL_COMPLEX.getQ1()));
             BasicLogger.debug("Jama  Q1 unitary", IMPL_RAW.getQ1().logical().conjugate().get().multiply(IMPL_RAW.getQ1()));
             BasicLogger.debug("Direc Q1 unitary", IMPL_PRIMITIVE.getQ1().logical().conjugate().get().multiply(IMPL_PRIMITIVE.getQ1()));
-
         }
 
         if (MatrixDecompositionTests.DEBUG) {
@@ -321,7 +316,6 @@ public class SingularValueTest {
             BasicLogger.debug("Cmplx Q2", IMPL_COMPLEX.getQ2());
             BasicLogger.debug("Jama  Q2", IMPL_RAW.getQ2());
             BasicLogger.debug("Direc Q2", IMPL_PRIMITIVE.getQ2());
-
         }
 
         if (MatrixDecompositionTests.DEBUG) {
@@ -330,7 +324,6 @@ public class SingularValueTest {
             BasicLogger.debug("Cmplx Q2 unitary", IMPL_COMPLEX.getQ2().multiply(IMPL_COMPLEX.getQ2().logical().conjugate().get()));
             BasicLogger.debug("Jama  Q2 unitary", IMPL_RAW.getQ2().multiply(IMPL_RAW.getQ2().logical().conjugate().get()));
             BasicLogger.debug("Direc Q2 unitary", IMPL_PRIMITIVE.getQ2().multiply(IMPL_PRIMITIVE.getQ2().logical().conjugate().get()));
-
         }
 
         tmpPrimitiveRoundFunction = CNTXT_CPLX_VALUES.getFunction(PrimitiveFunction.getSet());
@@ -350,14 +343,21 @@ public class SingularValueTest {
             BasicLogger.debug("Cmplx Recreated", IMPL_COMPLEX.reconstruct());
             BasicLogger.debug("Jama  Recreated", IMPL_RAW.reconstruct());
             BasicLogger.debug("Direc Recreated", IMPL_PRIMITIVE.reconstruct());
-
         }
+
+        if (MatrixDecompositionTests.DEBUG) {
+            BasicLogger.debug();
+            BasicLogger.debug("Big   inverse", IMPL_BIG.getInverse());
+            BasicLogger.debug("Cmplx inverse", IMPL_COMPLEX.getInverse());
+            BasicLogger.debug("Jama  inverse", IMPL_RAW.getInverse());
+            BasicLogger.debug("Direc inverse", IMPL_PRIMITIVE.getInverse());
+        }
+
 
         TestUtils.assertEquals(tmpBigStore, IMPL_BIG, CNTXT_REAL_DECOMP);
         TestUtils.assertEquals(tmpComplexStore, IMPL_COMPLEX, CNTXT_CPLX_DECOMP); // Fails too often...
         TestUtils.assertEquals(tmpPrimitiveStore, IMPL_RAW, CNTXT_REAL_DECOMP);
         TestUtils.assertEquals(tmpPrimitiveStore, IMPL_PRIMITIVE, CNTXT_REAL_DECOMP);
-
     }
 
     private void testRecreation(final PhysicalStore<Double> aMtrx) {

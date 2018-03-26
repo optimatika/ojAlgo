@@ -38,7 +38,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.scalar.PrimitiveScalar;
 
 /**
  * <p>
@@ -530,20 +529,20 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         if (myPseudoinverse == null) {
 
-            final double[][] tmpQ1 = myTransposed ? new RawStore(myVt, n, n).transpose().data : new RawStore(myUt, n, m).transpose().data;
+            final double[][] tmpQ1t = myTransposed ? myVt : myUt;
             final double[] tmpSingular = s;
 
-            final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1.length);
+            final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1t[0].length);
             final double[][] tmpMtrxData = tmpMtrx.data;
 
             final double tmpEps = (tmpSingular[0] * MACHINE_EPSILON) * tmpSingular.length;
 
             for (int i = 0; i < tmpSingular.length; i++) {
                 final double tmpVal = tmpSingular[i];
-                if (!PrimitiveScalar.isSmall(tmpEps, tmpVal)) {
+                if (tmpVal > tmpEps) {
                     final double[] tmpRow = tmpMtrxData[i];
-                    for (int j = 0; j < tmpQ1.length; j++) {
-                        tmpRow[j] = tmpQ1[j][i] / tmpVal;
+                    for (int j = 0; j < tmpRow.length; j++) {
+                        tmpRow[j] = tmpQ1t[i][j] / tmpVal;
                     }
                 }
             }
