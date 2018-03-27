@@ -22,6 +22,7 @@
 package org.ojalgo.scalar;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
@@ -146,6 +147,7 @@ public class FundamentalScalarTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testNegate() {
 
         final double tmpExp = -value1;
