@@ -250,7 +250,6 @@ public class IntegerProblems {
      * <a href="http://bugzilla.optimatika.se/show_bug.cgi?id=211">BugZilla-211</a>
      */
     @Test
-    @Tag("slow")
     public void testP20140819() {
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();

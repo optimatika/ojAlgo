@@ -24,8 +24,6 @@ package org.ojalgo.matrix;
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -41,7 +39,6 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-@Tags({ @Tag("functionality"), @Tag("matrix") })
 public class LargerCholeskyCase extends BasicMatrixTest {
 
     public static RationalMatrix getOriginal() {

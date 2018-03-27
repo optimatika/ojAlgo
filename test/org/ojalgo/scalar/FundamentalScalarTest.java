@@ -22,8 +22,6 @@
 package org.ojalgo.scalar;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
@@ -33,7 +31,6 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-@Tags({ @Tag("functionality"), @Tag("scalar") })
 public class FundamentalScalarTest {
 
     private static final Uniform UNIFORM = new Uniform(0, 4);

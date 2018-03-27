@@ -55,7 +55,6 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-@SuppressWarnings("deprecation")
 public abstract class TestUtils {
 
     private static final NumberContext EQUALS = new NumberContext(7, 14, RoundingMode.HALF_EVEN);

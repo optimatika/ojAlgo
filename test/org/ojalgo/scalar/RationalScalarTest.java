@@ -21,13 +21,11 @@
  */
 package org.ojalgo.scalar;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 
-@Tags({ @Tag("functionality"), @Tag("scalar") })
+
 public class RationalScalarTest {
 
     private double myAct;

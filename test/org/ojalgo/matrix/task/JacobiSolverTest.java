@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.task;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -36,7 +34,6 @@ import org.ojalgo.matrix.task.iterative.JacobiSolver;
  *
  * @author apete
  */
-@Tags({ @Tag("functionality"), @Tag("matrix"), @Tag("task") })
 public class JacobiSolverTest extends AbstractMatrixDecompositionTaskTest {
 
     @Test

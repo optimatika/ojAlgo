@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
@@ -100,6 +101,7 @@ public class TridiagonalizeCase {
     }
 
     @Test
+    @Tag("unstable")
     public void testRandomBigComplexPrimitive() {
 
         BasicMatrix tmpSymmetricRandoml = PrimitiveMatrix.FACTORY.makeFilled(9, 9, new Normal());

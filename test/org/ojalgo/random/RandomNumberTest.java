@@ -24,6 +24,7 @@ package org.ojalgo.random;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
@@ -391,6 +392,7 @@ public class RandomNumberTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testSampledMean() {
 
         final RandomNumber[] tmpRndNmbrs = new RandomNumber[] { new Exponential(), new LogNormal(), new Normal(), new Uniform(), new Binomial(),

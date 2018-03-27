@@ -141,7 +141,7 @@
 					</includes>
 					<properties>
 						<!-- <includeTags>fast</includeTags> -->
-						<excludeTags>slow</excludeTags>
+						<excludeTags>slow,unstable</excludeTags>
 						<!-- <configurationParameters> junit.jupiter.conditions.deactivate 
 							= * </configurationParameters> -->
 					</properties>
