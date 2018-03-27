@@ -1,6 +1,6 @@
 package org.ojalgo.machine;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 
 public class TestHardware {

@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.function.ComplexFunction;
@@ -108,7 +108,7 @@ public class P20050827Case extends BasicMatrixTest {
 
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
 

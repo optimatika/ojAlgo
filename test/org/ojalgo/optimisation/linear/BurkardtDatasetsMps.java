@@ -17,7 +17,7 @@ import static org.ojalgo.constant.BigMath.*;
 import java.io.File;
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.optimisation.Expression;

@@ -23,7 +23,7 @@ package org.ojalgo.random.process;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;

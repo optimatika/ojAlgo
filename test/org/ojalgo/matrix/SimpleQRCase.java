@@ -23,8 +23,8 @@ package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.decomposition.QR;
@@ -96,7 +96,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
 

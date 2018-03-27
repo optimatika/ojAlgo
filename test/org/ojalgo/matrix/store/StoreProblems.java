@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;

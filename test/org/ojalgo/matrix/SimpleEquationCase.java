@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -44,7 +44,7 @@ public class SimpleEquationCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
 

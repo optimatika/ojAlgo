@@ -1,15 +1,12 @@
 package org.ojalgo.scalar;
 
-import static org.ojalgo.TestUtils.*;
-import static org.ojalgo.scalar.RationalNumber.*;
-
 import java.math.BigDecimal;
 import java.util.Random;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 
 public class RationalNumberTest {
@@ -26,16 +23,16 @@ public class RationalNumberTest {
     })
     public void testValueOf(double d) {
 
-        final RationalNumber direct = valueOf(d);
-        final RationalNumber approximation = valueOf(d);
-        final RationalNumber viaBigDecimal = valueOf(BigDecimal.valueOf(d));
+        final RationalNumber direct = RationalNumber.valueOf(d);
+        final RationalNumber approximation = RationalNumber.valueOf(d);
+        final RationalNumber viaBigDecimal = RationalNumber.valueOf(BigDecimal.valueOf(d));
 
         double viaDirect = direct.doubleValue();
-        assertEquals(d, viaDirect, myDiff);
-        assertEquals(d, approximation.doubleValue(), myDiff);
-        assertEquals(d >= 0.0, direct.isAbsolute());
+        TestUtils.assertEquals(d, viaDirect, myDiff);
+        TestUtils.assertEquals(d, approximation.doubleValue(), myDiff);
+        TestUtils.assertEquals(d >= 0.0, direct.isAbsolute());
         double expected = viaBigDecimal.doubleValue();
-        assertEquals(expected, viaDirect, myDiff);
+        TestUtils.assertEquals(expected, viaDirect, myDiff);
     }
 
     @ParameterizedTest(name = "#{index} valueOf(longBitsToDouble({arguments}))")
@@ -47,37 +44,37 @@ public class RationalNumberTest {
             0b0_1111110011_1111111111111111111111111111111111111111111111111111L, // * 2^{-64}
     })
     public void testValueOf(long l) {
-        testValueOf(Double.longBitsToDouble(l));
+        this.testValueOf(Double.longBitsToDouble(l));
     }
 
     @Test
     public void testMultiplication() {
-        RationalNumber a = valueOf(0.04919653065050689);
-        RationalNumber b = valueOf(1.2325077080153841);
+        RationalNumber a = RationalNumber.valueOf(0.04919653065050689);
+        RationalNumber b = RationalNumber.valueOf(1.2325077080153841);
 
-        assertEquals(a.multiply(b).doubleValue(), a.doubleValue() * b.doubleValue(), myDiff);
+        TestUtils.assertEquals(a.multiply(b).doubleValue(), a.doubleValue() * b.doubleValue(), myDiff);
     }
 
     @Test
     public void testNaN() {
-        assertEquals(Double.doubleToLongBits(RationalNumber.NaN.doubleValue()), Double.doubleToLongBits(Double.NaN));
-        assertTrue(RationalNumber.isNaN(RationalNumber.NaN.add(RationalNumber.NaN)));
-        assertTrue(RationalNumber.isNaN(RationalNumber.ONE.add(RationalNumber.NaN)));
-        assertTrue(RationalNumber.isNaN(RationalNumber.NaN.add(RationalNumber.ONE)));
+        TestUtils.assertEquals(Double.doubleToLongBits(RationalNumber.NaN.doubleValue()), Double.doubleToLongBits(Double.NaN));
+        TestUtils.assertTrue(RationalNumber.isNaN(RationalNumber.NaN.add(RationalNumber.NaN)));
+        TestUtils.assertTrue(RationalNumber.isNaN(RationalNumber.ONE.add(RationalNumber.NaN)));
+        TestUtils.assertTrue(RationalNumber.isNaN(RationalNumber.NaN.add(RationalNumber.ONE)));
     }
 
     @Test
     public void testInfinity() {
-        assertTrue(Double.isInfinite(RationalNumber.POSITIVE_INFINITY.doubleValue()));
-        assertTrue(RationalNumber.POSITIVE_INFINITY.doubleValue() > 0.0);
-        assertTrue(Double.isInfinite(RationalNumber.NEGATIVE_INFINITY.doubleValue()));
-        assertTrue(RationalNumber.NEGATIVE_INFINITY.doubleValue() < 0.0);
-        assertTrue(RationalNumber.isInfinite(RationalNumber.POSITIVE_INFINITY.add(RationalNumber.POSITIVE_INFINITY)));
+        TestUtils.assertTrue(Double.isInfinite(RationalNumber.POSITIVE_INFINITY.doubleValue()));
+        TestUtils.assertTrue(RationalNumber.POSITIVE_INFINITY.doubleValue() > 0.0);
+        TestUtils.assertTrue(Double.isInfinite(RationalNumber.NEGATIVE_INFINITY.doubleValue()));
+        TestUtils.assertTrue(RationalNumber.NEGATIVE_INFINITY.doubleValue() < 0.0);
+        TestUtils.assertTrue(RationalNumber.isInfinite(RationalNumber.POSITIVE_INFINITY.add(RationalNumber.POSITIVE_INFINITY)));
     }
 
     @Test
     public void testRational() {
-        assertEquals(of(1, 10), rational(0.1));
+        TestUtils.assertEquals(RationalNumber.of(1, 10), RationalNumber.rational(0.1));
     }
 
     @Test
@@ -85,7 +82,7 @@ public class RationalNumberTest {
         Random r = new Random();
         for (int i = 0; i < 100; i++) {
             double d = r.nextGaussian();
-            Assert.assertEquals("Failing for " + d, rational2(d), rational(d));
+            TestUtils.assertEquals("Failing for " + d, RationalNumberTest.rational2(d), RationalNumber.rational(d));
         }
     }
 
@@ -108,9 +105,9 @@ public class RationalNumberTest {
         }
         i--;
 
-        RationalNumber approximation = valueOf(ds[i]);
+        RationalNumber approximation = RationalNumber.valueOf(ds[i]);
         for (; --i >= 0;) {
-            approximation = valueOf(ds[i]).add(approximation.invert());
+            approximation = RationalNumber.valueOf(ds[i]).add(approximation.invert());
         }
         return negative ? approximation.negate() : approximation;
     }

@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.SimpleCholeskyCase;
@@ -49,7 +49,7 @@ public class CompareJamaAndPrimitive {
     private static LU<Double> PRIMITIVE_RAW_LU = LU.PRIMITIVE.make();
     private static SingularValue<Double> PRIMITIVE_SVD = SingularValue.PRIMITIVE.make();
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }

@@ -25,9 +25,9 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.ColumnView;
 import org.ojalgo.access.RowView;
@@ -1091,7 +1091,7 @@ public abstract class BasicMatrixTest {
     /**
      * @see junit.framework.TestCase#setUp()
      */
-    @Before
+    @BeforeEach
     public void setUp() {
 
         TestUtils.minimiseAllBranchLimits();
@@ -1111,7 +1111,7 @@ public abstract class BasicMatrixTest {
         myNmbr = new BigDecimal(Math.random());
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         DEFINITION = NumberContext.getGeneral(9);
         EVALUATION = NumberContext.getGeneral(9);

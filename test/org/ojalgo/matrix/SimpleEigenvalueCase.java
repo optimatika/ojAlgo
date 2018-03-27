@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -92,7 +92,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
         DEFINITION = new NumberContext(7, 14);

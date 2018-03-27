@@ -23,8 +23,8 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Primitive64Array;
@@ -87,7 +87,7 @@ public class RandomNumberTest {
     }
 
     @Test
-    @Ignore("Underscored before JUnit 5")
+    @Disabled("Underscored before JUnit 5")
     public void testLogNormal() {
 
         final double tmpAccuracy = TENTH / THREE;
@@ -244,8 +244,8 @@ public class RandomNumberTest {
             for (int i = 1; i < 10; i++) {
                 final Erlang erl = new Erlang(i, theta);
                 final Gamma gam = new Gamma(i, theta);
-                TestUtils.assertEquals("Gamma should match erlang for integer k", erl.getVariance(), gam.getVariance(), 0.0);
-                TestUtils.assertEquals("Gamma should match erlang for integer k", erl.getExpected(), gam.getExpected(), 0.0);
+                TestUtils.assertEquals("Gamma should match erlang for integer k", erl.getVariance(), gam.getVariance(), MACHINE_SMALLEST);
+                TestUtils.assertEquals("Gamma should match erlang for integer k", erl.getExpected(), gam.getExpected(), MACHINE_SMALLEST);
             }
         }
         // param 1 is cast to integers by Dist2Erlang

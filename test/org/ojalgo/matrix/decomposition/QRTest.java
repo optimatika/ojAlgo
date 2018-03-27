@@ -23,8 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
@@ -57,7 +57,7 @@ public class QRTest {
         return tmpBase.multiply(tmpBase.conjugate());
     }
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }

@@ -23,7 +23,7 @@ package org.ojalgo.matrix.task;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;

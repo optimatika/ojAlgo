@@ -21,8 +21,8 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.PrimitiveFunction;
@@ -96,7 +96,7 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
      */
     abstract protected BasicMatrix[] getMatrices();
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         final BasicMatrix[] tmpMatrices = this.getMatrices();

@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -65,7 +65,7 @@ public class P20030528Case extends BasicMatrixTest {
         TestUtils.assertEquals(tmpA, tmpSVD, EVALUATION);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
 

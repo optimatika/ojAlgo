@@ -1,6 +1,6 @@
 package org.ojalgo.machine;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.matrix.RationalMatrix;
 

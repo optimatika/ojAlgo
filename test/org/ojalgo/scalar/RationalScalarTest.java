@@ -21,9 +21,9 @@
  */
 package org.ojalgo.scalar;
 
-import org.junit.Test;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 

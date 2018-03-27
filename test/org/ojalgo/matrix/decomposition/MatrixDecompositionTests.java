@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.TestUtils;
 
 /**
@@ -155,7 +155,7 @@ public abstract class MatrixDecompositionTests {
         return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new DeferredTridiagonal.Primitive(), new SimultaneousTridiagonal() };
     }
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }

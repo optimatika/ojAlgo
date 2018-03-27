@@ -23,8 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
@@ -57,7 +57,7 @@ public class SingularValueTest {
     static final NumberContext CNTXT_REAL_DECOMP = new NumberContext(3, 2);
     static final NumberContext CNTXT_REAL_VALUES = new NumberContext(7, 10);
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }

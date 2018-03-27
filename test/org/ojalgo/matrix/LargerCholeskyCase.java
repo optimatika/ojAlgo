@@ -23,10 +23,10 @@ package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.BigDenseStore;
@@ -70,7 +70,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpMtrx), tmpDecomp, EVALUATION);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
 

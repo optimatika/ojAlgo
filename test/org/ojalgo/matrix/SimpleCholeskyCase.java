@@ -23,8 +23,8 @@ package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.BigDenseStore;
@@ -86,7 +86,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     }
 
     //    @Test
-    //    @Ignore("Was commented uot before JUnit 5 transition")
+    //    @Disabled("Was commented uot before JUnit 5 transition")
     //    @Test public void testSolve() {
     //
     //        BasicMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
@@ -106,7 +106,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     //        JUnitUtils.assertEquals(tmpExpMtrx, tmpActMtrx, EVAL_CNTXT);
     //    }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
 

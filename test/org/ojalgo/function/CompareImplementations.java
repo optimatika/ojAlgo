@@ -25,7 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;

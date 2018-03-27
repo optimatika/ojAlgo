@@ -23,7 +23,7 @@ package org.ojalgo.optimisation.linear;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.matrix.RationalMatrix;

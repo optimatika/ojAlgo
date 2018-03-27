@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -81,7 +81,7 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
 

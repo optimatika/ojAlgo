@@ -26,9 +26,9 @@ import static org.ojalgo.matrix.decomposition.MatrixDecompositionTests.*;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
@@ -52,7 +52,7 @@ public class ExtremeElementsCase {
 
     static final NumberContext PRECISION = new NumberContext().newPrecision(12).newScale(148);
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }
@@ -183,19 +183,19 @@ public class ExtremeElementsCase {
     }
 
     @Test
-    @Ignore("Underscored before JUnit 5")
+    @Disabled("Underscored before JUnit 5")
     public void _testInvertOverflow() {
         ExtremeElementsCase.doTestInvert(true);
     }
 
     @Test
-    @Ignore("Underscored before JUnit 5")
+    @Disabled("Underscored before JUnit 5")
     public void _testInvertUnderflow() {
         ExtremeElementsCase.doTestInvert(true);
     }
 
     @Test
-    @Ignore("Underscored before JUnit 5")
+    @Disabled("Underscored before JUnit 5")
     public void _testLU() {
 
         final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
@@ -240,7 +240,7 @@ public class ExtremeElementsCase {
 
     }
 
-    @Ignore("Underscored before JUnit 5")
+    @Disabled("Underscored before JUnit 5")
     @Test
     public void _testQR() {
 
@@ -279,13 +279,13 @@ public class ExtremeElementsCase {
     }
 
     @Test
-    @Ignore("Underscored before JUnit 5")
+    @Disabled("Underscored before JUnit 5")
     public void _testSolveOverflow() {
         ExtremeElementsCase.doTestSolve(true);
     }
 
     @Test
-    @Ignore("Underscored before JUnit 5")
+    @Disabled("Underscored before JUnit 5")
     public void _testSolveUnderflow() {
         ExtremeElementsCase.doTestSolve(false);
     }

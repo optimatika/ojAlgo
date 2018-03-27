@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.PrimitiveFunction;
@@ -37,7 +37,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SVDbyEvD {
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }

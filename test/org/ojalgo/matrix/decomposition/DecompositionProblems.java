@@ -21,9 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
@@ -41,7 +41,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public class DecompositionProblems {
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }

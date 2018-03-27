@@ -17,7 +17,7 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;

@@ -23,8 +23,8 @@ package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.BigDenseStore;
@@ -72,7 +72,7 @@ public class SimpleLUCase extends BasicMatrixTest {
         TestUtils.assertEquals(BigDenseStore.FACTORY.copy(SimpleLUCase.getOrginal()), tmpLU, EVALUATION);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
 

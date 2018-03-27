@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
 
+import org.junit.jupiter.api.Assertions;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.access.StructureAnyD;
@@ -47,7 +48,7 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
-import junit.framework.Assert;
+
 
 /**
  * JUnitUtils
@@ -72,7 +73,7 @@ public abstract class TestUtils {
         final BigDecimal tmpUpper = TypeUtils.toBigDecimal(upper, precision);
 
         if ((tmpValue.compareTo(tmpLower) == -1) || (tmpValue.compareTo(tmpUpper) == 1)) {
-            Assert.fail("!(" + tmpLower.toPlainString() + " <= " + tmpValue.toPlainString() + " <= " + tmpUpper.toPlainString() + ")");
+            Assertions.fail("!(" + tmpLower.toPlainString() + " <= " + tmpValue.toPlainString() + " <= " + tmpUpper.toPlainString() + ")");
         }
     }
 
@@ -85,7 +86,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final boolean expected, final boolean actual) {
-        Assert.assertEquals(expected, actual);
+        Assertions.assertEquals(expected, actual);
     }
 
     public static void assertEquals(final ComplexNumber expected, final ComplexNumber actual) {
@@ -106,7 +107,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final double expected, final double actual, final double delta) {
-        Assert.assertEquals(expected, actual, delta);
+        Assertions.assertEquals(expected, actual, delta);
     }
 
     public static void assertEquals(final double expected, final double actual, final NumberContext context) {
@@ -114,7 +115,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final int expected, final int actual) {
-        Assert.assertEquals(expected, actual);
+        Assertions.assertEquals(expected, actual);
     }
 
     public static void assertEquals(final int[] expected, final int[] actual) {
@@ -131,19 +132,19 @@ public abstract class TestUtils {
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Bidiagonal<N> actual, final NumberContext context) {
         if (!Bidiagonal.equals(expected, actual, context)) {
-            Assert.failNotEquals("Bidiagonal<N>", expected, actual);
+            Assertions.fail("Bidiagonal<N>");
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Cholesky<N> actual, final NumberContext context) {
         if (!Cholesky.equals(expected, actual, context)) {
-            Assert.failNotEquals("Cholesky<N>", expected, actual);
+            Assertions.fail("Cholesky<N>");
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Eigenvalue<N> actual, final NumberContext context) {
         if (!Eigenvalue.equals(expected, actual, context)) {
-            Assert.failNotEquals("Eigenvalue<N>", expected, actual);
+            Assertions.fail("Eigenvalue<N>");
         }
         if (actual.isOrdered()) {
             final MatrixStore<N> mtrxD = actual.getD();
@@ -151,8 +152,8 @@ public abstract class TestUtils {
             final Array1D<ComplexNumber> tmpEigenvalues = actual.getEigenvalues();
             for (int i = 0; i < tmpEigenvalues.length; i++) {
                 final ComplexNumber value = tmpEigenvalues.get(i);
-                Assert.assertTrue(bigger >= value.getModulus());
-                Assert.assertEquals(value.doubleValue(), mtrxD.doubleValue(i, i), context.epsilon());
+                Assertions.assertTrue(bigger >= value.getModulus());
+                Assertions.assertEquals(value.doubleValue(), mtrxD.doubleValue(i, i), context.epsilon());
                 bigger = value.getModulus();
             }
         }
@@ -160,31 +161,31 @@ public abstract class TestUtils {
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Hessenberg<N> actual, final NumberContext context) {
         if (!Hessenberg.equals(expected, actual, context)) {
-            Assert.failNotEquals("Hessenberg<N>", expected, actual);
+            Assertions.fail("Hessenberg<N>");
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final LU<N> actual, final NumberContext context) {
         if (!LU.equals(expected, actual, context)) {
-            Assert.failNotEquals("LU<N>", expected, actual);
+            Assertions.fail("LU<N>");
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final QR<N> actual, final NumberContext context) {
         if (!QR.equals(expected, actual, context)) {
-            Assert.failNotEquals("QR<N>", expected, actual);
+            Assertions.fail("QR<N>");
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final SingularValue<N> actual, final NumberContext context) {
         if (!SingularValue.equals(expected, actual, context)) {
-            Assert.failNotEquals("SingularValue<N>", expected, actual);
+            Assertions.fail("SingularValue<N>");
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Tridiagonal<N> actual, final NumberContext context) {
         if (!Tridiagonal.equals(expected, actual, context)) {
-            Assert.failNotEquals("Tridiagonal<N>", expected, actual);
+            Assertions.fail("Tridiagonal<N>");
         }
     }
 
@@ -197,7 +198,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final Object expected, final Object actual) {
-        Assert.assertEquals(expected, actual);
+        Assertions.assertEquals(expected, actual);
     }
 
     public static void assertEquals(final Quaternion expected, final Quaternion actual) {
@@ -246,7 +247,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final String message, final double expected, final double actual, final double delta) {
-        Assert.assertEquals(message, expected, actual, delta);
+        Assertions.assertEquals(expected, actual, delta, message);
     }
 
     public static void assertEquals(final String message, final double expected, final double actual, final NumberContext context) {
@@ -254,12 +255,12 @@ public abstract class TestUtils {
         if (Double.isNaN(expected) && Double.isNaN(actual)) {
 
         } else if (context.isDifferent(expected, actual)) {
-            Assert.fail(Assert.format(message, expected, actual));
+            Assertions.fail(message);
         }
     }
 
     public static void assertEquals(final String message, final int expected, final int actual) {
-        Assert.assertEquals(message, expected, actual);
+        Assertions.assertEquals(expected, actual, message);
     }
 
     public static void assertEquals(final String message, final int[] expected, final int[] actual) {
@@ -267,7 +268,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final String message, final long expected, final long actual) {
-        Assert.assertEquals(message, expected, actual);
+        Assertions.assertEquals(expected, actual, message);
     }
 
     public static void assertEquals(final String message, final long[] expected, final long[] actual) {
@@ -286,10 +287,10 @@ public abstract class TestUtils {
             final ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
 
             if (!!context.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
-                Assert.failNotEquals(message + " (real)", expected, actual);
+                Assertions.fail(message + " (real)");
             }
             if (!!context.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
-                Assert.failNotEquals(message + " (imaginary)", expected, actual);
+                Assertions.fail(message + " (imaginary)");
             }
 
         } else if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
@@ -298,28 +299,28 @@ public abstract class TestUtils {
             final Quaternion tmpActual = Quaternion.valueOf(actual);
 
             if (!!context.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
-                Assert.failNotEquals(message + " (scalar)", expected, actual);
+                Assertions.fail(message + " (scalar)");
             }
             if (!!context.isDifferent(tmpExpected.i, tmpActual.i)) {
-                Assert.failNotEquals(message + " (i)", expected, actual);
+                Assertions.fail(message + " (i)");
             }
             if (!!context.isDifferent(tmpExpected.j, tmpActual.j)) {
-                Assert.failNotEquals(message + " (j)", expected, actual);
+                Assertions.fail(message + " (j)");
             }
             if (!!context.isDifferent(tmpExpected.k, tmpActual.k)) {
-                Assert.failNotEquals(message + " (k)", expected, actual);
+                Assertions.fail(message + " (k)");
             }
 
         } else {
 
             if (context.isDifferent(expected.doubleValue(), actual.doubleValue())) {
-                Assert.failNotEquals(message, expected, actual);
+                Assertions.fail(message);
             }
         }
     }
 
     public static void assertEquals(final String message, final Object expected, final Object actual) {
-        Assert.assertEquals(message, expected, actual);
+        Assertions.assertEquals(expected, actual, message);
 
     }
 
@@ -333,11 +334,11 @@ public abstract class TestUtils {
     }
 
     public static void assertFalse(final boolean condition) {
-        Assert.assertFalse(condition);
+        Assertions.assertFalse(condition);
     }
 
     public static void assertFalse(final String message, final boolean condition) {
-        Assert.assertFalse(message, condition);
+        Assertions.assertFalse(condition, message);
     }
 
     public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual) {
@@ -363,31 +364,31 @@ public abstract class TestUtils {
     }
 
     public static void assertStateLessThanFeasible(final Optimisation.Result actual) {
-        Assert.assertFalse(actual.toString(), actual.getState().isFeasible());
+        Assertions.assertFalse(actual.getState().isFeasible(), actual.toString());
     }
 
     public static void assertStateNotLessThanFeasible(final Optimisation.Result actual) {
-        Assert.assertTrue(actual.toString(), actual.getState().isFeasible());
+        Assertions.assertTrue(actual.getState().isFeasible(), actual.toString());
     }
 
     public static void assertStateNotLessThanOptimal(final Optimisation.Result actual) {
-        Assert.assertTrue(actual.toString(), actual.getState().isOptimal());
+        Assertions.assertTrue(actual.getState().isOptimal(), actual.toString());
     }
 
     public static void assertTrue(final boolean condition) {
-        Assert.assertTrue(condition);
+        Assertions.assertTrue(condition);
     }
 
     public static void assertTrue(final String message, final boolean condition) {
-        Assert.assertTrue(message, condition);
+        Assertions.assertTrue(condition, message);
     }
 
     public static void fail() {
-        Assert.fail();
+        Assertions.fail("");
     }
 
     public static void fail(final String message) {
-        Assert.fail(message);
+        Assertions.fail(message);
     }
 
     public static void minimiseAllBranchLimits() {

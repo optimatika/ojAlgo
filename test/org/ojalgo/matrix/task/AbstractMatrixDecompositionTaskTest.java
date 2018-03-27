@@ -21,12 +21,12 @@
  */
 package org.ojalgo.matrix.task;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.TestUtils;
 
 public abstract class AbstractMatrixDecompositionTaskTest extends MatrixTaskTests {
 
-    @Before
+    @BeforeEach
     public void setUp() {
         TestUtils.minimiseAllBranchLimits();
     }

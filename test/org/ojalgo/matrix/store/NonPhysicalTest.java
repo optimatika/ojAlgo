@@ -23,8 +23,8 @@ package org.ojalgo.matrix.store;
 
 import java.math.BigDecimal;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.BasicMatrix;
@@ -150,7 +150,7 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
         NonPhysicalTest.testMultiplication(myPrimitiveStore);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         myBigStore = null;
         myComplexStore = null;

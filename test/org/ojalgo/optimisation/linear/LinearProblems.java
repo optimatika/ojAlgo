@@ -25,7 +25,7 @@ import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;

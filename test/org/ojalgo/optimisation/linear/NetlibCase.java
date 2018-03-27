@@ -15,7 +15,7 @@ package org.ojalgo.optimisation.linear;
 import java.io.File;
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.MathProgSysModel;

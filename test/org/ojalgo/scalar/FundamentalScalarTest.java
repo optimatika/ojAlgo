@@ -21,10 +21,10 @@
  */
 package org.ojalgo.scalar;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.random.Uniform;
@@ -184,7 +184,7 @@ public class FundamentalScalarTest {
         this.assertEqual(tmpExp, tmpBig, tmpComplex, tmpPrimitive, tmpQuaternion, tmpRational);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         value1 = this.makeRandom();
         big1 = BigScalar.valueOf(value1);
