@@ -88,7 +88,7 @@ public class RandomNumberTest {
 
     @Test
     @Ignore("Underscored before JUnit 5")
-    public void _testLogNormal() {
+    public void testLogNormal() {
 
         final double tmpAccuracy = TENTH / THREE;
 
