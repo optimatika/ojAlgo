@@ -48,8 +48,6 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
-
-
 /**
  * JUnitUtils
  *

@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 
-
 public class RationalScalarTest {
 
     private double myAct;
