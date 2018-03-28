@@ -21,12 +21,12 @@
  */
 package org.ojalgo.array;
 
-import org.junit.Test;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;

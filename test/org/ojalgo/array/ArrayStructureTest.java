@@ -21,7 +21,7 @@
  */
 package org.ojalgo.array;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.StructureAnyD;
 

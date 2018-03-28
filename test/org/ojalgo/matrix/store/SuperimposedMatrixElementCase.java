@@ -23,7 +23,7 @@ package org.ojalgo.matrix.store;
 
 import java.math.BigDecimal;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
@@ -31,7 +31,7 @@ import org.ojalgo.scalar.ComplexNumber;
 
 public class SuperimposedMatrixElementCase extends NonPhysicalTest {
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         final int tmpRowDim = Uniform.randomInteger(1, 9);

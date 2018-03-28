@@ -21,13 +21,13 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.junit.Before;
-import org.ojalgo.TestUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
 
 public class ConjugatedCase extends NonPhysicalTest {
-    @Before
+
+    @BeforeEach
     public void setUp() {
 
         final int tmpRowDim = Uniform.randomInteger(1, 9);

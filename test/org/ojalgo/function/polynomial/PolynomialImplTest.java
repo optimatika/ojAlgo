@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function.polynomial;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.PrimitiveMath;

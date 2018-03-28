@@ -12,7 +12,12 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import org.junit.Test;
+import static org.ojalgo.constant.BigMath.*;
+
+import java.io.File;
+import java.math.BigDecimal;
+
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.optimisation.Expression;
@@ -21,11 +26,6 @@ import org.ojalgo.optimisation.MathProgSysModel;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
-
-import java.io.File;
-import java.math.BigDecimal;
-
-import static org.ojalgo.constant.BigMath.*;
 
 /**
  * A collection of datasets found here: http://people.sc.fsu.edu/~burkardt/datasets/mps/mps.html
@@ -149,25 +149,25 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
         final Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
         final Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
 
-        final Variable[] tmpVariables = new Variable[]{tmpXONE, tmpYTWO, tmpZTHREE};
+        final Variable[] tmpVariables = new Variable[] { tmpXONE, tmpYTWO, tmpZTHREE };
 
         final ExpressionsBasedModel tmpExpModel = new ExpressionsBasedModel(tmpVariables);
 
         final Expression tmpLIM1 = tmpExpModel.addExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {
-            tmpLIM1.set(v, new BigDecimal[]{ONE, ONE, ZERO}[v]);
+            tmpLIM1.set(v, new BigDecimal[] { ONE, ONE, ZERO }[v]);
         }
         tmpLIM1.upper(FIVE);
 
         final Expression tmpLIM2 = tmpExpModel.addExpression("LIM2");
         for (int v = 0; v < tmpVariables.length; v++) {
-            tmpLIM2.set(v, new BigDecimal[]{ONE, ZERO, ONE}[v]);
+            tmpLIM2.set(v, new BigDecimal[] { ONE, ZERO, ONE }[v]);
         }
         tmpLIM2.lower(TEN);
 
         final Expression tmpMYEQN = tmpExpModel.addExpression("MYEQN");
         for (int v = 0; v < tmpVariables.length; v++) {
-            tmpMYEQN.set(v, new BigDecimal[]{ZERO, ONE.negate(), ONE}[v]);
+            tmpMYEQN.set(v, new BigDecimal[] { ZERO, ONE.negate(), ONE }[v]);
         }
         tmpMYEQN.level(SEVEN);
 

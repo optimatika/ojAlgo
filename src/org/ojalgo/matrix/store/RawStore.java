@@ -1225,7 +1225,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     @Override
     public String toString() {
-        return MatrixUtils.toString(this);
+        return Access2D.toString(this);
     }
 
     public void transformLeft(final Householder<Double> transformation, final int firstColumn) {

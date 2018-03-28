@@ -31,7 +31,6 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyNeither;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyNeither;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyNeither;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 public final class MultiplyNeither extends MatrixOperation {

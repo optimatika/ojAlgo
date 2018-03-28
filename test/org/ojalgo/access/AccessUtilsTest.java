@@ -21,7 +21,7 @@
  */
 package org.ojalgo.access;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 

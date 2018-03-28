@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
@@ -37,7 +37,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class HessenbergTest {
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }

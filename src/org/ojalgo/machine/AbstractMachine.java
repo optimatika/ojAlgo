@@ -21,7 +21,6 @@
  */
 package org.ojalgo.machine;
 
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.IntCount;
 
 abstract class AbstractMachine extends BasicMachine {

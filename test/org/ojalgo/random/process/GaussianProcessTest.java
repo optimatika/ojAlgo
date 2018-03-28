@@ -25,7 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.util.Collection;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;

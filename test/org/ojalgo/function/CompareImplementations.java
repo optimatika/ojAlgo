@@ -21,17 +21,18 @@
  */
 package org.ojalgo.function;
 
-import org.junit.Test;
+import static org.ojalgo.constant.PrimitiveMath.*;
+
+import java.math.BigDecimal;
+
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
-
-import java.math.BigDecimal;
-
-import static org.ojalgo.constant.PrimitiveMath.*;
 
 /**
  * Checks that {@linkplain org.ojalgo.function.BigFunction}, {@linkplain org.ojalgo.function.ComplexFunction},
@@ -46,7 +47,6 @@ public class CompareImplementations {
     private static final Uniform AROUND_ZERO = new Uniform(NEG, TWO);
     private static final NumberContext CONTEXT = new NumberContext(7, 14);
     private static final Uniform POSITIVE = new Uniform(E - TWO, TWO);
-
 
     @Test
     public void testABS() {
@@ -406,6 +406,7 @@ public class CompareImplementations {
     }
 
     @Test
+    @Tag("unstable")
     public void testROOT() {
         this.assertParameter(BigFunction.ROOT, ComplexFunction.ROOT, PrimitiveFunction.ROOT, QuaternionFunction.ROOT, RationalFunction.ROOT,
                 POSITIVE.doubleValue(), Uniform.randomInteger(1, 10));
@@ -539,7 +540,7 @@ public class CompareImplementations {
     }
 
     private void assertBinary(final BinaryFunction<BigDecimal> big, final BinaryFunction<ComplexNumber> complex, final BinaryFunction<Double> primitive,
-                              final BinaryFunction<Quaternion> quaternion, final BinaryFunction<RationalNumber> rational, final double arg1, final double arg2) {
+            final BinaryFunction<Quaternion> quaternion, final BinaryFunction<RationalNumber> rational, final double arg1, final double arg2) {
 
         TestUtils.assertEquals("Big vs Complex, " + arg1 + ", " + arg2, big.invoke(arg1, arg2), complex.invoke(arg1, arg2), CONTEXT);
         TestUtils.assertEquals("Complex vs Primitive, " + arg1 + ", " + arg2, complex.invoke(arg1, arg2), primitive.invoke(arg1, arg2), CONTEXT);
@@ -548,8 +549,9 @@ public class CompareImplementations {
         TestUtils.assertEquals("Rational vs Big, " + arg1 + ", " + arg2, rational.invoke(arg1, arg2), big.invoke(arg1, arg2), CONTEXT);
     }
 
-    private void assertParameter(final ParameterFunction<BigDecimal> big, final ParameterFunction<ComplexNumber> complex, final ParameterFunction<Double> primitive,
-                                 final ParameterFunction<Quaternion> quaternion, final ParameterFunction<RationalNumber> rational, final double arg, final int param) {
+    private void assertParameter(final ParameterFunction<BigDecimal> big, final ParameterFunction<ComplexNumber> complex,
+            final ParameterFunction<Double> primitive, final ParameterFunction<Quaternion> quaternion, final ParameterFunction<RationalNumber> rational,
+            final double arg, final int param) {
 
         TestUtils.assertEquals("Big vs Complex", big.invoke(arg, param), complex.invoke(arg, param), CONTEXT);
         TestUtils.assertEquals("Complex vs Primitive", complex.invoke(arg, param), primitive.invoke(arg, param), CONTEXT);
@@ -559,7 +561,7 @@ public class CompareImplementations {
     }
 
     private void assertUnary(final UnaryFunction<BigDecimal> big, final UnaryFunction<ComplexNumber> complex, final UnaryFunction<Double> primitive,
-                             final UnaryFunction<Quaternion> quaternion, final UnaryFunction<RationalNumber> rational, final double arg) {
+            final UnaryFunction<Quaternion> quaternion, final UnaryFunction<RationalNumber> rational, final double arg) {
 
         TestUtils.assertEquals("Big vs Complex, " + arg, big.invoke(arg), complex.invoke(arg), CONTEXT);
         TestUtils.assertEquals("Complex vs Primitive, " + arg, complex.invoke(arg), primitive.invoke(arg), CONTEXT);

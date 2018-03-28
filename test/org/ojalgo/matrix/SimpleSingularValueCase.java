@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -38,26 +38,27 @@ import org.ojalgo.type.context.NumberContext;
 public class SimpleSingularValueCase extends BasicMatrixTest {
 
     private static RationalMatrix getMatrixD() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{2.0, 0.0}, {0.0, 3.0}, {0.0, 0.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, 3.0 }, { 0.0, 0.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     private static RationalMatrix getMatrixQ1() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0, 0.0, 0.0}, {0.0, -1.0, 0.0}, {0.0, 0.0, 1.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     private static RationalMatrix getMatrixQ2() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0, 0.0}, {0.0, 1.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static RationalMatrix getOriginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{2.0, 0.0}, {0.0, -3.0}, {0.0, 0.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -3.0 }, { 0.0, 0.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test public void testData() {
+    @Test
+    public void testData() {
 
         final PhysicalStore<Double> tmpExp = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getOriginal())
                 .multiply(PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getMatrixQ2())).copy();
@@ -68,7 +69,8 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
         TestUtils.assertEquals(tmpExp, tmpAct, EVALUATION);
     }
 
-    @Test public void testProblem() {
+    @Test
+    public void testProblem() {
 
         final MatrixStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getOriginal());
 
@@ -79,7 +81,7 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
         TestUtils.assertEquals(tmpA, tmpSVD, EVALUATION);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
 

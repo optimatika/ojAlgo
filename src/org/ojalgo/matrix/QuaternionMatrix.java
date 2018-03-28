@@ -59,7 +59,6 @@ public final class QuaternionMatrix extends AbstractMatrix<Quaternion, Quaternio
 
             return (GenericDenseStore<Quaternion>) matrix;
 
-            
         } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof Quaternion)) {
 
             return (ElementsSupplier<Quaternion>) matrix;

@@ -21,9 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
@@ -41,7 +41,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public class DecompositionProblems {
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }
@@ -50,8 +50,8 @@ public class DecompositionProblems {
      * A user reported problems solving complex valued (overdetermined) equation systemes.
      */
     @Test
-    @Ignore("Underscored before JUnit 5")
-    public void _testP20111213square() {
+    @Tag("unstable")
+    public void testP20111213square() {
 
         final int tmpDim = Uniform.randomInteger(2, 6);
 
@@ -60,7 +60,8 @@ public class DecompositionProblems {
         final PhysicalStore<ComplexNumber> tmpExpected = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> tmpActual;
 
-        @SuppressWarnings("unchecked") final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[]{Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
+        @SuppressWarnings("unchecked")
+        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
                 Eigenvalue.COMPLEX.make(MatrixDecomposition.TYPICAL,
                         true)/*
                               * , HessenbergDecomposition. makeComplex()
@@ -92,8 +93,8 @@ public class DecompositionProblems {
      * A user reported problems related to calculating the pseudoinverse for large (2000x2000) matrices.
      */
     @Test
-    @Ignore("Underscored before JUnit 5")
-    public void _testP20160419() {
+    @Tag("slow")
+    public void testP20160419() {
 
         final PrimitiveDenseStore tmpOrg = PrimitiveDenseStore.FACTORY.makeFilled(2000, 2000, new Normal());
 
@@ -116,8 +117,8 @@ public class DecompositionProblems {
      * https://github.com/optimatika/ojAlgo/issues/22
      */
     @Test
-    @Ignore("Underscored before JUnit 5")
-    public void _testP20160510InvertLargeMatrix() {
+    @Tag("slow")
+    public void testP20160510InvertLargeMatrix() {
 
         final double[][] data = new double[3000][3000];
         for (int i = 0; i < data.length; i++) {

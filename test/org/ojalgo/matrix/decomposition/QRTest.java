@@ -23,13 +23,13 @@ package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20030422Case;
+import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -57,7 +57,7 @@ public class QRTest {
         return tmpBase.multiply(tmpBase.conjugate());
     }
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }
@@ -66,7 +66,7 @@ public class QRTest {
     public void testDiagonalCase() {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
-                .rows(new double[][]{{4.0, 3.0, 2.0, 1.0}, {0.0, 3.0, 2.0, 1.0}, {0.0, 0.0, 2.0, 1.0}, {0.0, 0.0, 0.0, 1.0}});
+                .rows(new double[][] { { 4.0, 3.0, 2.0, 1.0 }, { 0.0, 3.0, 2.0, 1.0 }, { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
 
         final QR<Double> tmpDecomp = QR.PRIMITIVE.make();
         tmpDecomp.decompose(tmpOriginalMatrix);

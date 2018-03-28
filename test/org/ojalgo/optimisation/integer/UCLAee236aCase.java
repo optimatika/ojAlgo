@@ -25,7 +25,7 @@ import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.Expression;
@@ -46,21 +46,21 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
     private static ExpressionsBasedModel makeOriginalRootModel() {
 
-        final Variable[] tmpVariables = new Variable[]{new Variable("X1").lower(ZERO).weight(TWO.negate()).integer(true),
-                new Variable("X2").lower(ZERO).weight(THREE.negate()).integer(true)};
+        final Variable[] tmpVariables = new Variable[] { new Variable("X1").lower(ZERO).weight(TWO.negate()).integer(true),
+                new Variable("X2").lower(ZERO).weight(THREE.negate()).integer(true) };
 
         final ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
         retVal.setMinimisation();
 
         final Expression tmpExprC1 = retVal.addExpression("C1");
         for (int i = 0; i < retVal.countVariables(); i++) {
-            tmpExprC1.set(i, new BigDecimal[]{TWO.multiply(NINTH), QUARTER}[i]);
+            tmpExprC1.set(i, new BigDecimal[] { TWO.multiply(NINTH), QUARTER }[i]);
         }
         tmpExprC1.upper(ONE);
 
         final Expression tmpExprC2 = retVal.addExpression("C2");
         for (int i = 0; i < retVal.countVariables(); i++) {
-            tmpExprC2.set(i, new BigDecimal[]{SEVENTH, THIRD}[i]);
+            tmpExprC2.set(i, new BigDecimal[] { SEVENTH, THIRD }[i]);
         }
         tmpExprC2.upper(ONE);
 
@@ -79,7 +79,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][]{{2.0}, {2.0}});
+        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2.0 }, { 2.0 } });
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
     }
@@ -157,7 +157,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][]{{3.00}, {1.33}});
+        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 3.00 }, { 1.33 } });
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
@@ -178,7 +178,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][]{{2.00}, {2.00}});
+        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2.00 }, { 2.00 } });
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
@@ -203,7 +203,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
 
-        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][]{{0.00}, {3.00}});
+        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.00 }, { 3.00 } });
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
@@ -224,7 +224,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][]{{3.38}, {1.00}});
+        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 3.38 }, { 1.00 } });
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
@@ -261,7 +261,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][]{{3.00}, {1.00}});
+        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 3.00 }, { 1.00 } });
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
@@ -283,7 +283,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][]{{4.00}, {0.44}});
+        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.00 }, { 0.44 } });
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
@@ -306,7 +306,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][]{{4.50}, {0.00}});
+        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.50 }, { 0.00 } });
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
@@ -348,7 +348,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         //TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
 
-        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][]{{4.00}, {0.00}});
+        final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.00 }, { 0.00 } });
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 

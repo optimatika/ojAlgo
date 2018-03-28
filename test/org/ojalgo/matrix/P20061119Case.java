@@ -21,7 +21,8 @@
  */
 package org.ojalgo.matrix;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -56,11 +57,13 @@ public class P20061119Case extends BasicMatrixTest {
         return retVal.enforce(DEFINITION);
     }
 
-    @Test public void testData() {
+    @Test
+    public void testData() {
         TestUtils.assertEquals(true, P20061119Case.getProblematic().isSquare());
     }
 
-    @Test public void testProblem() {
+    @Test
+    public void testProblem() {
 
         final BasicMatrix tmpMatrix = P20061119Case.getProblematic();
 
@@ -72,6 +75,7 @@ public class P20061119Case extends BasicMatrixTest {
     }
 
     @Override
+    @BeforeEach
     public void setUp() {
 
         DEFINITION = new NumberContext(7, 2);

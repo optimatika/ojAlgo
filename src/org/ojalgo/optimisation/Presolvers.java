@@ -21,8 +21,8 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.ZERO;
-import static org.ojalgo.function.BigFunction.DIVIDE;
+import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.function.BigFunction.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

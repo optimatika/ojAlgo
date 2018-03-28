@@ -21,7 +21,7 @@
  */
 package org.ojalgo.scalar;
 
-import static org.ojalgo.function.PrimitiveFunction.ABS;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -116,6 +116,10 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
     }
 
+    public static RationalNumber valueOf(final long value) {
+        return fromLong(value);
+    }
+
     public static RationalNumber valueOf(final double value) {
 
         if (Double.isNaN(value)) {
@@ -131,9 +135,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         // Please refer to {@link Double#doubleToLongBits(long)} javadoc
         final int s = ((bits >> 63) == 0) ? 1 : -1;
         final int e = (int) ((bits >> 52) & 0x7ffL);
-        long m = (e == 0) ?
-                (bits & 0xfffffffffffffL) << 1 :
-                (bits & 0xfffffffffffffL) | 0x10000000000000L;
+        long m = (e == 0) ? (bits & 0xfffffffffffffL) << 1 : (bits & 0xfffffffffffffL) | 0x10000000000000L;
         // Now we're looking for s * m * 2^{e - 1075}, 1075 being bias of 1023 plus 52 positions of binary fraction
 
         int exponent = e - 1075;
@@ -162,6 +164,35 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             return new RationalNumber(s * m / factor.longValueExact(), Long.MAX_VALUE);
         }
         return new RationalNumber(s * m, 1L << -exponent);
+    }
+
+    public static RationalNumber rational(final double d) {
+        if (d < 0) {
+            return rational(-d, 1.0, 39).negate();
+        } else {
+            return rational(d, 1.0, 39);
+        }
+    }
+
+    private static RationalNumber rational(double d, double error, int depthLimit) {
+        assert (d >= 0);
+        if (d > Long.MAX_VALUE) {
+            throw new ArithmeticException("Cannot fit a double into long!");
+        }
+        final double a = Math.floor(d);
+        RationalNumber approximation = fromLong((long) a);
+        double remainder = d - a;
+        double newError = error * remainder;
+        if (newError > PrimitiveMath.MACHINE_EPSILON && depthLimit > 0) {
+            RationalNumber rationalRemainder = rational(1.0 / remainder, newError, depthLimit - 1).invert();
+            return approximation.add(rationalRemainder);
+        } else {
+            return approximation;
+        }
+    }
+
+    private static RationalNumber fromLong(long d) {
+        return of(d, 1L);
     }
 
     public static RationalNumber valueOf(final Number number) {
@@ -489,9 +520,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber invert() {
-        return this.sign() >= 0 ?
-                new RationalNumber(myDenominator, myNumerator) :
-                new RationalNumber(-myDenominator, -myNumerator);
+        return this.sign() >= 0 ? new RationalNumber(myDenominator, myNumerator) : new RationalNumber(-myDenominator, -myNumerator);
     }
 
     public boolean isAbsolute() {
@@ -625,8 +654,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             return BigDecimal.valueOf(Double.POSITIVE_INFINITY); // TODO: really?!
         }
         if (this.isInfinite()) {
-            return this.sign() > 0 ?
-                    BigDecimal.valueOf(Double.POSITIVE_INFINITY) : // TODO: really?!
+            return this.sign() > 0 ? BigDecimal.valueOf(Double.POSITIVE_INFINITY) : // TODO: really?!
                     BigDecimal.valueOf(Double.NEGATIVE_INFINITY); // TODO: really?!
         }
         return new BigDecimal(myNumerator).divide(new BigDecimal(myDenominator), context);

@@ -78,8 +78,8 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate>, S
     }
 
     static final long MILLIS_PER_SECOND = 1_000L;
-    static final int NANOS_PER_SECOND = 1_000_000_000;
     static final int NANOS_PER_MILLIS = 1_000_000;
+    static final int NANOS_PER_SECOND = 1_000_000_000;
     static final long SECONDS_PER_DAY = 24L * 60L * 60L;
 
     public static CalendarDate from(final TemporalAccessor temporal) {
@@ -164,6 +164,14 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate>, S
         return OffsetDateTime.ofInstant(instant, zone);
     }
 
+    public static OffsetDateTime toOffsetDateTime(final Instant instant, final ZoneId zone, final Instant zoneToOffsetConversionInstant) {
+        return OffsetDateTime.ofInstant(instant, zone).withOffsetSameInstant(OffsetDateTime.ofInstant(zoneToOffsetConversionInstant, zone).getOffset());
+    }
+
+    public static OffsetDateTime toOffsetDateTime(final Instant instant, final ZoneOffset offset) {
+        return OffsetDateTime.ofInstant(instant, ZoneId.systemDefault()).withOffsetSameInstant(offset);
+    }
+
     public static ZonedDateTime toZonedDateTime(final Instant instant, final ZoneId zone) {
         return ZonedDateTime.ofInstant(instant, zone);
     }
@@ -188,6 +196,10 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate>, S
         }
     }
 
+    /**
+     * An "instant" with ms precision. Equivalent to what is returned by {@link Instant#toEpochMilli()} and/or
+     * {@link System#currentTimeMillis()}.
+     */
     public final long millis;
 
     public CalendarDate() {

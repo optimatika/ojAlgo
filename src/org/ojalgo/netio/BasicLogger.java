@@ -39,11 +39,11 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * BasicLogger is not meant to replace any other logging library. It is primarily used for debugging during
  * development. ojAlgo has zero dependencies, and does not force any specific logging framework on you. But,
- * that meant we had to create one for internal use.
+ * that meant we had to create something a little better than plain {@link System#out} for internal use.
  * <ul>
  * <li>If you want to redirect whatever ojAlgo outputs then set {@link BasicLogger#DEBUG} and
  * {@link BasicLogger#ERROR} to something suitable. {@linkplain BasicLogger.Printer} is an interface so it
- * should be possible to create some implememnation that wraps your logging system. ojAlgo supplies 3
+ * should be possible to create some implementation that wraps your logging system. ojAlgo supplies 3
  * implementations of that interface.</li>
  * <li>ojAlgo typically doesn't do much logging. There's really not much to redirect. The main/only area where
  * BasicLogger is used is for debugging the various optimisation solvers. This is not intended to be "on" in

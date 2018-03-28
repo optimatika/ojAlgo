@@ -23,7 +23,7 @@ package org.ojalgo.optimisation.integer;
 
 import java.io.File;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.optimisation.ExpressionsBasedModel;

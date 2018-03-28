@@ -21,12 +21,12 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.random.Uniform;
 
 public class IdentityCase extends NonPhysicalTest {
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final int tmpDim = Uniform.randomInteger(1, 9);
 

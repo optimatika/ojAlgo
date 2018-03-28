@@ -21,11 +21,12 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.TestUtils;
 
 public abstract class AbstractMatrixStoreTest extends MatrixStoreTests {
-    @Before
+
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }

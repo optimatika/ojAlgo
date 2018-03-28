@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -69,7 +69,7 @@ public class SchurTest {
         TestUtils.assertEquals(expectedDiagonal, tmpDiagonal, accuracyContext);
     }
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }

@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.SimpleCholeskyCase;
 import org.ojalgo.matrix.SimpleEigenvalueCase;
@@ -47,7 +47,7 @@ public class TestJama {
     private static QR<Double> QR = new RawQR();
     private static SingularValue<Double> SINGULAR_VALUE = new RawSingularValue();
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }

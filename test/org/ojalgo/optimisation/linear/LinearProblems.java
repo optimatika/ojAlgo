@@ -21,22 +21,11 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.constant.BigMath.EIGHT;
-import static org.ojalgo.constant.BigMath.FIVE;
-import static org.ojalgo.constant.BigMath.FOUR;
-import static org.ojalgo.constant.BigMath.NEG;
-import static org.ojalgo.constant.BigMath.ONE;
-import static org.ojalgo.constant.BigMath.SEVEN;
-import static org.ojalgo.constant.BigMath.SIX;
-import static org.ojalgo.constant.BigMath.TEN;
-import static org.ojalgo.constant.BigMath.TENTH;
-import static org.ojalgo.constant.BigMath.THREE;
-import static org.ojalgo.constant.BigMath.TWO;
-import static org.ojalgo.constant.BigMath.ZERO;
+import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;
@@ -69,9 +58,9 @@ public class LinearProblems extends OptimisationLinearTests {
         final Variable tmpX5 = new Variable("X5").weight(TENTH.multiply(SIX)).lower(FIVE);
         final Variable tmpX6 = new Variable("X6").weight(TENTH.multiply(FOUR)).lower(ZERO);
 
-        final Variable[] tmpFullVars = new Variable[]{tmpX1.copy(), tmpX2.copy(), tmpX3.copy(), tmpX4.copy(), tmpX5.copy(), tmpX6.copy()};
-        final Variable[] tmpOddVars = new Variable[]{tmpX1.copy(), tmpX3.copy(), tmpX5.copy()};
-        final Variable[] tmpEvenVars = new Variable[]{tmpX2.copy(), tmpX4.copy(), tmpX6.copy()};
+        final Variable[] tmpFullVars = new Variable[] { tmpX1.copy(), tmpX2.copy(), tmpX3.copy(), tmpX4.copy(), tmpX5.copy(), tmpX6.copy() };
+        final Variable[] tmpOddVars = new Variable[] { tmpX1.copy(), tmpX3.copy(), tmpX5.copy() };
+        final Variable[] tmpEvenVars = new Variable[] { tmpX2.copy(), tmpX4.copy(), tmpX6.copy() };
 
         final ExpressionsBasedModel tmpFullModel = new ExpressionsBasedModel(tmpFullVars);
         //tmpFullModel.setMaximisation();
@@ -92,7 +81,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression retVal = tmpFullModel.addExpression("C1");
 
         for (int i = 0; i < tmpLength; i++) {
-            retVal.set(i, new BigDecimal[]{ONE, ZERO, ONE, ZERO, ONE, ZERO}[i]);
+            retVal.set(i, new BigDecimal[] { ONE, ZERO, ONE, ZERO, ONE, ZERO }[i]);
         }
 
         final Expression tmpAddWeightExpression = retVal;
@@ -102,7 +91,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression retVal1 = tmpOddModel.addExpression("C1");
 
         for (int i = 0; i < tmpLength1; i++) {
-            retVal1.set(i, new BigDecimal[]{ONE, ONE, ONE}[i]);
+            retVal1.set(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
         }
         final Expression tmpAddWeightExpression2 = retVal1;
         tmpAddWeightExpression2.level(tmpRHS);
@@ -111,7 +100,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression retVal2 = tmpFullModel.addExpression("C2");
 
         for (int i = 0; i < tmpLength2; i++) {
-            retVal2.set(i, new BigDecimal[]{ZERO, ONE, ZERO, ONE, ZERO, ONE}[i]);
+            retVal2.set(i, new BigDecimal[] { ZERO, ONE, ZERO, ONE, ZERO, ONE }[i]);
         }
 
         final Expression tmpAddWeightExpression3 = retVal2;
@@ -121,7 +110,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression retVal3 = tmpEvenModel.addExpression("C2");
 
         for (int i = 0; i < tmpLength3; i++) {
-            retVal3.set(i, new BigDecimal[]{ONE, ONE, ONE}[i]);
+            retVal3.set(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
         }
         final Expression tmpAddWeightExpression4 = retVal3;
         tmpAddWeightExpression4.level(tmpRHS);
@@ -195,8 +184,8 @@ public class LinearProblems extends OptimisationLinearTests {
     @Test
     public void testP20111010() {
 
-        final Variable[] tmpVariables = new Variable[]{new Variable("X").lower(ZERO).weight(ONE), new Variable("Y").lower(ZERO).weight(ZERO),
-                new Variable("Z").lower(ZERO).weight(ZERO)};
+        final Variable[] tmpVariables = new Variable[] { new Variable("X").lower(ZERO).weight(ONE), new Variable("Y").lower(ZERO).weight(ZERO),
+                new Variable("Z").lower(ZERO).weight(ZERO) };
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");

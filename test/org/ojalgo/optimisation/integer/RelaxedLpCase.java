@@ -21,11 +21,11 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public final class RelaxedLpCase extends MipLibCase {
 
@@ -44,7 +44,7 @@ public final class RelaxedLpCase extends MipLibCase {
      * </p>
      */
     @Test
-    @Ignore("Underscored before JUnit 5")
+    @Disabled("Underscored before JUnit 5")
     public void _testPk1() {
 
         // Solution obtained from lp_solve_5.5.2.0 with relaxed integer constraints

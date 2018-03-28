@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -30,21 +30,21 @@ import org.ojalgo.type.context.NumberContext;
 public class SimpleEquationCase extends BasicMatrixTest {
 
     public static RationalMatrix getBody() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{2.0, 1.0, 1.0}, {4.0, -6.0, 0.0}, {-2.0, 7.0, 2.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 1.0, 1.0 }, { 4.0, -6.0, 0.0 }, { -2.0, 7.0, 2.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static RationalMatrix getRHS() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{5.0}, {-2.0}, {9.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 5.0 }, { -2.0 }, { 9.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static RationalMatrix getSolution() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{1.0}, {1.0}, {2.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 2.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
 

@@ -21,9 +21,7 @@
  */
 package org.ojalgo.matrix;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
-
 public abstract class MatrixTests {
+
     static final boolean DEBUG = false;
 }

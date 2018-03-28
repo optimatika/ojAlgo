@@ -26,7 +26,7 @@ package org.ojalgo.random.process;
  *
  * @author apete
  */
-public abstract class RandomProcessTests  {
+public abstract class RandomProcessTests {
 
     static final boolean DEBUG = false;
 

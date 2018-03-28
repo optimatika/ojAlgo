@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -37,21 +37,22 @@ import org.ojalgo.type.context.NumberContext;
 public class SimpleEigenvalueCase extends BasicMatrixTest {
 
     private static RationalMatrix getMatrixD() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{2.0, 0.0}, {0.0, -1.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     private static RationalMatrix getMatrixV() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{5.0, 1.0}, {2.0, 1.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 5.0, 1.0 }, { 2.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static RationalMatrix getOriginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][]{{4.0, -5.0}, {2.0, -3.0}});
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 4.0, -5.0 }, { 2.0, -3.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test public void testData() {
+    @Test
+    public void testData() {
 
         myExpMtrx = SimpleEigenvalueCase.getOriginal().multiply(SimpleEigenvalueCase.getMatrixV());
 
@@ -60,7 +61,8 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Test public void testProblem() {
+    @Test
+    public void testProblem() {
 
         final Eigenvalue<Double> tmpEigen = Eigenvalue.PRIMITIVE.make();
         tmpEigen.decompose(PrimitiveDenseStore.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));
@@ -90,7 +92,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
         DEFINITION = new NumberContext(7, 14);

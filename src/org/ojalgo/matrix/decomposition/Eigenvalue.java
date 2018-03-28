@@ -201,6 +201,10 @@ public interface Eigenvalue<N extends Number>
             return (Eigenvalue<N>) COMPLEX.make(typical, hermitian);
         } else if (tmpNumber instanceof Double) {
             return (Eigenvalue<N>) PRIMITIVE.make(typical, hermitian);
+        } else if (tmpNumber instanceof Quaternion) {
+            return (Eigenvalue<N>) QUATERNION.make(typical, hermitian);
+        } else if (tmpNumber instanceof RationalNumber) {
+            return (Eigenvalue<N>) RATIONAL.make(typical, hermitian);
         } else {
             throw new IllegalArgumentException();
         }

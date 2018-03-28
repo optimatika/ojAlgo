@@ -21,13 +21,13 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.junit.Before;
-import org.ojalgo.TestUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.ojalgo.TestUtils;
 
 /**
  * MatrixDecompositionPackageTests
@@ -89,13 +89,13 @@ public abstract class MatrixDecompositionTests {
 
     @SuppressWarnings("unchecked")
     public static Eigenvalue<Double>[] getEigenvaluePrimitiveGeneral() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[]{new NewGeneralEvD.Primitive(), new RawEigenvalue.Dynamic(), new OldGeneralEvD.Primitive()};
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new NewGeneralEvD.Primitive(), new RawEigenvalue.Dynamic(), new OldGeneralEvD.Primitive() };
     }
 
     @SuppressWarnings("unchecked")
     public static Eigenvalue<Double>[] getEigenvaluePrimitiveSymmetric() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[]{new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(),
-                new RawEigenvalue.Symmetric()};
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(),
+                new RawEigenvalue.Symmetric() };
     }
 
     public static final Hessenberg<?>[] getHessenbergAll() {
@@ -155,7 +155,7 @@ public abstract class MatrixDecompositionTests {
         return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new DeferredTridiagonal.Primitive(), new SimultaneousTridiagonal() };
     }
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }

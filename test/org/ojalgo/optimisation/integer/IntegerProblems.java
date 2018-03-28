@@ -25,8 +25,8 @@ import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;
@@ -72,8 +72,8 @@ public class IntegerProblems {
     @Test
     public void testP20111010() {
 
-        final Variable[] tmpVariables = new Variable[]{Variable.makeBinary("X").weight(ONE), Variable.makeBinary("Y").weight(ONE),
-                Variable.makeBinary("Z").weight(ONE)};
+        final Variable[] tmpVariables = new Variable[] { Variable.makeBinary("X").weight(ONE), Variable.makeBinary("Y").weight(ONE),
+                Variable.makeBinary("Z").weight(ONE) };
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
@@ -131,8 +131,8 @@ public class IntegerProblems {
     @Test
     public void testP20130409a() {
 
-        final Variable[] tmpVariables = new Variable[]{new Variable("x1").lower(BigMath.ZERO).weight(BigMath.ONE),
-                new Variable("x2013").lower(BigMath.ZERO).integer(true), new Variable("x2014").lower(BigMath.ZERO).integer(true)};
+        final Variable[] tmpVariables = new Variable[] { new Variable("x1").lower(BigMath.ZERO).weight(BigMath.ONE),
+                new Variable("x2013").lower(BigMath.ZERO).integer(true), new Variable("x2014").lower(BigMath.ZERO).integer(true) };
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
@@ -154,7 +154,7 @@ public class IntegerProblems {
         tmpExpr3.level(new BigDecimal(19105000));
 
         final BigArray tmpExpSol = BigArray
-                .wrap(new BigDecimal[]{BigDecimal.valueOf(4200.000000000075), BigDecimal.valueOf(1892), BigDecimal.valueOf(1929)});
+                .wrap(new BigDecimal[] { BigDecimal.valueOf(4200.000000000075), BigDecimal.valueOf(1892), BigDecimal.valueOf(1929) });
 
         TestUtils.assertTrue("Expected Solution Not Valid", tmpModel.validate(tmpExpSol));
 
@@ -231,7 +231,7 @@ public class IntegerProblems {
         c6.level(BigDecimal.valueOf(19105000));
 
         final BigArray tmpExpSol = BigArray
-                .wrap(new BigDecimal[]{BigDecimal.valueOf(4849.999999997941), BigDecimal.valueOf(1245), BigDecimal.valueOf(1269), BigDecimal.valueOf(1307)});
+                .wrap(new BigDecimal[] { BigDecimal.valueOf(4849.999999997941), BigDecimal.valueOf(1245), BigDecimal.valueOf(1269), BigDecimal.valueOf(1307) });
 
         TestUtils.assertTrue("Expected Solution Not Valid", tmpModel.validate(tmpExpSol));
 
@@ -250,14 +250,13 @@ public class IntegerProblems {
      * <a href="http://bugzilla.optimatika.se/show_bug.cgi?id=211">BugZilla-211</a>
      */
     @Test
-    @Tag("slow")
     public void testP20140819() {
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
 
-        final double[] tmpWeights = new double[]{2691.5357279536333, 2600.760150603986, 2605.8958795795374, 2606.7208332501104, 2715.0757845953835,
+        final double[] tmpWeights = new double[] { 2691.5357279536333, 2600.760150603986, 2605.8958795795374, 2606.7208332501104, 2715.0757845953835,
                 2602.194912040238, 2606.0069468717575, 2609.0385816244316, 2750.0520522057927, 2602.048261785581, 2600.507229973181, 2602.046307869504,
-                2721.343937605796, 2601.7367414553805, 2600.595318433882, 2599.405979211142};
+                2721.343937605796, 2601.7367414553805, 2600.595318433882, 2599.405979211142 };
 
         for (int v = 0; v < tmpWeights.length; v++) {
             tmpModel.addVariable(Variable.make("x" + v).integer(true).lower(0).upper(414).weight(tmpWeights[v]));
@@ -268,13 +267,13 @@ public class IntegerProblems {
         // 341 <= 0 0 8 0 0 0 8 0 68 68 68 68 0 0 0 5 <= 140833
         // 413 <= 0 0 0 8 0 0 0 9 0 0 0 6 59 59 59 59 <= 48321
 
-        final int[] tmpLower = new int[]{117, 36, 341, 413};
-        final int[] tmpUpper = new int[]{14868, 170569, 140833, 48321};
+        final int[] tmpLower = new int[] { 117, 36, 341, 413 };
+        final int[] tmpUpper = new int[] { 14868, 170569, 140833, 48321 };
         final int[][] tmpFactors = new int[4][];
-        tmpFactors[0] = new int[]{30, 30, 30, 30, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0};
-        tmpFactors[1] = new int[]{0, 4, 0, 0, 40, 40, 40, 40, 0, 0, 4, 0, 0, 0, 4, 0};
-        tmpFactors[2] = new int[]{0, 0, 8, 0, 0, 0, 8, 0, 68, 68, 68, 68, 0, 0, 0, 5};
-        tmpFactors[3] = new int[]{0, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0, 6, 59, 59, 59, 59};
+        tmpFactors[0] = new int[] { 30, 30, 30, 30, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0 };
+        tmpFactors[1] = new int[] { 0, 4, 0, 0, 40, 40, 40, 40, 0, 0, 4, 0, 0, 0, 4, 0 };
+        tmpFactors[2] = new int[] { 0, 0, 8, 0, 0, 0, 8, 0, 68, 68, 68, 68, 0, 0, 0, 5 };
+        tmpFactors[3] = new int[] { 0, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0, 6, 59, 59, 59, 59 };
 
         for (int c = 0; c < tmpFactors.length; c++) {
             final Expression tmpExpr = tmpModel.addExpression("C" + c);

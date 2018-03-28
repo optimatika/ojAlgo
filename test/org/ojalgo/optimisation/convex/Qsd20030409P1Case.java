@@ -32,8 +32,8 @@ public class Qsd20030409P1Case extends GenericQPSolverTest {
         final BasicMatrix[] retVal = new RationalMatrix[8];
 
         // Equations/Equalities
-        retVal[0] = RationalMatrix.FACTORY.rows(new double[][] { { 1, 1, 1, 1, 1, 1, 1 }, { 0, 1, 0, 0, 0, 0, 0 }, { 0, 0, 1, 0, 0, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 },
-                { 0, 0, 0, 0, 1, 0, 0 }, { 0, 0, 0, 0, 0, 1, 0 }, { 0, 0, 0, 0, 0, 0, 1 } });
+        retVal[0] = RationalMatrix.FACTORY.rows(new double[][] { { 1, 1, 1, 1, 1, 1, 1 }, { 0, 1, 0, 0, 0, 0, 0 }, { 0, 0, 1, 0, 0, 0, 0 },
+                { 0, 0, 0, 1, 0, 0, 0 }, { 0, 0, 0, 0, 1, 0, 0 }, { 0, 0, 0, 0, 0, 1, 0 }, { 0, 0, 0, 0, 0, 0, 1 } });
 
         // Levels/Values
         retVal[1] = RationalMatrix.FACTORY.rows(new double[][] { { 1 }, { 0.0000 }, { 0.0000 }, { 0.0000 }, { 0.8709 }, { 0.0000 }, { 0.1291 } });

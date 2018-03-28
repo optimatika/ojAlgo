@@ -26,8 +26,8 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.MathContext;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
@@ -56,7 +56,7 @@ public class EigenvalueTest {
 
     }
 
-    @Before
+    @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
     }

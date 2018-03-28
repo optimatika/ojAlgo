@@ -23,9 +23,9 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Primitive64Array;
@@ -88,8 +88,8 @@ public class RandomNumberTest {
     }
 
     @Test
-    @Ignore("Underscored before JUnit 5")
-    public void _testLogNormal() {
+    @Disabled("Underscored before JUnit 5")
+    public void testLogNormal() {
 
         final double tmpAccuracy = TENTH / THREE;
 
@@ -245,18 +245,19 @@ public class RandomNumberTest {
             for (int i = 1; i < 10; i++) {
                 final Erlang erl = new Erlang(i, theta);
                 final Gamma gam = new Gamma(i, theta);
-                TestUtils.assertEquals("Gamma should match erlang for integer k", erl.getVariance(), gam.getVariance(), 0.0);
-                TestUtils.assertEquals("Gamma should match erlang for integer k", erl.getExpected(), gam.getExpected(), 0.0);
+                TestUtils.assertEquals("Gamma should match erlang for integer k", erl.getVariance(), gam.getVariance(), MACHINE_SMALLEST);
+                TestUtils.assertEquals("Gamma should match erlang for integer k", erl.getExpected(), gam.getExpected(), MACHINE_SMALLEST);
             }
         }
         // param 1 is cast to integers by Dist2Erlang
-        this.testDist2(new Dist2Erlang(), new double[]{1, .01}, new double[]{5, 10}, new double[]{5, 100}, 2500000, .05);
+        this.testDist2(new Dist2Erlang(), new double[] { 1, .01 }, new double[] { 5, 10 }, new double[] { 5, 100 }, 2500000, .05);
     }
 
     @Test
+    @Tag("unstable")
     public void testGamma() {
         // TODO 15% error seems a little high
-        this.testDist2(new Dist2Gamma(), new double[]{.01, .01}, new double[]{10, 10}, new double[]{100, 100}, 200000, .15);
+        this.testDist2(new Dist2Gamma(), new double[] { .01, .01 }, new double[] { 10, 10 }, new double[] { 100, 100 }, 200000, .15);
     }
 
     @Test
@@ -313,6 +314,7 @@ public class RandomNumberTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testGeometricMeanAndStandardDeviation() {
 
         final int tmpSize = 1000;
@@ -365,14 +367,14 @@ public class RandomNumberTest {
     // within 2 percent of the mean.
     @Test
     public void testNorm2() {
-        this.testDist2(new Dist2Norm(), new double[]{.01, .01}, new double[]{10, 10}, new double[]{100, 100}, 1500000, .05);
+        this.testDist2(new Dist2Norm(), new double[] { .01, .01 }, new double[] { 10, 10 }, new double[] { 100, 100 }, 1500000, .05);
     }
 
     @Test
     public void testNormal() {
 
-        final double[] tmpStdDevCount = new double[]{ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX}; // ± this number of std devs
-        final double[] tmpConfidence = new double[]{ZERO, 0.682689492137, 0.954499736104, 0.997300203937, 0.999936657516, 0.999999426697, 0.999999998027};
+        final double[] tmpStdDevCount = new double[] { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX }; // ± this number of std devs
+        final double[] tmpConfidence = new double[] { ZERO, 0.682689492137, 0.954499736104, 0.997300203937, 0.999936657516, 0.999999426697, 0.999999998027 };
 
         final Normal tmpDistribution = new Normal(TEN, PI);
 
@@ -392,10 +394,11 @@ public class RandomNumberTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testSampledMean() {
 
-        final RandomNumber[] tmpRndNmbrs = new RandomNumber[]{new Exponential(), new LogNormal(), new Normal(), new Uniform(), new Binomial(),
-                new Geometric(), new Poisson(), new Erlang(), new Gamma(), new Weibull()};
+        final RandomNumber[] tmpRndNmbrs = new RandomNumber[] { new Exponential(), new LogNormal(), new Normal(), new Uniform(), new Binomial(),
+                new Geometric(), new Poisson(), new Erlang(), new Gamma(), new Weibull() };
 
         for (int d = 0; d < tmpRndNmbrs.length; d++) {
 
@@ -419,6 +422,7 @@ public class RandomNumberTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testVariance() {
 
         final double tmpStdDev = TEN;
@@ -457,7 +461,7 @@ public class RandomNumberTest {
                 TestUtils.assertEquals("Weibull distribution's variance should be deterministic and precise.", w0.getVariance(), w1.getVariance());
             }
         }
-        this.testDist2(new Dist2Weibull(), new double[]{.01, .5}, new double[]{10, 2}, new double[]{100, 4}, 2500000, .05);
+        this.testDist2(new Dist2Weibull(), new double[] { .01, .5 }, new double[] { 10, 2 }, new double[] { 100, 4 }, 2500000, .05);
     }
 
     @Test

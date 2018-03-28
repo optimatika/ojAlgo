@@ -604,7 +604,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     @Override
     public String toString() {
-        return MatrixUtils.toString(this);
+        return Access2D.toString(this);
     }
 
     public I transpose() {

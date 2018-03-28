@@ -137,7 +137,9 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
 
         // Check the pseudoinverse.
         if (retVal) {
-            retVal &= matrix.equals(matrix.multiply(decomposition.getInverse().multiply(matrix)), context);
+            final MatrixStore<N> inverse = decomposition.getInverse();
+            final MatrixStore<N> multiplied = matrix.multiply(inverse.multiply(matrix));
+            retVal &= matrix.equals(multiplied, context);
         }
 
         // Check that the singular values are sorted in descending order
