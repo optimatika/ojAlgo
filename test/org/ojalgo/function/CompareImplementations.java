@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
@@ -405,6 +406,7 @@ public class CompareImplementations {
     }
 
     @Test
+    @Tag("unstable")
     public void testROOT() {
         this.assertParameter(BigFunction.ROOT, ComplexFunction.ROOT, PrimitiveFunction.ROOT, QuaternionFunction.ROOT, RationalFunction.ROOT,
                 POSITIVE.doubleValue(), Uniform.randomInteger(1, 10));

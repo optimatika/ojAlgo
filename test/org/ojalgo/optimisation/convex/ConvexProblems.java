@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.ProgrammingError;
@@ -1026,7 +1027,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * <p>
      * 2016-03-07: Initially the solution (from AMPL/LOQO) was stated to be:
      * <p>
-     * 
+     *
      * <pre>
      * 1.78684, 0.000326128, 1.78665, 0.000136478, 495.429, 0.00358488, 495.427, 0.00178874, 8.90701, 0.000339811, 8.90684, 0.000174032
      * </pre>
@@ -1035,7 +1036,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * context. When ExpressionsBasedModel uses CPLEX as the solver a slightly different solution is returned
      * that validates much better. Switched to using that solution as the expected solution in this test:
      * <p>
-     * 
+     *
      * <pre>
      * 1.7856570552, 1.216415374E-5, 1.78565097263, 6.08157995E-6, 495.426247828, 2.478968927E-5, 495.426235433, 1.239483719E-5, 8.90673094088, 6.04347562E-6, 8.90672791911, 3.02171321E-6
      * </pre>
@@ -1300,18 +1301,20 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20150809() {
 
+        final NumberContext precision = new NumberContext(11, 14, RoundingMode.HALF_EVEN);
+
         final Primitive64Array tmpExpectedSolution = Primitive64Array.wrap(new double[] { 0.12, -0.05, 0.08, 0.07 });
         final Primitive64Array tmpBoundedSolution = Primitive64Array.wrap(new double[] { 99999, -99999, 99999, 99999 });
 
         ConvexSolver tmpSolver = P20150809.buildModel(true, false);
         Result tmpResult = tmpSolver.solve();
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertEquals(tmpExpectedSolution, tmpResult);
+        TestUtils.assertEquals(tmpExpectedSolution, tmpResult, precision);
 
         tmpSolver = P20150809.buildModel(true, true);
         tmpResult = tmpSolver.solve();
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertEquals(tmpExpectedSolution, tmpResult);
+        TestUtils.assertEquals(tmpExpectedSolution, tmpResult, precision);
 
         tmpSolver = P20150809.buildModel(false, false);
         tmpResult = tmpSolver.solve();
@@ -1320,7 +1323,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         tmpSolver = P20150809.buildModel(false, true);
         tmpResult = tmpSolver.solve();
         TestUtils.assertStateNotLessThanOptimal(tmpResult); // Since it is now constrained, the solver should be able find the optimal solution.
-        TestUtils.assertEquals(tmpBoundedSolution, tmpResult);
+        TestUtils.assertEquals(tmpBoundedSolution, tmpResult, precision);
     }
 
     /**

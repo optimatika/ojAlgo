@@ -1086,9 +1086,9 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, false);
-        TestUtils.assertEquals(4.0, solution.getPoint()[0], PrimitiveMath.MACHINE_SMALLEST);
-        TestUtils.assertEquals(0.0, solution.getPoint()[1], PrimitiveMath.MACHINE_SMALLEST);
-        TestUtils.assertEquals(-13.0, solution.getValue(), PrimitiveMath.MACHINE_SMALLEST);
+        TestUtils.assertEquals(4.0, solution.getPoint()[0]);
+        TestUtils.assertEquals(0.0, solution.getPoint()[1]);
+        TestUtils.assertEquals(-13.0, solution.getValue());
     }
 
     /**
@@ -1105,9 +1105,9 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
-        TestUtils.assertEquals(2.0, solution.getPoint()[0], PrimitiveMath.MACHINE_SMALLEST);
-        TestUtils.assertEquals(2.0, solution.getPoint()[1], PrimitiveMath.MACHINE_SMALLEST);
-        TestUtils.assertEquals(50.0, solution.getValue(), PrimitiveMath.MACHINE_SMALLEST);
+        TestUtils.assertEquals(2.0, solution.getPoint()[0]);
+        TestUtils.assertEquals(2.0, solution.getPoint()[1]);
+        TestUtils.assertEquals(50.0, solution.getValue());
     }
 
     @Test
@@ -1140,9 +1140,9 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
-        TestUtils.assertEquals(2.0, solution.getPoint()[0], PrimitiveMath.MACHINE_SMALLEST);
-        TestUtils.assertEquals(2.0, solution.getPoint()[1], PrimitiveMath.MACHINE_SMALLEST);
-        TestUtils.assertEquals(57.0, solution.getValue(), PrimitiveMath.MACHINE_SMALLEST);
+        TestUtils.assertEquals(2.0, solution.getPoint()[0]);
+        TestUtils.assertEquals(2.0, solution.getPoint()[1]);
+        TestUtils.assertEquals(57.0, solution.getValue());
     }
 
     @Test
@@ -1153,8 +1153,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
-        TestUtils.assertEquals(10.0, solution.getPoint()[0], PrimitiveMath.MACHINE_SMALLEST);
-        TestUtils.assertEquals(30.0, solution.getValue(), PrimitiveMath.MACHINE_SMALLEST);
+        TestUtils.assertEquals(10.0, solution.getPoint()[0]);
+        TestUtils.assertEquals(30.0, solution.getValue());
     }
 
     @Test

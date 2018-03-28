@@ -23,6 +23,7 @@ package org.ojalgo.random.process;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Primitive64Array;
@@ -131,6 +132,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
     }
 
     @Test
+    @Tag("unstable")
     public void testLogNormal() {
 
         final int tmpPeriods = 10000;

@@ -55,7 +55,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class TestUtils {
 
-    private static final NumberContext EQUALS = new NumberContext(7, 14, RoundingMode.HALF_EVEN);
+    private static final NumberContext EQUALS = new NumberContext(12, 14, RoundingMode.HALF_EVEN);
 
     public static void assertBounds(final Number lower, final Access1D<?> values, final Number upper, final NumberContext precision) {
         for (final Number tmpValue : values) {

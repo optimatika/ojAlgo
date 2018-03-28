@@ -50,6 +50,7 @@ public class DecompositionProblems {
      * A user reported problems solving complex valued (overdetermined) equation systemes.
      */
     @Test
+    @Tag("unstable")
     public void testP20111213square() {
 
         final int tmpDim = Uniform.randomInteger(2, 6);
