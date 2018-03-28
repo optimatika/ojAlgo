@@ -314,6 +314,7 @@ public class RandomNumberTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testGeometricMeanAndStandardDeviation() {
 
         final int tmpSize = 1000;
@@ -421,6 +422,7 @@ public class RandomNumberTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testVariance() {
 
         final double tmpStdDev = TEN;

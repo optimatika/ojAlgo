@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
@@ -33,22 +34,22 @@ public final class DeterminantTest extends AbstractMatrixDecompositionTaskTest {
 
     @Test
     public void testFull2X2() {
-        this.doFull(AbstractDeterminator.FULL_2X2, 2);
+        this.doGeneral(AbstractDeterminator.FULL_2X2, 2);
     }
 
     @Test
     public void testFull3X3() {
-        this.doFull(AbstractDeterminator.FULL_3X3, 3);
+        this.doGeneral(AbstractDeterminator.FULL_3X3, 3);
     }
 
     @Test
     public void testFull4X4() {
-        this.doFull(AbstractDeterminator.FULL_4X4, 4);
+        this.doGeneral(AbstractDeterminator.FULL_4X4, 4);
     }
 
     @Test
     public void testFull5X5() {
-        this.doFull(AbstractDeterminator.FULL_5X5, 5);
+        this.doGeneral(AbstractDeterminator.FULL_5X5, 5);
     }
 
     @Test
@@ -76,9 +77,9 @@ public final class DeterminantTest extends AbstractMatrixDecompositionTaskTest {
         this.doSymmetric(AbstractDeterminator.SYMMETRIC_5X5, 5);
     }
 
-    void doFull(final DeterminantTask<Double> fixed, final int dimension) {
+    void doGeneral(final DeterminantTask<Double> fixed, final int dimension) {
 
-        final MatrixStore<Double> tmpMatrix = this.makeFull(dimension);
+        final MatrixStore<Double> tmpMatrix = this.makeGeneral(dimension);
 
         final Double tmpExpDet = fixed.calculateDeterminant(tmpMatrix);
 
@@ -102,15 +103,12 @@ public final class DeterminantTest extends AbstractMatrixDecompositionTaskTest {
         }
     }
 
-    MatrixStore<Double> makeFull(final int dim) {
+    MatrixStore<Double> makeGeneral(final int dim) {
         return PrimitiveDenseStore.FACTORY.makeFilled(dim, dim, new Uniform());
     }
 
     MatrixStore<Double> makeSymmetric(final int dim) {
-
-        final MatrixStore<Double> tmpVal = this.makeFull(dim);
-
-        return tmpVal.transpose().multiply(tmpVal);
+        return MatrixUtils.makeSPD(dim);
     }
 
 }

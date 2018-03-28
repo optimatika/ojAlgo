@@ -42,7 +42,7 @@ public abstract class MatrixTaskTests {
 
         Collections.addAll(retVal, MatrixDecompositionTests.getEigenvaluePrimitiveGeneral());
 
-        //        Collections.addAll(retVal, MatrixDecompositionTests.getQRPrimitive());
+        //  Collections.addAll(retVal, MatrixDecompositionTests.getQRPrimitive());
 
         return retVal;
     }
@@ -59,7 +59,7 @@ public abstract class MatrixTaskTests {
 
         Collections.addAll(retVal, MatrixDecompositionTests.getEigenvaluePrimitiveGeneral());
 
-        //        Collections.addAll(retVal, MatrixDecompositionTests.getQRPrimitive());
+        //  Collections.addAll(retVal, MatrixDecompositionTests.getQRPrimitive());
 
         return retVal;
     }

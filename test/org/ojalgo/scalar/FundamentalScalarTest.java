@@ -52,6 +52,7 @@ public class FundamentalScalarTest {
     double value2;
 
     @Test
+    @Tag("unstable")
     public void testAdd() {
 
         final double tmpExp = value1 + value2;
