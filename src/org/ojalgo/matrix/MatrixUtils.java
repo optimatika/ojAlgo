@@ -296,43 +296,11 @@ public abstract class MatrixUtils {
         return retVal;
     }
 
+    /**
+     * @deprecated v45 Use {@link Access2D#toString(Access2D<?>)} instead
+     */
     public static String toString(final Access2D<?> matrix) {
-
-        final StringBuilder retVal = new StringBuilder();
-
-        final int tmpRowDim = (int) matrix.countRows();
-        final int tmpColDim = (int) matrix.countColumns();
-
-        retVal.append(matrix.getClass().getName());
-        retVal.append(' ').append('<').append(' ').append(tmpRowDim).append(' ').append('x').append(' ').append(tmpColDim).append(' ').append('>');
-
-        if ((tmpRowDim > 0) && (tmpColDim > 0) && (tmpRowDim <= 50) && (tmpColDim <= 50) && ((tmpRowDim * tmpColDim) <= 200)) {
-
-            // First element
-            retVal.append("\n{ { ").append(matrix.get(0, 0));
-
-            // Rest of the first row
-            for (int j = 1; j < tmpColDim; j++) {
-                retVal.append(",\t").append(matrix.get(0, j));
-            }
-
-            // For each of the remaining rows
-            for (int i = 1; i < tmpRowDim; i++) {
-
-                // First column
-                retVal.append(" },\n{ ").append(matrix.get(i, 0));
-
-                // Remaining columns
-                for (int j = 1; j < tmpColDim; j++) {
-                    retVal.append(",\t").append(matrix.get(i, j));
-                }
-            }
-
-            // Finish
-            retVal.append(" } }");
-        }
-
-        return retVal.toString();
+        return Access2D.toString(matrix);
     }
 
     public static Access2D<BigDecimal> wrapBigAccess2D(final BasicMatrix matrix) {

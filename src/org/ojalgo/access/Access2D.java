@@ -365,6 +365,45 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         };
     }
 
+    static String toString(final Access2D<?> matrix) {
+
+        final StringBuilder retVal = new StringBuilder();
+
+        final int tmpRowDim = (int) matrix.countRows();
+        final int tmpColDim = (int) matrix.countColumns();
+
+        retVal.append(matrix.getClass().getName());
+        retVal.append(' ').append('<').append(' ').append(tmpRowDim).append(' ').append('x').append(' ').append(tmpColDim).append(' ').append('>');
+
+        if ((tmpRowDim > 0) && (tmpColDim > 0) && (tmpRowDim <= 50) && (tmpColDim <= 50) && ((tmpRowDim * tmpColDim) <= 200)) {
+
+            // First element
+            retVal.append("\n{ { ").append(matrix.get(0, 0));
+
+            // Rest of the first row
+            for (int j = 1; j < tmpColDim; j++) {
+                retVal.append(",\t").append(matrix.get(0, j));
+            }
+
+            // For each of the remaining rows
+            for (int i = 1; i < tmpRowDim; i++) {
+
+                // First column
+                retVal.append(" },\n{ ").append(matrix.get(i, 0));
+
+                // Remaining columns
+                for (int j = 1; j < tmpColDim; j++) {
+                    retVal.append(",\t").append(matrix.get(i, j));
+                }
+            }
+
+            // Finish
+            retVal.append(" } }");
+        }
+
+        return retVal.toString();
+    }
+
     static Access2D<Double> wrap(final double[][] target) {
         return new Access2D<Double>() {
 

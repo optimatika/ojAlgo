@@ -1,6 +1,6 @@
 package org.ojalgo.matrix.geometry;
 
-import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.transformation.TransformationMatrix;
 
 public class Primitive64Matrix4 implements GeometryMatrix<Primitive64Matrix4>, TransformationMatrix<Double, Primitive64Vector4> {
@@ -251,7 +251,7 @@ public class Primitive64Matrix4 implements GeometryMatrix<Primitive64Matrix4>, T
 
     @Override
     public final String toString() {
-        return MatrixUtils.toString(this);
+        return Access2D.toString(this);
     }
 
     public final void transform(final Primitive64Vector3 transformable, final double v3) {

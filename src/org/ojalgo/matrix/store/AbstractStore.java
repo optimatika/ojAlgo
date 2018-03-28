@@ -25,6 +25,7 @@ import java.io.Serializable;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -105,7 +106,7 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
 
     @Override
     public final String toString() {
-        return MatrixUtils.toString(this);
+        return Access2D.toString(this);
     }
 
     protected final int getColDim() {

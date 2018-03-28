@@ -986,7 +986,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     @Override
     public final String toString() {
-        return MatrixUtils.toString(this);
+        return Access2D.toString(this);
     }
 
     public void transformLeft(final Householder<BigDecimal> transformation, final int firstColumn) {

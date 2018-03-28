@@ -1079,7 +1079,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     @Override
     public String toString() {
-        return MatrixUtils.toString(this);
+        return Access2D.toString(this);
     }
 
     public void transformLeft(final Householder<Double> transformation, final int firstColumn) {

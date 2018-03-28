@@ -992,7 +992,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     @Override
     public final String toString() {
-        return MatrixUtils.toString(this);
+        return Access2D.toString(this);
     }
 
     public void transformLeft(final Householder<ComplexNumber> transformation, final int firstColumn) {

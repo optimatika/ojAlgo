@@ -1087,7 +1087,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     @Override
     public final String toString() {
-        return MatrixUtils.toString(this);
+        return Access2D.toString(this);
     }
 
     public void transformLeft(final Householder<N> transformation, final int firstColumn) {
