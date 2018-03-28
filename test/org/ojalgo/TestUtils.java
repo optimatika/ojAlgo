@@ -129,19 +129,19 @@ public abstract class TestUtils {
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Bidiagonal<N> actual, final NumberContext context) {
         if (!Bidiagonal.equals(expected, actual, context)) {
-            Assertions.fail("Bidiagonal<N>");
+            Assertions.fail(() -> "Bidiagonal<N> failed for " + expected);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Cholesky<N> actual, final NumberContext context) {
         if (!Cholesky.equals(expected, actual, context)) {
-            Assertions.fail("Cholesky<N>");
+            Assertions.fail(() -> "Cholesky<N> failed for " + expected);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Eigenvalue<N> actual, final NumberContext context) {
         if (!Eigenvalue.equals(expected, actual, context)) {
-            Assertions.fail("Eigenvalue<N>");
+            Assertions.fail(() -> "Eigenvalue<N> failed for " + expected);
         }
         if (actual.isOrdered()) {
             final MatrixStore<N> mtrxD = actual.getD();
@@ -158,31 +158,31 @@ public abstract class TestUtils {
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Hessenberg<N> actual, final NumberContext context) {
         if (!Hessenberg.equals(expected, actual, context)) {
-            Assertions.fail("Hessenberg<N>");
+            Assertions.fail(() -> "Hessenberg<N> failed for " + expected);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final LU<N> actual, final NumberContext context) {
         if (!LU.equals(expected, actual, context)) {
-            Assertions.fail("LU<N>");
+            Assertions.fail(() -> "LU<N> failed for " + expected);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final QR<N> actual, final NumberContext context) {
         if (!QR.equals(expected, actual, context)) {
-            Assertions.fail("QR<N>");
+            Assertions.fail(() -> "QR<N> failed for " + expected);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final SingularValue<N> actual, final NumberContext context) {
         if (!SingularValue.equals(expected, actual, context)) {
-            Assertions.fail("SingularValue<N>");
+            Assertions.fail(() -> "SingularValue<N> failed for " + expected);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Tridiagonal<N> actual, final NumberContext context) {
         if (!Tridiagonal.equals(expected, actual, context)) {
-            Assertions.fail("Tridiagonal<N>");
+            Assertions.fail(() -> "Tridiagonal<N> failed for " + expected);
         }
     }
 
@@ -252,7 +252,7 @@ public abstract class TestUtils {
         if (Double.isNaN(expected) && Double.isNaN(actual)) {
 
         } else if (context.isDifferent(expected, actual)) {
-            Assertions.fail(message);
+            Assertions.fail(() -> message + ": " + expected + " != " + actual);
         }
     }
 
@@ -284,10 +284,10 @@ public abstract class TestUtils {
             final ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
 
             if (!!context.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
-                Assertions.fail(message + " (real)");
+                Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
             }
             if (!!context.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
-                Assertions.fail(message + " (imaginary)");
+                Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
             }
 
         } else if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
@@ -296,22 +296,22 @@ public abstract class TestUtils {
             final Quaternion tmpActual = Quaternion.valueOf(actual);
 
             if (!!context.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
-                Assertions.fail(message + " (scalar)");
+                Assertions.fail(() -> message + " (scalar)" + ": " + expected + " != " + actual);
             }
             if (!!context.isDifferent(tmpExpected.i, tmpActual.i)) {
-                Assertions.fail(message + " (i)");
+                Assertions.fail(() -> message + " (i)" + ": " + expected + " != " + actual);
             }
             if (!!context.isDifferent(tmpExpected.j, tmpActual.j)) {
-                Assertions.fail(message + " (j)");
+                Assertions.fail(() -> message + " (j)" + ": " + expected + " != " + actual);
             }
             if (!!context.isDifferent(tmpExpected.k, tmpActual.k)) {
-                Assertions.fail(message + " (k)");
+                Assertions.fail(() -> message + " (k)" + ": " + expected + " != " + actual);
             }
 
         } else {
 
             if (context.isDifferent(expected.doubleValue(), actual.doubleValue())) {
-                Assertions.fail(message);
+                Assertions.fail(() -> message + ": " + expected + " != " + actual);
             }
         }
     }
