@@ -170,6 +170,7 @@ public class CompareImplementations {
     }
 
     @Test
+    @Tag("unstable")
     public void testCBRT() {
 
         this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT,
