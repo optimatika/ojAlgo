@@ -29,6 +29,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Stream2D;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.array.Raw1D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -99,7 +100,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         final AggregatorFunction<Double> aggregator = PrimitiveAggregator.getSet().product();
 
-        this.getR().visitDiagonal(aggregator);
+        Raw1D.visit(myDiagonalR, aggregator);
 
         if (myNumberOfHouseholderTransformations % 2 == 1) {
             return -aggregator.get();
