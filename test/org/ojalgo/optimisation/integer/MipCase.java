@@ -31,7 +31,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testMarkshare_5_0() {
+    public void testMarkshare_5_0() {
         MipLibCase.assertMinMaxVal("markshare_5_0.mps", new BigDecimal("1.00000000e+00"), null, false, null);
     }
 
@@ -49,7 +49,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testMarkshare1() {
+    public void testMarkshare1() {
         MipLibCase.assertMinMaxVal("markshare1.mps", new BigDecimal("1.00000000e+00"), null, false, null);
     }
 
@@ -67,7 +67,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testMarkshare2() {
+    public void testMarkshare2() {
         MipLibCase.assertMinMaxVal("markshare2.mps", new BigDecimal("1.00000000e+00"), null, false, null);
     }
 
@@ -88,7 +88,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testMas76() {
+    public void testMas76() {
         MipLibCase.assertMinMaxVal("mas76.mps", new BigDecimal("4.00050541e+04"), null, false, null);
     }
 
@@ -106,7 +106,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testModglob() {
+    public void testModglob() {
         MipLibCase.assertMinMaxVal("modglob.mps", new BigDecimal("2.07405081e+07"), null, false, null);
     }
 
@@ -121,7 +121,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testNeos911880() {
+    public void testNeos911880() {
         MipLibCase.assertMinMaxVal("neos-911880.mps", new BigDecimal("54.76"), null, false, null);
     }
 
@@ -137,7 +137,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testNoswot() {
+    public void testNoswot() {
         MipLibCase.assertMinMaxVal("noswot.mps", new BigDecimal("-4.10000000e+01"), null, false, null);
     }
 
@@ -150,7 +150,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testP2m2p1m1p0n100() {
+    public void testP2m2p1m1p0n100() {
         MipLibCase.assertMinMaxVal("p2m2p1m1p0n100.mps", new BigDecimal("Infeasible"), null, true, null);
     }
 
@@ -169,7 +169,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testPk1() {
+    public void testPk1() {
         MipLibCase.assertMinMaxVal("pk1.mps", new BigDecimal("1.10000000e+01"), null, false, null);
     }
 
@@ -185,7 +185,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testPp08a() {
+    public void testPp08a() {
         MipLibCase.assertMinMaxVal("pp08a.mps", new BigDecimal("7.35000000e+03"), null, false, null);
     }
 
@@ -200,7 +200,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testPp08aCUTS() {
+    public void testPp08aCUTS() {
         MipLibCase.assertMinMaxVal("pp08aCUTS.mps", new BigDecimal("7.35000000e+03"), null, false, null);
     }
 
@@ -215,7 +215,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testTimtab1() {
+    public void testTimtab1() {
         MipLibCase.assertMinMaxVal("timtab1.mps", new BigDecimal("7.64772000e+05"), null, false, null);
     }
 
@@ -232,7 +232,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testVpm2() {
+    public void testVpm2() {
         MipLibCase.assertMinMaxVal("vpm2.mps", new BigDecimal("1.37500000e+01"), null, false, null);
     }
 

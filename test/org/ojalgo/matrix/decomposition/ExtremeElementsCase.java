@@ -184,19 +184,19 @@ public class ExtremeElementsCase {
 
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testInvertOverflow() {
+    public void testInvertOverflow() {
         ExtremeElementsCase.doTestInvert(true);
     }
 
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testInvertUnderflow() {
+    public void testInvertUnderflow() {
         ExtremeElementsCase.doTestInvert(true);
     }
 
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testLU() {
+    public void testLU() {
 
         final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
 
@@ -242,7 +242,7 @@ public class ExtremeElementsCase {
 
     @Disabled("Underscored before JUnit 5")
     @Test
-    public void _testQR() {
+    public void testQR() {
 
         final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
 
@@ -280,13 +280,13 @@ public class ExtremeElementsCase {
 
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testSolveOverflow() {
+    public void testSolveOverflow() {
         ExtremeElementsCase.doTestSolve(true);
     }
 
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testSolveUnderflow() {
+    public void testSolveUnderflow() {
         ExtremeElementsCase.doTestSolve(false);
     }
 

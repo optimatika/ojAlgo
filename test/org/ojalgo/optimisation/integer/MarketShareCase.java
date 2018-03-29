@@ -108,7 +108,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testFullMIP() {
+    public void testFullMIP() {
 
         final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
 
@@ -128,7 +128,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testMipButLinearConstrainedToOptimal() {
+    public void testMipButLinearConstrainedToOptimal() {
 
         final ExpressionsBasedModel tmpModel = MarketShareCase.makeModel();
 
@@ -151,7 +151,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testSpecificBranch_20_25() {
+    public void testSpecificBranch_20_25() {
 
         final PrimitiveDenseStore tmpAE = PrimitiveDenseStore.FACTORY.rows(new double[][] {
                 { 0.88, 0.59, 1.0, 0.16, 0.7, 0.7, 0.12, 0.66, 0.85, 0.68, 0.97, 0.33, 0.87, 0.01, 0.6, 0.5, 0.85, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,

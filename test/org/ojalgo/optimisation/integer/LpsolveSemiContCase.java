@@ -37,7 +37,7 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
 
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testSemiContNot() {
+    public void testSemiContNot() {
 
         final File tmpFile = new File(PATH + "lpsolve_sc_not.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
@@ -59,7 +59,7 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
 
     @Test
     @Disabled("Underscored before JUnit 5")
-    public void _testSemiContOrg() {
+    public void testSemiContOrg() {
 
         final File tmpFile = new File(PATH + "lpsolve_sc_org.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
