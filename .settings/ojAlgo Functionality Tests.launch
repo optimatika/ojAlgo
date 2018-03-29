@@ -11,7 +11,7 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value="=ojAlgo"/>
-<stringAttribute key="org.eclipse.jdt.junit.EXCLUDE_TAGS" value="slow,unstable"/>
+<stringAttribute key="org.eclipse.jdt.junit.EXCLUDE_TAGS" value="slow"/>
 <booleanAttribute key="org.eclipse.jdt.junit.HAS_EXCLUDE_TAGS" value="true"/>
 <booleanAttribute key="org.eclipse.jdt.junit.HAS_INCLUDE_TAGS" value="false"/>
 <stringAttribute key="org.eclipse.jdt.junit.INCLUDE_TAGS" value="slow"/>

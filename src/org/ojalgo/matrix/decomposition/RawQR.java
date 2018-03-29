@@ -57,6 +57,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     private double[] myDiagonalR;
 
     private boolean myFullSize = false;
+    private int myNumberOfHouseholderTransformations = 0;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
@@ -96,11 +97,15 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     public Double getDeterminant() {
 
-        final AggregatorFunction<Double> tmpAggrFunc = PrimitiveAggregator.getSet().product();
+        final AggregatorFunction<Double> aggregator = PrimitiveAggregator.getSet().product();
 
-        this.getR().visitDiagonal(0, 0, tmpAggrFunc);
+        this.getR().visitDiagonal(aggregator);
 
-        return tmpAggrFunc.get();
+        if (myNumberOfHouseholderTransformations % 2 == 1) {
+            return -aggregator.get();
+        } else {
+            return aggregator.get();
+        }
     }
 
     public MatrixStore<Double> getInverse() {
@@ -256,6 +261,14 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return QR.reconstruct(this);
     }
 
+    @Override
+    public void reset() {
+
+        super.reset();
+
+        myNumberOfHouseholderTransformations = 0;
+    }
+
     public void setFullSize(final boolean fullSize) {
         myFullSize = fullSize;
     }
@@ -308,6 +321,8 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             }
 
             if (nrm != ZERO) {
+
+                myNumberOfHouseholderTransformations++;
 
                 // Form k-th Householder vector.
                 if (tmpColK[k] < 0) {

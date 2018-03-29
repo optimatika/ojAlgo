@@ -82,6 +82,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     }
 
     private boolean myFullSize = false;
+    private int myNumberOfHouseholderTransformations = 0;
 
     protected QRDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
@@ -108,6 +109,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         for (int ij = 0; ij < tmpLimit; ij++) {
             if (((ij + 1) < tmpRowDim) && tmpStore.generateApplyAndCopyHouseholderColumn(ij, ij, tmpHouseholder)) {
                 tmpStore.transformLeft(tmpHouseholder, ij + 1);
+                myNumberOfHouseholderTransformations++;
             }
         }
 
@@ -116,11 +118,15 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     public N getDeterminant() {
 
-        final AggregatorFunction<N> tmpAggrFunc = this.aggregator().product();
+        final AggregatorFunction<N> aggregator = this.aggregator().product();
 
-        this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
+        this.getInPlace().visitDiagonal(aggregator);
 
-        return tmpAggrFunc.get();
+        if (myNumberOfHouseholderTransformations % 2 == 1) {
+            return this.scalar().one().negate().multiply(aggregator.get()).get();
+        } else {
+            return aggregator.get();
+        }
     }
 
     @Override
@@ -315,6 +321,14 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
 
         return retVal;
+    }
+
+    @Override
+    public void reset() {
+
+        super.reset();
+
+        myNumberOfHouseholderTransformations = 0;
     }
 
 }
