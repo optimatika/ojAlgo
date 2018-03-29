@@ -89,6 +89,7 @@ public class FundamentalScalarTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testDivide() {
 
         final double tmpExp = value1 / value2;
