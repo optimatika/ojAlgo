@@ -47,9 +47,9 @@ import org.ojalgo.scalar.RationalNumber;
 public interface BLAS1 {
 
     @FunctionalInterface
-    public static interface PrimitiveToInt {
+    public static interface GenericToInt<T> {
 
-        int invoke(final double[] data, final int first, final int limit, final int step);
+        int invoke(final T[] data, final int first, final int limit, final int step);
 
     }
 
@@ -61,9 +61,9 @@ public interface BLAS1 {
     }
 
     @FunctionalInterface
-    public static interface GenericToInt<T> {
+    public static interface PrimitiveToInt {
 
-        int invoke(final T[] data, final int first, final int limit, final int step);
+        int invoke(final double[] data, final int first, final int limit, final int step);
 
     }
 

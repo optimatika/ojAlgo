@@ -73,16 +73,6 @@ public class SingularValueTest {
     }
 
     @Test
-    public void testBasicMatrixP20050827Case() {
-        this.doTestTypes(PrimitiveMatrix.FACTORY.copy(PrimitiveDenseStore.FACTORY.copy(P20050827Case.getProblematic())));
-    }
-
-    @Test
-    public void testBasicMatrixP20061119Case() {
-        this.doTestTypes(P20061119Case.getProblematic());
-    }
-
-    @Test
     public void testBasicMatrixP20030528Case() {
         this.doTestTypes(P20030528Case.getProblematic());
     }
@@ -90,6 +80,16 @@ public class SingularValueTest {
     @Test
     public void testBasicMatrixP20050125Case() {
         this.doTestTypes(P20050125Case.getProblematic());
+    }
+
+    @Test
+    public void testBasicMatrixP20050827Case() {
+        this.doTestTypes(PrimitiveMatrix.FACTORY.copy(PrimitiveDenseStore.FACTORY.copy(P20050827Case.getProblematic())));
+    }
+
+    @Test
+    public void testBasicMatrixP20061119Case() {
+        this.doTestTypes(P20061119Case.getProblematic());
     }
 
     @Test

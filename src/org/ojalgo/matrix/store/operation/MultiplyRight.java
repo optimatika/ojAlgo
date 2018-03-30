@@ -585,6 +585,36 @@ public final class MultiplyRight extends MatrixOperation {
         }
     }
 
+    public static <N extends Number & Scalar<N>> GenericMultiplyRight<N> getGeneric(final long rows, final long columns) {
+
+        if (columns > THRESHOLD) {
+
+            return (product, left, complexity, right, scalar) -> {
+
+                Arrays.fill(product, scalar.zero().get());
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        MultiplyRight.invoke(product, first, limit, left, complexity, right, scalar);
+                    }
+                };
+
+                tmpConquerer.invoke(0, (int) (right.count() / complexity), THRESHOLD);
+            };
+
+        } else {
+
+            return (product, left, complexity, right, scalar) -> {
+
+                Arrays.fill(product, scalar.zero().get());
+
+                MultiplyRight.invoke(product, 0, (int) (right.count() / complexity), left, complexity, right, scalar);
+            };
+        }
+    }
+
     public static PrimitiveMultiplyRight getPrimitive(final long rows, final long columns) {
         if (columns > THRESHOLD) {
             return PRIMITIVE_MT;
@@ -631,24 +661,6 @@ public final class MultiplyRight extends MatrixOperation {
         }
     }
 
-    static <N extends Number & Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
-            final Access1D<N> right, final Scalar.Factory<N> scalar) {
-
-        final int structure = left.length / complexity;
-
-        final N[] leftColumn = scalar.newArrayInstance(structure);
-        for (int c = 0; c < complexity; c++) {
-            System.arraycopy(left, c * structure, leftColumn, 0, structure);
-
-            final int firstInRightRow = MatrixUtils.firstInRow(right, c, firstColumn);
-            final int limitOfRightRow = MatrixUtils.limitOfRow(right, c, columnLimit);
-
-            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
-                AXPY.invoke(product, j * structure, right.get(c + (j * complexity)), leftColumn, 0, 0, structure);
-            }
-        }
-    }
-
     static void invoke(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity,
             final Access1D<?> right) {
 
@@ -667,6 +679,24 @@ public final class MultiplyRight extends MatrixOperation {
         }
     }
 
+    static <N extends Number & Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
+            final Access1D<N> right, final Scalar.Factory<N> scalar) {
+
+        final int structure = left.length / complexity;
+
+        final N[] leftColumn = scalar.newArrayInstance(structure);
+        for (int c = 0; c < complexity; c++) {
+            System.arraycopy(left, c * structure, leftColumn, 0, structure);
+
+            final int firstInRightRow = MatrixUtils.firstInRow(right, c, firstColumn);
+            final int limitOfRightRow = MatrixUtils.limitOfRow(right, c, columnLimit);
+
+            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
+                AXPY.invoke(product, j * structure, right.get(c + (j * complexity)), leftColumn, 0, 0, structure);
+            }
+        }
+    }
+
     private MultiplyRight() {
         super();
     }
@@ -674,36 +704,6 @@ public final class MultiplyRight extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
-    }
-
-    public static <N extends Number & Scalar<N>> GenericMultiplyRight<N> getGeneric(final long rows, final long columns) {
-
-        if (columns > THRESHOLD) {
-
-            return (product, left, complexity, right, scalar) -> {
-
-                Arrays.fill(product, scalar.zero().get());
-
-                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                    @Override
-                    public void conquer(final int first, final int limit) {
-                        MultiplyRight.invoke(product, first, limit, left, complexity, right, scalar);
-                    }
-                };
-
-                tmpConquerer.invoke(0, (int) (right.count() / complexity), THRESHOLD);
-            };
-
-        } else {
-
-            return (product, left, complexity, right, scalar) -> {
-
-                Arrays.fill(product, scalar.zero().get());
-
-                MultiplyRight.invoke(product, 0, (int) (right.count() / complexity), left, complexity, right, scalar);
-            };
-        }
     }
 
 }

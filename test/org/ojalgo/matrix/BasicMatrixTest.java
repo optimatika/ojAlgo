@@ -93,29 +93,32 @@ public abstract class BasicMatrixTest {
     PrimitiveMatrix myPrimitiveSafe;
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#getEigenvalues()
+     * @see junit.framework.TestCase#setUp()
      */
-    @Test
-    public void testGetEigenvalues() {
+    @BeforeEach
+    public void setUp() {
 
-        if (myBigAA.isSquare() && MatrixUtils.isHermitian(myBigAA)) {
+        TestUtils.minimiseAllBranchLimits();
 
-            final List<ComplexNumber> expected = myPrimitiveAA.getEigenvalues();
-            Collections.sort(expected);
-            List<ComplexNumber> actual;
+        myPrimitiveAA = PrimitiveMatrix.FACTORY.copy(myBigAA);
+        myPrimitiveAX = PrimitiveMatrix.FACTORY.copy(myBigAX);
+        myPrimitiveAB = PrimitiveMatrix.FACTORY.copy(myBigAB);
+        myPrimitiveI = PrimitiveMatrix.FACTORY.copy(myBigI);
+        myPrimitiveSafe = PrimitiveMatrix.FACTORY.copy(myBigSafe);
 
-            actual = myBigAA.getEigenvalues();
-            Collections.sort(actual);
-            for (int i = 0; i < expected.size(); i++) {
-                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i), actual.get(i), EVALUATION);
-            }
+        myComplexAA = ComplexMatrix.FACTORY.copy(myBigAA);
+        myComplexAX = ComplexMatrix.FACTORY.copy(myBigAX);
+        myComplexAB = ComplexMatrix.FACTORY.copy(myBigAB);
+        myComplexI = ComplexMatrix.FACTORY.copy(myBigI);
+        myComplexSafe = ComplexMatrix.FACTORY.copy(myBigSafe);
 
-            actual = myComplexAA.getEigenvalues();
-            Collections.sort(actual);
-            for (int i = 0; i < expected.size(); i++) {
-                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i), actual.get(i), EVALUATION);
-            }
-        }
+        myNmbr = new BigDecimal(Math.random());
+    }
+
+    @AfterEach
+    public void tearDown() {
+        DEFINITION = NumberContext.getGeneral(9);
+        EVALUATION = NumberContext.getGeneral(9);
     }
 
     /**
@@ -330,6 +333,32 @@ public abstract class BasicMatrixTest {
             myActNmbr = myPrimitiveAA.getDeterminant().get();
             TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
+        }
+    }
+
+    /**
+     * @see org.ojalgo.matrix.BasicMatrix#getEigenvalues()
+     */
+    @Test
+    public void testGetEigenvalues() {
+
+        if (myBigAA.isSquare() && MatrixUtils.isHermitian(myBigAA)) {
+
+            final List<ComplexNumber> expected = myPrimitiveAA.getEigenvalues();
+            Collections.sort(expected);
+            List<ComplexNumber> actual;
+
+            actual = myBigAA.getEigenvalues();
+            Collections.sort(actual);
+            for (int i = 0; i < expected.size(); i++) {
+                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i), actual.get(i), EVALUATION);
+            }
+
+            actual = myComplexAA.getEigenvalues();
+            Collections.sort(actual);
+            for (int i = 0; i < expected.size(); i++) {
+                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i), actual.get(i), EVALUATION);
+            }
         }
     }
 
@@ -1086,35 +1115,6 @@ public abstract class BasicMatrixTest {
         myActNmbr = myPrimitiveAA.getVectorNorm(tmpDegree).get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-    }
-
-    /**
-     * @see junit.framework.TestCase#setUp()
-     */
-    @BeforeEach
-    public void setUp() {
-
-        TestUtils.minimiseAllBranchLimits();
-
-        myPrimitiveAA = PrimitiveMatrix.FACTORY.copy(myBigAA);
-        myPrimitiveAX = PrimitiveMatrix.FACTORY.copy(myBigAX);
-        myPrimitiveAB = PrimitiveMatrix.FACTORY.copy(myBigAB);
-        myPrimitiveI = PrimitiveMatrix.FACTORY.copy(myBigI);
-        myPrimitiveSafe = PrimitiveMatrix.FACTORY.copy(myBigSafe);
-
-        myComplexAA = ComplexMatrix.FACTORY.copy(myBigAA);
-        myComplexAX = ComplexMatrix.FACTORY.copy(myBigAX);
-        myComplexAB = ComplexMatrix.FACTORY.copy(myBigAB);
-        myComplexI = ComplexMatrix.FACTORY.copy(myBigI);
-        myComplexSafe = ComplexMatrix.FACTORY.copy(myBigSafe);
-
-        myNmbr = new BigDecimal(Math.random());
-    }
-
-    @AfterEach
-    public void tearDown() {
-        DEFINITION = NumberContext.getGeneral(9);
-        EVALUATION = NumberContext.getGeneral(9);
     }
 
 }

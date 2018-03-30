@@ -105,6 +105,13 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
     MatrixStore<ComplexNumber> myComplexStore;
     MatrixStore<Double> myPrimitiveStore;
 
+    @AfterEach
+    public void tearDown() {
+        myBigStore = null;
+        myComplexStore = null;
+        myPrimitiveStore = null;
+    }
+
     @Test
     public void testBigAggregator() {
         NonPhysicalTest.testAggregation(myBigStore);
@@ -148,13 +155,6 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
     @Test
     public void testPrimitiveMultiplication() {
         NonPhysicalTest.testMultiplication(myPrimitiveStore);
-    }
-
-    @AfterEach
-    public void tearDown() {
-        myBigStore = null;
-        myComplexStore = null;
-        myPrimitiveStore = null;
     }
 
 }

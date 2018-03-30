@@ -48,25 +48,6 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         return RationalMatrix.FACTORY.copy(randomComplex.multiply(randomComplex.conjugate()));
     }
 
-    @Test
-    public void testData() {
-
-        final MatrixStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY.copy(LargerCholeskyCase.getOriginal());
-        final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
-        tmpDecomp.decompose(tmpMtrx);
-        TestUtils.assertEquals(true, tmpDecomp.isSolvable());
-    }
-
-    @Test
-    public void testProblem() {
-
-        final BasicMatrix tmpMtrx = LargerCholeskyCase.getOriginal();
-        final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
-        tmpDecomp.decompose(PrimitiveDenseStore.FACTORY.copy(tmpMtrx));
-
-        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpMtrx), tmpDecomp, EVALUATION);
-    }
-
     @BeforeEach
     @Override
     public void setUp() {
@@ -86,6 +67,25 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
 
         super.setUp();
+    }
+
+    @Test
+    public void testData() {
+
+        final MatrixStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY.copy(LargerCholeskyCase.getOriginal());
+        final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
+        tmpDecomp.decompose(tmpMtrx);
+        TestUtils.assertEquals(true, tmpDecomp.isSolvable());
+    }
+
+    @Test
+    public void testProblem() {
+
+        final BasicMatrix tmpMtrx = LargerCholeskyCase.getOriginal();
+        final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
+        tmpDecomp.decompose(PrimitiveDenseStore.FACTORY.copy(tmpMtrx));
+
+        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpMtrx), tmpDecomp, EVALUATION);
     }
 
 }

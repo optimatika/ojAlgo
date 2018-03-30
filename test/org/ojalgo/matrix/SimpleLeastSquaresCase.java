@@ -40,12 +40,6 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    private static RationalMatrix getFactorR() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
-                .rows(new double[][] { { -1.7321, 0.5774, 0.5774 }, { 0.0, -1.6330, 0.8165 }, { 0.0, 0.0, -1.4142 } });
-        return tmpMtrx.enforce(DEFINITION);
-    }
-
     public static RationalMatrix getRHS() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1237 }, { 1941 }, { 2417 }, { 711 }, { 1177 }, { 475 } });
         return tmpMtrx.enforce(DEFINITION);
@@ -56,9 +50,32 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
+    private static RationalMatrix getFactorR() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
+                .rows(new double[][] { { -1.7321, 0.5774, 0.5774 }, { 0.0, -1.6330, 0.8165 }, { 0.0, 0.0, -1.4142 } });
+        return tmpMtrx.enforce(DEFINITION);
+    }
+
     private static RationalMatrix getTransformedRHS() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 376 }, { -1200 }, { -3417 } });
         return tmpMtrx.enforce(DEFINITION);
+    }
+
+    @BeforeEach
+    @Override
+    public void setUp() {
+
+        DEFINITION = new NumberContext(7, 4);
+        EVALUATION = new NumberContext(4, 4); // TODO Something must be wrong here!
+
+        myBigAA = SimpleLeastSquaresCase.getFactorR();
+        myBigAX = SimpleLeastSquaresCase.getSolution();
+        myBigAB = SimpleLeastSquaresCase.getTransformedRHS();
+
+        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+
+        super.setUp();
     }
 
     @Test
@@ -79,23 +96,6 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         myActMtrx = SimpleLeastSquaresCase.getBody().solve(SimpleLeastSquaresCase.getRHS());
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
-    }
-
-    @BeforeEach
-    @Override
-    public void setUp() {
-
-        DEFINITION = new NumberContext(7, 4);
-        EVALUATION = new NumberContext(4, 4); // TODO Something must be wrong here!
-
-        myBigAA = SimpleLeastSquaresCase.getFactorR();
-        myBigAX = SimpleLeastSquaresCase.getSolution();
-        myBigAB = SimpleLeastSquaresCase.getTransformedRHS();
-
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-
-        super.setUp();
     }
 
 }

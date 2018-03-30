@@ -97,15 +97,6 @@ public final class HouseholderLeft extends MatrixOperation {
         }
     }
 
-    private HouseholderLeft() {
-        super();
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
     public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit,
             final Householder.Generic<N> householder, final Scalar.Factory<N> scalar) {
 
@@ -128,6 +119,15 @@ public final class HouseholderLeft extends MatrixOperation {
                 tmpIndex++;
             }
         }
+    }
+
+    private HouseholderLeft() {
+        super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

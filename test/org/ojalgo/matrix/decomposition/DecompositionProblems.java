@@ -47,101 +47,6 @@ public class DecompositionProblems {
     }
 
     /**
-     * A user reported problems solving complex valued (overdetermined) equation systemes.
-     */
-    @Test
-    @Tag("unstable")
-    public void testP20111213square() {
-
-        final int tmpDim = Uniform.randomInteger(2, 6);
-
-        final PhysicalStore<ComplexNumber> tmpSquare = MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim);
-        final MatrixStore<ComplexNumber> tmpHermitian = tmpSquare.conjugate().multiply(tmpSquare);
-        final PhysicalStore<ComplexNumber> tmpExpected = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
-        MatrixStore<ComplexNumber> tmpActual;
-
-        @SuppressWarnings("unchecked")
-        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
-                Eigenvalue.COMPLEX.make(MatrixDecomposition.TYPICAL,
-                        true)/*
-                              * , HessenbergDecomposition. makeComplex()
-                              */,
-                LU.COMPLEX.make(), QR.COMPLEX.make(),
-                SingularValue.COMPLEX.make() /*
-                                              * , TridiagonalDecomposition . makeComplex ( )
-                                              */ };
-
-        for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
-            tmpDecomposition.decompose(tmpHermitian);
-            if (MatrixDecompositionTests.DEBUG) {
-                BasicLogger.debug(tmpDecomposition.toString());
-                BasicLogger.debug("Original", tmpHermitian);
-                BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
-            }
-            TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), new NumberContext(8, 5));
-            if ((tmpDecomposition instanceof MatrixDecomposition.Solver<?>) && ((Solver) tmpDecomposition).isSolvable()) {
-                tmpActual = ((Solver) tmpDecomposition).getSolution(tmpHermitian);
-                if (MatrixDecompositionTests.DEBUG) {
-                    BasicLogger.debug("Actual", tmpActual);
-                }
-                TestUtils.assertEquals("Solving: " + tmpDecomposition.toString(), tmpExpected, tmpActual, new NumberContext(7, 6));
-            }
-        }
-    }
-
-    /**
-     * A user reported problems related to calculating the pseudoinverse for large (2000x2000) matrices.
-     */
-    @Test
-    @Tag("slow")
-    public void testP20160419() {
-
-        final PrimitiveDenseStore tmpOrg = PrimitiveDenseStore.FACTORY.makeFilled(2000, 2000, new Normal());
-
-        final SingularValue<Double> tmpRaw = new RawSingularValue();
-
-        try {
-
-            final MatrixStore<Double> tmpInv = tmpRaw.invert(tmpOrg);
-
-            TestUtils.assertEquals(tmpOrg, tmpOrg.multiply(tmpInv).multiply(tmpOrg), NumberContext.getGeneral(6, 6));
-
-        } catch (final RecoverableCondition exception) {
-            exception.printStackTrace();
-        }
-
-    }
-
-    /**
-     * A user discovered that some large (relatively uniform) matrices causes the algorithm to never finsh
-     * https://github.com/optimatika/ojAlgo/issues/22
-     */
-    @Test
-    @Tag("slow")
-    public void testP20160510InvertLargeMatrix() {
-
-        final double[][] data = new double[3000][3000];
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < data.length; j++) {
-                data[i][j] = 0.9;
-            }
-        }
-        data[0][1] = 1.01;
-
-        final PrimitiveMatrix input = PrimitiveMatrix.FACTORY.rows(data);
-        try {
-            // final SingularValue<Double> svd = SingularValue.make(input);
-            final SingularValue<Double> svd = new SingularValueDecomposition.Primitive();
-            svd.invert(input);
-        } catch (final RecoverableCondition exception) {
-            // TODO Auto-generated catch block
-            exception.printStackTrace();
-        }
-
-        // The issue:can't  be reached here!!!
-    }
-
-    /**
      * http://en.wikipedia.org/wiki/Singular_value_decomposition There is no problem...
      */
     @Test
@@ -279,6 +184,49 @@ public class DecompositionProblems {
      * A user reported problems solving complex valued (overdetermined) equation systemes.
      */
     @Test
+    @Tag("unstable")
+    public void testP20111213square() {
+
+        final int tmpDim = Uniform.randomInteger(2, 6);
+
+        final PhysicalStore<ComplexNumber> tmpSquare = MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim);
+        final MatrixStore<ComplexNumber> tmpHermitian = tmpSquare.conjugate().multiply(tmpSquare);
+        final PhysicalStore<ComplexNumber> tmpExpected = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
+        MatrixStore<ComplexNumber> tmpActual;
+
+        @SuppressWarnings("unchecked")
+        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
+                Eigenvalue.COMPLEX.make(MatrixDecomposition.TYPICAL,
+                        true)/*
+                              * , HessenbergDecomposition. makeComplex()
+                              */,
+                LU.COMPLEX.make(), QR.COMPLEX.make(),
+                SingularValue.COMPLEX.make() /*
+                                              * , TridiagonalDecomposition . makeComplex ( )
+                                              */ };
+
+        for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
+            tmpDecomposition.decompose(tmpHermitian);
+            if (MatrixDecompositionTests.DEBUG) {
+                BasicLogger.debug(tmpDecomposition.toString());
+                BasicLogger.debug("Original", tmpHermitian);
+                BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
+            }
+            TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), new NumberContext(8, 5));
+            if ((tmpDecomposition instanceof MatrixDecomposition.Solver<?>) && ((Solver) tmpDecomposition).isSolvable()) {
+                tmpActual = ((Solver) tmpDecomposition).getSolution(tmpHermitian);
+                if (MatrixDecompositionTests.DEBUG) {
+                    BasicLogger.debug("Actual", tmpActual);
+                }
+                TestUtils.assertEquals("Solving: " + tmpDecomposition.toString(), tmpExpected, tmpActual, new NumberContext(7, 6));
+            }
+        }
+    }
+
+    /**
+     * A user reported problems solving complex valued (overdetermined) equation systemes.
+     */
+    @Test
     public void testP20111213tall() {
 
         final int tmpDim = Uniform.randomInteger(2, 6);
@@ -311,6 +259,58 @@ public class DecompositionProblems {
                 TestUtils.assertEquals(decomp.toString(), identity, solution, new NumberContext(7, 6));
             }
         }
+    }
+
+    /**
+     * A user reported problems related to calculating the pseudoinverse for large (2000x2000) matrices.
+     */
+    @Test
+    @Tag("slow")
+    public void testP20160419() {
+
+        final PrimitiveDenseStore tmpOrg = PrimitiveDenseStore.FACTORY.makeFilled(2000, 2000, new Normal());
+
+        final SingularValue<Double> tmpRaw = new RawSingularValue();
+
+        try {
+
+            final MatrixStore<Double> tmpInv = tmpRaw.invert(tmpOrg);
+
+            TestUtils.assertEquals(tmpOrg, tmpOrg.multiply(tmpInv).multiply(tmpOrg), NumberContext.getGeneral(6, 6));
+
+        } catch (final RecoverableCondition exception) {
+            exception.printStackTrace();
+        }
+
+    }
+
+    /**
+     * A user discovered that some large (relatively uniform) matrices causes the algorithm to never finsh
+     * https://github.com/optimatika/ojAlgo/issues/22
+     */
+    @Test
+    @Tag("slow")
+    public void testP20160510InvertLargeMatrix() {
+
+        final double[][] data = new double[3000][3000];
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data.length; j++) {
+                data[i][j] = 0.9;
+            }
+        }
+        data[0][1] = 1.01;
+
+        final PrimitiveMatrix input = PrimitiveMatrix.FACTORY.rows(data);
+        try {
+            // final SingularValue<Double> svd = SingularValue.make(input);
+            final SingularValue<Double> svd = new SingularValueDecomposition.Primitive();
+            svd.invert(input);
+        } catch (final RecoverableCondition exception) {
+            // TODO Auto-generated catch block
+            exception.printStackTrace();
+        }
+
+        // The issue:can't  be reached here!!!
     }
 
 }

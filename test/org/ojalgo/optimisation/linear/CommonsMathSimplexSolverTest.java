@@ -149,6 +149,15 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
             myResult = result;
         }
 
+        public State getState() {
+            return myResult.getState();
+        }
+
+        public double getValue() {
+            final Access1D<?> tmpAccess = Access1D.wrap(this.getPoint());
+            return myObjFunc.getObjectiveFunction().invoke(Access1D.asPrimitive1D(tmpAccess)) + myObjFunc.getConstant();
+        }
+
         double[] getPoint() {
 
             final double[] retVal = new double[myResult.size()];
@@ -157,15 +166,6 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
             }
 
             return retVal;
-        }
-
-        public State getState() {
-            return myResult.getState();
-        }
-
-        public double getValue() {
-            final Access1D<?> tmpAccess = Access1D.wrap(this.getPoint());
-            return myObjFunc.getObjectiveFunction().invoke(Access1D.asPrimitive1D(tmpAccess)) + myObjFunc.getConstant();
         }
     }
 

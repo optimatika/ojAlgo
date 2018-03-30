@@ -100,19 +100,19 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             return new MatrixStore.Factory<N>() {
 
                 public LogicalBuilder<N> makeIdentity(final int dimension) {
-                    return new LogicalBuilder<N>(new IdentityStore<N>(GenericDenseStore.Factory.this, dimension));
+                    return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.Factory.this, dimension));
                 }
 
                 public LogicalBuilder<N> makeSingle(final N element) {
-                    return new LogicalBuilder<N>(new SingleStore<N>(GenericDenseStore.Factory.this, element));
+                    return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.Factory.this, element));
                 }
 
                 public LogicalBuilder<N> makeWrapper(final Access2D<?> access) {
-                    return new LogicalBuilder<N>(new WrapperStore<N>(GenericDenseStore.Factory.this, access));
+                    return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.Factory.this, access));
                 }
 
                 public LogicalBuilder<N> makeZero(final int rowsCount, final int columnsCount) {
-                    return new LogicalBuilder<N>(new ZeroStore<N>(GenericDenseStore.Factory.this, rowsCount, columnsCount));
+                    return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.Factory.this, rowsCount, columnsCount));
                 }
 
             };
@@ -133,7 +133,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new GenericDenseStore<N>(this, tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
         public GenericDenseStore<N> columns(final double[]... source) {
@@ -151,7 +151,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new GenericDenseStore<N>(this, tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
         public GenericDenseStore<N> columns(final List<? extends Number>... source) {
@@ -169,7 +169,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new GenericDenseStore<N>(this, tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
         public GenericDenseStore<N> columns(final Number[]... source) {
@@ -187,12 +187,12 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new GenericDenseStore<N>(this, tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
         public GenericDenseStore<N> conjugate(final Access2D<?> source) {
 
-            final GenericDenseStore<N> retVal = new GenericDenseStore<N>(this, (int) source.countColumns(), (int) source.countRows());
+            final GenericDenseStore<N> retVal = new GenericDenseStore<>(this, (int) source.countColumns(), (int) source.countRows());
 
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
@@ -223,7 +223,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             final int tmpRowDim = (int) source.countRows();
             final int tmpColDim = (int) source.countColumns();
 
-            final GenericDenseStore<N> retVal = new GenericDenseStore<N>(this, tmpRowDim, tmpColDim);
+            final GenericDenseStore<N> retVal = new GenericDenseStore<>(this, tmpRowDim, tmpColDim);
 
             if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
@@ -272,11 +272,11 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 tmpData[i] = myDenseArrayFactory.scalar().cast(supplier.get());
             }
 
-            return new GenericDenseStore<N>(this, tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
         public Householder.Generic<N> makeHouseholder(final int length) {
-            return new Householder.Generic<N>(myDenseArrayFactory.scalar(), length);
+            return new Householder.Generic<>(myDenseArrayFactory.scalar(), length);
         }
 
         public Rotation.Generic<N> makeRotation(final int low, final int high, final double cos, final double sin) {
@@ -284,11 +284,11 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         }
 
         public Rotation.Generic<N> makeRotation(final int low, final int high, final N cos, final N sin) {
-            return new Rotation.Generic<N>(low, high, cos, sin);
+            return new Rotation.Generic<>(low, high, cos, sin);
         }
 
         public GenericDenseStore<N> makeZero(final long rows, final long columns) {
-            return new GenericDenseStore<N>(this, (int) rows, (int) columns);
+            return new GenericDenseStore<>(this, (int) rows, (int) columns);
         }
 
         public GenericDenseStore<N> rows(final Access1D<?>... source) {
@@ -306,7 +306,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new GenericDenseStore<N>(this, tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
         public GenericDenseStore<N> rows(final double[]... source) {
@@ -324,7 +324,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new GenericDenseStore<N>(this, tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
         public GenericDenseStore<N> rows(final List<? extends Number>... source) {
@@ -342,7 +342,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new GenericDenseStore<N>(this, tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
         public GenericDenseStore<N> rows(final Number[]... source) {
@@ -360,7 +360,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                 }
             }
 
-            return new GenericDenseStore<N>(this, tmpRowDim, tmpColDim, tmpData);
+            return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
         public Scalar.Factory<N> scalar() {
@@ -369,7 +369,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
         public GenericDenseStore<N> transpose(final Access2D<?> source) {
 
-            final GenericDenseStore<N> retVal = new GenericDenseStore<N>(this, (int) source.countColumns(), (int) source.countRows());
+            final GenericDenseStore<N> retVal = new GenericDenseStore<>(this, (int) source.countColumns(), (int) source.countRows());
 
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
@@ -590,7 +590,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     public GenericDenseStore<N> copy() {
-        return new GenericDenseStore<N>(myFactory, myRowDim, myColDim, this.copyOfData());
+        return new GenericDenseStore<>(myFactory, myRowDim, myColDim, this.copyOfData());
     }
 
     public long countColumns() {
@@ -1234,7 +1234,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         } else if (transformation instanceof HouseholderReference<?>) {
             return ((Householder.Generic<N>) ((HouseholderReference<N>) transformation).getWorker(myFactory)).copy(transformation);
         } else {
-            return new Householder.Generic<N>(myFactory.scalar(), transformation);
+            return new Householder.Generic<>(myFactory.scalar(), transformation);
         }
     }
 
@@ -1242,7 +1242,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         if (transformation instanceof Rotation.Generic) {
             return (Rotation.Generic<N>) transformation;
         } else {
-            return new Rotation.Generic<N>(transformation);
+            return new Rotation.Generic<>(transformation);
         }
     }
 

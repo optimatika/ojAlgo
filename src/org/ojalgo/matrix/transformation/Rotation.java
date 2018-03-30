@@ -149,6 +149,62 @@ public abstract class Rotation<N extends Number> implements TransformationMatrix
 
     }
 
+    public static final class Generic<N extends Number & Scalar<N>> extends Rotation<N> {
+
+        public final N cos;
+        public final N sin;
+
+        public Generic(final int index) {
+            this(index, index, null, null);
+        }
+
+        public Generic(final int aLowerIndex, final int aHigherIndex) {
+            this(aLowerIndex, aHigherIndex, null, null);
+        }
+
+        public Generic(final int aLowerIndex, final int aHigherIndex, final N aCosine, final N aSine) {
+
+            super(aLowerIndex, aHigherIndex);
+
+            cos = aCosine;
+            sin = aSine;
+        }
+
+        public Generic(final Rotation<N> aRotation) {
+
+            super(aRotation.low, aRotation.high);
+
+            cos = aRotation.getCosine();
+            sin = aRotation.getSine();
+        }
+
+        @Override
+        public double doubleCosineValue() {
+            return cos.doubleValue();
+        }
+
+        @Override
+        public double doubleSineValue() {
+            return sin.doubleValue();
+        }
+
+        @Override
+        public N getCosine() {
+            return cos;
+        }
+
+        @Override
+        public N getSine() {
+            return sin;
+        }
+
+        @Override
+        public Generic<N> invert() {
+            return new Generic<>(high, low, cos, sin);
+        }
+
+    }
+
     public static final class Primitive extends Rotation<Double> {
 
         public final double cos;
@@ -224,7 +280,7 @@ public abstract class Rotation<N extends Number> implements TransformationMatrix
 
     public static <N extends Number & Scalar<N>> Generic<N> makeGeneric(final FunctionSet<N> functions, final int aLowerIndex, final int aHigherIndex,
             final N anAngle) {
-        return new Generic<N>(aLowerIndex, aHigherIndex, functions.cos().invoke(anAngle), functions.sin().invoke(anAngle));
+        return new Generic<>(aLowerIndex, aHigherIndex, functions.cos().invoke(anAngle), functions.sin().invoke(anAngle));
     }
 
     public static Primitive makePrimitive(final int aLowerIndex, final int aHigherIndex, final double anAngle) {
@@ -380,6 +436,7 @@ public abstract class Rotation<N extends Number> implements TransformationMatrix
     }
 
     public final int high;
+
     public final int low;
 
     @SuppressWarnings("unused")
@@ -411,62 +468,6 @@ public abstract class Rotation<N extends Number> implements TransformationMatrix
     @Override
     public String toString() {
         return "low=" + low + ", high=" + high + ", cos=" + this.getCosine() + ", sin=" + this.getSine();
-    }
-
-    public static final class Generic<N extends Number & Scalar<N>> extends Rotation<N> {
-
-        public final N cos;
-        public final N sin;
-
-        public Generic(final int index) {
-            this(index, index, null, null);
-        }
-
-        public Generic(final int aLowerIndex, final int aHigherIndex) {
-            this(aLowerIndex, aHigherIndex, null, null);
-        }
-
-        public Generic(final int aLowerIndex, final int aHigherIndex, final N aCosine, final N aSine) {
-
-            super(aLowerIndex, aHigherIndex);
-
-            cos = aCosine;
-            sin = aSine;
-        }
-
-        public Generic(final Rotation<N> aRotation) {
-
-            super(aRotation.low, aRotation.high);
-
-            cos = aRotation.getCosine();
-            sin = aRotation.getSine();
-        }
-
-        @Override
-        public double doubleCosineValue() {
-            return cos.doubleValue();
-        }
-
-        @Override
-        public double doubleSineValue() {
-            return sin.doubleValue();
-        }
-
-        @Override
-        public N getCosine() {
-            return cos;
-        }
-
-        @Override
-        public N getSine() {
-            return sin;
-        }
-
-        @Override
-        public Generic<N> invert() {
-            return new Generic<N>(high, low, cos, sin);
-        }
-
     }
 
     public void transform(final PhysicalStore<N> matrix) {

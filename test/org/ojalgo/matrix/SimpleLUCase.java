@@ -37,6 +37,11 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleLUCase extends BasicMatrixTest {
 
+    public static RationalMatrix getOrginal() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
+        return tmpMtrx.enforce(DEFINITION);
+    }
+
     private static RationalMatrix getMtrxL() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 }, { 1.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
@@ -47,9 +52,21 @@ public class SimpleLUCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static RationalMatrix getOrginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
-        return tmpMtrx.enforce(DEFINITION);
+    @BeforeEach
+    @Override
+    public void setUp() {
+
+        DEFINITION = new NumberContext(7, 1);
+        EVALUATION = new NumberContext(7, 9);
+
+        myBigAA = SimpleLUCase.getMtrxL();
+        myBigAX = SimpleLUCase.getMtrxU();
+        myBigAB = SimpleLUCase.getOrginal();
+
+        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+
+        super.setUp();
     }
 
     @Test
@@ -70,23 +87,6 @@ public class SimpleLUCase extends BasicMatrixTest {
         tmpLU.decompose(BigDenseStore.FACTORY.copy(SimpleLUCase.getOrginal()));
 
         TestUtils.assertEquals(BigDenseStore.FACTORY.copy(SimpleLUCase.getOrginal()), tmpLU, EVALUATION);
-    }
-
-    @BeforeEach
-    @Override
-    public void setUp() {
-
-        DEFINITION = new NumberContext(7, 1);
-        EVALUATION = new NumberContext(7, 9);
-
-        myBigAA = SimpleLUCase.getMtrxL();
-        myBigAX = SimpleLUCase.getMtrxU();
-        myBigAB = SimpleLUCase.getOrginal();
-
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-
-        super.setUp();
     }
 
 }

@@ -51,6 +51,12 @@ abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> im
         return this.count();
     }
 
+    public abstract double doubleValue(int index);
+
+    public final double doubleValue(final long index) {
+        return this.doubleValue((int) index);
+    }
+
     public final void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
         this.set((int) row, values.doubleValue(valueIndex));
     }
@@ -63,14 +69,8 @@ abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> im
         this.set((int) row, supplier.doubleValue());
     }
 
-    public abstract void set(int row, double value);
-
-    public final void set(final long row, final long col, final double value) {
-        this.set((int) row, value);
-    }
-
-    public final void set(final long row, final long col, final Number value) {
-        this.set((int) row, value.doubleValue());
+    public final Double get(final long index) {
+        return this.doubleValue((int) index);
     }
 
     public abstract void modifyOne(int row, UnaryFunction<Double> modifier);
@@ -79,14 +79,14 @@ abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> im
         this.modifyOne((int) row, modifier);
     }
 
-    public abstract double doubleValue(int index);
+    public abstract void set(int row, double value);
 
-    public final double doubleValue(final long index) {
-        return this.doubleValue((int) index);
+    public final void set(final long row, final long col, final double value) {
+        this.set((int) row, value);
     }
 
-    public final Double get(final long index) {
-        return this.doubleValue((int) index);
+    public final void set(final long row, final long col, final Number value) {
+        this.set((int) row, value.doubleValue());
     }
 
 }

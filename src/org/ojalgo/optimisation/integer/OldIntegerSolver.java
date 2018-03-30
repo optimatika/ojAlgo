@@ -72,6 +72,12 @@ public final class OldIntegerSolver extends IntegerSolver {
             return myKey.toString();
         }
 
+        private void flush(final BasicLogger.Printer receiver) {
+            if ((myPrinter != null) && (receiver != null)) {
+                myPrinter.flush(receiver);
+            }
+        }
+
         private boolean isNodeDebug() {
             return (myPrinter != null) && OldIntegerSolver.this.isDebug();
         }
@@ -257,12 +263,6 @@ public final class OldIntegerSolver extends IntegerSolver {
             return new BranchAndBoundNodeTask(tmpKey);
         }
 
-        private void flush(final BasicLogger.Printer receiver) {
-            if ((myPrinter != null) && (receiver != null)) {
-                myPrinter.flush(receiver);
-            }
-        }
-
         NodeKey getKey() {
             return myKey;
         }
@@ -357,6 +357,10 @@ public final class OldIntegerSolver extends IntegerSolver {
         return 0;
     }
 
+    void generateCuts(final ExpressionsBasedModel nodeModel) {
+        //   nodeModel.generateCuts(myPotentialCutExpressions);
+    }
+
     boolean isExplored(final BranchAndBoundNodeTask aNodeTask) {
         // return myExploredNodes.contains(aNodeTask.getKey());
         return false;
@@ -365,10 +369,6 @@ public final class OldIntegerSolver extends IntegerSolver {
     void markAsExplored(final BranchAndBoundNodeTask aNodeTask) {
 
         // myExploredNodes.add(aNodeTask.getKey());
-    }
-
-    void generateCuts(final ExpressionsBasedModel nodeModel) {
-        //   nodeModel.generateCuts(myPotentialCutExpressions);
     }
 
 }

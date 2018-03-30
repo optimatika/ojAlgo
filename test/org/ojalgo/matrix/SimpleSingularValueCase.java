@@ -37,6 +37,11 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleSingularValueCase extends BasicMatrixTest {
 
+    public static RationalMatrix getOriginal() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -3.0 }, { 0.0, 0.0 } });
+        return tmpMtrx.enforce(DEFINITION);
+    }
+
     private static RationalMatrix getMatrixD() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, 3.0 }, { 0.0, 0.0 } });
         return tmpMtrx.enforce(DEFINITION);
@@ -52,9 +57,21 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static RationalMatrix getOriginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -3.0 }, { 0.0, 0.0 } });
-        return tmpMtrx.enforce(DEFINITION);
+    @BeforeEach
+    @Override
+    public void setUp() {
+
+        DEFINITION = new NumberContext(7, 1);
+        EVALUATION = new NumberContext(7, 9);
+
+        myBigAA = SimpleSingularValueCase.getMatrixQ1();
+        myBigAX = SimpleSingularValueCase.getMatrixD();
+        myBigAB = SimpleSingularValueCase.getOriginal();
+
+        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+
+        super.setUp();
     }
 
     @Test
@@ -79,23 +96,6 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
 
         //tmpSVD.equals(tmpA, EVALUATION);
         TestUtils.assertEquals(tmpA, tmpSVD, EVALUATION);
-    }
-
-    @BeforeEach
-    @Override
-    public void setUp() {
-
-        DEFINITION = new NumberContext(7, 1);
-        EVALUATION = new NumberContext(7, 9);
-
-        myBigAA = SimpleSingularValueCase.getMatrixQ1();
-        myBigAX = SimpleSingularValueCase.getMatrixD();
-        myBigAB = SimpleSingularValueCase.getOriginal();
-
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-
-        super.setUp();
     }
 
 }

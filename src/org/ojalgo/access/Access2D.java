@@ -272,6 +272,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             this.loopDiagonal(row, col, (r, c) -> this.visitOne(r, c, visitor));
         }
 
+        default void visitDiagonal(final VoidFunction<N> visitor) {
+            this.visitDiagonal(0L, 0L, visitor);
+        }
+
         void visitOne(long row, long col, VoidFunction<N> visitor);
 
         default void visitOne(final long index, final VoidFunction<N> visitor) {

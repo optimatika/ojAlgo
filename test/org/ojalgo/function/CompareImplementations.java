@@ -170,6 +170,7 @@ public class CompareImplementations {
     }
 
     @Test
+    @Tag("unstable")
     public void testCBRT() {
 
         this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT,
@@ -324,6 +325,7 @@ public class CompareImplementations {
     }
 
     @Test
+    @Tag("unstable")
     public void testMAX() {
         this.assertBinary(BigFunction.MAX, ComplexFunction.MAX, PrimitiveFunction.MAX, QuaternionFunction.MAX, RationalFunction.MAX, AROUND_ZERO.doubleValue(),
                 POSITIVE.doubleValue());

@@ -22,6 +22,7 @@
 package org.ojalgo.array;
 
 import java.lang.reflect.Array;
+import java.util.function.DoubleConsumer;
 
 public abstract class Raw1D {
 
@@ -103,6 +104,16 @@ public abstract class Raw1D {
                 }
             }
         } while (tmpSwapped);
+    }
+
+    public static void visit(final double[] target, final DoubleConsumer visitor) {
+        Raw1D.visit(target, 0, target.length, visitor);
+    }
+
+    public static void visit(final double[] target, final int first, final int limit, final DoubleConsumer visitor) {
+        for (int i = first, lim = Math.min(limit, target.length); i < lim; i++) {
+            visitor.accept(target[i]);
+        }
     }
 
 }

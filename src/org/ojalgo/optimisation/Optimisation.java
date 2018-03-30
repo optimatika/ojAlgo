@@ -260,6 +260,16 @@ public interface Optimisation {
             validate = solver != null ? true : false;
         }
 
+        @SuppressWarnings("unchecked")
+        public <T> Optional<T> getConfigurator(final Class<T> type) {
+            ProgrammingError.throwIfNull(type);
+            if ((myConfigurator != null) && type.isInstance(myConfigurator)) {
+                return Optional.of((T) myConfigurator);
+            } else {
+                return Optional.empty();
+            }
+        }
+
         /**
          * Will configure high level (low volume) progress logging
          *
@@ -270,16 +280,6 @@ public interface Optimisation {
             logger_appender = solver != null ? BasicLogger.DEBUG : null;
             logger_detailed = false;
             validate = false;
-        }
-
-        @SuppressWarnings("unchecked")
-        public <T> Optional<T> getConfigurator(final Class<T> type) {
-            ProgrammingError.throwIfNull(type);
-            if ((myConfigurator != null) && type.isInstance(myConfigurator)) {
-                return Optional.of((T) myConfigurator);
-            } else {
-                return Optional.empty();
-            }
         }
 
         public void setConfigurator(final Object configurator) {

@@ -76,15 +76,6 @@ public final class MultiplyHermitianAndVector extends MatrixOperation {
         }
     }
 
-    private MultiplyHermitianAndVector() {
-        super();
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
     public static <N extends Number & Scalar<N>> void invoke(final N[] productMatrix, final int firstRow, final int rowLimit, final N[] hermitianMatrix,
             final N[] rightVector, final int firstColumn, final Scalar.Factory<N> scalar) {
 
@@ -101,6 +92,15 @@ public final class MultiplyHermitianAndVector extends MatrixOperation {
             }
             productMatrix[i] = tmpVal.get();
         }
+    }
+
+    private MultiplyHermitianAndVector() {
+        super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

@@ -52,11 +52,6 @@ public class ExtremeElementsCase {
 
     static final NumberContext PRECISION = new NumberContext().newPrecision(12).newScale(148);
 
-    @BeforeEach
-    public void minimiseAllBranchLimits() {
-        TestUtils.minimiseAllBranchLimits();
-    }
-
     private static void performInvertTest(final PrimitiveDenseStore original, final InverterTask<Double> task, final NumberContext context) {
 
         try {
@@ -182,112 +177,9 @@ public class ExtremeElementsCase {
         return tmpRndm.transpose().multiply(tmpRndm).multiply(1E-150);
     }
 
-    @Test
-    @Disabled("Underscored before JUnit 5")
-    public void _testInvertOverflow() {
-        ExtremeElementsCase.doTestInvert(true);
-    }
-
-    @Test
-    @Disabled("Underscored before JUnit 5")
-    public void _testInvertUnderflow() {
-        ExtremeElementsCase.doTestInvert(true);
-    }
-
-    @Test
-    @Disabled("Underscored before JUnit 5")
-    public void _testLU() {
-
-        final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
-
-        final LU<BigDecimal> tmpBig = LU.BIG.make();
-        final LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
-        final LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
-        final LU<Double> tmpJama = new RawLU();
-
-        TestUtils.assertTrue("Big.compute()", tmpBig.decompose(MatrixStore.BIG.makeWrapper(tmpProblematic)));
-        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(MatrixStore.COMPLEX.makeWrapper(tmpProblematic)));
-        TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
-        TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
-
-        if (DEBUG) {
-            BasicLogger.debug("Big.L", tmpBig.getL());
-            BasicLogger.debug("Complex.L", tmpComplex.getL());
-            BasicLogger.debug("Primitive.L", tmpPrimitive.getL());
-            BasicLogger.debug("Jama.L", tmpJama.getL());
-        }
-
-        TestUtils.assertEquals("L Big vs Complex", tmpBig.getL(), tmpComplex.getL(), PRECISION);
-        TestUtils.assertEquals("L Complex vs Primitive", tmpComplex.getL(), tmpPrimitive.getL(), PRECISION);
-        TestUtils.assertEquals("L Primitive vs Jama", tmpPrimitive.getL(), tmpJama.getL(), PRECISION);
-
-        TestUtils.assertEquals("U Big vs Complex", tmpBig.getU(), tmpComplex.getU(), PRECISION);
-        TestUtils.assertEquals("U Complex vs Primitive", tmpComplex.getU(), tmpPrimitive.getU(), PRECISION);
-        TestUtils.assertEquals("U Primitive vs Jama", tmpPrimitive.getU(), tmpJama.getU(), PRECISION);
-
-        TestUtils.assertEquals("Big.reconstruct()", tmpProblematic, tmpBig.reconstruct(), PRECISION);
-        TestUtils.assertEquals("Complex.reconstruct()", tmpProblematic, tmpComplex.reconstruct(), PRECISION);
-        TestUtils.assertEquals("Primitive.reconstruct()", tmpProblematic, tmpPrimitive.reconstruct(), PRECISION);
-        TestUtils.assertEquals("Jama.reconstruct()", tmpProblematic, tmpJama.reconstruct(), PRECISION);
-
-        final SingularValue<Double> tmpSVD = new RawSingularValue();
-        tmpSVD.decompose(tmpProblematic);
-
-        TestUtils.assertEquals("rank() SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
-        TestUtils.assertEquals("rank() SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());
-        TestUtils.assertEquals("rank() SVD vs Primitive", tmpSVD.getRank(), tmpPrimitive.getRank());
-        TestUtils.assertEquals("rank() SVD vs Jama", tmpSVD.getRank(), tmpJama.getRank());
-
-    }
-
-    @Disabled("Underscored before JUnit 5")
-    @Test
-    public void _testQR() {
-
-        final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
-
-        final QR<BigDecimal> tmpBig = QR.BIG.make();
-        final QR<ComplexNumber> tmpComplex = QR.COMPLEX.make();
-        final QR<Double> tmpPrimitive = QR.PRIMITIVE.make();
-        final QR<Double> tmpJama = new RawQR();
-
-        TestUtils.assertTrue("Big.compute()", tmpBig.decompose(MatrixStore.BIG.makeWrapper(tmpProblematic)));
-        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(MatrixStore.COMPLEX.makeWrapper(tmpProblematic)));
-        TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
-        TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
-
-        if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Big Q", tmpBig.getQ());
-            BasicLogger.debug("Complex Q", tmpComplex.getQ());
-            BasicLogger.debug("Primitive Q", tmpPrimitive.getQ());
-            BasicLogger.debug("Jama Q", tmpJama.getQ());
-        }
-
-        TestUtils.assertEquals("QR.reconstruct() Big", tmpProblematic, tmpBig.reconstruct(), PRECISION);
-        TestUtils.assertEquals("QR.reconstruct() Complex", tmpProblematic, tmpComplex.reconstruct(), PRECISION);
-        TestUtils.assertEquals("QR.reconstruct() Primitive", tmpProblematic, tmpPrimitive.reconstruct(), PRECISION);
-        TestUtils.assertEquals("QR.reconstruct() Jama", tmpProblematic, tmpJama.reconstruct(), PRECISION);
-
-        final SingularValue<Double> tmpSVD = new RawSingularValue();
-        tmpSVD.decompose(tmpProblematic);
-
-        TestUtils.assertEquals("rank() SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
-        TestUtils.assertEquals("rank() SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());
-        TestUtils.assertEquals("rank() SVD vs Primitive", tmpSVD.getRank(), tmpPrimitive.getRank());
-        TestUtils.assertEquals("rank() SVD vs Jama", tmpSVD.getRank(), tmpJama.getRank());
-
-    }
-
-    @Test
-    @Disabled("Underscored before JUnit 5")
-    public void _testSolveOverflow() {
-        ExtremeElementsCase.doTestSolve(true);
-    }
-
-    @Test
-    @Disabled("Underscored before JUnit 5")
-    public void _testSolveUnderflow() {
-        ExtremeElementsCase.doTestSolve(false);
+    @BeforeEach
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
     }
 
     @Test
@@ -383,6 +275,12 @@ public class ExtremeElementsCase {
     }
 
     @Test
+    @Disabled("Underscored before JUnit 5")
+    public void testInvertOverflow() {
+        ExtremeElementsCase.doTestInvert(true);
+    }
+
+    @Test
     public void testInvertSVD_6_307_2() {
 
         final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(
@@ -440,6 +338,96 @@ public class ExtremeElementsCase {
     }
 
     @Test
+    @Disabled("Underscored before JUnit 5")
+    public void testInvertUnderflow() {
+        ExtremeElementsCase.doTestInvert(true);
+    }
+
+    @Test
+    @Disabled("Underscored before JUnit 5")
+    public void testLU() {
+
+        final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
+
+        final LU<BigDecimal> tmpBig = LU.BIG.make();
+        final LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
+        final LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
+        final LU<Double> tmpJama = new RawLU();
+
+        TestUtils.assertTrue("Big.compute()", tmpBig.decompose(MatrixStore.BIG.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(MatrixStore.COMPLEX.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
+        TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
+
+        if (DEBUG) {
+            BasicLogger.debug("Big.L", tmpBig.getL());
+            BasicLogger.debug("Complex.L", tmpComplex.getL());
+            BasicLogger.debug("Primitive.L", tmpPrimitive.getL());
+            BasicLogger.debug("Jama.L", tmpJama.getL());
+        }
+
+        TestUtils.assertEquals("L Big vs Complex", tmpBig.getL(), tmpComplex.getL(), PRECISION);
+        TestUtils.assertEquals("L Complex vs Primitive", tmpComplex.getL(), tmpPrimitive.getL(), PRECISION);
+        TestUtils.assertEquals("L Primitive vs Jama", tmpPrimitive.getL(), tmpJama.getL(), PRECISION);
+
+        TestUtils.assertEquals("U Big vs Complex", tmpBig.getU(), tmpComplex.getU(), PRECISION);
+        TestUtils.assertEquals("U Complex vs Primitive", tmpComplex.getU(), tmpPrimitive.getU(), PRECISION);
+        TestUtils.assertEquals("U Primitive vs Jama", tmpPrimitive.getU(), tmpJama.getU(), PRECISION);
+
+        TestUtils.assertEquals("Big.reconstruct()", tmpProblematic, tmpBig.reconstruct(), PRECISION);
+        TestUtils.assertEquals("Complex.reconstruct()", tmpProblematic, tmpComplex.reconstruct(), PRECISION);
+        TestUtils.assertEquals("Primitive.reconstruct()", tmpProblematic, tmpPrimitive.reconstruct(), PRECISION);
+        TestUtils.assertEquals("Jama.reconstruct()", tmpProblematic, tmpJama.reconstruct(), PRECISION);
+
+        final SingularValue<Double> tmpSVD = new RawSingularValue();
+        tmpSVD.decompose(tmpProblematic);
+
+        TestUtils.assertEquals("rank() SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
+        TestUtils.assertEquals("rank() SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());
+        TestUtils.assertEquals("rank() SVD vs Primitive", tmpSVD.getRank(), tmpPrimitive.getRank());
+        TestUtils.assertEquals("rank() SVD vs Jama", tmpSVD.getRank(), tmpJama.getRank());
+
+    }
+
+    @Disabled("Underscored before JUnit 5")
+    @Test
+    public void testQR() {
+
+        final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
+
+        final QR<BigDecimal> tmpBig = QR.BIG.make();
+        final QR<ComplexNumber> tmpComplex = QR.COMPLEX.make();
+        final QR<Double> tmpPrimitive = QR.PRIMITIVE.make();
+        final QR<Double> tmpJama = new RawQR();
+
+        TestUtils.assertTrue("Big.compute()", tmpBig.decompose(MatrixStore.BIG.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(MatrixStore.COMPLEX.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
+        TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
+
+        if (MatrixDecompositionTests.DEBUG) {
+            BasicLogger.debug("Big Q", tmpBig.getQ());
+            BasicLogger.debug("Complex Q", tmpComplex.getQ());
+            BasicLogger.debug("Primitive Q", tmpPrimitive.getQ());
+            BasicLogger.debug("Jama Q", tmpJama.getQ());
+        }
+
+        TestUtils.assertEquals("QR.reconstruct() Big", tmpProblematic, tmpBig.reconstruct(), PRECISION);
+        TestUtils.assertEquals("QR.reconstruct() Complex", tmpProblematic, tmpComplex.reconstruct(), PRECISION);
+        TestUtils.assertEquals("QR.reconstruct() Primitive", tmpProblematic, tmpPrimitive.reconstruct(), PRECISION);
+        TestUtils.assertEquals("QR.reconstruct() Jama", tmpProblematic, tmpJama.reconstruct(), PRECISION);
+
+        final SingularValue<Double> tmpSVD = new RawSingularValue();
+        tmpSVD.decompose(tmpProblematic);
+
+        TestUtils.assertEquals("rank() SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
+        TestUtils.assertEquals("rank() SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());
+        TestUtils.assertEquals("rank() SVD vs Primitive", tmpSVD.getRank(), tmpPrimitive.getRank());
+        TestUtils.assertEquals("rank() SVD vs Jama", tmpSVD.getRank(), tmpJama.getRank());
+
+    }
+
+    @Test
     public void testSolveLU_1_16_1() {
 
         final PrimitiveDenseStore tmpBody = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.7259687987824925 } });
@@ -454,6 +442,18 @@ public class ExtremeElementsCase {
         final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
 
         ExtremeElementsCase.performSolveTest(tmpBody, tmpRHS, tmpAlgorithm, tmpContext);
+    }
+
+    @Test
+    @Disabled("Underscored before JUnit 5")
+    public void testSolveOverflow() {
+        ExtremeElementsCase.doTestSolve(true);
+    }
+
+    @Test
+    @Disabled("Underscored before JUnit 5")
+    public void testSolveUnderflow() {
+        ExtremeElementsCase.doTestSolve(false);
     }
 
 }

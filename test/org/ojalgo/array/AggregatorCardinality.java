@@ -31,7 +31,7 @@ public class AggregatorCardinality extends BasicArrayTest {
     @Override
     void doTest(final BasicArray<Double> array) {
 
-        setMultiple(array, INDICES);
+        BasicArrayTest.setMultiple(array, INDICES);
 
         final AggregatorFunction<Double> tmpVisitor = Aggregator.CARDINALITY.getFunction(PrimitiveAggregator.getSet());
 

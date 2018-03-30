@@ -37,6 +37,15 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleCholeskyCase extends BasicMatrixTest {
 
+    /**
+     * This matrix is taken from example 2.21 of the Scientific Computing, An Introductory Survey
+     *
+     * @return The data00 value
+     */
+    public static RationalMatrix getOriginal() {
+        return RationalMatrix.FACTORY.rows(new double[][] { { 3.0, -1.0, -1.0 }, { -1.0, 3.0, -1.0 }, { -1.0, -1.0, 3.0 } }).enforce(DEFINITION);
+    }
+
     private static RationalMatrix getFactorL() {
         return RationalMatrix.FACTORY.rows(new double[][] { { 1.7321, 0.0, 0.0 }, { -0.5774, 1.6330, 0.0 }, { -0.5774, -0.8165, 1.4142 } }).enforce(DEFINITION);
     }
@@ -45,13 +54,21 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
         return RationalMatrix.FACTORY.rows(new double[][] { { 1.7321, -0.5774, -0.5774 }, { 0.0, 1.6330, -0.8165 }, { 0.0, 0.0, 1.4142 } }).enforce(DEFINITION);
     }
 
-    /**
-     * This matrix is taken from example 2.21 of the Scientific Computing, An Introductory Survey
-     *
-     * @return The data00 value
-     */
-    public static RationalMatrix getOriginal() {
-        return RationalMatrix.FACTORY.rows(new double[][] { { 3.0, -1.0, -1.0 }, { -1.0, 3.0, -1.0 }, { -1.0, -1.0, 3.0 } }).enforce(DEFINITION);
+    @BeforeEach
+    @Override
+    public void setUp() {
+
+        DEFINITION = new NumberContext(7, 4);
+        EVALUATION = new NumberContext(4, 3);
+
+        myBigAA = SimpleCholeskyCase.getFactorL();
+        myBigAX = SimpleCholeskyCase.getFactorR();
+        myBigAB = SimpleCholeskyCase.getOriginal();
+
+        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+
+        super.setUp();
     }
 
     @Test
@@ -70,19 +87,6 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
         myActMtrx = tmpL.multiply(tmpR);
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrixTest#testProblem()
-     */
-    @Test
-    public void testProblem() {
-
-        final BasicMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
-        final Cholesky<BigDecimal> tmpDecomp = Cholesky.BIG.make();
-        tmpDecomp.decompose(BigDenseStore.FACTORY.copy(tmpMtrx));
-
-        TestUtils.assertEquals(BigDenseStore.FACTORY.copy(tmpMtrx), tmpDecomp, EVALUATION);
     }
 
     //    @Test
@@ -106,21 +110,17 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     //        JUnitUtils.assertEquals(tmpExpMtrx, tmpActMtrx, EVAL_CNTXT);
     //    }
 
-    @BeforeEach
-    @Override
-    public void setUp() {
+    /**
+     * @see org.ojalgo.matrix.BasicMatrixTest#testProblem()
+     */
+    @Test
+    public void testProblem() {
 
-        DEFINITION = new NumberContext(7, 4);
-        EVALUATION = new NumberContext(4, 3);
+        final BasicMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
+        final Cholesky<BigDecimal> tmpDecomp = Cholesky.BIG.make();
+        tmpDecomp.decompose(BigDenseStore.FACTORY.copy(tmpMtrx));
 
-        myBigAA = SimpleCholeskyCase.getFactorL();
-        myBigAX = SimpleCholeskyCase.getFactorR();
-        myBigAB = SimpleCholeskyCase.getOriginal();
-
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-
-        super.setUp();
+        TestUtils.assertEquals(BigDenseStore.FACTORY.copy(tmpMtrx), tmpDecomp, EVALUATION);
     }
 
 }
