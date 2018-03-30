@@ -48,6 +48,14 @@ public final class ApplyLDL extends MatrixOperation {
         }
     }
 
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit,
+            final N[] multipliers, final int iterationPoint) {
+        final Scalar<N> tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
+        for (int j = firstColumn; j < columnLimit; j++) {
+            AXPY.invoke(data, j * structure, tmpDiagVal.multiply(multipliers[j].conjugate()).negate().get(), multipliers, 0, j, structure);
+        }
+    }
+
     private ApplyLDL() {
         super();
     }
@@ -55,14 +63,6 @@ public final class ApplyLDL extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
-    }
-
-    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit,
-            final N[] multipliers, final int iterationPoint) {
-        final Scalar<N> tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
-        for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, tmpDiagVal.multiply(multipliers[j].conjugate()).negate().get(), multipliers, 0, j, structure);
-        }
     }
 
 }

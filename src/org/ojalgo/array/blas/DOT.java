@@ -62,6 +62,15 @@ public abstract class DOT implements BLAS1 {
         return retVal;
     }
 
+    public static <N extends Number & Scalar<N>> N invoke(final N[] array1, final int offset1, final N[] array2, final int offset2, final int first,
+            final int limit, final Scalar.Factory<N> factory) {
+        Scalar<N> retVal = factory.zero();
+        for (int i = first; i < limit; i++) {
+            retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));
+        }
+        return retVal.get();
+    }
+
     public static double invoke2(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
 
         double retVal = PrimitiveMath.ZERO;
@@ -246,15 +255,6 @@ public abstract class DOT implements BLAS1 {
         }
 
         return retVal;
-    }
-
-    public static <N extends Number & Scalar<N>> N invoke(final N[] array1, final int offset1, final N[] array2, final int offset2, final int first,
-            final int limit, final Scalar.Factory<N> factory) {
-        Scalar<N> retVal = factory.zero();
-        for (int i = first; i < limit; i++) {
-            retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));
-        }
-        return retVal.get();
     }
 
 }

@@ -104,6 +104,33 @@ public final class HouseholderRight extends MatrixOperation {
         }
     }
 
+    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int first, final int limit, final int tmpColDim,
+            final Householder.Generic<N> householder, final Scalar.Factory<N> scalar) {
+
+        final N[] tmpHouseholderVector = householder.vector;
+        final int tmpFirstNonZero = householder.first;
+        final N tmpBeta = householder.beta;
+
+        final int tmpRowDim = data.length / tmpColDim;
+
+        Scalar<N> tmpScale;
+        int tmpIndex;
+        for (int i = first; i < limit; i++) {
+            tmpScale = scalar.zero();
+            tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
+            for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
+                tmpScale = tmpScale.add(tmpHouseholderVector[j].conjugate().multiply(data[tmpIndex].conjugate()));
+                tmpIndex += tmpRowDim;
+            }
+            tmpScale = tmpScale.multiply(tmpBeta);
+            tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
+            for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
+                data[tmpIndex] = data[tmpIndex].conjugate().subtract(tmpScale.multiply(tmpHouseholderVector[j])).conjugate().get();
+                tmpIndex += tmpRowDim;
+            }
+        }
+    }
+
     private static void invoke2old(final double[] data, final int first, final int limit, final int tmpColDim, final Householder.Primitive householder) {
 
         final double[] tmpHouseholderVector = householder.vector;
@@ -137,33 +164,6 @@ public final class HouseholderRight extends MatrixOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
-    }
-
-    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int first, final int limit, final int tmpColDim,
-            final Householder.Generic<N> householder, final Scalar.Factory<N> scalar) {
-
-        final N[] tmpHouseholderVector = householder.vector;
-        final int tmpFirstNonZero = householder.first;
-        final N tmpBeta = householder.beta;
-
-        final int tmpRowDim = data.length / tmpColDim;
-
-        Scalar<N> tmpScale;
-        int tmpIndex;
-        for (int i = first; i < limit; i++) {
-            tmpScale = scalar.zero();
-            tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
-            for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
-                tmpScale = tmpScale.add(tmpHouseholderVector[j].conjugate().multiply(data[tmpIndex].conjugate()));
-                tmpIndex += tmpRowDim;
-            }
-            tmpScale = tmpScale.multiply(tmpBeta);
-            tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
-            for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
-                data[tmpIndex] = data[tmpIndex].conjugate().subtract(tmpScale.multiply(tmpHouseholderVector[j])).conjugate().get();
-                tmpIndex += tmpRowDim;
-            }
-        }
     }
 
 }

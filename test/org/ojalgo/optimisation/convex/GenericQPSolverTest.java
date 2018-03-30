@@ -57,45 +57,6 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
         return myXI.copy();
     }
 
-    @Test
-    public void testCaseData() {
-
-        final MatrixStore<Double> tmpExpected = myBE;
-
-        MatrixStore<Double> tmpActual = myAE.multiply(myXE);
-        Access2D.equals(tmpExpected, tmpActual, myEvaluationContext);
-
-        tmpActual = myAE.multiply(myXI);
-        TestUtils.assertEquals(tmpExpected, tmpActual, myEvaluationContext);
-
-        if ((myAI != null) && (myBI != null)) {
-
-            final PhysicalStore<Double> tmpSlack = myBI.copy();
-            tmpSlack.modifyMatching(PrimitiveFunction.SUBTRACT, myAI.multiply(myXI));
-
-            for (int i = 0; i < tmpSlack.countRows(); i++) {
-                TestUtils.assertTrue(tmpSlack.doubleValue(i, 0) > -myEvaluationContext.epsilon());
-            }
-        }
-    }
-
-    @Test
-    public void testSolverResults() {
-
-        final PrimitiveDenseStore[] tmpMatricesI = new PrimitiveDenseStore[] { myAE, myBE, myQ, myC, myAI, myBI };
-
-        ConvexProblems.builAndTestModel(tmpMatricesI, myXI, myEvaluationContext, true);
-
-        final PrimitiveDenseStore[] tmpMatricesE = new PrimitiveDenseStore[] { myAE, myBE, myQ, myC, null, null };
-
-        ConvexProblems.builAndTestModel(tmpMatricesE, myXE, myEvaluationContext, true);
-    }
-
-    /**
-     * @return {[AE],[BE],[Q],[C],[AI],[BI],[X only E constraints],[X both E and I constraints]}
-     */
-    abstract protected BasicMatrix[] getMatrices();
-
     @BeforeEach
     public void setUp() {
 
@@ -143,5 +104,44 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
         }
 
     }
+
+    @Test
+    public void testCaseData() {
+
+        final MatrixStore<Double> tmpExpected = myBE;
+
+        MatrixStore<Double> tmpActual = myAE.multiply(myXE);
+        Access2D.equals(tmpExpected, tmpActual, myEvaluationContext);
+
+        tmpActual = myAE.multiply(myXI);
+        TestUtils.assertEquals(tmpExpected, tmpActual, myEvaluationContext);
+
+        if ((myAI != null) && (myBI != null)) {
+
+            final PhysicalStore<Double> tmpSlack = myBI.copy();
+            tmpSlack.modifyMatching(PrimitiveFunction.SUBTRACT, myAI.multiply(myXI));
+
+            for (int i = 0; i < tmpSlack.countRows(); i++) {
+                TestUtils.assertTrue(tmpSlack.doubleValue(i, 0) > -myEvaluationContext.epsilon());
+            }
+        }
+    }
+
+    @Test
+    public void testSolverResults() {
+
+        final PrimitiveDenseStore[] tmpMatricesI = new PrimitiveDenseStore[] { myAE, myBE, myQ, myC, myAI, myBI };
+
+        ConvexProblems.builAndTestModel(tmpMatricesI, myXI, myEvaluationContext, true);
+
+        final PrimitiveDenseStore[] tmpMatricesE = new PrimitiveDenseStore[] { myAE, myBE, myQ, myC, null, null };
+
+        ConvexProblems.builAndTestModel(tmpMatricesE, myXE, myEvaluationContext, true);
+    }
+
+    /**
+     * @return {[AE],[BE],[Q],[C],[AI],[BI],[X only E constraints],[X both E and I constraints]}
+     */
+    abstract protected BasicMatrix[] getMatrices();
 
 }

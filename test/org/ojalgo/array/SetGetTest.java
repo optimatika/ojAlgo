@@ -31,7 +31,7 @@ public class SetGetTest extends BasicArrayTest {
     @Override
     void doTest(final BasicArray<Double> array) {
 
-        setMultiple(array, INDICES);
+        BasicArrayTest.setMultiple(array, INDICES);
 
         for (long i = 0L; i < COUNT; i++) {
 

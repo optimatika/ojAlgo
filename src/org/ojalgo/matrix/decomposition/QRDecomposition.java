@@ -122,7 +122,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         this.getInPlace().visitDiagonal(aggregator);
 
-        if (myNumberOfHouseholderTransformations % 2 == 1) {
+        if ((myNumberOfHouseholderTransformations % 2) == 1) {
             return this.scalar().one().negate().multiply(aggregator.get()).get();
         } else {
             return aggregator.get();
@@ -272,6 +272,14 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.allocate(templateBody.countRows(), templateRHS.countColumns());
     }
 
+    @Override
+    public void reset() {
+
+        super.reset();
+
+        myNumberOfHouseholderTransformations = 0;
+    }
+
     public void setFullSize(final boolean fullSize) {
         myFullSize = fullSize;
     }
@@ -321,14 +329,6 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
 
         return retVal;
-    }
-
-    @Override
-    public void reset() {
-
-        super.reset();
-
-        myNumberOfHouseholderTransformations = 0;
     }
 
 }

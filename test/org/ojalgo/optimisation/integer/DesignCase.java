@@ -84,9 +84,9 @@ public class DesignCase {
         final List<Variable> starts2 = new ArrayList<>();
         final List<Variable> works2 = new ArrayList<>();
 
-        final Set<Variable> orderedSet1 = new HashSet<Variable>();
+        final Set<Variable> orderedSet1 = new HashSet<>();
 
-        final Set<Variable> orderedSet2 = new HashSet<Variable>();
+        final Set<Variable> orderedSet2 = new HashSet<>();
 
         for (int h = 0; h < 24; h++) {
 

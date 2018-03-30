@@ -44,6 +44,22 @@ public class P20071019Case extends BasicMatrixTest {
         return SimpleLeastSquaresCase.getBody();
     }
 
+    @BeforeEach
+    @Override
+    public void setUp() {
+
+        EVALUATION = EVALUATION.newPrecision(14);
+
+        myBigAA = P20071019Case.getFatProblematic().multiply(P20071019Case.getTallProblematic()).enforce(DEFINITION);
+        myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
+        myBigAB = myBigAA;
+
+        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+
+        super.setUp();
+    }
+
     @Test
     public void testData() {
 
@@ -74,22 +90,6 @@ public class P20071019Case extends BasicMatrixTest {
         tmpDenseLU.decompose(tmpOriginal);
         TestUtils.assertEquals(tmpOriginal, tmpDenseLU, EVALUATION);
 
-    }
-
-    @BeforeEach
-    @Override
-    public void setUp() {
-
-        EVALUATION = EVALUATION.newPrecision(14);
-
-        myBigAA = P20071019Case.getFatProblematic().multiply(P20071019Case.getTallProblematic()).enforce(DEFINITION);
-        myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
-        myBigAB = myBigAA;
-
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-
-        super.setUp();
     }
 
 }

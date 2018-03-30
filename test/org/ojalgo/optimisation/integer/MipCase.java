@@ -19,6 +19,10 @@ import org.junit.jupiter.api.Test;
 
 public final class MipCase extends OptimisationIntegerTests {
 
+    @Test
+    public void testDummy() {
+    }
+
     /**
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal solution after 4h</li>
@@ -234,10 +238,6 @@ public final class MipCase extends OptimisationIntegerTests {
     @Disabled("Underscored before JUnit 5")
     public void testVpm2() {
         MipLibCase.assertMinMaxVal("vpm2.mps", new BigDecimal("1.37500000e+01"), null, false, null);
-    }
-
-    @Test
-    public void testDummy() {
     }
 
 }

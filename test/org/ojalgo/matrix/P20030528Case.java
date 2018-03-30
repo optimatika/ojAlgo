@@ -44,6 +44,23 @@ public class P20030528Case extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
+    @BeforeEach
+    @Override
+    public void setUp() {
+
+        DEFINITION = new NumberContext(7, 1);
+        EVALUATION = new NumberContext(7, 9);
+
+        myBigAA = P20030528Case.getProblematic();
+        myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
+        myBigAB = myBigAA;
+
+        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+
+        super.setUp();
+    }
+
     @Test
     public void testData() {
 
@@ -63,23 +80,6 @@ public class P20030528Case extends BasicMatrixTest {
 
         // tmpSVD.equals(tmpA, EVALUATION);
         TestUtils.assertEquals(tmpA, tmpSVD, EVALUATION);
-    }
-
-    @BeforeEach
-    @Override
-    public void setUp() {
-
-        DEFINITION = new NumberContext(7, 1);
-        EVALUATION = new NumberContext(7, 9);
-
-        myBigAA = P20030528Case.getProblematic();
-        myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
-        myBigAB = myBigAA;
-
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-
-        super.setUp();
     }
 
 }

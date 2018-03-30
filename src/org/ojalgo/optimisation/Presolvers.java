@@ -514,7 +514,7 @@ public abstract class Presolvers {
                 }
             }
 
-            if (varMinContrA != null && (varMinContrA.compareTo(exprUpper) > 0)) {
+            if ((varMinContrA != null) && (varMinContrA.compareTo(exprUpper) > 0)) {
                 BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varMinContrA), factorB);
 
                 newLimit = oldLowerB != null ? oldLowerB.max(newLimit) : newLimit;

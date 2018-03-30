@@ -47,16 +47,6 @@ public class P20030422Case extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test
-    public void testProblem() {
-
-        myExpMtrx = P20030422Case.getProblematic();
-        myActMtrx = myExpMtrx.invert().invert();
-
-        // The RationalMatrix implementation can do this do 6 decimals, but not the others
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, DEFINITION);
-    }
-
     @BeforeEach
     @Override
     public void setUp() {
@@ -72,6 +62,16 @@ public class P20030422Case extends BasicMatrixTest {
         myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
 
         super.setUp();
+    }
+
+    @Test
+    public void testProblem() {
+
+        myExpMtrx = P20030422Case.getProblematic();
+        myActMtrx = myExpMtrx.invert().invert();
+
+        // The RationalMatrix implementation can do this do 6 decimals, but not the others
+        TestUtils.assertEquals(myExpMtrx, myActMtrx, DEFINITION);
     }
 
 }

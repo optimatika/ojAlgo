@@ -47,6 +47,10 @@ public class GaussianProcessTest {
             public void calibrate(final Collection<ComparableToDouble<Double>> observations, final Mean<Double> mean) {
             }
 
+            public double invoke(final Double anArg1, final Double anArg2) {
+                return this.invoke(anArg1.doubleValue(), anArg2.doubleValue());
+            }
+
             double invoke(final double anArg1, final double anArg2) {
 
                 final double tmpSF = 1.27;
@@ -61,10 +65,6 @@ public class GaussianProcessTest {
                 }
 
                 return retVal;
-            }
-
-            public double invoke(final Double anArg1, final Double anArg2) {
-                return this.invoke(anArg1.doubleValue(), anArg2.doubleValue());
             }
 
         };

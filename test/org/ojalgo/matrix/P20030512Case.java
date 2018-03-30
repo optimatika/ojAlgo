@@ -55,16 +55,6 @@ public class P20030512Case extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @Test
-    public void testProblem() {
-
-        myExpMtrx = P20030512Case.getProblematic();
-        myActMtrx = myExpMtrx.invert().invert();
-
-        // RationalMatrix can do this, but not JamaMatrix and/or JampackMatrix
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
-    }
-
     @BeforeEach
     @Override
     public void setUp() {
@@ -80,6 +70,16 @@ public class P20030512Case extends BasicMatrixTest {
         myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
 
         super.setUp();
+    }
+
+    @Test
+    public void testProblem() {
+
+        myExpMtrx = P20030512Case.getProblematic();
+        myActMtrx = myExpMtrx.invert().invert();
+
+        // RationalMatrix can do this, but not JamaMatrix and/or JampackMatrix
+        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
 }

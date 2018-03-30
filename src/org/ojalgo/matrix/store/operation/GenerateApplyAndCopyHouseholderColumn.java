@@ -186,15 +186,6 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
         return retVal;
     }
 
-    private GenerateApplyAndCopyHouseholderColumn() {
-        super();
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
     public static <N extends Number & Scalar<N>> boolean invoke(final N[] data, final int structure, final int row, final int col,
             final Householder.Generic<N> destination, final Scalar.Factory<N> scalar) {
 
@@ -242,6 +233,15 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
         }
 
         return retVal;
+    }
+
+    private GenerateApplyAndCopyHouseholderColumn() {
+        super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

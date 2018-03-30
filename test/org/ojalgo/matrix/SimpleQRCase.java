@@ -38,6 +38,11 @@ import org.ojalgo.matrix.store.MatrixStore;
  */
 public class SimpleQRCase extends BasicMatrixTest {
 
+    public static RationalMatrix getOriginal() {
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
+        return tmpMtrx.enforce(DEFINITION);
+    }
+
     private static RationalMatrix getFactorQ() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveFunction.SQRT.invoke(2.0) },
                 { 2.0 / 3.0, -1.0 / PrimitiveFunction.SQRT.invoke(2.0) } });
@@ -49,9 +54,21 @@ public class SimpleQRCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    public static RationalMatrix getOriginal() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
-        return tmpMtrx.enforce(DEFINITION);
+    @BeforeEach
+    @Override
+    public void setUp() {
+
+        DEFINITION = DEFINITION.newScale(18);
+        EVALUATION = EVALUATION.newScale(9).newPrecision(15);
+
+        myBigAA = SimpleQRCase.getFactorQ();
+        myBigAX = SimpleQRCase.getFactorR();
+        myBigAB = SimpleQRCase.getOriginal();
+
+        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), EVALUATION);
+        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), EVALUATION);
+
+        super.setUp();
     }
 
     @Test
@@ -94,23 +111,6 @@ public class SimpleQRCase extends BasicMatrixTest {
         myActMtrx = RationalMatrix.FACTORY.copy(tmpR);
 
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
-    }
-
-    @BeforeEach
-    @Override
-    public void setUp() {
-
-        DEFINITION = DEFINITION.newScale(18);
-        EVALUATION = EVALUATION.newScale(9).newPrecision(15);
-
-        myBigAA = SimpleQRCase.getFactorQ();
-        myBigAX = SimpleQRCase.getFactorR();
-        myBigAB = SimpleQRCase.getOriginal();
-
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), EVALUATION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), EVALUATION);
-
-        super.setUp();
     }
 
 }

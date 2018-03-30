@@ -34,11 +34,11 @@ import java.time.temporal.TemporalAdjuster;
 public final class TemporalContext<T extends Temporal> implements TypeContext<T> {
 
     public static <T extends Temporal> TemporalContext<T> of(final DateTimeFormatter formatter) {
-        return new TemporalContext<T>(formatter);
+        return new TemporalContext<>(formatter);
     }
 
     public static <T extends Temporal> TemporalContext<T> of(final DateTimeFormatter formatter, final TemporalAdjuster adjuster) {
-        return new TemporalContext<T>(formatter, adjuster);
+        return new TemporalContext<>(formatter, adjuster);
     }
 
     private final TemporalAdjuster myAdjuster;

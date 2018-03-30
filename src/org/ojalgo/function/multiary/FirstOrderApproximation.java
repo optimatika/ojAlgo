@@ -86,6 +86,10 @@ public final class FirstOrderApproximation<N extends Number> extends Approximate
         return myDelegate.invoke(this.shift(arg));
     }
 
+    public PhysicalStore<N> linear() {
+        return myDelegate.linear();
+    }
+
     @Override
     public String toString() {
         return myDelegate.toString();
@@ -94,10 +98,6 @@ public final class FirstOrderApproximation<N extends Number> extends Approximate
     @Override
     protected Factory<N, ?> factory() {
         return myDelegate.factory();
-    }
-
-    public PhysicalStore<N> linear() {
-        return myDelegate.linear();
     }
 
 }

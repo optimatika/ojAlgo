@@ -116,8 +116,12 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
     }
 
-    public static RationalNumber valueOf(final long value) {
-        return fromLong(value);
+    public static RationalNumber rational(final double d) {
+        if (d < 0) {
+            return RationalNumber.rational(-d, 1.0, 39).negate();
+        } else {
+            return RationalNumber.rational(d, 1.0, 39);
+        }
     }
 
     public static RationalNumber valueOf(final double value) {
@@ -142,14 +146,14 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
         if (exponent >= 0) {
             long numerator = m << exponent;
-            if (numerator >> exponent != m) {
+            if ((numerator >> exponent) != m) {
                 return s > 0 ? RationalNumber.POSITIVE_INFINITY : RationalNumber.NEGATIVE_INFINITY;
             }
             return new RationalNumber(s * numerator, 1L);
         }
 
         // Since denominator is a power of 2, GCD can only be power of two, so we simplify by dividing by 2 repeatedly
-        while ((m & 1) == 0 && exponent < 0) {
+        while (((m & 1) == 0) && (exponent < 0)) {
             m >>= 1;
             exponent++;
         }
@@ -161,38 +165,13 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             if (factor.compareTo(maxlong) > 0) {
                 return ZERO;
             }
-            return new RationalNumber(s * m / factor.longValueExact(), Long.MAX_VALUE);
+            return new RationalNumber((s * m) / factor.longValueExact(), Long.MAX_VALUE);
         }
         return new RationalNumber(s * m, 1L << -exponent);
     }
 
-    public static RationalNumber rational(final double d) {
-        if (d < 0) {
-            return rational(-d, 1.0, 39).negate();
-        } else {
-            return rational(d, 1.0, 39);
-        }
-    }
-
-    private static RationalNumber rational(double d, double error, int depthLimit) {
-        assert (d >= 0);
-        if (d > Long.MAX_VALUE) {
-            throw new ArithmeticException("Cannot fit a double into long!");
-        }
-        final double a = Math.floor(d);
-        RationalNumber approximation = fromLong((long) a);
-        double remainder = d - a;
-        double newError = error * remainder;
-        if (newError > PrimitiveMath.MACHINE_EPSILON && depthLimit > 0) {
-            RationalNumber rationalRemainder = rational(1.0 / remainder, newError, depthLimit - 1).invert();
-            return approximation.add(rationalRemainder);
-        } else {
-            return approximation;
-        }
-    }
-
-    private static RationalNumber fromLong(long d) {
-        return of(d, 1L);
+    public static RationalNumber valueOf(final long value) {
+        return RationalNumber.fromLong(value);
     }
 
     public static RationalNumber valueOf(final Number number) {
@@ -283,6 +262,10 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return RationalNumber.of(retNumer, retDenom);
     }
 
+    private static RationalNumber fromLong(long d) {
+        return RationalNumber.of(d, 1L);
+    }
+
     /**
      * Greatest Common Denominator
      * <p>
@@ -345,6 +328,23 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return RationalNumber.of(numer.longValueExact(), denom.longValueExact());
     }
 
+    private static RationalNumber rational(double d, double error, int depthLimit) {
+        assert (d >= 0);
+        if (d > Long.MAX_VALUE) {
+            throw new ArithmeticException("Cannot fit a double into long!");
+        }
+        final double a = Math.floor(d);
+        RationalNumber approximation = RationalNumber.fromLong((long) a);
+        double remainder = d - a;
+        double newError = error * remainder;
+        if ((newError > PrimitiveMath.MACHINE_EPSILON) && (depthLimit > 0)) {
+            RationalNumber rationalRemainder = RationalNumber.rational(1.0 / remainder, newError, depthLimit - 1).invert();
+            return approximation.add(rationalRemainder);
+        } else {
+            return approximation;
+        }
+    }
+
     private static RationalNumber subtract(final RationalNumber arg1, final RationalNumber arg2) {
 
         final BigInteger numer1 = BigInteger.valueOf(arg1.getNumerator());
@@ -395,7 +395,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
 
         if (this.isInfinite()) {
-            if (!RationalNumber.isInfinite(arg) || this.sign() == arg.sign()) {
+            if (!RationalNumber.isInfinite(arg) || (this.sign() == arg.sign())) {
                 return this;
             } else {
                 return NaN;
@@ -590,7 +590,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
 
         if (this.isInfinite()) {
-            if (!arg.isInfinite() || this.sign() != arg.sign()) {
+            if (!arg.isInfinite() || (this.sign() != arg.sign())) {
                 return this;
             } else {
                 return NaN;

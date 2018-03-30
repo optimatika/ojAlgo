@@ -61,6 +61,23 @@ public class P20050827Case extends BasicMatrixTest {
         return ComplexMatrix.FACTORY.copy(tmpArray).enforce(DEFINITION);
     }
 
+    @BeforeEach
+    @Override
+    public void setUp() {
+
+        DEFINITION = NumberContext.getGeneral(12);
+        EVALUATION = NumberContext.getGeneral(6).newPrecision(12);
+
+        myBigAA = RationalMatrix.FACTORY.copy(P20050827Case.getProblematic());
+        myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
+        myBigAB = myBigAA;
+
+        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+
+        super.setUp();
+    }
+
     @Test
     public void testData() {
 
@@ -106,23 +123,6 @@ public class P20050827Case extends BasicMatrixTest {
         TestUtils.assertEquals(tmpExpected.norm(), tmpActual.norm(), EVALUATION);
         TestUtils.assertEquals(tmpExpected, tmpActual, EVALUATION);
 
-    }
-
-    @BeforeEach
-    @Override
-    public void setUp() {
-
-        DEFINITION = NumberContext.getGeneral(12);
-        EVALUATION = NumberContext.getGeneral(6).newPrecision(12);
-
-        myBigAA = RationalMatrix.FACTORY.copy(P20050827Case.getProblematic());
-        myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
-        myBigAB = myBigAA;
-
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-
-        super.setUp();
     }
 
 }

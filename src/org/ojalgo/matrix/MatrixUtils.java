@@ -299,6 +299,7 @@ public abstract class MatrixUtils {
     /**
      * @deprecated v45 Use {@link Access2D#toString(Access2D<?>)} instead
      */
+    @Deprecated
     public static String toString(final Access2D<?> matrix) {
         return Access2D.toString(matrix);
     }

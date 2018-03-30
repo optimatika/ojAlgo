@@ -94,18 +94,6 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         return System.currentTimeMillis() - myResetTime;
     }
 
-    protected final void log(final String descripttion, final Access2D<?> matrix) {
-        if (options.logger_appender != null) {
-            options.logger_appender.printmtrx(descripttion, matrix, options.print);
-        }
-    }
-
-    protected final void log(final String messagePattern, final Object... arguments) {
-        if (options.logger_appender != null) {
-            options.logger_appender.println(messagePattern, arguments);
-        }
-    }
-
     protected final void error(final String messagePattern, final Object... arguments) {
         BasicLogger.error(messagePattern, arguments);
     }
@@ -133,10 +121,6 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         return options.logger_detailed && this.isProgress();
     }
 
-    protected final boolean isProgress() {
-        return (options.logger_appender != null) && (options.logger_solver.isAssignableFrom(this.getClass()));
-    }
-
     /**
      * Should be called at the start of an iteration (before it actually starts) to check if you should abort
      * instead. Will return false if either the iterations count or the execution time has reached their
@@ -156,6 +140,22 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         //        }
 
         return tmpTimeOk && tmpIterationOk;
+    }
+
+    protected final boolean isProgress() {
+        return (options.logger_appender != null) && (options.logger_solver.isAssignableFrom(this.getClass()));
+    }
+
+    protected final void log(final String descripttion, final Access2D<?> matrix) {
+        if (options.logger_appender != null) {
+            options.logger_appender.printmtrx(descripttion, matrix, options.print);
+        }
+    }
+
+    protected final void log(final String messagePattern, final Object... arguments) {
+        if (options.logger_appender != null) {
+            options.logger_appender.println(messagePattern, arguments);
+        }
     }
 
     protected final void resetIterationsCount() {

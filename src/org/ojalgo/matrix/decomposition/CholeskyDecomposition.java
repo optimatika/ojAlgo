@@ -62,18 +62,18 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
     }
 
-    static final class Quat extends CholeskyDecomposition<Quaternion> {
-
-        Quat() {
-            super(GenericDenseStore.QUATERNION);
-        }
-
-    }
-
     static final class Primitive extends CholeskyDecomposition<Double> {
 
         Primitive() {
             super(PrimitiveDenseStore.FACTORY);
+        }
+
+    }
+
+    static final class Quat extends CholeskyDecomposition<Quaternion> {
+
+        Quat() {
+            super(GenericDenseStore.QUATERNION);
         }
 
     }

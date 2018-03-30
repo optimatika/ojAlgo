@@ -74,15 +74,6 @@ public final class RotateLeft extends MatrixOperation {
         }
     }
 
-    private RotateLeft() {
-        super();
-    }
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
     public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int rowA, final int rowB, final N cos, final N sin) {
 
         N oldA;
@@ -102,6 +93,15 @@ public final class RotateLeft extends MatrixOperation {
             indexA += structure;
             indexB += structure;
         }
+    }
+
+    private RotateLeft() {
+        super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

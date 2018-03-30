@@ -36,6 +36,11 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
     private static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
     @Test
+    public void testDummy() {
+
+    }
+
+    @Test
     @Disabled("Underscored before JUnit 5")
     public void testSemiContNot() {
 
@@ -77,10 +82,5 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
         }
 
         TestUtils.assertEquals(tmpExpVal.doubleValue(), tmpActVal, PRECISION);
-    }
-
-    @Test
-    public void testDummy() {
-
     }
 }

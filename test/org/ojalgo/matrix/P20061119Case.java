@@ -57,23 +57,6 @@ public class P20061119Case extends BasicMatrixTest {
         return retVal.enforce(DEFINITION);
     }
 
-    @Test
-    public void testData() {
-        TestUtils.assertEquals(true, P20061119Case.getProblematic().isSquare());
-    }
-
-    @Test
-    public void testProblem() {
-
-        final BasicMatrix tmpMatrix = P20061119Case.getProblematic();
-
-        final Eigenvalue<Double> tmpEigenvalue = Eigenvalue.PRIMITIVE.make();
-        final PhysicalStore<Double> tmpPrimitiveStore = PrimitiveDenseStore.FACTORY.copy(tmpMatrix);
-        tmpEigenvalue.decompose(tmpPrimitiveStore);
-
-        TestUtils.assertEquals(tmpPrimitiveStore, tmpEigenvalue, EVALUATION);
-    }
-
     @Override
     @BeforeEach
     public void setUp() {
@@ -89,6 +72,23 @@ public class P20061119Case extends BasicMatrixTest {
         myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
 
         super.setUp();
+    }
+
+    @Test
+    public void testData() {
+        TestUtils.assertEquals(true, P20061119Case.getProblematic().isSquare());
+    }
+
+    @Test
+    public void testProblem() {
+
+        final BasicMatrix tmpMatrix = P20061119Case.getProblematic();
+
+        final Eigenvalue<Double> tmpEigenvalue = Eigenvalue.PRIMITIVE.make();
+        final PhysicalStore<Double> tmpPrimitiveStore = PrimitiveDenseStore.FACTORY.copy(tmpMatrix);
+        tmpEigenvalue.decompose(tmpPrimitiveStore);
+
+        TestUtils.assertEquals(tmpPrimitiveStore, tmpEigenvalue, EVALUATION);
     }
 
 }
