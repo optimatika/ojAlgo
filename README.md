@@ -35,4 +35,4 @@ ojAlgo is Open Source, and you are strongly encouraged to clone or fork this rep
 
 ### Contributing
 
-There's a whole separate [page on contributing](CONTRIBUTING.md).
+There's a whole separate [page on contributing](CONTRIBUTING).
