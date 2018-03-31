@@ -6,7 +6,10 @@ One very good way to contribute is to supply test cases that verify that the fun
 
 ...or have a look at the list of [open issues](https://github.com/optimatika/ojAlgo/issues) to see if there is something you can help out with.
 
+### Existing Tests
 
-1. @Disregard
-2. @Tag("unstable")
-3. @Tag("slow")
+The already existing tests needs some attention as well:
+
+1. @Disabled  Essentially there should be no disabled tests. Rather than disabled they may be tagged "unstabe" or "slow". The only tests that potentially could be permanently annnnotated as disabled are some difficult optimisation problems. 
+2. @Tag("unstable") There are some tests that sometimes fail due to randomly generated input. The solution here is typically NOT to set a fixed seed on the random number generator, but to find the root cause of the test failure. (In many cases the problem seems to be related to complex number arithmatics.)
+3. @Tag("slow") Is it possible to reliably test the same thing faster?
