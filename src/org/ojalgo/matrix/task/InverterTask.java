@@ -42,18 +42,34 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     public static abstract class Factory<N extends Number> {
 
+        public final InverterTask<N> make(final int dim, final boolean spd) {
+
+            final Structure2D template = new Structure2D() {
+
+                public long countColumns() {
+                    return dim;
+                }
+
+                public long countRows() {
+                    return dim;
+                }
+            };
+
+            return this.make(template, spd, spd);
+        }
+
         public final InverterTask<N> make(final MatrixStore<N> template) {
             return this.make(template, MatrixUtils.isHermitian(template), false);
         }
 
-        public abstract InverterTask<N> make(MatrixStore<N> template, boolean symmetric, boolean positiveDefinite);
+        public abstract InverterTask<N> make(Structure2D template, boolean symmetric, boolean positiveDefinite);
 
     }
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        public InverterTask<BigDecimal> make(final MatrixStore<BigDecimal> template, final boolean symmetric, final boolean positiveDefinite) {
+        public InverterTask<BigDecimal> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
                 return Cholesky.BIG.make(template);
             } else if (template.isSquare()) {
@@ -70,7 +86,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        public InverterTask<ComplexNumber> make(final MatrixStore<ComplexNumber> template, final boolean symmetric, final boolean positiveDefinite) {
+        public InverterTask<ComplexNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
                 return Cholesky.COMPLEX.make(template);
             } else if (template.isSquare()) {
@@ -87,7 +103,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
-        public InverterTask<Double> make(final MatrixStore<Double> template, final boolean symmetric, final boolean positiveDefinite) {
+        public InverterTask<Double> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
 
             final long tmpDim = template.countRows();
 
@@ -131,7 +147,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
-        public InverterTask<Quaternion> make(final MatrixStore<Quaternion> template, final boolean symmetric, final boolean positiveDefinite) {
+        public InverterTask<Quaternion> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (template.isSquare()) {
                 if (symmetric && positiveDefinite) {
                     return Cholesky.QUATERNION.make(template);
@@ -150,7 +166,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
-        public InverterTask<RationalNumber> make(final MatrixStore<RationalNumber> template, final boolean symmetric, final boolean positiveDefinite) {
+        public InverterTask<RationalNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (template.isSquare()) {
                 if (symmetric && positiveDefinite) {
                     return Cholesky.RATIONAL.make(template);
