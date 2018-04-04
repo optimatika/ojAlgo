@@ -2,10 +2,10 @@ package org.ojalgo.optimisation;
 
 import java.math.BigDecimal;
 
-public interface UpdatableSolver {
+public interface UpdatableSolver extends Optimisation.Solver {
 
-    void update(BigDecimal lower, Variable variable);
+    boolean update(BigDecimal lower, Variable variable);
 
-    void update(Variable variable, BigDecimal upper);
+    boolean update(Variable variable, BigDecimal upper);
 
 }

@@ -48,10 +48,9 @@ public final class TableData<R> {
             builder.append(row);
             for (final String col : columnKeys) {
                 builder.append(";");
-                final double tmpDoubleValue = myColumns.get(col).doubleValue(myRowIndexMapper.toIndex(row));
-                if (!Double.isNaN(tmpDoubleValue)) {
-
-                    builder.append(GENERAL.format(tmpDoubleValue));
+                final double value = myColumns.get(col).doubleValue(myRowIndexMapper.toIndex(row));
+                if (!Double.isNaN(value)) {
+                    builder.append(GENERAL.format(value));
                 }
             }
             builder.append(LineTerminator.UNIX);
