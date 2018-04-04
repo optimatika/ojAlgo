@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.ojalgo.access.Access1D;
@@ -31,11 +32,12 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
 
-public abstract class LinearSolver extends GenericSolver {
+public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
     public static final class Builder extends GenericSolver.Builder<LinearSolver.Builder, LinearSolver> {
 
@@ -223,5 +225,17 @@ public abstract class LinearSolver extends GenericSolver {
     protected abstract boolean initialise(Result kickStarter);
 
     protected abstract boolean needsAnotherIteration();
+
+    @Override
+    public boolean update(BigDecimal lower, Variable variable) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean update(Variable variable, BigDecimal upper) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
 }

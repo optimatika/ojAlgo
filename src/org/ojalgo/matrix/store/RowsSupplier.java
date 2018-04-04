@@ -72,8 +72,7 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
 
         receiver.reset();
 
-        final int limit = myRows.size();
-        for (int i = 0; i < limit; i++) {
+        for (int i = 0, limit = myRows.size(); i < limit; i++) {
             final long row = i;
 
             myRows.get(i).supplyNonZerosTo(new Mutate1D() {

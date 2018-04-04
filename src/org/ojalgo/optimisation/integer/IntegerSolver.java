@@ -391,7 +391,7 @@ public abstract class IntegerSolver extends GenericSolver {
 
                 if (this.isIntegerSolutionFound()) {
                     // If an integer solution is already found
-                    // then scale the fraction by its significane
+                    // then scale the fraction by its significance
 
                     compareFraction = fraction * this.getIntegerSignificance(i);
 

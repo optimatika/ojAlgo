@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation;
 
-import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.ProgrammingError;
@@ -30,7 +29,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 
-public abstract class GenericSolver implements Optimisation.Solver, Serializable {
+public abstract class GenericSolver implements Optimisation.Solver {
 
     public static abstract class Builder<B extends Builder<?, ?>, S extends GenericSolver> {
 
