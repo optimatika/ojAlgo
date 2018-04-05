@@ -12,7 +12,7 @@ ojAlgo is available at [The Central (Maven) Repository](http://search.maven.org/
 <dependency>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>44.0.0</version>
+    <version>45.0.0</version>
 </dependency>
 ```
 ...or download the jar from SourceForge.
@@ -35,8 +35,4 @@ ojAlgo is Open Source, and you are strongly encouraged to clone or fork this rep
 
 ### Contributing
 
-Feel free to contribute any way you want. Whatever you feel is missing or "wrong", just fix it.
-
-One very good way to contribute is to supply test cases that verify that the functionality you use works as expected. The ojAlgo code base is often refactored. Having tests specific to your use case can be very beneficial (for you) in assuring future releases.
-
-...or have a look at the list of [open issues](https://github.com/optimatika/ojAlgo/issues) to see if there is something you can help out with.
+There's a whole separate [page on contributing](CONTRIBUTING.md).
