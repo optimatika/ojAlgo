@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.ojalgo.access.Access1D;
@@ -227,13 +226,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
     protected abstract boolean needsAnotherIteration();
 
     @Override
-    public boolean update(BigDecimal lower, Variable variable) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean update(Variable variable, BigDecimal upper) {
+    public boolean update(Variable variable) {
         // TODO Auto-generated method stub
         return false;
     }

@@ -836,14 +836,14 @@ public final class Expression extends ModelEntity<Expression> {
     void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
 
         if (this.isAnyQuadraticFactorNonZero()) {
-            for (final BigDecimal tmpQuadraticFactor : myQuadratic.values()) {
-                largest.invoke(tmpQuadraticFactor);
-                smallest.invoke(tmpQuadraticFactor);
+            for (final BigDecimal quadraticFactor : myQuadratic.values()) {
+                largest.invoke(quadraticFactor);
+                smallest.invoke(quadraticFactor);
             }
         } else if (this.isAnyLinearFactorNonZero()) {
-            for (final BigDecimal tmpLinearFactor : myLinear.values()) {
-                largest.invoke(tmpLinearFactor);
-                smallest.invoke(tmpLinearFactor);
+            for (final BigDecimal linearFactor : myLinear.values()) {
+                largest.invoke(linearFactor);
+                smallest.invoke(linearFactor);
             }
         } else {
             super.visitAllParameters(largest, smallest);

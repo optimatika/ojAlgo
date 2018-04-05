@@ -69,7 +69,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
             final double tmpNegatedAverage = (tmpLargestExp + tmpSmallestExp) / (-TWO);
 
-            return (int) PrimitiveFunction.RINT.invoke(tmpNegatedAverage);
+            return (int) Math.round(tmpNegatedAverage);
         }
     }
 
@@ -95,6 +95,8 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
         myLowerLimit = entityToCopy.getLowerLimit();
         myUpperLimit = entityToCopy.getUpperLimit();
+
+        myAdjustmentExponent = entityToCopy.getAdjustmentExponent();
     }
 
     protected ModelEntity(final String name) {
@@ -124,25 +126,11 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     }
 
     public final double getAdjustedLowerLimit() {
-
-        final BigDecimal tmpLowerLimit = this.getLowerLimit(true);
-
-        if (tmpLowerLimit != null) {
-            return tmpLowerLimit.doubleValue();
-        } else {
-            return Double.NEGATIVE_INFINITY;
-        }
+        return this.toLowerValue(true);
     }
 
     public final double getAdjustedUpperLimit() {
-
-        final BigDecimal tmpUpperLimit = this.getUpperLimit(true);
-
-        if (tmpUpperLimit != null) {
-            return tmpUpperLimit.doubleValue();
-        } else {
-            return Double.POSITIVE_INFINITY;
-        }
+        return this.toUpperValue(true);
     }
 
     /**
@@ -157,7 +145,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     }
 
     public final BigDecimal getLowerLimit() {
-        return this.getLowerLimit(false);
+        return myLowerLimit;
     }
 
     public final String getName() {
@@ -165,29 +153,15 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     }
 
     public final double getUnadjustedLowerLimit() {
-
-        final BigDecimal tmpLowerLimit = this.getLowerLimit(false);
-
-        if (tmpLowerLimit != null) {
-            return tmpLowerLimit.doubleValue();
-        } else {
-            return Double.NEGATIVE_INFINITY;
-        }
+        return this.toLowerValue(false);
     }
 
     public final double getUnadjustedUpperLimit() {
-
-        final BigDecimal tmpUpperLimit = this.getUpperLimit(false);
-
-        if (tmpUpperLimit != null) {
-            return tmpUpperLimit.doubleValue();
-        } else {
-            return Double.POSITIVE_INFINITY;
-        }
+        return this.toUpperValue(false);
     }
 
     public final BigDecimal getUpperLimit() {
-        return this.getUpperLimit(false);
+        return myUpperLimit;
     }
 
     @Override
@@ -242,7 +216,6 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      */
     @SuppressWarnings("unchecked")
     public final ME lower(final Number lower) {
-        myAdjustmentExponent = Integer.MIN_VALUE;
         myLowerLimit = null;
         if (lower != null) {
             if (lower instanceof BigDecimal) {
@@ -278,7 +251,6 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      */
     @SuppressWarnings("unchecked")
     public final ME upper(final Number upper) {
-        myAdjustmentExponent = Integer.MIN_VALUE;
         myUpperLimit = null;
         if (upper != null) {
             if (upper instanceof BigDecimal) {
@@ -315,6 +287,48 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
             }
         }
         return (ME) this;
+    }
+
+    private double toLowerValue(final boolean adjusted) {
+
+        final BigDecimal limit;
+        if (adjusted && (myLowerLimit != null)) {
+            final int adjustmentExponent = this.getAdjustmentExponent();
+            if (adjustmentExponent != 0) {
+                limit = myLowerLimit.movePointRight(adjustmentExponent);
+            } else {
+                limit = myLowerLimit;
+            }
+        } else {
+            limit = myLowerLimit;
+        }
+
+        if (limit != null) {
+            return limit.doubleValue();
+        } else {
+            return Double.NEGATIVE_INFINITY;
+        }
+    }
+
+    private double toUpperValue(final boolean adjusted) {
+
+        final BigDecimal limit;
+        if (adjusted && (myUpperLimit != null)) {
+            final int adjustmentExponent = this.getAdjustmentExponent();
+            if (adjustmentExponent != 0) {
+                limit = myUpperLimit.movePointRight(adjustmentExponent);
+            } else {
+                limit = myUpperLimit;
+            }
+        } else {
+            limit = myUpperLimit;
+        }
+
+        if (limit != null) {
+            return limit.doubleValue();
+        } else {
+            return Double.POSITIVE_INFINITY;
+        }
     }
 
     protected void appendLeftPart(final StringBuilder builder) {
@@ -420,48 +434,6 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         this.appendLeftPart(builder);
         this.appendMiddlePart(builder);
         this.appendRightPart(builder);
-    }
-
-    final BigDecimal getLowerLimit(final boolean adjusted) {
-
-        if (adjusted && (myLowerLimit != null)) {
-
-            final int tmpAdjustmentExponent = this.getAdjustmentExponent();
-
-            if (tmpAdjustmentExponent != 0) {
-
-                return myLowerLimit.movePointRight(tmpAdjustmentExponent);
-
-            } else {
-
-                return myLowerLimit;
-            }
-
-        } else {
-
-            return myLowerLimit;
-        }
-    }
-
-    final BigDecimal getUpperLimit(final boolean adjusted) {
-
-        if (adjusted && (myUpperLimit != null)) {
-
-            final int tmpAdjustmentExponent = this.getAdjustmentExponent();
-
-            if (tmpAdjustmentExponent != 0) {
-
-                return myUpperLimit.movePointRight(tmpAdjustmentExponent);
-
-            } else {
-
-                return myUpperLimit;
-            }
-
-        } else {
-
-            return myUpperLimit;
-        }
     }
 
     boolean isInfeasible() {

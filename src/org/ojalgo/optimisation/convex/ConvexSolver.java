@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -908,15 +907,20 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     }
 
     @Override
-    public boolean update(BigDecimal lower, Variable variable) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean update(Variable variable) {
+
+        boolean retVal = true;
+
+        if (variable.isLowerLimitSet()) {
+            retVal = false;
+        }
+
+        if (variable.isUpperLimitSet()) {
+            retVal = false;
+        }
+
+        return retVal;
     }
 
-    @Override
-    public boolean update(Variable variable, BigDecimal upper) {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
 }
