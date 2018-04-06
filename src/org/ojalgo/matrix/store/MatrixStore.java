@@ -669,6 +669,14 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return new MatrixPipeline.Multiplication<>(left, this);
     }
 
+    default ElementsSupplier<N> reduceColumns(Aggregator aggregator) {
+        return new MatrixPipeline.ColumnsReducer<>(this, aggregator);
+    }
+
+    default ElementsSupplier<N> reduceRows(Aggregator aggregator) {
+        return new MatrixPipeline.RowsReducer<>(this, aggregator);
+    }
+
     default MatrixStore<N> signum() {
         return this.multiply(PrimitiveMath.ONE / this.norm());
     }

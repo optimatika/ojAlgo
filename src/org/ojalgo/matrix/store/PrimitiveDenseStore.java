@@ -463,9 +463,9 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        final AggregatorFunction<Double> tmpMainAggr = aggregator.getFunction(PrimitiveAggregator.getSet());
+        final AggregatorFunction<Double> mainAggr = aggregator.getFunction(PrimitiveAggregator.getSet());
 
-        if (tmpColDim > AggregateAll.THRESHOLD) {
+        if (mainAggr.isMergeable() && tmpColDim > AggregateAll.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -476,8 +476,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
                     PrimitiveDenseStore.this.visit(tmpRowDim * first, tmpRowDim * limit, 1, tmpPartAggr);
 
-                    synchronized (tmpMainAggr) {
-                        tmpMainAggr.merge(tmpPartAggr.get());
+                    synchronized (mainAggr) {
+                        mainAggr.merge(tmpPartAggr.get());
                     }
                 }
             };
@@ -486,10 +486,10 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         } else {
 
-            PrimitiveDenseStore.this.visit(0, this.size(), 1, tmpMainAggr);
+            PrimitiveDenseStore.this.visit(0, this.size(), 1, mainAggr);
         }
 
-        return tmpMainAggr.get();
+        return mainAggr.get();
     }
 
     public void applyCholesky(final int iterationPoint, final BasicArray<Double> multipliers) {

@@ -481,9 +481,9 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        final AggregatorFunction<BigDecimal> tmpMainAggr = aggregator.getFunction(BigAggregator.getSet());
+        final AggregatorFunction<BigDecimal> mainAggr = aggregator.getFunction(BigAggregator.getSet());
 
-        if (tmpColDim > AggregateAll.THRESHOLD) {
+        if (mainAggr.isMergeable() && tmpColDim > AggregateAll.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -494,8 +494,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
                     BigDenseStore.this.visit(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, tmpPartAggr);
 
-                    synchronized (tmpMainAggr) {
-                        tmpMainAggr.merge(tmpPartAggr.get());
+                    synchronized (mainAggr) {
+                        mainAggr.merge(tmpPartAggr.get());
                     }
                 }
             };
@@ -504,10 +504,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
         } else {
 
-            BigDenseStore.this.visit(0, this.size(), 1, tmpMainAggr);
+            BigDenseStore.this.visit(0, this.size(), 1, mainAggr);
         }
 
-        return tmpMainAggr.get();
+        return mainAggr.get();
     }
 
     public void applyCholesky(final int iterationPoint, final BasicArray<BigDecimal> multipliers) {

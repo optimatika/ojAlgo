@@ -478,9 +478,9 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        final AggregatorFunction<N> tmpMainAggr = aggregator.getFunction(myFactory.aggregator());
+        final AggregatorFunction<N> mainAggr = aggregator.getFunction(myFactory.aggregator());
 
-        if (tmpColDim > AggregateAll.THRESHOLD) {
+        if (mainAggr.isMergeable() && tmpColDim > AggregateAll.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -491,8 +491,8 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
                     GenericDenseStore.this.visit(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, tmpPartAggr);
 
-                    synchronized (tmpMainAggr) {
-                        tmpMainAggr.merge(tmpPartAggr.get());
+                    synchronized (mainAggr) {
+                        mainAggr.merge(tmpPartAggr.get());
                     }
                 }
             };
@@ -501,10 +501,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
         } else {
 
-            GenericDenseStore.this.visit(0, this.size(), 1, tmpMainAggr);
+            GenericDenseStore.this.visit(0, this.size(), 1, mainAggr);
         }
 
-        return tmpMainAggr.get();
+        return mainAggr.get();
     }
 
     public void applyCholesky(final int iterationPoint, final BasicArray<N> multipliers) {

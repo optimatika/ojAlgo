@@ -23,6 +23,7 @@ package org.ojalgo.function.aggregator;
 
 import static org.ojalgo.function.RationalFunction.*;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.RationalFunction;
@@ -32,17 +33,75 @@ import org.ojalgo.scalar.Scalar;
 
 public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
+    static abstract class RationalAggregatorFunction implements AggregatorFunction<RationalNumber> {
+
+        public final double doubleValue() {
+            return this.get().doubleValue();
+        }
+
+        public final void invoke(final double anArg) {
+            this.invoke(RationalNumber.valueOf(anArg));
+        }
+
+        public final Scalar<RationalNumber> toScalar() {
+            return this.get();
+        }
+
+    }
+
+    public static final ThreadLocal<AggregatorFunction<RationalNumber>> AVERAGE = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+
+        @Override
+        protected AggregatorFunction<RationalNumber> initialValue() {
+            return new RationalAggregatorFunction() {
+
+                private int myCount = 0;
+
+                private RationalNumber myNumber = RationalNumber.ZERO;
+
+                public RationalNumber get() {
+                    return myNumber.divide(myCount);
+                }
+
+                public int intValue() {
+                    return this.get().intValue();
+                }
+
+                public void invoke(final RationalNumber anArg) {
+                    myCount++;
+                    myNumber = myNumber.add(anArg);
+                }
+
+                public boolean isMergeable() {
+                    return false;
+                }
+
+                public void merge(final RationalNumber result) {
+                    ProgrammingError.throwForIllegalInvocation();
+                }
+
+                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
+                    ProgrammingError.throwForIllegalInvocation();
+                    return null;
+                }
+
+                public AggregatorFunction<RationalNumber> reset() {
+                    myCount = 0;
+                    myNumber = RationalNumber.ZERO;
+                    return this;
+                }
+
+            };
+        }
+    };
+
     public static final ThreadLocal<AggregatorFunction<RationalNumber>> CARDINALITY = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
-            return new AggregatorFunction<RationalNumber>() {
+            return new RationalAggregatorFunction() {
 
                 private int myCount = 0;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public RationalNumber get() {
                     return RationalNumber.valueOf(myCount);
@@ -50,10 +109,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public int intValue() {
                     return myCount;
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -75,25 +130,16 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     return this;
                 }
 
-                public Scalar<RationalNumber> toScalar() {
-                    return this.get();
-                }
-
             };
         }
     };
-
     public static final ThreadLocal<AggregatorFunction<RationalNumber>> LARGEST = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
-            return new AggregatorFunction<RationalNumber>() {
+            return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.ZERO;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public RationalNumber get() {
                     return myNumber;
@@ -101,10 +147,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -124,23 +166,17 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     return this;
                 }
 
-                public Scalar<RationalNumber> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
+
     public static final ThreadLocal<AggregatorFunction<RationalNumber>> MAX = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
-            return new AggregatorFunction<RationalNumber>() {
+            return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.ZERO;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public RationalNumber get() {
                     return myNumber;
@@ -148,10 +184,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -171,9 +203,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     return this;
                 }
 
-                public Scalar<RationalNumber> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -182,13 +211,9 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
-            return new AggregatorFunction<RationalNumber>() {
+            return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.POSITIVE_INFINITY;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public RationalNumber get() {
                     if (RationalNumber.isInfinite(myNumber)) {
@@ -200,10 +225,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -223,9 +244,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     return this;
                 }
 
-                public Scalar<RationalNumber> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -234,13 +252,9 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
-            return new AggregatorFunction<RationalNumber>() {
+            return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.ZERO;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public RationalNumber get() {
                     return myNumber;
@@ -248,10 +262,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -271,9 +281,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     return this;
                 }
 
-                public Scalar<RationalNumber> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -282,13 +289,9 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
-            return new AggregatorFunction<RationalNumber>() {
+            return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.ZERO;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public RationalNumber get() {
                     return RationalNumber.valueOf(PrimitiveFunction.SQRT.invoke(PrimitiveFunction.ABS.invoke(myNumber.doubleValue())));
@@ -296,10 +299,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -320,9 +319,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     return this;
                 }
 
-                public Scalar<RationalNumber> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -331,13 +327,9 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
-            return new AggregatorFunction<RationalNumber>() {
+            return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.ONE;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public RationalNumber get() {
                     return myNumber;
@@ -345,10 +337,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -368,9 +356,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     return this;
                 }
 
-                public Scalar<RationalNumber> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -379,13 +364,9 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
-            return new AggregatorFunction<RationalNumber>() {
+            return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.ONE;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public RationalNumber get() {
                     return myNumber;
@@ -393,10 +374,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -416,9 +393,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     return this;
                 }
 
-                public Scalar<RationalNumber> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -427,13 +401,9 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
-            return new AggregatorFunction<RationalNumber>() {
+            return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.POSITIVE_INFINITY;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public RationalNumber get() {
                     if (RationalNumber.isInfinite(myNumber)) {
@@ -445,10 +415,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -470,9 +436,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     return this;
                 }
 
-                public Scalar<RationalNumber> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -481,13 +444,9 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
-            return new AggregatorFunction<RationalNumber>() {
+            return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.ZERO;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public RationalNumber get() {
                     return myNumber;
@@ -495,10 +454,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -518,9 +473,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     return this;
                 }
 
-                public Scalar<RationalNumber> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -529,13 +481,9 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
         @Override
         protected AggregatorFunction<RationalNumber> initialValue() {
-            return new AggregatorFunction<RationalNumber>() {
+            return new RationalAggregatorFunction() {
 
                 private RationalNumber myNumber = RationalNumber.ZERO;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public RationalNumber get() {
                     return myNumber;
@@ -543,10 +491,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -566,9 +510,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     return this;
                 }
 
-                public Scalar<RationalNumber> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -581,6 +522,11 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
     private RationalAggregator() {
         super();
+    }
+
+    @Override
+    public AggregatorFunction<RationalNumber> average() {
+        return AVERAGE.get().reset();
     }
 
     @Override
