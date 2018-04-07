@@ -52,8 +52,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Access1D.Aggregatable<N>,
-        Mutate1D, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
+public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
+        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
 
     public static final class Factory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
 
@@ -182,10 +182,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         myFactory = factory;
     }
 
-    public N aggregateRange(long first, long limit, Aggregator aggregator) {
-        return this.aggregate(first, limit, 1L, aggregator);
-    }
-
     public long indexOfLargest() {
         return this.indexOfLargest(0L, this.count(), 1L);
     }
@@ -230,12 +226,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
         this.visit(first, limit, 1L, visitor);
-    }
-
-    protected final N aggregate(long first, long limit, long step, Aggregator aggregator) {
-        AggregatorFunction<N> visitor = aggregator.getFunction(this.factory().aggregator());
-        this.visit(first, limit, step, visitor);
-        return visitor.get();
     }
 
     protected abstract void exchange(long firstA, long firstB, long step, long count);

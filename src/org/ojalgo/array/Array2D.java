@@ -37,6 +37,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -318,21 +319,27 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     public N aggregateColumn(long row, long col, Aggregator aggregator) {
-        return myDelegate.aggregate(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L, aggregator);
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitColumn(row, col, visitor);
+        return visitor.get();
     }
 
     public N aggregateDiagonal(long row, long col, Aggregator aggregator) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
-        return myDelegate.aggregate(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount,
-                aggregator);
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitDiagonal(row, col, visitor);
+        return visitor.get();
     }
 
     public N aggregateRange(long first, long limit, Aggregator aggregator) {
-        return myDelegate.aggregate(first, limit, 1L, aggregator);
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitRange(first, limit, visitor);
+        return visitor.get();
     }
 
     public N aggregateRow(long row, long col, Aggregator aggregator) {
-        return myDelegate.aggregate(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, aggregator);
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitRow(row, col, visitor);
+        return visitor.get();
     }
 
     /**

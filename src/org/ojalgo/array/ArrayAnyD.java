@@ -37,6 +37,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -130,7 +131,9 @@ public final class ArrayAnyD<N extends Number>
     }
 
     public N aggregateRange(long first, long limit, Aggregator aggregator) {
-        return myDelegate.aggregate(first, limit, 1L, aggregator);
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitRange(first, limit, visitor);
+        return visitor.get();
     }
 
     /**

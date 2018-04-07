@@ -41,6 +41,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -274,9 +275,9 @@ public final class Array1D<N extends Number> extends AbstractList<N>
     }
 
     public N aggregateRange(long first, long limit, Aggregator aggregator) {
-        final long tmpFirst = myFirst + (myStep * first);
-        final long tmpLimit = myFirst + (myStep * limit);
-        return myDelegate.aggregate(tmpFirst, tmpLimit, myStep, aggregator);
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitRange(first, limit, visitor);
+        return visitor.get();
     }
 
     @Override
