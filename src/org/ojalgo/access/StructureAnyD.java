@@ -24,6 +24,7 @@ package org.ojalgo.access;
 import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.function.aggregator.Aggregator;
 
 /**
  * A (fixed size) any-dimensional data structure.
@@ -153,6 +154,12 @@ public interface StructureAnyD extends Structure1D {
         public String toString() {
             return Arrays.toString(reference);
         }
+
+    }
+
+    public interface Reducible<R extends Structure1D> extends StructureAnyD {
+
+        R reduce(int dimension, Aggregator aggregator);
 
     }
 

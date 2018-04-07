@@ -356,14 +356,14 @@ public class Primitive64Array extends PrimitiveArray {
      */
     protected Primitive64Array(final double[] data) {
 
-        super(data.length);
+        super(FACTORY, data.length);
 
         this.data = data;
     }
 
     protected Primitive64Array(final int size) {
 
-        super(size);
+        super(FACTORY, size);
 
         data = new double[size];
     }

@@ -77,20 +77,12 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
         return new ComplexArray(data);
     }
 
-    private ComplexArray(final ComplexNumber[] data, final org.ojalgo.scalar.Scalar.Factory<ComplexNumber> factory) {
-        super(data, factory);
-    }
-
-    private ComplexArray(final int length, final org.ojalgo.scalar.Scalar.Factory<ComplexNumber> factory) {
-        super(length, factory);
-    }
-
     protected ComplexArray(final ComplexNumber[] data) {
-        this(data, ComplexNumber.FACTORY);
+        super(FACTORY, data);
     }
 
     protected ComplexArray(final int size) {
-        this(size, ComplexNumber.FACTORY);
+        super(FACTORY, size);
     }
 
     @Override

@@ -33,6 +33,8 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.scalar.Scalar;
@@ -50,8 +52,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
-        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
+public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Access1D.Aggregatable<N>,
+        Mutate1D, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
 
     public static final class Factory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
 
@@ -168,8 +170,20 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         return retVal;
     }
 
-    protected BasicArray() {
+    private final ArrayFactory<N, ?> myFactory;
+
+    @SuppressWarnings("unused")
+    private BasicArray() {
+        this(null);
+    }
+
+    protected BasicArray(ArrayFactory<N, ?> factory) {
         super();
+        myFactory = factory;
+    }
+
+    public N aggregateRange(long first, long limit, Aggregator aggregator) {
+        return this.aggregate(first, limit, 1L, aggregator);
     }
 
     public long indexOfLargest() {
@@ -218,6 +232,12 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         this.visit(first, limit, 1L, visitor);
     }
 
+    protected final N aggregate(long first, long limit, long step, Aggregator aggregator) {
+        AggregatorFunction<N> visitor = aggregator.getFunction(this.factory().aggregator());
+        this.visit(first, limit, step, visitor);
+        return visitor.get();
+    }
+
     protected abstract void exchange(long firstA, long firstB, long step, long count);
 
     protected abstract void fill(long first, long limit, long step, N value);
@@ -263,6 +283,10 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
      */
     protected final ArrayAnyD<N> wrapInArrayAnyD(final long[] structure) {
         return new ArrayAnyD<>(this, structure);
+    }
+
+    final ArrayFactory<N, ?> factory() {
+        return myFactory;
     }
 
     /**

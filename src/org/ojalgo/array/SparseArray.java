@@ -176,7 +176,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     SparseArray(final long count, final DenseCapacityStrategy<N> strategy) {
 
-        super();
+        super(strategy.getDenseFactory());
 
         myCount = count;
 

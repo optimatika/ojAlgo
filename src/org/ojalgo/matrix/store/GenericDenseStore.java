@@ -425,7 +425,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     GenericDenseStore(final GenericDenseStore.Factory<N> factory, final int numbRows, final int numbCols) {
 
-        super(numbRows * numbCols, factory.scalar());
+        super(factory.array(), numbRows * numbCols);
 
         myFactory = factory;
 
@@ -442,7 +442,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     GenericDenseStore(final GenericDenseStore.Factory<N> factory, final int numbRows, final int numbCols, final N[] dataArray) {
 
-        super(dataArray, factory.scalar());
+        super(factory.array(), dataArray);
 
         myFactory = factory;
 
@@ -480,7 +480,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
         final AggregatorFunction<N> mainAggr = aggregator.getFunction(myFactory.aggregator());
 
-        if (mainAggr.isMergeable() && tmpColDim > AggregateAll.THRESHOLD) {
+        if (mainAggr.isMergeable() && (tmpColDim > AggregateAll.THRESHOLD)) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 

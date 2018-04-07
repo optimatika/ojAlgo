@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.constant.PrimitiveMath;
@@ -59,7 +60,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Access2D<N>, Access2D.Elements, Access2D.Visitable<N>, Access2D.Aggregatable<N>,
-        Access2D.Sliceable<N>, NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>> {
+        Structure2D.Reducible<ElementsSupplier<N>>, Access2D.Sliceable<N>, NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>> {
 
     public static interface Factory<N extends Number> {
 

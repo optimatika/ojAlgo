@@ -40,6 +40,7 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -51,8 +52,8 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array1D<N extends Number> extends AbstractList<N>
-        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Sliceable<N>, Access1D.Visitable<N>, Mutate1D.Receiver<N>,
-        Mutate1D.BiModifiable<N>, Mutate1D.Modifiable<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess, Serializable {
+        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Sliceable<N>, Access1D.Visitable<N>, Access1D.Aggregatable<N>,
+        Mutate1D.Receiver<N>, Mutate1D.BiModifiable<N>, Mutate1D.Modifiable<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess, Serializable {
 
     public static final class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
@@ -270,6 +271,12 @@ public final class Array1D<N extends Number> extends AbstractList<N>
     public void add(final long index, final Number addend) {
         final long tmpIndex = myFirst + (myStep * index);
         myDelegate.add(tmpIndex, addend);
+    }
+
+    public N aggregateRange(long first, long limit, Aggregator aggregator) {
+        final long tmpFirst = myFirst + (myStep * first);
+        final long tmpLimit = myFirst + (myStep * limit);
+        return myDelegate.aggregate(tmpFirst, tmpLimit, myStep, aggregator);
     }
 
     @Override

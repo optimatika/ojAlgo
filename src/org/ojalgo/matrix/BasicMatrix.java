@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Factory2D;
 import org.ojalgo.access.Mutate2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.algebra.ScalarOperation;
@@ -49,9 +50,9 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access2D.Aggregatable<Number>, NormedVectorSpace<BasicMatrix, Number>,
-        Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>, ScalarOperation.Addition<BasicMatrix, Number>,
-        ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number> {
+public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access2D.Aggregatable<Number>, Structure2D.Reducible<BasicMatrix>,
+        NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>,
+        ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number> {
 
     public static interface Builder<I extends BasicMatrix> extends Mutate2D, Supplier<I> {
 
