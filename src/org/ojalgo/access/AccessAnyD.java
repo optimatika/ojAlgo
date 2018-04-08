@@ -22,6 +22,7 @@
 package org.ojalgo.access;
 
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -34,6 +35,14 @@ import org.ojalgo.type.context.NumberContext;
 public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N> {
 
     public interface Aggregatable<N extends Number> extends StructureAnyD, Access1D.Aggregatable<N> {
+
+        Number aggregate(int dimension, long dimensionalIndex, Aggregator aggregator);
+
+        default void reduce(int dimension, Aggregator aggregator, Mutate1D receiver) {
+            for (long i = 0L, limit = Math.min(this.count(dimension), receiver.count()); i < limit; i++) {
+                receiver.set(i, this.aggregate(dimension, i, aggregator));
+            }
+        }
 
     }
 
@@ -77,6 +86,8 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
     }
 
     public interface Visitable<N extends Number> extends StructureAnyD, Access1D.Visitable<N> {
+
+        void visit(int dimension, long dimensionalIndex, VoidFunction<N> visitor);
 
         void visitOne(long[] reference, VoidFunction<N> visitor);
 

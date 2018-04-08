@@ -130,6 +130,12 @@ public final class ArrayAnyD<N extends Number>
         myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
 
+    public Number aggregate(int dimension, long dimensionalIndex, Aggregator aggregator) {
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visit(dimension, dimensionalIndex, visitor);
+        return visitor.get();
+    }
+
     public N aggregateRange(long first, long limit, Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitRange(first, limit, visitor);
@@ -379,6 +385,20 @@ public final class ArrayAnyD<N extends Number>
         }
 
         return retVal.toString();
+    }
+
+    public void visit(int dimension, long dimensionalIndex, VoidFunction<N> visitor) {
+
+        long outerStep = StructureAnyD.step(myStructure, dimension + 1);
+        long innerStep = StructureAnyD.step(myStructure, dimension);
+
+        final long totalCount = this.count();
+        final long dimenCount = this.count(dimension);
+        final long dimenRange = innerStep * dimenCount;
+
+        for (long first = innerStep * dimensionalIndex; first < totalCount; first += outerStep) {
+            myDelegate.visit(first, first + dimenRange, innerStep, visitor);
+        }
     }
 
     public void visitAll(final VoidFunction<N> visitor) {
