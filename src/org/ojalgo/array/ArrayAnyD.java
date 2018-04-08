@@ -48,9 +48,9 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class ArrayAnyD<N extends Number>
-        implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, AccessAnyD.Visitable<N>, AccessAnyD.Aggregatable<N>, AccessAnyD.Sliceable<N>,
-        MutateAnyD, MutateAnyD.Fillable<N>, MutateAnyD.Modifiable<N>, MutateAnyD.BiModifiable<N>, MutateAnyD.Mixable<N>, Serializable {
+public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, AccessAnyD.Visitable<N>,
+        AccessAnyD.Aggregatable<N>, StructureAnyD.Reducible<Array1D<N>>, AccessAnyD.Sliceable<N>, MutateAnyD, MutateAnyD.Fillable<N>, MutateAnyD.Modifiable<N>,
+        MutateAnyD.BiModifiable<N>, MutateAnyD.Mixable<N>, Serializable {
 
     public static final class Factory<N extends Number> implements FactoryAnyD<ArrayAnyD<N>> {
 
@@ -328,6 +328,12 @@ public final class ArrayAnyD<N extends Number>
 
     public int rank() {
         return myStructure.length;
+    }
+
+    public Array1D<N> reduce(int dimension, Aggregator aggregator) {
+        Array1D<N> retVal = myDelegate.factory().makeZero(StructureAnyD.count(myStructure, dimension)).wrapInArray1D();
+        this.reduce(dimension, aggregator, retVal);
+        return retVal;
     }
 
     public void set(final long index, final double value) {
