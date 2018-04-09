@@ -39,7 +39,9 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         Number aggregate(int dimension, long dimensionalIndex, Aggregator aggregator);
 
         default void reduce(int dimension, Aggregator aggregator, Mutate1D receiver) {
-            for (long i = 0L, limit = Math.min(this.count(dimension), receiver.count()); i < limit; i++) {
+            final long count1 = this.count(dimension);
+            final long count2 = receiver.count();
+            for (long i = 0L, limit = Math.min(count1, count2); i < limit; i++) {
                 receiver.set(i, this.aggregate(dimension, i, aggregator));
             }
         }

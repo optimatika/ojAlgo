@@ -331,7 +331,8 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public Array1D<N> reduce(int dimension, Aggregator aggregator) {
-        Array1D<N> retVal = myDelegate.factory().makeZero(StructureAnyD.count(myStructure, dimension)).wrapInArray1D();
+        final long reduceToCount = StructureAnyD.count(myStructure, dimension);
+        Array1D<N> retVal = myDelegate.factory().makeZero(reduceToCount).wrapInArray1D();
         this.reduce(dimension, aggregator, retVal);
         return retVal;
     }
@@ -395,16 +396,20 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     public void visit(int dimension, long dimensionalIndex, VoidFunction<N> visitor) {
 
-        long outerStep = StructureAnyD.step(myStructure, dimension + 1);
-        long innerStep = StructureAnyD.step(myStructure, dimension);
+//        long outerStep = StructureAnyD.step(myStructure, dimension + 1);
+//        long dimenStep = StructureAnyD.step(myStructure, dimension);
+//        long innerStep = StructureAnyD.step(myStructure, dimension - 1);
+//
+//
+//        final long totalCount = this.count();
+//        final long dimenCount = this.count(dimension);
+//        final long dimenRange = dimenStep * dimenCount;
+//
+//        for (long first = dimenStep * dimensionalIndex; first < totalCount; first += outerStep) {
+//            myDelegate.visit(first, first + dimenRange, dimenStep, visitor);
+//        }
 
-        final long totalCount = this.count();
-        final long dimenCount = this.count(dimension);
-        final long dimenRange = innerStep * dimenCount;
-
-        for (long first = innerStep * dimensionalIndex; first < totalCount; first += outerStep) {
-            myDelegate.visit(first, first + dimenRange, innerStep, visitor);
-        }
+        this.loop(dimension, dimensionalIndex, (r) -> visitor.invoke(this.get(r)));
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

@@ -25,6 +25,7 @@ import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.netio.BasicLogger;
 
 /**
  * A (fixed size) any-dimensional data structure.
@@ -443,6 +444,21 @@ public interface StructureAnyD extends Structure1D {
         final long[] tmpShape = this.shape();
         for (long i = 0L; i < this.count(); i++) {
             callback.call(StructureAnyD.reference(i, tmpShape));
+        }
+    }
+
+    default void loop(int dimension, long dimensionalIndex, final ReferenceCallback callback) {
+        BasicLogger.debug();
+        BasicLogger.debug();
+        BasicLogger.debug("Loop dimension {} on index {}", dimension, dimensionalIndex);
+        BasicLogger.debug();
+        final long[] structure = this.shape();
+        for (long i = 0L, limit = this.count(); i < limit; i++) {
+            final long[] reference = StructureAnyD.reference(i, structure);
+            if (reference[dimension] == dimensionalIndex) {
+                BasicLogger.debug("Reference {} => {}", Arrays.toString(reference), StructureAnyD.index(structure, reference));
+                callback.call(reference);
+            }
         }
     }
 

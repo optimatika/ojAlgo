@@ -579,45 +579,15 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     @Override
     protected void fill(final long first, final long limit, final long step, final N value) {
-        int tmpFirst = this.index(first);
-        if (tmpFirst < 0) {
-            tmpFirst = -tmpFirst + 1;
-        }
-        int tmpLimit = this.index(limit);
-        if (tmpLimit < 0) {
-            tmpLimit = -tmpLimit + 1;
-        }
-        if (this.isPrimitive()) {
-            final double tmpValue = value.doubleValue();
-            for (int i = tmpFirst; i < tmpLimit; i++) {
-                myValues.set(i, tmpValue);
-            }
-        } else {
-            for (int i = tmpFirst; i < tmpLimit; i++) {
-                myValues.set(i, value);
-            }
+        for (long i = first; i < limit; i += step) {
+            this.fillOne(i, value);
         }
     }
 
     @Override
     protected void fill(final long first, final long limit, final long step, final NullaryFunction<N> supplier) {
-        int tmpFirst = this.index(first);
-        if (tmpFirst < 0) {
-            tmpFirst = -tmpFirst + 1;
-        }
-        int tmpLimit = this.index(limit);
-        if (tmpLimit < 0) {
-            tmpLimit = -tmpLimit + 1;
-        }
-        if (this.isPrimitive()) {
-            final double tmpValue = supplier.doubleValue();
-            for (int i = tmpFirst; i < tmpLimit; i++) {
-                myValues.set(i, tmpValue);
-            }
-        } else {
-            for (int i = tmpFirst; i < tmpLimit; i++) {
-                myValues.set(i, supplier.invoke());
-            }
+        for (long i = first; i < limit; i += step) {
+            this.fillOne(i, supplier);
         }
     }
 

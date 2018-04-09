@@ -23,8 +23,8 @@ package org.ojalgo.array;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.random.RandomUtils;
 
 public class ReductionTest {
 
@@ -35,9 +35,11 @@ public class ReductionTest {
     @Test
     public void testAnyD() {
 
-        long[] structure = new long[] { 6, 7, 4, 5, 2, 3, 1 };
+        //  long[] structure = new long[] { 6, 7, 4, 5, 2, 3, 1 };
 
-        double total = RandomUtils.factorial(7);
+        long[] structure = new long[] { 5, 3, 4, 2, 1 };
+
+        double total = StructureAnyD.count(structure);
 
         ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.makeZero(structure);
         array.fillAll(1.0);
