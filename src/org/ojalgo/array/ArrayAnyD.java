@@ -395,21 +395,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public void visit(int dimension, long dimensionalIndex, VoidFunction<N> visitor) {
-
-//        long outerStep = StructureAnyD.step(myStructure, dimension + 1);
-//        long dimenStep = StructureAnyD.step(myStructure, dimension);
-//        long innerStep = StructureAnyD.step(myStructure, dimension - 1);
-//
-//
-//        final long totalCount = this.count();
-//        final long dimenCount = this.count(dimension);
-//        final long dimenRange = dimenStep * dimenCount;
-//
-//        for (long first = dimenStep * dimensionalIndex; first < totalCount; first += outerStep) {
-//            myDelegate.visit(first, first + dimenRange, dimenStep, visitor);
-//        }
-
-        this.loop(dimension, dimensionalIndex, (r) -> visitor.invoke(this.get(r)));
+        this.loop(dimension, dimensionalIndex, (f, l, s) -> myDelegate.visit(f, l, s, visitor));
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

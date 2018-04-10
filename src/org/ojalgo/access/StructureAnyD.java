@@ -373,6 +373,7 @@ public interface StructureAnyD extends Structure1D {
      * @param structure An access structure
      * @param dimension A dimension index indication a direction
      * @return The step size (index change) in that direction
+     * @deprecated v45.1 Dopesn't work. Will be removed. Use of the loop(...) methods instead
      */
     static int step(final int[] structure, final int dimension) {
         int retVal = 1;
@@ -388,6 +389,7 @@ public interface StructureAnyD extends Structure1D {
      * @param structure An access structure
      * @param increment A vector indication a direction (and size)
      * @return The step size (index change)
+     * @deprecated v45.1 Dopesn't work. Will be removed. Use of the loop(...) methods instead
      */
     static int step(final int[] structure, final int[] increment) {
         int retVal = 0;
@@ -404,6 +406,7 @@ public interface StructureAnyD extends Structure1D {
      * @param structure An access structure
      * @param dimension A dimension index indication a direction
      * @return The step size (index change) in that direction
+     * @deprecated v45.1 Dopesn't work. Will be removed. Use of the loop(...) methods instead
      */
     static long step(final long[] structure, final int dimension) {
         long retVal = 1;
@@ -419,6 +422,7 @@ public interface StructureAnyD extends Structure1D {
      * @param structure An access structure
      * @param increment A vector indication a direction (and size)
      * @return The step size (index change)
+     * @deprecated v45.1 Dopesn't work. Will be removed. Use of the loop(...) methods instead
      */
     static long step(final long[] structure, final long[] increment) {
         long retVal = 0;
@@ -447,7 +451,10 @@ public interface StructureAnyD extends Structure1D {
         }
     }
 
-    default void loop(int dimension, long dimensionalIndex, final ReferenceCallback callback) {
+    /**
+     * @deprecated Temporary code. Will soon be removed
+     */
+    default void loop47(int dimension, long dimensionalIndex, final ReferenceCallback callback) {
         BasicLogger.debug();
         BasicLogger.debug();
         BasicLogger.debug("Loop dimension {} on index {}", dimension, dimensionalIndex);
@@ -460,6 +467,83 @@ public interface StructureAnyD extends Structure1D {
                 callback.call(reference);
             }
         }
+    }
+
+    /**
+     * @deprecated Temporary code. Will soon be removed
+     */
+    default void loop74(int dimension, long dimensionalIndex, final ReferenceCallback callback) {
+
+        BasicLogger.debug();
+        BasicLogger.debug();
+        BasicLogger.debug("Loop dimension {} on index {}", dimension, dimensionalIndex);
+        BasicLogger.debug();
+
+        final long[] structure = this.shape();
+
+        long innerCount = 1L;
+        long dimenCount = 1L;
+        long outerCount = 1L;
+        for (int i = 0; i < structure.length; i++) {
+            if (i < dimension) {
+                innerCount *= structure[i];
+            } else if (i > dimension) {
+                outerCount *= structure[i];
+            } else {
+                dimenCount = structure[i];
+            }
+        }
+        final long totalCount = innerCount * dimenCount * outerCount;
+
+        for (long i = dimensionalIndex * innerCount; i < totalCount; i += innerCount * dimenCount) {
+            for (long index = i; index < (innerCount + i); index++) {
+                final long[] reference = StructureAnyD.reference(index, structure);
+                BasicLogger.debug("Reference {} => {}", Arrays.toString(reference), index);
+                callback.call(reference);
+            }
+        }
+    }
+
+    /**
+     * Will loop through this multidimensional data structure so that one index value of one dimension is
+     * fixed. (Ex: Loop through all items with row index == 5.)
+     *
+     * @param dimension The dimension with a fixed/supplied index. (0==row, 1==column, 2=matrix/area...)
+     * @param dimensionalIndex The index value that dimension is fixed to. (Which row, column or matrix/area)
+     * @param callback A callback with parameters that define a sub-loop
+     */
+    default void loop(int dimension, long dimensionalIndex, final LoopCallback callback) {
+
+        BasicLogger.debug();
+        BasicLogger.debug();
+        BasicLogger.debug("Loop dimension {} on index {}", dimension, dimensionalIndex);
+        BasicLogger.debug();
+
+        final long[] structure = this.shape();
+
+        long innerCount = 1L;
+        long dimenCount = 1L;
+        long outerCount = 1L;
+        for (int i = 0; i < structure.length; i++) {
+            if (i < dimension) {
+                innerCount *= structure[i];
+            } else if (i > dimension) {
+                outerCount *= structure[i];
+            } else {
+                dimenCount = structure[i];
+            }
+        }
+        final long totalCount = innerCount * dimenCount * outerCount;
+
+        if (innerCount == 1L) {
+            callback.call(dimensionalIndex * innerCount, totalCount, dimenCount);
+        } else {
+            final long step = innerCount * dimenCount;
+            for (long i = dimensionalIndex * innerCount; i < totalCount; i += step) {
+                callback.call(i, innerCount + i, 1L);
+            }
+        }
+
     }
 
     long[] shape();
