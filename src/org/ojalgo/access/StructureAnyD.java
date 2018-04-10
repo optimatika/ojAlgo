@@ -22,6 +22,7 @@
 package org.ojalgo.access;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -375,6 +376,7 @@ public interface StructureAnyD extends Structure1D {
      * @return The step size (index change) in that direction
      * @deprecated v45.1 Dopesn't work. Will be removed. Use of the loop(...) methods instead
      */
+    @Deprecated
     static int step(final int[] structure, final int dimension) {
         int retVal = 1;
         for (int i = 0; i < dimension; i++) {
@@ -391,6 +393,7 @@ public interface StructureAnyD extends Structure1D {
      * @return The step size (index change)
      * @deprecated v45.1 Dopesn't work. Will be removed. Use of the loop(...) methods instead
      */
+    @Deprecated
     static int step(final int[] structure, final int[] increment) {
         int retVal = 0;
         int tmpFactor = 1;
@@ -408,6 +411,7 @@ public interface StructureAnyD extends Structure1D {
      * @return The step size (index change) in that direction
      * @deprecated v45.1 Dopesn't work. Will be removed. Use of the loop(...) methods instead
      */
+    @Deprecated
     static long step(final long[] structure, final int dimension) {
         long retVal = 1;
         for (int i = 0; i < dimension; i++) {
@@ -424,6 +428,7 @@ public interface StructureAnyD extends Structure1D {
      * @return The step size (index change)
      * @deprecated v45.1 Dopesn't work. Will be removed. Use of the loop(...) methods instead
      */
+    @Deprecated
     static long step(final long[] structure, final long[] increment) {
         long retVal = 0;
         long tmpFactor = 1;
@@ -443,66 +448,6 @@ public interface StructureAnyD extends Structure1D {
     }
 
     long count(int dimension);
-
-    default void loopAll(final ReferenceCallback callback) {
-        final long[] tmpShape = this.shape();
-        for (long i = 0L; i < this.count(); i++) {
-            callback.call(StructureAnyD.reference(i, tmpShape));
-        }
-    }
-
-    /**
-     * @deprecated Temporary code. Will soon be removed
-     */
-    default void loop47(int dimension, long dimensionalIndex, final ReferenceCallback callback) {
-        BasicLogger.debug();
-        BasicLogger.debug();
-        BasicLogger.debug("Loop dimension {} on index {}", dimension, dimensionalIndex);
-        BasicLogger.debug();
-        final long[] structure = this.shape();
-        for (long i = 0L, limit = this.count(); i < limit; i++) {
-            final long[] reference = StructureAnyD.reference(i, structure);
-            if (reference[dimension] == dimensionalIndex) {
-                BasicLogger.debug("Reference {} => {}", Arrays.toString(reference), StructureAnyD.index(structure, reference));
-                callback.call(reference);
-            }
-        }
-    }
-
-    /**
-     * @deprecated Temporary code. Will soon be removed
-     */
-    default void loop74(int dimension, long dimensionalIndex, final ReferenceCallback callback) {
-
-        BasicLogger.debug();
-        BasicLogger.debug();
-        BasicLogger.debug("Loop dimension {} on index {}", dimension, dimensionalIndex);
-        BasicLogger.debug();
-
-        final long[] structure = this.shape();
-
-        long innerCount = 1L;
-        long dimenCount = 1L;
-        long outerCount = 1L;
-        for (int i = 0; i < structure.length; i++) {
-            if (i < dimension) {
-                innerCount *= structure[i];
-            } else if (i > dimension) {
-                outerCount *= structure[i];
-            } else {
-                dimenCount = structure[i];
-            }
-        }
-        final long totalCount = innerCount * dimenCount * outerCount;
-
-        for (long i = dimensionalIndex * innerCount; i < totalCount; i += innerCount * dimenCount) {
-            for (long index = i; index < (innerCount + i); index++) {
-                final long[] reference = StructureAnyD.reference(index, structure);
-                BasicLogger.debug("Reference {} => {}", Arrays.toString(reference), index);
-                callback.call(reference);
-            }
-        }
-    }
 
     /**
      * Will loop through this multidimensional data structure so that one index value of one dimension is
@@ -544,6 +489,23 @@ public interface StructureAnyD extends Structure1D {
             }
         }
 
+    }
+
+    default void loop(final Predicate<long[]> filter, IndexCallback callback) {
+        final long[] structure = this.shape();
+        for (long i = 0L, limit = this.count(); i < limit; i++) {
+            final long[] reference = StructureAnyD.reference(i, structure);
+            if (filter.test(reference)) {
+                callback.call(i);
+            }
+        }
+    }
+
+    default void loopAll(final ReferenceCallback callback) {
+        final long[] tmpShape = this.shape();
+        for (long i = 0L; i < this.count(); i++) {
+            callback.call(StructureAnyD.reference(i, tmpShape));
+        }
     }
 
     long[] shape();
