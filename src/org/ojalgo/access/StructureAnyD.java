@@ -26,7 +26,6 @@ import java.util.function.Predicate;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.netio.BasicLogger;
 
 /**
  * A (fixed size) any-dimensional data structure.
@@ -433,7 +432,6 @@ public interface StructureAnyD extends Structure1D {
         return retVal;
     }
 
-
     /**
      * A more complex/general version of {@linkplain #step(int[], int)}.
      *
@@ -463,8 +461,6 @@ public interface StructureAnyD extends Structure1D {
 
     long count(int dimension);
 
-
-
     /**
      * Will loop through this multidimensional data structure so that one index value of one dimension is
      * fixed. (Ex: Loop through all items with row index == 5.)
@@ -474,11 +470,6 @@ public interface StructureAnyD extends Structure1D {
      * @param callback A callback with parameters that define a sub-loop
      */
     default void loop(int dimension, long dimensionalIndex, final LoopCallback callback) {
-
-        BasicLogger.debug();
-        BasicLogger.debug();
-        BasicLogger.debug("Loop dimension {} on index {}", dimension, dimensionalIndex);
-        BasicLogger.debug();
 
         final long[] structure = this.shape();
 
