@@ -159,9 +159,28 @@ public interface StructureAnyD extends Structure1D {
 
     }
 
-    public interface Reducible<R extends Structure1D> extends StructureAnyD {
+    public interface ReducibleTo1D<R extends Structure1D> extends StructureAnyD {
 
+        /**
+         * @param dimension Which of the AnyD-dimensions should be mapped to the resulting 1D structure.
+         * @param aggregator How to aggregate the values of the reduction
+         * @return A 1D data structure with aggregated values
+         */
         R reduce(int dimension, Aggregator aggregator);
+
+    }
+
+    public interface ReducibleTo2D<R extends Structure2D> extends StructureAnyD {
+
+        /**
+         * @param rowDimension Which of the AnyD-dimensions should be mapped to the rows of the resulting 2D
+         *        structure.
+         * @param columnDimension Which of the AnyD-dimensions should be mapped to the columns of the
+         *        resulting 2D structure.
+         * @param aggregator How to aggregate the values of the reduction
+         * @return A 2D data structure with aggregated values
+         */
+        R reduce(int rowDimension, int columnDimension, Aggregator aggregator);
 
     }
 

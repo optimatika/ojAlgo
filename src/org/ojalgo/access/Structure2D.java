@@ -164,7 +164,7 @@ public interface Structure2D extends Structure1D {
 
     }
 
-    public interface Reducible<R extends Structure1D> extends Structure2D {
+    public interface ReducibleTo1D<R extends Structure1D> extends Structure2D {
 
         R reduceColumns(Aggregator aggregator);
 

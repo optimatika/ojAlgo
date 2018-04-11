@@ -50,7 +50,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access2D.Aggregatable<Number>, Structure2D.Reducible<BasicMatrix>,
+public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access2D.Aggregatable<Number>, Structure2D.ReducibleTo1D<BasicMatrix>,
         NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>,
         ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number> {
 

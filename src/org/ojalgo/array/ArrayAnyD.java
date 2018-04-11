@@ -50,8 +50,8 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, AccessAnyD.Visitable<N>,
-        AccessAnyD.Aggregatable<N>, StructureAnyD.Reducible<Array1D<N>>, AccessAnyD.Sliceable<N>, MutateAnyD, MutateAnyD.Fillable<N>, MutateAnyD.Modifiable<N>,
-        MutateAnyD.BiModifiable<N>, MutateAnyD.Mixable<N>, Serializable {
+        AccessAnyD.Aggregatable<N>, StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, AccessAnyD.Sliceable<N>, MutateAnyD,
+        MutateAnyD.Fillable<N>, MutateAnyD.Modifiable<N>, MutateAnyD.BiModifiable<N>, MutateAnyD.Mixable<N>, Serializable {
 
     public static final class Factory<N extends Number> implements FactoryAnyD<ArrayAnyD<N>> {
 
@@ -348,6 +348,39 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         final long reduceToCount = StructureAnyD.count(myStructure, dimension);
         Array1D<N> retVal = myDelegate.factory().makeZero(reduceToCount).wrapInArray1D();
         this.reduce(dimension, aggregator, retVal);
+        return retVal;
+    }
+
+    @Override
+    public Array2D<N> reduce(int rowDimension, int columnDimension, Aggregator aggregator) {
+
+        long[] structure = this.shape();
+
+        long numberOfRows = structure[rowDimension];
+        long numberOfColumns = structure[columnDimension];
+
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+
+        final boolean primitive = myDelegate.isPrimitive();
+
+        Array2D<N> retVal = myDelegate.factory().makeZero(numberOfRows * numberOfColumns).wrapInArray2D(numberOfRows);
+
+        for (long j = 0L; j < numberOfColumns; j++) {
+            final long colInd = j;
+
+            for (long i = 0L; i < numberOfRows; i++) {
+                final long rowInd = i;
+
+                visitor.reset();
+                this.loop(reference -> reference[rowDimension] == rowInd && reference[columnDimension] == colInd, index -> this.visitOne(index, visitor));
+                if (primitive) {
+                    retVal.set(rowInd, colInd, visitor.doubleValue());
+                } else {
+                    retVal.set(rowInd, colInd, visitor.get());
+                }
+            }
+        }
+
         return retVal;
     }
 

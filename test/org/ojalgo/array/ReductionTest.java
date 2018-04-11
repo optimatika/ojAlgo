@@ -33,9 +33,26 @@ public class ReductionTest {
     }
 
     @Test
-    public void testAnyD() {
+    public void test2To1D() {
 
-        //  long[] structure = new long[] { 6, 7, 4, 5, 2, 3, 1 };
+        Array2D<Double> array = Array2D.PRIMITIVE64.makeZero(5, 3);
+        array.fillAll(1.0);
+
+        Array1D<Double> reducedRows = array.reduceRows(Aggregator.SUM);
+        TestUtils.assertEquals(5, reducedRows.count());
+        for (int i = 0; i < reducedRows.length; i++) {
+            TestUtils.assertEquals(3, reducedRows.doubleValue(i));
+        }
+
+        Array1D<Double> reducedColumns = array.reduceColumns(Aggregator.SUM);
+        TestUtils.assertEquals(3, reducedColumns.count());
+        for (int i = 0; i < reducedColumns.length; i++) {
+            TestUtils.assertEquals(5, reducedColumns.doubleValue(i));
+        }
+    }
+
+    @Test
+    public void testAnyTo1D() {
 
         long[] structure = new long[] { 5, 3, 4, 2, 1 };
 
@@ -50,6 +67,34 @@ public class ReductionTest {
             double expected = total / structure[d];
             for (int i = 0; i < reduced.length; i++) {
                 TestUtils.assertEquals(expected, reduced.doubleValue(i));
+            }
+        }
+    }
+
+    @Test
+    public void testAnyTo2D() {
+
+        long[] structure = new long[] { 6, 5, 3, 4, 2, 1 };
+
+        double total = StructureAnyD.count(structure);
+
+        ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.makeZero(structure);
+        array.fillAll(1.0);
+
+        for (int rd = 0; rd < structure.length; rd++) {
+            for (int cd = 0; cd < structure.length; cd++) {
+                if (rd != cd) {
+                    Array2D<Double> reduced = array.reduce(rd, cd, Aggregator.SUM);
+                    TestUtils.assertEquals(structure[rd], reduced.countRows());
+                    TestUtils.assertEquals(structure[cd], reduced.countColumns());
+                    TestUtils.assertEquals(structure[rd] * structure[cd], reduced.count());
+                    double expected = total / (structure[rd] * structure[cd]);
+                    for (int i = 0; i < reduced.countRows(); i++) {
+                        for (int j = 0; j < reduced.countColumns(); j++) {
+                            TestUtils.assertEquals(expected, reduced.doubleValue(i, j));
+                        }
+                    }
+                }
             }
         }
     }

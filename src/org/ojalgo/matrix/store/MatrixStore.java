@@ -60,7 +60,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Access2D<N>, Access2D.Elements, Access2D.Visitable<N>, Access2D.Aggregatable<N>,
-        Structure2D.Reducible<ElementsSupplier<N>>, Access2D.Sliceable<N>, NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>> {
+        Structure2D.ReducibleTo1D<ElementsSupplier<N>>, Access2D.Sliceable<N>, NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>> {
 
     public static interface Factory<N extends Number> {
 
