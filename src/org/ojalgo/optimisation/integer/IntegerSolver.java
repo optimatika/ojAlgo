@@ -275,10 +275,7 @@ public abstract class IntegerSolver extends GenericSolver {
 
         } else {
 
-            final int tmpIterations = this.countIterations();
-            final long tmpTime = this.countTime();
-
-            return (tmpTime < options.time_suffice) && (tmpIterations < options.iterations_suffice);
+            return (this.countTime() < options.time_suffice) && (this.countIterations() < options.iterations_suffice);
         }
     }
 

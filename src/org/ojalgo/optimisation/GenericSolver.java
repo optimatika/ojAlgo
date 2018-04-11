@@ -126,19 +126,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
      * respective limits.
      */
     protected final boolean isIterationAllowed() {
-
-        final int tmpIterations = this.countIterations();
-        final long tmpTime = this.countTime();
-
-        final boolean tmpIterationOk = tmpIterations < options.iterations_abort;
-        final boolean tmpTimeOk = tmpTime < options.time_abort;
-
-        //        if (this.isDebug()) {
-        //            this.logDebug("Iterations OK? {} {} < {}", tmpIterationOk, tmpIterations, options.iterations_abort);
-        //            this.logDebug("Time OK? {} {} < {}", tmpTimeOk, tmpTime, options.time_abort);
-        //        }
-
-        return tmpTimeOk && tmpIterationOk;
+        return this.countTime() < options.time_abort && this.countIterations() < options.iterations_abort;
     }
 
     protected final boolean isProgress() {
