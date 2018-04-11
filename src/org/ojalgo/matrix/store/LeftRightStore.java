@@ -77,7 +77,7 @@ final class LeftRightStore<N extends Number> extends ComposingStore<N> {
 
     @Override
     public int limitOfRow(final int row) {
-        return mySplit + myRight.limitOfRow(row);
+        return myRight.limitOfRow(row) == 0 ? this.getBase().limitOfRow(row) : mySplit + myRight.limitOfRow(row);
     }
 
     public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
