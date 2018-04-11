@@ -323,14 +323,11 @@ public interface StructureAnyD extends Structure1D {
         return retVal;
     }
 
-    static void loopMatching(final StructureAnyD structureA, final StructureAnyD structureB, final ReferenceCallback callback) {
-        final long[] tmpShape = structureA.shape();
-        if (!Arrays.equals(tmpShape, structureB.shape())) {
+    static void loopMatching(final StructureAnyD structureA, final StructureAnyD structureB, final IndexCallback callback) {
+        if (!Arrays.equals(structureA.shape(), structureB.shape())) {
             throw new ProgrammingError("The 2 structures must have the same shape!");
         }
-        for (long i = 0L; i < structureA.count(); i++) {
-            callback.call(StructureAnyD.reference(i, tmpShape));
-        }
+        Structure1D.loopMatching(structureA, structureB, callback);
     }
 
     static long[] reference(final long index, final long[] structure) {
@@ -374,9 +371,7 @@ public interface StructureAnyD extends Structure1D {
      * @param structure An access structure
      * @param dimension A dimension index indication a direction
      * @return The step size (index change) in that direction
-     * @deprecated v45.1 Dopesn't work. Will be removed. Use of the loop(...) methods instead
      */
-    @Deprecated
     static int step(final int[] structure, final int dimension) {
         int retVal = 1;
         for (int i = 0; i < dimension; i++) {
@@ -391,9 +386,7 @@ public interface StructureAnyD extends Structure1D {
      * @param structure An access structure
      * @param increment A vector indication a direction (and size)
      * @return The step size (index change)
-     * @deprecated v45.1 Dopesn't work. Will be removed. Use of the loop(...) methods instead
      */
-    @Deprecated
     static int step(final int[] structure, final int[] increment) {
         int retVal = 0;
         int tmpFactor = 1;
@@ -406,12 +399,13 @@ public interface StructureAnyD extends Structure1D {
     }
 
     /**
+     * How does the index change when stepping to the next dimensional unit (next row, next column. next
+     * matrix/area, next cube...)
+     *
      * @param structure An access structure
-     * @param dimension A dimension index indication a direction
-     * @return The step size (index change) in that direction
-     * @deprecated v45.1 Dopesn't work. Will be removed. Use of the loop(...) methods instead
+     * @param dimension Which reference index to increment
+     * @return The step size (index change)
      */
-    @Deprecated
     static long step(final long[] structure, final int dimension) {
         long retVal = 1;
         for (int i = 0; i < dimension; i++) {
@@ -420,23 +414,24 @@ public interface StructureAnyD extends Structure1D {
         return retVal;
     }
 
+
     /**
      * A more complex/general version of {@linkplain #step(int[], int)}.
      *
      * @param structure An access structure
      * @param increment A vector indication a direction (and size)
      * @return The step size (index change)
-     * @deprecated v45.1 Dopesn't work. Will be removed. Use of the loop(...) methods instead
      */
-    @Deprecated
     static long step(final long[] structure, final long[] increment) {
-        long retVal = 0;
-        long tmpFactor = 1;
-        final int tmpLimit = increment.length;
-        for (int i = 1; i < tmpLimit; i++) {
-            retVal += tmpFactor * increment[i];
-            tmpFactor *= structure[i];
+
+        long retVal = 0L;
+        long factor = 1L;
+
+        for (int i = 1, limit = increment.length; i < limit; i++) {
+            retVal += factor * increment[i];
+            factor *= structure[i];
         }
+
         return retVal;
     }
 
@@ -448,6 +443,8 @@ public interface StructureAnyD extends Structure1D {
     }
 
     long count(int dimension);
+
+
 
     /**
      * Will loop through this multidimensional data structure so that one index value of one dimension is
@@ -491,6 +488,19 @@ public interface StructureAnyD extends Structure1D {
 
     }
 
+    default void loop(long[] initial, int dimension, LoopCallback callback) {
+
+        long[] structure = this.shape();
+
+        final long remaining = StructureAnyD.count(structure, dimension) - initial[dimension];
+
+        final long first = StructureAnyD.index(structure, initial);
+        final long step = StructureAnyD.step(structure, dimension);
+        final long limit = first + (step * remaining);
+
+        callback.call(first, limit, step);
+    }
+
     default void loop(final Predicate<long[]> filter, IndexCallback callback) {
         final long[] structure = this.shape();
         for (long i = 0L, limit = this.count(); i < limit; i++) {
@@ -506,6 +516,13 @@ public interface StructureAnyD extends Structure1D {
         for (long i = 0L; i < this.count(); i++) {
             callback.call(StructureAnyD.reference(i, tmpShape));
         }
+    }
+
+    /**
+     * @return The number of dimensions (the number of indices used to reference one element)
+     */
+    default int rank() {
+        return this.shape().length;
     }
 
     long[] shape();
