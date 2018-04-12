@@ -6,6 +6,8 @@ One very good way to contribute is to supply test cases that verify that the fun
 
 ...or have a look at the list of [open issues](https://github.com/optimatika/ojAlgo/issues) to see if there is something you can help out with.
 
+Please use the develop branch rather than master!
+
 ### Existing Tests
 
 The already existing tests needs some attention as well:
