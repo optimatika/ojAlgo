@@ -1,10 +1,10 @@
 package org.ojalgo.matrix.store;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ojalgo.function.NullaryFunction;
 
-import static org.junit.Assert.*;
+import org.ojalgo.TestUtils;
 import static org.ojalgo.constant.PrimitiveMath.ONE;
 
 public class ComposingStoreTest {
@@ -52,7 +52,7 @@ public class ComposingStoreTest {
                 .below(lowerRight.logical().left((int)upperLeft.countColumns()).get()).get();
     }
 
-    @Before
+    @BeforeEach
     public void setUp(){
         theMatrix = sparseMatrix(SPARSE_SIZE,SPARSE_SIZE);
         for (int i = 0; i < BLOCK_COUNT; i++) {
@@ -63,24 +63,24 @@ public class ComposingStoreTest {
     @Test
     public void firstInColumn() {
         int block = (int)Math.floor(Math.random()*BLOCK_COUNT);
-        assertEquals(block * 128 + SPARSE_SIZE, theMatrix.firstInColumn(block*128+SPARSE_SIZE+64));
+        TestUtils.assertEquals(block * 128 + SPARSE_SIZE, theMatrix.firstInColumn(block*128+SPARSE_SIZE+64));
     }
 
     @Test
     public void firstInRow() {
         int block = (int)Math.floor(Math.random()*BLOCK_COUNT);
-        assertEquals(block * 128 + SPARSE_SIZE, theMatrix.firstInRow(block*128+SPARSE_SIZE+64));
+        TestUtils.assertEquals(block * 128 + SPARSE_SIZE, theMatrix.firstInRow(block*128+SPARSE_SIZE+64));
     }
 
     @Test
     public void limitOfColumn() {
         int block = (int)Math.floor(Math.random()*BLOCK_COUNT);
-        assertEquals((block +1)* 128 + 128, theMatrix.limitOfColumn(block*128+192));
+        TestUtils.assertEquals((block +1)* 128 + 128, theMatrix.limitOfColumn(block*128+192));
     }
 
     @Test
     public void limitOfRow() {
         int block = (int)Math.floor(Math.random()*BLOCK_COUNT);
-        assertEquals((block +1)* 128 + 128, theMatrix.limitOfRow(block*128+192));
+        TestUtils.assertEquals((block +1)* 128 + 128, theMatrix.limitOfRow(block*128+192));
     }
 }
