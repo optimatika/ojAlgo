@@ -36,12 +36,12 @@ import org.ojalgo.scalar.Scalar;
  */
 public abstract class ScalarArray<N extends Number & Scalar<N>> extends ReferenceTypeArray<N> {
 
-    protected ScalarArray(final int length, final Scalar.Factory<N> factory) {
-        super(length, factory);
+    protected ScalarArray(DenseArray.Factory<N> factory, final int length) {
+        super(factory, length);
     }
 
-    protected ScalarArray(final N[] data, final Scalar.Factory<N> factory) {
-        super(data, factory);
+    protected ScalarArray(DenseArray.Factory<N> factory, final N[] data) {
+        super(factory, data);
     }
 
     public final void axpy(final double a, final Mutate1D y) {

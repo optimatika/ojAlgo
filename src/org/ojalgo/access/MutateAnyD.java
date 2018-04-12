@@ -46,6 +46,14 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
         void fillOne(long[] reference, NullaryFunction<N> supplier);
 
+        void fillSet(int dimension, long dimensionalIndex, N value);
+
+        void fillSet(int dimension, long dimensionalIndex, NullaryFunction<N> supplier);
+
+        void fillSet(long[] initial, int dimension, N value);
+
+        void fillSet(long[] initial, int dimension, NullaryFunction<N> supplier);
+
     }
 
     interface Mixable<N extends Number> extends StructureAnyD, Mutate1D.Mixable<N> {
@@ -67,6 +75,10 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
     interface Modifiable<N extends Number> extends StructureAnyD, Mutate1D.Modifiable<N> {
 
         void modifyOne(long[] reference, UnaryFunction<N> modifier);
+
+        void modifySet(int dimension, long dimensionalIndex, UnaryFunction<N> modifier);
+
+        void modifySet(long[] initial, int dimension, UnaryFunction<N> modifier);
 
     }
 

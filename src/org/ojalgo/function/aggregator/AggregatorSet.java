@@ -44,6 +44,10 @@ public abstract class AggregatorSet<N extends Number> {
 
         switch (aggregator) {
 
+        case AVERAGE:
+
+            return this.average();
+
         case CARDINALITY:
 
             return this.cardinality();
@@ -103,6 +107,11 @@ public abstract class AggregatorSet<N extends Number> {
      * Max value
      */
     public abstract AggregatorFunction<N> maximum();
+
+    /**
+     * Average value
+     */
+    public abstract AggregatorFunction<N> average();
 
     /**
      * Min value

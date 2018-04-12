@@ -43,6 +43,12 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
+    /**
+     * This interface complements {@linkplain Visitable} but does not extend it. It's a feature to be able to
+     * be aggregatable but not necessarily visitable in that it does not require generic input parameters.
+     *
+     * @author apete
+     */
     public interface Aggregatable<N extends Number> extends Structure1D {
 
         default N aggregateAll(final Aggregator aggregator) {

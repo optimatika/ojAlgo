@@ -79,6 +79,10 @@ final class DenseCapacityStrategy<N extends Number> {
         return this;
     }
 
+    DenseArray.Factory<N> getDenseFactory() {
+        return myDenseFactory;
+    }
+
     int grow(final int current) {
         return (int) this.grow((long) current);
     }

@@ -515,6 +515,14 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return myStore.norm();
     }
 
+    public I reduceColumns(Aggregator aggregator) {
+        return this.getFactory().instantiate(myStore.reduceColumns(aggregator).get());
+    }
+
+    public I reduceRows(Aggregator aggregator) {
+        return this.getFactory().instantiate(myStore.reduceRows(aggregator).get());
+    }
+
     public I selectColumns(final int... someCols) {
         return this.getFactory().instantiate(myStore.logical().column(someCols).get());
     }

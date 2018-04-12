@@ -23,6 +23,7 @@ package org.ojalgo.function.aggregator;
 
 import static org.ojalgo.function.QuaternionFunction.*;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.QuaternionFunction;
@@ -32,17 +33,75 @@ import org.ojalgo.scalar.Scalar;
 
 public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
+    static abstract class QuaternionAggregatorFunction implements AggregatorFunction<Quaternion> {
+
+        public final double doubleValue() {
+            return this.get().doubleValue();
+        }
+
+        public final void invoke(final double anArg) {
+            this.invoke(Quaternion.valueOf(anArg));
+        }
+
+        public final Scalar<Quaternion> toScalar() {
+            return this.get();
+        }
+
+    }
+
+    public static final ThreadLocal<AggregatorFunction<Quaternion>> AVERAGE = new ThreadLocal<AggregatorFunction<Quaternion>>() {
+
+        @Override
+        protected AggregatorFunction<Quaternion> initialValue() {
+            return new QuaternionAggregatorFunction() {
+
+                private int myCount = 0;
+
+                private Quaternion myNumber = Quaternion.ZERO;
+
+                public Quaternion get() {
+                    return myNumber.divide(myCount);
+                }
+
+                public int intValue() {
+                    return this.get().intValue();
+                }
+
+                public void invoke(final Quaternion anArg) {
+                    myCount++;
+                    myNumber = myNumber.add(anArg);
+                }
+
+                public boolean isMergeable() {
+                    return false;
+                }
+
+                public void merge(final Quaternion result) {
+                    ProgrammingError.throwForIllegalInvocation();
+                }
+
+                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
+                    ProgrammingError.throwForIllegalInvocation();
+                    return null;
+                }
+
+                public AggregatorFunction<Quaternion> reset() {
+                    myCount = 0;
+                    myNumber = Quaternion.ZERO;
+                    return this;
+                }
+
+            };
+        }
+    };
+
     public static final ThreadLocal<AggregatorFunction<Quaternion>> CARDINALITY = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
-            return new AggregatorFunction<Quaternion>() {
+            return new QuaternionAggregatorFunction() {
 
                 private int myCount = 0;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public Quaternion get() {
                     return Quaternion.valueOf(myCount);
@@ -50,10 +109,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public int intValue() {
                     return myCount;
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(Quaternion.valueOf(anArg));
                 }
 
                 public void invoke(final Quaternion anArg) {
@@ -75,25 +130,16 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     return this;
                 }
 
-                public Scalar<Quaternion> toScalar() {
-                    return this.get();
-                }
-
             };
         }
     };
-
     public static final ThreadLocal<AggregatorFunction<Quaternion>> LARGEST = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
-            return new AggregatorFunction<Quaternion>() {
+            return new QuaternionAggregatorFunction() {
 
                 private Quaternion myNumber = Quaternion.ZERO;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public Quaternion get() {
                     return myNumber;
@@ -101,10 +147,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(Quaternion.valueOf(anArg));
                 }
 
                 public void invoke(final Quaternion anArg) {
@@ -124,23 +166,17 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     return this;
                 }
 
-                public Scalar<Quaternion> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
+
     public static final ThreadLocal<AggregatorFunction<Quaternion>> MAX = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
-            return new AggregatorFunction<Quaternion>() {
+            return new QuaternionAggregatorFunction() {
 
                 private Quaternion myNumber = Quaternion.ZERO;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public Quaternion get() {
                     return myNumber;
@@ -148,10 +184,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(Quaternion.valueOf(anArg));
                 }
 
                 public void invoke(final Quaternion anArg) {
@@ -171,9 +203,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     return this;
                 }
 
-                public Scalar<Quaternion> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -182,13 +211,9 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
-            return new AggregatorFunction<Quaternion>() {
+            return new QuaternionAggregatorFunction() {
 
                 private Quaternion myNumber = Quaternion.INFINITY;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public Quaternion get() {
                     if (Quaternion.isInfinite(myNumber)) {
@@ -200,10 +225,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(Quaternion.valueOf(anArg));
                 }
 
                 public void invoke(final Quaternion anArg) {
@@ -223,9 +244,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     return this;
                 }
 
-                public Scalar<Quaternion> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -234,13 +252,9 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
-            return new AggregatorFunction<Quaternion>() {
+            return new QuaternionAggregatorFunction() {
 
                 private Quaternion myNumber = Quaternion.ZERO;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public Quaternion get() {
                     return myNumber;
@@ -248,10 +262,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(Quaternion.valueOf(anArg));
                 }
 
                 public void invoke(final Quaternion anArg) {
@@ -271,9 +281,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     return this;
                 }
 
-                public Scalar<Quaternion> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -282,13 +289,9 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
-            return new AggregatorFunction<Quaternion>() {
+            return new QuaternionAggregatorFunction() {
 
                 private Quaternion myNumber = Quaternion.ZERO;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public Quaternion get() {
                     return Quaternion.valueOf(PrimitiveFunction.SQRT.invoke(myNumber.norm()));
@@ -296,10 +299,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(Quaternion.valueOf(anArg));
                 }
 
                 public void invoke(final Quaternion anArg) {
@@ -320,9 +319,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     return this;
                 }
 
-                public Scalar<Quaternion> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -331,13 +327,9 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
-            return new AggregatorFunction<Quaternion>() {
+            return new QuaternionAggregatorFunction() {
 
                 private Quaternion myNumber = Quaternion.ONE;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public Quaternion get() {
                     return myNumber;
@@ -345,10 +337,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(Quaternion.valueOf(anArg));
                 }
 
                 public void invoke(final Quaternion anArg) {
@@ -368,24 +356,16 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     return this;
                 }
 
-                public Scalar<Quaternion> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
-
     public static final ThreadLocal<AggregatorFunction<Quaternion>> PRODUCT2 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
-            return new AggregatorFunction<Quaternion>() {
+            return new QuaternionAggregatorFunction() {
 
                 private Quaternion myNumber = Quaternion.ONE;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public Quaternion get() {
                     return myNumber;
@@ -393,10 +373,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(Quaternion.valueOf(anArg));
                 }
 
                 public void invoke(final Quaternion anArg) {
@@ -416,23 +392,17 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     return this;
                 }
 
-                public Scalar<Quaternion> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
+
     public static final ThreadLocal<AggregatorFunction<Quaternion>> SMALLEST = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
-            return new AggregatorFunction<Quaternion>() {
+            return new QuaternionAggregatorFunction() {
 
                 private Quaternion myNumber = Quaternion.INFINITY;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public Quaternion get() {
                     if (Quaternion.isInfinite(myNumber)) {
@@ -444,10 +414,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(Quaternion.valueOf(anArg));
                 }
 
                 public void invoke(final Quaternion anArg) {
@@ -469,9 +435,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     return this;
                 }
 
-                public Scalar<Quaternion> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -480,13 +443,9 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
-            return new AggregatorFunction<Quaternion>() {
+            return new QuaternionAggregatorFunction() {
 
                 private Quaternion myNumber = Quaternion.ZERO;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public Quaternion get() {
                     return myNumber;
@@ -494,10 +453,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(Quaternion.valueOf(anArg));
                 }
 
                 public void invoke(final Quaternion anArg) {
@@ -517,9 +472,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     return this;
                 }
 
-                public Scalar<Quaternion> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -528,13 +480,9 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
         @Override
         protected AggregatorFunction<Quaternion> initialValue() {
-            return new AggregatorFunction<Quaternion>() {
+            return new QuaternionAggregatorFunction() {
 
                 private Quaternion myNumber = Quaternion.ZERO;
-
-                public double doubleValue() {
-                    return this.get().doubleValue();
-                }
 
                 public Quaternion get() {
                     return myNumber;
@@ -542,10 +490,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public int intValue() {
                     return this.get().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(Quaternion.valueOf(anArg));
                 }
 
                 public void invoke(final Quaternion anArg) {
@@ -565,9 +509,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     return this;
                 }
 
-                public Scalar<Quaternion> toScalar() {
-                    return this.get();
-                }
             };
         }
     };
@@ -580,6 +521,11 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
     private QuaternionAggregator() {
         super();
+    }
+
+    @Override
+    public AggregatorFunction<Quaternion> average() {
+        return AVERAGE.get().reset();
     }
 
     @Override

@@ -22,8 +22,10 @@
 package org.ojalgo.access;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.function.aggregator.Aggregator;
 
 /**
  * A (fixed size) any-dimensional data structure.
@@ -153,6 +155,31 @@ public interface StructureAnyD extends Structure1D {
         public String toString() {
             return Arrays.toString(reference);
         }
+
+    }
+
+    public interface ReducibleTo1D<R extends Structure1D> extends StructureAnyD {
+
+        /**
+         * @param dimension Which of the AnyD-dimensions should be mapped to the resulting 1D structure.
+         * @param aggregator How to aggregate the values of the reduction
+         * @return A 1D data structure with aggregated values
+         */
+        R reduce(int dimension, Aggregator aggregator);
+
+    }
+
+    public interface ReducibleTo2D<R extends Structure2D> extends StructureAnyD {
+
+        /**
+         * @param rowDimension Which of the AnyD-dimensions should be mapped to the rows of the resulting 2D
+         *        structure.
+         * @param columnDimension Which of the AnyD-dimensions should be mapped to the columns of the
+         *        resulting 2D structure.
+         * @param aggregator How to aggregate the values of the reduction
+         * @return A 2D data structure with aggregated values
+         */
+        R reduce(int rowDimension, int columnDimension, Aggregator aggregator);
 
     }
 
@@ -314,14 +341,11 @@ public interface StructureAnyD extends Structure1D {
         return retVal;
     }
 
-    static void loopMatching(final StructureAnyD structureA, final StructureAnyD structureB, final ReferenceCallback callback) {
-        final long[] tmpShape = structureA.shape();
-        if (!Arrays.equals(tmpShape, structureB.shape())) {
+    static void loopMatching(final StructureAnyD structureA, final StructureAnyD structureB, final IndexCallback callback) {
+        if (!Arrays.equals(structureA.shape(), structureB.shape())) {
             throw new ProgrammingError("The 2 structures must have the same shape!");
         }
-        for (long i = 0L; i < structureA.count(); i++) {
-            callback.call(StructureAnyD.reference(i, tmpShape));
-        }
+        Structure1D.loopMatching(structureA, structureB, callback);
     }
 
     static long[] reference(final long index, final long[] structure) {
@@ -393,9 +417,12 @@ public interface StructureAnyD extends Structure1D {
     }
 
     /**
+     * How does the index change when stepping to the next dimensional unit (next row, next column. next
+     * matrix/area, next cube...)
+     *
      * @param structure An access structure
-     * @param dimension A dimension index indication a direction
-     * @return The step size (index change) in that direction
+     * @param dimension Which reference index to increment
+     * @return The step size (index change)
      */
     static long step(final long[] structure, final int dimension) {
         long retVal = 1;
@@ -413,13 +440,15 @@ public interface StructureAnyD extends Structure1D {
      * @return The step size (index change)
      */
     static long step(final long[] structure, final long[] increment) {
-        long retVal = 0;
-        long tmpFactor = 1;
-        final int tmpLimit = increment.length;
-        for (int i = 1; i < tmpLimit; i++) {
-            retVal += tmpFactor * increment[i];
-            tmpFactor *= structure[i];
+
+        long retVal = 0L;
+        long factor = 1L;
+
+        for (int i = 1, limit = increment.length; i < limit; i++) {
+            retVal += factor * increment[i];
+            factor *= structure[i];
         }
+
         return retVal;
     }
 
@@ -432,11 +461,78 @@ public interface StructureAnyD extends Structure1D {
 
     long count(int dimension);
 
+    /**
+     * Will loop through this multidimensional data structure so that one index value of one dimension is
+     * fixed. (Ex: Loop through all items with row index == 5.)
+     *
+     * @param dimension The dimension with a fixed/supplied index. (0==row, 1==column, 2=matrix/area...)
+     * @param dimensionalIndex The index value that dimension is fixed to. (Which row, column or matrix/area)
+     * @param callback A callback with parameters that define a sub-loop
+     */
+    default void loop(int dimension, long dimensionalIndex, final LoopCallback callback) {
+
+        final long[] structure = this.shape();
+
+        long innerCount = 1L;
+        long dimenCount = 1L;
+        long outerCount = 1L;
+        for (int i = 0; i < structure.length; i++) {
+            if (i < dimension) {
+                innerCount *= structure[i];
+            } else if (i > dimension) {
+                outerCount *= structure[i];
+            } else {
+                dimenCount = structure[i];
+            }
+        }
+        final long totalCount = innerCount * dimenCount * outerCount;
+
+        if (innerCount == 1L) {
+            callback.call(dimensionalIndex * innerCount, totalCount, dimenCount);
+        } else {
+            final long step = innerCount * dimenCount;
+            for (long i = dimensionalIndex * innerCount; i < totalCount; i += step) {
+                callback.call(i, innerCount + i, 1L);
+            }
+        }
+
+    }
+
+    default void loop(long[] initial, int dimension, LoopCallback callback) {
+
+        long[] structure = this.shape();
+
+        final long remaining = StructureAnyD.count(structure, dimension) - initial[dimension];
+
+        final long first = StructureAnyD.index(structure, initial);
+        final long step = StructureAnyD.step(structure, dimension);
+        final long limit = first + (step * remaining);
+
+        callback.call(first, limit, step);
+    }
+
+    default void loop(final Predicate<long[]> filter, IndexCallback callback) {
+        final long[] structure = this.shape();
+        for (long i = 0L, limit = this.count(); i < limit; i++) {
+            final long[] reference = StructureAnyD.reference(i, structure);
+            if (filter.test(reference)) {
+                callback.call(i);
+            }
+        }
+    }
+
     default void loopAll(final ReferenceCallback callback) {
         final long[] tmpShape = this.shape();
         for (long i = 0L; i < this.count(); i++) {
             callback.call(StructureAnyD.reference(i, tmpShape));
         }
+    }
+
+    /**
+     * @return The number of dimensions (the number of indices used to reference one element)
+     */
+    default int rank() {
+        return this.shape().length;
     }
 
     long[] shape();

@@ -34,7 +34,6 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.scalar.Scalar;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain java.lang.Number}.
@@ -116,26 +115,20 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
 
     public final N[] data;
 
-    private final Scalar.Factory<N> myFactory;
+    ReferenceTypeArray(DenseArray.Factory<N> factory, final int length) {
 
-    ReferenceTypeArray(final int length, final Scalar.Factory<N> factory) {
+        super(factory, length);
 
-        super(length);
+        data = factory.scalar().newArrayInstance(length);
 
-        data = factory.newArrayInstance(length);
-
-        this.fill(0, length, 1, factory.zero().get());
-
-        myFactory = factory;
+        this.fill(0, length, 1, this.factory().scalar().zero().get());
     }
 
-    ReferenceTypeArray(final N[] data, final Scalar.Factory<N> factory) {
+    ReferenceTypeArray(DenseArray.Factory<N> factory, final N[] data) {
 
-        super(data.length);
+        super(factory, data.length);
 
         this.data = data;
-
-        myFactory = factory;
     }
 
     @Override
@@ -149,7 +142,7 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
 
     public void fillMatching(final Access1D<?> values) {
         for (int i = 0, limit = (int) Math.min(this.count(), values.count()); i < limit; i++) {
-            data[i] = myFactory.cast(values.get(i));
+            data[i] = this.factory().scalar().cast(values.get(i));
         }
     }
 
@@ -327,11 +320,11 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
     }
 
     final N valueOf(final double value) {
-        return myFactory.cast(value);
+        return this.factory().scalar().cast(value);
     }
 
     final N valueOf(final Number number) {
-        return myFactory.cast(number);
+        return this.factory().scalar().cast(number);
     }
 
 }

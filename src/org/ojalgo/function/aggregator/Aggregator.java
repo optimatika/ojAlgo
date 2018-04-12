@@ -23,7 +23,7 @@ package org.ojalgo.function.aggregator;
 
 public enum Aggregator {
 
-    CARDINALITY, LARGEST, MAXIMUM, MINIMUM, NORM1, NORM2, PRODUCT, PRODUCT2, SMALLEST, SUM, SUM2;
+    AVERAGE, CARDINALITY, LARGEST, MAXIMUM, MINIMUM, NORM1, NORM2, PRODUCT, PRODUCT2, SMALLEST, SUM, SUM2;
 
     public final <N extends Number> AggregatorFunction<N> getFunction(final AggregatorSet<N> collection) {
         return collection.get(this);

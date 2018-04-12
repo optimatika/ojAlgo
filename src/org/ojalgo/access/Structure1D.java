@@ -205,6 +205,20 @@ public interface Structure1D {
 
     }
 
+    @FunctionalInterface
+    public interface LoopCallback {
+
+        /**
+         * for(long i = first; i < limit; i += step)
+         *
+         * @param first The initial value
+         * @param limit The value limit
+         * @param step The increment size
+         */
+        void call(long first, long limit, long step);
+
+    }
+
     static void loopMatching(final Structure1D structureA, final Structure1D structureB, final IndexCallback callback) {
         final long limit = Math.min(structureA.count(), structureB.count());
         Structure1D.loopRange(0L, limit, callback);

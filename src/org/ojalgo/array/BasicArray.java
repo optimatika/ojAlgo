@@ -168,8 +168,16 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         return retVal;
     }
 
-    protected BasicArray() {
+    private final ArrayFactory<N, ?> myFactory;
+
+    @SuppressWarnings("unused")
+    private BasicArray() {
+        this(null);
+    }
+
+    protected BasicArray(ArrayFactory<N, ?> factory) {
         super();
+        myFactory = factory;
     }
 
     public long indexOfLargest() {
@@ -263,6 +271,10 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
      */
     protected final ArrayAnyD<N> wrapInArrayAnyD(final long[] structure) {
         return new ArrayAnyD<>(this, structure);
+    }
+
+    final ArrayFactory<N, ?> factory() {
+        return myFactory;
     }
 
     /**

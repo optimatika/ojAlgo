@@ -24,6 +24,7 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 
 abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
@@ -64,6 +65,29 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
     }
 
+    static final class ColumnsReducer<N extends Number> extends MatrixPipeline<N> {
+
+        private final Aggregator myAggregator;
+        private final MatrixStore<N> myBase;
+
+        ColumnsReducer(MatrixStore<N> base, Aggregator aggregator) {
+            super(base);
+            myBase = base;
+            myAggregator = aggregator;
+        }
+
+        @Override
+        public long countRows() {
+            return 1L;
+        }
+
+        @Override
+        public void supplyTo(ElementsConsumer<N> receiver) {
+            myBase.reduceColumns(myAggregator, receiver);
+        }
+
+    }
+
     static final class Multiplication<N extends Number> extends MatrixPipeline<N> {
 
         private final Access1D<N> myLeft;
@@ -90,6 +114,29 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         @Override
         public void supplyTo(final ElementsConsumer<N> receiver) {
             receiver.fillByMultiplying(myLeft, myRight);
+        }
+
+    }
+
+    static final class RowsReducer<N extends Number> extends MatrixPipeline<N> {
+
+        private final Aggregator myAggregator;
+        private final MatrixStore<N> myBase;
+
+        RowsReducer(MatrixStore<N> base, Aggregator aggregator) {
+            super(base);
+            myBase = base;
+            myAggregator = aggregator;
+        }
+
+        @Override
+        public long countColumns() {
+            return 1L;
+        }
+
+        @Override
+        public void supplyTo(ElementsConsumer<N> receiver) {
+            myBase.reduceRows(myAggregator, receiver);
         }
 
     }

@@ -482,9 +482,9 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        final AggregatorFunction<ComplexNumber> tmpMainAggr = aggregator.getFunction(ComplexAggregator.getSet());
+        final AggregatorFunction<ComplexNumber> mainAggr = aggregator.getFunction(ComplexAggregator.getSet());
 
-        if (tmpColDim > AggregateAll.THRESHOLD) {
+        if (mainAggr.isMergeable() && tmpColDim > AggregateAll.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -495,8 +495,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
                     ComplexDenseStore.this.visit(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, tmpPartAggr);
 
-                    synchronized (tmpMainAggr) {
-                        tmpMainAggr.merge(tmpPartAggr.get());
+                    synchronized (mainAggr) {
+                        mainAggr.merge(tmpPartAggr.get());
                     }
                 }
             };
@@ -505,10 +505,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         } else {
 
-            ComplexDenseStore.this.visit(0, this.size(), 1, tmpMainAggr);
+            ComplexDenseStore.this.visit(0, this.size(), 1, mainAggr);
         }
 
-        return tmpMainAggr.get();
+        return mainAggr.get();
     }
 
     public void applyCholesky(final int iterationPoint, final BasicArray<ComplexNumber> multipliers) {

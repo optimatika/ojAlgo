@@ -352,14 +352,14 @@ public class Primitive32Array extends PrimitiveArray {
      */
     protected Primitive32Array(final float[] data) {
 
-        super(data.length);
+        super(FACTORY, data.length);
 
         this.data = data;
     }
 
     protected Primitive32Array(final int size) {
 
-        super(size);
+        super(FACTORY, size);
 
         data = new float[size];
     }
