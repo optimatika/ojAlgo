@@ -77,20 +77,12 @@ public class RationalArray extends ScalarArray<RationalNumber> {
         return new RationalArray(data);
     }
 
-    private RationalArray(final int length, final Scalar.Factory<RationalNumber> factory) {
-        super(length, factory);
-    }
-
-    private RationalArray(final RationalNumber[] data, final Scalar.Factory<RationalNumber> factory) {
-        super(data, factory);
-    }
-
     protected RationalArray(final int size) {
-        this(size, RationalNumber.FACTORY);
+        super(FACTORY, size);
     }
 
     protected RationalArray(final RationalNumber[] data) {
-        this(data, RationalNumber.FACTORY);
+        super(FACTORY, data);
     }
 
     @Override

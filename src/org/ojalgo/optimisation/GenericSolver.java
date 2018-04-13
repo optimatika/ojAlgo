@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation;
 
-import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.ProgrammingError;
@@ -30,7 +29,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 
-public abstract class GenericSolver implements Optimisation.Solver, Serializable {
+public abstract class GenericSolver implements Optimisation.Solver {
 
     public static abstract class Builder<B extends Builder<?, ?>, S extends GenericSolver> {
 
@@ -127,19 +126,7 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
      * respective limits.
      */
     protected final boolean isIterationAllowed() {
-
-        final int tmpIterations = this.countIterations();
-        final long tmpTime = this.countTime();
-
-        final boolean tmpIterationOk = tmpIterations < options.iterations_abort;
-        final boolean tmpTimeOk = tmpTime < options.time_abort;
-
-        //        if (this.isDebug()) {
-        //            this.logDebug("Iterations OK? {} {} < {}", tmpIterationOk, tmpIterations, options.iterations_abort);
-        //            this.logDebug("Time OK? {} {} < {}", tmpTimeOk, tmpTime, options.time_abort);
-        //        }
-
-        return tmpTimeOk && tmpIterationOk;
+        return (this.countTime() < options.time_abort) && (this.countIterations() < options.iterations_abort);
     }
 
     protected final boolean isProgress() {

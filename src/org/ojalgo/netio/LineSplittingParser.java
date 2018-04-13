@@ -19,14 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function.aggregator;
+package org.ojalgo.netio;
 
-public enum Aggregator {
+import org.ojalgo.RecoverableCondition;
 
-    AVERAGE, CARDINALITY, LARGEST, MAXIMUM, MINIMUM, NORM1, NORM2, PRODUCT, PRODUCT2, SMALLEST, SUM, SUM2;
+public final class LineSplittingParser implements BasicParser<String[]> {
 
-    public final <N extends Number> AggregatorFunction<N> getFunction(final AggregatorSet<N> collection) {
-        return collection.get(this);
+    private final String myRegExp;
+    private final boolean myTrim;
+
+    public LineSplittingParser() {
+        this("\\s+", true);
+    }
+
+    public LineSplittingParser(String regex) {
+        this(regex, false);
+    }
+
+    public LineSplittingParser(String regex, boolean trim) {
+        super();
+        myRegExp = regex;
+        myTrim = trim;
+    }
+
+    @Override
+    public String[] parse(String line) throws RecoverableCondition {
+        return (myTrim ? line.trim() : line).split(myRegExp);
     }
 
 }

@@ -460,53 +460,45 @@ public abstract class ConvexSolver extends GenericSolver {
 
         destinationBuilder.reset();
 
-        final List<Variable> tmpFreeVariables = sourceModel.getFreeVariables();
-        final Set<IntIndex> tmpFixedVariables = sourceModel.getFixedVariables();
-        final int tmpFreeVarDim = tmpFreeVariables.size();
+        final List<Variable> freeVariables = sourceModel.getFreeVariables();
+        final Set<IntIndex> fixedVariables = sourceModel.getFixedVariables();
 
-        //        final Array1D<Double> tmpCurrentSolution = Array1D.PRIMITIVE.makeZero(tmpFreeVarDim);
-        //        for (int i = 0; i < tmpFreeVariables.size(); i++) {
-        //            final BigDecimal tmpValue = tmpFreeVariables.get(i).getValue();
-        //            if (tmpValue != null) {
-        //                tmpCurrentSolution.set(i, tmpValue.doubleValue());
-        //            }
-        //        }
-        //        final Optimisation.Result tmpKickStarter = new Optimisation.Result(Optimisation.State.UNEXPLORED, Double.NaN, tmpCurrentSolution);
+        final int numbVars = freeVariables.size();
 
         // AE & BE
 
         final List<Expression> tmpEqExpr = sourceModel.constraints()
                 .filter((final Expression c) -> c.isEqualityConstraint() && !c.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
-        final int tmpEqExprDim = tmpEqExpr.size();
+        final int numbEqExpr = tmpEqExpr.size();
 
-        if (tmpEqExprDim > 0) {
+        if (numbEqExpr > 0) {
 
-            final SparseStore<Double> tmpAE = SparseStore.PRIMITIVE.make(tmpEqExprDim, tmpFreeVarDim);
-            final PhysicalStore<Double> tmpBE = FACTORY.makeZero(tmpEqExprDim, 1);
+            final SparseStore<Double> mtrxAE = SparseStore.PRIMITIVE.make(numbEqExpr, numbVars);
+            final PhysicalStore<Double> mtrxBE = FACTORY.makeZero(numbEqExpr, 1);
 
-            for (int i = 0; i < tmpEqExprDim; i++) {
+            for (int i = 0; i < numbEqExpr; i++) {
 
-                final Expression tmpExpression = tmpEqExpr.get(i).compensate(tmpFixedVariables);
+                final Expression tmpExpression = tmpEqExpr.get(i).compensate(fixedVariables);
 
                 for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
                     final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                     if (tmpIndex >= 0) {
-                        tmpAE.set(i, tmpIndex, tmpExpression.getAdjustedLinearFactor(tmpKey));
+                        mtrxAE.set(i, tmpIndex, tmpExpression.getAdjustedLinearFactor(tmpKey));
                     }
                 }
-                tmpBE.set(i, 0, tmpExpression.getAdjustedUpperLimit());
+                mtrxBE.set(i, 0, tmpExpression.getAdjustedUpperLimit());
             }
 
-            destinationBuilder.equalities(tmpAE, tmpBE);
+            destinationBuilder.equalities(mtrxAE, mtrxBE);
         }
 
         // Q & C
 
-        final Expression tmpObjExpr = sourceModel.objective().compensate(tmpFixedVariables);
+        final Expression tmpObjExpr = sourceModel.objective().compensate(fixedVariables);
 
-        PhysicalStore<Double> tmpQ = null;
+        PhysicalStore<Double> mtrxQ = null;
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
-            tmpQ = FACTORY.makeZero(tmpFreeVarDim, tmpFreeVarDim);
+            mtrxQ = FACTORY.makeZero(numbVars, numbVars);
 
             final BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? SUBTRACT : ADD;
             UnaryFunction<Double> tmpModifier;
@@ -515,96 +507,102 @@ public abstract class ConvexSolver extends GenericSolver {
                 final int tmpColumn = sourceModel.indexOfFreeVariable(tmpKey.column);
                 if ((tmpRow >= 0) && (tmpColumn >= 0)) {
                     tmpModifier = tmpBaseFunc.second(tmpObjExpr.getAdjustedQuadraticFactor(tmpKey));
-                    tmpQ.modifyOne(tmpRow, tmpColumn, tmpModifier);
-                    tmpQ.modifyOne(tmpColumn, tmpRow, tmpModifier);
+                    mtrxQ.modifyOne(tmpRow, tmpColumn, tmpModifier);
+                    mtrxQ.modifyOne(tmpColumn, tmpRow, tmpModifier);
                 }
             }
         }
 
-        PhysicalStore<Double> tmpC = null;
+        PhysicalStore<Double> mtrxC = null;
         if (tmpObjExpr.isAnyLinearFactorNonZero()) {
-            tmpC = FACTORY.makeZero(tmpFreeVarDim, 1);
+            mtrxC = FACTORY.makeZero(numbVars, 1);
             if (sourceModel.isMinimisation()) {
                 for (final IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
                     final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                     if (tmpIndex >= 0) {
-                        tmpC.set(tmpIndex, 0, -tmpObjExpr.getAdjustedLinearFactor(tmpKey));
+                        mtrxC.set(tmpIndex, 0, -tmpObjExpr.getAdjustedLinearFactor(tmpKey));
                     }
                 }
             } else {
                 for (final IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
                     final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                     if (tmpIndex >= 0) {
-                        tmpC.set(tmpIndex, 0, tmpObjExpr.getAdjustedLinearFactor(tmpKey));
+                        mtrxC.set(tmpIndex, 0, tmpObjExpr.getAdjustedLinearFactor(tmpKey));
                     }
                 }
             }
         }
 
-        destinationBuilder.objective(tmpQ, tmpC);
+        destinationBuilder.objective(mtrxQ, mtrxC);
 
         // AI & BI
 
-        final List<Expression> tmpUpExpr = sourceModel.constraints()
-                .filter((final Expression c2) -> c2.isUpperConstraint() && !c2.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
-        final int tmpUpExprDim = tmpUpExpr.size();
+        final List<Expression> tmpUpExpr = sourceModel.constraints().filter((e) -> e.isUpperConstraint() && !e.isAnyQuadraticFactorNonZero())
+                .collect(Collectors.toList());
+        final int numbUpExpr = tmpUpExpr.size();
+
         final List<Variable> tmpUpVar = sourceModel.bounds().filter((final Variable c4) -> c4.isUpperConstraint()).collect(Collectors.toList());
-        final int tmpUpVarDim = tmpUpVar.size();
+        final int numbUpVar = tmpUpVar.size();
 
         final List<Expression> tmpLoExpr = sourceModel.constraints()
                 .filter((final Expression c1) -> c1.isLowerConstraint() && !c1.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
-        final int tmpLoExprDim = tmpLoExpr.size();
+        final int numbLoExpr = tmpLoExpr.size();
+
         final List<Variable> tmpLoVar = sourceModel.bounds().filter((final Variable c3) -> c3.isLowerConstraint()).collect(Collectors.toList());
-        final int tmpLoVarDim = tmpLoVar.size();
+        final int numbLoVar = tmpLoVar.size();
 
-        if ((tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim) > 0) {
+        if ((numbUpExpr + numbUpVar + numbLoExpr + numbLoVar) > 0) {
 
-            final SparseStore<Double> tmpAI = SparseStore.PRIMITIVE.make(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim, tmpFreeVarDim);
-            final PhysicalStore<Double> tmpBI = FACTORY.makeZero(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim, 1);
+            final RowsSupplier<Double> mtrxAI = FACTORY.makeRowsSupplier(numbVars);
+            final PhysicalStore<Double> mtrxBI = FACTORY.makeZero(numbUpExpr + numbUpVar + numbLoExpr + numbLoVar, 1);
 
-            if (tmpUpExprDim > 0) {
-                for (int i = 0; i < tmpUpExprDim; i++) {
-                    final Expression tmpExpression = tmpUpExpr.get(i).compensate(tmpFixedVariables);
+            if (numbUpExpr > 0) {
+                for (int i = 0; i < numbUpExpr; i++) {
+                    final SparseArray<Double> rowAI = mtrxAI.addRow();
+                    final Expression tmpExpression = tmpUpExpr.get(i).compensate(fixedVariables);
                     for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
                         final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                         if (tmpIndex >= 0) {
-                            tmpAI.set(i, tmpIndex, tmpExpression.getAdjustedLinearFactor(tmpKey));
+                            rowAI.set(tmpIndex, tmpExpression.getAdjustedLinearFactor(tmpKey));
                         }
                     }
-                    tmpBI.set(i, 0, tmpExpression.getAdjustedUpperLimit());
+                    mtrxBI.set(i, 0, tmpExpression.getAdjustedUpperLimit());
                 }
             }
 
-            if (tmpUpVarDim > 0) {
-                for (int i = 0; i < tmpUpVarDim; i++) {
+            if (numbUpVar > 0) {
+                for (int i = 0; i < numbUpVar; i++) {
+                    final SparseArray<Double> rowAI = mtrxAI.addRow();
                     final Variable tmpVariable = tmpUpVar.get(i);
-                    tmpAI.set(tmpUpExprDim + i, sourceModel.indexOfFreeVariable(tmpVariable), tmpVariable.getAdjustmentFactor());
-                    tmpBI.set(tmpUpExprDim + i, 0, tmpVariable.getAdjustedUpperLimit());
+                    rowAI.set(sourceModel.indexOfFreeVariable(tmpVariable), tmpVariable.getAdjustmentFactor());
+                    mtrxBI.set(numbUpExpr + i, 0, tmpVariable.getAdjustedUpperLimit());
                 }
             }
 
-            if (tmpLoExprDim > 0) {
-                for (int i = 0; i < tmpLoExprDim; i++) {
-                    final Expression tmpExpression = tmpLoExpr.get(i).compensate(tmpFixedVariables);
+            if (numbLoExpr > 0) {
+                for (int i = 0; i < numbLoExpr; i++) {
+                    final SparseArray<Double> rowAI = mtrxAI.addRow();
+                    final Expression tmpExpression = tmpLoExpr.get(i).compensate(fixedVariables);
                     for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
                         final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                         if (tmpIndex >= 0) {
-                            tmpAI.set(tmpUpExprDim + tmpUpVarDim + i, tmpIndex, -tmpExpression.getAdjustedLinearFactor(tmpKey));
+                            rowAI.set(tmpIndex, -tmpExpression.getAdjustedLinearFactor(tmpKey));
                         }
                     }
-                    tmpBI.set(tmpUpExprDim + tmpUpVarDim + i, 0, -tmpExpression.getAdjustedLowerLimit());
+                    mtrxBI.set(numbUpExpr + numbUpVar + i, 0, -tmpExpression.getAdjustedLowerLimit());
                 }
             }
 
-            if (tmpLoVarDim > 0) {
-                for (int i = 0; i < tmpLoVarDim; i++) {
+            if (numbLoVar > 0) {
+                for (int i = 0; i < numbLoVar; i++) {
+                    final SparseArray<Double> rowAI = mtrxAI.addRow();
                     final Variable tmpVariable = tmpLoVar.get(i);
-                    tmpAI.set(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + i, sourceModel.indexOfFreeVariable(tmpVariable), -tmpVariable.getAdjustmentFactor());
-                    tmpBI.set(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + i, 0, -tmpVariable.getAdjustedLowerLimit());
+                    rowAI.set(sourceModel.indexOfFreeVariable(tmpVariable), -tmpVariable.getAdjustmentFactor());
+                    mtrxBI.set(numbUpExpr + numbUpVar + numbLoExpr + i, 0, -tmpVariable.getAdjustedLowerLimit());
                 }
             }
 
-            destinationBuilder.inequalities(tmpAI, tmpBI);
+            destinationBuilder.inequalities(mtrxAI, mtrxBI);
         }
     }
 

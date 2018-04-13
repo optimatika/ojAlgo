@@ -59,7 +59,8 @@ final class AboveBelowStore<N extends Number> extends ComposingStore<N> {
     }
 
     public int firstInColumn(final int col) {
-        return this.getBase().firstInColumn(col);
+        final int baseFirst = this.getBase().firstInColumn(col);
+        return (baseFirst < mySplit) ? baseFirst : mySplit + myBelow.firstInColumn(col);
     }
 
     public int firstInRow(final int row) {
@@ -72,7 +73,8 @@ final class AboveBelowStore<N extends Number> extends ComposingStore<N> {
 
     @Override
     public int limitOfColumn(final int col) {
-        return mySplit + myBelow.limitOfColumn(col);
+        final int belowLimit = myBelow.limitOfColumn(col);
+        return (belowLimit == 0) ? this.getBase().limitOfColumn(col) : mySplit + belowLimit;
     }
 
     @Override

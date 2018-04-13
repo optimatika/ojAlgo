@@ -36,6 +36,8 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -47,7 +49,8 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Access2D.Sliceable<N>, Access2D.Visitable<N>,
-        Mutate2D.Receiver<N>, Mutate2D.Exchangeable, Mutate2D.Mixable<N>, Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N>, Serializable {
+        Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.Receiver<N>, Mutate2D.Exchangeable, Mutate2D.Mixable<N>,
+        Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N>, Serializable {
 
     public static final class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
@@ -313,6 +316,30 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     public void add(final long index, final Number addend) {
         myDelegate.add(index, addend);
+    }
+
+    public N aggregateColumn(long row, long col, Aggregator aggregator) {
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitColumn(row, col, visitor);
+        return visitor.get();
+    }
+
+    public N aggregateDiagonal(long row, long col, Aggregator aggregator) {
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitDiagonal(row, col, visitor);
+        return visitor.get();
+    }
+
+    public N aggregateRange(long first, long limit, Aggregator aggregator) {
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitRange(first, limit, visitor);
+        return visitor.get();
+    }
+
+    public N aggregateRow(long row, long col, Aggregator aggregator) {
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitRow(row, col, visitor);
+        return visitor.get();
     }
 
     /**
@@ -604,6 +631,18 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     public void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
         myDelegate.modify(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, modifier);
+    }
+
+    public Array1D<N> reduceColumns(Aggregator aggregator) {
+        Array1D<N> retVal = myDelegate.factory().makeZero(myColumnsCount).wrapInArray1D();
+        this.reduceColumns(aggregator, retVal);
+        return retVal;
+    }
+
+    public Array1D<N> reduceRows(Aggregator aggregator) {
+        Array1D<N> retVal = myDelegate.factory().makeZero(myRowsCount).wrapInArray1D();
+        this.reduceRows(aggregator, retVal);
+        return retVal;
     }
 
     public void set(final long index, final double value) {

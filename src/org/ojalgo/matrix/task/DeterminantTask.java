@@ -24,6 +24,7 @@ package org.ojalgo.matrix.task;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
@@ -36,18 +37,34 @@ public interface DeterminantTask<N extends Number> extends MatrixTask<N> {
 
     public static abstract class Factory<N extends Number> {
 
+        public final DeterminantTask<N> make(final int dim, final boolean symmetric) {
+
+            final Structure2D template = new Structure2D() {
+
+                public long countColumns() {
+                    return dim;
+                }
+
+                public long countRows() {
+                    return dim;
+                }
+            };
+
+            return this.make(template, symmetric, false);
+        }
+
         public final DeterminantTask<N> make(final MatrixStore<N> template) {
             return this.make(template, MatrixUtils.isHermitian(template), false);
         }
 
-        public abstract DeterminantTask<N> make(MatrixStore<N> template, boolean symmetric, boolean positiveDefinite);
+        public abstract DeterminantTask<N> make(Structure2D template, boolean symmetric, boolean positiveDefinite);
 
     }
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        public DeterminantTask<BigDecimal> make(final MatrixStore<BigDecimal> template, final boolean symmetric, final boolean positiveDefinite) {
+        public DeterminantTask<BigDecimal> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
                 return Cholesky.BIG.make(template);
             } else {
@@ -60,7 +77,7 @@ public interface DeterminantTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        public DeterminantTask<ComplexNumber> make(final MatrixStore<ComplexNumber> template, final boolean symmetric, final boolean positiveDefinite) {
+        public DeterminantTask<ComplexNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
                 return Cholesky.COMPLEX.make(template);
             } else {
@@ -73,7 +90,7 @@ public interface DeterminantTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
-        public DeterminantTask<Double> make(final MatrixStore<Double> template, final boolean symmetric, final boolean positiveDefinite) {
+        public DeterminantTask<Double> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             final long tmpDim = template.countRows();
             if (tmpDim == 1L) {
                 return AbstractDeterminator.FULL_1X1;
@@ -109,7 +126,7 @@ public interface DeterminantTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
-        public DeterminantTask<Quaternion> make(final MatrixStore<Quaternion> template, final boolean symmetric, final boolean positiveDefinite) {
+        public DeterminantTask<Quaternion> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
                 return Cholesky.QUATERNION.make(template);
             } else {
@@ -122,7 +139,7 @@ public interface DeterminantTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
-        public DeterminantTask<RationalNumber> make(final MatrixStore<RationalNumber> template, final boolean symmetric, final boolean positiveDefinite) {
+        public DeterminantTask<RationalNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
             if (symmetric && positiveDefinite) {
                 return Cholesky.RATIONAL.make(template);
             } else {

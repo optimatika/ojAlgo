@@ -82,20 +82,12 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         return new BigArray(data);
     }
 
-    private BigArray(final BigDecimal[] data, final Scalar.Factory<BigDecimal> factory) {
-        super(data, factory);
-    }
-
-    private BigArray(final int length, final Scalar.Factory<BigDecimal> factory) {
-        super(length, factory);
-    }
-
     protected BigArray(final BigDecimal[] data) {
-        this(data, BigScalar.FACTORY);
+        super(FACTORY, data);
     }
 
     protected BigArray(final int size) {
-        this(size, BigScalar.FACTORY);
+        super(FACTORY, size);
     }
 
     public final void axpy(final double a, final Mutate1D y) {

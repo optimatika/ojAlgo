@@ -36,6 +36,11 @@ public abstract class AggregatorSet<N extends Number> {
     }
 
     /**
+     * Average value
+     */
+    public abstract AggregatorFunction<N> average();
+
+    /**
      * Count of non-zero elements
      */
     public abstract AggregatorFunction<N> cardinality();
@@ -43,6 +48,10 @@ public abstract class AggregatorSet<N extends Number> {
     public final AggregatorFunction<N> get(final Aggregator aggregator) {
 
         switch (aggregator) {
+
+        case AVERAGE:
+
+            return this.average();
 
         case CARDINALITY:
 

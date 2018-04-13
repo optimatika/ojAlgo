@@ -77,20 +77,12 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
         return new QuaternionArray(data);
     }
 
-    private QuaternionArray(final int length, final org.ojalgo.scalar.Scalar.Factory<Quaternion> factory) {
-        super(length, factory);
-    }
-
-    private QuaternionArray(final Quaternion[] data, final org.ojalgo.scalar.Scalar.Factory<Quaternion> factory) {
-        super(data, factory);
-    }
-
     protected QuaternionArray(final int size) {
-        this(size, Quaternion.FACTORY);
+        super(FACTORY, size);
     }
 
     protected QuaternionArray(final Quaternion[] data) {
-        this(data, Quaternion.FACTORY);
+        super(FACTORY, data);
     }
 
     @Override

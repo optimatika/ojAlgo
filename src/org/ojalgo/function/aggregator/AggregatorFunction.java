@@ -27,8 +27,19 @@ import org.ojalgo.scalar.Scalar;
 
 public interface AggregatorFunction<N extends Number> extends VoidFunction<N>, AccessScalar<N> {
 
+    default boolean isMergeable() {
+        return true;
+    }
+
+    /**
+     * Only works if {@link #isMergeable()}!
+     */
     void merge(N result);
 
+    /**
+     * @deprecated v45 Use {@link #merge(Number)} instead
+     */
+    @Deprecated
     N merge(N result1, N result2);
 
     AggregatorFunction<N> reset();

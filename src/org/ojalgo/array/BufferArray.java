@@ -70,7 +70,7 @@ public abstract class BufferArray extends PlainArray<Double> {
 
         DoubleBufferArray(final DoubleBuffer buffer, final RandomAccessFile file) {
 
-            super(buffer, file);
+            super(DIRECT64, buffer, file);
 
             myDoubleBuffer = buffer;
         }
@@ -93,7 +93,7 @@ public abstract class BufferArray extends PlainArray<Double> {
 
         FloatBufferArray(final FloatBuffer buffer, final RandomAccessFile file) {
 
-            super(buffer, file);
+            super(DIRECT32, buffer, file);
 
             myFloatBuffer = buffer;
         }
@@ -349,9 +349,9 @@ public abstract class BufferArray extends PlainArray<Double> {
     private final Buffer myBuffer;
     private final RandomAccessFile myFile;
 
-    BufferArray(final Buffer buffer, final RandomAccessFile file) {
+    BufferArray(DenseArray.Factory<Double> factory, final Buffer buffer, final RandomAccessFile file) {
 
-        super(buffer.capacity());
+        super(factory, buffer.capacity());
 
         myBuffer = buffer;
         myFile = file;

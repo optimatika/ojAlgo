@@ -40,23 +40,23 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
 
     private static NumberContext CNTXT = StandardType.DECIMAL_032;
 
-    private static void testAggregation(final MatrixStore<?> aStore) {
+    private static void testAggregation(final MatrixStore<?> anyStore) {
 
-        final PhysicalStore<?> tmpPhysical = aStore.copy();
+        final PhysicalStore<?> copied = anyStore.copy();
 
         Number tmpExpected;
         Number tmpActual;
 
         for (final Aggregator tmpAggr : Aggregator.values()) {
 
-            tmpExpected = tmpPhysical.aggregateAll(tmpAggr);
-            tmpActual = aStore.aggregateAll(tmpAggr);
+            tmpExpected = copied.aggregateAll(tmpAggr);
+            tmpActual = anyStore.aggregateAll(tmpAggr);
 
             if (MatrixStoreTests.DEBUG) {
                 BasicLogger.debug("Aggregator={}, Expected/Physical={}, Actual/Logical={}", tmpAggr, tmpExpected, tmpActual);
             }
 
-            TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
+            TestUtils.assertEquals(tmpAggr.name(), tmpExpected, tmpActual, CNTXT);
         }
     }
 

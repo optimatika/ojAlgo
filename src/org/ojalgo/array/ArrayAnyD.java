@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
@@ -36,6 +37,8 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -47,7 +50,8 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, AccessAnyD.Visitable<N>,
-        AccessAnyD.Sliceable<N>, MutateAnyD, MutateAnyD.Fillable<N>, MutateAnyD.Modifiable<N>, MutateAnyD.BiModifiable<N>, MutateAnyD.Mixable<N>, Serializable {
+        AccessAnyD.Aggregatable<N>, StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, AccessAnyD.Sliceable<N>, MutateAnyD,
+        MutateAnyD.Fillable<N>, MutateAnyD.Modifiable<N>, MutateAnyD.BiModifiable<N>, MutateAnyD.Mixable<N>, Serializable {
 
     public static final class Factory<N extends Number> implements FactoryAnyD<ArrayAnyD<N>> {
 
@@ -125,6 +129,25 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     public void add(final long[] reference, final Number addend) {
         myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
+    }
+
+    public N aggregateRange(long first, long limit, Aggregator aggregator) {
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitRange(first, limit, visitor);
+        return visitor.get();
+    }
+
+    public Number aggregateSet(int dimension, long dimensionalIndex, Aggregator aggregator) {
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitSet(dimension, dimensionalIndex, visitor);
+        return visitor.get();
+    }
+
+    @Override
+    public Number aggregateSet(long[] initial, int dimension, Aggregator aggregator) {
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+        this.visitSet(initial, dimension, visitor);
+        return visitor.get();
     }
 
     /**
@@ -205,15 +228,23 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         myDelegate.fill(first, limit, 1L, supplier);
     }
 
-    public void fillSet(final long[] first, final int dimension, final N number) {
+    @Override
+    public void fillSet(int dimension, long dimensionalIndex, N value) {
+        this.loop(dimension, dimensionalIndex, (f, l, s) -> myDelegate.fill(f, l, s, value));
+    }
 
-        final long tmpCount = StructureAnyD.count(myStructure, dimension) - first[dimension];
+    @Override
+    public void fillSet(int dimension, long dimensionalIndex, NullaryFunction<N> supplier) {
+        this.loop(dimension, dimensionalIndex, (f, l, s) -> myDelegate.fill(f, l, s, supplier));
+    }
 
-        final long tmpFirst = StructureAnyD.index(myStructure, first);
-        final long tmpStep = StructureAnyD.step(myStructure, dimension);
-        final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
+    public void fillSet(final long[] initial, final int dimension, final N value) {
+        this.loop(initial, dimension, (f, l, s) -> myDelegate.fill(f, l, s, value));
+    }
 
-        myDelegate.fill(tmpFirst, tmpLimit, tmpStep, number);
+    @Override
+    public void fillSet(long[] initial, int dimension, NullaryFunction<N> supplier) {
+        this.loop(initial, dimension, (f, l, s) -> myDelegate.fill(f, l, s, supplier));
     }
 
     public N get(final long index) {
@@ -300,19 +331,57 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         myDelegate.modify(first, limit, 1L, modifier);
     }
 
-    public void modifySet(final long[] first, final int dimension, final UnaryFunction<N> function) {
+    @Override
+    public void modifySet(int dimension, long dimensionalIndex, UnaryFunction<N> modifier) {
+        this.loop(dimension, dimensionalIndex, (f, l, s) -> myDelegate.modify(f, l, s, modifier));
+    }
 
-        final long tmpCount = StructureAnyD.count(myStructure, dimension) - first[dimension];
-
-        final long tmpFirst = StructureAnyD.index(myStructure, first);
-        final long tmpStep = StructureAnyD.step(myStructure, dimension);
-        final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
-
-        myDelegate.modify(tmpFirst, tmpLimit, tmpStep, function);
+    public void modifySet(final long[] initial, final int dimension, final UnaryFunction<N> modifier) {
+        this.loop(initial, dimension, (f, l, s) -> myDelegate.modify(f, l, s, modifier));
     }
 
     public int rank() {
         return myStructure.length;
+    }
+
+    public Array1D<N> reduce(int dimension, Aggregator aggregator) {
+        final long reduceToCount = StructureAnyD.count(myStructure, dimension);
+        Array1D<N> retVal = myDelegate.factory().makeZero(reduceToCount).wrapInArray1D();
+        this.reduce(dimension, aggregator, retVal);
+        return retVal;
+    }
+
+    @Override
+    public Array2D<N> reduce(int rowDimension, int columnDimension, Aggregator aggregator) {
+
+        long[] structure = this.shape();
+
+        long numberOfRows = structure[rowDimension];
+        long numberOfColumns = structure[columnDimension];
+
+        AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
+
+        final boolean primitive = myDelegate.isPrimitive();
+
+        Array2D<N> retVal = myDelegate.factory().makeZero(numberOfRows * numberOfColumns).wrapInArray2D(numberOfRows);
+
+        for (long j = 0L; j < numberOfColumns; j++) {
+            final long colInd = j;
+
+            for (long i = 0L; i < numberOfRows; i++) {
+                final long rowInd = i;
+
+                visitor.reset();
+                this.loop(reference -> (reference[rowDimension] == rowInd) && (reference[columnDimension] == colInd), index -> this.visitOne(index, visitor));
+                if (primitive) {
+                    retVal.set(rowInd, colInd, visitor.doubleValue());
+                } else {
+                    retVal.set(rowInd, colInd, visitor.get());
+                }
+            }
+        }
+
+        return retVal;
     }
 
     public void set(final long index, final double value) {
@@ -335,19 +404,23 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         return myStructure;
     }
 
-    public Array1D<N> slice(final long[] first, final int dimension) {
-
-        final long tmpCount = StructureAnyD.count(myStructure, dimension) - first[dimension];
-
-        final long tmpFirst = StructureAnyD.index(myStructure, first);
-        final long tmpStep = StructureAnyD.step(myStructure, dimension);
-        final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
-
-        return new Array1D<>(myDelegate, tmpFirst, tmpLimit, tmpStep);
-    }
-
     public Array1D<N> sliceRange(final long first, final long limit) {
         return myDelegate.wrapInArray1D().sliceRange(first, limit);
+    }
+
+    public Array1D<N> sliceSet(final long[] initial, final int dimension) {
+
+        AtomicLong first = new AtomicLong();
+        AtomicLong limit = new AtomicLong();
+        AtomicLong step = new AtomicLong();
+
+        this.loop(initial, dimension, (f, l, s) -> {
+            first.set(f);
+            limit.set(l);
+            step.set(s);
+        });
+
+        return new Array1D<>(myDelegate, first.longValue(), limit.longValue(), step.longValue());
     }
 
     @Override
@@ -388,15 +461,12 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         myDelegate.visit(first, limit, 1L, visitor);
     }
 
-    public void visitSet(final long[] first, final int dimension, final VoidFunction<N> visitor) {
+    public void visitSet(int dimension, long dimensionalIndex, VoidFunction<N> visitor) {
+        this.loop(dimension, dimensionalIndex, (f, l, s) -> myDelegate.visit(f, l, s, visitor));
+    }
 
-        final long tmpCount = StructureAnyD.count(myStructure, dimension) - first[dimension];
-
-        final long tmpFirst = StructureAnyD.index(myStructure, first);
-        final long tmpStep = StructureAnyD.step(myStructure, dimension);
-        final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
-
-        myDelegate.visit(tmpFirst, tmpLimit, tmpStep, visitor);
+    public void visitSet(final long[] initial, final int dimension, final VoidFunction<N> visitor) {
+        this.loop(initial, dimension, (f, l, s) -> myDelegate.visit(f, l, s, visitor));
     }
 
     final BasicArray<N> getDelegate() {

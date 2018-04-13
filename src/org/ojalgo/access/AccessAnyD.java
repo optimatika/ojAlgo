@@ -22,6 +22,7 @@
 package org.ojalgo.access;
 
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -34,6 +35,18 @@ import org.ojalgo.type.context.NumberContext;
 public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N> {
 
     public interface Aggregatable<N extends Number> extends StructureAnyD, Access1D.Aggregatable<N> {
+
+        Number aggregateSet(int dimension, long dimensionalIndex, Aggregator aggregator);
+
+        Number aggregateSet(long[] initial, int dimension, Aggregator aggregator);
+
+        default void reduce(int dimension, Aggregator aggregator, Mutate1D receiver) {
+            final long count1 = this.count(dimension);
+            final long count2 = receiver.count();
+            for (long i = 0L, limit = Math.min(count1, count2); i < limit; i++) {
+                receiver.set(i, this.aggregateSet(dimension, i, aggregator));
+            }
+        }
 
     }
 
@@ -72,13 +85,17 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     public interface Sliceable<N extends Number> extends StructureAnyD, Access1D.Sliceable<N> {
 
-        Access1D<N> slice(final long[] first, final int dimension);
+        Access1D<N> sliceSet(final long[] initial, final int dimension);
 
     }
 
     public interface Visitable<N extends Number> extends StructureAnyD, Access1D.Visitable<N> {
 
         void visitOne(long[] reference, VoidFunction<N> visitor);
+
+        void visitSet(int dimension, long dimensionalIndex, VoidFunction<N> visitor);
+
+        void visitSet(long[] initial, int dimension, VoidFunction<N> visitor);
 
     }
 

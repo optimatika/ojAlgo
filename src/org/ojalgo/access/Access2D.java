@@ -52,6 +52,18 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         N aggregateRow(long row, long col, Aggregator aggregator);
 
+        default void reduceColumns(Aggregator aggregator, Mutate1D receiver) {
+            for (long j = 0L, limit = Math.min(this.countColumns(), receiver.count()); j < limit; j++) {
+                receiver.set(j, this.aggregateColumn(j, aggregator));
+            }
+        }
+
+        default void reduceRows(Aggregator aggregator, Mutate1D receiver) {
+            for (long i = 0L, limit = Math.min(this.countRows(), receiver.count()); i < limit; i++) {
+                receiver.set(i, this.aggregateRow(i, aggregator));
+            }
+        }
+
     }
 
     public interface Collectable<N extends Number, R extends Mutate2D.Receiver<N>> extends Structure2D {

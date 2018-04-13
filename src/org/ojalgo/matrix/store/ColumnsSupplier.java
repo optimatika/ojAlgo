@@ -73,8 +73,7 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
 
         receiver.reset();
 
-        final int limit = myColumns.size();
-        for (int j = 0; j < limit; j++) {
+        for (int j = 0, limit = myColumns.size(); j < limit; j++) {
             final long col = j;
 
             myColumns.get(j).supplyNonZerosTo(new Mutate1D() {
@@ -100,11 +99,6 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
                 }
 
             });
-        }
-
-        final int tmpLimit = myColumns.size();
-        for (int j = 0; j < tmpLimit; j++) {
-            receiver.fillColumn(j, myColumns.get(j));
         }
     }
 

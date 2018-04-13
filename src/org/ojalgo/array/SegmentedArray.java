@@ -56,7 +56,7 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     SegmentedArray(final BasicArray<N>[] segments, final ArrayFactory<N, ?> segmentFactory) {
 
-        super();
+        super(segmentFactory);
 
         mySegmentSize = segments[0].count();
         final int tmpIndexOfLastSegment = segments.length - 1;
@@ -83,7 +83,7 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
     @SuppressWarnings("unchecked")
     SegmentedArray(final long count, final int indexBits, final ArrayFactory<N, ?> segmentFactory) {
 
-        super();
+        super(segmentFactory);
 
         final long tmpSegmentSize = 1L << indexBits; // 2^bits
 

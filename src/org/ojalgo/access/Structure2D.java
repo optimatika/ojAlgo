@@ -21,6 +21,8 @@
  */
 package org.ojalgo.access;
 
+import org.ojalgo.function.aggregator.Aggregator;
+
 /**
  * A (fixed size) 2-dimensional data structure.
  *
@@ -159,6 +161,14 @@ public interface Structure2D extends Structure1D {
         public String toString() {
             return "<" + Long.toString(row) + "," + Long.toString(column) + ">";
         }
+
+    }
+
+    public interface ReducibleTo1D<R extends Structure1D> extends Structure2D {
+
+        R reduceColumns(Aggregator aggregator);
+
+        R reduceRows(Aggregator aggregator);
 
     }
 

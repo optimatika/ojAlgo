@@ -39,6 +39,8 @@ import org.ojalgo.access.Iterator1D;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 
 /**
  * Think of this as an {@link ArrayList} that can only contain numbers, but with a few extra features. Among
@@ -167,6 +169,12 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
             this.add(index + counter++, value);
         }
         return elements.size() > 0;
+    }
+
+    public N aggregateRange(long first, long limit, Aggregator aggregator) {
+        AggregatorFunction<N> visitor = aggregator.getFunction(myStorage.factory().aggregator());
+        this.visitRange(first, limit, visitor);
+        return visitor.get();
     }
 
     /**

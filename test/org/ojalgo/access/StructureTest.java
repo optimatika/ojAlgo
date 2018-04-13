@@ -25,7 +25,12 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 
-public class AccessUtilsTest {
+public class StructureTest {
+
+    static void backAndForth(long index, long[] structure, long[] reference) {
+        TestUtils.assertEquals(index, StructureAnyD.index(structure, reference));
+        TestUtils.assertEquals(StructureAnyD.reference(index, structure), reference);
+    }
 
     @Test
     public void access2D() {
@@ -84,6 +89,26 @@ public class AccessUtilsTest {
 
         TestUtils.assertEquals(tmpMatchingInd3, StructureAnyD.index(tmpStructure, tmpMatchingRef3));
         TestUtils.assertEquals(tmpMatchingRef3, StructureAnyD.reference(tmpMatchingInd3, tmpStructure));
+    }
+
+    @Test
+    public void testAnyD53421() {
+
+        long[] structure = new long[] { 5, 3, 4, 2, 1 };
+
+        StructureTest.backAndForth(0, structure, new long[] { 0, 0, 0, 0, 0 });
+        StructureTest.backAndForth(15, structure, new long[] { 0, 0, 1, 0, 0 });
+        StructureTest.backAndForth(30, structure, new long[] { 0, 0, 2, 0, 0 });
+        StructureTest.backAndForth(45, structure, new long[] { 0, 0, 3, 0, 0 });
+        StructureTest.backAndForth(60, structure, new long[] { 0, 0, 0, 1, 0 });
+        StructureTest.backAndForth(75, structure, new long[] { 0, 0, 1, 1, 0 });
+        StructureTest.backAndForth(90, structure, new long[] { 0, 0, 2, 1, 0 });
+        StructureTest.backAndForth(105, structure, new long[] { 0, 0, 3, 1, 0 });
+
+        StructureTest.backAndForth(0, structure, new long[] { 0, 0, 0, 0, 0 });
+        StructureTest.backAndForth(81, structure, new long[] { 1, 1, 1, 1, 0 });
+        StructureTest.backAndForth(38, structure, new long[] { 3, 1, 2, 0, 0 });
+        StructureTest.backAndForth(119, structure, new long[] { 4, 2, 3, 1, 0 });
     }
 
 }

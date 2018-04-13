@@ -332,6 +332,7 @@ public class CompareImplementations {
     }
 
     @Test
+    @Tag("unstable")
     public void testMIN() {
         this.assertBinary(BigFunction.MIN, ComplexFunction.MIN, PrimitiveFunction.MIN, QuaternionFunction.MIN, RationalFunction.MIN, AROUND_ZERO.doubleValue(),
                 POSITIVE.doubleValue());
