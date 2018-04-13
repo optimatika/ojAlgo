@@ -483,7 +483,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
         final AggregatorFunction<BigDecimal> mainAggr = aggregator.getFunction(BigAggregator.getSet());
 
-        if (mainAggr.isMergeable() && tmpColDim > AggregateAll.THRESHOLD) {
+        if (mainAggr.isMergeable() && (tmpColDim > AggregateAll.THRESHOLD)) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 

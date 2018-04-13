@@ -27,6 +27,11 @@ import org.ojalgo.random.Uniform;
 
 public class StructureTest {
 
+    static void backAndForth(long index, long[] structure, long[] reference) {
+        TestUtils.assertEquals(index, StructureAnyD.index(structure, reference));
+        TestUtils.assertEquals(StructureAnyD.reference(index, structure), reference);
+    }
+
     @Test
     public void access2D() {
 
@@ -104,11 +109,6 @@ public class StructureTest {
         StructureTest.backAndForth(81, structure, new long[] { 1, 1, 1, 1, 0 });
         StructureTest.backAndForth(38, structure, new long[] { 3, 1, 2, 0, 0 });
         StructureTest.backAndForth(119, structure, new long[] { 4, 2, 3, 1, 0 });
-    }
-
-    static void backAndForth(long index, long[] structure, long[] reference) {
-        TestUtils.assertEquals(index, StructureAnyD.index(structure, reference));
-        TestUtils.assertEquals(StructureAnyD.reference(index, structure), reference);
     }
 
 }

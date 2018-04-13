@@ -465,7 +465,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         final AggregatorFunction<Double> mainAggr = aggregator.getFunction(PrimitiveAggregator.getSet());
 
-        if (mainAggr.isMergeable() && tmpColDim > AggregateAll.THRESHOLD) {
+        if (mainAggr.isMergeable() && (tmpColDim > AggregateAll.THRESHOLD)) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 

@@ -372,7 +372,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
                 final long rowInd = i;
 
                 visitor.reset();
-                this.loop(reference -> reference[rowDimension] == rowInd && reference[columnDimension] == colInd, index -> this.visitOne(index, visitor));
+                this.loop(reference -> (reference[rowDimension] == rowInd) && (reference[columnDimension] == colInd), index -> this.visitOne(index, visitor));
                 if (primitive) {
                     retVal.set(rowInd, colInd, visitor.doubleValue());
                 } else {

@@ -36,6 +36,11 @@ public abstract class AggregatorSet<N extends Number> {
     }
 
     /**
+     * Average value
+     */
+    public abstract AggregatorFunction<N> average();
+
+    /**
      * Count of non-zero elements
      */
     public abstract AggregatorFunction<N> cardinality();
@@ -107,11 +112,6 @@ public abstract class AggregatorSet<N extends Number> {
      * Max value
      */
     public abstract AggregatorFunction<N> maximum();
-
-    /**
-     * Average value
-     */
-    public abstract AggregatorFunction<N> average();
 
     /**
      * Min value

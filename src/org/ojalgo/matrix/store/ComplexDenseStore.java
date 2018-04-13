@@ -484,7 +484,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         final AggregatorFunction<ComplexNumber> mainAggr = aggregator.getFunction(ComplexAggregator.getSet());
 
-        if (mainAggr.isMergeable() && tmpColDim > AggregateAll.THRESHOLD) {
+        if (mainAggr.isMergeable() && (tmpColDim > AggregateAll.THRESHOLD)) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 

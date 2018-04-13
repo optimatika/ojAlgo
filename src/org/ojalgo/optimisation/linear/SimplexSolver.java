@@ -756,5 +756,4 @@ public final class SimplexSolver extends LinearSolver {
         }
     }
 
-
 }
