@@ -53,7 +53,6 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.scalar.ComplexNumber;
@@ -89,7 +88,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class ConvexSolver extends GenericSolver implements UpdatableSolver {
+public abstract class ConvexSolver extends GenericSolver {
 
     public static final class Builder extends GenericSolver.Builder<ConvexSolver.Builder, ConvexSolver> {
 
@@ -538,8 +537,8 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         // AI & BI
 
-        final List<Expression> tmpUpExpr = sourceModel.constraints()
-                .filter((e) -> e.isUpperConstraint() && !e.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
+        final List<Expression> tmpUpExpr = sourceModel.constraints().filter((e) -> e.isUpperConstraint() && !e.isAnyQuadraticFactorNonZero())
+                .collect(Collectors.toList());
         final int numbUpExpr = tmpUpExpr.size();
 
         final List<Variable> tmpUpVar = sourceModel.bounds().filter((final Variable c4) -> c4.isUpperConstraint()).collect(Collectors.toList());
@@ -554,13 +553,12 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         if ((numbUpExpr + numbUpVar + numbLoExpr + numbLoVar) > 0) {
 
-
             final RowsSupplier<Double> mtrxAI = FACTORY.makeRowsSupplier(numbVars);
             final PhysicalStore<Double> mtrxBI = FACTORY.makeZero(numbUpExpr + numbUpVar + numbLoExpr + numbLoVar, 1);
 
             if (numbUpExpr > 0) {
                 for (int i = 0; i < numbUpExpr; i++) {
-                    SparseArray<Double> rowAI = mtrxAI.addRow();
+                    final SparseArray<Double> rowAI = mtrxAI.addRow();
                     final Expression tmpExpression = tmpUpExpr.get(i).compensate(fixedVariables);
                     for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
                         final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
@@ -574,7 +572,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             if (numbUpVar > 0) {
                 for (int i = 0; i < numbUpVar; i++) {
-                    SparseArray<Double> rowAI = mtrxAI.addRow();
+                    final SparseArray<Double> rowAI = mtrxAI.addRow();
                     final Variable tmpVariable = tmpUpVar.get(i);
                     rowAI.set(sourceModel.indexOfFreeVariable(tmpVariable), tmpVariable.getAdjustmentFactor());
                     mtrxBI.set(numbUpExpr + i, 0, tmpVariable.getAdjustedUpperLimit());
@@ -583,7 +581,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             if (numbLoExpr > 0) {
                 for (int i = 0; i < numbLoExpr; i++) {
-                    SparseArray<Double> rowAI = mtrxAI.addRow();
+                    final SparseArray<Double> rowAI = mtrxAI.addRow();
                     final Expression tmpExpression = tmpLoExpr.get(i).compensate(fixedVariables);
                     for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
                         final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
@@ -597,7 +595,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             if (numbLoVar > 0) {
                 for (int i = 0; i < numbLoVar; i++) {
-                    SparseArray<Double> rowAI = mtrxAI.addRow();
+                    final SparseArray<Double> rowAI = mtrxAI.addRow();
                     final Variable tmpVariable = tmpLoVar.get(i);
                     rowAI.set(sourceModel.indexOfFreeVariable(tmpVariable), -tmpVariable.getAdjustmentFactor());
                     mtrxBI.set(numbUpExpr + numbUpVar + numbLoExpr + i, 0, -tmpVariable.getAdjustedLowerLimit());
@@ -905,22 +903,5 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             slack.add(i, -mtrxAI.getRow(i).dot(mtrxX));
         }
     }
-
-    @Override
-    public boolean update(Variable variable) {
-
-        boolean retVal = true;
-
-        if (variable.isLowerLimitSet()) {
-            retVal = false;
-        }
-
-        if (variable.isUpperLimitSet()) {
-            retVal = false;
-        }
-
-        return retVal;
-    }
-
 
 }

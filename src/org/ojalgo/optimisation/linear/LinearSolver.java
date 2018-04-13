@@ -31,12 +31,11 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
 
-public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
+public abstract class LinearSolver extends GenericSolver {
 
     public static final class Builder extends GenericSolver.Builder<LinearSolver.Builder, LinearSolver> {
 
@@ -224,11 +223,5 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
     protected abstract boolean initialise(Result kickStarter);
 
     protected abstract boolean needsAnotherIteration();
-
-    @Override
-    public boolean update(Variable variable) {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
 }
