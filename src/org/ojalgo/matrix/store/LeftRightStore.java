@@ -63,8 +63,8 @@ final class LeftRightStore<N extends Number> extends ComposingStore<N> {
     }
 
     public int firstInRow(final int row) {
-        int baseFirst = this.getBase().firstInRow(row);
-        return (baseFirst<mySplit) ? baseFirst : mySplit+myRight.firstInRow(row);
+        final int baseFirst = this.getBase().firstInRow(row);
+        return (baseFirst < mySplit) ? baseFirst : mySplit + myRight.firstInRow(row);
     }
 
     public N get(final long row, final long col) {
@@ -78,7 +78,7 @@ final class LeftRightStore<N extends Number> extends ComposingStore<N> {
 
     @Override
     public int limitOfRow(final int row) {
-        int rightLimit = myRight.limitOfRow(row);
+        final int rightLimit = myRight.limitOfRow(row);
         return rightLimit == 0 ? this.getBase().limitOfRow(row) : mySplit + rightLimit;
     }
 
