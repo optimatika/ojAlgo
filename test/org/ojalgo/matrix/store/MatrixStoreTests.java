@@ -23,6 +23,6 @@ package org.ojalgo.matrix.store;
 
 public abstract class MatrixStoreTests {
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
 }

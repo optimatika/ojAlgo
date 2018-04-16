@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
@@ -35,6 +33,7 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -395,26 +394,6 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
-
-        public LogicalBuilder<BigDecimal> makeIdentity(final int dimension) {
-            return new LogicalBuilder<>(new IdentityStore<>(BigDenseStore.FACTORY, dimension));
-        }
-
-        public LogicalBuilder<BigDecimal> makeSingle(final BigDecimal element) {
-            return new LogicalBuilder<>(new SingleStore<>(BigDenseStore.FACTORY, element));
-        }
-
-        public LogicalBuilder<BigDecimal> makeWrapper(final Access2D<?> access) {
-            return new LogicalBuilder<>(new WrapperStore<>(BigDenseStore.FACTORY, access));
-        }
-
-        public LogicalBuilder<BigDecimal> makeZero(final int rowsCount, final int columnsCount) {
-            return new LogicalBuilder<>(new ZeroStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount));
-        }
-
-    };
-
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         public LogicalBuilder<ComplexNumber> makeIdentity(final int dimension) {
@@ -431,6 +410,26 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         public LogicalBuilder<ComplexNumber> makeZero(final int rowsCount, final int columnsCount) {
             return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.COMPLEX, rowsCount, columnsCount));
+        }
+
+    };
+
+    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+
+        public LogicalBuilder<RationalNumber> makeIdentity(final int dimension) {
+            return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.RATIONAL, dimension));
+        }
+
+        public LogicalBuilder<RationalNumber> makeSingle(final RationalNumber element) {
+            return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.RATIONAL, element));
+        }
+
+        public LogicalBuilder<RationalNumber> makeWrapper(final Access2D<?> access) {
+            return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.RATIONAL, access));
+        }
+
+        public LogicalBuilder<RationalNumber> makeZero(final int rowsCount, final int columnsCount) {
+            return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.RATIONAL, rowsCount, columnsCount));
         }
 
     };

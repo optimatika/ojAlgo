@@ -375,6 +375,10 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
     private final long myNumerator;
 
+    public RationalNumber() {
+        this(0L, 1L);
+    }
+
     private RationalNumber(final long numerator, final long denominator) {
         assert denominator >= 0;
         myNumerator = numerator;
@@ -423,7 +427,27 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public int compareTo(final RationalNumber reference) {
-        return this.toBigDecimal().compareTo(reference.toBigDecimal());
+
+        final long refNumer = reference.getNumerator();
+        final long refDenom = reference.getDenominator();
+
+        if (refDenom == 0L) {
+            if (myDenominator == 0L) {
+                return Long.compare(myNumerator, refNumer);
+            } else if (refNumer > 0L) {
+                return -1;
+            } else {
+                return 1;
+            }
+        } else if (myDenominator == 0L) {
+            if (myNumerator > 0L) {
+                return 1;
+            } else {
+                return -1;
+            }
+        } else {
+            return this.toBigDecimal().compareTo(reference.toBigDecimal());
+        }
     }
 
     public RationalNumber conjugate() {
@@ -650,14 +674,11 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     private BigDecimal toBigDecimal(final MathContext context) {
-        if (this.isNaN()) {
-            return BigDecimal.valueOf(Double.POSITIVE_INFINITY); // TODO: really?!
+        if (myDenominator == 0L) {
+            throw new NumberFormatException();
+        } else {
+            return new BigDecimal(myNumerator).divide(new BigDecimal(myDenominator), context);
         }
-        if (this.isInfinite()) {
-            return this.sign() > 0 ? BigDecimal.valueOf(Double.POSITIVE_INFINITY) : // TODO: really?!
-                    BigDecimal.valueOf(Double.NEGATIVE_INFINITY); // TODO: really?!
-        }
-        return new BigDecimal(myNumerator).divide(new BigDecimal(myDenominator), context);
     }
 
     long getDenominator() {

@@ -34,13 +34,14 @@ import org.ojalgo.access.RowView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix.Builder;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -935,23 +936,6 @@ public abstract class BasicMatrixTest {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#toBigStore()
-     */
-    @Test
-    public void testToBigStore() {
-
-        final PhysicalStore<BigDecimal> tmpExpStore = BigDenseStore.FACTORY.copy(myBigAA);
-        PhysicalStore<BigDecimal> tmpActStore;
-
-        tmpActStore = BigDenseStore.FACTORY.copy(myComplexAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
-
-        tmpActStore = BigDenseStore.FACTORY.copy(myPrimitiveAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
-
-    }
-
-    /**
      * @see org.ojalgo.matrix.BasicMatrix#toComplexNumber(int, int)
      */
     @Test
@@ -1034,6 +1018,23 @@ public abstract class BasicMatrixTest {
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
         tmpActStore = PrimitiveDenseStore.FACTORY.copy(myPrimitiveAA);
+        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
+
+    }
+
+    /**
+     * @see org.ojalgo.matrix.BasicMatrix#toBigStore()
+     */
+    @Test
+    public void testToRationalStore() {
+
+        final PhysicalStore<RationalNumber> tmpExpStore = GenericDenseStore.RATIONAL.copy(myBigAA);
+        PhysicalStore<RationalNumber> tmpActStore;
+
+        tmpActStore = GenericDenseStore.RATIONAL.copy(myComplexAA);
+        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
+
+        tmpActStore = GenericDenseStore.RATIONAL.copy(myPrimitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
     }

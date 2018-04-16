@@ -40,9 +40,9 @@ public class SelectedColumnsCase extends NonPhysicalTest {
             tmpCols[i] = Uniform.randomInteger(tmpColDim);
         }
 
-        myBigStore = new ColumnsStore<>(BigDenseStore.FACTORY.copy(tmpBase), tmpCols);
-        myComplexStore = new ColumnsStore<>(ComplexDenseStore.FACTORY.copy(tmpBase), tmpCols);
-        myPrimitiveStore = new ColumnsStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), tmpCols);
+        rationalStore = new ColumnsStore<>(GenericDenseStore.RATIONAL.copy(tmpBase), tmpCols);
+        complexStore = new ColumnsStore<>(GenericDenseStore.COMPLEX.copy(tmpBase), tmpCols);
+        primitiveStore = new ColumnsStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), tmpCols);
     }
 
 }

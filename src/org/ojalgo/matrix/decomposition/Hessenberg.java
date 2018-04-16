@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -47,8 +45,6 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
 
     }
 
-    public static final Factory<BigDecimal> BIG = typical -> new HessenbergDecomposition.Big();
-
     public static final Factory<ComplexNumber> COMPLEX = typical -> new HessenbergDecomposition.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> new HessenbergDecomposition.Primitive();
@@ -62,8 +58,10 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
 
         final N tmpNumber = typical.get(0, 0);
 
-        if (tmpNumber instanceof BigDecimal) {
-            return (Hessenberg<N>) BIG.make(typical);
+        if (tmpNumber instanceof RationalNumber) {
+            return (Hessenberg<N>) RATIONAL.make(typical);
+        } else if (tmpNumber instanceof Quaternion) {
+            return (Hessenberg<N>) QUATERNION.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
             return (Hessenberg<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {

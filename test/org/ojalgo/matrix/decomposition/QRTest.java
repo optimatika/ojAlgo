@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
@@ -30,8 +28,8 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20030422Case;
 import org.ojalgo.matrix.RationalMatrix;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -39,6 +37,7 @@ import org.ojalgo.matrix.store.operation.MatrixOperation;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -196,15 +195,15 @@ public class QRTest {
 
         final RationalMatrix tmpOriginal = P20030422Case.getProblematic();
 
-        final QR<BigDecimal> tmpBigDecomp = QR.BIG.make();
+        final QR<RationalNumber> tmpBigDecomp = QR.RATIONAL.make();
         final QR<ComplexNumber> tmpComplexDecomp = QR.COMPLEX.make();
         final QR<Double> tmpPrimitiveDecomp = QR.PRIMITIVE.make();
 
-        tmpBigDecomp.decompose(BigDenseStore.FACTORY.copy(tmpOriginal));
+        tmpBigDecomp.decompose(GenericDenseStore.RATIONAL.copy(tmpOriginal));
         tmpComplexDecomp.decompose(ComplexDenseStore.FACTORY.copy(tmpOriginal));
         tmpPrimitiveDecomp.decompose(PrimitiveDenseStore.FACTORY.copy(tmpOriginal));
 
-        final MatrixStore<BigDecimal> tmpBigQ = tmpBigDecomp.getQ();
+        final MatrixStore<RationalNumber> tmpBigQ = tmpBigDecomp.getQ();
         final MatrixStore<ComplexNumber> tmpComplexQ = tmpComplexDecomp.getQ();
         final MatrixStore<Double> tmpPrimitiveQ = tmpPrimitiveDecomp.getQ();
 
@@ -214,7 +213,7 @@ public class QRTest {
             BasicLogger.debug("Primitive Q", tmpPrimitiveQ);
         }
 
-        final MatrixStore<BigDecimal> tmpBigR = tmpBigDecomp.getR();
+        final MatrixStore<RationalNumber> tmpBigR = tmpBigDecomp.getR();
         final MatrixStore<ComplexNumber> tmpComplexR = tmpComplexDecomp.getR();
         final MatrixStore<Double> tmpPrimitiveR = tmpPrimitiveDecomp.getR();
 
@@ -224,7 +223,7 @@ public class QRTest {
             BasicLogger.debug("Primitive R", tmpPrimitiveR);
         }
 
-        TestUtils.assertEquals(BigDenseStore.FACTORY.copy(tmpOriginal), tmpBigDecomp, new NumberContext(7, 14));
+        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(tmpOriginal), tmpBigDecomp, new NumberContext(7, 14));
         TestUtils.assertEquals(ComplexDenseStore.FACTORY.copy(tmpOriginal), tmpComplexDecomp, new NumberContext(7, 14));
         TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpOriginal), tmpPrimitiveDecomp, new NumberContext(7, 14));
     }

@@ -35,9 +35,9 @@ public class ConjugatedCase extends NonPhysicalTest {
 
         final BasicMatrix tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        myBigStore = new ConjugatedStore<>(BigDenseStore.FACTORY.copy(tmpBase));
-        myComplexStore = new ConjugatedStore<>(ComplexDenseStore.FACTORY.copy(tmpBase));
-        myPrimitiveStore = new ConjugatedStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase));
+        rationalStore = new ConjugatedStore<>(GenericDenseStore.RATIONAL.copy(tmpBase));
+        complexStore = new ConjugatedStore<>(GenericDenseStore.COMPLEX.copy(tmpBase));
+        primitiveStore = new ConjugatedStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase));
     }
 
 }

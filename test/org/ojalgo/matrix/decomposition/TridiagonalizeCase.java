@@ -21,22 +21,21 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -107,11 +106,11 @@ public class TridiagonalizeCase {
         BasicMatrix tmpSymmetricRandoml = PrimitiveMatrix.FACTORY.makeFilled(9, 9, new Normal());
         tmpSymmetricRandoml = tmpSymmetricRandoml.add(tmpSymmetricRandoml.transpose());
 
-        final MatrixStore<BigDecimal> tmpBigA = BigDenseStore.FACTORY.copy(tmpSymmetricRandoml);
+        final MatrixStore<RationalNumber> tmpBigA = GenericDenseStore.RATIONAL.copy(tmpSymmetricRandoml);
         final MatrixStore<ComplexNumber> tmpComplexA = ComplexDenseStore.FACTORY.copy(tmpSymmetricRandoml);
         final MatrixStore<Double> tmpPrimitiveA = PrimitiveDenseStore.FACTORY.copy(tmpSymmetricRandoml);
 
-        final Tridiagonal<BigDecimal> tmpBigDecomp = Tridiagonal.BIG.make();
+        final Tridiagonal<RationalNumber> tmpBigDecomp = Tridiagonal.RATIONAL.make();
         final Tridiagonal<ComplexNumber> tmpComplexDecomp = Tridiagonal.COMPLEX.make();
         final Tridiagonal<Double> tmpPrimitiveDecomp = Tridiagonal.PRIMITIVE.make();
 

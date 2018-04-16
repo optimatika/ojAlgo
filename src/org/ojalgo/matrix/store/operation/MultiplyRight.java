@@ -27,10 +27,8 @@ import java.util.Arrays;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyRight;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyRight;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyRight;
 import org.ojalgo.scalar.Scalar;
@@ -40,28 +38,6 @@ public final class MultiplyRight extends MatrixOperation {
     public static final MultiplyRight SETUP = new MultiplyRight();
 
     public static int THRESHOLD = 32;
-
-    static final BigMultiplyRight BIG = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, BigMath.ZERO);
-
-        MultiplyRight.invoke(product, 0, (int) (right.count() / complexity), left, complexity, right);
-    };
-
-    static final BigMultiplyRight BIG_MT = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, BigMath.ZERO);
-
-        final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-            @Override
-            public void conquer(final int first, final int limit) {
-                MultiplyRight.invoke(product, first, limit, left, complexity, right);
-            }
-        };
-
-        tmpConquerer.invoke(0, (int) (right.count() / complexity), THRESHOLD);
-    };
 
     static final PrimitiveMultiplyRight PRIMITIVE = (product, left, complexity, right) -> {
 
@@ -576,14 +552,6 @@ public final class MultiplyRight extends MatrixOperation {
 
         tmpConquerer.invoke(0, (int) (right.count() / complexity), THRESHOLD);
     };
-
-    public static BigMultiplyRight getBig(final long rows, final long columns) {
-        if (columns > THRESHOLD) {
-            return BIG_MT;
-        } else {
-            return BIG;
-        }
-    }
 
     public static <N extends Number & Scalar<N>> GenericMultiplyRight<N> getGeneric(final long rows, final long columns) {
 

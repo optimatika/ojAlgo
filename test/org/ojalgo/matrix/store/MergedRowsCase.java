@@ -36,9 +36,9 @@ public class MergedRowsCase extends NonPhysicalTest {
         final BasicMatrix tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
         final BasicMatrix tmpRight = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        myBigStore = new LeftRightStore<>(BigDenseStore.FACTORY.copy(tmpBase), BigDenseStore.FACTORY.copy(tmpRight));
-        myComplexStore = new LeftRightStore<>(ComplexDenseStore.FACTORY.copy(tmpBase), ComplexDenseStore.FACTORY.copy(tmpRight));
-        myPrimitiveStore = new LeftRightStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), PrimitiveDenseStore.FACTORY.copy(tmpRight));
+        rationalStore = new LeftRightStore<>(GenericDenseStore.RATIONAL.copy(tmpBase), GenericDenseStore.RATIONAL.copy(tmpRight));
+        complexStore = new LeftRightStore<>(GenericDenseStore.COMPLEX.copy(tmpBase), GenericDenseStore.COMPLEX.copy(tmpRight));
+        primitiveStore = new LeftRightStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), PrimitiveDenseStore.FACTORY.copy(tmpRight));
     }
 
 }

@@ -30,9 +30,9 @@ public class IdentityCase extends NonPhysicalTest {
     public void setUp() {
         final int tmpDim = Uniform.randomInteger(1, 9);
 
-        myBigStore = new IdentityStore<>(BigDenseStore.FACTORY, tmpDim);
-        myComplexStore = new IdentityStore<>(ComplexDenseStore.FACTORY, tmpDim);
-        myPrimitiveStore = new IdentityStore<>(PrimitiveDenseStore.FACTORY, tmpDim);
+        rationalStore = new IdentityStore<>(GenericDenseStore.RATIONAL, tmpDim);
+        complexStore = new IdentityStore<>(GenericDenseStore.COMPLEX, tmpDim);
+        primitiveStore = new IdentityStore<>(PrimitiveDenseStore.FACTORY, tmpDim);
     }
 
 }

@@ -21,16 +21,14 @@
  */
 package org.ojalgo.function.multiary;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access1D;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 
 /**
  * Constant valued function - always returns the same value.
@@ -38,14 +36,6 @@ import org.ojalgo.scalar.ComplexNumber;
  * @author apete
  */
 public final class ConstantFunction<N extends Number> extends AbstractMultiary<N, ConstantFunction<N>> {
-
-    public static ConstantFunction<BigDecimal> makeBig(final int arity) {
-        return new ConstantFunction<>(arity, BigDenseStore.FACTORY, null);
-    }
-
-    public static ConstantFunction<BigDecimal> makeBig(final int arity, final Number constant) {
-        return new ConstantFunction<>(arity, BigDenseStore.FACTORY, constant);
-    }
 
     public static ConstantFunction<ComplexNumber> makeComplex(final int arity) {
         return new ConstantFunction<>(arity, GenericDenseStore.COMPLEX, null);
@@ -61,6 +51,14 @@ public final class ConstantFunction<N extends Number> extends AbstractMultiary<N
 
     public static ConstantFunction<Double> makePrimitive(final int arity, final Number constant) {
         return new ConstantFunction<>(arity, PrimitiveDenseStore.FACTORY, constant);
+    }
+
+    public static ConstantFunction<RationalNumber> makeRational(final int arity) {
+        return new ConstantFunction<>(arity, GenericDenseStore.RATIONAL, null);
+    }
+
+    public static ConstantFunction<RationalNumber> makeRational(final int arity, final Number constant) {
+        return new ConstantFunction<>(arity, GenericDenseStore.RATIONAL, constant);
     }
 
     private final int myArity;

@@ -35,9 +35,9 @@ public class TransposedCase extends NonPhysicalTest {
 
         final BasicMatrix tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        myBigStore = new TransposedStore<>(BigDenseStore.FACTORY.copy(tmpBase));
-        myComplexStore = new TransposedStore<>(ComplexDenseStore.FACTORY.copy(tmpBase));
-        myPrimitiveStore = new TransposedStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase));
+        rationalStore = new TransposedStore<>(GenericDenseStore.RATIONAL.copy(tmpBase));
+        complexStore = new TransposedStore<>(GenericDenseStore.COMPLEX.copy(tmpBase));
+        primitiveStore = new TransposedStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase));
     }
 
 }

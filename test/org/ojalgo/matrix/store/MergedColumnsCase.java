@@ -35,9 +35,9 @@ public class MergedColumnsCase extends NonPhysicalTest {
         final BasicMatrix tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
         final BasicMatrix tmpLower = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        myBigStore = new AboveBelowStore<>(BigDenseStore.FACTORY.copy(tmpBase), BigDenseStore.FACTORY.copy(tmpLower));
-        myComplexStore = new AboveBelowStore<>(ComplexDenseStore.FACTORY.copy(tmpBase), ComplexDenseStore.FACTORY.copy(tmpLower));
-        myPrimitiveStore = new AboveBelowStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), PrimitiveDenseStore.FACTORY.copy(tmpLower));
+        rationalStore = new AboveBelowStore<>(GenericDenseStore.RATIONAL.copy(tmpBase), GenericDenseStore.RATIONAL.copy(tmpLower));
+        complexStore = new AboveBelowStore<>(GenericDenseStore.COMPLEX.copy(tmpBase), GenericDenseStore.COMPLEX.copy(tmpLower));
+        primitiveStore = new AboveBelowStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), PrimitiveDenseStore.FACTORY.copy(tmpLower));
     }
 
 }

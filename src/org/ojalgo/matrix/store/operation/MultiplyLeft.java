@@ -27,10 +27,8 @@ import java.util.Arrays;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyLeft;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyLeft;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyLeft;
 import org.ojalgo.scalar.Scalar;
@@ -40,28 +38,6 @@ public final class MultiplyLeft extends MatrixOperation {
     public static final MultiplyLeft SETUP = new MultiplyLeft();
 
     public static int THRESHOLD = 32;
-
-    static final BigMultiplyLeft BIG = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, BigMath.ZERO);
-
-        MultiplyLeft.invoke(product, 0, right.length / complexity, left, complexity, right);
-    };
-
-    static final BigMultiplyLeft BIG_MT = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, BigMath.ZERO);
-
-        final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-            @Override
-            public void conquer(final int first, final int limit) {
-                MultiplyLeft.invoke(product, first, limit, left, complexity, right);
-            }
-        };
-
-        tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
-    };
 
     static final PrimitiveMultiplyLeft PRIMITIVE = (product, left, complexity, right) -> {
 
@@ -576,14 +552,6 @@ public final class MultiplyLeft extends MatrixOperation {
 
         tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
     };
-
-    public static BigMultiplyLeft getBig(final long rows, final long columns) {
-        if (rows > THRESHOLD) {
-            return BIG_MT;
-        } else {
-            return BIG;
-        }
-    }
 
     public static <N extends Number & Scalar<N>> GenericMultiplyLeft<N> getGeneric(final long rows, final long columns) {
 

@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
@@ -150,8 +149,6 @@ public interface Eigenvalue<N extends Number>
 
     }
 
-    public static final Factory<BigDecimal> BIG = (typical, hermitian) -> hermitian ? new HermitianEvD.Big() : null;
-
     public static final Factory<ComplexNumber> COMPLEX = (typical, hermitian) -> hermitian ? new HermitianEvD.Complex() : null;
 
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
@@ -195,9 +192,7 @@ public interface Eigenvalue<N extends Number>
 
         final N tmpNumber = typical.get(0L, 0L);
 
-        if (tmpNumber instanceof BigDecimal) {
-            return (Eigenvalue<N>) BIG.make(typical, hermitian);
-        } else if (tmpNumber instanceof ComplexNumber) {
+        if (tmpNumber instanceof ComplexNumber) {
             return (Eigenvalue<N>) COMPLEX.make(typical, hermitian);
         } else if (tmpNumber instanceof Double) {
             return (Eigenvalue<N>) PRIMITIVE.make(typical, hermitian);
