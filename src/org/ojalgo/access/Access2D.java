@@ -44,6 +44,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         N aggregateColumn(long row, long col, Aggregator aggregator);
 
+        default N aggregateDiagonal(final Aggregator aggregator) {
+            return this.aggregateDiagonal(0L, 0L, aggregator);
+        }
+
         N aggregateDiagonal(long row, long col, Aggregator aggregator);
 
         default N aggregateRow(final long row, final Aggregator aggregator) {
@@ -52,13 +56,13 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         N aggregateRow(long row, long col, Aggregator aggregator);
 
-        default void reduceColumns(Aggregator aggregator, Mutate1D receiver) {
+        default void reduceColumns(final Aggregator aggregator, final Mutate1D receiver) {
             for (long j = 0L, limit = Math.min(this.countColumns(), receiver.count()); j < limit; j++) {
                 receiver.set(j, this.aggregateColumn(j, aggregator));
             }
         }
 
-        default void reduceRows(Aggregator aggregator, Mutate1D receiver) {
+        default void reduceRows(final Aggregator aggregator, final Mutate1D receiver) {
             for (long i = 0L, limit = Math.min(this.countRows(), receiver.count()); i < limit; i++) {
                 receiver.set(i, this.aggregateRow(i, aggregator));
             }
@@ -259,6 +263,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         }
 
         Access1D<N> sliceColumn(long row, long col);
+
+        default Access1D<N> sliceDiagonal() {
+            return this.sliceDiagonal(0L, 0L);
+        }
 
         Access1D<N> sliceDiagonal(long row, long col);
 
