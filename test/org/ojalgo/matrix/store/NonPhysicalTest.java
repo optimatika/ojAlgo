@@ -48,13 +48,14 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
 
         for (final Aggregator tmpAggr : Aggregator.values()) {
 
-            BasicLogger.debug("Aggregator={}", tmpAggr);
+            // BasicLogger.debug("Aggregator={}", tmpAggr);
 
             tmpExpected = copied.aggregateAll(tmpAggr);
             tmpActual = anyStore.aggregateAll(tmpAggr);
 
-            if (MatrixStoreTests.DEBUG) {
-                BasicLogger.debug("Aggregator={}, Expected/Physical={}, Actual/Logical={}", tmpAggr, tmpExpected, tmpActual);
+            if (MatrixStoreTests.DEBUG && CNTXT.isDifferent(tmpExpected.doubleValue(), tmpActual.doubleValue())) {
+                BasicLogger.debug("Aggregator={} {}, Expected/Physical={}, Actual/Logical={}", tmpAggr, anyStore.get(0, 0).getClass().getSimpleName(),
+                        tmpExpected.doubleValue(), tmpActual.doubleValue());
             }
 
             TestUtils.assertEquals(tmpAggr.name(), tmpExpected, tmpActual, CNTXT);
@@ -114,47 +115,23 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
     }
 
     @Test
-    public void testComplexAggregator() {
-        NonPhysicalTest.testAggregation(complexStore);
-    }
-
-    @Test
-    public void testComplexElements() {
-        NonPhysicalTest.testElements(complexStore);
-    }
-
-    @Test
-    public void testComplexMultiplication() {
-        NonPhysicalTest.testMultiplication(complexStore);
-    }
-
-    @Test
-    public void testPrimitiveAggregator() {
+    public void testAggregator() {
         NonPhysicalTest.testAggregation(primitiveStore);
-    }
-
-    @Test
-    public void testPrimitiveElements() {
-        NonPhysicalTest.testElements(primitiveStore);
-    }
-
-    @Test
-    public void testPrimitiveMultiplication() {
-        NonPhysicalTest.testMultiplication(primitiveStore);
-    }
-
-    @Test
-    public void testRationalAggregator() {
+        NonPhysicalTest.testAggregation(complexStore);
         NonPhysicalTest.testAggregation(rationalStore);
     }
 
     @Test
-    public void testRationalElements() {
+    public void testElements() {
+        NonPhysicalTest.testElements(primitiveStore);
+        NonPhysicalTest.testElements(complexStore);
         NonPhysicalTest.testElements(rationalStore);
     }
 
     @Test
-    public void testRationalMultiplication() {
+    public void testMultiplication() {
+        NonPhysicalTest.testMultiplication(primitiveStore);
+        NonPhysicalTest.testMultiplication(complexStore);
         NonPhysicalTest.testMultiplication(rationalStore);
     }
 

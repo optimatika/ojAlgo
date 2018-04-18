@@ -306,6 +306,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     private static RationalNumber of(BigInteger numer, BigInteger denom) {
+
         final BigInteger gcd = numer.gcd(denom);
         if (gcd.compareTo(BigInteger.ONE) > 0) {
             numer = numer.divide(gcd);
@@ -318,7 +319,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
 
         final int bits = Math.max(numer.bitLength(), denom.bitLength());
-
         if (bits > MAX_BITS) {
             final int shift = bits - MAX_BITS;
             numer = numer.shiftRight(shift);

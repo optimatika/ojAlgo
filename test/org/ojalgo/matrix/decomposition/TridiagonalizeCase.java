@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
-import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -101,43 +100,48 @@ public class TridiagonalizeCase {
 
     @Test
     @Tag("unstable")
-    public void testRandomBigComplexPrimitive() {
+    public void testTypesWithRandom() {
 
         BasicMatrix tmpSymmetricRandoml = PrimitiveMatrix.FACTORY.makeFilled(9, 9, new Normal());
         tmpSymmetricRandoml = tmpSymmetricRandoml.add(tmpSymmetricRandoml.transpose());
 
-        final MatrixStore<RationalNumber> tmpBigA = GenericDenseStore.RATIONAL.copy(tmpSymmetricRandoml);
-        final MatrixStore<ComplexNumber> tmpComplexA = ComplexDenseStore.FACTORY.copy(tmpSymmetricRandoml);
-        final MatrixStore<Double> tmpPrimitiveA = PrimitiveDenseStore.FACTORY.copy(tmpSymmetricRandoml);
+        final MatrixStore<Double> primitiveA = PrimitiveDenseStore.FACTORY.copy(tmpSymmetricRandoml);
+        final MatrixStore<ComplexNumber> complexA = GenericDenseStore.COMPLEX.copy(tmpSymmetricRandoml);
+        final MatrixStore<RationalNumber> rationalA = GenericDenseStore.RATIONAL.copy(tmpSymmetricRandoml);
 
-        final Tridiagonal<RationalNumber> tmpBigDecomp = Tridiagonal.RATIONAL.make();
-        final Tridiagonal<ComplexNumber> tmpComplexDecomp = Tridiagonal.COMPLEX.make();
-        final Tridiagonal<Double> tmpPrimitiveDecomp = Tridiagonal.PRIMITIVE.make();
+        final Tridiagonal<Double> primitiveDecomp = Tridiagonal.PRIMITIVE.make();
+        final Tridiagonal<ComplexNumber> complexDecomp = Tridiagonal.COMPLEX.make();
+        final Tridiagonal<RationalNumber> rationalDecomp = Tridiagonal.RATIONAL.make();
 
-        tmpBigDecomp.decompose(tmpBigA);
-        tmpComplexDecomp.decompose(tmpComplexA);
-        tmpPrimitiveDecomp.decompose(tmpPrimitiveA);
-
-        TestUtils.assertEquals(tmpBigA, tmpBigDecomp, new NumberContext(7, 14));
-        TestUtils.assertEquals(tmpComplexA, tmpComplexDecomp, new NumberContext(7, 14));
-        TestUtils.assertEquals(tmpPrimitiveA, tmpPrimitiveDecomp, new NumberContext(7, 14));
+        primitiveDecomp.decompose(primitiveA);
+        complexDecomp.decompose(complexA);
+        rationalDecomp.decompose(rationalA);
 
         if (MatrixDecompositionTests.DEBUG) {
 
-            BasicLogger.debug("Big Q", tmpBigDecomp.getQ());
-            BasicLogger.debug("Complex Q", tmpComplexDecomp.getQ());
-            BasicLogger.debug("Primitive Q", tmpPrimitiveDecomp.getQ());
+            BasicLogger.debug("Primitive Q", primitiveDecomp.getQ());
+            BasicLogger.debug("Complex Q", complexDecomp.getQ());
+            BasicLogger.debug("Rational Q", rationalDecomp.getQ());
 
-            BasicLogger.debug("Big D", tmpBigDecomp.getD());
-            BasicLogger.debug("Complex D", tmpComplexDecomp.getD());
-            BasicLogger.debug("Primitive D", tmpPrimitiveDecomp.getD());
+            BasicLogger.debug("Primitive D", primitiveDecomp.getD());
+            BasicLogger.debug("Complex D", complexDecomp.getD());
+            BasicLogger.debug("Rational D", rationalDecomp.getD());
         }
 
-        TestUtils.assertEquals(tmpPrimitiveDecomp.getD(), PrimitiveDenseStore.FACTORY.copy(tmpBigDecomp.getD()), new NumberContext(7, 14));
-        // TODO        JUnitUtils.assertEquals(tmpPrimitiveDecomp.getD(), PrimitiveDenseStore.FACTORY.copy(tmpComplexDecomp.getD()), JUnitUtils.EQUALS);
+        final NumberContext precision = new NumberContext(7, 14);
 
-        TestUtils.assertEquals(tmpPrimitiveDecomp.getQ(), PrimitiveDenseStore.FACTORY.copy(tmpBigDecomp.getQ()), new NumberContext(7, 14));
-        // TODO        JUnitUtils.assertEquals(tmpPrimitiveDecomp.getQ(), PrimitiveDenseStore.FACTORY.copy(tmpComplexDecomp.getQ()), JUnitUtils.EQUALS);
+        TestUtils.assertEquals(primitiveA, primitiveDecomp, precision);
+        TestUtils.assertEquals(complexA, complexDecomp, precision);
+        TestUtils.assertEquals(rationalA, rationalDecomp, precision);
+
+        TestUtils.assertEquals(primitiveDecomp.getD().sliceDiagonal(), rationalDecomp.getD().sliceDiagonal(), precision);
+        TestUtils.assertEquals(primitiveDecomp.getD().sliceDiagonal(), complexDecomp.getD().sliceDiagonal(), precision);
+
+        //        TestUtils.assertEquals(primitiveDecomp.getD(), PrimitiveDenseStore.FACTORY.copy(rationalDecomp.getD()), precision);
+        //        TestUtils.assertEquals(primitiveDecomp.getD(), PrimitiveDenseStore.FACTORY.copy(complexDecomp.getD()), precision);
+        //
+        //        TestUtils.assertEquals(primitiveDecomp.getQ(), PrimitiveDenseStore.FACTORY.copy(rationalDecomp.getQ()), precision);
+        //        TestUtils.assertEquals(primitiveDecomp.getQ(), PrimitiveDenseStore.FACTORY.copy(complexDecomp.getQ()), precision);
     }
 
     /**
