@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.task;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
@@ -65,23 +63,6 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
         public abstract InverterTask<N> make(Structure2D template, boolean symmetric, boolean positiveDefinite);
 
     }
-
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
-
-        @Override
-        public InverterTask<BigDecimal> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
-            if (symmetric && positiveDefinite) {
-                return Cholesky.BIG.make(template);
-            } else if (template.isSquare()) {
-                return LU.BIG.make(template);
-            } else if (template.isTall()) {
-                return QR.BIG.make(template);
-            } else {
-                return SingularValue.BIG.make(template);
-            }
-        }
-
-    };
 
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 

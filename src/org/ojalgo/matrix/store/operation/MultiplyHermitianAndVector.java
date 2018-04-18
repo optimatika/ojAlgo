@@ -40,24 +40,6 @@ public final class MultiplyHermitianAndVector extends MatrixOperation {
 
     public static int THRESHOLD = 256;
 
-    public static void invoke(final BigDecimal[] productMatrix, final int firstRow, final int rowLimit, final BigDecimal[] hermitianMatrix,
-            final BigDecimal[] rightVector, final int firstColumn) {
-
-        final int structure = rightVector.length;
-
-        BigDecimal tmpVal;
-        for (int i = firstRow; i < rowLimit; i++) {
-            tmpVal = BigMath.ZERO;
-            for (int c = firstColumn; c < i; c++) {
-                tmpVal = tmpVal.add(hermitianMatrix[i + (c * structure)].multiply(rightVector[c]));
-            }
-            for (int c = i; c < structure; c++) {
-                tmpVal = tmpVal.add(hermitianMatrix[c + (i * structure)].multiply(rightVector[c]));
-            }
-            productMatrix[i] = tmpVal;
-        }
-    }
-
     public static void invoke(final double[] productMatrix, final int firstRow, final int rowLimit, final double[] hermitianMatrix, final double[] rightVector,
             final int firstColumn) {
 

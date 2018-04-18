@@ -26,9 +26,7 @@ import java.util.Arrays;
 
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyNeither;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyNeither;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyNeither;
 import org.ojalgo.scalar.Scalar;
@@ -38,28 +36,6 @@ public final class MultiplyNeither extends MatrixOperation {
     public static final MultiplyNeither SETUP = new MultiplyNeither();
 
     public static int THRESHOLD = 32;
-
-    static final BigMultiplyNeither BIG = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, BigMath.ZERO);
-
-        MultiplyNeither.invoke(product, 0, right.length / complexity, left, complexity, right);
-    };
-
-    static final BigMultiplyNeither BIG_MT = (product, left, complexity, right) -> {
-
-        Arrays.fill(product, BigMath.ZERO);
-
-        final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-            @Override
-            public void conquer(final int first, final int limit) {
-                MultiplyNeither.invoke(product, first, limit, left, complexity, right);
-            }
-        };
-
-        tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
-    };
 
     static final PrimitiveMultiplyNeither PRIMITIVE = (product, left, complexity, right) -> {
 
@@ -574,14 +550,6 @@ public final class MultiplyNeither extends MatrixOperation {
 
         tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
     };
-
-    public static BigMultiplyNeither getBig(final long rows, final long columns) {
-        if (rows > THRESHOLD) {
-            return BIG_MT;
-        } else {
-            return BIG;
-        }
-    }
 
     public static <N extends Number & Scalar<N>> GenericMultiplyNeither<N> getGeneric(final long rows, final long columns) {
 

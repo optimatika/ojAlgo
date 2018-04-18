@@ -22,8 +22,8 @@
 package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.scalar.ComplexNumber;
 
 public class TransposedCase extends NonPhysicalTest {
 
@@ -33,11 +33,11 @@ public class TransposedCase extends NonPhysicalTest {
         final int tmpRowDim = Uniform.randomInteger(1, 9);
         final int tmpColDim = Uniform.randomInteger(1, 9);
 
-        final BasicMatrix tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        final MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        myBigStore = new TransposedStore<>(BigDenseStore.FACTORY.copy(tmpBase));
-        myComplexStore = new TransposedStore<>(ComplexDenseStore.FACTORY.copy(tmpBase));
-        myPrimitiveStore = new TransposedStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase));
+        rationalStore = new TransposedStore<>(GenericDenseStore.RATIONAL.copy(tmpBase));
+        complexStore = new TransposedStore<>(GenericDenseStore.COMPLEX.copy(tmpBase));
+        primitiveStore = new TransposedStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase));
     }
 
 }

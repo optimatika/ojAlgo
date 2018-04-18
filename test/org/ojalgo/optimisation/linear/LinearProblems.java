@@ -33,7 +33,6 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -130,8 +129,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final BasicMatrix tmpFullSolution = tmpBuilder.build();
         final BasicMatrix tmpOddSolution = tmpFullSolution.selectRows(0, 2, 4);
         final BasicMatrix tmpEvenSolution = tmpFullSolution.selectRows(1, 3, 5);
-        TestUtils.assertEquals("Claimed solution not valid!", true,
-                tmpFullModel.validate(BigDenseStore.FACTORY.copy(tmpFullSolution), new NumberContext(7, 6)));
+        TestUtils.assertEquals("Claimed solution not valid!", true, tmpFullModel.validate(BigArray.FACTORY.copy(tmpFullSolution), new NumberContext(7, 6)));
         final Double tmpActualValue = tmpFullObjective.toFunction().invoke(PrimitiveDenseStore.FACTORY.copy(tmpFullSolution));
         //final BigDecimal tmpActualValue = TypeUtils.toBigDecimal(tmpObjectiveValue);
         //JUnitUtils.assertEquals("Claimed objective value wrong!", 0, tmpClaimedValue.compareTo(tmpActualValue));

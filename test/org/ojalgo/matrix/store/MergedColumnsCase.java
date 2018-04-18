@@ -22,22 +22,23 @@
 package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.scalar.ComplexNumber;
 
 public class MergedColumnsCase extends NonPhysicalTest {
 
     @BeforeEach
     public void setUp() {
+
         final int tmpRowDim = Uniform.randomInteger(1, 9);
         final int tmpColDim = Uniform.randomInteger(1, 9);
 
-        final BasicMatrix tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
-        final BasicMatrix tmpLower = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        final MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        final MatrixStore<ComplexNumber> tmpLower = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        myBigStore = new AboveBelowStore<>(BigDenseStore.FACTORY.copy(tmpBase), BigDenseStore.FACTORY.copy(tmpLower));
-        myComplexStore = new AboveBelowStore<>(ComplexDenseStore.FACTORY.copy(tmpBase), ComplexDenseStore.FACTORY.copy(tmpLower));
-        myPrimitiveStore = new AboveBelowStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), PrimitiveDenseStore.FACTORY.copy(tmpLower));
+        rationalStore = new AboveBelowStore<>(GenericDenseStore.RATIONAL.copy(tmpBase), GenericDenseStore.RATIONAL.copy(tmpLower));
+        complexStore = new AboveBelowStore<>(GenericDenseStore.COMPLEX.copy(tmpBase), GenericDenseStore.COMPLEX.copy(tmpLower));
+        primitiveStore = new AboveBelowStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), PrimitiveDenseStore.FACTORY.copy(tmpLower));
     }
 
 }

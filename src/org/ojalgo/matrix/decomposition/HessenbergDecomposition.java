@@ -21,10 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -36,14 +33,6 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 
 abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Hessenberg<N> {
-
-    static final class Big extends HessenbergDecomposition<BigDecimal> {
-
-        Big() {
-            super(BigDenseStore.FACTORY);
-        }
-
-    }
 
     static final class Complex extends HessenbergDecomposition<ComplexNumber> {
 

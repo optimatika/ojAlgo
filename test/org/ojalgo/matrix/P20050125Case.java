@@ -21,15 +21,14 @@
  */
 package org.ojalgo.matrix;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.store.BigDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -66,22 +65,22 @@ public class P20050125Case extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        final Cholesky<BigDecimal> tmpDelegate = Cholesky.BIG.make();
-        tmpDelegate.decompose(BigDenseStore.FACTORY.copy(myBigAA));
+        final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
+        tmpDelegate.decompose(GenericDenseStore.RATIONAL.copy(myBigAA));
 
-        TestUtils.assertEquals(BigDenseStore.FACTORY.copy(myBigAA), tmpDelegate, EVALUATION);
+        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(myBigAA), tmpDelegate, EVALUATION);
     }
 
     @Test
     public void testProblem() {
 
-        final Cholesky<BigDecimal> tmpDelegate = Cholesky.BIG.make();
-        tmpDelegate.decompose(BigDenseStore.FACTORY.copy(myBigAA));
+        final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
+        tmpDelegate.decompose(GenericDenseStore.RATIONAL.copy(myBigAA));
 
-        final MatrixStore<BigDecimal> tmpInv = tmpDelegate.getSolution(BigDenseStore.FACTORY.copy(myBigI));
+        final MatrixStore<RationalNumber> tmpInv = tmpDelegate.getSolution(GenericDenseStore.RATIONAL.copy(myBigI));
 
-        final MatrixStore<BigDecimal> tmpExpMtrx = BigDenseStore.FACTORY.copy(myBigI);
-        final MatrixStore<BigDecimal> tmpActMtrx = BigDenseStore.FACTORY.copy(myBigAA).multiply(tmpInv);
+        final MatrixStore<RationalNumber> tmpExpMtrx = GenericDenseStore.RATIONAL.copy(myBigI);
+        final MatrixStore<RationalNumber> tmpActMtrx = GenericDenseStore.RATIONAL.copy(myBigAA).multiply(tmpInv);
 
         TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, EVALUATION);
     }

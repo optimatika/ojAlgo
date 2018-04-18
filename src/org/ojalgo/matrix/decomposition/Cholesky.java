@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -55,12 +53,6 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
 
     }
 
-    /**
-     * @deprecated v45 Use {@link #RATIONAL} instead.
-     */
-    @Deprecated
-    public static final Factory<BigDecimal> BIG = typical -> new CholeskyDecomposition.Big();
-
     public static final Factory<ComplexNumber> COMPLEX = typical -> new CholeskyDecomposition.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> {
@@ -80,8 +72,10 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
 
         final N tmpNumber = typical.get(0, 0);
 
-        if (tmpNumber instanceof BigDecimal) {
-            return (Cholesky<N>) BIG.make(typical);
+        if (tmpNumber instanceof RationalNumber) {
+            return (Cholesky<N>) RATIONAL.make(typical);
+        } else if (tmpNumber instanceof Quaternion) {
+            return (Cholesky<N>) QUATERNION.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
             return (Cholesky<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {

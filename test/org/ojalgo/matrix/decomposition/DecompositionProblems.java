@@ -29,7 +29,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -191,7 +191,7 @@ public class DecompositionProblems {
 
         final PhysicalStore<ComplexNumber> tmpSquare = MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim);
         final MatrixStore<ComplexNumber> tmpHermitian = tmpSquare.conjugate().multiply(tmpSquare);
-        final PhysicalStore<ComplexNumber> tmpExpected = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
+        final PhysicalStore<ComplexNumber> tmpExpected = GenericDenseStore.COMPLEX.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> tmpActual;
 
         @SuppressWarnings("unchecked")
@@ -232,7 +232,7 @@ public class DecompositionProblems {
         final int tmpDim = Uniform.randomInteger(2, 6);
 
         final PhysicalStore<ComplexNumber> original = MatrixUtils.makeRandomComplexStore(tmpDim + tmpDim, tmpDim);
-        final PhysicalStore<ComplexNumber> identity = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
+        final PhysicalStore<ComplexNumber> identity = GenericDenseStore.COMPLEX.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> solution;
 
         @SuppressWarnings("unchecked")

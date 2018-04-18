@@ -55,10 +55,6 @@ public final class RationalMatrix extends AbstractMatrix<RationalNumber, Rationa
 
             return ((RationalMatrix) matrix).getStore();
 
-        } else if (matrix instanceof GenericDenseStore) {
-
-            return (GenericDenseStore<RationalNumber>) matrix;
-
         } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof RationalNumber)) {
 
             return (ElementsSupplier<RationalNumber>) matrix;

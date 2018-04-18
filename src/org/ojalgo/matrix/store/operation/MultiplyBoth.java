@@ -32,7 +32,6 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyBoth;
 import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
@@ -43,22 +42,6 @@ public final class MultiplyBoth extends MatrixOperation {
     public static final MultiplyBoth SETUP = new MultiplyBoth();
 
     public static int THRESHOLD = 16;
-
-    static final BigMultiplyBoth BIG = (product, left, complexity, right) -> MultiplyBoth.invokeBig(product, 0, ((int) left.count()) / complexity, left,
-            complexity, right);
-
-    static final BigMultiplyBoth BIG_MT = (product, left, complexity, right) -> {
-
-        final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-            @Override
-            public void conquer(final int first, final int limit) {
-                MultiplyBoth.invokeBig(product, first, limit, left, complexity, right);
-            }
-        };
-
-        tmpConquerer.invoke(0, ((int) left.count()) / complexity, THRESHOLD);
-    };
 
     static final PrimitiveMultiplyBoth PRIMITIVE = (product, left, complexity, right) -> MultiplyBoth.invokePrimitive(product, 0,
             ((int) left.count()) / complexity, left, complexity, right);
@@ -574,14 +557,6 @@ public final class MultiplyBoth extends MatrixOperation {
 
         tmpConquerer.invoke(0, ((int) left.count()) / complexity, THRESHOLD);
     };
-
-    public static BigMultiplyBoth getBig(final long rows, final long columns) {
-        if (rows > THRESHOLD) {
-            return BIG_MT;
-        } else {
-            return BIG;
-        }
-    }
 
     public static <N extends Number & Scalar<N>> GenericMultiplyBoth<N> getGeneric(final long rows, final long columns) {
 

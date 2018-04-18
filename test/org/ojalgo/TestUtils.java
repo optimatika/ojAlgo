@@ -278,19 +278,7 @@ public abstract class TestUtils {
 
     public static void assertEquals(final String message, final Number expected, final Number actual, final NumberContext context) {
 
-        if ((expected instanceof ComplexNumber) || (actual instanceof ComplexNumber)) {
-
-            final ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
-            final ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
-
-            if (!!context.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
-                Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
-            }
-            if (!!context.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
-                Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
-            }
-
-        } else if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
+        if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
 
             final Quaternion tmpExpected = Quaternion.valueOf(expected);
             final Quaternion tmpActual = Quaternion.valueOf(actual);
@@ -306,6 +294,18 @@ public abstract class TestUtils {
             }
             if (!!context.isDifferent(tmpExpected.k, tmpActual.k)) {
                 Assertions.fail(() -> message + " (k)" + ": " + expected + " != " + actual);
+            }
+
+        } else if ((expected instanceof ComplexNumber) || (actual instanceof ComplexNumber)) {
+
+            final ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
+            final ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
+
+            if (!!context.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
+                Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
+            }
+            if (!!context.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
+                Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
             }
 
         } else {

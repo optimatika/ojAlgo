@@ -21,12 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -39,19 +36,6 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 
 abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
-
-    static final class Big extends BidiagonalDecomposition<BigDecimal> {
-
-        Big() {
-            super(BigDenseStore.FACTORY);
-        }
-
-        @Override
-        Array1D<BigDecimal>[] makeReal() {
-            return null;
-        }
-
-    }
 
     static final class Complex extends BidiagonalDecomposition<ComplexNumber> {
 
