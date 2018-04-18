@@ -32,14 +32,6 @@ public final class ApplyLDL extends MatrixOperation {
 
     public static int THRESHOLD = 256;
 
-    public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int columnLimit, final BigDecimal[] multipliers,
-            final int iterationPoint) {
-        final BigDecimal tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
-        for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, tmpDiagVal.multiply(multipliers[j]).negate(), multipliers, 0, j, structure);
-        }
-    }
-
     public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers,
             final int iterationPoint) {
         final double tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];

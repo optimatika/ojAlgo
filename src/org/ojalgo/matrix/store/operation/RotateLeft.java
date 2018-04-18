@@ -32,27 +32,6 @@ public final class RotateLeft extends MatrixOperation {
 
     public static int THRESHOLD = 128;
 
-    public static void invoke(final BigDecimal[] data, final int structure, final int rowA, final int rowB, final BigDecimal cos, final BigDecimal sin) {
-
-        BigDecimal oldA;
-        BigDecimal oldB;
-
-        int indexA = rowA;
-        int indexB = rowB;
-
-        for (int j = 0, lim = data.length / structure; j < lim; j++) {
-
-            oldA = data[indexA];
-            oldB = data[indexB];
-
-            data[indexA] = BigFunction.ADD.invoke(BigFunction.MULTIPLY.invoke(cos, oldA), BigFunction.MULTIPLY.invoke(sin, oldB));
-            data[indexB] = BigFunction.SUBTRACT.invoke(BigFunction.MULTIPLY.invoke(cos, oldB), BigFunction.MULTIPLY.invoke(sin, oldA));
-
-            indexA += structure;
-            indexB += structure;
-        }
-    }
-
     public static void invoke(final double[] data, final int structure, final int rowA, final int rowB, final double cos, final double sin) {
 
         double oldA;
