@@ -28,6 +28,7 @@ public class IdentityCase extends NonPhysicalTest {
 
     @BeforeEach
     public void setUp() {
+
         final int tmpDim = Uniform.randomInteger(1, 9);
 
         rationalStore = new IdentityStore<>(GenericDenseStore.RATIONAL, tmpDim);

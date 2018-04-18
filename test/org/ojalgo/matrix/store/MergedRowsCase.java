@@ -22,8 +22,8 @@
 package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.scalar.ComplexNumber;
 
 public class MergedRowsCase extends NonPhysicalTest {
 
@@ -33,8 +33,8 @@ public class MergedRowsCase extends NonPhysicalTest {
         final int tmpRowDim = Uniform.randomInteger(1, 9);
         final int tmpColDim = Uniform.randomInteger(1, 9);
 
-        final BasicMatrix tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
-        final BasicMatrix tmpRight = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        final MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        final MatrixStore<ComplexNumber> tmpRight = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
         rationalStore = new LeftRightStore<>(GenericDenseStore.RATIONAL.copy(tmpBase), GenericDenseStore.RATIONAL.copy(tmpRight));
         complexStore = new LeftRightStore<>(GenericDenseStore.COMPLEX.copy(tmpBase), GenericDenseStore.COMPLEX.copy(tmpRight));

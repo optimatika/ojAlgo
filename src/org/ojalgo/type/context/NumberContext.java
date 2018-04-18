@@ -383,7 +383,11 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
     }
 
     public boolean isDifferent(final double expected, final double actual) {
-        return (Double.isNaN(expected) && Double.isNaN(actual)) ? false : !this.isSmall(expected, actual - expected);
+        if (expected == actual) {
+            return false;
+        } else {
+            return !this.isSmall(expected, actual - expected);
+        }
     }
 
     public boolean isLessThan(final BigDecimal reference, final BigDecimal value) {

@@ -25,8 +25,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.ComplexMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
@@ -75,7 +73,7 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
         final int tmpNewDim = Uniform.randomInteger(1, tmpRowDim + tmpColDim);
 
         // multiplyLeft
-        final BasicMatrix tmpLeftMtrx = NonPhysicalTest.makeRandomMatrix(tmpNewDim, tmpRowDim);
+        final MatrixStore<ComplexNumber> tmpLeftMtrx = NonPhysicalTest.makeRandomMatrix(tmpNewDim, tmpRowDim);
         final PhysicalStore<N> tmpLeft = matrixStore.physical().copy(tmpLeftMtrx);
 
         MatrixStore<N> tmpExpected = tmpLeft.multiply(tmpCopy);
@@ -87,7 +85,7 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
         TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
 
         // multiplyRight
-        final BasicMatrix tmpRightMtrx = NonPhysicalTest.makeRandomMatrix(tmpColDim, tmpNewDim);
+        final MatrixStore<ComplexNumber> tmpRightMtrx = NonPhysicalTest.makeRandomMatrix(tmpColDim, tmpNewDim);
         final PhysicalStore<N> tmpRight = matrixStore.physical().copy(tmpRightMtrx);
 
         tmpExpected = tmpCopy.multiply(tmpRight);
@@ -99,8 +97,8 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
         TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
     }
 
-    protected static BasicMatrix makeRandomMatrix(final int aRowDim, final int aColDim) {
-        return ComplexMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(aRowDim, aColDim));
+    protected static MatrixStore<ComplexNumber> makeRandomMatrix(final int numberOfRows, final int numberOfColumns) {
+        return MatrixUtils.makeRandomComplexStore(numberOfRows, numberOfColumns).signum();
     }
 
     MatrixStore<ComplexNumber> complexStore;

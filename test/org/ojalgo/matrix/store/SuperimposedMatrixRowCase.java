@@ -22,8 +22,8 @@
 package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.scalar.ComplexNumber;
 
 public class SuperimposedMatrixRowCase extends NonPhysicalTest {
 
@@ -33,8 +33,8 @@ public class SuperimposedMatrixRowCase extends NonPhysicalTest {
         final int tmpRowDim = Uniform.randomInteger(1, 9);
         final int tmpColDim = Uniform.randomInteger(1, 9);
 
-        final BasicMatrix tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
-        final BasicMatrix tmpRow = NonPhysicalTest.makeRandomMatrix(1, tmpColDim);
+        final MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        final MatrixStore<ComplexNumber> tmpRow = NonPhysicalTest.makeRandomMatrix(1, tmpColDim);
         final int tmpIndex = Uniform.randomInteger(tmpRowDim);
 
         rationalStore = new SuperimposedStore<>(GenericDenseStore.RATIONAL.copy(tmpBase), tmpIndex, 0, GenericDenseStore.RATIONAL.copy(tmpRow));

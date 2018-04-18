@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -38,7 +37,7 @@ public class SuperimposedMatrixElementCase extends NonPhysicalTest {
         final int tmpRowDim = Uniform.randomInteger(1, 9);
         final int tmpColDim = Uniform.randomInteger(1, 9);
 
-        final BasicMatrix tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        final MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
         final int tmpRowIndex = Uniform.randomInteger(tmpRowDim);
         final int tmpColumnIndex = Uniform.randomInteger(tmpColDim);
         final BigDecimal tmpElement = BigMath.PI;
