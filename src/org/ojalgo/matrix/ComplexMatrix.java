@@ -23,7 +23,6 @@ package org.ojalgo.matrix;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -87,10 +86,6 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
         if (matrix instanceof ComplexMatrix) {
 
             return ((ComplexMatrix) matrix).getStore();
-
-        } else if (matrix instanceof ComplexDenseStore) {
-
-            return (ComplexDenseStore) matrix;
 
         } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof ComplexNumber)) {
 

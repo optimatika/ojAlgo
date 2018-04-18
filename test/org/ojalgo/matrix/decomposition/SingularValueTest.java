@@ -30,7 +30,6 @@ import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.*;
-import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -121,7 +120,7 @@ public class SingularValueTest {
 
         for (final ComplexNumber tmpScale : tmpScales) {
 
-            final PhysicalStore<ComplexNumber> tmpOriginalMtrx = ComplexDenseStore.FACTORY.transpose(tmpBaseMtrx);
+            final PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericDenseStore.COMPLEX.transpose(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexFunction.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx);
@@ -145,7 +144,7 @@ public class SingularValueTest {
                 BasicLogger.debug("Scale = {}", tmpScale);
             }
 
-            final PhysicalStore<ComplexNumber> tmpOriginalMtrx = ComplexDenseStore.FACTORY.copy(tmpBaseMtrx);
+            final PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericDenseStore.COMPLEX.copy(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexFunction.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx.conjugate());
@@ -247,11 +246,11 @@ public class SingularValueTest {
     private void doTestTypes(final BasicMatrix original) {
 
         final PhysicalStore<RationalNumber> tmpBigStore = GenericDenseStore.RATIONAL.copy(original);
-        final PhysicalStore<ComplexNumber> tmpComplexStore = ComplexDenseStore.FACTORY.copy(original);
+        final PhysicalStore<ComplexNumber> tmpComplexStore = GenericDenseStore.COMPLEX.copy(original);
         final PhysicalStore<Double> tmpPrimitiveStore = PrimitiveDenseStore.FACTORY.copy(original);
 
         IMPL_BIG.decompose(GenericDenseStore.RATIONAL.copy(original));
-        IMPL_COMPLEX.decompose(ComplexDenseStore.FACTORY.copy(original));
+        IMPL_COMPLEX.decompose(GenericDenseStore.COMPLEX.copy(original));
         IMPL_RAW.decompose(PrimitiveDenseStore.FACTORY.copy(original));
         IMPL_PRIMITIVE.decompose(PrimitiveDenseStore.FACTORY.copy(original));
 

@@ -27,7 +27,6 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.SimpleEquationCase;
-import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -75,7 +74,7 @@ public class DegenerateLUCase {
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<ComplexNumber> tmpComplexDecomp = LU.COMPLEX.make();
-        tmpComplexDecomp.decompose(ComplexDenseStore.FACTORY.copy(tmpMtrxA));
+        tmpComplexDecomp.decompose(GenericDenseStore.COMPLEX.copy(tmpMtrxA));
         //        System.out.println("A: " + tmpMtrxA.enforce(tmpEvalContext));
         //        System.out.println("P: " + new ComplexMatrix(tmpComplexDecomp.getP()).enforce(tmpEvalContext));
         //        System.out.println("L: " + new ComplexMatrix(tmpComplexDecomp.getL()).enforce(tmpEvalContext));
@@ -83,7 +82,7 @@ public class DegenerateLUCase {
         //        System.out.println("D: " + new ComplexMatrix(tmpComplexDecomp.getD()).enforce(tmpEvalContext));
         //        System.out.println("U: " + new ComplexMatrix(tmpComplexDecomp.getU()).enforce(tmpEvalContext));
         //        System.out.println("DU: " + new ComplexMatrix(tmpComplexDecomp.getD().multiplyRight(tmpComplexDecomp.getU())).enforce(tmpEvalContext));
-        TestUtils.assertEquals(ComplexDenseStore.FACTORY.copy(tmpMtrxA), tmpComplexDecomp, tmpEvalContext);
+        TestUtils.assertEquals(GenericDenseStore.COMPLEX.copy(tmpMtrxA), tmpComplexDecomp, tmpEvalContext);
     }
 
     @Test

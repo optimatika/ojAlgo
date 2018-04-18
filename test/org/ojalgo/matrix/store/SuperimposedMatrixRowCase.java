@@ -38,7 +38,7 @@ public class SuperimposedMatrixRowCase extends NonPhysicalTest {
         final int tmpIndex = Uniform.randomInteger(tmpRowDim);
 
         rationalStore = new SuperimposedStore<>(GenericDenseStore.RATIONAL.copy(tmpBase), tmpIndex, 0, GenericDenseStore.RATIONAL.copy(tmpRow));
-        complexStore = new SuperimposedStore<>(GenericDenseStore.COMPLEX.copy(tmpBase), tmpIndex, 0, ComplexDenseStore.FACTORY.copy(tmpRow));
+        complexStore = new SuperimposedStore<>(GenericDenseStore.COMPLEX.copy(tmpBase), tmpIndex, 0, GenericDenseStore.COMPLEX.copy(tmpRow));
         primitiveStore = new SuperimposedStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), tmpIndex, 0, PrimitiveDenseStore.FACTORY.copy(tmpRow));
     }
 

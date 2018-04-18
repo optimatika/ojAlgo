@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.RationalMatrix;
-import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -53,7 +52,7 @@ public class LUTest {
         tmpBig.decompose(GenericDenseStore.RATIONAL.copy(tmpProblematic));
 
         final LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
-        tmpComplex.decompose(ComplexDenseStore.FACTORY.copy(tmpProblematic));
+        tmpComplex.decompose(GenericDenseStore.COMPLEX.copy(tmpProblematic));
 
         final LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
         tmpPrimitive.decompose(PrimitiveDenseStore.FACTORY.copy(tmpProblematic));

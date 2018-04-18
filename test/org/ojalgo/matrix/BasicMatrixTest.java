@@ -34,7 +34,6 @@ import org.ojalgo.access.RowView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix.Builder;
-import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -960,13 +959,13 @@ public abstract class BasicMatrixTest {
     @Test
     public void testToComplexStore() {
 
-        final PhysicalStore<ComplexNumber> tmpExpStore = ComplexDenseStore.FACTORY.copy(myBigAA);
+        final PhysicalStore<ComplexNumber> tmpExpStore = GenericDenseStore.COMPLEX.copy(myBigAA);
         PhysicalStore<ComplexNumber> tmpActStore;
 
-        tmpActStore = ComplexDenseStore.FACTORY.copy(myComplexAA);
+        tmpActStore = GenericDenseStore.COMPLEX.copy(myComplexAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
-        tmpActStore = ComplexDenseStore.FACTORY.copy(myPrimitiveAA);
+        tmpActStore = GenericDenseStore.COMPLEX.copy(myPrimitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
     }
