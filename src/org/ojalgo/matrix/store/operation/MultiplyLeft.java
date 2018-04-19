@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
@@ -608,27 +607,6 @@ public final class MultiplyLeft extends MatrixOperation {
             return PRIMITIVE_1XN;
         } else {
             return PRIMITIVE;
-        }
-    }
-
-    static void invoke(final BigDecimal[] product, final int firstColumn, final int columnLimit, final Access1D<BigDecimal> left, final int complexity,
-            final BigDecimal[] right) {
-
-        final int structure = ((int) left.count()) / complexity;
-
-        final BigDecimal[] leftColumn = new BigDecimal[structure];
-        for (int c = 0; c < complexity; c++) {
-
-            final int firstInLeftColumn = MatrixUtils.firstInColumn(left, c, 0);
-            final int limitOfLeftColumn = MatrixUtils.limitOfColumn(left, c, structure);
-
-            for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
-                leftColumn[i] = left.get(i + (c * structure));
-            }
-
-            for (int j = firstColumn; j < columnLimit; j++) {
-                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
-            }
         }
     }
 

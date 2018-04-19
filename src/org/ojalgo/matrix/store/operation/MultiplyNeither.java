@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.ojalgo.array.blas.AXPY;
@@ -606,21 +605,6 @@ public final class MultiplyNeither extends MatrixOperation {
             return PRIMITIVE_1XN;
         } else {
             return PRIMITIVE;
-        }
-    }
-
-    static void invoke(final BigDecimal[] product, final int firstColumn, final int columnLimit, final BigDecimal[] left, final int complexity,
-            final BigDecimal[] right) {
-
-        final int structure = left.length / complexity;
-
-        final BigDecimal[] leftColumn = new BigDecimal[structure];
-        for (int c = 0; c < complexity; c++) {
-            System.arraycopy(left, c * structure, leftColumn, 0, structure);
-
-            for (int j = firstColumn; j < columnLimit; j++) {
-                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, 0, structure);
-            }
         }
     }
 
