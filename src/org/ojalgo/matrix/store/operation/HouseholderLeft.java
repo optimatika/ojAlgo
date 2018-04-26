@@ -21,14 +21,9 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.DOT;
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.transformation.Householder;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 public final class HouseholderLeft extends MatrixOperation {

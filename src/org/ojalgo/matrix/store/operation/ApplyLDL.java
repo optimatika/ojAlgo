@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.scalar.Scalar;
 

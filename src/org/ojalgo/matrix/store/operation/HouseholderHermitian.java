@@ -23,19 +23,14 @@ package org.ojalgo.matrix.store.operation;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.COPY;
 import org.ojalgo.concurrent.DivideAndConquer;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.BigFunction;
-import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.transformation.Householder;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
