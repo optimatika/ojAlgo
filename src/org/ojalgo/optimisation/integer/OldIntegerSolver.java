@@ -141,7 +141,7 @@ public final class OldIntegerSolver extends IntegerSolver {
             myKey.bound(nodeModel, OldIntegerSolver.this.getIntegerIndices());
 
             final Result bestResultSoFar = OldIntegerSolver.this.getBestResultSoFar();
-            final Optimisation.Result nodeResult = nodeModel.solve(bestResultSoFar);
+            final Optimisation.Result nodeResult = nodeModel.prepare().solve(bestResultSoFar);
 
             // Increment when/if an iteration was actually performed
             OldIntegerSolver.this.incrementIterationsCount();

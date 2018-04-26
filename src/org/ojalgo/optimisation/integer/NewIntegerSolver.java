@@ -177,7 +177,7 @@ public final class NewIntegerSolver extends IntegerSolver {
         }
 
         ExpressionsBasedModel tmpModel = NewIntegerSolver.this.makeNodeModel(nodeKey);
-        final Optimisation.Result tmpResult = tmpModel.solve(NewIntegerSolver.this.getBestResultSoFar());
+        final Optimisation.Result tmpResult = tmpModel.prepare().solve(NewIntegerSolver.this.getBestResultSoFar());
 
         NewIntegerSolver.this.incrementIterationsCount();
 
@@ -348,7 +348,7 @@ public final class NewIntegerSolver extends IntegerSolver {
         myKey = new NodeKey(tmpIntegerModel);
 
         final ExpressionsBasedModel tmpRootModel = NewIntegerSolver.this.makeNodeModel(myKey);
-        final Result tmpRootResult = tmpRootModel.solve(tmpIntegerModel.getVariableValues());
+        final Result tmpRootResult = tmpRootModel.prepare().solve(tmpIntegerModel.getVariableValues());
         final double tmpRootValue = tmpRootResult.getValue();
 
         double tmpMinValue = PrimitiveMath.MACHINE_LARGEST;
@@ -365,7 +365,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
             final NodeKey tmpLowerNodeKey = myKey.createLowerBranch(i, tmpVariableValue, tmpRootValue);
             final ExpressionsBasedModel tmpLowerModel = NewIntegerSolver.this.makeNodeModel(tmpLowerNodeKey);
-            final Result tmpLowerResult = tmpLowerModel.solve(tmpRootResult);
+            final Result tmpLowerResult = tmpLowerModel.prepare().solve(tmpRootResult);
             final double tmpLowerValue = tmpLowerResult.getValue();
 
             if (tmpLowerValue < tmpMinValue) {
@@ -377,7 +377,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
             final NodeKey tmpUpperNodeKey = myKey.createUpperBranch(i, tmpVariableValue, tmpRootValue);
             final ExpressionsBasedModel tmpUpperModel = NewIntegerSolver.this.makeNodeModel(tmpUpperNodeKey);
-            final Result tmpUpperResult = tmpUpperModel.solve(tmpRootResult);
+            final Result tmpUpperResult = tmpUpperModel.prepare().solve(tmpRootResult);
             final double tmpUpperValue = tmpUpperResult.getValue();
 
             if (tmpUpperValue < tmpMinValue) {
