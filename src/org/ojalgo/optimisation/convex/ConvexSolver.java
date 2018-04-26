@@ -680,7 +680,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     @Override
     public boolean update(final Variable variable) {
 
-        boolean retVal = true;
+        boolean retVal = false;
 
         if (variable.isLowerLimitSet()) {
             retVal = false;

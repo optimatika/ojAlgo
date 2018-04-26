@@ -35,7 +35,7 @@ import org.ojalgo.optimisation.Variable;
 
 final class NodeKey implements Serializable, Comparable<NodeKey> {
 
-    private static AtomicLong GENERATOR = new AtomicLong();
+    private static final AtomicLong GENERATOR = new AtomicLong();
 
     private final int[] myLowerBounds;
     private final int[] myUpperBounds;

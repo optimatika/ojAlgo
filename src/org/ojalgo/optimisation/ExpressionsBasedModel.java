@@ -256,6 +256,25 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             return mySolver;
         }
 
+        public void update(final int index) {
+            this.update(myModel.getVariable(index));
+        }
+
+        public void update(final IntIndex index) {
+            this.update(myModel.getVariable(index));
+        }
+
+        public void update(final Variable variable) {
+            if (mySolver != null) {
+                if ((mySolver instanceof UpdatableSolver) && ((UpdatableSolver) mySolver).update(variable)) {
+                    // Solver updated in-place
+                } else {
+                    // Solver needs to be regenerated
+                    mySolver = null;
+                }
+            }
+        }
+
     }
 
     public static abstract class Presolver extends Simplifier<Expression, Presolver> {
