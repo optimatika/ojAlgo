@@ -21,17 +21,11 @@
  */
 package org.ojalgo.matrix.transformation;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.BigFunction;
-import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 

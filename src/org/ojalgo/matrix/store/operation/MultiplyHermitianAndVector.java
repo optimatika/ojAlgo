@@ -23,9 +23,6 @@ package org.ojalgo.matrix.store.operation;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import java.math.BigDecimal;
-
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.scalar.Scalar;
 
 /**

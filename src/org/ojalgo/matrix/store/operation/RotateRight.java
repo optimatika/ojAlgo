@@ -21,9 +21,6 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import java.math.BigDecimal;
-
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.scalar.Scalar;
 
 public final class RotateRight extends MatrixOperation {
