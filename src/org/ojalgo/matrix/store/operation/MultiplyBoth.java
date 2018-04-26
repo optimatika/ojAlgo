@@ -22,15 +22,12 @@
 package org.ojalgo.matrix.store.operation;
 
 import java.lang.reflect.Array;
-import java.math.BigDecimal;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
@@ -629,42 +626,6 @@ public final class MultiplyBoth extends MatrixOperation {
 
             for (int j = firstInRightRow; j < limitOfRightRow; j++) {
                 AXPY.invoke(product, j * structure, right.doubleValue(c + (j * complexity)), leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
-            }
-        }
-    }
-
-    static void invokeBig(final ElementsConsumer<BigDecimal> product, final int firstRow, final int rowLimit, final Access1D<BigDecimal> left,
-            final int complexity, final Access1D<BigDecimal> right) {
-
-        final int tmpRowDim = (int) (left.count() / complexity);
-        final int tmpColDim = (int) (right.count() / complexity);
-
-        final BigDecimal[] tmpLeftRow = new BigDecimal[complexity];
-        BigDecimal tmpVal;
-
-        int tmpFirst = 0;
-        int tmpLimit = complexity;
-
-        for (int i = firstRow; i < rowLimit; i++) {
-
-            final int tmpFirstInRow = MatrixUtils.firstInRow(left, i, 0);
-            final int tmpLimitOfRow = MatrixUtils.limitOfRow(left, i, complexity);
-
-            for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
-                tmpLeftRow[c] = left.get(i + (c * tmpRowDim));
-            }
-
-            for (int j = 0; j < tmpColDim; j++) {
-                final int tmpColBase = j * complexity;
-
-                tmpFirst = MatrixUtils.firstInColumn(right, j, tmpFirstInRow);
-                tmpLimit = MatrixUtils.limitOfColumn(right, j, tmpLimitOfRow);
-
-                tmpVal = BigMath.ZERO;
-                for (int c = tmpFirst; c < tmpLimit; c++) {
-                    tmpVal = BigFunction.ADD.invoke(tmpVal, BigFunction.MULTIPLY.invoke(tmpLeftRow[c], right.get(c + tmpColBase)));
-                }
-                product.set(i, j, tmpVal);
             }
         }
     }

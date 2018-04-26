@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
@@ -608,24 +607,6 @@ public final class MultiplyRight extends MatrixOperation {
             return PRIMITIVE_1XN;
         } else {
             return PRIMITIVE;
-        }
-    }
-
-    static void invoke(final BigDecimal[] product, final int firstColumn, final int columnLimit, final BigDecimal[] left, final int complexity,
-            final Access1D<BigDecimal> right) {
-
-        final int structure = left.length / complexity;
-
-        final BigDecimal[] leftColumn = new BigDecimal[structure];
-        for (int c = 0; c < complexity; c++) {
-            System.arraycopy(left, c * structure, leftColumn, 0, structure);
-
-            final int firstInRightRow = MatrixUtils.firstInRow(right, c, firstColumn);
-            final int limitOfRightRow = MatrixUtils.limitOfRow(right, c, columnLimit);
-
-            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
-                AXPY.invoke(product, j * structure, right.get(c + (j * complexity)), leftColumn, 0, 0, structure);
-            }
         }
     }
 
