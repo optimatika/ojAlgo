@@ -1,6 +1,7 @@
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive32Array;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.random.Uniform;
 
@@ -75,6 +76,13 @@ public class RollingMean {
     }
 
     public RollingMean() {
+
+        MatrixStore<Double> matrix = null;
+
+        matrix.logical().limits(3, 3).offsets(1, 1).get();
+
+        matrix.logical().offsets(1, 1).get();
+
     }
 
 }
