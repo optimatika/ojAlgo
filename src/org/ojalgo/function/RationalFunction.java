@@ -62,6 +62,15 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
     }
 
+    @FunctionalInterface
+    public static interface Void extends VoidFunction<RationalNumber> {
+
+        default void invoke(final double arg) {
+            this.invoke(RationalNumber.valueOf(arg));
+        }
+
+    }
+
     public static final Unary ABS = new Unary() {
 
         public final RationalNumber invoke(final RationalNumber arg) {

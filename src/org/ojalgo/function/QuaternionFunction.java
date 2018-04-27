@@ -57,6 +57,15 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     }
 
+    @FunctionalInterface
+    public static interface Void extends VoidFunction<Quaternion> {
+
+        default void invoke(final double arg) {
+            this.invoke(Quaternion.valueOf(arg));
+        }
+
+    }
+
     public static final Unary ABS = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
