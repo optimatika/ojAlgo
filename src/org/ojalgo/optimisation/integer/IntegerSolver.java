@@ -165,6 +165,9 @@ public abstract class IntegerSolver extends GenericSolver {
 
     private volatile Optimisation.Result myBestResultSoFar = null;
     private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
+    /**
+     * One entry per integer variable, the entry is the global index of that integer variable
+     */
     private final int[] myIntegerIndices;
     private final ExpressionsBasedModel myIntegerModel;
     private final double[] myIntegerSignificances;
@@ -368,8 +371,9 @@ public abstract class IntegerSolver extends GenericSolver {
     }
 
     /**
-     * Should return the index of the (best) variable to branch on. Returning a negative index means an
-     * integer solition has been found (no further branching).
+     * Should return the index of the (best) integer variable to branch on. Returning a negative index means
+     * an integer solution has been found (no further branching). Does NOT return a global variable index -
+     * it's the index among the ineteger variable.
      */
     final int identifyNonIntegerVariable(final Optimisation.Result nodeResult, final NodeKey nodeKey) {
 

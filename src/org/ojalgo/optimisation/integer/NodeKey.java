@@ -62,7 +62,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
      */
     final long sequence = GENERATOR.getAndIncrement();
 
-    private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int indexBranchedOn,
+    private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int integerIndexBranchedOn,
             final double branchVariableDisplacement, final double parentObjectiveFunctionValue) {
 
         super();
@@ -71,7 +71,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         myUpperBounds = upperBounds;
 
         parent = parentSequenceNumber;
-        index = indexBranchedOn;
+        index = integerIndexBranchedOn;
         displacement = branchVariableDisplacement;
         objective = parentObjectiveFunctionValue;
     }
@@ -196,6 +196,14 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
             final BigDecimal upperBound = this.getUpperBound(i);
 
             final Variable variable = model.getVariable(integerIndices[i]);
+            //            if ((i != index) && variable.isLowerLimitSet() && !variable.getLowerLimit().equals(lowerBound)) {
+            //                BasicLogger.debug("Variable {} lb≠{} ub={} index={}, i={}, integer_index={}, integer_i={}", variable, lowerBound, upperBound, index, i,
+            //                        integerIndices[index], integerIndices[i]);
+            //            }
+            //            if ((i != index) && variable.isUpperLimitSet() && !variable.getUpperLimit().equals(upperBound)) {
+            //                BasicLogger.debug("Variable {} lb≠{} ub={} index={}, i={}, integer_index={}, integer_i={}", variable, lowerBound, upperBound, index, i,
+            //                        integerIndices[index], integerIndices[i]);
+            //            }
             variable.lower(lowerBound);
             variable.upper(upperBound);
 
@@ -219,40 +227,40 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         return retVal;
     }
 
-    NodeKey createLowerBranch(final int index, final double value, final double objective) {
+    NodeKey createLowerBranch(final int branchIntegerIndex, final double value, final double objective) {
 
         final int[] tmpLBs = this.getLowerBounds();
         final int[] tmpUBs = this.getUpperBounds();
 
-        final double tmpFeasibleValue = this.feasible(index, value);
+        final double tmpFeasibleValue = this.feasible(branchIntegerIndex, value);
 
         final int tmpFloor = (int) PrimitiveFunction.FLOOR.invoke(tmpFeasibleValue);
 
-        if ((tmpFloor >= tmpUBs[index]) && (tmpFloor > tmpLBs[index])) {
-            tmpUBs[index] = tmpFloor - 1;
+        if ((tmpFloor >= tmpUBs[branchIntegerIndex]) && (tmpFloor > tmpLBs[branchIntegerIndex])) {
+            tmpUBs[branchIntegerIndex] = tmpFloor - 1;
         } else {
-            tmpUBs[index] = tmpFloor;
+            tmpUBs[branchIntegerIndex] = tmpFloor;
         }
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, index, value - tmpFloor, objective);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, value - tmpFloor, objective);
     }
 
-    NodeKey createUpperBranch(final int index, final double value, final double objective) {
+    NodeKey createUpperBranch(final int branchIntegerIndex, final double value, final double objective) {
 
         final int[] tmpLBs = this.getLowerBounds();
         final int[] tmpUBs = this.getUpperBounds();
 
-        final double tmpFeasibleValue = this.feasible(index, value);
+        final double tmpFeasibleValue = this.feasible(branchIntegerIndex, value);
 
         final int tmpCeil = (int) PrimitiveFunction.CEIL.invoke(tmpFeasibleValue);
 
-        if ((tmpCeil <= tmpLBs[index]) && (tmpCeil < tmpUBs[index])) {
-            tmpLBs[index] = tmpCeil + 1;
+        if ((tmpCeil <= tmpLBs[branchIntegerIndex]) && (tmpCeil < tmpUBs[branchIntegerIndex])) {
+            tmpLBs[branchIntegerIndex] = tmpCeil + 1;
         } else {
-            tmpLBs[index] = tmpCeil;
+            tmpLBs[branchIntegerIndex] = tmpCeil;
         }
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, index, tmpCeil - value, objective);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, tmpCeil - value, objective);
     }
 
     double getFraction(final int index, final double value) {

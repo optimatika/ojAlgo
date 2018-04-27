@@ -168,10 +168,10 @@ public final class OldIntegerSolver extends IntegerSolver {
                     return false;
                 }
 
-                final int tmpBranchIndex = OldIntegerSolver.this.identifyNonIntegerVariable(nodeResult, myKey);
+                final int branchIntegerIndex = OldIntegerSolver.this.identifyNonIntegerVariable(nodeResult, myKey);
                 final double tmpSolutionValue = OldIntegerSolver.this.evaluateFunction(nodeResult);
 
-                if (tmpBranchIndex == -1) {
+                if (branchIntegerIndex == -1) {
                     if (this.isNodeDebug()) {
                         myPrinter.println("Integer solution! Store it among the others, and stop this branch!");
                     }
@@ -196,20 +196,20 @@ public final class OldIntegerSolver extends IntegerSolver {
                         myPrinter.println("Not an Integer Solution: " + tmpSolutionValue);
                     }
 
-                    final double tmpVariableValue = nodeResult.doubleValue(OldIntegerSolver.this.getGlobalIndex(tmpBranchIndex));
+                    final double tmpVariableValue = nodeResult.doubleValue(OldIntegerSolver.this.getGlobalIndex(branchIntegerIndex));
 
                     if (OldIntegerSolver.this.isGoodEnoughToContinueBranching(tmpSolutionValue)) {
 
                         if (this.isNodeDebug()) {
-                            myPrinter.println("Still hope, branching on {} @ {} >>> {}", tmpBranchIndex, tmpVariableValue,
-                                    nodeModel.getVariable(OldIntegerSolver.this.getGlobalIndex(tmpBranchIndex)));
+                            myPrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, tmpVariableValue,
+                                    nodeModel.getVariable(OldIntegerSolver.this.getGlobalIndex(branchIntegerIndex)));
                             this.flush(OldIntegerSolver.this.getIntegerModel().options.logger_appender);
                         }
 
                         OldIntegerSolver.this.generateCuts(nodeModel);
 
-                        final BranchAndBoundNodeTask lowerBranch = this.createLowerBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);
-                        final BranchAndBoundNodeTask upperBranch = this.createUpperBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);
+                        final BranchAndBoundNodeTask lowerBranch = this.createLowerBranch(branchIntegerIndex, tmpVariableValue, tmpSolutionValue);
+                        final BranchAndBoundNodeTask upperBranch = this.createUpperBranch(branchIntegerIndex, tmpVariableValue, tmpSolutionValue);
 
                         final BranchAndBoundNodeTask nextTask;
                         final BranchAndBoundNodeTask forkedTask;
@@ -249,16 +249,16 @@ public final class OldIntegerSolver extends IntegerSolver {
 
         }
 
-        BranchAndBoundNodeTask createLowerBranch(final int branchIndex, final double nonIntegerValue, final double parentObjectiveValue) {
+        BranchAndBoundNodeTask createLowerBranch(final int branchIntegerIndex, final double nonIntegerValue, final double parentObjectiveValue) {
 
-            final NodeKey tmpKey = myKey.createLowerBranch(branchIndex, nonIntegerValue, parentObjectiveValue);
+            final NodeKey tmpKey = myKey.createLowerBranch(branchIntegerIndex, nonIntegerValue, parentObjectiveValue);
 
             return new BranchAndBoundNodeTask(tmpKey);
         }
 
-        BranchAndBoundNodeTask createUpperBranch(final int branchIndex, final double nonIntegerValue, final double parentObjectiveValue) {
+        BranchAndBoundNodeTask createUpperBranch(final int branchIntegerIndex, final double nonIntegerValue, final double parentObjectiveValue) {
 
-            final NodeKey tmpKey = myKey.createUpperBranch(branchIndex, nonIntegerValue, parentObjectiveValue);
+            final NodeKey tmpKey = myKey.createUpperBranch(branchIntegerIndex, nonIntegerValue, parentObjectiveValue);
 
             return new BranchAndBoundNodeTask(tmpKey);
         }
