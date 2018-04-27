@@ -188,33 +188,6 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         return PrimitiveFunction.MIN.invoke(PrimitiveFunction.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
     }
 
-    void bound(final ExpressionsBasedModel model, final int[] integerIndices) {
-
-        for (int i = 0; i < integerIndices.length; i++) {
-
-            final BigDecimal lowerBound = this.getLowerBound(i);
-            final BigDecimal upperBound = this.getUpperBound(i);
-
-            final Variable variable = model.getVariable(integerIndices[i]);
-            //            if ((i != index) && variable.isLowerLimitSet() && !variable.getLowerLimit().equals(lowerBound)) {
-            //                BasicLogger.debug("Variable {} lb≠{} ub={} index={}, i={}, integer_index={}, integer_i={}", variable, lowerBound, upperBound, index, i,
-            //                        integerIndices[index], integerIndices[i]);
-            //            }
-            //            if ((i != index) && variable.isUpperLimitSet() && !variable.getUpperLimit().equals(upperBound)) {
-            //                BasicLogger.debug("Variable {} lb≠{} ub={} index={}, i={}, integer_index={}, integer_i={}", variable, lowerBound, upperBound, index, i,
-            //                        integerIndices[index], integerIndices[i]);
-            //            }
-            variable.lower(lowerBound);
-            variable.upper(upperBound);
-
-            final BigDecimal value = variable.getValue();
-            if (value != null) {
-                // Re-setting will ensure the new bounds are not violated
-                variable.setValue(value);
-            }
-        }
-    }
-
     long calculateTreeSize() {
 
         long retVal = 1L;
@@ -263,6 +236,22 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, tmpCeil - value, objective);
     }
 
+    void enforceBounds(final ExpressionsBasedModel model, final int integerIndex, final int[] integerToGlobalTranslator) {
+
+        final BigDecimal lowerBound = this.getLowerBound(integerIndex);
+        final BigDecimal upperBound = this.getUpperBound(integerIndex);
+
+        final Variable variable = model.getVariable(integerToGlobalTranslator[integerIndex]);
+        variable.lower(lowerBound);
+        variable.upper(upperBound);
+
+        final BigDecimal value = variable.getValue();
+        if (value != null) {
+            // Re-setting will ensure the new bounds are not violated
+            variable.setValue(value);
+        }
+    }
+
     double getFraction(final int index, final double value) {
 
         final double feasibleValue = this.feasible(index, value);
@@ -294,6 +283,12 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
     int[] getUpperBounds() {
         return Raw1D.copyOf(myUpperBounds);
+    }
+
+    void setNodeState(final ExpressionsBasedModel model, final int[] integerIndices) {
+        for (int i = 0; i < integerIndices.length; i++) {
+            this.enforceBounds(model, i, integerIndices);
+        }
     }
 
 }

@@ -86,6 +86,7 @@ public final class OldIntegerSolver extends IntegerSolver {
         protected Boolean compute() {
 
             final ExpressionsBasedModel nodeModel = OldIntegerSolver.this.getRelaxedModel();
+            myKey.setNodeState(nodeModel, OldIntegerSolver.this.getIntegerIndices());
 
             if (OldIntegerSolver.this.isIntegerSolutionFound()) {
 
@@ -138,7 +139,9 @@ public final class OldIntegerSolver extends IntegerSolver {
                 return true;
             }
 
-            myKey.bound(nodeModel, OldIntegerSolver.this.getIntegerIndices());
+            if (myKey.index >= 0) {
+                myKey.enforceBounds(nodeModel, myKey.index, OldIntegerSolver.this.getIntegerIndices());
+            }
 
             final Result bestResultSoFar = OldIntegerSolver.this.getBestResultSoFar();
             final Optimisation.Result nodeResult = nodeModel.prepare().solve(bestResultSoFar);

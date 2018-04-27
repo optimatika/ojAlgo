@@ -167,6 +167,7 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2017-10-20: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution</li>
      * <li>2018-02-07: MacPro (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s</li>
+     * <li>2018-04-47: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s</li>
      * </ul>
      *
      * @see RelaxedLpCase#testPk1()
