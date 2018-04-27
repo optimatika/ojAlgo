@@ -69,6 +69,15 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     }
 
+    @FunctionalInterface
+    public static interface Void extends VoidFunction<BigDecimal> {
+
+        default void invoke(final double arg) {
+            this.invoke(BigDecimal.valueOf(arg));
+        }
+
+    }
+
     public static final Unary ABS = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {

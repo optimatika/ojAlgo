@@ -67,6 +67,15 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     }
 
+    @FunctionalInterface
+    public static interface Void extends VoidFunction<Double> {
+
+        default void invoke(final Double arg) {
+            this.invoke(arg.doubleValue());
+        }
+
+    }
+
     public static final Unary ABS = new Unary() {
 
         public final double invoke(final double arg) {
