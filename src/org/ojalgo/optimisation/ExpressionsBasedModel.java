@@ -201,6 +201,14 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             myIntegration = null;
         }
 
+        public Variable getVariable(int globalIndex) {
+            return myModel.getVariable(globalIndex);
+        }
+
+        public Variable getVariable(IntIndex globalIndex) {
+            return myModel.getVariable(globalIndex);
+        }
+
         public Optimisation.Result solve(final Optimisation.Result candidate) {
 
             if (myModel.isInfeasible()) {
@@ -242,20 +250,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             return retVal;
         }
 
-        ExpressionsBasedModel.Integration<?> getIntegration() {
-            if (myIntegration == null) {
-                myIntegration = myModel.getIntegration();
-            }
-            return myIntegration;
-        }
-
-        Optimisation.Solver getSolver() {
-            if (mySolver == null) {
-                mySolver = this.getIntegration().build(myModel);
-            }
-            return mySolver;
-        }
-
         public void update(final int index) {
             this.update(myModel.getVariable(index));
         }
@@ -273,6 +267,24 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                     mySolver = null;
                 }
             }
+        }
+
+        public boolean validate(Result solution) {
+            return myModel.validate(solution);
+        }
+
+        ExpressionsBasedModel.Integration<?> getIntegration() {
+            if (myIntegration == null) {
+                myIntegration = myModel.getIntegration();
+            }
+            return myIntegration;
+        }
+
+        Optimisation.Solver getSolver() {
+            if (mySolver == null) {
+                mySolver = this.getIntegration().build(myModel);
+            }
+            return mySolver;
         }
 
     }

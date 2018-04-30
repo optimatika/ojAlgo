@@ -144,7 +144,7 @@ public final class OldIntegerSolver extends IntegerSolver {
             }
 
             final Result bestResultSoFar = OldIntegerSolver.this.getBestResultSoFar();
-            final Optimisation.Result nodeResult = nodeModel.prepare().solve(bestResultSoFar);
+            final Optimisation.Result nodeResult = nodeModel.solve(bestResultSoFar);
 
             // Increment when/if an iteration was actually performed
             OldIntegerSolver.this.incrementIterationsCount();
@@ -209,7 +209,7 @@ public final class OldIntegerSolver extends IntegerSolver {
                             this.flush(OldIntegerSolver.this.getIntegerModel().options.logger_appender);
                         }
 
-                        OldIntegerSolver.this.generateCuts(nodeModel);
+                        // OldIntegerSolver.this.generateCuts(nodeModel);
 
                         final BranchAndBoundNodeTask lowerBranch = this.createLowerBranch(branchIntegerIndex, tmpVariableValue, tmpSolutionValue);
                         final BranchAndBoundNodeTask upperBranch = this.createUpperBranch(branchIntegerIndex, tmpVariableValue, tmpSolutionValue);
