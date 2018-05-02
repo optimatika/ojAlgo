@@ -111,10 +111,10 @@ public final class OldIntegerSolver extends IntegerSolver {
                 }
             }
 
-            return this.compute(nodeModel);
+            return this.compute(nodeModel.prepare());
         }
 
-        protected Boolean compute(final ExpressionsBasedModel nodeModel) {
+        protected Boolean compute(final ExpressionsBasedModel.Intermediate nodeModel) {
 
             if (this.isNodeDebug()) {
                 myPrinter.println();
@@ -140,9 +140,8 @@ public final class OldIntegerSolver extends IntegerSolver {
             }
 
             if (myKey.index >= 0) {
-                //myKey.enforceBounds(nodeModel, myKey.index, OldIntegerSolver.this.getIntegerIndices());
-                //myKey.enforceBounds(nodeModel, OldIntegerSolver.this.getIntegerIndices());
-                myKey.setNodeState(nodeModel, OldIntegerSolver.this.getIntegerIndices());
+                myKey.enforceBounds(nodeModel, OldIntegerSolver.this.getIntegerIndices());
+                //myKey.setNodeState(nodeModel, OldIntegerSolver.this.getIntegerIndices());
             }
 
             final Result bestResultSoFar = OldIntegerSolver.this.getBestResultSoFar();

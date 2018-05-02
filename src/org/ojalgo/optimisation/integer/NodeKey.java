@@ -115,7 +115,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         return Long.compare(sequence, ref.sequence);
     }
 
-    public void enforceBounds(Intermediate nodeModel, int[] integerIndices) {
+    public void enforceBounds(final Intermediate nodeModel, final int[] integerIndices) {
 
         final BigDecimal lowerBound = this.getLowerBound(index);
         final BigDecimal upperBound = this.getUpperBound(index);

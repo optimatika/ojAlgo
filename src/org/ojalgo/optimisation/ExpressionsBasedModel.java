@@ -205,15 +205,18 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             return myModel;
         }
 
-        public Variable getVariable(int globalIndex) {
+        public Variable getVariable(final int globalIndex) {
             return myModel.getVariable(globalIndex);
         }
 
-        public Variable getVariable(IntIndex globalIndex) {
+        public Variable getVariable(final IntIndex globalIndex) {
             return myModel.getVariable(globalIndex);
         }
 
         public Optimisation.Result solve(final Optimisation.Result candidate) {
+
+            // TODO Move this to the prepare() method.
+            myModel.presolve();
 
             if (myModel.isInfeasible()) {
 
@@ -275,7 +278,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             }
         }
 
-        public boolean validate(Result solution) {
+        public boolean validate(final Result solution) {
             return myModel.validate(solution);
         }
 
@@ -1068,6 +1071,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      */
     public ExpressionsBasedModel.Intermediate prepare() {
 
+        // TODO Should be able to do presolve() here rather than in Intermeditae#solve()
         this.presolve();
 
         return new ExpressionsBasedModel.Intermediate(this);
