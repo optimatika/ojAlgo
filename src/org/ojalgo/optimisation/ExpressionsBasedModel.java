@@ -168,6 +168,15 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         /**
+         * @param model
+         * @param variable
+         * @return The index with which one can reference parameters related to this variable in the solver.
+         */
+        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
+            return model.indexOfFreeVariable(variable);
+        }
+
+        /**
          * @return true if the set of variables present in the solver is not precisely the same as in the
          *         model. If fixed variables are omitted or if variables are split into a positive and
          *         negative part, then this method must return true
@@ -268,7 +277,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         public void update(final Variable variable) {
 
             if (mySolver != null) {
-                if ((mySolver instanceof UpdatableSolver) && ((UpdatableSolver) mySolver).update(variable)) {
+                if (variable.isFixed() && (mySolver instanceof UpdatableSolver) && ((UpdatableSolver) mySolver)
+                        .fixVariable(this.getIntegration().getIndexInSolver(myModel, variable), variable.getUnadjustedLowerLimit())) {
                     // Solver updated in-place
                 } else {
                     // Solver needs to be regenerated

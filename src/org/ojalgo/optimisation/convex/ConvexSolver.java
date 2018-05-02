@@ -921,4 +921,9 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
     }
 
+    public boolean fixVariable(final int index, final double value) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

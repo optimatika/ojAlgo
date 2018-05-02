@@ -172,6 +172,23 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         }
 
         @Override
+        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
+
+            int retVal = -1;
+
+            retVal = model.indexOfPositiveVariable(variable);
+
+            if (retVal < 0) {
+                retVal = model.indexOfNegativeVariable(variable);
+                if (retVal >= 0) {
+                    retVal += model.getPositiveVariables().size();
+                }
+            }
+
+            return retVal;
+        }
+
+        @Override
         protected boolean isSolutionMapped() {
             return true;
         }

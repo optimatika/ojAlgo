@@ -724,6 +724,12 @@ public final class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
+    public boolean fixVariable(final int index, final double value) {
+
+        // TODO Auto-generated method stub
+        return false;
+    }
+
     void performIteration(final IterationPoint pivot) {
 
         final double tmpPivotElement = myTableau.doubleValue(pivot.row, pivot.col);

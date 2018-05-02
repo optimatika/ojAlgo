@@ -25,4 +25,6 @@ public interface UpdatableSolver extends Optimisation.Solver {
 
     boolean update(Variable variable);
 
+    boolean fixVariable(int index, double value);
+
 }
