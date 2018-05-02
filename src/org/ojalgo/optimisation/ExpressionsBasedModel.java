@@ -201,6 +201,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             myIntegration = null;
         }
 
+        public ExpressionsBasedModel getModel() {
+            return myModel;
+        }
+
         public Variable getVariable(int globalIndex) {
             return myModel.getVariable(globalIndex);
         }
@@ -259,11 +263,13 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         public void update(final Variable variable) {
+
             if (mySolver != null) {
                 if ((mySolver instanceof UpdatableSolver) && ((UpdatableSolver) mySolver).update(variable)) {
                     // Solver updated in-place
                 } else {
                     // Solver needs to be regenerated
+
                     mySolver = null;
                 }
             }

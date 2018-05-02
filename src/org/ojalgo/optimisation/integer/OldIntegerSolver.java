@@ -140,7 +140,9 @@ public final class OldIntegerSolver extends IntegerSolver {
             }
 
             if (myKey.index >= 0) {
-                myKey.enforceBounds(nodeModel, myKey.index, OldIntegerSolver.this.getIntegerIndices());
+                //myKey.enforceBounds(nodeModel, myKey.index, OldIntegerSolver.this.getIntegerIndices());
+                //myKey.enforceBounds(nodeModel, OldIntegerSolver.this.getIntegerIndices());
+                myKey.setNodeState(nodeModel, OldIntegerSolver.this.getIntegerIndices());
             }
 
             final Result bestResultSoFar = OldIntegerSolver.this.getBestResultSoFar();
@@ -164,7 +166,7 @@ public final class OldIntegerSolver extends IntegerSolver {
                     myPrinter.println("Lower bounds: {}", Arrays.toString(myKey.getLowerBounds()));
                     myPrinter.println("Upper bounds: {}", Arrays.toString(myKey.getUpperBounds()));
 
-                    nodeModel.validate(nodeResult, myPrinter);
+                    // nodeModel.validate(nodeResult, myPrinter);
 
                     this.flush(OldIntegerSolver.this.getIntegerModel().options.logger_appender);
 

@@ -31,6 +31,7 @@ import org.ojalgo.array.Raw1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.ExpressionsBasedModel.Intermediate;
 import org.ojalgo.optimisation.Variable;
 
 final class NodeKey implements Serializable, Comparable<NodeKey> {
@@ -112,6 +113,25 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
     public int compareTo(final NodeKey ref) {
         return Long.compare(sequence, ref.sequence);
+    }
+
+    public void enforceBounds(Intermediate nodeModel, int[] integerIndices) {
+
+        final BigDecimal lowerBound = this.getLowerBound(index);
+        final BigDecimal upperBound = this.getUpperBound(index);
+
+        final Variable variable = nodeModel.getVariable(integerIndices[index]);
+        variable.lower(lowerBound);
+        variable.upper(upperBound);
+
+        final BigDecimal value = variable.getValue();
+        if (value != null) {
+            // Re-setting will ensure the new bounds are not violated
+            variable.setValue(value);
+        }
+
+        nodeModel.update(variable);
+
     }
 
     @Override
