@@ -103,7 +103,7 @@ public class CodeSnippets {
 
         TestUtils.assertEquals(expSquared, actSquared2);
 
-        final MatrixStore<Double> matrix = null;
+        final MatrixStore<Double> matrix = org;
 
         matrix.logical().limits(3, 3).offsets(1, 1).get();
 

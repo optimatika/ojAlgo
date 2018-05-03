@@ -33,6 +33,7 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -222,13 +223,13 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return myStore.countRows();
         }
 
-        public final LogicalBuilder<N> diagonal(final boolean assumeOne) {
-            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, assumeOne), assumeOne);
+        public final LogicalBuilder<N> diagonal() {
+            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, false), false);
             return this;
         }
 
-        public final LogicalBuilder<N> diagonal() {
-            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, false), false);
+        public final LogicalBuilder<N> diagonal(final boolean assumeOne) {
+            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, assumeOne), assumeOne);
             return this;
         }
 
@@ -419,26 +420,6 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     };
 
-    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
-
-        public LogicalBuilder<RationalNumber> makeIdentity(final int dimension) {
-            return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.RATIONAL, dimension));
-        }
-
-        public LogicalBuilder<RationalNumber> makeSingle(final RationalNumber element) {
-            return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.RATIONAL, element));
-        }
-
-        public LogicalBuilder<RationalNumber> makeWrapper(final Access2D<?> access) {
-            return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.RATIONAL, access));
-        }
-
-        public LogicalBuilder<RationalNumber> makeZero(final int rowsCount, final int columnsCount) {
-            return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.RATIONAL, rowsCount, columnsCount));
-        }
-
-    };
-
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         public LogicalBuilder<Double> makeIdentity(final int dimension) {
@@ -455,6 +436,46 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         public LogicalBuilder<Double> makeZero(final int rowsCount, final int columnsCount) {
             return new LogicalBuilder<>(new ZeroStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount));
+        }
+
+    };
+
+    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+
+        public LogicalBuilder<Quaternion> makeIdentity(final int dimension) {
+            return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.QUATERNION, dimension));
+        }
+
+        public LogicalBuilder<Quaternion> makeSingle(final Quaternion element) {
+            return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.QUATERNION, element));
+        }
+
+        public LogicalBuilder<Quaternion> makeWrapper(final Access2D<?> access) {
+            return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.QUATERNION, access));
+        }
+
+        public LogicalBuilder<Quaternion> makeZero(final int rowsCount, final int columnsCount) {
+            return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.QUATERNION, rowsCount, columnsCount));
+        }
+
+    };
+
+    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+
+        public LogicalBuilder<RationalNumber> makeIdentity(final int dimension) {
+            return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.RATIONAL, dimension));
+        }
+
+        public LogicalBuilder<RationalNumber> makeSingle(final RationalNumber element) {
+            return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.RATIONAL, element));
+        }
+
+        public LogicalBuilder<RationalNumber> makeWrapper(final Access2D<?> access) {
+            return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.RATIONAL, access));
+        }
+
+        public LogicalBuilder<RationalNumber> makeZero(final int rowsCount, final int columnsCount) {
+            return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.RATIONAL, rowsCount, columnsCount));
         }
 
     };
