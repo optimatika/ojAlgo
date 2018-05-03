@@ -227,6 +227,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
+        public final LogicalBuilder<N> diagonal() {
+            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, false), false);
+            return this;
+        }
+
         @SafeVarargs
         public final LogicalBuilder<N> diagonally(final MatrixStore<N>... aDiagonalStore) {
 
@@ -669,11 +674,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return new MatrixPipeline.Multiplication<>(left, this);
     }
 
-    default ElementsSupplier<N> reduceColumns(Aggregator aggregator) {
+    default ElementsSupplier<N> reduceColumns(final Aggregator aggregator) {
         return new MatrixPipeline.ColumnsReducer<>(this, aggregator);
     }
 
-    default ElementsSupplier<N> reduceRows(Aggregator aggregator) {
+    default ElementsSupplier<N> reduceRows(final Aggregator aggregator) {
         return new MatrixPipeline.RowsReducer<>(this, aggregator);
     }
 
