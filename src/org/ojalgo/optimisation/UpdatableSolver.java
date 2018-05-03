@@ -28,6 +28,8 @@ public interface UpdatableSolver extends Optimisation.Solver {
      * @param value The value to fix that variable to
      * @return true if fixing is supported and was successful, otherwise false
      */
-    boolean fixVariable(int index, double value);
+    default boolean fixVariable(final int index, final double value) {
+        return false;
+    }
 
 }

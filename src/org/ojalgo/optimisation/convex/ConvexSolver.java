@@ -454,7 +454,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
         @Override
-        protected boolean update(Variable variable, ExpressionsBasedModel model, ConvexSolver solver) {
+        protected boolean update(final Variable variable, final ExpressionsBasedModel model, final ConvexSolver solver) {
             // TODO Auto-generated method stub
             return super.update(variable, model, solver);
         }
@@ -648,13 +648,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         super.dispose();
 
         myMatrices.reset();
-    }
-
-    public boolean fixVariable(final int index, final double value) {
-
-        boolean retVal = false;
-
-        return retVal;
     }
 
     public final Optimisation.Result solve(final Optimisation.Result kickStarter) {
