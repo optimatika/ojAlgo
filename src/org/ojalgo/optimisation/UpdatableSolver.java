@@ -23,8 +23,11 @@ package org.ojalgo.optimisation;
 
 public interface UpdatableSolver extends Optimisation.Solver {
 
-    boolean update(Variable variable);
-
+    /**
+     * @param index The, solver specific, variable index
+     * @param value The value to fix that variable to
+     * @return true if fixing is supported and was successful, otherwise false
+     */
     boolean fixVariable(int index, double value);
 
 }

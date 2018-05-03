@@ -183,6 +183,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
          */
         protected abstract boolean isSolutionMapped();
 
+        protected boolean update(Variable variable, ExpressionsBasedModel model, S solver) {
+            return false;
+        }
+
     }
 
     public static final class Intermediate implements Optimisation.Solver {

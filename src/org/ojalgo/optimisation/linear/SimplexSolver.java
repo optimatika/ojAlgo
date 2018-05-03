@@ -460,6 +460,13 @@ public final class SimplexSolver extends LinearSolver {
         }
     }
 
+    public boolean fixVariable(final int index, final double value) {
+
+        boolean retVal = false;
+
+        return retVal;
+    }
+
     public Result solve(final Result kickStarter) {
 
         if (this.isDebug() && this.isTableauPrintable()) {
@@ -722,12 +729,6 @@ public final class SimplexSolver extends LinearSolver {
         }
 
         return retVal;
-    }
-
-    public boolean fixVariable(final int index, final double value) {
-
-        // TODO Auto-generated method stub
-        return false;
     }
 
     void performIteration(final IterationPoint pivot) {

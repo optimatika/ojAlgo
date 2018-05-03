@@ -193,6 +193,12 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             return true;
         }
 
+        @Override
+        protected boolean update(Variable variable, ExpressionsBasedModel model, LinearSolver solver) {
+            // TODO Auto-generated method stub
+            return super.update(variable, model, solver);
+        }
+
     }
 
     public static LinearSolver.Builder getBuilder() {
@@ -236,11 +242,6 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     protected LinearSolver(final Options solverOptions) {
         super(solverOptions);
-    }
-
-    public boolean update(final Variable variable) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     protected abstract boolean initialise(Result kickStarter);

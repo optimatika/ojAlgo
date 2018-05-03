@@ -453,6 +453,12 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             return true;
         }
 
+        @Override
+        protected boolean update(Variable variable, ExpressionsBasedModel model, ConvexSolver solver) {
+            // TODO Auto-generated method stub
+            return super.update(variable, model, solver);
+        }
+
     }
 
     static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
@@ -644,6 +650,13 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         myMatrices.reset();
     }
 
+    public boolean fixVariable(final int index, final double value) {
+
+        boolean retVal = false;
+
+        return retVal;
+    }
+
     public final Optimisation.Result solve(final Optimisation.Result kickStarter) {
 
         boolean ok = true;
@@ -675,22 +688,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     @Override
     public String toString() {
         return myMatrices.toString();
-    }
-
-    @Override
-    public boolean update(final Variable variable) {
-
-        boolean retVal = false;
-
-        if (variable.isLowerLimitSet()) {
-            retVal = false;
-        }
-
-        if (variable.isUpperLimitSet()) {
-            retVal = false;
-        }
-
-        return retVal;
     }
 
     protected boolean computeGeneral(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
@@ -919,11 +916,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         for (int i = 0; i < mtrxAI.countRows(); i++) {
             slack.add(i, -mtrxAI.getRow(i).dot(mtrxX));
         }
-    }
-
-    public boolean fixVariable(final int index, final double value) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
 }
