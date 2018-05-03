@@ -228,8 +228,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         public Optimisation.Result solve(final Optimisation.Result candidate) {
 
-            // TODO Move this to the prepare() method.
-            myModel.presolve();
+            if (mySolver == null) {
+                myModel.presolve();
+            }
 
             if (myModel.isInfeasible()) {
 
@@ -1084,10 +1085,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      * </ul>
      */
     public ExpressionsBasedModel.Intermediate prepare() {
-
-        // TODO Should be able to do presolve() here rather than in Intermeditae#solve()
-        this.presolve();
-
         return new ExpressionsBasedModel.Intermediate(this);
     }
 
