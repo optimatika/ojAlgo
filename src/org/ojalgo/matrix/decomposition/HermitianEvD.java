@@ -417,8 +417,8 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
     @Override
     protected MatrixStore<N> makeD() {
-        final DiagonalBasicArray<Double> tmpDiagonal = new DiagonalBasicArray<>(Primitive64Array.wrap(d), null, null, ZERO);
-        return this.wrap(tmpDiagonal).diagonal(false).get();
+        final DiagonalBasicArray<Double> diagonal = new DiagonalBasicArray<>(Primitive64Array.wrap(d), null, null, ZERO);
+        return this.wrap(diagonal).diagonal().get();
     }
 
     @Override
