@@ -600,4 +600,29 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return d;
     }
 
+    //    public MatrixStore<Double> getExponential() {
+    //
+    //        final MatrixStore<Double> mtrxV = this.getV();
+    //
+    //        final PhysicalStore<Double> tmpD = this.getD().copy();
+    //        tmpD.modifyDiagonal(mtrxV.physical().function().exp());
+    //        final MatrixStore<Double> mtrxD = tmpD.logical().diagonal().get();
+    //
+    //        return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
+    //    }
+    //
+    //    public MatrixStore<Double> getPower(final int exponent) {
+    //
+    //        final MatrixStore<Double> mtrxV = this.getV();
+    //        final MatrixStore<Double> mtrxD = this.getD();
+    //
+    //        MatrixStore<Double> retVal = mtrxV;
+    //        for (int e = 0; e < exponent; e++) {
+    //            retVal = retVal.multiply(mtrxD);
+    //        }
+    //        retVal = retVal.multiply(mtrxV.conjugate());
+    //
+    //        return retVal;
+    //    }
+
 }

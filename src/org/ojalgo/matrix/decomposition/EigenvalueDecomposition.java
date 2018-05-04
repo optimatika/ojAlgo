@@ -174,4 +174,29 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         myV = newV;
     }
 
+    //    public MatrixStore<N> getExponential() {
+    //
+    //        final MatrixStore<N> mtrxV = this.getV();
+    //
+    //        final PhysicalStore<N> tmpD = this.getD().copy();
+    //        tmpD.modifyDiagonal(mtrxV.physical().function().exp());
+    //        final MatrixStore<N> mtrxD = tmpD.logical().diagonal().get();
+    //
+    //        return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
+    //    }
+    //
+    //    public MatrixStore<N> getPower(final int exponent) {
+    //
+    //        final MatrixStore<N> mtrxV = this.getV();
+    //        final MatrixStore<N> mtrxD = this.getD();
+    //
+    //        MatrixStore<N> retVal = mtrxV;
+    //        for (int e = 0; e < exponent; e++) {
+    //            retVal = retVal.multiply(mtrxD);
+    //        }
+    //        retVal = retVal.multiply(mtrxV.conjugate());
+    //
+    //        return retVal;
+    //    }
+
 }
