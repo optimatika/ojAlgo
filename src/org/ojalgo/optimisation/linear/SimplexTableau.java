@@ -37,6 +37,7 @@ import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.SparseArray.SparseFactory;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -369,6 +370,40 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             myObjectiveWeights = factory1D.makeZero(totNumbVars);
             myPhase1Weights = denseFactory.makeZero(totNumbVars);
+        }
+
+        SparseTableau(LinearSolver.Builder matrices) {
+
+            this(matrices.countConstraints(), matrices.countVariables(), 0);
+
+            MatrixStore<Double> A = matrices.getAE();
+            Mutate2D body = this.newConstraintsBody();
+            for (int i = 0; i < A.countRows(); i++) {
+                for (int j = 0; j < A.countColumns(); j++) {
+                    final double value = A.doubleValue(i, j);
+                    if (Math.abs(value) > PrimitiveMath.MACHINE_EPSILON) {
+                        body.set(i, j, value);
+                    }
+                }
+            }
+
+            MatrixStore<Double> b = matrices.getBE();
+            Mutate1D rhs = this.newConstraintsRHS();
+            for (int i = 0; i < b.count(); i++) {
+                final double value = b.doubleValue(i);
+                if (Math.abs(value) > PrimitiveMath.MACHINE_EPSILON) {
+                    rhs.set(i, value);
+                }
+            }
+
+            MatrixStore<Double> c = matrices.getC();
+            Mutate1D obj = this.newObjective();
+            for (int i = 0; i < c.count(); i++) {
+                final double value = c.doubleValue(i);
+                if (Math.abs(value) > PrimitiveMath.MACHINE_EPSILON) {
+                    obj.set(i, value);
+                }
+            }
         }
 
         public long countColumns() {
