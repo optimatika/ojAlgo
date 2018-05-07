@@ -59,7 +59,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
         Factory(final DenseArray.Factory<N> denseArray) {
             super();
-            myDelegate = BasicArray.factory(denseArray);
+            myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
         public final ArrayAnyD<N> copy(final AccessAnyD<?> source) {

@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.linear;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.linear.LinearSolver.Builder;
@@ -57,11 +56,13 @@ public class SpecialSituations {
         Result expected = new Optimisation.Result(Optimisation.State.OPTIMAL, x);
         Result actual = lp.solve();
 
+        // Same solution as in the example
         TestUtils.assertStateAndSolution(expected, actual);
 
         DenseTableau dense = new SimplexTableau.DenseTableau(builder);
         SparseTableau sparse = new SimplexTableau.SparseTableau(builder);
 
+        // Dense and spare tableau implementations behave equal
         TestUtils.assertEquals(dense, sparse);
 
         SimplexTableau.IterationPoint pivot = new SimplexTableau.IterationPoint();
@@ -85,20 +86,27 @@ public class SpecialSituations {
         sparse.pivot(pivot);
         TestUtils.assertEquals(dense, sparse);
 
+        // Correct optimal value
         TestUtils.assertEquals(4.0, dense.doubleValue(3, 5 + 3));
 
-        BasicLogger.debug("Final", sparse);
-
+        // Same fix result
+        dense.fixVariable(0, 1.5);
         sparse.fixVariable(0, 1.5);
+        TestUtils.assertEquals(dense, sparse);
 
-        BasicLogger.debug("Fixed", sparse);
-
+        // Make optimal again
         pivot.row = 1;
         pivot.col = 1;
         dense.pivot(pivot);
         sparse.pivot(pivot);
+        TestUtils.assertEquals(dense, sparse);
 
-        BasicLogger.debug("Optimal?", sparse);
+        // Correct when fixing on the solver
+        lp.fixVariable(0, 1.5);
+        Result fixed = lp.solve();
+        TestUtils.assertEquals(-4.0, fixed.getValue());
+        TestUtils.assertEquals(1.5, fixed.doubleValue(0));
+        TestUtils.assertEquals(1.0, fixed.doubleValue(1));
     }
 
     @Test

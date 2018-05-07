@@ -45,7 +45,7 @@ public class SegmentedArrayTest {
 
         final long tmpCount = Long.MAX_VALUE;
 
-        final BasicArray<Double> tmpArray = BasicArray.factory(Primitive64Array.FACTORY).makeZero(tmpCount);
+        final BasicArray<Double> tmpArray = new BasicArray.Factory<>(Primitive64Array.FACTORY).makeZero(tmpCount);
 
         ArrayTests.doTestRandomSetAndGetBack(tmpArray, tmpCount);
     }

@@ -58,7 +58,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         Factory(final DenseArray.Factory<N> denseArray) {
             super();
-            myDelegate = BasicArray.factory(denseArray);
+            myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
         public final Array2D<N> columns(final Access1D<?>... source) {

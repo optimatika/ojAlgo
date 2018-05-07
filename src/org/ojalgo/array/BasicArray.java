@@ -132,10 +132,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     }
 
-    public static <N extends Number> BasicArray.Factory<N> factory(final DenseArray.Factory<N> denseFactory) {
-        return new BasicArray.Factory<>(denseFactory);
-    }
-
     public static int[] makeDecreasingRange(final int first, final int count) {
         final int[] retVal = new int[count];
         for (int i = 0; i < count; i++) {

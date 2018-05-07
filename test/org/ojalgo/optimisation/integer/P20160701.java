@@ -155,7 +155,7 @@ class P20160701 {
             }
         }
 
-        model.options.debug(IntegerSolver.class);
+        // model.options.debug(IntegerSolver.class);
 
         final Optimisation.Result result = model.minimise();
 

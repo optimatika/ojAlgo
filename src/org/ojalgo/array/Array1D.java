@@ -62,7 +62,7 @@ public final class Array1D<N extends Number> extends AbstractList<N>
 
         Factory(final DenseArray.Factory<N> denseArray) {
             super();
-            myDelegate = BasicArray.factory(denseArray);
+            myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
         public final Array1D<N> copy(final Access1D<?> source) {
