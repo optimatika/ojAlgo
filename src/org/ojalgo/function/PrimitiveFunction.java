@@ -59,6 +59,15 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     }
 
     @FunctionalInterface
+    public static interface Predicate extends PredicateFunction<Double> {
+
+        default boolean invoke(final Double arg) {
+            return this.invoke(arg.doubleValue());
+        }
+
+    }
+
+    @FunctionalInterface
     public static interface Unary extends UnaryFunction<Double> {
 
         default Double invoke(final Double arg) {

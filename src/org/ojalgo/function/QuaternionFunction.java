@@ -49,6 +49,15 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     }
 
     @FunctionalInterface
+    public static interface Predicate extends PredicateFunction<Quaternion> {
+
+        default boolean invoke(final double arg) {
+            return this.invoke(Quaternion.valueOf(arg));
+        }
+
+    }
+
+    @FunctionalInterface
     public static interface Unary extends UnaryFunction<Quaternion> {
 
         default double invoke(final double arg) {

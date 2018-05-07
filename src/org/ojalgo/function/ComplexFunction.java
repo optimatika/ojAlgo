@@ -50,6 +50,15 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     }
 
     @FunctionalInterface
+    public static interface Predicate extends PredicateFunction<ComplexNumber> {
+
+        default boolean invoke(final double arg) {
+            return this.invoke(ComplexNumber.valueOf(arg));
+        }
+
+    }
+
+    @FunctionalInterface
     public static interface Unary extends UnaryFunction<ComplexNumber> {
 
         default double invoke(final double arg) {

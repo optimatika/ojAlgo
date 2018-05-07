@@ -54,6 +54,15 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     }
 
     @FunctionalInterface
+    public static interface Predicate extends PredicateFunction<RationalNumber> {
+
+        default boolean invoke(final double arg) {
+            return this.invoke(RationalNumber.valueOf(arg));
+        }
+
+    }
+
+    @FunctionalInterface
     public static interface Unary extends UnaryFunction<RationalNumber> {
 
         default double invoke(final double arg) {
