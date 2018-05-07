@@ -35,7 +35,10 @@ import org.ojalgo.access.Mutate1D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.LongToNumberMap;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
@@ -446,6 +449,7 @@ public final class SimplexSolver extends LinearSolver {
     private final IterationPoint myPoint;
 
     private final SimplexTableau myTableau;
+    private LongToNumberMap<Double> myFixedVariables = null;
 
     SimplexSolver(final SimplexTableau tableau, final Optimisation.Options solverOptions) {
 
@@ -462,7 +466,14 @@ public final class SimplexSolver extends LinearSolver {
 
     public boolean fixVariable(final int index, final double value) {
 
-        boolean retVal = false;
+        boolean retVal = myTableau.fixVariable(index, value);
+
+        if (retVal) {
+            if (myFixedVariables == null) {
+                myFixedVariables = LongToNumberMap.factory(Primitive64Array.FACTORY).make();
+            }
+            myFixedVariables.put(index, value);
+        }
 
         return retVal;
     }
@@ -528,9 +539,15 @@ public final class SimplexSolver extends LinearSolver {
 
         final int numberOfConstraints = myTableau.countConstraints();
         for (int row = 0; row < numberOfConstraints; row++) {
-            final int variableIndex = myTableau.getBasis(row);
+            final int variableIndex = myTableau.getBasisColumnIndex(row);
             if (variableIndex >= 0) {
                 solution.set(variableIndex, myTableau.doubleValue(row, colRHS));
+            }
+        }
+
+        if (myFixedVariables != null) {
+            for (NonzeroView<Double> entry : myFixedVariables.nonzeros()) {
+                solution.set(entry.index(), entry.doubleValue());
             }
         }
 
@@ -608,7 +625,7 @@ public final class SimplexSolver extends LinearSolver {
 
         if (this.isDebug()) {
             if (retVal) {
-                this.log("\n==>>\tRow: {},\tExit: {},\tColumn/Enter: {}.\n", myPoint.row, myTableau.getBasis(myPoint.row), myPoint.col);
+                this.log("\n==>>\tRow: {},\tExit: {},\tColumn/Enter: {}.\n", myPoint.row, myTableau.getBasisColumnIndex(myPoint.row), myPoint.col);
             } else {
                 this.log("\n==>>\tNo more iterations needed/possible.\n");
             }
@@ -691,7 +708,7 @@ public final class SimplexSolver extends LinearSolver {
         for (int i = 0; i < tmpConstraintsCount; i++) {
 
             // Phase 2 with artificials still in the basis
-            final boolean tmpSpecialCase = tmpPhase2 && (myTableau.getBasis(i) < 0);
+            final boolean tmpSpecialCase = tmpPhase2 && (myTableau.getBasisColumnIndex(i) < 0);
 
             // tmpDenom = myTransposedTableau.doubleValue(tmpDenomCol, i);
             tmpDenom = myTableau.doubleValue(i, tmpDenomCol);

@@ -34,6 +34,7 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.array.Raw1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.SparseArray.SparseFactory;
@@ -495,16 +496,80 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         @Override
         protected boolean fixVariable(int index, double value) {
 
-            final int totNumbVars = this.countVariablesTotally();
+            int row = this.getBasisRowIndex(index);
 
+            if (row < 0) {
+                return false;
+            }
+
+            SparseArray<Double> currentRow = myRows[row];
+            double currentRHS = myRHS.doubleValue(row);
+
+            final int totNumbVars = this.countVariablesTotally();
             final SparseFactory<Double> sparseFactory = SparseArray.factory(DENSE_FACTORY, totNumbVars).initial(1).limit(totNumbVars);
 
-            SparseArray<Double> auxiliary = sparseFactory.make();
-            auxiliary.set(index, 1.0);
+            SparseArray<Double> auxiliaryRow = sparseFactory.make();
 
-            this.doPivot(-1, index, auxiliary, value);
+            double auxiliaryRHS = ZERO;
 
-            return false;
+            if (currentRHS > value) {
+
+                currentRow.axpy(NEG, auxiliaryRow);
+                auxiliaryRow.set(index, ZERO);
+                auxiliaryRHS = value - currentRHS;
+
+            } else if (currentRHS < value) {
+
+                currentRow.axpy(ONE, auxiliaryRow);
+                auxiliaryRow.set(index, ZERO);
+                auxiliaryRHS = currentRHS - value;
+
+            } else {
+
+                return true;
+            }
+
+            Access1D<Double> objective = this.sliceTableauRow(this.countConstraints());
+
+            int pivotCol = -1;
+            double quoteMin = Double.MAX_VALUE;
+
+            for (int i = 0; i < auxiliaryRow.count(); i++) {
+                double rowAux = auxiliaryRow.doubleValue(i);
+                if (rowAux < ZERO) {
+                    double rowObj = objective.doubleValue(i);
+                    if (rowObj != ZERO) {
+                        double quotiewnt = Math.abs(rowObj / rowAux);
+                        if (quotiewnt < quoteMin) {
+                            quoteMin = quotiewnt;
+                            pivotCol = i;
+                        }
+                    }
+                }
+            }
+
+            if (pivotCol < 0) {
+                return false;
+            }
+
+            double pivotElement = auxiliaryRow.doubleValue(pivotCol);
+
+            if (PrimitiveFunction.ABS.invoke(pivotElement) < ONE) {
+                final UnaryFunction<Double> tmpModifier = DIVIDE.second(pivotElement);
+                auxiliaryRow.modifyAll(tmpModifier);
+                auxiliaryRHS = tmpModifier.invoke(auxiliaryRHS);
+            } else if (pivotElement != ONE) {
+                final UnaryFunction<Double> tmpModifier = MULTIPLY.second(ONE / pivotElement);
+                auxiliaryRow.modifyAll(tmpModifier);
+                auxiliaryRHS = tmpModifier.invoke(auxiliaryRHS);
+            }
+
+            this.doPivot(-1, pivotCol, auxiliaryRow, auxiliaryRHS);
+
+            myRows[row] = auxiliaryRow;
+            myRHS.set(row, auxiliaryRHS);
+
+            return true;
         }
 
         @Override
@@ -822,8 +887,12 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
     protected abstract boolean fixVariable(int index, double value);
 
-    protected int getBasis(final int basisIndex) {
-        return myBasis[basisIndex];
+    protected int getBasisColumnIndex(final int basisRowIndex) {
+        return myBasis[basisRowIndex];
+    }
+
+    protected int getBasisRowIndex(final int basisColumnIndex) {
+        return Raw1D.indexOf(myBasis, basisColumnIndex);
     }
 
     protected final int[] getExcluded() {

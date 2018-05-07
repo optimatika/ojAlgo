@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.linear;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.linear.LinearSolver.Builder;
@@ -85,6 +86,19 @@ public class SpecialSituations {
         TestUtils.assertEquals(dense, sparse);
 
         TestUtils.assertEquals(4.0, dense.doubleValue(3, 5 + 3));
+
+        BasicLogger.debug("Final", sparse);
+
+        sparse.fixVariable(0, 1.5);
+
+        BasicLogger.debug("Fixed", sparse);
+
+        pivot.row = 1;
+        pivot.col = 1;
+        dense.pivot(pivot);
+        sparse.pivot(pivot);
+
+        BasicLogger.debug("Optimal?", sparse);
     }
 
     @Test
