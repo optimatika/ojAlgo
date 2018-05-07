@@ -62,6 +62,24 @@ public abstract class Raw1D {
         return retVal;
     }
 
+    public static int indexOf(final int[] array, int value) {
+        for (int i = 0, limit = array.length; i < limit; i++) {
+            if (array[i] == value) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int indexOf(final long[] array, long value) {
+        for (int i = 0, limit = array.length; i < limit; i++) {
+            if (array[i] == value) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public static void sort(final long[] primary, final double[] secondary) {
 
         boolean tmpSwapped;
