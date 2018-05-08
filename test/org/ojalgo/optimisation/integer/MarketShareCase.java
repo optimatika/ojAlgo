@@ -170,8 +170,8 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         final Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertTrue(tmpModel.validate(tmpModel.options.feasibility));
-        TestUtils.assertTrue(tmpModel.validate(tmpResult, tmpModel.options.feasibility));
+        TestUtils.assertTrue(tmpModel.validate(tmpModel.options.feasibility, BasicLogger.DEBUG));
+        TestUtils.assertTrue(tmpModel.validate(tmpResult, tmpModel.options.feasibility, BasicLogger.DEBUG));
 
         TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), tmpModel.options.feasibility);
 

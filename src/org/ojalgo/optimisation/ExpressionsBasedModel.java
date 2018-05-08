@@ -285,6 +285,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                 if (variable.isFixed() && (mySolver instanceof UpdatableSolver) && ((UpdatableSolver) mySolver)
                         .fixVariable(this.getIntegration().getIndexInSolver(myModel, variable), variable.getUnadjustedLowerLimit())) {
                     // Solver updated in-place
+
+                    // mySolver = null;
+
                 } else {
                     // Solver needs to be regenerated
 
@@ -309,6 +312,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                 mySolver = this.getIntegration().build(myModel);
             }
             return mySolver;
+        }
+
+        public void validate(final Access1D<BigDecimal> solution, final Printer appender) {
+            myModel.validate(solution, appender);
         }
 
     }
