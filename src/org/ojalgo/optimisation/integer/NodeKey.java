@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.ojalgo.array.Raw1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ExpressionsBasedModel.Intermediate;
 import org.ojalgo.optimisation.Variable;
@@ -209,7 +210,14 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
     }
 
     private double feasible(final int index, final double value) {
-        return PrimitiveFunction.MIN.invoke(PrimitiveFunction.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
+
+        double retVal = PrimitiveFunction.MIN.invoke(PrimitiveFunction.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
+
+        if (Math.abs(retVal - value) > 1E-10) {
+            BasicLogger.debug("Obviously infeasible value {}: {} <= {} <= {} @ {}", index, myLowerBounds[index], value, myUpperBounds[index], this);
+        }
+
+        return retVal;
     }
 
     long calculateTreeSize() {

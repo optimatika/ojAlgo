@@ -33,6 +33,7 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.ExpressionsBasedModel.Intermediate;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
@@ -292,14 +293,13 @@ public class IntegerProblems {
             BasicLogger.debug(model);
         }
 
-        TestUtils.assertStateNotLessThanOptimal(fullResult);
-        TestUtils.assertTrue(model.validate(fullResult, BasicLogger.DEBUG));
+        //        TestUtils.assertStateNotLessThanOptimal(fullResult);
+        //        TestUtils.assertTrue(model.validate(fullResult, BasicLogger.DEBUG));
 
-        int[] lowerBounds = new int[] { 0, 0, 0, 3, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0 };
-        int[] upperBounds = new int[] { 414, 414, 414, 414, 414, 0, 414, 0, 414, 414, 414, 414, 414, 414, 6, 0 };
-
-        for (int v = 0; v < upperBounds.length; v++) {
-            model.getVariable(v).integer(false).lower(lowerBounds[v]).upper(upperBounds[v]);
+        int[] lowerBounds1 = new int[] { 0, 0, 0, 3, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0 };
+        int[] upperBounds1 = new int[] { 414, 414, 414, 414, 414, 0, 414, 0, 414, 414, 414, 414, 414, 414, 6, 0 };
+        for (int v = 0; v < upperBounds1.length; v++) {
+            model.getVariable(v).integer(false).lower(lowerBounds1[v]).upper(upperBounds1[v]);
         }
 
         final Result node1Result = model.minimise();
@@ -311,6 +311,26 @@ public class IntegerProblems {
 
         TestUtils.assertStateNotLessThanOptimal(node1Result);
         TestUtils.assertTrue(model.validate(node1Result, BasicLogger.DEBUG));
+
+        int[] lowerBounds2 = new int[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] upperBounds2 = new int[] { 0, 2, 0, 0, 414, 414, 414, 414, 414, 5, 414, 0, 414, 8, 414, 414 };
+        for (int v = 0; v < upperBounds1.length; v++) {
+            model.getVariable(v).integer(false).lower(lowerBounds2[v]).upper(upperBounds2[v]);
+        }
+
+        model.setMinimisation();
+        Intermediate intermediate2 = model.prepare();
+        final Result nodeResult2 = intermediate2.solve();
+
+        Variable variable2 = model.getVariable(5);
+        variable2.integer(false).lower(1).upper(1);
+
+        intermediate2.update(variable2);
+
+        final Result nodeResult3 = intermediate2.solve();
+
+        TestUtils.assertStateNotLessThanOptimal(nodeResult3);
+        TestUtils.assertTrue(model.validate(nodeResult3, BasicLogger.DEBUG));
 
     }
 

@@ -840,7 +840,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
         int retVal = -1;
         double minQuotient = MACHINE_LARGEST;
-        double minDenominator = ZERO;
+        double minDenominator = -1E-8;
 
         for (ElementView1D<Double, ?> nz : auxiliaryRow.nonzeros()) {
             final int i = (int) nz.index();
@@ -848,7 +848,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                 break;
             }
             final double denominator = nz.doubleValue();
-            if (denominator < ZERO) {
+            if (denominator < minDenominator) {
                 double numerator = objectiveRow.doubleValue(i);
                 if (numerator != ZERO) {
                     double quotient = Math.abs(numerator / denominator);
@@ -859,7 +859,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     }
                 } else {
                     if (denominator < minDenominator) {
-                        minQuotient = ZERO;
+                        //minQuotient = ZERO;
                         minDenominator = denominator;
                         retVal = i;
                     }
