@@ -134,6 +134,16 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
     }
 
+    public boolean equals(int[] lowerBounds, int[] upperBounds) {
+        if (!Arrays.equals(myLowerBounds, lowerBounds)) {
+            return false;
+        }
+        if (!Arrays.equals(myUpperBounds, upperBounds)) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -146,13 +156,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
             return false;
         }
         final NodeKey other = (NodeKey) obj;
-        if (!Arrays.equals(myLowerBounds, other.myLowerBounds)) {
-            return false;
-        }
-        if (!Arrays.equals(myUpperBounds, other.myUpperBounds)) {
-            return false;
-        }
-        return true;
+        return this.equals(other.myLowerBounds, other.myUpperBounds);
     }
 
     @Override

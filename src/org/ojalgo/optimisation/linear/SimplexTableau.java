@@ -27,6 +27,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.ElementView1D;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.array.Array1D;
@@ -179,24 +180,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             Access1D<Double> objectiveRow = this.sliceTableauRow(this.countConstraints());
 
-            int pivotCol = -1;
-            double minVal = Double.MAX_VALUE;
-
-            for (int i = 0; i < this.countVariables(); i++) {
-                double auxVal = auxiliaryRow.doubleValue(i);
-                if (auxVal < ZERO) {
-                    double objVal = objectiveRow.doubleValue(i);
-                    if (objVal != ZERO) {
-                        double quotient = Math.abs(objVal / auxVal);
-                        if (quotient < minVal) {
-                            minVal = quotient;
-                            pivotCol = i;
-                        }
-                    } else if (pivotCol < 0) {
-                        pivotCol = i;
-                    }
-                }
-            }
+            int pivotCol = this.findNextPivotColumn(auxiliaryRow, objectiveRow);
 
             if (pivotCol < 0) {
                 // TODO Problem infeasible?
@@ -608,24 +592,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             Access1D<Double> objectiveRow = this.sliceTableauRow(this.countConstraints());
 
-            int pivotCol = -1;
-            double minVal = Double.MAX_VALUE;
-
-            for (int i = 0; i < this.countVariables(); i++) {
-                double auxVal = auxiliaryRow.doubleValue(i);
-                if (auxVal < ZERO) {
-                    double objVal = objectiveRow.doubleValue(i);
-                    if (objVal != ZERO) {
-                        double quotient = Math.abs(objVal / auxVal);
-                        if (quotient < minVal) {
-                            minVal = quotient;
-                            pivotCol = i;
-                        }
-                    } else if (pivotCol < 0) {
-                        pivotCol = i;
-                    }
-                }
-            }
+            int pivotCol = this.findNextPivotColumn(auxiliaryRow, objectiveRow);
 
             if (pivotCol < 0) {
                 // TODO Problem infeasible?
@@ -867,6 +834,40 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         } else {
             return new SparseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
         }
+    }
+
+    int findNextPivotColumn(Access1D<Double> auxiliaryRow, Access1D<Double> objectiveRow) {
+
+        int retVal = -1;
+        double minQuotient = MACHINE_LARGEST;
+        double minDenominator = ZERO;
+
+        for (ElementView1D<Double, ?> nz : auxiliaryRow.nonzeros()) {
+            final int i = (int) nz.index();
+            if (i >= this.countVariables()) {
+                break;
+            }
+            final double denominator = nz.doubleValue();
+            if (denominator < ZERO) {
+                double numerator = objectiveRow.doubleValue(i);
+                if (numerator != ZERO) {
+                    double quotient = Math.abs(numerator / denominator);
+                    if (quotient < minQuotient) {
+                        minQuotient = quotient;
+                        minDenominator = denominator;
+                        retVal = i;
+                    }
+                } else {
+                    if (denominator < minDenominator) {
+                        minQuotient = ZERO;
+                        minDenominator = denominator;
+                        retVal = i;
+                    }
+                }
+            }
+        }
+
+        return retVal;
     }
 
     private final int[] myBasis;
