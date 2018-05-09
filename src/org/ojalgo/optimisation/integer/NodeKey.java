@@ -131,7 +131,6 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         }
 
         nodeModel.update(variable);
-
     }
 
     public boolean equals(int[] lowerBounds, int[] upperBounds) {
