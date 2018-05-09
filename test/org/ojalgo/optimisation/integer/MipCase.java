@@ -172,7 +172,6 @@ public final class MipCase extends OptimisationIntegerTests {
      * @see RelaxedLpCase#testPk1()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testPk1() {
         MipLibCase.assertMinMaxVal("pk1.mps", new BigDecimal("1.10000000e+01"), null, false, null);
     }
