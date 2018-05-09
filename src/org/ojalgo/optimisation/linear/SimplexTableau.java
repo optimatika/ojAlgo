@@ -192,6 +192,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             this.doPivot(-1, pivotCol, auxiliaryRow.data, 0, structure);
 
+            //  BasicLogger.debug("After pivot: " + Arrays.toString(this.getBasis()), this);
+
             myTransposed.fillColumn(row, auxiliaryRow);
 
             IterationPoint iterationPoint = new IterationPoint();
@@ -840,7 +842,6 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
         int retVal = -1;
         double minQuotient = MACHINE_LARGEST;
-        double minDenominator = -1E-8;
 
         for (ElementView1D<Double, ?> nz : auxiliaryRow.nonzeros()) {
             final int i = (int) nz.index();
@@ -848,21 +849,12 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                 break;
             }
             final double denominator = nz.doubleValue();
-            if (denominator < minDenominator) {
+            if (denominator < -1E-8) {
                 double numerator = objectiveRow.doubleValue(i);
-                if (numerator != ZERO) {
-                    double quotient = Math.abs(numerator / denominator);
-                    if (quotient < minQuotient) {
-                        minQuotient = quotient;
-                        minDenominator = denominator;
-                        retVal = i;
-                    }
-                } else {
-                    if (denominator < minDenominator) {
-                        //minQuotient = ZERO;
-                        minDenominator = denominator;
-                        retVal = i;
-                    }
+                double quotient = Math.abs(numerator / denominator);
+                if (quotient < minQuotient) {
+                    minQuotient = quotient;
+                    retVal = i;
                 }
             }
         }

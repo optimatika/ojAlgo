@@ -329,32 +329,89 @@ public class IntegerProblems {
     }
 
     @Test
-    public void testP20140819fixing() {
+    public void testP20140819fix1() {
 
-        final ExpressionsBasedModel model = IntegerProblems.makeP20140819();
+        final ExpressionsBasedModel expModel = IntegerProblems.makeP20140819();
 
-        int[] lowerBounds = new int[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
-        int[] upperBounds = new int[] { 0, 2, 0, 0, 414, 414, 414, 414, 414, 5, 414, 0, 414, 8, 414, 414 };
-        for (int v = 0; v < upperBounds.length; v++) {
-            model.getVariable(v).integer(false).lower(lowerBounds[v]).upper(upperBounds[v]);
+        int[] lowerBoundsExp = new int[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] upperBoundsExp = new int[] { 0, 2, 0, 0, 414, 1, 414, 414, 414, 5, 414, 0, 414, 8, 414, 414 };
+        for (int v = 0; v < upperBoundsExp.length; v++) {
+            expModel.getVariable(v).integer(false).lower(lowerBoundsExp[v]).upper(upperBoundsExp[v]);
         }
 
-        model.setMinimisation();
-        Intermediate intermediate = model.prepare();
+        final Result expResult = expModel.minimise();
+
+        TestUtils.assertStateLessThanFeasible(expResult);
+        TestUtils.assertFalse(expModel.validate(expResult));
+
+        final ExpressionsBasedModel actModel = IntegerProblems.makeP20140819();
+
+        int[] lowerBoundsAct = new int[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] upperBoundsAct = new int[] { 0, 2, 0, 0, 414, 414, 414, 414, 414, 5, 414, 0, 414, 8, 414, 414 };
+        for (int v = 0; v < upperBoundsAct.length; v++) {
+            actModel.getVariable(v).integer(false).lower(lowerBoundsAct[v]).upper(upperBoundsAct[v]);
+        }
+
+        actModel.setMinimisation();
+        Intermediate intermediate = actModel.prepare();
         final Result nodeResult = intermediate.solve();
 
         TestUtils.assertStateNotLessThanOptimal(nodeResult);
-        TestUtils.assertTrue(model.validate(nodeResult, BasicLogger.DEBUG));
+        TestUtils.assertTrue(actModel.validate(nodeResult, BasicLogger.DEBUG));
 
-        Variable variableToFix = model.getVariable(5);
-        variableToFix.integer(false).lower(1).upper(1);
+        Variable variableToFix = actModel.getVariable(5);
+        variableToFix.lower(1).upper(1);
+        intermediate.update(variableToFix);
 
+        final Result fixedResult = intermediate.solve();
+
+        TestUtils.assertStateLessThanFeasible(fixedResult);
+        TestUtils.assertFalse(expModel.validate(fixedResult));
+    }
+
+    @Test
+    public void testP20140819fix2() {
+
+        final ExpressionsBasedModel nodeModel = IntegerProblems.makeP20140819();
+
+        int[] nodeLowerBounds = new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] nodeUpperBounds = new int[] { 1, 1, 0, 0, 414, 0, 414, 414, 414, 5, 414, 0, 414, 414, 414, 414 };
+        for (int v = 0; v < nodeUpperBounds.length; v++) {
+            nodeModel.getVariable(v).integer(false).lower(nodeLowerBounds[v]).upper(nodeUpperBounds[v]);
+        }
+
+        final Result nodeResult = nodeModel.minimise();
+
+        TestUtils.assertStateNotLessThanOptimal(nodeResult);
+        TestUtils.assertTrue(nodeModel.validate(nodeResult, BasicLogger.DEBUG));
+
+        final ExpressionsBasedModel parentModel = IntegerProblems.makeP20140819();
+
+        int[] parentLowerBounds = new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] parentUpperBounds = new int[] { 414, 1, 0, 0, 414, 0, 414, 414, 414, 5, 414, 0, 414, 414, 414, 414 };
+        for (int v = 0; v < parentUpperBounds.length; v++) {
+            parentModel.getVariable(v).integer(false).lower(parentLowerBounds[v]).upper(parentUpperBounds[v]);
+        }
+
+        parentModel.setMinimisation();
+        Intermediate intermediate = parentModel.prepare();
+        final Result parentResult = intermediate.solve();
+
+        TestUtils.assertTrue(nodeResult.getValue() >= parentResult.getValue());
+
+        TestUtils.assertStateNotLessThanOptimal(parentResult);
+        TestUtils.assertTrue(parentModel.validate(parentResult, BasicLogger.DEBUG));
+
+        Variable variableToFix = parentModel.getVariable(0);
+        variableToFix.lower(1).upper(1);
         intermediate.update(variableToFix);
 
         final Result fixedResult = intermediate.solve();
 
         TestUtils.assertStateNotLessThanOptimal(fixedResult);
-        TestUtils.assertTrue(model.validate(fixedResult, BasicLogger.DEBUG));
+        TestUtils.assertTrue(nodeModel.validate(fixedResult, BasicLogger.DEBUG));
+
+        TestUtils.assertStateAndSolution(nodeResult, fixedResult);
     }
 
     @Test
