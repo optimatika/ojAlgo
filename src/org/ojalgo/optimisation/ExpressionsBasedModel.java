@@ -191,6 +191,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public static final class Intermediate implements Optimisation.Solver {
 
+        private boolean myInPlaceUpdatesOK = true;
         private transient ExpressionsBasedModel.Integration<?> myIntegration = null;
         private final ExpressionsBasedModel myModel;
         private transient Optimisation.Solver mySolver = null;
@@ -281,28 +282,27 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         public void update(final Variable variable) {
 
-            // mySolver = null;
-
-            if ((mySolver != null) && (myInPlaceCount < 1) && variable.isFixed() && (mySolver instanceof UpdatableSolver)) {
+            if (myInPlaceUpdatesOK && (mySolver != null) && variable.isFixed() && (mySolver instanceof UpdatableSolver)) {
                 final UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
 
                 final int indexInSolver = this.getIntegration().getIndexInSolver(myModel, variable);
-                final double unadjustedValue = variable.getUnadjustedLowerLimit();
+                final double fixedValue = variable.getValue().doubleValue();
 
-                if (updatableSolver.fixVariable(indexInSolver, unadjustedValue)) {
+                if (updatableSolver.fixVariable(indexInSolver, fixedValue)) {
                     // Solver updated in-place
-
-                    myInPlaceCount++;
-                    // mySolver = null;
                     return;
+                } else {
+                    myInPlaceUpdatesOK = false;
                 }
             }
 
+            // Solver will be re-generated
             mySolver = null;
-            myInPlaceCount = 0;
         }
 
-        private int myInPlaceCount = 0;
+        public void validate(final Access1D<BigDecimal> solution, final Printer appender) {
+            myModel.validate(solution, appender);
+        }
 
         public boolean validate(final Result solution) {
             return myModel.validate(solution);
@@ -320,10 +320,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                 mySolver = this.getIntegration().build(myModel);
             }
             return mySolver;
-        }
-
-        public void validate(final Access1D<BigDecimal> solution, final Printer appender) {
-            myModel.validate(solution, appender);
         }
 
     }

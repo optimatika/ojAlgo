@@ -196,6 +196,22 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             myTransposed.fillColumn(row, auxiliaryRow);
 
+            for (ElementView1D<Double, ?> elem : this.sliceConstraintsRHS().elements()) {
+                if (elem.doubleValue() < ZERO) {
+                    return false;
+                    //                    int tmpRow = (int) elem.index();
+                    //                    int tmpCol = this.findNextPivotColumn(this.sliceTableauRow(tmpRow), objectiveRow);
+                    //                    if (tmpCol < 0) {
+                    //                        return false;
+                    //                    } else {
+                    //                        IterationPoint iterationPoint = new IterationPoint();
+                    //                        iterationPoint.row = tmpRow;
+                    //                        iterationPoint.col = tmpCol;
+                    //                        this.pivot(iterationPoint);
+                    //                    }
+                }
+            }
+
             IterationPoint iterationPoint = new IterationPoint();
             iterationPoint.row = row;
             iterationPoint.col = pivotCol;
@@ -608,6 +624,18 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             myRows[row] = auxiliaryRow;
             myRHS.set(row, auxiliaryRHS);
+
+            for (ElementView1D<Double, ?> elem : this.sliceConstraintsRHS().elements()) {
+                if (elem.doubleValue() < ZERO) {
+                    return false;
+                }
+            }
+
+            IterationPoint iterationPoint = new IterationPoint();
+            iterationPoint.row = row;
+            iterationPoint.col = pivotCol;
+
+            this.update(iterationPoint);
 
             return true;
         }
