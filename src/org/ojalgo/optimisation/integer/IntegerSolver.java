@@ -24,21 +24,31 @@ package org.ojalgo.optimisation.integer;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.netio.CharacterRing;
+import org.ojalgo.netio.CharacterRing.PrinterBuffer;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.type.TypeUtils;
 
-public abstract class IntegerSolver extends GenericSolver {
+public final class IntegerSolver extends GenericSolver {
 
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<IntegerSolver> {
 
@@ -63,6 +73,265 @@ public abstract class IntegerSolver extends GenericSolver {
         @Override
         protected boolean isSolutionMapped() {
             return false;
+        }
+
+    }
+
+    final class BranchAndBoundNodeTask extends RecursiveTask<Boolean> implements Comparable<BranchAndBoundNodeTask> {
+
+        private final NodeKey myKey;
+        private final PrinterBuffer myPrinter = IntegerSolver.this.isDebug() ? new CharacterRing().asPrinter() : null;
+
+        private BranchAndBoundNodeTask(final NodeKey key) {
+
+            super();
+
+            myKey = key;
+        }
+
+        BranchAndBoundNodeTask() {
+
+            super();
+
+            myKey = new NodeKey(IntegerSolver.this.getIntegerModel());
+        }
+
+        public int compareTo(BranchAndBoundNodeTask o) {
+            return myKey.compareTo(o.getKey());
+        }
+
+        @Override
+        public String toString() {
+            return myKey.toString();
+        }
+
+        private void flush(final BasicLogger.Printer receiver) {
+            if ((myPrinter != null) && (receiver != null)) {
+                myPrinter.flush(receiver);
+            }
+        }
+
+        private boolean isNodeDebug() {
+            return (myPrinter != null) && IntegerSolver.this.isDebug();
+        }
+
+        @Override
+        protected Boolean compute() {
+
+            final ExpressionsBasedModel nodeModel = IntegerSolver.this.getRelaxedModel();
+            myKey.setNodeState(nodeModel, IntegerSolver.this.getIntegerIndices());
+
+            if (IntegerSolver.this.isIntegerSolutionFound()) {
+
+                final double mip_gap = IntegerSolver.this.options.mip_gap;
+
+                final double bestIntegerSolutionValue = IntegerSolver.this.getBestResultSoFar().getValue();
+                final double parentRelaxedSolutionValue = myKey.objective;
+
+                final double absoluteValue = ABS.invoke(bestIntegerSolutionValue);
+                final double absoluteGap = ABS.invoke(absoluteValue - parentRelaxedSolutionValue);
+
+                final double small = FunctionUtils.max(mip_gap, absoluteGap * mip_gap, absoluteValue * mip_gap);
+
+                if (nodeModel.isMinimisation()) {
+                    final BigDecimal upperLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue - small, IntegerSolver.this.options.feasibility);
+                    // final BigDecimal lowerLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
+                    nodeModel.limitObjective(null, upperLimit);
+                } else {
+                    final BigDecimal lowerLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue + small, IntegerSolver.this.options.feasibility);
+                    // final BigDecimal upperLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
+                    nodeModel.limitObjective(lowerLimit, null);
+                }
+            }
+
+            return this.compute(nodeModel.prepare());
+        }
+
+        protected Boolean compute(final ExpressionsBasedModel.Intermediate nodeModel) {
+
+            if (this.isNodeDebug()) {
+                myPrinter.println();
+                myPrinter.println("Branch&Bound Node");
+                myPrinter.println(myKey.toString());
+                myPrinter.println(IntegerSolver.this.toString());
+            }
+
+            if (!IntegerSolver.this.isIterationAllowed() || !IntegerSolver.this.isIterationNecessary()) {
+                if (this.isNodeDebug()) {
+                    myPrinter.println("Reached iterations or time limit - stop!");
+                    this.flush(IntegerSolver.this.getIntegerModel().options.logger_appender);
+                }
+                return false;
+            }
+
+            if (!IntegerSolver.this.isGoodEnoughToContinueBranching(myKey.objective)) {
+                if (this.isNodeDebug()) {
+                    myPrinter.println("No longer a relevant node!");
+                    this.flush(IntegerSolver.this.getIntegerModel().options.logger_appender);
+                }
+                return true;
+            }
+
+            if (myKey.index >= 0) {
+                myKey.enforceBounds(nodeModel, IntegerSolver.this.getIntegerIndices());
+                //myKey.setNodeState(nodeModel, IntegerSolver.this.getIntegerIndices());
+            }
+
+            final Result bestResultSoFar = IntegerSolver.this.getBestResultSoFar();
+            final Optimisation.Result nodeResult = nodeModel.solve(bestResultSoFar);
+
+            // Increment when/if an iteration was actually performed
+            IntegerSolver.this.incrementIterationsCount();
+
+            if (this.isNodeDebug()) {
+                myPrinter.println("Node Result: {}", nodeResult);
+            }
+
+            if (nodeResult.getState().isOptimal()) {
+                if (this.isNodeDebug()) {
+                    myPrinter.println("Node solved to optimality!");
+                }
+
+                if (IntegerSolver.this.options.validate && !nodeModel.validate(nodeResult)) {
+                    // This should not be possible. There is a bug somewhere.
+                    myPrinter.println("Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!");
+                    myPrinter.println("Lower bounds: {}", Arrays.toString(myKey.getLowerBounds()));
+                    myPrinter.println("Upper bounds: {}", Arrays.toString(myKey.getUpperBounds()));
+
+                    // nodeModel.validate(nodeResult, myPrinter);
+
+                    this.flush(IntegerSolver.this.getIntegerModel().options.logger_appender);
+
+                    return false;
+                }
+
+                final int branchIntegerIndex = IntegerSolver.this.identifyNonIntegerVariable(nodeResult, myKey);
+                final double tmpSolutionValue = IntegerSolver.this.evaluateFunction(nodeResult);
+
+                if (branchIntegerIndex == -1) {
+                    if (this.isNodeDebug()) {
+                        myPrinter.println("Integer solution! Store it among the others, and stop this branch!");
+                    }
+
+                    final Optimisation.Result tmpIntegerSolutionResult = new Optimisation.Result(Optimisation.State.FEASIBLE, tmpSolutionValue, nodeResult);
+
+                    IntegerSolver.this.markInteger(myKey, null, tmpIntegerSolutionResult);
+
+                    if (this.isNodeDebug()) {
+                        myPrinter.println(IntegerSolver.this.getBestResultSoFar().toString());
+                        BasicLogger.debug();
+                        BasicLogger.debug(IntegerSolver.this.toString());
+                        // BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
+                        this.flush(IntegerSolver.this.getIntegerModel().options.logger_appender);
+                    }
+
+                    nodeModel.dispose();
+                    return true;
+
+                } else {
+                    if (this.isNodeDebug()) {
+                        myPrinter.println("Not an Integer Solution: " + tmpSolutionValue);
+                    }
+
+                    final double tmpVariableValue = nodeResult.doubleValue(IntegerSolver.this.getGlobalIndex(branchIntegerIndex));
+
+                    if (IntegerSolver.this.isGoodEnoughToContinueBranching(tmpSolutionValue)) {
+
+                        if (this.isNodeDebug()) {
+                            myPrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, tmpVariableValue,
+                                    nodeModel.getVariable(IntegerSolver.this.getGlobalIndex(branchIntegerIndex)));
+                            this.flush(IntegerSolver.this.getIntegerModel().options.logger_appender);
+                        }
+
+                        // IntegerSolver.this.generateCuts(nodeModel);
+
+                        final BranchAndBoundNodeTask lowerBranch = this.createLowerBranch(branchIntegerIndex, tmpVariableValue, tmpSolutionValue);
+                        final BranchAndBoundNodeTask upperBranch = this.createUpperBranch(branchIntegerIndex, tmpVariableValue, tmpSolutionValue);
+
+                        final BranchAndBoundNodeTask nextTask;
+                        final BranchAndBoundNodeTask forkedTask;
+                        BranchAndBoundNodeTask deferredTask;
+
+                        final double fractional = tmpVariableValue - Math.floor(tmpVariableValue);
+                        if (fractional >= HALF) {
+                            nextTask = upperBranch;
+                            if (fractional > 0.95) {
+                                forkedTask = null;
+                                //deferredTask = lowerBranch;
+                                deferred.offer(lowerBranch);
+                            } else {
+                                forkedTask = lowerBranch;
+                                deferredTask = null;
+                            }
+                        } else {
+                            nextTask = lowerBranch;
+                            if (fractional < 0.05) {
+                                forkedTask = null;
+                                // deferredTask = upperBranch;
+                                deferred.offer(upperBranch);
+                            } else {
+                                forkedTask = upperBranch;
+                                deferredTask = null;
+                            }
+                        }
+
+                        if (forkedTask != null) {
+
+                            forkedTask.fork();
+
+                            return nextTask.compute(nodeModel) && forkedTask.join();
+
+                        } else {
+
+                            Boolean tmpCompute = nextTask.compute(nodeModel);
+
+                            deferredTask = deferred.poll();
+                            if (tmpCompute.booleanValue() && (deferredTask != null)) {
+                                tmpCompute = deferredTask.compute();
+                            }
+
+                            return tmpCompute;
+                        }
+
+                    } else {
+                        if (this.isNodeDebug()) {
+                            myPrinter.println("Can't find better integer solutions - stop this branch!");
+                            this.flush(IntegerSolver.this.getIntegerModel().options.logger_appender);
+                        }
+
+                        nodeModel.dispose();
+                        return true;
+                    }
+                }
+
+            } else {
+                if (this.isNodeDebug()) {
+                    myPrinter.println("Failed to solve node problem - stop this branch!");
+                    this.flush(IntegerSolver.this.getIntegerModel().options.logger_appender);
+                }
+
+                nodeModel.dispose();
+                return true;
+            }
+
+        }
+
+        BranchAndBoundNodeTask createLowerBranch(final int branchIntegerIndex, final double nonIntegerValue, final double parentObjectiveValue) {
+
+            final NodeKey tmpKey = myKey.createLowerBranch(branchIntegerIndex, nonIntegerValue, parentObjectiveValue);
+
+            return new BranchAndBoundNodeTask(tmpKey);
+        }
+
+        BranchAndBoundNodeTask createUpperBranch(final int branchIntegerIndex, final double nonIntegerValue, final double parentObjectiveValue) {
+
+            final NodeKey tmpKey = myKey.createUpperBranch(branchIntegerIndex, nonIntegerValue, parentObjectiveValue);
+
+            return new BranchAndBoundNodeTask(tmpKey);
+        }
+
+        NodeKey getKey() {
+            return myKey;
         }
 
     }
@@ -159,8 +428,7 @@ public abstract class IntegerSolver extends GenericSolver {
     }
 
     public static IntegerSolver make(final ExpressionsBasedModel model) {
-        return new OldIntegerSolver(model, model.options);
-        //return new NewIntegerSolver(model, model.options);
+        return new IntegerSolver(model, model.options);
     }
 
     private volatile Optimisation.Result myBestResultSoFar = null;
@@ -174,6 +442,7 @@ public abstract class IntegerSolver extends GenericSolver {
     private final AtomicInteger myIntegerSolutionsCount = new AtomicInteger();
     private final boolean myMinimisation;
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
+    PriorityBlockingQueue<BranchAndBoundNodeTask> deferred = new PriorityBlockingQueue<BranchAndBoundNodeTask>();
 
     protected IntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
 
@@ -194,6 +463,42 @@ public abstract class IntegerSolver extends GenericSolver {
         Arrays.fill(myIntegerSignificances, ONE);
     }
 
+    public Result solve(final Result kickStarter) {
+
+        // Must verify that it actually is an integer solution
+        // The kickStarter may be user-supplied
+        if ((kickStarter != null) && kickStarter.getState().isFeasible() && this.getIntegerModel().validate(kickStarter)) {
+            this.markInteger(null, null, kickStarter);
+        }
+
+        this.resetIterationsCount();
+
+        final BranchAndBoundNodeTask rootNodeTask = new BranchAndBoundNodeTask();
+
+        final boolean normalExit = ForkJoinPool.commonPool().invoke(rootNodeTask);
+
+        final Optimisation.Result bestSolutionFound = this.getBestResultSoFar();
+
+        if (bestSolutionFound.getState().isFeasible()) {
+            if (normalExit) {
+                return new Optimisation.Result(State.OPTIMAL, bestSolutionFound);
+            } else {
+                return new Optimisation.Result(State.FEASIBLE, bestSolutionFound);
+            }
+        } else {
+            if (normalExit) {
+                return new Optimisation.Result(State.INFEASIBLE, bestSolutionFound);
+            } else {
+                return new Optimisation.Result(State.FAILED, bestSolutionFound);
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        return TypeUtils.format("Solutions={} Nodes/Iterations={} {}", this.countIntegerSolutions(), this.countExploredNodes(), this.getBestResultSoFar());
+    }
+
     protected int countIntegerSolutions() {
         return myIntegerSolutionsCount.intValue();
     }
@@ -205,6 +510,11 @@ public abstract class IntegerSolver extends GenericSolver {
         } else {
             return Double.NaN;
         }
+    }
+
+    @Override
+    protected MatrixStore<Double> extractSolution() {
+        return PrimitiveDenseStore.FACTORY.columns(this.getBestResultSoFar());
     }
 
     protected Optimisation.Result getBestResultSoFar() {
@@ -237,7 +547,9 @@ public abstract class IntegerSolver extends GenericSolver {
         return myIntegerModel.relax(false);
     }
 
-    protected abstract boolean initialise(Result kickStarter);
+    protected boolean initialise(final Result kickStarter) {
+        return true;
+    }
 
     protected final boolean isFunctionSet() {
         return myFunction != null;
@@ -340,7 +652,9 @@ public abstract class IntegerSolver extends GenericSolver {
         myIntegerSolutionsCount.incrementAndGet();
     }
 
-    protected abstract boolean needsAnotherIteration();
+    protected boolean needsAnotherIteration() {
+        return !this.getState().isOptimal();
+    }
 
     /**
      * Should validate the solver data/input/structue. Even "expensive" validation can be performed as the
@@ -352,10 +666,38 @@ public abstract class IntegerSolver extends GenericSolver {
      *
      * @return Is the solver instance valid?
      */
-    protected abstract boolean validate();
+    protected boolean validate() {
+
+        boolean retVal = true;
+        this.setState(State.VALID);
+
+        try {
+
+            if (!(retVal = this.getIntegerModel().validate())) {
+                retVal = false;
+                this.setState(State.INVALID);
+            }
+
+        } catch (final Exception ex) {
+
+            retVal = false;
+            this.setState(State.FAILED);
+        }
+
+        return retVal;
+    }
 
     void addIntegerSignificance(final int index, final double significance) {
         myIntegerSignificances[index] += significance;
+    }
+
+    int countExploredNodes() {
+        // return myExploredNodes.size();
+        return 0;
+    }
+
+    void generateCuts(final ExpressionsBasedModel nodeModel) {
+        //   nodeModel.generateCuts(myPotentialCutExpressions);
     }
 
     final int getGlobalIndex(final int integerIndex) {
@@ -413,6 +755,16 @@ public abstract class IntegerSolver extends GenericSolver {
         }
 
         return retVal;
+    }
+
+    boolean isExplored(final BranchAndBoundNodeTask aNodeTask) {
+        // return myExploredNodes.contains(aNodeTask.getKey());
+        return false;
+    }
+
+    void markAsExplored(final BranchAndBoundNodeTask aNodeTask) {
+
+        // myExploredNodes.add(aNodeTask.getKey());
     }
 
 }
