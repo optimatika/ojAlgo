@@ -27,6 +27,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.RecursiveTask;
 
 import org.ojalgo.function.FunctionUtils;
@@ -48,7 +49,7 @@ public final class OldIntegerSolver extends IntegerSolver {
 
     //  private final Set<Expression> myPotentialCutExpressions;
 
-    final class BranchAndBoundNodeTask extends RecursiveTask<Boolean> {
+    final class BranchAndBoundNodeTask extends RecursiveTask<Boolean> implements Comparable<BranchAndBoundNodeTask> {
 
         private final NodeKey myKey;
         private final PrinterBuffer myPrinter = OldIntegerSolver.this.isDebug() ? new CharacterRing().asPrinter() : null;
@@ -217,18 +218,48 @@ public final class OldIntegerSolver extends IntegerSolver {
 
                         final BranchAndBoundNodeTask nextTask;
                         final BranchAndBoundNodeTask forkedTask;
+                        BranchAndBoundNodeTask deferredTask;
 
-                        if ((tmpVariableValue - Math.floor(tmpVariableValue)) > HALF) {
+                        final double fractional = tmpVariableValue - Math.floor(tmpVariableValue);
+                        if (fractional >= HALF) {
                             nextTask = upperBranch;
-                            forkedTask = lowerBranch;
+                            if (fractional > 0.95) {
+                                forkedTask = null;
+                                //deferredTask = lowerBranch;
+                                deferred.offer(lowerBranch);
+                            } else {
+                                forkedTask = lowerBranch;
+                                deferredTask = null;
+                            }
                         } else {
                             nextTask = lowerBranch;
-                            forkedTask = upperBranch;
+                            if (fractional < 0.05) {
+                                forkedTask = null;
+                                // deferredTask = upperBranch;
+                                deferred.offer(upperBranch);
+                            } else {
+                                forkedTask = upperBranch;
+                                deferredTask = null;
+                            }
                         }
 
-                        forkedTask.fork();
+                        if (forkedTask != null) {
 
-                        return nextTask.compute(nodeModel) && forkedTask.join();
+                            forkedTask.fork();
+
+                            return nextTask.compute(nodeModel) && forkedTask.join();
+
+                        } else {
+
+                            Boolean tmpCompute = nextTask.compute(nodeModel);
+
+                            deferredTask = deferred.poll();
+                            if (tmpCompute.booleanValue() && (deferredTask != null)) {
+                                tmpCompute = deferredTask.compute();
+                            }
+
+                            return tmpCompute;
+                        }
 
                     } else {
                         if (this.isNodeDebug()) {
@@ -271,16 +302,16 @@ public final class OldIntegerSolver extends IntegerSolver {
             return myKey;
         }
 
+        public int compareTo(BranchAndBoundNodeTask o) {
+            return myKey.compareTo(o.getKey());
+        }
+
     }
 
-    // private final Set<NodeKey> myExploredNodes = Collections.synchronizedSet(new HashSet<NodeKey>());
+    PriorityBlockingQueue<BranchAndBoundNodeTask> deferred = new PriorityBlockingQueue<BranchAndBoundNodeTask>();
 
     OldIntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
-
         super(model, solverOptions);
-
-        //        myPotentialCutExpressions = model.constraints().filter(e -> e.isFunctionLinear()).filter(e -> e.getLinearEntrySet().size() > 2)
-        //                .filter(e -> e.isAllBinary()).collect(Collectors.toSet());
     }
 
     public Result solve(final Result kickStarter) {
