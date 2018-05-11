@@ -455,11 +455,11 @@ public final class IntegerSolver extends GenericSolver {
 
         final List<Variable> integerVariables = myIntegerModel.getIntegerVariables();
         myIntegerIndices = new int[integerVariables.size()];
-        for (int i = 0; i < myIntegerIndices.length; i++) {
+        for (int i = 0, limit = myIntegerIndices.length; i < limit; i++) {
             myIntegerIndices[i] = myIntegerModel.indexOf(integerVariables.get(i));
         }
 
-        myIntegerSignificances = new double[integerVariables.size()];
+        myIntegerSignificances = new double[myIntegerIndices.length];
         Arrays.fill(myIntegerSignificances, ONE);
     }
 
@@ -504,7 +504,7 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     @Override
-    protected final double evaluateFunction(final Access1D<?> solution) {
+    protected double evaluateFunction(final Access1D<?> solution) {
         if ((myFunction != null) && (solution != null) && (myFunction.arity() == solution.count())) {
             return myFunction.invoke(Access1D.asPrimitive1D(solution));
         } else {
@@ -519,11 +519,11 @@ public final class IntegerSolver extends GenericSolver {
 
     protected Optimisation.Result getBestResultSoFar() {
 
-        final Result tmpCurrentlyTheBest = myBestResultSoFar;
+        final Result currentlyTheBest = myBestResultSoFar;
 
-        if (tmpCurrentlyTheBest != null) {
+        if (currentlyTheBest != null) {
 
-            return tmpCurrentlyTheBest;
+            return currentlyTheBest;
 
         } else {
 
@@ -535,7 +535,7 @@ public final class IntegerSolver extends GenericSolver {
         }
     }
 
-    protected final MatrixStore<Double> getGradient(final Access1D<Double> solution) {
+    protected MatrixStore<Double> getGradient(final Access1D<Double> solution) {
         return myFunction.getGradient(solution);
     }
 
@@ -543,7 +543,7 @@ public final class IntegerSolver extends GenericSolver {
         return myIntegerModel;
     }
 
-    protected final ExpressionsBasedModel getRelaxedModel() {
+    protected ExpressionsBasedModel getRelaxedModel() {
         return myIntegerModel.relax(false);
     }
 
@@ -551,7 +551,7 @@ public final class IntegerSolver extends GenericSolver {
         return true;
     }
 
-    protected final boolean isFunctionSet() {
+    protected boolean isFunctionSet() {
         return myFunction != null;
     }
 
@@ -594,7 +594,7 @@ public final class IntegerSolver extends GenericSolver {
         }
     }
 
-    protected final boolean isModelSet() {
+    protected boolean isModelSet() {
         return myIntegerModel != null;
     }
 
@@ -605,17 +605,17 @@ public final class IntegerSolver extends GenericSolver {
             this.log("\t@ node {}", key);
         }
 
-        final Optimisation.Result tmpCurrentlyTheBest = myBestResultSoFar;
+        final Optimisation.Result currentlyTheBest = myBestResultSoFar;
 
-        if (tmpCurrentlyTheBest == null) {
-
-            myBestResultSoFar = result;
-
-        } else if (myMinimisation && (result.getValue() < tmpCurrentlyTheBest.getValue())) {
+        if (currentlyTheBest == null) {
 
             myBestResultSoFar = result;
 
-        } else if (!myMinimisation && (result.getValue() > tmpCurrentlyTheBest.getValue())) {
+        } else if (myMinimisation && (result.getValue() < currentlyTheBest.getValue())) {
+
+            myBestResultSoFar = result;
+
+        } else if (!myMinimisation && (result.getValue() > currentlyTheBest.getValue())) {
 
             myBestResultSoFar = result;
 
@@ -626,12 +626,13 @@ public final class IntegerSolver extends GenericSolver {
             }
         }
 
-        if (tmpCurrentlyTheBest != null) {
+        if (currentlyTheBest != null) {
 
-            final double objDiff = ABS.invoke((result.getValue() - tmpCurrentlyTheBest.getValue()) / tmpCurrentlyTheBest.getValue());
+            final double objDiff = ABS.invoke((result.getValue() - currentlyTheBest.getValue()) / currentlyTheBest.getValue());
 
             for (int i = 0; i < myIntegerIndices.length; i++) {
-                final double varDiff = ABS.invoke(result.doubleValue(myIntegerIndices[i]) - tmpCurrentlyTheBest.doubleValue(myIntegerIndices[i]));
+                final int globalIndex = myIntegerIndices[i];
+                final double varDiff = ABS.invoke(result.doubleValue(globalIndex) - currentlyTheBest.doubleValue(globalIndex));
                 if (!options.feasibility.isZero(varDiff)) {
                     this.addIntegerSignificance(i, objDiff / varDiff);
                 }
@@ -644,7 +645,8 @@ public final class IntegerSolver extends GenericSolver {
 
             if (largest > ZERO) {
                 for (int i = 0; i < myIntegerIndices.length; i++) {
-                    this.addIntegerSignificance(i, ABS.invoke(gradient.doubleValue(myIntegerIndices[i])) / largest);
+                    final int globalIndex = myIntegerIndices[i];
+                    this.addIntegerSignificance(i, ABS.invoke(gradient.doubleValue(globalIndex)) / largest);
                 }
             }
         }
@@ -700,11 +702,11 @@ public final class IntegerSolver extends GenericSolver {
         //   nodeModel.generateCuts(myPotentialCutExpressions);
     }
 
-    final int getGlobalIndex(final int integerIndex) {
+    int getGlobalIndex(final int integerIndex) {
         return myIntegerIndices[integerIndex];
     }
 
-    final int[] getIntegerIndices() {
+    int[] getIntegerIndices() {
         return myIntegerIndices;
     }
 
@@ -717,7 +719,7 @@ public final class IntegerSolver extends GenericSolver {
      * an integer solution has been found (no further branching). Does NOT return a global variable index -
      * it's the index among the ineteger variable.
      */
-    final int identifyNonIntegerVariable(final Optimisation.Result nodeResult, final NodeKey nodeKey) {
+    int identifyNonIntegerVariable(final Optimisation.Result nodeResult, final NodeKey nodeKey) {
 
         int retVal = -1;
 
@@ -725,7 +727,7 @@ public final class IntegerSolver extends GenericSolver {
         double compareFraction = ZERO;
         double maxFraction = ZERO;
 
-        for (int i = 0; i < myIntegerIndices.length; i++) {
+        for (int i = 0, limit = myIntegerIndices.length; i < limit; i++) {
 
             fraction = nodeKey.getFraction(i, nodeResult.doubleValue(myIntegerIndices[i]));
             // [0, 0.5]
@@ -743,7 +745,7 @@ public final class IntegerSolver extends GenericSolver {
                     // then compare the remaining/reversed (larger) fraction
 
                     compareFraction = ONE - fraction;
-                    // [0.5, 1.0]
+                    // [0.5, 1.0)
                 }
 
                 if (compareFraction > maxFraction) {
@@ -751,20 +753,9 @@ public final class IntegerSolver extends GenericSolver {
                     maxFraction = compareFraction;
                 }
             }
-
         }
 
         return retVal;
-    }
-
-    boolean isExplored(final BranchAndBoundNodeTask aNodeTask) {
-        // return myExploredNodes.contains(aNodeTask.getKey());
-        return false;
-    }
-
-    void markAsExplored(final BranchAndBoundNodeTask aNodeTask) {
-
-        // myExploredNodes.add(aNodeTask.getKey());
     }
 
 }
