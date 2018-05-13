@@ -284,7 +284,11 @@ public final class IntegerSolver extends GenericSolver {
 
         final BranchAndBoundNodeTask rootNodeTask = new BranchAndBoundNodeTask();
 
-        final boolean normalExit = ForkJoinPool.commonPool().invoke(rootNodeTask).booleanValue();
+        boolean normalExit = ForkJoinPool.commonPool().invoke(rootNodeTask).booleanValue();
+        while (normalExit && (myDeferredNodes.size() > 0)) {
+            normalExit &= ForkJoinPool.commonPool().invoke(new BranchAndBoundNodeTask(myDeferredNodes.poll())).booleanValue();
+        }
+        myDeferredNodes.clear();
 
         final Optimisation.Result bestSolutionFound = this.getBestResultSoFar();
 
@@ -410,28 +414,22 @@ public final class IntegerSolver extends GenericSolver {
 
                     final NodeKey nextTask;
                     final BranchAndBoundNodeTask forkedTask;
-                    NodeKey deferredTask;
 
-                    final double fractional = tmpVariableValue - Math.floor(tmpVariableValue);
-                    if (fractional >= HALF) {
+                    if (upperBranch.displacement <= HALF) {
                         nextTask = upperBranch;
-                        if (fractional > 0.95) {
+                        if (lowerBranch.displacement > TWO_THIRDS) {
                             forkedTask = null;
-                            //deferredTask = lowerBranch;
                             myDeferredNodes.offer(lowerBranch);
                         } else {
                             forkedTask = new BranchAndBoundNodeTask(lowerBranch);
-                            deferredTask = null;
                         }
                     } else {
                         nextTask = lowerBranch;
-                        if (fractional < 0.05) {
+                        if (upperBranch.displacement > TWO_THIRDS) {
                             forkedTask = null;
-                            // deferredTask = upperBranch;
                             myDeferredNodes.offer(upperBranch);
                         } else {
                             forkedTask = new BranchAndBoundNodeTask(upperBranch);
-                            deferredTask = null;
                         }
                     }
 
@@ -443,14 +441,7 @@ public final class IntegerSolver extends GenericSolver {
 
                     } else {
 
-                        Boolean tmpCompute = this.compute(nextTask, nodeModel, nodePrinter);
-
-                        deferredTask = myDeferredNodes.poll();
-                        if (tmpCompute.booleanValue() && (deferredTask != null)) {
-                            tmpCompute = new BranchAndBoundNodeTask(deferredTask).compute();
-                        }
-
-                        return tmpCompute;
+                        return this.compute(nextTask, nodeModel, nodePrinter);
                     }
 
                 } else {
