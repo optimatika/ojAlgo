@@ -417,7 +417,7 @@ public final class IntegerSolver extends GenericSolver {
 
                     if (upperBranch.displacement <= HALF) {
                         nextTask = upperBranch;
-                        if (lowerBranch.displacement > TWO_THIRDS) {
+                        if (lowerBranch.displacement > THREE_QUARTERS) {
                             forkedTask = null;
                             myDeferredNodes.offer(lowerBranch);
                         } else {
@@ -425,7 +425,7 @@ public final class IntegerSolver extends GenericSolver {
                         }
                     } else {
                         nextTask = lowerBranch;
-                        if (upperBranch.displacement > TWO_THIRDS) {
+                        if (upperBranch.displacement > THREE_QUARTERS) {
                             forkedTask = null;
                             myDeferredNodes.offer(upperBranch);
                         } else {
