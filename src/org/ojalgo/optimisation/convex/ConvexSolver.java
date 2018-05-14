@@ -453,12 +453,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             return true;
         }
 
-        @Override
-        protected boolean update(final Variable variable, final ExpressionsBasedModel model, final ConvexSolver solver) {
-            // TODO Auto-generated method stub
-            return super.update(variable, model, solver);
-        }
-
     }
 
     static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
