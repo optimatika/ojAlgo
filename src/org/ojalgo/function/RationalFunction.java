@@ -45,6 +45,15 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     }
 
     @FunctionalInterface
+    public static interface Consumer extends ConsumerFunction<RationalNumber> {
+
+        default void invoke(final double arg) {
+            this.invoke(RationalNumber.valueOf(arg));
+        }
+
+    }
+
+    @FunctionalInterface
     public static interface Parameter extends ParameterFunction<RationalNumber> {
 
         default double invoke(final double arg, final int param) {
@@ -67,15 +76,6 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
         default double invoke(final double arg) {
             return this.invoke(RationalNumber.valueOf(arg)).doubleValue();
-        }
-
-    }
-
-    @FunctionalInterface
-    public static interface Void extends VoidFunction<RationalNumber> {
-
-        default void invoke(final double arg) {
-            this.invoke(RationalNumber.valueOf(arg));
         }
 
     }

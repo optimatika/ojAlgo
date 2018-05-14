@@ -32,7 +32,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.ConsumerFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.scalar.Scalar;
@@ -214,11 +214,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         return retVal.toString();
     }
 
-    public void visitAll(final VoidFunction<N> visitor) {
+    public void visitAll(final ConsumerFunction<N> visitor) {
         this.visit(0L, this.count(), 1L, visitor);
     }
 
-    public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
+    public void visitRange(final long first, final long limit, final ConsumerFunction<N> visitor) {
         this.visit(first, limit, 1L, visitor);
     }
 
@@ -240,7 +240,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     protected abstract void modify(long first, long limit, long step, UnaryFunction<N> function);
 
-    protected abstract void visit(long first, long limit, long step, VoidFunction<N> visitor);
+    protected abstract void visit(long first, long limit, long step, ConsumerFunction<N> visitor);
 
     /**
      * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray}

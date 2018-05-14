@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.DoubleAdder;
 import java.util.stream.BaseStream;
 import java.util.stream.StreamSupport;
 
-import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.ConsumerFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
@@ -194,13 +194,13 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     public interface Visitable<N extends Number> extends Structure1D {
 
-        default void visitAll(final VoidFunction<N> visitor) {
+        default void visitAll(final ConsumerFunction<N> visitor) {
             this.visitRange(0L, this.count(), visitor);
         }
 
-        void visitOne(long index, VoidFunction<N> visitor);
+        void visitOne(long index, ConsumerFunction<N> visitor);
 
-        default void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
+        default void visitRange(final long first, final long limit, final ConsumerFunction<N> visitor) {
             Structure1D.loopRange(first, limit, i -> this.visitOne(i, visitor));
         }
 

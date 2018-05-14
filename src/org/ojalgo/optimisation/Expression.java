@@ -39,7 +39,7 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.ConsumerFunction;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.ConstantFunction;
 import org.ojalgo.function.multiary.LinearFunction;
@@ -833,7 +833,7 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     @Override
-    void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
+    void visitAllParameters(final ConsumerFunction<BigDecimal> largest, final ConsumerFunction<BigDecimal> smallest) {
 
         if (this.isAnyQuadraticFactorNonZero()) {
             for (final BigDecimal quadraticFactor : myQuadratic.values()) {

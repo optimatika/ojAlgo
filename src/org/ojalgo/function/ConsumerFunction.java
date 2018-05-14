@@ -26,7 +26,7 @@ import java.util.function.DoubleConsumer;
 
 import org.ojalgo.ProgrammingError;
 
-public interface VoidFunction<N extends Number> extends BasicFunction<N>, Consumer<N>, DoubleConsumer {
+public interface ConsumerFunction<N extends Number> extends BasicFunction<N>, Consumer<N>, DoubleConsumer {
 
     default void accept(final double arg) {
         this.invoke(arg);
@@ -36,16 +36,16 @@ public interface VoidFunction<N extends Number> extends BasicFunction<N>, Consum
         this.invoke(arg);
     }
 
-    default VoidFunction<N> compose(final UnaryFunction<N> before) {
+    default ConsumerFunction<N> compose(final UnaryFunction<N> before) {
         ProgrammingError.throwIfNull(before);
-        return new VoidFunction<N>() {
+        return new ConsumerFunction<N>() {
 
             public void invoke(final double arg) {
-                VoidFunction.this.invoke(before.invoke(arg));
+                ConsumerFunction.this.invoke(before.invoke(arg));
             }
 
             public void invoke(final N arg) {
-                VoidFunction.this.invoke(before.invoke(arg));
+                ConsumerFunction.this.invoke(before.invoke(arg));
             }
 
         };

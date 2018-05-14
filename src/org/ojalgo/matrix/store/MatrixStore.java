@@ -28,7 +28,7 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.ConsumerFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
@@ -798,7 +798,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return new TransposedStore<>(this);
     }
 
-    default void visitOne(final long row, final long col, final VoidFunction<N> visitor) {
+    default void visitOne(final long row, final long col, final ConsumerFunction<N> visitor) {
         visitor.invoke(this.get(row, col));
     }
 

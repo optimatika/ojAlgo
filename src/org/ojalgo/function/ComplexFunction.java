@@ -41,6 +41,15 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     }
 
     @FunctionalInterface
+    public static interface Consumer extends ConsumerFunction<ComplexNumber> {
+
+        default void invoke(final double arg) {
+            this.invoke(ComplexNumber.valueOf(arg));
+        }
+
+    }
+
+    @FunctionalInterface
     public static interface Parameter extends ParameterFunction<ComplexNumber> {
 
         default double invoke(final double arg, final int param) {
@@ -63,15 +72,6 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         default double invoke(final double arg) {
             return this.invoke(ComplexNumber.valueOf(arg)).doubleValue();
-        }
-
-    }
-
-    @FunctionalInterface
-    public static interface Void extends VoidFunction<ComplexNumber> {
-
-        default void invoke(final double arg) {
-            this.invoke(ComplexNumber.valueOf(arg));
         }
 
     }

@@ -40,6 +40,15 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     }
 
     @FunctionalInterface
+    public static interface Consumer extends ConsumerFunction<Quaternion> {
+
+        default void invoke(final double arg) {
+            this.invoke(Quaternion.valueOf(arg));
+        }
+
+    }
+
+    @FunctionalInterface
     public static interface Parameter extends ParameterFunction<Quaternion> {
 
         default double invoke(final double arg, final int param) {
@@ -62,15 +71,6 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
         default double invoke(final double arg) {
             return this.invoke(Quaternion.valueOf(arg)).doubleValue();
-        }
-
-    }
-
-    @FunctionalInterface
-    public static interface Void extends VoidFunction<Quaternion> {
-
-        default void invoke(final double arg) {
-            this.invoke(Quaternion.valueOf(arg));
         }
 
     }
