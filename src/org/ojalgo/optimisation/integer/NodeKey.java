@@ -31,11 +31,12 @@ import org.ojalgo.array.Raw1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.ExpressionsBasedModel.Intermediate;
 import org.ojalgo.optimisation.Variable;
 
 final class NodeKey implements Serializable, Comparable<NodeKey> {
 
-    private static AtomicLong GENERATOR = new AtomicLong();
+    private static final AtomicLong GENERATOR = new AtomicLong();
 
     private final int[] myLowerBounds;
     private final int[] myUpperBounds;
@@ -62,7 +63,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
      */
     final long sequence = GENERATOR.getAndIncrement();
 
-    private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int indexBranchedOn,
+    private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int integerIndexBranchedOn,
             final double branchVariableDisplacement, final double parentObjectiveFunctionValue) {
 
         super();
@@ -71,7 +72,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         myUpperBounds = upperBounds;
 
         parent = parentSequenceNumber;
-        index = indexBranchedOn;
+        index = integerIndexBranchedOn;
         displacement = branchVariableDisplacement;
         objective = parentObjectiveFunctionValue;
     }
@@ -111,7 +112,35 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
     }
 
     public int compareTo(final NodeKey ref) {
-        return Long.compare(sequence, ref.sequence);
+        return Double.compare(ref.displacement, displacement);
+    }
+
+    public void enforceBounds(final Intermediate nodeModel, final int[] integerIndices) {
+
+        final BigDecimal lowerBound = this.getLowerBound(index);
+        final BigDecimal upperBound = this.getUpperBound(index);
+
+        final Variable variable = nodeModel.getVariable(integerIndices[index]);
+        variable.lower(lowerBound);
+        variable.upper(upperBound);
+
+        final BigDecimal value = variable.getValue();
+        if (value != null) {
+            // Re-setting will ensure the new bounds are not violated
+            variable.setValue(value);
+        }
+
+        nodeModel.update(variable);
+    }
+
+    public boolean equals(int[] lowerBounds, int[] upperBounds) {
+        if (!Arrays.equals(myLowerBounds, lowerBounds)) {
+            return false;
+        }
+        if (!Arrays.equals(myUpperBounds, upperBounds)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -126,13 +155,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
             return false;
         }
         final NodeKey other = (NodeKey) obj;
-        if (!Arrays.equals(myLowerBounds, other.myLowerBounds)) {
-            return false;
-        }
-        if (!Arrays.equals(myUpperBounds, other.myUpperBounds)) {
-            return false;
-        }
-        return true;
+        return this.equals(other.myLowerBounds, other.myUpperBounds);
     }
 
     @Override
@@ -185,26 +208,14 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
     }
 
     private double feasible(final int index, final double value) {
-        return PrimitiveFunction.MIN.invoke(PrimitiveFunction.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
-    }
 
-    void bound(final ExpressionsBasedModel model, final int[] integerIndices) {
+        double retVal = PrimitiveFunction.MIN.invoke(PrimitiveFunction.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
 
-        for (int i = 0; i < integerIndices.length; i++) {
+        //        if (Math.abs(retVal - value) > 1E-10) {
+        //            BasicLogger.debug("Obviously infeasible value {}: {} <= {} <= {} @ {}", index, myLowerBounds[index], value, myUpperBounds[index], this);
+        //        }
 
-            final BigDecimal lowerBound = this.getLowerBound(i);
-            final BigDecimal upperBound = this.getUpperBound(i);
-
-            final Variable variable = model.getVariable(integerIndices[i]);
-            variable.lower(lowerBound);
-            variable.upper(upperBound);
-
-            final BigDecimal value = variable.getValue();
-            if (value != null) {
-                // Re-setting will ensure the new bounds are not violated
-                variable.setValue(value);
-            }
-        }
+        return retVal;
     }
 
     long calculateTreeSize() {
@@ -219,40 +230,56 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         return retVal;
     }
 
-    NodeKey createLowerBranch(final int index, final double value, final double objective) {
+    NodeKey createLowerBranch(final int branchIntegerIndex, final double value, final double objective) {
 
         final int[] tmpLBs = this.getLowerBounds();
         final int[] tmpUBs = this.getUpperBounds();
 
-        final double tmpFeasibleValue = this.feasible(index, value);
+        final double tmpFeasibleValue = this.feasible(branchIntegerIndex, value);
 
         final int tmpFloor = (int) PrimitiveFunction.FLOOR.invoke(tmpFeasibleValue);
 
-        if ((tmpFloor >= tmpUBs[index]) && (tmpFloor > tmpLBs[index])) {
-            tmpUBs[index] = tmpFloor - 1;
+        if ((tmpFloor >= tmpUBs[branchIntegerIndex]) && (tmpFloor > tmpLBs[branchIntegerIndex])) {
+            tmpUBs[branchIntegerIndex] = tmpFloor - 1;
         } else {
-            tmpUBs[index] = tmpFloor;
+            tmpUBs[branchIntegerIndex] = tmpFloor;
         }
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, index, value - tmpFloor, objective);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, value - tmpFloor, objective);
     }
 
-    NodeKey createUpperBranch(final int index, final double value, final double objective) {
+    NodeKey createUpperBranch(final int branchIntegerIndex, final double value, final double objective) {
 
         final int[] tmpLBs = this.getLowerBounds();
         final int[] tmpUBs = this.getUpperBounds();
 
-        final double tmpFeasibleValue = this.feasible(index, value);
+        final double tmpFeasibleValue = this.feasible(branchIntegerIndex, value);
 
         final int tmpCeil = (int) PrimitiveFunction.CEIL.invoke(tmpFeasibleValue);
 
-        if ((tmpCeil <= tmpLBs[index]) && (tmpCeil < tmpUBs[index])) {
-            tmpLBs[index] = tmpCeil + 1;
+        if ((tmpCeil <= tmpLBs[branchIntegerIndex]) && (tmpCeil < tmpUBs[branchIntegerIndex])) {
+            tmpLBs[branchIntegerIndex] = tmpCeil + 1;
         } else {
-            tmpLBs[index] = tmpCeil;
+            tmpLBs[branchIntegerIndex] = tmpCeil;
         }
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, index, tmpCeil - value, objective);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, tmpCeil - value, objective);
+    }
+
+    void enforceBounds(final ExpressionsBasedModel model, final int integerIndex, final int[] integerToGlobalTranslator) {
+
+        final BigDecimal lowerBound = this.getLowerBound(integerIndex);
+        final BigDecimal upperBound = this.getUpperBound(integerIndex);
+
+        final Variable variable = model.getVariable(integerToGlobalTranslator[integerIndex]);
+        variable.lower(lowerBound);
+        variable.upper(upperBound);
+
+        final BigDecimal value = variable.getValue();
+        if (value != null) {
+            // Re-setting will ensure the new bounds are not violated
+            variable.setValue(value);
+        }
     }
 
     double getFraction(final int index, final double value) {
@@ -286,6 +313,12 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
     int[] getUpperBounds() {
         return Raw1D.copyOf(myUpperBounds);
+    }
+
+    void setNodeState(final ExpressionsBasedModel model, final int[] integerIndices) {
+        for (int i = 0; i < integerIndices.length; i++) {
+            this.enforceBounds(model, i, integerIndices);
+        }
     }
 
 }

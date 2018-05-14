@@ -52,6 +52,15 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     }
 
     @FunctionalInterface
+    public static interface Consumer extends ConsumerFunction<BigDecimal> {
+
+        default void invoke(final double arg) {
+            this.invoke(BigDecimal.valueOf(arg));
+        }
+
+    }
+
+    @FunctionalInterface
     public static interface Parameter extends ParameterFunction<BigDecimal> {
 
         default double invoke(final double arg, final int param) {
@@ -61,19 +70,19 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     }
 
     @FunctionalInterface
-    public static interface Unary extends UnaryFunction<BigDecimal> {
+    public static interface Predicate extends PredicateFunction<BigDecimal> {
 
-        default double invoke(final double arg) {
-            return this.invoke(BigDecimal.valueOf(arg)).doubleValue();
+        default boolean invoke(final double arg) {
+            return this.invoke(BigDecimal.valueOf(arg));
         }
 
     }
 
     @FunctionalInterface
-    public static interface Void extends VoidFunction<BigDecimal> {
+    public static interface Unary extends UnaryFunction<BigDecimal> {
 
-        default void invoke(final double arg) {
-            this.invoke(BigDecimal.valueOf(arg));
+        default double invoke(final double arg) {
+            return this.invoke(BigDecimal.valueOf(arg)).doubleValue();
         }
 
     }

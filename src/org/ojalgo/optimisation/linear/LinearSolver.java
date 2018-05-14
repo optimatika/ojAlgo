@@ -31,11 +31,12 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
 
-public abstract class LinearSolver extends GenericSolver {
+public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
     public static final class Builder extends GenericSolver.Builder<LinearSolver.Builder, LinearSolver> {
 
@@ -168,6 +169,23 @@ public abstract class LinearSolver extends GenericSolver {
             }
 
             return new Result(modelState.getState(), modelState.getValue(), tmpSolverSolution);
+        }
+
+        @Override
+        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
+
+            int retVal = -1;
+
+            retVal = model.indexOfPositiveVariable(variable);
+
+            if (retVal < 0) {
+                retVal = model.indexOfNegativeVariable(variable);
+                if (retVal >= 0) {
+                    retVal += model.getPositiveVariables().size();
+                }
+            }
+
+            return retVal;
         }
 
         @Override

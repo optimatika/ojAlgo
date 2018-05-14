@@ -73,7 +73,7 @@ public abstract class BasicArrayTest {
     @Test
     public void testSegmentedSparse() {
         //this.doTest(SparseArray.makePrimitiveSegmented(COUNT));
-        this.doTest(BasicArray.factory(Primitive64Array.FACTORY).makeSegmented(COUNT));
+        this.doTest(new BasicArray.Factory<>(Primitive64Array.FACTORY).makeSegmented(COUNT));
     }
 
     @Test

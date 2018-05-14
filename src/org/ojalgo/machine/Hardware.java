@@ -59,7 +59,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      */
     public static final long CPU_CACHE_LINE_SIZE = 64L;
     /**
-     * Practically all architectures/Os:s have a page size of 4k (one notable exception is Solaris/SPARC that
+     * Practically all architectures/OS:s have a page size of 4k (one notable exception is Solaris/SPARC that
      * have 8k)
      */
     public static final long OS_MEMORY_PAGE_SIZE = 4L * K;

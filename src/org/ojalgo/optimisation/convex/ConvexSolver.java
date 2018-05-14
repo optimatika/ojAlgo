@@ -53,6 +53,7 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.scalar.ComplexNumber;
@@ -88,7 +89,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class ConvexSolver extends GenericSolver {
+public abstract class ConvexSolver extends GenericSolver implements UpdatableSolver {
 
     public static final class Builder extends GenericSolver.Builder<ConvexSolver.Builder, ConvexSolver> {
 

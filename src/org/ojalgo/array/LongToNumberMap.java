@@ -232,6 +232,10 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         }
     }
 
+    public NonzeroView<N> nonzeros() {
+        return myStorage.nonzeros();
+    }
+
     public double put(final long key, final double value) {
         final int index = myStorage.index(key);
         final double oldValue = index >= 0 ? myStorage.doubleValueInternally(index) : PrimitiveMath.NaN;
