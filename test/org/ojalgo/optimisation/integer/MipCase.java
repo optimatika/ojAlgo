@@ -20,10 +20,6 @@ import org.junit.jupiter.api.Test;
 @Disabled("Underscored before JUnit 5")
 public final class MipCase extends OptimisationIntegerTests {
 
-    @Test
-    public void testDummy() {
-    }
-
     /**
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal solution after 4h</li>
@@ -147,6 +143,7 @@ public final class MipCase extends OptimisationIntegerTests {
      * @see RelaxedLpCase#testP2m2p1m1p0n100()
      */
     @Test
+    @Disabled("Need to fix handle infeasible case")
     public void testP2m2p1m1p0n100() {
         MipLibCase.assertMinMaxVal("p2m2p1m1p0n100.mps", new BigDecimal("Infeasible"), null, true, null);
     }
