@@ -51,6 +51,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
     static final class DenseTableau extends SimplexTableau {
 
+        private final int myStructure;
         private final PrimitiveDenseStore myTransposed;
 
         DenseTableau(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables) {
@@ -61,6 +62,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             final int numbCols = numberOfProblemVariables + numberOfSlackVariables + numberOfConstraints + 1;
 
             myTransposed = PrimitiveDenseStore.FACTORY.makeZero(numbCols, numbRows);
+            myStructure = (int) myTransposed.countRows();
         }
 
         DenseTableau(final LinearSolver.Builder matrices) {
@@ -90,6 +92,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     }));
             //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
             myTransposed = PrimitiveDenseStore.FACTORY.transpose(tmpTableauBuilder.get());
+            myStructure = (int) myTransposed.countRows();
             // myTableau = LinearSolver.make(myTransposedTableau);
 
             for (int i = 0; i < tmpConstraintsCount; i++) {
@@ -105,6 +108,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             super(sparse.countConstraints(), sparse.countProblemVariables(), sparse.countSlackVariables());
 
             myTransposed = sparse.transpose();
+            myStructure = (int) myTransposed.countRows();
         }
 
         public long countColumns() {
@@ -158,25 +162,27 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                 return false;
             }
 
-            final int structure = (int) myTransposed.countRows();
+            // Diff begin
 
             Array1D<Double> currentRow = myTransposed.sliceColumn(row);
-            double currentRHS = currentRow.doubleValue(structure - 1);
+            double currentRHS = currentRow.doubleValue(myStructure - 1);
 
-            final Primitive64Array auxiliaryRow = Primitive64Array.make(structure);
+            final Primitive64Array auxiliaryRow = Primitive64Array.make(myStructure);
             double auxiliaryRHS = ZERO;
 
             if (currentRHS > value) {
                 currentRow.axpy(NEG, auxiliaryRow);
                 auxiliaryRow.set(index, ZERO);
-                auxiliaryRow.set(structure - 1, auxiliaryRHS = value - currentRHS);
+                auxiliaryRow.set(myStructure - 1, auxiliaryRHS = value - currentRHS);
             } else if (currentRHS < value) {
                 currentRow.axpy(ONE, auxiliaryRow);
                 auxiliaryRow.set(index, ZERO);
-                auxiliaryRow.set(structure - 1, auxiliaryRHS = currentRHS - value);
+                auxiliaryRow.set(myStructure - 1, auxiliaryRHS = currentRHS - value);
             } else {
                 return true;
             }
+
+            // Diff end
 
             Access1D<Double> objectiveRow = this.sliceTableauRow(this.countConstraints());
 
@@ -188,27 +194,19 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                 return false;
             }
 
+            // Diff begin
+
             auxiliaryRHS = this.scale(auxiliaryRow, pivotCol);
 
-            this.doPivot(-1, pivotCol, auxiliaryRow.data, 0, structure);
-
-            //  BasicLogger.debug("After pivot: " + Arrays.toString(this.getBasis()), this);
+            this.doPivot(-1, pivotCol, auxiliaryRow.data, 0, myStructure);
 
             myTransposed.fillColumn(row, auxiliaryRow);
+
+            // Diff end
 
             for (ElementView1D<Double, ?> elem : this.sliceConstraintsRHS().elements()) {
                 if (elem.doubleValue() < ZERO) {
                     return false;
-                    //                    int tmpRow = (int) elem.index();
-                    //                    int tmpCol = this.findNextPivotColumn(this.sliceTableauRow(tmpRow), objectiveRow);
-                    //                    if (tmpCol < 0) {
-                    //                        return false;
-                    //                    } else {
-                    //                        IterationPoint iterationPoint = new IterationPoint();
-                    //                        iterationPoint.row = tmpRow;
-                    //                        iterationPoint.col = tmpCol;
-                    //                        this.pivot(iterationPoint);
-                    //                    }
                 }
             }
 
@@ -588,6 +586,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                 return false;
             }
 
+            // Diff begin
+
             SparseArray<Double> currentRow = myRows[row];
             double currentRHS = myRHS.doubleValue(row);
 
@@ -608,6 +608,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                 return true;
             }
 
+            // Diff end
+
             Access1D<Double> objectiveRow = this.sliceTableauRow(this.countConstraints());
 
             int pivotCol = this.findNextPivotColumn(auxiliaryRow, objectiveRow);
@@ -618,12 +620,16 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                 return false;
             }
 
+            // Diff begin
+
             auxiliaryRHS = this.scale(auxiliaryRow, pivotCol, auxiliaryRHS);
 
             this.doPivot(-1, pivotCol, auxiliaryRow, auxiliaryRHS);
 
             myRows[row] = auxiliaryRow;
             myRHS.set(row, auxiliaryRHS);
+
+            // Diff end
 
             for (ElementView1D<Double, ?> elem : this.sliceConstraintsRHS().elements()) {
                 if (elem.doubleValue() < ZERO) {
@@ -866,31 +872,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         }
     }
 
-    int findNextPivotColumn(Access1D<Double> auxiliaryRow, Access1D<Double> objectiveRow) {
-
-        int retVal = -1;
-        double minQuotient = MACHINE_LARGEST;
-
-        for (ElementView1D<Double, ?> nz : auxiliaryRow.nonzeros()) {
-            final int i = (int) nz.index();
-            if (i >= this.countVariables()) {
-                break;
-            }
-            final double denominator = nz.doubleValue();
-            if (denominator < -1E-8) {
-                double numerator = objectiveRow.doubleValue(i);
-                double quotient = Math.abs(numerator / denominator);
-                if (quotient < minQuotient) {
-                    minQuotient = quotient;
-                    retVal = i;
-                }
-            }
-        }
-
-        return retVal;
-    }
-
     private final int[] myBasis;
+
     private transient Mutate2D myConstraintsBody = null;
     private transient Mutate1D myConstraintsRHS = null;
     private final int myNumberOfConstraints;
@@ -970,7 +953,16 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         return myNumberOfProblemVariables + myNumberOfSlackVariables + myNumberOfConstraints;
     }
 
-    protected abstract boolean fixVariable(int index, double value);
+    protected boolean fixVariable(int index, double value) {
+
+        int row = this.getBasisRowIndex(index);
+
+        if (row < 0) {
+            return false;
+        }
+
+        return false;
+    }
 
     protected int getBasisColumnIndex(final int basisRowIndex) {
         return myBasis[basisRowIndex];
@@ -1036,6 +1028,30 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             mySelector.include(tmpNew);
         }
         myBasis[pivotRow] = pivotCol;
+    }
+
+    int findNextPivotColumn(Access1D<Double> auxiliaryRow, Access1D<Double> objectiveRow) {
+
+        int retVal = -1;
+        double minQuotient = MACHINE_LARGEST;
+
+        for (ElementView1D<Double, ?> nz : auxiliaryRow.nonzeros()) {
+            final int i = (int) nz.index();
+            if (i >= this.countVariables()) {
+                break;
+            }
+            final double denominator = nz.doubleValue();
+            if (denominator < -1E-8) {
+                double numerator = objectiveRow.doubleValue(i);
+                double quotient = Math.abs(numerator / denominator);
+                if (quotient < minQuotient) {
+                    minQuotient = quotient;
+                    retVal = i;
+                }
+            }
+        }
+
+        return retVal;
     }
 
     int[] getBasis() {

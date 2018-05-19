@@ -234,9 +234,9 @@ public final class IntegerSolver extends GenericSolver {
         return new IntegerSolver(model, model.options);
     }
 
-    static void flush(PrinterBuffer myPrinter, BasicLogger.Printer receiver) {
-        if ((myPrinter != null) && (receiver != null)) {
-            myPrinter.flush(receiver);
+    static void flush(PrinterBuffer buffer, BasicLogger.Printer receiver) {
+        if ((buffer != null) && (receiver != null)) {
+            buffer.flush(receiver);
         }
     }
 
