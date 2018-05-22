@@ -415,20 +415,19 @@ public final class IntegerSolver extends GenericSolver {
                     final NodeKey nextTask;
                     final BranchAndBoundNodeTask forkedTask;
 
-                    if (upperBranch.displacement <= HALF) {
+                    if ((tmpVariableValue > TWO_THIRDS) && (tmpVariableValue < ONE)) {
+
                         nextTask = upperBranch;
-                        if (lowerBranch.displacement > THREE_QUARTERS) {
-                            forkedTask = null;
-                            myDeferredNodes.offer(lowerBranch);
-                        } else {
-                            forkedTask = new BranchAndBoundNodeTask(lowerBranch);
-                        }
+                        forkedTask = null;
+                        myDeferredNodes.offer(lowerBranch);
+
                     } else {
-                        nextTask = lowerBranch;
-                        if (upperBranch.displacement > THREE_QUARTERS) {
-                            forkedTask = null;
-                            myDeferredNodes.offer(upperBranch);
+
+                        if (upperBranch.displacement <= HALF) {
+                            nextTask = upperBranch;
+                            forkedTask = new BranchAndBoundNodeTask(lowerBranch);
                         } else {
+                            nextTask = lowerBranch;
                             forkedTask = new BranchAndBoundNodeTask(upperBranch);
                         }
                     }
@@ -697,6 +696,7 @@ public final class IntegerSolver extends GenericSolver {
                     // then compare the remaining/reversed (larger) fraction
 
                     compareFraction = ONE - fraction;
+                    //compareFraction = fraction;
                     // [0.5, 1.0)
                 }
 

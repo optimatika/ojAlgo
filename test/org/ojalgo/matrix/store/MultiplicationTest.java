@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Normal;
@@ -33,6 +34,7 @@ public class MultiplicationTest {
     }
 
     @Test
+    @Tag("slow")
     public void testRepeatedMultiplications() {
 
         int[] sizes = new int[] { 1, 2, 3, 4, 5, 10, 20, 50, 100, 200, 500, 1000 };
