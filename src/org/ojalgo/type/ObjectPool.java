@@ -21,26 +21,26 @@
  */
 package org.ojalgo.type;
 
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class ObjectPool<T> {
 
     private final boolean myLimited;
-    private final BlockingDeque<T> myObjects;
+    private final BlockingQueue<T> myObjects;
 
     public ObjectPool() {
         super();
-        myObjects = new LinkedBlockingDeque<T>();
+        myObjects = new LinkedBlockingQueue<T>();
         myLimited = false;
     }
 
     public ObjectPool(int capacity) {
         super();
-        myObjects = new LinkedBlockingDeque<T>(capacity);
+        myObjects = new LinkedBlockingQueue<T>(capacity);
         myLimited = true;
         for (int i = 0; i < capacity; i++) {
-            myObjects.addLast(this.newObject());
+            myObjects.add(this.newObject());
         }
     }
 
@@ -48,12 +48,12 @@ public abstract class ObjectPool<T> {
         T retVal;
         if (myLimited) {
             try {
-                retVal = myObjects.takeFirst();
+                retVal = myObjects.take();
             } catch (InterruptedException exception) {
                 retVal = null;
             }
         } else {
-            if ((retVal = myObjects.pollFirst()) == null) {
+            if ((retVal = myObjects.poll()) == null) {
                 retVal = this.newObject();
             }
         }
@@ -63,11 +63,12 @@ public abstract class ObjectPool<T> {
     public final void giveBack(T object) {
         if (myLimited) {
             try {
-                myObjects.putFirst(object);
+                myObjects.put(object);
             } catch (InterruptedException exception) {
+                throw new RuntimeException(exception);
             }
         } else {
-            myObjects.offerFirst(object);
+            myObjects.offer(object);
         }
     }
 
