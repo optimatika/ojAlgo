@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.integer;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
@@ -32,6 +33,7 @@ import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.multiary.MultiaryFunction;
@@ -44,6 +46,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.type.ObjectPool;
 import org.ojalgo.type.TypeUtils;
 
 public final class IntegerSolver extends GenericSolver {
@@ -105,30 +108,34 @@ public final class IntegerSolver extends GenericSolver {
             final ExpressionsBasedModel nodeModel = IntegerSolver.this.getRelaxedModel();
             myKey.setNodeState(nodeModel, IntegerSolver.this.getIntegerIndices());
 
-            //            if (IntegerSolver.this.isIntegerSolutionFound()) {
-            //
-            //                final double mip_gap = IntegerSolver.this.options.mip_gap;
-            //
-            //                final double bestIntegerSolutionValue = IntegerSolver.this.getBestResultSoFar().getValue();
-            //                final double parentRelaxedSolutionValue = myKey.objective;
-            //
-            //                final double absoluteValue = ABS.invoke(bestIntegerSolutionValue);
-            //                final double absoluteGap = ABS.invoke(absoluteValue - parentRelaxedSolutionValue);
-            //
-            //                final double small = FunctionUtils.max(mip_gap, absoluteGap * mip_gap, absoluteValue * mip_gap);
-            //
-            //                if (nodeModel.isMinimisation()) {
-            //                    final BigDecimal upperLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue - small, IntegerSolver.this.options.feasibility);
-            //                    // final BigDecimal lowerLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
-            //                    nodeModel.limitObjective(null, upperLimit);
-            //                } else {
-            //                    final BigDecimal lowerLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue + small, IntegerSolver.this.options.feasibility);
-            //                    // final BigDecimal upperLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
-            //                    nodeModel.limitObjective(lowerLimit, null);
-            //                }
-            //            }
+            if (IntegerSolver.this.isIntegerSolutionFound()) {
 
-            return IntegerSolver.this.compute(myKey, nodeModel.prepare(), myPrinter);
+                final double mip_gap = IntegerSolver.this.options.mip_gap;
+
+                final double bestIntegerSolutionValue = IntegerSolver.this.getBestResultSoFar().getValue();
+                final double parentRelaxedSolutionValue = myKey.objective;
+
+                final double absoluteValue = ABS.invoke(bestIntegerSolutionValue);
+                final double absoluteGap = ABS.invoke(absoluteValue - parentRelaxedSolutionValue);
+
+                final double small = FunctionUtils.max(mip_gap, absoluteGap * mip_gap, absoluteValue * mip_gap);
+
+                if (nodeModel.isMinimisation()) {
+                    final BigDecimal upperLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue - small, IntegerSolver.this.options.feasibility);
+                    // final BigDecimal lowerLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
+                    nodeModel.limitObjective(null, upperLimit);
+                } else {
+                    final BigDecimal lowerLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue + small, IntegerSolver.this.options.feasibility);
+                    // final BigDecimal upperLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
+                    nodeModel.limitObjective(lowerLimit, null);
+                }
+            }
+
+            final Boolean retVal = IntegerSolver.this.compute(myKey, nodeModel.prepare(), myPrinter);
+
+            myModelPool.giveBack(nodeModel);
+
+            return retVal;
         }
 
         NodeKey getKey() {
@@ -250,6 +257,7 @@ public final class IntegerSolver extends GenericSolver {
     private final boolean myMinimisation;
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
     private final PriorityBlockingQueue<NodeKey> myDeferredNodes = new PriorityBlockingQueue<>();
+    private final ObjectPool<ExpressionsBasedModel> myModelPool;
 
     protected IntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
 
@@ -268,6 +276,15 @@ public final class IntegerSolver extends GenericSolver {
 
         myIntegerSignificances = new double[myIntegerIndices.length];
         Arrays.fill(myIntegerSignificances, ONE);
+
+        myModelPool = new ObjectPool<ExpressionsBasedModel>() {
+
+            @Override
+            protected ExpressionsBasedModel newObject() {
+                return myIntegerModel.relax(false);
+            }
+
+        };
     }
 
     public Result solve(final Result kickStarter) {
@@ -504,7 +521,20 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     protected ExpressionsBasedModel getRelaxedModel() {
-        return myIntegerModel.relax(false);
+
+        final ExpressionsBasedModel retVal = myModelPool.borrow();
+
+        List<Variable> rootVars = this.getIntegerModel().getVariables();
+
+        for (int i = 0; i < rootVars.size(); i++) {
+            Variable rVar = rootVars.get(i);
+            Variable nVar = retVal.getVariable(i);
+            nVar.lower(rVar.getLowerLimit());
+            nVar.upper(rVar.getUpperLimit());
+        }
+
+        return retVal;
+
     }
 
     protected boolean initialise(final Result kickStarter) {

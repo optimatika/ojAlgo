@@ -21,33 +21,56 @@
  */
 package org.ojalgo.type;
 
-import java.util.Collection;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public abstract class ObjectPool<T> {
 
-    private final Queue<T> myObjects;
+    private final boolean myLimited;
+    private final BlockingDeque<T> myObjects;
 
     public ObjectPool() {
-        this.myObjects = new ConcurrentLinkedQueue<T>();
+        super();
+        myObjects = new LinkedBlockingDeque<T>();
+        myLimited = false;
     }
 
-    public ObjectPool(Collection<? extends T> objects) {
-        this.myObjects = new ConcurrentLinkedQueue<T>(objects);
+    public ObjectPool(int capacity) {
+        super();
+        myObjects = new LinkedBlockingDeque<T>(capacity);
+        myLimited = true;
+        for (int i = 0; i < capacity; i++) {
+            myObjects.addLast(this.newObject());
+        }
     }
 
-    public T borrow() {
+    public final T borrow() {
         T retVal;
-        if ((retVal = myObjects.poll()) == null) {
-            retVal = this.createExpensiveObject();
+        if (myLimited) {
+            try {
+                retVal = myObjects.takeFirst();
+            } catch (InterruptedException exception) {
+                retVal = null;
+            }
+        } else {
+            if ((retVal = myObjects.pollFirst()) == null) {
+                retVal = this.newObject();
+            }
         }
         return retVal;
     }
 
-    public abstract T createExpensiveObject();
-
-    public void giveBack(T object) {
-        this.myObjects.offer(object); // no point to wait for free space, just return
+    public final void giveBack(T object) {
+        if (myLimited) {
+            try {
+                myObjects.putFirst(object);
+            } catch (InterruptedException exception) {
+            }
+        } else {
+            myObjects.offerFirst(object);
+        }
     }
+
+    protected abstract T newObject();
+
 }
