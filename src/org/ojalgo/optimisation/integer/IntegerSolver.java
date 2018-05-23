@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.integer;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
@@ -33,7 +32,6 @@ import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.multiary.MultiaryFunction;
@@ -107,28 +105,28 @@ public final class IntegerSolver extends GenericSolver {
             final ExpressionsBasedModel nodeModel = IntegerSolver.this.getRelaxedModel();
             myKey.setNodeState(nodeModel, IntegerSolver.this.getIntegerIndices());
 
-            if (IntegerSolver.this.isIntegerSolutionFound()) {
-
-                final double mip_gap = IntegerSolver.this.options.mip_gap;
-
-                final double bestIntegerSolutionValue = IntegerSolver.this.getBestResultSoFar().getValue();
-                final double parentRelaxedSolutionValue = myKey.objective;
-
-                final double absoluteValue = ABS.invoke(bestIntegerSolutionValue);
-                final double absoluteGap = ABS.invoke(absoluteValue - parentRelaxedSolutionValue);
-
-                final double small = FunctionUtils.max(mip_gap, absoluteGap * mip_gap, absoluteValue * mip_gap);
-
-                if (nodeModel.isMinimisation()) {
-                    final BigDecimal upperLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue - small, IntegerSolver.this.options.feasibility);
-                    // final BigDecimal lowerLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
-                    nodeModel.limitObjective(null, upperLimit);
-                } else {
-                    final BigDecimal lowerLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue + small, IntegerSolver.this.options.feasibility);
-                    // final BigDecimal upperLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
-                    nodeModel.limitObjective(lowerLimit, null);
-                }
-            }
+            //            if (IntegerSolver.this.isIntegerSolutionFound()) {
+            //
+            //                final double mip_gap = IntegerSolver.this.options.mip_gap;
+            //
+            //                final double bestIntegerSolutionValue = IntegerSolver.this.getBestResultSoFar().getValue();
+            //                final double parentRelaxedSolutionValue = myKey.objective;
+            //
+            //                final double absoluteValue = ABS.invoke(bestIntegerSolutionValue);
+            //                final double absoluteGap = ABS.invoke(absoluteValue - parentRelaxedSolutionValue);
+            //
+            //                final double small = FunctionUtils.max(mip_gap, absoluteGap * mip_gap, absoluteValue * mip_gap);
+            //
+            //                if (nodeModel.isMinimisation()) {
+            //                    final BigDecimal upperLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue - small, IntegerSolver.this.options.feasibility);
+            //                    // final BigDecimal lowerLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
+            //                    nodeModel.limitObjective(null, upperLimit);
+            //                } else {
+            //                    final BigDecimal lowerLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue + small, IntegerSolver.this.options.feasibility);
+            //                    // final BigDecimal upperLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
+            //                    nodeModel.limitObjective(lowerLimit, null);
+            //                }
+            //            }
 
             return IntegerSolver.this.compute(myKey, nodeModel.prepare(), myPrinter);
         }
@@ -286,7 +284,10 @@ public final class IntegerSolver extends GenericSolver {
 
         boolean normalExit = ForkJoinPool.commonPool().invoke(rootNodeTask).booleanValue();
         while (normalExit && (myDeferredNodes.size() > 0)) {
-            normalExit &= ForkJoinPool.commonPool().invoke(new BranchAndBoundNodeTask(myDeferredNodes.poll())).booleanValue();
+            NodeKey nodeKey = myDeferredNodes.poll();
+            if (this.isGoodEnoughToContinueBranching(nodeKey.objective)) {
+                normalExit &= ForkJoinPool.commonPool().invoke(new BranchAndBoundNodeTask(nodeKey)).booleanValue();
+            }
         }
         myDeferredNodes.clear();
 
@@ -327,14 +328,6 @@ public final class IntegerSolver extends GenericSolver {
                 IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
             }
             return false;
-        }
-
-        if (!this.isGoodEnoughToContinueBranching(nodeKey.objective)) {
-            if (this.isDebug()) {
-                nodePrinter.println("No longer a relevant node!");
-                IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
-            }
-            return true;
         }
 
         if (nodeKey.index >= 0) {
