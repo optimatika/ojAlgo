@@ -24,6 +24,8 @@ package org.ojalgo.type;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.ojalgo.ProgrammingError;
+
 public abstract class ObjectPool<T> {
 
     private final boolean myLimited;
@@ -50,7 +52,7 @@ public abstract class ObjectPool<T> {
             try {
                 retVal = myObjects.take();
             } catch (InterruptedException exception) {
-                retVal = null;
+                throw new RuntimeException(exception);
             }
         } else {
             if ((retVal = myObjects.poll()) == null) {
@@ -61,6 +63,8 @@ public abstract class ObjectPool<T> {
     }
 
     public final void giveBack(T object) {
+        ProgrammingError.throwIfNull(object);
+        this.reset(object);
         if (myLimited) {
             try {
                 myObjects.put(object);
@@ -70,8 +74,11 @@ public abstract class ObjectPool<T> {
         } else {
             myObjects.offer(object);
         }
+
     }
 
     protected abstract T newObject();
+
+    protected abstract void reset(T object);
 
 }

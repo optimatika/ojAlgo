@@ -824,16 +824,17 @@ public final class Expression extends ModelEntity<Expression> {
         return myRedundant;
     }
 
+    void reset() {
+        myInfeasible = false;
+        myRedundant = false;
+    }
+
     void setInfeasible() {
-        this.setInfeasible(true);
+        myInfeasible = true;
     }
 
-    void setInfeasible(boolean value) {
-        myInfeasible = value;
-    }
-
-    void setRedundant(final boolean redundant) {
-        myRedundant = redundant;
+    void setRedundant() {
+        myRedundant = true;
     }
 
     @Override

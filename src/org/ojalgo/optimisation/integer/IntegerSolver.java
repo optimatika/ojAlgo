@@ -105,7 +105,7 @@ public final class IntegerSolver extends GenericSolver {
         @Override
         protected Boolean compute() {
 
-            final ExpressionsBasedModel nodeModel = IntegerSolver.this.getRelaxedModel();
+            final ExpressionsBasedModel nodeModel = IntegerSolver.this.getNodeModel();
             myKey.setNodeState(nodeModel, IntegerSolver.this.getIntegerIndices());
 
             if (IntegerSolver.this.isIntegerSolutionFound()) {
@@ -122,18 +122,16 @@ public final class IntegerSolver extends GenericSolver {
 
                 if (nodeModel.isMinimisation()) {
                     final BigDecimal upperLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue - small, IntegerSolver.this.options.feasibility);
-                    // final BigDecimal lowerLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
                     nodeModel.limitObjective(null, upperLimit);
                 } else {
                     final BigDecimal lowerLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue + small, IntegerSolver.this.options.feasibility);
-                    // final BigDecimal upperLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
                     nodeModel.limitObjective(lowerLimit, null);
                 }
             }
 
             final Boolean retVal = IntegerSolver.this.compute(myKey, nodeModel.prepare(), myPrinter);
 
-            myModelPool.giveBack(nodeModel);
+            IntegerSolver.this.recycleNodeModel(nodeModel);
 
             return retVal;
         }
@@ -246,6 +244,7 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     private volatile Optimisation.Result myBestResultSoFar = null;
+    private final PriorityBlockingQueue<NodeKey> myDeferredNodes = new PriorityBlockingQueue<>();
     private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     /**
      * One entry per integer variable, the entry is the global index of that integer variable
@@ -255,9 +254,8 @@ public final class IntegerSolver extends GenericSolver {
     private final double[] myIntegerSignificances;
     private final AtomicInteger myIntegerSolutionsCount = new AtomicInteger();
     private final boolean myMinimisation;
-    private final NodeStatistics myNodeStatistics = new NodeStatistics();
-    private final PriorityBlockingQueue<NodeKey> myDeferredNodes = new PriorityBlockingQueue<>();
     private final ObjectPool<ExpressionsBasedModel> myModelPool;
+    private final NodeStatistics myNodeStatistics = new NodeStatistics();
 
     protected IntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
 
@@ -282,6 +280,17 @@ public final class IntegerSolver extends GenericSolver {
             @Override
             protected ExpressionsBasedModel newObject() {
                 return myIntegerModel.relax(false);
+            }
+
+            @Override
+            protected void reset(ExpressionsBasedModel object) {
+                List<Variable> rootModelVariables = myIntegerModel.getVariables();
+                for (int i = 0, limit = rootModelVariables.size(); i < limit; i++) {
+                    Variable rVar = rootModelVariables.get(i);
+                    Variable nVar = object.getVariable(i);
+                    nVar.lower(rVar.getLowerLimit());
+                    nVar.upper(rVar.getUpperLimit());
+                }
             }
 
         };
@@ -425,7 +434,7 @@ public final class IntegerSolver extends GenericSolver {
                     final NodeKey nextTask;
                     final BranchAndBoundNodeTask forkedTask;
 
-                    if ((tmpVariableValue > TWO_THIRDS) && (tmpVariableValue < ONE)) {
+                    if (!this.isIntegerSolutionFound() && (tmpVariableValue > TWO_THIRDS) && (tmpVariableValue < ONE)) {
 
                         nextTask = upperBranch;
                         forkedTask = null;
@@ -435,10 +444,20 @@ public final class IntegerSolver extends GenericSolver {
 
                         if (upperBranch.displacement <= HALF) {
                             nextTask = upperBranch;
-                            forkedTask = new BranchAndBoundNodeTask(lowerBranch);
+                            if (lowerBranch.displacement < 0.99) {
+                                forkedTask = new BranchAndBoundNodeTask(lowerBranch);
+                            } else {
+                                forkedTask = null;
+                                myDeferredNodes.offer(lowerBranch);
+                            }
                         } else {
                             nextTask = lowerBranch;
-                            forkedTask = new BranchAndBoundNodeTask(upperBranch);
+                            if (upperBranch.displacement < 0.99) {
+                                forkedTask = new BranchAndBoundNodeTask(upperBranch);
+                            } else {
+                                forkedTask = null;
+                                myDeferredNodes.offer(upperBranch);
+                            }
                         }
                     }
 
@@ -520,21 +539,8 @@ public final class IntegerSolver extends GenericSolver {
         return myIntegerModel;
     }
 
-    protected ExpressionsBasedModel getRelaxedModel() {
-
-        final ExpressionsBasedModel retVal = myModelPool.borrow();
-
-        List<Variable> rootVars = this.getIntegerModel().getVariables();
-
-        for (int i = 0; i < rootVars.size(); i++) {
-            Variable rVar = rootVars.get(i);
-            Variable nVar = retVal.getVariable(i);
-            nVar.lower(rVar.getLowerLimit());
-            nVar.upper(rVar.getUpperLimit());
-        }
-
-        return retVal;
-
+    protected ExpressionsBasedModel getNodeModel() {
+        return myModelPool.borrow();
     }
 
     protected boolean initialise(final Result kickStarter) {
@@ -634,6 +640,10 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         myIntegerSolutionsCount.incrementAndGet();
+    }
+
+    protected void recycleNodeModel(ExpressionsBasedModel model) {
+        myModelPool.giveBack(model);
     }
 
     /**

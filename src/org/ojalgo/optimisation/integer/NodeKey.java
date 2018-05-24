@@ -112,7 +112,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
     }
 
     public int compareTo(final NodeKey ref) {
-        return Double.compare(ref.displacement, displacement);
+        return Double.compare(ref.sequence, sequence);
     }
 
     public void enforceBounds(final Intermediate nodeModel, final int[] integerIndices) {
