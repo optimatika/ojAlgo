@@ -434,7 +434,7 @@ public final class IntegerSolver extends GenericSolver {
                     final NodeKey nextTask;
                     final BranchAndBoundNodeTask forkedTask;
 
-                    if (!this.isIntegerSolutionFound() && (tmpVariableValue > TWO_THIRDS) && (tmpVariableValue < ONE)) {
+                    if (!this.isIntegerSolutionFound() && (TWO_THIRDS < tmpVariableValue) && (tmpVariableValue < ONE)) {
 
                         nextTask = upperBranch;
                         forkedTask = null;
