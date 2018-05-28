@@ -416,25 +416,25 @@ public final class IntegerSolver extends GenericSolver {
                     nodePrinter.println("Not an Integer Solution: " + tmpSolutionValue);
                 }
 
-                final double tmpVariableValue = nodeResult.doubleValue(this.getGlobalIndex(branchIntegerIndex));
+                final double variableValue = nodeResult.doubleValue(this.getGlobalIndex(branchIntegerIndex));
 
                 if (this.isGoodEnoughToContinueBranching(tmpSolutionValue)) {
 
                     if (this.isDebug()) {
-                        nodePrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, tmpVariableValue,
+                        nodePrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, variableValue,
                                 nodeModel.getVariable(this.getGlobalIndex(branchIntegerIndex)));
                         IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
                     }
 
                     // this.generateCuts(nodeModel);
 
-                    final NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, tmpVariableValue, tmpSolutionValue);
-                    final NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, tmpVariableValue, tmpSolutionValue);
+                    final NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, tmpSolutionValue);
+                    final NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, variableValue, tmpSolutionValue);
 
                     final NodeKey nextTask;
                     final BranchAndBoundNodeTask forkedTask;
 
-                    if (!this.isIntegerSolutionFound() && (TWO_THIRDS < tmpVariableValue) && (tmpVariableValue < ONE)) {
+                    if (!this.isIntegerSolutionFound() && (TWO_THIRDS < variableValue) && (variableValue < ONE)) {
 
                         nextTask = upperBranch;
                         forkedTask = null;
