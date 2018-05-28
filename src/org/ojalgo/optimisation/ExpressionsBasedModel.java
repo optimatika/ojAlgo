@@ -296,8 +296,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             mySolver = null;
         }
 
-        public void validate(final Access1D<BigDecimal> solution, final Printer appender) {
-            myModel.validate(solution, appender);
+        public boolean validate(final Access1D<BigDecimal> solution, final Printer appender) {
+            return myModel.validate(solution, appender);
         }
 
         public boolean validate(final Result solution) {

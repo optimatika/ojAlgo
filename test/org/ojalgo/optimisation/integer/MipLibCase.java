@@ -75,7 +75,7 @@ abstract class MipLibCase extends OptimisationIntegerTests {
         tmpModel.options.time_abort = 15L * CalendarDateUnit.MINUTE.size();
         // tmpModel.options.iterations_suffice = 1000;
 
-        tmpModel.options.debug(IntegerSolver.class);
+        tmpModel.options.progress(IntegerSolver.class);
         tmpModel.options.validate = false;
 
         TestUtils.assertTrue(tmpModel.validate());

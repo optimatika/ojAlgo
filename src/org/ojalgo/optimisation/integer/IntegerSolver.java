@@ -33,7 +33,6 @@ import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.multiary.MultiaryFunction;
@@ -110,22 +109,13 @@ public final class IntegerSolver extends GenericSolver {
 
             if (IntegerSolver.this.isIntegerSolutionFound()) {
 
-                final double mip_gap = IntegerSolver.this.options.mip_gap;
-
                 final double bestIntegerSolutionValue = IntegerSolver.this.getBestResultSoFar().getValue();
-                final double parentRelaxedSolutionValue = myKey.objective;
-
-                final double absoluteValue = ABS.invoke(bestIntegerSolutionValue);
-                final double absoluteGap = ABS.invoke(absoluteValue - parentRelaxedSolutionValue);
-
-                final double small = FunctionUtils.max(mip_gap, absoluteGap * mip_gap, absoluteValue * mip_gap);
+                final BigDecimal objectiveBound = TypeUtils.toBigDecimal(bestIntegerSolutionValue, IntegerSolver.this.options.feasibility);
 
                 if (nodeModel.isMinimisation()) {
-                    final BigDecimal upperLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue - small, IntegerSolver.this.options.feasibility);
-                    nodeModel.limitObjective(null, upperLimit);
+                    nodeModel.limitObjective(null, objectiveBound);
                 } else {
-                    final BigDecimal lowerLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue + small, IntegerSolver.this.options.feasibility);
-                    nodeModel.limitObjective(lowerLimit, null);
+                    nodeModel.limitObjective(objectiveBound, null);
                 }
             }
 
@@ -375,13 +365,12 @@ public final class IntegerSolver extends GenericSolver {
                 nodePrinter.println("Node solved to optimality!");
             }
 
-            if (options.validate && !nodeModel.validate(nodeResult)) {
+            if (options.validate && !nodeModel.validate(nodeResult, nodePrinter)) {
                 // This should not be possible. There is a bug somewhere.
                 nodePrinter.println("Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!");
+                nodePrinter.println("Integer indices: {}", Arrays.toString(this.getIntegerIndices()));
                 nodePrinter.println("Lower bounds: {}", Arrays.toString(nodeKey.getLowerBounds()));
                 nodePrinter.println("Upper bounds: {}", Arrays.toString(nodeKey.getUpperBounds()));
-
-                // nodeModel.validate(nodeResult, myPrinter);
 
                 IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
 
