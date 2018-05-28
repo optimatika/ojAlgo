@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @Disabled("Underscored before JUnit 5")
-public final class MipCase extends OptimisationIntegerTests {
+public final class MipCase extends MipLibCase {
 
     /**
      * <ul>
