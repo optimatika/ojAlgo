@@ -37,6 +37,7 @@ import org.ojalgo.optimisation.Variable;
 
 final class NodeKey implements Serializable, Comparable<NodeKey> {
 
+    private static final double FEASIBILITY_ERROR = 1E-4;
     private static final AtomicLong GENERATOR = new AtomicLong();
 
     private final int[] myLowerBounds;
@@ -208,12 +209,12 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         builder.append(myUpperBounds[index]);
     }
 
-    private double feasible(final int index, final double value) {
+    private double feasible(final int index, final double value, boolean validate) {
 
         double retVal = PrimitiveFunction.MIN.invoke(PrimitiveFunction.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
 
-        if (Math.abs(retVal - value) > 1E-8) {
-            BasicLogger.debug("Obviously infeasible value {}: {} <= {} <= {} @ {}", index, myLowerBounds[index], value, myUpperBounds[index], this);
+        if (validate && (Math.abs(retVal - value) > FEASIBILITY_ERROR)) {
+            BasicLogger.error("Obviously infeasible value {}: {} <= {} <= {} @ {}", index, myLowerBounds[index], value, myUpperBounds[index], this);
         }
 
         return retVal;
@@ -236,7 +237,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         final int[] tmpLBs = this.getLowerBounds();
         final int[] tmpUBs = this.getUpperBounds();
 
-        final double tmpFeasibleValue = this.feasible(branchIntegerIndex, value);
+        final double tmpFeasibleValue = this.feasible(branchIntegerIndex, value, false);
 
         final int tmpFloor = (int) PrimitiveFunction.FLOOR.invoke(tmpFeasibleValue);
 
@@ -254,7 +255,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         final int[] tmpLBs = this.getLowerBounds();
         final int[] tmpUBs = this.getUpperBounds();
 
-        final double tmpFeasibleValue = this.feasible(branchIntegerIndex, value);
+        final double tmpFeasibleValue = this.feasible(branchIntegerIndex, value, false);
 
         final int tmpCeil = (int) PrimitiveFunction.CEIL.invoke(tmpFeasibleValue);
 
@@ -285,7 +286,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
     double getFraction(final int index, final double value) {
 
-        final double feasibleValue = this.feasible(index, value);
+        final double feasibleValue = this.feasible(index, value, true);
 
         return PrimitiveFunction.ABS.invoke(feasibleValue - PrimitiveFunction.RINT.invoke(feasibleValue));
     }
