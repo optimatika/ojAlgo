@@ -25,16 +25,23 @@ import java.util.function.Supplier;
 
 public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
-    private final ArtificialNeuralNetwork myANN;
+    private final int[] myHidden;
+    private final int myInput;
+    private final int myOutput;
 
     public NetworkBuilder(int input, int output, int... hidden) {
         super();
-        myANN = new ArtificialNeuralNetwork(input, output, hidden);
+
+        myInput = input;
+        myOutput = output;
+        myHidden = hidden;
     }
 
     public ArtificialNeuralNetwork get() {
 
-        return myANN;
+        ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(myInput, myHidden, myOutput);
+
+        return retVal;
     }
 
 }

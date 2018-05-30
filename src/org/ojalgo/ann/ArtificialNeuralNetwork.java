@@ -45,7 +45,7 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     private final Layer[] myLayers;
 
-    ArtificialNeuralNetwork(int input, int output, int[] hidden) {
+    ArtificialNeuralNetwork(int input, int[] hidden, int output) {
         super();
         myLayers = new Layer[hidden.length + 1];
         int tmpIn = input;
@@ -62,10 +62,16 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     public Access1D<Double> apply(Access1D<Double> input) {
         Access1D<Double> retVal = input;
-        for (int i = 0; i < myLayers.length; i++) {
+        for (int i = 0, limit = myLayers.length; i < limit; i++) {
             retVal = myLayers[i].apply(retVal);
         }
         return retVal;
+    }
+
+    void initialise() {
+        for (int i = 0, limit = myLayers.length; i < limit; i++) {
+            myLayers[i].initialise();
+        }
     }
 
 }

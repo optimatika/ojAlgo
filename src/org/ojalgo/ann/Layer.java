@@ -21,6 +21,7 @@
  */
 package org.ojalgo.ann;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.function.UnaryOperator;
@@ -28,8 +29,9 @@ import java.util.function.UnaryOperator;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.random.Normal;
 
-public class Layer implements UnaryOperator<Access1D<Double>> {
+final class Layer implements UnaryOperator<Access1D<Double>> {
 
     private final UnaryFunction<Double> myActivator;
     private final PrimitiveDenseStore myBias;
@@ -50,6 +52,13 @@ public class Layer implements UnaryOperator<Access1D<Double>> {
     public Access1D<Double> apply(Access1D<Double> input) {
         myWeights.premultiply(input).operateOnMatching(ADD, myBias).operateOnAll(myActivator).supplyTo(myOutput);
         return myOutput;
+    }
+
+    void initialise() {
+
+        Normal generator = new Normal(ONE / myWeights.countRows(), HALF);
+
+        myWeights.fillAll(generator);
     }
 
 }
