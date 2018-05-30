@@ -24,15 +24,41 @@ package org.ojalgo.ann;
 import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.UnaryFunction;
 
 public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Double>> {
 
-    ArtificialNeuralNetwork(int input, int output, int[] hidden) {
-        super();
-        myLayers = new Layer[2 + hidden.length];
-    }
+    /**
+     * [0,+)
+     */
+    public static final UnaryFunction<Double> RELU = PrimitiveFunction.MAX.first(PrimitiveMath.ZERO);
+    /**
+     * [0,1]
+     */
+    public static final UnaryFunction<Double> SIGMOID = PrimitiveFunction.LOGISTIC;
+    /**
+     * [-1,1]
+     */
+    public static final UnaryFunction<Double> TANH = PrimitiveFunction.TANH;
 
     private final Layer[] myLayers;
+
+    ArtificialNeuralNetwork(int input, int output, int[] hidden) {
+        super();
+        myLayers = new Layer[hidden.length + 1];
+        int tmpIn = input;
+        int tmpOut = input;
+        for (int i = 0; i < hidden.length; i++) {
+            tmpIn = tmpOut;
+            tmpOut = hidden[i];
+            myLayers[i] = new Layer(tmpIn, tmpOut, RELU);
+        }
+        tmpIn = tmpOut;
+        tmpOut = output;
+        myLayers[hidden.length] = new Layer(tmpIn, tmpOut, RELU);
+    }
 
     public Access1D<Double> apply(Access1D<Double> input) {
         Access1D<Double> retVal = input;

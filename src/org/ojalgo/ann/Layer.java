@@ -21,35 +21,34 @@
  */
 package org.ojalgo.ann;
 
+import static org.ojalgo.function.PrimitiveFunction.*;
+
 import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public class Layer implements UnaryOperator<Access1D<Double>> {
 
-    private final PrimitiveDenseStore myInput;
-    private final int myNumberOfInputs;
-    private final int myNumberOfOutputs;
+    private final UnaryFunction<Double> myActivator;
+    private final PrimitiveDenseStore myBias;
     private final PrimitiveDenseStore myOutput;
     private final PrimitiveDenseStore myWeights;
-    private final PrimitiveFunction.Unary myActivator = null;
 
-    public Layer(int numberOfInputs, int numberOfOutputs) {
+    Layer(int numberOfInputs, int numberOfOutputs, UnaryFunction<Double> activator) {
 
         super();
 
-        myNumberOfInputs = numberOfInputs;
-        myNumberOfOutputs = numberOfOutputs;
-
         myWeights = PrimitiveDenseStore.FACTORY.makeZero(numberOfInputs, numberOfOutputs);
-        myInput = PrimitiveDenseStore.FACTORY.makeZero(1, numberOfInputs);
+        myBias = PrimitiveDenseStore.FACTORY.makeZero(1, numberOfOutputs);
         myOutput = PrimitiveDenseStore.FACTORY.makeZero(1, numberOfOutputs);
+
+        myActivator = activator;
     }
 
     public Access1D<Double> apply(Access1D<Double> input) {
-        myWeights.premultiply(input).operateOnAll(myActivator).supplyTo(myOutput);
+        myWeights.premultiply(input).operateOnMatching(ADD, myBias).operateOnAll(myActivator).supplyTo(myOutput);
         return myOutput;
     }
 
