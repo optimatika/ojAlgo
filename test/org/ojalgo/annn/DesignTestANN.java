@@ -43,6 +43,8 @@ public class DesignTestANN extends ANNTest {
     @Test
     public void testMattMazurBackpropagationExample() {
 
+        NumberContext precision = new NumberContext(8, 8);
+
         NetworkBuilder builder = new NetworkBuilder(2, 2, 2);
 
         builder.activator(0, ArtificialNeuralNetwork.SIGMOID).activator(1, ArtificialNeuralNetwork.SIGMOID);
@@ -71,7 +73,6 @@ public class DesignTestANN extends ANNTest {
         Access1D<Double> expected_first_network_output = PrimitiveDenseStore.FACTORY.rows(new double[] { 0.75136507, 0.772928465 });
         Access1D<Double> actual_first_network_output = network.apply(training_input);
 
-        NumberContext precision = new NumberContext(8, 8);
         TestUtils.assertEquals(expected_first_network_output, actual_first_network_output, precision);
 
         double expectedError = 0.298371109;
