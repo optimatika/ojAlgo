@@ -33,7 +33,7 @@ import org.ojalgo.random.Normal;
 
 final class Layer implements UnaryOperator<Access1D<Double>> {
 
-    private final UnaryFunction<Double> myActivator;
+    private UnaryFunction<Double> myActivator;
     private final PrimitiveDenseStore myBias;
     private final PrimitiveDenseStore myOutput;
     private final PrimitiveDenseStore myWeights;
@@ -54,11 +54,27 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
         return myOutput;
     }
 
+    UnaryFunction<Double> getActivator() {
+        return myActivator;
+    }
+
     void initialise() {
 
         Normal generator = new Normal(ONE / myWeights.countRows(), HALF);
 
         myWeights.fillAll(generator);
+    }
+
+    void setActivator(UnaryFunction<Double> activator) {
+        myActivator = activator;
+    }
+
+    void setWeight(int input, int output, double weight) {
+        myWeights.set(input, output, weight);
+    }
+
+    void setBias(int output, double bias) {
+        myBias.set(output, bias);
     }
 
 }

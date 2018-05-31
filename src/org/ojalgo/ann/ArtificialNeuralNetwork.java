@@ -45,19 +45,16 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     private final Layer[] myLayers;
 
-    ArtificialNeuralNetwork(int input, int[] hidden, int output) {
+    ArtificialNeuralNetwork(int inputs, int[] layerss) {
         super();
-        myLayers = new Layer[hidden.length + 1];
-        int tmpIn = input;
-        int tmpOut = input;
-        for (int i = 0; i < hidden.length; i++) {
+        myLayers = new Layer[layerss.length];
+        int tmpIn = inputs;
+        int tmpOut = inputs;
+        for (int i = 0; i < layerss.length; i++) {
             tmpIn = tmpOut;
-            tmpOut = hidden[i];
+            tmpOut = layerss[i];
             myLayers[i] = new Layer(tmpIn, tmpOut, RELU);
         }
-        tmpIn = tmpOut;
-        tmpOut = output;
-        myLayers[hidden.length] = new Layer(tmpIn, tmpOut, RELU);
     }
 
     public Access1D<Double> apply(Access1D<Double> input) {
@@ -72,6 +69,18 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         for (int i = 0, limit = myLayers.length; i < limit; i++) {
             myLayers[i].initialise();
         }
+    }
+
+    void setActivator(int layer, UnaryFunction<Double> activator) {
+        myLayers[layer].setActivator(activator);
+    }
+
+    void setBias(int layer, int output, double bias) {
+        myLayers[layer].setBias(output, bias);
+    }
+
+    void setWeight(int layer, int input, int output, double weight) {
+        myLayers[layer].setWeight(input, output, weight);
     }
 
 }
