@@ -21,20 +21,31 @@
  */
 package org.ojalgo.ann;
 
+import java.util.Arrays;
 import java.util.function.Supplier;
+
+import org.ojalgo.function.UnaryFunction;
 
 public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
     private final int[] myHidden;
+    private final UnaryFunction<Double>[] myHiddenActivators;
     private final int myInput;
     private final int myOutput;
+    private UnaryFunction<Double> myOutputActivator;
 
+    @SuppressWarnings("unchecked")
     public NetworkBuilder(int input, int output, int... hidden) {
         super();
 
         myInput = input;
         myOutput = output;
         myHidden = hidden;
+
+        myHiddenActivators = new UnaryFunction[myHidden.length];
+        Arrays.fill(myHiddenActivators, ArtificialNeuralNetwork.RELU);
+        myOutputActivator = ArtificialNeuralNetwork.RELU;
+
     }
 
     public ArtificialNeuralNetwork get() {
@@ -42,6 +53,20 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(myInput, myHidden, myOutput);
 
         return retVal;
+    }
+
+    /**
+     * @param index 0-based index among the hidden layers
+     * @param activator The activator function to use
+     */
+    public NetworkBuilder setHiddenActivator(int index, UnaryFunction<Double> activator) {
+        myHiddenActivators[index] = activator;
+        return this;
+    }
+
+    public NetworkBuilder setOutputActivator(UnaryFunction<Double> activator) {
+        myOutputActivator = activator;
+        return this;
     }
 
 }
