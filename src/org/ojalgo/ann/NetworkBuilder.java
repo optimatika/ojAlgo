@@ -23,7 +23,8 @@ package org.ojalgo.ann;
 
 import java.util.function.Supplier;
 
-import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.access.Access1D;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
@@ -38,7 +39,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
      * @param layer 0-based index among the calculation layers
      * @param activator The activator function to use
      */
-    public NetworkBuilder activator(int layer, UnaryFunction<Double> activator) {
+    public NetworkBuilder activator(int layer, ArtificialNeuralNetwork.Activator activator) {
         myANN.setActivator(layer, activator);
         return this;
     }
@@ -55,6 +56,17 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
     public NetworkBuilder weight(int layer, int input, int output, double weight) {
         myANN.setWeight(layer, input, output, weight);
         return this;
+    }
+
+    public void train(Access1D<Double> input, Access1D<Double> target, ArtificialNeuralNetwork.Error meassurement) {
+
+        Access1D<Double> current = myANN.apply(input);
+
+        PrimitiveDenseStore errorDerivative = PrimitiveDenseStore.FACTORY.columns(target);
+        errorDerivative.modifyMatching(meassurement.getDerivative(), current);
+
+        myANN.backpropagate(input, errorDerivative);
+
     }
 
 }

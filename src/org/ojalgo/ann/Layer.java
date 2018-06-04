@@ -27,18 +27,18 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Normal;
 
 final class Layer implements UnaryOperator<Access1D<Double>> {
 
-    private UnaryFunction<Double> myActivator;
+    private ArtificialNeuralNetwork.Activator myActivator;
     private final PrimitiveDenseStore myBias;
     private final PrimitiveDenseStore myOutput;
     private final PrimitiveDenseStore myWeights;
 
-    Layer(int numberOfInputs, int numberOfOutputs, UnaryFunction<Double> activator) {
+    Layer(int numberOfInputs, int numberOfOutputs, ArtificialNeuralNetwork.Activator activator) {
 
         super();
 
@@ -50,11 +50,23 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
     }
 
     public Access1D<Double> apply(Access1D<Double> input) {
-        myWeights.premultiply(input).operateOnMatching(ADD, myBias).operateOnAll(myActivator).supplyTo(myOutput);
+        myWeights.premultiply(input).operateOnMatching(ADD, myBias).operateOnAll(myActivator.getFunction()).supplyTo(myOutput);
         return myOutput;
     }
 
-    UnaryFunction<Double> getActivator() {
+    PrimitiveDenseStore copyBias() {
+        return myBias.copy();
+    }
+
+    PrimitiveDenseStore copyOutput() {
+        return myOutput.copy();
+    }
+
+    PrimitiveDenseStore copyWeights() {
+        return myWeights.copy();
+    }
+
+    ArtificialNeuralNetwork.Activator getActivator() {
         return myActivator;
     }
 
@@ -65,16 +77,20 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
         myWeights.fillAll(generator);
     }
 
-    void setActivator(UnaryFunction<Double> activator) {
+    void setActivator(Activator activator) {
         myActivator = activator;
+    }
+
+    void setBias(int output, double bias) {
+        myBias.set(output, bias);
     }
 
     void setWeight(int input, int output, double weight) {
         myWeights.set(input, output, weight);
     }
 
-    void setBias(int output, double bias) {
-        myBias.set(output, bias);
+    void update(Access1D<Double> input, Access1D<Double> downStreamDerivative) {
+
     }
 
 }

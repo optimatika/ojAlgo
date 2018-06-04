@@ -29,6 +29,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.ann.ArtificialNeuralNetwork;
 import org.ojalgo.ann.NetworkBuilder;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.type.context.NumberContext;
 
@@ -45,10 +46,11 @@ public class DesignTestANN extends ANNTest {
     public void testMattMazurBackpropagationExample() {
 
         NumberContext precision = new NumberContext(8, 8);
+        Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
 
         NetworkBuilder builder = new NetworkBuilder(2, 2, 2);
 
-        builder.activator(0, ArtificialNeuralNetwork.SIGMOID).activator(1, ArtificialNeuralNetwork.SIGMOID);
+        builder.activator(0, ArtificialNeuralNetwork.Activator.SIGMOID).activator(1, ArtificialNeuralNetwork.Activator.SIGMOID);
 
         builder.weight(0, 0, 0, 0.15);
         builder.weight(0, 1, 0, 0.20);
@@ -68,15 +70,15 @@ public class DesignTestANN extends ANNTest {
 
         ArtificialNeuralNetwork network = builder.get();
 
-        PrimitiveDenseStore training_input = PrimitiveDenseStore.FACTORY.rows(new double[] { 0.05, 0.10 });
-        PrimitiveDenseStore training_output = PrimitiveDenseStore.FACTORY.rows(new double[] { 0.01, 0.99 });
+        PrimitiveDenseStore training_input = factory.rows(new double[] { 0.05, 0.10 });
+        PrimitiveDenseStore training_output = factory.rows(new double[] { 0.01, 0.99 });
 
-        Access1D<Double> expected_first_network_output = PrimitiveDenseStore.FACTORY.rows(new double[] { 0.75136507, 0.772928465 });
+        Access1D<Double> expected_first_network_output = factory.rows(new double[] { 0.75136507, 0.772928465 });
         Access1D<Double> actual_first_network_output = network.apply(training_input);
 
         TestUtils.assertEquals(expected_first_network_output, actual_first_network_output, precision);
 
-        PrimitiveDenseStore errors = PrimitiveDenseStore.FACTORY.copy(training_output);
+        PrimitiveDenseStore errors = factory.copy(training_output);
         errors.modifyMatching(SUBTRACT, actual_first_network_output);
 
         double expectedError = 0.298371109;
