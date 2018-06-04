@@ -22,6 +22,7 @@
 package org.ojalgo.annn;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
@@ -75,11 +76,14 @@ public class DesignTestANN extends ANNTest {
 
         TestUtils.assertEquals(expected_first_network_output, actual_first_network_output, precision);
 
+        PrimitiveDenseStore errors = PrimitiveDenseStore.FACTORY.copy(training_output);
+        errors.modifyMatching(SUBTRACT, actual_first_network_output);
+
         double expectedError = 0.298371109;
-        double actualError = HALF * (Math.pow((training_output.doubleValue(0) - actual_first_network_output.doubleValue(0)), TWO)
-                + Math.pow((training_output.doubleValue(1) - actual_first_network_output.doubleValue(1)), TWO));
+        double actualError = HALF * (Math.pow(errors.doubleValue(0), TWO) + Math.pow(errors.doubleValue(1), TWO));
 
         TestUtils.assertEquals(expectedError, actualError, precision);
+
     }
 
 }

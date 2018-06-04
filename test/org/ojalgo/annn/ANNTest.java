@@ -21,10 +21,10 @@
  */
 package org.ojalgo.annn;
 
-
-public class ANNTest {
+abstract class ANNTest {
 
     public ANNTest() {
+        super();
     }
 
 }
