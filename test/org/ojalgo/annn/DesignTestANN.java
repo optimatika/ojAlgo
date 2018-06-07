@@ -86,6 +86,8 @@ public class DesignTestANN extends ANNTest {
 
         TestUtils.assertEquals(expectedError, actualError, precision);
 
+        builder.train(training_input, training_output, ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE);
+
     }
 
 }

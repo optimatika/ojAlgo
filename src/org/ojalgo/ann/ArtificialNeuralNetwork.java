@@ -125,12 +125,25 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
             output[i] = myLayers[i].copyOutput();
         }
 
-        for (int i = myLayers.length - 1; i >= 0; i--) {
-            output[i].modifyAll(myLayers[i].getActivator().getDerivativeInTermsOfOutput());
-            output[i].modifyMatching(MULTIPLY, downStreamDerivative);
-            for (int r = 0; r < weights[i].countRows(); r++) {
-                weights[i].sliceRow(r).modifyMatching(MULTIPLY, output[i]);
+        for (int k = myLayers.length - 1; k >= 0; k--) {
+            output[k].modifyAll(myLayers[k].getActivator().getDerivativeInTermsOfOutput());
+            output[k].modifyMatching(MULTIPLY, downStreamDerivative);
+            if (k == 0) {
+                for (int j = 0; j < output[k].count(); j++) {
+                    for (int i = 0; i < input.count(); i++) {
+                        weights[k].set(i, j, input.doubleValue(i) * output[k].doubleValue(j));
+                    }
+                    bias[k].set(j, output[k].doubleValue(j));
+                }
+            } else {
+                for (int j = 0; j < output[k].count(); j++) {
+                    for (int i = 0; i < output[k - 1].count(); i++) {
+                        weights[k].set(i, j, output[k - 1].doubleValue(i) * output[k].doubleValue(j));
+                    }
+                    bias[k].set(j, output[k].doubleValue(j));
+                }
             }
+            downStreamDerivative = myLayers[k].multiply(output[k]);
         }
 
     }

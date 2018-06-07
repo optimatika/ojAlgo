@@ -28,6 +28,7 @@ import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Normal;
 
@@ -91,6 +92,10 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
     void update(Access1D<Double> input, Access1D<Double> downStreamDerivative) {
 
+    }
+
+    MatrixStore<Double> multiply(final MatrixStore<Double> right) {
+        return myWeights.multiply(right);
     }
 
 }
