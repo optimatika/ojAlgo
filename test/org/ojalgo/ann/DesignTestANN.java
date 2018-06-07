@@ -107,19 +107,19 @@ public class DesignTestANN extends ANNTest {
 
         // In the example the bias are not updated, ojAlgo does update them
         // This gives better/faster learning in this first step
-        TestUtils.assertTrue(actualError1 > actualError2);
         TestUtils.assertTrue(expectedError2 > actualError2);
+        TestUtils.assertTrue(actualError1 > actualError2);
 
-        // Create a lerger, more complex network, to make sure there are no IndexOutOfRangeExceptions or similar..
+        // Create a larger, more complex network, to make sure there are no IndexOutOfRangeExceptions or similar..
         NetworkBuilder largerBuilder = new NetworkBuilder(2, 5, 3, 4, 2).randomise();
         ArtificialNeuralNetwork largerANN = largerBuilder.get();
 
-        Access1D<Double> preLarger = factory.rows(largerANN.apply(training_input));
+        Access1D<Double> preTraining = factory.rows(largerANN.apply(training_input));
         largerBuilder.train(training_input, training_output, HALF);
-        Access1D<Double> postLarger = factory.rows(largerANN.apply(training_input));
+        Access1D<Double> postTraining = factory.rows(largerANN.apply(training_input));
 
         // Even in this case training should reduce the error
-        TestUtils.assertTrue(errorMeassure.invoke(training_output, preLarger) > errorMeassure.invoke(training_output, postLarger));
+        TestUtils.assertTrue(errorMeassure.invoke(training_output, preTraining) > errorMeassure.invoke(training_output, postTraining));
     }
 
 }
