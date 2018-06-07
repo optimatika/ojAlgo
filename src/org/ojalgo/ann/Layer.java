@@ -36,8 +36,11 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
     private ArtificialNeuralNetwork.Activator myActivator;
     private final PrimitiveDenseStore myBias;
+    private transient PrimitiveDenseStore myBiasCopy = null;
     private final PrimitiveDenseStore myOutput;
+    private transient PrimitiveDenseStore myOutputCopy = null;
     private final PrimitiveDenseStore myWeights;
+    private transient PrimitiveDenseStore myWeightsCopy = null;
 
     Layer(int numberOfInputs, int numberOfOutputs, ArtificialNeuralNetwork.Activator activator) {
 
@@ -56,26 +59,50 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
     }
 
     PrimitiveDenseStore copyBias() {
-        return myBias.copy();
+        if (myBiasCopy == null) {
+            myBiasCopy = myBias.copy();
+        }
+        return myBiasCopy;
     }
 
     PrimitiveDenseStore copyOutput() {
-        return myOutput.copy();
+        if (myOutputCopy == null) {
+            myOutputCopy = myOutput.copy();
+        } else {
+            myOutput.supplyTo(myOutputCopy);
+        }
+        return myOutputCopy;
     }
 
     PrimitiveDenseStore copyWeights() {
-        return myWeights.copy();
+        if (myWeightsCopy == null) {
+            myWeightsCopy = myWeights.copy();
+        }
+        return myWeightsCopy;
     }
 
     ArtificialNeuralNetwork.Activator getActivator() {
         return myActivator;
     }
 
-    void initialise() {
+    double getBias(int output) {
+        return myBias.doubleValue(output);
+    }
+
+    double getWeight(int input, int output) {
+        return myWeights.doubleValue(input, output);
+    }
+
+    void multiply(final MatrixStore<Double> right, PrimitiveDenseStore product) {
+        myWeights.multiply(right, product);
+    }
+
+    void randomise() {
 
         Normal generator = new Normal(ONE / myWeights.countRows(), HALF);
 
         myWeights.fillAll(generator);
+        myBias.fillAll(generator);
     }
 
     void setActivator(Activator activator) {
@@ -90,12 +117,9 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
         myWeights.set(input, output, weight);
     }
 
-    void update(Access1D<Double> input, Access1D<Double> downStreamDerivative) {
-
-    }
-
-    MatrixStore<Double> multiply(final MatrixStore<Double> right) {
-        return myWeights.multiply(right);
+    void update(double learningRate, Access1D<?> weights, Access1D<?> bias) {
+        weights.axpy(learningRate, myWeights);
+        bias.axpy(learningRate, myBias);
     }
 
 }

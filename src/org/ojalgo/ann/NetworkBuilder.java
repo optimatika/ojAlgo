@@ -23,20 +23,25 @@ package org.ojalgo.ann;
 
 import java.util.function.Supplier;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
     private final ArtificialNeuralNetwork myANN;
+    private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
 
     public NetworkBuilder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
         super();
+        if (nodesPerCalculationLayer.length < 1) {
+            ProgrammingError.throwWithMessage("There must be atleast 1 calculation layer - that would be the output layer!");
+        }
         myANN = new ArtificialNeuralNetwork(numberOfInputNodes, nodesPerCalculationLayer);
     }
 
     /**
-     * @param layer 0-based index among the calculation layers
+     * @param layer 0-based index among the calculation layers (excluding the input layer)
      * @param activator The activator function to use
      */
     public NetworkBuilder activator(int layer, ArtificialNeuralNetwork.Activator activator) {
@@ -49,24 +54,33 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return this;
     }
 
+    public NetworkBuilder error(ArtificialNeuralNetwork.Error error) {
+        myError = error;
+        return this;
+    }
+
     public ArtificialNeuralNetwork get() {
         return myANN;
+    }
+
+    public NetworkBuilder randomise() {
+        myANN.randomise();
+        return this;
+    }
+
+    public void train(Access1D<Double> givenInput, Access1D<Double> desiredOutput, double learningRate) {
+
+        Access1D<Double> current = myANN.apply(givenInput);
+
+        PrimitiveDenseStore downStreamDerivatives = PrimitiveDenseStore.FACTORY.columns(desiredOutput);
+        downStreamDerivatives.modifyMatching(myError.getDerivative(), current);
+
+        myANN.backpropagate(givenInput, downStreamDerivatives, learningRate);
     }
 
     public NetworkBuilder weight(int layer, int input, int output, double weight) {
         myANN.setWeight(layer, input, output, weight);
         return this;
-    }
-
-    public void train(Access1D<Double> input, Access1D<Double> target, ArtificialNeuralNetwork.Error meassurement) {
-
-        Access1D<Double> current = myANN.apply(input);
-
-        PrimitiveDenseStore errorDerivative = PrimitiveDenseStore.FACTORY.columns(target);
-        errorDerivative.modifyMatching(meassurement.getDerivative(), current);
-
-        myANN.backpropagate(input, errorDerivative);
-
     }
 
 }

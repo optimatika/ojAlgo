@@ -70,7 +70,7 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         }
     }
 
-    public static enum Error {
+    public static enum Error implements PrimitiveFunction.Binary {
 
         HALF_SQUARED_DIFFERENCE((target, current) -> HALF * (target - current) * (target - current), (target, current) -> (current - target));
 
@@ -82,26 +82,35 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
             myDerivative = derivative;
         }
 
-        BinaryFunction<Double> getDerivative() {
-            return myDerivative;
+        public double invoke(Access1D<?> target, Access1D<?> current) {
+            int limit = (int) Math.min(target.count(), current.count());
+            double retVal = ZERO;
+            for (int i = 0; i < limit; i++) {
+                retVal += myFunction.invoke(target.doubleValue(i), current.doubleValue(i));
+            }
+            return retVal;
         }
 
-        BinaryFunction<Double> getFunction() {
-            return myFunction;
+        public double invoke(double target, double current) {
+            return myFunction.invoke(target, current);
+        }
+
+        BinaryFunction<Double> getDerivative() {
+            return myDerivative;
         }
     }
 
     private final Layer[] myLayers;
 
-    ArtificialNeuralNetwork(int inputs, int[] layerss) {
+    ArtificialNeuralNetwork(int inputs, int[] layers) {
         super();
-        myLayers = new Layer[layerss.length];
+        myLayers = new Layer[layers.length];
         int tmpIn = inputs;
         int tmpOut = inputs;
-        for (int i = 0; i < layerss.length; i++) {
+        for (int i = 0; i < layers.length; i++) {
             tmpIn = tmpOut;
-            tmpOut = layerss[i];
-            myLayers[i] = new Layer(tmpIn, tmpOut, Activator.RELU);
+            tmpOut = layers[i];
+            myLayers[i] = new Layer(tmpIn, tmpOut, Activator.SIGMOID);
         }
     }
 
@@ -113,44 +122,52 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return retVal;
     }
 
-    void backpropagate(Access1D<Double> input, Access1D<Double> downStreamDerivative) {
+    void backpropagate(Access1D<Double> input, PrimitiveDenseStore downStreamDerivative, double learningRate) {
 
         PrimitiveDenseStore[] weights = new PrimitiveDenseStore[myLayers.length];
         PrimitiveDenseStore[] bias = new PrimitiveDenseStore[myLayers.length];
         PrimitiveDenseStore[] output = new PrimitiveDenseStore[myLayers.length];
 
-        for (int i = 0; i < myLayers.length; i++) {
-            weights[i] = myLayers[i].copyWeights();
-            bias[i] = myLayers[i].copyBias();
-            output[i] = myLayers[i].copyOutput();
+        for (int k = 0, limit = myLayers.length; k < limit; k++) {
+            weights[k] = myLayers[k].copyWeights();
+            bias[k] = myLayers[k].copyBias();
+            output[k] = myLayers[k].copyOutput();
         }
 
         for (int k = myLayers.length - 1; k >= 0; k--) {
             output[k].modifyAll(myLayers[k].getActivator().getDerivativeInTermsOfOutput());
             output[k].modifyMatching(MULTIPLY, downStreamDerivative);
-            if (k == 0) {
-                for (int j = 0; j < output[k].count(); j++) {
+            for (int j = 0; j < output[k].count(); j++) {
+                if (k == 0) {
                     for (int i = 0; i < input.count(); i++) {
                         weights[k].set(i, j, input.doubleValue(i) * output[k].doubleValue(j));
                     }
-                    bias[k].set(j, output[k].doubleValue(j));
-                }
-            } else {
-                for (int j = 0; j < output[k].count(); j++) {
+                } else {
                     for (int i = 0; i < output[k - 1].count(); i++) {
                         weights[k].set(i, j, output[k - 1].doubleValue(i) * output[k].doubleValue(j));
                     }
-                    bias[k].set(j, output[k].doubleValue(j));
                 }
+                bias[k].set(j, output[k].doubleValue(j));
             }
-            downStreamDerivative = myLayers[k].multiply(output[k]);
+            myLayers[k].multiply(output[k], downStreamDerivative);
         }
 
+        for (int k = 0, limit = myLayers.length; k < limit; k++) {
+            myLayers[k].update(-learningRate, weights[k], bias[k]);
+        }
     }
 
-    void initialise() {
+    double getBias(int layer, int output) {
+        return myLayers[layer].getBias(output);
+    }
+
+    double getWeight(int layer, int input, int output) {
+        return myLayers[layer].getWeight(input, output);
+    }
+
+    void randomise() {
         for (int i = 0, limit = myLayers.length; i < limit; i++) {
-            myLayers[i].initialise();
+            myLayers[i].randomise();
         }
     }
 

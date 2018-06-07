@@ -19,16 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.annn;
+package org.ojalgo.ann;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.ann.ArtificialNeuralNetwork;
-import org.ojalgo.ann.NetworkBuilder;
+import org.ojalgo.ann.ArtificialNeuralNetwork.Error;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.type.context.NumberContext;
@@ -47,10 +45,11 @@ public class DesignTestANN extends ANNTest {
 
         NumberContext precision = new NumberContext(8, 8);
         Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
+        Error errorMeassure = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
 
         NetworkBuilder builder = new NetworkBuilder(2, 2, 2);
 
-        builder.activator(0, ArtificialNeuralNetwork.Activator.SIGMOID).activator(1, ArtificialNeuralNetwork.Activator.SIGMOID);
+        builder.activator(0, ArtificialNeuralNetwork.Activator.SIGMOID).activator(1, ArtificialNeuralNetwork.Activator.SIGMOID).error(errorMeassure);
 
         builder.weight(0, 0, 0, 0.15);
         builder.weight(0, 1, 0, 0.20);
@@ -78,16 +77,49 @@ public class DesignTestANN extends ANNTest {
 
         TestUtils.assertEquals(expected_first_network_output, actual_first_network_output, precision);
 
-        PrimitiveDenseStore errors = factory.copy(training_output);
-        errors.modifyMatching(SUBTRACT, actual_first_network_output);
+        double expectedError1 = 0.298371109;
+        double actualError1 = errorMeassure.invoke(training_output, actual_first_network_output);
 
-        double expectedError = 0.298371109;
-        double actualError = HALF * (Math.pow(errors.doubleValue(0), TWO) + Math.pow(errors.doubleValue(1), TWO));
+        TestUtils.assertEquals(expectedError1, actualError1, precision);
 
-        TestUtils.assertEquals(expectedError, actualError, precision);
+        builder.train(training_input, training_output, HALF);
 
-        builder.train(training_input, training_output, ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE);
+        // 0.40 w5
+        TestUtils.assertEquals(0.35891648, network.getWeight(1, 0, 0), precision);
+        // 0.45 w6
+        TestUtils.assertEquals(0.408666186, network.getWeight(1, 1, 0), precision);
+        // 0.50 w7
+        TestUtils.assertEquals(0.511301270, network.getWeight(1, 0, 1), precision);
+        // 0.55 w8
+        TestUtils.assertEquals(0.561370121, network.getWeight(1, 1, 1), precision);
 
+        // 0.15 w1
+        TestUtils.assertEquals(0.149780716, network.getWeight(0, 0, 0), precision);
+        // 0.20 w2
+        TestUtils.assertEquals(0.19956143, network.getWeight(0, 1, 0), precision);
+        // 0.25 w3
+        TestUtils.assertEquals(0.24975114, network.getWeight(0, 0, 1), precision);
+        // 0.30 w4
+        TestUtils.assertEquals(0.29950229, network.getWeight(0, 1, 1), precision);
+
+        double expectedError2 = 0.291027924;
+        double actualError2 = errorMeassure.invoke(training_output, network.apply(training_input));
+
+        // In the example the bias are not updated, ojAlgo does update them
+        // This gives better/faster learning in this first step
+        TestUtils.assertTrue(actualError1 > actualError2);
+        TestUtils.assertTrue(expectedError2 > actualError2);
+
+        // Create a lerger, more complex network, to make sure there are no IndexOutOfRangeExceptions or similar..
+        NetworkBuilder largerBuilder = new NetworkBuilder(2, 5, 3, 4, 2).randomise();
+        ArtificialNeuralNetwork largerANN = largerBuilder.get();
+
+        Access1D<Double> preLarger = factory.rows(largerANN.apply(training_input));
+        largerBuilder.train(training_input, training_output, HALF);
+        Access1D<Double> postLarger = factory.rows(largerANN.apply(training_input));
+
+        // Even in this case training should reduce the error
+        TestUtils.assertTrue(errorMeassure.invoke(training_output, preLarger) > errorMeassure.invoke(training_output, postLarger));
     }
 
 }
