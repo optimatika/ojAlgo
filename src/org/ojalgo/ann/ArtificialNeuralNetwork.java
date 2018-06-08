@@ -34,12 +34,16 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Double>> {
 
-    public static enum Activator {
+    public static enum Activator implements PrimitiveFunction.Unary {
 
         /**
-         * [0,+)
+         * (-,+)
          */
-        RELU(arg -> Math.max(ZERO, arg), null),
+        IDENTITY(arg -> arg, arg -> ONE),
+        /**
+         * ReLU: [0,+)
+         */
+        RECTIFIER(arg -> Math.max(ZERO, arg), arg -> arg > ZERO ? ONE : ZERO),
         /**
          * [0,1]
          */
@@ -47,7 +51,7 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         /**
          * [-1,1]
          */
-        TANH(PrimitiveFunction.TANH, null);
+        TANH(PrimitiveFunction.TANH, arg -> ONE - (arg * arg));
 
         private final PrimitiveFunction.Unary myDerivativeInTermsOfOutput;
         private final PrimitiveFunction.Unary myFunction;
@@ -57,16 +61,16 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
             myDerivativeInTermsOfOutput = derivativeInTermsOfOutput;
         }
 
+        public double invoke(double arg) {
+            return myFunction.invoke(arg);
+        }
+
         UnaryFunction<Double> getDerivative() {
             return myFunction.andThen(myDerivativeInTermsOfOutput);
         }
 
         PrimitiveFunction.Unary getDerivativeInTermsOfOutput() {
             return myDerivativeInTermsOfOutput;
-        }
-
-        UnaryFunction<Double> getFunction() {
-            return myFunction;
         }
     }
 
