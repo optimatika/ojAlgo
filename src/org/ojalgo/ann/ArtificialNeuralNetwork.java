@@ -22,7 +22,6 @@
 package org.ojalgo.ann;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.function.UnaryOperator;
 
@@ -126,38 +125,9 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return retVal;
     }
 
-    void backpropagate(Access1D<Double> input, PrimitiveDenseStore downStreamDerivative, double learningRate) {
-
-        PrimitiveDenseStore[] weights = new PrimitiveDenseStore[myLayers.length];
-        PrimitiveDenseStore[] bias = new PrimitiveDenseStore[myLayers.length];
-        PrimitiveDenseStore[] output = new PrimitiveDenseStore[myLayers.length];
-
-        for (int k = 0, limit = myLayers.length; k < limit; k++) {
-            weights[k] = myLayers[k].copyWeights();
-            bias[k] = myLayers[k].copyBias();
-            output[k] = myLayers[k].copyOutput();
-        }
-
+    void backpropagate(Access1D<Double> input, PrimitiveDenseStore downstreamGradient, double learningRate) {
         for (int k = myLayers.length - 1; k >= 0; k--) {
-            output[k].modifyAll(myLayers[k].getActivator().getDerivativeInTermsOfOutput());
-            output[k].modifyMatching(MULTIPLY, downStreamDerivative);
-            for (int j = 0; j < output[k].count(); j++) {
-                if (k == 0) {
-                    for (int i = 0; i < input.count(); i++) {
-                        weights[k].set(i, j, input.doubleValue(i) * output[k].doubleValue(j));
-                    }
-                } else {
-                    for (int i = 0; i < output[k - 1].count(); i++) {
-                        weights[k].set(i, j, output[k - 1].doubleValue(i) * output[k].doubleValue(j));
-                    }
-                }
-                bias[k].set(j, output[k].doubleValue(j));
-            }
-            myLayers[k].multiply(output[k], downStreamDerivative);
-        }
-
-        for (int k = 0, limit = myLayers.length; k < limit; k++) {
-            myLayers[k].update(-learningRate, weights[k], bias[k]);
+            myLayers[k].adjust(k == 0 ? input : myLayers[k - 1].getOutput(), downstreamGradient, learningRate);
         }
     }
 

@@ -28,7 +28,6 @@ import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Normal;
 
@@ -36,11 +35,9 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
     private ArtificialNeuralNetwork.Activator myActivator;
     private final PrimitiveDenseStore myBias;
-    private transient PrimitiveDenseStore myBiasCopy = null;
     private final PrimitiveDenseStore myOutput;
     private transient PrimitiveDenseStore myOutputCopy = null;
     private final PrimitiveDenseStore myWeights;
-    private transient PrimitiveDenseStore myWeightsCopy = null;
 
     Layer(int numberOfInputs, int numberOfOutputs, ArtificialNeuralNetwork.Activator activator) {
 
@@ -58,11 +55,21 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
         return myOutput;
     }
 
-    PrimitiveDenseStore copyBias() {
-        if (myBiasCopy == null) {
-            myBiasCopy = myBias.copy();
+    void adjust(final Access1D<Double> input, PrimitiveDenseStore downstreamGradient, double learningRate) {
+
+        PrimitiveDenseStore gradient = this.copyOutput();
+        gradient.modifyAll(myActivator.getDerivativeInTermsOfOutput());
+        gradient.modifyMatching(MULTIPLY, downstreamGradient);
+
+        myWeights.multiply(gradient, downstreamGradient);
+
+        for (long j = 0L, outLim = gradient.count(); j < outLim; j++) {
+            final double grad = gradient.doubleValue(j);
+            for (long i = 0L, inLim = input.count(); i < inLim; i++) {
+                myWeights.add(i, j, learningRate * input.doubleValue(i) * grad);
+            }
+            myBias.add(j, learningRate * grad);
         }
-        return myBiasCopy;
     }
 
     PrimitiveDenseStore copyOutput() {
@@ -74,27 +81,16 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
         return myOutputCopy;
     }
 
-    PrimitiveDenseStore copyWeights() {
-        if (myWeightsCopy == null) {
-            myWeightsCopy = myWeights.copy();
-        }
-        return myWeightsCopy;
-    }
-
-    ArtificialNeuralNetwork.Activator getActivator() {
-        return myActivator;
-    }
-
     double getBias(int output) {
         return myBias.doubleValue(output);
     }
 
-    double getWeight(int input, int output) {
-        return myWeights.doubleValue(input, output);
+    PrimitiveDenseStore getOutput() {
+        return myOutput;
     }
 
-    void multiply(final MatrixStore<Double> right, PrimitiveDenseStore product) {
-        myWeights.multiply(right, product);
+    double getWeight(int input, int output) {
+        return myWeights.doubleValue(input, output);
     }
 
     void randomise() {
@@ -115,11 +111,6 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
     void setWeight(int input, int output, double weight) {
         myWeights.set(input, output, weight);
-    }
-
-    void update(double learningRate, Access1D<?> weights, Access1D<?> bias) {
-        weights.axpy(learningRate, myWeights);
-        bias.axpy(learningRate, myBias);
     }
 
 }
