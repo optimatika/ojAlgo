@@ -33,6 +33,12 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Double>> {
 
+    static interface ActivatorFunctionFactory {
+
+        PrimitiveFunction.Unary make(PrimitiveDenseStore arguments);
+
+    }
+
     public static enum Activator implements PrimitiveFunction.Unary {
 
         /**
@@ -47,6 +53,10 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
          * [0,1]
          */
         SIGMOID(PrimitiveFunction.LOGISTIC, arg -> arg * (ONE - arg)),
+        /**
+         * [0,1]
+         */
+        SOFTMAX(null, null),
         /**
          * [-1,1]
          */
@@ -75,6 +85,13 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     public static enum Error implements PrimitiveFunction.Binary {
 
+        /**
+         *
+         */
+        CROSS_ENTROPY((target, current) -> target * Math.log(current), (target, current) -> (-target / current)),
+        /**
+         *
+         */
         HALF_SQUARED_DIFFERENCE((target, current) -> HALF * (target - current) * (target - current), (target, current) -> (current - target));
 
         private final PrimitiveFunction.Binary myDerivative;

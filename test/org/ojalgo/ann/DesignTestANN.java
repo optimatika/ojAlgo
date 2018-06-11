@@ -26,6 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Error;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -35,6 +36,23 @@ public class DesignTestANN extends ANNTest {
 
     public DesignTestANN() {
         super();
+    }
+
+    /**
+     * https://gormanalysis.com/neural-networks-a-worked-example/
+     * https://github.com/ben519/MLPB/tree/master/Problems/Classify%20Images%20of%20Stairs
+     */
+    @Test
+    public void testWorkedExample() {
+
+        NumberContext precision = new NumberContext(8, 8);
+        Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
+        Error errorMeassure = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
+
+        NetworkBuilder builder = new NetworkBuilder(4, 2, 2);
+
+        builder.activator(0, Activator.SIGMOID).activator(1, Activator.SOFTMAX);
+
     }
 
     /**
