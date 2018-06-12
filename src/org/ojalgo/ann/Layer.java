@@ -51,7 +51,8 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
     }
 
     public Access1D<Double> apply(Access1D<Double> input) {
-        myWeights.premultiply(input).operateOnMatching(ADD, myBias).operateOnAll(myActivator).supplyTo(myOutput);
+        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
+        myOutput.modifyAll(myActivator.getFunction(myOutput));
         return myOutput;
     }
 

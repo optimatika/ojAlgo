@@ -28,7 +28,6 @@ import java.util.function.UnaryOperator;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Double>> {
@@ -39,43 +38,45 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     }
 
-    public static enum Activator implements PrimitiveFunction.Unary {
+    public static enum Activator {
 
         /**
          * (-,+)
          */
-        IDENTITY(arg -> arg, arg -> ONE),
+        IDENTITY(args -> (arg -> arg), arg -> ONE),
         /**
          * ReLU: [0,+)
          */
-        RECTIFIER(arg -> Math.max(ZERO, arg), arg -> arg > ZERO ? ONE : ZERO),
+        RECTIFIER(args -> (arg -> Math.max(ZERO, arg)), arg -> arg > ZERO ? ONE : ZERO),
         /**
          * [0,1]
          */
-        SIGMOID(PrimitiveFunction.LOGISTIC, arg -> arg * (ONE - arg)),
+        SIGMOID(args -> (PrimitiveFunction.LOGISTIC), arg -> arg * (ONE - arg)),
         /**
          * [0,1]
          */
-        SOFTMAX(null, null),
+        SOFTMAX(args -> {
+            return null;
+        }, null),
         /**
          * [-1,1]
          */
-        TANH(PrimitiveFunction.TANH, arg -> ONE - (arg * arg));
+        TANH(args -> (PrimitiveFunction.TANH), arg -> ONE - (arg * arg));
 
         private final PrimitiveFunction.Unary myDerivativeInTermsOfOutput;
-        private final PrimitiveFunction.Unary myFunction;
+        private final ActivatorFunctionFactory myFunction;
 
-        Activator(PrimitiveFunction.Unary function, PrimitiveFunction.Unary derivativeInTermsOfOutput) {
+        Activator(ActivatorFunctionFactory function, PrimitiveFunction.Unary derivativeInTermsOfOutput) {
             myFunction = function;
             myDerivativeInTermsOfOutput = derivativeInTermsOfOutput;
         }
 
-        public double invoke(double arg) {
-            return myFunction.invoke(arg);
-        }
+        //        UnaryFunction<Double> getDerivative() {
+        //            return myFunction.andThen(myDerivativeInTermsOfOutput);
+        //        }
 
-        UnaryFunction<Double> getDerivative() {
-            return myFunction.andThen(myDerivativeInTermsOfOutput);
+        PrimitiveFunction.Unary getFunction(PrimitiveDenseStore arguments) {
+            return myFunction.make(arguments);
         }
 
         PrimitiveFunction.Unary getDerivativeInTermsOfOutput() {
