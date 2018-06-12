@@ -45,13 +45,74 @@ public class DesignTestANN extends ANNTest {
     @Test
     public void testWorkedExample() {
 
-        NumberContext precision = new NumberContext(8, 8);
+        NumberContext precision = new NumberContext(5, 5);
         Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
-        Error errorMeassure = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
+        Error errorMeassure = ArtificialNeuralNetwork.Error.CROSS_ENTROPY;
 
         NetworkBuilder builder = new NetworkBuilder(4, 2, 2);
 
-        builder.activator(0, Activator.SIGMOID).activator(1, Activator.SOFTMAX);
+        builder.activator(0, Activator.SIGMOID).activator(1, Activator.SOFTMAX).error(errorMeassure);
+
+        builder.bias(0, 0, -0.00469);
+        builder.bias(0, 1, 0.00797);
+        builder.weight(0, 0, 0, -0.00256);
+        builder.weight(0, 0, 1, 0.00889);
+        builder.weight(0, 1, 0, 0.00146);
+        builder.weight(0, 1, 1, 0.00322);
+        builder.weight(0, 2, 0, 0.00816);
+        builder.weight(0, 2, 1, 0.00258);
+        builder.weight(0, 3, 0, -0.00597);
+        builder.weight(0, 3, 1, -0.00876);
+
+        builder.bias(1, 0, -0.00588);
+        builder.bias(1, 1, -0.00232);
+        builder.weight(1, 0, 0, -0.00647);
+        builder.weight(1, 0, 1, 0.00540);
+        builder.weight(1, 1, 0, 0.00347);
+        builder.weight(1, 1, 1, -0.00005);
+
+        ArtificialNeuralNetwork network = builder.get();
+
+        PrimitiveDenseStore input_1 = factory.rows(new double[] { 252, 4, 155, 175 });
+        PrimitiveDenseStore input_2 = factory.rows(new double[] { 175, 10, 186, 200 });
+        PrimitiveDenseStore input_3 = factory.rows(new double[] { 82, 131, 230, 100 });
+        PrimitiveDenseStore input_4 = factory.rows(new double[] { 115, 138, 80, 88 });
+
+        PrimitiveDenseStore layer0_1 = factory.rows(new double[] { 0.39558, 0.75548 });
+        PrimitiveDenseStore layer0_2 = factory.rows(new double[] { 0.47145, 0.58025 });
+        PrimitiveDenseStore layer0_3 = factory.rows(new double[] { 0.77841, 0.70603 });
+        PrimitiveDenseStore layer0_4 = factory.rows(new double[] { 0.50746, 0.71304 });
+
+        PrimitiveDenseStore layer1_1 = factory.rows(new double[] { 0.49865, 0.50135 });
+        PrimitiveDenseStore layer1_2 = factory.rows(new double[] { 0.49826, 0.50174 });
+        PrimitiveDenseStore layer1_3 = factory.rows(new double[] { 0.49747, 0.50253 });
+        PrimitiveDenseStore layer1_4 = factory.rows(new double[] { 0.49828, 0.50172 });
+
+        this.compare(input_1, network, precision, layer0_1, layer1_1);
+        this.compare(input_2, network, precision, layer0_2, layer1_2);
+        this.compare(input_3, network, precision, layer0_3, layer1_3);
+        this.compare(input_4, network, precision, layer0_4, layer1_4);
+
+        PrimitiveDenseStore target_1 = factory.rows(new double[] { 1, 0 });
+        PrimitiveDenseStore target_2 = factory.rows(new double[] { 1, 0 });
+        PrimitiveDenseStore target_3 = factory.rows(new double[] { 0, 1 });
+        PrimitiveDenseStore target_4 = factory.rows(new double[] { 0, 1 });
+
+        builder.train(input_1, target_1, 0.1);
+        builder.train(input_2, target_2, 0.1);
+        builder.train(input_3, target_3, 0.1);
+        builder.train(input_4, target_4, 0.1);
+
+    }
+
+    void compare(Access1D<Double> input, ArtificialNeuralNetwork network, NumberContext precision, Access1D<Double>... layerOutput) {
+
+        Access1D<Double> output = network.apply(input);
+        TestUtils.assertEquals(output, network.getOutput(layerOutput.length - 1), precision);
+
+        for (int l = 0; l < layerOutput.length; l++) {
+            TestUtils.assertEquals(layerOutput[l], network.getOutput(l), precision);
+        }
 
     }
 

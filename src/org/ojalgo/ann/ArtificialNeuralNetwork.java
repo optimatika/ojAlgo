@@ -26,8 +26,8 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Double>> {
@@ -56,8 +56,12 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
          * [0,1]
          */
         SOFTMAX(args -> {
-            return null;
-        }, null),
+            PrimitiveDenseStore parts = args.copy();
+            parts.modifyAll(PrimitiveFunction.EXP);
+            final double total = parts.aggregateAll(Aggregator.SUM);
+            return arg -> PrimitiveFunction.EXP.invoke(arg) / total;
+        }, arg -> ONE),
+
         /**
          * [-1,1]
          */
@@ -89,7 +93,7 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         /**
          *
          */
-        CROSS_ENTROPY((target, current) -> target * Math.log(current), (target, current) -> (-target / current)),
+        CROSS_ENTROPY((target, current) -> target * Math.log(current), (target, current) -> (current - target)),
         /**
          *
          */
@@ -116,9 +120,10 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
             return myFunction.invoke(target, current);
         }
 
-        BinaryFunction<Double> getDerivative() {
+        PrimitiveFunction.Binary getDerivative() {
             return myDerivative;
         }
+
     }
 
     private final Layer[] myLayers;
@@ -173,6 +178,10 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     void setWeight(int layer, int input, int output, double weight) {
         myLayers[layer].setWeight(input, output, weight);
+    }
+
+    Access1D<Double> getOutput(int layer) {
+        return myLayers[layer].getOutput();
     }
 
 }

@@ -64,9 +64,12 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
         myWeights.multiply(gradient, downstreamGradient);
 
+        PrimitiveDenseStore delta = myWeights.copy();
+
         for (long j = 0L, outLim = gradient.count(); j < outLim; j++) {
             final double grad = gradient.doubleValue(j);
             for (long i = 0L, inLim = input.count(); i < inLim; i++) {
+                delta.set(i, j, input.doubleValue(i) * grad);
                 myWeights.add(i, j, learningRate * input.doubleValue(i) * grad);
             }
             myBias.add(j, learningRate * grad);
