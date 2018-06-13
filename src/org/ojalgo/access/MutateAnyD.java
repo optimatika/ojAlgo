@@ -36,7 +36,7 @@ import org.ojalgo.function.UnaryFunction;
  */
 public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
-    interface BiModifiable<N extends Number> extends StructureAnyD, Mutate1D.BiModifiable<N> {
+    interface BiModifiable<N extends Number> extends MutateAnyD.Modifiable<N>, Mutate1D.BiModifiable<N> {
 
     }
 

@@ -26,17 +26,12 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Double>> {
-
-    static interface ActivatorFunctionFactory {
-
-        PrimitiveFunction.Unary make(PrimitiveDenseStore arguments);
-
-    }
 
     public static enum Activator {
 
@@ -79,12 +74,12 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         //            return myFunction.andThen(myDerivativeInTermsOfOutput);
         //        }
 
-        PrimitiveFunction.Unary getFunction(PrimitiveDenseStore arguments) {
-            return myFunction.make(arguments);
-        }
-
         PrimitiveFunction.Unary getDerivativeInTermsOfOutput() {
             return myDerivativeInTermsOfOutput;
+        }
+
+        PrimitiveFunction.Unary getFunction(PrimitiveDenseStore arguments) {
+            return myFunction.make(arguments);
         }
     }
 
@@ -126,6 +121,12 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     }
 
+    static interface ActivatorFunctionFactory {
+
+        PrimitiveFunction.Unary make(PrimitiveDenseStore arguments);
+
+    }
+
     private final Layer[] myLayers;
 
     ArtificialNeuralNetwork(int inputs, int[] layers) {
@@ -148,6 +149,14 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return retVal;
     }
 
+    Access2D<Double> applyBatch(Access2D<Double> input) {
+        Access2D<Double> retVal = input;
+        for (int i = 0, limit = myLayers.length; i < limit; i++) {
+            retVal = myLayers[i].applyBatch(retVal);
+        }
+        return retVal;
+    }
+
     void backpropagate(Access1D<Double> input, PrimitiveDenseStore downstreamGradient, double learningRate) {
         for (int k = myLayers.length - 1; k >= 0; k--) {
             myLayers[k].adjust(k == 0 ? input : myLayers[k - 1].getOutput(), downstreamGradient, learningRate);
@@ -156,6 +165,10 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     double getBias(int layer, int output) {
         return myLayers[layer].getBias(output);
+    }
+
+    Access1D<Double> getOutput(int layer) {
+        return myLayers[layer].getOutput();
     }
 
     double getWeight(int layer, int input, int output) {
@@ -178,10 +191,6 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     void setWeight(int layer, int input, int output, double weight) {
         myLayers[layer].setWeight(input, output, weight);
-    }
-
-    Access1D<Double> getOutput(int layer) {
-        return myLayers[layer].getOutput();
     }
 
 }

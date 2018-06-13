@@ -21,10 +21,14 @@
  */
 package org.ojalgo.ann;
 
+import java.util.Iterator;
 import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Access2D;
+import org.ojalgo.access.ColumnView;
+import org.ojalgo.access.RowView;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
@@ -76,6 +80,26 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         downstreamGradient.modifyMatching(myError.getDerivative(), current);
 
         myANN.backpropagate(givenInput, downstreamGradient, -learningRate);
+    }
+
+    public void trainColumns(Access2D<Double> givenInput, Access2D<Double> desiredOutput, double learningRate) {
+
+        Iterator<ColumnView<Double>> iterInp = givenInput.columns().iterator();
+        Iterator<ColumnView<Double>> iterOut = desiredOutput.columns().iterator();
+
+        while (iterInp.hasNext() && iterOut.hasNext()) {
+            this.train(iterInp.next(), iterOut.next(), learningRate);
+        }
+    }
+
+    public void trainRows(Access2D<Double> givenInput, Access2D<Double> desiredOutput, double learningRate) {
+
+        Iterator<RowView<Double>> iterInp = givenInput.rows().iterator();
+        Iterator<RowView<Double>> iterOut = desiredOutput.rows().iterator();
+
+        while (iterInp.hasNext() && iterOut.hasNext()) {
+            this.train(iterInp.next(), iterOut.next(), learningRate);
+        }
     }
 
     public NetworkBuilder weight(int layer, int input, int output, double weight) {
