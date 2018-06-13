@@ -26,7 +26,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -145,14 +144,6 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         Access1D<Double> retVal = input;
         for (int i = 0, limit = myLayers.length; i < limit; i++) {
             retVal = myLayers[i].apply(retVal);
-        }
-        return retVal;
-    }
-
-    Access2D<Double> applyBatch(Access2D<Double> input) {
-        Access2D<Double> retVal = input;
-        for (int i = 0, limit = myLayers.length; i < limit; i++) {
-            retVal = myLayers[i].applyBatch(retVal);
         }
         return retVal;
     }
