@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -56,23 +57,33 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<SingularValue<N>> {
 
+        default SingularValue<N> make(boolean fullSize) {
+            return this.make(TYPICAL, fullSize);
+        }
+
+        default SingularValue<N> make(Structure2D typical) {
+            return this.make(typical, false);
+        }
+
+        SingularValue<N> make(Structure2D typical, boolean fullSize);
+
     }
 
-    public static final Factory<BigDecimal> BIG = typical -> new SingularValueDecomposition.Big();
+    public static final Factory<BigDecimal> BIG = (typical, fullSize) -> new SingularValueDecomposition.Big(fullSize);
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new SingularValueDecomposition.Complex();
+    public static final Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new SingularValueDecomposition.Complex(fullSize);
 
-    public static final Factory<Double> PRIMITIVE = typical -> {
-        if ((1024L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
-            return new SingularValueDecomposition.Primitive();
+    public static final Factory<Double> PRIMITIVE = (typical, fullSize) -> {
+        if (fullSize || ((1024L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE))) {
+            return new SingularValueDecomposition.Primitive(fullSize);
         } else {
             return new RawSingularValue();
         }
     };
 
-    public static final Factory<Quaternion> QUATERNION = typical -> new SingularValueDecomposition.Quat();
+    public static final Factory<Quaternion> QUATERNION = (typical, fullSize) -> new SingularValueDecomposition.Quat(fullSize);
 
-    public static final Factory<RationalNumber> RATIONAL = typical -> new SingularValueDecomposition.Rational();
+    public static final Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new SingularValueDecomposition.Rational(fullSize);
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> SingularValue<N> make(final Access2D<N> typical) {

@@ -39,8 +39,110 @@ import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-public class DecompositionProblems {
+public class DecompositionProblems extends MatrixDecompositionTests {
 
+    private static final double ZERO = 1e-9; // tolerance for zero checks
+
+    /**
+     * Perform a QR decomposition of a matrix with the full size flag set to true. In order to find a basis
+     * for the null space, we decompose the transpose of the original matrix.
+     *
+     * @param matrix the matrix to decompose
+     */
+    static void fullQR(final MatrixStore<Double> matrix) {
+
+        // Initialize the QR decomposition object.
+        QR<Double> qr = QR.PRIMITIVE.make(matrix.transpose(), true);
+        // Set it to full size and confirm the setting.
+        TestUtils.assertTrue("Full size flag is set to ", qr.isFullSize());
+
+        // Perform the decomposition.
+        if (!qr.decompose(matrix.transpose())) {
+            TestUtils.fail("Decomposition failed?");
+        }
+        // Check the rank.
+        int rank = qr.getRank();
+        int nullity = (int) matrix.countColumns() - rank;
+        if (DEBUG) {
+            System.out.println(String.format("The original matrix has rank %d and" + " nullity %d.", rank, nullity));
+        }
+
+        // Recover the Q matrix.
+        MatrixStore<Double> q = qr.getQ();
+        if (DEBUG) {
+            System.out.println("Q matrix:\n" + q);
+        }
+
+        // Check whether Q has the correct number of columns.
+        int rows = (int) q.countRows();
+        int cols = (int) q.countColumns();
+        TestUtils.assertEquals(String.format("In a full decomposition, Q should be " + "7 x 7, but here is %d by %d.", rows, cols), matrix.countColumns(),
+                cols);
+
+        // Detect which, if any, of the columns of Q are in the null space of A.
+        MatrixStore<Double> product = matrix.multiply(q);
+        int kernelCount = 0;
+        for (int i = 0; i < product.countColumns(); i++) {
+            double norm = PrimitiveDenseStore.FACTORY.columns(product.sliceColumn(i)).norm();
+            if (norm < ZERO) {
+                if (DEBUG) {
+                    System.out.println(String.format("Column %d of Q belongs to the " + "kernel of A.", i));
+                }
+                kernelCount += 1;
+            }
+        }
+        TestUtils.assertEquals(String.format("Expected nullity %d, found %d kernel" + " vectors.", nullity, kernelCount), nullity, kernelCount);
+    }
+
+    /**
+     * Perform a singular value decomposition of a matrix with the full size flag set to true.
+     *
+     * @param matrix the matrix to decompose
+     */
+    static void fullSVD(final MatrixStore<Double> matrix) {
+        // Initialize the SVD object.
+        SingularValue<Double> svd = SingularValue.PRIMITIVE.make(matrix, true);
+        // Set it to full size and confirm the setting.
+        TestUtils.assertTrue("Full size flag is set to ", svd.isFullSize());
+        // Perform the decomposition.
+        if (!svd.decompose(matrix)) {
+            TestUtils.fail("Decomposition failed?");
+        }
+        // Check the rank.
+        int rank = svd.getRank();
+        int nullity = (int) matrix.countColumns() - rank;
+        if (DEBUG) {
+            System.out.println(String.format("The original matrix has rank %d and" + " nullity %d.", rank, nullity));
+        }
+
+        // Recover the Q2 matrix.
+        MatrixStore<Double> q2 = svd.getQ2();
+        if (DEBUG) {
+            System.out.println("Q2 matrix:\n" + q2);
+        }
+
+        // Check whether Q2 has the correct number of columns.
+        int rows = (int) q2.countRows();
+        int cols = (int) q2.countColumns();
+        TestUtils.assertEquals(String.format("In a full decomposition, Q should be " + "7 x 7, but here is %d by %d.", rows, cols), matrix.countColumns(),
+                cols);
+
+        // Detect which, if any, of the columns of Q2 are in the null space of A.
+        MatrixStore<Double> product = matrix.multiply(q2);
+        int kernelCount = 0;
+        for (int i = 0; i < product.countColumns(); i++) {
+            double norm = PrimitiveDenseStore.FACTORY.columns(product.sliceColumn(i)).norm();
+            if (norm < ZERO) {
+                if (DEBUG) {
+                    System.out.println(String.format("Column %d of Q2 belongs to the " + "kernel of A.", i));
+                }
+                kernelCount += 1;
+            }
+        }
+        TestUtils.assertEquals(String.format("Expected nullity %d, found %d kernel" + " vectors.", nullity, kernelCount), nullity, kernelCount);
+    }
+
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
@@ -311,6 +413,59 @@ public class DecompositionProblems {
         }
 
         // The issue:can't  be reached here!!!
+    }
+
+    /**
+     * This program tests the behavior of the QR and SVD decompositions on matrices with more columns than
+     * rows. The desire is to compute a basis for the (right) null space of a matrix.
+     *
+     * @author Paul A. Rubin (rubin@msu.edu)
+     */
+    @Test
+    public void testP20180614() {
+
+        // We start by creating a 5 x 7 matrix with rank 4.
+        double[][] data = new double[][] { { 3, -6, 6, 9, 1, 3, 2 }, { -2, 4, 5, 3, 2, 7, 5 }, { -7, 14, 3, -4, 0, 0, 0 }, { 0, 0, -2, -2, 3, -5, -8 },
+                { -1, 2, 7, 6, 2, 0, -2 } };
+        MatrixStore<Double> matrixA = PrimitiveDenseStore.FACTORY.rows(data);
+        // Print the matrix to verify it.
+        if (DEBUG) {
+            System.out.println("A matrix:\n" + matrixA);
+        }
+        // Try computing a full size QR decomposition.
+        if (DEBUG) {
+            System.out.println("\nAttempting QR decomposition of A' ...");
+        }
+        DecompositionProblems.fullQR(matrixA);
+
+        // Repeat this with a square matrix (padding with rows of zeros).
+        int rows = data.length;
+        int cols = data[0].length;
+        MatrixStore<Double> zeros = PrimitiveDenseStore.FACTORY.makeZero(cols - rows, cols);
+        MatrixStore<Double> matrixB = matrixA.logical().below(zeros).copy();
+        if (DEBUG) {
+            // Print B to verify it.
+            System.out.println("\nB matrix:\n" + matrixB);
+            // Try computing a full size QR decomposition.
+            System.out.println("\nAttempting QR decomposition of B' ...");
+        }
+
+        DecompositionProblems.fullQR(matrixB);
+
+        // We repeat this experiment using SVD rather than QR, beginning with
+        // the original matrix A.
+        if (DEBUG) {
+            System.out.println("\nAttempting singular value decomposition of A ...");
+        }
+
+        DecompositionProblems.fullSVD(matrixA);
+
+        // Finally, we confirm that it works with the padded matrix.
+        if (DEBUG) {
+            System.out.println("\nAttempting singular value decomposition of B ...");
+        }
+
+        DecompositionProblems.fullSVD(matrixB);
     }
 
 }
