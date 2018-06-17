@@ -62,6 +62,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         }
         // Check the rank.
         int rank = qr.getRank();
+        TestUtils.assertEquals(4, rank);
         int nullity = (int) matrix.countColumns() - rank;
         if (DEBUG) {
             System.out.println(String.format("The original matrix has rank %d and" + " nullity %d.", rank, nullity));
@@ -110,6 +111,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         }
         // Check the rank.
         int rank = svd.getRank();
+        TestUtils.assertEquals(4, rank);
         int nullity = (int) matrix.countColumns() - rank;
         if (DEBUG) {
             System.out.println(String.format("The original matrix has rank %d and" + " nullity %d.", rank, nullity));
@@ -419,7 +421,9 @@ public class DecompositionProblems extends MatrixDecompositionTests {
      * This program tests the behavior of the QR and SVD decompositions on matrices with more columns than
      * rows. The desire is to compute a basis for the (right) null space of a matrix.
      *
-     * @author Paul A. Rubin (rubin@msu.edu)
+     * @see https://stackoverflow.com/questions/50847140
+     * @see https://github.com/optimatika/ojAlgo/issues/104
+     * @author Paul A. Rubin
      */
     @Test
     public void testP20180614() {
