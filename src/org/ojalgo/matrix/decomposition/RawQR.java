@@ -56,8 +56,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      * @serial diagonal of R.
      */
     private double[] myDiagonalR;
-
-    private boolean myFullSize = false;
     private int myNumberOfHouseholderTransformations = 0;
 
     /**
@@ -247,7 +245,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     public boolean isFullSize() {
-        return myFullSize;
+        return false;
     }
 
     public PhysicalStore<Double> preallocate(final Structure2D template) {
@@ -268,10 +266,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         super.reset();
 
         myNumberOfHouseholderTransformations = 0;
-    }
-
-    public void setFullSize(final boolean fullSize) {
-        myFullSize = fullSize;
     }
 
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {

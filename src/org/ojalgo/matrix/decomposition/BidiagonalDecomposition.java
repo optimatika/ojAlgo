@@ -40,7 +40,11 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
     static final class Complex extends BidiagonalDecomposition<ComplexNumber> {
 
         Complex() {
-            super(GenericDenseStore.COMPLEX);
+            this(false);
+        }
+
+        Complex(boolean fullSize) {
+            super(GenericDenseStore.COMPLEX, fullSize);
         }
 
         @Override
@@ -124,7 +128,11 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
     static final class Primitive extends BidiagonalDecomposition<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY);
+            this(false);
+        }
+
+        Primitive(boolean fullSize) {
+            super(PrimitiveDenseStore.FACTORY, fullSize);
         }
 
         @Override
@@ -137,7 +145,11 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
     static final class Quat extends BidiagonalDecomposition<Quaternion> {
 
         Quat() {
-            super(GenericDenseStore.QUATERNION);
+            this(false);
+        }
+
+        Quat(boolean fullSize) {
+            super(GenericDenseStore.QUATERNION, fullSize);
         }
 
         @Override
@@ -151,7 +163,11 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
     static final class Rational extends BidiagonalDecomposition<RationalNumber> {
 
         Rational() {
-            super(GenericDenseStore.RATIONAL);
+            this(false);
+        }
+
+        Rational(boolean fullSize) {
+            super(GenericDenseStore.RATIONAL, fullSize);
         }
 
         @Override
@@ -162,17 +178,15 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
     }
 
     private transient DiagonalArray1D<N> myDiagonal;
-
-    private boolean myFullSize = false;
-
+    private final boolean myFullSize;
     private Array1D<N> myInitDiagQ1 = null;
     private Array1D<N> myInitDiagQ2 = null;
-
     private transient DecompositionStore<N> myQ1;
     private transient DecompositionStore<N> myQ2;
 
-    protected BidiagonalDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
-        super(aFactory);
+    protected BidiagonalDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, boolean fullSize) {
+        super(factory);
+        myFullSize = fullSize;
     }
 
     public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
@@ -233,7 +247,15 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
     }
 
     public MatrixStore<N> getD() {
-        return this.getInPlace().logical().bidiagonal(this.isAspectRatioNormal(), false).get();
+        MatrixStore<N> retVal = this.getInPlace().logical().bidiagonal(this.isAspectRatioNormal(), false).get();
+        if (myFullSize) {
+            if (this.getRowDim() > retVal.countRows()) {
+                retVal = retVal.logical().below((int) (this.getRowDim() - retVal.countRows())).get();
+            } else if (this.getColDim() > retVal.countColumns()) {
+                retVal = retVal.logical().right((int) (this.getColDim() - retVal.countColumns())).get();
+            }
+        }
+        return retVal;
     }
 
     public MatrixStore<N> getQ1() {
@@ -269,10 +291,6 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
         myInitDiagQ1 = null;
         myInitDiagQ2 = null;
-    }
-
-    public void setFullSize(final boolean fullSize) {
-        myFullSize = fullSize;
     }
 
     private DiagonalArray1D<N> makeDiagonal() {
