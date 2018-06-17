@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
@@ -39,8 +40,9 @@ import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-public class DecompositionProblems {
+public class DecompositionProblems extends MatrixDecompositionTests {
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
@@ -311,6 +313,51 @@ public class DecompositionProblems {
         }
 
         // The issue:can't  be reached here!!!
+    }
+
+    /**
+     * There was a problem extracting the eigenpairs (java.lang.ArrayIndexOutOfBoundsException)
+     *
+     * @see https://github.com/optimatika/ojAlgo/issues/105
+     */
+    @Test
+    public void testP20180617() {
+
+        final NumberContext precision = new NumberContext(12, 8);
+
+        PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.730967787376657, 0.24053641567148587, 0.6374174253501083 },
+                { 0.24053641567148587, 0.5975452777972018, 0.3332183994766498 }, { 0.6374174253501083, 0.3332183994766498, 0.8791825178724801 } });
+
+        for (Eigenvalue<Double> evd : MatrixDecompositionTests.getEigenvaluePrimitiveAny()) {
+
+            String className = evd.getClass().getName();
+
+            evd.decompose(matrix);
+
+            TestUtils.assertEquals(matrix, evd, precision);
+
+            if (DEBUG) {
+                BasicLogger.debug("D", evd.getD());
+                BasicLogger.debug("V", evd.getV());
+            }
+
+            MatrixStore<Double> d = evd.getD();
+            Array1D<ComplexNumber> values = evd.getEigenvalues();
+            MatrixStore<ComplexNumber> vectors = evd.getEigenvectors();
+
+            TestUtils.assertEquals(className, values.get(0), d.doubleValue(0, 0));
+            TestUtils.assertEquals(className, values.get(0), evd.getEigenpair(0).value);
+            TestUtils.assertEquals(className, vectors.sliceColumn(0), evd.getEigenpair(0).vector);
+
+            TestUtils.assertEquals(className, values.get(1), d.doubleValue(1, 1));
+            TestUtils.assertEquals(className, values.get(1), evd.getEigenpair(1).value);
+            TestUtils.assertEquals(className, vectors.sliceColumn(1), evd.getEigenpair(1).vector);
+
+            TestUtils.assertEquals(className, values.get(2), d.doubleValue(2, 2));
+            TestUtils.assertEquals(className, values.get(2), evd.getEigenpair(2).value);
+            TestUtils.assertEquals(className, vectors.sliceColumn(2), evd.getEigenpair(2).vector);
+        }
+
     }
 
 }

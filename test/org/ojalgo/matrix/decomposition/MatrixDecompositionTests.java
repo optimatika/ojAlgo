@@ -74,12 +74,23 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllGeneral() {
-        return new Eigenvalue<?>[] { new NewGeneralEvD.Primitive(), new RawEigenvalue.Dynamic(), new OldGeneralEvD.Primitive() };
+        return new Eigenvalue<?>[] { /* new NewGeneralEvD.Primitive(), */ new RawEigenvalue.Dynamic(), new OldGeneralEvD.Primitive() };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllHermitian() {
         return new Eigenvalue<?>[] { new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(), new RawEigenvalue.Symmetric(),
                 new HermitianEvD.Big(), new HermitianEvD.Complex() };
+    }
+
+    public static List<Eigenvalue<Double>> getEigenvaluePrimitiveAny() {
+
+        final List<Eigenvalue<Double>> retVal = new ArrayList<>();
+
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getEigenvaluePrimitiveGeneral()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getEigenvaluePrimitiveDynamic()));
+
+        return Collections.unmodifiableList(retVal);
     }
 
     @SuppressWarnings("unchecked")
@@ -89,7 +100,7 @@ public abstract class MatrixDecompositionTests {
 
     @SuppressWarnings("unchecked")
     public static Eigenvalue<Double>[] getEigenvaluePrimitiveGeneral() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new NewGeneralEvD.Primitive(), new RawEigenvalue.Dynamic(), new OldGeneralEvD.Primitive() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { /* new NewGeneralEvD.Primitive(), */ new RawEigenvalue.Dynamic(), new OldGeneralEvD.Primitive() };
     }
 
     @SuppressWarnings("unchecked")

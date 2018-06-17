@@ -272,13 +272,15 @@ public interface Eigenvalue<N extends Number>
 
     default Eigenpair getEigenpair(final int index) {
 
-        final long tmpDimension = this.getV().countColumns();
+        final long dim = this.getV().countColumns();
 
-        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(tmpDimension, 1L);
+        final Array1D<ComplexNumber> vector = Array1D.COMPLEX.makeZero(dim);
+        this.copyEigenvector(index, vector);
 
-        this.copyEigenvector(index, retVal.sliceColumn(0, index));
+        final Array1D<ComplexNumber> values = this.getEigenvalues();
+        final ComplexNumber value = values.get(index);
 
-        return new Eigenpair(this.getEigenvalues().get(index), retVal);
+        return new Eigenpair(value, vector);
     }
 
     /**
