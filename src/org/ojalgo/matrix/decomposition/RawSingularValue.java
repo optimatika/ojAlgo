@@ -228,10 +228,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         myPseudoinverse = null;
     }
 
-    public void setFullSize(final boolean fullSize) {
-        ;
-    }
-
     @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 

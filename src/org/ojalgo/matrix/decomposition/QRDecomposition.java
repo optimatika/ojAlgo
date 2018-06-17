@@ -41,7 +41,11 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     static final class Complex extends QRDecomposition<ComplexNumber> {
 
         Complex() {
-            super(GenericDenseStore.COMPLEX);
+            this(false);
+        }
+
+        Complex(boolean fullSize) {
+            super(GenericDenseStore.COMPLEX, fullSize);
         }
 
     }
@@ -49,7 +53,11 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     static final class Primitive extends QRDecomposition<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY);
+            this(false);
+        }
+
+        Primitive(boolean fullSize) {
+            super(PrimitiveDenseStore.FACTORY, fullSize);
         }
 
     }
@@ -57,7 +65,11 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     static final class Quat extends QRDecomposition<Quaternion> {
 
         Quat() {
-            super(GenericDenseStore.QUATERNION);
+            this(false);
+        }
+
+        Quat(boolean fullSize) {
+            super(GenericDenseStore.QUATERNION, fullSize);
         }
 
     }
@@ -65,16 +77,21 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     static final class Rational extends QRDecomposition<RationalNumber> {
 
         Rational() {
-            super(GenericDenseStore.RATIONAL);
+            this(false);
+        }
+
+        Rational(boolean fullSize) {
+            super(GenericDenseStore.RATIONAL, fullSize);
         }
 
     }
 
-    private boolean myFullSize = false;
+    private final boolean myFullSize;
     private int myNumberOfHouseholderTransformations = 0;
 
-    protected QRDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
-        super(aFactory);
+    protected QRDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, boolean fullSize) {
+        super(factory);
+        myFullSize = fullSize;
     }
 
     public N calculateDeterminant(final Access2D<?> matrix) {
@@ -143,12 +160,11 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     public MatrixStore<N> getR() {
 
-        //MatrixStore<N> retVal = new UpperTriangularStore<N>(this.getInPlace(), false);
         MatrixStore<N> retVal = this.getInPlace().logical().triangular(true, false).get();
 
-        final int tmpPadding = this.getRowDim() - this.getColDim();
-        if (myFullSize && (tmpPadding < 0)) {
-            retVal = retVal.logical().below(tmpPadding).get();
+        final int padding = this.getRowDim() - this.getColDim();
+        if (myFullSize && (padding > 0)) {
+            retVal = retVal.logical().below(padding).get();
         }
 
         return retVal;
@@ -267,10 +283,6 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         super.reset();
 
         myNumberOfHouseholderTransformations = 0;
-    }
-
-    public void setFullSize(final boolean fullSize) {
-        myFullSize = fullSize;
     }
 
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {

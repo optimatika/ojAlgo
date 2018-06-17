@@ -148,7 +148,6 @@ public class SingularValueTest {
             tmpOriginalMtrx.modifyAll(ComplexFunction.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx.conjugate());
-            tmpSVD.setFullSize(false);
             tmpSVD.decompose(tmpOriginalMtrx);
 
             final Array1D<Double> tmpActualSingularValues = tmpSVD.getSingularValues();

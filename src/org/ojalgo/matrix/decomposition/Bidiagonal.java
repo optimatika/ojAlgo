@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -45,15 +46,25 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<Bidiagonal<N>> {
 
+        default Bidiagonal<N> make(boolean fullSize) {
+            return this.make(TYPICAL, fullSize);
+        }
+
+        default Bidiagonal<N> make(Structure2D typical) {
+            return this.make(typical, false);
+        }
+
+        Bidiagonal<N> make(Structure2D typical, boolean fullSize);
+
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new BidiagonalDecomposition.Complex();
+    public static final Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new BidiagonalDecomposition.Complex(fullSize);
 
-    public static final Factory<Double> PRIMITIVE = typical -> new BidiagonalDecomposition.Primitive();
+    public static final Factory<Double> PRIMITIVE = (typical, fullSize) -> new BidiagonalDecomposition.Primitive(fullSize);
 
-    public static final Factory<Quaternion> QUATERNION = typical -> new BidiagonalDecomposition.Quat();
+    public static final Factory<Quaternion> QUATERNION = (typical, fullSize) -> new BidiagonalDecomposition.Quat(fullSize);
 
-    public static final Factory<RationalNumber> RATIONAL = typical -> new BidiagonalDecomposition.Rational();
+    public static final Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new BidiagonalDecomposition.Rational(fullSize);
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Bidiagonal<N> make(final Access2D<N> typical) {

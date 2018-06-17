@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.decomposition.MatrixDecomposition.EconomySize;
 
 /**
  * MatrixDecompositionPackageTests
@@ -96,6 +97,12 @@ public abstract class MatrixDecompositionTests {
     public static Eigenvalue<Double>[] getEigenvaluePrimitiveSymmetric() {
         return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(),
                 new RawEigenvalue.Symmetric() };
+    }
+
+    @SuppressWarnings("unchecked")
+    public static EconomySize<Double>[] getFullSizePrimitive() {
+        return (EconomySize<Double>[]) new EconomySize<?>[] { new BidiagonalDecomposition.Primitive(true), new QRDecomposition.Primitive(true),
+                new SingularValueDecomposition.Primitive(true) };
     }
 
     public static final Hessenberg<?>[] getHessenbergAll() {
