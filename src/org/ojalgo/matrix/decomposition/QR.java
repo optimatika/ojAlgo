@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -55,21 +56,31 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<QR<N>> {
 
+        default QR<N> make(boolean fullSize) {
+            return this.make(TYPICAL, fullSize);
+        }
+
+        default QR<N> make(Structure2D typical) {
+            return this.make(typical, false);
+        }
+
+        QR<N> make(Structure2D typical, boolean fullSize);
+
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new QRDecomposition.Complex();
+    public static final Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new QRDecomposition.Complex(fullSize);
 
-    public static final Factory<Double> PRIMITIVE = typical -> {
-        if (typical.isFat() || ((256L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE))) {
-            return new QRDecomposition.Primitive();
+    public static final Factory<Double> PRIMITIVE = (typical, fullSize) -> {
+        if (fullSize || (typical.isFat() || ((256L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)))) {
+            return new QRDecomposition.Primitive(fullSize);
         } else {
             return new RawQR();
         }
     };
 
-    public static final Factory<Quaternion> QUATERNION = typical -> new QRDecomposition.Quat();
+    public static final Factory<Quaternion> QUATERNION = (typical, fullSize) -> new QRDecomposition.Quat(fullSize);
 
-    public static final Factory<RationalNumber> RATIONAL = typical -> new QRDecomposition.Rational();
+    public static final Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new QRDecomposition.Rational(fullSize);
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> QR<N> make(final Access2D<N> typical) {

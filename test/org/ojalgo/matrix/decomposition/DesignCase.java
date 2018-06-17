@@ -31,6 +31,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.decomposition.MatrixDecomposition.EconomySize;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -62,6 +63,93 @@ public class DesignCase {
     }
 
     @Test
+    public void testFullSize() {
+
+        final NumberContext precision = new NumberContext(12, 8);
+
+        MatrixStore<Double> tall = PrimitiveDenseStore.FACTORY.makeFilled(7, 5, new Uniform());
+        MatrixStore<Double> fat = PrimitiveDenseStore.FACTORY.makeFilled(5, 7, new Uniform());
+
+        MatrixDecomposition.EconomySize<Double>[] all = MatrixDecompositionTests.getFullSizePrimitive();
+        for (EconomySize<Double> decomp : all) {
+
+            final String className = decomp.getClass().getName();
+
+            if (decomp instanceof Bidiagonal<?>) {
+                Bidiagonal<Double> bidiagonal = (Bidiagonal<Double>) decomp;
+
+                bidiagonal.decompose(tall);
+
+                TestUtils.assertEquals(className, 7, bidiagonal.getQ1().countRows());
+                TestUtils.assertEquals(className, 7, bidiagonal.getQ1().countColumns());
+
+                TestUtils.assertEquals(className, 5, bidiagonal.getQ2().countRows());
+                TestUtils.assertEquals(className, 5, bidiagonal.getQ2().countColumns());
+
+                TestUtils.assertEquals(tall, bidiagonal, precision);
+
+                bidiagonal.decompose(fat);
+
+                TestUtils.assertEquals(className, 5, bidiagonal.getQ1().countRows());
+                TestUtils.assertEquals(className, 5, bidiagonal.getQ1().countColumns());
+
+                TestUtils.assertEquals(className, 7, bidiagonal.getQ2().countRows());
+                TestUtils.assertEquals(className, 7, bidiagonal.getQ2().countColumns());
+
+                TestUtils.assertEquals(fat, bidiagonal, precision);
+
+            } else if (decomp instanceof QR<?>) {
+                QR<Double> qr = (QR<Double>) decomp;
+
+                qr.decompose(tall);
+
+                TestUtils.assertEquals(className, 7, qr.getQ().countRows());
+                TestUtils.assertEquals(className, 7, qr.getQ().countColumns());
+
+                TestUtils.assertEquals(className, 7, qr.getR().countRows());
+                TestUtils.assertEquals(className, 5, qr.getR().countColumns());
+
+                TestUtils.assertEquals(tall, qr, precision);
+
+                qr.decompose(fat);
+
+                TestUtils.assertEquals(className, 5, qr.getQ().countRows());
+                TestUtils.assertEquals(className, 5, qr.getQ().countColumns());
+
+                TestUtils.assertEquals(className, 5, qr.getR().countRows());
+                TestUtils.assertEquals(className, 7, qr.getR().countColumns());
+
+                TestUtils.assertEquals(fat, qr, precision);
+
+            } else if (decomp instanceof SingularValue<?>) {
+                SingularValue<Double> svd = (SingularValue<Double>) decomp;
+
+                svd.decompose(tall);
+
+                TestUtils.assertEquals(className, 7, svd.getQ1().countRows());
+                TestUtils.assertEquals(className, 7, svd.getQ1().countColumns());
+
+                TestUtils.assertEquals(className, 5, svd.getQ2().countRows());
+                TestUtils.assertEquals(className, 5, svd.getQ2().countColumns());
+
+                TestUtils.assertEquals(tall, svd, precision);
+
+                svd.decompose(fat);
+
+                TestUtils.assertEquals(className, 5, svd.getQ1().countRows());
+                TestUtils.assertEquals(className, 5, svd.getQ1().countColumns());
+
+                TestUtils.assertEquals(className, 7, svd.getQ2().countRows());
+                TestUtils.assertEquals(className, 7, svd.getQ2().countColumns());
+
+                TestUtils.assertEquals(fat, svd, precision);
+            }
+
+        }
+
+    }
+
+    @Test
     public void testLuSolveInverse() {
 
         final PhysicalStore<ComplexNumber> tmpRandomComplexStore = MatrixUtils.makeRandomComplexStore(4, 9);
@@ -78,7 +166,6 @@ public class DesignCase {
         final PhysicalStore<Double> tmpB = PrimitiveDenseStore.FACTORY.makeFilled(3, 1, new Normal());
 
         final QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
-        tmpQR.setFullSize(false);
         tmpQR.decompose(tmpA);
 
         final PhysicalStore<Double> tmpX = tmpQR.getSolution(tmpB).copy();
@@ -128,30 +215,36 @@ public class DesignCase {
     @Test
     public void testWikipediaNullspace() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2, 3, 5 }, { -4, 2, 3 } });
+        final PhysicalStore<Double> mtrxA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2, 3, 5 }, { -4, 2, 3 } });
+        final MatrixStore<Double> mtrxAt = mtrxA.transpose();
 
-        final QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
-        tmpQR.setFullSize(true);
-        tmpQR.decompose(tmpA.transpose());
+        final NumberContext precision = new NumberContext(14, 8);
 
-        final SingularValue<Double> tmpSVD = new SingularValueDecomposition.Primitive();
-        tmpSVD.setFullSize(true); // Supports full size
-        tmpSVD.decompose(tmpA);
+        final QR<Double> decompPriQR = QR.PRIMITIVE.make(true);
+        decompPriQR.decompose(mtrxAt);
+        TestUtils.assertEquals(mtrxAt, decompPriQR, precision);
+        TestUtils.assertEquals(3, decompPriQR.getQ().countRows());
+        TestUtils.assertEquals(3, decompPriQR.getQ().countColumns());
 
-        final PhysicalStore<Double> tmpNullspaceQR = tmpQR.getQ().logical().offsets(0, tmpQR.getRank()).get().copy();
-        final PhysicalStore<Double> tmpNullspaceSVD = tmpSVD.getQ2().logical().offsets(0, tmpSVD.getRank()).get().copy();
+        final SingularValue<Double> decompPriSVD = SingularValue.PRIMITIVE.make(true);
+        decompPriSVD.decompose(mtrxA);
+        TestUtils.assertEquals(mtrxA, decompPriSVD, precision);
+        TestUtils.assertEquals(3, decompPriSVD.getQ2().countRows());
+        TestUtils.assertEquals(3, decompPriSVD.getQ2().countColumns());
 
-        final double tmpScaleQR = PrimitiveFunction.ABS.invoke(tmpNullspaceQR.doubleValue(0));
-        tmpNullspaceQR.modifyAll(PrimitiveFunction.DIVIDE.second(tmpScaleQR));
+        final PhysicalStore<Double> nullspacePriQR = decompPriQR.getQ().logical().offsets(0, decompPriQR.getRank()).get().copy();
+        final PhysicalStore<Double> nullspacePriSVD = decompPriSVD.getQ2().logical().offsets(0, decompPriSVD.getRank()).get().copy();
 
-        final double tmpScaleSVD = PrimitiveFunction.ABS.invoke(tmpNullspaceSVD.doubleValue(0));
-        tmpNullspaceSVD.modifyAll(PrimitiveFunction.DIVIDE.second(tmpScaleSVD));
+        final double scalePriQR = PrimitiveFunction.ABS.invoke(nullspacePriQR.doubleValue(0));
+        nullspacePriQR.modifyAll(PrimitiveFunction.DIVIDE.second(scalePriQR));
 
-        final PrimitiveDenseStore tmpExpected = PrimitiveDenseStore.FACTORY.columns(new double[] { -1, -26, 16 });
-        final NumberContext tmpPrecision = new NumberContext(14, 8);
+        final double scalePriSVD = PrimitiveFunction.ABS.invoke(nullspacePriSVD.doubleValue(0));
+        nullspacePriSVD.modifyAll(PrimitiveFunction.DIVIDE.second(scalePriSVD));
 
-        TestUtils.assertEquals(tmpExpected, tmpNullspaceQR, tmpPrecision);
-        TestUtils.assertEquals(tmpExpected, tmpNullspaceSVD, tmpPrecision);
+        final PrimitiveDenseStore nullspace = PrimitiveDenseStore.FACTORY.columns(new double[] { -1, -26, 16 });
+
+        TestUtils.assertEquals(nullspace, nullspacePriQR, precision);
+        TestUtils.assertEquals(nullspace, nullspacePriSVD, precision);
     }
 
     /**

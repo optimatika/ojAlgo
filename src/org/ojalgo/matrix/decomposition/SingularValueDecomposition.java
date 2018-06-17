@@ -52,7 +52,11 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     static final class Complex extends SingularValueDecomposition<ComplexNumber> {
 
         Complex() {
-            super(GenericDenseStore.COMPLEX, new BidiagonalDecomposition.Complex());
+            this(false);
+        }
+
+        Complex(boolean fullSize) {
+            super(GenericDenseStore.COMPLEX, new BidiagonalDecomposition.Complex(fullSize), fullSize);
         }
 
     }
@@ -60,7 +64,11 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     static final class Primitive extends SingularValueDecomposition<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY, new BidiagonalDecomposition.Primitive());
+            this(false);
+        }
+
+        Primitive(boolean fullSize) {
+            super(PrimitiveDenseStore.FACTORY, new BidiagonalDecomposition.Primitive(fullSize), fullSize);
         }
 
     }
@@ -68,7 +76,11 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     static final class Quat extends SingularValueDecomposition<Quaternion> {
 
         Quat() {
-            super(GenericDenseStore.QUATERNION, new BidiagonalDecomposition.Quat());
+            this(false);
+        }
+
+        Quat(boolean fullSize) {
+            super(GenericDenseStore.QUATERNION, new BidiagonalDecomposition.Quat(fullSize), fullSize);
         }
 
     }
@@ -76,7 +88,11 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     static final class Rational extends SingularValueDecomposition<RationalNumber> {
 
         Rational() {
-            super(GenericDenseStore.RATIONAL, new BidiagonalDecomposition.Rational());
+            this(false);
+        }
+
+        Rational(boolean fullSize) {
+            super(GenericDenseStore.RATIONAL, new BidiagonalDecomposition.Rational(fullSize), fullSize);
         }
 
     }
@@ -306,11 +322,9 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     private double[] e = null;
-
     private final BidiagonalDecomposition<N> myBidiagonal;
-
     private transient MatrixStore<N> myD = null;
-    private boolean myFullSize = false;
+    private final boolean myFullSize;
     private final Structure2D myInputStructure = new Structure2D() {
 
         public long countColumns() {
@@ -331,15 +345,16 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     @SuppressWarnings("unused")
     private SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
-        this(factory, null);
+        this(factory, null, false);
     }
 
     protected SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory,
-            final BidiagonalDecomposition<N> bidiagonal) {
+            final BidiagonalDecomposition<N> bidiagonal, boolean fullSize) {
 
         super(factory);
 
         myBidiagonal = bidiagonal;
+        myFullSize = fullSize;
     }
 
     public boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
@@ -548,10 +563,6 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         myTransposed = false;
     }
 
-    public void setFullSize(final boolean fullSize) {
-        myFullSize = fullSize;
-    }
-
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
 
         this.decompose(this.wrap(body));
@@ -638,7 +649,6 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     protected boolean computeBidiagonal(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean fullSize) {
-        myBidiagonal.setFullSize(fullSize);
         return myBidiagonal.decompose(matrix);
     }
 
@@ -694,7 +704,15 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     protected MatrixStore<N> makeD() {
-        return this.wrap(new DiagonalArray1D<>(this.getSingularValues(), null, null, ZERO)).get();
+        MatrixStore<N> retVal = this.wrap(new DiagonalArray1D<>(this.getSingularValues(), null, null, ZERO)).get();
+        if (myFullSize) {
+            if (myInputStructure.countRows() > retVal.countRows()) {
+                retVal = retVal.logical().below((int) (myInputStructure.countRows() - retVal.countRows())).get();
+            } else if (myInputStructure.countColumns() > retVal.countColumns()) {
+                retVal = retVal.logical().right((int) (myInputStructure.countColumns() - retVal.countColumns())).get();
+            }
+        }
+        return retVal;
     }
 
     protected MatrixStore<N> makeQ1() {

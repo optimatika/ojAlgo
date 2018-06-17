@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
@@ -85,7 +86,13 @@ public interface MatrixDecomposition<N extends Number> {
          */
         boolean isFullSize();
 
-        void setFullSize(boolean fullSize);
+        /**
+         * @deprecated v45.1.1 Property now set in constructor (final)
+         */
+        @Deprecated
+        default void setFullSize(boolean fullSize) {
+            ProgrammingError.throwForIllegalInvocation();
+        }
 
     }
 
