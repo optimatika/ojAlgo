@@ -97,13 +97,14 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
 
     static List<Equation> toListOfRows(final Access2D<?> body, final Access2D<?> rhs) {
 
-        final int tmpDim = (int) body.countRows();
+        final int numbEquations = (int) body.countRows();
+        final int numbVariables = (int) body.countColumns();
 
-        final List<Equation> retVal = new ArrayList<>(tmpDim);
+        final List<Equation> retVal = new ArrayList<>(numbEquations);
 
-        for (int i = 0; i < tmpDim; i++) {
-            final Equation tmpRow = new Equation(i, tmpDim, rhs.doubleValue(i));
-            for (int j = 0; j < tmpDim; j++) {
+        for (int i = 0; i < numbEquations; i++) {
+            final Equation tmpRow = new Equation(i, numbVariables, rhs.doubleValue(i));
+            for (int j = 0; j < numbVariables; j++) {
                 final double tmpVal = body.doubleValue(i, j);
                 if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
                     tmpRow.set(j, tmpVal);
@@ -132,7 +133,7 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
         if (templateRHS.countColumns() != 1L) {
             throw new IllegalArgumentException("The RHS must have precisely 1 column!");
         }
-        return PrimitiveDenseStore.FACTORY.makeZero(templateRHS.countRows(), 1L);
+        return PrimitiveDenseStore.FACTORY.makeZero(templateBody.countColumns(), 1L);
     }
 
     public final Optional<MatrixStore<Double>> solve(final MatrixStore<Double> body, final MatrixStore<Double> rhs) {

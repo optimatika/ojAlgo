@@ -31,7 +31,7 @@ import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStore;
 
-public final class InverterTest extends AbstractMatrixDecompositionTaskTest {
+public final class InverterTest extends MatrixTaskTests {
 
     @Test
     public void testFull2X2() {

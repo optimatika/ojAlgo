@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.task;
 
 import java.util.List;
+import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
@@ -31,9 +32,62 @@ import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
+import org.ojalgo.matrix.task.iterative.GaussSeidelSolver;
+import org.ojalgo.matrix.task.iterative.JacobiSolver;
 import org.ojalgo.random.Uniform;
 
-public final class SolverTest extends AbstractMatrixDecompositionTaskTest {
+public final class SolverTest extends MatrixTaskTests {
+
+    @Test
+    public void testExampleWikipediA() {
+
+        final MatrixStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4, 1 }, { 1, 3 } });
+        final MatrixStore<Double> tmpB = PrimitiveDenseStore.FACTORY.columns(new double[] { 1, 2 });
+
+        final MatrixStore<Double> tmpExpected = PrimitiveDenseStore.FACTORY.columns(new double[] { 1.0 / 11.0, 7.0 / 11.0 });
+
+        final JacobiSolver tmpJacobiSolver = new JacobiSolver();
+        TestUtils.assertEquals(tmpExpected, tmpJacobiSolver.solve(tmpA, tmpB).get());
+
+        final GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
+        TestUtils.assertEquals(tmpExpected, tmpGaussSeidelSolver.solve(tmpA, tmpB).get());
+
+        final ConjugateGradientSolver tmpConjugateGradientSolver = new ConjugateGradientSolver();
+        TestUtils.assertEquals(tmpExpected, tmpConjugateGradientSolver.solve(tmpA, tmpB).get());
+    }
+
+    @Test
+    public void testUnderdeterminedIterative() {
+
+        final int numEqs = 2;
+        final int numVars = 5;
+
+        final PrimitiveDenseStore body = PrimitiveDenseStore.FACTORY.makeZero(numEqs, numVars);
+        final PrimitiveDenseStore rhs = PrimitiveDenseStore.FACTORY.makeZero(numEqs, 1);
+
+        final PrimitiveDenseStore expected = PrimitiveDenseStore.FACTORY.makeZero(numVars, 1);
+
+        final Random tmpRandom = new Random();
+        for (int i = 0; i < numEqs; i++) {
+
+            double pivotE = tmpRandom.nextDouble();
+            double rhsE = tmpRandom.nextDouble();
+
+            body.set(i, i, pivotE);
+            rhs.set(i, rhsE);
+            expected.set(i, rhsE / pivotE);
+        }
+
+        final JacobiSolver tmpJacobiSolver = new JacobiSolver();
+        TestUtils.assertEquals(expected, tmpJacobiSolver.solve(body, rhs).get());
+
+        final GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
+        TestUtils.assertEquals(expected, tmpGaussSeidelSolver.solve(body, rhs).get());
+
+        final ConjugateGradientSolver tmpConjugateGradientSolver = new ConjugateGradientSolver();
+        TestUtils.assertEquals(expected, tmpConjugateGradientSolver.solve(body, rhs).get());
+    }
 
     @Test
     public void testFull2X2() {
@@ -53,6 +107,22 @@ public final class SolverTest extends AbstractMatrixDecompositionTaskTest {
     @Test
     public void testFull5X5() {
         this.doCompare(AbstractSolver.FULL_5X5, 5);
+    }
+
+    @Test
+    public void testLinAlg34PDF() {
+
+        final MatrixStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4, 2, 3 }, { 3, -5, 2 }, { -2, 3, 8 } });
+        final MatrixStore<Double> tmpB = PrimitiveDenseStore.FACTORY.columns(new double[] { 8, -14, 27 });
+
+        final MatrixStore<Double> tmpExpected = PrimitiveDenseStore.FACTORY.columns(new double[] { -1, 3, 2 });
+
+        final JacobiSolver tmpJacobiSolver = new JacobiSolver();
+        TestUtils.assertEquals(tmpExpected, tmpJacobiSolver.solve(tmpA, tmpB).get());
+
+        final GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
+        TestUtils.assertEquals(tmpExpected, tmpGaussSeidelSolver.solve(tmpA, tmpB).get());
+
     }
 
     @Test
