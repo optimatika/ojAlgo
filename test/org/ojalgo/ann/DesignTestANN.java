@@ -23,6 +23,8 @@ package org.ojalgo.ann;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import java.io.File;
+
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
@@ -30,6 +32,8 @@ import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Error;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.netio.LineSplittingParser;
 import org.ojalgo.type.context.NumberContext;
 
 public class DesignTestANN extends ANNTest {
@@ -196,6 +200,40 @@ public class DesignTestANN extends ANNTest {
         builder.train(input_4, target_4, 0.1);
 
         builder.trainRows(input, target, 0.1);
+
+        LineSplittingParser parser = new LineSplittingParser(",", true);
+
+        parser.parse(new File("./test/org/ojalgo/ann/train.csv"), false, columns -> {
+
+            // R1C1,R1C2,R2C1,R2C2,IsStairs
+            int R1C1 = Integer.parseInt(columns[1]);
+            int R1C2 = Integer.parseInt(columns[2]);
+            int R2C1 = Integer.parseInt(columns[3]);
+            int R2C2 = Integer.parseInt(columns[4]);
+            int IsStairs = Integer.parseInt(columns[5]);
+
+            PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.rows(new double[] { R1C1, R1C2, R2C1, R2C2 });
+            PrimitiveDenseStore output_csv = PrimitiveDenseStore.FACTORY.rows(new double[] { IsStairs, ONE - IsStairs });
+
+            builder.train(input_csv, output_csv, 1);
+        });
+
+        parser.parse(new File("./test/org/ojalgo/ann/test.csv"), false, columns -> {
+
+            // R1C1,R1C2,R2C1,R2C2,IsStairs
+            int R1C1 = Integer.parseInt(columns[1]);
+            int R1C2 = Integer.parseInt(columns[2]);
+            int R2C1 = Integer.parseInt(columns[3]);
+            int R2C2 = Integer.parseInt(columns[4]);
+            int IsStairs = Integer.parseInt(columns[5]);
+
+            PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.rows(new double[] { R1C1, R1C2, R2C1, R2C2 });
+
+            Access1D<Double> output_net = network.apply(input_csv);
+
+            BasicLogger.debug("{}, but was {}", IsStairs, output_net.doubleValue(0));
+            // TestUtils.assertEquals(columns[0], IsStairs, Math.round(output_net.doubleValue(0)));
+        });
 
     }
 
