@@ -203,7 +203,7 @@ public class DesignTestANN extends ANNTest {
 
         LineSplittingParser parser = new LineSplittingParser(",", true);
 
-        parser.parse(new File("./test/org/ojalgo/ann/train.csv"), false, columns -> {
+        parser.parse(new File("./test/org/ojalgo/ann/train.csv"), true, columns -> {
 
             // R1C1,R1C2,R2C1,R2C2,IsStairs
             int R1C1 = Integer.parseInt(columns[1]);
@@ -218,7 +218,7 @@ public class DesignTestANN extends ANNTest {
             builder.train(input_csv, output_csv, 1);
         });
 
-        parser.parse(new File("./test/org/ojalgo/ann/test.csv"), false, columns -> {
+        parser.parse(new File("./test/org/ojalgo/ann/test.csv"), true, columns -> {
 
             // R1C1,R1C2,R2C1,R2C2,IsStairs
             int R1C1 = Integer.parseInt(columns[1]);
