@@ -23,11 +23,14 @@ package org.ojalgo.ann;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Double>> {
@@ -91,7 +94,15 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         /**
          *
          */
-        HALF_SQUARED_DIFFERENCE((target, current) -> HALF * (target - current) * (target - current), (target, current) -> (current - target));
+        HALF_SQUARED_DIFFERENCE((target, current) -> HALF * (target - current) * (target - current), (target, current) -> (current - target)),
+        /**
+         * Odd alternative that I've seen used in some examples online.
+         */
+        PLAIN_SAME((target, current) -> (target - current), (target, current) -> (target - current)),
+        /**
+         *
+         */
+        PLAIN_DIFFERENCE((target, current) -> (target - current), (target, current) -> NEG);
 
         private final PrimitiveFunction.Binary myDerivative;
         private final PrimitiveFunction.Binary myFunction;
@@ -170,6 +181,14 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         for (int i = 0, limit = myLayers.length; i < limit; i++) {
             myLayers[i].randomise();
         }
+    }
+
+    List<MatrixStore<Double>> getWeights() {
+        final ArrayList<MatrixStore<Double>> retVal = new ArrayList<>();
+        for (int i = 0; i < myLayers.length; i++) {
+            retVal.add(myLayers[i].getWeights());
+        }
+        return retVal;
     }
 
     void setActivator(int layer, Activator activator) {

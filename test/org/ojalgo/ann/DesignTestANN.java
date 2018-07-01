@@ -21,6 +21,7 @@
  */
 package org.ojalgo.ann;
 
+import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.io.File;
@@ -28,7 +29,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Error;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -46,7 +46,7 @@ public class DesignTestANN extends ANNTest {
      * https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
      */
     @Test
-    public void testMattMazurBackpropagationExample() {
+    public void testStepByStepBackpropagationExample() {
 
         NumberContext precision = new NumberContext(8, 8);
         Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
@@ -54,7 +54,7 @@ public class DesignTestANN extends ANNTest {
 
         NetworkBuilder builder = new NetworkBuilder(2, 2, 2);
 
-        builder.activator(0, ArtificialNeuralNetwork.Activator.SIGMOID).activator(1, ArtificialNeuralNetwork.Activator.SIGMOID).error(errorMeassure);
+        builder.activator(0, SIGMOID).activator(1, SIGMOID).error(errorMeassure);
 
         builder.weight(0, 0, 0, 0.15);
         builder.weight(0, 1, 0, 0.20);
@@ -128,11 +128,134 @@ public class DesignTestANN extends ANNTest {
     }
 
     /**
+     * https://medium.com/@14prakash/back-propagation-is-very-simple-who-made-it-complicated-97b794c97e5c
+     */
+    @Test
+    public void testBackPropagationIsVerySimple() {
+
+        NumberContext precision = new NumberContext(4, 4);
+        Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
+        Error errorMeassure = ArtificialNeuralNetwork.Error.CROSS_ENTROPY;
+
+        NetworkBuilder builder = new NetworkBuilder(3, 3, 3, 3);
+
+        builder.activator(0, RECTIFIER).activator(1, SIGMOID).activator(2, SOFTMAX).error(errorMeassure);
+
+        builder.weight(0, 0, 0, 0.1);
+        builder.weight(0, 1, 0, 0.3);
+        builder.weight(0, 2, 0, 0.4);
+        builder.weight(0, 0, 1, 0.2);
+        builder.weight(0, 1, 1, 0.2);
+        builder.weight(0, 2, 1, 0.3);
+        builder.weight(0, 0, 2, 0.3);
+        builder.weight(0, 1, 2, 0.7);
+        builder.weight(0, 2, 2, 0.9);
+
+        builder.bias(0, 0, 1.0);
+        builder.bias(0, 1, 1.0);
+        builder.bias(0, 2, 1.0);
+
+        builder.weight(1, 0, 0, 0.2);
+        builder.weight(1, 1, 0, 0.3);
+        builder.weight(1, 2, 0, 0.6);
+        builder.weight(1, 0, 1, 0.3);
+        builder.weight(1, 1, 1, 0.5);
+        builder.weight(1, 2, 1, 0.4);
+        builder.weight(1, 0, 2, 0.5);
+        builder.weight(1, 1, 2, 0.7);
+        builder.weight(1, 2, 2, 0.8);
+
+        builder.bias(1, 0, 1.0);
+        builder.bias(1, 1, 1.0);
+        builder.bias(1, 2, 1.0);
+
+        builder.weight(2, 0, 0, 0.1);
+        builder.weight(2, 1, 0, 0.3);
+        builder.weight(2, 2, 0, 0.5);
+        builder.weight(2, 0, 1, 0.4);
+        builder.weight(2, 1, 1, 0.7);
+        builder.weight(2, 2, 1, 0.2);
+        builder.weight(2, 0, 2, 0.8);
+        builder.weight(2, 1, 2, 0.2);
+        builder.weight(2, 2, 2, 0.9);
+
+        builder.bias(2, 0, 1.0);
+        builder.bias(2, 1, 1.0);
+        builder.bias(2, 2, 1.0);
+
+        ArtificialNeuralNetwork network = builder.get();
+
+        PrimitiveDenseStore example_input = factory.rows(new double[] { 0.1, 0.2, 0.7 });
+        PrimitiveDenseStore target_output = factory.rows(new double[] { 1.0, 0.0, 0.0 });
+        PrimitiveDenseStore expected_output = factory.rows(new double[] { 0.19858, 0.28559, 0.51583 });
+        Access1D<Double> actual_output = network.apply(example_input);
+
+        TestUtils.assertEquals(expected_output, actual_output, precision);
+
+        builder.train(example_input, target_output, 0.01);
+
+        network.getWeights().forEach(w -> BasicLogger.debug("", w));
+
+    }
+
+    /**
+     * https://stevenmiller888.github.io/mind-how-to-build-a-neural-network/
+     */
+    @Test
+    public void testHowToBuildNeuralNetwork() {
+
+        NumberContext precision = new NumberContext(4, 4);
+        Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
+        Error errorMeassure = ArtificialNeuralNetwork.Error.PLAIN_SAME;
+
+        NetworkBuilder builder = new NetworkBuilder(2, 3, 1);
+
+        builder.activator(0, SIGMOID).activator(1, SIGMOID).error(errorMeassure);
+
+        builder.weight(0, 0, 0, 0.8);
+        builder.weight(0, 0, 1, 0.4);
+        builder.weight(0, 0, 2, 0.3);
+
+        builder.weight(0, 1, 0, 0.2);
+        builder.weight(0, 1, 1, 0.9);
+        builder.weight(0, 1, 2, 0.5);
+
+        builder.bias(0, 0, 0.0);
+        builder.bias(0, 1, 0.0);
+        builder.bias(0, 2, 0.0);
+
+        builder.weight(1, 0, 0, 0.3);
+        builder.weight(1, 1, 0, 0.5);
+        builder.weight(1, 2, 0, 0.9);
+
+        builder.bias(1, 0, 0.0);
+
+        ArtificialNeuralNetwork network = builder.get();
+
+        PrimitiveDenseStore given_input = factory.rows(new double[] { 1.0, 1.0 });
+        PrimitiveDenseStore target_output = factory.rows(new double[] { 0.0 });
+        PrimitiveDenseStore expected_output = factory.rows(new double[] { 0.7746924929149283 });
+        Access1D<Double> actual_output = network.apply(given_input);
+
+        TestUtils.assertEquals(expected_output, actual_output, precision);
+
+        double expectedError = -0.7746924929149283;
+        double actualError = errorMeassure.invoke(target_output, actual_output);
+
+        TestUtils.assertEquals(expectedError, actualError, precision);
+
+        builder.train(given_input, target_output, ONE);
+
+        network.getWeights().forEach(w -> BasicLogger.debug("", w));
+
+    }
+
+    /**
      * https://gormanalysis.com/neural-networks-a-worked-example/
      * https://github.com/ben519/MLPB/tree/master/Problems/Classify%20Images%20of%20Stairs
      */
     @Test
-    public void testWorkedExample() {
+    public void testNeuralNetworkWorkedExample() {
 
         NumberContext precision = new NumberContext(5, 5);
         Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
@@ -140,7 +263,7 @@ public class DesignTestANN extends ANNTest {
 
         NetworkBuilder builder = new NetworkBuilder(4, 2, 2);
 
-        builder.activator(0, Activator.SIGMOID).activator(1, Activator.SOFTMAX).error(errorMeassure);
+        builder.activator(0, SIGMOID).activator(1, SOFTMAX).error(errorMeassure);
 
         builder.bias(0, 0, -0.00469);
         builder.bias(0, 1, 0.00797);

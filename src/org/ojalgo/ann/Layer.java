@@ -28,6 +28,7 @@ import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Normal;
 
@@ -95,6 +96,10 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
     double getWeight(int input, int output) {
         return myWeights.doubleValue(input, output);
+    }
+
+    MatrixStore<Double> getWeights() {
+        return myWeights.logical().below(myBias).get();
     }
 
     void randomise() {
