@@ -43,91 +43,6 @@ public class DesignTestANN extends ANNTest {
     }
 
     /**
-     * https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
-     */
-    @Test
-    public void testStepByStepBackpropagationExample() {
-
-        NumberContext precision = new NumberContext(8, 8);
-        Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
-        Error errorMeassure = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
-
-        NetworkBuilder builder = new NetworkBuilder(2, 2, 2);
-
-        builder.activator(0, SIGMOID).activator(1, SIGMOID).error(errorMeassure);
-
-        builder.weight(0, 0, 0, 0.15);
-        builder.weight(0, 1, 0, 0.20);
-        builder.weight(0, 0, 1, 0.25);
-        builder.weight(0, 1, 1, 0.30);
-
-        builder.weight(1, 0, 0, 0.40);
-        builder.weight(1, 1, 0, 0.45);
-        builder.weight(1, 0, 1, 0.50);
-        builder.weight(1, 1, 1, 0.55);
-
-        builder.bias(0, 0, 0.35);
-        builder.bias(0, 1, 0.35);
-
-        builder.bias(1, 0, 0.60);
-        builder.bias(1, 1, 0.60);
-
-        ArtificialNeuralNetwork network = builder.get();
-
-        PrimitiveDenseStore training_input = factory.rows(new double[] { 0.05, 0.10 });
-        PrimitiveDenseStore training_output = factory.rows(new double[] { 0.01, 0.99 });
-
-        Access1D<Double> expected_first_network_output = factory.rows(new double[] { 0.75136507, 0.772928465 });
-        Access1D<Double> actual_first_network_output = network.apply(training_input);
-
-        TestUtils.assertEquals(expected_first_network_output, actual_first_network_output, precision);
-
-        double expectedError1 = 0.298371109;
-        double actualError1 = errorMeassure.invoke(training_output, actual_first_network_output);
-
-        TestUtils.assertEquals(expectedError1, actualError1, precision);
-
-        builder.train(training_input, training_output, HALF);
-
-        // 0.40 w5
-        TestUtils.assertEquals(0.35891648, network.getWeight(1, 0, 0), precision);
-        // 0.45 w6
-        TestUtils.assertEquals(0.408666186, network.getWeight(1, 1, 0), precision);
-        // 0.50 w7
-        TestUtils.assertEquals(0.511301270, network.getWeight(1, 0, 1), precision);
-        // 0.55 w8
-        TestUtils.assertEquals(0.561370121, network.getWeight(1, 1, 1), precision);
-
-        // 0.15 w1
-        TestUtils.assertEquals(0.149780716, network.getWeight(0, 0, 0), precision);
-        // 0.20 w2
-        TestUtils.assertEquals(0.19956143, network.getWeight(0, 1, 0), precision);
-        // 0.25 w3
-        TestUtils.assertEquals(0.24975114, network.getWeight(0, 0, 1), precision);
-        // 0.30 w4
-        TestUtils.assertEquals(0.29950229, network.getWeight(0, 1, 1), precision);
-
-        double expectedError2 = 0.291027924;
-        double actualError2 = errorMeassure.invoke(training_output, network.apply(training_input));
-
-        // In the example the bias are not updated, ojAlgo does update them
-        // This gives better/faster learning in this first step
-        TestUtils.assertTrue(expectedError2 > actualError2);
-        TestUtils.assertTrue(actualError1 > actualError2);
-
-        // Create a larger, more complex network, to make sure there are no IndexOutOfRangeExceptions or similar..
-        NetworkBuilder largerBuilder = new NetworkBuilder(2, 5, 3, 4, 2).randomise();
-        ArtificialNeuralNetwork largerANN = largerBuilder.get();
-
-        Access1D<Double> preTraining = factory.rows(largerANN.apply(training_input));
-        largerBuilder.train(training_input, training_output, HALF);
-        Access1D<Double> postTraining = factory.rows(largerANN.apply(training_input));
-
-        // Even in this case training should reduce the error
-        TestUtils.assertTrue(errorMeassure.invoke(training_output, preTraining) > errorMeassure.invoke(training_output, postTraining));
-    }
-
-    /**
      * https://medium.com/@14prakash/back-propagation-is-very-simple-who-made-it-complicated-97b794c97e5c
      */
     @Test
@@ -358,6 +273,91 @@ public class DesignTestANN extends ANNTest {
             // TestUtils.assertEquals(columns[0], IsStairs, Math.round(output_net.doubleValue(0)));
         });
 
+    }
+
+    /**
+     * https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
+     * https://github.com/mattm/simple-neural-network
+     */
+    @Test
+    public void testStepByStepBackpropagationExample() {
+
+        NumberContext precision = new NumberContext(8, 8);
+        Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
+        Error errorMeassure = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
+
+        NetworkBuilder builder = new NetworkBuilder(2, 2, 2);
+
+        builder.activator(0, SIGMOID).activator(1, SIGMOID).error(errorMeassure);
+
+        builder.weight(0, 0, 0, 0.15);
+        builder.weight(0, 1, 0, 0.20);
+        builder.weight(0, 0, 1, 0.25);
+        builder.weight(0, 1, 1, 0.30);
+
+        builder.bias(0, 0, 0.35);
+        builder.bias(0, 1, 0.35);
+
+        builder.weight(1, 0, 0, 0.40);
+        builder.weight(1, 1, 0, 0.45);
+        builder.weight(1, 0, 1, 0.50);
+        builder.weight(1, 1, 1, 0.55);
+
+        builder.bias(1, 0, 0.60);
+        builder.bias(1, 1, 0.60);
+
+        ArtificialNeuralNetwork network = builder.get();
+
+        PrimitiveDenseStore givenInput = factory.rows(new double[] { 0.05, 0.10 });
+        PrimitiveDenseStore targetOutput = factory.rows(new double[] { 0.01, 0.99 });
+        Access1D<Double> expectedOutput = factory.rows(new double[] { 0.75136507, 0.772928465 });
+        Access1D<Double> actualOutput = network.apply(givenInput);
+
+        TestUtils.assertEquals(expectedOutput, actualOutput, precision);
+
+        double expectedError = 0.298371109;
+        double actualError = errorMeassure.invoke(targetOutput, actualOutput);
+
+        TestUtils.assertEquals(expectedError, actualError, precision);
+
+        builder.train(givenInput, targetOutput, HALF);
+
+        // 0.40 w5
+        TestUtils.assertEquals(0.35891648, network.getWeight(1, 0, 0), precision);
+        // 0.45 w6
+        TestUtils.assertEquals(0.408666186, network.getWeight(1, 1, 0), precision);
+        // 0.50 w7
+        TestUtils.assertEquals(0.511301270, network.getWeight(1, 0, 1), precision);
+        // 0.55 w8
+        TestUtils.assertEquals(0.561370121, network.getWeight(1, 1, 1), precision);
+
+        // 0.15 w1
+        TestUtils.assertEquals(0.149780716, network.getWeight(0, 0, 0), precision);
+        // 0.20 w2
+        TestUtils.assertEquals(0.19956143, network.getWeight(0, 1, 0), precision);
+        // 0.25 w3
+        TestUtils.assertEquals(0.24975114, network.getWeight(0, 0, 1), precision);
+        // 0.30 w4
+        TestUtils.assertEquals(0.29950229, network.getWeight(0, 1, 1), precision);
+
+        double expectedErrorAfterTraining = 0.291027924;
+        double actualErrorAfterTraining = errorMeassure.invoke(targetOutput, network.apply(givenInput));
+
+        // In the example the bias are not updated, ojAlgo does update them
+        // This should give more aggressive learning in this single step
+        TestUtils.assertTrue(expectedErrorAfterTraining > actualErrorAfterTraining);
+        TestUtils.assertTrue(actualError > actualErrorAfterTraining);
+
+        // Create a larger, more complex network, to make sure there are no IndexOutOfRangeExceptions or similar..
+        NetworkBuilder largerBuilder = new NetworkBuilder(2, 5, 3, 4, 2).randomise();
+        ArtificialNeuralNetwork largerANN = largerBuilder.get();
+
+        Access1D<Double> preTrainingOutput = factory.rows(largerANN.apply(givenInput));
+        largerBuilder.train(givenInput, targetOutput, HALF);
+        Access1D<Double> postTrainingOutput = factory.rows(largerANN.apply(givenInput));
+
+        // Even in this case training should reduce the error
+        TestUtils.assertTrue(errorMeassure.invoke(targetOutput, preTrainingOutput) > errorMeassure.invoke(targetOutput, postTrainingOutput));
     }
 
     void compare(Access1D<Double> input, ArtificialNeuralNetwork network, NumberContext precision, Access1D<Double>... layerOutput) {
