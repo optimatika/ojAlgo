@@ -72,11 +72,11 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return this;
     }
 
-    public void train(Access1D<Double> givenInput, Access1D<Double> desiredOutput, double learningRate) {
+    public void train(Access1D<Double> givenInput, Access1D<Double> targetOutput, double learningRate) {
 
         Access1D<Double> current = myANN.apply(givenInput);
 
-        PrimitiveDenseStore downstreamGradient = PrimitiveDenseStore.FACTORY.columns(desiredOutput);
+        PrimitiveDenseStore downstreamGradient = PrimitiveDenseStore.FACTORY.columns(targetOutput);
         downstreamGradient.modifyMatching(myError.getDerivative(), current);
 
         myANN.backpropagate(givenInput, downstreamGradient, -learningRate);
