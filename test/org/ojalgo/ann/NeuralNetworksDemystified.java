@@ -21,6 +21,9 @@
  */
 package org.ojalgo.ann;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -43,11 +46,11 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
     }
 
     @Override
-    protected TrainingTriplet getTrainingTriplet() {
+    protected List<TrainingTriplet> getTriplets() {
 
         TrainingTriplet retVal = new TrainingTriplet();
 
-        return retVal;
+        return Collections.emptyList();
     }
 
     @Override

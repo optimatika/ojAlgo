@@ -21,6 +21,8 @@
  */
 package org.ojalgo.ann;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
@@ -66,21 +68,20 @@ abstract class BackPropagationExample extends ANNTest {
     @Test
     public void testFeedForward() {
 
-        TrainingTriplet triplet = this.getTrainingTriplet();
+        ArtificialNeuralNetwork network = this.getInitialNetwork().get();
 
-        if ((triplet.input != null) && (triplet.expected != null)) {
+        for (TrainingTriplet triplet : this.getTriplets()) {
 
-            NetworkBuilder builder = this.getInitialNetwork();
+            if ((triplet.input != null) && (triplet.expected != null)) {
 
-            ArtificialNeuralNetwork network = builder.get();
-
-            TestUtils.assertEquals(triplet.expected, network.apply(triplet.input), this.precision());
+                TestUtils.assertEquals(triplet.expected, network.apply(triplet.input), this.precision());
+            }
         }
     }
 
     protected abstract NetworkBuilder getInitialNetwork();
 
-    protected abstract TrainingTriplet getTrainingTriplet();
+    protected abstract List<TrainingTriplet> getTriplets();
 
     protected abstract NumberContext precision();
 

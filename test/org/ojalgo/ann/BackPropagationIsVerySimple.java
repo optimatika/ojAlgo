@@ -24,6 +24,9 @@ package org.ojalgo.ann;
 import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
 import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
@@ -119,7 +122,7 @@ public class BackPropagationIsVerySimple extends BackPropagationExample {
     }
 
     @Override
-    protected TrainingTriplet getTrainingTriplet() {
+    protected List<TrainingTriplet> getTriplets() {
 
         TrainingTriplet retVal = new TrainingTriplet(0.01);
 
@@ -127,7 +130,7 @@ public class BackPropagationIsVerySimple extends BackPropagationExample {
         retVal.target(1.0, 0.0, 0.0);
         retVal.expected(0.19858, 0.28559, 0.51583);
 
-        return retVal;
+        return Collections.singletonList(retVal);
     }
 
     @Override

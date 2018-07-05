@@ -25,6 +25,9 @@ import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
 import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
@@ -142,7 +145,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
     }
 
     @Override
-    protected TrainingTriplet getTrainingTriplet() {
+    protected List<TrainingTriplet> getTriplets() {
 
         TrainingTriplet retVal = new TrainingTriplet(0.5);
 
@@ -150,7 +153,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
         retVal.target(0.01, 0.99);
         retVal.expected(0.75136507, 0.772928465);
 
-        return retVal;
+        return Collections.singletonList(retVal);
     }
 
 }
