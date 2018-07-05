@@ -94,15 +94,7 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         /**
          *
          */
-        HALF_SQUARED_DIFFERENCE((target, current) -> HALF * (target - current) * (target - current), (target, current) -> (current - target)),
-        /**
-         * Odd alternative that I've seen used in some examples online.
-         */
-        PLAIN_SAME((target, current) -> (target - current), (target, current) -> (target - current)),
-        /**
-         *
-         */
-        PLAIN_DIFFERENCE((target, current) -> (target - current), (target, current) -> NEG);
+        HALF_SQUARED_DIFFERENCE((target, current) -> HALF * (target - current) * (target - current), (target, current) -> (current - target));
 
         private final PrimitiveFunction.Binary myDerivative;
         private final PrimitiveFunction.Binary myFunction;

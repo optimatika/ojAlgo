@@ -21,12 +21,38 @@
  */
 package org.ojalgo.ann;
 
-abstract class ANNTest {
+import org.ojalgo.type.context.NumberContext;
 
-    protected static final boolean DEBUG = true;
+/**
+ * NeuralNetworksDemystified
+ *
+ * @author apete
+ */
+public class NeuralNetworksDemystified extends BackPropagationExample {
 
-    public ANNTest() {
+    private static final NumberContext PRECISION = new NumberContext(8, 8);
+
+    public NeuralNetworksDemystified() {
         super();
+    }
+
+    @Override
+    protected NetworkBuilder getInitialNetwork() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected TrainingTriplet getTrainingTriplet() {
+
+        TrainingTriplet retVal = new TrainingTriplet();
+
+        return retVal;
+    }
+
+    @Override
+    protected NumberContext precision() {
+        return PRECISION;
     }
 
 }
