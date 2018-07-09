@@ -47,7 +47,7 @@ public class SimpleDerivativesTest extends BackPropagationExample {
         for (ArtificialNeuralNetwork.Activator activator : ArtificialNeuralNetwork.Activator.values()) {
 
             if (activator == SOFTMAX) {
-                // this.doTest(activator, ArtificialNeuralNetwork.Error.CROSS_ENTROPY);
+                this.doTest(activator, ArtificialNeuralNetwork.Error.CROSS_ENTROPY);
             } else {
                 this.doTest(activator, ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE);
             }
@@ -77,9 +77,7 @@ public class SimpleDerivativesTest extends BackPropagationExample {
 
         NetworkBuilder builder = new NetworkBuilder(3, 3);
 
-        builder.activator(0, SIGMOID).error(HALF_SQUARED_DIFFERENCE).randomise();
-
-        return builder;
+        return builder.activator(0, SIGMOID).error(HALF_SQUARED_DIFFERENCE).randomise();
     }
 
     @Override
@@ -88,7 +86,7 @@ public class SimpleDerivativesTest extends BackPropagationExample {
         TrainingTriplet retVal = new TrainingTriplet(1.0);
 
         retVal.input(0.5, 0.5, 0.5);
-        retVal.target(0.5, 0.5, 0.5);
+        retVal.target(0.0, 1.0, 0.0); // Single 1.0 to be compatible with SOFTMAX/CROSS-ENTROPY
 
         return Collections.singletonList(retVal);
     }

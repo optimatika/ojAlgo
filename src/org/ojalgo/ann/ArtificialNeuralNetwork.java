@@ -91,7 +91,7 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         /**
          *
          */
-        CROSS_ENTROPY((target, current) -> target * Math.log(current), (target, current) -> (current - target)),
+        CROSS_ENTROPY((target, current) -> -target * Math.log(current), (target, current) -> (current - target)),
         /**
          *
          */
@@ -170,6 +170,17 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return myLayers[layer].getOutput();
     }
 
+    Structure2D[] getStructure() {
+
+        Structure2D[] retVal = new Structure2D[myLayers.length];
+
+        for (int l = 0; l < retVal.length; l++) {
+            retVal[l] = myLayers[l].getStructure();
+        }
+
+        return retVal;
+    }
+
     double getWeight(int layer, int input, int output) {
         return myLayers[layer].getWeight(input, output);
     }
@@ -198,17 +209,6 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     void setWeight(int layer, int input, int output, double weight) {
         myLayers[layer].setWeight(input, output, weight);
-    }
-
-    Structure2D[] getStructure() {
-
-        Structure2D[] retVal = new Structure2D[myLayers.length];
-
-        for (int l = 0; l < retVal.length; l++) {
-            retVal[l] = myLayers[l].getStructure();
-        }
-
-        return retVal;
     }
 
 }
