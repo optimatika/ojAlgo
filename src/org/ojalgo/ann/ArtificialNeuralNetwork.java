@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -157,6 +158,10 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         }
     }
 
+    int countCalculationLayers() {
+        return myLayers.length;
+    }
+
     double getBias(int layer, int output) {
         return myLayers[layer].getBias(output);
     }
@@ -169,18 +174,18 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return myLayers[layer].getWeight(input, output);
     }
 
-    void randomise() {
-        for (int i = 0, limit = myLayers.length; i < limit; i++) {
-            myLayers[i].randomise();
-        }
-    }
-
     List<MatrixStore<Double>> getWeights() {
         final ArrayList<MatrixStore<Double>> retVal = new ArrayList<>();
         for (int i = 0; i < myLayers.length; i++) {
             retVal.add(myLayers[i].getWeights());
         }
         return retVal;
+    }
+
+    void randomise() {
+        for (int i = 0, limit = myLayers.length; i < limit; i++) {
+            myLayers[i].randomise();
+        }
     }
 
     void setActivator(int layer, Activator activator) {
@@ -193,6 +198,17 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     void setWeight(int layer, int input, int output, double weight) {
         myLayers[layer].setWeight(input, output, weight);
+    }
+
+    Structure2D[] getStructure() {
+
+        Structure2D[] retVal = new Structure2D[myLayers.length];
+
+        for (int l = 0; l < retVal.length; l++) {
+            retVal[l] = myLayers[l].getStructure();
+        }
+
+        return retVal;
     }
 
 }

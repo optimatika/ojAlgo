@@ -26,6 +26,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.type.context.NumberContext;
 
@@ -73,10 +74,75 @@ abstract class BackPropagationExample extends ANNTest {
         for (TrainingTriplet triplet : this.getTriplets()) {
 
             if ((triplet.input != null) && (triplet.expected != null)) {
-
                 TestUtils.assertEquals(triplet.expected, network.apply(triplet.input), this.precision());
             }
         }
+    }
+
+    @Test
+    public void testTraining() {
+        for (TrainingTriplet triplet : this.getTriplets()) {
+            if ((triplet.input != null) && (triplet.target != null)) {
+                this.deriveTheHardWay(this.getInitialNetwork(), triplet, this.precision());
+            }
+        }
+    }
+
+    protected void deriveTheHardWay(NetworkBuilder builder, TrainingTriplet triplet, NumberContext precision) {
+
+        double delta = 0.0001;
+
+        Structure2D[] structure = builder.getStructure();
+
+        PrimitiveDenseStore[] weights = new PrimitiveDenseStore[structure.length];
+        PrimitiveDenseStore[] bias = new PrimitiveDenseStore[structure.length];
+
+        for (int layer = 0, limit = structure.length; layer < limit; layer++) {
+
+            PrimitiveDenseStore newWeights = weights[layer] = PrimitiveDenseStore.FACTORY.makeZero(structure[layer]);
+            PrimitiveDenseStore newBias = bias[layer] = PrimitiveDenseStore.FACTORY.makeZero(1, structure[layer].countColumns());
+
+            for (int output = 0; output < structure[layer].countColumns(); output++) {
+                for (int input = 0; input < structure[layer].countRows(); input++) {
+
+                    double orgWeight = builder.getWeight(layer, input, output);
+
+                    builder.weight(layer, input, output, orgWeight + delta);
+                    double upperError = builder.error(triplet.target, builder.get().apply(triplet.input));
+                    builder.weight(layer, input, output, orgWeight - delta);
+                    double lowerError = builder.error(triplet.target, builder.get().apply(triplet.input));
+                    builder.weight(layer, input, output, orgWeight);
+
+                    final double derivative = (upperError - lowerError) / (delta + delta);
+                    newWeights.set(input, output, orgWeight - (triplet.rate * derivative));
+                }
+
+                double orgBias = builder.getBias(layer, output);
+
+                builder.bias(layer, output, orgBias + delta);
+                double upperError = builder.error(triplet.target, builder.get().apply(triplet.input));
+                builder.bias(layer, output, orgBias - delta);
+                double lowerError = builder.error(triplet.target, builder.get().apply(triplet.input));
+                builder.bias(layer, output, orgBias);
+
+                final double derivative = (upperError - lowerError) / (delta + delta);
+                newBias.set(output, orgBias - (triplet.rate * derivative));
+            }
+
+        }
+
+        builder.train(triplet.input, triplet.target, triplet.rate);
+
+        for (int layer = 0, limit = structure.length; layer < limit; layer++) {
+            for (int output = 0; output < structure[layer].countColumns(); output++) {
+                for (int input = 0; input < structure[layer].countRows(); input++) {
+                    final PrimitiveDenseStore expectedWeights = weights[layer];
+                    TestUtils.assertEquals(expectedWeights.doubleValue(input, output), builder.getWeight(layer, input, output), precision);
+                }
+                TestUtils.assertEquals(bias[layer].doubleValue(output), builder.getBias(layer, output), precision);
+            }
+        }
+
     }
 
     protected abstract NetworkBuilder getInitialNetwork();

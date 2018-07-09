@@ -29,6 +29,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.ColumnView;
 import org.ojalgo.access.RowView;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
@@ -105,6 +106,26 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
     public NetworkBuilder weight(int layer, int input, int output, double weight) {
         myANN.setWeight(layer, input, output, weight);
         return this;
+    }
+
+    public Structure2D[] getStructure() {
+        return myANN.getStructure();
+    }
+
+    double getBias(int layer, int output) {
+        return myANN.getBias(layer, output);
+    }
+
+    Access1D<Double> getOutput(int layer) {
+        return myANN.getOutput(layer);
+    }
+
+    double getWeight(int layer, int input, int output) {
+        return myANN.getWeight(layer, input, output);
+    }
+
+    public double error(Access1D<?> target, Access1D<?> current) {
+        return myError.invoke(target, current);
     }
 
 }

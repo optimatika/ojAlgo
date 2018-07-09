@@ -24,6 +24,7 @@ package org.ojalgo.ann;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -31,6 +32,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
+@Disabled
 public class NeuralNetworksDemystified extends BackPropagationExample {
 
     private static final NumberContext PRECISION = new NumberContext(8, 8);

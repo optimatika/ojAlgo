@@ -27,6 +27,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -120,6 +121,10 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
     void setWeight(int input, int output, double weight) {
         myWeights.set(input, output, weight);
+    }
+
+    Structure2D getStructure() {
+        return myWeights;
     }
 
 }
