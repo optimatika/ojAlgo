@@ -59,7 +59,6 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
             final double total = parts.aggregateAll(Aggregator.SUM);
             return arg -> PrimitiveFunction.EXP.invoke(arg) / total;
         }, arg -> ONE),
-
         /**
          * [-1,1]
          */
