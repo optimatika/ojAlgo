@@ -22,12 +22,14 @@
 package org.ojalgo.ann;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class BackPropagationExample extends ANNTest {
@@ -90,6 +92,15 @@ abstract class BackPropagationExample extends ANNTest {
 
     protected void deriveTheHardWay(NetworkBuilder builder, TrainingTriplet triplet, NumberContext precision) {
 
+        if (DEBUG) {
+            BasicLogger.debug("Weights before training");
+            final AtomicInteger layer = new AtomicInteger();
+            builder.getWeights().forEach(l -> {
+                BasicLogger.debug(layer.toString(), l);
+                layer.incrementAndGet();
+            });
+        }
+
         double delta = 0.0001;
 
         Structure2D[] structure = builder.getStructure();
@@ -129,20 +140,45 @@ abstract class BackPropagationExample extends ANNTest {
                 newBias.set(output, orgBias - (triplet.rate * derivative));
             }
 
+            if (DEBUG) {
+                BasicLogger.debug("");
+                BasicLogger.debug("Calculated for layer " + layer);
+                BasicLogger.debug("Weighs", newWeights);
+                BasicLogger.debug("Bias", newBias);
+            }
+        }
+
+        if (DEBUG) {
+            BasicLogger.debug("");
+            BasicLogger.debug("Weights reset/before training");
+            final AtomicInteger layer = new AtomicInteger();
+            builder.getWeights().forEach(l -> {
+                BasicLogger.debug(layer.toString(), l);
+                layer.incrementAndGet();
+            });
         }
 
         builder.train(triplet.input, triplet.target, triplet.rate);
+
+        if (DEBUG) {
+            BasicLogger.debug("");
+            BasicLogger.debug("Weights after training");
+            final AtomicInteger layer = new AtomicInteger();
+            builder.getWeights().forEach(l -> {
+                BasicLogger.debug(layer.toString(), l);
+                layer.incrementAndGet();
+            });
+        }
 
         for (int layer = 0, limit = structure.length; layer < limit; layer++) {
             for (int output = 0; output < structure[layer].countColumns(); output++) {
                 for (int input = 0; input < structure[layer].countRows(); input++) {
                     final PrimitiveDenseStore expectedWeights = weights[layer];
-                    TestUtils.assertEquals(expectedWeights.doubleValue(input, output), builder.getWeight(layer, input, output), precision);
+                    TestUtils.assertEquals(builder.toString(), expectedWeights.doubleValue(input, output), builder.getWeight(layer, input, output), precision);
                 }
-                TestUtils.assertEquals(bias[layer].doubleValue(output), builder.getBias(layer, output), precision);
+                TestUtils.assertEquals(builder.toString(), bias[layer].doubleValue(output), builder.getBias(layer, output), precision);
             }
         }
-
     }
 
     protected abstract NetworkBuilder getInitialNetwork();

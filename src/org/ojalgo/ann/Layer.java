@@ -66,12 +66,9 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
         myWeights.multiply(gradient, downstreamGradient);
 
-        PrimitiveDenseStore delta = myWeights.copy();
-
         for (long j = 0L, outLim = gradient.count(); j < outLim; j++) {
             final double grad = gradient.doubleValue(j);
             for (long i = 0L, inLim = input.count(); i < inLim; i++) {
-                delta.set(i, j, input.doubleValue(i) * grad);
                 myWeights.add(i, j, learningRate * input.doubleValue(i) * grad);
             }
             myBias.add(j, learningRate * grad);
@@ -125,6 +122,21 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
     Structure2D getStructure() {
         return myWeights;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder tmpBuilder = new StringBuilder();
+        tmpBuilder.append("Layer [myWeights=");
+        tmpBuilder.append(myWeights);
+        tmpBuilder.append(", myBias=");
+        tmpBuilder.append(myBias);
+        tmpBuilder.append(", myActivator=");
+        tmpBuilder.append(myActivator);
+        tmpBuilder.append(", myOutput=");
+        tmpBuilder.append(myOutput);
+        tmpBuilder.append("]");
+        return tmpBuilder.toString();
     }
 
 }

@@ -22,7 +22,6 @@
 package org.ojalgo.ann;
 
 import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,37 +46,26 @@ public class SimpleDerivativesTest extends BackPropagationExample {
         for (ArtificialNeuralNetwork.Activator activator : ArtificialNeuralNetwork.Activator.values()) {
 
             if (activator == SOFTMAX) {
-                this.doTest(activator, ArtificialNeuralNetwork.Error.CROSS_ENTROPY);
+                this.doTestDerivatives(activator, ArtificialNeuralNetwork.Error.CROSS_ENTROPY);
             } else {
-                this.doTest(activator, ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE);
+                this.doTestDerivatives(activator, ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE);
             }
-
         }
     }
 
-    private void doTest(ArtificialNeuralNetwork.Activator activator, ArtificialNeuralNetwork.Error error) {
+    private void doTestDerivatives(ArtificialNeuralNetwork.Activator activator, ArtificialNeuralNetwork.Error error) {
 
         for (TrainingTriplet triplet : this.getTriplets()) {
 
-            NetworkBuilder builder = this.getInitialNetwork();
-
-            builder.activator(0, activator).error(error);
+            NetworkBuilder builder = this.getInitialNetwork().activators(activator).error(error);
 
             this.deriveTheHardWay(builder, triplet, this.precision());
         }
     }
 
     @Override
-    protected NumberContext precision() {
-        return PRECISION;
-    }
-
-    @Override
     protected NetworkBuilder getInitialNetwork() {
-
-        NetworkBuilder builder = new NetworkBuilder(3, 3);
-
-        return builder.activator(0, SIGMOID).error(HALF_SQUARED_DIFFERENCE).randomise();
+        return ArtificialNeuralNetwork.builder(3, 3).randomise();
     }
 
     @Override
@@ -89,6 +77,11 @@ public class SimpleDerivativesTest extends BackPropagationExample {
         retVal.target(0.0, 1.0, 0.0); // Single 1.0 to be compatible with SOFTMAX/CROSS-ENTROPY
 
         return Collections.singletonList(retVal);
+    }
+
+    @Override
+    protected NumberContext precision() {
+        return PRECISION;
     }
 
 }

@@ -24,6 +24,7 @@ package org.ojalgo.ann;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
@@ -129,6 +130,10 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     }
 
+    public static NetworkBuilder builder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
+        return new NetworkBuilder(numberOfInputNodes, nodesPerCalculationLayer);
+    }
+
     private final Layer[] myLayers;
 
     ArtificialNeuralNetwork(int inputs, int[] layers) {
@@ -202,12 +207,27 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         myLayers[layer].setActivator(activator);
     }
 
+    void setActivators(Activator activator) {
+        for (int l = 0; l < myLayers.length; l++) {
+            myLayers[l].setActivator(activator);
+        }
+    }
+
     void setBias(int layer, int output, double bias) {
         myLayers[layer].setBias(output, bias);
     }
 
     void setWeight(int layer, int input, int output, double weight) {
         myLayers[layer].setWeight(input, output, weight);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder tmpBuilder = new StringBuilder();
+        tmpBuilder.append("ArtificialNeuralNetwork [myLayers=");
+        tmpBuilder.append(Arrays.toString(myLayers));
+        tmpBuilder.append("]");
+        return tmpBuilder.toString();
     }
 
 }

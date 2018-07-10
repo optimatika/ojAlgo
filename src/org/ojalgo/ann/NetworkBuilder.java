@@ -22,6 +22,7 @@
 package org.ojalgo.ann;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
@@ -30,6 +31,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.ColumnView;
 import org.ojalgo.access.RowView;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
@@ -54,9 +56,18 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return this;
     }
 
+    public NetworkBuilder activators(ArtificialNeuralNetwork.Activator activator) {
+        myANN.setActivators(activator);
+        return this;
+    }
+
     public NetworkBuilder bias(int layer, int output, double bias) {
         myANN.setBias(layer, output, bias);
         return this;
+    }
+
+    public double error(Access1D<?> target, Access1D<?> current) {
+        return myError.invoke(target, current);
     }
 
     public NetworkBuilder error(ArtificialNeuralNetwork.Error error) {
@@ -66,6 +77,10 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
     public ArtificialNeuralNetwork get() {
         return myANN;
+    }
+
+    public Structure2D[] getStructure() {
+        return myANN.getStructure();
     }
 
     public NetworkBuilder randomise() {
@@ -108,10 +123,6 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return this;
     }
 
-    public Structure2D[] getStructure() {
-        return myANN.getStructure();
-    }
-
     double getBias(int layer, int output) {
         return myANN.getBias(layer, output);
     }
@@ -124,8 +135,19 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return myANN.getWeight(layer, input, output);
     }
 
-    public double error(Access1D<?> target, Access1D<?> current) {
-        return myError.invoke(target, current);
+    List<MatrixStore<Double>> getWeights() {
+        return myANN.getWeights();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder tmpBuilder = new StringBuilder();
+        tmpBuilder.append("NetworkBuilder [myANN=");
+        tmpBuilder.append(myANN);
+        tmpBuilder.append(", myError=");
+        tmpBuilder.append(myError);
+        tmpBuilder.append("]");
+        return tmpBuilder.toString();
     }
 
 }
