@@ -64,7 +64,7 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
         gradient.modifyAll(myActivator.getDerivativeInTermsOfOutput());
         gradient.modifyMatching(MULTIPLY, downstreamGradient);
 
-        myWeights.multiply(gradient, downstreamGradient);
+        myWeights.multiply(gradient, downstreamGradient); // TODO Should be upstreamGradient
 
         for (long j = 0L, outLim = gradient.count(); j < outLim; j++) {
             final double grad = gradient.doubleValue(j);
