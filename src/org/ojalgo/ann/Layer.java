@@ -58,13 +58,13 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
         return myOutput;
     }
 
-    void adjust(final Access1D<Double> input, PrimitiveDenseStore downstreamGradient, double learningRate) {
+    void adjust(final Access1D<Double> input, PrimitiveDenseStore downstreamGradient, double learningRate, PrimitiveDenseStore upstreamGradient) {
 
         PrimitiveDenseStore gradient = this.copyOutput();
         gradient.modifyAll(myActivator.getDerivativeInTermsOfOutput());
         gradient.modifyMatching(MULTIPLY, downstreamGradient);
 
-        myWeights.multiply(gradient, downstreamGradient); // TODO Should be upstreamGradient
+        myWeights.multiply(gradient, upstreamGradient);
 
         for (long j = 0L, outLim = gradient.count(); j < outLim; j++) {
             final double grad = gradient.doubleValue(j);

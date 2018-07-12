@@ -159,9 +159,9 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return retVal;
     }
 
-    void backpropagate(Access1D<Double> input, PrimitiveDenseStore downstreamGradient, double learningRate) {
+    void backpropagate(Access1D<Double> input, PrimitiveDenseStore[] layerGradients, double learningRate) {
         for (int k = myLayers.length - 1; k >= 0; k--) {
-            myLayers[k].adjust(k == 0 ? input : myLayers[k - 1].getOutput(), downstreamGradient, learningRate);
+            myLayers[k].adjust(k == 0 ? input : myLayers[k - 1].getOutput(), layerGradients[k + 1], learningRate, layerGradients[k]);
         }
     }
 

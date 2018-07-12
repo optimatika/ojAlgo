@@ -38,13 +38,14 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
     private final ArtificialNeuralNetwork myANN;
     private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
+    private final PrimitiveDenseStore[] myGradients;
 
     public NetworkBuilder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
 
         super();
 
         if (nodesPerCalculationLayer.length < 1) {
-            ProgrammingError.throwWithMessage("There must be atleast 1 calculation layer - that would be the output layer!");
+            ProgrammingError.throwWithMessage("There must be at least 2 layers!");
         }
 
         myANN = new ArtificialNeuralNetwork(numberOfInputNodes, nodesPerCalculationLayer);
@@ -55,8 +56,6 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
             myGradients[1 + l] = PrimitiveDenseStore.FACTORY.makeZero(nodesPerCalculationLayer[l], 1);
         }
     }
-
-    private final PrimitiveDenseStore[] myGradients;
 
     /**
      * @param layer 0-based index among the calculation layers (excluding the input layer)
@@ -99,14 +98,28 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return this;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder tmpBuilder = new StringBuilder();
+        tmpBuilder.append("NetworkBuilder [myANN=");
+        tmpBuilder.append(myANN);
+        tmpBuilder.append(", myError=");
+        tmpBuilder.append(myError);
+        tmpBuilder.append("]");
+        return tmpBuilder.toString();
+    }
+
     public void train(Access1D<Double> givenInput, Access1D<Double> targetOutput, double learningRate) {
 
         Access1D<Double> current = myANN.apply(givenInput);
 
-        PrimitiveDenseStore downstreamGradient = PrimitiveDenseStore.FACTORY.columns(targetOutput);
-        downstreamGradient.modifyMatching(myError.getDerivative(), current);
+        // PrimitiveDenseStore downstreamGradient = PrimitiveDenseStore.FACTORY.columns(targetOutput);
+        //        myGradients[myGradients.length - 1].fillMatching(targetOutput);
+        //        myGradients[myGradients.length - 1].modifyMatching(myError.getDerivative(), current);
 
-        myANN.backpropagate(givenInput, downstreamGradient, -learningRate);
+        myGradients[myGradients.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
+
+        myANN.backpropagate(givenInput, myGradients, -learningRate);
     }
 
     public void trainColumns(Access2D<Double> givenInput, Access2D<Double> desiredOutput, double learningRate) {
@@ -148,17 +161,6 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
     List<MatrixStore<Double>> getWeights() {
         return myANN.getWeights();
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder tmpBuilder = new StringBuilder();
-        tmpBuilder.append("NetworkBuilder [myANN=");
-        tmpBuilder.append(myANN);
-        tmpBuilder.append(", myError=");
-        tmpBuilder.append(myError);
-        tmpBuilder.append("]");
-        return tmpBuilder.toString();
     }
 
 }
