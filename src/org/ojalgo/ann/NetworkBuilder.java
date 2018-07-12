@@ -40,12 +40,23 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
     private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
 
     public NetworkBuilder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
+
         super();
+
         if (nodesPerCalculationLayer.length < 1) {
             ProgrammingError.throwWithMessage("There must be atleast 1 calculation layer - that would be the output layer!");
         }
+
         myANN = new ArtificialNeuralNetwork(numberOfInputNodes, nodesPerCalculationLayer);
+
+        myGradients = new PrimitiveDenseStore[1 + nodesPerCalculationLayer.length];
+        myGradients[0] = PrimitiveDenseStore.FACTORY.makeZero(numberOfInputNodes, 1);
+        for (int l = 0; l < nodesPerCalculationLayer.length; l++) {
+            myGradients[1 + l] = PrimitiveDenseStore.FACTORY.makeZero(nodesPerCalculationLayer[l], 1);
+        }
     }
+
+    private final PrimitiveDenseStore[] myGradients;
 
     /**
      * @param layer 0-based index among the calculation layers (excluding the input layer)

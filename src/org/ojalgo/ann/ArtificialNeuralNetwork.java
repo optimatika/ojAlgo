@@ -52,7 +52,9 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
          */
         SIGMOID(args -> (PrimitiveFunction.LOGISTIC), arg -> arg * (ONE - arg)),
         /**
-         * [0,1]
+         * [0,1] <br>
+         * Currently this can only be used in the final layer in combination with {@link Error#CROSS_ENTROPY}.
+         * All other usage will give incorrect network training.
          */
         SOFTMAX(args -> {
             PrimitiveDenseStore parts = args.copy();
@@ -89,7 +91,8 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
     public static enum Error implements PrimitiveFunction.Binary {
 
         /**
-         *
+         * Currently this can only be used in in combination with {@link Activator#SOFTMAX} in the final
+         * layer. All other usage will give incorrect network training.
          */
         CROSS_ENTROPY((target, current) -> -target * Math.log(current), (target, current) -> (current - target)),
         /**
