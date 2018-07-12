@@ -159,6 +159,15 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return retVal;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder tmpBuilder = new StringBuilder();
+        tmpBuilder.append("ArtificialNeuralNetwork [myLayers=");
+        tmpBuilder.append(Arrays.toString(myLayers));
+        tmpBuilder.append("]");
+        return tmpBuilder.toString();
+    }
+
     void backpropagate(Access1D<Double> input, PrimitiveDenseStore[] layerGradients, double learningRate) {
         for (int k = myLayers.length - 1; k >= 0; k--) {
             myLayers[k].adjust(k == 0 ? input : myLayers[k - 1].getOutput(), layerGradients[k + 1], learningRate, layerGradients[k]);
@@ -173,7 +182,7 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return myLayers[layer].getBias(output);
     }
 
-    Access1D<Double> getOutput(int layer) {
+    PrimitiveDenseStore getOutput(int layer) {
         return myLayers[layer].getOutput();
     }
 
@@ -222,15 +231,6 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
 
     void setWeight(int layer, int input, int output, double weight) {
         myLayers[layer].setWeight(input, output, weight);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder tmpBuilder = new StringBuilder();
-        tmpBuilder.append("ArtificialNeuralNetwork [myLayers=");
-        tmpBuilder.append(Arrays.toString(myLayers));
-        tmpBuilder.append("]");
-        return tmpBuilder.toString();
     }
 
 }

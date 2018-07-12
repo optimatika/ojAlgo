@@ -50,7 +50,7 @@ public class HowToBuildNeuralNetwork extends BackPropagationExample {
     @Override
     protected NetworkBuilder getInitialNetwork() {
 
-        NetworkBuilder builder = new NetworkBuilder(2, 3, 1);
+        NetworkBuilder builder = ArtificialNeuralNetwork.builder(2, 3, 1);
 
         builder.activator(0, SIGMOID).activator(1, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
 

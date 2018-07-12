@@ -29,6 +29,7 @@ import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
@@ -678,6 +679,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     default double norm() {
         return this.aggregateAll(Aggregator.NORM2).doubleValue();
+    }
+
+    default MatrixStore<N> operateOnAll(final UnaryFunction<N> operator) {
+        return new UnaryOperatoStore<>(this, operator);
     }
 
     /**

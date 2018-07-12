@@ -102,7 +102,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
         TestUtils.assertTrue(actualError > actualErrorAfterTraining);
 
         // Create a larger, more complex network, to make sure there are no IndexOutOfRangeExceptions or similar..
-        NetworkBuilder largerBuilder = new NetworkBuilder(2, 5, 3, 4, 2).randomise();
+        NetworkBuilder largerBuilder = ArtificialNeuralNetwork.builder(2, 5, 3, 4, 2).randomise();
         ArtificialNeuralNetwork largerANN = largerBuilder.get();
 
         Access1D<Double> preTrainingOutput = factory.rows(largerANN.apply(givenInput));
@@ -121,7 +121,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
     @Override
     protected NetworkBuilder getInitialNetwork() {
 
-        NetworkBuilder builder = new NetworkBuilder(2, 2, 2);
+        NetworkBuilder builder = ArtificialNeuralNetwork.builder(2, 2, 2);
 
         builder.activator(0, SIGMOID).activator(1, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
 

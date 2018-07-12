@@ -144,7 +144,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
     @Override
     protected NetworkBuilder getInitialNetwork() {
 
-        NetworkBuilder builder = new NetworkBuilder(4, 2, 2);
+        NetworkBuilder builder = ArtificialNeuralNetwork.builder(4, 2, 2);
 
         builder.activator(0, SIGMOID).activator(1, SOFTMAX).error(CROSS_ENTROPY);
 

@@ -38,7 +38,6 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
     private ArtificialNeuralNetwork.Activator myActivator;
     private final PrimitiveDenseStore myBias;
     private final PrimitiveDenseStore myOutput;
-    private transient PrimitiveDenseStore myOutputCopy = null;
     private final PrimitiveDenseStore myWeights;
 
     Layer(int numberOfInputs, int numberOfOutputs, ArtificialNeuralNetwork.Activator activator) {
@@ -58,30 +57,42 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
         return myOutput;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder tmpBuilder = new StringBuilder();
+        tmpBuilder.append("Layer [myWeights=");
+        tmpBuilder.append(myWeights);
+        tmpBuilder.append(", myBias=");
+        tmpBuilder.append(myBias);
+        tmpBuilder.append(", myActivator=");
+        tmpBuilder.append(myActivator);
+        tmpBuilder.append(", myOutput=");
+        tmpBuilder.append(myOutput);
+        tmpBuilder.append("]");
+        return tmpBuilder.toString();
+    }
+
     void adjust(final Access1D<Double> input, PrimitiveDenseStore downstreamGradient, double learningRate, PrimitiveDenseStore upstreamGradient) {
 
-        PrimitiveDenseStore gradient = this.copyOutput();
-        gradient.modifyAll(myActivator.getDerivativeInTermsOfOutput());
-        gradient.modifyMatching(MULTIPLY, downstreamGradient);
+        //        PrimitiveDenseStore gradient = this.copyOutput();
+        //        gradient.modifyAll(myActivator.getDerivativeInTermsOfOutput());
+        //        gradient.modifyMatching(MULTIPLY, downstreamGradient);
 
-        myWeights.multiply(gradient, upstreamGradient);
+        downstreamGradient.modifyMatching(MULTIPLY, myOutput.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
 
-        for (long j = 0L, outLim = gradient.count(); j < outLim; j++) {
-            final double grad = gradient.doubleValue(j);
-            for (long i = 0L, inLim = input.count(); i < inLim; i++) {
+        if (upstreamGradient != null) {
+            // No need to do this multiplication for the input layer
+            // input null to stop it...
+            myWeights.multiply(downstreamGradient, upstreamGradient);
+        }
+
+        for (long j = 0L, numbOutput = myWeights.countColumns(); j < numbOutput; j++) {
+            final double grad = downstreamGradient.doubleValue(j);
+            for (long i = 0L, numbInput = myWeights.countRows(); i < numbInput; i++) {
                 myWeights.add(i, j, learningRate * input.doubleValue(i) * grad);
             }
             myBias.add(j, learningRate * grad);
         }
-    }
-
-    PrimitiveDenseStore copyOutput() {
-        if (myOutputCopy == null) {
-            myOutputCopy = myOutput.copy();
-        } else {
-            myOutput.supplyTo(myOutputCopy);
-        }
-        return myOutputCopy;
     }
 
     double getBias(int output) {
@@ -90,6 +101,10 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
     PrimitiveDenseStore getOutput() {
         return myOutput;
+    }
+
+    Structure2D getStructure() {
+        return myWeights;
     }
 
     double getWeight(int input, int output) {
@@ -118,25 +133,6 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
     void setWeight(int input, int output, double weight) {
         myWeights.set(input, output, weight);
-    }
-
-    Structure2D getStructure() {
-        return myWeights;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder tmpBuilder = new StringBuilder();
-        tmpBuilder.append("Layer [myWeights=");
-        tmpBuilder.append(myWeights);
-        tmpBuilder.append(", myBias=");
-        tmpBuilder.append(myBias);
-        tmpBuilder.append(", myActivator=");
-        tmpBuilder.append(myActivator);
-        tmpBuilder.append(", myOutput=");
-        tmpBuilder.append(myOutput);
-        tmpBuilder.append("]");
-        return tmpBuilder.toString();
     }
 
 }

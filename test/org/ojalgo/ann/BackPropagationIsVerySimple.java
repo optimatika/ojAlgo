@@ -72,7 +72,7 @@ public class BackPropagationIsVerySimple extends BackPropagationExample {
     @Override
     protected NetworkBuilder getInitialNetwork() {
 
-        NetworkBuilder builder = new NetworkBuilder(3, 3, 3, 3);
+        NetworkBuilder builder = ArtificialNeuralNetwork.builder(3, 3, 3, 3);
 
         builder.activator(0, RECTIFIER).activator(1, SIGMOID).activator(2, SOFTMAX).error(CROSS_ENTROPY);
 

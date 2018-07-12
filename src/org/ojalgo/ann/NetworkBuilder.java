@@ -34,13 +34,18 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
+/**
+ * An artificial neural network builder/trainer.
+ *
+ * @author apete
+ */
 public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
     private final ArtificialNeuralNetwork myANN;
     private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
-    private final PrimitiveDenseStore[] myGradients;
+    private final PrimitiveDenseStore[] myLayerValues;
 
-    public NetworkBuilder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
+    NetworkBuilder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
 
         super();
 
@@ -50,10 +55,11 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
         myANN = new ArtificialNeuralNetwork(numberOfInputNodes, nodesPerCalculationLayer);
 
-        myGradients = new PrimitiveDenseStore[1 + nodesPerCalculationLayer.length];
-        myGradients[0] = PrimitiveDenseStore.FACTORY.makeZero(numberOfInputNodes, 1);
+        myLayerValues = new PrimitiveDenseStore[1 + nodesPerCalculationLayer.length];
+        myLayerValues[0] = PrimitiveDenseStore.FACTORY.makeZero(numberOfInputNodes, 1);
         for (int l = 0; l < nodesPerCalculationLayer.length; l++) {
-            myGradients[1 + l] = PrimitiveDenseStore.FACTORY.makeZero(nodesPerCalculationLayer[l], 1);
+            myLayerValues[1 + l] = PrimitiveDenseStore.FACTORY.makeZero(nodesPerCalculationLayer[l], 1);
+            //myLayerValues[1 + l] = myANN.getOutput(l);
         }
     }
 
@@ -117,9 +123,10 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         //        myGradients[myGradients.length - 1].fillMatching(targetOutput);
         //        myGradients[myGradients.length - 1].modifyMatching(myError.getDerivative(), current);
 
-        myGradients[myGradients.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
+        myLayerValues[0].fillMatching(givenInput);
+        myLayerValues[myLayerValues.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
 
-        myANN.backpropagate(givenInput, myGradients, -learningRate);
+        myANN.backpropagate(givenInput, myLayerValues, -learningRate);
     }
 
     public void trainColumns(Access2D<Double> givenInput, Access2D<Double> desiredOutput, double learningRate) {
