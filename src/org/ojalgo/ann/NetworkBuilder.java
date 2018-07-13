@@ -68,17 +68,19 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
      * @param activator The activator function to use
      */
     public NetworkBuilder activator(int layer, ArtificialNeuralNetwork.Activator activator) {
-        myANN.setActivator(layer, activator);
+        myANN.getLayer(layer).setActivator(activator);
         return this;
     }
 
     public NetworkBuilder activators(ArtificialNeuralNetwork.Activator activator) {
-        myANN.setActivators(activator);
+        for (int i = 0, limit = myANN.countCalculationLayers(); i < limit; i++) {
+            myANN.getLayer(i).setActivator(activator);
+        }
         return this;
     }
 
     public NetworkBuilder bias(int layer, int output, double bias) {
-        myANN.setBias(layer, output, bias);
+        myANN.getLayer(layer).setBias(output, bias);
         return this;
     }
 
@@ -184,16 +186,12 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
     }
 
     public NetworkBuilder weight(int layer, int input, int output, double weight) {
-        myANN.setWeight(layer, input, output, weight);
+        myANN.getLayer(layer).setWeight(input, output, weight);
         return this;
     }
 
     double getBias(int layer, int output) {
         return myANN.getBias(layer, output);
-    }
-
-    Access1D<Double> getOutput(int layer) {
-        return myANN.getOutput(layer);
     }
 
     double getWeight(int layer, int input, int output) {

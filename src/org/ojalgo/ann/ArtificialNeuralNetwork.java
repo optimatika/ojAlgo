@@ -208,6 +208,10 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return myLayers[layer].getBias(output);
     }
 
+    CalculationLayer getLayer(int index) {
+        return myLayers[index];
+    }
+
     PrimitiveDenseStore getOutput(int layer) {
         return myLayers[layer].getOutput();
     }
@@ -239,24 +243,6 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         for (int i = 0, limit = myLayers.length; i < limit; i++) {
             myLayers[i].randomise();
         }
-    }
-
-    void setActivator(int layer, Activator activator) {
-        myLayers[layer].setActivator(activator);
-    }
-
-    void setActivators(Activator activator) {
-        for (int l = 0; l < myLayers.length; l++) {
-            myLayers[l].setActivator(activator);
-        }
-    }
-
-    void setBias(int layer, int output, double bias) {
-        myLayers[layer].setBias(output, bias);
-    }
-
-    void setWeight(int layer, int input, int output, double weight) {
-        myLayers[layer].setWeight(input, output, weight);
     }
 
 }
