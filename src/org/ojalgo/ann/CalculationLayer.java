@@ -33,14 +33,14 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Normal;
 
-final class Layer implements UnaryOperator<Access1D<Double>> {
+final class CalculationLayer implements UnaryOperator<Access1D<Double>> {
 
     private ArtificialNeuralNetwork.Activator myActivator;
     private final PrimitiveDenseStore myBias;
     private final PrimitiveDenseStore myOutput;
     private final PrimitiveDenseStore myWeights;
 
-    Layer(int numberOfInputs, int numberOfOutputs, ArtificialNeuralNetwork.Activator activator) {
+    CalculationLayer(int numberOfInputs, int numberOfOutputs, ArtificialNeuralNetwork.Activator activator) {
 
         super();
 
@@ -58,6 +58,48 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof CalculationLayer)) {
+            return false;
+        }
+        CalculationLayer other = (CalculationLayer) obj;
+        if (myActivator != other.myActivator) {
+            return false;
+        }
+        if (myBias == null) {
+            if (other.myBias != null) {
+                return false;
+            }
+        } else if (!myBias.equals(other.myBias)) {
+            return false;
+        }
+        if (myWeights == null) {
+            if (other.myWeights != null) {
+                return false;
+            }
+        } else if (!myWeights.equals(other.myWeights)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + ((myActivator == null) ? 0 : myActivator.hashCode());
+        result = (prime * result) + ((myBias == null) ? 0 : myBias.hashCode());
+        result = (prime * result) + ((myWeights == null) ? 0 : myWeights.hashCode());
+        return result;
+    }
+
+    @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
         tmpBuilder.append("Layer [myWeights=");
@@ -72,11 +114,7 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
         return tmpBuilder.toString();
     }
 
-    void adjust(final Access1D<Double> input, PrimitiveDenseStore downstreamGradient, double learningRate, PrimitiveDenseStore upstreamGradient) {
-
-        //        PrimitiveDenseStore gradient = this.copyOutput();
-        //        gradient.modifyAll(myActivator.getDerivativeInTermsOfOutput());
-        //        gradient.modifyMatching(MULTIPLY, downstreamGradient);
+    void adjust(final Access1D<Double> layerInput, PrimitiveDenseStore downstreamGradient, double learningRate, PrimitiveDenseStore upstreamGradient) {
 
         downstreamGradient.modifyMatching(MULTIPLY, myOutput.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
 
@@ -89,7 +127,7 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
         for (long j = 0L, numbOutput = myWeights.countColumns(); j < numbOutput; j++) {
             final double grad = downstreamGradient.doubleValue(j);
             for (long i = 0L, numbInput = myWeights.countRows(); i < numbInput; i++) {
-                myWeights.add(i, j, learningRate * input.doubleValue(i) * grad);
+                myWeights.add(i, j, learningRate * layerInput.doubleValue(i) * grad);
             }
             myBias.add(j, learningRate * grad);
         }
@@ -97,6 +135,10 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
     double getBias(int output) {
         return myBias.doubleValue(output);
+    }
+
+    MatrixStore<Double> getLogicalWeights() {
+        return myWeights.logical().below(myBias).get();
     }
 
     PrimitiveDenseStore getOutput() {
@@ -109,10 +151,6 @@ final class Layer implements UnaryOperator<Access1D<Double>> {
 
     double getWeight(int input, int output) {
         return myWeights.doubleValue(input, output);
-    }
-
-    MatrixStore<Double> getWeights() {
-        return myWeights.logical().below(myBias).get();
     }
 
     void randomise() {

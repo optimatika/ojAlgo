@@ -137,17 +137,17 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return new NetworkBuilder(numberOfInputNodes, nodesPerCalculationLayer);
     }
 
-    private final Layer[] myLayers;
+    private final CalculationLayer[] myLayers;
 
     ArtificialNeuralNetwork(int inputs, int[] layers) {
         super();
-        myLayers = new Layer[layers.length];
+        myLayers = new CalculationLayer[layers.length];
         int tmpIn = inputs;
         int tmpOut = inputs;
         for (int i = 0; i < layers.length; i++) {
             tmpIn = tmpOut;
             tmpOut = layers[i];
-            myLayers[i] = new Layer(tmpIn, tmpOut, Activator.SIGMOID);
+            myLayers[i] = new CalculationLayer(tmpIn, tmpOut, Activator.SIGMOID);
         }
     }
 
@@ -160,6 +160,32 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof ArtificialNeuralNetwork)) {
+            return false;
+        }
+        ArtificialNeuralNetwork other = (ArtificialNeuralNetwork) obj;
+        if (!Arrays.equals(myLayers, other.myLayers)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + Arrays.hashCode(myLayers);
+        return result;
+    }
+
+    @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
         tmpBuilder.append("ArtificialNeuralNetwork [myLayers=");
@@ -168,9 +194,9 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return tmpBuilder.toString();
     }
 
-    void backpropagate(Access1D<Double> input, PrimitiveDenseStore[] layerGradients, double learningRate) {
+    void backpropagate(Access1D<Double> networkInput, PrimitiveDenseStore[] layerGradients, double learningRate) {
         for (int k = myLayers.length - 1; k >= 0; k--) {
-            myLayers[k].adjust(k == 0 ? input : myLayers[k - 1].getOutput(), layerGradients[k + 1], learningRate, layerGradients[k]);
+            myLayers[k].adjust(k == 0 ? networkInput : myLayers[k - 1].getOutput(), layerGradients[k + 1], learningRate, layerGradients[k]);
         }
     }
 
@@ -204,7 +230,7 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
     List<MatrixStore<Double>> getWeights() {
         final ArrayList<MatrixStore<Double>> retVal = new ArrayList<>();
         for (int i = 0; i < myLayers.length; i++) {
-            retVal.add(myLayers[i].getWeights());
+            retVal.add(myLayers[i].getLogicalWeights());
         }
         return retVal;
     }

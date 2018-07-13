@@ -82,6 +82,31 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return this;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof NetworkBuilder)) {
+            return false;
+        }
+        NetworkBuilder other = (NetworkBuilder) obj;
+        if (myANN == null) {
+            if (other.myANN != null) {
+                return false;
+            }
+        } else if (!myANN.equals(other.myANN)) {
+            return false;
+        }
+        if (myError != other.myError) {
+            return false;
+        }
+        return true;
+    }
+
     public double error(Access1D<?> target, Access1D<?> current) {
         return myError.invoke(target, current);
     }
@@ -97,6 +122,15 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
     public Structure2D[] getStructure() {
         return myANN.getStructure();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + ((myANN == null) ? 0 : myANN.hashCode());
+        result = (prime * result) + ((myError == null) ? 0 : myError.hashCode());
+        return result;
     }
 
     public NetworkBuilder randomise() {
