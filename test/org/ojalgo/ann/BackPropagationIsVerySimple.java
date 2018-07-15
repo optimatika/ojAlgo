@@ -27,12 +27,6 @@ import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -46,27 +40,6 @@ public class BackPropagationIsVerySimple extends BackPropagationExample {
 
     public BackPropagationIsVerySimple() {
         super();
-    }
-
-    @Test
-    public void testBackPropagationIsVerySimple() {
-
-        NumberContext precision = this.precision();
-        Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
-        NetworkBuilder builder = this.getInitialNetwork();
-
-        ArtificialNeuralNetwork network = builder.get();
-
-        PrimitiveDenseStore example_input = factory.rows(new double[] { 0.1, 0.2, 0.7 });
-        PrimitiveDenseStore target_output = factory.rows(new double[] { 1.0, 0.0, 0.0 });
-        PrimitiveDenseStore expected_output = factory.rows(new double[] { 0.19858, 0.28559, 0.51583 });
-        Access1D<Double> actual_output = network.apply(example_input);
-
-        TestUtils.assertEquals(expected_output, actual_output, precision);
-
-        builder.train(example_input, target_output, 0.01);
-
-        network.getWeights().forEach(w -> BasicLogger.debug("", w));
     }
 
     @Override
@@ -122,9 +95,9 @@ public class BackPropagationIsVerySimple extends BackPropagationExample {
     }
 
     @Override
-    protected List<TrainingTriplet> getTriplets() {
+    protected List<Data> getTestCases() {
 
-        TrainingTriplet retVal = new TrainingTriplet(0.01);
+        Data retVal = new Data(0.01);
 
         retVal.input(0.1, 0.2, 0.7);
         retVal.target(1.0, 0.0, 0.0);

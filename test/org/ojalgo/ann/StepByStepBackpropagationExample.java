@@ -145,9 +145,9 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
     }
 
     @Override
-    protected List<TrainingTriplet> getTriplets() {
+    protected List<Data> getTestCases() {
 
-        TrainingTriplet retVal = new TrainingTriplet(0.5);
+        Data retVal = new Data(0.5);
 
         retVal.input(0.05, 0.10);
         retVal.target(0.01, 0.99);

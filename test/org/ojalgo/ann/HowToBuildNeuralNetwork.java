@@ -42,9 +42,33 @@ public class HowToBuildNeuralNetwork extends BackPropagationExample {
         super();
     }
 
-    @Override
-    protected NumberContext precision() {
-        return PRECISION;
+    private Data makeCase00(double learningRate) {
+        Data _00 = new Data(learningRate);
+        _00.input(0.0, 0.0);
+        _00.target(0.0);
+        return _00;
+    }
+
+    private Data makeCase01(double learningRate) {
+        Data _01 = new Data(learningRate);
+        _01.input(0.0, 1.0);
+        _01.target(1.0);
+        return _01;
+    }
+
+    private Data makeCase10(double learningRate) {
+        Data _10 = new Data(learningRate);
+        _10.input(1.0, 0.0);
+        _10.target(1.0);
+        return _10;
+    }
+
+    private Data makeCase11(double learningRate) {
+        Data _11 = new Data(learningRate);
+        _11.input(1.0, 1.0);
+        _11.target(0.0);
+        _11.expected(0.7746924929149283);
+        return _11;
     }
 
     @Override
@@ -52,7 +76,7 @@ public class HowToBuildNeuralNetwork extends BackPropagationExample {
 
         NetworkBuilder builder = ArtificialNeuralNetwork.builder(2, 3, 1);
 
-        builder.activator(0, SIGMOID).activator(1, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
+        builder.activators(SIGMOID, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
 
         builder.weight(0, 0, 0, 0.8);
         builder.weight(0, 0, 1, 0.4);
@@ -76,34 +100,23 @@ public class HowToBuildNeuralNetwork extends BackPropagationExample {
     }
 
     @Override
-    protected List<TrainingTriplet> getTriplets() {
+    protected List<Data> getTestCases() {
 
         double learningRate = 1.0;
 
-        List<TrainingTriplet> retVal = new ArrayList<>();
+        List<Data> retVal = new ArrayList<>();
 
-        TrainingTriplet _00 = new TrainingTriplet(learningRate);
-        _00.input(0.0, 0.0);
-        _00.target(0.0);
-        retVal.add(_00);
-
-        TrainingTriplet _01 = new TrainingTriplet(learningRate);
-        _01.input(0.0, 1.0);
-        _01.target(1.0);
-        retVal.add(_01);
-
-        TrainingTriplet _10 = new TrainingTriplet(learningRate);
-        _10.input(1.0, 0.0);
-        _10.target(1.0);
-        retVal.add(_10);
-
-        TrainingTriplet _11 = new TrainingTriplet(learningRate);
-        _11.input(1.0, 1.0);
-        _11.target(0.0);
-        _11.expected(0.7746924929149283);
-        retVal.add(_11);
+        retVal.add(this.makeCase00(learningRate));
+        retVal.add(this.makeCase01(learningRate));
+        retVal.add(this.makeCase10(learningRate));
+        retVal.add(this.makeCase11(learningRate));
 
         return retVal;
+    }
+
+    @Override
+    protected NumberContext precision() {
+        return PRECISION;
     }
 
 }

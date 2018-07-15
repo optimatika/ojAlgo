@@ -79,6 +79,13 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return this;
     }
 
+    public NetworkBuilder activators(ArtificialNeuralNetwork.Activator... activators) {
+        for (int i = 0, limit = activators.length; i < limit; i++) {
+            myANN.getLayer(i).setActivator(activators[i]);
+        }
+        return this;
+    }
+
     public NetworkBuilder bias(int layer, int output, double bias) {
         myANN.getLayer(layer).setBias(output, bias);
         return this;

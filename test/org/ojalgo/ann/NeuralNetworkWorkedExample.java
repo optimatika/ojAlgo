@@ -170,9 +170,9 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
     }
 
     @Override
-    protected List<TrainingTriplet> getTriplets() {
+    protected List<Data> getTestCases() {
 
-        TrainingTriplet retVal = new TrainingTriplet(0.01);
+        Data retVal = new Data(0.01);
 
         //        retVal.input();
         //        retVal.target();

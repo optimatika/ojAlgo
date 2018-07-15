@@ -34,35 +34,40 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class BackPropagationExample extends ANNTest {
 
-    static final class TrainingTriplet {
+    static final class Data {
 
-        PrimitiveDenseStore expected;
-        PrimitiveDenseStore input;
+        PrimitiveDenseStore expected = null;
+        PrimitiveDenseStore input = null;
         final double rate;
-        PrimitiveDenseStore target;
+        PrimitiveDenseStore target = null;
 
-        TrainingTriplet() {
+        Data() {
             this(1.0);
         }
 
-        TrainingTriplet(double rate) {
+        Data(double rate) {
             super();
             this.rate = rate;
         }
 
-        void expected(double... row) {
+        Data expected(double... row) {
             expected = PrimitiveDenseStore.FACTORY.rows(row);
+            return this;
         }
 
-        void input(double... row) {
+        Data input(double... row) {
             input = PrimitiveDenseStore.FACTORY.rows(row);
+            return this;
         }
 
-        void target(double... row) {
+        Data target(double... row) {
             target = PrimitiveDenseStore.FACTORY.rows(row);
+            return this;
         }
 
     }
+
+    private static final String TEST_DID_NOT_DO_ANYTHING = "Test didn't do anything!";
 
     public BackPropagationExample() {
         super();
@@ -71,26 +76,40 @@ abstract class BackPropagationExample extends ANNTest {
     @Test
     public void testFeedForward() {
 
+        int counter = 0;
+
         ArtificialNeuralNetwork network = this.getInitialNetwork().get();
 
-        for (TrainingTriplet triplet : this.getTriplets()) {
-
+        for (Data triplet : this.getTestCases()) {
             if ((triplet.input != null) && (triplet.expected != null)) {
                 TestUtils.assertEquals(triplet.expected, network.apply(triplet.input), this.precision());
+                counter++;
             }
+        }
+
+        if (counter == 0) {
+            TestUtils.fail(TEST_DID_NOT_DO_ANYTHING);
         }
     }
 
     @Test
-    public void testTraining() {
-        for (TrainingTriplet triplet : this.getTriplets()) {
+    public void testBackpropagation() {
+
+        int counter = 0;
+
+        for (Data triplet : this.getTestCases()) {
             if ((triplet.input != null) && (triplet.target != null)) {
                 this.deriveTheHardWay(this.getInitialNetwork(), triplet, this.precision());
+                counter++;
             }
+        }
+
+        if (counter == 0) {
+            TestUtils.fail(TEST_DID_NOT_DO_ANYTHING);
         }
     }
 
-    protected void deriveTheHardWay(NetworkBuilder builder, TrainingTriplet triplet, NumberContext precision) {
+    protected void deriveTheHardWay(NetworkBuilder builder, Data triplet, NumberContext precision) {
 
         if (DEBUG) {
             BasicLogger.debug("Weights before training");
@@ -183,7 +202,7 @@ abstract class BackPropagationExample extends ANNTest {
 
     protected abstract NetworkBuilder getInitialNetwork();
 
-    protected abstract List<TrainingTriplet> getTriplets();
+    protected abstract List<Data> getTestCases();
 
     protected abstract NumberContext precision();
 

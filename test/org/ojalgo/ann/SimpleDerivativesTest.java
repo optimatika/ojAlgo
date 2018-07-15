@@ -40,6 +40,12 @@ public class SimpleDerivativesTest extends BackPropagationExample {
         super();
     }
 
+    @Override
+    public void testFeedForward() {
+        // Not possible to test for this case
+        ;
+    }
+
     @Test
     public void testDerivatives() {
 
@@ -55,7 +61,7 @@ public class SimpleDerivativesTest extends BackPropagationExample {
 
     private void doTestDerivatives(ArtificialNeuralNetwork.Activator activator, ArtificialNeuralNetwork.Error error) {
 
-        for (TrainingTriplet triplet : this.getTriplets()) {
+        for (Data triplet : this.getTestCases()) {
 
             NetworkBuilder builder = this.getInitialNetwork().activators(activator).error(error);
 
@@ -69,9 +75,9 @@ public class SimpleDerivativesTest extends BackPropagationExample {
     }
 
     @Override
-    protected List<TrainingTriplet> getTriplets() {
+    protected List<Data> getTestCases() {
 
-        TrainingTriplet retVal = new TrainingTriplet(1.0);
+        Data retVal = new Data();
 
         retVal.input(0.5, 0.5, 0.5);
         retVal.target(0.0, 1.0, 0.0); // Single 1.0 to be compatible with SOFTMAX/CROSS-ENTROPY

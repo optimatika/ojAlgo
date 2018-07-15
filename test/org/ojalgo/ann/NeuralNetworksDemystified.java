@@ -21,10 +21,17 @@
  */
 package org.ojalgo.ann;
 
-import java.util.Collections;
+import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
+import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.ojalgo.TestUtils;
+import org.ojalgo.access.Access1D;
+import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -32,32 +39,93 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-@Disabled
 public class NeuralNetworksDemystified extends BackPropagationExample {
 
+    private static final double LEARNING_RATE = 0.1;
     private static final NumberContext PRECISION = new NumberContext(8, 8);
+    private static final int TRAINING_ITERATIONS = 100;
 
     public NeuralNetworksDemystified() {
         super();
     }
 
-    @Override
-    protected NetworkBuilder getInitialNetwork() {
-        // TODO Auto-generated method stub
-        return null;
+    /**
+     * Test that trainning on multiple different data point improve the results on all examples.
+     */
+    @Test
+    public void testTraining() {
+
+        final NetworkBuilder builder = this.getInitialNetwork();
+
+        List<Data> examples = this.getTestCases();
+
+        double[] initialErrors = this.getErrors(builder);
+
+        for (int iter = 0; iter < TRAINING_ITERATIONS; iter++) {
+            for (Data data : examples) {
+                builder.train(data.input, data.target, LEARNING_RATE);
+            }
+        }
+
+        double[] trainedErrors = this.getErrors(builder);
+
+        double initialError = 0.0, trainedError = 0.0;
+        for (int i = 0; i < trainedErrors.length; i++) {
+            initialError = PrimitiveFunction.HYPOT.invoke(initialError, initialErrors[i]);
+            trainedError = PrimitiveFunction.HYPOT.invoke(trainedError, trainedErrors[i]);
+        }
+
+        TestUtils.assertTrue(initialError >= trainedError);
+    }
+
+    private double[] getErrors(final NetworkBuilder builder) {
+
+        ArtificialNeuralNetwork network = builder.get();
+
+        List<Data> examples = this.getTestCases();
+
+        double[] errors = new double[examples.size()];
+
+        for (int i = 0; i < errors.length; i++) {
+            final Data data = examples.get(i);
+            final PrimitiveDenseStore input = data.input;
+            final Access1D<Double> actual = network.apply(input);
+            final PrimitiveDenseStore expected = data.target;
+            double error = builder.error(expected, actual);
+            errors[i] = error;
+        }
+
+        return errors;
     }
 
     @Override
-    protected List<TrainingTriplet> getTriplets() {
+    protected NetworkBuilder getInitialNetwork() {
+        return ArtificialNeuralNetwork.builder(2, 3, 1).activators(SIGMOID, SIGMOID).error(HALF_SQUARED_DIFFERENCE).randomise();
 
-        TrainingTriplet retVal = new TrainingTriplet();
+    }
 
-        return Collections.emptyList();
+    @Override
+    protected List<Data> getTestCases() {
+
+        List<Data> retVal = new ArrayList<>();
+
+        // Normalised input on 10 and target/output on 100
+        retVal.add(new Data(LEARNING_RATE).input(0.3, 0.5).target(0.75));
+        retVal.add(new Data(LEARNING_RATE).input(0.5, 0.1).target(0.82));
+        retVal.add(new Data(LEARNING_RATE).input(1.0, 0.2).target(0.93));
+
+        return retVal;
     }
 
     @Override
     protected NumberContext precision() {
         return PRECISION;
+    }
+
+    @Override
+    public void testFeedForward() {
+        // Example output
+        ;
     }
 
 }
