@@ -42,15 +42,15 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         /**
          * (-,+)
          */
-        IDENTITY(args -> (arg -> arg), arg -> ONE),
+        IDENTITY(args -> (arg -> arg), arg -> ONE, true),
         /**
          * ReLU: [0,+)
          */
-        RECTIFIER(args -> (arg -> Math.max(ZERO, arg)), arg -> arg > ZERO ? ONE : ZERO),
+        RECTIFIER(args -> (arg -> Math.max(ZERO, arg)), arg -> arg > ZERO ? ONE : ZERO, true),
         /**
          * [0,1]
          */
-        SIGMOID(args -> (PrimitiveFunction.LOGISTIC), arg -> arg * (ONE - arg)),
+        SIGMOID(args -> (PrimitiveFunction.LOGISTIC), arg -> arg * (ONE - arg), true),
         /**
          * [0,1] <br>
          * Currently this can only be used in the final layer in combination with {@link Error#CROSS_ENTROPY}.
@@ -61,18 +61,24 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
             parts.modifyAll(PrimitiveFunction.EXP);
             final double total = parts.aggregateAll(Aggregator.SUM);
             return arg -> PrimitiveFunction.EXP.invoke(arg) / total;
-        }, arg -> ONE),
+        }, arg -> ONE, false),
         /**
          * [-1,1]
          */
-        TANH(args -> (PrimitiveFunction.TANH), arg -> ONE - (arg * arg));
+        TANH(args -> (PrimitiveFunction.TANH), arg -> ONE - (arg * arg), true);
 
         private final PrimitiveFunction.Unary myDerivativeInTermsOfOutput;
         private final ActivatorFunctionFactory myFunction;
+        private final boolean mySingleFolded;
 
-        Activator(ActivatorFunctionFactory function, PrimitiveFunction.Unary derivativeInTermsOfOutput) {
+        Activator(ActivatorFunctionFactory function, PrimitiveFunction.Unary derivativeInTermsOfOutput, boolean singleFolded) {
             myFunction = function;
             myDerivativeInTermsOfOutput = derivativeInTermsOfOutput;
+            mySingleFolded = singleFolded;
+        }
+
+        public boolean isSingleFolded() {
+            return mySingleFolded;
         }
 
         //        UnaryFunction<Double> getDerivative() {

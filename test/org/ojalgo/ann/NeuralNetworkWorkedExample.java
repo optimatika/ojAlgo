@@ -28,6 +28,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.access.Access1D;
@@ -102,37 +103,52 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
 
         LineSplittingParser parser = new LineSplittingParser(",", true);
 
-        parser.parse(new File("./test/org/ojalgo/ann/train.csv"), true, columns -> {
+        builder.randomise();
 
-            // R1C1,R1C2,R2C1,R2C2,IsStairs
-            int R1C1 = Integer.parseInt(columns[1]);
-            int R1C2 = Integer.parseInt(columns[2]);
-            int R2C1 = Integer.parseInt(columns[3]);
-            int R2C2 = Integer.parseInt(columns[4]);
-            int IsStairs = Integer.parseInt(columns[5]);
+        for (int i = 0; i < 10; i++) {
 
-            PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.rows(new double[] { R1C1, R1C2, R2C1, R2C2 });
-            PrimitiveDenseStore output_csv = PrimitiveDenseStore.FACTORY.rows(new double[] { IsStairs, ONE - IsStairs });
+            parser.parse(new File("./test/org/ojalgo/ann/train.csv"), true, columns -> {
 
-            builder.train(input_csv, output_csv, 1);
-        });
+                // R1C1,R1C2,R2C1,R2C2,IsStairs
+                double R1C1 = Double.parseDouble(columns[1]);
+                double R1C2 = Double.parseDouble(columns[2]);
+                double R2C1 = Double.parseDouble(columns[3]);
+                double R2C2 = Double.parseDouble(columns[4]);
+                int IsStairs = Integer.parseInt(columns[5]);
+
+                PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.rows(new double[] { R1C1 / 255.0, R1C2 / 255.0, R2C1 / 255.0, R2C2 / 255.0 });
+                PrimitiveDenseStore output_csv = PrimitiveDenseStore.FACTORY.rows(new double[] { IsStairs, ONE - IsStairs });
+
+                builder.train(input_csv, output_csv, 0.1);
+            });
+
+        }
+
+        AtomicInteger correct = new AtomicInteger();
+        AtomicInteger wrong = new AtomicInteger();
 
         parser.parse(new File("./test/org/ojalgo/ann/test.csv"), true, columns -> {
 
             // R1C1,R1C2,R2C1,R2C2,IsStairs
-            int R1C1 = Integer.parseInt(columns[1]);
-            int R1C2 = Integer.parseInt(columns[2]);
-            int R2C1 = Integer.parseInt(columns[3]);
-            int R2C2 = Integer.parseInt(columns[4]);
+            double R1C1 = Double.parseDouble(columns[1]);
+            double R1C2 = Double.parseDouble(columns[2]);
+            double R2C1 = Double.parseDouble(columns[3]);
+            double R2C2 = Double.parseDouble(columns[4]);
             int IsStairs = Integer.parseInt(columns[5]);
 
-            PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.rows(new double[] { R1C1, R1C2, R2C1, R2C2 });
+            PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.rows(new double[] { R1C1 / 255.0, R1C2 / 255.0, R2C1 / 255.0, R2C2 / 255.0 });
 
             Access1D<Double> output_net = network.apply(input_csv);
 
             BasicLogger.debug("{}, but was {}", IsStairs, output_net.doubleValue(0));
-            // TestUtils.assertEquals(columns[0], IsStairs, Math.round(output_net.doubleValue(0)));
+            if (IsStairs == Math.round(output_net.doubleValue(0))) {
+                correct.incrementAndGet();
+            } else {
+                wrong.incrementAndGet();
+            }
         });
+
+        BasicLogger.debug(correct.doubleValue() / wrong.doubleValue());
 
     }
 
@@ -146,7 +162,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
 
         NetworkBuilder builder = ArtificialNeuralNetwork.builder(4, 2, 2);
 
-        builder.activator(0, SIGMOID).activator(1, SOFTMAX).error(CROSS_ENTROPY);
+        builder.activators(SIGMOID, SOFTMAX).error(CROSS_ENTROPY);
 
         builder.bias(0, 0, -0.00469);
         builder.bias(0, 1, 0.00797);
