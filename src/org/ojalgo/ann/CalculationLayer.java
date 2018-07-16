@@ -29,6 +29,7 @@ import java.util.function.UnaryOperator;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Normal;
@@ -155,10 +156,13 @@ final class CalculationLayer implements UnaryOperator<Access1D<Double>> {
 
     void randomise() {
 
-        Normal generator = new Normal(ONE / myWeights.countRows(), ONE);
+        double location = ONE / myWeights.countRows();
+        double scale = PrimitiveFunction.SQRT.invoke(location);
+        Normal generator = new Normal(location, scale);
 
         myWeights.fillAll(generator);
-        myBias.fillAll(myActivator.getCenter() - HALF);
+
+        myBias.fillAll(generator);
     }
 
     void setActivator(Activator activator) {

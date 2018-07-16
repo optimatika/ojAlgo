@@ -59,7 +59,6 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         myLayerValues[0] = PrimitiveDenseStore.FACTORY.makeZero(numberOfInputNodes, 1);
         for (int l = 0; l < nodesPerCalculationLayer.length; l++) {
             myLayerValues[1 + l] = PrimitiveDenseStore.FACTORY.makeZero(nodesPerCalculationLayer[l], 1);
-            //myLayerValues[1 + l] = myANN.getOutput(l);
         }
     }
 
@@ -143,7 +142,9 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
     }
 
     public NetworkBuilder randomise() {
-        myANN.randomise();
+        for (int i = 0, limit = myANN.countCalculationLayers(); i < limit; i++) {
+            myANN.getLayer(i).randomise();
+        }
         return this;
     }
 
@@ -162,14 +163,12 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
         Access1D<Double> current = myANN.apply(givenInput);
 
-        // PrimitiveDenseStore downstreamGradient = PrimitiveDenseStore.FACTORY.columns(targetOutput);
-        //        myGradients[myGradients.length - 1].fillMatching(targetOutput);
-        //        myGradients[myGradients.length - 1].modifyMatching(myError.getDerivative(), current);
-
         myLayerValues[0].fillMatching(givenInput);
         myLayerValues[myLayerValues.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
 
-        myANN.backpropagate(givenInput, myLayerValues, -learningRate);
+        for (int k = myANN.countCalculationLayers() - 1; k >= 0; k--) {
+            myANN.getLayer(k).adjust(k == 0 ? givenInput : myANN.getLayer(k - 1).getOutput(), myLayerValues[k + 1], -learningRate, myLayerValues[k]);
+        }
     }
 
     public void trainColumns(Access2D<Double> givenInput, Access2D<Double> desiredOutput, double learningRate) {

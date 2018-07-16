@@ -37,62 +37,61 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Double>> {
 
+    /**
+     * https://en.wikipedia.org/wiki/Activation_function
+     *
+     * @author apete
+     */
     public static enum Activator {
 
-        /**
-         * (-,+)
-         */
-        IDENTITY(args -> (arg -> arg), arg -> ONE, true, ZERO),
-        /**
-         * ReLU: [0,+)
-         */
-        RECTIFIER(args -> (arg -> Math.max(ZERO, arg)), arg -> arg > ZERO ? ONE : ZERO, true, ONE),
-        /**
-         * [0,1]
-         */
-        SIGMOID(args -> (PrimitiveFunction.LOGISTIC), arg -> arg * (ONE - arg), true, HALF),
-        /**
-         * [0,1] <br>
-         * Currently this can only be used in the final layer in combination with {@link Error#CROSS_ENTROPY}.
-         * All other usage will give incorrect network training.
-         */
-        SOFTMAX(args -> {
-            PrimitiveDenseStore parts = args.copy();
-            parts.modifyAll(PrimitiveFunction.EXP);
-            final double total = parts.aggregateAll(Aggregator.SUM);
-            return arg -> PrimitiveFunction.EXP.invoke(arg) / total;
-        }, arg -> ONE, false, HALF),
-        /**
-         * [-1,1]
-         */
-        TANH(args -> (PrimitiveFunction.TANH), arg -> ONE - (arg * arg), true, ZERO);
+    /**
+     * (-,+)
+     */
+    IDENTITY(args -> (arg -> arg), arg -> ONE, true),
+    /**
+     * ReLU: [0,+)
+     */
+    RECTIFIER(args -> (arg -> Math.max(ZERO, arg)), arg -> arg > ZERO ? ONE : ZERO, true),
+    /**
+     * [0,1]
+     */
+    SIGMOID(args -> (PrimitiveFunction.LOGISTIC), arg -> arg * (ONE - arg), true),
+    /**
+     * [0,1] <br>
+     * Currently this can only be used in the final layer in combination with {@link Error#CROSS_ENTROPY}. All
+     * other usage will give incorrect network training.
+     */
+    SOFTMAX(args -> {
+        PrimitiveDenseStore parts = args.copy();
+        parts.modifyAll(PrimitiveFunction.EXP);
+        final double total = parts.aggregateAll(Aggregator.SUM);
+        return arg -> PrimitiveFunction.EXP.invoke(arg) / total;
+    }, arg -> ONE, false),
+    /**
+     * [-1,1]
+     */
+    TANH(args -> (PrimitiveFunction.TANH), arg -> ONE - (arg * arg), true);
 
         private final PrimitiveFunction.Unary myDerivativeInTermsOfOutput;
         private final ActivatorFunctionFactory myFunction;
         private final boolean mySingleFolded;
-        private final double myCenter;
 
-        Activator(ActivatorFunctionFactory function, PrimitiveFunction.Unary derivativeInTermsOfOutput, boolean singleFolded, double center) {
+        Activator(ActivatorFunctionFactory function, PrimitiveFunction.Unary derivativeInTermsOfOutput, boolean singleFolded) {
             myFunction = function;
             myDerivativeInTermsOfOutput = derivativeInTermsOfOutput;
             mySingleFolded = singleFolded;
-            myCenter = center;
-        }
-
-        boolean isSingleFolded() {
-            return mySingleFolded;
         }
 
         PrimitiveFunction.Unary getDerivativeInTermsOfOutput() {
             return myDerivativeInTermsOfOutput;
         }
 
-        double getCenter() {
-            return myCenter;
-        }
-
         PrimitiveFunction.Unary getFunction(PrimitiveDenseStore arguments) {
             return myFunction.make(arguments);
+        }
+
+        boolean isSingleFolded() {
+            return mySingleFolded;
         }
     }
 
@@ -202,12 +201,6 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return tmpBuilder.toString();
     }
 
-    void backpropagate(Access1D<Double> networkInput, PrimitiveDenseStore[] layerGradients, double learningRate) {
-        for (int k = myLayers.length - 1; k >= 0; k--) {
-            myLayers[k].adjust(k == 0 ? networkInput : myLayers[k - 1].getOutput(), layerGradients[k + 1], learningRate, layerGradients[k]);
-        }
-    }
-
     int countCalculationLayers() {
         return myLayers.length;
     }
@@ -245,12 +238,6 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
             retVal.add(myLayers[i].getLogicalWeights());
         }
         return retVal;
-    }
-
-    void randomise() {
-        for (int i = 0, limit = myLayers.length; i < limit; i++) {
-            myLayers[i].randomise();
-        }
     }
 
 }

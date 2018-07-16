@@ -23,7 +23,7 @@ package org.ojalgo.ann;
 
 abstract class ANNTest {
 
-    protected static final boolean DEBUG = true;
+    protected static final boolean DEBUG = false;
 
     public ANNTest() {
         super();
