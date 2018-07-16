@@ -155,10 +155,10 @@ final class CalculationLayer implements UnaryOperator<Access1D<Double>> {
 
     void randomise() {
 
-        Normal generator = new Normal(ONE / myWeights.countRows(), HALF);
+        Normal generator = new Normal(ONE / myWeights.countRows(), ONE);
 
         myWeights.fillAll(generator);
-        myBias.fillAll(generator);
+        myBias.fillAll(myActivator.getCenter() - HALF);
     }
 
     void setActivator(Activator activator) {

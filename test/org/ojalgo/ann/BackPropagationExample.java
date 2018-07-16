@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -205,16 +204,5 @@ abstract class BackPropagationExample extends ANNTest {
     protected abstract List<Data> getTestCases();
 
     protected abstract NumberContext precision();
-
-    void compare(Access1D<Double> input, ArtificialNeuralNetwork network, NumberContext precision, Access1D<Double>... layerOutput) {
-
-        Access1D<Double> output = network.apply(input);
-        TestUtils.assertEquals(output, network.getOutput(layerOutput.length - 1), precision);
-
-        for (int l = 0; l < layerOutput.length; l++) {
-            TestUtils.assertEquals(layerOutput[l], network.getOutput(l), precision);
-        }
-
-    }
 
 }

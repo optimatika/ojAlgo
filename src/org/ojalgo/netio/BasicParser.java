@@ -117,4 +117,8 @@ public interface BasicParser<T> {
         this.parse(reader, false, consumer);
     }
 
+    default void parse(final String filePath, boolean skipHeader, final Consumer<T> consumer) {
+        this.parse(new File(filePath), skipHeader, consumer);
+    }
+
 }

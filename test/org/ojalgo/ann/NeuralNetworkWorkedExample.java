@@ -25,16 +25,14 @@ import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
 import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import java.io.File;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
+import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.LineSplittingParser;
 import org.ojalgo.type.context.NumberContext;
 
@@ -46,68 +44,27 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class NeuralNetworkWorkedExample extends BackPropagationExample {
 
+    private static final double _255_0 = 255.0;
     private static final NumberContext PRECISION = new NumberContext(5, 5);
 
     public NeuralNetworkWorkedExample() {
         super();
     }
 
+    /**
+     * Train on the "training" data with random weights and normalised input, and test against the "test"
+     * data.
+     */
     @Test
-    public void testNeuralNetworkWorkedExample() {
+    public void testTraining() {
 
-        NumberContext precision = this.precision();
-        Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
-
-        NetworkBuilder builder = this.getInitialNetwork();
-
-        ArtificialNeuralNetwork network = builder.get();
-
-        PrimitiveDenseStore input_1 = factory.rows(new double[] { 252, 4, 155, 175 });
-        PrimitiveDenseStore input_2 = factory.rows(new double[] { 175, 10, 186, 200 });
-        PrimitiveDenseStore input_3 = factory.rows(new double[] { 82, 131, 230, 100 });
-        PrimitiveDenseStore input_4 = factory.rows(new double[] { 115, 138, 80, 88 });
-
-        PrimitiveDenseStore layer0_1 = factory.rows(new double[] { 0.39558, 0.75548 });
-        PrimitiveDenseStore layer0_2 = factory.rows(new double[] { 0.47145, 0.58025 });
-        PrimitiveDenseStore layer0_3 = factory.rows(new double[] { 0.77841, 0.70603 });
-        PrimitiveDenseStore layer0_4 = factory.rows(new double[] { 0.50746, 0.71304 });
-
-        PrimitiveDenseStore layer1_1 = factory.rows(new double[] { 0.49865, 0.50135 });
-        PrimitiveDenseStore layer1_2 = factory.rows(new double[] { 0.49826, 0.50174 });
-        PrimitiveDenseStore layer1_3 = factory.rows(new double[] { 0.49747, 0.50253 });
-        PrimitiveDenseStore layer1_4 = factory.rows(new double[] { 0.49828, 0.50172 });
-
-        this.compare(input_1, network, precision, layer0_1, layer1_1);
-        this.compare(input_2, network, precision, layer0_2, layer1_2);
-        this.compare(input_3, network, precision, layer0_3, layer1_3);
-        this.compare(input_4, network, precision, layer0_4, layer1_4);
-
-        PrimitiveDenseStore target_1 = factory.rows(new double[] { 1, 0 });
-        PrimitiveDenseStore target_2 = factory.rows(new double[] { 1, 0 });
-        PrimitiveDenseStore target_3 = factory.rows(new double[] { 0, 1 });
-        PrimitiveDenseStore target_4 = factory.rows(new double[] { 0, 1 });
-
-        PrimitiveDenseStore input = factory.rows(input_1, input_2, input_3, input_4);
-        PrimitiveDenseStore target = factory.rows(target_1, target_2, target_3, target_4);
-        PrimitiveDenseStore expected_output = factory.rows(layer1_1, layer1_2, layer1_3, layer1_4);
-        // Access2D<Double> actual_output = network.applyBatch(input);
-
-        // TestUtils.assertEquals(expected_output, actual_output, precision);
-
-        builder.train(input_1, target_1, 0.1);
-        builder.train(input_2, target_2, 0.1);
-        builder.train(input_3, target_3, 0.1);
-        builder.train(input_4, target_4, 0.1);
-
-        builder.trainRows(input, target, 0.1);
+        NetworkBuilder builder = this.getInitialNetwork().randomise();
 
         LineSplittingParser parser = new LineSplittingParser(",", true);
 
-        builder.randomise();
+        for (int i = 0; i < 1000; i++) {
 
-        for (int i = 0; i < 10; i++) {
-
-            parser.parse(new File("./test/org/ojalgo/ann/train.csv"), true, columns -> {
+            parser.parse("./test/org/ojalgo/ann/train.csv", true, columns -> {
 
                 // R1C1,R1C2,R2C1,R2C2,IsStairs
                 double R1C1 = Double.parseDouble(columns[1]);
@@ -116,18 +73,19 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
                 double R2C2 = Double.parseDouble(columns[4]);
                 int IsStairs = Integer.parseInt(columns[5]);
 
-                PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.rows(new double[] { R1C1 / 255.0, R1C2 / 255.0, R2C1 / 255.0, R2C2 / 255.0 });
-                PrimitiveDenseStore output_csv = PrimitiveDenseStore.FACTORY.rows(new double[] { IsStairs, ONE - IsStairs });
+                PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
+                PrimitiveDenseStore output_csv = PrimitiveDenseStore.FACTORY.row(IsStairs, ONE - IsStairs);
 
-                builder.train(input_csv, output_csv, 0.1);
+                builder.train(input_csv, output_csv, 0.01);
             });
 
         }
 
+        ArtificialNeuralNetwork network = builder.get();
         AtomicInteger correct = new AtomicInteger();
         AtomicInteger wrong = new AtomicInteger();
 
-        parser.parse(new File("./test/org/ojalgo/ann/test.csv"), true, columns -> {
+        parser.parse("./test/org/ojalgo/ann/test.csv", true, columns -> {
 
             // R1C1,R1C2,R2C1,R2C2,IsStairs
             double R1C1 = Double.parseDouble(columns[1]);
@@ -136,11 +94,10 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
             double R2C2 = Double.parseDouble(columns[4]);
             int IsStairs = Integer.parseInt(columns[5]);
 
-            PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.rows(new double[] { R1C1 / 255.0, R1C2 / 255.0, R2C1 / 255.0, R2C2 / 255.0 });
+            PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
 
             Access1D<Double> output_net = network.apply(input_csv);
 
-            BasicLogger.debug("{}, but was {}", IsStairs, output_net.doubleValue(0));
             if (IsStairs == Math.round(output_net.doubleValue(0))) {
                 correct.incrementAndGet();
             } else {
@@ -148,13 +105,9 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
             }
         });
 
-        BasicLogger.debug(correct.doubleValue() / wrong.doubleValue());
-
-    }
-
-    @Override
-    protected NumberContext precision() {
-        return PRECISION;
+        double quotient = correct.doubleValue() / wrong.doubleValue();
+        // Can get quotients of more than 30. 5.0 should be a safe limit
+        TestUtils.assertTrue(Double.toString(quotient), quotient > FIVE);
     }
 
     @Override
@@ -188,13 +141,20 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
     @Override
     protected List<Data> getTestCases() {
 
-        Data retVal = new Data(0.01);
+        List<Data> retVal = new ArrayList<>();
 
-        //        retVal.input();
-        //        retVal.target();
-        //        retVal.expected();
+        // In the example the input is not normalised (which is very odd)
+        retVal.add(new Data().input(252, 4, 155, 175).target(1, 0).expected(0.49865, 0.50135));
+        retVal.add(new Data().input(175, 10, 186, 200).target(1, 0).expected(0.49826, 0.50174));
+        retVal.add(new Data().input(82, 131, 230, 100).target(0, 1).expected(0.49747, 0.50253));
+        retVal.add(new Data().input(115, 138, 80, 88).target(0, 1).expected(0.49828, 0.50172));
 
-        return Collections.emptyList();
+        return retVal;
+    }
+
+    @Override
+    protected NumberContext precision() {
+        return PRECISION;
     }
 
 }

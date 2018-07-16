@@ -124,7 +124,7 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
 
     @Override
     public void testFeedForward() {
-        // Example output
+        // No example output
         ;
     }
 

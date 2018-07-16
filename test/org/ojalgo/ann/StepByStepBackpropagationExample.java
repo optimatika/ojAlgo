@@ -61,9 +61,11 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
 
         ArtificialNeuralNetwork network = builder.get();
 
-        PrimitiveDenseStore givenInput = factory.rows(new double[] { 0.05, 0.10 });
-        PrimitiveDenseStore targetOutput = factory.rows(new double[] { 0.01, 0.99 });
-        Access1D<Double> expectedOutput = factory.rows(new double[] { 0.75136507, 0.772928465 });
+        Data testCase = this.getTestCases().get(0);
+
+        PrimitiveDenseStore givenInput = testCase.input;
+        PrimitiveDenseStore targetOutput = testCase.target;
+        Access1D<Double> expectedOutput = testCase.expected;
         Access1D<Double> actualOutput = network.apply(givenInput);
 
         TestUtils.assertEquals(expectedOutput, actualOutput, precision);
