@@ -47,9 +47,10 @@ public interface BasicParser<T> {
      * Will parse this file, line by line, passing the reulting objects (1 per line) to the supplied consumer.
      *
      * @param file The CSV file to parse
+     * @param skipHeader Should skip (1) header row/line
      * @param consumer The results consumer
      */
-    default void parse(final File file, final Consumer<T> consumer) {
+    default void parse(final File file, boolean skipHeader, final Consumer<T> consumer) {
 
         if (file.exists() && file.isFile() && file.canRead()) {
 
@@ -58,11 +59,11 @@ public interface BasicParser<T> {
             try {
 
                 if (tmpPath.endsWith(".gz")) {
-                    this.parse(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))), consumer);
+                    this.parse(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))), skipHeader, consumer);
                 } else if (tmpPath.endsWith(".zip")) {
-                    this.parse(new InputStreamReader(new ZipInputStream(new FileInputStream(file))), consumer);
+                    this.parse(new InputStreamReader(new ZipInputStream(new FileInputStream(file))), skipHeader, consumer);
                 } else {
-                    this.parse(new InputStreamReader(new FileInputStream(file)), consumer);
+                    this.parse(new InputStreamReader(new FileInputStream(file)), skipHeader, consumer);
                 }
 
             } catch (final IOException exception) {
@@ -72,14 +73,28 @@ public interface BasicParser<T> {
     }
 
     /**
-     * @param reader The CSV data reader
+     * Will parse this file, line by line, passing the reulting objects (1 per line) to the supplied consumer.
+     *
+     * @param file The CSV file to parse
      * @param consumer The results consumer
      */
-    default void parse(final Reader reader, final Consumer<T> consumer) {
+    default void parse(final File file, final Consumer<T> consumer) {
+        this.parse(file, false, consumer);
+    }
+
+    /**
+     * @param reader The CSV data reader
+     * @param skipHeader Should skip (1) header row/line
+     * @param consumer The results consumer
+     */
+    default void parse(final Reader reader, boolean skipHeader, final Consumer<T> consumer) {
 
         String tmpLine = null;
         T tmpItem = null;
         try (final BufferedReader tmpBufferedReader = new BufferedReader(reader)) {
+            if (skipHeader) {
+                tmpBufferedReader.readLine();
+            }
             while ((tmpLine = tmpBufferedReader.readLine()) != null) {
                 try {
                     if ((tmpLine.length() > 0) && !tmpLine.startsWith("#") && ((tmpItem = this.parse(tmpLine)) != null)) {
@@ -92,6 +107,18 @@ public interface BasicParser<T> {
         } catch (final IOException exception) {
             exception.printStackTrace();
         }
+    }
+
+    /**
+     * @param reader The CSV data reader
+     * @param consumer The results consumer
+     */
+    default void parse(final Reader reader, final Consumer<T> consumer) {
+        this.parse(reader, false, consumer);
+    }
+
+    default void parse(final String filePath, boolean skipHeader, final Consumer<T> consumer) {
+        this.parse(new File(filePath), skipHeader, consumer);
     }
 
 }
