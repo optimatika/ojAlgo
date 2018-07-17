@@ -1,7 +1,8 @@
+import static org.ojalgo.function.PrimitiveFunction.*;
+
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive32Array;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -98,7 +99,7 @@ public class CodeSnippets {
         TestUtils.assertEquals(expSquared, actSquared);
 
         final PhysicalStore<Double> copied = v.copy();
-        copied.loopRow(0, (r, c) -> copied.modifyColumn(c, PrimitiveFunction.MULTIPLY.second(values.doubleValue(c) * values.doubleValue(c))));
+        copied.loopRow(0, (r, c) -> copied.modifyColumn(c, MULTIPLY.second(values.doubleValue(c) * values.doubleValue(c))));
         final MatrixStore<Double> actSquared2 = copied.multiply(v.conjugate());
 
         TestUtils.assertEquals(expSquared, actSquared2);
@@ -108,6 +109,14 @@ public class CodeSnippets {
         matrix.logical().limits(3, 3).offsets(1, 1).get();
 
         matrix.logical().offsets(1, 1).get();
+
+        MatrixStore<Double> matrixStore = org;
+        MatrixStore<Double> anotherStore = org;
+
+        matrixStore.operateOnMatching(MULTIPLY, anotherStore).get();
+
+        PhysicalStore<Double> result = matrixStore.copy();
+        result.modifyMatching(MULTIPLY, anotherStore);
 
     }
 

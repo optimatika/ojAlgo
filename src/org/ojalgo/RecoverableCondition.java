@@ -48,7 +48,7 @@ public final class RecoverableCondition extends Exception implements EffectiveTh
         super();
     }
 
-    RecoverableCondition(final String message) {
+    public RecoverableCondition(final String message) {
         super(message);
     }
 
