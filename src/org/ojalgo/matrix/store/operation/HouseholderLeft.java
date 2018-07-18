@@ -21,14 +21,9 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.DOT;
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.transformation.Householder;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 public final class HouseholderLeft extends MatrixOperation {
@@ -36,52 +31,6 @@ public final class HouseholderLeft extends MatrixOperation {
     public static final HouseholderLeft SETUP = new HouseholderLeft();
 
     public static int THRESHOLD = 128;
-
-    public static void invoke(final BigDecimal[] data, final int structure, final int first, final int limit, final Householder.Big householder) {
-
-        final BigDecimal[] tmpHouseholderVector = householder.vector;
-        final int tmpFirstNonZero = householder.first;
-        final BigDecimal tmpBeta = householder.beta;
-
-        BigDecimal tmpScale;
-        int tmpIndex;
-        for (int j = first; j < limit; j++) {
-            tmpScale = BigMath.ZERO;
-            tmpIndex = tmpFirstNonZero + (j * structure);
-            for (int i = tmpFirstNonZero; i < structure; i++) {
-                tmpScale = BigFunction.ADD.invoke(tmpScale, BigFunction.MULTIPLY.invoke(tmpHouseholderVector[i], data[tmpIndex++]));
-            }
-            tmpScale = BigFunction.MULTIPLY.invoke(tmpScale, tmpBeta);
-            tmpIndex = tmpFirstNonZero + (j * structure);
-            for (int i = tmpFirstNonZero; i < structure; i++) {
-                data[tmpIndex] = BigFunction.SUBTRACT.invoke(data[tmpIndex], BigFunction.MULTIPLY.invoke(tmpScale, tmpHouseholderVector[i]));
-                tmpIndex++;
-            }
-        }
-    }
-
-    public static void invoke(final ComplexNumber[] data, final int structure, final int first, final int limit, final Householder.Complex householder) {
-
-        final ComplexNumber[] tmpHouseholderVector = householder.vector;
-        final int tmpFirstNonZero = householder.first;
-        final ComplexNumber tmpBeta = householder.beta;
-
-        ComplexNumber tmpScale;
-        int tmpIndex;
-        for (int j = first; j < limit; j++) {
-            tmpScale = ComplexNumber.ZERO;
-            tmpIndex = tmpFirstNonZero + (j * structure);
-            for (int i = tmpFirstNonZero; i < structure; i++) {
-                tmpScale = tmpScale.add(tmpHouseholderVector[i].conjugate().multiply(data[tmpIndex++]));
-            }
-            tmpScale = tmpScale.multiply(tmpBeta);
-            tmpIndex = tmpFirstNonZero + (j * structure);
-            for (int i = tmpFirstNonZero; i < structure; i++) {
-                data[tmpIndex] = data[tmpIndex].subtract(tmpScale.multiply(tmpHouseholderVector[i]));
-                tmpIndex++;
-            }
-        }
-    }
 
     public static void invoke(final double[] data, final int structure, final int first, final int limit, final Householder.Primitive householder) {
 

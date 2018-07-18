@@ -41,7 +41,6 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Factory;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -849,9 +848,9 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        final PhysicalStore<BigDecimal> tmpSolution = BigDenseStore.FACTORY.copy(RationalMatrix.FACTORY.columns(tmpResult));
+        final Array1D<BigDecimal> tmpSolution = Array1D.BIG.copy(tmpResult);
         tmpSolution.modifyAll(new NumberContext(7, 6).getFunction(BigFunction.getSet()));
-        for (final BigDecimal tmpBigDecimal : tmpSolution.asList()) {
+        for (final BigDecimal tmpBigDecimal : tmpSolution) {
             if ((tmpBigDecimal.compareTo(BigMath.ZERO) == -1) || (tmpBigDecimal.compareTo(BigMath.ONE) == 1)) {
                 TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
             }

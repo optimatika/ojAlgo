@@ -33,6 +33,7 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.ExpressionsBasedModel.Intermediate;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
@@ -40,6 +41,42 @@ import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
 public class IntegerProblems {
+
+    static ExpressionsBasedModel makeP20140819() {
+
+        final ExpressionsBasedModel retVal = new ExpressionsBasedModel();
+
+        final double[] tmpWeights = new double[] { 2691.5357279536333, 2600.760150603986, 2605.8958795795374, 2606.7208332501104, 2715.0757845953835,
+                2602.194912040238, 2606.0069468717575, 2609.0385816244316, 2750.0520522057927, 2602.048261785581, 2600.507229973181, 2602.046307869504,
+                2721.343937605796, 2601.7367414553805, 2600.595318433882, 2599.405979211142 };
+
+        for (int v = 0; v < tmpWeights.length; v++) {
+            retVal.addVariable(Variable.make("x" + v).integer(true).lower(0).upper(414).weight(tmpWeights[v]));
+        }
+
+        // 117 <= 30 30 30 30 0 4 0 0 0 4 0 0 0 4 0 0 <= 14868
+        // 36 <= 0 4 0 0 40 40 40 40 0 0 4 0 0 0 4 0 <= 170569
+        // 341 <= 0 0 8 0 0 0 8 0 68 68 68 68 0 0 0 5 <= 140833
+        // 413 <= 0 0 0 8 0 0 0 9 0 0 0 6 59 59 59 59 <= 48321
+
+        final int[] tmpLower = new int[] { 117, 36, 341, 413 };
+        final int[] tmpUpper = new int[] { 14868, 170569, 140833, 48321 };
+        final int[][] tmpFactors = new int[4][];
+        tmpFactors[0] = new int[] { 30, 30, 30, 30, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0 };
+        tmpFactors[1] = new int[] { 0, 4, 0, 0, 40, 40, 40, 40, 0, 0, 4, 0, 0, 0, 4, 0 };
+        tmpFactors[2] = new int[] { 0, 0, 8, 0, 0, 0, 8, 0, 68, 68, 68, 68, 0, 0, 0, 5 };
+        tmpFactors[3] = new int[] { 0, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0, 6, 59, 59, 59, 59 };
+
+        for (int c = 0; c < tmpFactors.length; c++) {
+            final Expression tmpExpr = retVal.addExpression("C" + c);
+            tmpExpr.lower(tmpLower[c]).upper(tmpUpper[c]);
+            for (int v = 0; v < tmpFactors[c].length; v++) {
+                tmpExpr.set(v, tmpFactors[c][v]);
+            }
+        }
+
+        return retVal;
+    }
 
     /**
      * 20120227: Forgot to document what the problem was. Now I just check there is an optimal solution.
@@ -252,49 +289,169 @@ public class IntegerProblems {
     @Test
     public void testP20140819() {
 
-        final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
+        final ExpressionsBasedModel model = IntegerProblems.makeP20140819();
 
-        final double[] tmpWeights = new double[] { 2691.5357279536333, 2600.760150603986, 2605.8958795795374, 2606.7208332501104, 2715.0757845953835,
-                2602.194912040238, 2606.0069468717575, 2609.0385816244316, 2750.0520522057927, 2602.048261785581, 2600.507229973181, 2602.046307869504,
-                2721.343937605796, 2601.7367414553805, 2600.595318433882, 2599.405979211142 };
+        // model.options.debug(IntegerSolver.class);
 
-        for (int v = 0; v < tmpWeights.length; v++) {
-            tmpModel.addVariable(Variable.make("x" + v).integer(true).lower(0).upper(414).weight(tmpWeights[v]));
-        }
-
-        // 117 <= 30 30 30 30 0 4 0 0 0 4 0 0 0 4 0 0 <= 14868
-        // 36 <= 0 4 0 0 40 40 40 40 0 0 4 0 0 0 4 0 <= 170569
-        // 341 <= 0 0 8 0 0 0 8 0 68 68 68 68 0 0 0 5 <= 140833
-        // 413 <= 0 0 0 8 0 0 0 9 0 0 0 6 59 59 59 59 <= 48321
-
-        final int[] tmpLower = new int[] { 117, 36, 341, 413 };
-        final int[] tmpUpper = new int[] { 14868, 170569, 140833, 48321 };
-        final int[][] tmpFactors = new int[4][];
-        tmpFactors[0] = new int[] { 30, 30, 30, 30, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0 };
-        tmpFactors[1] = new int[] { 0, 4, 0, 0, 40, 40, 40, 40, 0, 0, 4, 0, 0, 0, 4, 0 };
-        tmpFactors[2] = new int[] { 0, 0, 8, 0, 0, 0, 8, 0, 68, 68, 68, 68, 0, 0, 0, 5 };
-        tmpFactors[3] = new int[] { 0, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0, 6, 59, 59, 59, 59 };
-
-        for (int c = 0; c < tmpFactors.length; c++) {
-            final Expression tmpExpr = tmpModel.addExpression("C" + c);
-            tmpExpr.lower(tmpLower[c]).upper(tmpUpper[c]);
-            for (int v = 0; v < tmpFactors[c].length; v++) {
-                tmpExpr.set(v, tmpFactors[c][v]);
-            }
-        }
-
-        // tmpModel.options.debug(IntegerSolver.class);
-
-        final Result tmpResult = tmpModel.minimise();
+        final Result fullResult = model.minimise();
 
         if (OptimisationIntegerTests.DEBUG) {
-            BasicLogger.debug(tmpResult);
-            BasicLogger.debug(tmpModel);
+            BasicLogger.debug(fullResult);
+            BasicLogger.debug(model);
         }
 
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
+        TestUtils.assertStateNotLessThanOptimal(fullResult);
+        TestUtils.assertTrue(model.validate(fullResult, BasicLogger.DEBUG));
+    }
 
-        TestUtils.assertTrue(tmpModel.validate(tmpResult));
+    @Test
+    public void testP20140819node() {
+
+        final ExpressionsBasedModel model = IntegerProblems.makeP20140819();
+
+        // model.options.debug(IntegerSolver.class);
+
+        int[] lowerBounds1 = new int[] { 0, 0, 0, 3, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0 };
+        int[] upperBounds1 = new int[] { 414, 414, 414, 414, 414, 0, 414, 0, 414, 414, 414, 414, 414, 414, 6, 0 };
+        for (int v = 0; v < upperBounds1.length; v++) {
+            model.getVariable(v).integer(false).lower(lowerBounds1[v]).upper(upperBounds1[v]);
+        }
+
+        final Result node1Result = model.minimise();
+
+        if (OptimisationIntegerTests.DEBUG) {
+            BasicLogger.debug(node1Result);
+            BasicLogger.debug(model);
+        }
+
+        TestUtils.assertStateNotLessThanOptimal(node1Result);
+        TestUtils.assertTrue(model.validate(node1Result, BasicLogger.DEBUG));
+    }
+
+    @Test
+    public void testP20140819fix1() {
+
+        final ExpressionsBasedModel expModel = IntegerProblems.makeP20140819();
+
+        int[] lowerBoundsExp = new int[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] upperBoundsExp = new int[] { 0, 2, 0, 0, 414, 1, 414, 414, 414, 5, 414, 0, 414, 8, 414, 414 };
+        for (int v = 0; v < upperBoundsExp.length; v++) {
+            expModel.getVariable(v).integer(false).lower(lowerBoundsExp[v]).upper(upperBoundsExp[v]);
+        }
+
+        final Result expResult = expModel.minimise();
+
+        TestUtils.assertStateLessThanFeasible(expResult);
+        TestUtils.assertFalse(expModel.validate(expResult));
+
+        final ExpressionsBasedModel actModel = IntegerProblems.makeP20140819();
+
+        int[] lowerBoundsAct = new int[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] upperBoundsAct = new int[] { 0, 2, 0, 0, 414, 414, 414, 414, 414, 5, 414, 0, 414, 8, 414, 414 };
+        for (int v = 0; v < upperBoundsAct.length; v++) {
+            actModel.getVariable(v).integer(false).lower(lowerBoundsAct[v]).upper(upperBoundsAct[v]);
+        }
+
+        actModel.setMinimisation();
+        Intermediate intermediate = actModel.prepare();
+        final Result nodeResult = intermediate.solve();
+
+        TestUtils.assertStateNotLessThanOptimal(nodeResult);
+        TestUtils.assertTrue(actModel.validate(nodeResult, BasicLogger.DEBUG));
+
+        Variable variableToFix = actModel.getVariable(5);
+        variableToFix.lower(1).upper(1);
+        intermediate.update(variableToFix);
+
+        final Result fixedResult = intermediate.solve();
+
+        TestUtils.assertStateLessThanFeasible(fixedResult);
+        TestUtils.assertFalse(expModel.validate(fixedResult));
+    }
+
+    @Test
+    public void testP20140819fix2() {
+
+        final ExpressionsBasedModel nodeModel = IntegerProblems.makeP20140819();
+
+        int[] nodeLowerBounds = new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] nodeUpperBounds = new int[] { 1, 1, 0, 0, 414, 0, 414, 414, 414, 5, 414, 0, 414, 414, 414, 414 };
+        for (int v = 0; v < nodeUpperBounds.length; v++) {
+            nodeModel.getVariable(v).integer(false).lower(nodeLowerBounds[v]).upper(nodeUpperBounds[v]);
+        }
+
+        final Result nodeResult = nodeModel.minimise();
+
+        TestUtils.assertStateNotLessThanOptimal(nodeResult);
+        TestUtils.assertTrue(nodeModel.validate(nodeResult, BasicLogger.DEBUG));
+
+        final ExpressionsBasedModel parentModel = IntegerProblems.makeP20140819();
+
+        int[] parentLowerBounds = new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 7, 0, 0 };
+        int[] parentUpperBounds = new int[] { 414, 1, 0, 0, 414, 0, 414, 414, 414, 5, 414, 0, 414, 414, 414, 414 };
+        for (int v = 0; v < parentUpperBounds.length; v++) {
+            parentModel.getVariable(v).integer(false).lower(parentLowerBounds[v]).upper(parentUpperBounds[v]);
+        }
+
+        parentModel.setMinimisation();
+        Intermediate intermediate = parentModel.prepare();
+        final Result parentResult = intermediate.solve();
+
+        TestUtils.assertStateNotLessThanOptimal(parentResult);
+        TestUtils.assertTrue(parentModel.validate(parentResult, BasicLogger.DEBUG));
+
+        Variable variableToFix = parentModel.getVariable(0);
+        variableToFix.lower(1).upper(1);
+        intermediate.update(variableToFix);
+
+        final Result fixedResult = intermediate.solve();
+
+        TestUtils.assertStateNotLessThanOptimal(fixedResult);
+        TestUtils.assertTrue(fixedResult.getValue() >= parentResult.getValue());
+        TestUtils.assertTrue(nodeModel.validate(fixedResult, BasicLogger.DEBUG));
+        TestUtils.assertStateAndSolution(nodeResult, fixedResult);
+    }
+
+    @Test
+    public void testP20140819fix3() {
+
+        final ExpressionsBasedModel nodeModel = IntegerProblems.makeP20140819();
+
+        int[] nodeLowerBounds = new int[] { 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 7, 0, 0 };
+        int[] nodeUpperBounds = new int[] { 0, 0, 2, 0, 414, 414, 414, 414, 414, 5, 0, 0, 414, 7, 414, 414 };
+        for (int v = 0; v < nodeUpperBounds.length; v++) {
+            nodeModel.getVariable(v).integer(false).lower(nodeLowerBounds[v]).upper(nodeUpperBounds[v]);
+        }
+
+        final Result nodeResult = nodeModel.minimise();
+
+        TestUtils.assertStateNotLessThanOptimal(nodeResult);
+        TestUtils.assertTrue(nodeModel.validate(nodeResult, BasicLogger.DEBUG));
+
+        final ExpressionsBasedModel parentModel = IntegerProblems.makeP20140819();
+
+        int[] parentLowerBounds = new int[] { 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 7, 0, 0 };
+        int[] parentUpperBounds = new int[] { 0, 0, 2, 0, 414, 414, 414, 414, 414, 5, 0, 0, 414, 8, 414, 414 };
+        for (int v = 0; v < parentUpperBounds.length; v++) {
+            parentModel.getVariable(v).integer(false).lower(parentLowerBounds[v]).upper(parentUpperBounds[v]);
+        }
+
+        parentModel.setMinimisation();
+        Intermediate intermediate = parentModel.prepare();
+        final Result parentResult = intermediate.solve();
+
+        TestUtils.assertStateNotLessThanOptimal(parentResult);
+        TestUtils.assertTrue(parentModel.validate(parentResult, BasicLogger.DEBUG));
+
+        Variable variableToFix = parentModel.getVariable(13);
+        variableToFix.lower(7).upper(7);
+        intermediate.update(variableToFix);
+
+        final Result fixedResult = intermediate.solve();
+
+        TestUtils.assertStateNotLessThanOptimal(fixedResult);
+        TestUtils.assertTrue(nodeModel.validate(fixedResult, BasicLogger.DEBUG));
+        TestUtils.assertStateAndSolution(nodeResult, fixedResult);
     }
 
     @Test

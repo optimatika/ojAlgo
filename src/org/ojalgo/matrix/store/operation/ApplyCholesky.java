@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.scalar.Scalar;
 
@@ -31,12 +29,6 @@ public final class ApplyCholesky extends MatrixOperation {
     public static final ApplyCholesky SETUP = new ApplyCholesky();
 
     public static int THRESHOLD = 128;
-
-    public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int columnLimit, final BigDecimal[] multipliers) {
-        for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, multipliers[j].negate(), multipliers, 0, j, structure);
-        }
-    }
 
     public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers) {
         for (int j = firstColumn; j < columnLimit; j++) {

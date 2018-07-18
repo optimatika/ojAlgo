@@ -22,8 +22,8 @@
 package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.scalar.ComplexNumber;
 
 public class SelectedColumnsCase extends NonPhysicalTest {
 
@@ -33,16 +33,16 @@ public class SelectedColumnsCase extends NonPhysicalTest {
         final int tmpRowDim = Uniform.randomInteger(1, 9);
         final int tmpColDim = Uniform.randomInteger(1, 9);
 
-        final BasicMatrix tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        final MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
         final int[] tmpCols = new int[Uniform.randomInteger(1, tmpColDim)];
         for (int i = 0; i < tmpCols.length; i++) {
             tmpCols[i] = Uniform.randomInteger(tmpColDim);
         }
 
-        myBigStore = new ColumnsStore<>(BigDenseStore.FACTORY.copy(tmpBase), tmpCols);
-        myComplexStore = new ColumnsStore<>(ComplexDenseStore.FACTORY.copy(tmpBase), tmpCols);
-        myPrimitiveStore = new ColumnsStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), tmpCols);
+        rationalStore = new ColumnsStore<>(GenericDenseStore.RATIONAL.copy(tmpBase), tmpCols);
+        complexStore = new ColumnsStore<>(GenericDenseStore.COMPLEX.copy(tmpBase), tmpCols);
+        primitiveStore = new ColumnsStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), tmpCols);
     }
 
 }

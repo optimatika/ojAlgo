@@ -21,12 +21,8 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access2D;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.scalar.Scalar;
 
 public final class SubstituteBackwards extends MatrixOperation {
@@ -34,40 +30,6 @@ public final class SubstituteBackwards extends MatrixOperation {
     public static final SubstituteBackwards SETUP = new SubstituteBackwards();
 
     public static int THRESHOLD = 64;
-
-    public static void invoke(final BigDecimal[] data, final int structure, final int first, final int limit, final Access2D<BigDecimal> body,
-            final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
-
-        final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
-        final BigDecimal[] tmpBodyRow = new BigDecimal[tmpDiagDim];
-        BigDecimal tmpVal;
-        int tmpColBaseIndex;
-
-        final int tmpFirstRow = hermitian ? first : 0;
-        for (int i = tmpDiagDim - 1; i >= tmpFirstRow; i--) {
-
-            for (int j = i; j < tmpDiagDim; j++) {
-                tmpBodyRow[j] = conjugated ? body.get(j, i) : body.get(i, j);
-            }
-
-            final int tmpColumnLimit = hermitian ? Math.min(i + 1, limit) : limit;
-            for (int s = first; s < tmpColumnLimit; s++) {
-
-                tmpColBaseIndex = s * structure;
-
-                tmpVal = BigMath.ZERO;
-                for (int j = i + 1; j < tmpDiagDim; j++) {
-                    tmpVal = tmpVal.add(tmpBodyRow[j].multiply(data[j + tmpColBaseIndex]));
-                }
-                tmpVal = data[i + tmpColBaseIndex].subtract(tmpVal);
-                if (!unitDiagonal) {
-                    tmpVal = BigFunction.DIVIDE.invoke(tmpVal, tmpBodyRow[i]);
-                }
-
-                data[i + tmpColBaseIndex] = tmpVal;
-            }
-        }
-    }
 
     public static void invoke(final double[] data, final int structure, final int first, final int limit, final Access2D<Double> body,
             final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {

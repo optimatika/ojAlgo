@@ -27,6 +27,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -47,7 +48,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
         } else {
             tmpBody = MatrixStore.PRIMITIVE.makeWrapper(body).get();
         }
-        final MatrixStore<Double> tmpBodyDiagonal = PrimitiveDenseStore.FACTORY.columns(tmpBody.sliceDiagonal(0L, 0L));
+        final MatrixStore<Double> tmpBodyDiagonal = PrimitiveDenseStore.FACTORY.columns(tmpBody.sliceDiagonal());
 
         MatrixStore<Double> tmpRHS = null;
         if ((rhs instanceof MatrixStore<?>) && (rhs.get(0L) instanceof Double)) {
@@ -57,6 +58,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
         }
 
         final PhysicalStore<Double> tmpIncrement = this.preallocate(body, rhs);
+        ElementsConsumer<Double> incremetReceiver = body.isFat() ? tmpIncrement.regionByLimits((int) body.countRows(), 1) : tmpIncrement;
 
         double tmpNormErr = POSITIVE_INFINITY;
         final double tmpNormRHS = tmpRHS.aggregateAll(Aggregator.NORM2);
@@ -67,7 +69,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
         final double tmpRelaxation = this.getRelaxationFactor();
         do {
 
-            current.premultiply(tmpBody).operateOnMatching(tmpRHS, SUBTRACT).supplyTo(tmpIncrement);
+            current.premultiply(tmpBody).operateOnMatching(tmpRHS, SUBTRACT).supplyTo(incremetReceiver);
             tmpNormErr = tmpIncrement.aggregateAll(Aggregator.NORM2);
             tmpIncrement.modifyMatching(DIVIDE, tmpBodyDiagonal);
 

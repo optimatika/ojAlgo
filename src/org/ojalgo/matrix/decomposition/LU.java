@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -60,8 +58,6 @@ public interface LU<N extends Number> extends LDU<N> {
 
     }
 
-    public static final Factory<BigDecimal> BIG = typical -> new LUDecomposition.Big();
-
     public static final Factory<ComplexNumber> COMPLEX = typical -> new LUDecomposition.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> {
@@ -81,8 +77,10 @@ public interface LU<N extends Number> extends LDU<N> {
 
         final N tmpNumber = typical.get(0, 0);
 
-        if (tmpNumber instanceof BigDecimal) {
-            return (LU<N>) BIG.make(typical);
+        if (tmpNumber instanceof RationalNumber) {
+            return (LU<N>) RATIONAL.make(typical);
+        } else if (tmpNumber instanceof Quaternion) {
+            return (LU<N>) QUATERNION.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
             return (LU<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {

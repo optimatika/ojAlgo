@@ -50,10 +50,28 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     }
 
     @FunctionalInterface
+    public static interface Consumer extends ConsumerFunction<Double> {
+
+        default void invoke(final Double arg) {
+            this.invoke(arg.doubleValue());
+        }
+
+    }
+
+    @FunctionalInterface
     public static interface Parameter extends ParameterFunction<Double> {
 
         default Double invoke(final Double arg, final int param) {
             return this.invoke(arg.doubleValue(), param);
+        }
+
+    }
+
+    @FunctionalInterface
+    public static interface Predicate extends PredicateFunction<Double> {
+
+        default boolean invoke(final Double arg) {
+            return this.invoke(arg.doubleValue());
         }
 
     }

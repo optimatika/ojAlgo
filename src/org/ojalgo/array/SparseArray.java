@@ -34,7 +34,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.ConsumerFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -142,21 +142,31 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     public static final class SparseFactory<N extends Number> extends StrategyBuilder<N, SparseArray<N>, SparseFactory<N>> {
 
-        private final long myCount;
+        SparseFactory(final DenseArray.Factory<N> denseFactory) {
+            super(denseFactory);
+        }
 
         SparseFactory(final DenseArray.Factory<N> denseFactory, final long count) {
             super(denseFactory);
-            myCount = count;
+            this.getStrategy().limit(count);
         }
 
         @Override
         public SparseArray<N> make() {
-            return new SparseArray<>(myCount, this.getStrategy());
+            return new SparseArray<>(this.getStrategy().limit(), this.getStrategy());
+        }
+
+        public SparseArray<N> make(long count) {
+            return new SparseArray<>(count, this.getStrategy().limit(count));
         }
 
     }
 
     static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
+
+    public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
+        return new SparseFactory<>(denseFactory);
+    }
 
     public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory, final long count) {
         return new SparseFactory<>(denseFactory, count);
@@ -422,7 +432,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public void visitOne(final long index, final VoidFunction<N> visitor) {
+    public void visitOne(final long index, final ConsumerFunction<N> visitor) {
         if (this.isPrimitive()) {
             visitor.invoke(this.doubleValue(index));
         } else {
@@ -694,7 +704,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    protected void visit(final long first, final long limit, final long step, final VoidFunction<N> visitor) {
+    protected void visit(final long first, final long limit, final long step, final ConsumerFunction<N> visitor) {
         boolean tmpOnlyOnce = true;
         for (int i = 0; i < myIndices.length; i++) {
             final long tmpIndex = myIndices[i];

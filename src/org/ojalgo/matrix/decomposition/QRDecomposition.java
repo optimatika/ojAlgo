@@ -21,14 +21,11 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -40,18 +37,6 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 
 abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N> implements QR<N> {
-
-    static final class Big extends QRDecomposition<BigDecimal> {
-
-        Big() {
-            this(false);
-        }
-
-        Big(boolean fullSize) {
-            super(BigDenseStore.FACTORY, fullSize);
-        }
-
-    }
 
     static final class Complex extends QRDecomposition<ComplexNumber> {
 

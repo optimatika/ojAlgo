@@ -21,12 +21,8 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access2D;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.scalar.Scalar;
 
 public final class SubstituteForwards extends MatrixOperation {
@@ -34,42 +30,6 @@ public final class SubstituteForwards extends MatrixOperation {
     public static final SubstituteForwards SETUP = new SubstituteForwards();
 
     public static int THRESHOLD = 64;
-
-    public static void invoke(final BigDecimal[] data, final int structure, final int first, final int limit, final Access2D<BigDecimal> body,
-            final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
-
-        final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
-        final BigDecimal[] tmpBodyRow = new BigDecimal[tmpDiagDim];
-        BigDecimal tmpVal;
-        int tmpColBaseIndex;
-
-        for (int i = 0; i < tmpDiagDim; i++) {
-
-            for (int j = 0; j <= i; j++) {
-                tmpBodyRow[j] = conjugated ? body.get(j, i) : body.get(i, j);
-            }
-
-            for (int s = first; s < limit; s++) {
-                tmpColBaseIndex = s * structure;
-
-                tmpVal = BigMath.ZERO;
-                for (int j = identity ? s : 0; j < i; j++) {
-                    tmpVal = tmpVal.add(tmpBodyRow[j].multiply(data[j + tmpColBaseIndex]));
-                }
-                if (identity) {
-                    tmpVal = i == s ? BigMath.ONE.subtract(tmpVal) : tmpVal.negate();
-                } else {
-                    tmpVal = data[i + tmpColBaseIndex].subtract(tmpVal);
-                }
-
-                if (!unitDiagonal) {
-                    tmpVal = BigFunction.DIVIDE.invoke(tmpVal, tmpBodyRow[i]);
-                }
-
-                data[i + tmpColBaseIndex] = tmpVal;
-            }
-        }
-    }
 
     public static void invoke(final double[] data, final int structure, final int first, final int limit, final Access2D<Double> body,
             final boolean unitDiagonal, final boolean conjugated, final boolean identity) {

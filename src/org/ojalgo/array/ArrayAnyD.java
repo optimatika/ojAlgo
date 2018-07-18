@@ -36,7 +36,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.ConsumerFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
@@ -59,7 +59,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
         Factory(final DenseArray.Factory<N> denseArray) {
             super();
-            myDelegate = BasicArray.factory(denseArray);
+            myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
         public final ArrayAnyD<N> copy(final AccessAnyD<?> source) {
@@ -445,27 +445,27 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         return retVal.toString();
     }
 
-    public void visitAll(final VoidFunction<N> visitor) {
+    public void visitAll(final ConsumerFunction<N> visitor) {
         myDelegate.visit(0L, this.count(), 1L, visitor);
     }
 
-    public void visitOne(final long index, final VoidFunction<N> visitor) {
+    public void visitOne(final long index, final ConsumerFunction<N> visitor) {
         myDelegate.visitOne(index, visitor);
     }
 
-    public void visitOne(final long[] reference, final VoidFunction<N> visitor) {
+    public void visitOne(final long[] reference, final ConsumerFunction<N> visitor) {
         myDelegate.visitOne(StructureAnyD.index(myStructure, reference), visitor);
     }
 
-    public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
+    public void visitRange(final long first, final long limit, final ConsumerFunction<N> visitor) {
         myDelegate.visit(first, limit, 1L, visitor);
     }
 
-    public void visitSet(int dimension, long dimensionalIndex, VoidFunction<N> visitor) {
+    public void visitSet(int dimension, long dimensionalIndex, ConsumerFunction<N> visitor) {
         this.loop(dimension, dimensionalIndex, (f, l, s) -> myDelegate.visit(f, l, s, visitor));
     }
 
-    public void visitSet(final long[] initial, final int dimension, final VoidFunction<N> visitor) {
+    public void visitSet(final long[] initial, final int dimension, final ConsumerFunction<N> visitor) {
         this.loop(initial, dimension, (f, l, s) -> myDelegate.visit(f, l, s, visitor));
     }
 

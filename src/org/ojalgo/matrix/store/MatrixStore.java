@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
@@ -30,11 +28,14 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -223,6 +224,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return myStore.countRows();
         }
 
+        public final LogicalBuilder<N> diagonal() {
+            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, false), false);
+            return this;
+        }
+
         public final LogicalBuilder<N> diagonal(final boolean assumeOne) {
             myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, assumeOne), assumeOne);
             return this;
@@ -395,26 +401,6 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
-
-        public LogicalBuilder<BigDecimal> makeIdentity(final int dimension) {
-            return new LogicalBuilder<>(new IdentityStore<>(BigDenseStore.FACTORY, dimension));
-        }
-
-        public LogicalBuilder<BigDecimal> makeSingle(final BigDecimal element) {
-            return new LogicalBuilder<>(new SingleStore<>(BigDenseStore.FACTORY, element));
-        }
-
-        public LogicalBuilder<BigDecimal> makeWrapper(final Access2D<?> access) {
-            return new LogicalBuilder<>(new WrapperStore<>(BigDenseStore.FACTORY, access));
-        }
-
-        public LogicalBuilder<BigDecimal> makeZero(final int rowsCount, final int columnsCount) {
-            return new LogicalBuilder<>(new ZeroStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount));
-        }
-
-    };
-
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         public LogicalBuilder<ComplexNumber> makeIdentity(final int dimension) {
@@ -451,6 +437,46 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         public LogicalBuilder<Double> makeZero(final int rowsCount, final int columnsCount) {
             return new LogicalBuilder<>(new ZeroStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount));
+        }
+
+    };
+
+    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+
+        public LogicalBuilder<Quaternion> makeIdentity(final int dimension) {
+            return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.QUATERNION, dimension));
+        }
+
+        public LogicalBuilder<Quaternion> makeSingle(final Quaternion element) {
+            return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.QUATERNION, element));
+        }
+
+        public LogicalBuilder<Quaternion> makeWrapper(final Access2D<?> access) {
+            return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.QUATERNION, access));
+        }
+
+        public LogicalBuilder<Quaternion> makeZero(final int rowsCount, final int columnsCount) {
+            return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.QUATERNION, rowsCount, columnsCount));
+        }
+
+    };
+
+    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+
+        public LogicalBuilder<RationalNumber> makeIdentity(final int dimension) {
+            return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.RATIONAL, dimension));
+        }
+
+        public LogicalBuilder<RationalNumber> makeSingle(final RationalNumber element) {
+            return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.RATIONAL, element));
+        }
+
+        public LogicalBuilder<RationalNumber> makeWrapper(final Access2D<?> access) {
+            return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.RATIONAL, access));
+        }
+
+        public LogicalBuilder<RationalNumber> makeZero(final int rowsCount, final int columnsCount) {
+            return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.RATIONAL, rowsCount, columnsCount));
         }
 
     };
@@ -655,6 +681,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return this.aggregateAll(Aggregator.NORM2).doubleValue();
     }
 
+    default MatrixStore<N> operateOnAll(final UnaryFunction<N> operator) {
+        return new UnaryOperatoStore<>(this, operator);
+    }
+
     /**
      * The <code>premultiply</code> method differs from <code>multiply</code> in 3 ways:
      * <ol>
@@ -670,11 +700,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return new MatrixPipeline.Multiplication<>(left, this);
     }
 
-    default ElementsSupplier<N> reduceColumns(Aggregator aggregator) {
+    default ElementsSupplier<N> reduceColumns(final Aggregator aggregator) {
         return new MatrixPipeline.ColumnsReducer<>(this, aggregator);
     }
 
-    default ElementsSupplier<N> reduceRows(Aggregator aggregator) {
+    default ElementsSupplier<N> reduceRows(final Aggregator aggregator) {
         return new MatrixPipeline.RowsReducer<>(this, aggregator);
     }
 
@@ -773,7 +803,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return new TransposedStore<>(this);
     }
 
-    default void visitOne(final long row, final long col, final VoidFunction<N> visitor) {
+    default void visitOne(final long row, final long col, final ConsumerFunction<N> visitor) {
         visitor.invoke(this.get(row, col));
     }
 

@@ -34,7 +34,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.ConsumerFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.BigAggregator;
@@ -215,7 +215,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      * are always used as they are.
      */
     @SuppressWarnings("unchecked")
-    public final ME lower(final Number lower) {
+    public ME lower(final Number lower) {
         myLowerLimit = null;
         if (lower != null) {
             if (lower instanceof BigDecimal) {
@@ -250,7 +250,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      * are always used as they are.
      */
     @SuppressWarnings("unchecked")
-    public final ME upper(final Number upper) {
+    public ME upper(final Number upper) {
         myUpperLimit = null;
         if (upper != null) {
             if (upper instanceof BigDecimal) {
@@ -440,7 +440,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0);
     }
 
-    void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
+    void visitAllParameters(final ConsumerFunction<BigDecimal> largest, final ConsumerFunction<BigDecimal> smallest) {
         largest.invoke(ONE);
         smallest.invoke(ONE);
         if (myLowerLimit != null) {

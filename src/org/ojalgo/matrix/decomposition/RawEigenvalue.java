@@ -32,6 +32,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.COPY;
 import org.ojalgo.array.blas.DOT;
@@ -156,6 +157,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             return this.computed(true);
         }
 
+        @Override
+        protected MatrixStore<Double> makeD(final double[] d, final double[] e) {
+            final DiagonalBasicArray<Double> diagonal = new DiagonalBasicArray<>(Primitive64Array.wrap(d), null, null, ZERO);
+            return MatrixStore.PRIMITIVE.makeWrapper(diagonal).diagonal().get();
+        }
+
     }
 
     /**
@@ -210,22 +217,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      *
      * @return D
      */
-    public RawStore getD() {
-        final int n = this.getRowDim();
-        final RawStore X = new RawStore(n, n);
-        final double[][] D = X.data;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                D[i][j] = ZERO;
-            }
-            D[i][i] = d[i];
-            if (e[i] > 0) {
-                D[i][i + 1] = e[i];
-            } else if (e[i] < 0) {
-                D[i][i - 1] = e[i];
-            }
-        }
-        return X;
+    public final MatrixStore<Double> getD() {
+        return this.makeD(d, e);
     }
 
     public Double getDeterminant() {
@@ -376,6 +369,21 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     }
 
     protected abstract boolean doDecompose(double[][] data, boolean valuesOnly);
+
+    protected MatrixStore<Double> makeD(final double[] d, final double[] e) {
+        final int n = this.getRowDim();
+        final RawStore fullD = new RawStore(n, n);
+        final double[][] D = fullD.data;
+        for (int i = 0; i < n; i++) {
+            D[i][i] = d[i];
+            if (e[i] > 0) {
+                D[i][i + 1] = e[i];
+            } else if (e[i] < 0) {
+                D[i][i - 1] = e[i];
+            }
+        }
+        return fullD.logical().tridiagonal().get();
+    }
 
     final void doGeneral(final double[][] data, final boolean valuesOnly) {
 
@@ -591,5 +599,30 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     double[] getRealParts() {
         return d;
     }
+
+    //    public MatrixStore<Double> getExponential() {
+    //
+    //        final MatrixStore<Double> mtrxV = this.getV();
+    //
+    //        final PhysicalStore<Double> tmpD = this.getD().copy();
+    //        tmpD.modifyDiagonal(mtrxV.physical().function().exp());
+    //        final MatrixStore<Double> mtrxD = tmpD.logical().diagonal().get();
+    //
+    //        return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
+    //    }
+    //
+    //    public MatrixStore<Double> getPower(final int exponent) {
+    //
+    //        final MatrixStore<Double> mtrxV = this.getV();
+    //        final MatrixStore<Double> mtrxD = this.getD();
+    //
+    //        MatrixStore<Double> retVal = mtrxV;
+    //        for (int e = 0; e < exponent; e++) {
+    //            retVal = retVal.multiply(mtrxD);
+    //        }
+    //        retVal = retVal.multiply(mtrxV.conjugate());
+    //
+    //        return retVal;
+    //    }
 
 }

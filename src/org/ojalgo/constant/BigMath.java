@@ -60,6 +60,9 @@ public abstract class BigMath {
     public static final BigDecimal HUNDREDTH = ONE.divide(HUNDRED, MathContext.DECIMAL128);
     public static final BigDecimal THOUSANDTH = ONE.divide(THOUSAND, MathContext.DECIMAL128);
 
+    public static final BigDecimal TWO_THIRDS = BigFunction.DIVIDE.invoke(TWO, THREE);
+    public static final BigDecimal THREE_QUARTERS = BigFunction.DIVIDE.invoke(THREE, FOUR);
+
     public static final BigDecimal E = new BigDecimal("2.71828182845904523536028747135266249775724709369996", MathContext.DECIMAL128);
     public static final BigDecimal PI = new BigDecimal("3.14159265358979323846264338327950288419716939937511", MathContext.DECIMAL128);
     public static final BigDecimal GOLDEN_RATIO = BigFunction.DIVIDE.invoke(BigFunction.ADD.invoke(ONE, BigFunction.SQRT.invoke(FIVE)), TWO);

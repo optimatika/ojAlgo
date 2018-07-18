@@ -258,14 +258,14 @@ public abstract class MatrixUtils {
         return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
     }
 
-    public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int aRowDim, final int aColDim) {
+    public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {
 
-        final PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(aRowDim, aColDim);
+        final PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
 
         final Uniform tmpArgGen = new Uniform(PrimitiveMath.ZERO, PrimitiveMath.TWO_PI);
 
-        for (int j = 0; j < aColDim; j++) {
-            for (int i = 0; i < aRowDim; i++) {
+        for (int j = 0; j < numberOfColumns; j++) {
+            for (int i = 0; i < numberOfRows; i++) {
                 retVal.set(i, j, ComplexNumber.makePolar(PrimitiveMath.E, tmpArgGen.doubleValue()).add(PrimitiveMath.PI));
             }
         }

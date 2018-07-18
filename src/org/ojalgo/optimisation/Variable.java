@@ -176,6 +176,13 @@ public final class Variable extends ModelEntity<Variable> {
         return myValue != null;
     }
 
+    @Override
+    public Variable lower(Number lower) {
+        Variable retVal = super.lower(lower);
+        this.assertFixedValue();
+        return retVal;
+    }
+
     public BigDecimal quantifyContribution() {
 
         BigDecimal retVal = ZERO;
@@ -208,6 +215,19 @@ public final class Variable extends ModelEntity<Variable> {
             }
         }
         myValue = tmpValue;
+    }
+
+    @Override
+    public Variable upper(Number upper) {
+        Variable retVal = super.upper(upper);
+        this.assertFixedValue();
+        return retVal;
+    }
+
+    private void assertFixedValue() {
+        if (this.isLowerLimitSet() && this.isUpperLimitSet() && (this.getLowerLimit().compareTo(this.getUpperLimit()) == 0)) {
+            myValue = this.getLowerLimit();
+        }
     }
 
     @Override

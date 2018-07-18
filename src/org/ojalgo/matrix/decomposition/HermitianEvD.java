@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
@@ -40,7 +39,6 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -63,14 +61,6 @@ import org.ojalgo.scalar.RationalNumber;
  * upon V.cond().
  **/
 public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
-
-    static final class Big extends HermitianEvD<BigDecimal> {
-
-        Big() {
-            super(BigDenseStore.FACTORY, new DeferredTridiagonal.Big());
-        }
-
-    }
 
     static final class Complex extends HermitianEvD<ComplexNumber> {
 
@@ -427,8 +417,8 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
     @Override
     protected MatrixStore<N> makeD() {
-        final DiagonalBasicArray<Double> tmpDiagonal = new DiagonalBasicArray<>(Primitive64Array.wrap(d), null, null, ZERO);
-        return this.wrap(tmpDiagonal).diagonal(false).get();
+        final DiagonalBasicArray<Double> diagonal = new DiagonalBasicArray<>(Primitive64Array.wrap(d), null, null, ZERO);
+        return this.wrap(diagonal).diagonal().get();
     }
 
     @Override

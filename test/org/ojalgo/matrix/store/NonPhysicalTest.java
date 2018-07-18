@@ -21,18 +21,15 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.ComplexMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.context.NumberContext;
 
@@ -49,11 +46,14 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
 
         for (final Aggregator tmpAggr : Aggregator.values()) {
 
+            // BasicLogger.debug("Aggregator={}", tmpAggr);
+
             tmpExpected = copied.aggregateAll(tmpAggr);
             tmpActual = anyStore.aggregateAll(tmpAggr);
 
-            if (MatrixStoreTests.DEBUG) {
-                BasicLogger.debug("Aggregator={}, Expected/Physical={}, Actual/Logical={}", tmpAggr, tmpExpected, tmpActual);
+            if (MatrixStoreTests.DEBUG && CNTXT.isDifferent(tmpExpected.doubleValue(), tmpActual.doubleValue())) {
+                BasicLogger.debug("Aggregator={} {}, Expected/Physical={}, Actual/Logical={}", tmpAggr, anyStore.get(0, 0).getClass().getSimpleName(),
+                        tmpExpected.doubleValue(), tmpActual.doubleValue());
             }
 
             TestUtils.assertEquals(tmpAggr.name(), tmpExpected, tmpActual, CNTXT);
@@ -73,7 +73,7 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
         final int tmpNewDim = Uniform.randomInteger(1, tmpRowDim + tmpColDim);
 
         // multiplyLeft
-        final BasicMatrix tmpLeftMtrx = NonPhysicalTest.makeRandomMatrix(tmpNewDim, tmpRowDim);
+        final MatrixStore<ComplexNumber> tmpLeftMtrx = NonPhysicalTest.makeRandomMatrix(tmpNewDim, tmpRowDim);
         final PhysicalStore<N> tmpLeft = matrixStore.physical().copy(tmpLeftMtrx);
 
         MatrixStore<N> tmpExpected = tmpLeft.multiply(tmpCopy);
@@ -85,7 +85,7 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
         TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
 
         // multiplyRight
-        final BasicMatrix tmpRightMtrx = NonPhysicalTest.makeRandomMatrix(tmpColDim, tmpNewDim);
+        final MatrixStore<ComplexNumber> tmpRightMtrx = NonPhysicalTest.makeRandomMatrix(tmpColDim, tmpNewDim);
         final PhysicalStore<N> tmpRight = matrixStore.physical().copy(tmpRightMtrx);
 
         tmpExpected = tmpCopy.multiply(tmpRight);
@@ -97,64 +97,40 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
         TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
     }
 
-    protected static BasicMatrix makeRandomMatrix(final int aRowDim, final int aColDim) {
-        return ComplexMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(aRowDim, aColDim));
+    protected static MatrixStore<ComplexNumber> makeRandomMatrix(final int numberOfRows, final int numberOfColumns) {
+        return MatrixUtils.makeRandomComplexStore(numberOfRows, numberOfColumns).signum();
     }
 
-    MatrixStore<BigDecimal> myBigStore;
-    MatrixStore<ComplexNumber> myComplexStore;
-    MatrixStore<Double> myPrimitiveStore;
+    MatrixStore<ComplexNumber> complexStore;
+    MatrixStore<Double> primitiveStore;
+    MatrixStore<RationalNumber> rationalStore;
 
     @AfterEach
     public void tearDown() {
-        myBigStore = null;
-        myComplexStore = null;
-        myPrimitiveStore = null;
+        rationalStore = null;
+        complexStore = null;
+        primitiveStore = null;
     }
 
     @Test
-    public void testBigAggregator() {
-        NonPhysicalTest.testAggregation(myBigStore);
+    public void testAggregator() {
+        NonPhysicalTest.testAggregation(primitiveStore);
+        NonPhysicalTest.testAggregation(complexStore);
+        NonPhysicalTest.testAggregation(rationalStore);
     }
 
     @Test
-    public void testBigElements() {
-        NonPhysicalTest.testElements(myBigStore);
+    public void testElements() {
+        NonPhysicalTest.testElements(primitiveStore);
+        NonPhysicalTest.testElements(complexStore);
+        NonPhysicalTest.testElements(rationalStore);
     }
 
     @Test
-    public void testBigMultiplication() {
-        NonPhysicalTest.testMultiplication(myBigStore);
-    }
-
-    @Test
-    public void testComplexAggregator() {
-        NonPhysicalTest.testAggregation(myComplexStore);
-    }
-
-    @Test
-    public void testComplexElements() {
-        NonPhysicalTest.testElements(myComplexStore);
-    }
-
-    @Test
-    public void testComplexMultiplication() {
-        NonPhysicalTest.testMultiplication(myComplexStore);
-    }
-
-    @Test
-    public void testPrimitiveAggregator() {
-        NonPhysicalTest.testAggregation(myPrimitiveStore);
-    }
-
-    @Test
-    public void testPrimitiveElements() {
-        NonPhysicalTest.testElements(myPrimitiveStore);
-    }
-
-    @Test
-    public void testPrimitiveMultiplication() {
-        NonPhysicalTest.testMultiplication(myPrimitiveStore);
+    public void testMultiplication() {
+        NonPhysicalTest.testMultiplication(primitiveStore);
+        NonPhysicalTest.testMultiplication(complexStore);
+        NonPhysicalTest.testMultiplication(rationalStore);
     }
 
 }

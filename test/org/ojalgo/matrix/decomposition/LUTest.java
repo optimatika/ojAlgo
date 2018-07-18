@@ -21,18 +21,16 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.RationalMatrix;
-import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -50,11 +48,11 @@ public class LUTest {
 
         final RationalMatrix tmpProblematic = P20061119Case.getProblematic();
 
-        final LU<BigDecimal> tmpBig = LU.BIG.make();
-        tmpBig.decompose(BigDenseStore.FACTORY.copy(tmpProblematic));
+        final LU<RationalNumber> tmpBig = LU.RATIONAL.make();
+        tmpBig.decompose(GenericDenseStore.RATIONAL.copy(tmpProblematic));
 
         final LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
-        tmpComplex.decompose(ComplexDenseStore.FACTORY.copy(tmpProblematic));
+        tmpComplex.decompose(GenericDenseStore.COMPLEX.copy(tmpProblematic));
 
         final LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
         tmpPrimitive.decompose(PrimitiveDenseStore.FACTORY.copy(tmpProblematic));

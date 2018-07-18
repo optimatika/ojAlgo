@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
@@ -150,8 +149,6 @@ public interface Eigenvalue<N extends Number>
 
     }
 
-    public static final Factory<BigDecimal> BIG = (typical, hermitian) -> hermitian ? new HermitianEvD.Big() : null;
-
     public static final Factory<ComplexNumber> COMPLEX = (typical, hermitian) -> hermitian ? new HermitianEvD.Complex() : null;
 
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
@@ -195,9 +192,7 @@ public interface Eigenvalue<N extends Number>
 
         final N tmpNumber = typical.get(0L, 0L);
 
-        if (tmpNumber instanceof BigDecimal) {
-            return (Eigenvalue<N>) BIG.make(typical, hermitian);
-        } else if (tmpNumber instanceof ComplexNumber) {
+        if (tmpNumber instanceof ComplexNumber) {
             return (Eigenvalue<N>) COMPLEX.make(typical, hermitian);
         } else if (tmpNumber instanceof Double) {
             return (Eigenvalue<N>) PRIMITIVE.make(typical, hermitian);
@@ -358,6 +353,37 @@ public interface Eigenvalue<N extends Number>
 
         return retVal;
     }
+
+    //    /**
+    //     * @return The matrix exponential
+    //     */
+    //    default MatrixStore<N> getExponential() {
+    //
+    //        final MatrixStore<N> mtrxV = this.getV();
+    //
+    //        final PhysicalStore<N> tmpD = this.getD().copy();
+    //        tmpD.modifyDiagonal(mtrxV.physical().function().exp());
+    //        final MatrixStore<N> mtrxD = tmpD.logical().diagonal().get();
+    //
+    //        return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
+    //    }
+    //
+    //    /**
+    //     * @return The matrix power
+    //     */
+    //    default MatrixStore<N> getPower(final int exponent) {
+    //
+    //        final MatrixStore<N> mtrxV = this.getV();
+    //        final MatrixStore<N> mtrxD = this.getD();
+    //
+    //        MatrixStore<N> retVal = mtrxV;
+    //        for (int e = 0; e < exponent; e++) {
+    //            retVal = retVal.multiply(mtrxD);
+    //        }
+    //        retVal = retVal.multiply(mtrxV.conjugate());
+    //
+    //        return retVal;
+    //    }
 
     /**
      * A matrix' trace is the sum of the diagonal elements. It is also the sum of the eigenvalues. This method

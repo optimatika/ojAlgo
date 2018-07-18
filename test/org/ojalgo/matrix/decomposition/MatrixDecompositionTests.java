@@ -53,7 +53,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static final Bidiagonal<?>[] getBidiagonalAll() {
-        return new Bidiagonal<?>[] { new BidiagonalDecomposition.Big(), Bidiagonal.COMPLEX.make(), Bidiagonal.PRIMITIVE.make() };
+        return new Bidiagonal<?>[] { new BidiagonalDecomposition.Rational(), Bidiagonal.COMPLEX.make(), Bidiagonal.PRIMITIVE.make() };
     }
 
     @SuppressWarnings("unchecked")
@@ -62,7 +62,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static final Cholesky<?>[] getCholeskyAll() {
-        return new Cholesky<?>[] { Cholesky.BIG.make(), Cholesky.COMPLEX.make(), Cholesky.PRIMITIVE.make(), new RawCholesky() };
+        return new Cholesky<?>[] { Cholesky.RATIONAL.make(), Cholesky.COMPLEX.make(), Cholesky.PRIMITIVE.make(), new RawCholesky() };
     }
 
     @SuppressWarnings("unchecked")
@@ -80,7 +80,7 @@ public abstract class MatrixDecompositionTests {
 
     public static final Eigenvalue<?>[] getEigenvalueAllHermitian() {
         return new Eigenvalue<?>[] { new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(), new RawEigenvalue.Symmetric(),
-                new HermitianEvD.Big(), new HermitianEvD.Complex() };
+                new HermitianEvD.Rational(), new HermitianEvD.Complex() };
     }
 
     public static List<Eigenvalue<Double>> getEigenvaluePrimitiveAny() {
@@ -117,7 +117,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static final Hessenberg<?>[] getHessenbergAll() {
-        return new Hessenberg<?>[] { Hessenberg.BIG.make(), Hessenberg.COMPLEX.make(), Hessenberg.PRIMITIVE.make() };
+        return new Hessenberg<?>[] { Hessenberg.RATIONAL.make(), Hessenberg.COMPLEX.make(), Hessenberg.PRIMITIVE.make() };
     }
 
     @SuppressWarnings("unchecked")
@@ -126,7 +126,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static final LU<?>[] getLUAll() {
-        return new LU<?>[] { LU.BIG.make(), LU.COMPLEX.make(), LU.PRIMITIVE.make(), new RawLU() };
+        return new LU<?>[] { LU.RATIONAL.make(), LU.COMPLEX.make(), LU.PRIMITIVE.make(), new RawLU() };
     }
 
     @SuppressWarnings("unchecked")
@@ -135,7 +135,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static final QR<?>[] getQRAll() {
-        return new QR<?>[] { QR.BIG.make(), QR.COMPLEX.make(), QR.PRIMITIVE.make(), new RawQR() };
+        return new QR<?>[] { QR.RATIONAL.make(), QR.COMPLEX.make(), QR.PRIMITIVE.make(), new RawQR() };
     }
 
     @SuppressWarnings("unchecked")
@@ -153,7 +153,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static final SingularValue<?>[] getSingularValueAll() {
-        return new SingularValue<?>[] { new SingularValueDecomposition.Big(), new SingularValueDecomposition.Complex(),
+        return new SingularValue<?>[] { new SingularValueDecomposition.Rational(), new SingularValueDecomposition.Complex(),
                 new SingularValueDecomposition.Primitive(), new RawSingularValue() };
     }
 
@@ -165,7 +165,8 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static final Tridiagonal<?>[] getTridiagonalAll() {
-        return new Tridiagonal<?>[] { Tridiagonal.BIG.make(), Tridiagonal.COMPLEX.make(), new DeferredTridiagonal.Primitive(), new SimultaneousTridiagonal() };
+        return new Tridiagonal<?>[] { Tridiagonal.RATIONAL.make(), Tridiagonal.COMPLEX.make(), new DeferredTridiagonal.Primitive(),
+                new SimultaneousTridiagonal() };
     }
 
     @SuppressWarnings("unchecked")
