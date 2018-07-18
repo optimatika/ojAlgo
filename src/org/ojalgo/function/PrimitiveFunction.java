@@ -244,6 +244,10 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
         @Override
         public final double invoke(final double arg1, final double arg2) {
 
+            if (Double.isNaN(arg1) || Double.isNaN(arg2)) {
+                return NaN;
+            }
+
             final double abs1 = ABS.invoke(arg1);
             final double abs2 = ABS.invoke(arg2);
 

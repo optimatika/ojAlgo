@@ -53,6 +53,14 @@ public class PrimitiveCase {
     }
 
     @Test
+    public void testHYPOT() {
+
+        TestUtils.assertEquals(FIVE, HYPOT.invoke(FOUR, THREE), MACHINE_EPSILON);
+        TestUtils.assertEquals(NaN, HYPOT.invoke(NaN, NaN), MACHINE_EPSILON);
+
+    }
+
+    @Test
     public void testMinMax() {
 
         TestUtils.assertEquals(Math.min(2, -78), FunctionUtils.min(2, -78));

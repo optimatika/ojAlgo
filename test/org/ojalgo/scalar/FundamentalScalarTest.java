@@ -32,7 +32,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class FundamentalScalarTest {
+public class FundamentalScalarTest extends ScalarTests {
 
     private static final Uniform UNIFORM = new Uniform(0, 4);
 
