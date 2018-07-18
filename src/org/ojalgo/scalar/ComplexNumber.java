@@ -141,6 +141,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     public static final ComplexNumber I = new ComplexNumber(PrimitiveMath.ZERO, PrimitiveMath.ONE);
     public static final ComplexNumber INFINITY = ComplexNumber.makePolar(Double.POSITIVE_INFINITY, PrimitiveMath.ZERO);
+    public static final ComplexNumber NaN = ComplexNumber.of(PrimitiveMath.NaN, PrimitiveMath.NaN);
     public static final ComplexNumber NEG = ComplexNumber.valueOf(PrimitiveMath.NEG);
     public static final ComplexNumber ONE = ComplexNumber.valueOf(PrimitiveMath.ONE);
     public static final ComplexNumber TWO = ComplexNumber.valueOf(PrimitiveMath.TWO);
