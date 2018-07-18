@@ -195,7 +195,7 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
     @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
-        tmpBuilder.append("ArtificialNeuralNetwork [myLayers=");
+        tmpBuilder.append("ArtificialNeuralNetwork [Layers=");
         tmpBuilder.append(Arrays.toString(myLayers));
         tmpBuilder.append("]");
         return tmpBuilder.toString();

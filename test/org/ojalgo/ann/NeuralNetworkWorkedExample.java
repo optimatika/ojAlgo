@@ -76,7 +76,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
                 PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
                 PrimitiveDenseStore output_csv = PrimitiveDenseStore.FACTORY.row(IsStairs, ONE - IsStairs);
 
-                builder.train(input_csv, output_csv, 0.01);
+                builder.rate(0.01).accept(input_csv, output_csv);
             });
 
         }

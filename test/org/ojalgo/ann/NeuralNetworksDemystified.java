@@ -63,7 +63,7 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
 
         for (int iter = 0; iter < TRAINING_ITERATIONS; iter++) {
             for (Data data : examples) {
-                builder.train(data.input, data.target, LEARNING_RATE);
+                builder.rate(LEARNING_RATE).accept(data.input, data.target);
             }
         }
 

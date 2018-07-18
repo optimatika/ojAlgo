@@ -121,7 +121,7 @@ abstract class BackPropagationExample extends ANNTest {
 
         double delta = 0.0001;
 
-        Structure2D[] structure = builder.getStructure();
+        Structure2D[] structure = builder.structure();
 
         PrimitiveDenseStore[] weights = new PrimitiveDenseStore[structure.length];
         PrimitiveDenseStore[] bias = new PrimitiveDenseStore[structure.length];
@@ -176,7 +176,7 @@ abstract class BackPropagationExample extends ANNTest {
             });
         }
 
-        builder.train(triplet.input, triplet.target, triplet.rate);
+        builder.rate(triplet.rate).accept(triplet.input, triplet.target);
 
         if (DEBUG) {
             BasicLogger.debug("");

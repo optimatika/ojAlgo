@@ -23,13 +23,12 @@ package org.ojalgo.ann;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.ColumnView;
-import org.ojalgo.access.RowView;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -39,11 +38,12 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
  *
  * @author apete
  */
-public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
+public final class NetworkBuilder implements BiConsumer<Access1D<Double>, Access1D<Double>>, Supplier<ArtificialNeuralNetwork> {
 
     private final ArtificialNeuralNetwork myANN;
     private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
     private final PrimitiveDenseStore[] myLayerValues;
+    private double myLearningRate = 1.0;
 
     NetworkBuilder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
 
@@ -59,6 +59,18 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         myLayerValues[0] = PrimitiveDenseStore.FACTORY.makeZero(numberOfInputNodes, 1);
         for (int l = 0; l < nodesPerCalculationLayer.length; l++) {
             myLayerValues[1 + l] = PrimitiveDenseStore.FACTORY.makeZero(nodesPerCalculationLayer[l], 1);
+        }
+    }
+
+    public void accept(Access1D<Double> givenInput, Access1D<Double> targetOutput) {
+
+        Access1D<Double> current = myANN.apply(givenInput);
+
+        myLayerValues[0].fillMatching(givenInput);
+        myLayerValues[myLayerValues.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
+
+        for (int k = myANN.countCalculationLayers() - 1; k >= 0; k--) {
+            myANN.getLayer(k).adjust(k == 0 ? givenInput : myANN.getLayer(k - 1).getOutput(), myLayerValues[k + 1], -myLearningRate, myLayerValues[k]);
         }
     }
 
@@ -98,7 +110,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof NetworkBuilder)) {
+        if (this.getClass() != obj.getClass()) {
             return false;
         }
         NetworkBuilder other = (NetworkBuilder) obj;
@@ -110,6 +122,9 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
             return false;
         }
         if (myError != other.myError) {
+            return false;
+        }
+        if (Double.doubleToLongBits(myLearningRate) != Double.doubleToLongBits(other.myLearningRate)) {
             return false;
         }
         return true;
@@ -128,16 +143,15 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return myANN;
     }
 
-    public Structure2D[] getStructure() {
-        return myANN.getStructure();
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = (prime * result) + ((myANN == null) ? 0 : myANN.hashCode());
         result = (prime * result) + ((myError == null) ? 0 : myError.hashCode());
+        long temp;
+        temp = Double.doubleToLongBits(myLearningRate);
+        result = (prime * result) + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
@@ -148,46 +162,33 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return this;
     }
 
+    public NetworkBuilder rate(double rate) {
+        myLearningRate = rate;
+        return this;
+    }
+
+    public Structure2D[] structure() {
+        return myANN.getStructure();
+    }
+
     @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
-        tmpBuilder.append("NetworkBuilder [myANN=");
-        tmpBuilder.append(myANN);
-        tmpBuilder.append(", myError=");
-        tmpBuilder.append(myError);
-        tmpBuilder.append("]");
+        tmpBuilder.append("NetworkBuilder [ANN=").append(myANN).append(", Error=").append(myError).append(", LearningRate=").append(myLearningRate).append("]");
         return tmpBuilder.toString();
     }
 
-    public void train(Access1D<Double> givenInput, Access1D<Double> targetOutput, double learningRate) {
+    /**
+     * Please note that the required {@link Iterable}:s can be obtained from calling {@link Access2D#rows()}
+     * or {@link Access2D#columns()} on anything "2D".
+     */
+    public void train(Iterable<? extends Access1D<Double>> givenInputs, Iterable<? extends Access1D<Double>> targetOutputs) {
 
-        Access1D<Double> current = myANN.apply(givenInput);
-
-        myLayerValues[0].fillMatching(givenInput);
-        myLayerValues[myLayerValues.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
-
-        for (int k = myANN.countCalculationLayers() - 1; k >= 0; k--) {
-            myANN.getLayer(k).adjust(k == 0 ? givenInput : myANN.getLayer(k - 1).getOutput(), myLayerValues[k + 1], -learningRate, myLayerValues[k]);
-        }
-    }
-
-    public void trainColumns(Access2D<Double> givenInput, Access2D<Double> desiredOutput, double learningRate) {
-
-        Iterator<ColumnView<Double>> iterInp = givenInput.columns().iterator();
-        Iterator<ColumnView<Double>> iterOut = desiredOutput.columns().iterator();
+        Iterator<? extends Access1D<Double>> iterInp = givenInputs.iterator();
+        Iterator<? extends Access1D<Double>> iterOut = targetOutputs.iterator();
 
         while (iterInp.hasNext() && iterOut.hasNext()) {
-            this.train(iterInp.next(), iterOut.next(), learningRate);
-        }
-    }
-
-    public void trainRows(Access2D<Double> givenInput, Access2D<Double> desiredOutput, double learningRate) {
-
-        Iterator<RowView<Double>> iterInp = givenInput.rows().iterator();
-        Iterator<RowView<Double>> iterOut = desiredOutput.rows().iterator();
-
-        while (iterInp.hasNext() && iterOut.hasNext()) {
-            this.train(iterInp.next(), iterOut.next(), learningRate);
+            this.accept(iterInp.next(), iterOut.next());
         }
     }
 

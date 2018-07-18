@@ -103,14 +103,12 @@ final class CalculationLayer implements UnaryOperator<Access1D<Double>> {
     @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
-        tmpBuilder.append("Layer [myWeights=");
+        tmpBuilder.append("CalculationLayer [Weights=");
         tmpBuilder.append(myWeights);
-        tmpBuilder.append(", myBias=");
+        tmpBuilder.append(", Bias=");
         tmpBuilder.append(myBias);
-        tmpBuilder.append(", myActivator=");
+        tmpBuilder.append(", Activator=");
         tmpBuilder.append(myActivator);
-        tmpBuilder.append(", myOutput=");
-        tmpBuilder.append(myOutput);
         tmpBuilder.append("]");
         return tmpBuilder.toString();
     }
