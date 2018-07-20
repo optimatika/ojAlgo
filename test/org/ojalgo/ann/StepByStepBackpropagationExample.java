@@ -66,7 +66,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
         PrimitiveDenseStore givenInput = testCase.input;
         PrimitiveDenseStore targetOutput = testCase.target;
         Access1D<Double> expectedOutput = testCase.expected;
-        Access1D<Double> actualOutput = network.apply(givenInput);
+        Access1D<Double> actualOutput = network.invoke(givenInput);
 
         TestUtils.assertEquals(expectedOutput, actualOutput, precision);
 
@@ -75,7 +75,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
 
         TestUtils.assertEquals(expectedError, actualError, precision);
 
-        builder.rate(HALF).accept(givenInput, targetOutput);
+        builder.rate(HALF).train(givenInput, targetOutput);
 
         // 0.40 w5
         TestUtils.assertEquals(0.35891648, network.getWeight(1, 0, 0), precision);
@@ -96,7 +96,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
         TestUtils.assertEquals(0.29950229, network.getWeight(0, 1, 1), precision);
 
         double expectedErrorAfterTraining = 0.291027924;
-        double actualErrorAfterTraining = errorMeassure.invoke(targetOutput, network.apply(givenInput));
+        double actualErrorAfterTraining = errorMeassure.invoke(targetOutput, network.invoke(givenInput));
 
         // In the example the bias are not updated, ojAlgo does update them
         // This should give more aggressive learning in this single step
@@ -107,9 +107,9 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
         NetworkBuilder largerBuilder = ArtificialNeuralNetwork.builder(2, 5, 3, 4, 2).randomise();
         ArtificialNeuralNetwork largerANN = largerBuilder.get();
 
-        Access1D<Double> preTrainingOutput = factory.rows(largerANN.apply(givenInput));
-        largerBuilder.rate(HALF).accept(givenInput, targetOutput);
-        Access1D<Double> postTrainingOutput = factory.rows(largerANN.apply(givenInput));
+        Access1D<Double> preTrainingOutput = factory.rows(largerANN.invoke(givenInput));
+        largerBuilder.rate(HALF).train(givenInput, targetOutput);
+        Access1D<Double> postTrainingOutput = factory.rows(largerANN.invoke(givenInput));
 
         // Even in this case training should reduce the error
         TestUtils.assertTrue(errorMeassure.invoke(targetOutput, preTrainingOutput) > errorMeassure.invoke(targetOutput, postTrainingOutput));

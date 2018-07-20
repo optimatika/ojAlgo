@@ -21,19 +21,32 @@
  */
 package org.ojalgo.function;
 
-public interface BasicFunction<N extends Number> {
+import java.util.function.Function;
 
-    public static interface Differentiable<N extends Number, F extends BasicFunction<N>> extends BasicFunction<N> {
+public interface BasicFunction {
+
+    public interface Differentiable<N extends Number, F extends BasicFunction> extends BasicFunction {
 
         F buildDerivative();
 
     }
 
-    public static interface Integratable<N extends Number, F extends BasicFunction<N>> extends BasicFunction<N> {
+    public interface Integratable<N extends Number, F extends BasicFunction> extends BasicFunction {
 
         F buildPrimitive();
 
         N integrate(N fromPoint, N toPoint);
+
+    }
+
+    @FunctionalInterface
+    public interface PlainUnary<T, R> extends Function<T, R> {
+
+        default R apply(T arg) {
+            return this.invoke(arg);
+        }
+
+        R invoke(T arg);
 
     }
 

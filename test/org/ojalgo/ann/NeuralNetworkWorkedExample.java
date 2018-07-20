@@ -76,7 +76,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
                 PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
                 PrimitiveDenseStore output_csv = PrimitiveDenseStore.FACTORY.row(IsStairs, ONE - IsStairs);
 
-                builder.rate(0.01).accept(input_csv, output_csv);
+                builder.rate(0.01).train(input_csv, output_csv);
             });
 
         }
@@ -96,7 +96,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
 
             PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
 
-            Access1D<Double> output_net = network.apply(input_csv);
+            Access1D<Double> output_net = network.invoke(input_csv);
 
             if (IsStairs == Math.round(output_net.doubleValue(0))) {
                 correct.incrementAndGet();

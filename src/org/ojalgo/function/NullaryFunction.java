@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 
-public interface NullaryFunction<N extends Number> extends BasicFunction<N>, Supplier<N>, DoubleSupplier {
+public interface NullaryFunction<N extends Number> extends BasicFunction, Supplier<N>, DoubleSupplier {
 
     default NullaryFunction<N> andThen(final UnaryFunction<N> after) {
         ProgrammingError.throwIfNull(after);

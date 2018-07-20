@@ -30,7 +30,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 
-public interface MultiaryFunction<N extends Number> extends BasicFunction<N>, Function<Access1D<N>, N> {
+public interface MultiaryFunction<N extends Number> extends BasicFunction, Function<Access1D<N>, N> {
 
     public static interface Constant<N extends Number, F extends Constant<N, ?>> extends MultiaryFunction<N> {
 

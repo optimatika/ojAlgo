@@ -23,7 +23,6 @@ package org.ojalgo.ann;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
@@ -38,7 +37,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
  *
  * @author apete
  */
-public final class NetworkBuilder implements BiConsumer<Access1D<Double>, Access1D<Double>>, Supplier<ArtificialNeuralNetwork> {
+public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
     private final ArtificialNeuralNetwork myANN;
     private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
@@ -59,18 +58,6 @@ public final class NetworkBuilder implements BiConsumer<Access1D<Double>, Access
         myLayerValues[0] = PrimitiveDenseStore.FACTORY.makeZero(numberOfInputNodes, 1);
         for (int l = 0; l < nodesPerCalculationLayer.length; l++) {
             myLayerValues[1 + l] = PrimitiveDenseStore.FACTORY.makeZero(nodesPerCalculationLayer[l], 1);
-        }
-    }
-
-    public void accept(Access1D<Double> givenInput, Access1D<Double> targetOutput) {
-
-        Access1D<Double> current = myANN.apply(givenInput);
-
-        myLayerValues[0].fillMatching(givenInput);
-        myLayerValues[myLayerValues.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
-
-        for (int k = myANN.countCalculationLayers() - 1; k >= 0; k--) {
-            myANN.getLayer(k).adjust(k == 0 ? givenInput : myANN.getLayer(k - 1).getOutput(), myLayerValues[k + 1], -myLearningRate, myLayerValues[k]);
         }
     }
 
@@ -168,7 +155,7 @@ public final class NetworkBuilder implements BiConsumer<Access1D<Double>, Access
     }
 
     public Structure2D[] structure() {
-        return myANN.getStructure();
+        return myANN.structure();
     }
 
     @Override
@@ -178,17 +165,29 @@ public final class NetworkBuilder implements BiConsumer<Access1D<Double>, Access
         return tmpBuilder.toString();
     }
 
+    public void train(Access1D<Double> givenInput, Access1D<Double> targetOutput) {
+
+        Access1D<Double> current = myANN.invoke(givenInput);
+
+        myLayerValues[0].fillMatching(givenInput);
+        myLayerValues[myLayerValues.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
+
+        for (int k = myANN.countCalculationLayers() - 1; k >= 0; k--) {
+            myANN.getLayer(k).adjust(k == 0 ? givenInput : myANN.getLayer(k - 1).getOutput(), myLayerValues[k + 1], -myLearningRate, myLayerValues[k]);
+        }
+    }
+
     /**
-     * Please note that the required {@link Iterable}:s can be obtained from calling {@link Access2D#rows()}
-     * or {@link Access2D#columns()} on anything "2D".
+     * Note that the required {@link Iterable}:s can be obtained from calling {@link Access2D#rows()} or
+     * {@link Access2D#columns()} on anything "2D".
      */
     public void train(Iterable<? extends Access1D<Double>> givenInputs, Iterable<? extends Access1D<Double>> targetOutputs) {
 
-        Iterator<? extends Access1D<Double>> iterInp = givenInputs.iterator();
-        Iterator<? extends Access1D<Double>> iterOut = targetOutputs.iterator();
+        Iterator<? extends Access1D<Double>> iterI = givenInputs.iterator();
+        Iterator<? extends Access1D<Double>> iterO = targetOutputs.iterator();
 
-        while (iterInp.hasNext() && iterOut.hasNext()) {
-            this.accept(iterInp.next(), iterOut.next());
+        while (iterI.hasNext() && iterO.hasNext()) {
+            this.train(iterI.next(), iterO.next());
         }
     }
 

@@ -26,7 +26,7 @@ import java.util.function.DoubleConsumer;
 
 import org.ojalgo.ProgrammingError;
 
-public interface ConsumerFunction<N extends Number> extends BasicFunction<N>, Consumer<N>, DoubleConsumer {
+public interface ConsumerFunction<N extends Number> extends BasicFunction, Consumer<N>, DoubleConsumer {
 
     default void accept(final double arg) {
         this.invoke(arg);

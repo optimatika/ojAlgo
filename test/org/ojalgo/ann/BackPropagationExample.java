@@ -81,7 +81,7 @@ abstract class BackPropagationExample extends ANNTest {
 
         for (Data triplet : this.getTestCases()) {
             if ((triplet.input != null) && (triplet.expected != null)) {
-                TestUtils.assertEquals(triplet.expected, network.apply(triplet.input), this.precision());
+                TestUtils.assertEquals(triplet.expected, network.invoke(triplet.input), this.precision());
                 counter++;
             }
         }
@@ -137,9 +137,9 @@ abstract class BackPropagationExample extends ANNTest {
                     double orgWeight = builder.getWeight(layer, input, output);
 
                     builder.weight(layer, input, output, orgWeight + delta);
-                    double upperError = builder.error(triplet.target, builder.get().apply(triplet.input));
+                    double upperError = builder.error(triplet.target, builder.get().invoke(triplet.input));
                     builder.weight(layer, input, output, orgWeight - delta);
-                    double lowerError = builder.error(triplet.target, builder.get().apply(triplet.input));
+                    double lowerError = builder.error(triplet.target, builder.get().invoke(triplet.input));
                     builder.weight(layer, input, output, orgWeight);
 
                     final double derivative = (upperError - lowerError) / (delta + delta);
@@ -149,9 +149,9 @@ abstract class BackPropagationExample extends ANNTest {
                 double orgBias = builder.getBias(layer, output);
 
                 builder.bias(layer, output, orgBias + delta);
-                double upperError = builder.error(triplet.target, builder.get().apply(triplet.input));
+                double upperError = builder.error(triplet.target, builder.get().invoke(triplet.input));
                 builder.bias(layer, output, orgBias - delta);
-                double lowerError = builder.error(triplet.target, builder.get().apply(triplet.input));
+                double lowerError = builder.error(triplet.target, builder.get().invoke(triplet.input));
                 builder.bias(layer, output, orgBias);
 
                 final double derivative = (upperError - lowerError) / (delta + delta);
@@ -176,7 +176,7 @@ abstract class BackPropagationExample extends ANNTest {
             });
         }
 
-        builder.rate(triplet.rate).accept(triplet.input, triplet.target);
+        builder.rate(triplet.rate).train(triplet.input, triplet.target);
 
         if (DEBUG) {
             BasicLogger.debug("");

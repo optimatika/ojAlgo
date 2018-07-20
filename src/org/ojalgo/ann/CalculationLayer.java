@@ -24,17 +24,16 @@ package org.ojalgo.ann;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.util.function.UnaryOperator;
-
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
+import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Normal;
 
-final class CalculationLayer implements UnaryOperator<Access1D<Double>> {
+final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double>, PrimitiveDenseStore> {
 
     private ArtificialNeuralNetwork.Activator myActivator;
     private final PrimitiveDenseStore myBias;
@@ -50,12 +49,6 @@ final class CalculationLayer implements UnaryOperator<Access1D<Double>> {
         myOutput = PrimitiveDenseStore.FACTORY.makeZero(1, numberOfOutputs);
 
         myActivator = activator;
-    }
-
-    public Access1D<Double> apply(Access1D<Double> input) {
-        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
-        myOutput.modifyAll(myActivator.getFunction(myOutput));
-        return myOutput;
     }
 
     @Override
@@ -130,6 +123,12 @@ final class CalculationLayer implements UnaryOperator<Access1D<Double>> {
             }
             myBias.add(j, learningRate * grad);
         }
+    }
+
+    public PrimitiveDenseStore invoke(Access1D<Double> input) {
+        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
+        myOutput.modifyAll(myActivator.getFunction(myOutput));
+        return myOutput;
     }
 
     double getBias(int output) {
