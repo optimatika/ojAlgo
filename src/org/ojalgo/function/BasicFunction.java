@@ -21,8 +21,6 @@
  */
 package org.ojalgo.function;
 
-import java.util.function.Function;
-
 public interface BasicFunction {
 
     public interface Differentiable<N extends Number, F extends BasicFunction> extends BasicFunction {
@@ -39,12 +37,13 @@ public interface BasicFunction {
 
     }
 
+    /**
+     * For when you want to emphasise that something is a (mathematical) function.
+     *
+     * @author apete
+     */
     @FunctionalInterface
-    public interface PlainUnary<T, R> extends Function<T, R> {
-
-        default R apply(T arg) {
-            return this.invoke(arg);
-        }
+    public interface PlainUnary<T, R> extends BasicFunction {
 
         R invoke(T arg);
 
