@@ -117,10 +117,6 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return true;
     }
 
-    public double error(Access1D<?> target, Access1D<?> current) {
-        return myError.invoke(target, current);
-    }
-
     public NetworkBuilder error(ArtificialNeuralNetwork.Error error) {
         myError = error;
         return this;
@@ -142,6 +138,9 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return result;
     }
 
+    /**
+     * Initialise all weights and biases with random numbers.
+     */
     public NetworkBuilder randomise() {
         for (int i = 0, limit = myANN.countCalculationLayers(); i < limit; i++) {
             myANN.getLayer(i).randomise();
@@ -191,9 +190,21 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         }
     }
 
+    /**
+     * Assumes the givenInputs and targetOutputs are stored in the columns of the supplied 2D data structures.
+     */
+    public void train(Access2D<Double> givenInputs, Access2D<Double> targetOutputs) {
+        ProgrammingError.throwIfNotEqualColumnDimensions(givenInputs, targetOutputs);
+        this.train(givenInputs.columns(), targetOutputs.columns());
+    }
+
     public NetworkBuilder weight(int layer, int input, int output, double weight) {
         myANN.getLayer(layer).setWeight(input, output, weight);
         return this;
+    }
+
+    double error(Access1D<?> target, Access1D<?> current) {
+        return myError.invoke(target, current);
     }
 
     double getBias(int layer, int output) {
