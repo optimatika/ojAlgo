@@ -35,7 +35,7 @@ public class MultiplicationTest {
     @Test
     public void testRepeatedMultiplications() {
 
-        int[] sizes = new int[] { 1, 2, 3, 4, 5, 10, 20, 50, 100, 200, 500, 1000 };
+        int[] sizes = new int[] { 1, 2, 3, 4, 5, 10, 20, 50, 100 };
 
         for (int s = 0; s < sizes.length; s++) {
             int dim = sizes[s];

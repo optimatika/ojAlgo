@@ -190,14 +190,6 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         }
     }
 
-    /**
-     * Assumes the givenInputs and targetOutputs are stored in the columns of the supplied 2D data structures.
-     */
-    public void train(Access2D<Double> givenInputs, Access2D<Double> targetOutputs) {
-        ProgrammingError.throwIfNotEqualColumnDimensions(givenInputs, targetOutputs);
-        this.train(givenInputs.columns(), targetOutputs.columns());
-    }
-
     public NetworkBuilder weight(int layer, int input, int output, double weight) {
         myANN.getLayer(layer).setWeight(input, output, weight);
         return this;
