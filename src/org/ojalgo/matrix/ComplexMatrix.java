@@ -38,7 +38,7 @@ import org.ojalgo.scalar.ComplexNumber;
  */
 public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMatrix> {
 
-    public static final BasicMatrix.Factory<ComplexMatrix> FACTORY = new MatrixFactory<>(ComplexMatrix.class, GenericDenseStore.COMPLEX);
+    public static final MatrixFactory<ComplexNumber, ComplexMatrix> FACTORY = new MatrixFactory<>(ComplexMatrix.class, GenericDenseStore.COMPLEX);
 
     /**
      * This method is for internal use only - YOU should NOT use it!
@@ -52,7 +52,7 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
      */
     @SuppressWarnings("unchecked")
     public PrimitiveMatrix getArgument() {
-        return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexArgument(this.getStore()));
+        return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexArgument(this.getStore()));
     }
 
     /**
@@ -60,7 +60,7 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
      */
     @SuppressWarnings("unchecked")
     public PrimitiveMatrix getImaginary() {
-        return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexImaginary(this.getStore()));
+        return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexImaginary(this.getStore()));
     }
 
     /**
@@ -68,7 +68,7 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
      */
     @SuppressWarnings("unchecked")
     public PrimitiveMatrix getModulus() {
-        return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexModulus(this.getStore()));
+        return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexModulus(this.getStore()));
     }
 
     /**
@@ -76,7 +76,7 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
      */
     @SuppressWarnings("unchecked")
     public PrimitiveMatrix getReal() {
-        return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexReal(this.getStore()));
+        return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexReal(this.getStore()));
     }
 
     @SuppressWarnings("unchecked")
@@ -110,7 +110,7 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
     @SuppressWarnings("unchecked")
     @Override
     MatrixFactory<ComplexNumber, ComplexMatrix> getFactory() {
-        return (MatrixFactory<ComplexNumber, ComplexMatrix>) FACTORY;
+        return FACTORY;
     }
 
     @Override

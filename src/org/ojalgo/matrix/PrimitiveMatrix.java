@@ -37,7 +37,7 @@ import org.ojalgo.matrix.task.SolverTask;
  */
 public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatrix> {
 
-    public static final BasicMatrix.Factory<PrimitiveMatrix> FACTORY = new MatrixFactory<>(PrimitiveMatrix.class, PrimitiveDenseStore.FACTORY);
+    public static final MatrixFactory<Double, PrimitiveMatrix> FACTORY = new MatrixFactory<>(PrimitiveMatrix.class, PrimitiveDenseStore.FACTORY);
 
     /**
      * This method is for internal use only - YOU should NOT use it!
@@ -81,7 +81,7 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
     @SuppressWarnings("unchecked")
     @Override
     MatrixFactory<Double, PrimitiveMatrix> getFactory() {
-        return (MatrixFactory<Double, PrimitiveMatrix>) FACTORY;
+        return FACTORY;
     }
 
     @Override

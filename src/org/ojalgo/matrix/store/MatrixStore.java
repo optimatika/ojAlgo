@@ -84,47 +84,47 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             implements ElementsSupplier<N>, Structure2D.Logical<MatrixStore<N>, MatrixStore.LogicalBuilder<N>> {
 
         @SafeVarargs
-        static <N extends Number> MatrixStore<N> buildColumn(final int aMinRowDim, final MatrixStore<N>... aColStore) {
-            MatrixStore<N> retVal = aColStore[0];
-            for (int i = 1; i < aColStore.length; i++) {
-                retVal = new AboveBelowStore<>(retVal, aColStore[i]);
+        static <N extends Number> MatrixStore<N> buildColumn(final int minRowDim, final MatrixStore<N>... columnStores) {
+            MatrixStore<N> retVal = columnStores[0];
+            for (int i = 1; i < columnStores.length; i++) {
+                retVal = new AboveBelowStore<>(retVal, columnStores[i]);
             }
             final int tmpRowDim = (int) retVal.countRows();
-            if (tmpRowDim < aMinRowDim) {
-                retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(retVal.physical(), aMinRowDim - tmpRowDim, (int) retVal.countColumns()));
+            if (tmpRowDim < minRowDim) {
+                retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(retVal.physical(), minRowDim - tmpRowDim, (int) retVal.countColumns()));
             }
             return retVal;
         }
 
         @SafeVarargs
-        static <N extends Number> MatrixStore<N> buildColumn(final PhysicalStore.Factory<N, ?> factory, final int aMinRowDim, final N... aColStore) {
-            MatrixStore<N> retVal = factory.columns(aColStore);
+        static <N extends Number> MatrixStore<N> buildColumn(final PhysicalStore.Factory<N, ?> factory, final int minRowDim, final N... columnElements) {
+            MatrixStore<N> retVal = factory.columns(columnElements);
             final int tmpRowDim = (int) retVal.countRows();
-            if (tmpRowDim < aMinRowDim) {
-                retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(factory, aMinRowDim - tmpRowDim, (int) retVal.countColumns()));
+            if (tmpRowDim < minRowDim) {
+                retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(factory, minRowDim - tmpRowDim, (int) retVal.countColumns()));
             }
             return retVal;
         }
 
         @SafeVarargs
-        static <N extends Number> MatrixStore<N> buildRow(final int aMinColDim, final MatrixStore<N>... aRowStore) {
-            MatrixStore<N> retVal = aRowStore[0];
-            for (int j = 1; j < aRowStore.length; j++) {
-                retVal = new LeftRightStore<>(retVal, aRowStore[j]);
+        static <N extends Number> MatrixStore<N> buildRow(final int minColDim, final MatrixStore<N>... rowStores) {
+            MatrixStore<N> retVal = rowStores[0];
+            for (int j = 1; j < rowStores.length; j++) {
+                retVal = new LeftRightStore<>(retVal, rowStores[j]);
             }
             final int tmpColDim = (int) retVal.countColumns();
-            if (tmpColDim < aMinColDim) {
-                retVal = new LeftRightStore<>(retVal, new ZeroStore<>(retVal.physical(), (int) retVal.countRows(), aMinColDim - tmpColDim));
+            if (tmpColDim < minColDim) {
+                retVal = new LeftRightStore<>(retVal, new ZeroStore<>(retVal.physical(), (int) retVal.countRows(), minColDim - tmpColDim));
             }
             return retVal;
         }
 
         @SafeVarargs
-        static <N extends Number> MatrixStore<N> buildRow(final PhysicalStore.Factory<N, ?> factory, final int aMinColDim, final N... aRowStore) {
-            MatrixStore<N> retVal = new TransposedStore<>(factory.columns(aRowStore));
+        static <N extends Number> MatrixStore<N> buildRow(final PhysicalStore.Factory<N, ?> factory, final int minColDim, final N... rowElements) {
+            MatrixStore<N> retVal = new TransposedStore<>(factory.columns(rowElements));
             final int tmpColDim = (int) retVal.countColumns();
-            if (tmpColDim < aMinColDim) {
-                retVal = new LeftRightStore<>(retVal, new ZeroStore<>(factory, (int) retVal.countRows(), aMinColDim - tmpColDim));
+            if (tmpColDim < minColDim) {
+                retVal = new LeftRightStore<>(retVal, new ZeroStore<>(factory, (int) retVal.countRows(), minColDim - tmpColDim));
             }
             return retVal;
         }

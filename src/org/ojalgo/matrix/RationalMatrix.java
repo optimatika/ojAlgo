@@ -38,7 +38,7 @@ import org.ojalgo.scalar.RationalNumber;
  */
 public final class RationalMatrix extends AbstractMatrix<RationalNumber, RationalMatrix> {
 
-    public static final BasicMatrix.Factory<RationalMatrix> FACTORY = new MatrixFactory<>(RationalMatrix.class, GenericDenseStore.RATIONAL);
+    public static final MatrixFactory<RationalNumber, RationalMatrix> FACTORY = new MatrixFactory<>(RationalMatrix.class, GenericDenseStore.RATIONAL);
 
     /**
      * This method is for internal use only - YOU should NOT use it!
@@ -78,7 +78,7 @@ public final class RationalMatrix extends AbstractMatrix<RationalNumber, Rationa
     @SuppressWarnings("unchecked")
     @Override
     MatrixFactory<RationalNumber, RationalMatrix> getFactory() {
-        return (MatrixFactory<RationalNumber, RationalMatrix>) FACTORY;
+        return FACTORY;
     }
 
     @Override

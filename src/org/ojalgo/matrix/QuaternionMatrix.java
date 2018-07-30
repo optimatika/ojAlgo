@@ -38,7 +38,7 @@ import org.ojalgo.scalar.Quaternion;
  */
 public final class QuaternionMatrix extends AbstractMatrix<Quaternion, QuaternionMatrix> {
 
-    public static final BasicMatrix.Factory<QuaternionMatrix> FACTORY = new MatrixFactory<>(QuaternionMatrix.class, GenericDenseStore.QUATERNION);
+    public static final MatrixFactory<Quaternion, QuaternionMatrix> FACTORY = new MatrixFactory<>(QuaternionMatrix.class, GenericDenseStore.QUATERNION);
 
     /**
      * This method is for internal use only - YOU should NOT use it!
@@ -78,7 +78,7 @@ public final class QuaternionMatrix extends AbstractMatrix<Quaternion, Quaternio
     @SuppressWarnings("unchecked")
     @Override
     MatrixFactory<Quaternion, QuaternionMatrix> getFactory() {
-        return (MatrixFactory<Quaternion, QuaternionMatrix>) FACTORY;
+        return FACTORY;
     }
 
     @Override

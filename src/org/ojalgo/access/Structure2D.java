@@ -98,7 +98,7 @@ public interface Structure2D extends Structure1D {
     }
 
     @SuppressWarnings("unchecked")
-    interface Logical<S extends Structure2D, B extends Logical<S, ?>> {
+    interface Logical<S extends Structure2D, B extends Logical<S, ?>> extends Structure2D {
 
         B above(S... above);
 

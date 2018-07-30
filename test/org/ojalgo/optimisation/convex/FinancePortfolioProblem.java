@@ -47,7 +47,7 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
 
         static {
 
-            PhysicalBuilder<PrimitiveMatrix> mtrxBuilder;
+            PhysicalBuilder<Double, PrimitiveMatrix> mtrxBuilder;
 
             mtrxBuilder = PrimitiveMatrix.FACTORY.getBuilder(2, 2);
             mtrxBuilder.add(0, 0, 0.040000);

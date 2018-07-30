@@ -146,17 +146,17 @@ public abstract class BasicMatrixTest {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        final PhysicalBuilder<RationalMatrix> tmpBigBuilder = myBigAA.copy();
+        final PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = myBigAA.copy();
         tmpBigBuilder.add(tmpRow, tmpCol, myNmbr);
         myExpMtrx = tmpBigBuilder.build();
 
-        final PhysicalBuilder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
+        final PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
         tmpComplexBuilder.add(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpComplexBuilder.build();
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        final PhysicalBuilder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
+        final PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
         tmpPrimitiveBuilder.add(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpPrimitiveBuilder.build();
 
@@ -834,17 +834,17 @@ public abstract class BasicMatrixTest {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        final PhysicalBuilder<RationalMatrix> tmpBigBuilder = myBigAA.copy();
+        final PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = myBigAA.copy();
         tmpBigBuilder.set(tmpRow, tmpCol, myNmbr);
         myExpMtrx = tmpBigBuilder.build();
 
-        final PhysicalBuilder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
+        final PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
         tmpComplexBuilder.set(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpComplexBuilder.build();
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        final PhysicalBuilder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
+        final PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
         tmpPrimitiveBuilder.set(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpPrimitiveBuilder.build();
 

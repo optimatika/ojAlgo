@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Factory2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.algebra.NormedVectorSpace;
@@ -37,6 +36,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -54,51 +54,58 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
         NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>,
         ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number> {
 
-    public static interface PhysicalBuilder<I extends BasicMatrix> extends Mutate2D, Supplier<I> {
+    @SuppressWarnings("unchecked")
+    public static interface LogicalBuilder<N extends Number, I extends BasicMatrix>
+            extends Structure2D.Logical<I, BasicMatrix.LogicalBuilder<N, I>>, Access2D.Collectable<N, PhysicalStore<N>> {
+
+        LogicalBuilder<N, I> above(int numberOfRows);
+
+        LogicalBuilder<N, I> above(N... elements);
+
+        LogicalBuilder<N, I> below(int numberOfRows);
+
+        LogicalBuilder<N, I> below(N... elements);
+
+        LogicalBuilder<N, I> bidiagonal(boolean upper, boolean assumeOne);
 
         default I build() {
             return this.get();
         }
 
+        LogicalBuilder<N, I> column(final int... columns);
+
+        LogicalBuilder<N, I> diagonal();
+
+        LogicalBuilder<N, I> hermitian(boolean upper);
+
+        LogicalBuilder<N, I> hessenberg(boolean upper);
+
+        LogicalBuilder<N, I> left(int numberOfColumns);
+
+        LogicalBuilder<N, I> left(N... elements);
+
+        LogicalBuilder<N, I> limits(int rowLimit, int columnLimit);
+
+        LogicalBuilder<N, I> offsets(int rowOffset, int columnOffset);
+
+        LogicalBuilder<N, I> right(int numberOfColumns);
+
+        LogicalBuilder<N, I> right(N... elements);
+
+        LogicalBuilder<N, I> row(final int... rows);
+
+        LogicalBuilder<N, I> triangular(boolean upper, boolean assumeOne);
+
+        LogicalBuilder<N, I> tridiagonal();
+
     }
 
-    public static interface Factory<I extends BasicMatrix> extends Factory2D<I> {
+    public static interface PhysicalBuilder<N extends Number, I extends BasicMatrix>
+            extends Mutate2D.Receiver<N>, Mutate2D.BiModifiable<N>, Mutate2D.Exchangeable, Supplier<I>, Access2D.Collectable<N, PhysicalStore<N>> {
 
-        PhysicalBuilder<I> getBuilder(int count);
-
-        PhysicalBuilder<I> getBuilder(int rows, int columns);
-
-    }
-
-    public static interface LogicalBuilder<I extends BasicMatrix> extends Structure2D.Logical<I, BasicMatrix.LogicalBuilder<I>> {
-
-        LogicalBuilder<I> above(int numberOfRows);
-
-        LogicalBuilder<I> below(int numberOfRows);
-
-        LogicalBuilder<I> bidiagonal(boolean upper, boolean assumeOne);
-
-        LogicalBuilder<I> column(final int... columns);
-
-        LogicalBuilder<I> diagonal();
-
-        LogicalBuilder<I> hermitian(boolean upper);
-
-        LogicalBuilder<I> hessenberg(boolean upper);
-
-        LogicalBuilder<I> left(int numberOfColumns);
-
-        LogicalBuilder<I> limits(int rowLimit, int columnLimit);
-
-        LogicalBuilder<I> offsets(int rowOffset, int columnOffset);
-
-        LogicalBuilder<I> right(int numberOfColumns);
-
-        LogicalBuilder<I> row(final int... rows);
-
-        LogicalBuilder<I> triangular(boolean upper, boolean assumeOne);
-
-        LogicalBuilder<I> tridiagonal();
+        default I build() {
+            return this.get();
+        }
 
     }
 
@@ -153,14 +160,16 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     /**
      * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
      */
-    PhysicalBuilder<? extends BasicMatrix> copy();
+    PhysicalBuilder<? extends Number, ? extends BasicMatrix> copy();
 
     /**
      * Divides the elements of this with the elements of aMtrx. The matrices must have equal dimensions.
      *
      * @param aMtrx The denominator elements.
      * @return A new matrix whos elements are the elements of this divided with the elements of aMtrx.
+     * @deprecated v46 Use {@link #copy()} instead.
      */
+    @Deprecated
     BasicMatrix divideElements(Access2D<?> aMtrx);
 
     /**
@@ -282,7 +291,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
 
     boolean isSymmetric();
 
-    LogicalBuilder<? extends BasicMatrix> logical();
+    LogicalBuilder<? extends Number, ? extends BasicMatrix> logical();
 
     /**
      * [belowRows] is appended below [this]. The two matrices must have the same number of columns.
@@ -305,7 +314,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     BasicMatrix mergeRows(Access2D<?> rightColumns);
 
     /**
-     * @deprecated v42
+     * @deprecated v42 Use {@link #copy()} instead.
      */
     @Deprecated
     BasicMatrix modify(UnaryFunction<? extends Number> aFunc);
@@ -316,7 +325,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      *
      * @param aMtrx The elements to multiply by.
      * @return A new matrix whos elements are the elements of this multiplied with the elements of aMtrx.
+     * @deprecated v46 Use {@link #copy()} instead.
      */
+    @Deprecated
     BasicMatrix multiplyElements(Access2D<?> aMtrx);
 
     /**
@@ -342,7 +353,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     /**
      * <p>
      * This method solves a system of linear equations: [this][X]=[aRHS]. A combination of columns in [this]
-     * should produce a column in [aRHS]. It is ok for [aRHS] to have more than 1 column.
+     * should produce a column(s) in [aRHS]. It is ok for [aRHS] to have more than 1 column.
      * </p>
      * <ul>
      * <li>If the problem is over-qualified an approximate solution is returned.</li>

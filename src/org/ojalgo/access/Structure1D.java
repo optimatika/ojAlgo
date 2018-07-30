@@ -152,7 +152,7 @@ public interface Structure1D {
 
     }
 
-    interface Logical<S extends Structure1D, B extends Logical<S, ?>> {
+    interface Logical<S extends Structure1D, B extends Logical<S, ?>> extends Structure1D {
 
         B after(S after);
 
