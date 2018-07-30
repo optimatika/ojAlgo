@@ -33,7 +33,7 @@ import org.ojalgo.access.ColumnView;
 import org.ojalgo.access.RowView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.BasicMatrix.Builder;
+import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -138,7 +138,7 @@ public abstract class BasicMatrixTest {
     }
 
     /**
-     * @see BasicMatrix.Builder#add(long, long, Number)
+     * @see BasicMatrix.PhysicalBuilder#add(long, long, Number)
      */
     @Test
     public void testAddIntIntNumber() {
@@ -146,17 +146,17 @@ public abstract class BasicMatrixTest {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        final Builder<RationalMatrix> tmpBigBuilder = myBigAA.copy();
+        final PhysicalBuilder<RationalMatrix> tmpBigBuilder = myBigAA.copy();
         tmpBigBuilder.add(tmpRow, tmpCol, myNmbr);
         myExpMtrx = tmpBigBuilder.build();
 
-        final Builder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
+        final PhysicalBuilder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
         tmpComplexBuilder.add(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpComplexBuilder.build();
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        final Builder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
+        final PhysicalBuilder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
         tmpPrimitiveBuilder.add(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpPrimitiveBuilder.build();
 
@@ -826,7 +826,7 @@ public abstract class BasicMatrixTest {
     }
 
     /**
-     * @see BasicMatrix.Builder#set(long, long, Number)
+     * @see BasicMatrix.PhysicalBuilder#set(long, long, Number)
      */
     @Test
     public void testSetIntIntNumber() {
@@ -834,17 +834,17 @@ public abstract class BasicMatrixTest {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        final Builder<RationalMatrix> tmpBigBuilder = myBigAA.copy();
+        final PhysicalBuilder<RationalMatrix> tmpBigBuilder = myBigAA.copy();
         tmpBigBuilder.set(tmpRow, tmpCol, myNmbr);
         myExpMtrx = tmpBigBuilder.build();
 
-        final Builder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
+        final PhysicalBuilder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
         tmpComplexBuilder.set(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpComplexBuilder.build();
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        final Builder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
+        final PhysicalBuilder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
         tmpPrimitiveBuilder.set(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpPrimitiveBuilder.build();
 

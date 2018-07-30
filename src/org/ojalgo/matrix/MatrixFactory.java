@@ -30,7 +30,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.matrix.BasicMatrix.Builder;
+import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.Scalar;
@@ -43,7 +43,7 @@ import org.ojalgo.scalar.Scalar;
  */
 final class MatrixFactory<N extends Number, I extends BasicMatrix> implements BasicMatrix.Factory<I> {
 
-    final class MatrixBuilder implements Builder<I> {
+    final class MatrixBuilder implements PhysicalBuilder<I> {
 
         private final PhysicalStore<N> myStore;
         private boolean mySafe = true;
@@ -215,11 +215,11 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         return myPhysicalFactory.function();
     }
 
-    public Builder<I> getBuilder(final int count) {
+    public PhysicalBuilder<I> getBuilder(final int count) {
         return this.getBuilder(count, 1);
     }
 
-    public Builder<I> getBuilder(final int rows, final int columns) {
+    public PhysicalBuilder<I> getBuilder(final int rows, final int columns) {
         return new MatrixBuilder(myPhysicalFactory, rows, columns);
     }
 

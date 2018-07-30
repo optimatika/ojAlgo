@@ -38,19 +38,19 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     interface BiModifiable<N extends Number> extends Mutate2D.Modifiable<N>, Mutate1D.BiModifiable<N> {
 
         default void modifyMatchingInColumns(final Access1D<N> left, final BinaryFunction<N> function) {
-            this.loopColumn(0L, (r, c) -> this.modifyRow(r, c, function.first(left.get(c))));
+            left.loopAll(r -> this.modifyRow(r, function.first(left.get(r))));
         }
 
         default void modifyMatchingInColumns(final BinaryFunction<N> function, final Access1D<N> right) {
-            this.loopColumn(0L, (r, c) -> this.modifyRow(r, c, function.second(right.get(c))));
+            right.loopAll(r -> this.modifyRow(r, function.second(right.get(r))));
         }
 
         default void modifyMatchingInRows(final Access1D<N> left, final BinaryFunction<N> function) {
-            this.loopRow(0L, (r, c) -> this.modifyColumn(r, c, function.first(left.get(c))));
+            left.loopAll(c -> this.modifyColumn(c, function.first(left.get(c))));
         }
 
         default void modifyMatchingInRows(final BinaryFunction<N> function, final Access1D<N> right) {
-            this.loopRow(0L, (r, c) -> this.modifyColumn(r, c, function.second(right.get(c))));
+            right.loopAll(c -> this.modifyColumn(c, function.second(right.get(c))));
         }
 
     }

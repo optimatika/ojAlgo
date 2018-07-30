@@ -54,7 +54,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
         NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>,
         ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number> {
 
-    public static interface Builder<I extends BasicMatrix> extends Mutate2D, Supplier<I> {
+    public static interface PhysicalBuilder<I extends BasicMatrix> extends Mutate2D, Supplier<I> {
 
         default I build() {
             return this.get();
@@ -64,9 +64,41 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
 
     public static interface Factory<I extends BasicMatrix> extends Factory2D<I> {
 
-        Builder<I> getBuilder(int count);
+        PhysicalBuilder<I> getBuilder(int count);
 
-        Builder<I> getBuilder(int rows, int columns);
+        PhysicalBuilder<I> getBuilder(int rows, int columns);
+
+    }
+
+    public static interface LogicalBuilder<I extends BasicMatrix> extends Structure2D.Logical<I, BasicMatrix.LogicalBuilder<I>> {
+
+        LogicalBuilder<I> above(int numberOfRows);
+
+        LogicalBuilder<I> below(int numberOfRows);
+
+        LogicalBuilder<I> bidiagonal(boolean upper, boolean assumeOne);
+
+        LogicalBuilder<I> column(final int... columns);
+
+        LogicalBuilder<I> diagonal();
+
+        LogicalBuilder<I> hermitian(boolean upper);
+
+        LogicalBuilder<I> hessenberg(boolean upper);
+
+        LogicalBuilder<I> left(int numberOfColumns);
+
+        LogicalBuilder<I> limits(int rowLimit, int columnLimit);
+
+        LogicalBuilder<I> offsets(int rowOffset, int columnOffset);
+
+        LogicalBuilder<I> right(int numberOfColumns);
+
+        LogicalBuilder<I> row(final int... rows);
+
+        LogicalBuilder<I> triangular(boolean upper, boolean assumeOne);
+
+        LogicalBuilder<I> tridiagonal();
 
     }
 
@@ -121,7 +153,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     /**
      * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
      */
-    Builder<? extends BasicMatrix> copy();
+    PhysicalBuilder<? extends BasicMatrix> copy();
 
     /**
      * Divides the elements of this with the elements of aMtrx. The matrices must have equal dimensions.
@@ -155,7 +187,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * @param first The first column to include.
      * @param limit The limit (exclusive) - the first column not to include.
      * @return A new matrix with only the specified range of columns
+     * @deprecated v46 Use {@link #logical()} instead.
      */
+    @Deprecated
     BasicMatrix getColumnsRange(final int first, final int limit);
 
     /**
@@ -192,7 +226,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * @param first The first row to include.
      * @param kimit The limit (exclusive) - the first row not to include.
      * @return A new matrix with only the specified range of rows
+     * @deprecated v46 Use {@link #logical()} instead.
      */
+    @Deprecated
     BasicMatrix getRowsRange(final int first, final int kimit);
 
     /**
@@ -246,12 +282,16 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
 
     boolean isSymmetric();
 
+    LogicalBuilder<? extends BasicMatrix> logical();
+
     /**
      * [belowRows] is appended below [this]. The two matrices must have the same number of columns.
      *
      * @param belowRows The matrix to merge.
      * @return A new matrix with more rows.
+     * @deprecated v46 Use {@link #logical()} instead.
      */
+    @Deprecated
     BasicMatrix mergeColumns(Access2D<?> belowRows);
 
     /**
@@ -259,7 +299,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      *
      * @param rightColumns The matrix to merge.
      * @return A new matrix with more columns.
+     * @deprecated v46 Use {@link #logical()} instead.
      */
+    @Deprecated
     BasicMatrix mergeRows(Access2D<?> rightColumns);
 
     /**
@@ -280,14 +322,22 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     /**
      * @param someCols An ordered array of column indeces.
      * @return A matrix with a subset of, reordered, columns.
+     * @deprecated v46 Use {@link #logical()} instead.
      */
-    BasicMatrix selectColumns(int... someCols);
+    @Deprecated
+    default BasicMatrix selectColumns(int... someCols) {
+        return this.logical().column(someCols).get();
+    }
 
     /**
      * @param someRows An ordered array of row indeces.
      * @return A matrix with a subset of, reordered, rows.
+     * @deprecated v46 Use {@link #logical()} instead.
      */
-    BasicMatrix selectRows(int... someRows);
+    @Deprecated
+    default BasicMatrix selectRows(int... someRows) {
+        return this.logical().row(someRows).get();
+    }
 
     /**
      * <p>
@@ -315,14 +365,6 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * @return One matrix element
      */
     Scalar<?> toScalar(long row, long col);
-
-    /**
-     * @deprecated v42
-     */
-    @Deprecated
-    default String toString(final int row, final int col) {
-        return this.toScalar(row, col).toString();
-    }
 
     /**
      * Transposes this matrix. For complex matrices conjugate() and transpose() are NOT EQUAL.

@@ -97,6 +97,23 @@ public interface Structure2D extends Structure1D {
 
     }
 
+    @SuppressWarnings("unchecked")
+    interface Logical<S extends Structure2D, B extends Logical<S, ?>> {
+
+        B above(S... above);
+
+        B below(S... below);
+
+        B diagonally(S... diagonally);
+
+        S get();
+
+        B left(S... left);
+
+        B right(S... right);
+
+    }
+
     public final class LongRowColumn implements Comparable<LongRowColumn> {
 
         public final long column;

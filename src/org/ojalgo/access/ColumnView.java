@@ -85,7 +85,7 @@ public class ColumnView<N extends Number> implements Access1D<N>, Iterator<Colum
         return this;
     }
 
-    public void remove() {
+    public final void remove() {
         ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 

@@ -96,6 +96,10 @@ public interface StructureAnyD extends Structure1D {
 
     }
 
+    interface Logical<S extends StructureAnyD, B extends Logical<S, ?>> {
+
+    }
+
     public final class LongReference implements Comparable<LongReference> {
 
         public final long[] reference;
