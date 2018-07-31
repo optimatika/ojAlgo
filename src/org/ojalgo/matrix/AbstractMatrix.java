@@ -22,6 +22,8 @@
 package org.ojalgo.matrix;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
@@ -34,6 +36,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
@@ -443,6 +446,21 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         }
 
         return myStore.physical().scalar().convert(tmpDeterminant);
+    }
+
+    public List<Eigenpair> getEigenpairs() {
+
+        Eigenvalue<N> evd = this.getComputedEigenvalue();
+
+        List<Eigenpair> retVal = new ArrayList<>();
+
+        for (int i = 0, limit = evd.getEigenvalues().size(); i < limit; i++) {
+            retVal.add(evd.getEigenpair(i));
+        }
+
+        retVal.sort(Comparator.reverseOrder());
+
+        return retVal;
     }
 
     public List<ComplexNumber> getEigenvalues() {

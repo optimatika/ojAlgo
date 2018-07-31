@@ -34,6 +34,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
@@ -227,6 +228,8 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * @return The matrix' determinant.
      */
     Scalar<?> getDeterminant();
+
+    List<Eigenvalue.Eigenpair> getEigenpairs();
 
     /**
      * @deprecated v40 Use {@link SingularValue}
