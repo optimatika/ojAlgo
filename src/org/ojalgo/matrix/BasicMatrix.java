@@ -34,6 +34,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -74,6 +75,8 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
 
         LogicalBuilder<N, I> column(final int... columns);
 
+        LogicalBuilder<N, I> conjugate();
+
         LogicalBuilder<N, I> diagonal();
 
         LogicalBuilder<N, I> hermitian(boolean upper);
@@ -93,6 +96,14 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
         LogicalBuilder<N, I> right(N... elements);
 
         LogicalBuilder<N, I> row(final int... rows);
+
+        LogicalBuilder<N, I> superimpose(BasicMatrix matrix);
+
+        LogicalBuilder<N, I> superimpose(int row, int col, BasicMatrix matrix);
+
+        LogicalBuilder<N, I> superimpose(int row, int col, Number matrix);
+
+        LogicalBuilder<N, I> transpose();
 
         LogicalBuilder<N, I> triangular(boolean upper, boolean assumeOne);
 
@@ -154,7 +165,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * @param col The column index of where to superimpose the top left element of the addend
      * @param addend A matrix to superimpose
      * @return A new matrix
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
+    @Deprecated
     BasicMatrix add(int row, int col, Access2D<?> addend);
 
     /**
@@ -167,7 +180,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      *
      * @param aMtrx The denominator elements.
      * @return A new matrix whos elements are the elements of this divided with the elements of aMtrx.
-     * @deprecated v46 Use {@link #copy()} instead.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
     BasicMatrix divideElements(Access2D<?> aMtrx);
@@ -196,7 +209,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * @param first The first column to include.
      * @param limit The limit (exclusive) - the first column not to include.
      * @return A new matrix with only the specified range of columns
-     * @deprecated v46 Use {@link #logical()} instead.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
     BasicMatrix getColumnsRange(final int first, final int limit);
@@ -226,16 +239,15 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * also equal to the number of nonzero singular values of the matrix.
      *
      * @return The matrix' rank.
-     * @deprecated v40 Use {@link SingularValue}
+     * @see MatrixDecomposition.RankRevealing
      */
-    @Deprecated
     int getRank();
 
     /**
      * @param first The first row to include.
      * @param kimit The limit (exclusive) - the first row not to include.
      * @return A new matrix with only the specified range of rows
-     * @deprecated v46 Use {@link #logical()} instead.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
     BasicMatrix getRowsRange(final int first, final int kimit);
@@ -282,9 +294,8 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
 
     /**
      * @return true if {@linkplain #getRank()} == min({@linkplain #countRows()}, {@linkplain #countColumns()})
-     * @deprecated v40
+     * @see MatrixDecomposition.RankRevealing
      */
-    @Deprecated
     boolean isFullRank();
 
     boolean isHermitian();
@@ -298,7 +309,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      *
      * @param belowRows The matrix to merge.
      * @return A new matrix with more rows.
-     * @deprecated v46 Use {@link #logical()} instead.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
     BasicMatrix mergeColumns(Access2D<?> belowRows);
@@ -308,13 +319,13 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      *
      * @param rightColumns The matrix to merge.
      * @return A new matrix with more columns.
-     * @deprecated v46 Use {@link #logical()} instead.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
     BasicMatrix mergeRows(Access2D<?> rightColumns);
 
     /**
-     * @deprecated v42 Use {@link #copy()} instead.
+     * @deprecated v42 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
     BasicMatrix modify(UnaryFunction<? extends Number> aFunc);
@@ -325,7 +336,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      *
      * @param aMtrx The elements to multiply by.
      * @return A new matrix whos elements are the elements of this multiplied with the elements of aMtrx.
-     * @deprecated v46 Use {@link #copy()} instead.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
     BasicMatrix multiplyElements(Access2D<?> aMtrx);
@@ -333,7 +344,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     /**
      * @param someCols An ordered array of column indeces.
      * @return A matrix with a subset of, reordered, columns.
-     * @deprecated v46 Use {@link #logical()} instead.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
     default BasicMatrix selectColumns(int... someCols) {
@@ -343,7 +354,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     /**
      * @param someRows An ordered array of row indeces.
      * @return A matrix with a subset of, reordered, rows.
-     * @deprecated v46 Use {@link #logical()} instead.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
     default BasicMatrix selectRows(int... someRows) {
@@ -382,7 +393,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      *
      * @return A matrix that is the transpose of this matrix.
      * @see org.ojalgo.matrix.BasicMatrix#conjugate()
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
+    @Deprecated
     BasicMatrix transpose();
 
 }

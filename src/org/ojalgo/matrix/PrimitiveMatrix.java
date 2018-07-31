@@ -23,6 +23,11 @@ package org.ojalgo.matrix;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -74,11 +79,30 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
     }
 
     @Override
+    Eigenvalue<Double> getDecompositionEigenvalue(Structure2D typical) {
+        return Eigenvalue.PRIMITIVE.make(typical, this.isHermitian());
+    }
+
+    @Override
+    LU<Double> getDecompositionLU(Structure2D typical) {
+        return LU.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    QR<Double> getDecompositionQR(Structure2D typical) {
+        return QR.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    SingularValue<Double> getDecompositionSingularValue(Structure2D typical) {
+        return SingularValue.PRIMITIVE.make(typical);
+    }
+
+    @Override
     DeterminantTask<Double> getDeterminantTask(final MatrixStore<Double> template) {
         return DeterminantTask.PRIMITIVE.make(template, this.isHermitian(), false);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     MatrixFactory<Double, PrimitiveMatrix> getFactory() {
         return FACTORY;

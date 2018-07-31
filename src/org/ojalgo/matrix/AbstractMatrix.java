@@ -28,12 +28,15 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
+import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -97,6 +100,11 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         public BasicMatrix.LogicalBuilder<N, I> column(int... columns) {
             myDelegate.column(columns);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, I> conjugate() {
+            myDelegate.conjugate();
             return this;
         }
 
@@ -177,8 +185,28 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
             return this;
         }
 
+        public BasicMatrix.LogicalBuilder<N, I> superimpose(BasicMatrix matrix) {
+            myDelegate.superimpose(myOrigin.cast(matrix).get());
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, I> superimpose(int row, int col, BasicMatrix matrix) {
+            myDelegate.superimpose(row, col, myOrigin.cast(matrix).get());
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, I> superimpose(int row, int col, Number matrix) {
+            myDelegate.superimpose(row, col, matrix);
+            return this;
+        }
+
         public void supplyTo(PhysicalStore<N> receiver) {
             myDelegate.supplyTo(receiver);
+        }
+
+        public BasicMatrix.LogicalBuilder<N, I> transpose() {
+            myDelegate.transpose();
+            return this;
         }
 
         public BasicMatrix.LogicalBuilder<N, I> triangular(boolean upper, boolean assumeOne) {
@@ -448,7 +476,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     public int getRank() {
-        return this.getComputedSingularValue().getRank();
+        return this.getRankRevealing(myStore).getRank();
     }
 
     public I getRowsRange(final int first, final int limit) {
@@ -552,7 +580,8 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     public boolean isFullRank() {
-        return this.getRank() == Math.min(myStore.countRows(), myStore.countColumns());
+        return this.getRankRevealing(myStore).isFullRank();
+        // return this.getRank() == Math.min(myStore.countRows(), myStore.countColumns());
     }
 
     public boolean isHermitian() {
@@ -788,6 +817,27 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return (SingularValue<N>) myDecomposition;
     }
 
+    private MatrixDecomposition.RankRevealing<N> getRankRevealing(final MatrixStore<N> store) {
+
+        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.RankRevealing)
+                && ((MatrixDecomposition.RankRevealing<?>) myDecomposition).isComputed()) {
+
+        } else {
+
+            if (store.isTall()) {
+                myDecomposition = this.getDecompositionQR(store);
+            } else if (store.isFat()) {
+                myDecomposition = this.getDecompositionSingularValue(store);
+            } else {
+                myDecomposition = this.getDecompositionLU(store);
+            }
+
+            myDecomposition.decompose(store);
+        }
+
+        return (MatrixDecomposition.RankRevealing<N>) myDecomposition;
+    }
+
     private boolean isComputedEigenvalue() {
         return (myDecomposition != null) && (myDecomposition instanceof Eigenvalue) && myDecomposition.isComputed();
     }
@@ -797,6 +847,14 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     abstract ElementsSupplier<N> cast(Access1D<?> matrix);
+
+    abstract Eigenvalue<N> getDecompositionEigenvalue(Structure2D typical);
+
+    abstract LU<N> getDecompositionLU(Structure2D typical);
+
+    abstract QR<N> getDecompositionQR(Structure2D typical);
+
+    abstract SingularValue<N> getDecompositionSingularValue(Structure2D typical);
 
     abstract DeterminantTask<N> getDeterminantTask(final MatrixStore<N> template);
 

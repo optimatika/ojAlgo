@@ -23,6 +23,11 @@ package org.ojalgo.matrix;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -71,11 +76,30 @@ public final class QuaternionMatrix extends AbstractMatrix<Quaternion, Quaternio
     }
 
     @Override
+    Eigenvalue<Quaternion> getDecompositionEigenvalue(Structure2D typical) {
+        return Eigenvalue.QUATERNION.make(typical, this.isHermitian());
+    }
+
+    @Override
+    LU<Quaternion> getDecompositionLU(Structure2D typical) {
+        return LU.QUATERNION.make(typical);
+    }
+
+    @Override
+    QR<Quaternion> getDecompositionQR(Structure2D typical) {
+        return QR.QUATERNION.make(typical);
+    }
+
+    @Override
+    SingularValue<Quaternion> getDecompositionSingularValue(Structure2D typical) {
+        return SingularValue.QUATERNION.make(typical);
+    }
+
+    @Override
     DeterminantTask<Quaternion> getDeterminantTask(final MatrixStore<Quaternion> template) {
         return DeterminantTask.QUATERNION.make(template, this.isHermitian(), false);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     MatrixFactory<Quaternion, QuaternionMatrix> getFactory() {
         return FACTORY;

@@ -23,6 +23,11 @@ package org.ojalgo.matrix;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -71,11 +76,30 @@ public final class RationalMatrix extends AbstractMatrix<RationalNumber, Rationa
     }
 
     @Override
+    Eigenvalue<RationalNumber> getDecompositionEigenvalue(Structure2D typical) {
+        return Eigenvalue.RATIONAL.make(typical, this.isHermitian());
+    }
+
+    @Override
+    LU<RationalNumber> getDecompositionLU(Structure2D typical) {
+        return LU.RATIONAL.make(typical);
+    }
+
+    @Override
+    QR<RationalNumber> getDecompositionQR(Structure2D typical) {
+        return QR.RATIONAL.make(typical);
+    }
+
+    @Override
+    SingularValue<RationalNumber> getDecompositionSingularValue(Structure2D typical) {
+        return SingularValue.RATIONAL.make(typical);
+    }
+
+    @Override
     DeterminantTask<RationalNumber> getDeterminantTask(final MatrixStore<RationalNumber> template) {
         return DeterminantTask.RATIONAL.make(template, this.isHermitian(), false);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     MatrixFactory<RationalNumber, RationalMatrix> getFactory() {
         return FACTORY;
