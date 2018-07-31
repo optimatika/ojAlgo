@@ -48,7 +48,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public abstract class BasicMatrixTest {
+public abstract class BasicMatrixTest extends MatrixTests {
 
     public static NumberContext DEFINITION = NumberContext.getGeneral(9);
     public static NumberContext EVALUATION = NumberContext.getGeneral(9);
