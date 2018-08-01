@@ -681,14 +681,14 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     default double norm() {
 
-        final double vectorNorm = this.aggregateAll(Aggregator.NORM2).doubleValue();
+        final double frobeniusNorm = this.aggregateAll(Aggregator.NORM2).doubleValue();
 
         if (this.isVector()) {
-            return vectorNorm;
+            return frobeniusNorm;
         } else {
             // Bringing it closer to what the operator norm would be
             // In case of representing a ComplexNumber or Quaternion as a matrix this will match their norms
-            return vectorNorm / PrimitiveFunction.SQRT.invoke(Math.min(this.countRows(), this.countColumns()));
+            return frobeniusNorm / PrimitiveFunction.SQRT.invoke(Math.min(this.countRows(), this.countColumns()));
         }
     }
 

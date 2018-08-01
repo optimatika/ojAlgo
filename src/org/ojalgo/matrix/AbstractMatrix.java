@@ -47,7 +47,6 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -382,8 +381,8 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(tmpCopy);
     }
 
-    public boolean equals(final Access2D<?> aMtrx, final NumberContext aCntxt) {
-        return Access2D.equals(myStore, aMtrx, aCntxt);
+    public boolean equals(final Access2D<?> another, final NumberContext precision) {
+        return Access2D.equals(myStore, another, precision);
     }
 
     @Override
@@ -450,6 +449,10 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public List<Eigenpair> getEigenpairs() {
 
+        if (!this.isSquare()) {
+            throw new ProgrammingError("Only defined for square matrices!");
+        }
+
         Eigenvalue<N> evd = this.getComputedEigenvalue();
 
         List<Eigenpair> retVal = new ArrayList<>();
@@ -461,36 +464,6 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         retVal.sort(Comparator.reverseOrder());
 
         return retVal;
-    }
-
-    public List<ComplexNumber> getEigenvalues() {
-        return this.getComputedEigenvalue().getEigenvalues();
-    }
-
-    public Scalar<N> getFrobeniusNorm() {
-        return myStore.physical().scalar().convert(BasicMatrix.calculateFrobeniusNorm(this));
-    }
-
-    public Scalar<N> getInfinityNorm() {
-        return myStore.physical().scalar().convert(BasicMatrix.calculateInfinityNorm(this));
-    }
-
-    public Scalar<N> getKyFanNorm(final int k) {
-        return myStore.physical().scalar().convert(this.getComputedSingularValue().getKyFanNorm(k));
-    }
-
-    public Scalar<N> getOneNorm() {
-        return myStore.physical().scalar().convert(BasicMatrix.calculateOneNorm(this));
-    }
-
-    /**
-     * 2-norm, max singular value
-     *
-     * @deprecated v40 Use {@link SingularValue}
-     */
-    @Deprecated
-    public Scalar<N> getOperatorNorm() {
-        return myStore.physical().scalar().convert(this.getComputedSingularValue().getOperatorNorm());
     }
 
     public int getRank() {
@@ -512,39 +485,6 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         myStore.visitDiagonal(0, 0, tmpAggr);
 
         return myStore.physical().scalar().convert(tmpAggr.get());
-    }
-
-    public Scalar<N> getTraceNorm() {
-        return myStore.physical().scalar().convert(this.getComputedSingularValue().getTraceNorm());
-    }
-
-    /**
-     * Treats [this] as if it is one dimensional (a vector) and calculates the vector norm. The interface only
-     * requires that implementations can handle arguments 0, 1, 2 and {@linkplain Integer#MAX_VALUE}.
-     *
-     * @deprecated v40 Use {@link #aggregateAll(org.ojalgo.function.aggregator.Aggregator)}
-     */
-    @Deprecated
-    public Scalar<N> getVectorNorm(final int degree) {
-
-        switch (degree) {
-
-        case 0:
-
-            return myStore.physical().scalar().convert(myStore.aggregateAll(Aggregator.CARDINALITY));
-
-        case 1:
-
-            return myStore.physical().scalar().convert(myStore.aggregateAll(Aggregator.NORM1));
-
-        case 2:
-
-            return myStore.physical().scalar().convert(myStore.aggregateAll(Aggregator.NORM2));
-
-        default:
-
-            return myStore.physical().scalar().convert(myStore.aggregateAll(Aggregator.LARGEST));
-        }
     }
 
     @Override

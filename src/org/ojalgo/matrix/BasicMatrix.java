@@ -39,7 +39,6 @@ import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -54,7 +53,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access2D.Aggregatable<Number>, Structure2D.ReducibleTo1D<BasicMatrix>,
         NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>,
-        ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number> {
+        ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number>,
+        NumberContext.Enforceable<BasicMatrix> {
 
     @SuppressWarnings("unchecked")
     public static interface LogicalBuilder<N extends Number, I extends BasicMatrix>
@@ -187,18 +187,10 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     BasicMatrix divideElements(Access2D<?> aMtrx);
 
     /**
-     * Will enforce this number context on the elements
-     *
-     * @param context The context
-     * @return A new matrix with the elements enforced
-     */
-    BasicMatrix enforce(NumberContext context);
-
-    /**
      * @return true if the frobenius norm of the difference between [this] and [aStore] is zero within the
      *         limits of aCntxt.
      */
-    boolean equals(Access2D<?> aMtrx, NumberContext aCntxt);
+    boolean equals(Access2D<?> another, NumberContext precision);
 
     /**
      * BasicMatrix instances are intended to be immutable. If they are it is possible to cache (partial)
@@ -219,9 +211,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * Matrix condition (2-norm)
      *
      * @return ratio of largest to smallest singular value.
-     * @deprecated v40 Use {@link SingularValue}
      */
-    @Deprecated
     Scalar<?> getCondition();
 
     /**
@@ -230,12 +220,6 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     Scalar<?> getDeterminant();
 
     List<Eigenvalue.Eigenpair> getEigenpairs();
-
-    /**
-     * @deprecated v40 Use {@link SingularValue}
-     */
-    @Deprecated
-    List<ComplexNumber> getEigenvalues();
 
     /**
      * The rank of a matrix is the (maximum) number of linearly independent rows or columns it contains. It is
@@ -396,9 +380,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      *
      * @return A matrix that is the transpose of this matrix.
      * @see org.ojalgo.matrix.BasicMatrix#conjugate()
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
-    @Deprecated
     BasicMatrix transpose();
 
 }
