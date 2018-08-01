@@ -680,7 +680,16 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
     }
 
     default double norm() {
-        return PrimitiveFunction.SQRT.invoke(this.aggregateAll(Aggregator.SUM2).doubleValue() / PrimitiveFunction.SQRT.invoke(this.count()));
+
+        final double vectorNorm = this.aggregateAll(Aggregator.NORM2).doubleValue();
+
+        if (this.isVector()) {
+            return vectorNorm;
+        } else {
+            // Bringing it closer to what the operator norm would be
+            // In case of representing a ComplexNumber or Quaternion as a matrix this will match their norms
+            return vectorNorm / PrimitiveFunction.SQRT.invoke(Math.min(this.countRows(), this.countColumns()));
+        }
     }
 
     default MatrixStore<N> operateOnAll(final UnaryFunction<N> operator) {
