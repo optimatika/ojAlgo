@@ -96,22 +96,22 @@ public final class RationalMatrix extends AbstractMatrix<RationalNumber, Rationa
     }
 
     @Override
-    DeterminantTask<RationalNumber> getDeterminantTask(final MatrixStore<RationalNumber> template) {
-        return DeterminantTask.RATIONAL.make(template, this.isHermitian(), false);
-    }
-
-    @Override
     MatrixFactory<RationalNumber, RationalMatrix> getFactory() {
         return FACTORY;
     }
 
     @Override
-    InverterTask<RationalNumber> getInverterTask(final MatrixStore<RationalNumber> template) {
+    DeterminantTask<RationalNumber> getTaskDeterminant(final MatrixStore<RationalNumber> template) {
+        return DeterminantTask.RATIONAL.make(template, this.isHermitian(), false);
+    }
+
+    @Override
+    InverterTask<RationalNumber> getTaskInverter(final MatrixStore<RationalNumber> template) {
         return InverterTask.RATIONAL.make(template, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<RationalNumber> getSolverTask(final MatrixStore<RationalNumber> templateBody, final Access2D<?> templateRHS) {
+    SolverTask<RationalNumber> getTaskSolver(final MatrixStore<RationalNumber> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.RATIONAL.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

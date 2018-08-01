@@ -124,22 +124,22 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
     }
 
     @Override
-    DeterminantTask<ComplexNumber> getDeterminantTask(final MatrixStore<ComplexNumber> template) {
-        return DeterminantTask.COMPLEX.make(template, this.isHermitian(), false);
-    }
-
-    @Override
     MatrixFactory<ComplexNumber, ComplexMatrix> getFactory() {
         return FACTORY;
     }
 
     @Override
-    InverterTask<ComplexNumber> getInverterTask(final MatrixStore<ComplexNumber> base) {
+    DeterminantTask<ComplexNumber> getTaskDeterminant(final MatrixStore<ComplexNumber> template) {
+        return DeterminantTask.COMPLEX.make(template, this.isHermitian(), false);
+    }
+
+    @Override
+    InverterTask<ComplexNumber> getTaskInverter(final MatrixStore<ComplexNumber> base) {
         return InverterTask.COMPLEX.make(base, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<ComplexNumber> getSolverTask(final MatrixStore<ComplexNumber> templateBody, final Access2D<?> templateRHS) {
+    SolverTask<ComplexNumber> getTaskSolver(final MatrixStore<ComplexNumber> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.COMPLEX.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

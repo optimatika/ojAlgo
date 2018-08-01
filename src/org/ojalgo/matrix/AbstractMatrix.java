@@ -436,7 +436,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         } else {
 
-            final DeterminantTask<N> tmpTask = this.getDeterminantTask(myStore);
+            final DeterminantTask<N> tmpTask = this.getTaskDeterminant(myStore);
 
             if (tmpTask instanceof MatrixDecomposition.Determinant) {
                 myDecomposition = (MatrixDecomposition.Determinant<N>) tmpTask;
@@ -566,7 +566,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         } else {
 
-            final InverterTask<N> tmpTask = this.getInverterTask(myStore);
+            final InverterTask<N> tmpTask = this.getTaskInverter(myStore);
 
             if (tmpTask instanceof MatrixDecomposition.Solver) {
 
@@ -738,7 +738,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         } else {
 
-            final SolverTask<N> tmpTask = this.getSolverTask(myStore, rhs);
+            final SolverTask<N> tmpTask = this.getTaskSolver(myStore, rhs);
 
             if (tmpTask instanceof MatrixDecomposition.Solver) {
 
@@ -874,16 +874,16 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     abstract SingularValue<N> getDecompositionSingularValue(Structure2D typical);
 
-    abstract DeterminantTask<N> getDeterminantTask(final MatrixStore<N> template);
-
     abstract MatrixFactory<N, I> getFactory();
-
-    abstract InverterTask<N> getInverterTask(final MatrixStore<N> template);
-
-    abstract SolverTask<N> getSolverTask(MatrixStore<N> templateBody, Access2D<?> templateRHS);
 
     final MatrixStore<N> getStore() {
         return myStore;
     }
+
+    abstract DeterminantTask<N> getTaskDeterminant(final MatrixStore<N> template);
+
+    abstract InverterTask<N> getTaskInverter(final MatrixStore<N> template);
+
+    abstract SolverTask<N> getTaskSolver(MatrixStore<N> templateBody, Access2D<?> templateRHS);
 
 }

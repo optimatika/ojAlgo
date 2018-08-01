@@ -96,22 +96,22 @@ public final class QuaternionMatrix extends AbstractMatrix<Quaternion, Quaternio
     }
 
     @Override
-    DeterminantTask<Quaternion> getDeterminantTask(final MatrixStore<Quaternion> template) {
-        return DeterminantTask.QUATERNION.make(template, this.isHermitian(), false);
-    }
-
-    @Override
     MatrixFactory<Quaternion, QuaternionMatrix> getFactory() {
         return FACTORY;
     }
 
     @Override
-    InverterTask<Quaternion> getInverterTask(final MatrixStore<Quaternion> template) {
+    DeterminantTask<Quaternion> getTaskDeterminant(final MatrixStore<Quaternion> template) {
+        return DeterminantTask.QUATERNION.make(template, this.isHermitian(), false);
+    }
+
+    @Override
+    InverterTask<Quaternion> getTaskInverter(final MatrixStore<Quaternion> template) {
         return InverterTask.QUATERNION.make(template, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<Quaternion> getSolverTask(final MatrixStore<Quaternion> templateBody, final Access2D<?> templateRHS) {
+    SolverTask<Quaternion> getTaskSolver(final MatrixStore<Quaternion> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.QUATERNION.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

@@ -99,22 +99,22 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
     }
 
     @Override
-    DeterminantTask<Double> getDeterminantTask(final MatrixStore<Double> template) {
-        return DeterminantTask.PRIMITIVE.make(template, this.isHermitian(), false);
-    }
-
-    @Override
     MatrixFactory<Double, PrimitiveMatrix> getFactory() {
         return FACTORY;
     }
 
     @Override
-    InverterTask<Double> getInverterTask(final MatrixStore<Double> base) {
+    DeterminantTask<Double> getTaskDeterminant(final MatrixStore<Double> template) {
+        return DeterminantTask.PRIMITIVE.make(template, this.isHermitian(), false);
+    }
+
+    @Override
+    InverterTask<Double> getTaskInverter(final MatrixStore<Double> base) {
         return InverterTask.PRIMITIVE.make(base, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<Double> getSolverTask(final MatrixStore<Double> templateBody, final Access2D<?> templateRHS) {
+    SolverTask<Double> getTaskSolver(final MatrixStore<Double> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.PRIMITIVE.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 
