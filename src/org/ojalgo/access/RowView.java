@@ -81,7 +81,7 @@ public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<
         return this;
     }
 
-    public void remove() {
+    public final void remove() {
         ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 

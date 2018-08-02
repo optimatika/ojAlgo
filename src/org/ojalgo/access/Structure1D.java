@@ -152,6 +152,14 @@ public interface Structure1D {
 
     }
 
+    interface Logical<S extends Structure1D, B extends Logical<S, ?>> extends Structure1D {
+
+        B after(S after);
+
+        B before(S before);
+
+    }
+
     public final class LongIndex implements Comparable<LongIndex> {
 
         public final long index;

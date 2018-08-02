@@ -28,9 +28,12 @@ import java.util.List;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Factory2D;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.matrix.BasicMatrix.Builder;
+import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.Scalar;
@@ -41,12 +44,12 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-final class MatrixFactory<N extends Number, I extends BasicMatrix> implements BasicMatrix.Factory<I> {
+public final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Factory2D<I> {
 
-    final class MatrixBuilder implements Builder<I> {
+    final class MatrixBuilder implements PhysicalBuilder<N, I> {
 
-        private final PhysicalStore<N> myStore;
         private boolean mySafe = true;
+        private final PhysicalStore<N> myStore;
 
         protected MatrixBuilder(final PhysicalStore.Factory<N, ?> factory, final int rowDim, final int colDim) {
 
@@ -62,7 +65,23 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             myStore = physicalStore;
         }
 
-        public final void add(final long row, final long col, final double value) {
+        public void accept(Access2D<?> supplied) {
+            if (mySafe) {
+                myStore.accept(supplied);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void add(long index, double addend) {
+            if (mySafe) {
+                myStore.add(index, addend);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void add(final long row, final long col, final double value) {
             if (mySafe) {
                 myStore.add(row, col, value);
             } else {
@@ -70,7 +89,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             }
         }
 
-        public final void add(final long row, final long col, final Number value) {
+        public void add(final long row, final long col, final Number value) {
             if (mySafe) {
                 myStore.add(row, col, value);
             } else {
@@ -78,61 +97,433 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             }
         }
 
-        public final long count() {
+        public void add(long index, Number addend) {
+            if (mySafe) {
+                myStore.add(index, addend);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public long count() {
             return myStore.count();
         }
 
-        public final long countColumns() {
+        public long countColumns() {
             return myStore.countColumns();
         }
 
-        public final long countRows() {
+        public long countRows() {
             return myStore.countRows();
         }
 
-        public final MatrixBuilder fillAll(final Number value) {
+        public void exchangeColumns(long colA, long colB) {
+            if (mySafe) {
+                myStore.exchangeColumns(colA, colB);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void exchangeRows(long rowA, long rowB) {
+            if (mySafe) {
+                myStore.exchangeRows(rowA, rowB);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillAll(NullaryFunction<N> supplier) {
+            if (mySafe) {
+                myStore.fillAll(supplier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillAll(final Number value) {
             if (mySafe) {
                 myStore.fillAll(myStore.physical().scalar().cast(value));
             } else {
                 throw new IllegalStateException();
             }
-            return this;
         }
 
-        public final MatrixBuilder fillColumn(final long row, final long column, final Number value) {
+        public void fillColumn(long col, Access1D<N> values) {
+            if (mySafe) {
+                myStore.fillColumn(col, values);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillColumn(long row, long col, Access1D<N> values) {
+            if (mySafe) {
+                myStore.fillColumn(row, col, values);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillColumn(long row, long col, NullaryFunction<N> supplier) {
+            if (mySafe) {
+                myStore.fillColumn(row, col, supplier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillColumn(final long row, final long column, final Number value) {
             if (mySafe) {
                 myStore.fillColumn((int) row, (int) column, myStore.physical().scalar().cast(value));
             } else {
                 throw new IllegalStateException();
             }
-            return this;
         }
 
-        public final MatrixBuilder fillDiagonal(final long row, final long column, final Number value) {
+        public void fillColumn(long col, N value) {
+            if (mySafe) {
+                myStore.fillColumn(col, value);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillColumn(long col, NullaryFunction<N> supplier) {
+            if (mySafe) {
+                myStore.fillColumn(col, supplier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillDiagonal(Access1D<N> values) {
+            if (mySafe) {
+                myStore.fillDiagonal(values);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillDiagonal(long row, long col, Access1D<N> values) {
+            if (mySafe) {
+                myStore.fillDiagonal(row, col, values);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillDiagonal(long row, long col, NullaryFunction<N> supplier) {
+            if (mySafe) {
+                myStore.fillDiagonal(row, col, supplier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillDiagonal(final long row, final long column, final Number value) {
             if (mySafe) {
                 myStore.fillDiagonal((int) row, (int) column, myStore.physical().scalar().cast(value));
             } else {
                 throw new IllegalStateException();
             }
-            return this;
         }
 
-        public final MatrixBuilder fillRow(final long row, final long column, final Number value) {
+        public void fillDiagonal(N value) {
+            if (mySafe) {
+                myStore.fillDiagonal(value);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillDiagonal(NullaryFunction<N> supplier) {
+            if (mySafe) {
+                myStore.fillDiagonal(supplier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillMatching(Access1D<?> values) {
+            if (mySafe) {
+                myStore.fillMatching(values);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillMatching(Access1D<N> left, BinaryFunction<N> function, Access1D<N> right) {
+            if (mySafe) {
+                myStore.fillMatching(left, function, right);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillMatching(UnaryFunction<N> function, Access1D<N> arguments) {
+            if (mySafe) {
+                myStore.fillMatching(function, arguments);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillOne(long index, Access1D<?> values, long valueIndex) {
+            if (mySafe) {
+                myStore.fillOne(index, values, valueIndex);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillOne(long row, long col, Access1D<?> values, long valueIndex) {
+            if (mySafe) {
+                myStore.fillOne(row, col, values, valueIndex);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillOne(long row, long col, N value) {
+            if (mySafe) {
+                myStore.fillOne(row, col, value);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillOne(long row, long col, NullaryFunction<N> supplier) {
+            if (mySafe) {
+                myStore.fillOne(row, col, supplier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillOne(long index, N value) {
+            if (mySafe) {
+                myStore.fillOne(index, value);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillOne(long index, NullaryFunction<N> supplier) {
+            if (mySafe) {
+                myStore.fillOne(index, supplier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillRange(long first, long limit, N value) {
+            if (mySafe) {
+                myStore.fillRange(first, limit, value);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillRange(long first, long limit, NullaryFunction<N> supplier) {
+            if (mySafe) {
+                myStore.fillRange(first, limit, supplier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillRow(long row, Access1D<N> values) {
+            if (mySafe) {
+                myStore.fillRow(row, values);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillRow(long row, long col, Access1D<N> values) {
+            if (mySafe) {
+                myStore.fillRow(row, col, values);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillRow(long row, long col, NullaryFunction<N> supplier) {
+            if (mySafe) {
+                myStore.fillRow(row, col, supplier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillRow(final long row, final long column, final Number value) {
             if (mySafe) {
                 myStore.fillRow((int) row, (int) column, myStore.physical().scalar().cast(value));
             } else {
                 throw new IllegalStateException();
             }
-            return this;
+        }
+
+        public void fillRow(long row, N value) {
+            if (mySafe) {
+                myStore.fillRow(row, value);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void fillRow(long row, NullaryFunction<N> supplier) {
+            if (mySafe) {
+                myStore.fillRow(row, supplier);
+            } else {
+                throw new IllegalStateException();
+            }
         }
 
         @Override
-        public final I get() {
+        public I get() {
             mySafe = false;
             return MatrixFactory.this.instantiate(myStore);
         }
 
-        public final void set(final long index, final double value) {
+        public void modifyAll(UnaryFunction<N> modifier) {
+            if (mySafe) {
+                myStore.modifyAll(modifier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyColumn(long row, long col, UnaryFunction<N> modifier) {
+            if (mySafe) {
+                myStore.modifyColumn(row, col, modifier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyColumn(long col, UnaryFunction<N> modifier) {
+            if (mySafe) {
+                myStore.modifyColumn(col, modifier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyDiagonal(long row, long col, UnaryFunction<N> modifier) {
+            if (mySafe) {
+                myStore.modifyDiagonal(row, col, modifier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyDiagonal(UnaryFunction<N> modifier) {
+            if (mySafe) {
+                myStore.modifyDiagonal(modifier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyMatching(Access1D<N> left, BinaryFunction<N> function) {
+            if (mySafe) {
+                myStore.modifyMatching(left, function);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyMatching(BinaryFunction<N> function, Access1D<N> right) {
+            if (mySafe) {
+                myStore.modifyMatching(function, right);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyMatchingInColumns(Access1D<N> left, BinaryFunction<N> function) {
+            if (mySafe) {
+                myStore.modifyMatchingInColumns(left, function);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyMatchingInColumns(BinaryFunction<N> function, Access1D<N> right) {
+            if (mySafe) {
+                myStore.modifyMatchingInColumns(function, right);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyMatchingInRows(Access1D<N> left, BinaryFunction<N> function) {
+            if (mySafe) {
+                myStore.modifyMatchingInRows(left, function);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyMatchingInRows(BinaryFunction<N> function, Access1D<N> right) {
+            if (mySafe) {
+                myStore.modifyMatchingInRows(function, right);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyOne(long row, long col, UnaryFunction<N> modifier) {
+            if (mySafe) {
+                myStore.modifyOne(row, col, modifier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyOne(long index, UnaryFunction<N> modifier) {
+            if (mySafe) {
+                myStore.modifyOne(index, modifier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyRange(long first, long limit, UnaryFunction<N> modifier) {
+            if (mySafe) {
+                myStore.modifyRange(first, limit, modifier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyRow(long row, long col, UnaryFunction<N> modifier) {
+            if (mySafe) {
+                myStore.modifyRow(row, col, modifier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void modifyRow(long row, UnaryFunction<N> modifier) {
+            if (mySafe) {
+                myStore.modifyRow(row, modifier);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void reset() {
+            if (mySafe) {
+                myStore.reset();
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public void set(final long index, final double value) {
             if (mySafe) {
                 myStore.set(index, value);
             } else {
@@ -140,7 +531,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             }
         }
 
-        public final void set(final long row, final long col, final double value) {
+        public void set(final long row, final long col, final double value) {
             if (mySafe) {
                 myStore.set(row, col, value);
             } else {
@@ -148,7 +539,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             }
         }
 
-        public final void set(final long row, final long col, final Number value) {
+        public void set(final long row, final long col, final Number value) {
             if (mySafe) {
                 myStore.set(row, col, value);
             } else {
@@ -156,7 +547,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             }
         }
 
-        public final void set(final long index, final Number value) {
+        public void set(final long index, final Number value) {
             if (mySafe) {
                 myStore.set(index, myStore.physical().scalar().cast(value));
             } else {
@@ -164,6 +555,9 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             }
         }
 
+        public void supplyTo(PhysicalStore<N> receiver) {
+            myStore.supplyTo(receiver);
+        }
     }
 
     private static Constructor<? extends BasicMatrix> getConstructor(final Class<? extends BasicMatrix> aTemplate) {
@@ -198,6 +592,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 
+    @SuppressWarnings("unchecked")
     public I columns(final List<? extends Number>... source) {
         return this.instantiate(myPhysicalFactory.columns(source));
     }
@@ -211,15 +606,15 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
     }
 
     @Override
-    public final FunctionSet<N> function() {
+    public FunctionSet<N> function() {
         return myPhysicalFactory.function();
     }
 
-    public Builder<I> getBuilder(final int count) {
+    public PhysicalBuilder<N, I> getBuilder(final int count) {
         return this.getBuilder(count, 1);
     }
 
-    public Builder<I> getBuilder(final int rows, final int columns) {
+    public PhysicalBuilder<N, I> getBuilder(final int rows, final int columns) {
         return new MatrixBuilder(myPhysicalFactory, rows, columns);
     }
 
@@ -265,14 +660,14 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
     }
 
     @Override
-    public final Scalar.Factory<N> scalar() {
+    public Scalar.Factory<N> scalar() {
         return myPhysicalFactory.scalar();
     }
 
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    final I instantiate(final MatrixStore<N> store) {
+    I instantiate(final MatrixStore<N> store) {
         try {
             return myConstructor.newInstance(store);
         } catch (final IllegalArgumentException anException) {
@@ -286,7 +681,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         }
     }
 
-    final MatrixBuilder wrap(final PhysicalStore<N> store) {
+    MatrixBuilder wrap(final PhysicalStore<N> store) {
         return new MatrixBuilder(store);
     }
 

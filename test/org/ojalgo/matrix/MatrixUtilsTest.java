@@ -28,7 +28,7 @@ import org.ojalgo.function.FunctionUtils;
 /**
  * @author apete
  */
-public class MatrixUtilsTest {
+public class MatrixUtilsTest extends MatrixTests {
 
     @Test
     public void testMax() {

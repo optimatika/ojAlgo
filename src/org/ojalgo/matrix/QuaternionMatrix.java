@@ -23,6 +23,11 @@ package org.ojalgo.matrix;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -38,7 +43,7 @@ import org.ojalgo.scalar.Quaternion;
  */
 public final class QuaternionMatrix extends AbstractMatrix<Quaternion, QuaternionMatrix> {
 
-    public static final BasicMatrix.Factory<QuaternionMatrix> FACTORY = new MatrixFactory<>(QuaternionMatrix.class, GenericDenseStore.QUATERNION);
+    public static final MatrixFactory<Quaternion, QuaternionMatrix> FACTORY = new MatrixFactory<>(QuaternionMatrix.class, GenericDenseStore.QUATERNION);
 
     /**
      * This method is for internal use only - YOU should NOT use it!
@@ -71,23 +76,42 @@ public final class QuaternionMatrix extends AbstractMatrix<Quaternion, Quaternio
     }
 
     @Override
-    DeterminantTask<Quaternion> getDeterminantTask(final MatrixStore<Quaternion> template) {
+    Eigenvalue<Quaternion> getDecompositionEigenvalue(Structure2D typical) {
+        return Eigenvalue.QUATERNION.make(typical, this.isHermitian());
+    }
+
+    @Override
+    LU<Quaternion> getDecompositionLU(Structure2D typical) {
+        return LU.QUATERNION.make(typical);
+    }
+
+    @Override
+    QR<Quaternion> getDecompositionQR(Structure2D typical) {
+        return QR.QUATERNION.make(typical);
+    }
+
+    @Override
+    SingularValue<Quaternion> getDecompositionSingularValue(Structure2D typical) {
+        return SingularValue.QUATERNION.make(typical);
+    }
+
+    @Override
+    MatrixFactory<Quaternion, QuaternionMatrix> getFactory() {
+        return FACTORY;
+    }
+
+    @Override
+    DeterminantTask<Quaternion> getTaskDeterminant(final MatrixStore<Quaternion> template) {
         return DeterminantTask.QUATERNION.make(template, this.isHermitian(), false);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    MatrixFactory<Quaternion, QuaternionMatrix> getFactory() {
-        return (MatrixFactory<Quaternion, QuaternionMatrix>) FACTORY;
-    }
-
-    @Override
-    InverterTask<Quaternion> getInverterTask(final MatrixStore<Quaternion> template) {
+    InverterTask<Quaternion> getTaskInverter(final MatrixStore<Quaternion> template) {
         return InverterTask.QUATERNION.make(template, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<Quaternion> getSolverTask(final MatrixStore<Quaternion> templateBody, final Access2D<?> templateRHS) {
+    SolverTask<Quaternion> getTaskSolver(final MatrixStore<Quaternion> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.QUATERNION.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 
