@@ -38,7 +38,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 
@@ -413,7 +413,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         return array;
     }
 
-    public void visitOne(final long index, final ConsumerFunction<N> visitor) {
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {

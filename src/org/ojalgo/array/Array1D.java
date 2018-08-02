@@ -39,7 +39,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
@@ -608,15 +608,15 @@ public final class Array1D<N extends Number> extends AbstractList<N>
         return this.sliceRange(first, limit);
     }
 
-    public void visitAll(final ConsumerFunction<N> visitor) {
+    public void visitAll(final VoidFunction<N> visitor) {
         myDelegate.visit(myFirst, myLimit, myStep, visitor);
     }
 
-    public void visitOne(final long index, final ConsumerFunction<N> visitor) {
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
         myDelegate.visitOne(myFirst + (myStep * index), visitor);
     }
 
-    public void visitRange(final long first, final long limit, final ConsumerFunction<N> visitor) {
+    public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
         final long tmpFirst = myFirst + (myStep * first);
         final long tmpLimit = myFirst + (myStep * limit);
         myDelegate.visit(tmpFirst, tmpLimit, myStep, visitor);

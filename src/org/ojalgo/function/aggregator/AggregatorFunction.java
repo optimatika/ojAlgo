@@ -22,10 +22,10 @@
 package org.ojalgo.function.aggregator;
 
 import org.ojalgo.access.AccessScalar;
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
 
-public interface AggregatorFunction<N extends Number> extends ConsumerFunction<N>, AccessScalar<N> {
+public interface AggregatorFunction<N extends Number> extends VoidFunction<N>, AccessScalar<N> {
 
     default boolean isMergeable() {
         return true;

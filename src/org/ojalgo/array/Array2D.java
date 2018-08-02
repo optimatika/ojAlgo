@@ -35,7 +35,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
@@ -692,32 +692,32 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         return myDelegate.toString();
     }
 
-    public void visitAll(final ConsumerFunction<N> visitor) {
+    public void visitAll(final VoidFunction<N> visitor) {
         myDelegate.visit(0L, this.count(), 1L, visitor);
     }
 
-    public void visitColumn(final long row, final long col, final ConsumerFunction<N> visitor) {
+    public void visitColumn(final long row, final long col, final VoidFunction<N> visitor) {
         myDelegate.visit(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L, visitor);
     }
 
-    public void visitDiagonal(final long row, final long col, final ConsumerFunction<N> visitor) {
+    public void visitDiagonal(final long row, final long col, final VoidFunction<N> visitor) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
         myDelegate.visit(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, visitor);
     }
 
-    public void visitOne(final long row, final long col, final ConsumerFunction<N> visitor) {
+    public void visitOne(final long row, final long col, final VoidFunction<N> visitor) {
         myDelegate.visitOne(Structure2D.index(myRowsCount, row, col), visitor);
     }
 
-    public void visitOne(final long index, final ConsumerFunction<N> visitor) {
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
         myDelegate.visitOne(index, visitor);
     }
 
-    public void visitRange(final long first, final long limit, final ConsumerFunction<N> visitor) {
+    public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
         myDelegate.visit(first, limit, 1L, visitor);
     }
 
-    public void visitRow(final long row, final long col, final ConsumerFunction<N> visitor) {
+    public void visitRow(final long row, final long col, final VoidFunction<N> visitor) {
         myDelegate.visit(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, visitor);
     }
 

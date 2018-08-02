@@ -33,7 +33,7 @@ import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain java.lang.Number}.
@@ -107,7 +107,7 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
         }
     }
 
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final ConsumerFunction<N> aVisitor) {
+    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final VoidFunction<N> aVisitor) {
         for (int i = first; i < limit; i += step) {
             aVisitor.invoke(data[i]);
         }
@@ -290,12 +290,12 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
     }
 
     @Override
-    protected final void visit(final int first, final int limit, final int step, final ConsumerFunction<N> visitor) {
+    protected final void visit(final int first, final int limit, final int step, final VoidFunction<N> visitor) {
         ReferenceTypeArray.invoke(data, first, limit, step, visitor);
     }
 
     @Override
-    protected void visitOne(final int index, final ConsumerFunction<N> visitor) {
+    protected void visitOne(final int index, final VoidFunction<N> visitor) {
         visitor.invoke(data[index]);
     }
 

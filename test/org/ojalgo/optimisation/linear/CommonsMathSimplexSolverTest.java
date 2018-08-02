@@ -53,15 +53,15 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
      */
     enum GoalType implements Serializable {
 
-        /**
-         * Maximization goal.
-         */
-        MAXIMIZE,
+    /**
+     * Maximization goal.
+     */
+    MAXIMIZE,
 
-        /**
-         * Minimization goal.
-         */
-        MINIMIZE
+    /**
+     * Minimization goal.
+     */
+    MINIMIZE
 
     }
 

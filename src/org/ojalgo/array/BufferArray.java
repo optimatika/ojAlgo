@@ -47,7 +47,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.machine.JavaType;
@@ -340,7 +340,7 @@ public abstract class BufferArray extends PlainArray<Double> {
         }
     }
 
-    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final ConsumerFunction<Double> visitor) {
+    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         for (int i = first; i < limit; i += step) {
             visitor.invoke(data.get(i));
         }
@@ -538,12 +538,12 @@ public abstract class BufferArray extends PlainArray<Double> {
     }
 
     @Override
-    protected void visit(final int first, final int limit, final int step, final ConsumerFunction<Double> visitor) {
+    protected void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         BufferArray.invoke(this, first, limit, step, visitor);
     }
 
     @Override
-    protected void visitOne(final int index, final ConsumerFunction<Double> visitor) {
+    protected void visitOne(final int index, final VoidFunction<Double> visitor) {
         visitor.invoke(this.doubleValue(index));
     }
 

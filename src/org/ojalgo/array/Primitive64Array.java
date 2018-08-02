@@ -43,7 +43,7 @@ import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.ParameterFunction.FixedParameter;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.machine.JavaType;
@@ -266,7 +266,7 @@ public class Primitive64Array extends PrimitiveArray {
         }
     }
 
-    protected static void invoke(final double[] data, final int first, final int limit, final int step, final ConsumerFunction<Double> aVisitor) {
+    protected static void invoke(final double[] data, final int first, final int limit, final int step, final VoidFunction<Double> aVisitor) {
         for (int i = first; i < limit; i += step) {
             aVisitor.invoke(data[i]);
         }
@@ -573,12 +573,12 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     @Override
-    protected final void visit(final int first, final int limit, final int step, final ConsumerFunction<Double> visitor) {
+    protected final void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         Primitive64Array.invoke(data, first, limit, step, visitor);
     }
 
     @Override
-    protected void visitOne(final int index, final ConsumerFunction<Double> visitor) {
+    protected void visitOne(final int index, final VoidFunction<Double> visitor) {
         visitor.invoke(data[index]);
     }
 

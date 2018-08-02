@@ -36,8 +36,6 @@ public final class HermitianRank2Update extends MatrixOperation {
 
     public static int THRESHOLD = 256;
 
-    
-
     //    public static void invoke(final ComplexNumber[] data, final int firstColumn, final int columnLimit, final ComplexNumber[] vector1,
     //            final ComplexNumber[] vector2) {
     //

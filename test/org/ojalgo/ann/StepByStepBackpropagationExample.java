@@ -77,7 +77,6 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
 
         builder.rate(HALF).train(givenInput, targetOutput);
 
-
         // 0.40 w5
         TestUtils.assertEquals(0.35891648, network.getWeight(1, 0, 0), precision);
         // 0.45 w6
@@ -111,7 +110,6 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
         Access1D<Double> preTrainingOutput = factory.rows(largerANN.invoke(givenInput));
         largerBuilder.rate(HALF).train(givenInput, targetOutput);
         Access1D<Double> postTrainingOutput = factory.rows(largerANN.invoke(givenInput));
-
 
         // Even in this case training should reduce the error
         TestUtils.assertTrue(errorMeassure.invoke(targetOutput, preTrainingOutput) > errorMeassure.invoke(targetOutput, postTrainingOutput));

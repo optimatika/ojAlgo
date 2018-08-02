@@ -34,7 +34,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -432,7 +432,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public void visitOne(final long index, final ConsumerFunction<N> visitor) {
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
         if (this.isPrimitive()) {
             visitor.invoke(this.doubleValue(index));
         } else {
@@ -704,7 +704,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    protected void visit(final long first, final long limit, final long step, final ConsumerFunction<N> visitor) {
+    protected void visit(final long first, final long limit, final long step, final VoidFunction<N> visitor) {
         boolean tmpOnlyOnce = true;
         for (int i = 0; i < myIndices.length; i++) {
             final long tmpIndex = myIndices[i];

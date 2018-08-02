@@ -21,7 +21,7 @@
  */
 package org.ojalgo.access;
 
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -91,11 +91,11 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     public interface Visitable<N extends Number> extends StructureAnyD, Access1D.Visitable<N> {
 
-        void visitOne(long[] reference, ConsumerFunction<N> visitor);
+        void visitOne(long[] reference, VoidFunction<N> visitor);
 
-        void visitSet(int dimension, long dimensionalIndex, ConsumerFunction<N> visitor);
+        void visitSet(int dimension, long dimensionalIndex, VoidFunction<N> visitor);
 
-        void visitSet(long[] initial, int dimension, ConsumerFunction<N> visitor);
+        void visitSet(long[] initial, int dimension, VoidFunction<N> visitor);
 
     }
 

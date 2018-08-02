@@ -28,9 +28,9 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.ConsumerFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
@@ -696,10 +696,6 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return new UnaryOperatoStore<>(this, operator);
     }
 
-    default MatrixStore<N> operateOnAll(final UnaryFunction<N> operator) {
-        return new UnaryOperatoStore<>(this, operator);
-    }
-
     /**
      * The <code>premultiply</code> method differs from <code>multiply</code> in 3 ways:
      * <ol>
@@ -818,7 +814,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return new TransposedStore<>(this);
     }
 
-    default void visitOne(final long row, final long col, final ConsumerFunction<N> visitor) {
+    default void visitOne(final long row, final long col, final VoidFunction<N> visitor) {
         visitor.invoke(this.get(row, col));
     }
 

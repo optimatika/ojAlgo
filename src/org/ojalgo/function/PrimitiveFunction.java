@@ -50,7 +50,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     }
 
     @FunctionalInterface
-    public static interface Consumer extends ConsumerFunction<Double> {
+    public static interface Consumer extends VoidFunction<Double> {
 
         default void invoke(final Double arg) {
             this.invoke(arg.doubleValue());

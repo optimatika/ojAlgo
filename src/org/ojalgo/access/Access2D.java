@@ -23,7 +23,7 @@ package org.ojalgo.access;
 
 import java.util.Iterator;
 
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -280,34 +280,34 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     public interface Visitable<N extends Number> extends Structure2D, Access1D.Visitable<N> {
 
-        default void visitColumn(final long row, final long col, final ConsumerFunction<N> visitor) {
+        default void visitColumn(final long row, final long col, final VoidFunction<N> visitor) {
             this.loopColumn(row, col, (r, c) -> this.visitOne(r, c, visitor));
         }
 
-        default void visitColumn(final long col, final ConsumerFunction<N> visitor) {
+        default void visitColumn(final long col, final VoidFunction<N> visitor) {
             this.visitColumn(0L, col, visitor);
         }
 
-        default void visitDiagonal(final long row, final long col, final ConsumerFunction<N> visitor) {
+        default void visitDiagonal(final long row, final long col, final VoidFunction<N> visitor) {
             this.loopDiagonal(row, col, (r, c) -> this.visitOne(r, c, visitor));
         }
 
-        default void visitDiagonal(final ConsumerFunction<N> visitor) {
+        default void visitDiagonal(final VoidFunction<N> visitor) {
             this.visitDiagonal(0L, 0L, visitor);
         }
 
-        void visitOne(long row, long col, ConsumerFunction<N> visitor);
+        void visitOne(long row, long col, VoidFunction<N> visitor);
 
-        default void visitOne(final long index, final ConsumerFunction<N> visitor) {
+        default void visitOne(final long index, final VoidFunction<N> visitor) {
             final long tmpStructure = this.countRows();
             this.visitOne(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), visitor);
         }
 
-        default void visitRow(final long row, final long col, final ConsumerFunction<N> visitor) {
+        default void visitRow(final long row, final long col, final VoidFunction<N> visitor) {
             this.loopRow(row, col, (r, c) -> this.visitOne(r, c, visitor));
         }
 
-        default void visitRow(final long row, final ConsumerFunction<N> visitor) {
+        default void visitRow(final long row, final VoidFunction<N> visitor) {
             this.visitRow(row, 0L, visitor);
         }
 

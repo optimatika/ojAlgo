@@ -52,7 +52,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     }
 
     @FunctionalInterface
-    public static interface Consumer extends ConsumerFunction<BigDecimal> {
+    public static interface Consumer extends VoidFunction<BigDecimal> {
 
         default void invoke(final double arg) {
             this.invoke(BigDecimal.valueOf(arg));

@@ -41,7 +41,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     }
 
     @FunctionalInterface
-    public static interface Consumer extends ConsumerFunction<ComplexNumber> {
+    public static interface Consumer extends VoidFunction<ComplexNumber> {
 
         default void invoke(final double arg) {
             this.invoke(ComplexNumber.valueOf(arg));

@@ -43,7 +43,7 @@ import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -1200,15 +1200,15 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         HouseholderHermitian.tred2j(data, ((Primitive64Array) mainDiagonal).data, ((Primitive64Array) offDiagonal).data, yesvecs);
     }
 
-    public void visitColumn(final long row, final long col, final ConsumerFunction<Double> visitor) {
+    public void visitColumn(final long row, final long col, final VoidFunction<Double> visitor) {
         myUtility.visitColumn(row, col, visitor);
     }
 
-    public void visitDiagonal(final long row, final long col, final ConsumerFunction<Double> visitor) {
+    public void visitDiagonal(final long row, final long col, final VoidFunction<Double> visitor) {
         myUtility.visitDiagonal(row, col, visitor);
     }
 
-    public void visitRow(final long row, final long col, final ConsumerFunction<Double> visitor) {
+    public void visitRow(final long row, final long col, final VoidFunction<Double> visitor) {
         myUtility.visitRow(row, col, visitor);
     }
 

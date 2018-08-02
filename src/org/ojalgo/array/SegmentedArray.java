@@ -29,7 +29,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 
 /**
  * <p>
@@ -250,7 +250,7 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
         mySegments[(int) (index >> myIndexBits)].set(index & myIndexMask, value);
     }
 
-    public void visitOne(final long index, final ConsumerFunction<N> visitor) {
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
         if (this.isPrimitive()) {
             visitor.invoke(this.doubleValue(index));
         } else {
@@ -430,7 +430,7 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    protected void visit(final long first, final long limit, final long step, final ConsumerFunction<N> visitor) {
+    protected void visit(final long first, final long limit, final long step, final VoidFunction<N> visitor) {
 
         if (step <= mySegmentSize) {
             // Will use a continuous range of segements

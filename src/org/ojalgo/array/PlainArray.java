@@ -29,7 +29,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.ConsumerFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -127,7 +127,7 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
         this.set((int) index, number);
     }
 
-    public void visitOne(final long index, final ConsumerFunction<N> visitor) {
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
         this.visitOne((int) index, visitor);
     }
 
@@ -246,13 +246,13 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
 
     protected abstract void sortDescending();
 
-    protected abstract void visit(int first, int limit, int step, ConsumerFunction<N> visitor);
+    protected abstract void visit(int first, int limit, int step, VoidFunction<N> visitor);
 
     @Override
-    protected final void visit(final long first, final long limit, final long step, final ConsumerFunction<N> visitor) {
+    protected final void visit(final long first, final long limit, final long step, final VoidFunction<N> visitor) {
         this.visit((int) first, (int) limit, (int) step, visitor);
     }
 
-    protected abstract void visitOne(final int index, final ConsumerFunction<N> visitor);
+    protected abstract void visitOne(final int index, final VoidFunction<N> visitor);
 
 }
