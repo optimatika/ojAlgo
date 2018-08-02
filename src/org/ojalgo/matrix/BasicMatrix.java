@@ -44,17 +44,16 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
- * This interface declares a set of high level methods for linear algebra. Only the most basic set of matrix
- * functionality is defined here. Various matrix decompositions may be used to do some of the more advanced
- * tasks.
+ * This interface declares a limited set of high level methods for linear algebra. If this is not enough for
+ * your use case, then look at the various interfaces/classes in the {@linkplain org.ojalgo.matrix.store}
+ * and/or {@linkplain org.ojalgo.matrix.decomposition} packages.
  * </p>
  *
  * @author apete
  */
-public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access2D.Aggregatable<Number>, Structure2D.ReducibleTo1D<BasicMatrix>,
-        NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>,
+public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>,
         ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number>,
-        NumberContext.Enforceable<BasicMatrix> {
+        Access2D<Number>, Access2D.Elements, Access2D.Aggregatable<Number>, Structure2D.ReducibleTo1D<BasicMatrix>, NumberContext.Enforceable<BasicMatrix> {
 
     @SuppressWarnings("unchecked")
     public static interface LogicalBuilder<N extends Number, I extends BasicMatrix>
