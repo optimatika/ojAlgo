@@ -25,7 +25,7 @@ import java.util.function.BiFunction;
 
 import org.ojalgo.ProgrammingError;
 
-public interface ParameterFunction<N extends Number> extends BasicFunction<N>, BiFunction<N, Integer, N> {
+public interface ParameterFunction<N extends Number> extends BasicFunction, BiFunction<N, Integer, N> {
 
     /**
      * A {@linkplain ParameterFunction} with a set/fixed parameter.

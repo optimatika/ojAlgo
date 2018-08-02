@@ -55,9 +55,9 @@ import org.ojalgo.type.format.NumberStyle;
  */
 public final class NumberContext extends FormatContext<Number, NumberFormat> {
 
-    public static interface Enforceable<N extends Number> {
+    public static interface Enforceable<T> {
 
-        N enforce(NumberContext context);
+        T enforce(NumberContext context);
 
     }
 
@@ -293,7 +293,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         if (object instanceof BigDecimal) {
             return this.enforce((BigDecimal) object);
         } else if (object instanceof Enforceable<?>) {
-            return ((Enforceable<?>) object).enforce(this);
+            return (Number) ((Enforceable<?>) object).enforce(this);
         } else {
             return this.enforce(object.doubleValue());
         }

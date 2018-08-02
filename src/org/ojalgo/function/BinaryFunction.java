@@ -26,7 +26,7 @@ import java.util.function.DoubleBinaryOperator;
 
 import org.ojalgo.ProgrammingError;
 
-public interface BinaryFunction<N extends Number> extends BasicFunction<N>, BinaryOperator<N>, DoubleBinaryOperator {
+public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryOperator<N>, DoubleBinaryOperator {
 
     /**
      * A {@linkplain BinaryFunction} with a set/fixed first argument.

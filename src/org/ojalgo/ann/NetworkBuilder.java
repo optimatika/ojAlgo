@@ -28,8 +28,6 @@ import java.util.function.Supplier;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.ColumnView;
-import org.ojalgo.access.RowView;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -44,6 +42,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
     private final ArtificialNeuralNetwork myANN;
     private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
     private final PrimitiveDenseStore[] myLayerValues;
+    private double myLearningRate = 1.0;
 
     NetworkBuilder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
 
@@ -98,7 +97,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof NetworkBuilder)) {
+        if (this.getClass() != obj.getClass()) {
             return false;
         }
         NetworkBuilder other = (NetworkBuilder) obj;
@@ -112,11 +111,10 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         if (myError != other.myError) {
             return false;
         }
+        if (Double.doubleToLongBits(myLearningRate) != Double.doubleToLongBits(other.myLearningRate)) {
+            return false;
+        }
         return true;
-    }
-
-    public double error(Access1D<?> target, Access1D<?> current) {
-        return myError.invoke(target, current);
     }
 
     public NetworkBuilder error(ArtificialNeuralNetwork.Error error) {
@@ -128,19 +126,22 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return myANN;
     }
 
-    public Structure2D[] getStructure() {
-        return myANN.getStructure();
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = (prime * result) + ((myANN == null) ? 0 : myANN.hashCode());
         result = (prime * result) + ((myError == null) ? 0 : myError.hashCode());
+
+        long temp;
+        temp = Double.doubleToLongBits(myLearningRate);
+        result = (prime * result) + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
+    /**
+     * Initialise all weights and biases with random numbers.
+     */
     public NetworkBuilder randomise() {
         for (int i = 0, limit = myANN.countCalculationLayers(); i < limit; i++) {
             myANN.getLayer(i).randomise();
@@ -148,52 +149,55 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return this;
     }
 
+    public NetworkBuilder rate(double rate) {
+        myLearningRate = rate;
+        return this;
+    }
+
+    public Structure2D[] structure() {
+        return myANN.structure();
+    }
+
     @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
-        tmpBuilder.append("NetworkBuilder [myANN=");
-        tmpBuilder.append(myANN);
-        tmpBuilder.append(", myError=");
-        tmpBuilder.append(myError);
-        tmpBuilder.append("]");
+        tmpBuilder.append("NetworkBuilder [ANN=").append(myANN).append(", Error=").append(myError).append(", LearningRate=").append(myLearningRate).append("]");
         return tmpBuilder.toString();
     }
 
-    public void train(Access1D<Double> givenInput, Access1D<Double> targetOutput, double learningRate) {
+    public void train(Access1D<Double> givenInput, Access1D<Double> targetOutput) {
 
-        Access1D<Double> current = myANN.apply(givenInput);
+        Access1D<Double> current = myANN.invoke(givenInput);
 
         myLayerValues[0].fillMatching(givenInput);
         myLayerValues[myLayerValues.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
 
         for (int k = myANN.countCalculationLayers() - 1; k >= 0; k--) {
-            myANN.getLayer(k).adjust(k == 0 ? givenInput : myANN.getLayer(k - 1).getOutput(), myLayerValues[k + 1], -learningRate, myLayerValues[k]);
+            myANN.getLayer(k).adjust(k == 0 ? givenInput : myANN.getLayer(k - 1).getOutput(), myLayerValues[k + 1], -myLearningRate, myLayerValues[k]);
         }
     }
 
-    public void trainColumns(Access2D<Double> givenInput, Access2D<Double> desiredOutput, double learningRate) {
+    /**
+     * Note that the required {@link Iterable}:s can be obtained from calling {@link Access2D#rows()} or
+     * {@link Access2D#columns()} on anything "2D".
+     */
+    public void train(Iterable<? extends Access1D<Double>> givenInputs, Iterable<? extends Access1D<Double>> targetOutputs) {
 
-        Iterator<ColumnView<Double>> iterInp = givenInput.columns().iterator();
-        Iterator<ColumnView<Double>> iterOut = desiredOutput.columns().iterator();
+        Iterator<? extends Access1D<Double>> iterI = givenInputs.iterator();
+        Iterator<? extends Access1D<Double>> iterO = targetOutputs.iterator();
 
-        while (iterInp.hasNext() && iterOut.hasNext()) {
-            this.train(iterInp.next(), iterOut.next(), learningRate);
-        }
-    }
-
-    public void trainRows(Access2D<Double> givenInput, Access2D<Double> desiredOutput, double learningRate) {
-
-        Iterator<RowView<Double>> iterInp = givenInput.rows().iterator();
-        Iterator<RowView<Double>> iterOut = desiredOutput.rows().iterator();
-
-        while (iterInp.hasNext() && iterOut.hasNext()) {
-            this.train(iterInp.next(), iterOut.next(), learningRate);
+        while (iterI.hasNext() && iterO.hasNext()) {
+            this.train(iterI.next(), iterO.next());
         }
     }
 
     public NetworkBuilder weight(int layer, int input, int output, double weight) {
         myANN.getLayer(layer).setWeight(input, output, weight);
         return this;
+    }
+
+    double error(Access1D<?> target, Access1D<?> current) {
+        return myError.invoke(target, current);
     }
 
     double getBias(int layer, int output) {

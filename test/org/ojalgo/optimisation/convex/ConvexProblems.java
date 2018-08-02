@@ -38,7 +38,7 @@ import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.BasicMatrix.Factory;
+import org.ojalgo.matrix.MatrixFactory;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -549,7 +549,7 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20080819() {
 
-        final Factory<PrimitiveMatrix> tmpMtrxFact = PrimitiveMatrix.FACTORY;
+        final MatrixFactory<Double, PrimitiveMatrix> tmpMtrxFact = PrimitiveMatrix.FACTORY;
         final NumberContext tmpEvalCntxt = StandardType.DECIMAL_032;
 
         final BasicMatrix[] tmpMatrices = new PrimitiveMatrix[8];

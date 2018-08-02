@@ -63,7 +63,7 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
 
         for (int iter = 0; iter < TRAINING_ITERATIONS; iter++) {
             for (Data data : examples) {
-                builder.train(data.input, data.target, LEARNING_RATE);
+                builder.rate(LEARNING_RATE).train(data.input, data.target);
             }
         }
 
@@ -89,7 +89,7 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
         for (int i = 0; i < errors.length; i++) {
             final Data data = examples.get(i);
             final PrimitiveDenseStore input = data.input;
-            final Access1D<Double> actual = network.apply(input);
+            final Access1D<Double> actual = network.invoke(input);
             final PrimitiveDenseStore expected = data.target;
             double error = builder.error(expected, actual);
             errors[i] = error;

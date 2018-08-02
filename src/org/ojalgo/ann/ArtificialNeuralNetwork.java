@@ -26,16 +26,16 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
-public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Double>> {
+public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<Access1D<Double>, MatrixStore<Double>> {
 
     /**
      * https://en.wikipedia.org/wiki/Activation_function
@@ -158,14 +158,6 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         }
     }
 
-    public Access1D<Double> apply(Access1D<Double> input) {
-        Access1D<Double> retVal = input;
-        for (int i = 0, limit = myLayers.length; i < limit; i++) {
-            retVal = myLayers[i].apply(retVal);
-        }
-        return retVal;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -192,10 +184,19 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return result;
     }
 
+    public MatrixStore<Double> invoke(Access1D<Double> input) {
+        MatrixStore<Double> retVal = null;
+        for (int i = 0, limit = myLayers.length; i < limit; i++) {
+            retVal = myLayers[i].invoke(input);
+            input = retVal;
+        }
+        return retVal;
+    }
+
     @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
-        tmpBuilder.append("ArtificialNeuralNetwork [myLayers=");
+        tmpBuilder.append("ArtificialNeuralNetwork [Layers=");
         tmpBuilder.append(Arrays.toString(myLayers));
         tmpBuilder.append("]");
         return tmpBuilder.toString();
@@ -217,7 +218,7 @@ public final class ArtificialNeuralNetwork implements UnaryOperator<Access1D<Dou
         return myLayers[layer].getOutput();
     }
 
-    Structure2D[] getStructure() {
+    Structure2D[] structure() {
 
         Structure2D[] retVal = new Structure2D[myLayers.length];
 

@@ -21,19 +21,31 @@
  */
 package org.ojalgo.function;
 
-public interface BasicFunction<N extends Number> {
+public interface BasicFunction {
 
-    public static interface Differentiable<N extends Number, F extends BasicFunction<N>> extends BasicFunction<N> {
+    public interface Differentiable<N extends Number, F extends BasicFunction> extends BasicFunction {
 
         F buildDerivative();
 
     }
 
-    public static interface Integratable<N extends Number, F extends BasicFunction<N>> extends BasicFunction<N> {
+    public interface Integratable<N extends Number, F extends BasicFunction> extends BasicFunction {
 
         F buildPrimitive();
 
         N integrate(N fromPoint, N toPoint);
+
+    }
+
+    /**
+     * For when you want to emphasise that something is a (mathematical) function.
+     *
+     * @author apete
+     */
+    @FunctionalInterface
+    public interface PlainUnary<T, R> extends BasicFunction {
+
+        R invoke(T arg);
 
     }
 
