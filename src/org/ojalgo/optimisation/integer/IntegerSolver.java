@@ -33,7 +33,6 @@ import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.multiary.MultiaryFunction;
@@ -46,6 +45,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.type.ObjectPool;
 import org.ojalgo.type.TypeUtils;
 
 public final class IntegerSolver extends GenericSolver {
@@ -104,33 +104,26 @@ public final class IntegerSolver extends GenericSolver {
         @Override
         protected Boolean compute() {
 
-            final ExpressionsBasedModel nodeModel = IntegerSolver.this.getRelaxedModel();
+            final ExpressionsBasedModel nodeModel = IntegerSolver.this.getNodeModel();
             myKey.setNodeState(nodeModel, IntegerSolver.this.getIntegerIndices());
 
             if (IntegerSolver.this.isIntegerSolutionFound()) {
 
-                final double mip_gap = IntegerSolver.this.options.mip_gap;
-
                 final double bestIntegerSolutionValue = IntegerSolver.this.getBestResultSoFar().getValue();
-                final double parentRelaxedSolutionValue = myKey.objective;
-
-                final double absoluteValue = ABS.invoke(bestIntegerSolutionValue);
-                final double absoluteGap = ABS.invoke(absoluteValue - parentRelaxedSolutionValue);
-
-                final double small = FunctionUtils.max(mip_gap, absoluteGap * mip_gap, absoluteValue * mip_gap);
+                final BigDecimal objectiveBound = TypeUtils.toBigDecimal(bestIntegerSolutionValue, IntegerSolver.this.options.feasibility);
 
                 if (nodeModel.isMinimisation()) {
-                    final BigDecimal upperLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue - small, IntegerSolver.this.options.feasibility);
-                    // final BigDecimal lowerLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
-                    nodeModel.limitObjective(null, upperLimit);
+                    nodeModel.limitObjective(null, objectiveBound);
                 } else {
-                    final BigDecimal lowerLimit = TypeUtils.toBigDecimal(bestIntegerSolutionValue + small, IntegerSolver.this.options.feasibility);
-                    // final BigDecimal upperLimit = TypeUtils.toBigDecimal(parentRelaxedSolutionValue, IntegerSolver.this.options.feasibility);
-                    nodeModel.limitObjective(lowerLimit, null);
+                    nodeModel.limitObjective(objectiveBound, null);
                 }
             }
 
-            return IntegerSolver.this.compute(myKey, nodeModel.prepare(), myPrinter);
+            final Boolean retVal = IntegerSolver.this.compute(myKey, nodeModel.prepare(), myPrinter);
+
+            IntegerSolver.this.recycleNodeModel(nodeModel);
+
+            return retVal;
         }
 
         NodeKey getKey() {
@@ -241,6 +234,7 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     private volatile Optimisation.Result myBestResultSoFar = null;
+    private final PriorityBlockingQueue<NodeKey> myDeferredNodes = new PriorityBlockingQueue<>();
     private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     /**
      * One entry per integer variable, the entry is the global index of that integer variable
@@ -250,8 +244,8 @@ public final class IntegerSolver extends GenericSolver {
     private final double[] myIntegerSignificances;
     private final AtomicInteger myIntegerSolutionsCount = new AtomicInteger();
     private final boolean myMinimisation;
+    private final ObjectPool<ExpressionsBasedModel> myModelPool;
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
-    private final PriorityBlockingQueue<NodeKey> myDeferredNodes = new PriorityBlockingQueue<>();
 
     protected IntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
 
@@ -270,6 +264,26 @@ public final class IntegerSolver extends GenericSolver {
 
         myIntegerSignificances = new double[myIntegerIndices.length];
         Arrays.fill(myIntegerSignificances, ONE);
+
+        myModelPool = new ObjectPool<ExpressionsBasedModel>() {
+
+            @Override
+            protected ExpressionsBasedModel newObject() {
+                return myIntegerModel.relax(false);
+            }
+
+            @Override
+            protected void reset(ExpressionsBasedModel object) {
+                List<Variable> rootModelVariables = myIntegerModel.getVariables();
+                for (int i = 0, limit = rootModelVariables.size(); i < limit; i++) {
+                    Variable rVar = rootModelVariables.get(i);
+                    Variable nVar = object.getVariable(i);
+                    nVar.lower(rVar.getLowerLimit());
+                    nVar.upper(rVar.getUpperLimit());
+                }
+            }
+
+        };
     }
 
     public Result solve(final Result kickStarter) {
@@ -286,7 +300,10 @@ public final class IntegerSolver extends GenericSolver {
 
         boolean normalExit = ForkJoinPool.commonPool().invoke(rootNodeTask).booleanValue();
         while (normalExit && (myDeferredNodes.size() > 0)) {
-            normalExit &= ForkJoinPool.commonPool().invoke(new BranchAndBoundNodeTask(myDeferredNodes.poll())).booleanValue();
+            NodeKey nodeKey = myDeferredNodes.poll();
+            if (this.isGoodEnoughToContinueBranching(nodeKey.objective)) {
+                normalExit &= ForkJoinPool.commonPool().invoke(new BranchAndBoundNodeTask(nodeKey)).booleanValue();
+            }
         }
         myDeferredNodes.clear();
 
@@ -329,14 +346,6 @@ public final class IntegerSolver extends GenericSolver {
             return false;
         }
 
-        if (!this.isGoodEnoughToContinueBranching(nodeKey.objective)) {
-            if (this.isDebug()) {
-                nodePrinter.println("No longer a relevant node!");
-                IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
-            }
-            return true;
-        }
-
         if (nodeKey.index >= 0) {
             nodeKey.enforceBounds(nodeModel, this.getIntegerIndices());
         }
@@ -356,13 +365,12 @@ public final class IntegerSolver extends GenericSolver {
                 nodePrinter.println("Node solved to optimality!");
             }
 
-            if (options.validate && !nodeModel.validate(nodeResult)) {
+            if (options.validate && !nodeModel.validate(nodeResult, nodePrinter)) {
                 // This should not be possible. There is a bug somewhere.
                 nodePrinter.println("Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED. Stop this branch!");
+                nodePrinter.println("Integer indices: {}", Arrays.toString(this.getIntegerIndices()));
                 nodePrinter.println("Lower bounds: {}", Arrays.toString(nodeKey.getLowerBounds()));
                 nodePrinter.println("Upper bounds: {}", Arrays.toString(nodeKey.getUpperBounds()));
-
-                // nodeModel.validate(nodeResult, myPrinter);
 
                 IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
 
@@ -397,39 +405,48 @@ public final class IntegerSolver extends GenericSolver {
                     nodePrinter.println("Not an Integer Solution: " + tmpSolutionValue);
                 }
 
-                final double tmpVariableValue = nodeResult.doubleValue(this.getGlobalIndex(branchIntegerIndex));
+                final double variableValue = nodeResult.doubleValue(this.getGlobalIndex(branchIntegerIndex));
 
                 if (this.isGoodEnoughToContinueBranching(tmpSolutionValue)) {
 
                     if (this.isDebug()) {
-                        nodePrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, tmpVariableValue,
+                        nodePrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, variableValue,
                                 nodeModel.getVariable(this.getGlobalIndex(branchIntegerIndex)));
                         IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
                     }
 
                     // this.generateCuts(nodeModel);
 
-                    final NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, tmpVariableValue, tmpSolutionValue);
-                    final NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, tmpVariableValue, tmpSolutionValue);
+                    final NodeKey lowerBranch = nodeKey.createLowerBranch(branchIntegerIndex, variableValue, tmpSolutionValue);
+                    final NodeKey upperBranch = nodeKey.createUpperBranch(branchIntegerIndex, variableValue, tmpSolutionValue);
 
                     final NodeKey nextTask;
                     final BranchAndBoundNodeTask forkedTask;
 
-                    if (upperBranch.displacement <= HALF) {
+                    if (!this.isIntegerSolutionFound() && (TWO_THIRDS < variableValue) && (variableValue < ONE)) {
+
                         nextTask = upperBranch;
-                        if (lowerBranch.displacement > THREE_QUARTERS) {
-                            forkedTask = null;
-                            myDeferredNodes.offer(lowerBranch);
-                        } else {
-                            forkedTask = new BranchAndBoundNodeTask(lowerBranch);
-                        }
+                        forkedTask = null;
+                        myDeferredNodes.offer(lowerBranch);
+
                     } else {
-                        nextTask = lowerBranch;
-                        if (upperBranch.displacement > THREE_QUARTERS) {
-                            forkedTask = null;
-                            myDeferredNodes.offer(upperBranch);
+
+                        if (upperBranch.displacement <= HALF) {
+                            nextTask = upperBranch;
+                            if (lowerBranch.displacement < 0.99) {
+                                forkedTask = new BranchAndBoundNodeTask(lowerBranch);
+                            } else {
+                                forkedTask = null;
+                                myDeferredNodes.offer(lowerBranch);
+                            }
                         } else {
-                            forkedTask = new BranchAndBoundNodeTask(upperBranch);
+                            nextTask = lowerBranch;
+                            if (upperBranch.displacement < 0.99) {
+                                forkedTask = new BranchAndBoundNodeTask(upperBranch);
+                            } else {
+                                forkedTask = null;
+                                myDeferredNodes.offer(upperBranch);
+                            }
                         }
                     }
 
@@ -511,8 +528,8 @@ public final class IntegerSolver extends GenericSolver {
         return myIntegerModel;
     }
 
-    protected ExpressionsBasedModel getRelaxedModel() {
-        return myIntegerModel.relax(false);
+    protected ExpressionsBasedModel getNodeModel() {
+        return myModelPool.borrow();
     }
 
     protected boolean initialise(final Result kickStarter) {
@@ -614,6 +631,10 @@ public final class IntegerSolver extends GenericSolver {
         myIntegerSolutionsCount.incrementAndGet();
     }
 
+    protected void recycleNodeModel(ExpressionsBasedModel model) {
+        myModelPool.giveBack(model);
+    }
+
     /**
      * Should validate the solver data/input/structue. Even "expensive" validation can be performed as the
      * method should only be called if {@linkplain Optimisation.Options#validate} is set to true. In addition
@@ -697,6 +718,7 @@ public final class IntegerSolver extends GenericSolver {
                     // then compare the remaining/reversed (larger) fraction
 
                     compareFraction = ONE - fraction;
+                    //compareFraction = fraction;
                     // [0.5, 1.0)
                 }
 

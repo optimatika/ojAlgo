@@ -29,6 +29,7 @@ import java.util.Optional;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.BigArray;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.type.CalendarDateUnit;
@@ -369,6 +370,19 @@ public interface Optimisation {
 
         public Optimisation.State getState() {
             return myState;
+        }
+
+        /**
+         * Will round the solution to the given precision
+         */
+        public Optimisation.Result getSolution(NumberContext precision) {
+            final Optimisation.State state = this.getState();
+            final double value = this.getValue();
+            final BigArray solution = BigArray.make((int) this.count());
+            for (int i = 0, limit = solution.data.length; i < limit; i++) {
+                solution.set(i, precision.enforce(this.get(i)));
+            }
+            return new Optimisation.Result(state, value, solution);
         }
 
         /**

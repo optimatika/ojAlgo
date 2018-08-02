@@ -203,7 +203,9 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             myTransposed.fillColumn(row, auxiliaryRow);
 
             // Diff end
-
+            //            if (myTransposed.doubleValue(myTransposed.count() - 1L) != ZERO) {
+            //                return false;
+            //            }
             for (ElementView1D<Double, ?> elem : this.sliceConstraintsRHS().elements()) {
                 if (elem.doubleValue() < ZERO) {
                     return false;
@@ -630,7 +632,9 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             myRHS.set(row, auxiliaryRHS);
 
             // Diff end
-
+            //            if (myInfeasibility != ZERO) {
+            //                return false;
+            //            }
             for (ElementView1D<Double, ?> elem : this.sliceConstraintsRHS().elements()) {
                 if (elem.doubleValue() < ZERO) {
                     return false;

@@ -278,7 +278,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         public void update(final Variable variable) {
 
-            if (myInPlaceUpdatesOK && (mySolver != null) && variable.isFixed() && (mySolver instanceof UpdatableSolver)) {
+            if (myInPlaceUpdatesOK && (mySolver != null) && variable.isFixed() && (variable.getValue().compareTo(ZERO) != 0)
+                    && (mySolver instanceof UpdatableSolver)) {
                 final UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
 
                 final int indexInSolver = this.getIntegration().getIndexInSolver(myModel, variable);
@@ -296,8 +297,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             mySolver = null;
         }
 
-        public void validate(final Access1D<BigDecimal> solution, final Printer appender) {
-            myModel.validate(solution, appender);
+        public boolean validate(final Access1D<BigDecimal> solution, final Printer appender) {
+            return myModel.validate(solution, appender);
         }
 
         public boolean validate(final Result solution) {
@@ -1455,7 +1456,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     final void presolve() {
 
-        myExpressions.values().forEach(expr -> expr.setRedundant(false));
+        myExpressions.values().forEach(expr -> expr.reset());
 
         boolean needToRepeat = false;
 

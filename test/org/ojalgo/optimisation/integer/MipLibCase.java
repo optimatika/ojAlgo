@@ -36,7 +36,6 @@ abstract class MipLibCase extends OptimisationIntegerTests {
 
     protected static final String COMPOSITION_NOT_VALID = " Composition not valid!";
     protected static final String PATH = "./test/org/ojalgo/optimisation/integer/";
-    protected static final NumberContext PRECISION = new NumberContext(7, 6);
     protected static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
     protected static void assertMinMaxVal(final String modelName, final BigDecimal expMinVal, final BigDecimal expMaxVal, final boolean relax,
@@ -66,7 +65,7 @@ abstract class MipLibCase extends OptimisationIntegerTests {
                     tmpVariable.setValue(BigMath.ZERO);
                 }
             }
-            if (!tmpModel.validate(PRECISION.newScale(4))) {
+            if (!tmpModel.validate(new NumberContext(7, 4))) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
         }
@@ -77,6 +76,7 @@ abstract class MipLibCase extends OptimisationIntegerTests {
         // tmpModel.options.iterations_suffice = 1000;
 
         tmpModel.options.progress(IntegerSolver.class);
+        tmpModel.options.validate = false;
 
         TestUtils.assertTrue(tmpModel.validate());
 
@@ -84,7 +84,7 @@ abstract class MipLibCase extends OptimisationIntegerTests {
 
             final double tmpMinimum = tmpModel.minimise().getValue();
 
-            if (!tmpModel.validate(PRECISION)) {
+            if (!tmpModel.validate(new NumberContext(7, 6))) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
 
@@ -97,7 +97,7 @@ abstract class MipLibCase extends OptimisationIntegerTests {
 
             final double tmpMaximum = tmpModel.maximise().getValue();
 
-            if (!tmpModel.validate(PRECISION)) {
+            if (!tmpModel.validate(new NumberContext(7, 6))) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
 

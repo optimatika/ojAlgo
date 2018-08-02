@@ -132,6 +132,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         int result = 1;
         result = (prime * result) + ((myANN == null) ? 0 : myANN.hashCode());
         result = (prime * result) + ((myError == null) ? 0 : myError.hashCode());
+
         long temp;
         temp = Double.doubleToLongBits(myLearningRate);
         result = (prime * result) + (int) (temp ^ (temp >>> 32));

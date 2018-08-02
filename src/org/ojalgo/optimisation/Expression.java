@@ -37,9 +37,9 @@ import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.access.Structure2D.IntRowColumn;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.ConsumerFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.ConsumerFunction;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.ConstantFunction;
 import org.ojalgo.function.multiary.LinearFunction;
@@ -824,12 +824,17 @@ public final class Expression extends ModelEntity<Expression> {
         return myRedundant;
     }
 
+    void reset() {
+        myInfeasible = false;
+        myRedundant = false;
+    }
+
     void setInfeasible() {
         myInfeasible = true;
     }
 
-    void setRedundant(final boolean redundant) {
-        myRedundant = redundant;
+    void setRedundant() {
+        myRedundant = true;
     }
 
     @Override

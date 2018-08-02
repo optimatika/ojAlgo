@@ -696,6 +696,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return new UnaryOperatoStore<>(this, operator);
     }
 
+    default MatrixStore<N> operateOnAll(final UnaryFunction<N> operator) {
+        return new UnaryOperatoStore<>(this, operator);
+    }
+
     /**
      * The <code>premultiply</code> method differs from <code>multiply</code> in 3 ways:
      * <ol>

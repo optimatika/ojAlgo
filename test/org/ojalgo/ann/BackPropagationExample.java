@@ -121,7 +121,9 @@ abstract class BackPropagationExample extends ANNTest {
 
         double delta = 0.0001;
 
+
         Structure2D[] structure = builder.structure();
+
 
         PrimitiveDenseStore[] weights = new PrimitiveDenseStore[structure.length];
         PrimitiveDenseStore[] bias = new PrimitiveDenseStore[structure.length];
@@ -137,6 +139,7 @@ abstract class BackPropagationExample extends ANNTest {
                     double orgWeight = builder.getWeight(layer, input, output);
 
                     builder.weight(layer, input, output, orgWeight + delta);
+
                     double upperError = builder.error(triplet.target, builder.get().invoke(triplet.input));
                     builder.weight(layer, input, output, orgWeight - delta);
                     double lowerError = builder.error(triplet.target, builder.get().invoke(triplet.input));
