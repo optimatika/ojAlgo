@@ -33,11 +33,16 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ExpressionsBasedModel.Intermediate;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.type.context.NumberContext;
 
 final class NodeKey implements Serializable, Comparable<NodeKey> {
 
-    private static final double FEASIBILITY_ERROR = 1E-4;
+    /**
+     * Same scale as the default {@linkplain Optimisation.Options#feasibility} and half its precision.
+     */
+    private static final NumberContext FEASIBILITY = new NumberContext(6, 8);
     private static final AtomicLong GENERATOR = new AtomicLong();
 
     private final int[] myLowerBounds;
@@ -211,13 +216,13 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
     private double feasible(final int index, final double value, boolean validate) {
 
-        double retVal = PrimitiveFunction.MIN.invoke(PrimitiveFunction.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
+        double feasibilityAdjusted = PrimitiveFunction.MIN.invoke(PrimitiveFunction.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
 
-        if (validate && (Math.abs(retVal - value) > FEASIBILITY_ERROR)) {
+        if (validate && FEASIBILITY.isDifferent(feasibilityAdjusted, value)) {
             BasicLogger.error("Obviously infeasible value {}: {} <= {} <= {} @ {}", index, myLowerBounds[index], value, myUpperBounds[index], this);
         }
 
-        return retVal;
+        return feasibilityAdjusted;
     }
 
     long calculateTreeSize() {

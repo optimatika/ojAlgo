@@ -27,8 +27,9 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -234,7 +235,7 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     private volatile Optimisation.Result myBestResultSoFar = null;
-    private final PriorityBlockingQueue<NodeKey> myDeferredNodes = new PriorityBlockingQueue<>();
+    private final Queue<NodeKey> myDeferredNodes = new ConcurrentLinkedQueue<>();
     private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     /**
      * One entry per integer variable, the entry is the global index of that integer variable
