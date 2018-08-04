@@ -604,11 +604,11 @@ public final class IntegerSolver extends GenericSolver {
             }
         }
 
-        if (currentlyTheBest != null) {
+        if ((currentlyTheBest != null) && options.solution.isDifferent(currentlyTheBest.getValue(), result.getValue())) {
 
             final double objDiff = ABS.invoke((result.getValue() - currentlyTheBest.getValue()) / currentlyTheBest.getValue());
 
-            for (int i = 0; i < myIntegerIndices.length; i++) {
+            for (int i = 0, limit = myIntegerIndices.length; i < limit; i++) {
                 final int globalIndex = myIntegerIndices[i];
                 final double varDiff = ABS.invoke(result.doubleValue(globalIndex) - currentlyTheBest.doubleValue(globalIndex));
                 if (!options.feasibility.isZero(varDiff)) {
@@ -622,7 +622,7 @@ public final class IntegerSolver extends GenericSolver {
             final double largest = gradient.aggregateAll(Aggregator.LARGEST);
 
             if (largest > ZERO) {
-                for (int i = 0; i < myIntegerIndices.length; i++) {
+                for (int i = 0, limit = myIntegerIndices.length; i < limit; i++) {
                     final int globalIndex = myIntegerIndices[i];
                     this.addIntegerSignificance(i, ABS.invoke(gradient.doubleValue(globalIndex)) / largest);
                 }
