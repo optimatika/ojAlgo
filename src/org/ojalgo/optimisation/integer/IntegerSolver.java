@@ -111,12 +111,15 @@ public final class IntegerSolver extends GenericSolver {
             if (IntegerSolver.this.isIntegerSolutionFound()) {
 
                 final double bestIntegerSolutionValue = IntegerSolver.this.getBestResultSoFar().getValue();
-                final BigDecimal objectiveBound = TypeUtils.toBigDecimal(bestIntegerSolutionValue, IntegerSolver.this.options.feasibility);
+
+                double nudge = (Math.abs(bestIntegerSolutionValue) * options.mip_gap) + options.mip_gap;
 
                 if (nodeModel.isMinimisation()) {
-                    nodeModel.limitObjective(null, objectiveBound);
+                    final BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, IntegerSolver.this.options.feasibility);
+                    nodeModel.limitObjective(null, upper);
                 } else {
-                    nodeModel.limitObjective(objectiveBound, null);
+                    final BigDecimal lower = TypeUtils.toBigDecimal(bestIntegerSolutionValue + nudge, IntegerSolver.this.options.feasibility);
+                    nodeModel.limitObjective(lower, null);
                 }
             }
 
@@ -265,6 +268,14 @@ public final class IntegerSolver extends GenericSolver {
 
         myIntegerSignificances = new double[myIntegerIndices.length];
         Arrays.fill(myIntegerSignificances, ONE);
+        final MatrixStore<Double> gradient = this.getGradient(Access1D.asPrimitive1D(model.getVariableValues()));
+        final double largest = gradient.aggregateAll(Aggregator.LARGEST);
+        if (largest > ZERO) {
+            for (int i = 0, limit = myIntegerIndices.length; i < limit; i++) {
+                final int globalIndex = myIntegerIndices[i];
+                this.addIntegerSignificance(i, gradient.doubleValue(globalIndex) / largest);
+            }
+        }
 
         myModelPool = new ObjectPool<ExpressionsBasedModel>() {
 
@@ -424,30 +435,22 @@ public final class IntegerSolver extends GenericSolver {
                     final NodeKey nextTask;
                     final BranchAndBoundNodeTask forkedTask;
 
-                    if (!this.isIntegerSolutionFound() && (TWO_THIRDS < variableValue) && (variableValue < ONE)) {
-
+                    double cutoff = this.isIntegerSolutionFound() ? 0.99 : 0.9;
+                    if (upperBranch.displacement <= HALF) {
                         nextTask = upperBranch;
-                        forkedTask = null;
-                        myDeferredNodes.offer(lowerBranch);
-
-                    } else {
-
-                        if (upperBranch.displacement <= HALF) {
-                            nextTask = upperBranch;
-                            if (lowerBranch.displacement < 0.99) {
-                                forkedTask = new BranchAndBoundNodeTask(lowerBranch);
-                            } else {
-                                forkedTask = null;
-                                myDeferredNodes.offer(lowerBranch);
-                            }
+                        if (lowerBranch.displacement < cutoff) {
+                            forkedTask = new BranchAndBoundNodeTask(lowerBranch);
                         } else {
-                            nextTask = lowerBranch;
-                            if (upperBranch.displacement < 0.99) {
-                                forkedTask = new BranchAndBoundNodeTask(upperBranch);
-                            } else {
-                                forkedTask = null;
-                                myDeferredNodes.offer(upperBranch);
-                            }
+                            forkedTask = null;
+                            myDeferredNodes.offer(lowerBranch);
+                        }
+                    } else {
+                        nextTask = lowerBranch;
+                        if (upperBranch.displacement < cutoff) {
+                            forkedTask = new BranchAndBoundNodeTask(upperBranch);
+                        } else {
+                            forkedTask = null;
+                            myDeferredNodes.offer(upperBranch);
                         }
                     }
 
@@ -605,26 +608,11 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         if ((currentlyTheBest != null) && options.solution.isDifferent(currentlyTheBest.getValue(), result.getValue())) {
-
-            final double objDiff = ABS.invoke((result.getValue() - currentlyTheBest.getValue()) / currentlyTheBest.getValue());
-
             for (int i = 0, limit = myIntegerIndices.length; i < limit; i++) {
                 final int globalIndex = myIntegerIndices[i];
-                final double varDiff = ABS.invoke(result.doubleValue(globalIndex) - currentlyTheBest.doubleValue(globalIndex));
+                final double varDiff = result.doubleValue(globalIndex) - currentlyTheBest.doubleValue(globalIndex);
                 if (!options.feasibility.isZero(varDiff)) {
-                    this.addIntegerSignificance(i, objDiff / varDiff);
-                }
-            }
-
-        } else {
-
-            final MatrixStore<Double> gradient = this.getGradient(Access1D.asPrimitive1D(result));
-            final double largest = gradient.aggregateAll(Aggregator.LARGEST);
-
-            if (largest > ZERO) {
-                for (int i = 0, limit = myIntegerIndices.length; i < limit; i++) {
-                    final int globalIndex = myIntegerIndices[i];
-                    this.addIntegerSignificance(i, ABS.invoke(gradient.doubleValue(globalIndex)) / largest);
+                    this.addIntegerSignificance(i, ONE / varDiff);
                 }
             }
         }
@@ -668,7 +656,7 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     void addIntegerSignificance(final int index, final double significance) {
-        myIntegerSignificances[index] += significance;
+        myIntegerSignificances[index] = HYPOT.invoke(myIntegerSignificances[index], significance);
     }
 
     int countExploredNodes() {
