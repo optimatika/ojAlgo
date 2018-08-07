@@ -278,8 +278,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         public void update(final Variable variable) {
 
-            if (myInPlaceUpdatesOK && (mySolver != null) && variable.isFixed() && (variable.getValue().compareTo(ZERO) != 0)
-                    && (mySolver instanceof UpdatableSolver)) {
+            if (myInPlaceUpdatesOK && (mySolver != null) && (mySolver instanceof UpdatableSolver) && variable.isFixed()) {
                 final UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
 
                 final int indexInSolver = this.getIntegration().getIndexInSolver(myModel, variable);

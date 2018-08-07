@@ -466,6 +466,10 @@ public final class SimplexSolver extends LinearSolver {
 
     public boolean fixVariable(final int index, final double value) {
 
+        if (value < ZERO) {
+            return false;
+        }
+
         boolean retVal = myTableau.fixVariable(index, value);
 
         if (retVal) {

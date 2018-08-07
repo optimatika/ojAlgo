@@ -108,6 +108,7 @@ public class StrategyMixer {
             BasicLogger.debug(tmpStrategyCount.toString());
         }
 
+        // tmpModel.options.debug(IntegerSolver.class);
         tmpModel.minimise();
 
         if (OptimisationIntegerTests.DEBUG) {
