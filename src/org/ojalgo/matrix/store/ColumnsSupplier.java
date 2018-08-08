@@ -3,12 +3,12 @@ package org.ojalgo.matrix.store;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate1D;
 
 public final class ColumnsSupplier<N extends Number> implements Access2D<N>, ElementsSupplier<N> {
 

@@ -1,7 +1,7 @@
 package org.ojalgo.matrix.geometry;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.transformation.TransformationMatrix;
+import org.ojalgo.structure.Access2D;
 
 public class Primitive64Matrix3 implements GeometryMatrix<Primitive64Matrix3>, TransformationMatrix<Double, Primitive64Vector3> {
 

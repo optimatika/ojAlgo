@@ -23,8 +23,8 @@ package org.ojalgo.random.process;
 
 import java.util.List;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.random.LogNormal;
+import org.ojalgo.structure.Access2D;
 
 public class GeometricBrownian1D extends Process1D<LogNormal, GeometricBrownianMotion> {
 

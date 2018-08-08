@@ -23,11 +23,11 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 
 public final class Normal1D extends RandomNumber1D {
 

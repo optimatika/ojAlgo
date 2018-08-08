@@ -21,11 +21,11 @@
  */
 package org.ojalgo.matrix.transformation;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 
 public interface Householder<N extends Number> extends TransformationMatrix<N, PhysicalStore<N>>, Access1D<N> {
 

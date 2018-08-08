@@ -19,32 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.access;
+package org.ojalgo.structure;
 
-import java.util.List;
+import org.ojalgo.function.FunctionSet;
+import org.ojalgo.scalar.Scalar;
 
-import org.ojalgo.function.NullaryFunction;
+interface FactorySupplement {
 
-public interface Factory1D<I extends Structure1D> extends FactorySupplement {
+    FunctionSet<?> function();
 
-    I copy(Access1D<?> source);
-
-    I copy(double... source);
-
-    I copy(List<? extends Number> source);
-
-    I copy(Number... source);
-
-    I makeFilled(long count, NullaryFunction<?> supplier);
-
-    default I makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
-        return this.makeFilled(shape.count(), supplier);
-    }
-
-    I makeZero(long count);
-
-    default I makeZero(final Structure1D shape) {
-        return this.makeZero(shape.count());
-    }
+    Scalar.Factory<?> scalar();
 
 }

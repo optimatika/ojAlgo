@@ -23,7 +23,7 @@ package org.ojalgo.array;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.StructureAnyD;
+import org.ojalgo.structure.StructureAnyD;
 
 /**
  * AbstractArrayTest

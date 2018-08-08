@@ -19,24 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.access;
+package org.ojalgo.structure;
 
-import org.ojalgo.function.NullaryFunction;
+public interface ElementView2D<N extends Number, V extends ElementView2D<N, V>> extends ElementView1D<N, V> {
 
-public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement {
+    long column();
 
-    I copy(AccessAnyD<?> source);
+    long row();
 
-    I makeFilled(long[] structure, NullaryFunction<?> supplier);
-
-    default I makeFilled(final StructureAnyD shape, final NullaryFunction<?> supplier) {
-        return this.makeFilled(shape.shape(), supplier);
-    }
-
-    I makeZero(long... structure);
-
-    default I makeZero(final StructureAnyD shape) {
-        return this.makeZero(shape.shape());
-    }
+    abstract ElementView2D<N, V> trySplit();
 
 }

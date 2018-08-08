@@ -1,4 +1,4 @@
-package org.ojalgo.access;
+package org.ojalgo.structure;
 
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;

@@ -22,11 +22,11 @@
 package org.ojalgo.function.multiary;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.structure.Access1D;
 
 public interface MultiaryFunction<N extends Number> extends BasicFunction.PlainUnary<Access1D<N>, N> {
 

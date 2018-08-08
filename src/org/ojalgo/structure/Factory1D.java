@@ -19,60 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.access;
+package org.ojalgo.structure;
 
-public interface AccessScalar<N extends Number> {
+import java.util.List;
 
-    /**
-     * @see Number#byteValue()
-     */
-    default byte byteValue() {
-        return this.get().byteValue();
+import org.ojalgo.function.NullaryFunction;
+
+public interface Factory1D<I extends Structure1D> extends FactorySupplement {
+
+    I copy(Access1D<?> source);
+
+    I copy(double... source);
+
+    I copy(List<? extends Number> source);
+
+    I copy(Number... source);
+
+    I makeFilled(long count, NullaryFunction<?> supplier);
+
+    default I makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
+        return this.makeFilled(shape.count(), supplier);
     }
 
-    /**
-     * @see Number#doubleValue()
-     */
-    default double doubleValue() {
-        return this.get().doubleValue();
-    }
+    I makeZero(long count);
 
-    /**
-     * @see Number#floatValue()
-     */
-    default float floatValue() {
-        return this.get().floatValue();
-    }
-
-    N get();
-
-    /**
-     * @deprecated v45 Use {@link #get()} instead
-     */
-    @Deprecated
-    default N getNumber() {
-        return this.get();
-    }
-
-    /**
-     * @see Number#intValue()
-     */
-    default int intValue() {
-        return this.get().intValue();
-    }
-
-    /**
-     * @see Number#longValue()
-     */
-    default long longValue() {
-        return this.get().longValue();
-    }
-
-    /**
-     * @see Number#shortValue()
-     */
-    default short shortValue() {
-        return this.get().shortValue();
+    default I makeZero(final Structure1D shape) {
+        return this.makeZero(shape.count());
     }
 
 }

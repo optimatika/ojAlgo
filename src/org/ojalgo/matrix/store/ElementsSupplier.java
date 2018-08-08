@@ -23,10 +23,10 @@ package org.ojalgo.matrix.store;
 
 import java.util.function.Supplier;
 
-import org.ojalgo.access.Factory2D;
-import org.ojalgo.access.Stream2D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.structure.Factory2D;
+import org.ojalgo.structure.Stream2D;
 
 /**
  * An elements supplier is not (yet) a matrix, but there are several matrix related things you can do with

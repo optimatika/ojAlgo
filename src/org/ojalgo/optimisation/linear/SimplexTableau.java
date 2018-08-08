@@ -25,11 +25,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.ElementView1D;
-import org.ojalgo.access.Mutate1D;
-import org.ojalgo.access.Mutate2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
@@ -45,6 +40,11 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.linear.SimplexSolver.AlgorithmStore;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.ElementView1D;
+import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.type.IndexSelector;
 
 abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {

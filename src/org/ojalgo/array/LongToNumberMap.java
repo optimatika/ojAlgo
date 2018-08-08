@@ -8,12 +8,12 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**

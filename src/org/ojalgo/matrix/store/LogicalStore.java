@@ -24,8 +24,8 @@ package org.ojalgo.matrix.store;
 import java.util.concurrent.Future;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.concurrent.DaemonPoolExecutor;
+import org.ojalgo.structure.Access1D;
 
 /**
  * Logical stores are (intended to be) immutable.

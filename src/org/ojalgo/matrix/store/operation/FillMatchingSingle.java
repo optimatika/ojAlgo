@@ -23,8 +23,8 @@ package org.ojalgo.matrix.store.operation;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.TypeUtils;
 
 public final class FillMatchingSingle extends MatrixOperation {

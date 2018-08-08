@@ -22,9 +22,6 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.constant.PrimitiveMath;
@@ -38,6 +35,9 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -46,7 +46,7 @@ import org.ojalgo.type.context.NumberContext;
  * </p>
  * <p>
  * A {@linkplain MatrixStore} extends {@linkplain Access2D} (as well as
- * {@linkplain org.ojalgo.access.Access2D.Visitable} and {@linkplain org.ojalgo.access.Access2D.Elements}) and
+ * {@linkplain org.ojalgo.structure.Access2D.Visitable} and {@linkplain org.ojalgo.structure.Access2D.Elements}) and
  * defines some futher funtionality - mainly matrix multiplication.
  * </p>
  * <p>

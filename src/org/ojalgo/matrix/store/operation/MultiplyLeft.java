@@ -23,7 +23,6 @@ package org.ojalgo.matrix.store.operation;
 
 import java.util.Arrays;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.PrimitiveMath;
@@ -31,6 +30,7 @@ import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyLeft;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyLeft;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 
 public final class MultiplyLeft extends MatrixOperation {
 

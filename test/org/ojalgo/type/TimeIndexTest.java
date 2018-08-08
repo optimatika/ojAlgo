@@ -7,7 +7,7 @@ import java.time.ZoneOffset;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.Structure1D.IndexMapper;
+import org.ojalgo.structure.Structure1D.IndexMapper;
 
 public class TimeIndexTest {
 

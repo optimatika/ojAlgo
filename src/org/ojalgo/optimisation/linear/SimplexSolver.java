@@ -30,10 +30,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Mutate1D;
-import org.ojalgo.access.Mutate2D;
-import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.array.Primitive64Array;
@@ -52,6 +48,10 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.IterationPoint;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 /**

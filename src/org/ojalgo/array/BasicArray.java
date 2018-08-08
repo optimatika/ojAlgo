@@ -23,9 +23,6 @@ package org.ojalgo.array;
 
 import java.io.Serializable;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Mutate1D;
-import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -36,6 +33,9 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.structure.StructureAnyD;
 
 /**
  * <p>

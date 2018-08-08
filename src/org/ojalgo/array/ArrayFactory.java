@@ -24,14 +24,14 @@ package org.ojalgo.array;
 import java.util.List;
 
 import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Factory1D;
-import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Factory1D;
+import org.ojalgo.structure.StructureAnyD;
 
 abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends Object implements Factory1D<BasicArray<N>> {
 

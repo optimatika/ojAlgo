@@ -26,9 +26,6 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Assertions;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Structure2D;
-import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
@@ -45,6 +42,9 @@ import org.ojalgo.matrix.store.operation.MatrixOperation;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure2D;
+import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 

@@ -21,8 +21,8 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.structure.Mutate1D;
 
 public abstract class PrimitiveArray extends PlainArray<Double> implements Mutate1D.Sortable {
 

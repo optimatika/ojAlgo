@@ -21,9 +21,9 @@
  */
 package org.ojalgo.random;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.structure.Access2D;
 
 abstract class RandomNumber1D {
 

@@ -19,15 +19,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.access;
+package org.ojalgo.structure;
 
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.scalar.Scalar;
+public interface AccessScalar<N extends Number> {
 
-interface FactorySupplement {
+    /**
+     * @see Number#byteValue()
+     */
+    default byte byteValue() {
+        return this.get().byteValue();
+    }
 
-    FunctionSet<?> function();
+    /**
+     * @see Number#doubleValue()
+     */
+    default double doubleValue() {
+        return this.get().doubleValue();
+    }
 
-    Scalar.Factory<?> scalar();
+    /**
+     * @see Number#floatValue()
+     */
+    default float floatValue() {
+        return this.get().floatValue();
+    }
+
+    N get();
+
+    /**
+     * @deprecated v45 Use {@link #get()} instead
+     */
+    @Deprecated
+    default N getNumber() {
+        return this.get();
+    }
+
+    /**
+     * @see Number#intValue()
+     */
+    default int intValue() {
+        return this.get().intValue();
+    }
+
+    /**
+     * @see Number#longValue()
+     */
+    default long longValue() {
+        return this.get().longValue();
+    }
+
+    /**
+     * @see Number#shortValue()
+     */
+    default short shortValue() {
+        return this.get().shortValue();
+    }
 
 }

@@ -27,11 +27,6 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessAnyD;
-import org.ojalgo.access.FactoryAnyD;
-import org.ojalgo.access.MutateAnyD;
-import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -43,6 +38,11 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.AccessAnyD;
+import org.ojalgo.structure.FactoryAnyD;
+import org.ojalgo.structure.MutateAnyD;
+import org.ojalgo.structure.StructureAnyD;
 
 /**
  * ArrayAnyD

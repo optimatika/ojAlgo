@@ -23,10 +23,10 @@ package org.ojalgo.series.function;
 
 import java.util.Map;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.series.BasicSeries;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.series.CoordinationSet;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;

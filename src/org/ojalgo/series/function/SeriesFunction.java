@@ -26,8 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.series.BasicSeries;
+import org.ojalgo.structure.Access1D;
 
 /**
  * A function that maps from a (collection of) series and one or more keys to a series of numbers. The

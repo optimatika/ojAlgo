@@ -23,13 +23,13 @@ package org.ojalgo.function.polynomial;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.TypeUtils;
 
 /**

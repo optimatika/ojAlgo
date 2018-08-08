@@ -21,11 +21,11 @@
  */
 package org.ojalgo.tensor;
 
-import org.ojalgo.access.AccessAnyD;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.AccessAnyD;
 
 public interface Tensor<N extends Number> extends AccessAnyD<N>, NormedVectorSpace<Tensor<N>, N> {
 

@@ -24,10 +24,6 @@ package org.ojalgo.matrix.store;
 import java.io.Serializable;
 import java.util.List;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Factory2D;
-import org.ojalgo.access.Mutate2D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -35,6 +31,10 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Factory2D;
+import org.ojalgo.structure.Mutate2D;
 
 /**
  * <p>

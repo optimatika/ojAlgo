@@ -21,9 +21,9 @@
  */
 package org.ojalgo.function.aggregator;
 
-import org.ojalgo.access.AccessScalar;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.AccessScalar;
 
 public interface AggregatorFunction<N extends Number> extends VoidFunction<N>, AccessScalar<N> {
 

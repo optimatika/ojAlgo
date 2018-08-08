@@ -35,12 +35,12 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Structure1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.series.primitive.CoordinatedSet;
 import org.ojalgo.series.primitive.PrimitiveSeries;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TimeIndex;

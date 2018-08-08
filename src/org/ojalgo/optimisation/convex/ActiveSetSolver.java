@@ -26,8 +26,6 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Optional;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.PrimitiveFunction.Unary;
@@ -35,6 +33,8 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.IndexSelector;
 import org.ojalgo.type.context.NumberContext;
 

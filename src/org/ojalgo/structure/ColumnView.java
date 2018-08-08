@@ -19,65 +19,69 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.access;
+package org.ojalgo.structure;
 
 import java.util.Iterator;
 
 import org.ojalgo.ProgrammingError;
 
-public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<N>> {
+public class ColumnView<N extends Number> implements Access1D<N>, Iterator<ColumnView<N>> {
 
-    public static <S extends Number> Iterable<RowView<S>> makeIterable(final Access2D<S> access) {
-        return new RowView<>(access).iterable;
+    public static <S extends Number> Iterable<ColumnView<S>> makeIterable(final Access2D<S> access) {
+        return new ColumnView<>(access).iterable;
     }
 
+    private long myColumn = -1L;
     private final Access2D<N> myDelegate2D;
-    private final long myLastRow;
-    private long myRow = -1L;
+    private final long myLastColumn;
 
-    final Iterable<RowView<N>> iterable = () -> RowView.this;
+    final Iterable<ColumnView<N>> iterable = () -> ColumnView.this;
 
-    protected RowView(final Access2D<N> access) {
+    protected ColumnView(final Access2D<N> access) {
         this(access, -1L);
     }
 
-    RowView(final Access2D<N> access, final long row) {
+    ColumnView(final Access2D<N> access, final long column) {
 
         super();
 
         myDelegate2D = access;
-        myLastRow = access.countRows() - 1L;
+        myLastColumn = access.countColumns() - 1L;
 
-        myRow = row;
+        myColumn = column;
+    }
+
+    public long column() {
+        return myColumn;
     }
 
     public long count() {
-        return myDelegate2D.countColumns();
+        return myDelegate2D.countRows();
     }
 
     public double doubleValue(final long index) {
-        return myDelegate2D.doubleValue(myRow, index);
+        return myDelegate2D.doubleValue(index, myColumn);
     }
 
     public N get(final long index) {
-        return myDelegate2D.get(myRow, index);
+        return myDelegate2D.get(index, myColumn);
     }
 
     public boolean hasNext() {
-        return myRow < myLastRow;
+        return myColumn < myLastColumn;
     }
 
     public boolean hasPrevious() {
-        return myRow > 0L;
+        return myColumn > 0L;
     }
 
-    public RowView<N> next() {
-        myRow++;
+    public ColumnView<N> next() {
+        myColumn++;
         return this;
     }
 
-    public RowView<N> previous() {
-        myRow--;
+    public ColumnView<N> previous() {
+        myColumn--;
         return this;
     }
 
@@ -85,12 +89,8 @@ public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<
         ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
-    public long row() {
-        return myRow;
-    }
-
-    protected void setRow(final long row) {
-        myRow = row;
+    protected void setColumn(final long column) {
+        myColumn = column;
     }
 
 }

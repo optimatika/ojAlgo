@@ -26,10 +26,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**

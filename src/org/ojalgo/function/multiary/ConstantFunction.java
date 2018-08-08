@@ -21,7 +21,6 @@
  */
 package org.ojalgo.function.multiary;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -29,6 +28,7 @@ import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access1D;
 
 /**
  * Constant valued function - always returns the same value.

@@ -23,9 +23,9 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.structure.Access1D;
 
 /**
  * A continuous distribution in which the logarithm of a variable has a normal distribution. A log normal

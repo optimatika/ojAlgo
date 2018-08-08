@@ -24,14 +24,14 @@ package org.ojalgo.ann;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Normal;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure2D;
 
 final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double>, PrimitiveDenseStore> {
 

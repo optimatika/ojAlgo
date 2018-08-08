@@ -23,11 +23,11 @@ package org.ojalgo.matrix.task.iterative;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate1D;
 
 public final class Equation implements Comparable<Equation>, Access1D<Double>, Mutate1D {
 

@@ -25,9 +25,9 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Arrays;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.structure.Access1D;
 
 public abstract class PrimitiveSeries implements Access1D<Double> {
 

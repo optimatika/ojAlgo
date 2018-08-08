@@ -25,9 +25,9 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.random.Normal;
+import org.ojalgo.structure.StructureAnyD;
 
 public class ReductionTest {
 

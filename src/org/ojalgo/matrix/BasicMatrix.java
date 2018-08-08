@@ -24,9 +24,6 @@ package org.ojalgo.matrix;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Mutate2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.algebra.ScalarOperation;
@@ -40,6 +37,9 @@ import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**

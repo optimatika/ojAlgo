@@ -26,9 +26,6 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.LongStream;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.ElementView1D;
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -37,6 +34,9 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.ElementView1D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**

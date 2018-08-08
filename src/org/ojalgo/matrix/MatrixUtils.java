@@ -23,8 +23,6 @@ package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.store.ElementsConsumer;
@@ -35,6 +33,8 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.TypeUtils;
 
 public abstract class MatrixUtils {

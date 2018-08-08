@@ -1,11 +1,11 @@
-package org.ojalgo.access;
+package org.ojalgo.structure;
 
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 
-public interface StreamAnyD<N extends Number, A extends AccessAnyD<N>, R extends MutateAnyD.Receiver<N>, P extends StreamAnyD<N, A, R, P>>
-        extends AccessAnyD.Collectable<N, R> {
+public interface Stream1D<N extends Number, A extends Access1D<N>, R extends Mutate1D.Receiver<N>, P extends Stream1D<N, A, R, P>>
+        extends Access1D.Collectable<N, R> {
 
     default P operateOnAll(final BinaryFunction<N> operator, final double right) {
         return this.operateOnAll(operator.second(right));

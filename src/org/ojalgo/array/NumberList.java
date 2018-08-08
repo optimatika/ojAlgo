@@ -34,13 +34,13 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Iterator1D;
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Iterator1D;
+import org.ojalgo.structure.Mutate1D;
 
 /**
  * Think of this as an {@link ArrayList} that can only contain numbers, but with a few extra features. Among

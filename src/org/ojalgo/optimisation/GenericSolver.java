@@ -24,10 +24,10 @@ package org.ojalgo.optimisation;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 
 public abstract class GenericSolver implements Optimisation.Solver {
 

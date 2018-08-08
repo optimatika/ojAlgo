@@ -25,14 +25,14 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Mutate2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.TransformationMatrix;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 

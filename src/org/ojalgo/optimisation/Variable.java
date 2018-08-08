@@ -25,8 +25,8 @@ import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 

@@ -21,9 +21,9 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access2D;
 
 public final class SubstituteForwards extends MatrixOperation {
 

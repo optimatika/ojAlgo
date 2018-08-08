@@ -21,11 +21,11 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
+import org.ojalgo.structure.Access1D;
 
 abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
 

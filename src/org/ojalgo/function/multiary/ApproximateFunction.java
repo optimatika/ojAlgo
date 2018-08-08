@@ -21,8 +21,8 @@
  */
 package org.ojalgo.function.multiary;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.structure.Access1D;
 
 abstract class ApproximateFunction<N extends Number> implements MultiaryFunction<N>, MultiaryFunction.TwiceDifferentiable<N> {
 
