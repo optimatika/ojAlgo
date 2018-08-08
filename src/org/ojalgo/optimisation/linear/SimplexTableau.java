@@ -46,11 +46,8 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.linear.SimplexSolver.AlgorithmStore;
 import org.ojalgo.type.IndexSelector;
-import org.ojalgo.type.context.NumberContext;
 
 abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
-
-    static final NumberContext PRECISION = NumberContext.getGeneral(12, 8);
 
     static final class DenseTableau extends SimplexTableau {
 
@@ -207,9 +204,6 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             // Diff end
 
-            if (!PRECISION.isZero(myTransposed.doubleValue(myTransposed.count() - 1L))) {
-                return false;
-            }
             for (ElementView1D<Double, ?> elem : this.sliceConstraintsRHS().elements()) {
                 if (elem.doubleValue() < ZERO) {
                     return false;
@@ -436,6 +430,10 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             myPhase1 = false;
         }
 
+        void returnToPhase1() {
+            myPhase1 = true;
+        }
+
     }
 
     static final class SparseTableau extends SimplexTableau {
@@ -637,9 +635,6 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             // Diff end
 
-            if (!PRECISION.isZero(myInfeasibility)) {
-                return false;
-            }
             for (ElementView1D<Double, ?> elem : this.sliceConstraintsRHS().elements()) {
                 if (elem.doubleValue() < ZERO) {
                     return false;

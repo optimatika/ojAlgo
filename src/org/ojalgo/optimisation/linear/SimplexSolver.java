@@ -477,6 +477,7 @@ public final class SimplexSolver extends LinearSolver {
                 myFixedVariables = LongToNumberMap.factory(Primitive64Array.FACTORY).make();
             }
             myFixedVariables.put(index, value);
+            myPoint.returnToPhase1();
         }
 
         return retVal;
