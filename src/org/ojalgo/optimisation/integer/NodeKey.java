@@ -46,6 +46,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
     private static final AtomicLong GENERATOR = new AtomicLong();
 
     private final int[] myLowerBounds;
+    private final boolean mySignChanged;
     private final int[] myUpperBounds;
 
     /**
@@ -71,7 +72,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
     final long sequence = GENERATOR.getAndIncrement();
 
     private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int integerIndexBranchedOn,
-            final double branchVariableDisplacement, final double parentObjectiveFunctionValue) {
+            final double branchVariableDisplacement, final double parentObjectiveFunctionValue, boolean signChanged) {
 
         super();
 
@@ -82,6 +83,8 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         index = integerIndexBranchedOn;
         displacement = branchVariableDisplacement;
         objective = parentObjectiveFunctionValue;
+
+        mySignChanged = signChanged;
     }
 
     NodeKey(final ExpressionsBasedModel integerModel) {
@@ -116,6 +119,8 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         index = -1;
         displacement = PrimitiveMath.NaN;
         objective = PrimitiveMath.NaN;
+
+        mySignChanged = false;
     }
 
     public int compareTo(final NodeKey ref) {
@@ -137,7 +142,11 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
             variable.setValue(value);
         }
 
-        nodeModel.update(variable);
+        if (this.isSignChanged()) {
+            nodeModel.dispose();
+        } else {
+            nodeModel.update(variable);
+        }
     }
 
     public boolean equals(int[] lowerBounds, int[] upperBounds) {
@@ -246,13 +255,19 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
         final int tmpFloor = (int) PrimitiveFunction.FLOOR.invoke(tmpFeasibleValue);
 
+        int oldVal = tmpUBs[branchIntegerIndex];
+
         if ((tmpFloor >= tmpUBs[branchIntegerIndex]) && (tmpFloor > tmpLBs[branchIntegerIndex])) {
             tmpUBs[branchIntegerIndex] = tmpFloor - 1;
         } else {
             tmpUBs[branchIntegerIndex] = tmpFloor;
         }
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, value - tmpFloor, objective);
+        int newVal = tmpUBs[branchIntegerIndex];
+
+        final boolean changed = (oldVal > 0) && (newVal <= 0);
+
+        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, value - tmpFloor, objective, changed);
     }
 
     NodeKey createUpperBranch(final int branchIntegerIndex, final double value, final double objective) {
@@ -264,13 +279,19 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
         final int tmpCeil = (int) PrimitiveFunction.CEIL.invoke(tmpFeasibleValue);
 
+        int oldVal = tmpLBs[branchIntegerIndex];
+
         if ((tmpCeil <= tmpLBs[branchIntegerIndex]) && (tmpCeil < tmpUBs[branchIntegerIndex])) {
             tmpLBs[branchIntegerIndex] = tmpCeil + 1;
         } else {
             tmpLBs[branchIntegerIndex] = tmpCeil;
         }
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, tmpCeil - value, objective);
+        int newVal = tmpLBs[branchIntegerIndex];
+
+        final boolean changed = (oldVal < 0) && (newVal >= 0);
+
+        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, tmpCeil - value, objective, changed);
     }
 
     void enforceBounds(final ExpressionsBasedModel model, final int integerIndex, final int[] integerToGlobalTranslator) {
@@ -320,6 +341,10 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
     int[] getUpperBounds() {
         return Raw1D.copyOf(myUpperBounds);
+    }
+
+    boolean isSignChanged() {
+        return mySignChanged;
     }
 
     void setNodeState(final ExpressionsBasedModel model, final int[] integerIndices) {

@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.ojalgo.array.Primitive64Array;
@@ -176,16 +177,16 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             int retVal = -1;
 
-            retVal = model.indexOfPositiveVariable(variable);
+            BigDecimal value = variable.getValue();
 
-            if (retVal < 0) {
-                retVal = model.indexOfNegativeVariable(variable);
-                if (retVal >= 0) {
-                    retVal += model.getPositiveVariables().size();
-                }
+            if ((value.signum() >= 0) && ((retVal = model.indexOfPositiveVariable(variable)) >= 0)) {
+                return retVal;
+            } else if ((value.signum() <= 0) && ((retVal = model.indexOfNegativeVariable(variable)) >= 0)) {
+                retVal += model.getPositiveVariables().size();
+                return retVal;
             }
 
-            return retVal;
+            return -1;
         }
 
         @Override

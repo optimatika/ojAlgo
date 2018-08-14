@@ -46,7 +46,6 @@ import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.structure.Access1D;
-import org.ojalgo.type.ObjectPool;
 import org.ojalgo.type.TypeUtils;
 
 public final class IntegerSolver extends GenericSolver {
@@ -112,13 +111,13 @@ public final class IntegerSolver extends GenericSolver {
 
                 final double bestIntegerSolutionValue = IntegerSolver.this.getBestResultSoFar().getValue();
 
-                double nudge = (Math.abs(bestIntegerSolutionValue) * options.mip_gap) + options.mip_gap;
+                double nudge = MAX.invoke(ABS.invoke(bestIntegerSolutionValue) * options.mip_gap, options.mip_gap);
 
                 if (nodeModel.isMinimisation()) {
-                    final BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, IntegerSolver.this.options.feasibility);
+                    final BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, options.feasibility);
                     nodeModel.limitObjective(null, upper);
                 } else {
-                    final BigDecimal lower = TypeUtils.toBigDecimal(bestIntegerSolutionValue + nudge, IntegerSolver.this.options.feasibility);
+                    final BigDecimal lower = TypeUtils.toBigDecimal(bestIntegerSolutionValue + nudge, options.feasibility);
                     nodeModel.limitObjective(lower, null);
                 }
             }
@@ -248,7 +247,6 @@ public final class IntegerSolver extends GenericSolver {
     private final double[] myIntegerSignificances;
     private final AtomicInteger myIntegerSolutionsCount = new AtomicInteger();
     private final boolean myMinimisation;
-    private final ObjectPool<ExpressionsBasedModel> myModelPool;
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
 
     protected IntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
@@ -276,26 +274,6 @@ public final class IntegerSolver extends GenericSolver {
                 this.addIntegerSignificance(i, gradient.doubleValue(globalIndex) / largest);
             }
         }
-
-        myModelPool = new ObjectPool<ExpressionsBasedModel>() {
-
-            @Override
-            protected ExpressionsBasedModel newObject() {
-                return myIntegerModel.relax(false);
-            }
-
-            @Override
-            protected void reset(ExpressionsBasedModel object) {
-                List<Variable> rootModelVariables = myIntegerModel.getVariables();
-                for (int i = 0, limit = rootModelVariables.size(); i < limit; i++) {
-                    Variable rVar = rootModelVariables.get(i);
-                    Variable nVar = object.getVariable(i);
-                    nVar.lower(rVar.getLowerLimit());
-                    nVar.upper(rVar.getUpperLimit());
-                }
-            }
-
-        };
     }
 
     public Result solve(final Result kickStarter) {
@@ -435,10 +413,9 @@ public final class IntegerSolver extends GenericSolver {
                     final NodeKey nextTask;
                     final BranchAndBoundNodeTask forkedTask;
 
-                    double cutoff = this.isIntegerSolutionFound() ? 0.99 : 0.9;
                     if (upperBranch.displacement <= HALF) {
                         nextTask = upperBranch;
-                        if (lowerBranch.displacement < cutoff) {
+                        if (lowerBranch.displacement < options.mip_defer) {
                             forkedTask = new BranchAndBoundNodeTask(lowerBranch);
                         } else {
                             forkedTask = null;
@@ -446,7 +423,7 @@ public final class IntegerSolver extends GenericSolver {
                         }
                     } else {
                         nextTask = lowerBranch;
-                        if (upperBranch.displacement < cutoff) {
+                        if (upperBranch.displacement < options.mip_defer) {
                             forkedTask = new BranchAndBoundNodeTask(upperBranch);
                         } else {
                             forkedTask = null;
@@ -533,7 +510,7 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     protected ExpressionsBasedModel getNodeModel() {
-        return myModelPool.borrow();
+        return myIntegerModel.relax(false);
     }
 
     protected boolean initialise(final Result kickStarter) {
@@ -621,7 +598,7 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     protected void recycleNodeModel(ExpressionsBasedModel model) {
-        myModelPool.giveBack(model);
+        //  myModelPool.giveBack(model);
     }
 
     /**

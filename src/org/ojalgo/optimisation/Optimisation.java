@@ -192,10 +192,23 @@ public interface Optimisation {
         public Class<? extends Optimisation.Solver> logger_solver = null;
 
         /**
-         * The (relative) MIP gap is the difference between the best integer solution found so far and a
-         * node's non-integer solution, relative to the optimal value (approximated by the currently best
-         * integer solution). If the gap is smaller than this value, then the corresponding branch i
-         * terminated as it is deemed unlikely or too "expensive" to find better integer solutions there.
+         * The branch-and-bound nodes/subproblems come in pairs, and each node has a displacement (the
+         * fractional amount removed by the new bound). Every pair's total displacement is always exactly 1.0.
+         * From each pair the node with the smallest displacement (0.0 - 0.5) is always evaluated directly.
+         * The other node (with displacement 0.5 - 1.0) can either be forked off and evalueated in another
+         * thread, or deferred to be evaluated later in order of creation. Nodes with displacement larger than
+         * this value are deferred. If this value is set to 0.5 or less then everything is deferred,
+         * effectively making the MIP solver single threaded and deterministic. If this value is set to 1.0 or
+         * more then nothinng is deferred
+         */
+        public double mip_defer = 0.99;
+
+        /**
+         * The MIP gap is the difference between the best integer solution found so far and a node's
+         * non-integer solution. The relative MIP gap is that difference divided by the optimal value
+         * (approximated by the currently best integer solution). If the gap (absolute or relative) is smaller
+         * than this value, then the corresponding branch i terminated as it is deemed unlikely or too
+         * "expensive" to find better integer solutions there.
          */
         public double mip_gap = 1.0E-4;
 
@@ -368,10 +381,6 @@ public interface Optimisation {
             return Optional.ofNullable(myMultipliers);
         }
 
-        public Optimisation.State getState() {
-            return myState;
-        }
-
         /**
          * Will round the solution to the given precision
          */
@@ -383,6 +392,10 @@ public interface Optimisation {
                 solution.set(i, precision.enforce(this.get(i)));
             }
             return new Optimisation.Result(state, value, solution);
+        }
+
+        public Optimisation.State getState() {
+            return myState;
         }
 
         /**

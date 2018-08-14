@@ -199,6 +199,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             mySolver = null;
         }
 
+        /**
+         * Force re-generation of any cached/transient data
+         */
         public void dispose() {
 
             Solver.super.dispose();
