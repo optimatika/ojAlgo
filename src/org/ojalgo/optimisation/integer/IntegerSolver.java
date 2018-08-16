@@ -673,7 +673,20 @@ public final class IntegerSolver extends GenericSolver {
 
             if (!options.feasibility.isZero(fraction)) {
 
-                compareFraction = fraction * this.getIntegerSignificance(i);
+                if (this.isIntegerSolutionFound()) {
+                    // If an integer solution is already found
+                    // then scale the fraction by its significance
+
+                    compareFraction = fraction * this.getIntegerSignificance(i);
+
+                } else {
+                    // If not yet found integer solution
+                    // then compare the remaining/reversed (larger) fraction
+
+                    compareFraction = ONE - fraction;
+                    //compareFraction = fraction;
+                    // [0.5, 1.0)
+                }
 
                 if (compareFraction > maxFraction) {
                     retVal = i;
