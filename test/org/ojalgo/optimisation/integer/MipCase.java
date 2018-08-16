@@ -26,6 +26,7 @@ public final class MipCase extends MipLibCase {
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 2.0 rather than 1.0 after
      * 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
+     * <li>2018-08-16: MacPro sufficed with optimal solution</li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare_5_0()
@@ -43,6 +44,7 @@ public final class MipCase extends MipLibCase {
      * 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
      * was:<5.0></li>
+     * <li>2018-08-16: MacPro sufficed: <1.0> but was: <8.0></li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare1()
@@ -60,6 +62,7 @@ public final class MipCase extends MipLibCase {
      * 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
      * was:<19.00000000000008></li>
+     * <li>2018-08-16: MacPro sufficed: <1.0> but was: <14.0></li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare2()
@@ -80,6 +83,7 @@ public final class MipCase extends MipLibCase {
      * <li>2015-11-07: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 107min</li>
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
+     * <li>2018-08-16: MacPro sufficed with optimal solution</li>
      * </ul>
      *
      * @see RelaxedLpCase#testMas76()
@@ -97,6 +101,7 @@ public final class MipCase extends MipLibCase {
      * than 2.07405081E7 after 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<2.07405081E7>
      * but was:<2.45509922222574E7></li>
+     * <li>2018-08-16: MacPro sufficed: <2.07405081E7> but was: <2.4337382015089516E7></li>
      * </ul>
      *
      * @see RelaxedLpCase#testModglob()
@@ -111,6 +116,7 @@ public final class MipCase extends MipLibCase {
      * <li>2015-02-08: MacPro (suffice=4h abort=8h) Stopped after 4.75h: expected:<54.76> but was:<220.69>
      * </li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Aborted with no integer solution</li>
+     * <li>2018-08-16: MacPro aborted with no integer solution</li>
      * </ul>
      *
      * @see RelaxedLpCase#testNeos911880()
@@ -126,6 +132,7 @@ public final class MipCase extends MipLibCase {
      * <li>2013-11-29: MacPro (suffice=4h abort=8h) Stopped after 4h: expected:<-41.0> but was:<-40.0></li>
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
+     * <li>2018-08-16: MacPro sufficed with optimal solution</li>
      * </ul>
      *
      * @see RelaxedLpCase#testNoswot()
@@ -158,6 +165,7 @@ public final class MipCase extends MipLibCase {
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution</li>
      * <li>2018-02-07: MacPro (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s</li>
      * <li>2018-04-47: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s</li>
+     * <li>2018-08-16: MacPro sufficed: <11.0> but was: <14.0></li>
      * </ul>
      *
      * @see RelaxedLpCase#testPk1()
@@ -173,6 +181,7 @@ public final class MipCase extends MipLibCase {
      * <li>2013-11-30: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<7350.0> but was:<8020.0></li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<7350.0> but
      * was:<7580.0></li>
+     * <li>2018-08-16: MacPro sufficed: <7350.0> but was: <7490.0></li>
      * </ul>
      *
      * @see RelaxedLpCase#testPp08a()
@@ -187,6 +196,7 @@ public final class MipCase extends MipLibCase {
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<7350.0> but was:<8080.0></li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<7350.0> but
      * was:<7500.0></li>
+     * <li>2018-08-16: MacPro sufficed: <7350.0> but was: <7580.0></li>
      * </ul>
      *
      * @see RelaxedLpCase#testPp08aCUTS()
@@ -201,6 +211,7 @@ public final class MipCase extends MipLibCase {
      * <li>2013-11-24: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<764772.0> but was:
      * <1012900.999999></li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Aborted with no integer solution</li>
+     * <li>2018-08-16: MacPro sufficed: <764772.0> but was: <1256281.99999962></li>
      * </ul>
      *
      * @see RelaxedLpCase#testTimtab1()
@@ -217,6 +228,7 @@ public final class MipCase extends MipLibCase {
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped after 5min expected:<13.75> but was:<16.25></li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<13.75> but
      * was:<16.0></li>
+     * <li>2018-08-16: MacPro sufficed: <13.75> but was: <16.5></li>
      * </ul>
      *
      * @see RelaxedLpCase#testVpm2()
