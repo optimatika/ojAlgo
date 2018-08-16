@@ -1440,7 +1440,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             this.scanEntities();
         }
 
-        final Optimisation.Result solver = this.prepare().solve(null);
+        Intermediate prepared = this.prepare();
+        final Optimisation.Result solver = prepared.solve(null);
 
         for (int i = 0, limit = myVariables.size(); i < limit; i++) {
             final Variable tmpVariable = myVariables.get(i);

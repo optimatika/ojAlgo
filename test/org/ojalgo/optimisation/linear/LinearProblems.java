@@ -406,4 +406,42 @@ public class LinearProblems extends OptimisationLinearTests {
         TestUtils.assertStateNotLessThanOptimal(solution);
     }
 
+    @Test
+    public void precisionTestDoubleRunInfeasible() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        Variable d35 = model.addVariable("d35");
+        Variable d56 = model.addVariable("d56");
+        Variable d57 = model.addVariable("d57");
+
+        // d35 = 0.0;
+        d35.level(0.0);
+
+        // d56 - d35 = -2000.0400000000002;
+        Expression expression1 = model.addExpression("d56 - d35");
+        expression1.set(d56, 1.0);
+        expression1.set(d35, -1.0);
+        expression1.level(-2000.0400000000002);
+
+        // d57 - d56 = 0.0;
+        Expression expression2 = model.addExpression("d57 - d56");
+        expression2.set(d57, 1.0);
+        expression2.set(d56, -1.0);
+        expression2.level(0.0);
+
+        // minimize: 1.0 d57;
+        d57.weight(1.0);
+
+        System.out.println(model);
+        Optimisation.Result result1 = model.minimise();
+        System.out.println(result1);
+        System.out.println("Valid? " + model.validate(result1));
+
+        Optimisation.Result result2 = model.minimise();
+        System.out.println(result2);
+        System.out.println("Valid? " + model.validate(result2));
+
+        TestUtils.assertEquals(result1.getState(), result2.getState());
+    }
+
 }
