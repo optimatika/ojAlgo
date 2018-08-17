@@ -440,6 +440,7 @@ public class LinearProblems extends OptimisationLinearTests {
         Optimisation.Result result2 = model.minimise();
         System.out.println(result2);
         System.out.println("Valid? " + model.validate(result2));
+        System.out.println(model);
 
         TestUtils.assertEquals(result1.getState(), result2.getState());
     }
