@@ -1475,7 +1475,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                     fixedValue = options.solution.enforce(expr.calculateFixedValue(fixedVariables));
                     for (final Presolver presolver : PRESOLVERS) {
                         if (!needToRepeat) {
-                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.solution);
+                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.feasibility);
                         }
                     }
                 }
