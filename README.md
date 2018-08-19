@@ -12,7 +12,7 @@ ojAlgo is available at [The Central (Maven) Repository](http://search.maven.org/
 <dependency>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>45.1.1</version>
+    <version>46.0.0</version>
 </dependency>
 ```
 ...or download the jar from SourceForge.
