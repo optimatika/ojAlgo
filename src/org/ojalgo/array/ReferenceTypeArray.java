@@ -25,8 +25,6 @@ import java.util.Arrays;
 import java.util.Spliterator;
 import java.util.Spliterators;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionUtils;
@@ -34,6 +32,8 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate1D;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain java.lang.Number}.

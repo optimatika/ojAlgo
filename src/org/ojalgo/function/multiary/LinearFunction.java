@@ -21,17 +21,15 @@
  */
 package org.ojalgo.function.multiary;
 
-import java.math.BigDecimal;
-
-import org.ojalgo.access.Access1D;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 
 /**
  * [l]<sup>T</sup>[x] + c
@@ -39,14 +37,6 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class LinearFunction<N extends Number> extends AbstractMultiary<N, LinearFunction<N>> implements MultiaryFunction.Linear<N> {
-
-    public static LinearFunction<BigDecimal> makeBig(final Access1D<? extends Number> factors) {
-        return new LinearFunction<>(BigDenseStore.FACTORY.rows(factors));
-    }
-
-    public static LinearFunction<BigDecimal> makeBig(final int arity) {
-        return new LinearFunction<>(BigDenseStore.FACTORY.makeZero(1, arity));
-    }
 
     public static LinearFunction<ComplexNumber> makeComplex(final Access1D<? extends Number> factors) {
         return new LinearFunction<>(GenericDenseStore.COMPLEX.rows(factors));
@@ -62,6 +52,14 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
 
     public static LinearFunction<Double> makePrimitive(final int arity) {
         return new LinearFunction<>(PrimitiveDenseStore.FACTORY.makeZero(1, arity));
+    }
+
+    public static LinearFunction<RationalNumber> makeRational(final Access1D<? extends Number> factors) {
+        return new LinearFunction<>(GenericDenseStore.RATIONAL.rows(factors));
+    }
+
+    public static LinearFunction<RationalNumber> makeRational(final int arity) {
+        return new LinearFunction<>(GenericDenseStore.RATIONAL.makeZero(1, arity));
     }
 
     private final MatrixStore<N> myFactors;

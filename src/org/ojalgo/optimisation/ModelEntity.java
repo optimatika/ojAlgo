@@ -215,7 +215,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      * are always used as they are.
      */
     @SuppressWarnings("unchecked")
-    public final ME lower(final Number lower) {
+    public ME lower(final Number lower) {
         myLowerLimit = null;
         if (lower != null) {
             if (lower instanceof BigDecimal) {
@@ -250,7 +250,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      * are always used as they are.
      */
     @SuppressWarnings("unchecked")
-    public final ME upper(final Number upper) {
+    public ME upper(final Number upper) {
         myUpperLimit = null;
         if (upper != null) {
             if (upper instanceof BigDecimal) {

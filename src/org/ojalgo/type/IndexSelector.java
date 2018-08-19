@@ -152,10 +152,10 @@ public final class IndexSelector {
         }
     }
 
-    public void include(final int anIndexToInclude) {
-        if (!mySelector[anIndexToInclude]) {
-            mySelector[anIndexToInclude] = true;
-            myLastIncluded = anIndexToInclude;
+    public void include(final int indexToInclude) {
+        if (!mySelector[indexToInclude]) {
+            mySelector[indexToInclude] = true;
+            myLastIncluded = indexToInclude;
             myIncludedLength++;
             myExcludedLength--;
         }

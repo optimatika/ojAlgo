@@ -31,10 +31,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure1D.IntIndex;
-import org.ojalgo.access.Structure2D.IntRowColumn;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
@@ -47,6 +43,10 @@ import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.QuadraticFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure1D.IntIndex;
+import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.TypeUtils;
 
 /**
@@ -824,12 +824,17 @@ public final class Expression extends ModelEntity<Expression> {
         return myRedundant;
     }
 
+    void reset() {
+        myInfeasible = false;
+        myRedundant = false;
+    }
+
     void setInfeasible() {
         myInfeasible = true;
     }
 
-    void setRedundant(final boolean redundant) {
-        myRedundant = redundant;
+    void setRedundant() {
+        myRedundant = true;
     }
 
     @Override

@@ -27,8 +27,8 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 public final class SampleSet implements Access1D<Double> {
@@ -359,10 +359,11 @@ public final class SampleSet implements Access1D<Double> {
     /**
      * Replace the underlying samples and reset the sample set.
      */
-    public void swap(final Access1D<?> samples) {
+    public SampleSet swap(final Access1D<?> samples) {
         ProgrammingError.throwIfNull(samples);
         mySamples = samples;
         this.reset();
+        return this;
     }
 
     @Override

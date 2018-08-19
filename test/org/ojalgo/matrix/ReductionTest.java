@@ -4,7 +4,7 @@ import static org.ojalgo.function.aggregator.Aggregator.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.BasicMatrix.Builder;
+import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
 
 public class ReductionTest {
 
@@ -20,7 +20,7 @@ public class ReductionTest {
     @Test
     public void testReduction() {
 
-        Builder<PrimitiveMatrix> builder = PrimitiveMatrix.FACTORY.getBuilder(2, 3);
+        PhysicalBuilder<Double, PrimitiveMatrix> builder = PrimitiveMatrix.FACTORY.getBuilder(2, 3);
         builder.set(0, 0, 1.0);
         builder.set(0, 1, 2.0);
         builder.set(0, 2, 3.0);

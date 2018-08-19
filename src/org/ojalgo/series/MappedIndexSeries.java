@@ -29,13 +29,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.ojalgo.access.Structure1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.PrimitiveSeries;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.CalendarDate.Resolution;
 import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;

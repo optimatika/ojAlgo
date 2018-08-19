@@ -24,12 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Access2D.Collectable;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
@@ -38,7 +33,6 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -48,21 +42,12 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends GenericDecomposition<N> implements SingularValue<N> {
-
-    static final class Big extends SingularValueDecomposition<BigDecimal> {
-
-        Big() {
-            this(false);
-        }
-
-        Big(boolean fullSize) {
-            super(BigDenseStore.FACTORY, new BidiagonalDecomposition.Big(fullSize), fullSize);
-        }
-
-    }
 
     static final class Complex extends SingularValueDecomposition<ComplexNumber> {
 

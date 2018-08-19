@@ -141,6 +141,9 @@ public abstract class FunctionSet<N extends Number> {
      */
     public abstract UnaryFunction<N> log1p();
 
+    /**
+     * Standard logistic sigmoid function
+     */
     public abstract UnaryFunction<N> logistic();
 
     public abstract UnaryFunction<N> logit();

@@ -26,9 +26,6 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.LongStream;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.ElementView1D;
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -37,6 +34,9 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.ElementView1D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -142,21 +142,31 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     public static final class SparseFactory<N extends Number> extends StrategyBuilder<N, SparseArray<N>, SparseFactory<N>> {
 
-        private final long myCount;
+        SparseFactory(final DenseArray.Factory<N> denseFactory) {
+            super(denseFactory);
+        }
 
         SparseFactory(final DenseArray.Factory<N> denseFactory, final long count) {
             super(denseFactory);
-            myCount = count;
+            this.getStrategy().limit(count);
         }
 
         @Override
         public SparseArray<N> make() {
-            return new SparseArray<>(myCount, this.getStrategy());
+            return new SparseArray<>(this.getStrategy().limit(), this.getStrategy());
+        }
+
+        public SparseArray<N> make(long count) {
+            return new SparseArray<>(count, this.getStrategy().limit(count));
         }
 
     }
 
     static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
+
+    public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
+        return new SparseFactory<>(denseFactory);
+    }
 
     public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory, final long count) {
         return new SparseFactory<>(denseFactory, count);

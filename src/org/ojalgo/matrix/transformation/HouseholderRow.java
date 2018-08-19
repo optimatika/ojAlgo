@@ -1,9 +1,9 @@
 package org.ojalgo.matrix.transformation;
 
-import org.ojalgo.access.RowView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.structure.RowView;
 
 final class HouseholderRow<N extends Number> extends RowView<N> implements HouseholderReference<N> {
 

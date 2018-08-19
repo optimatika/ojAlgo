@@ -23,12 +23,12 @@ package org.ojalgo.random.process;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.random.LogNormal;
 import org.ojalgo.random.RandomUtils;
 import org.ojalgo.random.SampleSet;
+import org.ojalgo.structure.Access1D;
 
 /**
  * Diffusion process defined by a stochastic differential equation: dX = r X dt + s X dW A stochastic process

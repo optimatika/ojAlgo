@@ -23,13 +23,8 @@ package org.ojalgo.matrix.store;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.ElementView2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -37,7 +32,12 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.ElementView2D;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 public final class SparseStore<N extends Number> extends FactoryStore<N> implements ElementsConsumer<N> {
@@ -48,15 +48,12 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     }
 
-    public static final SparseStore.Factory<BigDecimal> BIG = (rowsCount, columnsCount) -> SparseStore.makeBig((int) rowsCount, (int) columnsCount);
+    public static final SparseStore.Factory<RationalNumber> RATIONAL = (rowsCount, columnsCount) -> SparseStore.makeRational((int) rowsCount,
+            (int) columnsCount);
 
     public static final SparseStore.Factory<ComplexNumber> COMPLEX = (rowsCount, columnsCount) -> SparseStore.makeComplex((int) rowsCount, (int) columnsCount);
 
     public static final SparseStore.Factory<Double> PRIMITIVE = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
-
-    public static SparseStore<BigDecimal> makeBig(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount);
-    }
 
     public static SparseStore<ComplexNumber> makeComplex(final int rowsCount, final int columnsCount) {
         return new SparseStore<>(GenericDenseStore.COMPLEX, rowsCount, columnsCount);
@@ -64,6 +61,10 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     public static SparseStore<Double> makePrimitive(final int rowsCount, final int columnsCount) {
         return new SparseStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount);
+    }
+
+    public static SparseStore<RationalNumber> makeRational(final int rowsCount, final int columnsCount) {
+        return new SparseStore<>(GenericDenseStore.RATIONAL, rowsCount, columnsCount);
     }
 
     private final SparseArray<N> myElements;
@@ -86,8 +87,6 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
             myMultiplyer = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getPrimitive(rowsCount, columnsCount);
         } else if (tmpType.equals(ComplexNumber.class)) {
             myMultiplyer = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getGeneric(rowsCount, columnsCount);
-        } else if (tmpType.equals(BigDecimal.class)) {
-            myMultiplyer = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getBig(rowsCount, columnsCount);
         } else {
             myMultiplyer = null;
         }

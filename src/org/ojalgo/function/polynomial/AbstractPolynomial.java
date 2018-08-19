@@ -23,9 +23,9 @@ package org.ojalgo.function.polynomial;
 
 import java.util.List;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.series.NumberSeries;
+import org.ojalgo.structure.Access1D;
 
 abstract class AbstractPolynomial<N extends Number> implements PolynomialFunction<N> {
 

@@ -21,21 +21,23 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure1D.IntIndex;
 
-public abstract class LinearSolver extends GenericSolver {
+public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
     public static final class Builder extends GenericSolver.Builder<LinearSolver.Builder, LinearSolver> {
 
@@ -168,6 +170,23 @@ public abstract class LinearSolver extends GenericSolver {
             }
 
             return new Result(modelState.getState(), modelState.getValue(), tmpSolverSolution);
+        }
+
+        @Override
+        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
+
+            int retVal = -1;
+
+            BigDecimal value = variable.getValue();
+
+            if ((value.signum() >= 0) && ((retVal = model.indexOfPositiveVariable(variable)) >= 0)) {
+                return retVal;
+            } else if ((value.signum() <= 0) && ((retVal = model.indexOfNegativeVariable(variable)) >= 0)) {
+                retVal += model.getPositiveVariables().size();
+                return retVal;
+            }
+
+            return -1;
         }
 
         @Override

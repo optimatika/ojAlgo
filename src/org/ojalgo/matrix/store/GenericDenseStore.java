@@ -25,8 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.array.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
@@ -48,6 +46,8 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**

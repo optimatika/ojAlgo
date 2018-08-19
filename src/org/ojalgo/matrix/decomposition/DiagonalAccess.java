@@ -21,10 +21,10 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate1D;
 
 abstract class DiagonalAccess<N extends Number, D extends Access1D<N> & Mutate1D> implements Access2D<N> {
 

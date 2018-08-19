@@ -24,12 +24,12 @@ package org.ojalgo.matrix.task;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 
 public abstract class AbstractInverter implements InverterTask<Double> {
 

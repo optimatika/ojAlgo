@@ -23,8 +23,6 @@ package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.store.ElementsConsumer;
@@ -35,6 +33,8 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.TypeUtils;
 
 public abstract class MatrixUtils {
@@ -258,14 +258,14 @@ public abstract class MatrixUtils {
         return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
     }
 
-    public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int aRowDim, final int aColDim) {
+    public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {
 
-        final PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(aRowDim, aColDim);
+        final PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
 
         final Uniform tmpArgGen = new Uniform(PrimitiveMath.ZERO, PrimitiveMath.TWO_PI);
 
-        for (int j = 0; j < aColDim; j++) {
-            for (int i = 0; i < aRowDim; i++) {
+        for (int j = 0; j < numberOfColumns; j++) {
+            for (int i = 0; i < numberOfRows; i++) {
                 retVal.set(i, j, ComplexNumber.makePolar(PrimitiveMath.E, tmpArgGen.doubleValue()).add(PrimitiveMath.PI));
             }
         }

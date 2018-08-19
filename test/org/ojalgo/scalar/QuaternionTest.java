@@ -30,7 +30,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
-public class QuaternionTest {
+public class QuaternionTest extends ScalarTests {
 
     @Test
     @Disabled("Was underscored before JUnit 5 transition")

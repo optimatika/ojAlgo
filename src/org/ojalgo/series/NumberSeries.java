@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.structure.Access1D;
 
 public final class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N, N, NumberSeries<N>> {
 

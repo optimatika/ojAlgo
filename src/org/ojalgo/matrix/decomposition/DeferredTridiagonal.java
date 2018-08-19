@@ -21,13 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
-import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
@@ -39,23 +35,12 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access2D;
 
 /**
  * @author apete
  */
 abstract class DeferredTridiagonal<N extends Number> extends TridiagonalDecomposition<N> {
-
-    static final class Big extends DeferredTridiagonal<BigDecimal> {
-
-        Big() {
-            super(BigDenseStore.FACTORY);
-        }
-
-        @Override
-        Array1D<BigDecimal> makeReal(final BasicArray<BigDecimal> offDiagonal) {
-            return null;
-        }
-    }
 
     static final class Complex extends DeferredTridiagonal<ComplexNumber> {
 

@@ -24,14 +24,10 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Access2D.Collectable;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
@@ -40,7 +36,6 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -48,6 +43,9 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.structure.Structure2D;
 
 /**
  * Eigenvalues and eigenvectors of a real matrix.
@@ -63,14 +61,6 @@ import org.ojalgo.scalar.RationalNumber;
  * upon V.cond().
  **/
 public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
-
-    static final class Big extends HermitianEvD<BigDecimal> {
-
-        Big() {
-            super(BigDenseStore.FACTORY, new DeferredTridiagonal.Big());
-        }
-
-    }
 
     static final class Complex extends HermitianEvD<ComplexNumber> {
 
@@ -427,8 +417,8 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
     @Override
     protected MatrixStore<N> makeD() {
-        final DiagonalBasicArray<Double> tmpDiagonal = new DiagonalBasicArray<>(Primitive64Array.wrap(d), null, null, ZERO);
-        return this.wrap(tmpDiagonal).diagonal(false).get();
+        final DiagonalBasicArray<Double> diagonal = new DiagonalBasicArray<>(Primitive64Array.wrap(d), null, null, ZERO);
+        return this.wrap(diagonal).diagonal().get();
     }
 
     @Override

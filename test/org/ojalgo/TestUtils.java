@@ -26,9 +26,6 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Assertions;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Structure2D;
-import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
@@ -45,6 +42,9 @@ import org.ojalgo.matrix.store.operation.MatrixOperation;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure2D;
+import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -278,19 +278,7 @@ public abstract class TestUtils {
 
     public static void assertEquals(final String message, final Number expected, final Number actual, final NumberContext context) {
 
-        if ((expected instanceof ComplexNumber) || (actual instanceof ComplexNumber)) {
-
-            final ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
-            final ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
-
-            if (!!context.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
-                Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
-            }
-            if (!!context.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
-                Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
-            }
-
-        } else if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
+        if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
 
             final Quaternion tmpExpected = Quaternion.valueOf(expected);
             final Quaternion tmpActual = Quaternion.valueOf(actual);
@@ -306,6 +294,18 @@ public abstract class TestUtils {
             }
             if (!!context.isDifferent(tmpExpected.k, tmpActual.k)) {
                 Assertions.fail(() -> message + " (k)" + ": " + expected + " != " + actual);
+            }
+
+        } else if ((expected instanceof ComplexNumber) || (actual instanceof ComplexNumber)) {
+
+            final ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
+            final ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
+
+            if (!!context.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
+                Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
+            }
+            if (!!context.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
+                Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
             }
 
         } else {

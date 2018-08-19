@@ -23,9 +23,9 @@ package org.ojalgo.array.blas;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Mutate1D;
 
 /**
  * The ?axpy routines perform a vector-vector operation defined as y := a*x + y where: a is a scalar x and y

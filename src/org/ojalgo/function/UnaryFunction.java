@@ -26,7 +26,7 @@ import java.util.function.UnaryOperator;
 
 import org.ojalgo.ProgrammingError;
 
-public interface UnaryFunction<N extends Number> extends BasicFunction<N>, UnaryOperator<N>, DoubleUnaryOperator {
+public interface UnaryFunction<N extends Number> extends BasicFunction, UnaryOperator<N>, DoubleUnaryOperator {
 
     default UnaryFunction<N> andThen(final UnaryFunction<N> after) {
         ProgrammingError.throwIfNull(after);

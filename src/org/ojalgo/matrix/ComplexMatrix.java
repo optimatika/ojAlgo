@@ -21,9 +21,10 @@
  */
 package org.ojalgo.matrix;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -31,6 +32,9 @@ import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 
 /**
  * ComplexMatrix
@@ -39,7 +43,7 @@ import org.ojalgo.scalar.ComplexNumber;
  */
 public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMatrix> {
 
-    public static final BasicMatrix.Factory<ComplexMatrix> FACTORY = new MatrixFactory<>(ComplexMatrix.class, GenericDenseStore.COMPLEX);
+    public static final MatrixFactory<ComplexNumber, ComplexMatrix> FACTORY = new MatrixFactory<>(ComplexMatrix.class, GenericDenseStore.COMPLEX);
 
     /**
      * This method is for internal use only - YOU should NOT use it!
@@ -51,33 +55,29 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
     /**
      * @return A primitive double valued matrix containg this matrix' element arguments
      */
-    @SuppressWarnings("unchecked")
     public PrimitiveMatrix getArgument() {
-        return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexArgument(this.getStore()));
+        return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexArgument(this.getStore()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element imaginary parts
      */
-    @SuppressWarnings("unchecked")
     public PrimitiveMatrix getImaginary() {
-        return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexImaginary(this.getStore()));
+        return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexImaginary(this.getStore()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element modulus
      */
-    @SuppressWarnings("unchecked")
     public PrimitiveMatrix getModulus() {
-        return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexModulus(this.getStore()));
+        return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexModulus(this.getStore()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element real parts
      */
-    @SuppressWarnings("unchecked")
     public PrimitiveMatrix getReal() {
-        return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexReal(this.getStore()));
+        return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexReal(this.getStore()));
     }
 
     @SuppressWarnings("unchecked")
@@ -87,10 +87,6 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
         if (matrix instanceof ComplexMatrix) {
 
             return ((ComplexMatrix) matrix).getStore();
-
-        } else if (matrix instanceof ComplexDenseStore) {
-
-            return (ComplexDenseStore) matrix;
 
         } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof ComplexNumber)) {
 
@@ -108,23 +104,42 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
     }
 
     @Override
-    DeterminantTask<ComplexNumber> getDeterminantTask(final MatrixStore<ComplexNumber> template) {
+    Eigenvalue<ComplexNumber> getDecompositionEigenvalue(Structure2D typical) {
+        return Eigenvalue.COMPLEX.make(typical, this.isHermitian());
+    }
+
+    @Override
+    LU<ComplexNumber> getDecompositionLU(Structure2D typical) {
+        return LU.COMPLEX.make(typical);
+    }
+
+    @Override
+    QR<ComplexNumber> getDecompositionQR(Structure2D typical) {
+        return QR.COMPLEX.make(typical);
+    }
+
+    @Override
+    SingularValue<ComplexNumber> getDecompositionSingularValue(Structure2D typical) {
+        return SingularValue.COMPLEX.make(typical);
+    }
+
+    @Override
+    MatrixFactory<ComplexNumber, ComplexMatrix> getFactory() {
+        return FACTORY;
+    }
+
+    @Override
+    DeterminantTask<ComplexNumber> getTaskDeterminant(final MatrixStore<ComplexNumber> template) {
         return DeterminantTask.COMPLEX.make(template, this.isHermitian(), false);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    MatrixFactory<ComplexNumber, ComplexMatrix> getFactory() {
-        return (MatrixFactory<ComplexNumber, ComplexMatrix>) FACTORY;
-    }
-
-    @Override
-    InverterTask<ComplexNumber> getInverterTask(final MatrixStore<ComplexNumber> base) {
+    InverterTask<ComplexNumber> getTaskInverter(final MatrixStore<ComplexNumber> base) {
         return InverterTask.COMPLEX.make(base, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<ComplexNumber> getSolverTask(final MatrixStore<ComplexNumber> templateBody, final Access2D<?> templateRHS) {
+    SolverTask<ComplexNumber> getTaskSolver(final MatrixStore<ComplexNumber> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.COMPLEX.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

@@ -22,10 +22,10 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 
 /**
  * IdentityStore

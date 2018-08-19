@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.function.BigFunction;
@@ -35,6 +34,7 @@ import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Mutate1D;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain java.math.BigDecimal}.

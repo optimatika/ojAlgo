@@ -29,11 +29,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Access2D.Collectable;
-import org.ojalgo.access.Structure1D.IntIndex;
-import org.ojalgo.access.Structure2D.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
@@ -53,9 +48,15 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.structure.Structure1D.IntIndex;
+import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -88,7 +89,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class ConvexSolver extends GenericSolver {
+public abstract class ConvexSolver extends GenericSolver implements UpdatableSolver {
 
     public static final class Builder extends GenericSolver.Builder<ConvexSolver.Builder, ConvexSolver> {
 

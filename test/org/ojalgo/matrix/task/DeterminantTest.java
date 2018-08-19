@@ -30,7 +30,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
 
-public final class DeterminantTest extends AbstractMatrixDecompositionTaskTest {
+public final class DeterminantTest extends MatrixTaskTests {
 
     @Test
     public void testFull2X2() {

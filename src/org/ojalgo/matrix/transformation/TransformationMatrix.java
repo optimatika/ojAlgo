@@ -21,9 +21,9 @@
  */
 package org.ojalgo.matrix.transformation;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.transformation.TransformationMatrix.Transformable;
+import org.ojalgo.structure.Access1D;
 
 /**
  * <p>

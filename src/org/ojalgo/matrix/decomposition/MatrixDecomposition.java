@@ -22,9 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Access2D.Collectable;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -32,6 +29,9 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.structure.Structure2D;
 
 /**
  * Notation used to describe the various matrix decompositions:

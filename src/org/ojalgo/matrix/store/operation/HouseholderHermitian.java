@@ -23,19 +23,14 @@ package org.ojalgo.matrix.store.operation;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.COPY;
 import org.ojalgo.concurrent.DivideAndConquer;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.BigFunction;
-import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.transformation.Householder;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -48,116 +43,6 @@ import org.ojalgo.type.context.NumberContext;
 public final class HouseholderHermitian extends MatrixOperation {
 
     public static final HouseholderHermitian SETUP = new HouseholderHermitian();
-
-    public static void invoke(final BigDecimal[] data, final Householder.Big householder, final BigDecimal[] worker) {
-
-        final BigDecimal[] tmpVector = householder.vector;
-        final int tmpFirst = householder.first;
-        final int tmpLength = tmpVector.length;
-        final BigDecimal tmpBeta = householder.beta;
-        final int tmpCount = tmpLength - tmpFirst;
-
-        if (tmpCount > MultiplyHermitianAndVector.THRESHOLD) {
-
-            final DivideAndConquer tmpConqurer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    MultiplyHermitianAndVector.invoke(worker, first, limit, data, tmpVector, tmpFirst);
-                }
-            };
-
-            tmpConqurer.invoke(tmpFirst, tmpLength, MultiplyHermitianAndVector.THRESHOLD);
-
-        } else {
-
-            MultiplyHermitianAndVector.invoke(worker, tmpFirst, tmpLength, data, tmpVector, tmpFirst);
-        }
-
-        BigDecimal tmpVal = BigMath.ZERO;
-        for (int c = tmpFirst; c < tmpLength; c++) {
-            //tmpVal += tmpVector[c] * worker[c];
-            tmpVal = tmpVal.add(tmpVector[c].multiply(worker[c]));
-        }
-        //tmpVal *= (tmpBeta / TWO);
-        tmpVal = BigFunction.DIVIDE.invoke(tmpVal.multiply(tmpBeta), BigMath.TWO);
-        for (int c = tmpFirst; c < tmpLength; c++) {
-            //worker[c] = tmpBeta * (worker[c] - (tmpVal * tmpVector[c]));
-            worker[c] = tmpBeta.multiply(worker[c].subtract(tmpVal.multiply(tmpVector[c])));
-        }
-
-        if (tmpCount > HermitianRank2Update.THRESHOLD) {
-
-            final DivideAndConquer tmpConqurer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    HermitianRank2Update.invoke(data, first, limit, tmpVector, worker);
-                }
-            };
-
-            tmpConqurer.invoke(tmpFirst, tmpLength, HermitianRank2Update.THRESHOLD);
-
-        } else {
-
-            HermitianRank2Update.invoke(data, tmpFirst, tmpLength, tmpVector, worker);
-        }
-    }
-
-    public static void invoke(final ComplexNumber[] data, final Householder.Complex householder, final ComplexNumber[] worker) {
-
-        final ComplexNumber[] tmpVector = householder.vector;
-        final int tmpFirst = householder.first;
-        final int tmpLength = tmpVector.length;
-        final ComplexNumber tmpBeta = householder.beta;
-        final int tmpCount = tmpLength - tmpFirst;
-
-        if (tmpCount > MultiplyHermitianAndVector.THRESHOLD) {
-
-            final DivideAndConquer tmpConqurer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    MultiplyHermitianAndVector.invoke(worker, first, limit, data, tmpVector, tmpFirst, ComplexNumber.FACTORY);
-                }
-            };
-
-            tmpConqurer.invoke(tmpFirst, tmpLength, MultiplyHermitianAndVector.THRESHOLD);
-
-        } else {
-
-            MultiplyHermitianAndVector.invoke(worker, tmpFirst, tmpLength, data, tmpVector, tmpFirst, ComplexNumber.FACTORY);
-        }
-
-        ComplexNumber tmpVal = ComplexNumber.ZERO;
-        for (int c = tmpFirst; c < tmpLength; c++) {
-            //tmpVal += tmpVector[c] * worker[c];
-            tmpVal = tmpVal.add(tmpVector[c].conjugate().multiply(worker[c]));
-        }
-        //tmpVal *= (tmpBeta / TWO);
-        tmpVal = ComplexFunction.DIVIDE.invoke(tmpVal.multiply(tmpBeta), ComplexNumber.TWO);
-        for (int c = tmpFirst; c < tmpLength; c++) {
-            //worker[c] = tmpBeta * (worker[c] - (tmpVal * tmpVector[c]));
-            worker[c] = tmpBeta.multiply(worker[c].subtract(tmpVal.multiply(tmpVector[c])));
-        }
-
-        if (tmpCount > HermitianRank2Update.THRESHOLD) {
-
-            final DivideAndConquer tmpConqurer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    HermitianRank2Update.invoke(data, first, limit, tmpVector, worker);
-                }
-            };
-
-            tmpConqurer.invoke(tmpFirst, tmpLength, HermitianRank2Update.THRESHOLD);
-
-        } else {
-
-            HermitianRank2Update.invoke(data, tmpFirst, tmpLength, tmpVector, worker);
-        }
-    }
 
     public static void invoke(final double[] data, final Householder.Primitive householder, final double[] worker) {
 

@@ -27,12 +27,12 @@ import java.io.PrintWriter;
 import java.util.Formatter;
 import java.util.Locale;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.ComplexMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 

@@ -23,8 +23,8 @@ package org.ojalgo;
 
 import java.util.Objects;
 
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.TypeUtils;
 
 /**

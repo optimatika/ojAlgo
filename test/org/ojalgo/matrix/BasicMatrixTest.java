@@ -22,33 +22,33 @@
 package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.ColumnView;
-import org.ojalgo.access.RowView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.BasicMatrix.Builder;
-import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
+import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.ColumnView;
+import org.ojalgo.structure.RowView;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete
  */
-public abstract class BasicMatrixTest {
+public abstract class BasicMatrixTest extends MatrixTests {
 
     public static NumberContext DEFINITION = NumberContext.getGeneral(9);
     public static NumberContext EVALUATION = NumberContext.getGeneral(9);
@@ -138,7 +138,7 @@ public abstract class BasicMatrixTest {
     }
 
     /**
-     * @see BasicMatrix.Builder#add(long, long, Number)
+     * @see BasicMatrix.PhysicalBuilder#add(long, long, Number)
      */
     @Test
     public void testAddIntIntNumber() {
@@ -146,17 +146,17 @@ public abstract class BasicMatrixTest {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        final Builder<RationalMatrix> tmpBigBuilder = myBigAA.copy();
+        final PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = myBigAA.copy();
         tmpBigBuilder.add(tmpRow, tmpCol, myNmbr);
         myExpMtrx = tmpBigBuilder.build();
 
-        final Builder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
+        final PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
         tmpComplexBuilder.add(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpComplexBuilder.build();
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        final Builder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
+        final PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
         tmpPrimitiveBuilder.add(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpPrimitiveBuilder.build();
 
@@ -344,20 +344,17 @@ public abstract class BasicMatrixTest {
 
         if (myBigAA.isSquare() && MatrixUtils.isHermitian(myBigAA)) {
 
-            final List<ComplexNumber> expected = myPrimitiveAA.getEigenvalues();
-            Collections.sort(expected);
-            List<ComplexNumber> actual;
+            final List<Eigenpair> expected = myPrimitiveAA.getEigenpairs();
+            List<Eigenpair> actual;
 
-            actual = myBigAA.getEigenvalues();
-            Collections.sort(actual);
+            actual = myBigAA.getEigenpairs();
             for (int i = 0; i < expected.size(); i++) {
-                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i), actual.get(i), EVALUATION);
+                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i).value, actual.get(i).value, EVALUATION);
             }
 
-            actual = myComplexAA.getEigenvalues();
-            Collections.sort(actual);
+            actual = myComplexAA.getEigenpairs();
             for (int i = 0; i < expected.size(); i++) {
-                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i), actual.get(i), EVALUATION);
+                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i).value, actual.get(i).value, EVALUATION);
             }
         }
     }
@@ -368,32 +365,13 @@ public abstract class BasicMatrixTest {
     @Test
     public void testGetInfinityNorm() {
 
-        myExpNmbr = myBigAA.getInfinityNorm().get();
+        myExpVal = BasicMatrix.calculateInfinityNorm(myBigAA);
 
-        myActNmbr = myComplexAA.getInfinityNorm().get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        myActVal = BasicMatrix.calculateInfinityNorm(myComplexAA);
+        TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.getInfinityNorm().get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getKyFanNorm(int)
-     */
-    @Test
-    public void testGetKyFanNormInt() {
-
-        final int tmpDegree = Uniform.randomInteger(1, (int) Math.min(myBigAA.countRows(), myBigAA.countColumns()));
-
-        myExpNmbr = myBigAA.getKyFanNorm(tmpDegree).get();
-
-        myActNmbr = myComplexAA.getKyFanNorm(tmpDegree).get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
-        myActNmbr = myPrimitiveAA.getKyFanNorm(tmpDegree).get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
+        myActVal = BasicMatrix.calculateInfinityNorm(myPrimitiveAA);
+        TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
     }
 
     /**
@@ -402,30 +380,13 @@ public abstract class BasicMatrixTest {
     @Test
     public void testGetOneNorm() {
 
-        myExpNmbr = myBigAA.getOneNorm().get();
+        myExpVal = BasicMatrix.calculateOneNorm(myBigAA);
 
-        myActNmbr = myComplexAA.getOneNorm().get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        myActVal = BasicMatrix.calculateOneNorm(myComplexAA);
+        TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.getOneNorm().get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getOperatorNorm()
-     */
-    @Test
-    public void testGetOperatorNorm() {
-
-        myExpNmbr = myBigAA.getOperatorNorm().get();
-
-        myActNmbr = myComplexAA.getOperatorNorm().get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
-        myActNmbr = myPrimitiveAA.getOperatorNorm().get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
+        myActVal = BasicMatrix.calculateOneNorm(myPrimitiveAA);
+        TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
     }
 
     /**
@@ -525,54 +486,6 @@ public abstract class BasicMatrixTest {
         myActNmbr = myPrimitiveAA.getTrace().get();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getTraceNorm()
-     */
-    @Test
-    public void testGetTraceNorm() {
-
-        myExpNmbr = myBigAA.getTraceNorm().get();
-
-        myActNmbr = myComplexAA.getTraceNorm().get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
-        myActNmbr = myPrimitiveAA.getTraceNorm().get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getVectorNorm(int)
-     */
-    @Test
-    public void testGetVectorNorm0() {
-        this.testGetVectorNormInt(0);
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getVectorNorm(int)
-     */
-    @Test
-    public void testGetVectorNorm1() {
-        this.testGetVectorNormInt(1);
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getVectorNorm(int)
-     */
-    @Test
-    public void testGetVectorNorm2() {
-        this.testGetVectorNormInt(2);
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getVectorNorm(int)
-     */
-    @Test
-    public void testGetVectorNormI() {
-        this.testGetVectorNormInt(Integer.MAX_VALUE);
     }
 
     /**
@@ -826,7 +739,7 @@ public abstract class BasicMatrixTest {
     }
 
     /**
-     * @see BasicMatrix.Builder#set(long, long, Number)
+     * @see BasicMatrix.PhysicalBuilder#set(long, long, Number)
      */
     @Test
     public void testSetIntIntNumber() {
@@ -834,17 +747,17 @@ public abstract class BasicMatrixTest {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        final Builder<RationalMatrix> tmpBigBuilder = myBigAA.copy();
+        final PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = myBigAA.copy();
         tmpBigBuilder.set(tmpRow, tmpCol, myNmbr);
         myExpMtrx = tmpBigBuilder.build();
 
-        final Builder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
+        final PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
         tmpComplexBuilder.set(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpComplexBuilder.build();
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        final Builder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
+        final PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
         tmpPrimitiveBuilder.set(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpPrimitiveBuilder.build();
 
@@ -865,7 +778,7 @@ public abstract class BasicMatrixTest {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#solve(org.ojalgo.access.Access2D)
+     * @see org.ojalgo.matrix.BasicMatrix#solve(org.ojalgo.structure.Access2D)
      */
     @Test
     public void testSolveBasicMatrix() {
@@ -935,23 +848,6 @@ public abstract class BasicMatrixTest {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#toBigStore()
-     */
-    @Test
-    public void testToBigStore() {
-
-        final PhysicalStore<BigDecimal> tmpExpStore = BigDenseStore.FACTORY.copy(myBigAA);
-        PhysicalStore<BigDecimal> tmpActStore;
-
-        tmpActStore = BigDenseStore.FACTORY.copy(myComplexAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
-
-        tmpActStore = BigDenseStore.FACTORY.copy(myPrimitiveAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
-
-    }
-
-    /**
      * @see org.ojalgo.matrix.BasicMatrix#toComplexNumber(int, int)
      */
     @Test
@@ -976,13 +872,13 @@ public abstract class BasicMatrixTest {
     @Test
     public void testToComplexStore() {
 
-        final PhysicalStore<ComplexNumber> tmpExpStore = ComplexDenseStore.FACTORY.copy(myBigAA);
+        final PhysicalStore<ComplexNumber> tmpExpStore = GenericDenseStore.COMPLEX.copy(myBigAA);
         PhysicalStore<ComplexNumber> tmpActStore;
 
-        tmpActStore = ComplexDenseStore.FACTORY.copy(myComplexAA);
+        tmpActStore = GenericDenseStore.COMPLEX.copy(myComplexAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
-        tmpActStore = ComplexDenseStore.FACTORY.copy(myPrimitiveAA);
+        tmpActStore = GenericDenseStore.COMPLEX.copy(myPrimitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
     }
@@ -1034,6 +930,23 @@ public abstract class BasicMatrixTest {
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
         tmpActStore = PrimitiveDenseStore.FACTORY.copy(myPrimitiveAA);
+        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
+
+    }
+
+    /**
+     * @see org.ojalgo.matrix.BasicMatrix#toBigStore()
+     */
+    @Test
+    public void testToRationalStore() {
+
+        final PhysicalStore<RationalNumber> tmpExpStore = GenericDenseStore.RATIONAL.copy(myBigAA);
+        PhysicalStore<RationalNumber> tmpActStore;
+
+        tmpActStore = GenericDenseStore.RATIONAL.copy(myComplexAA);
+        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
+
+        tmpActStore = GenericDenseStore.RATIONAL.copy(myPrimitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
     }
@@ -1102,18 +1015,6 @@ public abstract class BasicMatrixTest {
 
         myActMtrx = myPrimitiveAA.transpose();
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
-
-    }
-
-    private void testGetVectorNormInt(final int tmpDegree) {
-
-        myExpNmbr = myBigAA.getVectorNorm(tmpDegree).get();
-
-        myActNmbr = myComplexAA.getVectorNorm(tmpDegree).get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
-        myActNmbr = myPrimitiveAA.getVectorNorm(tmpDegree).get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }
 

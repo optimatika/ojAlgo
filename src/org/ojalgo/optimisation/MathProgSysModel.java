@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 
-import org.ojalgo.access.Access1D;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -523,7 +523,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
     }
 
     /**
-     * @see org.ojalgo.optimisation.ExpressionsBasedModel#validate(org.ojalgo.access.Access1D,
+     * @see org.ojalgo.optimisation.ExpressionsBasedModel#validate(org.ojalgo.structure.Access1D,
      *      org.ojalgo.type.context.NumberContext)
      */
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context) {

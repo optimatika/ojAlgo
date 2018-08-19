@@ -21,15 +21,13 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -70,8 +68,6 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
 
     }
 
-    public static final Factory<BigDecimal> BIG = (typical, fullSize) -> new QRDecomposition.Big(fullSize);
-
     public static final Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new QRDecomposition.Complex(fullSize);
 
     public static final Factory<Double> PRIMITIVE = (typical, fullSize) -> {
@@ -91,8 +87,10 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
 
         final N tmpNumber = typical.get(0, 0);
 
-        if (tmpNumber instanceof BigDecimal) {
-            return (QR<N>) BIG.make(typical);
+        if (tmpNumber instanceof RationalNumber) {
+            return (QR<N>) RATIONAL.make(typical);
+        } else if (tmpNumber instanceof Quaternion) {
+            return (QR<N>) QUATERNION.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
             return (QR<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {

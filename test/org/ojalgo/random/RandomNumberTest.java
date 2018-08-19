@@ -27,12 +27,12 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.series.CalendarDateSeries;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**

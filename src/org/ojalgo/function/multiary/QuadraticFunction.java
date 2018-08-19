@@ -21,17 +21,15 @@
  */
 package org.ojalgo.function.multiary;
 
-import java.math.BigDecimal;
-
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 
 /**
  * [x]<sup>T</sup>[Q][x] + c
@@ -39,14 +37,6 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class QuadraticFunction<N extends Number> extends AbstractMultiary<N, QuadraticFunction<N>> implements MultiaryFunction.Quadratic<N> {
-
-    public static QuadraticFunction<BigDecimal> makeBig(final Access2D<? extends Number> factors) {
-        return new QuadraticFunction<>(BigDenseStore.FACTORY.copy(factors));
-    }
-
-    public static QuadraticFunction<BigDecimal> makeBig(final int arity) {
-        return new QuadraticFunction<>(BigDenseStore.FACTORY.makeZero(arity, arity));
-    }
 
     public static QuadraticFunction<ComplexNumber> makeComplex(final Access2D<? extends Number> factors) {
         return new QuadraticFunction<>(GenericDenseStore.COMPLEX.copy(factors));
@@ -62,6 +52,14 @@ public final class QuadraticFunction<N extends Number> extends AbstractMultiary<
 
     public static QuadraticFunction<Double> makePrimitive(final int arity) {
         return new QuadraticFunction<>(PrimitiveDenseStore.FACTORY.makeZero(arity, arity));
+    }
+
+    public static QuadraticFunction<RationalNumber> makeRational(final Access2D<? extends Number> factors) {
+        return new QuadraticFunction<>(GenericDenseStore.RATIONAL.copy(factors));
+    }
+
+    public static QuadraticFunction<RationalNumber> makeRational(final int arity) {
+        return new QuadraticFunction<>(GenericDenseStore.RATIONAL.makeZero(arity, arity));
     }
 
     private final MatrixStore<N> myFactors;

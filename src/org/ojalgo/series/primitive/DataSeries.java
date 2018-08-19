@@ -21,13 +21,13 @@
  */
 package org.ojalgo.series.primitive;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.structure.Access1D;
 
 public final class DataSeries extends PrimitiveSeries {
 

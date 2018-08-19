@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.ojalgo.access.Structure1D.IndexMapper;
 import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.array.LongToNumberMap.MapFactory;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.structure.Structure1D.IndexMapper;
 import org.ojalgo.type.context.NumberContext;
 
 public final class TableData<R> {

@@ -26,11 +26,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Factory2D;
-import org.ojalgo.access.Mutate2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -42,6 +37,11 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Factory2D;
+import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Structure2D;
 
 /**
  * Array2D
@@ -58,7 +58,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         Factory(final DenseArray.Factory<N> denseArray) {
             super();
-            myDelegate = BasicArray.factory(denseArray);
+            myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
         public final Array2D<N> columns(final Access1D<?>... source) {

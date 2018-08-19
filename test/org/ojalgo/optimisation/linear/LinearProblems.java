@@ -30,10 +30,9 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.BasicMatrix.Builder;
+import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -47,6 +46,45 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 public class LinearProblems extends OptimisationLinearTests {
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/117 <br>
+     * Problem was getting different state after second solve.
+     */
+    @Test
+    public void precisionTestDoubleRunInfeasible() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        Variable d35 = model.addVariable("d35");
+        Variable d56 = model.addVariable("d56");
+        Variable d57 = model.addVariable("d57");
+
+        // d35 = 0.0;
+        d35.level(0.0);
+
+        // d56 - d35 = -2000.0400000000002;
+        Expression expression1 = model.addExpression("d56 - d35");
+        expression1.set(d56, 1.0);
+        expression1.set(d35, -1.0);
+        expression1.level(-2000.0400000000002);
+
+        // d57 - d56 = 0.0;
+        Expression expression2 = model.addExpression("d57 - d56");
+        expression2.set(d57, 1.0);
+        expression2.set(d56, -1.0);
+        expression2.level(0.0);
+
+        // minimize: 1.0 d57;
+        d57.weight(1.0);
+
+        Optimisation.Result result1 = model.minimise();
+
+        TestUtils.assertStateNotLessThanOptimal(result1);
+
+        Optimisation.Result result2 = model.minimise();
+
+        TestUtils.assertStateAndSolution(result1, result2);
+    }
 
     @Test
     public void testMath286() {
@@ -122,7 +160,7 @@ public class LinearProblems extends OptimisationLinearTests {
         // A valid solution of 25.8 can be produced with:
         // X1=10, X2=0, X3=8, X4=0, X5=5, X6=23
         final BigDecimal tmpClaimedValue = new BigDecimal("25.8");
-        final Builder<PrimitiveMatrix> tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(6, 1);
+        final PhysicalBuilder<Double, PrimitiveMatrix> tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(6, 1);
         tmpBuilder.set(0, 0, 10);
         tmpBuilder.set(2, 0, 8);
         tmpBuilder.set(4, 0, 5);
@@ -130,8 +168,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final BasicMatrix tmpFullSolution = tmpBuilder.build();
         final BasicMatrix tmpOddSolution = tmpFullSolution.selectRows(0, 2, 4);
         final BasicMatrix tmpEvenSolution = tmpFullSolution.selectRows(1, 3, 5);
-        TestUtils.assertEquals("Claimed solution not valid!", true,
-                tmpFullModel.validate(BigDenseStore.FACTORY.copy(tmpFullSolution), new NumberContext(7, 6)));
+        TestUtils.assertEquals("Claimed solution not valid!", true, tmpFullModel.validate(BigArray.FACTORY.copy(tmpFullSolution), new NumberContext(7, 6)));
         final Double tmpActualValue = tmpFullObjective.toFunction().invoke(PrimitiveDenseStore.FACTORY.copy(tmpFullSolution));
         //final BigDecimal tmpActualValue = TypeUtils.toBigDecimal(tmpObjectiveValue);
         //JUnitUtils.assertEquals("Claimed objective value wrong!", 0, tmpClaimedValue.compareTo(tmpActualValue));

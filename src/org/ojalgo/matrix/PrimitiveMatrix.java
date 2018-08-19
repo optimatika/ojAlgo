@@ -21,14 +21,19 @@
  */
 package org.ojalgo.matrix;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 
 /**
  * PrimitiveMatrix
@@ -37,7 +42,7 @@ import org.ojalgo.matrix.task.SolverTask;
  */
 public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatrix> {
 
-    public static final BasicMatrix.Factory<PrimitiveMatrix> FACTORY = new MatrixFactory<>(PrimitiveMatrix.class, PrimitiveDenseStore.FACTORY);
+    public static final MatrixFactory<Double, PrimitiveMatrix> FACTORY = new MatrixFactory<>(PrimitiveMatrix.class, PrimitiveDenseStore.FACTORY);
 
     /**
      * This method is for internal use only - YOU should NOT use it!
@@ -74,23 +79,42 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
     }
 
     @Override
-    DeterminantTask<Double> getDeterminantTask(final MatrixStore<Double> template) {
+    Eigenvalue<Double> getDecompositionEigenvalue(Structure2D typical) {
+        return Eigenvalue.PRIMITIVE.make(typical, this.isHermitian());
+    }
+
+    @Override
+    LU<Double> getDecompositionLU(Structure2D typical) {
+        return LU.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    QR<Double> getDecompositionQR(Structure2D typical) {
+        return QR.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    SingularValue<Double> getDecompositionSingularValue(Structure2D typical) {
+        return SingularValue.PRIMITIVE.make(typical);
+    }
+
+    @Override
+    MatrixFactory<Double, PrimitiveMatrix> getFactory() {
+        return FACTORY;
+    }
+
+    @Override
+    DeterminantTask<Double> getTaskDeterminant(final MatrixStore<Double> template) {
         return DeterminantTask.PRIMITIVE.make(template, this.isHermitian(), false);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    MatrixFactory<Double, PrimitiveMatrix> getFactory() {
-        return (MatrixFactory<Double, PrimitiveMatrix>) FACTORY;
-    }
-
-    @Override
-    InverterTask<Double> getInverterTask(final MatrixStore<Double> base) {
+    InverterTask<Double> getTaskInverter(final MatrixStore<Double> base) {
         return InverterTask.PRIMITIVE.make(base, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<Double> getSolverTask(final MatrixStore<Double> templateBody, final Access2D<?> templateRHS) {
+    SolverTask<Double> getTaskSolver(final MatrixStore<Double> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.PRIMITIVE.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

@@ -24,8 +24,8 @@ package org.ojalgo.matrix.store;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 
 /**
  * A merger of two {@linkplain MatrixStore} instances by placing one store to the right of the other. The two

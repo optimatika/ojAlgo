@@ -42,12 +42,12 @@ public class Normal extends AbstractContinuous {
         this(ZERO, ONE);
     }
 
-    public Normal(final double aLocation, final double aScale) {
+    public Normal(final double location, final double scale) {
 
         super();
 
-        myLocation = aLocation;
-        myScale = aScale;
+        myLocation = location;
+        myScale = scale;
     }
 
     public double getDistribution(final double value) {

@@ -29,8 +29,6 @@ import java.math.RoundingMode;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.BigMath;
@@ -38,10 +36,9 @@ import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.BasicMatrix.Factory;
+import org.ojalgo.matrix.MatrixFactory;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -54,6 +51,8 @@ import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -550,7 +549,7 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20080819() {
 
-        final Factory<PrimitiveMatrix> tmpMtrxFact = PrimitiveMatrix.FACTORY;
+        final MatrixFactory<Double, PrimitiveMatrix> tmpMtrxFact = PrimitiveMatrix.FACTORY;
         final NumberContext tmpEvalCntxt = StandardType.DECIMAL_032;
 
         final BasicMatrix[] tmpMatrices = new PrimitiveMatrix[8];
@@ -849,9 +848,9 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        final PhysicalStore<BigDecimal> tmpSolution = BigDenseStore.FACTORY.copy(RationalMatrix.FACTORY.columns(tmpResult));
+        final Array1D<BigDecimal> tmpSolution = Array1D.BIG.copy(tmpResult);
         tmpSolution.modifyAll(new NumberContext(7, 6).getFunction(BigFunction.getSet()));
-        for (final BigDecimal tmpBigDecimal : tmpSolution.asList()) {
+        for (final BigDecimal tmpBigDecimal : tmpSolution) {
             if ((tmpBigDecimal.compareTo(BigMath.ZERO) == -1) || (tmpBigDecimal.compareTo(BigMath.ONE) == 1)) {
                 TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
             }

@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -37,27 +35,6 @@ public final class HermitianRank2Update extends MatrixOperation {
     public static final HermitianRank2Update SETUP = new HermitianRank2Update();
 
     public static int THRESHOLD = 256;
-
-    public static void invoke(final BigDecimal[] data, final int firstColumn, final int columnLimit, final BigDecimal[] vector1, final BigDecimal[] vector2) {
-
-        final int structure = vector1.length;
-
-        BigDecimal tmpVal1j;
-        BigDecimal tmpVal2j;
-
-        int tmpIndex;
-        for (int j = firstColumn; j < columnLimit; j++) {
-
-            tmpVal1j = vector1[j];
-            tmpVal2j = vector2[j];
-
-            tmpIndex = j + (j * structure);
-            for (int i = j; i < structure; i++) {
-                data[tmpIndex] = data[tmpIndex].subtract(vector2[i].multiply(tmpVal1j).add(vector1[i].multiply(tmpVal2j)));
-                tmpIndex++;
-            }
-        }
-    }
 
     //    public static void invoke(final ComplexNumber[] data, final int firstColumn, final int columnLimit, final ComplexNumber[] vector1,
     //            final ComplexNumber[] vector2) {

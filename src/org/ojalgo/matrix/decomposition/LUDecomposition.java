@@ -23,16 +23,11 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Access2D.Collectable;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -41,17 +36,12 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Access2D.Collectable;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LU<N> {
-
-    static final class Big extends LUDecomposition<BigDecimal> {
-
-        Big() {
-            super(BigDenseStore.FACTORY);
-        }
-
-    }
 
     static final class Complex extends LUDecomposition<ComplexNumber> {
 
@@ -151,16 +141,12 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         int retVal = 0;
 
-        final DecompositionStore<N> tmpInPlace = this.getInPlace();
+        final DecompositionStore<N> internalStore = this.getInPlace();
 
-        final AggregatorFunction<N> tmpLargest = this.aggregator().largest();
-        tmpInPlace.visitDiagonal(0L, 0L, tmpLargest);
-        final double tmpLargestValue = tmpLargest.doubleValue();
+        final double largestValue = internalStore.aggregateAll(Aggregator.LARGEST).doubleValue();
 
-        final int tmpMinDim = this.getMinDim();
-
-        for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpInPlace.isSmall(ij, ij, tmpLargestValue)) {
+        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+            if (!internalStore.isSmall(ij, ij, largestValue)) {
                 retVal++;
             }
         }
@@ -325,18 +311,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     @Override
     protected boolean checkSolvability() {
-
-        boolean retVal = this.getRowDim() == this.getColDim();
-
-        final DecompositionStore<N> tmpStore = this.getInPlace();
-        final int tmpMinDim = (int) Math.min(tmpStore.countRows(), tmpStore.countColumns());
-
-        for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
-            // retVal &= tmpStore.doubleValue(ij, ij) != PrimitiveMath.ZERO;
-            retVal &= NumberContext.compare(tmpStore.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0;
-        }
-
-        return retVal;
+        return (this.getRowDim() == this.getColDim()) && (this.getRank() == this.getColDim());
     }
 
     int[] getReducedPivots() {

@@ -24,10 +24,10 @@ package org.ojalgo.scalar;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 
-import org.ojalgo.access.AccessScalar;
 import org.ojalgo.algebra.Field;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.ScalarOperation;
+import org.ojalgo.structure.AccessScalar;
 import org.ojalgo.type.context.NumberContext;
 
 /**

@@ -26,7 +26,7 @@ import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.DoubleUnaryOperator;
 
-import org.ojalgo.access.Structure2D;
+import org.ojalgo.structure.Structure2D;
 
 public class Raw2D {
 

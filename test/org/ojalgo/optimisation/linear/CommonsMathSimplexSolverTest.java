@@ -29,7 +29,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
@@ -40,6 +39,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.structure.Access1D;
 
 /**
  * Contains the same test cases found in: org.apache.commons.math3.optimization.linear.SimplexSolverTest
@@ -53,15 +53,15 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
      */
     enum GoalType implements Serializable {
 
-        /**
-         * Maximization goal.
-         */
-        MAXIMIZE,
+    /**
+     * Maximization goal.
+     */
+    MAXIMIZE,
 
-        /**
-         * Minimization goal.
-         */
-        MINIMIZE
+    /**
+     * Minimization goal.
+     */
+    MINIMIZE
 
     }
 

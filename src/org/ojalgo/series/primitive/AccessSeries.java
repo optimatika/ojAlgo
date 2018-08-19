@@ -21,7 +21,7 @@
  */
 package org.ojalgo.series.primitive;
 
-import org.ojalgo.access.Access1D;
+import org.ojalgo.structure.Access1D;
 
 final class AccessSeries extends PrimitiveSeries {
 

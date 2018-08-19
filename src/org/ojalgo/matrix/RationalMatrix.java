@@ -21,8 +21,10 @@
  */
 package org.ojalgo.matrix;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -30,6 +32,9 @@ import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 
 /**
  * RationalMatrix
@@ -38,7 +43,7 @@ import org.ojalgo.scalar.RationalNumber;
  */
 public final class RationalMatrix extends AbstractMatrix<RationalNumber, RationalMatrix> {
 
-    public static final BasicMatrix.Factory<RationalMatrix> FACTORY = new MatrixFactory<>(RationalMatrix.class, GenericDenseStore.RATIONAL);
+    public static final MatrixFactory<RationalNumber, RationalMatrix> FACTORY = new MatrixFactory<>(RationalMatrix.class, GenericDenseStore.RATIONAL);
 
     /**
      * This method is for internal use only - YOU should NOT use it!
@@ -54,10 +59,6 @@ public final class RationalMatrix extends AbstractMatrix<RationalNumber, Rationa
         if (matrix instanceof RationalMatrix) {
 
             return ((RationalMatrix) matrix).getStore();
-
-        } else if (matrix instanceof GenericDenseStore) {
-
-            return (GenericDenseStore<RationalNumber>) matrix;
 
         } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof RationalNumber)) {
 
@@ -75,23 +76,42 @@ public final class RationalMatrix extends AbstractMatrix<RationalNumber, Rationa
     }
 
     @Override
-    DeterminantTask<RationalNumber> getDeterminantTask(final MatrixStore<RationalNumber> template) {
+    Eigenvalue<RationalNumber> getDecompositionEigenvalue(Structure2D typical) {
+        return Eigenvalue.RATIONAL.make(typical, this.isHermitian());
+    }
+
+    @Override
+    LU<RationalNumber> getDecompositionLU(Structure2D typical) {
+        return LU.RATIONAL.make(typical);
+    }
+
+    @Override
+    QR<RationalNumber> getDecompositionQR(Structure2D typical) {
+        return QR.RATIONAL.make(typical);
+    }
+
+    @Override
+    SingularValue<RationalNumber> getDecompositionSingularValue(Structure2D typical) {
+        return SingularValue.RATIONAL.make(typical);
+    }
+
+    @Override
+    MatrixFactory<RationalNumber, RationalMatrix> getFactory() {
+        return FACTORY;
+    }
+
+    @Override
+    DeterminantTask<RationalNumber> getTaskDeterminant(final MatrixStore<RationalNumber> template) {
         return DeterminantTask.RATIONAL.make(template, this.isHermitian(), false);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    MatrixFactory<RationalNumber, RationalMatrix> getFactory() {
-        return (MatrixFactory<RationalNumber, RationalMatrix>) FACTORY;
-    }
-
-    @Override
-    InverterTask<RationalNumber> getInverterTask(final MatrixStore<RationalNumber> template) {
+    InverterTask<RationalNumber> getTaskInverter(final MatrixStore<RationalNumber> template) {
         return InverterTask.RATIONAL.make(template, this.isHermitian(), false);
     }
 
     @Override
-    SolverTask<RationalNumber> getSolverTask(final MatrixStore<RationalNumber> templateBody, final Access2D<?> templateRHS) {
+    SolverTask<RationalNumber> getTaskSolver(final MatrixStore<RationalNumber> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.RATIONAL.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

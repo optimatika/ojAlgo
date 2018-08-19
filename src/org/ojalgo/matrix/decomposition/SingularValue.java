@@ -21,17 +21,15 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -69,8 +67,6 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
 
     }
 
-    public static final Factory<BigDecimal> BIG = (typical, fullSize) -> new SingularValueDecomposition.Big(fullSize);
-
     public static final Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new SingularValueDecomposition.Complex(fullSize);
 
     public static final Factory<Double> PRIMITIVE = (typical, fullSize) -> {
@@ -92,8 +88,6 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
 
         if (tmpNumber instanceof RationalNumber) {
             return (SingularValue<N>) RATIONAL.make(typical);
-        } else if (tmpNumber instanceof BigDecimal) {
-            return (SingularValue<N>) BIG.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
             return (SingularValue<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {

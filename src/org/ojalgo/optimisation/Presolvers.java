@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.ojalgo.access.Structure1D.IntIndex;
+import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 public abstract class Presolvers {
@@ -311,7 +311,7 @@ public abstract class Presolvers {
     static boolean doCase0(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
             final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
-        expression.setRedundant(true);
+        expression.setRedundant();
 
         if (expression.validate(fixedValue, precision, null)) {
             expression.level(fixedValue);
@@ -406,7 +406,7 @@ public abstract class Presolvers {
             }
         }
 
-        expression.setRedundant(true);
+        expression.setRedundant();
 
         if (variable.isEqualityConstraint()) {
             variable.setValue(variable.getLowerLimit());

@@ -59,6 +59,9 @@ public abstract class PrimitiveMath {
     public static final double HUNDREDTH = BigMath.HUNDREDTH.doubleValue();
     public static final double THOUSANDTH = BigMath.THOUSANDTH.doubleValue();
 
+    public static final double TWO_THIRDS = BigMath.TWO_THIRDS.doubleValue();
+    public static final double THREE_QUARTERS = BigMath.THREE_QUARTERS.doubleValue();
+
     public static final double E = BigMath.E.doubleValue();
     public static final double PI = BigMath.PI.doubleValue();
     public static final double GOLDEN_RATIO = BigMath.GOLDEN_RATIO.doubleValue();

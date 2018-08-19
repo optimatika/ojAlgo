@@ -30,9 +30,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Structure1D.IntIndex;
-import org.ojalgo.access.Structure2D.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.BigMath;
@@ -41,6 +38,9 @@ import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.linear.LinearSolver;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure1D.IntIndex;
+import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -168,11 +168,158 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         /**
+         * @param model
+         * @param variable
+         * @return The index with which one can reference parameters related to this variable in the solver.
+         */
+        protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
+            return model.indexOfFreeVariable(variable);
+        }
+
+        /**
          * @return true if the set of variables present in the solver is not precisely the same as in the
          *         model. If fixed variables are omitted or if variables are split into a positive and
          *         negative part, then this method must return true
          */
         protected abstract boolean isSolutionMapped();
+
+    }
+
+    public static final class Intermediate implements Optimisation.Solver {
+
+        private boolean myInPlaceUpdatesOK = true;
+        private transient ExpressionsBasedModel.Integration<?> myIntegration = null;
+        private final ExpressionsBasedModel myModel;
+        private transient Optimisation.Solver mySolver = null;
+
+        Intermediate(final ExpressionsBasedModel model) {
+            super();
+            myModel = model;
+            myIntegration = null;
+            mySolver = null;
+        }
+
+        /**
+         * Force re-generation of any cached/transient data
+         */
+        public void dispose() {
+
+            Solver.super.dispose();
+
+            if (mySolver != null) {
+                mySolver.dispose();
+                mySolver = null;
+            }
+
+            myIntegration = null;
+        }
+
+        public ExpressionsBasedModel getModel() {
+            return myModel;
+        }
+
+        public Variable getVariable(final int globalIndex) {
+            return myModel.getVariable(globalIndex);
+        }
+
+        public Variable getVariable(final IntIndex globalIndex) {
+            return myModel.getVariable(globalIndex);
+        }
+
+        public Optimisation.Result solve(final Optimisation.Result candidate) {
+
+            if (mySolver == null) {
+                myModel.presolve();
+            }
+
+            if (myModel.isInfeasible()) {
+
+                final Optimisation.Result solution = candidate != null ? candidate : myModel.getVariableValues();
+
+                return new Optimisation.Result(State.INFEASIBLE, solution);
+
+            } else if (myModel.isUnbounded()) {
+
+                if ((candidate != null) && myModel.validate(candidate)) {
+                    return new Optimisation.Result(State.UNBOUNDED, candidate);
+                }
+
+                final Optimisation.Result derivedSolution = myModel.getVariableValues();
+                if (derivedSolution.getState().isFeasible()) {
+                    return new Optimisation.Result(State.UNBOUNDED, derivedSolution);
+                }
+
+            } else if (myModel.isFixed()) {
+
+                final Optimisation.Result derivedSolution = myModel.getVariableValues();
+
+                if (derivedSolution.getState().isFeasible()) {
+                    return new Optimisation.Result(State.DISTINCT, derivedSolution);
+                } else {
+                    return new Optimisation.Result(State.INVALID, derivedSolution);
+                }
+            }
+
+            final ExpressionsBasedModel.Integration<?> integration = this.getIntegration();
+            final Optimisation.Solver solver = this.getSolver();
+
+            Optimisation.Result retVal = candidate != null ? candidate : myModel.getVariableValues();
+            retVal = integration.toSolverState(retVal, myModel);
+            retVal = solver.solve(retVal);
+            retVal = integration.toModelState(retVal, myModel);
+
+            return retVal;
+        }
+
+        public void update(final int index) {
+            this.update(myModel.getVariable(index));
+        }
+
+        public void update(final IntIndex index) {
+            this.update(myModel.getVariable(index));
+        }
+
+        public void update(final Variable variable) {
+
+            if (myInPlaceUpdatesOK && (mySolver != null) && (mySolver instanceof UpdatableSolver) && variable.isFixed()) {
+                final UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
+
+                final int indexInSolver = this.getIntegration().getIndexInSolver(myModel, variable);
+                final double fixedValue = variable.getValue().doubleValue();
+
+                if (updatableSolver.fixVariable(indexInSolver, fixedValue)) {
+                    // Solver updated in-place
+                    return;
+                } else {
+                    myInPlaceUpdatesOK = false;
+                }
+            }
+
+            // Solver will be re-generated
+            mySolver = null;
+        }
+
+        public boolean validate(final Access1D<BigDecimal> solution, final Printer appender) {
+            return myModel.validate(solution, appender);
+        }
+
+        public boolean validate(final Result solution) {
+            return myModel.validate(solution);
+        }
+
+        ExpressionsBasedModel.Integration<?> getIntegration() {
+            if (myIntegration == null) {
+                myIntegration = myModel.getIntegration();
+            }
+            return myIntegration;
+        }
+
+        Optimisation.Solver getSolver() {
+            if (mySolver == null) {
+                mySolver = this.getIntegration().build(myModel);
+            }
+            return mySolver;
+        }
 
     }
 
@@ -929,6 +1076,28 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
+    /**
+     * <p>
+     * The general recommendation is to NOT call this method directly. Instead you should use/call
+     * {@link #maximise()} or {@link #minimise()}.
+     * </P>
+     * <p>
+     * The primary use case for this method is as a callback method for solvers that iteratively modifies the
+     * model and solves at each iteration point.
+     * </P>
+     * <p>
+     * With direct usage of this method:
+     * </P>
+     * <ul>
+     * <li>Maximisation/Minimisation is undefined (you don't know which it is)</li>
+     * <li>The solution is not written back to the model</li>
+     * <li>The solution is not validated by the model</li>
+     * </ul>
+     */
+    public ExpressionsBasedModel.Intermediate prepare() {
+        return new ExpressionsBasedModel.Intermediate(this);
+    }
+
     public ExpressionsBasedModel relax(final boolean inPlace) {
 
         final ExpressionsBasedModel retVal = inPlace ? this : new ExpressionsBasedModel(this, true, true);
@@ -953,63 +1122,19 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     /**
      * <p>
-     * The general recommendation is to NOT call this method directly. Instead you should use/call
+     * Most likely you should NOT have been using this method directly. Instead you should have used/called
      * {@link #maximise()} or {@link #minimise()}.
      * </P>
      * <p>
-     * The primary use case for this method is as a callback method for solvers that iteratively modifies the
-     * model and solves at each iteration point.
+     * In case you believe it was correct to use this method, you should now use {@link #prepare()} and then
+     * {@link Intermediate#solve(Optimisation.Result)} instead.
      * </P>
-     * <p>
-     * With direct usage of this method:
-     * </P>
-     * <ul>
-     * <li>Maximisation/Minimisation is undefined (you don't know which it is)</li>
-     * <li>The solution is not written back to the model</li>
-     * <li>The solution is not validated by the model</li>
-     * </ul>
+     *
+     * @deprecated v46
      */
+    @Deprecated
     public Optimisation.Result solve(final Optimisation.Result candidate) {
-
-        this.presolve();
-
-        if (this.isInfeasible()) {
-
-            final Optimisation.Result solution = candidate != null ? candidate : this.getVariableValues();
-
-            return new Optimisation.Result(State.INFEASIBLE, solution);
-
-        } else if (this.isUnbounded()) {
-
-            if ((candidate != null) && this.validate(candidate)) {
-                return new Optimisation.Result(State.UNBOUNDED, candidate);
-            }
-
-            final Optimisation.Result derivedSolution = this.getVariableValues();
-            if (derivedSolution.getState().isFeasible()) {
-                return new Optimisation.Result(State.UNBOUNDED, derivedSolution);
-            }
-
-        } else if (this.isFixed()) {
-
-            final Optimisation.Result derivedSolution = this.getVariableValues();
-
-            if (derivedSolution.getState().isFeasible()) {
-                return new Result(State.DISTINCT, derivedSolution);
-            } else {
-                return new Result(State.INVALID, derivedSolution);
-            }
-        }
-
-        final Integration<?> tmpIntegration = this.getIntegration();
-        final Solver tmpSolver = tmpIntegration.build(this);
-        Optimisation.Result retVal = tmpIntegration.toSolverState(candidate != null ? candidate : this.getVariableValues(), this);
-        retVal = tmpSolver.solve(retVal);
-        retVal = tmpIntegration.toModelState(retVal, this);
-
-        tmpSolver.dispose();
-
-        return retVal;
+        return this.prepare().solve(candidate);
     }
 
     @Override
@@ -1315,7 +1440,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             this.scanEntities();
         }
 
-        final Result solver = this.solve(null);
+        Intermediate prepared = this.prepare();
+        final Optimisation.Result solver = prepared.solve(null);
 
         for (int i = 0, limit = myVariables.size(); i < limit; i++) {
             final Variable tmpVariable = myVariables.get(i);
@@ -1327,14 +1453,13 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         final Access1D<BigDecimal> retSolution = this.getVariableValues();
         final Optimisation.State retState = solver.getState();
         final double retValue = this.objective().evaluate(retSolution).doubleValue();
-        final Result output = new Optimisation.Result(retState, retValue, retSolution);
 
-        return output;
+        return new Optimisation.Result(retState, retValue, retSolution);
     }
 
     final void presolve() {
 
-        myExpressions.values().forEach(expr -> expr.setRedundant(false));
+        myExpressions.values().forEach(expr -> expr.reset());
 
         boolean needToRepeat = false;
 
@@ -1350,7 +1475,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                     fixedValue = options.solution.enforce(expr.calculateFixedValue(fixedVariables));
                     for (final Presolver presolver : PRESOLVERS) {
                         if (!needToRepeat) {
-                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.solution);
+                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.feasibility);
                         }
                     }
                 }

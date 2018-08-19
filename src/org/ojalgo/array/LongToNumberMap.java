@@ -8,12 +8,12 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -230,6 +230,10 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
             myStorage.put(key, tmpIndex, newValue);
             return newValue;
         }
+    }
+
+    public NonzeroView<N> nonzeros() {
+        return myStorage.nonzeros();
     }
 
     public double put(final long key, final double value) {

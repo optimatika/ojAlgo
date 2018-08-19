@@ -27,8 +27,6 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.util.Arrays;
 import java.util.List;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
@@ -60,6 +58,8 @@ import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**

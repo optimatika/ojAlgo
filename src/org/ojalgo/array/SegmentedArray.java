@@ -25,11 +25,11 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.structure.Access1D;
 
 /**
  * <p>

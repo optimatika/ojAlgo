@@ -21,17 +21,16 @@
  */
 package org.ojalgo.matrix;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.store.BigDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -57,8 +56,8 @@ public class LargerCholeskyCase extends BasicMatrixTest {
 
         myBigAB = LargerCholeskyCase.getOriginal();
 
-        final Cholesky<BigDecimal> tmpCholesky = Cholesky.BIG.make();
-        tmpCholesky.decompose(BigDenseStore.FACTORY.copy(myBigAB));
+        final Cholesky<RationalNumber> tmpCholesky = Cholesky.RATIONAL.make();
+        tmpCholesky.decompose(GenericDenseStore.RATIONAL.copy(myBigAB));
 
         myBigAA = RationalMatrix.FACTORY.copy(tmpCholesky.getL());
         myBigAX = myBigAA.transpose();

@@ -23,13 +23,13 @@ package org.ojalgo.random.process;
 
 import java.util.List;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.random.ContinuousDistribution;
 import org.ojalgo.random.Random1D;
 import org.ojalgo.random.process.RandomProcess.SimulationResults;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 
 abstract class Process1D<D extends ContinuousDistribution, P extends AbstractProcess<D>> {
 

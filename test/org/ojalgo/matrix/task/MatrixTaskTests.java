@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 
 /**
@@ -62,5 +64,10 @@ public abstract class MatrixTaskTests {
         Collections.addAll(retVal, MatrixDecompositionTests.getQRPrimitive());
 
         return retVal;
+    }
+
+    @BeforeEach
+    public void setUp() {
+        TestUtils.minimiseAllBranchLimits();
     }
 }

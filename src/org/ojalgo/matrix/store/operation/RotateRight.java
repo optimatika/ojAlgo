@@ -21,9 +21,6 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import java.math.BigDecimal;
-
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.scalar.Scalar;
 
 public final class RotateRight extends MatrixOperation {
@@ -31,27 +28,6 @@ public final class RotateRight extends MatrixOperation {
     public static final RotateRight SETUP = new RotateRight();
 
     public static int THRESHOLD = 128;
-
-    public static void invoke(final BigDecimal[] data, final int structure, final int colA, final int colB, final BigDecimal cos, final BigDecimal sin) {
-
-        BigDecimal oldA;
-        BigDecimal oldB;
-
-        int indexA = colA * structure;
-        int indexB = colB * structure;
-
-        for (int i = 0; i < structure; i++) {
-
-            oldA = data[indexA];
-            oldB = data[indexB];
-
-            data[indexA] = BigFunction.SUBTRACT.invoke(BigFunction.MULTIPLY.invoke(cos, oldA), BigFunction.MULTIPLY.invoke(sin, oldB));
-            data[indexB] = BigFunction.ADD.invoke(BigFunction.MULTIPLY.invoke(cos, oldB), BigFunction.MULTIPLY.invoke(sin, oldA));
-
-            indexA++;
-            indexB++;
-        }
-    }
 
     public static void invoke(final double[] data, final int structure, final int colA, final int colB, final double cos, final double sin) {
 

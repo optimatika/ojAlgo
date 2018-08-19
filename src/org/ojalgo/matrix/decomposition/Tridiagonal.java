@@ -21,13 +21,11 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
-import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -45,8 +43,6 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
 
     }
 
-    public static final Factory<BigDecimal> BIG = typical -> new DeferredTridiagonal.Big();
-
     public static final Factory<ComplexNumber> COMPLEX = typical -> new DeferredTridiagonal.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> new DeferredTridiagonal.Primitive();
@@ -60,8 +56,10 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
 
         final N tmpNumber = typical.get(0, 0);
 
-        if (tmpNumber instanceof BigDecimal) {
-            return (Tridiagonal<N>) BIG.make(typical);
+        if (tmpNumber instanceof RationalNumber) {
+            return (Tridiagonal<N>) RATIONAL.make(typical);
+        } else if (tmpNumber instanceof Quaternion) {
+            return (Tridiagonal<N>) QUATERNION.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
             return (Tridiagonal<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {
@@ -73,10 +71,23 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
 
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Tridiagonal<N> decomposition, final NumberContext context) {
 
+        boolean retVal = true;
+
         // Check that [A] == [Q][D][Q]<sup>T</sup>
-        return Access2D.equals(matrix, Tridiagonal.reconstruct(decomposition), context);
+        retVal &= Access2D.equals(matrix, Tridiagonal.reconstruct(decomposition), context);
 
         // Check that Q is orthogonal/unitary...
+
+        final MatrixStore<N> mtrxQ = decomposition.getQ();
+        MatrixStore<N> identity = mtrxQ.physical().makeEye(mtrxQ.countRows(), mtrxQ.countColumns());
+
+        MatrixStore<N> qqh = mtrxQ.multiply(mtrxQ.conjugate());
+        retVal &= qqh.equals(identity, context);
+
+        MatrixStore<N> qhq = mtrxQ.conjugate().multiply(mtrxQ);
+        retVal &= qhq.equals(identity, context);
+
+        return retVal;
     }
 
     static <N extends Number> MatrixStore<N> reconstruct(final Tridiagonal<N> decomposition) {

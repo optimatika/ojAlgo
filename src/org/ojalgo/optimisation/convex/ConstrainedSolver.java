@@ -21,9 +21,9 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.structure.Access2D.Collectable;
 
 abstract class ConstrainedSolver extends ConvexSolver {
 

@@ -21,16 +21,15 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Mutate2D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyBoth;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate2D;
 
 public interface ElementsConsumer<N extends Number> extends Mutate2D.Receiver<N>, Mutate2D.BiModifiable<N>, Mutate2D.Modifiable<N> {
 
@@ -121,8 +120,6 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.Receiver<N>
                 myMultiplier = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getPrimitive(rows, columns);
             } else if (multiplier instanceof GenericMultiplyBoth) {
                 myMultiplier = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getGeneric(rows, columns);
-            } else if (multiplier instanceof BigMultiplyBoth) {
-                myMultiplier = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getBig(rows, columns);
             } else {
                 myMultiplier = multiplier;
             }

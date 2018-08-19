@@ -21,15 +21,14 @@
  */
 package org.ojalgo.function.multiary;
 
-import java.math.BigDecimal;
-
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 
 /**
  * [x]<sup>T</sup>[Q][x] + [l]<sup>T</sup>[x] + c
@@ -38,18 +37,6 @@ import org.ojalgo.scalar.Scalar;
  */
 public final class CompoundFunction<N extends Number> extends AbstractMultiary<N, CompoundFunction<N>>
         implements MultiaryFunction.Linear<N>, MultiaryFunction.Quadratic<N> {
-
-    public static CompoundFunction<BigDecimal> makeBig(final Access2D<? extends Number> quadraticFactors, final Access1D<? extends Number> linearFactors) {
-        final QuadraticFunction<BigDecimal> tmpQuadratic = QuadraticFunction.makeBig(quadraticFactors);
-        final LinearFunction<BigDecimal> tmpLinear = LinearFunction.makeBig(linearFactors);
-        return new CompoundFunction<>(tmpQuadratic, tmpLinear);
-    }
-
-    public static CompoundFunction<BigDecimal> makeBig(final int arity) {
-        final QuadraticFunction<BigDecimal> tmpQuadratic = QuadraticFunction.makeBig(arity);
-        final LinearFunction<BigDecimal> tmpLinear = LinearFunction.makeBig(arity);
-        return new CompoundFunction<>(tmpQuadratic, tmpLinear);
-    }
 
     public static CompoundFunction<ComplexNumber> makeComplex(final Access2D<? extends Number> quadraticFactors,
             final Access1D<? extends Number> linearFactors) {
@@ -73,6 +60,19 @@ public final class CompoundFunction<N extends Number> extends AbstractMultiary<N
     public static CompoundFunction<Double> makePrimitive(final int arity) {
         final QuadraticFunction<Double> tmpQuadratic = QuadraticFunction.makePrimitive(arity);
         final LinearFunction<Double> tmpLinear = LinearFunction.makePrimitive(arity);
+        return new CompoundFunction<>(tmpQuadratic, tmpLinear);
+    }
+
+    public static CompoundFunction<RationalNumber> makeRational(final Access2D<? extends Number> quadraticFactors,
+            final Access1D<? extends Number> linearFactors) {
+        final QuadraticFunction<RationalNumber> tmpQuadratic = QuadraticFunction.makeRational(quadraticFactors);
+        final LinearFunction<RationalNumber> tmpLinear = LinearFunction.makeRational(linearFactors);
+        return new CompoundFunction<>(tmpQuadratic, tmpLinear);
+    }
+
+    public static CompoundFunction<RationalNumber> makeRational(final int arity) {
+        final QuadraticFunction<RationalNumber> tmpQuadratic = QuadraticFunction.makeRational(arity);
+        final LinearFunction<RationalNumber> tmpLinear = LinearFunction.makeRational(arity);
         return new CompoundFunction<>(tmpQuadratic, tmpLinear);
     }
 

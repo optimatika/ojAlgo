@@ -29,9 +29,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -39,6 +36,9 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class IterativeSolverTask implements SolverTask<Double> {
@@ -97,13 +97,14 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
 
     static List<Equation> toListOfRows(final Access2D<?> body, final Access2D<?> rhs) {
 
-        final int tmpDim = (int) body.countRows();
+        final int numbEquations = (int) body.countRows();
+        final int numbVariables = (int) body.countColumns();
 
-        final List<Equation> retVal = new ArrayList<>(tmpDim);
+        final List<Equation> retVal = new ArrayList<>(numbEquations);
 
-        for (int i = 0; i < tmpDim; i++) {
-            final Equation tmpRow = new Equation(i, tmpDim, rhs.doubleValue(i));
-            for (int j = 0; j < tmpDim; j++) {
+        for (int i = 0; i < numbEquations; i++) {
+            final Equation tmpRow = new Equation(i, numbVariables, rhs.doubleValue(i));
+            for (int j = 0; j < numbVariables; j++) {
                 final double tmpVal = body.doubleValue(i, j);
                 if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
                     tmpRow.set(j, tmpVal);
@@ -132,7 +133,7 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
         if (templateRHS.countColumns() != 1L) {
             throw new IllegalArgumentException("The RHS must have precisely 1 column!");
         }
-        return PrimitiveDenseStore.FACTORY.makeZero(templateRHS.countRows(), 1L);
+        return PrimitiveDenseStore.FACTORY.makeZero(templateBody.countColumns(), 1L);
     }
 
     public final Optional<MatrixStore<Double>> solve(final MatrixStore<Double> body, final MatrixStore<Double> rhs) {

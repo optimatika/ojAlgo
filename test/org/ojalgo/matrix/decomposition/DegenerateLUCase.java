@@ -21,18 +21,16 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.SimpleEquationCase;
-import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -54,8 +52,8 @@ public class DegenerateLUCase {
                 .makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
-        final LU<BigDecimal> tmpBigDecomp = LU.BIG.make();
-        tmpBigDecomp.decompose(BigDenseStore.FACTORY.copy(tmpMtrxA));
+        final LU<RationalNumber> tmpBigDecomp = LU.RATIONAL.make();
+        tmpBigDecomp.decompose(GenericDenseStore.RATIONAL.copy(tmpMtrxA));
         //        System.out.println("A: " + tmpMtrxA.enforce(tmpEvalContext));
         //        System.out.println("P: " + new RationalMatrix(tmpBigDecomp.getP()).enforce(tmpEvalContext));
         //        System.out.println("L: " + new RationalMatrix(tmpBigDecomp.getL()).enforce(tmpEvalContext));
@@ -63,7 +61,7 @@ public class DegenerateLUCase {
         //        System.out.println("D: " + new RationalMatrix(tmpBigDecomp.getD()).enforce(tmpEvalContext));
         //        System.out.println("U: " + new RationalMatrix(tmpBigDecomp.getU()).enforce(tmpEvalContext));
         //        System.out.println("DU: " + new RationalMatrix(tmpBigDecomp.getD().multiplyRight(tmpBigDecomp.getU())).enforce(tmpEvalContext));
-        TestUtils.assertEquals(BigDenseStore.FACTORY.copy(tmpMtrxA), tmpBigDecomp, tmpEvalContext);
+        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(tmpMtrxA), tmpBigDecomp, tmpEvalContext);
     }
 
     @Test
@@ -76,7 +74,7 @@ public class DegenerateLUCase {
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<ComplexNumber> tmpComplexDecomp = LU.COMPLEX.make();
-        tmpComplexDecomp.decompose(ComplexDenseStore.FACTORY.copy(tmpMtrxA));
+        tmpComplexDecomp.decompose(GenericDenseStore.COMPLEX.copy(tmpMtrxA));
         //        System.out.println("A: " + tmpMtrxA.enforce(tmpEvalContext));
         //        System.out.println("P: " + new ComplexMatrix(tmpComplexDecomp.getP()).enforce(tmpEvalContext));
         //        System.out.println("L: " + new ComplexMatrix(tmpComplexDecomp.getL()).enforce(tmpEvalContext));
@@ -84,7 +82,7 @@ public class DegenerateLUCase {
         //        System.out.println("D: " + new ComplexMatrix(tmpComplexDecomp.getD()).enforce(tmpEvalContext));
         //        System.out.println("U: " + new ComplexMatrix(tmpComplexDecomp.getU()).enforce(tmpEvalContext));
         //        System.out.println("DU: " + new ComplexMatrix(tmpComplexDecomp.getD().multiplyRight(tmpComplexDecomp.getU())).enforce(tmpEvalContext));
-        TestUtils.assertEquals(ComplexDenseStore.FACTORY.copy(tmpMtrxA), tmpComplexDecomp, tmpEvalContext);
+        TestUtils.assertEquals(GenericDenseStore.COMPLEX.copy(tmpMtrxA), tmpComplexDecomp, tmpEvalContext);
     }
 
     @Test

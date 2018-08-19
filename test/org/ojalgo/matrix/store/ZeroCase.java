@@ -32,9 +32,9 @@ public class ZeroCase extends NonPhysicalTest {
         final int tmpRowDim = Uniform.randomInteger(1, 9);
         final int tmpColDim = Uniform.randomInteger(1, 9);
 
-        myBigStore = new ZeroStore<>(BigDenseStore.FACTORY, tmpRowDim, tmpColDim);
-        myComplexStore = new ZeroStore<>(ComplexDenseStore.FACTORY, tmpRowDim, tmpColDim);
-        myPrimitiveStore = new ZeroStore<>(PrimitiveDenseStore.FACTORY, tmpRowDim, tmpColDim);
+        rationalStore = new ZeroStore<>(GenericDenseStore.RATIONAL, tmpRowDim, tmpColDim);
+        complexStore = new ZeroStore<>(GenericDenseStore.COMPLEX, tmpRowDim, tmpColDim);
+        primitiveStore = new ZeroStore<>(PrimitiveDenseStore.FACTORY, tmpRowDim, tmpColDim);
     }
 
 }

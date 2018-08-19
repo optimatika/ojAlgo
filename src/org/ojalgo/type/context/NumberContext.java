@@ -55,9 +55,9 @@ import org.ojalgo.type.format.NumberStyle;
  */
 public final class NumberContext extends FormatContext<Number, NumberFormat> {
 
-    public static interface Enforceable<N extends Number> {
+    public static interface Enforceable<T> {
 
-        N enforce(NumberContext context);
+        T enforce(NumberContext context);
 
     }
 
@@ -238,7 +238,6 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
 
         if (precision > 0) {
             myEpsilon = PrimitiveFunction.MAX.invoke(PrimitiveMath.MACHINE_EPSILON, PrimitiveFunction.POW.invoke(PrimitiveMath.TEN, 1 - precision));
-            //myEpsilon = PrimitiveMath.MACHINE_EPSILON * PrimitiveFunction.POW.invoke(PrimitiveMath.TEN, 16 - precision);
         } else {
             myEpsilon = PrimitiveMath.MACHINE_EPSILON;
         }
@@ -294,7 +293,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         if (object instanceof BigDecimal) {
             return this.enforce((BigDecimal) object);
         } else if (object instanceof Enforceable<?>) {
-            return ((Enforceable<?>) object).enforce(this);
+            return (Number) ((Enforceable<?>) object).enforce(this);
         } else {
             return this.enforce(object.doubleValue());
         }
@@ -383,7 +382,11 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
     }
 
     public boolean isDifferent(final double expected, final double actual) {
-        return !this.isSmall(expected, actual - expected);
+        if (expected == actual) {
+            return false;
+        } else {
+            return !this.isSmall(expected, actual - expected);
+        }
     }
 
     public boolean isLessThan(final BigDecimal reference, final BigDecimal value) {

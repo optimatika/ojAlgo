@@ -23,13 +23,13 @@ package org.ojalgo.function.polynomial;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.store.BigDenseStore;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.TypeUtils;
 
 public class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
@@ -47,8 +47,8 @@ public class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
         final int tmpRowDim = (int) Math.min(x.count(), y.count());
         final int tmpColDim = this.size();
 
-        final PhysicalStore<BigDecimal> tmpBody = BigDenseStore.FACTORY.makeZero(tmpRowDim, tmpColDim);
-        final PhysicalStore<BigDecimal> tmpRHS = BigDenseStore.FACTORY.makeZero(tmpRowDim, 1);
+        final PhysicalStore<RationalNumber> tmpBody = GenericDenseStore.RATIONAL.makeZero(tmpRowDim, tmpColDim);
+        final PhysicalStore<RationalNumber> tmpRHS = GenericDenseStore.RATIONAL.makeZero(tmpRowDim, 1);
 
         for (int i = 0; i < tmpRowDim; i++) {
 
@@ -63,7 +63,7 @@ public class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
             tmpRHS.set(i, 0, tmpY);
         }
 
-        final QR<BigDecimal> tmpQR = QR.BIG.make();
+        final QR<RationalNumber> tmpQR = QR.RATIONAL.make();
         tmpQR.decompose(tmpBody);
         this.set(tmpQR.getSolution(tmpRHS));
     }

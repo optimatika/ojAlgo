@@ -23,10 +23,10 @@ package org.ojalgo.array;
 
 import java.util.ArrayList;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.StructureAnyD;
 
 /**
  * <p>

@@ -21,7 +21,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -32,6 +31,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver;
+import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -170,8 +170,8 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         final Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertTrue(tmpModel.validate(tmpModel.options.feasibility));
-        TestUtils.assertTrue(tmpModel.validate(tmpResult, tmpModel.options.feasibility));
+        TestUtils.assertTrue(tmpModel.validate(tmpModel.options.feasibility, BasicLogger.DEBUG));
+        TestUtils.assertTrue(tmpModel.validate(tmpResult, tmpModel.options.feasibility, BasicLogger.DEBUG));
 
         TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), tmpModel.options.feasibility);
 

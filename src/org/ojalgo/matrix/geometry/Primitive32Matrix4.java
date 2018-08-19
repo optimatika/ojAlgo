@@ -1,7 +1,7 @@
 package org.ojalgo.matrix.geometry;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.transformation.TransformationMatrix;
+import org.ojalgo.structure.Access2D;
 
 public class Primitive32Matrix4 implements GeometryMatrix<Primitive32Matrix4>, TransformationMatrix<Double, Primitive32Vector4> {
 

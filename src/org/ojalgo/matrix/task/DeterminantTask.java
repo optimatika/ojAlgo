@@ -21,10 +21,6 @@
  */
 package org.ojalgo.matrix.task;
 
-import java.math.BigDecimal;
-
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
@@ -32,6 +28,8 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 
 public interface DeterminantTask<N extends Number> extends MatrixTask<N> {
 
@@ -60,19 +58,6 @@ public interface DeterminantTask<N extends Number> extends MatrixTask<N> {
         public abstract DeterminantTask<N> make(Structure2D template, boolean symmetric, boolean positiveDefinite);
 
     }
-
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
-
-        @Override
-        public DeterminantTask<BigDecimal> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
-            if (symmetric && positiveDefinite) {
-                return Cholesky.BIG.make(template);
-            } else {
-                return LU.BIG.make(template);
-            }
-        }
-
-    };
 
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 

@@ -32,9 +32,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Factory1D;
-import org.ojalgo.access.Mutate1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -46,6 +43,9 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Factory1D;
+import org.ojalgo.structure.Mutate1D;
 
 /**
  * Array1D
@@ -62,7 +62,7 @@ public final class Array1D<N extends Number> extends AbstractList<N>
 
         Factory(final DenseArray.Factory<N> denseArray) {
             super();
-            myDelegate = BasicArray.factory(denseArray);
+            myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
         public final Array1D<N> copy(final Access1D<?> source) {

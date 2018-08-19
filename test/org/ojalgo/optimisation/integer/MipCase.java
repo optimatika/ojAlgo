@@ -17,11 +17,8 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public final class MipCase extends OptimisationIntegerTests {
-
-    @Test
-    public void testDummy() {
-    }
+@Disabled("Underscored before JUnit 5")
+public final class MipCase extends MipLibCase {
 
     /**
      * <ul>
@@ -29,12 +26,12 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 2.0 rather than 1.0 after
      * 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
+     * <li>2018-08-16: MacPro sufficed with optimal solution</li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare_5_0()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testMarkshare_5_0() {
         MipLibCase.assertMinMaxVal("markshare_5_0.mps", new BigDecimal("1.00000000e+00"), null, false, null);
     }
@@ -47,12 +44,12 @@ public final class MipCase extends OptimisationIntegerTests {
      * 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
      * was:<5.0></li>
+     * <li>2018-08-16: MacPro sufficed: <1.0> but was: <8.0></li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare1()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testMarkshare1() {
         MipLibCase.assertMinMaxVal("markshare1.mps", new BigDecimal("1.00000000e+00"), null, false, null);
     }
@@ -65,12 +62,12 @@ public final class MipCase extends OptimisationIntegerTests {
      * 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
      * was:<19.00000000000008></li>
+     * <li>2018-08-16: MacPro sufficed: <1.0> but was: <14.0></li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare2()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testMarkshare2() {
         MipLibCase.assertMinMaxVal("markshare2.mps", new BigDecimal("1.00000000e+00"), null, false, null);
     }
@@ -86,12 +83,12 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2015-11-07: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 107min</li>
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
+     * <li>2018-08-16: MacPro sufficed with optimal solution</li>
      * </ul>
      *
      * @see RelaxedLpCase#testMas76()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testMas76() {
         MipLibCase.assertMinMaxVal("mas76.mps", new BigDecimal("4.00050541e+04"), null, false, null);
     }
@@ -104,12 +101,12 @@ public final class MipCase extends OptimisationIntegerTests {
      * than 2.07405081E7 after 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<2.07405081E7>
      * but was:<2.45509922222574E7></li>
+     * <li>2018-08-16: MacPro sufficed: <2.07405081E7> but was: <2.4337382015089516E7></li>
      * </ul>
      *
      * @see RelaxedLpCase#testModglob()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testModglob() {
         MipLibCase.assertMinMaxVal("modglob.mps", new BigDecimal("2.07405081e+07"), null, false, null);
     }
@@ -119,12 +116,12 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2015-02-08: MacPro (suffice=4h abort=8h) Stopped after 4.75h: expected:<54.76> but was:<220.69>
      * </li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Aborted with no integer solution</li>
+     * <li>2018-08-16: MacPro aborted with no integer solution</li>
      * </ul>
      *
      * @see RelaxedLpCase#testNeos911880()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testNeos911880() {
         MipLibCase.assertMinMaxVal("neos-911880.mps", new BigDecimal("54.76"), null, false, null);
     }
@@ -135,12 +132,12 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2013-11-29: MacPro (suffice=4h abort=8h) Stopped after 4h: expected:<-41.0> but was:<-40.0></li>
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
+     * <li>2018-08-16: MacPro sufficed with optimal solution</li>
      * </ul>
      *
      * @see RelaxedLpCase#testNoswot()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testNoswot() {
         MipLibCase.assertMinMaxVal("noswot.mps", new BigDecimal("-4.10000000e+01"), null, false, null);
     }
@@ -153,7 +150,7 @@ public final class MipCase extends OptimisationIntegerTests {
      * @see RelaxedLpCase#testP2m2p1m1p0n100()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
+    @Disabled("Need to fix handle infeasible case")
     public void testP2m2p1m1p0n100() {
         MipLibCase.assertMinMaxVal("p2m2p1m1p0n100.mps", new BigDecimal("Infeasible"), null, true, null);
     }
@@ -167,12 +164,13 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2017-10-20: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution</li>
      * <li>2018-02-07: MacPro (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s</li>
+     * <li>2018-04-47: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s</li>
+     * <li>2018-08-16: MacPro sufficed: <11.0> but was: <14.0></li>
      * </ul>
      *
      * @see RelaxedLpCase#testPk1()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testPk1() {
         MipLibCase.assertMinMaxVal("pk1.mps", new BigDecimal("1.10000000e+01"), null, false, null);
     }
@@ -183,12 +181,12 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2013-11-30: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<7350.0> but was:<8020.0></li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<7350.0> but
      * was:<7580.0></li>
+     * <li>2018-08-16: MacPro sufficed: <7350.0> but was: <7490.0></li>
      * </ul>
      *
      * @see RelaxedLpCase#testPp08a()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testPp08a() {
         MipLibCase.assertMinMaxVal("pp08a.mps", new BigDecimal("7.35000000e+03"), null, false, null);
     }
@@ -198,12 +196,12 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<7350.0> but was:<8080.0></li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<7350.0> but
      * was:<7500.0></li>
+     * <li>2018-08-16: MacPro sufficed: <7350.0> but was: <7580.0></li>
      * </ul>
      *
      * @see RelaxedLpCase#testPp08aCUTS()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testPp08aCUTS() {
         MipLibCase.assertMinMaxVal("pp08aCUTS.mps", new BigDecimal("7.35000000e+03"), null, false, null);
     }
@@ -213,12 +211,12 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2013-11-24: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<764772.0> but was:
      * <1012900.999999></li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Aborted with no integer solution</li>
+     * <li>2018-08-16: MacPro sufficed: <764772.0> but was: <1256281.99999962></li>
      * </ul>
      *
      * @see RelaxedLpCase#testTimtab1()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testTimtab1() {
         MipLibCase.assertMinMaxVal("timtab1.mps", new BigDecimal("7.64772000e+05"), null, false, null);
     }
@@ -230,12 +228,12 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped after 5min expected:<13.75> but was:<16.25></li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<13.75> but
      * was:<16.0></li>
+     * <li>2018-08-16: MacPro sufficed: <13.75> but was: <16.5></li>
      * </ul>
      *
      * @see RelaxedLpCase#testVpm2()
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testVpm2() {
         MipLibCase.assertMinMaxVal("vpm2.mps", new BigDecimal("1.37500000e+01"), null, false, null);
     }

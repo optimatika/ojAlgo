@@ -21,21 +21,23 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -44,8 +46,9 @@ import org.ojalgo.type.context.NumberContext;
  * </p>
  * <p>
  * A {@linkplain MatrixStore} extends {@linkplain Access2D} (as well as
- * {@linkplain org.ojalgo.access.Access2D.Visitable} and {@linkplain org.ojalgo.access.Access2D.Elements}) and
- * defines some futher funtionality - mainly matrix multiplication.
+ * {@linkplain org.ojalgo.structure.Access2D.Visitable} and
+ * {@linkplain org.ojalgo.structure.Access2D.Elements}) and defines some futher funtionality - mainly matrix
+ * multiplication.
  * </p>
  * <p>
  * This interface does not define any methods that require implementations to alter the matrix. Either the
@@ -79,50 +82,51 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
      *
      * @author apete
      */
-    public static final class LogicalBuilder<N extends Number> implements ElementsSupplier<N> {
+    public static final class LogicalBuilder<N extends Number>
+            implements ElementsSupplier<N>, Structure2D.Logical<MatrixStore<N>, MatrixStore.LogicalBuilder<N>> {
 
         @SafeVarargs
-        static <N extends Number> MatrixStore<N> buildColumn(final int aMinRowDim, final MatrixStore<N>... aColStore) {
-            MatrixStore<N> retVal = aColStore[0];
-            for (int i = 1; i < aColStore.length; i++) {
-                retVal = new AboveBelowStore<>(retVal, aColStore[i]);
+        static <N extends Number> MatrixStore<N> buildColumn(final int minRowDim, final MatrixStore<N>... columnStores) {
+            MatrixStore<N> retVal = columnStores[0];
+            for (int i = 1; i < columnStores.length; i++) {
+                retVal = new AboveBelowStore<>(retVal, columnStores[i]);
             }
             final int tmpRowDim = (int) retVal.countRows();
-            if (tmpRowDim < aMinRowDim) {
-                retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(retVal.physical(), aMinRowDim - tmpRowDim, (int) retVal.countColumns()));
+            if (tmpRowDim < minRowDim) {
+                retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(retVal.physical(), minRowDim - tmpRowDim, (int) retVal.countColumns()));
             }
             return retVal;
         }
 
         @SafeVarargs
-        static <N extends Number> MatrixStore<N> buildColumn(final PhysicalStore.Factory<N, ?> factory, final int aMinRowDim, final N... aColStore) {
-            MatrixStore<N> retVal = factory.columns(aColStore);
+        static <N extends Number> MatrixStore<N> buildColumn(final PhysicalStore.Factory<N, ?> factory, final int minRowDim, final N... columnElements) {
+            MatrixStore<N> retVal = factory.columns(columnElements);
             final int tmpRowDim = (int) retVal.countRows();
-            if (tmpRowDim < aMinRowDim) {
-                retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(factory, aMinRowDim - tmpRowDim, (int) retVal.countColumns()));
+            if (tmpRowDim < minRowDim) {
+                retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(factory, minRowDim - tmpRowDim, (int) retVal.countColumns()));
             }
             return retVal;
         }
 
         @SafeVarargs
-        static <N extends Number> MatrixStore<N> buildRow(final int aMinColDim, final MatrixStore<N>... aRowStore) {
-            MatrixStore<N> retVal = aRowStore[0];
-            for (int j = 1; j < aRowStore.length; j++) {
-                retVal = new LeftRightStore<>(retVal, aRowStore[j]);
+        static <N extends Number> MatrixStore<N> buildRow(final int minColDim, final MatrixStore<N>... rowStores) {
+            MatrixStore<N> retVal = rowStores[0];
+            for (int j = 1; j < rowStores.length; j++) {
+                retVal = new LeftRightStore<>(retVal, rowStores[j]);
             }
             final int tmpColDim = (int) retVal.countColumns();
-            if (tmpColDim < aMinColDim) {
-                retVal = new LeftRightStore<>(retVal, new ZeroStore<>(retVal.physical(), (int) retVal.countRows(), aMinColDim - tmpColDim));
+            if (tmpColDim < minColDim) {
+                retVal = new LeftRightStore<>(retVal, new ZeroStore<>(retVal.physical(), (int) retVal.countRows(), minColDim - tmpColDim));
             }
             return retVal;
         }
 
         @SafeVarargs
-        static <N extends Number> MatrixStore<N> buildRow(final PhysicalStore.Factory<N, ?> factory, final int aMinColDim, final N... aRowStore) {
-            MatrixStore<N> retVal = new TransposedStore<>(factory.columns(aRowStore));
+        static <N extends Number> MatrixStore<N> buildRow(final PhysicalStore.Factory<N, ?> factory, final int minColDim, final N... rowElements) {
+            MatrixStore<N> retVal = new TransposedStore<>(factory.columns(rowElements));
             final int tmpColDim = (int) retVal.countColumns();
-            if (tmpColDim < aMinColDim) {
-                retVal = new LeftRightStore<>(retVal, new ZeroStore<>(factory, (int) retVal.countRows(), aMinColDim - tmpColDim));
+            if (tmpColDim < minColDim) {
+                retVal = new LeftRightStore<>(retVal, new ZeroStore<>(factory, (int) retVal.countRows(), minColDim - tmpColDim));
             }
             return retVal;
         }
@@ -144,8 +148,8 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             myStore = matrixStore;
         }
 
-        public final LogicalBuilder<N> above(final int aRowDim) {
-            final ZeroStore<N> tmpUpperStore = new ZeroStore<>(myStore.physical(), aRowDim, (int) myStore.countColumns());
+        public final LogicalBuilder<N> above(final int numberOfRows) {
+            final ZeroStore<N> tmpUpperStore = new ZeroStore<>(myStore.physical(), numberOfRows, (int) myStore.countColumns());
             myStore = new AboveBelowStore<>(tmpUpperStore, myStore);
             return this;
         }
@@ -158,28 +162,28 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         }
 
         @SafeVarargs
-        public final LogicalBuilder<N> above(final N... anUpperStore) {
-            final MatrixStore<N> tmpUpperStore = LogicalBuilder.buildRow(myStore.physical(), (int) myStore.countColumns(), anUpperStore);
+        public final LogicalBuilder<N> above(final N... elements) {
+            final MatrixStore<N> tmpUpperStore = LogicalBuilder.buildRow(myStore.physical(), (int) myStore.countColumns(), elements);
             myStore = new AboveBelowStore<>(tmpUpperStore, myStore);
             return this;
         }
 
-        public final LogicalBuilder<N> below(final int aRowDim) {
-            final ZeroStore<N> tmpLowerStore = new ZeroStore<>(myStore.physical(), aRowDim, (int) myStore.countColumns());
+        public final LogicalBuilder<N> below(final int numberOfRows) {
+            final ZeroStore<N> tmpLowerStore = new ZeroStore<>(myStore.physical(), numberOfRows, (int) myStore.countColumns());
             myStore = new AboveBelowStore<>(myStore, tmpLowerStore);
             return this;
         }
 
         @SafeVarargs
-        public final LogicalBuilder<N> below(final MatrixStore<N>... aLowerStore) {
-            final MatrixStore<N> tmpLowerStore = LogicalBuilder.buildRow((int) myStore.countColumns(), aLowerStore);
+        public final LogicalBuilder<N> below(final MatrixStore<N>... lowerStore) {
+            final MatrixStore<N> tmpLowerStore = LogicalBuilder.buildRow((int) myStore.countColumns(), lowerStore);
             myStore = new AboveBelowStore<>(myStore, tmpLowerStore);
             return this;
         }
 
         @SafeVarargs
-        public final LogicalBuilder<N> below(final N... aLowerStore) {
-            final MatrixStore<N> tmpLowerStore = LogicalBuilder.buildRow(myStore.physical(), (int) myStore.countColumns(), aLowerStore);
+        public final LogicalBuilder<N> below(final N... elements) {
+            final MatrixStore<N> tmpLowerStore = LogicalBuilder.buildRow(myStore.physical(), (int) myStore.countColumns(), elements);
             myStore = new AboveBelowStore<>(myStore, tmpLowerStore);
             return this;
         }
@@ -193,8 +197,8 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
-        public final LogicalBuilder<N> column(final int... col) {
-            myStore = new ColumnsStore<>(myStore, col);
+        public final LogicalBuilder<N> column(final int... columns) {
+            myStore = new ColumnsStore<>(myStore, columns);
             return this;
         }
 
@@ -223,20 +227,25 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return myStore.countRows();
         }
 
+        public final LogicalBuilder<N> diagonal() {
+            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, false), false);
+            return this;
+        }
+
         public final LogicalBuilder<N> diagonal(final boolean assumeOne) {
             myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, assumeOne), assumeOne);
             return this;
         }
 
         @SafeVarargs
-        public final LogicalBuilder<N> diagonally(final MatrixStore<N>... aDiagonalStore) {
+        public final LogicalBuilder<N> diagonally(final MatrixStore<N>... diagonally) {
 
             final PhysicalStore.Factory<N, ?> tmpFactory = myStore.physical();
 
             MatrixStore<N> tmpDiagonalStore;
-            for (int ij = 0; ij < aDiagonalStore.length; ij++) {
+            for (int ij = 0; ij < diagonally.length; ij++) {
 
-                tmpDiagonalStore = aDiagonalStore[ij];
+                tmpDiagonalStore = diagonally[ij];
 
                 final int tmpBaseRowDim = (int) myStore.countRows();
                 final int tmpBaseColDim = (int) myStore.countColumns();
@@ -278,22 +287,22 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
-        public final LogicalBuilder<N> left(final int aColDim) {
-            final MatrixStore<N> tmpLeftStore = new ZeroStore<>(myStore.physical(), (int) myStore.countRows(), aColDim);
+        public final LogicalBuilder<N> left(final int numberOfColumns) {
+            final MatrixStore<N> tmpLeftStore = new ZeroStore<>(myStore.physical(), (int) myStore.countRows(), numberOfColumns);
             myStore = new LeftRightStore<>(tmpLeftStore, myStore);
             return this;
         }
 
         @SafeVarargs
-        public final LogicalBuilder<N> left(final MatrixStore<N>... aLeftStore) {
-            final MatrixStore<N> tmpLeftStore = LogicalBuilder.buildColumn((int) myStore.countRows(), aLeftStore);
+        public final LogicalBuilder<N> left(final MatrixStore<N>... left) {
+            final MatrixStore<N> tmpLeftStore = LogicalBuilder.buildColumn((int) myStore.countRows(), left);
             myStore = new LeftRightStore<>(tmpLeftStore, myStore);
             return this;
         }
 
         @SafeVarargs
-        public final LogicalBuilder<N> left(final N... aLeftStore) {
-            final MatrixStore<N> tmpLeftStore = LogicalBuilder.buildColumn(myStore.physical(), (int) myStore.countRows(), aLeftStore);
+        public final LogicalBuilder<N> left(final N... elements) {
+            final MatrixStore<N> tmpLeftStore = LogicalBuilder.buildColumn(myStore.physical(), (int) myStore.countRows(), elements);
             myStore = new LeftRightStore<>(tmpLeftStore, myStore);
             return this;
         }
@@ -317,43 +326,43 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return myStore.physical();
         }
 
-        public final LogicalBuilder<N> right(final int aColDim) {
-            final MatrixStore<N> tmpRightStore = new ZeroStore<>(myStore.physical(), (int) myStore.countRows(), aColDim);
+        public final LogicalBuilder<N> right(final int numberOfColumns) {
+            final MatrixStore<N> tmpRightStore = new ZeroStore<>(myStore.physical(), (int) myStore.countRows(), numberOfColumns);
             myStore = new LeftRightStore<>(myStore, tmpRightStore);
             return this;
         }
 
         @SafeVarargs
-        public final LogicalBuilder<N> right(final MatrixStore<N>... aRightStore) {
-            final MatrixStore<N> tmpRightStore = LogicalBuilder.buildColumn((int) myStore.countRows(), aRightStore);
+        public final LogicalBuilder<N> right(final MatrixStore<N>... right) {
+            final MatrixStore<N> tmpRightStore = LogicalBuilder.buildColumn((int) myStore.countRows(), right);
             myStore = new LeftRightStore<>(myStore, tmpRightStore);
             return this;
         }
 
         @SafeVarargs
-        public final LogicalBuilder<N> right(final N... aRightStore) {
-            final MatrixStore<N> tmpRightStore = LogicalBuilder.buildColumn(myStore.physical(), (int) myStore.countRows(), aRightStore);
+        public final LogicalBuilder<N> right(final N... elements) {
+            final MatrixStore<N> tmpRightStore = LogicalBuilder.buildColumn(myStore.physical(), (int) myStore.countRows(), elements);
             myStore = new LeftRightStore<>(myStore, tmpRightStore);
             return this;
         }
 
-        public final LogicalBuilder<N> row(final int... row) {
-            myStore = new RowsStore<>(myStore, row);
+        public final LogicalBuilder<N> row(final int... rows) {
+            myStore = new RowsStore<>(myStore, rows);
             return this;
         }
 
-        public final LogicalBuilder<N> superimpose(final int row, final int col, final MatrixStore<N> aStore) {
-            myStore = new SuperimposedStore<>(myStore, row, col, aStore);
+        public final LogicalBuilder<N> superimpose(final int row, final int col, final MatrixStore<N> matrix) {
+            myStore = new SuperimposedStore<>(myStore, row, col, matrix);
             return this;
         }
 
-        public final LogicalBuilder<N> superimpose(final int row, final int col, final Number aStore) {
-            myStore = new SuperimposedStore<>(myStore, row, col, new SingleStore<>(myStore.physical(), aStore));
+        public final LogicalBuilder<N> superimpose(final int row, final int col, final Number matrix) {
+            myStore = new SuperimposedStore<>(myStore, row, col, new SingleStore<>(myStore.physical(), matrix));
             return this;
         }
 
-        public final LogicalBuilder<N> superimpose(final MatrixStore<N> aStore) {
-            myStore = new SuperimposedStore<>(myStore, 0, 0, aStore);
+        public final LogicalBuilder<N> superimpose(final MatrixStore<N> matrix) {
+            myStore = new SuperimposedStore<>(myStore, 0, 0, matrix);
             return this;
         }
 
@@ -395,26 +404,6 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
-
-        public LogicalBuilder<BigDecimal> makeIdentity(final int dimension) {
-            return new LogicalBuilder<>(new IdentityStore<>(BigDenseStore.FACTORY, dimension));
-        }
-
-        public LogicalBuilder<BigDecimal> makeSingle(final BigDecimal element) {
-            return new LogicalBuilder<>(new SingleStore<>(BigDenseStore.FACTORY, element));
-        }
-
-        public LogicalBuilder<BigDecimal> makeWrapper(final Access2D<?> access) {
-            return new LogicalBuilder<>(new WrapperStore<>(BigDenseStore.FACTORY, access));
-        }
-
-        public LogicalBuilder<BigDecimal> makeZero(final int rowsCount, final int columnsCount) {
-            return new LogicalBuilder<>(new ZeroStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount));
-        }
-
-    };
-
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         public LogicalBuilder<ComplexNumber> makeIdentity(final int dimension) {
@@ -451,6 +440,46 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         public LogicalBuilder<Double> makeZero(final int rowsCount, final int columnsCount) {
             return new LogicalBuilder<>(new ZeroStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount));
+        }
+
+    };
+
+    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+
+        public LogicalBuilder<Quaternion> makeIdentity(final int dimension) {
+            return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.QUATERNION, dimension));
+        }
+
+        public LogicalBuilder<Quaternion> makeSingle(final Quaternion element) {
+            return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.QUATERNION, element));
+        }
+
+        public LogicalBuilder<Quaternion> makeWrapper(final Access2D<?> access) {
+            return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.QUATERNION, access));
+        }
+
+        public LogicalBuilder<Quaternion> makeZero(final int rowsCount, final int columnsCount) {
+            return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.QUATERNION, rowsCount, columnsCount));
+        }
+
+    };
+
+    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+
+        public LogicalBuilder<RationalNumber> makeIdentity(final int dimension) {
+            return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.RATIONAL, dimension));
+        }
+
+        public LogicalBuilder<RationalNumber> makeSingle(final RationalNumber element) {
+            return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.RATIONAL, element));
+        }
+
+        public LogicalBuilder<RationalNumber> makeWrapper(final Access2D<?> access) {
+            return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.RATIONAL, access));
+        }
+
+        public LogicalBuilder<RationalNumber> makeZero(final int rowsCount, final int columnsCount) {
+            return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.RATIONAL, rowsCount, columnsCount));
         }
 
     };
@@ -652,7 +681,20 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
     }
 
     default double norm() {
-        return this.aggregateAll(Aggregator.NORM2).doubleValue();
+
+        final double frobeniusNorm = this.aggregateAll(Aggregator.NORM2).doubleValue();
+
+        if (this.isVector()) {
+            return frobeniusNorm;
+        } else {
+            // Bringing it closer to what the operator norm would be
+            // In case of representing a ComplexNumber or Quaternion as a matrix this will match their norms
+            return frobeniusNorm / PrimitiveFunction.SQRT.invoke(Math.min(this.countRows(), this.countColumns()));
+        }
+    }
+
+    default MatrixStore<N> operateOnAll(final UnaryFunction<N> operator) {
+        return new UnaryOperatoStore<>(this, operator);
     }
 
     /**
@@ -670,11 +712,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return new MatrixPipeline.Multiplication<>(left, this);
     }
 
-    default ElementsSupplier<N> reduceColumns(Aggregator aggregator) {
+    default ElementsSupplier<N> reduceColumns(final Aggregator aggregator) {
         return new MatrixPipeline.ColumnsReducer<>(this, aggregator);
     }
 
-    default ElementsSupplier<N> reduceRows(Aggregator aggregator) {
+    default ElementsSupplier<N> reduceRows(final Aggregator aggregator) {
         return new MatrixPipeline.RowsReducer<>(this, aggregator);
     }
 
