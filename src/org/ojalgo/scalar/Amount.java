@@ -26,33 +26,33 @@ package org.ojalgo.scalar;
  *
  * @author apete
  */
-final class ExactScale2 extends ExactDecimal<ExactScale2> {
+final class Amount extends ExactDecimal<Amount> {
 
     public static final Descriptor DESCRIPTOR = new Descriptor(2);
 
-    public static final Scalar.Factory<ExactScale2> FACTORY = new Scalar.Factory<ExactScale2>() {
+    public static final Scalar.Factory<Amount> FACTORY = new Scalar.Factory<Amount>() {
 
-        public ExactScale2 cast(final double value) {
-            return ExactScale2.valueOf(value);
+        public Amount cast(final double value) {
+            return Amount.valueOf(value);
         }
 
-        public ExactScale2 cast(final Number number) {
-            return ExactScale2.valueOf(number);
+        public Amount cast(final Number number) {
+            return Amount.valueOf(number);
         }
 
-        public ExactScale2 convert(final double value) {
-            return ExactScale2.valueOf(value);
+        public Amount convert(final double value) {
+            return Amount.valueOf(value);
         }
 
-        public ExactScale2 convert(final Number number) {
-            return ExactScale2.valueOf(number);
+        public Amount convert(final Number number) {
+            return Amount.valueOf(number);
         }
 
-        public ExactScale2 one() {
+        public Amount one() {
             return ONE;
         }
 
-        public ExactScale2 zero() {
+        public Amount zero() {
             return ZERO;
         }
 
@@ -61,26 +61,26 @@ final class ExactScale2 extends ExactDecimal<ExactScale2> {
     private static final double DOUBLE_DENOMINATOR = 100D;
     private static final long LONG_DENOMINATOR = 100L;
 
-    public static final ExactScale2 NEG = new ExactScale2(-LONG_DENOMINATOR);
-    public static final ExactScale2 ONE = new ExactScale2(LONG_DENOMINATOR);
-    public static final ExactScale2 TWO = new ExactScale2(LONG_DENOMINATOR + LONG_DENOMINATOR);
-    public static final ExactScale2 ZERO = new ExactScale2();
+    public static final Amount NEG = new Amount(-LONG_DENOMINATOR);
+    public static final Amount ONE = new Amount(LONG_DENOMINATOR);
+    public static final Amount TWO = new Amount(LONG_DENOMINATOR + LONG_DENOMINATOR);
+    public static final Amount ZERO = new Amount();
 
-    public static ExactScale2 valueOf(final double value) {
-        return new ExactScale2(Math.round(value * DOUBLE_DENOMINATOR));
+    public static Amount valueOf(final double value) {
+        return new Amount(Math.round(value * DOUBLE_DENOMINATOR));
     }
 
-    public static ExactScale2 valueOf(final Number number) {
+    public static Amount valueOf(final Number number) {
 
         if (number != null) {
 
-            if (number instanceof ExactScale2) {
+            if (number instanceof Amount) {
 
-                return (ExactScale2) number;
+                return (Amount) number;
 
             } else {
 
-                return ExactScale2.valueOf(number.doubleValue());
+                return Amount.valueOf(number.doubleValue());
             }
 
         } else {
@@ -89,22 +89,34 @@ final class ExactScale2 extends ExactDecimal<ExactScale2> {
         }
     }
 
-    public ExactScale2() {
+    public Amount() {
         super(0L);
     }
 
-    private ExactScale2(long numerator) {
+    Amount(long numerator) {
         super(numerator);
     }
 
-    @Override
-    protected ExactScale2 wrap(long numerator) {
-        return new ExactScale2(numerator);
+    public Quantity divide(Price price) {
+        return new Quantity(Quantity.DESCRIPTOR.multiply(this, price));
+    }
+
+    public Price divide(Quantity quanntity) {
+        return new Price(Price.DESCRIPTOR.multiply(this, quanntity));
+    }
+
+    public Amount multiply(Price rate) {
+        return new Amount(Amount.DESCRIPTOR.multiply(this, rate));
     }
 
     @Override
     protected Descriptor descriptor() {
         return DESCRIPTOR;
+    }
+
+    @Override
+    protected Amount wrap(long numerator) {
+        return new Amount(numerator);
     }
 
 }

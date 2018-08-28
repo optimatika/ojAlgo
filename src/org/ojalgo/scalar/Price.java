@@ -22,37 +22,37 @@
 package org.ojalgo.scalar;
 
 /**
- * price or exchange rate as in "amount = price * quatity"
+ * price or exchange rate as in "amount = price * quatity" or "amount = rate * amount"
  *
  * @author apete
  */
-final class ExactScale8 extends ExactDecimal<ExactScale8> {
+final class Price extends ExactDecimal<Price> {
 
     public static final Descriptor DESCRIPTOR = new Descriptor(8);
 
-    public static final Scalar.Factory<ExactScale8> FACTORY = new Scalar.Factory<ExactScale8>() {
+    public static final Scalar.Factory<Price> FACTORY = new Scalar.Factory<Price>() {
 
-        public ExactScale8 cast(final double value) {
-            return ExactScale8.valueOf(value);
+        public Price cast(final double value) {
+            return Price.valueOf(value);
         }
 
-        public ExactScale8 cast(final Number number) {
-            return ExactScale8.valueOf(number);
+        public Price cast(final Number number) {
+            return Price.valueOf(number);
         }
 
-        public ExactScale8 convert(final double value) {
-            return ExactScale8.valueOf(value);
+        public Price convert(final double value) {
+            return Price.valueOf(value);
         }
 
-        public ExactScale8 convert(final Number number) {
-            return ExactScale8.valueOf(number);
+        public Price convert(final Number number) {
+            return Price.valueOf(number);
         }
 
-        public ExactScale8 one() {
+        public Price one() {
             return ONE;
         }
 
-        public ExactScale8 zero() {
+        public Price zero() {
             return ZERO;
         }
 
@@ -61,26 +61,26 @@ final class ExactScale8 extends ExactDecimal<ExactScale8> {
     private static final double DOUBLE_DENOMINATOR = 100_000_000D;
     private static final long LONG_DENOMINATOR = 100_000_000L;
 
-    public static final ExactScale8 NEG = new ExactScale8(-LONG_DENOMINATOR);
-    public static final ExactScale8 ONE = new ExactScale8(LONG_DENOMINATOR);
-    public static final ExactScale8 TWO = new ExactScale8(LONG_DENOMINATOR + LONG_DENOMINATOR);
-    public static final ExactScale8 ZERO = new ExactScale8();
+    public static final Price NEG = new Price(-LONG_DENOMINATOR);
+    public static final Price ONE = new Price(LONG_DENOMINATOR);
+    public static final Price TWO = new Price(LONG_DENOMINATOR + LONG_DENOMINATOR);
+    public static final Price ZERO = new Price();
 
-    public static ExactScale8 valueOf(final double value) {
-        return new ExactScale8(Math.round(value * DOUBLE_DENOMINATOR));
+    public static Price valueOf(final double value) {
+        return new Price(Math.round(value * DOUBLE_DENOMINATOR));
     }
 
-    public static ExactScale8 valueOf(final Number number) {
+    public static Price valueOf(final Number number) {
 
         if (number != null) {
 
-            if (number instanceof ExactScale8) {
+            if (number instanceof Price) {
 
-                return (ExactScale8) number;
+                return (Price) number;
 
             } else {
 
-                return ExactScale8.valueOf(number.doubleValue());
+                return Price.valueOf(number.doubleValue());
             }
 
         } else {
@@ -89,22 +89,26 @@ final class ExactScale8 extends ExactDecimal<ExactScale8> {
         }
     }
 
-    public ExactScale8() {
+    public Price() {
         super(0L);
     }
 
-    private ExactScale8(long numerator) {
+    Price(long numerator) {
         super(numerator);
     }
 
-    @Override
-    protected ExactScale8 wrap(long numerator) {
-        return new ExactScale8(numerator);
+    public Amount multiply(Quantity quanntity) {
+        return new Amount(Amount.DESCRIPTOR.multiply(this, quanntity));
     }
 
     @Override
     protected Descriptor descriptor() {
         return DESCRIPTOR;
+    }
+
+    @Override
+    protected Price wrap(long numerator) {
+        return new Price(numerator);
     }
 
 }

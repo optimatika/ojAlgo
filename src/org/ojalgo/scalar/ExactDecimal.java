@@ -50,6 +50,38 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
             return myDenominator;
         }
 
+        protected long add(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
+            final BigDecimal deci1 = arg1.toBigDecimal();
+            final BigDecimal deci2 = arg2.toBigDecimal();
+            final BigDecimal resul = deci1.add(deci2);
+            return ExactDecimal.extractUnscaledValue(resul, myContext);
+        }
+
+        protected long divide(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
+            final BigDecimal deci1 = arg1.toBigDecimal();
+            final BigDecimal deci2 = arg2.toBigDecimal();
+            final BigDecimal resul = deci1.divide(deci2, myContext.getMathContext());
+            return ExactDecimal.extractUnscaledValue(resul, myContext);
+        }
+
+        protected long multiply(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
+            final BigDecimal deci1 = arg1.toBigDecimal();
+            final BigDecimal deci2 = arg2.toBigDecimal();
+            final BigDecimal resul = deci1.multiply(deci2);
+            return ExactDecimal.extractUnscaledValue(resul, myContext);
+        }
+
+        protected long subtract(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
+            final BigDecimal deci1 = arg1.toBigDecimal();
+            final BigDecimal deci2 = arg2.toBigDecimal();
+            final BigDecimal resul = deci1.subtract(deci2);
+            return ExactDecimal.extractUnscaledValue(resul, myContext);
+        }
+
+    }
+
+    protected static long extractUnscaledValue(final BigDecimal decimal, final NumberContext cntxt) {
+        return decimal.setScale(cntxt.getScale(), cntxt.getRoundingMode()).unscaledValue().longValueExact();
     }
 
     private transient BigDecimal myDecimal = null;

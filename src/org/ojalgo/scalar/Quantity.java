@@ -26,33 +26,33 @@ package org.ojalgo.scalar;
  *
  * @author apete
  */
-final class ExactScale6 extends ExactDecimal<ExactScale6> {
+final class Quantity extends ExactDecimal<Quantity> {
 
     public static final Descriptor DESCRIPTOR = new Descriptor(6);
 
-    public static final Scalar.Factory<ExactScale6> FACTORY = new Scalar.Factory<ExactScale6>() {
+    public static final Scalar.Factory<Quantity> FACTORY = new Scalar.Factory<Quantity>() {
 
-        public ExactScale6 cast(final double value) {
-            return ExactScale6.valueOf(value);
+        public Quantity cast(final double value) {
+            return Quantity.valueOf(value);
         }
 
-        public ExactScale6 cast(final Number number) {
-            return ExactScale6.valueOf(number);
+        public Quantity cast(final Number number) {
+            return Quantity.valueOf(number);
         }
 
-        public ExactScale6 convert(final double value) {
-            return ExactScale6.valueOf(value);
+        public Quantity convert(final double value) {
+            return Quantity.valueOf(value);
         }
 
-        public ExactScale6 convert(final Number number) {
-            return ExactScale6.valueOf(number);
+        public Quantity convert(final Number number) {
+            return Quantity.valueOf(number);
         }
 
-        public ExactScale6 one() {
+        public Quantity one() {
             return ONE;
         }
 
-        public ExactScale6 zero() {
+        public Quantity zero() {
             return ZERO;
         }
 
@@ -61,26 +61,26 @@ final class ExactScale6 extends ExactDecimal<ExactScale6> {
     private static final double DOUBLE_DENOMINATOR = 1_000_000D;
     private static final long LONG_DENOMINATOR = 1_000_000L;
 
-    public static final ExactScale6 NEG = new ExactScale6(-LONG_DENOMINATOR);
-    public static final ExactScale6 ONE = new ExactScale6(LONG_DENOMINATOR);
-    public static final ExactScale6 TWO = new ExactScale6(LONG_DENOMINATOR + LONG_DENOMINATOR);
-    public static final ExactScale6 ZERO = new ExactScale6();
+    public static final Quantity NEG = new Quantity(-LONG_DENOMINATOR);
+    public static final Quantity ONE = new Quantity(LONG_DENOMINATOR);
+    public static final Quantity TWO = new Quantity(LONG_DENOMINATOR + LONG_DENOMINATOR);
+    public static final Quantity ZERO = new Quantity();
 
-    public static ExactScale6 valueOf(final double value) {
-        return new ExactScale6(Math.round(value * DOUBLE_DENOMINATOR));
+    public static Quantity valueOf(final double value) {
+        return new Quantity(Math.round(value * DOUBLE_DENOMINATOR));
     }
 
-    public static ExactScale6 valueOf(final Number number) {
+    public static Quantity valueOf(final Number number) {
 
         if (number != null) {
 
-            if (number instanceof ExactScale6) {
+            if (number instanceof Quantity) {
 
-                return (ExactScale6) number;
+                return (Quantity) number;
 
             } else {
 
-                return ExactScale6.valueOf(number.doubleValue());
+                return Quantity.valueOf(number.doubleValue());
             }
 
         } else {
@@ -89,22 +89,26 @@ final class ExactScale6 extends ExactDecimal<ExactScale6> {
         }
     }
 
-    public ExactScale6() {
+    public Quantity() {
         super(0L);
     }
 
-    private ExactScale6(long numerator) {
+    Quantity(long numerator) {
         super(numerator);
     }
 
-    @Override
-    protected ExactScale6 wrap(long numerator) {
-        return new ExactScale6(numerator);
+    public Amount multiply(Price price) {
+        return new Amount(Amount.DESCRIPTOR.multiply(this, price));
     }
 
     @Override
     protected Descriptor descriptor() {
         return DESCRIPTOR;
+    }
+
+    @Override
+    protected Quantity wrap(long numerator) {
+        return new Quantity(numerator);
     }
 
 }

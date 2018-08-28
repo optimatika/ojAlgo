@@ -22,37 +22,37 @@
 package org.ojalgo.scalar;
 
 /**
- * money (sql type money)
+ * Corresponding to the SQL data type MONEY or DECIMAL(19,4).
  *
  * @author apete
  */
-final class ExactScale4 extends ExactDecimal<ExactScale4> {
+final class Money extends ExactDecimal<Money> {
 
     public static final Descriptor DESCRIPTOR = new Descriptor(4);
 
-    public static final Scalar.Factory<ExactScale4> FACTORY = new Scalar.Factory<ExactScale4>() {
+    public static final Scalar.Factory<Money> FACTORY = new Scalar.Factory<Money>() {
 
-        public ExactScale4 cast(final double value) {
-            return ExactScale4.valueOf(value);
+        public Money cast(final double value) {
+            return Money.valueOf(value);
         }
 
-        public ExactScale4 cast(final Number number) {
-            return ExactScale4.valueOf(number);
+        public Money cast(final Number number) {
+            return Money.valueOf(number);
         }
 
-        public ExactScale4 convert(final double value) {
-            return ExactScale4.valueOf(value);
+        public Money convert(final double value) {
+            return Money.valueOf(value);
         }
 
-        public ExactScale4 convert(final Number number) {
-            return ExactScale4.valueOf(number);
+        public Money convert(final Number number) {
+            return Money.valueOf(number);
         }
 
-        public ExactScale4 one() {
+        public Money one() {
             return ONE;
         }
 
-        public ExactScale4 zero() {
+        public Money zero() {
             return ZERO;
         }
 
@@ -61,42 +61,42 @@ final class ExactScale4 extends ExactDecimal<ExactScale4> {
     private static final double DOUBLE_DENOMINATOR = 10_000D;
     private static final long LONG_DENOMINATOR = 10_000L;
 
-    public static final ExactScale4 NEG = new ExactScale4(-LONG_DENOMINATOR);
-    public static final ExactScale4 ONE = new ExactScale4(LONG_DENOMINATOR);
-    public static final ExactScale4 TWO = new ExactScale4(LONG_DENOMINATOR + LONG_DENOMINATOR);
-    public static final ExactScale4 ZERO = new ExactScale4();
+    public static final Money NEG = new Money(-LONG_DENOMINATOR);
+    public static final Money ONE = new Money(LONG_DENOMINATOR);
+    public static final Money TWO = new Money(LONG_DENOMINATOR + LONG_DENOMINATOR);
+    public static final Money ZERO = new Money();
 
-    public static boolean isAbsolute(final ExactScale4 value) {
+    public static boolean isAbsolute(final Money value) {
         return value.isAbsolute();
     }
 
-    public static boolean isInfinite(final ExactScale4 value) {
+    public static boolean isInfinite(final Money value) {
         return false;
     }
 
-    public static boolean isNaN(final ExactScale4 value) {
+    public static boolean isNaN(final Money value) {
         return false;
     }
 
-    public static boolean isSmall(final double comparedTo, final ExactScale4 value) {
+    public static boolean isSmall(final double comparedTo, final Money value) {
         return value.isSmall(comparedTo);
     }
 
-    public static ExactScale4 valueOf(final double value) {
-        return new ExactScale4(Math.round(value * DOUBLE_DENOMINATOR));
+    public static Money valueOf(final double value) {
+        return new Money(Math.round(value * DOUBLE_DENOMINATOR));
     }
 
-    public static ExactScale4 valueOf(final Number number) {
+    public static Money valueOf(final Number number) {
 
         if (number != null) {
 
-            if (number instanceof ExactScale4) {
+            if (number instanceof Money) {
 
-                return (ExactScale4) number;
+                return (Money) number;
 
             } else {
 
-                return ExactScale4.valueOf(number.doubleValue());
+                return Money.valueOf(number.doubleValue());
             }
 
         } else {
@@ -105,17 +105,17 @@ final class ExactScale4 extends ExactDecimal<ExactScale4> {
         }
     }
 
-    public ExactScale4() {
+    public Money() {
         super(0L);
     }
 
-    private ExactScale4(final long numerator) {
+    private Money(final long numerator) {
         super(numerator);
     }
 
     @Override
-    protected ExactScale4 wrap(long numerator) {
-        return new ExactScale4(numerator);
+    protected Money wrap(long numerator) {
+        return new Money(numerator);
     }
 
     @Override
