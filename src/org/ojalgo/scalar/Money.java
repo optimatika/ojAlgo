@@ -109,7 +109,7 @@ final class Money extends ExactDecimal<Money> {
         super(0L);
     }
 
-    private Money(final long numerator) {
+    Money(final long numerator) {
         super(numerator);
     }
 

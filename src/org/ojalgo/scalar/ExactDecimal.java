@@ -42,6 +42,13 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
             myDenominator = Math.round(Math.pow(10.0, scale));
         }
 
+        public long add(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
+            final BigDecimal deci1 = arg1.toBigDecimal();
+            final BigDecimal deci2 = arg2.toBigDecimal();
+            final BigDecimal resul = deci1.add(deci2);
+            return ExactDecimal.extractUnscaledValue(resul, myContext);
+        }
+
         public NumberContext context() {
             return myContext;
         }
@@ -50,28 +57,21 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
             return myDenominator;
         }
 
-        protected long add(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
-            final BigDecimal deci1 = arg1.toBigDecimal();
-            final BigDecimal deci2 = arg2.toBigDecimal();
-            final BigDecimal resul = deci1.add(deci2);
-            return ExactDecimal.extractUnscaledValue(resul, myContext);
-        }
-
-        protected long divide(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
+        public long divide(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
             final BigDecimal deci1 = arg1.toBigDecimal();
             final BigDecimal deci2 = arg2.toBigDecimal();
             final BigDecimal resul = deci1.divide(deci2, myContext.getMathContext());
             return ExactDecimal.extractUnscaledValue(resul, myContext);
         }
 
-        protected long multiply(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
+        public long multiply(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
             final BigDecimal deci1 = arg1.toBigDecimal();
             final BigDecimal deci2 = arg2.toBigDecimal();
             final BigDecimal resul = deci1.multiply(deci2);
             return ExactDecimal.extractUnscaledValue(resul, myContext);
         }
 
-        protected long subtract(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
+        public long subtract(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
             final BigDecimal deci1 = arg1.toBigDecimal();
             final BigDecimal deci2 = arg2.toBigDecimal();
             final BigDecimal resul = deci1.subtract(deci2);
@@ -87,7 +87,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
     private transient BigDecimal myDecimal = null;
     private final long myNumerator;
 
-    ExactDecimal(final long numerator) {
+    protected ExactDecimal(final long numerator) {
 
         super();
 
