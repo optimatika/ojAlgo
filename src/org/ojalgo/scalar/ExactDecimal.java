@@ -27,6 +27,11 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
+/**
+ * To help implement exact decimal numbers with a fixed number of decimal places (fixed scale).
+ *
+ * @author apete
+ */
 public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number implements Scalar<S>, Enforceable<S> {
 
     public static final class Descriptor {

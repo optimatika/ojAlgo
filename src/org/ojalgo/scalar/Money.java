@@ -22,11 +22,11 @@
 package org.ojalgo.scalar;
 
 /**
- * Corresponding to the SQL data type MONEY or DECIMAL(19,4).
+ * An example {@link ExactDecimal} implementation. Corresponding to the SQL data type MONEY or DECIMAL(19,4).
  *
  * @author apete
  */
-final class Money extends ExactDecimal<Money> {
+public final class Money extends ExactDecimal<Money> {
 
     public static final Descriptor DESCRIPTOR = new Descriptor(4);
 
@@ -114,13 +114,13 @@ final class Money extends ExactDecimal<Money> {
     }
 
     @Override
-    protected Money wrap(long numerator) {
-        return new Money(numerator);
+    protected Descriptor descriptor() {
+        return DESCRIPTOR;
     }
 
     @Override
-    protected Descriptor descriptor() {
-        return DESCRIPTOR;
+    protected Money wrap(long numerator) {
+        return new Money(numerator);
     }
 
 }
