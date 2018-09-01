@@ -22,7 +22,7 @@
 package org.ojalgo.scalar;
 
 /**
- * An example {@link ExactDecimal} implementation. Corresponding to the SQL data type MONEY or DECIMAL(19,4).
+ * An example {@link ExactDecimal} implementation corresponding to the SQL data type MONEY or DECIMAL(19,4).
  *
  * @author apete
  */
