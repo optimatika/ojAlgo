@@ -182,4 +182,8 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     N get(long[] ref);
 
+    default Iterable<MatrixView<N>> matrices() {
+        return MatrixView.makeIterable(this);
+    }
+
 }
