@@ -30,8 +30,18 @@ import java.io.IOException;
 import org.ojalgo.array.ArrayAnyD;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive32Array;
+import org.ojalgo.structure.Access2D;
 
+/**
+ * Reads IDX-files as described at <a href="http://yann.lecun.com/exdb/mnist/">THE MNIST DATABASE</a> page.
+ * The elements/pixels/bytes are written to the ArrayAnyD instance in order as they're read from the file. The
+ * indexing order then needs to be reversed, and that causes the images to be transposed.
+ */
 public abstract class IDX {
+
+    private static final double ZERO = 0D;
+    private static final double ONE_THIRD = 256D / 3D;
+    private static final double TWO_THIRDS = 512D / 3D;
 
     public static ArrayAnyD<Double> parse(File file) {
         return IDX.parse(file, Primitive32Array.FACTORY);
@@ -43,7 +53,7 @@ public abstract class IDX {
 
             input.read();
             input.read();
-            int elementType = input.read();
+            int type = input.read();
             int rank = input.read();
 
             long[] structure = new long[rank];
@@ -53,14 +63,8 @@ public abstract class IDX {
 
             ArrayAnyD<Double> data = ArrayAnyD.factory(factory).makeZero(structure);
 
-            // 0x08: unsigned byte
-            // 0x09: signed byte
-            // 0x0B: short (2 bytes)
-            // 0x0C: int (4 bytes)
-            // 0x0D: float (4 bytes)
-            // 0x0E: double (8 bytes)
             for (long i = 0, limit = data.count(); i < limit; i++) {
-                switch (elementType) {
+                switch (type) {
                 case 0x08:
                     data.set(i, input.readUnsignedByte());
                     break;
@@ -89,6 +93,27 @@ public abstract class IDX {
         } catch (IOException exception) {
 
             return null;
+        }
+    }
+
+    /**
+     * Taking into account that the images are transposed
+     */
+    public static void print(Access2D<?> image, BasicLogger.Printer printer) {
+        for (int col = 0; col < image.countColumns(); col++) {
+            for (int row = 0; row < image.countRows(); row++) {
+                double gray = image.doubleValue(row, col);
+                if (gray == ZERO) {
+                    printer.print(" ");
+                } else if (gray < ONE_THIRD) {
+                    printer.print("~");
+                } else if (gray < TWO_THIRDS) {
+                    printer.print("+");
+                } else {
+                    printer.print("X");
+                }
+            }
+            printer.println();
         }
     }
 
