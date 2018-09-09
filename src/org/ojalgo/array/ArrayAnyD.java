@@ -75,8 +75,12 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
             return myDelegate.makeFilled(StructureAnyD.count(structure), supplier).wrapInArrayAnyD(structure);
         }
 
-        public final ArrayAnyD<N> makeZero(final long... structure) {
+        public final ArrayAnyD<N> makeSparse(final long... structure) {
             return myDelegate.makeStructuredZero(structure).wrapInArrayAnyD(structure);
+        }
+
+        public final ArrayAnyD<N> makeZero(final long... structure) {
+            return myDelegate.makeToBeFilled(structure).wrapInArrayAnyD(structure);
         }
 
         @Override

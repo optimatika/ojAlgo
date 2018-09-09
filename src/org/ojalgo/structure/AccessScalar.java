@@ -27,7 +27,7 @@ public interface AccessScalar<N extends Number> {
      * @see Number#byteValue()
      */
     default byte byteValue() {
-        return this.get().byteValue();
+        return (byte) this.shortValue();
     }
 
     /**
@@ -41,7 +41,7 @@ public interface AccessScalar<N extends Number> {
      * @see Number#floatValue()
      */
     default float floatValue() {
-        return this.get().floatValue();
+        return (float) this.doubleValue();
     }
 
     N get();
@@ -58,21 +58,21 @@ public interface AccessScalar<N extends Number> {
      * @see Number#intValue()
      */
     default int intValue() {
-        return this.get().intValue();
+        return (int) this.longValue();
     }
 
     /**
      * @see Number#longValue()
      */
     default long longValue() {
-        return this.get().longValue();
+        return Math.round(this.doubleValue());
     }
 
     /**
      * @see Number#shortValue()
      */
     default short shortValue() {
-        return this.get().shortValue();
+        return (short) this.intValue();
     }
 
 }
