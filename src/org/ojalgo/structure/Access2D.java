@@ -518,13 +518,22 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         };
     }
 
+    default byte byteValue(long index) {
+        final long structure = this.countRows();
+        return this.byteValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
+    }
+
+    default byte byteValue(long row, long col) {
+        return (byte) this.shortValue(row, col);
+    }
+
     default Iterable<ColumnView<N>> columns() {
         return ColumnView.makeIterable(this);
     }
 
     default double doubleValue(final long index) {
-        final long tmpStructure = this.countRows();
-        return this.doubleValue(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure));
+        final long structure = this.countRows();
+        return this.doubleValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
     }
 
     /**
@@ -540,6 +549,15 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         return new Access2D.ElementView<>(Access1D.super.elements(), this.countRows());
     }
 
+    default float floatValue(long index) {
+        final long structure = this.countRows();
+        return this.floatValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
+    }
+
+    default float floatValue(long row, long col) {
+        return (float) this.doubleValue(row, col);
+    }
+
     default N get(final long index) {
         final long tmpStructure = this.countRows();
         return this.get(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure));
@@ -547,8 +565,35 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     N get(long row, long col);
 
+    default int intValue(long index) {
+        final long structure = this.countRows();
+        return this.intValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
+    }
+
+    default int intValue(long row, long col) {
+        return (int) this.longValue(row, col);
+    }
+
+    default long longValue(long index) {
+        final long structure = this.countRows();
+        return this.longValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
+    }
+
+    default long longValue(long row, long col) {
+        return Math.round(this.doubleValue(row, col));
+    }
+
     default Iterable<RowView<N>> rows() {
         return RowView.makeIterable(this);
+    }
+
+    default short shortValue(long index) {
+        final long structure = this.countRows();
+        return this.shortValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
+    }
+
+    default short shortValue(long row, long col) {
+        return (short) this.intValue(row, col);
     }
 
     default double[][] toRawCopy2D() {

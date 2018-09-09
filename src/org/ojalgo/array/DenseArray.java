@@ -51,30 +51,30 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
         @Override
         final DenseArray<N> makeStructuredZero(final long... structure) {
 
-            final long tmpTotal = StructureAnyD.count(structure);
+            final long total = StructureAnyD.count(structure);
 
-            if (tmpTotal > this.getCapacityLimit()) {
+            if (total > this.getCapacityLimit()) {
 
                 throw new IllegalArgumentException();
 
             } else {
 
-                return this.make(tmpTotal);
+                return this.make(total);
             }
         }
 
         @Override
         final DenseArray<N> makeToBeFilled(final long... structure) {
 
-            final long tmpTotal = StructureAnyD.count(structure);
+            final long total = StructureAnyD.count(structure);
 
-            if (tmpTotal > this.getCapacityLimit()) {
+            if (total > this.getCapacityLimit()) {
 
                 throw new IllegalArgumentException();
 
             } else {
 
-                return this.make(tmpTotal);
+                return this.make(total);
             }
         }
 

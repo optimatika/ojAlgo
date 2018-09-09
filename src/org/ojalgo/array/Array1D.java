@@ -90,8 +90,12 @@ public final class Array1D<N extends Number> extends AbstractList<N>
             return myDelegate.makeFilled(count, supplier).wrapInArray1D();
         }
 
+        public final Array1D<N> makeSparse(final long count) {
+            return myDelegate.makeStructuredZero(count).wrapInArray1D();
+        }
+
         public final Array1D<N> makeZero(final long count) {
-            return myDelegate.makeZero(count).wrapInArray1D();
+            return myDelegate.makeToBeFilled(count).wrapInArray1D();
         }
 
         @Override

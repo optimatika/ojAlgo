@@ -367,6 +367,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         Structure1D.loopMatching(this, y, i -> y.add(i, a * this.doubleValue(i)));
     }
 
+    default byte byteValue(long index) {
+        return (byte) this.shortValue(index);
+    }
+
     /**
      * Will calculate and return the dot product of this 1D-structure and another input 1D-vector.
      *
@@ -389,14 +393,30 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         return new Access1D.ElementView<>(this);
     }
 
+    default float floatValue(long index) {
+        return (float) this.doubleValue(index);
+    }
+
     N get(long index);
+
+    default int intValue(long index) {
+        return (int) this.longValue(index);
+    }
 
     default Iterator<N> iterator() {
         return new Iterator1D<>(this);
     }
 
+    default long longValue(long index) {
+        return Math.round(this.doubleValue(index));
+    }
+
     default ElementView1D<N, ?> nonzeros() {
         return this.elements();
+    }
+
+    default short shortValue(long index) {
+        return (short) this.intValue(index);
     }
 
     default BaseStream<N, ? extends BaseStream<N, ?>> stream(final boolean parallel) {

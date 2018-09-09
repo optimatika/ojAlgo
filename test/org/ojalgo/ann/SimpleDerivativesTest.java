@@ -21,7 +21,7 @@
  */
 package org.ojalgo.ann;
 
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
+import static org.ojalgo.ann.ANN.Activator.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -49,17 +49,17 @@ public class SimpleDerivativesTest extends BackPropagationExample {
     @Test
     public void testDerivatives() {
 
-        for (ArtificialNeuralNetwork.Activator activator : ArtificialNeuralNetwork.Activator.values()) {
+        for (ANN.Activator activator : ANN.Activator.values()) {
 
             if (activator == SOFTMAX) {
-                this.doTestDerivatives(activator, ArtificialNeuralNetwork.Error.CROSS_ENTROPY);
+                this.doTestDerivatives(activator, ANN.Error.CROSS_ENTROPY);
             } else {
-                this.doTestDerivatives(activator, ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE);
+                this.doTestDerivatives(activator, ANN.Error.HALF_SQUARED_DIFFERENCE);
             }
         }
     }
 
-    private void doTestDerivatives(ArtificialNeuralNetwork.Activator activator, ArtificialNeuralNetwork.Error error) {
+    private void doTestDerivatives(ANN.Activator activator, ANN.Error error) {
 
         for (Data triplet : this.getTestCases()) {
 
