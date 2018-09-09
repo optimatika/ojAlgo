@@ -181,8 +181,12 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return tmpDelegate.wrapInArray2D(rows);
         }
 
-        public final Array2D<N> makeZero(final long rows, final long columns) {
+        public final Array2D<N> makeSparse(final long rows, final long columns) {
             return myDelegate.makeStructuredZero(rows, columns).wrapInArray2D(rows);
+        }
+
+        public final Array2D<N> makeZero(final long rows, final long columns) {
+            return myDelegate.makeToBeFilled(rows, columns).wrapInArray2D(rows);
         }
 
         public final Array2D<N> rows(final Access1D<?>... source) {

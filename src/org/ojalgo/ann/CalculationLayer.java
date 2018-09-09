@@ -23,7 +23,7 @@ package org.ojalgo.ann;
 
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
+import org.ojalgo.ann.ANN.Activator;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -33,12 +33,14 @@ import org.ojalgo.structure.Structure2D;
 
 final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double>, PrimitiveDenseStore> {
 
-    private ArtificialNeuralNetwork.Activator myActivator;
+    private static final Uniform RANDOM = new Uniform(-1, 2);
+
+    private ANN.Activator myActivator;
     private final PrimitiveDenseStore myBias;
     private final PrimitiveDenseStore myOutput;
     private final PrimitiveDenseStore myWeights;
 
-    CalculationLayer(int numberOfInputs, int numberOfOutputs, ArtificialNeuralNetwork.Activator activator) {
+    CalculationLayer(int numberOfInputs, int numberOfOutputs, ANN.Activator activator) {
 
         super();
 
@@ -151,16 +153,12 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
 
     void randomise() {
 
-        //        double location = myWeights.countColumns() / myWeights.countRows();
-        //        double scale = PrimitiveFunction.SQRT.invoke(location);
-        Uniform generator = new Uniform(-1, 2);
+        myWeights.fillAll(RANDOM);
 
-        myWeights.fillAll(generator);
-
-        myBias.fillAll(generator);
+        myBias.fillAll(RANDOM);
     }
 
-    void setActivator(Activator activator) {
+    void setActivator(ANN.Activator activator) {
         myActivator = activator;
     }
 

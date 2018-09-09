@@ -21,8 +21,8 @@
  */
 package org.ojalgo.ann;
 
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
+import static org.ojalgo.ann.ANN.Activator.*;
+import static org.ojalgo.ann.ANN.Error.*;
 
 import java.util.Collections;
 import java.util.List;

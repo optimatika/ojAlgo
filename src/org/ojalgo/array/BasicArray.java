@@ -86,43 +86,39 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
         @Override
         final BasicArray<N> makeStructuredZero(final long... structure) {
-            // Typically sparse, but if very small then dense
-            // If very large then also segmented
 
-            final long tmpTotal = StructureAnyD.count(structure);
+            final long total = StructureAnyD.count(structure);
 
-            final DenseCapacityStrategy<N> tmpStrategy = this.strategy();
+            final DenseCapacityStrategy<N> strategy = this.strategy();
 
-            if (tmpTotal > SPARSE_SEGMENTATION_LIMIT) {
+            if (total > SPARSE_SEGMENTATION_LIMIT) {
 
                 return this.makeSegmented(structure);
 
-            } else if (tmpStrategy.isChunked(tmpTotal)) {
+            } else if (strategy.isChunked(total)) {
 
-                return new SparseArray<>(tmpTotal, tmpStrategy);
+                return new SparseArray<>(total, strategy);
 
             } else {
 
-                return tmpStrategy.make(tmpTotal);
+                return strategy.make(total);
             }
-
         }
 
         @Override
         final BasicArray<N> makeToBeFilled(final long... structure) {
-            // Always dense, but maybe segmented
 
-            final long tmpTotal = StructureAnyD.count(structure);
+            final long total = StructureAnyD.count(structure);
 
-            final DenseCapacityStrategy<N> tmpStrategy = this.strategy();
+            final DenseCapacityStrategy<N> strategy = this.strategy();
 
-            if (tmpStrategy.isSegmented(tmpTotal)) {
+            if (strategy.isSegmented(total)) {
 
-                return tmpStrategy.makeSegmented(tmpTotal);
+                return strategy.makeSegmented(total);
 
             } else {
 
-                return tmpStrategy.make(tmpTotal);
+                return strategy.make(total);
             }
         }
 
