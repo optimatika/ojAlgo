@@ -131,7 +131,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
             }
 
             // If m == l, d[l] is an eigenvalue, otherwise, iterate.
-            if (m > l) {
+            if ((m > l) && ((l + 1) < size)) {
                 do {
 
                     // Compute implicit shift
@@ -186,11 +186,9 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
             e[l] = ZERO;
 
         } // End main loop - l
-
     }
 
     private double[] d;
-
     private double[] e;
     private transient MatrixStore<N> myInverse;
     private final TridiagonalDecomposition<N> myTridiagonal;
