@@ -39,17 +39,13 @@ import org.ojalgo.structure.Access2D;
  */
 public abstract class IDX {
 
-    private static final double ZERO = 0D;
-    private static final double ONE_THIRD = 256D / 3D;
-    private static final double TWO_THIRDS = 512D / 3D;
-
-    public static ArrayAnyD<Double> parse(File file) {
-        return IDX.parse(file, Primitive32Array.FACTORY);
+    public static ArrayAnyD<Double> parse(String filePath) {
+        return IDX.parse(filePath, Primitive32Array.FACTORY);
     }
 
-    public static ArrayAnyD<Double> parse(File file, DenseArray.Factory<Double> factory) {
+    public static ArrayAnyD<Double> parse(String filePath, DenseArray.Factory<Double> arrayFactory) {
 
-        try (DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
+        try (DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(filePath))))) {
 
             input.read();
             input.read();
@@ -61,7 +57,7 @@ public abstract class IDX {
                 structure[rank - 1 - i] = input.readInt();
             }
 
-            ArrayAnyD<Double> data = ArrayAnyD.factory(factory).makeZero(structure);
+            ArrayAnyD<Double> data = ArrayAnyD.factory(arrayFactory).makeZero(structure);
 
             for (long i = 0, limit = data.count(); i < limit; i++) {
                 switch (type) {
@@ -97,23 +93,44 @@ public abstract class IDX {
     }
 
     /**
-     * Taking into account that the images are transposed
+     * Taking into account that the images are transposed, and assumes the values are between 0 and 255.
      */
     public static void print(Access2D<?> image, BasicLogger.Printer printer) {
-        for (int col = 0; col < image.countColumns(); col++) {
-            for (int row = 0; row < image.countRows(); row++) {
-                double gray = image.doubleValue(row, col);
-                if (gray == ZERO) {
-                    printer.print(" ");
-                } else if (gray < ONE_THIRD) {
-                    printer.print("~");
-                } else if (gray < TWO_THIRDS) {
-                    printer.print("+");
-                } else {
-                    printer.print("X");
+        IDX.print(image, printer, true, 255D);
+    }
+
+    public static void print(Access2D<?> image, BasicLogger.Printer printer, boolean transpose, double maxValue) {
+
+        double oneThird = maxValue / 3D;
+        double twoThirds = (2D * maxValue) / 3D;
+
+        long numbRows = (int) image.countRows();
+        long numbCols = (int) image.countColumns();
+
+        if (transpose) {
+            for (int j = 0; j < numbCols; j++) {
+                for (int i = 0; i < numbRows; i++) {
+                    IDX.printPixel(image.doubleValue(i, j), printer, oneThird, twoThirds);
                 }
+                printer.println();
             }
-            printer.println();
+        } else {
+            for (int i = 0; i < numbRows; i++) {
+                for (int j = 0; j < numbCols; j++) {
+                    IDX.printPixel(image.doubleValue(i, j), printer, oneThird, twoThirds);
+                }
+                printer.println();
+            }
+        }
+    }
+
+    private static void printPixel(double gray, BasicLogger.Printer printer, double oneThird, double twoThirds) {
+        if (gray < oneThird) {
+            printer.print(" ");
+        } else if (gray < twoThirds) {
+            printer.print("+");
+        } else {
+            printer.print("X");
         }
     }
 

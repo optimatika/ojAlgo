@@ -31,12 +31,12 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterator<Matri
         return new MatrixView<>(access).iterable;
     }
 
+    private final long myColumnsCount;
+    private final long myCount;
     private final AccessAnyD<N> myDelegateAnyD;
+    private final long myLastOffset;
     private long myOffset;
-    private long myLastOffset;
-    private long myRowsCount;
-    private long myColumnsCount;
-    private long myCount;
+    private final long myRowsCount;
 
     final Iterable<MatrixView<N>> iterable = () -> MatrixView.this;
 
@@ -44,7 +44,7 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterator<Matri
         this(access, -1L);
     }
 
-    MatrixView(final AccessAnyD<N> access, final long matrix) {
+    MatrixView(final AccessAnyD<N> access, final long index) {
 
         super();
 
@@ -54,42 +54,12 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterator<Matri
         myColumnsCount = access.count(1);
         myCount = myRowsCount * myColumnsCount;
 
-        myOffset = matrix * myCount;
-        myLastOffset = myDelegateAnyD.count() - myOffset;
+        myOffset = index * myCount;
+        myLastOffset = myDelegateAnyD.count() - myCount;
     }
 
     public long count() {
         return myCount;
-    }
-
-    public boolean hasNext() {
-        return myOffset < myLastOffset;
-    }
-
-    public boolean hasPrevious() {
-        return myOffset > 0L;
-    }
-
-    public MatrixView<N> next() {
-        myOffset += myCount;
-        return this;
-    }
-
-    public MatrixView<N> previous() {
-        myOffset -= myCount;
-        return this;
-    }
-
-    public final void remove() {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
-    }
-
-    public long matrix() {
-        return myOffset / myCount;
-    }
-
-    protected void setMatrix(final long matrix) {
-        myOffset = matrix * myCount;
     }
 
     public long countColumns() {
@@ -106,6 +76,39 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterator<Matri
 
     public N get(long row, long col) {
         return myDelegateAnyD.get(myOffset + Structure2D.index(myRowsCount, row, col));
+    }
+
+    public boolean hasNext() {
+        return myOffset < myLastOffset;
+    }
+
+    public boolean hasPrevious() {
+        return myOffset > 0L;
+    }
+
+    /**
+     * @return The index of the matrix (which matrix are we currently viewing).
+     */
+    public long index() {
+        return myOffset / myCount;
+    }
+
+    public MatrixView<N> next() {
+        myOffset += myCount;
+        return this;
+    }
+
+    public MatrixView<N> previous() {
+        myOffset -= myCount;
+        return this;
+    }
+
+    public final void remove() {
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+    }
+
+    protected void setIndex(final long matrix) {
+        myOffset = matrix * myCount;
     }
 
 }
