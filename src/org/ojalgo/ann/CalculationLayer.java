@@ -151,7 +151,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
 
     void randomise() {
 
-        double magnitude = ONE / Math.sqrt(myWeights.countRows());
+        double magnitude = TWO / Math.sqrt(myWeights.countRows());
 
         Uniform randomiser = new Uniform(-magnitude, 2 * magnitude);
 
