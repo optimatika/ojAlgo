@@ -41,7 +41,7 @@ public class DesignTestANN extends ANNTest {
         PrimitiveDenseStore arguments = PrimitiveDenseStore.FACTORY.row(1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0);
         PrimitiveDenseStore results = PrimitiveDenseStore.FACTORY.row(0.02364054, 0.06426166, 0.1746813, 0.474833, 0.02364054, 0.06426166, 0.1746813);
 
-        Unary function = ArtificialNeuralNetwork.Activator.SOFTMAX.getFunction(arguments);
+        Unary function = ANN.Activator.SOFTMAX.getFunction(arguments);
 
         for (int i = 0; i < results.count(); i++) {
             double expected = results.doubleValue(i);

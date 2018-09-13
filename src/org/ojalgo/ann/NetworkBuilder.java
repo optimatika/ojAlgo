@@ -40,7 +40,7 @@ import org.ojalgo.structure.Structure2D;
 public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
     private final ArtificialNeuralNetwork myANN;
-    private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
+    private ANN.Error myError = ANN.Error.HALF_SQUARED_DIFFERENCE;
     private final PrimitiveDenseStore[] myLayerValues;
     private double myLearningRate = 1.0;
 
@@ -65,19 +65,19 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
      * @param layer 0-based index among the calculation layers (excluding the input layer)
      * @param activator The activator function to use
      */
-    public NetworkBuilder activator(int layer, ArtificialNeuralNetwork.Activator activator) {
+    public NetworkBuilder activator(int layer, ANN.Activator activator) {
         myANN.getLayer(layer).setActivator(activator);
         return this;
     }
 
-    public NetworkBuilder activators(ArtificialNeuralNetwork.Activator activator) {
+    public NetworkBuilder activators(ANN.Activator activator) {
         for (int i = 0, limit = myANN.countCalculationLayers(); i < limit; i++) {
             myANN.getLayer(i).setActivator(activator);
         }
         return this;
     }
 
-    public NetworkBuilder activators(ArtificialNeuralNetwork.Activator... activators) {
+    public NetworkBuilder activators(ANN.Activator... activators) {
         for (int i = 0, limit = activators.length; i < limit; i++) {
             myANN.getLayer(i).setActivator(activators[i]);
         }
@@ -117,7 +117,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return true;
     }
 
-    public NetworkBuilder error(ArtificialNeuralNetwork.Error error) {
+    public NetworkBuilder error(ANN.Error error) {
         myError = error;
         return this;
     }

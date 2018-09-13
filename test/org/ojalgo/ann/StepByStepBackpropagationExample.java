@@ -21,8 +21,8 @@
  */
 package org.ojalgo.ann;
 
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
+import static org.ojalgo.ann.ANN.Activator.*;
+import static org.ojalgo.ann.ANN.Error.*;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.util.Collections;
@@ -54,6 +54,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
 
         NumberContext precision = this.precision();
         Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
+
         ArtificialNeuralNetwork.Error errorMeassure = HALF_SQUARED_DIFFERENCE;
 
         NetworkBuilder builder = this.getInitialNetwork();

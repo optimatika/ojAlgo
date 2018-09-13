@@ -21,17 +21,14 @@
  */
 package org.ojalgo.ann;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.BasicFunction;
-import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Structure2D;
 
-public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<Access1D<Double>, MatrixStore<Double>> {
+public abstract class ANN {
 
     /**
      * https://en.wikipedia.org/wiki/Activation_function
@@ -39,7 +36,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
      * @author apete
      */
     public static enum Activator {
-    
+
     /**
      * (-,+)
      */
@@ -67,32 +64,32 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
      * [-1,1]
      */
     TANH(args -> (PrimitiveFunction.TANH), arg -> ONE - (arg * arg), true);
-    
+
         private final PrimitiveFunction.Unary myDerivativeInTermsOfOutput;
         private final ActivatorFunctionFactory myFunction;
         private final boolean mySingleFolded;
-    
+
         Activator(ActivatorFunctionFactory function, PrimitiveFunction.Unary derivativeInTermsOfOutput, boolean singleFolded) {
             myFunction = function;
             myDerivativeInTermsOfOutput = derivativeInTermsOfOutput;
             mySingleFolded = singleFolded;
         }
-    
+
         PrimitiveFunction.Unary getDerivativeInTermsOfOutput() {
             return myDerivativeInTermsOfOutput;
         }
-    
+
         PrimitiveFunction.Unary getFunction(PrimitiveDenseStore arguments) {
             return myFunction.make(arguments);
         }
-    
+
         boolean isSingleFolded() {
             return mySingleFolded;
         }
     }
 
     public static enum Error implements PrimitiveFunction.Binary {
-    
+
         /**
          * Currently this can only be used in in combination with {@link Activator#SOFTMAX} in the final
          * layer. All other usage will give incorrect network training.
@@ -102,15 +99,15 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
          *
          */
         HALF_SQUARED_DIFFERENCE((target, current) -> HALF * (target - current) * (target - current), (target, current) -> (current - target));
-    
+
         private final PrimitiveFunction.Binary myDerivative;
         private final PrimitiveFunction.Binary myFunction;
-    
+
         Error(PrimitiveFunction.Binary function, PrimitiveFunction.Binary derivative) {
             myFunction = function;
             myDerivative = derivative;
         }
-    
+
         public double invoke(Access1D<?> target, Access1D<?> current) {
             int limit = (int) Math.min(target.count(), current.count());
             double retVal = ZERO;
@@ -119,122 +116,21 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
             }
             return retVal;
         }
-    
+
         public double invoke(double target, double current) {
             return myFunction.invoke(target, current);
         }
-    
+
         PrimitiveFunction.Binary getDerivative() {
             return myDerivative;
         }
-    
+
     }
 
     static interface ActivatorFunctionFactory {
-    
+
         PrimitiveFunction.Unary make(PrimitiveDenseStore arguments);
-    
-    }
 
-    public static NetworkBuilder builder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
-        return new NetworkBuilder(numberOfInputNodes, nodesPerCalculationLayer);
-    }
-
-    private final CalculationLayer[] myLayers;
-
-    ArtificialNeuralNetwork(int inputs, int[] layers) {
-        super();
-        myLayers = new CalculationLayer[layers.length];
-        int tmpIn = inputs;
-        int tmpOut = inputs;
-        for (int i = 0; i < layers.length; i++) {
-            tmpIn = tmpOut;
-            tmpOut = layers[i];
-            myLayers[i] = new CalculationLayer(tmpIn, tmpOut, ArtificialNeuralNetwork.Activator.SIGMOID);
-        }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof ArtificialNeuralNetwork)) {
-            return false;
-        }
-        ArtificialNeuralNetwork other = (ArtificialNeuralNetwork) obj;
-        if (!Arrays.equals(myLayers, other.myLayers)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = (prime * result) + Arrays.hashCode(myLayers);
-        return result;
-    }
-
-    public MatrixStore<Double> invoke(Access1D<Double> input) {
-        MatrixStore<Double> retVal = null;
-        for (int i = 0, limit = myLayers.length; i < limit; i++) {
-            retVal = myLayers[i].invoke(input);
-            input = retVal;
-        }
-        return retVal;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder tmpBuilder = new StringBuilder();
-        tmpBuilder.append("ArtificialNeuralNetwork [Layers=");
-        tmpBuilder.append(Arrays.toString(myLayers));
-        tmpBuilder.append("]");
-        return tmpBuilder.toString();
-    }
-
-    int countCalculationLayers() {
-        return myLayers.length;
-    }
-
-    double getBias(int layer, int output) {
-        return myLayers[layer].getBias(output);
-    }
-
-    CalculationLayer getLayer(int index) {
-        return myLayers[index];
-    }
-
-    PrimitiveDenseStore getOutput(int layer) {
-        return myLayers[layer].getOutput();
-    }
-
-    double getWeight(int layer, int input, int output) {
-        return myLayers[layer].getWeight(input, output);
-    }
-
-    List<MatrixStore<Double>> getWeights() {
-        final ArrayList<MatrixStore<Double>> retVal = new ArrayList<>();
-        for (int i = 0; i < myLayers.length; i++) {
-            retVal.add(myLayers[i].getLogicalWeights());
-        }
-        return retVal;
-    }
-
-    Structure2D[] structure() {
-
-        Structure2D[] retVal = new Structure2D[myLayers.length];
-
-        for (int l = 0; l < retVal.length; l++) {
-            retVal[l] = myLayers[l].getStructure();
-        }
-
-        return retVal;
     }
 
 }
