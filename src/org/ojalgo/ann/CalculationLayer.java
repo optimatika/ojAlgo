@@ -33,12 +33,12 @@ import org.ojalgo.structure.Structure2D;
 
 final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double>, PrimitiveDenseStore> {
 
-    private ANN.Activator myActivator;
+    private ArtificialNeuralNetwork.Activator myActivator;
     private final PrimitiveDenseStore myBias;
     private final PrimitiveDenseStore myOutput;
     private final PrimitiveDenseStore myWeights;
 
-    CalculationLayer(int numberOfInputs, int numberOfOutputs, ANN.Activator activator) {
+    CalculationLayer(int numberOfInputs, int numberOfOutputs, ArtificialNeuralNetwork.Activator activator) {
 
         super();
 
@@ -160,7 +160,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         myBias.fillAll(randomiser);
     }
 
-    void setActivator(ANN.Activator activator) {
+    void setActivator(ArtificialNeuralNetwork.Activator activator) {
         myActivator = activator;
     }
 
