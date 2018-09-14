@@ -21,17 +21,124 @@
  */
 package org.ojalgo.ann;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.function.BasicFunction;
+import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
 public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<Access1D<Double>, MatrixStore<Double>> {
+
+    /**
+     * https://en.wikipedia.org/wiki/Activation_function
+     *
+     * @author apete
+     */
+    public static enum Activator {
+
+    /**
+     * (-,+)
+     */
+    IDENTITY(args -> (arg -> arg), arg -> ONE, true),
+    /**
+     * ReLU: [0,+)
+     */
+    RECTIFIER(args -> (arg -> Math.max(ZERO, arg)), arg -> arg > ZERO ? ONE : ZERO, true),
+    /**
+     * [0,1]
+     */
+    SIGMOID(args -> (PrimitiveFunction.LOGISTIC), arg -> arg * (ONE - arg), true),
+    /**
+     * [0,1] <br>
+     * Currently this can only be used in the final layer in combination with {@link Error#CROSS_ENTROPY}. All
+     * other usage will give incorrect network training.
+     */
+    SOFTMAX(args -> {
+        PrimitiveDenseStore parts = args.copy();
+        parts.modifyAll(PrimitiveFunction.EXP);
+        final double total = parts.aggregateAll(Aggregator.SUM);
+        return arg -> PrimitiveFunction.EXP.invoke(arg) / total;
+    }, arg -> ONE, false),
+    /**
+     * [-1,1]
+     */
+    TANH(args -> (PrimitiveFunction.TANH), arg -> ONE - (arg * arg), true);
+
+        private final PrimitiveFunction.Unary myDerivativeInTermsOfOutput;
+        private final ActivatorFunctionFactory myFunction;
+        private final boolean mySingleFolded;
+
+        Activator(ActivatorFunctionFactory function, PrimitiveFunction.Unary derivativeInTermsOfOutput, boolean singleFolded) {
+            myFunction = function;
+            myDerivativeInTermsOfOutput = derivativeInTermsOfOutput;
+            mySingleFolded = singleFolded;
+        }
+
+        PrimitiveFunction.Unary getDerivativeInTermsOfOutput() {
+            return myDerivativeInTermsOfOutput;
+        }
+
+        PrimitiveFunction.Unary getFunction(PrimitiveDenseStore arguments) {
+            return myFunction.make(arguments);
+        }
+
+        boolean isSingleFolded() {
+            return mySingleFolded;
+        }
+    }
+
+    public static enum Error implements PrimitiveFunction.Binary {
+
+        /**
+         * Currently this can only be used in in combination with {@link Activator#SOFTMAX} in the final
+         * layer. All other usage will give incorrect network training.
+         */
+        CROSS_ENTROPY((target, current) -> -target * Math.log(current), (target, current) -> (current - target)),
+        /**
+         *
+         */
+        HALF_SQUARED_DIFFERENCE((target, current) -> HALF * (target - current) * (target - current), (target, current) -> (current - target));
+
+        private final PrimitiveFunction.Binary myDerivative;
+        private final PrimitiveFunction.Binary myFunction;
+
+        Error(PrimitiveFunction.Binary function, PrimitiveFunction.Binary derivative) {
+            myFunction = function;
+            myDerivative = derivative;
+        }
+
+        public double invoke(Access1D<?> target, Access1D<?> current) {
+            int limit = (int) Math.min(target.count(), current.count());
+            double retVal = ZERO;
+            for (int i = 0; i < limit; i++) {
+                retVal += myFunction.invoke(target.doubleValue(i), current.doubleValue(i));
+            }
+            return retVal;
+        }
+
+        public double invoke(double target, double current) {
+            return myFunction.invoke(target, current);
+        }
+
+        PrimitiveFunction.Binary getDerivative() {
+            return myDerivative;
+        }
+
+    }
+
+    static interface ActivatorFunctionFactory {
+
+        PrimitiveFunction.Unary make(PrimitiveDenseStore arguments);
+
+    }
 
     public static NetworkBuilder builder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
         return new NetworkBuilder(numberOfInputNodes, nodesPerCalculationLayer);
@@ -47,7 +154,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         for (int i = 0; i < layers.length; i++) {
             tmpIn = tmpOut;
             tmpOut = layers[i];
-            myLayers[i] = new CalculationLayer(tmpIn, tmpOut, ANN.Activator.SIGMOID);
+            myLayers[i] = new CalculationLayer(tmpIn, tmpOut, ArtificialNeuralNetwork.Activator.SIGMOID);
         }
     }
 
