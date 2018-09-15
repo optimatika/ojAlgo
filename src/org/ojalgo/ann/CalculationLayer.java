@@ -39,7 +39,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
     private final PrimitiveDenseStore myOutput;
     private final PrimitiveDenseStore myWeights;
 
-    CalculationLayer(int numberOfInputs, int numberOfOutputs, ArtificialNeuralNetwork.Activator activator) {
+    CalculationLayer(int numberOfInputs, int numberOfOutputs, ANN.Activator activator) {
 
         super();
 
@@ -162,7 +162,6 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
     }
 
     void setActivator(ArtificialNeuralNetwork.Activator activator) {
-
         myActivator = activator;
     }
 
