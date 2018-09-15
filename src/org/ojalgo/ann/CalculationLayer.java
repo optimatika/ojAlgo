@@ -23,7 +23,6 @@ package org.ojalgo.ann;
 
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import org.ojalgo.ann.ANN.Activator;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -35,7 +34,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
 
     private static final Uniform RANDOM = new Uniform(-1, 2);
 
-    private ANN.Activator myActivator;
+    private ArtificialNeuralNetwork.Activator myActivator;
     private final PrimitiveDenseStore myBias;
     private final PrimitiveDenseStore myOutput;
     private final PrimitiveDenseStore myWeights;
@@ -93,6 +92,12 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return result;
     }
 
+    public PrimitiveDenseStore invoke(Access1D<Double> input) {
+        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
+        myOutput.modifyAll(myActivator.getFunction(myOutput));
+        return myOutput;
+    }
+
     @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
@@ -125,12 +130,6 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         }
     }
 
-    public PrimitiveDenseStore invoke(Access1D<Double> input) {
-        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
-        myOutput.modifyAll(myActivator.getFunction(myOutput));
-        return myOutput;
-    }
-
     double getBias(int output) {
         return myBias.doubleValue(output);
     }
@@ -153,12 +152,16 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
 
     void randomise() {
 
-        myWeights.fillAll(RANDOM);
+        double magnitude = TWO / Math.sqrt(myWeights.countRows());
 
-        myBias.fillAll(RANDOM);
+        Uniform randomiser = new Uniform(-magnitude, 2 * magnitude);
+
+        myWeights.fillAll(randomiser);
+
+        myBias.fillAll(randomiser);
     }
 
-    void setActivator(ANN.Activator activator) {
+    void setActivator(ArtificialNeuralNetwork.Activator activator) {
         myActivator = activator;
     }
 

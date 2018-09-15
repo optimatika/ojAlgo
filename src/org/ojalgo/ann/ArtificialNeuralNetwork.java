@@ -47,7 +47,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         for (int i = 0; i < layers.length; i++) {
             tmpIn = tmpOut;
             tmpOut = layers[i];
-            myLayers[i] = new CalculationLayer(tmpIn, tmpOut, ANN.Activator.SIGMOID);
+            myLayers[i] = new CalculationLayer(tmpIn, tmpOut, ArtificialNeuralNetwork.Activator.SIGMOID);
         }
     }
 

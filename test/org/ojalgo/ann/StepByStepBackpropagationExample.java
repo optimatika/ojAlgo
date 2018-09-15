@@ -54,7 +54,8 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
 
         NumberContext precision = this.precision();
         Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
-        ANN.Error errorMeassure = HALF_SQUARED_DIFFERENCE;
+
+        ArtificialNeuralNetwork.Error errorMeassure = HALF_SQUARED_DIFFERENCE;
 
         NetworkBuilder builder = this.getInitialNetwork();
 
