@@ -154,7 +154,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         for (int i = 0; i < layers.length; i++) {
             tmpIn = tmpOut;
             tmpOut = layers[i];
-            myLayers[i] = new CalculationLayer(tmpIn, tmpOut, Activator.SIGMOID);
+            myLayers[i] = new CalculationLayer(tmpIn, tmpOut, ArtificialNeuralNetwork.Activator.SIGMOID);
         }
     }
 
@@ -218,17 +218,6 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return myLayers[layer].getOutput();
     }
 
-    Structure2D[] structure() {
-
-        Structure2D[] retVal = new Structure2D[myLayers.length];
-
-        for (int l = 0; l < retVal.length; l++) {
-            retVal[l] = myLayers[l].getStructure();
-        }
-
-        return retVal;
-    }
-
     double getWeight(int layer, int input, int output) {
         return myLayers[layer].getWeight(input, output);
     }
@@ -238,6 +227,17 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         for (int i = 0; i < myLayers.length; i++) {
             retVal.add(myLayers[i].getLogicalWeights());
         }
+        return retVal;
+    }
+
+    Structure2D[] structure() {
+
+        Structure2D[] retVal = new Structure2D[myLayers.length];
+
+        for (int l = 0; l < retVal.length; l++) {
+            retVal[l] = myLayers[l].getStructure();
+        }
+
         return retVal;
     }
 

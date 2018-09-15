@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.ann.ArtificialNeuralNetwork.Error;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.structure.Access1D;
@@ -55,7 +54,8 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
 
         NumberContext precision = this.precision();
         Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
-        Error errorMeassure = HALF_SQUARED_DIFFERENCE;
+
+        ArtificialNeuralNetwork.Error errorMeassure = HALF_SQUARED_DIFFERENCE;
 
         NetworkBuilder builder = this.getInitialNetwork();
 

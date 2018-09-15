@@ -166,6 +166,14 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         };
     }
 
+    default byte byteValue(long index) {
+        return this.byteValue(StructureAnyD.reference(index, this.shape()));
+    }
+
+    default byte byteValue(long[] ref) {
+        return (byte) this.shortValue(ref);
+    }
+
     /**
      * Will pass through each matching element position calling the {@code through} function. What happens is
      * entirely dictated by how you implement the callback.
@@ -176,10 +184,46 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     double doubleValue(long[] ref);
 
+    default float floatValue(long index) {
+        return this.floatValue(StructureAnyD.reference(index, this.shape()));
+    }
+
+    default float floatValue(long[] ref) {
+        return (float) this.doubleValue(ref);
+    }
+
     default N get(final long index) {
         return this.get(StructureAnyD.reference(index, this.shape()));
     }
 
     N get(long[] ref);
+
+    default int intValue(long index) {
+        return this.intValue(StructureAnyD.reference(index, this.shape()));
+    }
+
+    default int intValue(long[] ref) {
+        return (int) this.longValue(ref);
+    }
+
+    default long longValue(long index) {
+        return this.longValue(StructureAnyD.reference(index, this.shape()));
+    }
+
+    default long longValue(long[] ref) {
+        return Math.round(this.doubleValue(ref));
+    }
+
+    default Iterable<MatrixView<N>> matrices() {
+        return MatrixView.makeIterable(this);
+    }
+
+    default short shortValue(long index) {
+        return this.shortValue(StructureAnyD.reference(index, this.shape()));
+    }
+
+    default short shortValue(long[] ref) {
+        return (short) this.intValue(ref);
+    }
 
 }

@@ -23,7 +23,6 @@ package org.ojalgo.ann;
 
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -32,6 +31,8 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
 final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double>, PrimitiveDenseStore> {
+
+    private static final Uniform RANDOM = new Uniform(-1, 2);
 
     private ArtificialNeuralNetwork.Activator myActivator;
     private final PrimitiveDenseStore myBias;
@@ -91,6 +92,12 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return result;
     }
 
+    public PrimitiveDenseStore invoke(Access1D<Double> input) {
+        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
+        myOutput.modifyAll(myActivator.getFunction(myOutput));
+        return myOutput;
+    }
+
     @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
@@ -123,12 +130,6 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         }
     }
 
-    public PrimitiveDenseStore invoke(Access1D<Double> input) {
-        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
-        myOutput.modifyAll(myActivator.getFunction(myOutput));
-        return myOutput;
-    }
-
     double getBias(int output) {
         return myBias.doubleValue(output);
     }
@@ -151,16 +152,17 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
 
     void randomise() {
 
-        //        double location = myWeights.countColumns() / myWeights.countRows();
-        //        double scale = PrimitiveFunction.SQRT.invoke(location);
-        Uniform generator = new Uniform(-1, 2);
+        double magnitude = TWO / Math.sqrt(myWeights.countRows());
 
-        myWeights.fillAll(generator);
+        Uniform randomiser = new Uniform(-magnitude, 2 * magnitude);
 
-        myBias.fillAll(generator);
+        myWeights.fillAll(randomiser);
+
+        myBias.fillAll(randomiser);
     }
 
-    void setActivator(Activator activator) {
+    void setActivator(ArtificialNeuralNetwork.Activator activator) {
+
         myActivator = activator;
     }
 

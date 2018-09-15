@@ -38,34 +38,34 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
     public abstract AggregatorSet<N> aggregator();
 
     public final I copy(final Access1D<?> source) {
-        final long tmpCount = source.count();
-        final I retVal = this.makeToBeFilled(tmpCount);
+        final long count = source.count();
+        final I retVal = this.makeToBeFilled(count);
         retVal.fillMatching(source);
         return retVal;
     }
 
     public final I copy(final double... source) {
-        final int tmpLength = source.length;
-        final I retVal = this.makeToBeFilled(tmpLength);
-        for (int i = 0; i < tmpLength; i++) {
+        final int length = source.length;
+        final I retVal = this.makeToBeFilled(length);
+        for (int i = 0; i < length; i++) {
             retVal.set(i, source[i]);
         }
         return retVal;
     }
 
     public final I copy(final List<? extends Number> source) {
-        final int tmpSize = source.size();
-        final I retVal = this.makeToBeFilled(tmpSize);
-        for (int i = 0; i < tmpSize; i++) {
+        final int size = source.size();
+        final I retVal = this.makeToBeFilled(size);
+        for (int i = 0; i < size; i++) {
             retVal.set(i, source.get(i));
         }
         return retVal;
     }
 
     public final I copy(final Number... source) {
-        final int tmpLength = source.length;
-        final I retVal = this.makeToBeFilled(tmpLength);
-        for (int i = 0; i < tmpLength; i++) {
+        final int length = source.length;
+        final I retVal = this.makeToBeFilled(length);
+        for (int i = 0; i < length; i++) {
             retVal.set(i, source[i]);
         }
         return retVal;
@@ -97,22 +97,28 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
 
     final SegmentedArray<N> makeSegmented(final long... structure) {
 
-        final long tmpTotalCount = StructureAnyD.count(structure);
+        final long totalCount = StructureAnyD.count(structure);
 
-        final int tmpMax = PrimitiveMath.powerOf2Smaller(Math.min(tmpTotalCount, this.getCapacityLimit()));
-        final int tmpMin = PrimitiveMath.powerOf2Larger(tmpTotalCount / DenseArray.MAX_ARRAY_SIZE);
+        final int max = PrimitiveMath.powerOf2Smaller(Math.min(totalCount, this.getCapacityLimit()));
+        final int min = PrimitiveMath.powerOf2Larger(totalCount / DenseArray.MAX_ARRAY_SIZE);
 
-        if (tmpMin > tmpMax) {
+        if (min > max) {
             throw new IllegalArgumentException();
         }
 
-        final int tmpUse = Math.max(tmpMin, tmpMax - OjAlgoUtils.ENVIRONMENT.cores);
+        final int indexBits = Math.max(min, max - OjAlgoUtils.ENVIRONMENT.cores);
 
-        return new SegmentedArray<>(tmpTotalCount, tmpUse, this);
+        return new SegmentedArray<>(totalCount, indexBits, this);
     }
 
+    /**
+     * Typically sparse, but if very small then dense If very large then also segmented
+     */
     abstract I makeStructuredZero(final long... structure);
 
+    /**
+     * Always dense, but maybe segmented
+     */
     abstract I makeToBeFilled(final long... structure);
 
     /**
