@@ -170,7 +170,7 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
     }
 
     /**
-     * To allow syntax like <code>array.modifyAll(DIVIDE.by(255));</code>
+     * To allow syntax like <code>array.modifyAll(DIVIDE.by(3.0));</code>
      *
      * @see #second(double)
      */
