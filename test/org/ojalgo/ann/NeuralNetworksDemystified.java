@@ -100,7 +100,7 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
 
     @Override
     protected NetworkBuilder getInitialNetwork() {
-        return ArtificialNeuralNetwork.builder(2, 3, 1).activators(SIGMOID, SIGMOID).error(HALF_SQUARED_DIFFERENCE).randomise();
+        return ArtificialNeuralNetwork.builder(2, 3, 1).activators(SIGMOID, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
 
     }
 

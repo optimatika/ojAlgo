@@ -58,7 +58,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
     @Test
     public void testTraining() {
 
-        NetworkBuilder builder = this.getInitialNetwork().randomise();
+        NetworkBuilder builder = this.getInitialNetwork();
 
         LineSplittingParser parser = new LineSplittingParser(",", true);
 

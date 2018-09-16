@@ -71,7 +71,7 @@ public class SimpleDerivativesTest extends BackPropagationExample {
 
     @Override
     protected NetworkBuilder getInitialNetwork() {
-        return ArtificialNeuralNetwork.builder(3, 3).randomise();
+        return ArtificialNeuralNetwork.builder(3, 3);
     }
 
     @Override
