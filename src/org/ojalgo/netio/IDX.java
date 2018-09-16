@@ -99,10 +99,10 @@ public abstract class IDX {
         IDX.print(image, printer, true, 255D);
     }
 
-    public static void print(Access2D<?> image, BasicLogger.Printer printer, boolean transpose, double maxValue) {
+    public static void print(Access2D<?> image, BasicLogger.Printer printer, boolean transpose, double maxExpectedValue) {
 
-        double oneThird = maxValue / 3D;
-        double twoThirds = (2D * maxValue) / 3D;
+        double oneThird = maxExpectedValue / 3D;
+        double twoThirds = (2D * maxExpectedValue) / 3D;
 
         long numbRows = image.countRows();
         long numbCols = image.countColumns();
