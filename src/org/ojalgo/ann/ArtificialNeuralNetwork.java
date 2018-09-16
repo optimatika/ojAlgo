@@ -141,12 +141,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     }
 
     public static NetworkBuilder builder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
-
-        NetworkBuilder retVal = new NetworkBuilder(numberOfInputNodes, nodesPerCalculationLayer);
-
-        retVal.randomise();
-
-        return retVal;
+        return new NetworkBuilder(numberOfInputNodes, nodesPerCalculationLayer);
     }
 
     private final CalculationLayer[] myLayers;

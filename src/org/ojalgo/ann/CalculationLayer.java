@@ -33,8 +33,6 @@ import org.ojalgo.structure.Structure2D;
 
 final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double>, PrimitiveDenseStore> {
 
-    private static final Uniform RANDOM = new Uniform(-1, 2);
-
     private ArtificialNeuralNetwork.Activator myActivator;
     private final PrimitiveDenseStore myBias;
     private final PrimitiveDenseStore myOutput;
@@ -49,6 +47,8 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         myOutput = PrimitiveDenseStore.FACTORY.makeZero(1, numberOfOutputs);
 
         myActivator = activator;
+
+        this.randomise(numberOfInputs);
     }
 
     @Override
@@ -112,6 +112,17 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return tmpBuilder.toString();
     }
 
+    private void randomise(double numberOfInputs) {
+
+        double magnitude = ONE / Math.sqrt(numberOfInputs);
+
+        Uniform randomiser = new Uniform(-magnitude, 2 * magnitude);
+
+        myWeights.fillAll(randomiser);
+
+        myBias.fillAll(randomiser);
+    }
+
     void adjust(final Access1D<Double> layerInput, PrimitiveDenseStore downstreamGradient, double learningRate, PrimitiveDenseStore upstreamGradient) {
 
         downstreamGradient.modifyMatching(MULTIPLY, myOutput.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
@@ -152,18 +163,10 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
     }
 
     void randomise() {
-
-        double magnitude = TWO / Math.sqrt(myWeights.countRows());
-
-        Uniform randomiser = new Uniform(-magnitude, 2 * magnitude);
-
-        myWeights.fillAll(randomiser);
-
-        myBias.fillAll(randomiser);
+        this.randomise(myWeights.countRows());
     }
 
     void setActivator(ArtificialNeuralNetwork.Activator activator) {
-
         myActivator = activator;
     }
 
