@@ -44,20 +44,20 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
     private final PrimitiveDenseStore[] myLayerValues;
     private double myLearningRate = 1.0;
 
-    NetworkBuilder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
+    NetworkBuilder(int numberOfInputNodes, int... outputNodesPerCalculationLayer) {
 
         super();
 
-        if (nodesPerCalculationLayer.length < 1) {
-            ProgrammingError.throwWithMessage("There must be at least 2 layers!");
+        if (outputNodesPerCalculationLayer.length < 1) {
+            ProgrammingError.throwWithMessage("There must be at least 1 layer!");
         }
 
-        myANN = new ArtificialNeuralNetwork(numberOfInputNodes, nodesPerCalculationLayer);
+        myANN = new ArtificialNeuralNetwork(numberOfInputNodes, outputNodesPerCalculationLayer);
 
-        myLayerValues = new PrimitiveDenseStore[1 + nodesPerCalculationLayer.length];
+        myLayerValues = new PrimitiveDenseStore[1 + outputNodesPerCalculationLayer.length];
         myLayerValues[0] = PrimitiveDenseStore.FACTORY.makeZero(numberOfInputNodes, 1);
-        for (int l = 0; l < nodesPerCalculationLayer.length; l++) {
-            myLayerValues[1 + l] = PrimitiveDenseStore.FACTORY.makeZero(nodesPerCalculationLayer[l], 1);
+        for (int l = 0; l < outputNodesPerCalculationLayer.length; l++) {
+            myLayerValues[1 + l] = PrimitiveDenseStore.FACTORY.makeZero(outputNodesPerCalculationLayer[l], 1);
         }
     }
 
@@ -141,7 +141,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
     /**
      * Initialise all weights and biases with random numbers.
-     * 
+     *
      * @deprecated v46.1 No need to call this - it's done for you.
      */
     @Deprecated
