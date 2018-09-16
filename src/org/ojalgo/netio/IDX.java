@@ -104,19 +104,19 @@ public abstract class IDX {
         double oneThird = maxValue / 3D;
         double twoThirds = (2D * maxValue) / 3D;
 
-        long numbRows = (int) image.countRows();
-        long numbCols = (int) image.countColumns();
+        long numbRows = image.countRows();
+        long numbCols = image.countColumns();
 
         if (transpose) {
-            for (int j = 0; j < numbCols; j++) {
-                for (int i = 0; i < numbRows; i++) {
+            for (long j = 0L; j < numbCols; j++) {
+                for (long i = 0L; i < numbRows; i++) {
                     IDX.printPixel(image.doubleValue(i, j), printer, oneThird, twoThirds);
                 }
                 printer.println();
             }
         } else {
-            for (int i = 0; i < numbRows; i++) {
-                for (int j = 0; j < numbCols; j++) {
+            for (long i = 0L; i < numbRows; i++) {
+                for (long j = 0L; j < numbCols; j++) {
                     IDX.printPixel(image.doubleValue(i, j), printer, oneThird, twoThirds);
                 }
                 printer.println();
