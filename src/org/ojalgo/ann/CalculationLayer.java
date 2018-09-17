@@ -24,12 +24,10 @@ package org.ojalgo.ann;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.function.BasicFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.random.Normal;
+import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
@@ -49,6 +47,8 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         myOutput = PrimitiveDenseStore.FACTORY.makeZero(1, numberOfOutputs);
 
         myActivator = activator;
+
+        this.randomise(numberOfInputs);
     }
 
     @Override
@@ -93,6 +93,12 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return result;
     }
 
+    public PrimitiveDenseStore invoke(Access1D<Double> input) {
+        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
+        myOutput.modifyAll(myActivator.getFunction(myOutput));
+        return myOutput;
+    }
+
     @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
@@ -104,6 +110,17 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         tmpBuilder.append(myActivator);
         tmpBuilder.append("]");
         return tmpBuilder.toString();
+    }
+
+    private void randomise(double numberOfInputs) {
+
+        double magnitude = ONE / Math.sqrt(numberOfInputs);
+
+        Uniform randomiser = new Uniform(-magnitude, 2 * magnitude);
+
+        myWeights.fillAll(randomiser);
+
+        myBias.fillAll(randomiser);
     }
 
     void adjust(final Access1D<Double> layerInput, PrimitiveDenseStore downstreamGradient, double learningRate, PrimitiveDenseStore upstreamGradient) {
@@ -123,12 +140,6 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
             }
             myBias.add(j, learningRate * grad);
         }
-    }
-
-    public PrimitiveDenseStore invoke(Access1D<Double> input) {
-        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
-        myOutput.modifyAll(myActivator.getFunction(myOutput));
-        return myOutput;
     }
 
     double getBias(int output) {
@@ -152,17 +163,10 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
     }
 
     void randomise() {
-
-        double location = ONE / myWeights.countRows();
-        double scale = PrimitiveFunction.SQRT.invoke(location);
-        Normal generator = new Normal(location, scale);
-
-        myWeights.fillAll(generator);
-
-        myBias.fillAll(generator);
+        this.randomise(myWeights.countRows());
     }
 
-    void setActivator(Activator activator) {
+    void setActivator(ArtificialNeuralNetwork.Activator activator) {
         myActivator = activator;
     }
 

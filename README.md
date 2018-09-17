@@ -6,13 +6,13 @@ General information about ojAlgo is available at the project web site: http://oj
 
 ### Artifacts
 
-ojAlgo is available at [The Central (Maven) Repository](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.ojalgo%22%20AND%20a%3A%22ojalgo%22) to be used with your favourite dependency management tool.
+ojAlgo is available at [The Central (Maven) Repository](https://search.maven.org/artifact/org.ojalgo/ojalgo) to be used with your favourite dependency management tool.
 
 ```xml
 <dependency>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>46.0.0</version>
+    <version>46.1.0</version>
 </dependency>
 ```
 ...or download the jar from SourceForge.
