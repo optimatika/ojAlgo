@@ -29,6 +29,7 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.type.context.NumberContext;
 
 public class StoreProblems extends AbstractMatrixStoreTest {
@@ -164,6 +165,29 @@ public class StoreProblems extends AbstractMatrixStoreTest {
 
         TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.rows(exp), diff.get());
         TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.columns(exp), transp.get());
+    }
+
+    @Test
+    public void test() {
+        int n = 50_000;
+        SparseStore<Double> a = SparseStore.PRIMITIVE.make(n, n);
+        SparseStore<Double> b = SparseStore.PRIMITIVE.make(n, n);
+
+        System.out.println("A * B");
+        SparseStore<Double> ab1 = SparseStore.PRIMITIVE.make(n, n);
+        a.multiply(b).get().supplyTo(ab1);
+        final ElementView2D<Double, ?> nnz1 = ab1.nonzeros();
+        while (nnz1.hasNext()) {
+            nnz1.next();
+        }
+
+        System.out.println("A .* B");
+        SparseStore<Double> ab2 = SparseStore.PRIMITIVE.make(n, n);
+        a.operateOnMatching(PrimitiveFunction.MULTIPLY, b).supplyTo(ab2);
+        final ElementView2D<Double, ?> nnz2 = ab2.nonzeros();
+        while (nnz2.hasNext()) {
+            nnz2.next();
+        }
     }
 
 }

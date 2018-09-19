@@ -26,6 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -184,27 +185,57 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
-        final long tmpLimit = Math.min(left.count(), this.count());
+
+        final long limit = Math.min(left.count(), this.count());
+        boolean notModifiesZero = function.invoke(E, ZERO) == ZERO;
+
         if (this.isPrimitive()) {
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
+            if (notModifiesZero) {
+                for (NonzeroView<N> element : myElements.nonzeros()) {
+                    element.modify(left.doubleValue(element.index()), function);
+                }
+            } else {
+                for (long i = 0L; i < limit; i++) {
+                    this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
+                }
             }
         } else {
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.set(i, function.invoke(left.get(i), this.get(i)));
+            if (notModifiesZero) {
+                for (NonzeroView<N> element : myElements.nonzeros()) {
+                    element.modify(left.get(element.index()), function);
+                }
+            } else {
+                for (long i = 0L; i < limit; i++) {
+                    this.set(i, function.invoke(left.get(i), this.get(i)));
+                }
             }
         }
     }
 
     public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
-        final long tmpLimit = Math.min(this.count(), right.count());
+
+        final long limit = Math.min(this.count(), right.count());
+        boolean notModifiesZero = function.invoke(ZERO, E) == ZERO;
+
         if (this.isPrimitive()) {
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
+            if (notModifiesZero) {
+                for (NonzeroView<N> element : myElements.nonzeros()) {
+                    element.modify(function, right.doubleValue(element.index()));
+                }
+            } else {
+                for (long i = 0L; i < limit; i++) {
+                    this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
+                }
             }
         } else {
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.set(i, function.invoke(this.get(i), right.get(i)));
+            if (notModifiesZero) {
+                for (NonzeroView<N> element : myElements.nonzeros()) {
+                    element.modify(function, right.get(element.index()));
+                }
+            } else {
+                for (long i = 0L; i < limit; i++) {
+                    this.set(i, function.invoke(this.get(i), right.get(i)));
+                }
             }
         }
     }

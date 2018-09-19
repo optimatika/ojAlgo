@@ -102,6 +102,22 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             return myIndices[myCursor];
         }
 
+        public void modify(BinaryFunction<N> function, double right) {
+            myValues.set(myCursor, function.invoke(myValues.doubleValue(myCursor), right));
+        }
+
+        public void modify(BinaryFunction<N> function, N right) {
+            myValues.set(myCursor, function.invoke(myValues.get(myCursor), right));
+        }
+
+        public void modify(double left, BinaryFunction<N> function) {
+            myValues.set(myCursor, function.invoke(left, myValues.doubleValue(myCursor)));
+        }
+
+        public void modify(N left, BinaryFunction<N> function) {
+            myValues.set(myCursor, function.invoke(left, myValues.get(myCursor)));
+        }
+
         public NonzeroView<N> next() {
             myCursor++;
             return this;

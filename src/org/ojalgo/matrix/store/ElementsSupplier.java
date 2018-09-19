@@ -53,7 +53,6 @@ public interface ElementsSupplier<N extends Number> extends Stream2D<N, MatrixSt
 
     default ElementsSupplier<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
         return new MatrixPipeline.BinaryOperatorRight<>(this, operator, right);
-
     }
 
     default ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
