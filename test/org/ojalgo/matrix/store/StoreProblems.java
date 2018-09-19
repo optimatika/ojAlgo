@@ -24,6 +24,7 @@ package org.ojalgo.matrix.store;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
@@ -143,6 +144,26 @@ public class StoreProblems extends AbstractMatrixStoreTest {
         }
 
         TestUtils.assertEquals(c, a.multiply(b));
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/133
+     */
+    @Test
+    public void testTransposeElementsSupplier() {
+
+        double[][] _x = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
+        double[][] _y = { { 0, 0, 0 }, { 1, 1, 1 }, { 2, 2, 2 } };
+        double[][] exp = { { 1.0, 2.0, 3.0 }, { 3.0, 4.0, 5.0 }, { 5.0, 6.0, 7.0 } };
+
+        PrimitiveDenseStore x = PrimitiveDenseStore.FACTORY.rows(_x);
+        PrimitiveDenseStore y = PrimitiveDenseStore.FACTORY.rows(_y);
+
+        ElementsSupplier<Double> diff = y.operateOnMatching(x, PrimitiveFunction.SUBTRACT);
+        ElementsSupplier<Double> transp = diff.transpose();
+
+        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.rows(exp), diff.get());
+        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.columns(exp), transp.get());
     }
 
 }

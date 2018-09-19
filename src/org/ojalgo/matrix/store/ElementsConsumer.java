@@ -482,16 +482,6 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.Receiver<N>
             myBase.modifyDiagonal(col, row, modifier);
         }
 
-        @Override
-        public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
-            myBase.modifyMatching(left, function);
-        }
-
-        @Override
-        public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
-            myBase.modifyMatching(function, right);
-        }
-
         public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
             myBase.modifyOne(col, row, modifier);
         }
