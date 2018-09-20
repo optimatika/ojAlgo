@@ -30,6 +30,7 @@ import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
@@ -49,12 +50,12 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     }
 
-    public static final SparseStore.Factory<RationalNumber> RATIONAL = (rowsCount, columnsCount) -> SparseStore.makeRational((int) rowsCount,
-            (int) columnsCount);
-
     public static final SparseStore.Factory<ComplexNumber> COMPLEX = (rowsCount, columnsCount) -> SparseStore.makeComplex((int) rowsCount, (int) columnsCount);
 
     public static final SparseStore.Factory<Double> PRIMITIVE = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
+
+    public static final SparseStore.Factory<RationalNumber> RATIONAL = (rowsCount, columnsCount) -> SparseStore.makeRational((int) rowsCount,
+            (int) columnsCount);
 
     public static SparseStore<ComplexNumber> makeComplex(final int rowsCount, final int columnsCount) {
         return new SparseStore<>(GenericDenseStore.COMPLEX, rowsCount, columnsCount);
@@ -394,6 +395,38 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         receiver.reset();
 
         myElements.supplyNonZerosTo(receiver);
+    }
+
+    public void visitColumn(long row, long col, VoidFunction<N> visitor) {
+
+        long first = Math.max(this.firstInColumn((int) col), row);
+        long limit = this.limitOfColumn((int) col);
+
+        if (this.isPrimitive()) {
+            for (long i = first; i < limit; i++) {
+                visitor.accept(this.doubleValue(i, col));
+            }
+        } else {
+            for (long i = first; i < limit; i++) {
+                visitor.accept(this.get(i, col));
+            }
+        }
+    }
+
+    public void visitRow(long row, long col, VoidFunction<N> visitor) {
+
+        long first = Math.max(this.firstInRow((int) row), col);
+        long limit = this.limitOfRow((int) row);
+
+        if (this.isPrimitive()) {
+            for (long j = first; j < limit; j++) {
+                visitor.accept(this.doubleValue(row, j));
+            }
+        } else {
+            for (long j = first; j < limit; j++) {
+                visitor.accept(this.get(row, j));
+            }
+        }
     }
 
     private void updateNonZeros(final long row, final long col) {
