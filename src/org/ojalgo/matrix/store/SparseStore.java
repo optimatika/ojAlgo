@@ -407,18 +407,24 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public void visitRow(long row, long col, VoidFunction<N> visitor) {
+        int counter = 0;
         if (this.isPrimitive()) {
             for (ElementView2D<N, ?> nzv : this.nonzeros()) {
                 if (nzv.row() == row) {
                     visitor.accept(nzv.doubleValue());
+                    counter++;
                 }
             }
         } else {
             for (ElementView2D<N, ?> nzv : this.nonzeros()) {
                 if (nzv.row() == row) {
                     visitor.accept(nzv.get());
+                    counter++;
                 }
             }
+        }
+        if ((col + counter) < this.countColumns()) {
+            visitor.accept(0.0);
         }
     }
 
