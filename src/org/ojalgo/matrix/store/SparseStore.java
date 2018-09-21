@@ -399,32 +399,25 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     public void visitColumn(long row, long col, VoidFunction<N> visitor) {
 
-        long first = Math.max(this.firstInColumn((int) col), row);
-        long limit = this.limitOfColumn((int) col);
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, row, col);
+        long limit = Structure2D.index(structure, 0, col + 1L);
 
-        if (this.isPrimitive()) {
-            for (long i = first; i < limit; i++) {
-                visitor.accept(this.doubleValue(i, col));
-            }
-        } else {
-            for (long i = first; i < limit; i++) {
-                visitor.accept(this.get(i, col));
-            }
-        }
+        myElements.visitRange(first, limit, visitor);
     }
 
     public void visitRow(long row, long col, VoidFunction<N> visitor) {
-
-        long first = Math.max(this.firstInRow((int) row), col);
-        long limit = this.limitOfRow((int) row);
-
         if (this.isPrimitive()) {
-            for (long j = first; j < limit; j++) {
-                visitor.accept(this.doubleValue(row, j));
+            for (ElementView2D<N, ?> nzv : this.nonzeros()) {
+                if (nzv.row() == row) {
+                    visitor.accept(nzv.doubleValue());
+                }
             }
         } else {
-            for (long j = first; j < limit; j++) {
-                visitor.accept(this.get(row, j));
+            for (ElementView2D<N, ?> nzv : this.nonzeros()) {
+                if (nzv.row() == row) {
+                    visitor.accept(nzv.get());
+                }
             }
         }
     }

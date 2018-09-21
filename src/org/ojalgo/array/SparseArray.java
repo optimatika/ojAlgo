@@ -456,6 +456,27 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    @Override
+    public void visitRange(long first, long limit, VoidFunction<N> visitor) {
+
+        int localFirst = this.index(first);
+        if (localFirst < 0) {
+            localFirst = -(localFirst + 1);
+        }
+        int localLimit = this.index(limit);
+        if (localLimit < 0) {
+            localLimit = -(localLimit + 1);
+        }
+
+        if ((limit - first) > (localLimit - localFirst)) {
+            visitor.invoke(myZeroValue);
+        }
+
+        for (int i = localFirst; i < localLimit; i++) {
+            myValues.visitOne(i, visitor);
+        }
+    }
+
     /**
      * Will never remove anything - just insert or update
      */
