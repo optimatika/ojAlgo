@@ -189,7 +189,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         }
 
         public Iterator<ElementView<N>> iterator() {
-            return this;
+            return new ElementView<>(myDelegate, myStructure);
         }
 
         public ElementView<N> next() {
@@ -527,8 +527,8 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         return (byte) this.shortValue(row, col);
     }
 
-    default Iterable<ColumnView<N>> columns() {
-        return ColumnView.makeIterable(this);
+    default ColumnView<N> columns() {
+        return new ColumnView<N>(this);
     }
 
     default double doubleValue(final long index) {
@@ -583,8 +583,8 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         return Math.round(this.doubleValue(row, col));
     }
 
-    default Iterable<RowView<N>> rows() {
-        return RowView.makeIterable(this);
+    default RowView<N> rows() {
+        return new RowView<N>(this);
     }
 
     default short shortValue(long index) {

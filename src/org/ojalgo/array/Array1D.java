@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.List;
 import java.util.RandomAccess;
-import java.util.Spliterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
@@ -601,10 +600,6 @@ public final class Array1D<N extends Number> extends AbstractList<N>
                 exception.printStackTrace();
             }
         }
-    }
-
-    public Spliterator<N> spliterator() {
-        return myDelegate.spliterator();
     }
 
     @Override

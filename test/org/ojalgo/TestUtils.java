@@ -43,6 +43,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.TypeUtils;
@@ -58,8 +59,8 @@ public abstract class TestUtils {
     private static final NumberContext EQUALS = new NumberContext(12, 14, RoundingMode.HALF_EVEN);
 
     public static void assertBounds(final Number lower, final Access1D<?> values, final Number upper, final NumberContext precision) {
-        for (final Number tmpValue : values) {
-            TestUtils.assertBounds(lower, tmpValue, upper, precision);
+        for (final ElementView1D<?, ?> tmpValue : values.elements()) {
+            TestUtils.assertBounds(lower, tmpValue.get(), upper, precision);
         }
     }
 
