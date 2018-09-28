@@ -21,8 +21,6 @@
  */
 package org.ojalgo.structure;
 
-import java.util.Iterator;
-
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
@@ -188,8 +186,8 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             return myDelegate.index();
         }
 
-        public Iterator<ElementView<N>> iterator() {
-            return new ElementView<>(myDelegate, myStructure);
+        public ElementView<N> iterator() {
+            return new ElementView<>(myDelegate.iterator(), myStructure);
         }
 
         public ElementView<N> next() {

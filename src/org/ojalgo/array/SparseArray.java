@@ -23,7 +23,6 @@ package org.ojalgo.array;
 
 import java.math.MathContext;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.stream.LongStream;
 
@@ -103,7 +102,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             return myIndices[myCursor];
         }
 
-        public Iterator<NonzeroView<N>> iterator() {
+        public NonzeroView iterator() {
             return new NonzeroView<>(myIndices, myValues, -1, myLastCursor);
         }
 

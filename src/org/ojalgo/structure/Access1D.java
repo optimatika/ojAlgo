@@ -21,7 +21,6 @@
  */
 package org.ojalgo.structure;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.DoubleAdder;
 
@@ -142,7 +141,7 @@ public interface Access1D<N extends Number> extends Structure1D {
             return myCursor;
         }
 
-        public Iterator<ElementView<N>> iterator() {
+        public ElementView<N> iterator() {
             return new ElementView<>(myValues);
         }
 

@@ -92,6 +92,8 @@ public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>>
         }
     }
 
-    abstract ElementView1D<N, V> trySplit();
+    V trySplit();
+
+    V iterator();
 
 }
