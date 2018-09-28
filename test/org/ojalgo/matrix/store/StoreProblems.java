@@ -31,7 +31,7 @@ import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
-public class StoreProblems extends AbstractMatrixStoreTest {
+public class StoreProblems extends MatrixStoreTests {
 
     /**
      * Problem with LogicalStore and multi-threading. The MinBatchSize#EXECUTOR was designed to have a fixed

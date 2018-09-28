@@ -22,37 +22,47 @@
 package org.ojalgo.structure;
 
 import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.ojalgo.ProgrammingError;
 
-public class ColumnView<N extends Number> implements Access1D<N>, Iterator<ColumnView<N>> {
+public class ColumnView<N extends Number>
+        implements Access1D<N>, Iterator<ColumnView<N>>, Iterable<ColumnView<N>>, Spliterator<ColumnView<N>>, Comparable<ColumnView<N>> {
 
-    public static <S extends Number> Iterable<ColumnView<S>> makeIterable(final Access2D<S> access) {
-        return new ColumnView<>(access).iterable;
-    }
+    static final int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED
+            | Spliterator.SIZED | Spliterator.SORTED | Spliterator.SUBSIZED;
 
     private long myColumn = -1L;
     private final Access2D<N> myDelegate2D;
     private final long myLastColumn;
 
-    final Iterable<ColumnView<N>> iterable = () -> ColumnView.this;
-
-    protected ColumnView(final Access2D<N> access) {
-        this(access, -1L);
-    }
-
-    ColumnView(final Access2D<N> access, final long column) {
+    private ColumnView(final Access2D<N> access, final long column, long lastColumn) {
 
         super();
 
         myDelegate2D = access;
-        myLastColumn = access.countColumns() - 1L;
+        myLastColumn = lastColumn;
 
         myColumn = column;
     }
 
+    protected ColumnView(final Access2D<N> access) {
+        this(access, -1L, access.countColumns() - 1L);
+    }
+
+    public int characteristics() {
+        return CHARACTERISTICS;
+    }
+
     public long column() {
         return myColumn;
+    }
+
+    public int compareTo(ColumnView<N> other) {
+        return Long.compare(myColumn, other.column());
     }
 
     public long count() {
@@ -61,6 +71,14 @@ public class ColumnView<N extends Number> implements Access1D<N>, Iterator<Colum
 
     public double doubleValue(final long index) {
         return myDelegate2D.doubleValue(index, myColumn);
+    }
+
+    public long estimateSize() {
+        return myLastColumn - myColumn;
+    }
+
+    public void forEachRemaining(Consumer<? super ColumnView<N>> action) {
+        Iterator.super.forEachRemaining(action);
     }
 
     public N get(final long index) {
@@ -75,6 +93,10 @@ public class ColumnView<N extends Number> implements Access1D<N>, Iterator<Colum
         return myColumn > 0L;
     }
 
+    public ColumnView<N> iterator() {
+        return new ColumnView<N>(myDelegate2D);
+    }
+
     public ColumnView<N> next() {
         myColumn++;
         return this;
@@ -87,6 +109,39 @@ public class ColumnView<N extends Number> implements Access1D<N>, Iterator<Colum
 
     public final void remove() {
         ProgrammingError.throwForUnsupportedOptionalOperation();
+    }
+
+    public Stream<ColumnView<N>> stream(final boolean parallel) {
+        return StreamSupport.stream(this, parallel);
+    }
+
+    public boolean tryAdvance(Consumer<? super ColumnView<N>> action) {
+        if (this.hasNext()) {
+            action.accept(this.next());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public Spliterator<ColumnView<N>> trySplit() {
+
+        final long remaining = myLastColumn - myColumn;
+
+        if (remaining > 1L) {
+
+            final long split = myColumn + (remaining / 2L);
+
+            final ColumnView<N> retVal = new ColumnView<>(myDelegate2D, myColumn, split);
+
+            myColumn = split;
+
+            return retVal;
+
+        } else {
+
+            return null;
+        }
     }
 
     protected void setColumn(final long column) {

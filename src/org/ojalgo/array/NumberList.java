@@ -258,7 +258,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public Iterator<N> iterator() {
-        return Access1D.super.iterator();
+        return new Iterator1D<>(this);
     }
 
     public int lastIndexOf(final Object object) {

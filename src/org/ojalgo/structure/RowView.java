@@ -22,26 +22,23 @@
 package org.ojalgo.structure;
 
 import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.ojalgo.ProgrammingError;
 
-public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<N>> {
+public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<N>>, Iterable<RowView<N>>, Spliterator<RowView<N>>, Comparable<RowView<N>> {
 
-    public static <S extends Number> Iterable<RowView<S>> makeIterable(final Access2D<S> access) {
-        return new RowView<>(access).iterable;
-    }
+    static final int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED
+            | Spliterator.SIZED | Spliterator.SORTED | Spliterator.SUBSIZED;
 
     private final Access2D<N> myDelegate2D;
     private final long myLastRow;
     private long myRow = -1L;
 
-    final Iterable<RowView<N>> iterable = () -> RowView.this;
-
-    protected RowView(final Access2D<N> access) {
-        this(access, -1L);
-    }
-
-    RowView(final Access2D<N> access, final long row) {
+    private RowView(final Access2D<N> access, final long row, long lastRow) {
 
         super();
 
@@ -51,12 +48,32 @@ public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<
         myRow = row;
     }
 
+    protected RowView(final Access2D<N> access) {
+        this(access, -1L, access.countRows() - 1L);
+    }
+
+    public int characteristics() {
+        return CHARACTERISTICS;
+    }
+
+    public int compareTo(RowView<N> other) {
+        return Long.compare(myRow, other.row());
+    }
+
     public long count() {
         return myDelegate2D.countColumns();
     }
 
     public double doubleValue(final long index) {
         return myDelegate2D.doubleValue(myRow, index);
+    }
+
+    public long estimateSize() {
+        return myLastRow - myRow;
+    }
+
+    public void forEachRemaining(Consumer<? super RowView<N>> action) {
+        Iterator.super.forEachRemaining(action);
     }
 
     public N get(final long index) {
@@ -69,6 +86,10 @@ public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<
 
     public boolean hasPrevious() {
         return myRow > 0L;
+    }
+
+    public RowView<N> iterator() {
+        return new RowView<N>(myDelegate2D);
     }
 
     public RowView<N> next() {
@@ -87,6 +108,39 @@ public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<
 
     public long row() {
         return myRow;
+    }
+
+    public Stream<RowView<N>> stream(final boolean parallel) {
+        return StreamSupport.stream(this, parallel);
+    }
+
+    public boolean tryAdvance(Consumer<? super RowView<N>> action) {
+        if (this.hasNext()) {
+            action.accept(this.next());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public Spliterator<RowView<N>> trySplit() {
+
+        final long remaining = myLastRow - myRow;
+
+        if (remaining > 1L) {
+
+            final long split = myRow + (remaining / 2L);
+
+            final RowView<N> retVal = new RowView<>(myDelegate2D, myRow, split);
+
+            myRow = split;
+
+            return retVal;
+
+        } else {
+
+            return null;
+        }
     }
 
     protected void setRow(final long row) {

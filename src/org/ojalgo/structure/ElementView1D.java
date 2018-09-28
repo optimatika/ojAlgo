@@ -56,10 +56,6 @@ public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>>
 
     long index();
 
-    default Iterator<V> iterator() {
-        return this;
-    }
-
     default long nextIndex() {
         return this.index() + 1L;
     }
@@ -96,6 +92,8 @@ public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>>
         }
     }
 
-    abstract ElementView1D<N, V> trySplit();
+    V trySplit();
+
+    V iterator();
 
 }
