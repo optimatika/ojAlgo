@@ -31,6 +31,7 @@ import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyRight;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyRight;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure2D;
 
 public final class MultiplyRight extends MatrixOperation {
 
@@ -65,7 +66,7 @@ public final class MultiplyRight extends MatrixOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right.doubleValue(c + (j * complexity));
+                final double tmpRightCJ = right.doubleValue(Structure2D.index(complexity, c, j));
                 tmp0J += left[tmpIndex++] * tmpRightCJ;
                 tmp1J += left[tmpIndex++] * tmpRightCJ;
                 tmp2J += left[tmpIndex++] * tmpRightCJ;
@@ -114,7 +115,7 @@ public final class MultiplyRight extends MatrixOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                tmp0J += left[tmpIndex++] * right.doubleValue(c + (j * complexity));
+                tmp0J += left[tmpIndex++] * right.doubleValue(Structure2D.index(complexity, c, j));
             }
 
             product[j] = tmp0J;
@@ -399,7 +400,7 @@ public final class MultiplyRight extends MatrixOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right.doubleValue(c + (j * complexity));
+                final double tmpRightCJ = right.doubleValue(Structure2D.index(complexity, c, j));
                 tmp0J += left[tmpIndex++] * tmpRightCJ;
                 tmp1J += left[tmpIndex++] * tmpRightCJ;
                 tmp2J += left[tmpIndex++] * tmpRightCJ;
@@ -434,7 +435,7 @@ public final class MultiplyRight extends MatrixOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right.doubleValue(c + (j * complexity));
+                final double tmpRightCJ = right.doubleValue(Structure2D.index(complexity, c, j));
                 tmp0J += left[tmpIndex++] * tmpRightCJ;
                 tmp1J += left[tmpIndex++] * tmpRightCJ;
                 tmp2J += left[tmpIndex++] * tmpRightCJ;
@@ -472,7 +473,7 @@ public final class MultiplyRight extends MatrixOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right.doubleValue(c + (j * complexity));
+                final double tmpRightCJ = right.doubleValue(Structure2D.index(complexity, c, j));
                 tmp0J += left[tmpIndex++] * tmpRightCJ;
                 tmp1J += left[tmpIndex++] * tmpRightCJ;
                 tmp2J += left[tmpIndex++] * tmpRightCJ;
@@ -513,7 +514,7 @@ public final class MultiplyRight extends MatrixOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right.doubleValue(c + (j * complexity));
+                final double tmpRightCJ = right.doubleValue(Structure2D.index(complexity, c, j));
                 tmp0J += left[tmpIndex++] * tmpRightCJ;
                 tmp1J += left[tmpIndex++] * tmpRightCJ;
                 tmp2J += left[tmpIndex++] * tmpRightCJ;
@@ -623,7 +624,7 @@ public final class MultiplyRight extends MatrixOperation {
             final int limitOfRightRow = MatrixUtils.limitOfRow(right, c, columnLimit);
 
             for (int j = firstInRightRow; j < limitOfRightRow; j++) {
-                AXPY.invoke(product, j * structure, right.doubleValue(c + (j * complexity)), leftColumn, 0, 0, structure);
+                AXPY.invoke(product, j * structure, right.doubleValue(Structure2D.index(complexity, c, j)), leftColumn, 0, 0, structure);
             }
         }
     }
@@ -641,7 +642,7 @@ public final class MultiplyRight extends MatrixOperation {
             final int limitOfRightRow = MatrixUtils.limitOfRow(right, c, columnLimit);
 
             for (int j = firstInRightRow; j < limitOfRightRow; j++) {
-                AXPY.invoke(product, j * structure, right.get(c + (j * complexity)), leftColumn, 0, 0, structure);
+                AXPY.invoke(product, j * structure, right.get(Structure2D.index(complexity, c, j)), leftColumn, 0, 0, structure);
             }
         }
     }

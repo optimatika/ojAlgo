@@ -200,14 +200,14 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 for (int i = 0; i < tmpRows; i++) {
                     final Access1D<?> tmpRow = source[i];
                     for (long j = 0L; j < tmpColumns; j++) {
-                        tmpDelegate.set(i + (j * tmpRows), tmpRow.doubleValue(j));
+                        tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.doubleValue(j));
                     }
                 }
             } else {
                 for (int i = 0; i < tmpRows; i++) {
                     final Access1D<?> tmpRow = source[i];
                     for (long j = 0L; j < tmpColumns; j++) {
-                        tmpDelegate.set(i + (j * tmpRows), tmpRow.get(j));
+                        tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.get(j));
                     }
                 }
             }
@@ -225,7 +225,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             for (int i = 0; i < tmpRows; i++) {
                 final double[] tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(i + (j * tmpRows), tmpRow[j]);
+                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
                 }
             }
 
@@ -243,7 +243,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             for (int i = 0; i < tmpRows; i++) {
                 final List<? extends Number> tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(i + (j * tmpRows), tmpRow.get(j));
+                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.get(j));
                 }
             }
 
@@ -260,7 +260,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             for (int i = 0; i < tmpRows; i++) {
                 final Number[] tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(i + (j * tmpRows), tmpRow[j]);
+                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
                 }
             }
 

@@ -33,6 +33,7 @@ import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure2D;
 
 public final class MultiplyBoth extends MatrixOperation {
 
@@ -63,7 +64,7 @@ public final class MultiplyBoth extends MatrixOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right.doubleValue(c + (j * complexity));
+                final double tmpRightCJ = right.doubleValue(Structure2D.index(complexity, c, j));
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -110,7 +111,7 @@ public final class MultiplyBoth extends MatrixOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                tmp0J += left.doubleValue(tmpIndex++) * right.doubleValue(c + (j * complexity));
+                tmp0J += left.doubleValue(tmpIndex++) * right.doubleValue(Structure2D.index(complexity, c, j));
             }
 
             product.set(0, j, tmp0J);
@@ -404,7 +405,7 @@ public final class MultiplyBoth extends MatrixOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right.doubleValue(c + (j * complexity));
+                final double tmpRightCJ = right.doubleValue(Structure2D.index(complexity, c, j));
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -439,7 +440,7 @@ public final class MultiplyBoth extends MatrixOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right.doubleValue(c + (j * complexity));
+                final double tmpRightCJ = right.doubleValue(Structure2D.index(complexity, c, j));
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -477,7 +478,7 @@ public final class MultiplyBoth extends MatrixOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right.doubleValue(c + (j * complexity));
+                final double tmpRightCJ = right.doubleValue(Structure2D.index(complexity, c, j));
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -518,7 +519,7 @@ public final class MultiplyBoth extends MatrixOperation {
 
             int tmpIndex = 0;
             for (int c = 0; c < complexity; c++) {
-                final double tmpRightCJ = right.doubleValue(c + (j * complexity));
+                final double tmpRightCJ = right.doubleValue(Structure2D.index(complexity, c, j));
                 tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
@@ -625,7 +626,8 @@ public final class MultiplyBoth extends MatrixOperation {
             final int limitOfRightRow = MatrixUtils.limitOfRow(right, c, columnLimit);
 
             for (int j = firstInRightRow; j < limitOfRightRow; j++) {
-                AXPY.invoke(product, j * structure, right.doubleValue(c + (j * complexity)), leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
+                AXPY.invoke(product, j * structure, right.doubleValue(Structure2D.index(complexity, c, j)), leftColumn, 0, firstInLeftColumn,
+                        limitOfLeftColumn);
             }
         }
     }
