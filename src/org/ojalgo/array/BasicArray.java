@@ -21,8 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.io.Serializable;
-
 import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -50,8 +48,8 @@ import org.ojalgo.structure.StructureAnyD;
  *
  * @author apete
  */
-public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
-        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
+public abstract class BasicArray<N extends Number>
+        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N> {
 
     public static final class Factory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
 

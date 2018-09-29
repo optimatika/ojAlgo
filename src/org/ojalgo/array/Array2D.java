@@ -21,7 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -50,7 +49,7 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Access2D.Sliceable<N>, Access2D.Visitable<N>,
         Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.Receiver<N>, Mutate2D.Exchangeable, Mutate2D.Mixable<N>,
-        Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N>, Serializable {
+        Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N> {
 
     public static final class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 

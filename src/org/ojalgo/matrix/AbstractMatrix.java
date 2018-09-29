@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -50,8 +49,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends Object
-        implements BasicMatrix, Serializable, Access2D.Collectable<N, PhysicalStore<N>> {
+abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends Object implements BasicMatrix, Access2D.Collectable<N, PhysicalStore<N>> {
 
     @SuppressWarnings("unchecked")
     static final class Logical<N extends Number, I extends BasicMatrix> implements BasicMatrix.LogicalBuilder<N, I> {

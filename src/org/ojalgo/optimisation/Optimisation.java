@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
@@ -311,7 +310,7 @@ public interface Optimisation {
         }
     }
 
-    public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result>, Serializable {
+    public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result> {
 
         private transient Access1D<?> myMultipliers = null;
         private final Access1D<?> mySolution;

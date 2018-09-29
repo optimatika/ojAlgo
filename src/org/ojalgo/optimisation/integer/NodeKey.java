@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +36,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
-final class NodeKey implements Serializable, Comparable<NodeKey> {
+final class NodeKey implements Comparable<NodeKey> {
 
     /**
      * Same scale as the default {@linkplain Optimisation.Options#feasibility} and half its precision.

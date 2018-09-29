@@ -25,7 +25,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.io.BufferedReader;
-import java.io.Serializable;
 import java.io.StreamTokenizer;
 import java.util.AbstractList;
 import java.util.List;
@@ -62,7 +61,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class RawStore extends Object implements PhysicalStore<Double>, Serializable {
+public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public static PhysicalStore.Factory<Double, RawStore> FACTORY = new PhysicalStore.Factory<Double, RawStore>() {
 

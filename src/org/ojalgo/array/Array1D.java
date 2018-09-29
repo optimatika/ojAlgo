@@ -21,7 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.List;
@@ -53,7 +52,7 @@ import org.ojalgo.structure.Mutate1D;
  */
 public final class Array1D<N extends Number> extends AbstractList<N>
         implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Sliceable<N>, Access1D.Visitable<N>, Access1D.Aggregatable<N>,
-        Mutate1D.Receiver<N>, Mutate1D.BiModifiable<N>, Mutate1D.Modifiable<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess, Serializable {
+        Mutate1D.Receiver<N>, Mutate1D.BiModifiable<N>, Mutate1D.Modifiable<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
 
     public static final class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
