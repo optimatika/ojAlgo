@@ -24,7 +24,7 @@ package org.ojalgo.netio;
 import java.io.IOException;
 import java.io.Reader;
 
-public class BufferedParsingReader extends Reader {
+class BufferedParsingReader extends Reader {
 
     private static int BUFFER_SIZE = 8192;
     private final char myBuffer[];
