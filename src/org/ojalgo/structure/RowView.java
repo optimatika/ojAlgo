@@ -89,7 +89,7 @@ public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<
     }
 
     public RowView<N> iterator() {
-        return new RowView<N>(myDelegate2D);
+        return new RowView<>(myDelegate2D);
     }
 
     public RowView<N> next() {

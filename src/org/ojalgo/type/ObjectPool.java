@@ -33,13 +33,13 @@ public abstract class ObjectPool<T> {
 
     public ObjectPool() {
         super();
-        myObjects = new LinkedBlockingQueue<T>();
+        myObjects = new LinkedBlockingQueue<>();
         myLimited = false;
     }
 
     public ObjectPool(int capacity) {
         super();
-        myObjects = new LinkedBlockingQueue<T>(capacity);
+        myObjects = new LinkedBlockingQueue<>(capacity);
         myLimited = true;
         for (int i = 0; i < capacity; i++) {
             myObjects.add(this.newObject());

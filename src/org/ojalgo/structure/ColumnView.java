@@ -94,7 +94,7 @@ public class ColumnView<N extends Number>
     }
 
     public ColumnView<N> iterator() {
-        return new ColumnView<N>(myDelegate2D);
+        return new ColumnView<>(myDelegate2D);
     }
 
     public ColumnView<N> next() {

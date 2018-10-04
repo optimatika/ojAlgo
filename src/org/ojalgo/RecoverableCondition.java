@@ -44,12 +44,12 @@ public final class RecoverableCondition extends Exception implements EffectiveTh
         return new RecoverableCondition("Matrix Not Invertible!");
     }
 
-    RecoverableCondition() {
-        super();
-    }
-
     public RecoverableCondition(final String message) {
         super(message);
+    }
+
+    RecoverableCondition() {
+        super();
     }
 
     RecoverableCondition(final String message, final Throwable cause) {

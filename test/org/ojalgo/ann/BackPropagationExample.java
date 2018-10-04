@@ -73,15 +73,13 @@ abstract class BackPropagationExample extends ANNTest {
     }
 
     @Test
-    public void testFeedForward() {
+    public void testBackpropagation() {
 
         int counter = 0;
 
-        ArtificialNeuralNetwork network = this.getInitialNetwork().get();
-
         for (Data triplet : this.getTestCases()) {
-            if ((triplet.input != null) && (triplet.expected != null)) {
-                TestUtils.assertEquals(triplet.expected, network.invoke(triplet.input), this.precision());
+            if ((triplet.input != null) && (triplet.target != null)) {
+                this.deriveTheHardWay(this.getInitialNetwork(), triplet, this.precision());
                 counter++;
             }
         }
@@ -92,13 +90,15 @@ abstract class BackPropagationExample extends ANNTest {
     }
 
     @Test
-    public void testBackpropagation() {
+    public void testFeedForward() {
 
         int counter = 0;
 
+        ArtificialNeuralNetwork network = this.getInitialNetwork().get();
+
         for (Data triplet : this.getTestCases()) {
-            if ((triplet.input != null) && (triplet.target != null)) {
-                this.deriveTheHardWay(this.getInitialNetwork(), triplet, this.precision());
+            if ((triplet.input != null) && (triplet.expected != null)) {
+                TestUtils.assertEquals(triplet.expected, network.invoke(triplet.input), this.precision());
                 counter++;
             }
         }

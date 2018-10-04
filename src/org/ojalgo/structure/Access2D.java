@@ -526,7 +526,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     }
 
     default ColumnView<N> columns() {
-        return new ColumnView<N>(this);
+        return new ColumnView<>(this);
     }
 
     default double doubleValue(final long index) {
@@ -582,7 +582,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     }
 
     default RowView<N> rows() {
-        return new RowView<N>(this);
+        return new RowView<>(this);
     }
 
     default short shortValue(long index) {

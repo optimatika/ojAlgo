@@ -109,7 +109,7 @@ public class QRTest {
 
         for (int ij = 0; ij < tmpLim; ij++) {
 
-            final Householder.Generic<ComplexNumber> tmpVector = new Householder.Generic<ComplexNumber>(ComplexNumber.FACTORY, DIMENSION);
+            final Householder.Generic<ComplexNumber> tmpVector = new Householder.Generic<>(ComplexNumber.FACTORY, DIMENSION);
 
             if (tmpInPlace.generateApplyAndCopyHouseholderColumn(ij, ij, tmpVector)) {
                 tmpInPlace.transformLeft(tmpVector, ij + 1);

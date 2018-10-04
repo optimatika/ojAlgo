@@ -563,7 +563,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     public BasicMatrix.LogicalBuilder<N, I> logical() {
-        return new Logical<N, I>(this);
+        return new Logical<>(this);
     }
 
     public I mergeColumns(final Access2D<?> belowRows) {
