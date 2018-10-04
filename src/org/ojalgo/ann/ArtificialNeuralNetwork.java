@@ -44,33 +44,33 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
      */
     public static enum Activator {
 
-    /**
-     * (-,+)
-     */
-    IDENTITY(args -> (arg -> arg), arg -> ONE, true),
-    /**
-     * ReLU: [0,+)
-     */
-    RECTIFIER(args -> (arg -> Math.max(ZERO, arg)), arg -> arg > ZERO ? ONE : ZERO, true),
-    /**
-     * [0,1]
-     */
-    SIGMOID(args -> (PrimitiveFunction.LOGISTIC), arg -> arg * (ONE - arg), true),
-    /**
-     * [0,1] <br>
-     * Currently this can only be used in the final layer in combination with {@link Error#CROSS_ENTROPY}. All
-     * other usage will give incorrect network training.
-     */
-    SOFTMAX(args -> {
-        PrimitiveDenseStore parts = args.copy();
-        parts.modifyAll(PrimitiveFunction.EXP);
-        final double total = parts.aggregateAll(Aggregator.SUM);
-        return arg -> PrimitiveFunction.EXP.invoke(arg) / total;
-    }, arg -> ONE, false),
-    /**
-     * [-1,1]
-     */
-    TANH(args -> (PrimitiveFunction.TANH), arg -> ONE - (arg * arg), true);
+        /**
+         * (-,+)
+         */
+        IDENTITY(args -> (arg -> arg), arg -> ONE, true),
+        /**
+         * ReLU: [0,+)
+         */
+        RECTIFIER(args -> (arg -> Math.max(ZERO, arg)), arg -> arg > ZERO ? ONE : ZERO, true),
+        /**
+         * [0,1]
+         */
+        SIGMOID(args -> (PrimitiveFunction.LOGISTIC), arg -> arg * (ONE - arg), true),
+        /**
+         * [0,1] <br>
+         * Currently this can only be used in the final layer in combination with {@link Error#CROSS_ENTROPY}.
+         * All other usage will give incorrect network training.
+         */
+        SOFTMAX(args -> {
+            PrimitiveDenseStore parts = args.copy();
+            parts.modifyAll(PrimitiveFunction.EXP);
+            final double total = parts.aggregateAll(Aggregator.SUM);
+            return arg -> PrimitiveFunction.EXP.invoke(arg) / total;
+        }, arg -> ONE, false),
+        /**
+         * [-1,1]
+         */
+        TANH(args -> (PrimitiveFunction.TANH), arg -> ONE - (arg * arg), true);
 
         private final PrimitiveFunction.Unary myDerivativeInTermsOfOutput;
         private final ActivatorFunctionFactory myFunction;

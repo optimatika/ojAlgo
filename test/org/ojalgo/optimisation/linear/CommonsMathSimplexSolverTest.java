@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,17 +50,17 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     /**
      * Copied/stolen from Commons Math to simplify "copying" the test cases
      */
-    enum GoalType implements Serializable {
+    enum GoalType {
 
-    /**
-     * Maximization goal.
-     */
-    MAXIMIZE,
+        /**
+         * Maximization goal.
+         */
+        MAXIMIZE,
 
-    /**
-     * Minimization goal.
-     */
-    MINIMIZE
+        /**
+         * Minimization goal.
+         */
+        MINIMIZE
 
     }
 

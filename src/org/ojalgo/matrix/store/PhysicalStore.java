@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.ojalgo.array.DenseArray;
@@ -50,7 +49,7 @@ import org.ojalgo.structure.Mutate2D;
 public interface PhysicalStore<N extends Number>
         extends MatrixStore<N>, Access2D.IndexOf, ElementsConsumer<N>, Mutate2D.Exchangeable, TransformationMatrix.Transformable<N> {
 
-    public static interface Factory<N extends Number, I extends PhysicalStore<N>> extends Factory2D<I>, Serializable {
+    public static interface Factory<N extends Number, I extends PhysicalStore<N>> extends Factory2D<I> {
 
         AggregatorSet<N> aggregator();
 

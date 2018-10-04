@@ -25,7 +25,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.io.BufferedReader;
-import java.io.Serializable;
 import java.io.StreamTokenizer;
 import java.util.AbstractList;
 import java.util.List;
@@ -62,7 +61,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class RawStore extends Object implements PhysicalStore<Double>, Serializable {
+public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public static PhysicalStore.Factory<Double, RawStore> FACTORY = new PhysicalStore.Factory<Double, RawStore>() {
 
@@ -462,7 +461,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
             for (int i = 0; i < structure; i++) {
                 tmpRow = retVal[i] = new double[tmpNumberOfColumns];
                 for (int j = 0; j < tmpNumberOfColumns; j++) {
-                    tmpRow[j] = elements.doubleValue(i + (j * structure));
+                    tmpRow[j] = elements.doubleValue(Structure2D.index(structure, i, j));
                 }
             }
         }
@@ -535,7 +534,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
         for (int i = 0; i < structure; i++) {
             for (int j = 0; j < myNumberOfColumns; j++) {
-                data[i][j] = elements[i + (j * structure)];
+                data[i][j] = elements[Structure2D.index(structure, i, j)];
             }
         }
 
@@ -777,7 +776,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
             tmpRowI = data[i];
 
             for (int j = 0; j < myNumberOfColumns; j++) {
-                tmpRowI[j] = source.doubleValue(i + (j * tmpRowDim));
+                tmpRowI[j] = source.doubleValue(Structure2D.index(tmpRowDim, i, j));
             }
         }
     }
@@ -972,7 +971,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
                 tmpValue = PrimitiveFunction.ABS.invoke(tmpRow[j]);
                 if (tmpValue > tmpLargest) {
                     tmpLargest = tmpValue;
-                    retVal = i + (j * tmpRowDim);
+                    retVal = Structure2D.index(tmpRowDim, i, j);
                 }
             }
         }
@@ -1108,7 +1107,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
             tmpRowI = data[i];
 
             for (int j = 0; j < myNumberOfColumns; j++) {
-                tmpRowI[j] = function.invoke(left.doubleValue(i + (j * tmpRowDim)), tmpRowI[j]);
+                tmpRowI[j] = function.invoke(left.doubleValue(Structure2D.index(tmpRowDim, i, j)), tmpRowI[j]);
             }
         }
     }
@@ -1123,7 +1122,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
             tmpRowI = data[i];
 
             for (int j = 0; j < myNumberOfColumns; j++) {
-                tmpRowI[j] = function.invoke(tmpRowI[j], right.doubleValue(i + (j * tmpRowDim)));
+                tmpRowI[j] = function.invoke(tmpRowI[j], right.doubleValue(Structure2D.index(tmpRowDim, i, j)));
             }
         }
     }

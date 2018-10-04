@@ -21,7 +21,6 @@
  */
 package org.ojalgo.type;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.time.Period;
 import java.time.temporal.Temporal;
@@ -45,7 +44,7 @@ import org.ojalgo.constant.PrimitiveMath;
  * @see CalendarDateUnit
  * @author apete
  */
-public final class CalendarDateDuration extends Number implements TemporalAmount, CalendarDate.Resolution, Comparable<CalendarDateDuration>, Serializable {
+public final class CalendarDateDuration extends Number implements TemporalAmount, CalendarDate.Resolution, Comparable<CalendarDateDuration> {
 
     public final double measure;
     public final CalendarDateUnit unit;

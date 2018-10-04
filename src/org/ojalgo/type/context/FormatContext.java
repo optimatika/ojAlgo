@@ -21,7 +21,6 @@
  */
 package org.ojalgo.type.context;
 
-import java.io.Serializable;
 import java.text.Format;
 import java.text.ParseException;
 
@@ -33,7 +32,7 @@ import org.ojalgo.netio.ASCII;
  *
  * @author apete
  */
-abstract class FormatContext<T, F extends Format> implements TypeContext<T>, Serializable {
+abstract class FormatContext<T, F extends Format> implements TypeContext<T> {
 
     /**
      * Use 'Non-Breaking SPace' character instead of ardinary 'space' character.

@@ -21,11 +21,8 @@
  */
 package org.ojalgo.structure;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.DoubleAdder;
-import java.util.stream.BaseStream;
-import java.util.stream.StreamSupport;
 
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -41,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
+public interface Access1D<N extends Number> extends Structure1D {
 
     /**
      * This interface complements {@linkplain Visitable} but does not extend it. It's a feature to be able to
@@ -142,6 +139,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
         public long index() {
             return myCursor;
+        }
+
+        public ElementView<N> iterator() {
+            return new ElementView<>(myValues);
         }
 
         public ElementView<N> next() {
@@ -403,10 +404,6 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         return (int) this.longValue(index);
     }
 
-    default Iterator<N> iterator() {
-        return new Iterator1D<>(this);
-    }
-
     default long longValue(long index) {
         return Math.round(this.doubleValue(index));
     }
@@ -417,10 +414,6 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     default short shortValue(long index) {
         return (short) this.intValue(index);
-    }
-
-    default BaseStream<N, ? extends BaseStream<N, ?>> stream(final boolean parallel) {
-        return StreamSupport.stream(this.spliterator(), parallel);
     }
 
     default void supplyTo(final double[] receiver) {

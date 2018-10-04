@@ -21,8 +21,16 @@
  */
 package org.ojalgo.matrix.store;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.ojalgo.TestUtils;
+
 public abstract class MatrixStoreTests {
 
     static final boolean DEBUG = false;
+
+    @BeforeEach
+    public void minimiseAllBranchLimits() {
+        TestUtils.minimiseAllBranchLimits();
+    }
 
 }

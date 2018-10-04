@@ -92,11 +92,18 @@ public abstract class IDX {
         }
     }
 
-    /**
-     * Taking into account that the images are transposed, and assumes the values are between 0 and 255.
-     */
     public static void print(Access2D<?> image, BasicLogger.Printer printer) {
-        IDX.print(image, printer, true, 255D);
+        IDX.print(image, printer, true);
+    }
+
+    public static void print(Access2D<?> image, BasicLogger.Printer printer, boolean transpose) {
+
+        double maxValue = 0D;
+        for (int i = 0; i < image.count(); i++) {
+            maxValue = Math.max(maxValue, image.doubleValue(i));
+        }
+
+        IDX.print(image, printer, transpose, maxValue);
     }
 
     public static void print(Access2D<?> image, BasicLogger.Printer printer, boolean transpose, double maxExpectedValue) {

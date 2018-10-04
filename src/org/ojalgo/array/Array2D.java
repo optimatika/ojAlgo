@@ -21,7 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -50,7 +49,7 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Access2D.Sliceable<N>, Access2D.Visitable<N>,
         Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.Receiver<N>, Mutate2D.Exchangeable, Mutate2D.Mixable<N>,
-        Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N>, Serializable {
+        Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N> {
 
     public static final class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
@@ -200,14 +199,14 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 for (int i = 0; i < tmpRows; i++) {
                     final Access1D<?> tmpRow = source[i];
                     for (long j = 0L; j < tmpColumns; j++) {
-                        tmpDelegate.set(i + (j * tmpRows), tmpRow.doubleValue(j));
+                        tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.doubleValue(j));
                     }
                 }
             } else {
                 for (int i = 0; i < tmpRows; i++) {
                     final Access1D<?> tmpRow = source[i];
                     for (long j = 0L; j < tmpColumns; j++) {
-                        tmpDelegate.set(i + (j * tmpRows), tmpRow.get(j));
+                        tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.get(j));
                     }
                 }
             }
@@ -225,7 +224,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             for (int i = 0; i < tmpRows; i++) {
                 final double[] tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(i + (j * tmpRows), tmpRow[j]);
+                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
                 }
             }
 
@@ -243,7 +242,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             for (int i = 0; i < tmpRows; i++) {
                 final List<? extends Number> tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(i + (j * tmpRows), tmpRow.get(j));
+                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.get(j));
                 }
             }
 
@@ -260,7 +259,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             for (int i = 0; i < tmpRows; i++) {
                 final Number[] tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(i + (j * tmpRows), tmpRow[j]);
+                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
                 }
             }
 

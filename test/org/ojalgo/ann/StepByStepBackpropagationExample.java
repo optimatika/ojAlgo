@@ -116,11 +116,6 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
     }
 
     @Override
-    protected NumberContext precision() {
-        return PRECISION;
-    }
-
-    @Override
     protected NetworkBuilder getInitialNetwork() {
 
         NetworkBuilder builder = ArtificialNeuralNetwork.builder(2, 2, 2);
@@ -156,6 +151,11 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
         retVal.expected(0.75136507, 0.772928465);
 
         return Collections.singletonList(retVal);
+    }
+
+    @Override
+    protected NumberContext precision() {
+        return PRECISION;
     }
 
 }

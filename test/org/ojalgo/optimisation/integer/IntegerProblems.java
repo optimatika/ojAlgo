@@ -305,30 +305,6 @@ public class IntegerProblems {
     }
 
     @Test
-    public void testP20140819node() {
-
-        final ExpressionsBasedModel model = IntegerProblems.makeP20140819();
-
-        // model.options.debug(IntegerSolver.class);
-
-        int[] lowerBounds1 = new int[] { 0, 0, 0, 3, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0 };
-        int[] upperBounds1 = new int[] { 414, 414, 414, 414, 414, 0, 414, 0, 414, 414, 414, 414, 414, 414, 6, 0 };
-        for (int v = 0; v < upperBounds1.length; v++) {
-            model.getVariable(v).integer(false).lower(lowerBounds1[v]).upper(upperBounds1[v]);
-        }
-
-        final Result node1Result = model.minimise();
-
-        if (OptimisationIntegerTests.DEBUG) {
-            BasicLogger.debug(node1Result);
-            BasicLogger.debug(model);
-        }
-
-        TestUtils.assertStateNotLessThanOptimal(node1Result);
-        TestUtils.assertTrue(model.validate(node1Result, BasicLogger.DEBUG));
-    }
-
-    @Test
     public void testP20140819fix1() {
 
         final ExpressionsBasedModel expModel = IntegerProblems.makeP20140819();
@@ -452,6 +428,30 @@ public class IntegerProblems {
         TestUtils.assertStateNotLessThanOptimal(fixedResult);
         TestUtils.assertTrue(nodeModel.validate(fixedResult, BasicLogger.DEBUG));
         TestUtils.assertStateAndSolution(nodeResult, fixedResult);
+    }
+
+    @Test
+    public void testP20140819node() {
+
+        final ExpressionsBasedModel model = IntegerProblems.makeP20140819();
+
+        // model.options.debug(IntegerSolver.class);
+
+        int[] lowerBounds1 = new int[] { 0, 0, 0, 3, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0 };
+        int[] upperBounds1 = new int[] { 414, 414, 414, 414, 414, 0, 414, 0, 414, 414, 414, 414, 414, 414, 6, 0 };
+        for (int v = 0; v < upperBounds1.length; v++) {
+            model.getVariable(v).integer(false).lower(lowerBounds1[v]).upper(upperBounds1[v]);
+        }
+
+        final Result node1Result = model.minimise();
+
+        if (OptimisationIntegerTests.DEBUG) {
+            BasicLogger.debug(node1Result);
+            BasicLogger.debug(model);
+        }
+
+        TestUtils.assertStateNotLessThanOptimal(node1Result);
+        TestUtils.assertTrue(model.validate(node1Result, BasicLogger.DEBUG));
     }
 
     @Test

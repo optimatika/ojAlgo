@@ -26,9 +26,11 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
@@ -48,12 +50,12 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     }
 
-    public static final SparseStore.Factory<RationalNumber> RATIONAL = (rowsCount, columnsCount) -> SparseStore.makeRational((int) rowsCount,
-            (int) columnsCount);
-
     public static final SparseStore.Factory<ComplexNumber> COMPLEX = (rowsCount, columnsCount) -> SparseStore.makeComplex((int) rowsCount, (int) columnsCount);
 
     public static final SparseStore.Factory<Double> PRIMITIVE = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
+
+    public static final SparseStore.Factory<RationalNumber> RATIONAL = (rowsCount, columnsCount) -> SparseStore.makeRational((int) rowsCount,
+            (int) columnsCount);
 
     public static SparseStore<ComplexNumber> makeComplex(final int rowsCount, final int columnsCount) {
         return new SparseStore<>(GenericDenseStore.COMPLEX, rowsCount, columnsCount);
@@ -184,27 +186,57 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
-        final long tmpLimit = Math.min(left.count(), this.count());
+
+        final long limit = Math.min(left.count(), this.count());
+        boolean notModifiesZero = function.invoke(E, ZERO) == ZERO;
+
         if (this.isPrimitive()) {
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
+            if (notModifiesZero) {
+                for (NonzeroView<N> element : myElements.nonzeros()) {
+                    element.modify(left.doubleValue(element.index()), function);
+                }
+            } else {
+                for (long i = 0L; i < limit; i++) {
+                    this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
+                }
             }
         } else {
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.set(i, function.invoke(left.get(i), this.get(i)));
+            if (notModifiesZero) {
+                for (NonzeroView<N> element : myElements.nonzeros()) {
+                    element.modify(left.get(element.index()), function);
+                }
+            } else {
+                for (long i = 0L; i < limit; i++) {
+                    this.set(i, function.invoke(left.get(i), this.get(i)));
+                }
             }
         }
     }
 
     public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
-        final long tmpLimit = Math.min(this.count(), right.count());
+
+        final long limit = Math.min(this.count(), right.count());
+        boolean notModifiesZero = function.invoke(ZERO, E) == ZERO;
+
         if (this.isPrimitive()) {
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
+            if (notModifiesZero) {
+                for (NonzeroView<N> element : myElements.nonzeros()) {
+                    element.modify(function, right.doubleValue(element.index()));
+                }
+            } else {
+                for (long i = 0L; i < limit; i++) {
+                    this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
+                }
             }
         } else {
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.set(i, function.invoke(this.get(i), right.get(i)));
+            if (notModifiesZero) {
+                for (NonzeroView<N> element : myElements.nonzeros()) {
+                    element.modify(function, right.get(element.index()));
+                }
+            } else {
+                for (long i = 0L; i < limit; i++) {
+                    this.set(i, function.invoke(this.get(i), right.get(i)));
+                }
             }
         }
     }
@@ -363,6 +395,37 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         receiver.reset();
 
         myElements.supplyNonZerosTo(receiver);
+    }
+
+    public void visitColumn(long row, long col, VoidFunction<N> visitor) {
+
+        long structure = this.countRows();
+        long first = Structure2D.index(structure, row, col);
+        long limit = Structure2D.index(structure, 0, col + 1L);
+
+        myElements.visitRange(first, limit, visitor);
+    }
+
+    public void visitRow(long row, long col, VoidFunction<N> visitor) {
+        int counter = 0;
+        if (this.isPrimitive()) {
+            for (ElementView2D<N, ?> nzv : this.nonzeros()) {
+                if (nzv.row() == row) {
+                    visitor.accept(nzv.doubleValue());
+                    counter++;
+                }
+            }
+        } else {
+            for (ElementView2D<N, ?> nzv : this.nonzeros()) {
+                if (nzv.row() == row) {
+                    visitor.accept(nzv.get());
+                    counter++;
+                }
+            }
+        }
+        if ((col + counter) < this.countColumns()) {
+            visitor.accept(0.0);
+        }
     }
 
     private void updateNonZeros(final long row, final long col) {
