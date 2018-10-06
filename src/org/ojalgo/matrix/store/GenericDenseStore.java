@@ -880,7 +880,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     @Override
-    public void modifyAll(final UnaryFunction<N> aFunc) {
+    public void modifyAll(final UnaryFunction<N> modifier) {
 
         final int numberOfRows = myRowDim;
         final int numberOfCols = myColDim;
@@ -891,7 +891,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    GenericDenseStore.this.modify(numberOfRows * aFirst, numberOfRows * aLimit, 1, aFunc);
+                    GenericDenseStore.this.modify(numberOfRows * aFirst, numberOfRows * aLimit, 1, modifier);
                 }
 
             };
@@ -900,7 +900,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
         } else {
 
-            this.modify(0, numberOfRows * numberOfCols, 1, aFunc);
+            this.modify(0, numberOfRows * numberOfCols, 1, modifier);
         }
     }
 
