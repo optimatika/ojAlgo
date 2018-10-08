@@ -131,7 +131,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
             }
 
             // If m == l, d[l] is an eigenvalue, otherwise, iterate.
-            if ((m > l) && (m < size)) {
+            if ((m > l) && (m < size) && ((l + 1) < size)) {
                 do {
 
                     // Compute implicit shift
