@@ -105,6 +105,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     static void tql2(final double[] d, final double[] e, final RotateRight mtrxV) {
 
         final int size = d.length;
+        final int limit = size - 1;
 
         double shift = ZERO;
         double increment;
@@ -126,12 +127,12 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
             epsilon = MACHINE_EPSILON * magnitude;
 
             m = l;
-            while ((m < size) && (ABS.invoke(e[m]) > epsilon)) {
+            while ((m < limit) && (ABS.invoke(e[m]) > epsilon)) {
                 m++;
             }
 
             // If m == l, d[l] is an eigenvalue, otherwise, iterate.
-            if ((m > l) && (m < size) && ((l + 1) < size)) {
+            if ((l < m) && (m < size)) {
                 do {
 
                     // Compute implicit shift

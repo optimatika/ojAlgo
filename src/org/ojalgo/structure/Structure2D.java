@@ -322,6 +322,10 @@ public interface Structure2D extends Structure1D {
         return Structure2D.column(index, structure[0]);
     }
 
+    static long count(final long numberOfRows, final long numberOfColumnns) {
+        return numberOfRows * numberOfColumnns;
+    }
+
     static int index(final int structure, final int row, final int column) {
         return row + (column * structure);
     }

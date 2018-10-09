@@ -430,7 +430,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         return new Access2D<Double>() {
 
             public long count() {
-                return target.length * target[0].length;
+                return Structure2D.count(target.length, target[0].length);
             }
 
             public long countColumns() {
@@ -456,7 +456,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         return new Access2D<N>() {
 
             public long count() {
-                return target.length * target[0].length;
+                return Structure2D.count(target.length, target[0].length);
             }
 
             public long countColumns() {
