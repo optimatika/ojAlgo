@@ -74,6 +74,7 @@
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <mainClass>org.ojalgo.OjAlgoUtils</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
