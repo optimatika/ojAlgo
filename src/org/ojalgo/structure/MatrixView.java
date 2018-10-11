@@ -25,11 +25,7 @@ import java.util.Iterator;
 
 import org.ojalgo.ProgrammingError;
 
-public class MatrixView<N extends Number> implements Access2D<N>, Iterator<MatrixView<N>> {
-
-    public static <S extends Number> Iterable<MatrixView<S>> makeIterable(final AccessAnyD<S> access) {
-        return new MatrixView<>(access).iterable;
-    }
+public class MatrixView<N extends Number> implements Access2D<N>, Iterable<MatrixView<N>>, Iterator<MatrixView<N>>, Comparable<MatrixView<N>> {
 
     private final long myColumnsCount;
     private final long myCount;
@@ -37,8 +33,6 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterator<Matri
     private final long myLastOffset;
     private long myOffset;
     private final long myRowsCount;
-
-    final Iterable<MatrixView<N>> iterable = () -> MatrixView.this;
 
     protected MatrixView(final AccessAnyD<N> access) {
         this(access, -1L);
@@ -58,6 +52,10 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterator<Matri
         myLastOffset = myDelegateAnyD.count() - myCount;
     }
 
+    public int compareTo(MatrixView<N> other) {
+        return Long.compare(myOffset, other.getOffset());
+    }
+
     public long count() {
         return myCount;
     }
@@ -72,6 +70,10 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterator<Matri
 
     public double doubleValue(long row, long col) {
         return myDelegateAnyD.doubleValue(myOffset + Structure2D.index(myRowsCount, row, col));
+    }
+
+    public long estimateSize() {
+        return (myLastOffset - myOffset) / myCount;
     }
 
     public N get(long row, long col) {
@@ -93,6 +95,10 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterator<Matri
         return myOffset / myCount;
     }
 
+    public MatrixView<N> iterator() {
+        return new MatrixView<N>(myDelegateAnyD);
+    }
+
     public MatrixView<N> next() {
         myOffset += myCount;
         return this;
@@ -109,6 +115,10 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterator<Matri
 
     protected void setIndex(final long matrix) {
         myOffset = matrix * myCount;
+    }
+
+    long getOffset() {
+        return myOffset;
     }
 
 }

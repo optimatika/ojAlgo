@@ -30,7 +30,7 @@ import java.util.stream.StreamSupport;
 import org.ojalgo.ProgrammingError;
 
 public class ColumnView<N extends Number>
-        implements Access1D<N>, Iterator<ColumnView<N>>, Iterable<ColumnView<N>>, Spliterator<ColumnView<N>>, Comparable<ColumnView<N>> {
+        implements Access1D<N>, Iterable<ColumnView<N>>, Iterator<ColumnView<N>>, Spliterator<ColumnView<N>>, Comparable<ColumnView<N>> {
 
     static final int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED
             | Spliterator.SIZED | Spliterator.SORTED | Spliterator.SUBSIZED;
