@@ -33,10 +33,6 @@ public abstract class EvD2D {
 
         double norm = ZERO;
         for (int i = 0; i < size; i++) {
-            if ((i < 0) | (i > (size - 1))) {
-                d[i] = mtrxH[i][i];
-                e[i] = ZERO;
-            }
             for (int j = Math.max(i - 1, 0); j < size; j++) {
                 norm = norm + ABS.invoke(mtrxH[i][j]);
             }
@@ -153,12 +149,8 @@ public abstract class EvD2D {
                 // Form shift
 
                 x = mtrxH[n][n];
-                y = ZERO;
-                w = ZERO;
-                if (l < n) {
-                    y = mtrxH[n - 1][n - 1];
-                    w = mtrxH[n][n - 1] * mtrxH[n - 1][n];
-                }
+                y = mtrxH[n - 1][n - 1];
+                w = mtrxH[n][n - 1] * mtrxH[n - 1][n];
 
                 // Wilkinson's original ad hoc shift
 
@@ -443,16 +435,6 @@ public abstract class EvD2D {
         }
 
         if (trnspV != null) {
-
-            // Vectors of isolated roots
-            for (int i = 0; i < size; i++) {
-                if ((i < 0) | (i > (size - 1))) {
-                    for (int j = i; j < size; j++) {
-                        //V[i][j] = H[i][j];
-                        trnspV[j][i] = mtrxH[i][j];
-                    }
-                }
-            }
 
             // Back transformation to get eigenvectors of original matrix
             for (int j = size - 1; j >= 0; j--) {

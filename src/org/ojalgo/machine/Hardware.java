@@ -214,9 +214,24 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
+     * <li>MacBookPro14,2
+     * <ul>
+     * <li>1 processors</li>
+     * <li>2 cores per processor</li>
+     * <li>2 threads per core (4 threads in total)</li>
+     * <li>===</li>
+     * <li>8GB system RAM</li>
+     * <li>4MB L3 cache per processor</li>
+     * <li>256kB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
      * </ul>
      */
     static final Hardware X86_64__04_2 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(8L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
+            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
+
+    static final Hardware X86_64__04 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(16L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     /**
@@ -387,9 +402,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
         PREDEFINED.add(X86__01);
         PREDEFINED.add(X86__02);
         PREDEFINED.add(X86_64__02);
-        PREDEFINED.add(X86_64__04_2);
-        PREDEFINED.add(X86_64__04_1_L2);
-        PREDEFINED.add(X86_64__04_1_L3);
+        PREDEFINED.add(X86_64__04);
+        //        PREDEFINED.add(X86_64__04_2);
+        //        PREDEFINED.add(X86_64__04_1_L2);
+        //        PREDEFINED.add(X86_64__04_1_L3);
         PREDEFINED.add(X86_64__08);
         PREDEFINED.add(X86_64__12);
         PREDEFINED.add(X86_64__16);

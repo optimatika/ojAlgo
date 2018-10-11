@@ -100,7 +100,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         Raw1D.visit(myDiagonalR, aggregator);
 
-        if ((myNumberOfHouseholderTransformations % 2) == 1) {
+        if ((myNumberOfHouseholderTransformations % 2) != 0) {
             return -aggregator.get();
         } else {
             return aggregator.get();
