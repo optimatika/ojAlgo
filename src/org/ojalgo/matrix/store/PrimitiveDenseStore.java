@@ -879,25 +879,25 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     @Override
     public void modifyAll(final UnaryFunction<Double> modifier) {
 
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
+        final int numberOfRows = myRowDim;
+        final int numberOfCols = myColDim;
 
-        if (tmpColDim > ModifyAll.THRESHOLD) {
+        if (numberOfCols > ModifyAll.THRESHOLD) {
 
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+            final DivideAndConquer conquerer = new DivideAndConquer() {
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    PrimitiveDenseStore.this.modify(tmpRowDim * first, tmpRowDim * limit, 1, modifier);
+                    PrimitiveDenseStore.this.modify(numberOfRows * first, numberOfRows * limit, 1, modifier);
                 }
 
             };
 
-            tmpConquerer.invoke(0, tmpColDim, ModifyAll.THRESHOLD);
+            conquerer.invoke(0, numberOfCols, ModifyAll.THRESHOLD);
 
         } else {
 
-            this.modify(tmpRowDim * 0, tmpRowDim * tmpColDim, 1, modifier);
+            this.modify(0, numberOfRows * numberOfCols, 1, modifier);
         }
     }
 

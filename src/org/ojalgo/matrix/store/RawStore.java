@@ -704,7 +704,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
     }
 
     public long count() {
-        return data.length * myNumberOfColumns;
+        return Structure2D.count(data.length, myNumberOfColumns);
     }
 
     public long countColumns() {

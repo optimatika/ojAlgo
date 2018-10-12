@@ -50,7 +50,10 @@ import org.ojalgo.type.context.NumberContext;
  * </p>
  *
  * @author apete
+ * @deprecated v46.3 Use the specific implementations instead {@link PrimitiveMatrix}, {@link ComplexMatrix}
+ *             or {@link RationalMatrix}.
  */
+@Deprecated
 public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>,
         ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number>,
         Access2D<Number>, Access2D.Elements, Access2D.Aggregatable<Number>, Structure2D.ReducibleTo1D<BasicMatrix>, NumberContext.Enforceable<BasicMatrix> {
