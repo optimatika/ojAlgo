@@ -24,10 +24,13 @@ package org.ojalgo.matrix;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.algebra.NormedVectorSpace;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -46,14 +49,80 @@ import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> extends Object
-        implements BasicMatrix<N, I>, Access2D.Collectable<N, PhysicalStore<N>> {
+public abstract class AbstractMatrix<N extends Number, M extends AbstractMatrix<N, M>> extends Object
+        implements BasicMatrix<N, M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
     @SuppressWarnings("unchecked")
-    static final class Logical<N extends Number, I extends BasicMatrix<N, I>> implements BasicMatrix.LogicalBuilder<N, I> {
+    public static interface LogicalBuilder<N extends Number, I extends BasicMatrix<N, I>>
+            extends Structure2D.Logical<I, AbstractMatrix.LogicalBuilder<N, I>>, Access2D.Collectable<N, PhysicalStore<N>> {
+
+        LogicalBuilder<N, I> above(int numberOfRows);
+
+        LogicalBuilder<N, I> above(N... elements);
+
+        LogicalBuilder<N, I> below(int numberOfRows);
+
+        LogicalBuilder<N, I> below(N... elements);
+
+        LogicalBuilder<N, I> bidiagonal(boolean upper, boolean assumeOne);
+
+        default I build() {
+            return this.get();
+        }
+
+        LogicalBuilder<N, I> column(final int... columns);
+
+        LogicalBuilder<N, I> conjugate();
+
+        LogicalBuilder<N, I> diagonal();
+
+        LogicalBuilder<N, I> hermitian(boolean upper);
+
+        LogicalBuilder<N, I> hessenberg(boolean upper);
+
+        LogicalBuilder<N, I> left(int numberOfColumns);
+
+        LogicalBuilder<N, I> left(N... elements);
+
+        LogicalBuilder<N, I> limits(int rowLimit, int columnLimit);
+
+        LogicalBuilder<N, I> offsets(int rowOffset, int columnOffset);
+
+        LogicalBuilder<N, I> right(int numberOfColumns);
+
+        LogicalBuilder<N, I> right(N... elements);
+
+        LogicalBuilder<N, I> row(final int... rows);
+
+        LogicalBuilder<N, I> superimpose(I matrix);
+
+        LogicalBuilder<N, I> superimpose(int row, int col, I matrix);
+
+        LogicalBuilder<N, I> superimpose(int row, int col, Number matrix);
+
+        LogicalBuilder<N, I> transpose();
+
+        LogicalBuilder<N, I> triangular(boolean upper, boolean assumeOne);
+
+        LogicalBuilder<N, I> tridiagonal();
+
+    }
+
+    public static interface PhysicalBuilder<N extends Number, I extends BasicMatrix<N, I>>
+            extends Mutate2D.Receiver<N>, Mutate2D.BiModifiable<N>, Mutate2D.Exchangeable, Supplier<I>, Access2D.Collectable<N, PhysicalStore<N>> {
+
+        default I build() {
+            return this.get();
+        }
+
+    }
+
+    @SuppressWarnings("unchecked")
+    static final class Logical<N extends Number, I extends AbstractMatrix<N, I>> implements AbstractMatrix.LogicalBuilder<N, I> {
 
         private final MatrixStore.LogicalBuilder<N> myDelegate;
         private final AbstractMatrix<N, I> myOrigin;
@@ -64,47 +133,47 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
             myDelegate = matrix.getStore().logical();
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> above(I... above) {
+        public AbstractMatrix.LogicalBuilder<N, I> above(I... above) {
             myDelegate.above(this.cast(above));
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> above(int numberOfRows) {
+        public AbstractMatrix.LogicalBuilder<N, I> above(int numberOfRows) {
             myDelegate.above(numberOfRows);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> above(N... elements) {
+        public AbstractMatrix.LogicalBuilder<N, I> above(N... elements) {
             myDelegate.above(elements);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> below(I... below) {
+        public AbstractMatrix.LogicalBuilder<N, I> below(I... below) {
             myDelegate.below(this.cast(below));
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> below(int numberOfRows) {
+        public AbstractMatrix.LogicalBuilder<N, I> below(int numberOfRows) {
             myDelegate.below(numberOfRows);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> below(N... elements) {
+        public AbstractMatrix.LogicalBuilder<N, I> below(N... elements) {
             myDelegate.below(elements);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> bidiagonal(boolean upper, boolean assumeOne) {
+        public AbstractMatrix.LogicalBuilder<N, I> bidiagonal(boolean upper, boolean assumeOne) {
             myDelegate.bidiagonal(upper, assumeOne);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> column(int... columns) {
+        public AbstractMatrix.LogicalBuilder<N, I> column(int... columns) {
             myDelegate.column(columns);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> conjugate() {
+        public AbstractMatrix.LogicalBuilder<N, I> conjugate() {
             myDelegate.conjugate();
             return this;
         }
@@ -117,12 +186,12 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
             return myDelegate.countRows();
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> diagonal() {
+        public AbstractMatrix.LogicalBuilder<N, I> diagonal() {
             myDelegate.diagonal();
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> diagonally(I... diagonally) {
+        public AbstractMatrix.LogicalBuilder<N, I> diagonally(I... diagonally) {
             myDelegate.diagonally(this.cast(diagonally));
             return this;
         }
@@ -131,72 +200,72 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
             return myOrigin.getFactory().instantiate(myDelegate.get());
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> hermitian(boolean upper) {
+        public AbstractMatrix.LogicalBuilder<N, I> hermitian(boolean upper) {
             myDelegate.hermitian(upper);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> hessenberg(boolean upper) {
+        public AbstractMatrix.LogicalBuilder<N, I> hessenberg(boolean upper) {
             myDelegate.hessenberg(upper);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> left(I... left) {
+        public AbstractMatrix.LogicalBuilder<N, I> left(I... left) {
             myDelegate.left(this.cast(left));
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> left(int numberOfColumns) {
+        public AbstractMatrix.LogicalBuilder<N, I> left(int numberOfColumns) {
             myDelegate.left(numberOfColumns);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> left(N... elements) {
+        public AbstractMatrix.LogicalBuilder<N, I> left(N... elements) {
             myDelegate.left(elements);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> limits(int rowLimit, int columnLimit) {
+        public AbstractMatrix.LogicalBuilder<N, I> limits(int rowLimit, int columnLimit) {
             myDelegate.limits(rowLimit, columnLimit);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> offsets(int rowOffset, int columnOffset) {
+        public AbstractMatrix.LogicalBuilder<N, I> offsets(int rowOffset, int columnOffset) {
             myDelegate.offsets(rowOffset, columnOffset);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> right(I... right) {
+        public AbstractMatrix.LogicalBuilder<N, I> right(I... right) {
             myDelegate.right(this.cast(right));
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> right(int numberOfColumns) {
+        public AbstractMatrix.LogicalBuilder<N, I> right(int numberOfColumns) {
             myDelegate.right(numberOfColumns);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> right(N... elements) {
+        public AbstractMatrix.LogicalBuilder<N, I> right(N... elements) {
             myDelegate.right(elements);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> row(int... rows) {
+        public AbstractMatrix.LogicalBuilder<N, I> row(int... rows) {
             myDelegate.row(rows);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> superimpose(BasicMatrix matrix) {
+        public AbstractMatrix.LogicalBuilder<N, I> superimpose(I matrix) {
             myDelegate.superimpose(myOrigin.cast(matrix).get());
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> superimpose(int row, int col, BasicMatrix matrix) {
+        public AbstractMatrix.LogicalBuilder<N, I> superimpose(int row, int col, I matrix) {
             myDelegate.superimpose(row, col, myOrigin.cast(matrix).get());
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> superimpose(int row, int col, Number matrix) {
+        public AbstractMatrix.LogicalBuilder<N, I> superimpose(int row, int col, Number matrix) {
             myDelegate.superimpose(row, col, matrix);
             return this;
         }
@@ -205,17 +274,17 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
             myDelegate.supplyTo(receiver);
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> transpose() {
+        public AbstractMatrix.LogicalBuilder<N, I> transpose() {
             myDelegate.transpose();
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> triangular(boolean upper, boolean assumeOne) {
+        public AbstractMatrix.LogicalBuilder<N, I> triangular(boolean upper, boolean assumeOne) {
             myDelegate.triangular(upper, assumeOne);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> tridiagonal() {
+        public AbstractMatrix.LogicalBuilder<N, I> tridiagonal() {
             myDelegate.tridiagonal();
             return this;
         }
@@ -230,10 +299,53 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
 
     }
 
+    /**
+     * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
+     * the sum of the square of the singular values.
+     *
+     * @return The matrix' Frobenius norm
+     */
+    public static <M extends BasicMatrix<?, M>> double calculateFrobeniusNorm(final M matrix) {
+        return matrix.norm();
+    }
+
+    /**
+     * @return The inf-norm or maximum row sum
+     */
+    public static <M extends BasicMatrix<?, M>> double calculateInfinityNorm(final M matrix) {
+
+        double retVal = PrimitiveMath.ZERO;
+
+        final long tmpLimit = matrix.countRows();
+        for (long i = 0L; i < tmpLimit; i++) {
+            retVal = PrimitiveFunction.MAX.invoke(retVal, matrix.aggregateRow(i, Aggregator.NORM1).doubleValue());
+        }
+
+        return retVal;
+    }
+
+    /**
+     * @return The 1-norm or maximum column sum
+     */
+    public static <M extends BasicMatrix<?, M>> double calculateOneNorm(final M matrix) {
+
+        double retVal = PrimitiveMath.ZERO;
+
+        final long tmpLimit = matrix.countColumns();
+        for (long j = 0L; j < tmpLimit; j++) {
+            retVal = PrimitiveFunction.MAX.invoke(retVal, matrix.aggregateColumn(j, Aggregator.NORM1).doubleValue());
+        }
+
+        return retVal;
+    }
+
     private transient MatrixDecomposition<N> myDecomposition = null;
     private transient int myHashCode = 0;
+
     private transient Boolean myHermitian = null;
+
     private final MatrixStore<N> myStore;
+
     private transient Boolean mySymmetric = null;
 
     @SuppressWarnings("unused")
@@ -251,7 +363,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         myStore = store;
     }
 
-    public I add(final BasicMatrix addend) {
+    public M add(final M addend) {
 
         ProgrammingError.throwIfNotEqualDimensions(myStore, addend);
 
@@ -262,7 +374,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(retVal);
     }
 
-    public I add(final double scalarAddend) {
+    public M add(final double scalarAddend) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
 
@@ -273,7 +385,15 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(retVal);
     }
 
-    public I add(final int row, final int col, final Access2D<?> addend) {
+    /**
+     * @param row The row index of where to superimpose the top left element of the addend
+     * @param col The column index of where to superimpose the top left element of the addend
+     * @param addend A matrix to superimpose
+     * @return A new matrix
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
+     */
+    @Deprecated
+    public M add(final int row, final int col, final Access2D<?> addend) {
 
         final MatrixStore<N> tmpDiff = this.cast(addend).get();
 
@@ -281,7 +401,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(myStore.logical().superimpose(row, col, tmpDiff).get());
     }
 
-    public I add(final Number scalarAddend) {
+    public M add(final Number scalarAddend) {
 
         final org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> tmpPhysical = myStore.physical();
 
@@ -310,11 +430,14 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return myStore.aggregateRow(row, col, aggregator);
     }
 
-    public I conjugate() {
+    public M conjugate() {
         return this.getFactory().instantiate(myStore.conjugate());
     }
 
-    public PhysicalBuilder<N, I> copy() {
+    /**
+     * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
+     */
+    public AbstractMatrix.PhysicalBuilder<N, M> copy() {
         return this.getFactory().wrap(myStore.copy());
     }
 
@@ -330,7 +453,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return myStore.countRows();
     }
 
-    public I divide(final double scalarDivisor) {
+    public M divide(final double scalarDivisor) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
 
@@ -341,7 +464,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(retVal);
     }
 
-    public I divide(final Number scalarDivisor) {
+    public M divide(final Number scalarDivisor) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
 
@@ -352,7 +475,15 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(retVal);
     }
 
-    public I divideElements(final Access2D<?> divisor) {
+    /**
+     * Divides the elements of this with the elements of aMtrx. The matrices must have equal dimensions.
+     *
+     * @param aMtrx The denominator elements.
+     * @return A new matrix whos elements are the elements of this divided with the elements of aMtrx.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
+     */
+    @Deprecated
+    public M divideElements(final Access2D<?> divisor) {
 
         ProgrammingError.throwIfNotEqualDimensions(myStore, divisor);
 
@@ -371,7 +502,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return myStore.doubleValue(i, j);
     }
 
-    public I enforce(final NumberContext context) {
+    public M enforce(final NumberContext context) {
 
         final PhysicalStore<N> tmpCopy = myStore.copy();
 
@@ -380,6 +511,10 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(tmpCopy);
     }
 
+    /**
+     * @return true if the frobenius norm of the difference between [this] and [aStore] is zero within the
+     *         limits of aCntxt.
+     */
     public boolean equals(final Access2D<?> another, final NumberContext precision) {
         return Access2D.equals(myStore, another, precision);
     }
@@ -393,6 +528,10 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         }
     }
 
+    /**
+     * BasicMatrix instances are intended to be immutable. If they are it is possible to cache (partial)
+     * calculation results. Calling this method should flush any cached calculation results.
+     */
     public void flushCache() {
 
         myHashCode = 0;
@@ -415,14 +554,29 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return myStore.get(aRow, aColumn);
     }
 
-    public I getColumnsRange(final int first, final int limit) {
+    /**
+     * @param first The first column to include.
+     * @param limit The limit (exclusive) - the first column not to include.
+     * @return A new matrix with only the specified range of columns
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
+     */
+    @Deprecated
+    public M getColumnsRange(final int first, final int limit) {
         return this.getFactory().instantiate(myStore.logical().limits((int) myStore.countRows(), limit).offsets(0, first).get());
     }
 
+    /**
+     * Matrix condition (2-norm)
+     *
+     * @return ratio of largest to smallest singular value.
+     */
     public Scalar<N> getCondition() {
         return myStore.physical().scalar().convert(this.getComputedSingularValue().getCondition());
     }
 
+    /**
+     * @return The matrix' determinant.
+     */
     public Scalar<N> getDeterminant() {
 
         N tmpDeterminant = null;
@@ -465,18 +619,41 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return retVal;
     }
 
+    /**
+     * The rank of a matrix is the (maximum) number of linearly independent rows or columns it contains. It is
+     * also equal to the number of nonzero singular values of the matrix.
+     *
+     * @return The matrix' rank.
+     * @see MatrixDecomposition.RankRevealing
+     */
     public int getRank() {
         return this.getRankRevealing(myStore).getRank();
     }
 
-    public I getRowsRange(final int first, final int limit) {
+    /**
+     * @param first The first row to include.
+     * @param kimit The limit (exclusive) - the first row not to include.
+     * @return A new matrix with only the specified range of rows
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
+     */
+    @Deprecated
+    public M getRowsRange(final int first, final int limit) {
         return this.getFactory().instantiate(myStore.logical().limits(limit, (int) myStore.countColumns()).offsets(first, 0).get());
     }
 
+    /**
+     * @deprecated v40 Use {@link SingularValue}
+     */
+    @Deprecated
     public List<Double> getSingularValues() {
         return this.getComputedSingularValue().getSingularValues();
     }
 
+    /**
+     * The sum of the diagonal elements.
+     *
+     * @return The matrix' trace.
+     */
     public Scalar<N> getTrace() {
 
         final AggregatorFunction<N> tmpAggr = myStore.physical().aggregator().sum();
@@ -494,7 +671,32 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return myHashCode;
     }
 
-    public I invert() {
+    /**
+     * <p>
+     * About inverting matrices:
+     * </p>
+     * <ul>
+     * <li>"right inverse": [this][right inverse]=[I]. You may calculate it using
+     * {@linkplain #solve(Access2D)}.</li>
+     * <li>"left inverse": [left inverse][this]=[I]. You may calculate it using {@linkplain #solve(Access2D)}
+     * and transposing.</li>
+     * <li>"generalised inverse": [this][generalised inverse][this]=[this]. Note that if [this] is singular or
+     * non-square, then [generalised inverse] is not unique.</li>
+     * <li>"pseudoinverse": The generalised inverse (there are typically/possibly many) with the smallest
+     * frobenius norm is called the pseudoinverse. You may calculate it using the {@linkplain QR} or
+     * {@linkplain SingularValue} decompositions.</li>
+     * <li>"inverse":
+     * <ul>
+     * <li>If [left inverse]=[right inverse] then it is also [inverse].</li>
+     * <li>If [this] is square and has full rank then the [generalised inverse] is unique, with the
+     * [pseudoinverse] given, and equal to [inverse].</li>
+     * </ul>
+     * </li>
+     * </ul>
+     *
+     * @return The "best possible" inverse....
+     */
+    public M invert() {
 
         MatrixStore<N> tmpInverse = null;
 
@@ -536,6 +738,10 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return myStore.isAbsolute(row, col);
     }
 
+    /**
+     * @return true if {@linkplain #getRank()} == min({@linkplain #countRows()}, {@linkplain #countColumns()})
+     * @see MatrixDecomposition.RankRevealing
+     */
     public boolean isFullRank() {
         return this.getRankRevealing(myStore).isFullRank();
         // return this.getRank() == Math.min(myStore.countRows(), myStore.countColumns());
@@ -563,11 +769,19 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return mySymmetric.booleanValue();
     }
 
-    public BasicMatrix.LogicalBuilder<N, I> logical() {
+    public AbstractMatrix.LogicalBuilder<N, M> logical() {
         return new Logical<>(this);
     }
 
-    public I mergeColumns(final Access2D<?> belowRows) {
+    /**
+     * [belowRows] is appended below [this]. The two matrices must have the same number of columns.
+     *
+     * @param belowRows The matrix to merge.
+     * @return A new matrix with more rows.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
+     */
+    @Deprecated
+    public M mergeColumns(final Access2D<?> belowRows) {
 
         ProgrammingError.throwIfNotEqualColumnDimensions(myStore, belowRows);
 
@@ -576,7 +790,15 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(myStore.logical().below(tmpBelow).get());
     }
 
-    public I mergeRows(final Access2D<?> rightColumns) {
+    /**
+     * [rightColumns] is appended to the right of [this]. The two matrices must have the same number of rows.
+     *
+     * @param rightColumns The matrix to merge.
+     * @return A new matrix with more columns.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
+     */
+    @Deprecated
+    public M mergeRows(final Access2D<?> rightColumns) {
 
         ProgrammingError.throwIfNotEqualRowDimensions(myStore, rightColumns);
 
@@ -585,7 +807,11 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(myStore.logical().right(tmpRight).get());
     }
 
-    public I modify(final UnaryFunction<? extends Number> modifier) {
+    /**
+     * @deprecated v42 Use {@link #logical()} or {@link #copy()} instead
+     */
+    @Deprecated
+    public M modify(final UnaryFunction<? extends Number> modifier) {
 
         final PhysicalStore<N> retVal = myStore.copy();
 
@@ -594,14 +820,14 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(retVal);
     }
 
-    public I multiply(final BasicMatrix multiplicand) {
+    public M multiply(final M multiplicand) {
 
         ProgrammingError.throwIfMultiplicationNotPossible(myStore, multiplicand);
 
         return this.getFactory().instantiate(myStore.multiply(this.cast(multiplicand).get()));
     }
 
-    public I multiply(final double scalarMultiplicand) {
+    public M multiply(final double scalarMultiplicand) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
 
@@ -612,7 +838,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(retVal);
     }
 
-    public I multiply(final Number scalarMultiplicand) {
+    public M multiply(final Number scalarMultiplicand) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
 
@@ -623,7 +849,16 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(retVal);
     }
 
-    public I multiplyElements(final Access2D<?> multiplicand) {
+    /**
+     * Multiplies the elements of this matrix with the elements of aMtrx. The matrices must have equal
+     * dimensions.
+     *
+     * @param aMtrx The elements to multiply by.
+     * @return A new matrix whos elements are the elements of this multiplied with the elements of aMtrx.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
+     */
+    @Deprecated
+    public M multiplyElements(final Access2D<?> multiplicand) {
 
         ProgrammingError.throwIfNotEqualDimensions(myStore, multiplicand);
 
@@ -634,7 +869,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(retVal);
     }
 
-    public I negate() {
+    public M negate() {
 
         final PhysicalStore<N> retVal = myStore.copy();
 
@@ -654,19 +889,55 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return myStore.norm();
     }
 
-    public I reduceColumns(Aggregator aggregator) {
+    public M reduceColumns(Aggregator aggregator) {
         return this.getFactory().instantiate(myStore.reduceColumns(aggregator).get());
     }
 
-    public I reduceRows(Aggregator aggregator) {
+    public M reduceRows(Aggregator aggregator) {
         return this.getFactory().instantiate(myStore.reduceRows(aggregator).get());
     }
 
-    public I signum() {
+    /**
+     * @param someCols An ordered array of column indeces.
+     * @return A matrix with a subset of, reordered, columns.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
+     */
+    @Deprecated
+    public M selectColumns(int... someCols) {
+        return this.logical().column(someCols).get();
+    }
+
+    /**
+     * @param someRows An ordered array of row indeces.
+     * @return A matrix with a subset of, reordered, rows.
+     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
+     */
+    @Deprecated
+    public M selectRows(int... someRows) {
+        return this.logical().row(someRows).get();
+    }
+
+    public M signum() {
         return this.getFactory().instantiate(myStore.signum());
     }
 
-    public I solve(final Access2D<?> rhs) {
+    /**
+     * <p>
+     * This method solves a system of linear equations: [this][X]=[aRHS]. A combination of columns in [this]
+     * should produce a column(s) in [aRHS]. It is ok for [aRHS] to have more than 1 column.
+     * </p>
+     * <ul>
+     * <li>If the problem is over-qualified an approximate solution is returned.</li>
+     * <li>If the problem is under-qualified one possible solution is returned.</li>
+     * </ul>
+     * <p>
+     * Remember that: [X][this]=[aRHS] is equivalent to [this]<sup>T</sup>[X]<sup>T</sup>=[aRHS]<sup>T</sup>
+     * </p>
+     *
+     * @param aRHS The right hand side of the equation.
+     * @return The solution, [X].
+     */
+    public M solve(final Access2D<?> rhs) {
 
         MatrixStore<N> tmpSolution = null;
 
@@ -704,7 +975,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(tmpSolution);
     }
 
-    public I subtract(final BasicMatrix subtrahend) {
+    public M subtract(final M subtrahend) {
 
         ProgrammingError.throwIfNotEqualDimensions(myStore, subtrahend);
 
@@ -715,7 +986,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(retVal);
     }
 
-    public I subtract(final double scalarSubtrahend) {
+    public M subtract(final double scalarSubtrahend) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
 
@@ -726,7 +997,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return this.getFactory().instantiate(retVal);
     }
 
-    public I subtract(final Number scalarSubtrahend) {
+    public M subtract(final Number scalarSubtrahend) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
 
@@ -741,6 +1012,13 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         myStore.supplyTo(receiver);
     }
 
+    /**
+     * Extracts one element of this matrix as a Scalar.
+     *
+     * @param row A row index.
+     * @param col A column index.
+     * @return One matrix element
+     */
     public Scalar<N> toScalar(final long row, final long col) {
         return myStore.toScalar(row, col);
     }
@@ -750,7 +1028,13 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
         return Access2D.toString(this);
     }
 
-    public I transpose() {
+    /**
+     * Transposes this matrix. For complex matrices conjugate() and transpose() are NOT EQUAL.
+     *
+     * @return A matrix that is the transpose of this matrix.
+     * @see org.ojalgo.matrix.BasicMatrix#conjugate()
+     */
+    public M transpose() {
         return this.getFactory().instantiate(myStore.transpose());
     }
 
@@ -813,7 +1097,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> ext
 
     abstract SingularValue<N> getDecompositionSingularValue(Structure2D typical);
 
-    abstract MatrixFactory<N, I> getFactory();
+    abstract MatrixFactory<N, M> getFactory();
 
     final MatrixStore<N> getStore() {
         return myStore;

@@ -27,7 +27,7 @@ import java.io.PrintWriter;
 import java.util.Formatter;
 import java.util.Locale;
 
-import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.AbstractMatrix;
 import org.ojalgo.matrix.ComplexMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.scalar.ComplexNumber;
@@ -802,7 +802,7 @@ public abstract class BasicLogger {
         BasicLogger.println(ERROR, message, arguments);
     }
 
-    private static void printmtrx(final Printer appender, final BasicMatrix matrix, final NumberContext context, final boolean plain) {
+    private static void printmtrx(final Printer appender, final AbstractMatrix matrix, final NumberContext context, final boolean plain) {
 
         final int tmpRowDim = (int) matrix.countRows();
         final int tmpColDim = (int) matrix.countColumns();
@@ -864,8 +864,8 @@ public abstract class BasicLogger {
         if ((appender != null) && (matrix.count() > 0L)) {
             if (matrix instanceof ComplexMatrix) {
                 BasicLogger.printmtrx(appender, (ComplexMatrix) matrix, context, false);
-            } else if (matrix instanceof BasicMatrix) {
-                BasicLogger.printmtrx(appender, (BasicMatrix) matrix, context, true);
+            } else if (matrix instanceof AbstractMatrix) {
+                BasicLogger.printmtrx(appender, (AbstractMatrix) matrix, context, true);
             } else if (matrix.get(0, 0) instanceof ComplexNumber) {
                 BasicLogger.printmtrx(appender, ComplexMatrix.FACTORY.copy(matrix), context, false);
             } else {

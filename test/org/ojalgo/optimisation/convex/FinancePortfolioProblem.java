@@ -29,8 +29,9 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.BigFunction;
+import org.ojalgo.matrix.AbstractMatrix;
+import org.ojalgo.matrix.AbstractMatrix.PhysicalBuilder;
 import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
@@ -47,7 +48,7 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
 
         static {
 
-            PhysicalBuilder<Double, PrimitiveMatrix> mtrxBuilder;
+            AbstractMatrix.PhysicalBuilder<Double, PrimitiveMatrix> mtrxBuilder;
 
             mtrxBuilder = PrimitiveMatrix.FACTORY.getBuilder(2, 2);
             mtrxBuilder.add(0, 0, 0.040000);
