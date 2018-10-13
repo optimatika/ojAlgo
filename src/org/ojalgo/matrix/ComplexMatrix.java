@@ -41,7 +41,7 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMatrix> {
+public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatrix> {
 
     public static final MatrixFactory<ComplexNumber, ComplexMatrix> FACTORY = new MatrixFactory<>(ComplexMatrix.class, GenericDenseStore.COMPLEX);
 

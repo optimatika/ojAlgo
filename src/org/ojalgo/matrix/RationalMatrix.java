@@ -41,7 +41,7 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public final class RationalMatrix extends AbstractMatrix<RationalNumber, RationalMatrix> {
+public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMatrix> {
 
     public static final MatrixFactory<RationalNumber, RationalMatrix> FACTORY = new MatrixFactory<>(RationalMatrix.class, GenericDenseStore.RATIONAL);
 

@@ -29,8 +29,8 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.matrix.AbstractMatrix;
-import org.ojalgo.matrix.AbstractMatrix.PhysicalBuilder;
+import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -160,7 +160,7 @@ public class LinearProblems extends OptimisationLinearTests {
         // A valid solution of 25.8 can be produced with:
         // X1=10, X2=0, X3=8, X4=0, X5=5, X6=23
         final BigDecimal tmpClaimedValue = new BigDecimal("25.8");
-        final AbstractMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(6, 1);
+        final BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(6, 1);
         tmpBuilder.set(0, 0, 10);
         tmpBuilder.set(2, 0, 8);
         tmpBuilder.set(4, 0, 5);

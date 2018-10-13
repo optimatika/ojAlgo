@@ -30,7 +30,6 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.AbstractMatrix.PhysicalBuilder;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.Scalar;
@@ -46,7 +45,7 @@ import org.ojalgo.structure.Factory2D;
  */
 public final class MatrixFactory<N extends Number, I extends BasicMatrix<N, I>> implements Factory2D<I> {
 
-    final class MatrixBuilder implements AbstractMatrix.PhysicalBuilder<N, I> {
+    final class MatrixBuilder implements BasicMatrix.PhysicalBuilder<N, I> {
 
         private boolean mySafe = true;
         private final PhysicalStore<N> myStore;
@@ -610,11 +609,11 @@ public final class MatrixFactory<N extends Number, I extends BasicMatrix<N, I>> 
         return myPhysicalFactory.function();
     }
 
-    public AbstractMatrix.PhysicalBuilder<N, I> getBuilder(final int count) {
+    public BasicMatrix.PhysicalBuilder<N, I> getBuilder(final int count) {
         return this.getBuilder(count, 1);
     }
 
-    public AbstractMatrix.PhysicalBuilder<N, I> getBuilder(final int rows, final int columns) {
+    public BasicMatrix.PhysicalBuilder<N, I> getBuilder(final int rows, final int columns) {
         return new MatrixBuilder(myPhysicalFactory, rows, columns);
     }
 

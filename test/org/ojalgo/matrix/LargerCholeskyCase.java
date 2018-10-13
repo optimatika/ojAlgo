@@ -80,7 +80,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        final BasicMatrix tmpMtrx = LargerCholeskyCase.getOriginal();
+        final RationalMatrix tmpMtrx = LargerCholeskyCase.getOriginal();
         final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
         tmpDecomp.decompose(PrimitiveDenseStore.FACTORY.copy(tmpMtrx));
 

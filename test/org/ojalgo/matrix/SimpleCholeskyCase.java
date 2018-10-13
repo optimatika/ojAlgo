@@ -115,7 +115,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        final BasicMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
+        final RationalMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
         final Cholesky<RationalNumber> tmpDecomp = Cholesky.RATIONAL.make();
         tmpDecomp.decompose(GenericDenseStore.RATIONAL.copy(tmpMtrx));
 

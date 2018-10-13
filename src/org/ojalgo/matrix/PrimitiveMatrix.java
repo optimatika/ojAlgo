@@ -40,7 +40,7 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatrix> {
+public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> {
 
     public static final MatrixFactory<Double, PrimitiveMatrix> FACTORY = new MatrixFactory<>(PrimitiveMatrix.class, PrimitiveDenseStore.FACTORY);
 

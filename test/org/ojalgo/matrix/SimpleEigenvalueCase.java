@@ -94,7 +94,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         final RationalMatrix tmpExpV = SimpleEigenvalueCase.getMatrixV();
         final PrimitiveMatrix tmpActV = PrimitiveMatrix.FACTORY.copy(tmpV);
 
-        final BasicMatrix tmpMtrx = tmpExpV.divideElements(tmpActV);
+        final RationalMatrix tmpMtrx = tmpExpV.divideElements(tmpActV);
         double tmpExp;
         double tmpAct;
         for (int j = 0; j < tmpMtrx.countColumns(); j++) {

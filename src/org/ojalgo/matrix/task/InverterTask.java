@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.task;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;

@@ -64,7 +64,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     boolean myActBool;
     int myActInt;
-    AbstractMatrix myActMtrx;
+    BasicMatrix myActMtrx;
     Number myActNmbr;
     Scalar<?> myActSclr;
     double myActVal;
@@ -80,7 +80,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     ComplexMatrix myComplexSafe;
     boolean myExpBool;
     int myExpInt;
-    AbstractMatrix myExpMtrx;
+    BasicMatrix myExpMtrx;
     Number myExpNmbr;
     Scalar<?> myExpSclr;
     double myExpVal;
@@ -145,17 +145,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        final AbstractMatrix.PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = myBigAA.copy();
+        final BasicMatrix.PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = myBigAA.copy();
         tmpBigBuilder.add(tmpRow, tmpCol, myNmbr);
         myExpMtrx = tmpBigBuilder.build();
 
-        final AbstractMatrix.PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
+        final BasicMatrix.PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
         tmpComplexBuilder.add(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpComplexBuilder.build();
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        final AbstractMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
+        final BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
         tmpPrimitiveBuilder.add(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpPrimitiveBuilder.build();
 
@@ -364,12 +364,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetInfinityNorm() {
 
-        myExpVal = AbstractMatrix.calculateInfinityNorm(myBigAA);
+        myExpVal = BasicMatrix.calculateInfinityNorm(myBigAA);
 
-        myActVal = AbstractMatrix.calculateInfinityNorm(myComplexAA);
+        myActVal = BasicMatrix.calculateInfinityNorm(myComplexAA);
         TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
 
-        myActVal = AbstractMatrix.calculateInfinityNorm(myPrimitiveAA);
+        myActVal = BasicMatrix.calculateInfinityNorm(myPrimitiveAA);
         TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
     }
 
@@ -379,12 +379,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetOneNorm() {
 
-        myExpVal = AbstractMatrix.calculateOneNorm(myBigAA);
+        myExpVal = BasicMatrix.calculateOneNorm(myBigAA);
 
-        myActVal = AbstractMatrix.calculateOneNorm(myComplexAA);
+        myActVal = BasicMatrix.calculateOneNorm(myComplexAA);
         TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
 
-        myActVal = AbstractMatrix.calculateOneNorm(myPrimitiveAA);
+        myActVal = BasicMatrix.calculateOneNorm(myPrimitiveAA);
         TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
     }
 
@@ -746,17 +746,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        final AbstractMatrix.PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = myBigAA.copy();
+        final BasicMatrix.PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = myBigAA.copy();
         tmpBigBuilder.set(tmpRow, tmpCol, myNmbr);
         myExpMtrx = tmpBigBuilder.build();
 
-        final AbstractMatrix.PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
+        final BasicMatrix.PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
         tmpComplexBuilder.set(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpComplexBuilder.build();
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        final AbstractMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
+        final BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
         tmpPrimitiveBuilder.set(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpPrimitiveBuilder.build();
 
