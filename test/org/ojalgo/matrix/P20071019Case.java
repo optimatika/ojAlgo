@@ -40,7 +40,7 @@ public class P20071019Case extends BasicMatrixTest {
         return SimpleLeastSquaresCase.getBody().transpose();
     }
 
-    public static BasicMatrix getTallProblematic() {
+    public static RationalMatrix getTallProblematic() {
         return SimpleLeastSquaresCase.getBody();
     }
 

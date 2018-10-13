@@ -46,9 +46,9 @@ public class SingularValueTest {
     private static final SingularValue<Double> IMPL_PRIMITIVE = new SingularValueDecomposition.Primitive();
     private static final SingularValue<Double> IMPL_RAW = new RawSingularValue();
 
-    private static final BasicMatrix MTRX_FAT = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(7, 9));
-    private static final BasicMatrix MTRX_SQUARE = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(8, 8));
-    private static final BasicMatrix MTRX_TALL = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 7));
+    private static final RationalMatrix MTRX_FAT = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(7, 9));
+    private static final RationalMatrix MTRX_SQUARE = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(8, 8));
+    private static final RationalMatrix MTRX_TALL = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 7));
 
     static final NumberContext CNTXT_CPLX_DECOMP = new NumberContext(3, 2);
     static final NumberContext CNTXT_CPLX_VALUES = new NumberContext(7, 7);
@@ -82,7 +82,7 @@ public class SingularValueTest {
 
     @Test
     public void testBasicMatrixP20050827Case() {
-        this.doTestTypes(PrimitiveMatrix.FACTORY.copy(PrimitiveDenseStore.FACTORY.copy(P20050827Case.getProblematic())));
+        this.doTestTypes(RationalMatrix.FACTORY.copy(P20050827Case.getProblematic()));
     }
 
     @Test
@@ -242,7 +242,7 @@ public class SingularValueTest {
         this.testRecreation(tmpOriginal);
     }
 
-    private void doTestTypes(final BasicMatrix original) {
+    private void doTestTypes(final RationalMatrix original) {
 
         final PhysicalStore<RationalNumber> tmpBigStore = GenericDenseStore.RATIONAL.copy(original);
         final PhysicalStore<ComplexNumber> tmpComplexStore = GenericDenseStore.COMPLEX.copy(original);

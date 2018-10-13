@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.store.GenericDenseStore;
@@ -48,7 +47,7 @@ public class DegenerateLUCase {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY
+        final RationalMatrix tmpMtrxA = RationalMatrix.FACTORY
                 .makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
@@ -69,7 +68,7 @@ public class DegenerateLUCase {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY
+        final RationalMatrix tmpMtrxA = RationalMatrix.FACTORY
                 .makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
@@ -90,7 +89,7 @@ public class DegenerateLUCase {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY
+        final RationalMatrix tmpMtrxA = RationalMatrix.FACTORY
                 .makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
@@ -111,7 +110,7 @@ public class DegenerateLUCase {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY
+        final RationalMatrix tmpMtrxA = RationalMatrix.FACTORY
                 .makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
@@ -132,7 +131,7 @@ public class DegenerateLUCase {
 
         final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
-        final BasicMatrix tmpMtrxA = RationalMatrix.FACTORY
+        final RationalMatrix tmpMtrxA = RationalMatrix.FACTORY
                 .makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 

@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
@@ -165,9 +164,9 @@ public class LinearProblems extends OptimisationLinearTests {
         tmpBuilder.set(2, 0, 8);
         tmpBuilder.set(4, 0, 5);
         tmpBuilder.set(5, 0, 23);
-        final BasicMatrix tmpFullSolution = tmpBuilder.build();
-        final BasicMatrix tmpOddSolution = tmpFullSolution.selectRows(0, 2, 4);
-        final BasicMatrix tmpEvenSolution = tmpFullSolution.selectRows(1, 3, 5);
+        final PrimitiveMatrix tmpFullSolution = tmpBuilder.build();
+        final PrimitiveMatrix tmpOddSolution = tmpFullSolution.selectRows(0, 2, 4);
+        final PrimitiveMatrix tmpEvenSolution = tmpFullSolution.selectRows(1, 3, 5);
         TestUtils.assertEquals("Claimed solution not valid!", true, tmpFullModel.validate(BigArray.FACTORY.copy(tmpFullSolution), new NumberContext(7, 6)));
         final Double tmpActualValue = tmpFullObjective.toFunction().invoke(PrimitiveDenseStore.FACTORY.copy(tmpFullSolution));
         //final BigDecimal tmpActualValue = TypeUtils.toBigDecimal(tmpObjectiveValue);
@@ -239,7 +238,7 @@ public class LinearProblems extends OptimisationLinearTests {
         tmpExprC3.set(0, ONE);
         tmpExprC3.set(2, NEG);
 
-        final BasicMatrix tmpExpectedSolution = PrimitiveMatrix.FACTORY.makeZero(3, 1);
+        final PrimitiveMatrix tmpExpectedSolution = PrimitiveMatrix.FACTORY.makeZero(3, 1);
 
         final Optimisation.Result tmpResult11 = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResult11.getState());
