@@ -43,9 +43,9 @@ import org.ojalgo.structure.Factory2D;
  *
  * @author apete
  */
-public final class MatrixFactory<N extends Number, I extends BasicMatrix<N, I>> implements Factory2D<I> {
+public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> implements Factory2D<M> {
 
-    final class MatrixBuilder implements BasicMatrix.PhysicalBuilder<N, I> {
+    final class MatrixBuilder implements BasicMatrix.PhysicalBuilder<N, M> {
 
         private boolean mySafe = true;
         private final PhysicalStore<N> myStore;
@@ -381,7 +381,7 @@ public final class MatrixFactory<N extends Number, I extends BasicMatrix<N, I>> 
         }
 
         @Override
-        public I get() {
+        public M get() {
             mySafe = false;
             return MatrixFactory.this.instantiate(myStore);
         }
@@ -571,36 +571,36 @@ public final class MatrixFactory<N extends Number, I extends BasicMatrix<N, I>> 
         }
     }
 
-    private final Constructor<I> myConstructor;
+    private final Constructor<M> myConstructor;
     private final PhysicalStore.Factory<N, ?> myPhysicalFactory;
 
     @SuppressWarnings("unchecked")
-    MatrixFactory(final Class<I> template, final PhysicalStore.Factory<N, ?> factory) {
+    MatrixFactory(final Class<M> template, final PhysicalStore.Factory<N, ?> factory) {
 
         super();
 
         myPhysicalFactory = factory;
-        myConstructor = (Constructor<I>) MatrixFactory.getConstructor(template);
+        myConstructor = (Constructor<M>) MatrixFactory.getConstructor(template);
     }
 
-    public I columns(final Access1D<?>... source) {
+    public M columns(final Access1D<?>... source) {
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 
-    public I columns(final double[]... source) {
+    public M columns(final double[]... source) {
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 
     @SuppressWarnings("unchecked")
-    public I columns(final List<? extends Number>... source) {
+    public M columns(final List<? extends Number>... source) {
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 
-    public I columns(final Number[]... source) {
+    public M columns(final Number[]... source) {
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 
-    public I copy(final Access2D<?> source) {
+    public M copy(final Access2D<?> source) {
         return this.instantiate(myPhysicalFactory.copy(source));
     }
 
@@ -609,15 +609,15 @@ public final class MatrixFactory<N extends Number, I extends BasicMatrix<N, I>> 
         return myPhysicalFactory.function();
     }
 
-    public BasicMatrix.PhysicalBuilder<N, I> getBuilder(final int count) {
+    public BasicMatrix.PhysicalBuilder<N, M> getBuilder(final int count) {
         return this.getBuilder(count, 1);
     }
 
-    public BasicMatrix.PhysicalBuilder<N, I> getBuilder(final int rows, final int columns) {
+    public BasicMatrix.PhysicalBuilder<N, M> getBuilder(final int rows, final int columns) {
         return new MatrixBuilder(myPhysicalFactory, rows, columns);
     }
 
-    public I makeEye(final long rows, final long columns) {
+    public M makeEye(final long rows, final long columns) {
 
         final int tmpMinDim = (int) Math.min(rows, columns);
 
@@ -632,29 +632,29 @@ public final class MatrixFactory<N extends Number, I extends BasicMatrix<N, I>> 
         return this.instantiate(retVal.get());
     }
 
-    public I makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
+    public M makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
         return this.instantiate(myPhysicalFactory.makeFilled(rows, columns, supplier));
     }
 
-    public I makeZero(final long rows, final long columns) {
+    public M makeZero(final long rows, final long columns) {
         //return this.instantiate(new ZeroStore<N>(myPhysicalFactory, (int) rows, (int) columns));
         return this.instantiate(myPhysicalFactory.builder().makeZero((int) rows, (int) columns).get());
     }
 
-    public I rows(final Access1D<?>... source) {
+    public M rows(final Access1D<?>... source) {
         return this.instantiate(myPhysicalFactory.rows(source));
     }
 
-    public I rows(final double[]... source) {
+    public M rows(final double[]... source) {
         return this.instantiate(myPhysicalFactory.rows(source));
     }
 
     @SuppressWarnings("unchecked")
-    public I rows(final List<? extends Number>... source) {
+    public M rows(final List<? extends Number>... source) {
         return this.instantiate(myPhysicalFactory.rows(source));
     }
 
-    public I rows(final Number[]... source) {
+    public M rows(final Number[]... source) {
         return this.instantiate(myPhysicalFactory.rows(source));
     }
 
@@ -666,7 +666,7 @@ public final class MatrixFactory<N extends Number, I extends BasicMatrix<N, I>> 
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    I instantiate(final MatrixStore<N> store) {
+    M instantiate(final MatrixStore<N> store) {
         try {
             return myConstructor.newInstance(store);
         } catch (final IllegalArgumentException anException) {

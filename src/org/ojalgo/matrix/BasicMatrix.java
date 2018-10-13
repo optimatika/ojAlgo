@@ -63,133 +63,129 @@ import org.ojalgo.type.context.NumberContext;
  * </p>
  *
  * @author apete
- * @deprecated v46.3 Use the specific implementations instead {@link PrimitiveMatrix}, {@link ComplexMatrix}
- *             or {@link RationalMatrix}.
  */
-@Deprecated
-public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extends Object
-        implements NormedVectorSpace<M, N>, Operation.Subtraction<M>, Operation.Multiplication<M>, ScalarOperation.Addition<M, N>,
-        ScalarOperation.Division<M, N>, ScalarOperation.Subtraction<M, N>, Access2D<N>, Access2D.Elements, Access2D.Aggregatable<N>,
-        Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
+public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extends Object implements NormedVectorSpace<M, N>, Operation.Subtraction<M>,
+        Operation.Multiplication<M>, ScalarOperation.Addition<M, N>, ScalarOperation.Division<M, N>, ScalarOperation.Subtraction<M, N>, Access2D<N>,
+        Access2D.Elements, Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
     @SuppressWarnings("unchecked")
-    public static interface LogicalBuilder<N extends Number, I extends BasicMatrix<N, I>>
-            extends Structure2D.Logical<I, BasicMatrix.LogicalBuilder<N, I>>, Access2D.Collectable<N, PhysicalStore<N>> {
+    public static interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
+            extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>> {
 
-        LogicalBuilder<N, I> above(int numberOfRows);
+        LogicalBuilder<N, M> above(int numberOfRows);
 
-        LogicalBuilder<N, I> above(N... elements);
+        LogicalBuilder<N, M> above(N... elements);
 
-        LogicalBuilder<N, I> below(int numberOfRows);
+        LogicalBuilder<N, M> below(int numberOfRows);
 
-        LogicalBuilder<N, I> below(N... elements);
+        LogicalBuilder<N, M> below(N... elements);
 
-        LogicalBuilder<N, I> bidiagonal(boolean upper, boolean assumeOne);
+        LogicalBuilder<N, M> bidiagonal(boolean upper, boolean assumeOne);
 
-        default I build() {
+        default M build() {
             return this.get();
         }
 
-        LogicalBuilder<N, I> column(final int... columns);
+        LogicalBuilder<N, M> column(final int... columns);
 
-        LogicalBuilder<N, I> conjugate();
+        LogicalBuilder<N, M> conjugate();
 
-        LogicalBuilder<N, I> diagonal();
+        LogicalBuilder<N, M> diagonal();
 
-        LogicalBuilder<N, I> hermitian(boolean upper);
+        LogicalBuilder<N, M> hermitian(boolean upper);
 
-        LogicalBuilder<N, I> hessenberg(boolean upper);
+        LogicalBuilder<N, M> hessenberg(boolean upper);
 
-        LogicalBuilder<N, I> left(int numberOfColumns);
+        LogicalBuilder<N, M> left(int numberOfColumns);
 
-        LogicalBuilder<N, I> left(N... elements);
+        LogicalBuilder<N, M> left(N... elements);
 
-        LogicalBuilder<N, I> limits(int rowLimit, int columnLimit);
+        LogicalBuilder<N, M> limits(int rowLimit, int columnLimit);
 
-        LogicalBuilder<N, I> offsets(int rowOffset, int columnOffset);
+        LogicalBuilder<N, M> offsets(int rowOffset, int columnOffset);
 
-        LogicalBuilder<N, I> right(int numberOfColumns);
+        LogicalBuilder<N, M> right(int numberOfColumns);
 
-        LogicalBuilder<N, I> right(N... elements);
+        LogicalBuilder<N, M> right(N... elements);
 
-        LogicalBuilder<N, I> row(final int... rows);
+        LogicalBuilder<N, M> row(final int... rows);
 
-        LogicalBuilder<N, I> superimpose(I matrix);
+        LogicalBuilder<N, M> superimpose(M matrix);
 
-        LogicalBuilder<N, I> superimpose(int row, int col, I matrix);
+        LogicalBuilder<N, M> superimpose(int row, int col, M matrix);
 
-        LogicalBuilder<N, I> superimpose(int row, int col, Number matrix);
+        LogicalBuilder<N, M> superimpose(int row, int col, Number matrix);
 
-        LogicalBuilder<N, I> transpose();
+        LogicalBuilder<N, M> transpose();
 
-        LogicalBuilder<N, I> triangular(boolean upper, boolean assumeOne);
+        LogicalBuilder<N, M> triangular(boolean upper, boolean assumeOne);
 
-        LogicalBuilder<N, I> tridiagonal();
+        LogicalBuilder<N, M> tridiagonal();
 
     }
 
-    public static interface PhysicalBuilder<N extends Number, I extends BasicMatrix<N, I>>
-            extends Mutate2D.Receiver<N>, Mutate2D.BiModifiable<N>, Mutate2D.Exchangeable, Supplier<I>, Access2D.Collectable<N, PhysicalStore<N>> {
+    public static interface PhysicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
+            extends Mutate2D.Receiver<N>, Mutate2D.BiModifiable<N>, Mutate2D.Exchangeable, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
-        default I build() {
+        default M build() {
             return this.get();
         }
 
     }
 
     @SuppressWarnings("unchecked")
-    static final class Logical<N extends Number, I extends BasicMatrix<N, I>> implements BasicMatrix.LogicalBuilder<N, I> {
+    static final class Logical<N extends Number, M extends BasicMatrix<N, M>> implements BasicMatrix.LogicalBuilder<N, M> {
 
         private final MatrixStore.LogicalBuilder<N> myDelegate;
-        private final BasicMatrix<N, I> myOrigin;
+        private final BasicMatrix<N, M> myOrigin;
 
-        Logical(BasicMatrix<N, I> matrix) {
+        Logical(BasicMatrix<N, M> matrix) {
             super();
             myOrigin = matrix;
             myDelegate = matrix.getStore().logical();
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> above(I... above) {
+        public BasicMatrix.LogicalBuilder<N, M> above(M... above) {
             myDelegate.above(this.cast(above));
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> above(int numberOfRows) {
+        public BasicMatrix.LogicalBuilder<N, M> above(int numberOfRows) {
             myDelegate.above(numberOfRows);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> above(N... elements) {
+        public BasicMatrix.LogicalBuilder<N, M> above(N... elements) {
             myDelegate.above(elements);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> below(I... below) {
+        public BasicMatrix.LogicalBuilder<N, M> below(M... below) {
             myDelegate.below(this.cast(below));
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> below(int numberOfRows) {
+        public BasicMatrix.LogicalBuilder<N, M> below(int numberOfRows) {
             myDelegate.below(numberOfRows);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> below(N... elements) {
+        public BasicMatrix.LogicalBuilder<N, M> below(N... elements) {
             myDelegate.below(elements);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> bidiagonal(boolean upper, boolean assumeOne) {
+        public BasicMatrix.LogicalBuilder<N, M> bidiagonal(boolean upper, boolean assumeOne) {
             myDelegate.bidiagonal(upper, assumeOne);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> column(int... columns) {
+        public BasicMatrix.LogicalBuilder<N, M> column(int... columns) {
             myDelegate.column(columns);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> conjugate() {
+        public BasicMatrix.LogicalBuilder<N, M> conjugate() {
             myDelegate.conjugate();
             return this;
         }
@@ -202,86 +198,86 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
             return myDelegate.countRows();
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> diagonal() {
+        public BasicMatrix.LogicalBuilder<N, M> diagonal() {
             myDelegate.diagonal();
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> diagonally(I... diagonally) {
+        public BasicMatrix.LogicalBuilder<N, M> diagonally(M... diagonally) {
             myDelegate.diagonally(this.cast(diagonally));
             return this;
         }
 
-        public I get() {
+        public M get() {
             return myOrigin.getFactory().instantiate(myDelegate.get());
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> hermitian(boolean upper) {
+        public BasicMatrix.LogicalBuilder<N, M> hermitian(boolean upper) {
             myDelegate.hermitian(upper);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> hessenberg(boolean upper) {
+        public BasicMatrix.LogicalBuilder<N, M> hessenberg(boolean upper) {
             myDelegate.hessenberg(upper);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> left(I... left) {
+        public BasicMatrix.LogicalBuilder<N, M> left(M... left) {
             myDelegate.left(this.cast(left));
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> left(int numberOfColumns) {
+        public BasicMatrix.LogicalBuilder<N, M> left(int numberOfColumns) {
             myDelegate.left(numberOfColumns);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> left(N... elements) {
+        public BasicMatrix.LogicalBuilder<N, M> left(N... elements) {
             myDelegate.left(elements);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> limits(int rowLimit, int columnLimit) {
+        public BasicMatrix.LogicalBuilder<N, M> limits(int rowLimit, int columnLimit) {
             myDelegate.limits(rowLimit, columnLimit);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> offsets(int rowOffset, int columnOffset) {
+        public BasicMatrix.LogicalBuilder<N, M> offsets(int rowOffset, int columnOffset) {
             myDelegate.offsets(rowOffset, columnOffset);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> right(I... right) {
+        public BasicMatrix.LogicalBuilder<N, M> right(M... right) {
             myDelegate.right(this.cast(right));
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> right(int numberOfColumns) {
+        public BasicMatrix.LogicalBuilder<N, M> right(int numberOfColumns) {
             myDelegate.right(numberOfColumns);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> right(N... elements) {
+        public BasicMatrix.LogicalBuilder<N, M> right(N... elements) {
             myDelegate.right(elements);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> row(int... rows) {
+        public BasicMatrix.LogicalBuilder<N, M> row(int... rows) {
             myDelegate.row(rows);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> superimpose(I matrix) {
+        public BasicMatrix.LogicalBuilder<N, M> superimpose(M matrix) {
             myDelegate.superimpose(myOrigin.cast(matrix).get());
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> superimpose(int row, int col, I matrix) {
+        public BasicMatrix.LogicalBuilder<N, M> superimpose(int row, int col, M matrix) {
             myDelegate.superimpose(row, col, myOrigin.cast(matrix).get());
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> superimpose(int row, int col, Number matrix) {
+        public BasicMatrix.LogicalBuilder<N, M> superimpose(int row, int col, Number matrix) {
             myDelegate.superimpose(row, col, matrix);
             return this;
         }
@@ -290,22 +286,22 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
             myDelegate.supplyTo(receiver);
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> transpose() {
+        public BasicMatrix.LogicalBuilder<N, M> transpose() {
             myDelegate.transpose();
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> triangular(boolean upper, boolean assumeOne) {
+        public BasicMatrix.LogicalBuilder<N, M> triangular(boolean upper, boolean assumeOne) {
             myDelegate.triangular(upper, assumeOne);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, I> tridiagonal() {
+        public BasicMatrix.LogicalBuilder<N, M> tridiagonal() {
             myDelegate.tridiagonal();
             return this;
         }
 
-        MatrixStore<N>[] cast(I[] matrices) {
+        MatrixStore<N>[] cast(M[] matrices) {
             MatrixStore<N>[] retVal = (MatrixStore<N>[]) new MatrixStore<?>[matrices.length];
             for (int i = 0; i < retVal.length; i++) {
                 retVal[i] = myOrigin.cast(matrices[i]).get();
