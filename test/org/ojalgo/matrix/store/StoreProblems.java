@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.netio.BasicLogger;
@@ -41,7 +40,7 @@ public class StoreProblems extends MatrixStoreTests {
     @Test
     public void testP20071210() {
 
-        BasicMatrix A, Bu, K, sx, currentState;
+        PrimitiveMatrix A, Bu, K, sx, currentState;
 
         final double[][] a = { { 1, 2 }, { 3, 4 } };
         A = PrimitiveMatrix.FACTORY.rows(a);
@@ -51,10 +50,10 @@ public class StoreProblems extends MatrixStoreTests {
         K = PrimitiveMatrix.FACTORY.makeEye(2, 2);
         final int hp = 2 * OjAlgoUtils.ENVIRONMENT.threads;
 
-        final BasicMatrix eye = PrimitiveMatrix.FACTORY.makeEye(A.countRows(), A.countColumns());
-        final BasicMatrix Aprime = A.subtract(Bu.multiply(K));
-        BasicMatrix Apow = PrimitiveMatrix.FACTORY.copy(Aprime);
-        final BasicMatrix tmp = Aprime.subtract(eye);
+        final PrimitiveMatrix eye = PrimitiveMatrix.FACTORY.makeEye(A.countRows(), A.countColumns());
+        final PrimitiveMatrix Aprime = A.subtract(Bu.multiply(K));
+        PrimitiveMatrix Apow = PrimitiveMatrix.FACTORY.copy(Aprime);
+        final PrimitiveMatrix tmp = Aprime.subtract(eye);
         sx = PrimitiveMatrix.FACTORY.copy(eye);
         sx = sx.mergeColumns(tmp);
 

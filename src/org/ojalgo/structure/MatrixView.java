@@ -96,7 +96,7 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterable<Matri
     }
 
     public MatrixView<N> iterator() {
-        return new MatrixView<N>(myDelegateAnyD);
+        return new MatrixView<>(myDelegateAnyD);
     }
 
     public MatrixView<N> next() {

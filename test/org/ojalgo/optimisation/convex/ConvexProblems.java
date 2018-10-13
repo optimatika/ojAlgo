@@ -35,7 +35,6 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixFactory;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
@@ -552,7 +551,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final MatrixFactory<Double, PrimitiveMatrix> tmpMtrxFact = PrimitiveMatrix.FACTORY;
         final NumberContext tmpEvalCntxt = StandardType.DECIMAL_032;
 
-        final BasicMatrix[] tmpMatrices = new PrimitiveMatrix[8];
+        final PrimitiveMatrix[] tmpMatrices = new PrimitiveMatrix[8];
 
         tmpMatrices[0] = tmpMtrxFact.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0 } });
         tmpMatrices[1] = tmpMtrxFact.rows(new double[][] { { 1.0 } });

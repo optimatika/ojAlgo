@@ -54,12 +54,12 @@ import org.ojalgo.type.context.NumberContext;
  *             or {@link RationalMatrix}.
  */
 @Deprecated
-public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>,
-        ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number>,
-        Access2D<Number>, Access2D.Elements, Access2D.Aggregatable<Number>, Structure2D.ReducibleTo1D<BasicMatrix>, NumberContext.Enforceable<BasicMatrix> {
+public interface BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extends NormedVectorSpace<M, N>, Operation.Subtraction<M>,
+        Operation.Multiplication<M>, ScalarOperation.Addition<M, N>, ScalarOperation.Division<M, N>, ScalarOperation.Subtraction<M, N>, Access2D<N>,
+        Access2D.Elements, Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M> {
 
     @SuppressWarnings("unchecked")
-    public static interface LogicalBuilder<N extends Number, I extends BasicMatrix>
+    public static interface LogicalBuilder<N extends Number, I extends BasicMatrix<N, I>>
             extends Structure2D.Logical<I, BasicMatrix.LogicalBuilder<N, I>>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         LogicalBuilder<N, I> above(int numberOfRows);
@@ -100,9 +100,9 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
 
         LogicalBuilder<N, I> row(final int... rows);
 
-        LogicalBuilder<N, I> superimpose(BasicMatrix matrix);
+        LogicalBuilder<N, I> superimpose(I matrix);
 
-        LogicalBuilder<N, I> superimpose(int row, int col, BasicMatrix matrix);
+        LogicalBuilder<N, I> superimpose(int row, int col, I matrix);
 
         LogicalBuilder<N, I> superimpose(int row, int col, Number matrix);
 
@@ -114,7 +114,7 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
 
     }
 
-    public static interface PhysicalBuilder<N extends Number, I extends BasicMatrix>
+    public static interface PhysicalBuilder<N extends Number, I extends BasicMatrix<N, I>>
             extends Mutate2D.Receiver<N>, Mutate2D.BiModifiable<N>, Mutate2D.Exchangeable, Supplier<I>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         default I build() {
@@ -129,14 +129,14 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      *
      * @return The matrix' Frobenius norm
      */
-    public static double calculateFrobeniusNorm(final BasicMatrix matrix) {
+    public static <M extends BasicMatrix<?, M>> double calculateFrobeniusNorm(final M matrix) {
         return matrix.norm();
     }
 
     /**
      * @return The inf-norm or maximum row sum
      */
-    public static double calculateInfinityNorm(final BasicMatrix matrix) {
+    public static <M extends BasicMatrix<?, M>> double calculateInfinityNorm(final M matrix) {
 
         double retVal = PrimitiveMath.ZERO;
 
@@ -151,7 +151,7 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
     /**
      * @return The 1-norm or maximum column sum
      */
-    public static double calculateOneNorm(final BasicMatrix matrix) {
+    public static <M extends BasicMatrix<?, M>> double calculateOneNorm(final M matrix) {
 
         double retVal = PrimitiveMath.ZERO;
 
@@ -171,12 +171,12 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
-    BasicMatrix add(int row, int col, Access2D<?> addend);
+    M add(int row, int col, Access2D<?> addend);
 
     /**
      * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
      */
-    PhysicalBuilder<? extends Number, ? extends BasicMatrix> copy();
+    PhysicalBuilder<N, M> copy();
 
     /**
      * Divides the elements of this with the elements of aMtrx. The matrices must have equal dimensions.
@@ -186,7 +186,7 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
-    BasicMatrix divideElements(Access2D<?> aMtrx);
+    M divideElements(Access2D<?> aMtrx);
 
     /**
      * @return true if the frobenius norm of the difference between [this] and [aStore] is zero within the
@@ -207,7 +207,7 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
-    BasicMatrix getColumnsRange(final int first, final int limit);
+    M getColumnsRange(final int first, final int limit);
 
     /**
      * Matrix condition (2-norm)
@@ -239,13 +239,13 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
-    BasicMatrix getRowsRange(final int first, final int kimit);
+    M getRowsRange(final int first, final int kimit);
 
     /**
      * @deprecated v40 Use {@link SingularValue}
      */
     @Deprecated
-    List<? extends Number> getSingularValues();
+    List<Double> getSingularValues();
 
     /**
      * The sum of the diagonal elements.
@@ -279,7 +279,7 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      *
      * @return The "best possible" inverse....
      */
-    BasicMatrix invert();
+    M invert();
 
     /**
      * @return true if {@linkplain #getRank()} == min({@linkplain #countRows()}, {@linkplain #countColumns()})
@@ -291,7 +291,7 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
 
     boolean isSymmetric();
 
-    LogicalBuilder<? extends Number, ? extends BasicMatrix> logical();
+    LogicalBuilder<N, M> logical();
 
     /**
      * [belowRows] is appended below [this]. The two matrices must have the same number of columns.
@@ -301,7 +301,7 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
-    BasicMatrix mergeColumns(Access2D<?> belowRows);
+    M mergeColumns(Access2D<?> belowRows);
 
     /**
      * [rightColumns] is appended to the right of [this]. The two matrices must have the same number of rows.
@@ -311,13 +311,13 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
-    BasicMatrix mergeRows(Access2D<?> rightColumns);
+    M mergeRows(Access2D<?> rightColumns);
 
     /**
      * @deprecated v42 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
-    BasicMatrix modify(UnaryFunction<? extends Number> aFunc);
+    M modify(UnaryFunction<? extends Number> aFunc);
 
     /**
      * Multiplies the elements of this matrix with the elements of aMtrx. The matrices must have equal
@@ -328,7 +328,7 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
-    BasicMatrix multiplyElements(Access2D<?> aMtrx);
+    M multiplyElements(Access2D<?> aMtrx);
 
     /**
      * @param someCols An ordered array of column indeces.
@@ -336,7 +336,7 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
-    default BasicMatrix selectColumns(int... someCols) {
+    default M selectColumns(int... someCols) {
         return this.logical().column(someCols).get();
     }
 
@@ -346,7 +346,7 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated
-    default BasicMatrix selectRows(int... someRows) {
+    default M selectRows(int... someRows) {
         return this.logical().row(someRows).get();
     }
 
@@ -366,7 +366,7 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @param aRHS The right hand side of the equation.
      * @return The solution, [X].
      */
-    BasicMatrix solve(Access2D<?> aRHS);
+    M solve(Access2D<?> aRHS);
 
     /**
      * Extracts one element of this matrix as a Scalar.
@@ -383,6 +383,6 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @return A matrix that is the transpose of this matrix.
      * @see org.ojalgo.matrix.BasicMatrix#conjugate()
      */
-    BasicMatrix transpose();
+    M transpose();
 
 }

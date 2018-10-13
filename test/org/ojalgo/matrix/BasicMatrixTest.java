@@ -889,9 +889,9 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToListOfColumns() {
 
-        final Iterable<ColumnView<Number>> tmpColumns = myBigAA.columns();
+        final Iterable<ColumnView<RationalNumber>> tmpColumns = myBigAA.columns();
 
-        for (final ColumnView<Number> tmpColumnView : tmpColumns) {
+        for (final ColumnView<RationalNumber> tmpColumnView : tmpColumns) {
             final long j = tmpColumnView.column();
             for (long i = 0L; i < tmpColumnView.count(); i++) {
                 TestUtils.assertEquals(tmpColumnView.get(i), myComplexAA.get(i, j), EVALUATION);
@@ -906,9 +906,9 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToListOfRows() {
 
-        final Iterable<RowView<Number>> tmpRows = myBigAA.rows();
+        final Iterable<RowView<RationalNumber>> tmpRows = myBigAA.rows();
 
-        for (final RowView<Number> tmpRowView : tmpRows) {
+        for (final RowView<RationalNumber> tmpRowView : tmpRows) {
             final long i = tmpRowView.row();
             for (long j = 0L; j < tmpRowView.count(); j++) {
                 TestUtils.assertEquals(tmpRowView.get(j), myComplexAA.get(i, j), EVALUATION);

@@ -49,10 +49,11 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends Object implements BasicMatrix, Access2D.Collectable<N, PhysicalStore<N>> {
+abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N, I>> extends Object
+        implements BasicMatrix<N, I>, Access2D.Collectable<N, PhysicalStore<N>> {
 
     @SuppressWarnings("unchecked")
-    static final class Logical<N extends Number, I extends BasicMatrix> implements BasicMatrix.LogicalBuilder<N, I> {
+    static final class Logical<N extends Number, I extends BasicMatrix<N, I>> implements BasicMatrix.LogicalBuilder<N, I> {
 
         private final MatrixStore.LogicalBuilder<N> myDelegate;
         private final AbstractMatrix<N, I> myOrigin;
@@ -714,7 +715,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(retVal);
     }
 
-    public BasicMatrix subtract(final double scalarSubtrahend) {
+    public I subtract(final double scalarSubtrahend) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
 

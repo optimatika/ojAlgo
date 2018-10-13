@@ -44,7 +44,7 @@ import org.ojalgo.structure.Factory2D;
  *
  * @author apete
  */
-public final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Factory2D<I> {
+public final class MatrixFactory<N extends Number, I extends BasicMatrix<N, I>> implements Factory2D<I> {
 
     final class MatrixBuilder implements PhysicalBuilder<N, I> {
 
