@@ -110,11 +110,11 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
 
         LogicalBuilder<N, M> row(final int... rows);
 
-        LogicalBuilder<N, M> superimpose(M matrix);
-
         LogicalBuilder<N, M> superimpose(int row, int col, M matrix);
 
         LogicalBuilder<N, M> superimpose(int row, int col, Number matrix);
+
+        LogicalBuilder<N, M> superimpose(M matrix);
 
         LogicalBuilder<N, M> transpose();
 
@@ -145,13 +145,13 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
             myDelegate = matrix.getStore().logical();
         }
 
-        public BasicMatrix.LogicalBuilder<N, M> above(M... above) {
-            myDelegate.above(this.cast(above));
+        public BasicMatrix.LogicalBuilder<N, M> above(int numberOfRows) {
+            myDelegate.above(numberOfRows);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, M> above(int numberOfRows) {
-            myDelegate.above(numberOfRows);
+        public BasicMatrix.LogicalBuilder<N, M> above(M... above) {
+            myDelegate.above(this.cast(above));
             return this;
         }
 
@@ -160,13 +160,13 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, M> below(M... below) {
-            myDelegate.below(this.cast(below));
+        public BasicMatrix.LogicalBuilder<N, M> below(int numberOfRows) {
+            myDelegate.below(numberOfRows);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, M> below(int numberOfRows) {
-            myDelegate.below(numberOfRows);
+        public BasicMatrix.LogicalBuilder<N, M> below(M... below) {
+            myDelegate.below(this.cast(below));
             return this;
         }
 
@@ -222,13 +222,13 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, M> left(M... left) {
-            myDelegate.left(this.cast(left));
+        public BasicMatrix.LogicalBuilder<N, M> left(int numberOfColumns) {
+            myDelegate.left(numberOfColumns);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, M> left(int numberOfColumns) {
-            myDelegate.left(numberOfColumns);
+        public BasicMatrix.LogicalBuilder<N, M> left(M... left) {
+            myDelegate.left(this.cast(left));
             return this;
         }
 
@@ -247,13 +247,13 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, M> right(M... right) {
-            myDelegate.right(this.cast(right));
+        public BasicMatrix.LogicalBuilder<N, M> right(int numberOfColumns) {
+            myDelegate.right(numberOfColumns);
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, M> right(int numberOfColumns) {
-            myDelegate.right(numberOfColumns);
+        public BasicMatrix.LogicalBuilder<N, M> right(M... right) {
+            myDelegate.right(this.cast(right));
             return this;
         }
 
@@ -267,11 +267,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
             return this;
         }
 
-        public BasicMatrix.LogicalBuilder<N, M> superimpose(M matrix) {
-            myDelegate.superimpose(myOrigin.cast(matrix).get());
-            return this;
-        }
-
         public BasicMatrix.LogicalBuilder<N, M> superimpose(int row, int col, M matrix) {
             myDelegate.superimpose(row, col, myOrigin.cast(matrix).get());
             return this;
@@ -279,6 +274,11 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
 
         public BasicMatrix.LogicalBuilder<N, M> superimpose(int row, int col, Number matrix) {
             myDelegate.superimpose(row, col, matrix);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> superimpose(M matrix) {
+            myDelegate.superimpose(myOrigin.cast(matrix).get());
             return this;
         }
 
@@ -375,17 +375,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
         myStore = store;
     }
 
-    public M add(final M addend) {
-
-        ProgrammingError.throwIfNotEqualDimensions(myStore, addend);
-
-        final PhysicalStore<N> retVal = myStore.physical().copy(addend);
-
-        retVal.modifyMatching(myStore, myStore.physical().function().add());
-
-        return this.getFactory().instantiate(retVal);
-    }
-
     public M add(final double scalarAddend) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
@@ -411,6 +400,17 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
 
         //return this.getFactory().instantiate(new SuperimposedStore<N>(myStore, row, col, tmpDiff));
         return this.getFactory().instantiate(myStore.logical().superimpose(row, col, tmpDiff).get());
+    }
+
+    public M add(final M addend) {
+
+        ProgrammingError.throwIfNotEqualDimensions(myStore, addend);
+
+        final PhysicalStore<N> retVal = myStore.physical().copy(addend);
+
+        retVal.modifyMatching(myStore, myStore.physical().function().add());
+
+        return this.getFactory().instantiate(retVal);
     }
 
     public M add(final Number scalarAddend) {
@@ -832,13 +832,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
         return this.getFactory().instantiate(retVal);
     }
 
-    public M multiply(final M multiplicand) {
-
-        ProgrammingError.throwIfMultiplicationNotPossible(myStore, multiplicand);
-
-        return this.getFactory().instantiate(myStore.multiply(this.cast(multiplicand).get()));
-    }
-
     public M multiply(final double scalarMultiplicand) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
@@ -848,6 +841,13 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
         retVal.modifyAll(myStore.physical().function().multiply().second(tmpRight));
 
         return this.getFactory().instantiate(retVal);
+    }
+
+    public M multiply(final M multiplicand) {
+
+        ProgrammingError.throwIfMultiplicationNotPossible(myStore, multiplicand);
+
+        return this.getFactory().instantiate(myStore.multiply(this.cast(multiplicand).get()));
     }
 
     public M multiply(final Number scalarMultiplicand) {
@@ -987,17 +987,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
         return this.getFactory().instantiate(tmpSolution);
     }
 
-    public M subtract(final M subtrahend) {
-
-        ProgrammingError.throwIfNotEqualDimensions(myStore, subtrahend);
-
-        final PhysicalStore<N> retVal = myStore.physical().copy(subtrahend);
-
-        retVal.modifyMatching(myStore, myStore.physical().function().subtract());
-
-        return this.getFactory().instantiate(retVal);
-    }
-
     public M subtract(final double scalarSubtrahend) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
@@ -1005,6 +994,17 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
         final N tmpRight = myStore.physical().scalar().cast(scalarSubtrahend);
 
         retVal.modifyAll(myStore.physical().function().subtract().second(tmpRight));
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public M subtract(final M subtrahend) {
+
+        ProgrammingError.throwIfNotEqualDimensions(myStore, subtrahend);
+
+        final PhysicalStore<N> retVal = myStore.physical().copy(subtrahend);
+
+        retVal.modifyMatching(myStore, myStore.physical().function().subtract());
 
         return this.getFactory().instantiate(retVal);
     }

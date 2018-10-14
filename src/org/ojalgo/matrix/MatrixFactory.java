@@ -663,8 +663,7 @@ public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> 
     }
 
     public BasicMatrix.PhysicalBuilder<N, M> makeSparse(final int rows, final int columns) {
-        SparseStore<N> sparse = (SparseStore<N>) myPhysicalFactory.builder().makeSparse(rows, columns).get();
-        return new MatrixBuilder<SparseStore<N>>(sparse);
+        return new MatrixBuilder<>(myPhysicalFactory.builder().makeSparse(rows, columns));
     }
 
     public M makeWrapper(final Access2D<?> elements) {

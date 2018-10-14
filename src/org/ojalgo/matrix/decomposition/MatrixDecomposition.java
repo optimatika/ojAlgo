@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;

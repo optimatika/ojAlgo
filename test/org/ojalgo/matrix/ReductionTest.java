@@ -4,7 +4,6 @@ import static org.ojalgo.function.aggregator.Aggregator.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
 
 public class ReductionTest {
 
