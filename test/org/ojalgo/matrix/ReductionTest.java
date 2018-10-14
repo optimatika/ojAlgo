@@ -20,7 +20,7 @@ public class ReductionTest {
     @Test
     public void testReduction() {
 
-        BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> builder = PrimitiveMatrix.FACTORY.getBuilder(2, 3);
+        BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> builder = PrimitiveMatrix.FACTORY.makeDense(2, 3);
         builder.set(0, 0, 1.0);
         builder.set(0, 1, 2.0);
         builder.set(0, 2, 3.0);

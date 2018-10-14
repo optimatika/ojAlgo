@@ -32,10 +32,12 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
+import org.ojalgo.structure.Mutate2D;
 
 /**
  * MatrixFactory creates instances of classes that implement the {@linkplain org.ojalgo.matrix.BasicMatrix}
@@ -45,23 +47,23 @@ import org.ojalgo.structure.Factory2D;
  */
 public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> implements Factory2D<M> {
 
-    final class MatrixBuilder implements BasicMatrix.PhysicalBuilder<N, M> {
+    final class MatrixBuilder<MB extends MatrixStore<N> & Mutate2D.Receiver<N> & Mutate2D.BiModifiable<N>> implements BasicMatrix.PhysicalBuilder<N, M> {
 
         private boolean mySafe = true;
-        private final PhysicalStore<N> myStore;
+        private final MB myStore;
 
         protected MatrixBuilder(final PhysicalStore.Factory<N, ?> factory, final int rowDim, final int colDim) {
 
             super();
 
-            myStore = factory.makeZero(rowDim, colDim);
+            myStore = (MB) factory.makeZero(rowDim, colDim);
         }
 
-        MatrixBuilder(final PhysicalStore<N> physicalStore) {
+        MatrixBuilder(final MB store) {
 
             super();
 
-            myStore = physicalStore;
+            myStore = store;
         }
 
         public void accept(Access2D<?> supplied) {
@@ -117,16 +119,16 @@ public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> 
         }
 
         public void exchangeColumns(long colA, long colB) {
-            if (mySafe) {
-                myStore.exchangeColumns(colA, colB);
+            if (mySafe && (myStore instanceof Exchangeable)) {
+                ((Exchangeable) myStore).exchangeColumns(colA, colB);
             } else {
                 throw new IllegalStateException();
             }
         }
 
         public void exchangeRows(long rowA, long rowB) {
-            if (mySafe) {
-                myStore.exchangeRows(rowA, rowB);
+            if (mySafe && (myStore instanceof Exchangeable)) {
+                ((Exchangeable) myStore).exchangeRows(rowA, rowB);
             } else {
                 throw new IllegalStateException();
             }
@@ -609,11 +611,27 @@ public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> 
         return myPhysicalFactory.function();
     }
 
+    /**
+     * @deprecated v47 Use {@link #makeDense(int)} instead
+     */
+    @Deprecated
     public BasicMatrix.PhysicalBuilder<N, M> getBuilder(final int count) {
-        return this.getBuilder(count, 1);
+        return this.makeDense(count);
     }
 
+    /**
+     * @deprecated v47 Use {@link #makeDense(int,int)} instead
+     */
+    @Deprecated
     public BasicMatrix.PhysicalBuilder<N, M> getBuilder(final int rows, final int columns) {
+        return this.makeDense(rows, columns);
+    }
+
+    public BasicMatrix.PhysicalBuilder<N, M> makeDense(final int count) {
+        return this.makeDense(count, 1);
+    }
+
+    public BasicMatrix.PhysicalBuilder<N, M> makeDense(final int rows, final int columns) {
         return new MatrixBuilder(myPhysicalFactory, rows, columns);
     }
 
@@ -636,8 +654,24 @@ public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> 
         return this.instantiate(myPhysicalFactory.makeFilled(rows, columns, supplier));
     }
 
+    public M makeIdentity(final int dimension) {
+        return this.instantiate(myPhysicalFactory.builder().makeIdentity(dimension).get());
+    }
+
+    public M makeSingle(final N element) {
+        return this.instantiate(myPhysicalFactory.builder().makeSingle(element).get());
+    }
+
+    public BasicMatrix.PhysicalBuilder<N, M> makeSparse(final int rows, final int columns) {
+        SparseStore<N> sparse = (SparseStore<N>) myPhysicalFactory.builder().makeSparse(rows, columns).get();
+        return new MatrixBuilder<SparseStore<N>>(sparse);
+    }
+
+    public M makeWrapper(final Access2D<?> elements) {
+        return this.instantiate(myPhysicalFactory.builder().makeWrapper(elements).get());
+    }
+
     public M makeZero(final long rows, final long columns) {
-        //return this.instantiate(new ZeroStore<N>(myPhysicalFactory, (int) rows, (int) columns));
         return this.instantiate(myPhysicalFactory.builder().makeZero((int) rows, (int) columns).get());
     }
 
@@ -680,7 +714,7 @@ public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> 
         }
     }
 
-    MatrixBuilder wrap(final PhysicalStore<N> store) {
+    MatrixBuilder<PhysicalStore<N>> wrap(final PhysicalStore<N> store) {
         return new MatrixBuilder(store);
     }
 

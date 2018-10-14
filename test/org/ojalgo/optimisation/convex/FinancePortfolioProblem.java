@@ -48,14 +48,14 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
 
             BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> mtrxBuilder;
 
-            mtrxBuilder = PrimitiveMatrix.FACTORY.getBuilder(2, 2);
+            mtrxBuilder = PrimitiveMatrix.FACTORY.makeDense(2, 2);
             mtrxBuilder.add(0, 0, 0.040000);
             mtrxBuilder.add(0, 1, 0.1000);
             mtrxBuilder.add(1, 0, 0.1000);
             mtrxBuilder.add(1, 1, 0.250000);
             COVARIANCES = mtrxBuilder.build();
 
-            mtrxBuilder = PrimitiveMatrix.FACTORY.getBuilder(2);
+            mtrxBuilder = PrimitiveMatrix.FACTORY.makeDense(2);
             mtrxBuilder.add(0, 0.20000);
             mtrxBuilder.add(1, 0.40000);
             RETURNS = mtrxBuilder.build();
