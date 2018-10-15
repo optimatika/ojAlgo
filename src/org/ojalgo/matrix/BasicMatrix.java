@@ -133,184 +133,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
 
     }
 
-    @SuppressWarnings("unchecked")
-    static final class Logical<N extends Number, M extends BasicMatrix<N, M>> implements BasicMatrix.LogicalBuilder<N, M> {
-
-        private final MatrixStore.LogicalBuilder<N> myDelegate;
-        private final BasicMatrix<N, M> myOrigin;
-
-        Logical(BasicMatrix<N, M> matrix) {
-            super();
-            myOrigin = matrix;
-            myDelegate = matrix.getStore().logical();
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> above(int numberOfRows) {
-            myDelegate.above(numberOfRows);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> above(M... above) {
-            myDelegate.above(this.cast(above));
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> above(N... elements) {
-            myDelegate.above(elements);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> below(int numberOfRows) {
-            myDelegate.below(numberOfRows);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> below(M... below) {
-            myDelegate.below(this.cast(below));
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> below(N... elements) {
-            myDelegate.below(elements);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> bidiagonal(boolean upper, boolean assumeOne) {
-            myDelegate.bidiagonal(upper, assumeOne);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> column(int... columns) {
-            myDelegate.column(columns);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> conjugate() {
-            myDelegate.conjugate();
-            return this;
-        }
-
-        public long countColumns() {
-            return myDelegate.countColumns();
-        }
-
-        public long countRows() {
-            return myDelegate.countRows();
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> diagonal() {
-            myDelegate.diagonal();
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> diagonally(M... diagonally) {
-            myDelegate.diagonally(this.cast(diagonally));
-            return this;
-        }
-
-        public M get() {
-            return myOrigin.getFactory().instantiate(myDelegate.get());
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> hermitian(boolean upper) {
-            myDelegate.hermitian(upper);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> hessenberg(boolean upper) {
-            myDelegate.hessenberg(upper);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> left(int numberOfColumns) {
-            myDelegate.left(numberOfColumns);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> left(M... left) {
-            myDelegate.left(this.cast(left));
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> left(N... elements) {
-            myDelegate.left(elements);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> limits(int rowLimit, int columnLimit) {
-            myDelegate.limits(rowLimit, columnLimit);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> offsets(int rowOffset, int columnOffset) {
-            myDelegate.offsets(rowOffset, columnOffset);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> right(int numberOfColumns) {
-            myDelegate.right(numberOfColumns);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> right(M... right) {
-            myDelegate.right(this.cast(right));
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> right(N... elements) {
-            myDelegate.right(elements);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> row(int... rows) {
-            myDelegate.row(rows);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> superimpose(int row, int col, M matrix) {
-            myDelegate.superimpose(row, col, myOrigin.cast(matrix).get());
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> superimpose(int row, int col, Number matrix) {
-            myDelegate.superimpose(row, col, matrix);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> superimpose(M matrix) {
-            myDelegate.superimpose(myOrigin.cast(matrix).get());
-            return this;
-        }
-
-        public void supplyTo(PhysicalStore<N> receiver) {
-            myDelegate.supplyTo(receiver);
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> transpose() {
-            myDelegate.transpose();
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> triangular(boolean upper, boolean assumeOne) {
-            myDelegate.triangular(upper, assumeOne);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> tridiagonal() {
-            myDelegate.tridiagonal();
-            return this;
-        }
-
-        MatrixStore<N>[] cast(M[] matrices) {
-            MatrixStore<N>[] retVal = (MatrixStore<N>[]) new MatrixStore<?>[matrices.length];
-            for (int i = 0; i < retVal.length; i++) {
-                retVal[i] = myOrigin.cast(matrices[i]).get();
-            }
-            return retVal;
-        }
-
-    }
-
     /**
      * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
      * the sum of the square of the singular values.
@@ -450,7 +272,7 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
      * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
      */
     public BasicMatrix.PhysicalBuilder<N, M> copy() {
-        return this.getFactory().wrap(myStore.copy());
+        return this.getFactory().physical(myStore.copy());
     }
 
     public long count() {
@@ -782,7 +604,7 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
     }
 
     public BasicMatrix.LogicalBuilder<N, M> logical() {
-        return new Logical<>(this);
+        return this.getFactory().logical(myStore.logical());
     }
 
     /**
