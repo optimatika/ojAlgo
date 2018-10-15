@@ -53,7 +53,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     public static NumberContext EVALUATION = NumberContext.getGeneral(9);
 
     public static RationalMatrix getIdentity(final long rows, final long columns, final NumberContext context) {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeEye(rows, columns);
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeEye(Math.toIntExact(rows), Math.toIntExact(columns));
         return tmpMtrx.enforce(context);
     }
 

@@ -32,12 +32,12 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Structure2D;
 
 /**
  * MatrixFactory creates instances of classes that implement the {@linkplain org.ojalgo.matrix.BasicMatrix}
@@ -632,22 +632,26 @@ public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> 
     }
 
     public BasicMatrix.PhysicalBuilder<N, M> makeDense(final int rows, final int columns) {
-        return new MatrixBuilder(myPhysicalFactory, rows, columns);
+        return new MatrixBuilder<>(myPhysicalFactory, rows, columns);
     }
 
-    public M makeEye(final long rows, final long columns) {
+    public M makeEye(final int rows, final int columns) {
 
-        final int tmpMinDim = (int) Math.min(rows, columns);
+        final int tmpMinDim = Math.min(rows, columns);
 
         MatrixStore.LogicalBuilder<N> retVal = myPhysicalFactory.builder().makeIdentity(tmpMinDim);
 
         if (rows > tmpMinDim) {
-            retVal = retVal.below((int) rows - tmpMinDim);
+            retVal = retVal.below(rows - tmpMinDim);
         } else if (columns > tmpMinDim) {
-            retVal = retVal.right((int) columns - tmpMinDim);
+            retVal = retVal.right(columns - tmpMinDim);
         }
 
         return this.instantiate(retVal.get());
+    }
+
+    public M makeEye(final Structure2D shape) {
+        return this.makeEye(Math.toIntExact(shape.countRows()), Math.toIntExact(shape.countColumns()));
     }
 
     public M makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
@@ -664,6 +668,10 @@ public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> 
 
     public BasicMatrix.PhysicalBuilder<N, M> makeSparse(final int rows, final int columns) {
         return new MatrixBuilder<>(myPhysicalFactory.builder().makeSparse(rows, columns));
+    }
+
+    public BasicMatrix.PhysicalBuilder<N, M> makeSparse(final Structure2D shape) {
+        return this.makeSparse(Math.toIntExact(shape.countRows()), Math.toIntExact(shape.countColumns()));
     }
 
     public M makeWrapper(final Access2D<?> elements) {

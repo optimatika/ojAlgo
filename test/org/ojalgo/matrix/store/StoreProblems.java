@@ -50,7 +50,7 @@ public class StoreProblems extends MatrixStoreTests {
         K = PrimitiveMatrix.FACTORY.makeEye(2, 2);
         final int hp = 2 * OjAlgoUtils.ENVIRONMENT.threads;
 
-        final PrimitiveMatrix eye = PrimitiveMatrix.FACTORY.makeEye(A.countRows(), A.countColumns());
+        final PrimitiveMatrix eye = PrimitiveMatrix.FACTORY.makeEye(A);
         final PrimitiveMatrix Aprime = A.subtract(Bu.multiply(K));
         PrimitiveMatrix Apow = PrimitiveMatrix.FACTORY.copy(Aprime);
         final PrimitiveMatrix tmp = Aprime.subtract(eye);

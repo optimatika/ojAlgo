@@ -152,20 +152,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return myDelegate.function();
         }
 
-        public final Array2D<N> makeEye(final long rows, final long columns) {
-
-            final BasicArray<N> tmpDelegate = myDelegate.makeStructuredZero(rows, columns);
-
-            final long tmpLimit = Math.min(rows, columns);
-
-            final long tmpIncr = rows + 1L;
-            for (long ij = 0L; ij < tmpLimit; ij++) {
-                tmpDelegate.set(ij * tmpIncr, 1.0);
-            }
-
-            return tmpDelegate.wrapInArray2D(rows);
-        }
-
         public final Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(rows, columns);
