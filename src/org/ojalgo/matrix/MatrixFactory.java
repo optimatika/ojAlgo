@@ -32,6 +32,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -47,10 +48,190 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> implements Factory2D<M> {
 
+    @SuppressWarnings("unchecked")
+    final class Logical implements BasicMatrix.LogicalBuilder<N, M> {
+
+        private final MatrixStore.LogicalBuilder<N> myDelegate;
+
+        Logical(MatrixStore.LogicalBuilder<N> delegate) {
+            super();
+            myDelegate = delegate;
+        }
+
+        Logical(MatrixStore<N> store) {
+            this(store.logical());
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> above(int numberOfRows) {
+            myDelegate.above(numberOfRows);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> above(M... above) {
+            myDelegate.above(this.cast(above));
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> above(N... elements) {
+            myDelegate.above(elements);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> below(int numberOfRows) {
+            myDelegate.below(numberOfRows);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> below(M... below) {
+            myDelegate.below(this.cast(below));
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> below(N... elements) {
+            myDelegate.below(elements);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> bidiagonal(boolean upper, boolean assumeOne) {
+            myDelegate.bidiagonal(upper, assumeOne);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> column(int... columns) {
+            myDelegate.column(columns);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> conjugate() {
+            myDelegate.conjugate();
+            return this;
+        }
+
+        public long countColumns() {
+            return myDelegate.countColumns();
+        }
+
+        public long countRows() {
+            return myDelegate.countRows();
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> diagonal() {
+            myDelegate.diagonal();
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> diagonally(M... diagonally) {
+            myDelegate.diagonally(this.cast(diagonally));
+            return this;
+        }
+
+        public M get() {
+            return MatrixFactory.this.instantiate(myDelegate.get());
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> hermitian(boolean upper) {
+            myDelegate.hermitian(upper);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> hessenberg(boolean upper) {
+            myDelegate.hessenberg(upper);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> left(int numberOfColumns) {
+            myDelegate.left(numberOfColumns);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> left(M... left) {
+            myDelegate.left(this.cast(left));
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> left(N... elements) {
+            myDelegate.left(elements);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> limits(int rowLimit, int columnLimit) {
+            myDelegate.limits(rowLimit, columnLimit);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> offsets(int rowOffset, int columnOffset) {
+            myDelegate.offsets(rowOffset, columnOffset);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> right(int numberOfColumns) {
+            myDelegate.right(numberOfColumns);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> right(M... right) {
+            myDelegate.right(this.cast(right));
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> right(N... elements) {
+            myDelegate.right(elements);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> row(int... rows) {
+            myDelegate.row(rows);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> superimpose(int row, int col, M matrix) {
+            myDelegate.superimpose(row, col, matrix.getStore());
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> superimpose(int row, int col, Number matrix) {
+            myDelegate.superimpose(row, col, matrix);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> superimpose(M matrix) {
+            myDelegate.superimpose(matrix.getStore());
+            return this;
+        }
+
+        public void supplyTo(PhysicalStore<N> receiver) {
+            myDelegate.supplyTo(receiver);
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> transpose() {
+            myDelegate.transpose();
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> triangular(boolean upper, boolean assumeOne) {
+            myDelegate.triangular(upper, assumeOne);
+            return this;
+        }
+
+        public BasicMatrix.LogicalBuilder<N, M> tridiagonal() {
+            myDelegate.tridiagonal();
+            return this;
+        }
+
+        MatrixStore<N>[] cast(M[] matrices) {
+            MatrixStore<N>[] retVal = (MatrixStore<N>[]) new MatrixStore<?>[matrices.length];
+            for (int i = 0; i < retVal.length; i++) {
+                retVal[i] = matrices[i].getStore();
+            }
+            return retVal;
+        }
+
+    }
+
     final class Physical<MB extends MatrixStore<N> & Mutate2D.Receiver<N> & Mutate2D.BiModifiable<N>> implements BasicMatrix.PhysicalBuilder<N, M> {
 
-        private boolean mySafe = true;
         private final MB myDelegate;
+        private boolean mySafe = true;
 
         Physical(final MB delegate) {
 
@@ -554,190 +735,12 @@ public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> 
         }
     }
 
-    @SuppressWarnings("unchecked")
-    final class Logical implements BasicMatrix.LogicalBuilder<N, M> {
-
-        private final MatrixStore.LogicalBuilder<N> myDelegate;
-
-        Logical(MatrixStore.LogicalBuilder<N> delegate) {
-            super();
-            myDelegate = delegate;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> above(int numberOfRows) {
-            myDelegate.above(numberOfRows);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> above(M... above) {
-            myDelegate.above(this.cast(above));
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> above(N... elements) {
-            myDelegate.above(elements);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> below(int numberOfRows) {
-            myDelegate.below(numberOfRows);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> below(M... below) {
-            myDelegate.below(this.cast(below));
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> below(N... elements) {
-            myDelegate.below(elements);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> bidiagonal(boolean upper, boolean assumeOne) {
-            myDelegate.bidiagonal(upper, assumeOne);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> column(int... columns) {
-            myDelegate.column(columns);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> conjugate() {
-            myDelegate.conjugate();
-            return this;
-        }
-
-        public long countColumns() {
-            return myDelegate.countColumns();
-        }
-
-        public long countRows() {
-            return myDelegate.countRows();
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> diagonal() {
-            myDelegate.diagonal();
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> diagonally(M... diagonally) {
-            myDelegate.diagonally(this.cast(diagonally));
-            return this;
-        }
-
-        public M get() {
-            return MatrixFactory.this.instantiate(myDelegate.get());
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> hermitian(boolean upper) {
-            myDelegate.hermitian(upper);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> hessenberg(boolean upper) {
-            myDelegate.hessenberg(upper);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> left(int numberOfColumns) {
-            myDelegate.left(numberOfColumns);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> left(M... left) {
-            myDelegate.left(this.cast(left));
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> left(N... elements) {
-            myDelegate.left(elements);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> limits(int rowLimit, int columnLimit) {
-            myDelegate.limits(rowLimit, columnLimit);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> offsets(int rowOffset, int columnOffset) {
-            myDelegate.offsets(rowOffset, columnOffset);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> right(int numberOfColumns) {
-            myDelegate.right(numberOfColumns);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> right(M... right) {
-            myDelegate.right(this.cast(right));
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> right(N... elements) {
-            myDelegate.right(elements);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> row(int... rows) {
-            myDelegate.row(rows);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> superimpose(int row, int col, M matrix) {
-            myDelegate.superimpose(row, col, matrix.getStore());
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> superimpose(int row, int col, Number matrix) {
-            myDelegate.superimpose(row, col, matrix);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> superimpose(M matrix) {
-            myDelegate.superimpose(matrix.getStore());
-            return this;
-        }
-
-        public void supplyTo(PhysicalStore<N> receiver) {
-            myDelegate.supplyTo(receiver);
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> transpose() {
-            myDelegate.transpose();
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> triangular(boolean upper, boolean assumeOne) {
-            myDelegate.triangular(upper, assumeOne);
-            return this;
-        }
-
-        public BasicMatrix.LogicalBuilder<N, M> tridiagonal() {
-            myDelegate.tridiagonal();
-            return this;
-        }
-
-        MatrixStore<N>[] cast(M[] matrices) {
-            MatrixStore<N>[] retVal = (MatrixStore<N>[]) new MatrixStore<?>[matrices.length];
-            for (int i = 0; i < retVal.length; i++) {
-                retVal[i] = matrices[i].getStore();
-            }
-            return retVal;
-        }
-
-    }
-
-    private static Constructor<? extends BasicMatrix> getConstructor(final Class<? extends BasicMatrix> aTemplate) {
+    private static Constructor<? extends BasicMatrix<?, ?>> getConstructor(final Class<? extends BasicMatrix<?, ?>> aTemplate) {
         try {
-            final Constructor<? extends BasicMatrix> retVal = aTemplate.getDeclaredConstructor(MatrixStore.class);
+            final Constructor<? extends BasicMatrix<?, ?>> retVal = aTemplate.getDeclaredConstructor(MatrixStore.class);
             retVal.setAccessible(true);
             return retVal;
-        } catch (final SecurityException anException) {
-            return null;
-        } catch (final NoSuchMethodException anException) {
+        } catch (final SecurityException | NoSuchMethodException exception) {
             return null;
         }
     }
@@ -806,14 +809,14 @@ public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> 
 
     public M makeEye(final int rows, final int columns) {
 
-        final int tmpMinDim = Math.min(rows, columns);
+        final int square = Math.min(rows, columns);
 
-        MatrixStore.LogicalBuilder<N> retVal = myPhysicalFactory.builder().makeIdentity(tmpMinDim);
+        MatrixStore.LogicalBuilder<N> retVal = myPhysicalFactory.builder().makeIdentity(square);
 
-        if (rows > tmpMinDim) {
-            retVal = retVal.below(rows - tmpMinDim);
-        } else if (columns > tmpMinDim) {
-            retVal = retVal.right(columns - tmpMinDim);
+        if (rows > square) {
+            retVal = retVal.below(rows - square);
+        } else if (columns > square) {
+            retVal = retVal.right(columns - square);
         }
 
         return this.instantiate(retVal.get());
@@ -890,12 +893,16 @@ public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> 
         }
     }
 
+    Logical logical(final MatrixStore.LogicalBuilder<N> delegate) {
+        return new Logical(delegate);
+    }
+
     Physical<PhysicalStore<N>> physical(final PhysicalStore<N> delegate) {
         return new Physical<>(delegate);
     }
 
-    Logical logical(final MatrixStore.LogicalBuilder<N> delegate) {
-        return new Logical(delegate);
+    Physical<SparseStore<N>> physical(final SparseStore<N> delegate) {
+        return new Physical<>(delegate);
     }
 
 }
