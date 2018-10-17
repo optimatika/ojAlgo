@@ -38,18 +38,19 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20030528Case extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 1);
+
     public static RationalMatrix getProblematic() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
                 .rows(new double[][] { { 1, 0, 0, 0, 0, 0, 1 }, { 0, 1, 0, 0, 0, 1, 0 }, { 0, 0, 1, 0, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 1);
-        EVALUATION = new NumberContext(7, 9);
+        evaluation = new NumberContext(7, 9);
 
         rationalAA = P20030528Case.getProblematic();
         rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
@@ -79,7 +80,7 @@ public class P20030528Case extends BasicMatrixTest {
         tmpSVD.decompose(tmpA);
 
         // tmpSVD.equals(tmpA, EVALUATION);
-        TestUtils.assertEquals(tmpA, tmpSVD, EVALUATION);
+        TestUtils.assertEquals(tmpA, tmpSVD, evaluation);
     }
 
 }

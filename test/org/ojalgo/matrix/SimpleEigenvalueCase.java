@@ -39,6 +39,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleEigenvalueCase extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 14);
+
     public static RationalMatrix getOriginal() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 4.0, -5.0 }, { 2.0, -3.0 } });
         return tmpMtrx.enforce(DEFINITION);
@@ -54,11 +56,11 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
-        DEFINITION = new NumberContext(7, 14);
-        EVALUATION = new NumberContext(7, 3);
+
+        evaluation = new NumberContext(7, 3);
 
         rationalAA = SimpleEigenvalueCase.getOriginal();
         rationalAX = SimpleEigenvalueCase.getMatrixV();
@@ -77,7 +79,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
 
         actMtrx = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
 
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     @Test
@@ -92,7 +94,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         expMtrx = SimpleEigenvalueCase.getMatrixD();
         actMtrx = PrimitiveMatrix.FACTORY.copy(tmpD);
 
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         final RationalMatrix tmpExpV = SimpleEigenvalueCase.getMatrixV();
         final RationalMatrix tmpActV = RationalMatrix.FACTORY.copy(tmpV);
@@ -106,11 +108,11 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
             tmpExp = tmpMtrx.doubleValue(0, j);
             for (int i = 0; i < tmpMtrx.countRows(); i++) {
                 tmpAct = tmpMtrx.doubleValue(i, j);
-                TestUtils.assertEquals(tmpExp, tmpAct, EVALUATION);
+                TestUtils.assertEquals(tmpExp, tmpAct, evaluation);
             }
         }
 
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
 }

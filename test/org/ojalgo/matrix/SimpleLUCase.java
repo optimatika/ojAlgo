@@ -36,6 +36,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleLUCase extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 1);
+
     public static RationalMatrix getOrginal() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
@@ -51,12 +53,11 @@ public class SimpleLUCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 1);
-        EVALUATION = new NumberContext(7, 9);
+        evaluation = new NumberContext(7, 9);
 
         rationalAA = SimpleLUCase.getMtrxL();
         rationalAX = SimpleLUCase.getMtrxU();
@@ -74,7 +75,7 @@ public class SimpleLUCase extends BasicMatrixTest {
         expMtrx = SimpleLUCase.getOrginal();
         actMtrx = SimpleLUCase.getMtrxL().multiply(SimpleLUCase.getMtrxU());
 
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     @Test
@@ -85,7 +86,7 @@ public class SimpleLUCase extends BasicMatrixTest {
         final LU<RationalNumber> tmpLU = LU.RATIONAL.make();
         tmpLU.decompose(GenericDenseStore.RATIONAL.copy(SimpleLUCase.getOrginal()));
 
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(SimpleLUCase.getOrginal()), tmpLU, EVALUATION);
+        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(SimpleLUCase.getOrginal()), tmpLU, evaluation);
     }
 
 }

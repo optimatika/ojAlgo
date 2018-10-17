@@ -54,9 +54,6 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class BasicMatrixTest extends MatrixTests {
 
-    public static NumberContext DEFINITION = NumberContext.getGeneral(9);
-    public static NumberContext EVALUATION = NumberContext.getGeneral(9);
-
     public static RationalMatrix getIdentity(final long rows, final long columns, final NumberContext context) {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeEye(Math.toIntExact(rows), Math.toIntExact(columns));
         return tmpMtrx.enforce(context);
@@ -66,6 +63,8 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeFilled(rows, columns, new Uniform(PrimitiveMath.E, PrimitiveMath.PI));
         return tmpMtrx.enforce(context);
     }
+
+    protected NumberContext evaluation = NumberContext.getGeneral(9);
 
     boolean actBoolean;
     int actInt;
@@ -132,8 +131,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     @AfterEach
     public void tearDown() {
-        DEFINITION = NumberContext.getGeneral(9);
-        EVALUATION = NumberContext.getGeneral(9);
+        evaluation = NumberContext.getGeneral(9);
     }
 
     /**
@@ -145,10 +143,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.add(rationalSafe);
 
         actMtrx = complexAA.add(complexSafe);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.add(primitiveSafe);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -169,13 +167,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
         tmpComplexBuilder.add(tmpRow, tmpCol, bigNumber);
         actMtrx = tmpComplexBuilder.build();
 
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         final BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = primitiveAA.copy();
         tmpPrimitiveBuilder.add(tmpRow, tmpCol, bigNumber);
         actMtrx = tmpPrimitiveBuilder.build();
 
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     /**
@@ -187,10 +185,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.add(bigNumber);
 
         actMtrx = complexAA.add(bigNumber);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.add(bigNumber);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -203,10 +201,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.conjugate();
 
         actMtrx = complexAA.conjugate();
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.conjugate();
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -220,17 +218,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
         PhysicalBuilder<Double, PrimitiveMatrix> copyPrimitive = primitiveAA.copy();
         copyPrimitive.modifyMatching(PrimitiveFunction.DIVIDE, primitiveSafe);
         actMtrx = copyPrimitive.get();
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         PhysicalBuilder<ComplexNumber, ComplexMatrix> copyComplex = complexAA.copy();
         copyComplex.modifyMatching(ComplexFunction.DIVIDE, complexSafe);
         actMtrx = copyComplex.get();
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         PhysicalBuilder<Quaternion, QuaternionMatrix> copyQuaternion = quaternionAA.copy();
         copyQuaternion.modifyMatching(QuaternionFunction.DIVIDE, quaternionSafe);
         actMtrx = copyQuaternion.get();
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     /**
@@ -242,10 +240,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.divide(bigNumber);
 
         actMtrx = complexAA.divide(bigNumber);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.divide(bigNumber);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -257,10 +255,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expNumber = rationalAA.selectColumns(tmpCol).dot(rationalSafe.selectColumns(tmpCol));
 
         actNumber = complexAA.selectColumns(tmpCol).dot(complexSafe.selectColumns(tmpCol));
-        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+        TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
         actNumber = primitiveAA.selectColumns(tmpCol).dot(primitiveSafe.selectColumns(tmpCol));
-        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+        TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
     }
 
@@ -276,10 +274,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expNumber = rationalAA.doubleValue(tmpRow, tmpCol);
 
         actNumber = complexAA.doubleValue(tmpRow, tmpCol);
-        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+        TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
         actNumber = primitiveAA.doubleValue(tmpRow, tmpCol);
-        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+        TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
     }
 
@@ -314,10 +312,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.selectColumns(tmpArr);
 
         actMtrx = complexAA.selectColumns(tmpArr);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.selectColumns(tmpArr);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -353,10 +351,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
             expNumber = rationalAA.getDeterminant().get();
 
             actNumber = complexAA.getDeterminant().get();
-            TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+            TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
             actNumber = primitiveAA.getDeterminant().get();
-            TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+            TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
         }
     }
@@ -374,12 +372,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             actual = rationalAA.getEigenpairs();
             for (int i = 0; i < expected.size(); i++) {
-                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i).value, actual.get(i).value, EVALUATION);
+                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i).value, actual.get(i).value, evaluation);
             }
 
             actual = complexAA.getEigenpairs();
             for (int i = 0; i < expected.size(); i++) {
-                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i).value, actual.get(i).value, EVALUATION);
+                TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i).value, actual.get(i).value, evaluation);
             }
         }
     }
@@ -393,10 +391,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expValue = BasicMatrix.calculateInfinityNorm(rationalAA);
 
         actValue = BasicMatrix.calculateInfinityNorm(complexAA);
-        TestUtils.assertEquals(expValue, actValue, EVALUATION);
+        TestUtils.assertEquals(expValue, actValue, evaluation);
 
         actValue = BasicMatrix.calculateInfinityNorm(primitiveAA);
-        TestUtils.assertEquals(expValue, actValue, EVALUATION);
+        TestUtils.assertEquals(expValue, actValue, evaluation);
     }
 
     /**
@@ -408,10 +406,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expValue = BasicMatrix.calculateOneNorm(rationalAA);
 
         actValue = BasicMatrix.calculateOneNorm(complexAA);
-        TestUtils.assertEquals(expValue, actValue, EVALUATION);
+        TestUtils.assertEquals(expValue, actValue, evaluation);
 
         actValue = BasicMatrix.calculateOneNorm(primitiveAA);
-        TestUtils.assertEquals(expValue, actValue, EVALUATION);
+        TestUtils.assertEquals(expValue, actValue, evaluation);
     }
 
     /**
@@ -461,10 +459,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.selectRows(tmpArr);
 
         actMtrx = complexAA.selectRows(tmpArr);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.selectRows(tmpArr);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -485,7 +483,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
             BasicLogger.debug("Primitive SVs: {}", tmpActStore);
         }
         for (int i = 0; i < tmpExpStore.size(); i++) {
-            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
+            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), evaluation);
         }
 
         tmpActStore = complexAA.getSingularValues();
@@ -493,7 +491,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
             BasicLogger.debug("Complex SVs: {}", tmpActStore);
         }
         for (int i = 0; i < tmpExpStore.size(); i++) {
-            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
+            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), evaluation);
         }
     }
 
@@ -506,10 +504,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expNumber = rationalAA.getTrace().get();
 
         actNumber = complexAA.getTrace().get();
-        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+        TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
         actNumber = primitiveAA.getTrace().get();
-        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+        TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
     }
 
@@ -524,10 +522,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
             expMtrx = rationalAA.invert();
 
             actMtrx = complexAA.invert();
-            TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+            TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
             actMtrx = primitiveAA.invert();
-            TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+            TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         }
     }
@@ -666,10 +664,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.mergeColumns(rationalSafe);
 
         actMtrx = complexAA.mergeColumns(complexSafe);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.mergeColumns(primitiveSafe);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -679,10 +677,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.mergeRows(rationalSafe);
 
         actMtrx = complexAA.mergeRows(complexSafe);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.mergeRows(primitiveSafe);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -695,10 +693,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.multiply(rationalAX);
 
         actMtrx = complexAA.multiply(complexAX);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.multiply(primitiveAX);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -712,17 +710,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
         PhysicalBuilder<Double, PrimitiveMatrix> copyPrimitive = primitiveAA.copy();
         copyPrimitive.modifyMatching(PrimitiveFunction.MULTIPLY, primitiveSafe);
         actMtrx = copyPrimitive.get();
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         PhysicalBuilder<ComplexNumber, ComplexMatrix> copyComplex = complexAA.copy();
         copyComplex.modifyMatching(ComplexFunction.MULTIPLY, complexSafe);
         actMtrx = copyComplex.get();
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         PhysicalBuilder<Quaternion, QuaternionMatrix> copyQuaternion = quaternionAA.copy();
         copyQuaternion.modifyMatching(QuaternionFunction.MULTIPLY, quaternionSafe);
         actMtrx = copyQuaternion.get();
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     /**
@@ -734,10 +732,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.multiply(bigNumber);
 
         actMtrx = complexAA.multiply(bigNumber);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.multiply(bigNumber);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -750,10 +748,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.negate();
 
         actMtrx = complexAA.negate();
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.negate();
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -766,10 +764,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expValue = rationalAA.norm();
 
         actValue = complexAA.norm();
-        TestUtils.assertEquals(expValue, actValue, EVALUATION);
+        TestUtils.assertEquals(expValue, actValue, evaluation);
 
         actValue = primitiveAA.norm();
-        TestUtils.assertEquals(expValue, actValue, EVALUATION);
+        TestUtils.assertEquals(expValue, actValue, evaluation);
 
     }
 
@@ -790,13 +788,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
         tmpComplexBuilder.set(tmpRow, tmpCol, bigNumber);
         actMtrx = tmpComplexBuilder.build();
 
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         final BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = primitiveAA.copy();
         tmpPrimitiveBuilder.set(tmpRow, tmpCol, bigNumber);
         actMtrx = tmpPrimitiveBuilder.build();
 
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     @Test
@@ -823,10 +821,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
             expMtrx = rationalAA.solve(rationalAB);
 
             actMtrx = complexAA.solve(complexAB);
-            TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+            TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
             actMtrx = primitiveAA.solve(primitiveAB);
-            TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+            TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         }
     }
@@ -840,10 +838,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.subtract(rationalSafe);
 
         actMtrx = complexAA.subtract(complexSafe);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.subtract(primitiveSafe);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -856,10 +854,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.subtract(bigNumber);
 
         actMtrx = complexAA.subtract(bigNumber);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.subtract(bigNumber);
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 
@@ -875,10 +873,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expNumber = TypeUtils.toBigDecimal(rationalAA.get(tmpRow, tmpCol));
 
         actNumber = TypeUtils.toBigDecimal(complexAA.get(tmpRow, tmpCol));
-        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+        TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
         actNumber = TypeUtils.toBigDecimal(primitiveAA.get(tmpRow, tmpCol));
-        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+        TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
     }
 
@@ -894,10 +892,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expNumber = ComplexNumber.valueOf(rationalAA.get(tmpRow, tmpCol));
 
         actNumber = ComplexNumber.valueOf(complexAA.get(tmpRow, tmpCol));
-        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+        TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
         actNumber = ComplexNumber.valueOf(primitiveAA.get(tmpRow, tmpCol));
-        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+        TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
     }
 
@@ -911,10 +909,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         PhysicalStore<ComplexNumber> tmpActStore;
 
         tmpActStore = GenericDenseStore.COMPLEX.copy(complexAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
+        TestUtils.assertEquals(tmpExpStore, tmpActStore, evaluation);
 
         tmpActStore = GenericDenseStore.COMPLEX.copy(primitiveAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
+        TestUtils.assertEquals(tmpExpStore, tmpActStore, evaluation);
 
     }
 
@@ -929,8 +927,8 @@ public abstract class BasicMatrixTest extends MatrixTests {
         for (final ColumnView<RationalNumber> tmpColumnView : tmpColumns) {
             final long j = tmpColumnView.column();
             for (long i = 0L; i < tmpColumnView.count(); i++) {
-                TestUtils.assertEquals(tmpColumnView.get(i), complexAA.get(i, j), EVALUATION);
-                TestUtils.assertEquals(tmpColumnView.get(i), primitiveAA.get(i, j), EVALUATION);
+                TestUtils.assertEquals(tmpColumnView.get(i), complexAA.get(i, j), evaluation);
+                TestUtils.assertEquals(tmpColumnView.get(i), primitiveAA.get(i, j), evaluation);
             }
         }
     }
@@ -946,8 +944,8 @@ public abstract class BasicMatrixTest extends MatrixTests {
         for (final RowView<RationalNumber> tmpRowView : tmpRows) {
             final long i = tmpRowView.row();
             for (long j = 0L; j < tmpRowView.count(); j++) {
-                TestUtils.assertEquals(tmpRowView.get(j), complexAA.get(i, j), EVALUATION);
-                TestUtils.assertEquals(tmpRowView.get(j), primitiveAA.get(i, j), EVALUATION);
+                TestUtils.assertEquals(tmpRowView.get(j), complexAA.get(i, j), evaluation);
+                TestUtils.assertEquals(tmpRowView.get(j), primitiveAA.get(i, j), evaluation);
             }
         }
     }
@@ -962,10 +960,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         PhysicalStore<Double> tmpActStore;
 
         tmpActStore = PrimitiveDenseStore.FACTORY.copy(complexAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
+        TestUtils.assertEquals(tmpExpStore, tmpActStore, evaluation);
 
         tmpActStore = PrimitiveDenseStore.FACTORY.copy(primitiveAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
+        TestUtils.assertEquals(tmpExpStore, tmpActStore, evaluation);
 
     }
 
@@ -979,10 +977,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         PhysicalStore<RationalNumber> tmpActStore;
 
         tmpActStore = GenericDenseStore.RATIONAL.copy(complexAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
+        TestUtils.assertEquals(tmpExpStore, tmpActStore, evaluation);
 
         tmpActStore = GenericDenseStore.RATIONAL.copy(primitiveAA);
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
+        TestUtils.assertEquals(tmpExpStore, tmpActStore, evaluation);
 
     }
 
@@ -999,20 +997,20 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final int tmpLastIndex = (int) (rationalAA.count() - 1);
 
         tmpActStore = complexAA.toRawCopy1D();
-        TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], EVALUATION);
-        TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], EVALUATION);
+        TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], evaluation);
+        TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], evaluation);
         if (rationalAA.isVector()) {
             for (int i = 0; i < tmpExpStore.length; i++) {
-                TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], EVALUATION);
+                TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], evaluation);
             }
         }
 
         tmpActStore = primitiveAA.toRawCopy1D();
-        TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], EVALUATION);
-        TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], EVALUATION);
+        TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], evaluation);
+        TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], evaluation);
         if (rationalAA.isVector()) {
             for (int i = 0; i < tmpExpStore.length; i++) {
-                TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], EVALUATION);
+                TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], evaluation);
             }
         }
 
@@ -1030,10 +1028,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expNumber = rationalAA.toScalar(tmpRow, tmpCol).get();
 
         actNumber = complexAA.toScalar(tmpRow, tmpCol).get();
-        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+        TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
         actNumber = primitiveAA.toScalar(tmpRow, tmpCol).get();
-        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
+        TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
     }
 
@@ -1046,10 +1044,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expMtrx = rationalAA.transpose();
 
         actMtrx = complexAA.transpose();
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         actMtrx = primitiveAA.transpose();
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
 

@@ -34,6 +34,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20030512Case extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 12);
+
     public static RationalMatrix getProblematic() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] {
                 { -0.9739496281920735, 0.13212842225762753, -0.009493226825028579, 0.05293424713580207, -0.06924760059060892, 0.015657944731764042,
@@ -55,12 +57,11 @@ public class P20030512Case extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 12);
-        EVALUATION = new NumberContext(5, 6);
+        evaluation = new NumberContext(5, 6);
 
         rationalAA = P20030512Case.getProblematic();
         rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
@@ -79,7 +80,7 @@ public class P20030512Case extends BasicMatrixTest {
         actMtrx = expMtrx.invert().invert();
 
         // RationalMatrix can do this, but not JamaMatrix and/or JampackMatrix
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
 }

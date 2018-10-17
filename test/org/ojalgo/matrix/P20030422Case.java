@@ -34,6 +34,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20030422Case extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 6);
+
     public static RationalMatrix getProblematic() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
                 .rows(new double[][] { { 0.973950, 0.132128, -0.009493, 0.052934, -0.069248, 0.015658, -0.008564, 0.004549 },
@@ -47,12 +49,11 @@ public class P20030422Case extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 6);
-        EVALUATION = new NumberContext(7, 3);
+        evaluation = new NumberContext(7, 3);
 
         rationalAA = P20030422Case.getProblematic();
         rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);

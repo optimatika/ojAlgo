@@ -49,6 +49,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20061119Case extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 2);
+
     public static RationalMatrix getProblematic() {
 
         final RationalMatrix retVal = RationalMatrix.FACTORY.rows(new double[][] { { 9.28, 0.48, -2.72, 1.28, -8.32 }, { 4.48, 0.68, -6.52, 2.48, -1.12 },
@@ -61,8 +63,7 @@ public class P20061119Case extends BasicMatrixTest {
     @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 2);
-        EVALUATION = NumberContext.getGeneral(8).newPrecision(14);
+        evaluation = NumberContext.getGeneral(8).newPrecision(14);
 
         rationalAA = P20061119Case.getProblematic();
         rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
@@ -88,7 +89,7 @@ public class P20061119Case extends BasicMatrixTest {
         final PhysicalStore<Double> tmpPrimitiveStore = PrimitiveDenseStore.FACTORY.copy(tmpMatrix);
         tmpEigenvalue.decompose(tmpPrimitiveStore);
 
-        TestUtils.assertEquals(tmpPrimitiveStore, tmpEigenvalue, EVALUATION);
+        TestUtils.assertEquals(tmpPrimitiveStore, tmpEigenvalue, evaluation);
     }
 
 }

@@ -40,6 +40,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class LargerCholeskyCase extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 4);
+
     public static RationalMatrix getOriginal() {
 
         final PhysicalStore<ComplexNumber> randomComplex = MatrixUtils.makeRandomComplexStore(9, 9);
@@ -47,12 +49,11 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         return RationalMatrix.FACTORY.copy(randomComplex.multiply(randomComplex.conjugate()));
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 4);
-        EVALUATION = new NumberContext(7, 3);
+        evaluation = new NumberContext(7, 3);
 
         rationalAB = LargerCholeskyCase.getOriginal();
 
@@ -84,7 +85,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
         tmpDecomp.decompose(PrimitiveDenseStore.FACTORY.copy(tmpMtrx));
 
-        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpMtrx), tmpDecomp, EVALUATION);
+        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpMtrx), tmpDecomp, evaluation);
     }
 
 }

@@ -39,18 +39,19 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20050125Case extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 9);
+
     public static RationalMatrix getProblematic() {
         int DIM = 3;
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.makeFilled(DIM, DIM * DIM, new Uniform());
         return tmpMtrx.multiply(tmpMtrx.transpose());
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 9);
-        EVALUATION = new NumberContext(7, 6);
+        evaluation = new NumberContext(7, 6);
 
         rationalAA = P20050125Case.getProblematic();
         rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
@@ -68,7 +69,7 @@ public class P20050125Case extends BasicMatrixTest {
         final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
         tmpDelegate.decompose(GenericDenseStore.RATIONAL.copy(rationalAA));
 
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(rationalAA), tmpDelegate, EVALUATION);
+        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(rationalAA), tmpDelegate, evaluation);
     }
 
     @Test
@@ -82,7 +83,7 @@ public class P20050125Case extends BasicMatrixTest {
         final MatrixStore<RationalNumber> tmpExpMtrx = GenericDenseStore.RATIONAL.copy(rationlI);
         final MatrixStore<RationalNumber> tmpActMtrx = GenericDenseStore.RATIONAL.copy(rationalAA).multiply(tmpInv);
 
-        TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, EVALUATION);
+        TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, evaluation);
     }
 
     @Override

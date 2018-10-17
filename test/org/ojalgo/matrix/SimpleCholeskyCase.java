@@ -36,6 +36,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleCholeskyCase extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 4);
+
     /**
      * This matrix is taken from example 2.21 of the Scientific Computing, An Introductory Survey
      *
@@ -53,12 +55,11 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
         return RationalMatrix.FACTORY.rows(new double[][] { { 1.7321, -0.5774, -0.5774 }, { 0.0, 1.6330, -0.8165 }, { 0.0, 0.0, 1.4142 } }).enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 4);
-        EVALUATION = new NumberContext(4, 3);
+        evaluation = new NumberContext(4, 3);
 
         rationalAA = SimpleCholeskyCase.getFactorL();
         rationalAX = SimpleCholeskyCase.getFactorR();
@@ -80,12 +81,12 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
         expMtrx = tmpL;
         actMtrx = tmpR.transpose();
 
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         expMtrx = tmpA;
         actMtrx = tmpL.multiply(tmpR);
 
-        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     //    @Test
@@ -119,7 +120,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
         final Cholesky<RationalNumber> tmpDecomp = Cholesky.RATIONAL.make();
         tmpDecomp.decompose(GenericDenseStore.RATIONAL.copy(tmpMtrx));
 
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(tmpMtrx), tmpDecomp, EVALUATION);
+        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(tmpMtrx), tmpDecomp, evaluation);
     }
 
 }

@@ -29,6 +29,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleEquationCase extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 1);
+
     public static RationalMatrix getBody() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 1.0, 1.0 }, { 4.0, -6.0, 0.0 }, { -2.0, 7.0, 2.0 } });
         return tmpMtrx.enforce(DEFINITION);
@@ -44,12 +46,11 @@ public class SimpleEquationCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 1);
-        EVALUATION = new NumberContext(7, 9);
+        evaluation = new NumberContext(7, 9);
 
         rationalAA = SimpleEquationCase.getBody();
         rationalAX = SimpleEquationCase.getSolution();
