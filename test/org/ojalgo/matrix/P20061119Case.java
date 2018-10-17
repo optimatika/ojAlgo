@@ -64,12 +64,12 @@ public class P20061119Case extends BasicMatrixTest {
         DEFINITION = new NumberContext(7, 2);
         EVALUATION = NumberContext.getGeneral(8).newPrecision(14);
 
-        myBigAA = P20061119Case.getProblematic();
-        myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
-        myBigAB = myBigAA;
+        rationalAA = P20061119Case.getProblematic();
+        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
+        rationalAB = rationalAA;
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }

@@ -29,7 +29,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.QuaternionFunction;
+import org.ojalgo.function.RationalFunction;
+import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -37,6 +41,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.ColumnView;
@@ -62,34 +67,39 @@ public abstract class BasicMatrixTest extends MatrixTests {
         return tmpMtrx.enforce(context);
     }
 
-    boolean myActBool;
-    int myActInt;
-    BasicMatrix myActMtrx;
-    Number myActNmbr;
-    Scalar<?> myActSclr;
-    double myActVal;
-    RationalMatrix myBigAA;
-    RationalMatrix myBigAB;
-    RationalMatrix myBigAX;
-    RationalMatrix myBigI;
-    RationalMatrix myBigSafe;
-    ComplexMatrix myComplexAA;
-    ComplexMatrix myComplexAB;
-    ComplexMatrix myComplexAX;
-    ComplexMatrix myComplexI;
-    ComplexMatrix myComplexSafe;
-    boolean myExpBool;
-    int myExpInt;
-    BasicMatrix myExpMtrx;
-    Number myExpNmbr;
-    Scalar<?> myExpSclr;
-    double myExpVal;
-    Number myNmbr;
-    PrimitiveMatrix myPrimitiveAA;
-    PrimitiveMatrix myPrimitiveAB;
-    PrimitiveMatrix myPrimitiveAX;
-    PrimitiveMatrix myPrimitiveI;
-    PrimitiveMatrix myPrimitiveSafe;
+    boolean actBoolean;
+    int actInt;
+    BasicMatrix<?, ?> actMtrx;
+    Number actNumber;
+    Scalar<?> actScalar;
+    double actValue;
+    BigDecimal bigNumber;
+    ComplexMatrix complexAA;
+    ComplexMatrix complexAB;
+    ComplexMatrix complexAX;
+    ComplexMatrix complexI;
+    ComplexMatrix complexSafe;
+    boolean expBoolean;
+    int expInt;
+    BasicMatrix<?, ?> expMtrx;
+    Number expNumber;
+    Scalar<?> expScalar;
+    double expValue;
+    PrimitiveMatrix primitiveAA;
+    PrimitiveMatrix primitiveAB;
+    PrimitiveMatrix primitiveAX;
+    PrimitiveMatrix primitiveI;
+    PrimitiveMatrix primitiveSafe;
+    QuaternionMatrix quaternionAA;
+    QuaternionMatrix quaternionAB;
+    QuaternionMatrix quaternionAX;
+    QuaternionMatrix quaternionI;
+    QuaternionMatrix quaternionSafe;
+    RationalMatrix rationalAA;
+    RationalMatrix rationalAB;
+    RationalMatrix rationalAX;
+    RationalMatrix rationalSafe;
+    RationalMatrix rationlI;
 
     /**
      * @see junit.framework.TestCase#setUp()
@@ -99,19 +109,25 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         TestUtils.minimiseAllBranchLimits();
 
-        myPrimitiveAA = PrimitiveMatrix.FACTORY.copy(myBigAA);
-        myPrimitiveAX = PrimitiveMatrix.FACTORY.copy(myBigAX);
-        myPrimitiveAB = PrimitiveMatrix.FACTORY.copy(myBigAB);
-        myPrimitiveI = PrimitiveMatrix.FACTORY.copy(myBigI);
-        myPrimitiveSafe = PrimitiveMatrix.FACTORY.copy(myBigSafe);
+        primitiveAA = PrimitiveMatrix.FACTORY.copy(rationalAA);
+        primitiveAX = PrimitiveMatrix.FACTORY.copy(rationalAX);
+        primitiveAB = PrimitiveMatrix.FACTORY.copy(rationalAB);
+        primitiveI = PrimitiveMatrix.FACTORY.copy(rationlI);
+        primitiveSafe = PrimitiveMatrix.FACTORY.copy(rationalSafe);
 
-        myComplexAA = ComplexMatrix.FACTORY.copy(myBigAA);
-        myComplexAX = ComplexMatrix.FACTORY.copy(myBigAX);
-        myComplexAB = ComplexMatrix.FACTORY.copy(myBigAB);
-        myComplexI = ComplexMatrix.FACTORY.copy(myBigI);
-        myComplexSafe = ComplexMatrix.FACTORY.copy(myBigSafe);
+        complexAA = ComplexMatrix.FACTORY.copy(rationalAA);
+        complexAX = ComplexMatrix.FACTORY.copy(rationalAX);
+        complexAB = ComplexMatrix.FACTORY.copy(rationalAB);
+        complexI = ComplexMatrix.FACTORY.copy(rationlI);
+        complexSafe = ComplexMatrix.FACTORY.copy(rationalSafe);
 
-        myNmbr = new BigDecimal(Math.random());
+        quaternionAA = QuaternionMatrix.FACTORY.copy(rationalAA);
+        quaternionAX = QuaternionMatrix.FACTORY.copy(rationalAX);
+        quaternionAB = QuaternionMatrix.FACTORY.copy(rationalAB);
+        quaternionI = QuaternionMatrix.FACTORY.copy(rationlI);
+        quaternionSafe = QuaternionMatrix.FACTORY.copy(rationalSafe);
+
+        bigNumber = new BigDecimal(Math.random());
     }
 
     @AfterEach
@@ -126,13 +142,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testAddBasicMatrix() {
 
-        myExpMtrx = myBigAA.add(myBigSafe);
+        expMtrx = rationalAA.add(rationalSafe);
 
-        myActMtrx = myComplexAA.add(myComplexSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.add(complexSafe);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.add(myPrimitiveSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.add(primitiveSafe);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
@@ -142,24 +158,24 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testAddIntIntNumber() {
 
-        final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
-        final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
+        final int tmpRow = Uniform.randomInteger((int) rationalAA.countRows());
+        final int tmpCol = Uniform.randomInteger((int) rationalAA.countColumns());
 
-        final BasicMatrix.PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = myBigAA.copy();
-        tmpBigBuilder.add(tmpRow, tmpCol, myNmbr);
-        myExpMtrx = tmpBigBuilder.build();
+        final BasicMatrix.PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = rationalAA.copy();
+        tmpBigBuilder.add(tmpRow, tmpCol, bigNumber);
+        expMtrx = tmpBigBuilder.build();
 
-        final BasicMatrix.PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
-        tmpComplexBuilder.add(tmpRow, tmpCol, myNmbr);
-        myActMtrx = tmpComplexBuilder.build();
+        final BasicMatrix.PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = complexAA.copy();
+        tmpComplexBuilder.add(tmpRow, tmpCol, bigNumber);
+        actMtrx = tmpComplexBuilder.build();
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        final BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
-        tmpPrimitiveBuilder.add(tmpRow, tmpCol, myNmbr);
-        myActMtrx = tmpPrimitiveBuilder.build();
+        final BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = primitiveAA.copy();
+        tmpPrimitiveBuilder.add(tmpRow, tmpCol, bigNumber);
+        actMtrx = tmpPrimitiveBuilder.build();
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
     }
 
     /**
@@ -168,13 +184,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testAddNumber() {
 
-        myExpMtrx = myBigAA.add(myNmbr);
+        expMtrx = rationalAA.add(bigNumber);
 
-        myActMtrx = myComplexAA.add(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.add(bigNumber);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.add(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.add(bigNumber);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
@@ -184,27 +200,37 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testConjugate() {
 
-        myExpMtrx = myBigAA.conjugate();
+        expMtrx = rationalAA.conjugate();
 
-        myActMtrx = myComplexAA.conjugate();
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.conjugate();
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.conjugate();
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.conjugate();
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
     @Test
     public void testDivideElementsBasicMatrix() {
 
-        myExpMtrx = myBigAA.divideElements(myBigSafe);
+        PhysicalBuilder<RationalNumber, RationalMatrix> copyRational = rationalAA.copy();
+        copyRational.modifyMatching(RationalFunction.DIVIDE, rationalSafe);
+        expMtrx = copyRational.get();
 
-        myActMtrx = myComplexAA.divideElements(myComplexSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        PhysicalBuilder<Double, PrimitiveMatrix> copyPrimitive = primitiveAA.copy();
+        copyPrimitive.modifyMatching(PrimitiveFunction.DIVIDE, primitiveSafe);
+        actMtrx = copyPrimitive.get();
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.divideElements(myPrimitiveSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        PhysicalBuilder<ComplexNumber, ComplexMatrix> copyComplex = complexAA.copy();
+        copyComplex.modifyMatching(ComplexFunction.DIVIDE, complexSafe);
+        actMtrx = copyComplex.get();
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
+        PhysicalBuilder<Quaternion, QuaternionMatrix> copyQuaternion = quaternionAA.copy();
+        copyQuaternion.modifyMatching(QuaternionFunction.DIVIDE, quaternionSafe);
+        actMtrx = copyQuaternion.get();
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
     }
 
     /**
@@ -213,28 +239,28 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testDivideNumber() {
 
-        myExpMtrx = myBigAA.divide(myNmbr);
+        expMtrx = rationalAA.divide(bigNumber);
 
-        myActMtrx = myComplexAA.divide(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.divide(bigNumber);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.divide(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.divide(bigNumber);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
     @Test
     public void testDotAccess1D() {
 
-        final int[] tmpCol = new int[] { (int) Uniform.randomInteger(myBigAA.countColumns()) };
+        final int[] tmpCol = new int[] { (int) Uniform.randomInteger(rationalAA.countColumns()) };
 
-        myExpNmbr = myBigAA.selectColumns(tmpCol).dot(myBigSafe.selectColumns(tmpCol));
+        expNumber = rationalAA.selectColumns(tmpCol).dot(rationalSafe.selectColumns(tmpCol));
 
-        myActNmbr = myComplexAA.selectColumns(tmpCol).dot(myComplexSafe.selectColumns(tmpCol));
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        actNumber = complexAA.selectColumns(tmpCol).dot(complexSafe.selectColumns(tmpCol));
+        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.selectColumns(tmpCol).dot(myPrimitiveSafe.selectColumns(tmpCol));
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        actNumber = primitiveAA.selectColumns(tmpCol).dot(primitiveSafe.selectColumns(tmpCol));
+        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
     }
 
@@ -244,16 +270,16 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testDoubleValueIntInt() {
 
-        final int tmpRow = (int) Uniform.randomInteger(myBigAA.countRows());
-        final int tmpCol = (int) Uniform.randomInteger(myBigAA.countColumns());
+        final int tmpRow = (int) Uniform.randomInteger(rationalAA.countRows());
+        final int tmpCol = (int) Uniform.randomInteger(rationalAA.countColumns());
 
-        myExpNmbr = myBigAA.doubleValue(tmpRow, tmpCol);
+        expNumber = rationalAA.doubleValue(tmpRow, tmpCol);
 
-        myActNmbr = myComplexAA.doubleValue(tmpRow, tmpCol);
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        actNumber = complexAA.doubleValue(tmpRow, tmpCol);
+        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.doubleValue(tmpRow, tmpCol);
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        actNumber = primitiveAA.doubleValue(tmpRow, tmpCol);
+        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
     }
 
@@ -263,13 +289,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetColDim() {
 
-        myExpInt = (int) myBigAA.countColumns();
+        expInt = (int) rationalAA.countColumns();
 
-        myActInt = (int) myComplexAA.countColumns();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actInt = (int) complexAA.countColumns();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
-        myActInt = (int) myPrimitiveAA.countColumns();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actInt = (int) primitiveAA.countColumns();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
     }
 
@@ -279,19 +305,19 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetColumnsIntArray() {
 
-        final int[] tmpArr = new int[(int) (1 + Uniform.randomInteger(myBigAA.countColumns()))];
+        final int[] tmpArr = new int[(int) (1 + Uniform.randomInteger(rationalAA.countColumns()))];
 
         for (int i = 0; i < tmpArr.length; i++) {
-            tmpArr[i] = (int) Uniform.randomInteger(myBigAA.countColumns());
+            tmpArr[i] = (int) Uniform.randomInteger(rationalAA.countColumns());
         }
 
-        myExpMtrx = myBigAA.selectColumns(tmpArr);
+        expMtrx = rationalAA.selectColumns(tmpArr);
 
-        myActMtrx = myComplexAA.selectColumns(tmpArr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.selectColumns(tmpArr);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.selectColumns(tmpArr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.selectColumns(tmpArr);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
@@ -301,17 +327,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetCondition() {
 
-        if (myBigAA.isFullRank()) {
+        if (rationalAA.isFullRank()) {
 
             // Difficult to test numerically
             // Will only check that they are the same order of magnitude
 
-            final int tmpExpCondMag = (int) Math.round(PrimitiveFunction.LOG10.invoke(myBigAA.getCondition().doubleValue()));
+            final int tmpExpCondMag = (int) Math.round(PrimitiveFunction.LOG10.invoke(rationalAA.getCondition().doubleValue()));
 
-            int tmpActCondMag = (int) Math.round(PrimitiveFunction.LOG10.invoke(myPrimitiveAA.getCondition().doubleValue()));
+            int tmpActCondMag = (int) Math.round(PrimitiveFunction.LOG10.invoke(primitiveAA.getCondition().doubleValue()));
             TestUtils.assertEquals(tmpExpCondMag, tmpActCondMag);
 
-            tmpActCondMag = (int) Math.round(PrimitiveFunction.LOG10.invoke(myComplexAA.getCondition().doubleValue()));
+            tmpActCondMag = (int) Math.round(PrimitiveFunction.LOG10.invoke(complexAA.getCondition().doubleValue()));
             TestUtils.assertEquals(tmpExpCondMag, tmpActCondMag);
         }
     }
@@ -322,15 +348,15 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetDeterminant() {
 
-        if (myBigAA.isSquare()) {
+        if (rationalAA.isSquare()) {
 
-            myExpNmbr = myBigAA.getDeterminant().get();
+            expNumber = rationalAA.getDeterminant().get();
 
-            myActNmbr = myComplexAA.getDeterminant().get();
-            TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+            actNumber = complexAA.getDeterminant().get();
+            TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
-            myActNmbr = myPrimitiveAA.getDeterminant().get();
-            TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+            actNumber = primitiveAA.getDeterminant().get();
+            TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
         }
     }
@@ -341,17 +367,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetEigenvalues() {
 
-        if (myBigAA.isSquare() && MatrixUtils.isHermitian(myBigAA)) {
+        if (rationalAA.isSquare() && MatrixUtils.isHermitian(rationalAA)) {
 
-            final List<Eigenpair> expected = myPrimitiveAA.getEigenpairs();
+            final List<Eigenpair> expected = primitiveAA.getEigenpairs();
             List<Eigenpair> actual;
 
-            actual = myBigAA.getEigenpairs();
+            actual = rationalAA.getEigenpairs();
             for (int i = 0; i < expected.size(); i++) {
                 TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i).value, actual.get(i).value, EVALUATION);
             }
 
-            actual = myComplexAA.getEigenpairs();
+            actual = complexAA.getEigenpairs();
             for (int i = 0; i < expected.size(); i++) {
                 TestUtils.assertEquals("Scalar<?> != Scalar<?>", expected.get(i).value, actual.get(i).value, EVALUATION);
             }
@@ -364,13 +390,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetInfinityNorm() {
 
-        myExpVal = BasicMatrix.calculateInfinityNorm(myBigAA);
+        expValue = BasicMatrix.calculateInfinityNorm(rationalAA);
 
-        myActVal = BasicMatrix.calculateInfinityNorm(myComplexAA);
-        TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
+        actValue = BasicMatrix.calculateInfinityNorm(complexAA);
+        TestUtils.assertEquals(expValue, actValue, EVALUATION);
 
-        myActVal = BasicMatrix.calculateInfinityNorm(myPrimitiveAA);
-        TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
+        actValue = BasicMatrix.calculateInfinityNorm(primitiveAA);
+        TestUtils.assertEquals(expValue, actValue, EVALUATION);
     }
 
     /**
@@ -379,13 +405,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetOneNorm() {
 
-        myExpVal = BasicMatrix.calculateOneNorm(myBigAA);
+        expValue = BasicMatrix.calculateOneNorm(rationalAA);
 
-        myActVal = BasicMatrix.calculateOneNorm(myComplexAA);
-        TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
+        actValue = BasicMatrix.calculateOneNorm(complexAA);
+        TestUtils.assertEquals(expValue, actValue, EVALUATION);
 
-        myActVal = BasicMatrix.calculateOneNorm(myPrimitiveAA);
-        TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
+        actValue = BasicMatrix.calculateOneNorm(primitiveAA);
+        TestUtils.assertEquals(expValue, actValue, EVALUATION);
     }
 
     /**
@@ -394,13 +420,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetRank() {
 
-        myExpInt = myBigAA.getRank();
+        expInt = rationalAA.getRank();
 
-        myActInt = myComplexAA.getRank();
-        TestUtils.assertEquals(myExpInt, myActInt);
+        actInt = complexAA.getRank();
+        TestUtils.assertEquals(expInt, actInt);
 
-        myActInt = myPrimitiveAA.getRank();
-        TestUtils.assertEquals(myExpInt, myActInt);
+        actInt = primitiveAA.getRank();
+        TestUtils.assertEquals(expInt, actInt);
 
     }
 
@@ -410,13 +436,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetRowDim() {
 
-        myExpInt = (int) myBigAA.countRows();
+        expInt = (int) rationalAA.countRows();
 
-        myActInt = (int) myComplexAA.countRows();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actInt = (int) complexAA.countRows();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
-        myActInt = (int) myPrimitiveAA.countRows();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actInt = (int) primitiveAA.countRows();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
     }
 
@@ -426,19 +452,19 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetRowsIntArray() {
 
-        final int[] tmpArr = new int[(int) (1 + Uniform.randomInteger(myBigAA.countRows()))];
+        final int[] tmpArr = new int[(int) (1 + Uniform.randomInteger(rationalAA.countRows()))];
 
         for (int i = 0; i < tmpArr.length; i++) {
-            tmpArr[i] = (int) Uniform.randomInteger(myBigAA.countRows());
+            tmpArr[i] = (int) Uniform.randomInteger(rationalAA.countRows());
         }
 
-        myExpMtrx = myBigAA.selectRows(tmpArr);
+        expMtrx = rationalAA.selectRows(tmpArr);
 
-        myActMtrx = myComplexAA.selectRows(tmpArr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.selectRows(tmpArr);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.selectRows(tmpArr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.selectRows(tmpArr);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
@@ -448,13 +474,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetSingularValues() {
 
-        final List<? extends Number> tmpExpStore = myBigAA.getSingularValues();
+        final List<? extends Number> tmpExpStore = rationalAA.getSingularValues();
         if (MatrixTests.DEBUG) {
             BasicLogger.debug("Big SVs: {}", tmpExpStore);
         }
         List<? extends Number> tmpActStore;
 
-        tmpActStore = myPrimitiveAA.getSingularValues();
+        tmpActStore = primitiveAA.getSingularValues();
         if (MatrixTests.DEBUG) {
             BasicLogger.debug("Primitive SVs: {}", tmpActStore);
         }
@@ -462,7 +488,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
             TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
         }
 
-        tmpActStore = myComplexAA.getSingularValues();
+        tmpActStore = complexAA.getSingularValues();
         if (MatrixTests.DEBUG) {
             BasicLogger.debug("Complex SVs: {}", tmpActStore);
         }
@@ -477,13 +503,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testGetTrace() {
 
-        myExpNmbr = myBigAA.getTrace().get();
+        expNumber = rationalAA.getTrace().get();
 
-        myActNmbr = myComplexAA.getTrace().get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        actNumber = complexAA.getTrace().get();
+        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.getTrace().get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        actNumber = primitiveAA.getTrace().get();
+        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
     }
 
@@ -493,15 +519,15 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testInvert() {
 
-        if (myBigAA.isSquare() && (myBigAA.getRank() >= myBigAA.countColumns())) {
+        if (rationalAA.isSquare() && (rationalAA.getRank() >= rationalAA.countColumns())) {
 
-            myExpMtrx = myBigAA.invert();
+            expMtrx = rationalAA.invert();
 
-            myActMtrx = myComplexAA.invert();
-            TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+            actMtrx = complexAA.invert();
+            TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-            myActMtrx = myPrimitiveAA.invert();
-            TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+            actMtrx = primitiveAA.invert();
+            TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
         }
     }
@@ -512,13 +538,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsEmpty() {
 
-        myExpBool = myBigAA.isEmpty();
+        expBoolean = rationalAA.isEmpty();
 
-        myActBool = myComplexAA.isEmpty();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = complexAA.isEmpty();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
-        myActBool = myPrimitiveAA.isEmpty();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = primitiveAA.isEmpty();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
     }
 
@@ -528,13 +554,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsFat() {
 
-        myExpBool = myBigAA.isFat();
+        expBoolean = rationalAA.isFat();
 
-        myActBool = myComplexAA.isFat();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = complexAA.isFat();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
-        myActBool = myPrimitiveAA.isFat();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = primitiveAA.isFat();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
     }
 
@@ -544,13 +570,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsFullRank() {
 
-        myExpBool = myBigAA.isFullRank();
+        expBoolean = rationalAA.isFullRank();
 
-        myActBool = myComplexAA.isFullRank();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = complexAA.isFullRank();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
-        myActBool = myPrimitiveAA.isFullRank();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = primitiveAA.isFullRank();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
     }
 
@@ -560,13 +586,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsHermitian() {
 
-        myExpBool = myBigAA.isHermitian();
+        expBoolean = rationalAA.isHermitian();
 
-        myActBool = myComplexAA.isHermitian();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = complexAA.isHermitian();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
-        myActBool = myPrimitiveAA.isHermitian();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = primitiveAA.isHermitian();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
     }
 
@@ -576,13 +602,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsSquare() {
 
-        myExpBool = myBigAA.isSquare();
+        expBoolean = rationalAA.isSquare();
 
-        myActBool = myComplexAA.isSquare();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = complexAA.isSquare();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
-        myActBool = myPrimitiveAA.isSquare();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = primitiveAA.isSquare();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
     }
 
@@ -592,13 +618,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsSymmetric() {
 
-        myExpBool = myBigAA.isSymmetric();
+        expBoolean = rationalAA.isSymmetric();
 
-        myActBool = myComplexAA.isSymmetric();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = complexAA.isSymmetric();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
-        myActBool = myPrimitiveAA.isSymmetric();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = primitiveAA.isSymmetric();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
     }
 
@@ -608,13 +634,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsTall() {
 
-        myExpBool = myBigAA.isTall();
+        expBoolean = rationalAA.isTall();
 
-        myActBool = myComplexAA.isTall();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = complexAA.isTall();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
-        myActBool = myPrimitiveAA.isTall();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = primitiveAA.isTall();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
     }
 
@@ -624,39 +650,39 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testIsVector() {
 
-        myExpBool = myBigAA.isVector();
+        expBoolean = rationalAA.isVector();
 
-        myActBool = myComplexAA.isVector();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = complexAA.isVector();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
-        myActBool = myPrimitiveAA.isVector();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actBoolean = primitiveAA.isVector();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
     }
 
     @Test
     public void testMergeColumnsBasicMatrix() {
 
-        myExpMtrx = myBigAA.mergeColumns(myBigSafe);
+        expMtrx = rationalAA.mergeColumns(rationalSafe);
 
-        myActMtrx = myComplexAA.mergeColumns(myComplexSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.mergeColumns(complexSafe);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.mergeColumns(myPrimitiveSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.mergeColumns(primitiveSafe);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
     @Test
     public void testMergeRowsBasicMatrix() {
 
-        myExpMtrx = myBigAA.mergeRows(myBigSafe);
+        expMtrx = rationalAA.mergeRows(rationalSafe);
 
-        myActMtrx = myComplexAA.mergeRows(myComplexSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.mergeRows(complexSafe);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.mergeRows(myPrimitiveSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.mergeRows(primitiveSafe);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
@@ -666,27 +692,37 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testMultiplyBasicMatrix() {
 
-        myExpMtrx = myBigAA.multiply(myBigAX);
+        expMtrx = rationalAA.multiply(rationalAX);
 
-        myActMtrx = myComplexAA.multiply(myComplexAX);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.multiply(complexAX);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.multiply(myPrimitiveAX);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.multiply(primitiveAX);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
     @Test
     public void testMultiplyElementsBasicMatrix() {
 
-        myExpMtrx = myBigAA.multiplyElements(myBigSafe);
+        PhysicalBuilder<RationalNumber, RationalMatrix> copyRational = rationalAA.copy();
+        copyRational.modifyMatching(RationalFunction.MULTIPLY, rationalSafe);
+        expMtrx = copyRational.get();
 
-        myActMtrx = myComplexAA.multiplyElements(myComplexSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        PhysicalBuilder<Double, PrimitiveMatrix> copyPrimitive = primitiveAA.copy();
+        copyPrimitive.modifyMatching(PrimitiveFunction.MULTIPLY, primitiveSafe);
+        actMtrx = copyPrimitive.get();
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.multiplyElements(myPrimitiveSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        PhysicalBuilder<ComplexNumber, ComplexMatrix> copyComplex = complexAA.copy();
+        copyComplex.modifyMatching(ComplexFunction.MULTIPLY, complexSafe);
+        actMtrx = copyComplex.get();
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
+        PhysicalBuilder<Quaternion, QuaternionMatrix> copyQuaternion = quaternionAA.copy();
+        copyQuaternion.modifyMatching(QuaternionFunction.MULTIPLY, quaternionSafe);
+        actMtrx = copyQuaternion.get();
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
     }
 
     /**
@@ -695,13 +731,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testMultiplyNumber() {
 
-        myExpMtrx = myBigAA.multiply(myNmbr);
+        expMtrx = rationalAA.multiply(bigNumber);
 
-        myActMtrx = myComplexAA.multiply(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.multiply(bigNumber);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.multiply(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.multiply(bigNumber);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
@@ -711,13 +747,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testNegate() {
 
-        myExpMtrx = myBigAA.negate();
+        expMtrx = rationalAA.negate();
 
-        myActMtrx = myComplexAA.negate();
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.negate();
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.negate();
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.negate();
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
@@ -727,13 +763,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testNorm() {
 
-        myExpVal = myBigAA.norm();
+        expValue = rationalAA.norm();
 
-        myActVal = myComplexAA.norm();
-        TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
+        actValue = complexAA.norm();
+        TestUtils.assertEquals(expValue, actValue, EVALUATION);
 
-        myActVal = myPrimitiveAA.norm();
-        TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
+        actValue = primitiveAA.norm();
+        TestUtils.assertEquals(expValue, actValue, EVALUATION);
 
     }
 
@@ -743,36 +779,36 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testSetIntIntNumber() {
 
-        final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
-        final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
+        final int tmpRow = Uniform.randomInteger((int) rationalAA.countRows());
+        final int tmpCol = Uniform.randomInteger((int) rationalAA.countColumns());
 
-        final BasicMatrix.PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = myBigAA.copy();
-        tmpBigBuilder.set(tmpRow, tmpCol, myNmbr);
-        myExpMtrx = tmpBigBuilder.build();
+        final BasicMatrix.PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = rationalAA.copy();
+        tmpBigBuilder.set(tmpRow, tmpCol, bigNumber);
+        expMtrx = tmpBigBuilder.build();
 
-        final BasicMatrix.PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
-        tmpComplexBuilder.set(tmpRow, tmpCol, myNmbr);
-        myActMtrx = tmpComplexBuilder.build();
+        final BasicMatrix.PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = complexAA.copy();
+        tmpComplexBuilder.set(tmpRow, tmpCol, bigNumber);
+        actMtrx = tmpComplexBuilder.build();
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        final BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
-        tmpPrimitiveBuilder.set(tmpRow, tmpCol, myNmbr);
-        myActMtrx = tmpPrimitiveBuilder.build();
+        final BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = primitiveAA.copy();
+        tmpPrimitiveBuilder.set(tmpRow, tmpCol, bigNumber);
+        actMtrx = tmpPrimitiveBuilder.build();
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
     }
 
     @Test
     public void testSize() {
 
-        myExpInt = (int) myBigAA.count();
+        expInt = (int) rationalAA.count();
 
-        myActInt = (int) myComplexAA.count();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actInt = (int) complexAA.count();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
-        myActInt = (int) myPrimitiveAA.count();
-        TestUtils.assertEquals(myExpBool, myActBool);
+        actInt = (int) primitiveAA.count();
+        TestUtils.assertEquals(expBoolean, actBoolean);
 
     }
 
@@ -782,15 +818,15 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testSolveBasicMatrix() {
 
-        if (myBigAA.isSquare() && (myBigAA.getRank() >= myBigAA.countColumns())) {
+        if (rationalAA.isSquare() && (rationalAA.getRank() >= rationalAA.countColumns())) {
 
-            myExpMtrx = myBigAA.solve(myBigAB);
+            expMtrx = rationalAA.solve(rationalAB);
 
-            myActMtrx = myComplexAA.solve(myComplexAB);
-            TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+            actMtrx = complexAA.solve(complexAB);
+            TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-            myActMtrx = myPrimitiveAA.solve(myPrimitiveAB);
-            TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+            actMtrx = primitiveAA.solve(primitiveAB);
+            TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
         }
     }
@@ -801,13 +837,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testSubtractBasicMatrix() {
 
-        myExpMtrx = myBigAA.subtract(myBigSafe);
+        expMtrx = rationalAA.subtract(rationalSafe);
 
-        myActMtrx = myComplexAA.subtract(myComplexSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.subtract(complexSafe);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.subtract(myPrimitiveSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.subtract(primitiveSafe);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
@@ -817,13 +853,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testSubtractNumber() {
 
-        myExpMtrx = myBigAA.subtract(myNmbr);
+        expMtrx = rationalAA.subtract(bigNumber);
 
-        myActMtrx = myComplexAA.subtract(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.subtract(bigNumber);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.subtract(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.subtract(bigNumber);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 
@@ -833,16 +869,16 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToBigDecimalIntInt() {
 
-        final int tmpRow = (int) Uniform.randomInteger(myBigAA.countRows());
-        final int tmpCol = (int) Uniform.randomInteger(myBigAA.countColumns());
+        final int tmpRow = (int) Uniform.randomInteger(rationalAA.countRows());
+        final int tmpCol = (int) Uniform.randomInteger(rationalAA.countColumns());
 
-        myExpNmbr = TypeUtils.toBigDecimal(myBigAA.get(tmpRow, tmpCol));
+        expNumber = TypeUtils.toBigDecimal(rationalAA.get(tmpRow, tmpCol));
 
-        myActNmbr = TypeUtils.toBigDecimal(myComplexAA.get(tmpRow, tmpCol));
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        actNumber = TypeUtils.toBigDecimal(complexAA.get(tmpRow, tmpCol));
+        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
-        myActNmbr = TypeUtils.toBigDecimal(myPrimitiveAA.get(tmpRow, tmpCol));
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        actNumber = TypeUtils.toBigDecimal(primitiveAA.get(tmpRow, tmpCol));
+        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
     }
 
@@ -852,16 +888,16 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToComplexNumberIntInt() {
 
-        final int tmpRow = (int) Uniform.randomInteger(myBigAA.countRows());
-        final int tmpCol = (int) Uniform.randomInteger(myBigAA.countColumns());
+        final int tmpRow = (int) Uniform.randomInteger(rationalAA.countRows());
+        final int tmpCol = (int) Uniform.randomInteger(rationalAA.countColumns());
 
-        myExpNmbr = ComplexNumber.valueOf(myBigAA.get(tmpRow, tmpCol));
+        expNumber = ComplexNumber.valueOf(rationalAA.get(tmpRow, tmpCol));
 
-        myActNmbr = ComplexNumber.valueOf(myComplexAA.get(tmpRow, tmpCol));
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        actNumber = ComplexNumber.valueOf(complexAA.get(tmpRow, tmpCol));
+        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
-        myActNmbr = ComplexNumber.valueOf(myPrimitiveAA.get(tmpRow, tmpCol));
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        actNumber = ComplexNumber.valueOf(primitiveAA.get(tmpRow, tmpCol));
+        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
     }
 
@@ -871,13 +907,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToComplexStore() {
 
-        final PhysicalStore<ComplexNumber> tmpExpStore = GenericDenseStore.COMPLEX.copy(myBigAA);
+        final PhysicalStore<ComplexNumber> tmpExpStore = GenericDenseStore.COMPLEX.copy(rationalAA);
         PhysicalStore<ComplexNumber> tmpActStore;
 
-        tmpActStore = GenericDenseStore.COMPLEX.copy(myComplexAA);
+        tmpActStore = GenericDenseStore.COMPLEX.copy(complexAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
-        tmpActStore = GenericDenseStore.COMPLEX.copy(myPrimitiveAA);
+        tmpActStore = GenericDenseStore.COMPLEX.copy(primitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
     }
@@ -888,13 +924,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToListOfColumns() {
 
-        final Iterable<ColumnView<RationalNumber>> tmpColumns = myBigAA.columns();
+        final Iterable<ColumnView<RationalNumber>> tmpColumns = rationalAA.columns();
 
         for (final ColumnView<RationalNumber> tmpColumnView : tmpColumns) {
             final long j = tmpColumnView.column();
             for (long i = 0L; i < tmpColumnView.count(); i++) {
-                TestUtils.assertEquals(tmpColumnView.get(i), myComplexAA.get(i, j), EVALUATION);
-                TestUtils.assertEquals(tmpColumnView.get(i), myPrimitiveAA.get(i, j), EVALUATION);
+                TestUtils.assertEquals(tmpColumnView.get(i), complexAA.get(i, j), EVALUATION);
+                TestUtils.assertEquals(tmpColumnView.get(i), primitiveAA.get(i, j), EVALUATION);
             }
         }
     }
@@ -905,13 +941,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToListOfRows() {
 
-        final Iterable<RowView<RationalNumber>> tmpRows = myBigAA.rows();
+        final Iterable<RowView<RationalNumber>> tmpRows = rationalAA.rows();
 
         for (final RowView<RationalNumber> tmpRowView : tmpRows) {
             final long i = tmpRowView.row();
             for (long j = 0L; j < tmpRowView.count(); j++) {
-                TestUtils.assertEquals(tmpRowView.get(j), myComplexAA.get(i, j), EVALUATION);
-                TestUtils.assertEquals(tmpRowView.get(j), myPrimitiveAA.get(i, j), EVALUATION);
+                TestUtils.assertEquals(tmpRowView.get(j), complexAA.get(i, j), EVALUATION);
+                TestUtils.assertEquals(tmpRowView.get(j), primitiveAA.get(i, j), EVALUATION);
             }
         }
     }
@@ -922,13 +958,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToPrimitiveStore() {
 
-        final PhysicalStore<Double> tmpExpStore = PrimitiveDenseStore.FACTORY.copy(myBigAA);
+        final PhysicalStore<Double> tmpExpStore = PrimitiveDenseStore.FACTORY.copy(rationalAA);
         PhysicalStore<Double> tmpActStore;
 
-        tmpActStore = PrimitiveDenseStore.FACTORY.copy(myComplexAA);
+        tmpActStore = PrimitiveDenseStore.FACTORY.copy(complexAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
-        tmpActStore = PrimitiveDenseStore.FACTORY.copy(myPrimitiveAA);
+        tmpActStore = PrimitiveDenseStore.FACTORY.copy(primitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
     }
@@ -939,13 +975,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToRationalStore() {
 
-        final PhysicalStore<RationalNumber> tmpExpStore = GenericDenseStore.RATIONAL.copy(myBigAA);
+        final PhysicalStore<RationalNumber> tmpExpStore = GenericDenseStore.RATIONAL.copy(rationalAA);
         PhysicalStore<RationalNumber> tmpActStore;
 
-        tmpActStore = GenericDenseStore.RATIONAL.copy(myComplexAA);
+        tmpActStore = GenericDenseStore.RATIONAL.copy(complexAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
-        tmpActStore = GenericDenseStore.RATIONAL.copy(myPrimitiveAA);
+        tmpActStore = GenericDenseStore.RATIONAL.copy(primitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
     }
@@ -956,25 +992,25 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToRawCopy1D() {
 
-        final double[] tmpExpStore = myBigAA.toRawCopy1D();
+        final double[] tmpExpStore = rationalAA.toRawCopy1D();
         double[] tmpActStore;
 
         final int tmpFirstIndex = 0;
-        final int tmpLastIndex = (int) (myBigAA.count() - 1);
+        final int tmpLastIndex = (int) (rationalAA.count() - 1);
 
-        tmpActStore = myComplexAA.toRawCopy1D();
+        tmpActStore = complexAA.toRawCopy1D();
         TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], EVALUATION);
         TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], EVALUATION);
-        if (myBigAA.isVector()) {
+        if (rationalAA.isVector()) {
             for (int i = 0; i < tmpExpStore.length; i++) {
                 TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], EVALUATION);
             }
         }
 
-        tmpActStore = myPrimitiveAA.toRawCopy1D();
+        tmpActStore = primitiveAA.toRawCopy1D();
         TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], EVALUATION);
         TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], EVALUATION);
-        if (myBigAA.isVector()) {
+        if (rationalAA.isVector()) {
             for (int i = 0; i < tmpExpStore.length; i++) {
                 TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], EVALUATION);
             }
@@ -988,16 +1024,16 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToScalarIntInt() {
 
-        final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
-        final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
+        final int tmpRow = Uniform.randomInteger((int) rationalAA.countRows());
+        final int tmpCol = Uniform.randomInteger((int) rationalAA.countColumns());
 
-        myExpNmbr = myBigAA.toScalar(tmpRow, tmpCol).get();
+        expNumber = rationalAA.toScalar(tmpRow, tmpCol).get();
 
-        myActNmbr = myComplexAA.toScalar(tmpRow, tmpCol).get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        actNumber = complexAA.toScalar(tmpRow, tmpCol).get();
+        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.toScalar(tmpRow, tmpCol).get();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+        actNumber = primitiveAA.toScalar(tmpRow, tmpCol).get();
+        TestUtils.assertEquals(expNumber, actNumber, EVALUATION);
 
     }
 
@@ -1007,13 +1043,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testTranspose() {
 
-        myExpMtrx = myBigAA.transpose();
+        expMtrx = rationalAA.transpose();
 
-        myActMtrx = myComplexAA.transpose();
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = complexAA.transpose();
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.transpose();
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        actMtrx = primitiveAA.transpose();
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
     }
 

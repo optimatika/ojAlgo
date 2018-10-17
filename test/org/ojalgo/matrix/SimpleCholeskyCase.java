@@ -60,12 +60,12 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
         DEFINITION = new NumberContext(7, 4);
         EVALUATION = new NumberContext(4, 3);
 
-        myBigAA = SimpleCholeskyCase.getFactorL();
-        myBigAX = SimpleCholeskyCase.getFactorR();
-        myBigAB = SimpleCholeskyCase.getOriginal();
+        rationalAA = SimpleCholeskyCase.getFactorL();
+        rationalAX = SimpleCholeskyCase.getFactorR();
+        rationalAB = SimpleCholeskyCase.getOriginal();
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }
@@ -77,15 +77,15 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
         final RationalMatrix tmpL = SimpleCholeskyCase.getFactorL();
         final RationalMatrix tmpR = SimpleCholeskyCase.getFactorR();
 
-        myExpMtrx = tmpL;
-        myActMtrx = tmpR.transpose();
+        expMtrx = tmpL;
+        actMtrx = tmpR.transpose();
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
-        myExpMtrx = tmpA;
-        myActMtrx = tmpL.multiply(tmpR);
+        expMtrx = tmpA;
+        actMtrx = tmpL.multiply(tmpR);
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
     }
 
     //    @Test

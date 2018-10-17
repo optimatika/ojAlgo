@@ -51,12 +51,12 @@ public class P20030528Case extends BasicMatrixTest {
         DEFINITION = new NumberContext(7, 1);
         EVALUATION = new NumberContext(7, 9);
 
-        myBigAA = P20030528Case.getProblematic();
-        myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
-        myBigAB = myBigAA;
+        rationalAA = P20030528Case.getProblematic();
+        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
+        rationalAB = rationalAA;
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }

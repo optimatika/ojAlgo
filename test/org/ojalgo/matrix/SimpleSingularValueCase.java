@@ -64,12 +64,12 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
         DEFINITION = new NumberContext(7, 1);
         EVALUATION = new NumberContext(7, 9);
 
-        myBigAA = SimpleSingularValueCase.getMatrixQ1();
-        myBigAX = SimpleSingularValueCase.getMatrixD();
-        myBigAB = SimpleSingularValueCase.getOriginal();
+        rationalAA = SimpleSingularValueCase.getMatrixQ1();
+        rationalAX = SimpleSingularValueCase.getMatrixD();
+        rationalAB = SimpleSingularValueCase.getOriginal();
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }

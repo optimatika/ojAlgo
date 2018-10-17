@@ -208,22 +208,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
         return this.getFactory().instantiate(retVal);
     }
 
-    /**
-     * @param row The row index of where to superimpose the top left element of the addend
-     * @param col The column index of where to superimpose the top left element of the addend
-     * @param addend A matrix to superimpose
-     * @return A new matrix
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    public M add(final int row, final int col, final Access2D<?> addend) {
-
-        final MatrixStore<N> tmpDiff = this.cast(addend).get();
-
-        //return this.getFactory().instantiate(new SuperimposedStore<N>(myStore, row, col, tmpDiff));
-        return this.getFactory().instantiate(myStore.logical().superimpose(row, col, tmpDiff).get());
-    }
-
     public M add(final M addend) {
 
         ProgrammingError.throwIfNotEqualDimensions(myStore, addend);
@@ -305,25 +289,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
         final N tmpRight = myStore.physical().scalar().cast(scalarDivisor);
 
         retVal.modifyAll(myStore.physical().function().divide().second(tmpRight));
-
-        return this.getFactory().instantiate(retVal);
-    }
-
-    /**
-     * Divides the elements of this with the elements of aMtrx. The matrices must have equal dimensions.
-     *
-     * @param aMtrx The denominator elements.
-     * @return A new matrix whos elements are the elements of this divided with the elements of aMtrx.
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    public M divideElements(final Access2D<?> divisor) {
-
-        ProgrammingError.throwIfNotEqualDimensions(myStore, divisor);
-
-        final PhysicalStore<N> retVal = myStore.physical().copy(divisor);
-
-        retVal.modifyMatching(myStore, myStore.physical().function().divide());
 
         return this.getFactory().instantiate(retVal);
     }

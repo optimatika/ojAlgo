@@ -68,12 +68,12 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         DEFINITION = new NumberContext(7, 4);
         EVALUATION = new NumberContext(4, 4); // TODO Something must be wrong here!
 
-        myBigAA = SimpleLeastSquaresCase.getFactorR();
-        myBigAX = SimpleLeastSquaresCase.getSolution();
-        myBigAB = SimpleLeastSquaresCase.getTransformedRHS();
+        rationalAA = SimpleLeastSquaresCase.getFactorR();
+        rationalAX = SimpleLeastSquaresCase.getSolution();
+        rationalAB = SimpleLeastSquaresCase.getTransformedRHS();
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }
@@ -81,10 +81,10 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        myExpMtrx = SimpleLeastSquaresCase.getTransformedRHS();
-        myActMtrx = SimpleLeastSquaresCase.getFactorR().multiply(SimpleLeastSquaresCase.getSolution());
+        expMtrx = SimpleLeastSquaresCase.getTransformedRHS();
+        actMtrx = SimpleLeastSquaresCase.getFactorR().multiply(SimpleLeastSquaresCase.getSolution());
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
     }
 
     @Test
@@ -92,10 +92,10 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
 
         // Solve
 
-        myExpMtrx = SimpleLeastSquaresCase.getSolution();
-        myActMtrx = SimpleLeastSquaresCase.getBody().solve(SimpleLeastSquaresCase.getRHS());
+        expMtrx = SimpleLeastSquaresCase.getSolution();
+        actMtrx = SimpleLeastSquaresCase.getBody().solve(SimpleLeastSquaresCase.getRHS());
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
     }
 
 }

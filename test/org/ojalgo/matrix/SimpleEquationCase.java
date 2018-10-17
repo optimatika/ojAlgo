@@ -51,12 +51,12 @@ public class SimpleEquationCase extends BasicMatrixTest {
         DEFINITION = new NumberContext(7, 1);
         EVALUATION = new NumberContext(7, 9);
 
-        myBigAA = SimpleEquationCase.getBody();
-        myBigAX = SimpleEquationCase.getSolution();
-        myBigAB = SimpleEquationCase.getRHS();
+        rationalAA = SimpleEquationCase.getBody();
+        rationalAX = SimpleEquationCase.getSolution();
+        rationalAB = SimpleEquationCase.getRHS();
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }

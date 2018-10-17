@@ -60,12 +60,12 @@ public class SimpleQRCase extends BasicMatrixTest {
         DEFINITION = DEFINITION.newScale(18);
         EVALUATION = EVALUATION.newScale(9).newPrecision(15);
 
-        myBigAA = SimpleQRCase.getFactorQ();
-        myBigAX = SimpleQRCase.getFactorR();
-        myBigAB = SimpleQRCase.getOriginal();
+        rationalAA = SimpleQRCase.getFactorQ();
+        rationalAX = SimpleQRCase.getFactorR();
+        rationalAB = SimpleQRCase.getOriginal();
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), EVALUATION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), EVALUATION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), EVALUATION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), EVALUATION);
 
         super.setUp();
     }
@@ -73,12 +73,12 @@ public class SimpleQRCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        myExpMtrx = SimpleQRCase.getOriginal();
+        expMtrx = SimpleQRCase.getOriginal();
         final RationalMatrix tmpFactorQ = SimpleQRCase.getFactorQ();
         final RationalMatrix tmpFactorR = SimpleQRCase.getFactorR();
-        myActMtrx = tmpFactorQ.multiply(tmpFactorR);
+        actMtrx = tmpFactorQ.multiply(tmpFactorR);
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
     }
 
     @Test
@@ -92,22 +92,22 @@ public class SimpleQRCase extends BasicMatrixTest {
         final MatrixStore<RationalNumber> tmpQ = tmpQR.getQ();
         final MatrixStore<RationalNumber> tmpR = tmpQR.getR();
 
-        myExpMtrx = SimpleQRCase.getOriginal();
-        myActMtrx = RationalMatrix.FACTORY.copy(tmpQ.multiply(tmpR));
+        expMtrx = SimpleQRCase.getOriginal();
+        actMtrx = RationalMatrix.FACTORY.copy(tmpQ.multiply(tmpR));
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
 
         // Q
 
-        myExpMtrx = SimpleQRCase.getFactorQ();
-        myActMtrx = RationalMatrix.FACTORY.copy(tmpQ);
+        expMtrx = SimpleQRCase.getFactorQ();
+        actMtrx = RationalMatrix.FACTORY.copy(tmpQ);
 
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
 
         // R
 
-        myExpMtrx = SimpleQRCase.getFactorR();
-        myActMtrx = RationalMatrix.FACTORY.copy(tmpR);
+        expMtrx = SimpleQRCase.getFactorR();
+        actMtrx = RationalMatrix.FACTORY.copy(tmpR);
 
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
     }

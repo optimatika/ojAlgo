@@ -62,12 +62,12 @@ public class P20030512Case extends BasicMatrixTest {
         DEFINITION = new NumberContext(7, 12);
         EVALUATION = new NumberContext(5, 6);
 
-        myBigAA = P20030512Case.getProblematic();
-        myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
-        myBigAB = myBigAA;
+        rationalAA = P20030512Case.getProblematic();
+        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
+        rationalAB = rationalAA;
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }
@@ -75,11 +75,11 @@ public class P20030512Case extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        myExpMtrx = P20030512Case.getProblematic();
-        myActMtrx = myExpMtrx.invert().invert();
+        expMtrx = P20030512Case.getProblematic();
+        actMtrx = expMtrx.invert().invert();
 
         // RationalMatrix can do this, but not JamaMatrix and/or JampackMatrix
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, EVALUATION);
     }
 
 }

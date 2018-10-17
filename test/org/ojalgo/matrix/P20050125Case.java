@@ -52,12 +52,12 @@ public class P20050125Case extends BasicMatrixTest {
         DEFINITION = new NumberContext(7, 9);
         EVALUATION = new NumberContext(7, 6);
 
-        myBigAA = P20050125Case.getProblematic();
-        myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
-        myBigAB = myBigAA;
+        rationalAA = P20050125Case.getProblematic();
+        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
+        rationalAB = rationalAA;
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }
@@ -66,21 +66,21 @@ public class P20050125Case extends BasicMatrixTest {
     public void testData() {
 
         final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
-        tmpDelegate.decompose(GenericDenseStore.RATIONAL.copy(myBigAA));
+        tmpDelegate.decompose(GenericDenseStore.RATIONAL.copy(rationalAA));
 
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(myBigAA), tmpDelegate, EVALUATION);
+        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(rationalAA), tmpDelegate, EVALUATION);
     }
 
     @Test
     public void testProblem() {
 
         final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
-        tmpDelegate.decompose(GenericDenseStore.RATIONAL.copy(myBigAA));
+        tmpDelegate.decompose(GenericDenseStore.RATIONAL.copy(rationalAA));
 
-        final MatrixStore<RationalNumber> tmpInv = tmpDelegate.getSolution(GenericDenseStore.RATIONAL.copy(myBigI));
+        final MatrixStore<RationalNumber> tmpInv = tmpDelegate.getSolution(GenericDenseStore.RATIONAL.copy(rationlI));
 
-        final MatrixStore<RationalNumber> tmpExpMtrx = GenericDenseStore.RATIONAL.copy(myBigI);
-        final MatrixStore<RationalNumber> tmpActMtrx = GenericDenseStore.RATIONAL.copy(myBigAA).multiply(tmpInv);
+        final MatrixStore<RationalNumber> tmpExpMtrx = GenericDenseStore.RATIONAL.copy(rationlI);
+        final MatrixStore<RationalNumber> tmpActMtrx = GenericDenseStore.RATIONAL.copy(rationalAA).multiply(tmpInv);
 
         TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, EVALUATION);
     }
