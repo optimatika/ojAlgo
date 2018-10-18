@@ -252,12 +252,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         final int[] tmpCol = new int[] { (int) Uniform.randomInteger(rationalAA.countColumns()) };
 
-        expNumber = rationalAA.selectColumns(tmpCol).dot(rationalSafe.selectColumns(tmpCol));
+        expNumber = rationalAA.logical().column(tmpCol).get().dot(rationalSafe.logical().column(tmpCol).get());
 
-        actNumber = complexAA.selectColumns(tmpCol).dot(complexSafe.selectColumns(tmpCol));
+        actNumber = complexAA.logical().column(tmpCol).get().dot(complexSafe.logical().column(tmpCol).get());
         TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
-        actNumber = primitiveAA.selectColumns(tmpCol).dot(primitiveSafe.selectColumns(tmpCol));
+        actNumber = primitiveAA.logical().column(tmpCol).get().dot(primitiveSafe.logical().column(tmpCol).get());
         TestUtils.assertEquals(expNumber, actNumber, evaluation);
 
     }
@@ -309,12 +309,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
             tmpArr[i] = (int) Uniform.randomInteger(rationalAA.countColumns());
         }
 
-        expMtrx = rationalAA.selectColumns(tmpArr);
+        expMtrx = rationalAA.logical().column(tmpArr).get();
 
-        actMtrx = complexAA.selectColumns(tmpArr);
+        actMtrx = complexAA.logical().column(tmpArr).get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        actMtrx = primitiveAA.selectColumns(tmpArr);
+        actMtrx = primitiveAA.logical().column(tmpArr).get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
@@ -456,12 +456,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
             tmpArr[i] = (int) Uniform.randomInteger(rationalAA.countRows());
         }
 
-        expMtrx = rationalAA.selectRows(tmpArr);
+        expMtrx = rationalAA.logical().row(tmpArr).get();
 
-        actMtrx = complexAA.selectRows(tmpArr);
+        actMtrx = complexAA.logical().row(tmpArr).get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        actMtrx = primitiveAA.selectRows(tmpArr);
+        actMtrx = primitiveAA.logical().row(tmpArr).get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }

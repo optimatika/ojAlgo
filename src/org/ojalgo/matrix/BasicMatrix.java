@@ -354,17 +354,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
     }
 
     /**
-     * @param first The first column to include.
-     * @param limit The limit (exclusive) - the first column not to include.
-     * @return A new matrix with only the specified range of columns
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    public M getColumnsRange(final int first, final int limit) {
-        return this.getFactory().instantiate(myStore.logical().limits((int) myStore.countRows(), limit).offsets(0, first).get());
-    }
-
-    /**
      * Matrix condition (2-norm)
      *
      * @return ratio of largest to smallest singular value.
@@ -427,17 +416,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
      */
     public int getRank() {
         return this.getRankRevealing(myStore).getRank();
-    }
-
-    /**
-     * @param first The first row to include.
-     * @param kimit The limit (exclusive) - the first row not to include.
-     * @return A new matrix with only the specified range of rows
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    public M getRowsRange(final int first, final int limit) {
-        return this.getFactory().instantiate(myStore.logical().limits(limit, (int) myStore.countColumns()).offsets(first, 0).get());
     }
 
     /**
@@ -694,26 +672,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
 
     public M reduceRows(Aggregator aggregator) {
         return this.getFactory().instantiate(myStore.reduceRows(aggregator).get());
-    }
-
-    /**
-     * @param someCols An ordered array of column indeces.
-     * @return A matrix with a subset of, reordered, columns.
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    public M selectColumns(int... someCols) {
-        return this.logical().column(someCols).get();
-    }
-
-    /**
-     * @param someRows An ordered array of row indeces.
-     * @return A matrix with a subset of, reordered, rows.
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    public M selectRows(int... someRows) {
-        return this.logical().row(someRows).get();
     }
 
     public M signum() {
