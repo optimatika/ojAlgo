@@ -661,27 +661,31 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testMergeColumnsBasicMatrix() {
 
-        expMtrx = rationalAA.mergeColumns(rationalSafe);
+        expMtrx = rationalAA.logical().below(rationalSafe).get();
 
-        actMtrx = complexAA.mergeColumns(complexSafe);
+        actMtrx = primitiveAA.logical().below(primitiveSafe).get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        actMtrx = primitiveAA.mergeColumns(primitiveSafe);
+        actMtrx = complexAA.logical().below(complexSafe).get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
+        actMtrx = quaternionAA.logical().below(quaternionSafe).get();
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     @Test
     public void testMergeRowsBasicMatrix() {
 
-        expMtrx = rationalAA.mergeRows(rationalSafe);
+        expMtrx = rationalAA.logical().right(rationalSafe).get();
 
-        actMtrx = complexAA.mergeRows(complexSafe);
+        actMtrx = primitiveAA.logical().right(primitiveSafe).get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        actMtrx = primitiveAA.mergeRows(primitiveSafe);
+        actMtrx = complexAA.logical().right(complexSafe).get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
+        actMtrx = quaternionAA.logical().right(quaternionSafe).get();
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     /**

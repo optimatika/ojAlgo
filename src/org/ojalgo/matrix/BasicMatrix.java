@@ -551,40 +551,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
     }
 
     /**
-     * [belowRows] is appended below [this]. The two matrices must have the same number of columns.
-     *
-     * @param belowRows The matrix to merge.
-     * @return A new matrix with more rows.
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    public M mergeColumns(final Access2D<?> belowRows) {
-
-        ProgrammingError.throwIfNotEqualColumnDimensions(myStore, belowRows);
-
-        final MatrixStore<N> tmpBelow = this.cast(belowRows).get();
-
-        return this.getFactory().instantiate(myStore.logical().below(tmpBelow).get());
-    }
-
-    /**
-     * [rightColumns] is appended to the right of [this]. The two matrices must have the same number of rows.
-     *
-     * @param rightColumns The matrix to merge.
-     * @return A new matrix with more columns.
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    public M mergeRows(final Access2D<?> rightColumns) {
-
-        ProgrammingError.throwIfNotEqualRowDimensions(myStore, rightColumns);
-
-        final MatrixStore<N> tmpRight = this.cast(rightColumns).get();
-
-        return this.getFactory().instantiate(myStore.logical().right(tmpRight).get());
-    }
-
-    /**
      * @deprecated v42 Use {@link #logical()} or {@link #copy()} instead
      */
     @Deprecated

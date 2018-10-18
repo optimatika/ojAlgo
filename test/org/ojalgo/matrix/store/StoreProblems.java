@@ -55,11 +55,11 @@ public class StoreProblems extends MatrixStoreTests {
         PrimitiveMatrix Apow = PrimitiveMatrix.FACTORY.copy(Aprime);
         final PrimitiveMatrix tmp = Aprime.subtract(eye);
         sx = PrimitiveMatrix.FACTORY.copy(eye);
-        sx = sx.mergeColumns(tmp);
+        sx = sx.logical().below(tmp).get();
 
         //loop runs hp-2 times, which means the first elements of the matrices must be "hardcoded"
         for (int i = 0; i < (hp - 2); i++) {
-            sx = sx.mergeColumns(tmp.multiply(Apow));
+            sx = sx.logical().below(tmp.multiply(Apow)).get();
             Apow = Apow.multiply(Apow);
         }
         currentState = PrimitiveMatrix.FACTORY.makeZero(A.countRows(), 1);
