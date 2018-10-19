@@ -132,11 +132,11 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
 
         final PrimitiveDenseStore[] tmpMatricesI = new PrimitiveDenseStore[] { myAE, myBE, myQ, myC, myAI, myBI };
 
-        ConvexProblems.builAndTestModel(tmpMatricesI, myXI, myEvaluationContext, true);
+        ConvexProblems.builAndTestModel(tmpMatricesI, myXI, myEvaluationContext, false);
 
         final PrimitiveDenseStore[] tmpMatricesE = new PrimitiveDenseStore[] { myAE, myBE, myQ, myC, null, null };
 
-        ConvexProblems.builAndTestModel(tmpMatricesE, myXE, myEvaluationContext, true);
+        ConvexProblems.builAndTestModel(tmpMatricesE, myXE, myEvaluationContext, false);
     }
 
     /**

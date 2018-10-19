@@ -33,7 +33,6 @@ import org.ojalgo.algebra.Operation;
 import org.ojalgo.algebra.ScalarOperation;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -419,14 +418,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
     }
 
     /**
-     * @deprecated v40 Use {@link SingularValue}
-     */
-    @Deprecated
-    public List<Double> getSingularValues() {
-        return this.getComputedSingularValue().getSingularValues();
-    }
-
-    /**
      * The sum of the diagonal elements.
      *
      * @return The matrix' trace.
@@ -435,7 +426,7 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
 
         final AggregatorFunction<N> tmpAggr = myStore.physical().aggregator().sum();
 
-        myStore.visitDiagonal(0, 0, tmpAggr);
+        myStore.visitDiagonal(tmpAggr);
 
         return myStore.physical().scalar().convert(tmpAggr.get());
     }
@@ -508,6 +499,12 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
             }
         }
 
+        if (tmpInverse == null) {
+            SingularValue<N> computedSVD = this.getComputedSingularValue();
+            myDecomposition = computedSVD;
+            tmpInverse = computedSVD.getInverse();
+        }
+
         return this.getFactory().instantiate(tmpInverse);
     }
 
@@ -550,19 +547,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
         return this.getFactory().logical(myStore.logical());
     }
 
-    /**
-     * @deprecated v42 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    public M modify(final UnaryFunction<? extends Number> modifier) {
-
-        final PhysicalStore<N> retVal = myStore.copy();
-
-        retVal.modifyAll((UnaryFunction<N>) modifier);
-
-        return this.getFactory().instantiate(retVal);
-    }
-
     public M multiply(final double scalarMultiplicand) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
@@ -588,26 +572,6 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
         final N tmpRight = myStore.physical().scalar().cast(scalarMultiplicand);
 
         retVal.modifyAll(myStore.physical().function().multiply().second(tmpRight));
-
-        return this.getFactory().instantiate(retVal);
-    }
-
-    /**
-     * Multiplies the elements of this matrix with the elements of aMtrx. The matrices must have equal
-     * dimensions.
-     *
-     * @param aMtrx The elements to multiply by.
-     * @return A new matrix whos elements are the elements of this multiplied with the elements of aMtrx.
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    public M multiplyElements(final Access2D<?> multiplicand) {
-
-        ProgrammingError.throwIfNotEqualDimensions(myStore, multiplicand);
-
-        final PhysicalStore<N> retVal = myStore.physical().copy(multiplicand);
-
-        retVal.modifyMatching(myStore, myStore.physical().function().multiply());
 
         return this.getFactory().instantiate(retVal);
     }
@@ -646,18 +610,18 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
 
     /**
      * <p>
-     * This method solves a system of linear equations: [this][X]=[aRHS]. A combination of columns in [this]
-     * should produce a column(s) in [aRHS]. It is ok for [aRHS] to have more than 1 column.
+     * This method solves a system of linear equations: [this][X]=[rhs]. A combination of columns in [this]
+     * should produce a column(s) in [rhs]. It is ok for [aRHS] to have more than 1 column.
      * </p>
      * <ul>
      * <li>If the problem is over-qualified an approximate solution is returned.</li>
      * <li>If the problem is under-qualified one possible solution is returned.</li>
      * </ul>
      * <p>
-     * Remember that: [X][this]=[aRHS] is equivalent to [this]<sup>T</sup>[X]<sup>T</sup>=[aRHS]<sup>T</sup>
+     * Remember that: [X][this]=[rhs] is equivalent to [this]<sup>T</sup>[X]<sup>T</sup>=[rhs]<sup>T</sup>
      * </p>
      *
-     * @param aRHS The right hand side of the equation.
+     * @param rhs The right hand side of the equation.
      * @return The solution, [X].
      */
     public M solve(final Access2D<?> rhs) {

@@ -34,10 +34,11 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20030512Case extends BasicMatrixTest {
 
-    private static final NumberContext DEFINITION = new NumberContext(7, 12);
+    private static final NumberContext DEFINITION = new NumberContext(16, 18);
 
     public static RationalMatrix getProblematic() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] {
+
+        final RationalMatrix problematic = RationalMatrix.FACTORY.rows(new double[][] {
                 { -0.9739496281920735, 0.13212842225762753, -0.009493226825028579, 0.05293424713580207, -0.06924760059060892, 0.015657944731764042,
                         -0.008564346745847575, 0.004549185362729688 },
                 { -0.006968800104298036, -0.8297418413337506, -0.0362355854907016, 0.16177736191417533, -0.2100891795366892, 0.047384677993178616,
@@ -54,14 +55,15 @@ public class P20030512Case extends BasicMatrixTest {
                         -0.9466510330795804, 0.21994580987160817 },
                 { 4.2787387020086915E-8, 1.6510244524754327E-6, -8.431008420700906E-7, 8.524039438893604E-5, -3.878467110438371E-4, -0.00423012863453722,
                         -0.22206406664227266, 0.05162429369962791 } });
-        return tmpMtrx.enforce(DEFINITION);
+
+        return problematic.enforce(DEFINITION);
     }
 
     @Override
     @BeforeEach
     public void setUp() {
 
-        evaluation = new NumberContext(5, 6);
+        evaluation = new NumberContext(8, 6);
 
         rationalAA = P20030512Case.getProblematic();
         rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
@@ -79,7 +81,6 @@ public class P20030512Case extends BasicMatrixTest {
         expMtrx = P20030512Case.getProblematic();
         actMtrx = expMtrx.invert().invert();
 
-        // RationalMatrix can do this, but not JamaMatrix and/or JampackMatrix
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 

@@ -28,6 +28,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
@@ -35,10 +36,11 @@ import org.ojalgo.function.QuaternionFunction;
 import org.ojalgo.function.RationalFunction;
 import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
+import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
+import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -466,32 +468,28 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getSingularValues()
-     */
     @Test
     public void testGetSingularValues() {
 
-        final List<? extends Number> tmpExpStore = rationalAA.getSingularValues();
-        if (MatrixTests.DEBUG) {
-            BasicLogger.debug("Big SVs: {}", tmpExpStore);
-        }
-        List<? extends Number> tmpActStore;
+        SingularValue<RationalNumber> rationalSVD = SingularValue.RATIONAL.make(rationalAA);
+        rationalSVD.compute(rationalAA);
+        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(rationalAA), rationalSVD, evaluation);
+        Array1D<Double> expected = rationalSVD.getSingularValues();
 
-        tmpActStore = primitiveAA.getSingularValues();
-        if (MatrixTests.DEBUG) {
-            BasicLogger.debug("Primitive SVs: {}", tmpActStore);
-        }
-        for (int i = 0; i < tmpExpStore.size(); i++) {
-            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), evaluation);
-        }
+        SingularValue<ComplexNumber> complexSVD = SingularValue.COMPLEX.make(complexAA);
+        complexSVD.compute(complexAA);
+        TestUtils.assertEquals(GenericDenseStore.COMPLEX.copy(complexAA), complexSVD, evaluation);
+        TestUtils.assertEquals(expected, complexSVD.getSingularValues(), evaluation);
 
-        tmpActStore = complexAA.getSingularValues();
-        if (MatrixTests.DEBUG) {
-            BasicLogger.debug("Complex SVs: {}", tmpActStore);
-        }
-        for (int i = 0; i < tmpExpStore.size(); i++) {
-            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), evaluation);
+        SingularValue<Quaternion> quaternionSVD = SingularValue.QUATERNION.make(quaternionAA);
+        quaternionSVD.compute(quaternionAA);
+        TestUtils.assertEquals(GenericDenseStore.QUATERNION.copy(quaternionAA), quaternionSVD, evaluation);
+        TestUtils.assertEquals(expected, quaternionSVD.getSingularValues(), evaluation);
+
+        for (SingularValue<Double> primitiveSVD : MatrixDecompositionTests.getSingularValuePrimitive()) {
+            primitiveSVD.compute(primitiveAA);
+            TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(primitiveAA), primitiveSVD, evaluation);
+            TestUtils.assertEquals(expected, primitiveSVD.getSingularValues(), evaluation);
         }
     }
 
