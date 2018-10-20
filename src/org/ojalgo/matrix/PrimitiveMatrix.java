@@ -42,7 +42,15 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> {
 
-    public static final MatrixFactory<Double, PrimitiveMatrix> FACTORY = new MatrixFactory<>(PrimitiveMatrix.class, PrimitiveDenseStore.FACTORY);
+    public static final class Factory extends MatrixFactory<Double, PrimitiveMatrix> {
+
+        Factory() {
+            super(PrimitiveMatrix.class, PrimitiveDenseStore.FACTORY);
+        }
+
+    }
+
+    public static final Factory FACTORY = new Factory();
 
     /**
      * This method is for internal use only - YOU should NOT use it!

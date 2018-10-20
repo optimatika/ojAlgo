@@ -43,7 +43,15 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatrix> {
 
-    public static final MatrixFactory<ComplexNumber, ComplexMatrix> FACTORY = new MatrixFactory<>(ComplexMatrix.class, GenericDenseStore.COMPLEX);
+    public static final class Factory extends MatrixFactory<ComplexNumber, ComplexMatrix> {
+
+        Factory() {
+            super(ComplexMatrix.class, GenericDenseStore.COMPLEX);
+        }
+
+    }
+
+    public static final Factory FACTORY = new Factory();
 
     /**
      * This method is for internal use only - YOU should NOT use it!

@@ -43,7 +43,15 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMatrix> {
 
-    public static final MatrixFactory<Quaternion, QuaternionMatrix> FACTORY = new MatrixFactory<>(QuaternionMatrix.class, GenericDenseStore.QUATERNION);
+    public static final class Factory extends MatrixFactory<Quaternion, QuaternionMatrix> {
+
+        Factory() {
+            super(QuaternionMatrix.class, GenericDenseStore.QUATERNION);
+        }
+
+    }
+
+    public static final Factory FACTORY = new Factory();
 
     /**
      * This method is for internal use only - YOU should NOT use it!

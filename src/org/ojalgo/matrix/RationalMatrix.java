@@ -43,7 +43,15 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMatrix> {
 
-    public static final MatrixFactory<RationalNumber, RationalMatrix> FACTORY = new MatrixFactory<>(RationalMatrix.class, GenericDenseStore.RATIONAL);
+    public static final class Factory extends MatrixFactory<RationalNumber, RationalMatrix> {
+
+        Factory() {
+            super(RationalMatrix.class, GenericDenseStore.RATIONAL);
+        }
+
+    }
+
+    public static final Factory FACTORY = new Factory();
 
     /**
      * This method is for internal use only - YOU should NOT use it!

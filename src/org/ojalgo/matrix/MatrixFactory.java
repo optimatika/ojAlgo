@@ -46,7 +46,7 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public final class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> implements Factory2D<M> {
+class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> implements Factory2D<M> {
 
     @SuppressWarnings("unchecked")
     final class Logical implements BasicMatrix.LogicalBuilder<N, M> {
