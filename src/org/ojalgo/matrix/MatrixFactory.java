@@ -46,10 +46,19 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> implements Factory2D<M> {
+abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B extends BasicMatrix.LogicalBuilder<N, M>, DR extends BasicMatrix.PhysicalReceiver<N, M>, SR extends BasicMatrix.PhysicalReceiver<N, M>>
+        implements Factory2D<M> {
+
+    abstract class DenseReceiver extends Physical<PhysicalStore<N>> {
+
+        DenseReceiver(PhysicalStore<N> delegate) {
+            super(delegate);
+        }
+
+    }
 
     @SuppressWarnings("unchecked")
-    final class Logical implements BasicMatrix.LogicalBuilder<N, M> {
+    abstract class Logical implements BasicMatrix.LogicalBuilder<N, M> {
 
         private final MatrixStore.LogicalBuilder<N> myDelegate;
 
@@ -228,12 +237,12 @@ class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> implements Fa
 
     }
 
-    final class Physical<MB extends MatrixStore<N> & Mutate2D.Receiver<N> & Mutate2D.BiModifiable<N>> implements BasicMatrix.PhysicalBuilder<N, M> {
+    abstract class Physical<PR extends MatrixStore<N> & Mutate2D.ModifiableReceiver<N>> implements BasicMatrix.PhysicalReceiver<N, M> {
 
-        private final MB myDelegate;
+        private final PR myDelegate;
         private boolean mySafe = true;
 
-        Physical(final MB delegate) {
+        Physical(final PR delegate) {
 
             super();
 
@@ -735,6 +744,14 @@ class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> implements Fa
         }
     }
 
+    abstract class SparseReceiver extends Physical<SparseStore<N>> {
+
+        SparseReceiver(SparseStore<N> delegate) {
+            super(delegate);
+        }
+
+    }
+
     private static Constructor<? extends BasicMatrix<?, ?>> getConstructor(final Class<? extends BasicMatrix<?, ?>> aTemplate) {
         try {
             final Constructor<? extends BasicMatrix<?, ?>> retVal = aTemplate.getDeclaredConstructor(MatrixStore.class);
@@ -787,7 +804,7 @@ class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> implements Fa
      * @deprecated v47 Use {@link #makeDense(int)} instead
      */
     @Deprecated
-    public BasicMatrix.PhysicalBuilder<N, M> getBuilder(final int count) {
+    public DR getBuilder(final int count) {
         return this.makeDense(count);
     }
 
@@ -795,16 +812,16 @@ class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> implements Fa
      * @deprecated v47 Use {@link #makeDense(int,int)} instead
      */
     @Deprecated
-    public BasicMatrix.PhysicalBuilder<N, M> getBuilder(final int rows, final int columns) {
+    public DR getBuilder(final int rows, final int columns) {
         return this.makeDense(rows, columns);
     }
 
-    public BasicMatrix.PhysicalBuilder<N, M> makeDense(final int count) {
+    public DR makeDense(final int count) {
         return this.makeDense(count, 1);
     }
 
-    public BasicMatrix.PhysicalBuilder<N, M> makeDense(final int rows, final int columns) {
-        return new Physical<>(myPhysicalFactory.makeZero(rows, columns));
+    public DR makeDense(final int rows, final int columns) {
+        return this.physical(myPhysicalFactory.makeZero(rows, columns));
     }
 
     public M makeEye(final int rows, final int columns) {
@@ -838,11 +855,11 @@ class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> implements Fa
         return this.instantiate(myPhysicalFactory.builder().makeSingle(element).get());
     }
 
-    public BasicMatrix.PhysicalBuilder<N, M> makeSparse(final int rows, final int columns) {
-        return new Physical<>(myPhysicalFactory.builder().makeSparse(rows, columns));
+    public SR makeSparse(final int rows, final int columns) {
+        return this.physical(myPhysicalFactory.builder().makeSparse(rows, columns));
     }
 
-    public BasicMatrix.PhysicalBuilder<N, M> makeSparse(final Structure2D shape) {
+    public SR makeSparse(final Structure2D shape) {
         return this.makeSparse(Math.toIntExact(shape.countRows()), Math.toIntExact(shape.countColumns()));
     }
 
@@ -893,16 +910,10 @@ class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>> implements Fa
         }
     }
 
-    Logical logical(final MatrixStore.LogicalBuilder<N> delegate) {
-        return new Logical(delegate);
-    }
+    abstract B logical(final MatrixStore<N> delegate);
 
-    Physical<PhysicalStore<N>> physical(final PhysicalStore<N> delegate) {
-        return new Physical<>(delegate);
-    }
+    abstract DR physical(final PhysicalStore<N> delegate);
 
-    Physical<SparseStore<N>> physical(final SparseStore<N> delegate) {
-        return new Physical<>(delegate);
-    }
+    abstract SR physical(final SparseStore<N> delegate);
 
 }

@@ -31,7 +31,7 @@ import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate2D;
 
-public interface ElementsConsumer<N extends Number> extends Mutate2D.Receiver<N>, Mutate2D.BiModifiable<N> {
+public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableReceiver<N> {
 
     class ColumnsRegion<N extends Number> extends ConsumerRegion<N> {
 

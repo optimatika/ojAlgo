@@ -36,10 +36,6 @@ import org.ojalgo.function.UnaryFunction;
  */
 public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
-    interface BiModifiable<N extends Number> extends MutateAnyD.Modifiable<N>, Mutate1D.BiModifiable<N> {
-
-    }
-
     interface Fillable<N extends Number> extends StructureAnyD, Mutate1D.Fillable<N> {
 
         void fillOne(long[] reference, N value);
@@ -79,6 +75,15 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
         void modifySet(int dimension, long dimensionalIndex, UnaryFunction<N> modifier);
 
         void modifySet(long[] initial, int dimension, UnaryFunction<N> modifier);
+
+    }
+
+    /**
+     * A utility interface to simplify declaring to implement "everything mutable".
+     *
+     * @author apete
+     */
+    interface ModifiableReceiver<N extends Number> extends Modifiable<N>, Receiver<N> {
 
     }
 

@@ -34,7 +34,7 @@ import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.QuaternionFunction;
 import org.ojalgo.function.RationalFunction;
-import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
+import org.ojalgo.matrix.BasicMatrix.PhysicalReceiver;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.decomposition.SingularValue;
@@ -153,7 +153,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see BasicMatrix.PhysicalBuilder#add(long, long, Number)
+     * @see BasicMatrix.PhysicalReceiver#add(long, long, Number)
      */
     @Test
     public void testAddIntIntNumber() {
@@ -161,17 +161,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final int tmpRow = Uniform.randomInteger((int) rationalAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) rationalAA.countColumns());
 
-        final BasicMatrix.PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = rationalAA.copy();
+        final BasicMatrix.PhysicalReceiver<RationalNumber, RationalMatrix> tmpBigBuilder = rationalAA.copy();
         tmpBigBuilder.add(tmpRow, tmpCol, bigNumber);
         expMtrx = tmpBigBuilder.build();
 
-        final BasicMatrix.PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = complexAA.copy();
+        final BasicMatrix.PhysicalReceiver<ComplexNumber, ComplexMatrix> tmpComplexBuilder = complexAA.copy();
         tmpComplexBuilder.add(tmpRow, tmpCol, bigNumber);
         actMtrx = tmpComplexBuilder.build();
 
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        final BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = primitiveAA.copy();
+        final BasicMatrix.PhysicalReceiver<Double, PrimitiveMatrix> tmpPrimitiveBuilder = primitiveAA.copy();
         tmpPrimitiveBuilder.add(tmpRow, tmpCol, bigNumber);
         actMtrx = tmpPrimitiveBuilder.build();
 
@@ -213,21 +213,21 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testDivideElementsBasicMatrix() {
 
-        PhysicalBuilder<RationalNumber, RationalMatrix> copyRational = rationalAA.copy();
+        PhysicalReceiver<RationalNumber, RationalMatrix> copyRational = rationalAA.copy();
         copyRational.modifyMatching(RationalFunction.DIVIDE, rationalSafe);
         expMtrx = copyRational.get();
 
-        PhysicalBuilder<Double, PrimitiveMatrix> copyPrimitive = primitiveAA.copy();
+        PhysicalReceiver<Double, PrimitiveMatrix> copyPrimitive = primitiveAA.copy();
         copyPrimitive.modifyMatching(PrimitiveFunction.DIVIDE, primitiveSafe);
         actMtrx = copyPrimitive.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        PhysicalBuilder<ComplexNumber, ComplexMatrix> copyComplex = complexAA.copy();
+        PhysicalReceiver<ComplexNumber, ComplexMatrix> copyComplex = complexAA.copy();
         copyComplex.modifyMatching(ComplexFunction.DIVIDE, complexSafe);
         actMtrx = copyComplex.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        PhysicalBuilder<Quaternion, QuaternionMatrix> copyQuaternion = quaternionAA.copy();
+        PhysicalReceiver<Quaternion, QuaternionMatrix> copyQuaternion = quaternionAA.copy();
         copyQuaternion.modifyMatching(QuaternionFunction.DIVIDE, quaternionSafe);
         actMtrx = copyQuaternion.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
@@ -705,21 +705,21 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testMultiplyElementsBasicMatrix() {
 
-        PhysicalBuilder<RationalNumber, RationalMatrix> copyRational = rationalAA.copy();
+        PhysicalReceiver<RationalNumber, RationalMatrix> copyRational = rationalAA.copy();
         copyRational.modifyMatching(RationalFunction.MULTIPLY, rationalSafe);
         expMtrx = copyRational.get();
 
-        PhysicalBuilder<Double, PrimitiveMatrix> copyPrimitive = primitiveAA.copy();
+        PhysicalReceiver<Double, PrimitiveMatrix> copyPrimitive = primitiveAA.copy();
         copyPrimitive.modifyMatching(PrimitiveFunction.MULTIPLY, primitiveSafe);
         actMtrx = copyPrimitive.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        PhysicalBuilder<ComplexNumber, ComplexMatrix> copyComplex = complexAA.copy();
+        PhysicalReceiver<ComplexNumber, ComplexMatrix> copyComplex = complexAA.copy();
         copyComplex.modifyMatching(ComplexFunction.MULTIPLY, complexSafe);
         actMtrx = copyComplex.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        PhysicalBuilder<Quaternion, QuaternionMatrix> copyQuaternion = quaternionAA.copy();
+        PhysicalReceiver<Quaternion, QuaternionMatrix> copyQuaternion = quaternionAA.copy();
         copyQuaternion.modifyMatching(QuaternionFunction.MULTIPLY, quaternionSafe);
         actMtrx = copyQuaternion.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
@@ -774,7 +774,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see BasicMatrix.PhysicalBuilder#set(long, long, Number)
+     * @see BasicMatrix.PhysicalReceiver#set(long, long, Number)
      */
     @Test
     public void testSetIntIntNumber() {
@@ -782,17 +782,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final int tmpRow = Uniform.randomInteger((int) rationalAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) rationalAA.countColumns());
 
-        final BasicMatrix.PhysicalBuilder<RationalNumber, RationalMatrix> tmpBigBuilder = rationalAA.copy();
+        final BasicMatrix.PhysicalReceiver<RationalNumber, RationalMatrix> tmpBigBuilder = rationalAA.copy();
         tmpBigBuilder.set(tmpRow, tmpCol, bigNumber);
         expMtrx = tmpBigBuilder.build();
 
-        final BasicMatrix.PhysicalBuilder<ComplexNumber, ComplexMatrix> tmpComplexBuilder = complexAA.copy();
+        final BasicMatrix.PhysicalReceiver<ComplexNumber, ComplexMatrix> tmpComplexBuilder = complexAA.copy();
         tmpComplexBuilder.set(tmpRow, tmpCol, bigNumber);
         actMtrx = tmpComplexBuilder.build();
 
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        final BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> tmpPrimitiveBuilder = primitiveAA.copy();
+        final BasicMatrix.PhysicalReceiver<Double, PrimitiveMatrix> tmpPrimitiveBuilder = primitiveAA.copy();
         tmpPrimitiveBuilder.set(tmpRow, tmpCol, bigNumber);
         actMtrx = tmpPrimitiveBuilder.build();
 

@@ -46,7 +46,7 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
 
         static {
 
-            BasicMatrix.PhysicalBuilder<Double, PrimitiveMatrix> mtrxBuilder;
+            BasicMatrix.PhysicalReceiver<Double, PrimitiveMatrix> mtrxBuilder;
 
             mtrxBuilder = PrimitiveMatrix.FACTORY.makeDense(2, 2);
             mtrxBuilder.add(0, 0, 0.040000);

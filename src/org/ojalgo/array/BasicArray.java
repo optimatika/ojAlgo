@@ -182,6 +182,16 @@ public abstract class BasicArray<N extends Number>
         this.modify(0L, this.count(), 1L, modifier);
     }
 
+    public void modifyMatching(Access1D<N> left, BinaryFunction<N> function) {
+        long limit = Math.min(left.count(), this.count());
+        this.modify(0L, limit, 1L, left, function);
+    }
+
+    public void modifyMatching(BinaryFunction<N> function, Access1D<N> right) {
+        long limit = Math.min(this.count(), right.count());
+        this.modify(0L, limit, 1L, function, right);
+    }
+
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
         this.modify(first, limit, 1L, modifier);
     }

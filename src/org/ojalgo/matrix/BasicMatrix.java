@@ -123,8 +123,8 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
 
     }
 
-    public static interface PhysicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
-            extends Mutate2D.Receiver<N>, Mutate2D.BiModifiable<N>, Mutate2D.Exchangeable, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
+    public static interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
+            extends Mutate2D.ModifiableReceiver<N>, Mutate2D.Exchangeable, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         default M build() {
             return this.get();
@@ -254,7 +254,7 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
     /**
      * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
      */
-    public BasicMatrix.PhysicalBuilder<N, M> copy() {
+    public BasicMatrix.PhysicalReceiver<N, M> copy() {
         return this.getFactory().physical(myStore.copy());
     }
 
@@ -544,7 +544,7 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
     }
 
     public BasicMatrix.LogicalBuilder<N, M> logical() {
-        return this.getFactory().logical(myStore.logical());
+        return this.getFactory().logical(myStore);
     }
 
     public M multiply(final double scalarMultiplicand) {
@@ -784,7 +784,7 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
 
     abstract SingularValue<N> getDecompositionSingularValue(Structure2D typical);
 
-    abstract MatrixFactory<N, M> getFactory();
+    abstract MatrixFactory<N, M, ? extends LogicalBuilder<N, M>, ? extends PhysicalReceiver<N, M>, ? extends PhysicalReceiver<N, M>> getFactory();
 
     final MatrixStore<N> getStore() {
         return myStore;

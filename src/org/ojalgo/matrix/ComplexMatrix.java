@@ -28,6 +28,8 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
@@ -43,10 +45,57 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatrix> {
 
-    public static final class Factory extends MatrixFactory<ComplexNumber, ComplexMatrix> {
+    public static final class DenseReceiver extends
+            MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.DenseReceiver {
+
+        DenseReceiver(Factory enclosing, PhysicalStore<ComplexNumber> delegate) {
+            enclosing.super(delegate);
+        }
+
+    }
+
+    public static final class Factory
+            extends MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver> {
 
         Factory() {
             super(ComplexMatrix.class, GenericDenseStore.COMPLEX);
+        }
+
+        @Override
+        ComplexMatrix.LogicalBuilder logical(MatrixStore<ComplexNumber> delegate) {
+            return new ComplexMatrix.LogicalBuilder(this, delegate);
+        }
+
+        @Override
+        ComplexMatrix.DenseReceiver physical(PhysicalStore<ComplexNumber> delegate) {
+            return new ComplexMatrix.DenseReceiver(this, delegate);
+        }
+
+        @Override
+        ComplexMatrix.SparseReceiver physical(SparseStore<ComplexNumber> delegate) {
+            return new ComplexMatrix.SparseReceiver(this, delegate);
+        }
+
+    }
+
+    public static final class LogicalBuilder extends
+            MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.Logical {
+
+        LogicalBuilder(Factory enclosing, MatrixStore.LogicalBuilder<ComplexNumber> delegate) {
+            enclosing.super(delegate);
+        }
+
+        LogicalBuilder(Factory enclosing, MatrixStore<ComplexNumber> store) {
+            enclosing.super(store);
+        }
+
+    }
+
+    public static final class SparseReceiver extends
+            MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.SparseReceiver {
+
+        SparseReceiver(Factory enclosing, SparseStore<ComplexNumber> delegate) {
+            enclosing.super(delegate);
         }
 
     }
@@ -132,7 +181,7 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     }
 
     @Override
-    MatrixFactory<ComplexNumber, ComplexMatrix> getFactory() {
+    ComplexMatrix.Factory getFactory() {
         return FACTORY;
     }
 
