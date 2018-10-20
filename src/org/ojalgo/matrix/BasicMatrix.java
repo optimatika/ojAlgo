@@ -63,12 +63,12 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extends Object implements NormedVectorSpace<M, N>, Operation.Subtraction<M>,
+abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extends Object implements NormedVectorSpace<M, N>, Operation.Subtraction<M>,
         Operation.Multiplication<M>, ScalarOperation.Addition<M, N>, ScalarOperation.Division<M, N>, ScalarOperation.Subtraction<M, N>, Access2D<N>,
         Access2D.Elements, Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
     @SuppressWarnings("unchecked")
-    public static interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
+    static interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
             extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         LogicalBuilder<N, M> above(int numberOfRows);
@@ -123,7 +123,7 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
 
     }
 
-    public static interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
+    static interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
             extends Mutate2D.ModifiableReceiver<N>, Mutate2D.Exchangeable, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         default M build() {
@@ -254,9 +254,7 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
     /**
      * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
      */
-    public BasicMatrix.PhysicalReceiver<N, M> copy() {
-        return this.getFactory().physical(myStore.copy());
-    }
+    public abstract BasicMatrix.PhysicalReceiver<N, M> copy();
 
     public long count() {
         return myStore.count();
@@ -543,9 +541,7 @@ public abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>>
         return mySymmetric.booleanValue();
     }
 
-    public BasicMatrix.LogicalBuilder<N, M> logical() {
-        return this.getFactory().logical(myStore);
-    }
+    public abstract BasicMatrix.LogicalBuilder<N, M> logical();
 
     public M multiply(final double scalarMultiplicand) {
 

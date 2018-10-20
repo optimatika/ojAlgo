@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -159,7 +158,7 @@ public class LinearProblems extends OptimisationLinearTests {
         // A valid solution of 25.8 can be produced with:
         // X1=10, X2=0, X3=8, X4=0, X5=5, X6=23
         final BigDecimal tmpClaimedValue = new BigDecimal("25.8");
-        final BasicMatrix.PhysicalReceiver<Double, PrimitiveMatrix> tmpBuilder = PrimitiveMatrix.FACTORY.makeDense(6, 1);
+        final PrimitiveMatrix.DenseReceiver tmpBuilder = PrimitiveMatrix.FACTORY.makeDense(6, 1);
         tmpBuilder.set(0, 0, 10);
         tmpBuilder.set(2, 0, 8);
         tmpBuilder.set(4, 0, 5);
@@ -193,11 +192,11 @@ public class LinearProblems extends OptimisationLinearTests {
         TestUtils.assertEquals(tmpFullSolution, RationalMatrix.FACTORY.columns(tmpFullResult).logical().row(someRows4).get(), new NumberContext(7, 6));
         int[] someRows5 = { 0, 1, 2 };
 
-        final BigDecimal tmpEvenValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(
-                tmpEvenObjective.toFunction().invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpEvenResult).logical().row(someRows5).get()))));
+        final BigDecimal tmpEvenValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpEvenObjective.toFunction()
+                .invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpEvenResult).logical().row(someRows5).get()))));
         int[] someRows6 = { 0, 1, 2 };
-        final BigDecimal tmpOddValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(
-                tmpOddObjective.toFunction().invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpOddResult).logical().row(someRows6).get()))));
+        final BigDecimal tmpOddValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpOddObjective.toFunction()
+                .invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpOddResult).logical().row(someRows6).get()))));
         int[] someRows7 = { 0, 1, 2, 3, 4, 5 };
         final BigDecimal tmpFullValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpFullObjective.toFunction()
                 .invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpFullResult).logical().row(someRows7).get()))));

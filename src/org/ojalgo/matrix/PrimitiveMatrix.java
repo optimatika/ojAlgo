@@ -88,6 +88,11 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
             enclosing.super(store);
         }
 
+        @Override
+        LogicalBuilder self() {
+            return this;
+        }
+
     }
 
     public static final class SparseReceiver extends
@@ -106,6 +111,16 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
      */
     PrimitiveMatrix(final MatrixStore<Double> aStore) {
         super(aStore);
+    }
+
+    @Override
+    public PrimitiveMatrix.DenseReceiver copy() {
+        return new PrimitiveMatrix.DenseReceiver(FACTORY, this.getStore().copy());
+    }
+
+    @Override
+    public PrimitiveMatrix.LogicalBuilder logical() {
+        return new PrimitiveMatrix.LogicalBuilder(FACTORY, this.getStore());
     }
 
     @SuppressWarnings("unchecked")

@@ -89,6 +89,11 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
             enclosing.super(store);
         }
 
+        @Override
+        LogicalBuilder self() {
+            return this;
+        }
+
     }
 
     public static final class SparseReceiver extends
@@ -107,6 +112,16 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
      */
     RationalMatrix(final MatrixStore<RationalNumber> aStore) {
         super(aStore);
+    }
+
+    @Override
+    public RationalMatrix.DenseReceiver copy() {
+        return new RationalMatrix.DenseReceiver(FACTORY, this.getStore().copy());
+    }
+
+    @Override
+    public RationalMatrix.LogicalBuilder logical() {
+        return new RationalMatrix.LogicalBuilder(FACTORY, this.getStore());
     }
 
     @SuppressWarnings("unchecked")

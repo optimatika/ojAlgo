@@ -89,6 +89,11 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
             enclosing.super(store);
         }
 
+        @Override
+        LogicalBuilder self() {
+            return this;
+        }
+
     }
 
     public static final class SparseReceiver extends
@@ -107,6 +112,16 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
      */
     QuaternionMatrix(final MatrixStore<Quaternion> aStore) {
         super(aStore);
+    }
+
+    @Override
+    public QuaternionMatrix.DenseReceiver copy() {
+        return new QuaternionMatrix.DenseReceiver(FACTORY, this.getStore().copy());
+    }
+
+    @Override
+    public QuaternionMatrix.LogicalBuilder logical() {
+        return new QuaternionMatrix.LogicalBuilder(FACTORY, this.getStore());
     }
 
     @SuppressWarnings("unchecked")

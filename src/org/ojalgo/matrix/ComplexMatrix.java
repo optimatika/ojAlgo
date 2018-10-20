@@ -89,6 +89,11 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
             enclosing.super(store);
         }
 
+        @Override
+        LogicalBuilder self() {
+            return this;
+        }
+
     }
 
     public static final class SparseReceiver extends
@@ -107,6 +112,11 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
      */
     ComplexMatrix(final MatrixStore<ComplexNumber> aStore) {
         super(aStore);
+    }
+
+    @Override
+    public ComplexMatrix.DenseReceiver copy() {
+        return new ComplexMatrix.DenseReceiver(FACTORY, this.getStore().copy());
     }
 
     /**
@@ -135,6 +145,11 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
      */
     public PrimitiveMatrix getReal() {
         return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexReal(this.getStore()));
+    }
+
+    @Override
+    public ComplexMatrix.LogicalBuilder logical() {
+        return new ComplexMatrix.LogicalBuilder(FACTORY, this.getStore());
     }
 
     @SuppressWarnings("unchecked")
