@@ -71,6 +71,8 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         MatrixStore.LogicalBuilder<N> makeSingle(N element);
 
+        SparseStore<N> makeSparse(int rowsCount, int columnsCount);
+
         MatrixStore.LogicalBuilder<N> makeWrapper(Access2D<?> access);
 
         MatrixStore.LogicalBuilder<N> makeZero(int rowsCount, int columnsCount);
@@ -414,6 +416,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.COMPLEX, element));
         }
 
+        public SparseStore<ComplexNumber> makeSparse(int rowsCount, int columnsCount) {
+            return SparseStore.COMPLEX.make(rowsCount, columnsCount);
+        }
+
         public LogicalBuilder<ComplexNumber> makeWrapper(final Access2D<?> access) {
             return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.COMPLEX, access));
         }
@@ -432,6 +438,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         public LogicalBuilder<Double> makeSingle(final Double element) {
             return new LogicalBuilder<>(new SingleStore<>(PrimitiveDenseStore.FACTORY, element));
+        }
+
+        public SparseStore<Double> makeSparse(int rowsCount, int columnsCount) {
+            return SparseStore.PRIMITIVE.make(rowsCount, columnsCount);
         }
 
         public LogicalBuilder<Double> makeWrapper(final Access2D<?> access) {
@@ -454,6 +464,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.QUATERNION, element));
         }
 
+        public SparseStore<Quaternion> makeSparse(int rowsCount, int columnsCount) {
+            return SparseStore.QUATERNION.make(rowsCount, columnsCount);
+        }
+
         public LogicalBuilder<Quaternion> makeWrapper(final Access2D<?> access) {
             return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.QUATERNION, access));
         }
@@ -472,6 +486,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         public LogicalBuilder<RationalNumber> makeSingle(final RationalNumber element) {
             return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.RATIONAL, element));
+        }
+
+        public SparseStore<RationalNumber> makeSparse(int rowsCount, int columnsCount) {
+            return SparseStore.RATIONAL.make(rowsCount, columnsCount);
         }
 
         public LogicalBuilder<RationalNumber> makeWrapper(final Access2D<?> access) {

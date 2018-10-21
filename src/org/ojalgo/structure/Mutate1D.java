@@ -36,14 +36,6 @@ import org.ojalgo.function.UnaryFunction;
  */
 public interface Mutate1D extends Structure1D {
 
-    interface BiModifiable<N extends Number> extends Structure1D {
-
-        void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function);
-
-        void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right);
-
-    }
-
     /**
      * Fills the target
      *
@@ -117,11 +109,24 @@ public interface Mutate1D extends Structure1D {
             this.modifyRange(0L, this.count(), modifier);
         }
 
+        void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function);
+
+        void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right);
+
         void modifyOne(long index, UnaryFunction<N> modifier);
 
         default void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
             Structure1D.loopRange(first, limit, i -> this.modifyOne(i, modifier));
         }
+
+    }
+
+    /**
+     * A utility interface to simplify declaring to implement "everything mutable".
+     *
+     * @author apete
+     */
+    interface ModifiableReceiver<N extends Number> extends Modifiable<N>, Receiver<N> {
 
     }
 

@@ -49,8 +49,8 @@ import org.ojalgo.structure.StructureAnyD;
  * @author apete
  */
 public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, AccessAnyD.Visitable<N>,
-        AccessAnyD.Aggregatable<N>, StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, AccessAnyD.Sliceable<N>, MutateAnyD,
-        MutateAnyD.Fillable<N>, MutateAnyD.Modifiable<N>, MutateAnyD.BiModifiable<N>, MutateAnyD.Mixable<N> {
+        AccessAnyD.Aggregatable<N>, StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, AccessAnyD.Sliceable<N>,
+        MutateAnyD.ModifiableReceiver<N>, MutateAnyD.Mixable<N> {
 
     public static final class Factory<N extends Number> implements FactoryAnyD<ArrayAnyD<N>> {
 

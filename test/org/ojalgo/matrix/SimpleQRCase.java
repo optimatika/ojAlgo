@@ -29,6 +29,7 @@ import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Gilbert Strang, Linear Algebra and its Applications III, Problem 3.4.16
@@ -36,6 +37,8 @@ import org.ojalgo.scalar.RationalNumber;
  * @author apete
  */
 public class SimpleQRCase extends BasicMatrixTest {
+
+    private static final NumberContext DEFINITION = NumberContext.getGeneral(9).newScale(18);
 
     public static RationalMatrix getOriginal() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
@@ -53,19 +56,18 @@ public class SimpleQRCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = DEFINITION.newScale(18);
-        EVALUATION = EVALUATION.newScale(9).newPrecision(15);
+        evaluation = evaluation.newScale(9).newPrecision(15);
 
-        myBigAA = SimpleQRCase.getFactorQ();
-        myBigAX = SimpleQRCase.getFactorR();
-        myBigAB = SimpleQRCase.getOriginal();
+        rationalAA = SimpleQRCase.getFactorQ();
+        rationalAX = SimpleQRCase.getFactorR();
+        rationalAB = SimpleQRCase.getOriginal();
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), EVALUATION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), EVALUATION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), evaluation);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), evaluation);
 
         super.setUp();
     }
@@ -73,12 +75,12 @@ public class SimpleQRCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        myExpMtrx = SimpleQRCase.getOriginal();
+        expMtrx = SimpleQRCase.getOriginal();
         final RationalMatrix tmpFactorQ = SimpleQRCase.getFactorQ();
         final RationalMatrix tmpFactorR = SimpleQRCase.getFactorR();
-        myActMtrx = tmpFactorQ.multiply(tmpFactorR);
+        actMtrx = tmpFactorQ.multiply(tmpFactorR);
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     @Test
@@ -92,22 +94,22 @@ public class SimpleQRCase extends BasicMatrixTest {
         final MatrixStore<RationalNumber> tmpQ = tmpQR.getQ();
         final MatrixStore<RationalNumber> tmpR = tmpQR.getR();
 
-        myExpMtrx = SimpleQRCase.getOriginal();
-        myActMtrx = RationalMatrix.FACTORY.copy(tmpQ.multiply(tmpR));
+        expMtrx = SimpleQRCase.getOriginal();
+        actMtrx = RationalMatrix.FACTORY.copy(tmpQ.multiply(tmpR));
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         // Q
 
-        myExpMtrx = SimpleQRCase.getFactorQ();
-        myActMtrx = RationalMatrix.FACTORY.copy(tmpQ);
+        expMtrx = SimpleQRCase.getFactorQ();
+        actMtrx = RationalMatrix.FACTORY.copy(tmpQ);
 
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
 
         // R
 
-        myExpMtrx = SimpleQRCase.getFactorR();
-        myActMtrx = RationalMatrix.FACTORY.copy(tmpR);
+        expMtrx = SimpleQRCase.getFactorR();
+        actMtrx = RationalMatrix.FACTORY.copy(tmpR);
 
         // TODO JUnitUtils.assertEquals(myExpected, myActual);
     }

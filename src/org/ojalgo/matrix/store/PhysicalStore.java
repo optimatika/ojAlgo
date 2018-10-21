@@ -34,6 +34,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Structure2D;
 
 /**
  * <p>
@@ -78,6 +79,12 @@ public interface PhysicalStore<N extends Number>
         Scalar.Factory<N> scalar();
 
         I transpose(Access2D<?> source);
+
+        I makeEye(long rows, long columns);
+
+        default I makeEye(final Structure2D shape) {
+            return this.makeEye(shape.countRows(), shape.countColumns());
+        }
 
     }
 

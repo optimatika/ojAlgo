@@ -30,7 +30,6 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -77,10 +76,10 @@ public class LinearDesignTestCases {
         tmpExprC3.upper(new BigDecimal("30.0"));
 
         final Optimisation.Result tmpResult = tmpModel.maximise();
-        final BasicMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        final RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 5.0 }, { 4.0 }, { 0.0 } });
-        final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.selectRows(new int[] { 0, 1, 2 }));
+        final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.logical().row(new int[] { 0, 1, 2 }).get());
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -109,10 +108,10 @@ public class LinearDesignTestCases {
         tmpExprC2.level(SIX);
 
         final Optimisation.Result tmpResult = tmpModel.maximise();
-        final BasicMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        final RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 8.0 }, { 1.0 }, { 0.0 } });
-        final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.selectRows(new int[] { 0, 1, 2 }));
+        final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.logical().row(new int[] { 0, 1, 2 }).get());
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -146,10 +145,10 @@ public class LinearDesignTestCases {
         tmpExprC3.level(FOUR);
 
         final Optimisation.Result tmpResult = tmpModel.maximise();
-        final BasicMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        final RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2.0 }, { 2.0 } });
-        final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.selectRows(new int[] { 0, 1 }));
+        final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.logical().row(new int[] { 0, 1 }).get());
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -184,10 +183,10 @@ public class LinearDesignTestCases {
         tmpExprC3.level(FIVE);
 
         final Optimisation.Result tmpResult = tmpModel.minimise();
-        final BasicMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        final RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.74 }, { 0.45 }, { 1.0 } });
-        final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.selectRows(new int[] { 0, 1, 2 }));
+        final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.logical().row(new int[] { 0, 1, 2 }).get());
         tmpActX.modifyAll(new NumberContext(7, 2).getFunction(PrimitiveFunction.getSet()));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
@@ -222,10 +221,10 @@ public class LinearDesignTestCases {
         tmpExprC3.level(TEN);
 
         final Optimisation.Result tmpResult = tmpModel.minimise();
-        final BasicMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        final RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 5.0 }, { 5.0 } });
-        final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.selectRows(new int[] { 0, 1 }));
+        final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.logical().row(new int[] { 0, 1 }).get());
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -275,10 +274,10 @@ public class LinearDesignTestCases {
         tmpExprC3.lower(TWELVE);
 
         final Optimisation.Result tmpResult = tmpModel.minimise();
-        final BasicMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        final RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0 }, { 4.0 } });
-        final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.selectRows(new int[] { 0, 1 }));
+        final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.logical().row(new int[] { 0, 1 }).get());
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -452,11 +451,11 @@ public class LinearDesignTestCases {
         final ExpressionsBasedModel tmpModel = this.buildOldKnapsackTestModel();
 
         final Optimisation.Result tmpResult = tmpModel.maximise();
-        final BasicMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        final RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         final MatrixStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 0.0 }, { 0.0 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.8154 }, { 0.0 } });
-        final MatrixStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.selectRows(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }));
+        final MatrixStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.logical().row(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }).get());
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -467,11 +466,11 @@ public class LinearDesignTestCases {
         final ExpressionsBasedModel tmpModel = this.buildOldKnapsackTestModel();
 
         final Optimisation.Result tmpResult = tmpModel.minimise();
-        final BasicMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
+        final RationalMatrix tmpSolution = RationalMatrix.FACTORY.columns(tmpResult);
 
         final MatrixStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 0.0 }, { 0.8154 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
-        final MatrixStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.selectRows(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }));
+        final MatrixStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.logical().row(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }).get());
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }

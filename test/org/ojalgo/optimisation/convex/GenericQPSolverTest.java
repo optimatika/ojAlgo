@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -60,7 +60,7 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
     @BeforeEach
     public void setUp() {
 
-        final BasicMatrix[] tmpMatrices = this.getMatrices();
+        final RationalMatrix[] tmpMatrices = this.getMatrices();
 
         if (tmpMatrices[0] != null) {
             myAE = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[0]);
@@ -132,16 +132,16 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
 
         final PrimitiveDenseStore[] tmpMatricesI = new PrimitiveDenseStore[] { myAE, myBE, myQ, myC, myAI, myBI };
 
-        ConvexProblems.builAndTestModel(tmpMatricesI, myXI, myEvaluationContext, true);
+        ConvexProblems.builAndTestModel(tmpMatricesI, myXI, myEvaluationContext, false);
 
         final PrimitiveDenseStore[] tmpMatricesE = new PrimitiveDenseStore[] { myAE, myBE, myQ, myC, null, null };
 
-        ConvexProblems.builAndTestModel(tmpMatricesE, myXE, myEvaluationContext, true);
+        ConvexProblems.builAndTestModel(tmpMatricesE, myXE, myEvaluationContext, false);
     }
 
     /**
      * @return {[AE],[BE],[Q],[C],[AI],[BI],[X only E constraints],[X both E and I constraints]}
      */
-    abstract protected BasicMatrix[] getMatrices();
+    abstract protected RationalMatrix[] getMatrices();
 
 }

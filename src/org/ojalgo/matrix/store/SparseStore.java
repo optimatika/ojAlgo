@@ -34,6 +34,7 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -54,6 +55,9 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     public static final SparseStore.Factory<Double> PRIMITIVE = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
 
+    public static final SparseStore.Factory<Quaternion> QUATERNION = (rowsCount, columnsCount) -> SparseStore.makeQuaternion((int) rowsCount,
+            (int) columnsCount);
+
     public static final SparseStore.Factory<RationalNumber> RATIONAL = (rowsCount, columnsCount) -> SparseStore.makeRational((int) rowsCount,
             (int) columnsCount);
 
@@ -63,6 +67,10 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     public static SparseStore<Double> makePrimitive(final int rowsCount, final int columnsCount) {
         return new SparseStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount);
+    }
+
+    public static SparseStore<Quaternion> makeQuaternion(final int rowsCount, final int columnsCount) {
+        return new SparseStore<>(GenericDenseStore.QUATERNION, rowsCount, columnsCount);
     }
 
     public static SparseStore<RationalNumber> makeRational(final int rowsCount, final int columnsCount) {

@@ -27,12 +27,12 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Raw2D;
 import org.ojalgo.array.blas.DOT;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
@@ -113,15 +113,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         int retVal = 0;
 
-        final MatrixStore<Double> tmpU = this.getU();
-        final int tmpMinDim = (int) Math.min(tmpU.countRows(), tmpU.countColumns());
+        final RawStore internalStore = this.getRawInPlaceStore();
 
-        final AggregatorFunction<Double> tmpLargest = PrimitiveAggregator.LARGEST.get();
-        tmpU.visitDiagonal(0L, 0L, tmpLargest);
-        final double tmpLargestValue = tmpLargest.doubleValue();
+        double largestValue = internalStore.aggregateDiagonal(Aggregator.LARGEST);
 
-        for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpU.isSmall(ij, ij, tmpLargestValue)) {
+        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+            if (!internalStore.isSmall(ij, ij, largestValue)) {
                 retVal++;
             }
         }
@@ -169,10 +166,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
      */
     public boolean isFullRank() {
 
-        final double[][] raw = this.getRawInPlaceData();
-        final int size = this.getMinDim();
-        for (int ij = 0; ij < size; ij++) {
-            if (raw[ij][ij] == ZERO) {
+        final RawStore raw = this.getRawInPlaceStore();
+
+        double largestValue = Math.sqrt(raw.aggregateDiagonal(Aggregator.LARGEST));
+
+        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+            if (PrimitiveScalar.isSmall(largestValue, raw.doubleValue(ij, ij))) {
                 return false;
             }
         }

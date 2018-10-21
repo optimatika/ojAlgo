@@ -27,6 +27,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Discovered problems with calculating the LU decompositions for fat and/or tall matrices. Problems were
@@ -36,26 +37,28 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
  */
 public class P20071019Case extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = NumberContext.getGeneral(9);
+
     public static RationalMatrix getFatProblematic() {
         return SimpleLeastSquaresCase.getBody().transpose();
     }
 
-    public static BasicMatrix getTallProblematic() {
+    public static RationalMatrix getTallProblematic() {
         return SimpleLeastSquaresCase.getBody();
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        EVALUATION = EVALUATION.newPrecision(14);
+        evaluation = evaluation.newPrecision(14);
 
-        myBigAA = P20071019Case.getFatProblematic().multiply(P20071019Case.getTallProblematic()).enforce(DEFINITION);
-        myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
-        myBigAB = myBigAA;
+        rationalAA = P20071019Case.getFatProblematic().multiply(P20071019Case.getTallProblematic()).enforce(DEFINITION);
+        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
+        rationalAB = rationalAA;
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }
@@ -77,18 +80,18 @@ public class P20071019Case extends BasicMatrixTest {
         MatrixStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(P20071019Case.getFatProblematic());
 
         tmpJamaLU.decompose(tmpOriginal);
-        TestUtils.assertEquals(tmpOriginal, tmpJamaLU, EVALUATION);
+        TestUtils.assertEquals(tmpOriginal, tmpJamaLU, evaluation);
 
         tmpDenseLU.decompose(tmpOriginal);
-        TestUtils.assertEquals(tmpOriginal, tmpDenseLU, EVALUATION);
+        TestUtils.assertEquals(tmpOriginal, tmpDenseLU, evaluation);
 
         tmpOriginal = PrimitiveDenseStore.FACTORY.copy(P20071019Case.getTallProblematic());
 
         tmpJamaLU.decompose(tmpOriginal);
-        TestUtils.assertEquals(tmpOriginal, tmpJamaLU, EVALUATION);
+        TestUtils.assertEquals(tmpOriginal, tmpJamaLU, evaluation);
 
         tmpDenseLU.decompose(tmpOriginal);
-        TestUtils.assertEquals(tmpOriginal, tmpDenseLU, EVALUATION);
+        TestUtils.assertEquals(tmpOriginal, tmpDenseLU, evaluation);
 
     }
 
