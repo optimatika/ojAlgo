@@ -102,7 +102,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             return myIndices[myCursor];
         }
 
-        public NonzeroView iterator() {
+        public NonzeroView<N> iterator() {
             return new NonzeroView<>(myIndices, myValues, -1, myLastCursor);
         }
 
@@ -156,6 +156,14 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
                 return null;
             }
+        }
+
+        public long nextIndex() {
+            return myIndices[myCursor + 1];
+        }
+
+        public long previousIndex() {
+            return myIndices[myCursor - 1];
         }
 
     }

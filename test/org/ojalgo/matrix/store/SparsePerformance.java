@@ -24,9 +24,11 @@ package org.ojalgo.matrix.store;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.type.CalendarDateUnit;
@@ -101,6 +103,34 @@ public class SparsePerformance extends MatrixStoreTests {
         }
 
         TestUtils.assertTrue(clock.stop(CalendarDateUnit.SECOND).measure < ONE);
+    }
+
+    @Test
+    @Tag("slow")
+    public void testMatrixMultiplication() {
+
+        int n = 100_000;
+
+        SparseStore<Double> a = SparseStore.PRIMITIVE.make(n, n);
+        SparseStore<Double> b = SparseStore.PRIMITIVE.make(n, n);
+
+        for (int ij = 0; ij < n; ij++) {
+            a.set(ij, Uniform.randomInteger(n), Math.random());
+            a.set(Uniform.randomInteger(n), ij, Math.random());
+            b.set(ij, Uniform.randomInteger(n), Math.random());
+            b.set(Uniform.randomInteger(n), ij, Math.random());
+        }
+
+        Stopwatch clock = new Stopwatch();
+
+        MatrixStore<Double> sum = a.multiply(b);
+
+        ElementView1D<Double, ?> nnz = sum.nonzeros();
+        while (nnz.hasNext()) {
+            nnz.next();
+        }
+
+        TestUtils.assertTrue(clock.stop(CalendarDateUnit.SECOND).measure < 150);
     }
 
 }

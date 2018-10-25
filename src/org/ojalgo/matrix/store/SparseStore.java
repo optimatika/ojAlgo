@@ -270,13 +270,13 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
                 final long row = element.row();
                 final long col = element.column();
-                final double val = element.doubleValue();
+                final double value = element.doubleValue();
 
                 final long first = MatrixUtils.firstInRow(right, col, 0L);
                 final long limit = MatrixUtils.limitOfRow(right, col, numberOfColumns);
                 for (long j = first; j < limit; j++) {
                     final long index = Structure2D.index(structure, col, j);
-                    final double addition = val * right.doubleValue(index);
+                    final double addition = value * right.doubleValue(index);
                     if (NumberContext.compare(addition, ZERO) != 0) {
                         synchronized (target) {
                             target.add(row, j, addition);
@@ -314,12 +314,16 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
+        int numberOfRows = this.getRowDim();
+        int numberOfColumns = (int) right.countColumns();
         if (right instanceof SparseStore) {
-            final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), (int) right.countColumns());
+            final SparseStore<N> retVal = new SparseStore<>(this.physical(), numberOfRows, numberOfColumns);
             this.multiply(right, retVal);
             return retVal;
         } else {
-            return super.multiply(right);
+            final PhysicalStore<N> retVal = this.physical().makeZero(numberOfRows, numberOfColumns);
+            this.multiply(right, retVal);
+            return retVal;
         }
     }
 

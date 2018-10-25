@@ -182,6 +182,14 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             return myDelegate.hasPrevious();
         }
 
+        public long nextIndex() {
+            return myDelegate.nextIndex();
+        }
+
+        public long previousIndex() {
+            return myDelegate.previousIndex();
+        }
+
         public long index() {
             return myDelegate.index();
         }
