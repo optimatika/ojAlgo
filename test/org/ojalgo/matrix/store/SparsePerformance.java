@@ -30,79 +30,48 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.ElementView1D;
-import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;
 
 public class SparsePerformance extends MatrixStoreTests {
 
+    static void loopAll(MatrixStore<Double> store) {
+        ElementView1D<Double, ?> nz = store.nonzeros();
+        while (nz.hasNext()) {
+            nz.next();
+        }
+    }
+
     @Test
     public void testElementwiseMultiplication() {
 
-        int n = 50_000;
-        SparseStore<Double> a = SparseStore.PRIMITIVE.make(n, n);
-        SparseStore<Double> b = SparseStore.PRIMITIVE.make(n, n);
-
-        Stopwatch clock = new Stopwatch();
-
-        SparseStore<Double> ab1 = SparseStore.PRIMITIVE.make(n, n);
-        a.multiply(b).get().supplyTo(ab1);
-        final ElementView2D<Double, ?> nnz1 = ab1.nonzeros();
-        while (nnz1.hasNext()) {
-            nnz1.next();
-        }
-
-        TestUtils.assertTrue(clock.stop(CalendarDateUnit.SECOND).measure < ONE);
-
-        SparseStore<Double> ab2 = SparseStore.PRIMITIVE.make(n, n);
-        a.operateOnMatching(MULTIPLY, b).supplyTo(ab2);
-        final ElementView2D<Double, ?> nnz2 = ab2.nonzeros();
-        while (nnz2.hasNext()) {
-            nnz2.next();
-        }
-
-        TestUtils.assertTrue(clock.stop(CalendarDateUnit.SECOND).measure < TWO);
-    }
-
-    @Test
-    public void testMultByOneVector() {
-
         int n = 100_000;
 
-        SparseStore<Double> a = SparseStore.PRIMITIVE.make(n, n);
+        SparseStore<Double> mtrxA = SparseStore.PRIMITIVE.make(n, n);
+        SparseStore<Double> mtrxB = SparseStore.PRIMITIVE.make(n, n);
 
         Stopwatch clock = new Stopwatch();
 
-        PrimitiveDenseStore ones = PrimitiveDenseStore.FACTORY.makeZero(n, 1);
-        ones.modifyAll(ADD.second(ONE));
+        mtrxA.operateOnMatching(MULTIPLY, mtrxB);
 
-        MatrixStore<Double> sum = a.multiply(ones);
+        SparsePerformance.loopAll(mtrxA);
 
-        ElementView1D<Double, ?> nnz = sum.nonzeros();
-        while (nnz.hasNext()) {
-            nnz.next();
+        TestUtils.assertFasterThan(clock, 5, CalendarDateUnit.MILLIS);
+
+        for (int ij = 0; ij < n; ij++) {
+            mtrxA.set(ij, Uniform.randomInteger(n), Math.random());
+            mtrxA.set(Uniform.randomInteger(n), ij, Math.random());
+            mtrxB.set(ij, Uniform.randomInteger(n), Math.random());
+            mtrxB.set(Uniform.randomInteger(n), ij, Math.random());
         }
 
-        TestUtils.assertTrue(clock.stop(CalendarDateUnit.SECOND).measure < ONE);
-    }
+        clock.reset();
 
-    @Test
-    public void testReduceRows() {
+        mtrxA.operateOnMatching(MULTIPLY, mtrxB);
 
-        int n = 100_000;
-        SparseStore<Double> a = SparseStore.PRIMITIVE.make(n, n);
+        SparsePerformance.loopAll(mtrxA);
 
-        Stopwatch clock = new Stopwatch();
-
-        PrimitiveDenseStore sum = PrimitiveDenseStore.FACTORY.makeZero(n, 1);
-        a.reduceRows(Aggregator.SUM).supplyTo(sum);
-
-        ElementView1D<Double, ?> nnz = sum.get().nonzeros();
-        while (nnz.hasNext()) {
-            nnz.next();
-        }
-
-        TestUtils.assertTrue(clock.stop(CalendarDateUnit.SECOND).measure < ONE);
+        TestUtils.assertFasterThan(clock, 5, CalendarDateUnit.MILLIS);
     }
 
     @Test
@@ -111,26 +80,111 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> a = SparseStore.PRIMITIVE.make(n, n);
-        SparseStore<Double> b = SparseStore.PRIMITIVE.make(n, n);
-
-        for (int ij = 0; ij < n; ij++) {
-            a.set(ij, Uniform.randomInteger(n), Math.random());
-            a.set(Uniform.randomInteger(n), ij, Math.random());
-            b.set(ij, Uniform.randomInteger(n), Math.random());
-            b.set(Uniform.randomInteger(n), ij, Math.random());
-        }
+        SparseStore<Double> mtrxA = SparseStore.PRIMITIVE.make(n, n);
+        SparseStore<Double> mtrxB = SparseStore.PRIMITIVE.make(n, n);
 
         Stopwatch clock = new Stopwatch();
 
-        MatrixStore<Double> sum = a.multiply(b);
+        SparsePerformance.loopAll(mtrxA.multiply(mtrxB));
 
-        ElementView1D<Double, ?> nnz = sum.nonzeros();
-        while (nnz.hasNext()) {
-            nnz.next();
+        TestUtils.assertFasterThan(clock, 11, CalendarDateUnit.MILLIS);
+
+        for (int ij = 0; ij < n; ij++) {
+            mtrxA.set(ij, Uniform.randomInteger(n), Math.random());
+            mtrxA.set(Uniform.randomInteger(n), ij, Math.random());
+            mtrxB.set(ij, Uniform.randomInteger(n), Math.random());
+            mtrxB.set(Uniform.randomInteger(n), ij, Math.random());
         }
 
-        TestUtils.assertTrue(clock.stop(CalendarDateUnit.SECOND).measure < 150);
+        clock.reset();
+
+        SparsePerformance.loopAll(mtrxA.multiply(mtrxB));
+
+        TestUtils.assertFasterThan(clock, 170, CalendarDateUnit.SECOND);
+    }
+
+    @Test
+    public void testMultiplyByOneVector() {
+
+        int n = 100_000;
+
+        SparseStore<Double> mtrx = SparseStore.PRIMITIVE.make(n, n);
+
+        PrimitiveDenseStore ones = PrimitiveDenseStore.FACTORY.makeZero(n, 1);
+        ones.fillAll(ONE);
+
+        Stopwatch clock = new Stopwatch();
+
+        SparsePerformance.loopAll(mtrx.multiply(ones));
+
+        TestUtils.assertFasterThan(clock, 1, CalendarDateUnit.MILLIS);
+
+        for (int ij = 0; ij < n; ij++) {
+            mtrx.set(ij, Uniform.randomInteger(n), Math.random());
+            mtrx.set(Uniform.randomInteger(n), ij, Math.random());
+        }
+
+        clock.reset();
+
+        SparsePerformance.loopAll(mtrx.multiply(ones));
+
+        TestUtils.assertFasterThan(clock, 1, CalendarDateUnit.MILLIS);
+    }
+
+    @Test
+    public void testReduceRows() {
+
+        int n = 100_000;
+
+        SparseStore<Double> mtrx = SparseStore.PRIMITIVE.make(n, n);
+        PrimitiveDenseStore vctr = PrimitiveDenseStore.FACTORY.makeZero(n, 1);
+
+        Stopwatch clock = new Stopwatch();
+
+        mtrx.reduceRows(Aggregator.SUM).supplyTo(vctr);
+        SparsePerformance.loopAll(vctr);
+
+        TestUtils.assertFasterThan(clock, 60, CalendarDateUnit.MILLIS);
+
+        for (int ij = 0; ij < n; ij++) {
+            mtrx.set(ij, Uniform.randomInteger(n), Math.random());
+            mtrx.set(Uniform.randomInteger(n), ij, Math.random());
+        }
+
+        clock.reset();
+
+        mtrx.reduceRows(Aggregator.SUM).supplyTo(vctr);
+        SparsePerformance.loopAll(vctr);
+
+        TestUtils.assertFasterThan(clock, 200, CalendarDateUnit.SECOND);
+    }
+
+    @Test
+    public void testReduceColumns() {
+
+        int n = 100_000;
+
+        SparseStore<Double> mtrx = SparseStore.PRIMITIVE.make(n, n);
+        PrimitiveDenseStore vctr = PrimitiveDenseStore.FACTORY.makeZero(1, n);
+
+        Stopwatch clock = new Stopwatch();
+
+        mtrx.reduceColumns(Aggregator.SUM).supplyTo(vctr);
+        SparsePerformance.loopAll(vctr);
+
+        TestUtils.assertFasterThan(clock, 40, CalendarDateUnit.MILLIS);
+
+        for (int ij = 0; ij < n; ij++) {
+            mtrx.set(ij, Uniform.randomInteger(n), Math.random());
+            mtrx.set(Uniform.randomInteger(n), ij, Math.random());
+        }
+
+        clock.reset();
+
+        mtrx.reduceColumns(Aggregator.SUM).supplyTo(vctr);
+        SparsePerformance.loopAll(vctr);
+
+        TestUtils.assertFasterThan(clock, 6, CalendarDateUnit.SECOND);
     }
 
 }

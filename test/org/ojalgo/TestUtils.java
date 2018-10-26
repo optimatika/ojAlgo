@@ -46,6 +46,9 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.type.CalendarDateDuration;
+import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.Stopwatch;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -375,6 +378,13 @@ public abstract class TestUtils {
 
     public static void assertTrue(final boolean condition) {
         Assertions.assertTrue(condition);
+    }
+
+    public static void assertFasterThan(Stopwatch stopwatch, double meassure, CalendarDateUnit unit) {
+        CalendarDateDuration duration = stopwatch.stop(unit);
+        if (duration.measure > meassure) {
+            TestUtils.fail(duration.toString() + " > " + new CalendarDateDuration(meassure, unit));
+        }
     }
 
     public static void assertTrue(final String message, final boolean condition) {

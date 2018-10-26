@@ -48,13 +48,12 @@ public class Stopwatch {
     }
 
     private long myStart;
-    private long myStop;
 
     public Stopwatch() {
 
         super();
 
-        this.reset();
+        myStart = System.nanoTime();
     }
 
     /**
@@ -62,7 +61,6 @@ public class Stopwatch {
      */
     public void reset() {
         myStart = System.nanoTime();
-        myStop = myStart;
     }
 
     /**
@@ -75,9 +73,7 @@ public class Stopwatch {
     }
 
     public CalendarDateDuration stop(final CalendarDateUnit unit) {
-        myStop = System.nanoTime();
-        final CalendarDateDuration duration = new CalendarDateDuration(myStop - myStart, CalendarDateUnit.NANOS);
-        return duration.convertTo(unit);
+        return CalendarDateDuration.of(System.nanoTime() - myStart).convertTo(unit);
     }
 
 }
