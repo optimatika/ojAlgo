@@ -69,11 +69,11 @@ public class Stopwatch {
      * @return The duration since instantiation or reset.
      */
     public CalendarDateDuration stop() {
-        return this.stop(CalendarDateUnit.MILLIS);
+        return CalendarDateDuration.of(System.nanoTime() - myStart);
     }
 
     public CalendarDateDuration stop(final CalendarDateUnit unit) {
-        return CalendarDateDuration.of(System.nanoTime() - myStart).convertTo(unit);
+        return this.stop().convertTo(unit);
     }
 
 }

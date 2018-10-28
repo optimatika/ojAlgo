@@ -380,10 +380,10 @@ public abstract class TestUtils {
         Assertions.assertTrue(condition);
     }
 
-    public static void assertFasterThan(Stopwatch stopwatch, double meassure, CalendarDateUnit unit) {
-        CalendarDateDuration duration = stopwatch.stop(unit);
-        if (duration.measure > meassure) {
-            TestUtils.fail(duration.toString() + " > " + new CalendarDateDuration(meassure, unit));
+    public static void assertFasterThan(Stopwatch actualTimer, double limitMeassure, CalendarDateUnit limitUnit) {
+        CalendarDateDuration duration = actualTimer.stop(limitUnit);
+        if (duration.measure > limitMeassure) {
+            TestUtils.fail(duration.toString() + " > " + new CalendarDateDuration(limitMeassure, limitUnit));
         }
     }
 
