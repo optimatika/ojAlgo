@@ -117,11 +117,17 @@ public class SparseCase extends NonPhysicalTest {
         PhysicalStore<Double> denseC = sparseC.copy();
 
         TestUtils.assertEquals(denseA.multiply(denseB), sparseA.multiply(sparseB));
+        TestUtils.assertEquals(denseA.multiply(sparseB), sparseA.multiply(denseB));
 
         TestUtils.assertEquals(denseB.premultiply(denseA).get(), sparseB.premultiply(sparseA).get());
+        TestUtils.assertEquals(denseB.premultiply(sparseA).get(), sparseB.premultiply(denseA).get());
 
         denseA.multiply(denseB, denseC);
         sparseA.multiply(sparseB, sparseC);
+        TestUtils.assertEquals(denseC, sparseC);
+
+        denseA.multiply(sparseB, denseC);
+        sparseA.multiply(denseB, sparseC);
         TestUtils.assertEquals(denseC, sparseC);
     }
 
