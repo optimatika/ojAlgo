@@ -368,12 +368,19 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         long numberOfColumns = right.countColumns();
 
         if (right instanceof SparseStore) {
+
             final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
+
             SparseStore.multiply(this, (SparseStore<N>) right, retVal);
+
             return retVal;
+
         } else {
+
             final PhysicalStore<N> retVal = this.physical().makeZero(numberOfRows, numberOfColumns);
+
             this.multiply(right, retVal);
+
             return retVal;
         }
     }

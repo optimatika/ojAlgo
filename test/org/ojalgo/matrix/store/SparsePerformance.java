@@ -124,7 +124,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         SparsePerformance.touchNonzeros(mtrx.premultiply(ones).get());
 
-        TestUtils.assertFasterThan(clock, 1, CalendarDateUnit.SECOND);
+        TestUtils.assertFasterThan(clock, 2, CalendarDateUnit.SECOND);
     }
 
     static void fill(Mutate2D mtrx) {
