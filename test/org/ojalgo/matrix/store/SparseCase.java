@@ -101,4 +101,28 @@ public class SparseCase extends NonPhysicalTest {
         }
     }
 
+    @Test
+    public void testMultiplySparseDense() {
+
+        SparseStore<Double> sparseA = SparseStore.makePrimitive(7, 8);
+        SparseStore<Double> sparseB = SparseStore.makePrimitive(8, 9);
+        SparseStore<Double> sparseC = SparseStore.makePrimitive(7, 9);
+
+        SparsePerformance.fill(sparseA);
+        SparsePerformance.fill(sparseB);
+        SparsePerformance.fill(sparseC);
+
+        PhysicalStore<Double> denseA = sparseA.copy();
+        PhysicalStore<Double> denseB = sparseB.copy();
+        PhysicalStore<Double> denseC = sparseC.copy();
+
+        TestUtils.assertEquals(denseA.multiply(denseB), sparseA.multiply(sparseB));
+
+        TestUtils.assertEquals(denseB.premultiply(denseA).get(), sparseB.premultiply(sparseA).get());
+
+        denseA.multiply(denseB, denseC);
+        sparseA.multiply(sparseB, sparseC);
+        TestUtils.assertEquals(denseC, sparseC);
+    }
+
 }

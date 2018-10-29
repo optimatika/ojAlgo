@@ -30,6 +30,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.ElementView1D;
+import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;
 
@@ -58,12 +59,8 @@ public class SparsePerformance extends MatrixStoreTests {
 
         TestUtils.assertFasterThan(clock, 5, CalendarDateUnit.MILLIS);
 
-        for (int ij = 0; ij < n; ij++) {
-            mtrxA.set(ij, Uniform.randomInteger(n), Math.random());
-            mtrxA.set(Uniform.randomInteger(n), ij, Math.random());
-            mtrxB.set(ij, Uniform.randomInteger(n), Math.random());
-            mtrxB.set(Uniform.randomInteger(n), ij, Math.random());
-        }
+        SparsePerformance.fill(mtrxA);
+        SparsePerformance.fill(mtrxB);
 
         clock.reset();
 
@@ -89,12 +86,8 @@ public class SparsePerformance extends MatrixStoreTests {
 
         TestUtils.assertFasterThan(clock, 19, CalendarDateUnit.MILLIS);
 
-        for (int ij = 0; ij < n; ij++) {
-            mtrxA.set(ij, Uniform.randomInteger(n), Math.random());
-            mtrxA.set(Uniform.randomInteger(n), ij, Math.random());
-            mtrxB.set(ij, Uniform.randomInteger(n), Math.random());
-            mtrxB.set(Uniform.randomInteger(n), ij, Math.random());
-        }
+        SparsePerformance.fill(mtrxA);
+        SparsePerformance.fill(mtrxB);
 
         clock.reset();
 
@@ -119,10 +112,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         TestUtils.assertFasterThan(clock, 15, CalendarDateUnit.MILLIS);
 
-        for (int ij = 0; ij < n; ij++) {
-            mtrx.set(ij, Uniform.randomInteger(n), Math.random());
-            mtrx.set(Uniform.randomInteger(n), ij, Math.random());
-        }
+        SparsePerformance.fill(mtrx);
 
         clock.reset();
 
@@ -130,9 +120,19 @@ public class SparsePerformance extends MatrixStoreTests {
 
         TestUtils.assertFasterThan(clock, 53, CalendarDateUnit.MILLIS);
 
+        clock.reset();
+
         SparsePerformance.touchNonzeros(mtrx.premultiply(ones).get());
 
-        TestUtils.assertFasterThan(clock, 1, CalendarDateUnit.MILLIS);
+        TestUtils.assertFasterThan(clock, 1, CalendarDateUnit.SECOND);
+    }
+
+    static void fill(Mutate2D mtrx) {
+        int limit = Math.toIntExact(Math.min(mtrx.countRows(), mtrx.countColumns()));
+        for (int ij = 0; ij < limit; ij++) {
+            mtrx.set(ij, Uniform.randomInteger(limit), Math.random());
+            mtrx.set(Uniform.randomInteger(limit), ij, Math.random());
+        }
     }
 
     @Test
@@ -150,10 +150,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         TestUtils.assertFasterThan(clock, 10, CalendarDateUnit.MILLIS);
 
-        for (int ij = 0; ij < n; ij++) {
-            mtrx.set(ij, Uniform.randomInteger(n), Math.random());
-            mtrx.set(Uniform.randomInteger(n), ij, Math.random());
-        }
+        SparsePerformance.fill(mtrx);
 
         clock.reset();
 
@@ -178,10 +175,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         TestUtils.assertFasterThan(clock, 23, CalendarDateUnit.MILLIS);
 
-        for (int ij = 0; ij < n; ij++) {
-            mtrx.set(ij, Uniform.randomInteger(n), Math.random());
-            mtrx.set(Uniform.randomInteger(n), ij, Math.random());
-        }
+        SparsePerformance.fill(mtrx);
 
         clock.reset();
 
