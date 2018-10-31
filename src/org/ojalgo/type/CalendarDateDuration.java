@@ -164,11 +164,11 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
     }
 
     public long toDurationInMillis() {
-        return (long) (measure * unit.size());
+        return Math.round(measure * unit.size());
     }
 
     public long toDurationInNanos() {
-        return (long) (measure * (1_000_000L * unit.size()));
+        return Math.round(measure * (1_000_000L * unit.size()));
     }
 
     @Override
