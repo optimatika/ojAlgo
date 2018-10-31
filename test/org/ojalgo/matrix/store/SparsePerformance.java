@@ -84,7 +84,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         SparsePerformance.touchNonzeros(mtrxA.multiply(mtrxB));
 
-        TestUtils.assertFasterThan(clock, 19, CalendarDateUnit.MILLIS);
+        TestUtils.assertFasterThan(clock, 20, CalendarDateUnit.MILLIS);
 
         SparsePerformance.fill(mtrxA);
         SparsePerformance.fill(mtrxB);
@@ -93,7 +93,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         SparsePerformance.touchNonzeros(mtrxA.multiply(mtrxB));
 
-        TestUtils.assertFasterThan(clock, 170, CalendarDateUnit.SECOND);
+        TestUtils.assertFasterThan(clock, 200, CalendarDateUnit.SECOND);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         SparsePerformance.touchNonzeros(mtrx.multiply(ones));
 
-        TestUtils.assertFasterThan(clock, 15, CalendarDateUnit.MILLIS);
+        TestUtils.assertFasterThan(clock, 50, CalendarDateUnit.MILLIS);
 
         SparsePerformance.fill(mtrx);
 
@@ -118,13 +118,13 @@ public class SparsePerformance extends MatrixStoreTests {
 
         SparsePerformance.touchNonzeros(mtrx.multiply(ones));
 
-        TestUtils.assertFasterThan(clock, 53, CalendarDateUnit.MILLIS);
+        TestUtils.assertFasterThan(clock, 50, CalendarDateUnit.MILLIS);
 
         clock.reset();
 
         SparsePerformance.touchNonzeros(mtrx.premultiply(ones).get());
 
-        TestUtils.assertFasterThan(clock, 2, CalendarDateUnit.SECOND);
+        TestUtils.assertFasterThan(clock, 5, CalendarDateUnit.SECOND);
     }
 
     static void fill(Mutate2D mtrx) {
@@ -173,7 +173,7 @@ public class SparsePerformance extends MatrixStoreTests {
         mtrx.reduceRows(Aggregator.SUM).supplyTo(vctr);
         SparsePerformance.touchNonzeros(vctr);
 
-        TestUtils.assertFasterThan(clock, 23, CalendarDateUnit.MILLIS);
+        TestUtils.assertFasterThan(clock, 50, CalendarDateUnit.MILLIS);
 
         SparsePerformance.fill(mtrx);
 

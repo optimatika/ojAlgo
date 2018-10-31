@@ -97,7 +97,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
             target.reset();
 
-            right.nonzeros().stream(false).forEach(element -> {
+            right.nonzeros().stream(true).forEach(element -> {
 
                 final long row = element.row();
                 final long col = element.column();
