@@ -68,8 +68,9 @@ public final class NumberSeries<N extends Number & Comparable<N>> extends TreeSe
         return this.get(arg);
     }
 
+    @SuppressWarnings("unchecked")
     public double put(final N key, final double value) {
-        final Double tmpValue = value;
+        final Double tmpValue = Double.valueOf(value);
         final N tmpOldValue = super.put(key, (N) tmpValue);
         if (tmpOldValue != null) {
             return tmpOldValue.doubleValue();

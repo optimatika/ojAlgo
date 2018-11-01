@@ -35,11 +35,6 @@ abstract class DiagonalAccess<N extends Number, D extends Access1D<N> & Mutate1D
     final D subdiagonal;
     final D superdiagonal;
 
-    @SuppressWarnings("unused")
-    private DiagonalAccess() {
-        this(null, null, null, null);
-    }
-
     DiagonalAccess(final D mainDiag, final D superdiag, final D subdiag, final N zero) {
 
         super();

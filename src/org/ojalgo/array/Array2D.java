@@ -275,11 +275,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     private final BasicArray<N> myDelegate;
     private final long myRowsCount;
 
-    @SuppressWarnings("unused")
-    private Array2D() {
-        this(null, 0L);
-    }
-
     Array2D(final BasicArray<N> delegate, final long structure) {
 
         super();
