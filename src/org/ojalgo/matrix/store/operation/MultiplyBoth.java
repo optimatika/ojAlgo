@@ -619,7 +619,7 @@ public final class MultiplyBoth extends MatrixOperation {
             final int limitOfLeftColumn = MatrixUtils.limitOfColumn(left, c, structure);
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
-                leftColumn[i] = left.doubleValue(i + (c * structure));
+                leftColumn[i] = left.doubleValue(Structure2D.index(structure, i, c));
             }
 
             final int firstInRightRow = MatrixUtils.firstInRow(right, c, firstColumn);
@@ -661,7 +661,7 @@ public final class MultiplyBoth extends MatrixOperation {
             final int tmpLimitOfRow = MatrixUtils.limitOfRow(left, i, complexity);
 
             for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
-                tmpLeftRow[c] = left.get(i + (c * tmpRowDim));
+                tmpLeftRow[c] = left.get(Structure2D.index(tmpRowDim, i, c));
             }
 
             for (int j = 0; j < tmpColDim; j++) {
@@ -697,7 +697,7 @@ public final class MultiplyBoth extends MatrixOperation {
             final int tmpLimitOfRow = MatrixUtils.limitOfRow(left, i, complexity);
 
             for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
-                tmpLeftRow[c] = left.doubleValue(i + (c * tmpRowDim));
+                tmpLeftRow[c] = left.doubleValue(Structure2D.index(tmpRowDim, i, c));
             }
 
             for (int j = 0; j < tmpColDim; j++) {
