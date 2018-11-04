@@ -93,7 +93,7 @@ abstract class FormatContext<T, F extends Format> implements TypeContext<T> {
     }
 
     /**
-     * @see org.ojalgo.type.context.TypeContext#parse(java.lang.String)
+     * @see org.ojalgo.type.context.TypeContext#parse(CharSequence)
      */
     @Override
     @SuppressWarnings("unchecked")

@@ -112,6 +112,7 @@
                             <failOnError>false</failOnError>
                             <quiet>true</quiet>
                             <serialwarn>false</serialwarn>
+                            <doclint>none</doclint>
                         </configuration>
                         <goals>
                             <goal>jar</goal>

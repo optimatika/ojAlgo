@@ -257,9 +257,6 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
     }
 
-    /**
-     * @see org.ojalgo.matrix.decomposition.QR#isFullColumnRank()
-     */
     public boolean isFullRank() {
         return this.getRank() == this.getMinDim();
     }

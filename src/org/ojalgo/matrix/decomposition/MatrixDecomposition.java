@@ -264,9 +264,6 @@ public interface MatrixDecomposition<N extends Number> {
          *
          * @return true if this matrix decomposition is in a state to be able to deliver an inverse or an
          *         equation system solution (with some degree of numerical stability).
-         * @see #isComputed()
-         * @see #getSolution(Collectable)
-         * @see #getInverse()
          */
         boolean isSolvable();
 

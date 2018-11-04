@@ -110,9 +110,6 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     //        JUnitUtils.assertEquals(tmpExpMtrx, tmpActMtrx, EVAL_CNTXT);
     //    }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrixTest#testProblem()
-     */
     @Test
     public void testProblem() {
 

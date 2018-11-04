@@ -409,7 +409,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
      * also equal to the number of nonzero singular values of the matrix.
      *
      * @return The matrix' rank.
-     * @see MatrixDecomposition.RankRevealing
+     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition.RankRevealing
      */
     public int getRank() {
         return this.getRankRevealing(myStore).getRank();
@@ -512,7 +512,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     /**
      * @return true if {@linkplain #getRank()} == min({@linkplain #countRows()}, {@linkplain #countColumns()})
-     * @see MatrixDecomposition.RankRevealing
+     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition.RankRevealing
      */
     public boolean isFullRank() {
         return this.getRankRevealing(myStore).isFullRank();

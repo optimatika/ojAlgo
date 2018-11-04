@@ -769,8 +769,8 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
-     * A lower level version of {@linkplain org.ojalgo.finance.portfolio.PortfolioProblems#testP20090115()}.
-     * The solver returns negative, constraint breaking, variables with STATE == OPTIMAL.
+     * A lower level version of {@linkplain #testP20090115()}. The solver returns negative, constraint
+     * breaking, variables with STATE == OPTIMAL.
      */
     @SuppressWarnings("unchecked")
     @Test

@@ -28,7 +28,7 @@ import org.ojalgo.optimisation.Variable;
 public class StrategyMixer {
 
     /**
-     * This is test case using a reimplementation of the algorithm in {@link PortfolioMixer}.
+     * This is test case using a reimplementation of the algorithm in.
      */
     @Test
     public void testStratCombQuadraticExpressionModel() {

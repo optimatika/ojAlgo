@@ -495,8 +495,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     /**
-     * @param row
-     * @param col
      * @return The row-index of the largest absolute value in a column, starting at the specified row.
      */
     public long indexOfLargestInColumn(final long row, final long col) {
@@ -508,8 +506,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     /**
-     * @param row
-     * @param col
      * @return The column-index of the largest absolute value in a row, starting at the specified column.
      */
     public long indexOfLargestInRow(final long row, final long col) {
