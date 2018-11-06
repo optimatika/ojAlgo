@@ -149,6 +149,8 @@ public class IntegerProblems {
     @Tag("slow")
     public void testP20130225() {
 
+        System.out.println("testP20130225 i slow but is still runninng!");
+
         final ExpressionsBasedModel tmpIntegerModel = P20130225.makeModel();
         final ExpressionsBasedModel tmpRelaxedModel = tmpIntegerModel.relax(false);
 
