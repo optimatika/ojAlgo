@@ -168,8 +168,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         /**
-         * @param model
-         * @param variable
          * @return The index with which one can reference parameters related to this variable in the solver.
          */
         protected int getIndexInSolver(final ExpressionsBasedModel model, final Variable variable) {
@@ -330,11 +328,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         /**
-         * @param expression
-         * @param fixedVariables
-         * @param fixedValue TODO
-         * @param variableResolver TODO
-         * @param precision TODO
          * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
          *         typically when/if a variable was fixed.
          */

@@ -102,9 +102,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
     RationalMatrix rationalSafe;
     RationalMatrix rationlI;
 
-    /**
-     * @see junit.framework.TestCase#setUp()
-     */
     @BeforeEach
     public void setUp() {
 
@@ -299,9 +296,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#selectColumns(int[])
-     */
     @Test
     public void testGetColumnsIntArray() {
 
@@ -361,9 +355,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         }
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getEigenvalues()
-     */
     @Test
     public void testGetEigenvalues() {
 
@@ -384,9 +375,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         }
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getInfinityNorm()
-     */
     @Test
     public void testGetInfinityNorm() {
 
@@ -399,9 +387,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         TestUtils.assertEquals(expValue, actValue, evaluation);
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getOneNorm()
-     */
     @Test
     public void testGetOneNorm() {
 
@@ -446,9 +431,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#selectRows(int[])
-     */
     @Test
     public void testGetRowsIntArray() {
 
@@ -863,9 +845,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#toBigDecimal(int, int)
-     */
     @Test
     public void testToBigDecimalIntInt() {
 
@@ -882,9 +861,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#toComplexNumber(int, int)
-     */
     @Test
     public void testToComplexNumberIntInt() {
 
@@ -901,9 +877,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#toComplexStore()
-     */
     @Test
     public void testToComplexStore() {
 
@@ -952,9 +925,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         }
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#toPrimitiveStore()
-     */
     @Test
     public void testToPrimitiveStore() {
 
@@ -969,9 +939,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#toBigStore()
-     */
     @Test
     public void testToRationalStore() {
 

@@ -58,8 +58,9 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         SIGMOID(args -> (PrimitiveFunction.LOGISTIC), arg -> arg * (ONE - arg), true),
         /**
          * [0,1] <br>
-         * Currently this can only be used in the final layer in combination with {@link Error#CROSS_ENTROPY}.
-         * All other usage will give incorrect network training.
+         * Currently this can only be used in the final layer in combination with
+         * {@link ArtificialNeuralNetwork.Error#CROSS_ENTROPY}. All other usage will give incorrect network
+         * training.
          */
         SOFTMAX(args -> {
             PrimitiveDenseStore parts = args.copy();

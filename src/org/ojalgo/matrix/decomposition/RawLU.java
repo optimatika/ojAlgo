@@ -217,9 +217,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     /**
      * Use a "left-looking", dot-product, Crout/Doolittle algorithm, essentially copied from JAMA.
-     *
-     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#decompose(Access2D.Collectable<N, ? super
-     *      PhysicalStore<N>>)
      */
     private boolean doDecompose(final double[][] data) {
 

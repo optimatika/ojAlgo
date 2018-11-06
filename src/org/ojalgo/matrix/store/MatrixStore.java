@@ -599,7 +599,6 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
      * The default value is simply <code>0</code>, and if all elements are zeros then
      * <code>this.countColumns()</code>.
      *
-     * @param row
      * @return The column index of the first non-zero element in the specified row
      */
     default int firstInRow(final int row) {
@@ -625,8 +624,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
     /**
      * The default value is simply <code>this.countRows()</code>, and if all elements are zeros then
      * <code>0</code>.
-     *
-     * @param col
+     * 
      * @return The row index of the first zero element, after all non-zeros, in the specified column (index of
      *         the last non-zero + 1)
      */
@@ -637,8 +635,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
     /**
      * The default value is simply <code>this.countColumns()</code>, and if all elements are zeros then
      * <code>0</code>.
-     *
-     * @param row
+     * 
      * @return The column index of the first zero element, after all non-zeros, in the specified row (index of
      *         the last non-zero + 1)
      */

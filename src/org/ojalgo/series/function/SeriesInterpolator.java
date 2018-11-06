@@ -29,7 +29,6 @@ import org.ojalgo.series.BasicSeries;
  * An interpolator produces new data points to existing series, inbetween existing keys.
  *
  * @author apete
- * @param <K>
  */
 public abstract class SeriesInterpolator<K extends Comparable<? super K>> extends SeriesExtrapolator<K> {
 

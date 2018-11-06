@@ -127,8 +127,6 @@ public final class ResourceLocator {
 
     /**
      * The default (null) value is -1.
-     *
-     * @return
      */
     public ResourceLocator port(final int port) {
         myPort = port;
@@ -137,8 +135,6 @@ public final class ResourceLocator {
 
     /**
      * Protocol The default value is "https"
-     *
-     * @return
      */
     public ResourceLocator scheme(final String scheme) {
         myScheme = scheme;

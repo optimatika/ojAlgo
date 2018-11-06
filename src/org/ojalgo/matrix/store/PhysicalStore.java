@@ -121,7 +121,6 @@ public interface PhysicalStore<N extends Number>
      * @param body The equation system body parameters [A]
      * @param unitDiagonal true if body has ones on the diagonal
      * @param conjugated TODO
-     * @param identity
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 

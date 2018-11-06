@@ -74,7 +74,8 @@ import org.ojalgo.type.context.NumberContext;
  * <p>
  * The general recommendation is to construct optimisation problems using {@linkplain ExpressionsBasedModel}
  * and not worry about solver details. If you do want to instantiate a linear solver directly use the
- * {@linkplain Builder} class. It will return an appropriate subclass for you.
+ * {@linkplain org.ojalgo.optimisation.linear.LinearSolver.Builder} class. It will return an appropriate
+ * subclass for you.
  * </p>
  *
  * @author apete

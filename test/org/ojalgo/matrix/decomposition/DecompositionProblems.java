@@ -421,9 +421,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * This program tests the behavior of the QR and SVD decompositions on matrices with more columns than
      * rows. The desire is to compute a basis for the (right) null space of a matrix.
+     * https://stackoverflow.com/questions/50847140 https://github.com/optimatika/ojAlgo/issues/104
      *
-     * @see https://stackoverflow.com/questions/50847140
-     * @see https://github.com/optimatika/ojAlgo/issues/104
      * @author Paul A. Rubin
      */
     @Test
@@ -475,8 +474,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
     /**
      * There was a problem extracting the eigenpairs (java.lang.ArrayIndexOutOfBoundsException)
-     *
-     * @see https://github.com/optimatika/ojAlgo/issues/105
+     * https://github.com/optimatika/ojAlgo/issues/105
      */
     @Test
     public void testP20180617() {

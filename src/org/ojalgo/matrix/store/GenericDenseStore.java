@@ -51,7 +51,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * A {@linkplain N} implementation of {@linkplain PhysicalStore}.
+ * A generic implementation of {@linkplain PhysicalStore}.
  *
  * @author apete
  */
@@ -916,6 +916,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         myUtility.modifyDiagonal(row, col, modifier);
     }
 
+    @Override
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
         final long tmpLimit = FunctionUtils.min(left.count(), this.count(), this.count());
         for (long i = 0L; i < tmpLimit; i++) {
@@ -923,6 +924,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         }
     }
 
+    @Override
     public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
         final long tmpLimit = FunctionUtils.min(this.count(), right.count(), this.count());
         for (long i = 0L; i < tmpLimit; i++) {
