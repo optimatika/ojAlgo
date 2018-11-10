@@ -28,7 +28,14 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.*;
+import org.ojalgo.matrix.P20030422Case;
+import org.ojalgo.matrix.P20030512Case;
+import org.ojalgo.matrix.P20030528Case;
+import org.ojalgo.matrix.P20050125Case;
+import org.ojalgo.matrix.P20050827Case;
+import org.ojalgo.matrix.P20061119Case;
+import org.ojalgo.matrix.P20071019Case;
+import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -46,9 +53,9 @@ public class SingularValueTest {
     private static final SingularValue<Double> IMPL_PRIMITIVE = new SingularValueDecomposition.Primitive();
     private static final SingularValue<Double> IMPL_RAW = new RawSingularValue();
 
-    private static final RationalMatrix MTRX_FAT = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(7, 9));
-    private static final RationalMatrix MTRX_SQUARE = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(8, 8));
-    private static final RationalMatrix MTRX_TALL = RationalMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 7));
+    private static final RationalMatrix MTRX_FAT = RationalMatrix.FACTORY.copy(TestUtils.makeRandomComplexStore(7, 9));
+    private static final RationalMatrix MTRX_SQUARE = RationalMatrix.FACTORY.copy(TestUtils.makeRandomComplexStore(8, 8));
+    private static final RationalMatrix MTRX_TALL = RationalMatrix.FACTORY.copy(TestUtils.makeRandomComplexStore(9, 7));
 
     static final NumberContext CNTXT_CPLX_DECOMP = new NumberContext(3, 2);
     static final NumberContext CNTXT_CPLX_VALUES = new NumberContext(7, 7);
@@ -170,7 +177,7 @@ public class SingularValueTest {
     @Test
     public void testRandomActuallyComplexCase() {
 
-        final PhysicalStore<ComplexNumber> tmpOriginal = MatrixUtils.makeRandomComplexStore(4, 4);
+        final PhysicalStore<ComplexNumber> tmpOriginal = TestUtils.makeRandomComplexStore(4, 4);
 
         final SingularValue<ComplexNumber> tmpDecomposition = SingularValue.COMPLEX.make();
 

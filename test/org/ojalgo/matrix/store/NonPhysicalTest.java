@@ -25,7 +25,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -108,7 +107,7 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
     }
 
     protected static MatrixStore<ComplexNumber> makeRandomMatrix(final int numberOfRows, final int numberOfColumns) {
-        return MatrixUtils.makeRandomComplexStore(numberOfRows, numberOfColumns).signum();
+        return TestUtils.makeRandomComplexStore(numberOfRows, numberOfColumns).signum();
     }
 
     MatrixStore<ComplexNumber> complexStore;

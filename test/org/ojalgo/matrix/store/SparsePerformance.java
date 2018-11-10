@@ -36,6 +36,14 @@ import org.ojalgo.type.Stopwatch;
 
 public class SparsePerformance extends MatrixStoreTests {
 
+    static void fill(Mutate2D mtrx) {
+        int limit = Math.toIntExact(Math.min(mtrx.countRows(), mtrx.countColumns()));
+        for (int ij = 0; ij < limit; ij++) {
+            mtrx.set(ij, Uniform.randomInteger(limit), Math.random());
+            mtrx.set(Uniform.randomInteger(limit), ij, Math.random());
+        }
+    }
+
     static void touchNonzeros(MatrixStore<Double> store) {
         ElementView1D<Double, ?> nz = store.nonzeros();
         while (nz.hasNext()) {
@@ -125,14 +133,6 @@ public class SparsePerformance extends MatrixStoreTests {
         SparsePerformance.touchNonzeros(mtrx.premultiply(ones).get());
 
         TestUtils.assertFasterThan(5, CalendarDateUnit.SECOND, clock);
-    }
-
-    static void fill(Mutate2D mtrx) {
-        int limit = Math.toIntExact(Math.min(mtrx.countRows(), mtrx.countColumns()));
-        for (int ij = 0; ij < limit; ij++) {
-            mtrx.set(ij, Uniform.randomInteger(limit), Math.random());
-            mtrx.set(Uniform.randomInteger(limit), ij, Math.random());
-        }
     }
 
     @Test

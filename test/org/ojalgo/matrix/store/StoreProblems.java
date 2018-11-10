@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
@@ -76,8 +75,8 @@ public class StoreProblems extends MatrixStoreTests {
 
         final int tmpDim = 9;
 
-        final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpMtrxB = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        final PhysicalStore<Double> tmpMtrxB = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
         final PhysicalStore<Double> tmpMtrxC = PrimitiveDenseStore.FACTORY.makeZero(tmpDim, tmpDim);
 
         PhysicalStore<Double> tmpExpected;

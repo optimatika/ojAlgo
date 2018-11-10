@@ -502,6 +502,38 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     };
 
+    static int firstInColumn(final Access1D<?> matrix, final int col, final int defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn(col), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static long firstInColumn(final Access1D<?> matrix, final long col, final long defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn((int) col), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static int firstInRow(final Access1D<?> matrix, final int row, final int defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow(row), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static long firstInRow(final Access1D<?> matrix, final long row, final long defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow((int) row), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static int limitOfColumn(final Access1D<?> matrix, final int col, final int defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfColumn(col), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    static long limitOfColumn(final Access1D<?> matrix, final long col, final long defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfColumn((int) col), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    static int limitOfRow(final Access1D<?> matrix, final int row, final int defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow(row), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    static long limitOfRow(final Access1D<?> matrix, final long row, final long defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
+    }
+
     default MatrixStore<N> add(final MatrixStore<N> addend) {
         return this.operateOnMatching(this.physical().function().add(), addend).get();
     }
@@ -613,6 +645,46 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return this.toScalar(row, col).isAbsolute();
     }
 
+    default boolean isHermitian() {
+
+        final int numberOfRows = Math.toIntExact(this.countRows());
+        final int numberOfColumns = Math.toIntExact(this.countColumns());
+
+        final Number element = this.get(0L);
+
+        boolean retVal = numberOfRows == numberOfColumns;
+
+        if (element instanceof ComplexNumber) {
+
+            ComplexNumber lowerLeft;
+            ComplexNumber upperRight;
+
+            for (int j = 0; retVal && (j < numberOfColumns); j++) {
+                retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, ComplexNumber.valueOf(this.get(j, j)).i);
+                for (int i = j + 1; retVal && (i < numberOfRows); i++) {
+                    lowerLeft = ComplexNumber.valueOf(this.get(i, j)).conjugate();
+                    upperRight = ComplexNumber.valueOf(this.get(j, i));
+                    retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, lowerLeft.subtract(upperRight).norm());
+                }
+            }
+
+        } else {
+
+            for (int j = 0; retVal && (j < numberOfColumns); j++) {
+                for (int i = j + 1; retVal && (i < numberOfRows); i++) {
+                    retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, this.doubleValue(i, j) - this.doubleValue(j, i));
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    default boolean isNormal() {
+        final MatrixStore<N> conjugate = this.conjugate();
+        return conjugate.multiply(this).equals(this.multiply(conjugate));
+    }
+
     default boolean isSmall(final double comparedTo) {
         return PrimitiveScalar.isSmall(comparedTo, this.norm());
     }
@@ -624,7 +696,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
     /**
      * The default value is simply <code>this.countRows()</code>, and if all elements are zeros then
      * <code>0</code>.
-     * 
+     *
      * @return The row index of the first zero element, after all non-zeros, in the specified column (index of
      *         the last non-zero + 1)
      */
@@ -635,7 +707,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
     /**
      * The default value is simply <code>this.countColumns()</code>, and if all elements are zeros then
      * <code>0</code>.
-     * 
+     *
      * @return The column index of the first zero element, after all non-zeros, in the specified row (index of
      *         the last non-zero + 1)
      */

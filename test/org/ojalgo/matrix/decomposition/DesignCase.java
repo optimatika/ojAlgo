@@ -29,7 +29,6 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.EconomySize;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -55,7 +54,7 @@ public class DesignCase {
     @Test
     public void testCholeskySolveInverse() {
 
-        final PhysicalStore<ComplexNumber> tmpRandomComplexStore = MatrixUtils.makeRandomComplexStore(4, 9);
+        final PhysicalStore<ComplexNumber> tmpRandomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
         final PhysicalStore<Double> tmpVctr = PrimitiveDenseStore.FACTORY.copy(tmpRandomComplexStore);
         final MatrixStore<Double> tmpMtrx = tmpVctr.multiply(tmpVctr.transpose());
 
@@ -152,7 +151,7 @@ public class DesignCase {
     @Test
     public void testLuSolveInverse() {
 
-        final PhysicalStore<ComplexNumber> tmpRandomComplexStore = MatrixUtils.makeRandomComplexStore(4, 9);
+        final PhysicalStore<ComplexNumber> tmpRandomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
         final PhysicalStore<Double> tmpVctr = PrimitiveDenseStore.FACTORY.copy(tmpRandomComplexStore);
         final MatrixStore<Double> tmpMtrx = tmpVctr.multiply(tmpVctr.transpose());
 

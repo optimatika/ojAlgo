@@ -32,7 +32,6 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -84,7 +83,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     static <N extends Number> SparseStore<N> makeSparse(PhysicalStore.Factory<N, ?> physical, long numberOfRows, long numberOfColumns) {
-        return new SparseStore<N>(physical, Math.toIntExact(numberOfRows), Math.toIntExact(numberOfColumns));
+        return new SparseStore<>(physical, Math.toIntExact(numberOfRows), Math.toIntExact(numberOfColumns));
     }
 
     static <N extends Number> SparseStore<N> makeSparse(PhysicalStore.Factory<N, ?> physical, Structure2D shape) {
@@ -321,8 +320,8 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
                 final long col = element.column();
                 final double value = element.doubleValue();
 
-                final long first = MatrixUtils.firstInRow(right, col, 0L);
-                final long limit = MatrixUtils.limitOfRow(right, col, numberOfColumns);
+                final long first = MatrixStore.firstInRow(right, col, 0L);
+                final long limit = MatrixStore.limitOfRow(right, col, numberOfColumns);
                 for (long j = first; j < limit; j++) {
                     final long index = Structure2D.index(complexity, col, j);
                     final double addition = value * right.doubleValue(index);
@@ -443,8 +442,8 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
                 final long col = element.column();
                 final double value = element.doubleValue();
 
-                final long first = MatrixUtils.firstInColumn(left, row, 0L);
-                final long limit = MatrixUtils.limitOfColumn(left, row, numberOfRows);
+                final long first = MatrixStore.firstInColumn(left, row, 0L);
+                final long limit = MatrixStore.limitOfColumn(left, row, numberOfRows);
                 for (long i = first; i < limit; i++) {
                     final long index = Structure2D.index(numberOfRows, i, row);
                     final double addition = value * left.doubleValue(index);

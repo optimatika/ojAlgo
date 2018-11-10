@@ -28,6 +28,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * 1-dimensional mutator methods
@@ -157,6 +158,56 @@ public interface Mutate1D extends Structure1D {
 
         void sortDescending();
 
+    }
+
+    /**
+     * Copies the argument of the ComplexNumber elements to the destination.
+     */
+    static void copyComplexArgument(final Access1D<ComplexNumber> source, final Mutate1D destination) {
+        source.loopAll(i -> destination.set(i, source.get(i).getArgument()));
+    }
+
+    /**
+     * Copies the imaginary part of the ComplexNumber elements to the destination.
+     */
+    static void copyComplexImaginary(final Access1D<ComplexNumber> source, final Mutate1D destination) {
+        source.loopAll(i -> destination.set(i, source.get(i).getImaginary()));
+    }
+
+    /**
+     * Copies the modulus of the ComplexNumber elements to the destination.
+     */
+    static void copyComplexModulus(final Access1D<ComplexNumber> source, final Mutate1D destination) {
+        source.loopAll(i -> destination.set(i, source.get(i).getModulus()));
+    }
+
+    /**
+     * Simultaneously copies the modulus and argument of the ComplexNumber elements to the destinations.
+     */
+    static void copyComplexModulusAndArgument(final Access1D<ComplexNumber> source, final Mutate1D modDest, final Mutate1D argDest) {
+        source.loopAll(i -> {
+            ComplexNumber cmplx = source.get(i);
+            modDest.set(i, cmplx.getModulus());
+            argDest.set(i, cmplx.getArgument());
+        });
+    }
+
+    /**
+     * Copies the real part of the ComplexNumber elements to the destination.
+     */
+    static void copyComplexReal(final Access1D<ComplexNumber> source, final Mutate1D destination) {
+        source.loopAll(i -> destination.set(i, source.get(i).getReal()));
+    }
+
+    /**
+     * Simultaneously copies the real and imaginary parts of the ComplexNumber elements to the destinations.
+     */
+    static void copyComplexRealAndImaginary(final Access1D<ComplexNumber> source, final Mutate1D realDest, final Mutate1D imagDest) {
+        source.loopAll(i -> {
+            ComplexNumber cmplx = source.get(i);
+            realDest.set(i, cmplx.getReal());
+            imagDest.set(i, cmplx.getImaginary());
+        });
     }
 
     void add(long index, double addend);
