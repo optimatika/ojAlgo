@@ -24,21 +24,27 @@ package org.ojalgo.matrix;
 import java.math.BigDecimal;
 
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.FunctionUtils;
-import org.ojalgo.matrix.store.ElementsConsumer;
-import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.random.Uniform;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.TypeUtils;
 
+/**
+ * @deprecated v47
+ * @author apete
+ */
+@Deprecated
 public abstract class MatrixUtils {
 
+    /**
+     * @deprecated v47 Use {@link RawStore#FACTORY} instead
+     */
+    @Deprecated
     public static void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
         for (int i = 0; i < rows; i++) {
             final double[] tmpRow = destination[i];
@@ -50,156 +56,156 @@ public abstract class MatrixUtils {
 
     /**
      * Copies the argument of the ComplexNumber elements to the destination.
+     *
+     * @deprecated v47 Use {@link Mutate1D#copyComplexArgument(Access1D,Mutate1D)} instead
      */
-    public static void copyComplexArgument(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
-        final long tmpCount = FunctionUtils.min(source.count(), destination.count());
-        for (long i = 0L; i < tmpCount; i++) {
-            destination.set(i, source.get(i).getArgument());
-        }
+    @Deprecated
+    public static void copyComplexArgument(final Access1D<ComplexNumber> source, final Mutate1D destination) {
+        Mutate1D.copyComplexArgument(source, destination);
     }
 
     /**
      * Copies the imaginary part of the ComplexNumber elements to the destination.
+     *
+     * @deprecated v47 Use {@link Mutate1D#copyComplexImaginary(Access1D,Mutate1D)} instead
      */
-    public static void copyComplexImaginary(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
-        final long tmpCount = FunctionUtils.min(source.count(), destination.count());
-        for (long i = 0L; i < tmpCount; i++) {
-            destination.set(i, source.get(i).getImaginary());
-        }
+    @Deprecated
+    public static void copyComplexImaginary(final Access1D<ComplexNumber> source, final Mutate1D destination) {
+        Mutate1D.copyComplexImaginary(source, destination);
     }
 
     /**
      * Copies the modulus of the ComplexNumber elements to the destination.
+     *
+     * @deprecated v47 Use {@link Mutate1D#copyComplexModulus(Access1D,Mutate1D)} instead
      */
-    public static void copyComplexModulus(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
-        final long tmpCount = FunctionUtils.min(source.count(), destination.count());
-        for (long i = 0L; i < tmpCount; i++) {
-            destination.set(i, source.get(i).getModulus());
-        }
+    @Deprecated
+    public static void copyComplexModulus(final Access1D<ComplexNumber> source, final Mutate1D destination) {
+        Mutate1D.copyComplexModulus(source, destination);
     }
 
     /**
      * Simultaneously copies the modulus and argument of the ComplexNumber elements to the destinations.
+     *
+     * @deprecated v47 Use {@link Mutate1D#copyComplexModulusAndArgument(Access1D,Mutate1D,Mutate1D)} instead
      */
-    public static void copyComplexModulusAndArgument(final Access2D<ComplexNumber> source, final ElementsConsumer<?> modDest,
-            final ElementsConsumer<?> argDest) {
-        final long tmpCount = FunctionUtils.min(source.count(), modDest.count(), argDest.count());
-        ComplexNumber tmpComplexNumber;
-        for (long i = 0L; i < tmpCount; i++) {
-            tmpComplexNumber = source.get(i);
-            modDest.set(i, tmpComplexNumber.getModulus());
-            argDest.set(i, tmpComplexNumber.getArgument());
-        }
+    @Deprecated
+    public static void copyComplexModulusAndArgument(final Access1D<ComplexNumber> source, final Mutate1D modDest, final Mutate1D argDest) {
+        Mutate1D.copyComplexModulusAndArgument(source, modDest, argDest);
     }
 
     /**
      * Copies the real part of the ComplexNumber elements to the destination.
+     *
+     * @deprecated v47 Use {@link Mutate1D#copyComplexReal(Access1D,Mutate1D)} instead
      */
-    public static void copyComplexReal(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
-        final long tmpCount = FunctionUtils.min(source.count(), destination.count());
-        for (long i = 0L; i < tmpCount; i++) {
-            destination.set(i, source.get(i).getReal());
-        }
+    @Deprecated
+    public static void copyComplexReal(final Access1D<ComplexNumber> source, final Mutate1D destination) {
+        Mutate1D.copyComplexReal(source, destination);
     }
 
     /**
      * Simultaneously copies the real and imaginary parts of the ComplexNumber elements to the destinations.
+     *
+     * @deprecated v47 Use {@link Mutate1D#copyComplexRealAndImaginary(Access1D,Mutate1D,Mutate1D)} instead
      */
-    public static void copyComplexRealAndImaginary(final Access2D<ComplexNumber> source, final ElementsConsumer<?> realDest,
-            final ElementsConsumer<?> imagDest) {
-        final long tmpCount = FunctionUtils.min(source.count(), realDest.count(), imagDest.count());
-        ComplexNumber tmpComplexNumber;
-        for (long i = 0L; i < tmpCount; i++) {
-            tmpComplexNumber = source.get(i);
-            realDest.set(i, tmpComplexNumber.getReal());
-            imagDest.set(i, tmpComplexNumber.getImaginary());
-        }
+    @Deprecated
+    public static void copyComplexRealAndImaginary(final Access1D<ComplexNumber> source, final Mutate1D realDest, final Mutate1D imagDest) {
+        Mutate1D.copyComplexRealAndImaginary(source, realDest, imagDest);
     }
 
+    /**
+     * @deprecated v47 Use {@link MatrixStore#firstInColumn(Access1D,int,int)} instead
+     */
+    @Deprecated
     public static final int firstInColumn(final Access1D<?> matrix, final int col, final int defaultAndMinimum) {
-        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn(col), defaultAndMinimum) : defaultAndMinimum;
+        return MatrixStore.firstInColumn(matrix, col, defaultAndMinimum);
     }
 
+    /**
+     * @deprecated v47 Use {@link MatrixStore#firstInColumn(Access1D,long,long)} instead
+     */
+    @Deprecated
     public static final long firstInColumn(final Access1D<?> matrix, final long col, final long defaultAndMinimum) {
-        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn((int) col), defaultAndMinimum) : defaultAndMinimum;
+        return MatrixStore.firstInColumn(matrix, col, defaultAndMinimum);
     }
 
+    /**
+     * @deprecated v47 Use {@link MatrixStore#firstInRow(Access1D,int,int)} instead
+     */
+    @Deprecated
     public static final int firstInRow(final Access1D<?> matrix, final int row, final int defaultAndMinimum) {
-        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow(row), defaultAndMinimum) : defaultAndMinimum;
+        return MatrixStore.firstInRow(matrix, row, defaultAndMinimum);
     }
 
+    /**
+     * @deprecated v47 Use {@link MatrixStore#firstInRow(Access1D,long,long)} instead
+     */
+    @Deprecated
     public static final long firstInRow(final Access1D<?> matrix, final long row, final long defaultAndMinimum) {
-        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow((int) row), defaultAndMinimum) : defaultAndMinimum;
+        return MatrixStore.firstInRow(matrix, row, defaultAndMinimum);
     }
 
     /**
      * Extracts the argument of the ComplexNumber elements to a new primitive double valued matrix.
+     *
+     * @deprecated v47 Use {@link PrimitiveDenseStore#getComplexArgument(Access2D)} instead
      */
+    @Deprecated
     public static PrimitiveDenseStore getComplexArgument(final Access2D<ComplexNumber> arg) {
-
-        final long tmpRows = arg.countRows();
-        final long tmpColumns = arg.countColumns();
-
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpRows, tmpColumns);
-
-        MatrixUtils.copyComplexArgument(arg, retVal);
-
-        return retVal;
+        return PrimitiveDenseStore.getComplexArgument(arg);
     }
 
     /**
      * Extracts the imaginary part of the ComplexNumber elements to a new primitive double valued matrix.
+     *
+     * @deprecated v47 Use {@link PrimitiveDenseStore#getComplexImaginary(Access2D)} instead
      */
+    @Deprecated
     public static PrimitiveDenseStore getComplexImaginary(final Access2D<ComplexNumber> arg) {
-
-        final long tmpRows = arg.countRows();
-        final long tmpColumns = arg.countColumns();
-
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpRows, tmpColumns);
-
-        MatrixUtils.copyComplexImaginary(arg, retVal);
-
-        return retVal;
+        return PrimitiveDenseStore.getComplexImaginary(arg);
     }
 
     /**
      * Extracts the modulus of the ComplexNumber elements to a new primitive double valued matrix.
+     *
+     * @deprecated v47 Use {@link PrimitiveDenseStore#getComplexModulus(Access2D)} instead
      */
+    @Deprecated
     public static PrimitiveDenseStore getComplexModulus(final Access2D<ComplexNumber> arg) {
-
-        final long tmpRows = arg.countRows();
-        final long tmpColumns = arg.countColumns();
-
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpRows, tmpColumns);
-
-        MatrixUtils.copyComplexModulus(arg, retVal);
-
-        return retVal;
+        return PrimitiveDenseStore.getComplexModulus(arg);
     }
 
     /**
      * Extracts the real part of the ComplexNumber elements to a new primitive double valued matrix.
+     *
+     * @deprecated v47 Use {@link PrimitiveDenseStore#getComplexReal(Access2D)} instead
      */
+    @Deprecated
     public static PrimitiveDenseStore getComplexReal(final Access2D<ComplexNumber> arg) {
-
-        final long tmpRows = arg.countRows();
-        final long tmpColumns = arg.countColumns();
-
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpRows, tmpColumns);
-
-        MatrixUtils.copyComplexReal(arg, retVal);
-
-        return retVal;
+        return PrimitiveDenseStore.getComplexReal(arg);
     }
 
-    public static <N extends Number> int hashCode(final BasicMatrix matrix) {
+    /**
+     * @deprecated v47 Use {@link Access1D#hashCode()} instead.
+     */
+    @Deprecated
+    public static <N extends Number> int hashCode(final BasicMatrix<?, ?> matrix) {
         return Access1D.hashCode(matrix);
     }
 
+    /**
+     * @deprecated v47 Use {@link Access1D#hashCode()} instead.
+     */
+    @Deprecated
     public static <N extends Number> int hashCode(final MatrixStore<N> matrix) {
         return Access1D.hashCode(matrix);
     }
 
+    /**
+     * @deprecated v47 Use {@link MatrixStore#isHermitian()} instead
+     */
+    @Deprecated
     public static boolean isHermitian(final Access2D<?> matrix) {
 
         final long tmpRowDim = matrix.countRows();
@@ -235,68 +241,61 @@ public abstract class MatrixUtils {
         return retVal;
     }
 
+    /**
+     * @deprecated v47 {@link MatrixStore#isNormal()}
+     */
+    @Deprecated
     public static <N extends Number> boolean isNormal(final MatrixStore<N> matrix) {
-
-        final MatrixStore<N> tmpConjugate = matrix.conjugate();
-
-        return tmpConjugate.multiply(matrix).equals(matrix.multiply(tmpConjugate));
+        return matrix.isNormal();
     }
 
+    /**
+     * @deprecated v47 Use {@link MatrixStore#limitOfColumn(Access1D,int,int)} instead
+     */
+    @Deprecated
     public static final int limitOfColumn(final Access1D<?> matrix, final int col, final int defaultAndMaximum) {
-        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfColumn(col), defaultAndMaximum) : defaultAndMaximum;
+        return MatrixStore.limitOfColumn(matrix, col, defaultAndMaximum);
     }
 
+    /**
+     * @deprecated v47 Use {@link MatrixStore#limitOfColumn(Access1D,long,long)} instead
+     */
+    @Deprecated
     public static final long limitOfColumn(final Access1D<?> matrix, final long col, final long defaultAndMaximum) {
-        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfColumn((int) col), defaultAndMaximum) : defaultAndMaximum;
+        return MatrixStore.limitOfColumn(matrix, col, defaultAndMaximum);
     }
 
+    /**
+     * @deprecated v47 Use {@link MatrixStore#limitOfRow(Access1D,int,int)} instead
+     */
+    @Deprecated
     public static final int limitOfRow(final Access1D<?> matrix, final int row, final int defaultAndMaximum) {
-        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow(row), defaultAndMaximum) : defaultAndMaximum;
+        return MatrixStore.limitOfRow(matrix, row, defaultAndMaximum);
     }
 
+    /**
+     * @deprecated v47 Use {@link MatrixStore#limitOfRow(Access1D,long,long)} instead
+     */
+    @Deprecated
     public static final long limitOfRow(final Access1D<?> matrix, final long row, final long defaultAndMaximum) {
-        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
-    }
-
-    public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {
-
-        final PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
-
-        final Uniform tmpArgGen = new Uniform(PrimitiveMath.ZERO, PrimitiveMath.TWO_PI);
-
-        for (int j = 0; j < numberOfColumns; j++) {
-            for (int i = 0; i < numberOfRows; i++) {
-                retVal.set(i, j, ComplexNumber.makePolar(PrimitiveMath.E, tmpArgGen.doubleValue()).add(PrimitiveMath.PI));
-            }
-        }
-
-        return retVal;
+        return MatrixStore.limitOfRow(matrix, row, defaultAndMaximum);
     }
 
     /**
      * Make a random symmetric positive definite matrix
+     *
+     * @deprecated v47 Use {@link org.ojalgo.matrix.store.PhysicalStore.Factory#makeSPD(int)} instead
      */
+    @Deprecated
     public static PrimitiveDenseStore makeSPD(final int dim) {
-
-        final double[] tmpRandom = new double[dim];
-
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(dim, dim);
-
-        for (int i = 0; i < dim; i++) {
-
-            tmpRandom[i] = Math.random();
-
-            for (int j = 0; j < i; j++) {
-                retVal.set(i, j, tmpRandom[i] * tmpRandom[j]);
-                retVal.set(j, i, tmpRandom[j] * tmpRandom[i]);
-            }
-            retVal.set(i, i, tmpRandom[i] + 1.0);
-        }
-
-        return retVal;
+        return PrimitiveDenseStore.FACTORY.makeSPD(dim);
     }
 
-    public static Access2D<BigDecimal> wrapBigAccess2D(final BasicMatrix matrix) {
+    /**
+     * @deprecated v47 Use {@link MatrixStore#RATIONAL} instaed
+     */
+    @Deprecated
+    public static Access2D<BigDecimal> wrapBigAccess2D(final BasicMatrix<?, ?> matrix) {
         return new Access2D<BigDecimal>() {
 
             public long count() {
@@ -330,72 +329,20 @@ public abstract class MatrixUtils {
         };
     }
 
-    public static Access2D<ComplexNumber> wrapComplexAccess2D(final BasicMatrix matrix) {
-        return new Access2D<ComplexNumber>() {
-
-            public long count() {
-                return this.size();
-            }
-
-            public long countColumns() {
-                return matrix.countColumns();
-            }
-
-            public long countRows() {
-                return matrix.countRows();
-            }
-
-            public double doubleValue(final long index) {
-                return matrix.doubleValue(index);
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return matrix.doubleValue(row, col);
-            }
-
-            public ComplexNumber get(final long row, final long col) {
-                return ComplexNumber.valueOf(matrix.get((int) row, (int) col));
-            }
-
-            public int size() {
-                return (int) matrix.count();
-            }
-
-        };
+    /**
+     * @deprecated v47 Use {@link MatrixStore#COMPLEX} instaed
+     */
+    @Deprecated
+    public static Access2D<ComplexNumber> wrapComplexAccess2D(final BasicMatrix<?, ?> matrix) {
+        return MatrixStore.COMPLEX.makeWrapper(matrix).get();
     }
 
-    public static Access2D<Double> wrapPrimitiveAccess2D(final BasicMatrix matrix) {
-        return new Access2D<Double>() {
-
-            public long count() {
-                return this.size();
-            }
-
-            public long countColumns() {
-                return matrix.countColumns();
-            }
-
-            public long countRows() {
-                return matrix.countRows();
-            }
-
-            public double doubleValue(final long index) {
-                return matrix.doubleValue(index);
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return matrix.doubleValue(row, col);
-            }
-
-            public Double get(final long row, final long col) {
-                return matrix.doubleValue(row, col);
-            }
-
-            public int size() {
-                return (int) matrix.count();
-            }
-
-        };
+    /**
+     * @deprecated v47 Use {@link MatrixStore#PRIMITIVE} instaed
+     */
+    @Deprecated
+    public static Access2D<Double> wrapPrimitiveAccess2D(final BasicMatrix<?, ?> matrix) {
+        return MatrixStore.PRIMITIVE.makeWrapper(matrix).get();
     }
 
     private MatrixUtils() {

@@ -27,9 +27,9 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -615,15 +615,15 @@ public final class MultiplyBoth extends MatrixOperation {
         final double[] leftColumn = new double[structure];
         for (int c = 0; c < complexity; c++) {
 
-            final int firstInLeftColumn = MatrixUtils.firstInColumn(left, c, 0);
-            final int limitOfLeftColumn = MatrixUtils.limitOfColumn(left, c, structure);
+            final int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
+            final int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
                 leftColumn[i] = left.doubleValue(Structure2D.index(structure, i, c));
             }
 
-            final int firstInRightRow = MatrixUtils.firstInRow(right, c, firstColumn);
-            final int limitOfRightRow = MatrixUtils.limitOfRow(right, c, columnLimit);
+            final int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
+            final int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
 
             for (int j = firstInRightRow; j < limitOfRightRow; j++) {
                 AXPY.invoke(product, j * structure, right.doubleValue(Structure2D.index(complexity, c, j)), leftColumn, 0, firstInLeftColumn,
@@ -657,8 +657,8 @@ public final class MultiplyBoth extends MatrixOperation {
 
         for (int i = firstRow; i < rowLimit; i++) {
 
-            final int tmpFirstInRow = MatrixUtils.firstInRow(left, i, 0);
-            final int tmpLimitOfRow = MatrixUtils.limitOfRow(left, i, complexity);
+            final int tmpFirstInRow = MatrixStore.firstInRow(left, i, 0);
+            final int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, complexity);
 
             for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
                 tmpLeftRow[c] = left.get(Structure2D.index(tmpRowDim, i, c));
@@ -667,8 +667,8 @@ public final class MultiplyBoth extends MatrixOperation {
             for (int j = 0; j < tmpColDim; j++) {
                 final int tmpColBase = j * complexity;
 
-                tmpFirst = MatrixUtils.firstInColumn(right, j, tmpFirstInRow);
-                tmpLimit = MatrixUtils.limitOfColumn(right, j, tmpLimitOfRow);
+                tmpFirst = MatrixStore.firstInColumn(right, j, tmpFirstInRow);
+                tmpLimit = MatrixStore.limitOfColumn(right, j, tmpLimitOfRow);
 
                 tmpVal = zero;
                 for (int c = tmpFirst; c < tmpLimit; c++) {
@@ -693,8 +693,8 @@ public final class MultiplyBoth extends MatrixOperation {
 
         for (int i = firstRow; i < rowLimit; i++) {
 
-            final int tmpFirstInRow = MatrixUtils.firstInRow(left, i, 0);
-            final int tmpLimitOfRow = MatrixUtils.limitOfRow(left, i, complexity);
+            final int tmpFirstInRow = MatrixStore.firstInRow(left, i, 0);
+            final int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, complexity);
 
             for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
                 tmpLeftRow[c] = left.doubleValue(Structure2D.index(tmpRowDim, i, c));
@@ -703,8 +703,8 @@ public final class MultiplyBoth extends MatrixOperation {
             for (int j = 0; j < tmpColDim; j++) {
                 final int tmpColBase = j * complexity;
 
-                tmpFirst = MatrixUtils.firstInColumn(right, j, tmpFirstInRow);
-                tmpLimit = MatrixUtils.limitOfColumn(right, j, tmpLimitOfRow);
+                tmpFirst = MatrixStore.firstInColumn(right, j, tmpFirstInRow);
+                tmpLimit = MatrixStore.limitOfColumn(right, j, tmpLimitOfRow);
 
                 tmpVal = PrimitiveMath.ZERO;
                 for (int c = tmpFirst; c < tmpLimit; c++) {

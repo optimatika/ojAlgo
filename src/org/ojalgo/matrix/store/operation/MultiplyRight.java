@@ -26,8 +26,8 @@ import java.util.Arrays;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyRight;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyRight;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -620,8 +620,8 @@ public final class MultiplyRight extends MatrixOperation {
         for (int c = 0; c < complexity; c++) {
             System.arraycopy(left, c * structure, leftColumn, 0, structure);
 
-            final int firstInRightRow = MatrixUtils.firstInRow(right, c, firstColumn);
-            final int limitOfRightRow = MatrixUtils.limitOfRow(right, c, columnLimit);
+            final int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
+            final int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
 
             for (int j = firstInRightRow; j < limitOfRightRow; j++) {
                 AXPY.invoke(product, j * structure, right.doubleValue(Structure2D.index(complexity, c, j)), leftColumn, 0, 0, structure);
@@ -638,8 +638,8 @@ public final class MultiplyRight extends MatrixOperation {
         for (int c = 0; c < complexity; c++) {
             System.arraycopy(left, c * structure, leftColumn, 0, structure);
 
-            final int firstInRightRow = MatrixUtils.firstInRow(right, c, firstColumn);
-            final int limitOfRightRow = MatrixUtils.limitOfRow(right, c, columnLimit);
+            final int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
+            final int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
 
             for (int j = firstInRightRow; j < limitOfRightRow; j++) {
                 AXPY.invoke(product, j * structure, right.get(Structure2D.index(complexity, c, j)), leftColumn, 0, 0, structure);

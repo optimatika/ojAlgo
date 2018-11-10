@@ -26,8 +26,8 @@ import java.util.Arrays;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyLeft;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyLeft;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -617,8 +617,8 @@ public final class MultiplyLeft extends MatrixOperation {
         final double[] leftColumn = new double[structure];
         for (int c = 0; c < complexity; c++) {
 
-            final int firstInLeftColumn = MatrixUtils.firstInColumn(left, c, 0);
-            final int limitOfLeftColumn = MatrixUtils.limitOfColumn(left, c, structure);
+            final int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
+            final int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
                 leftColumn[i] = left.doubleValue(Structure2D.index(structure, i, c));
@@ -638,8 +638,8 @@ public final class MultiplyLeft extends MatrixOperation {
         final N[] leftColumn = scalar.newArrayInstance(structure);
         for (int c = 0; c < complexity; c++) {
 
-            final int firstInLeftColumn = MatrixUtils.firstInColumn(left, c, 0);
-            final int limitOfLeftColumn = MatrixUtils.limitOfColumn(left, c, structure);
+            final int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
+            final int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
                 leftColumn[i] = left.get(Structure2D.index(structure, i, c));

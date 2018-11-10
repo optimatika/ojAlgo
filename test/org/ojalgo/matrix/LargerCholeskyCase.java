@@ -44,7 +44,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
 
     public static RationalMatrix getOriginal() {
 
-        final PhysicalStore<ComplexNumber> randomComplex = MatrixUtils.makeRandomComplexStore(9, 9);
+        final PhysicalStore<ComplexNumber> randomComplex = TestUtils.makeRandomComplexStore(9, 9);
 
         return RationalMatrix.FACTORY.copy(randomComplex.multiply(randomComplex.conjugate()));
     }

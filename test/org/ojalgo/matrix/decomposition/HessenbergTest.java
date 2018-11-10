@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -53,7 +52,7 @@ public class HessenbergTest {
     @Test
     public void testSquareRandom() {
 
-        final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(5, 5));
+        final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 5));
 
         this.doTestCorrect(tmpMatrix);
     }

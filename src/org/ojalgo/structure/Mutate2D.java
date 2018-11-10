@@ -180,21 +180,6 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.modifyDiagonal(0L, 0L, modifier);
         }
 
-        void modifyOne(long row, long col, UnaryFunction<N> modifier);
-
-        default void modifyOne(final long index, final UnaryFunction<N> modifier) {
-            final long tmpStructure = this.countRows();
-            this.modifyOne(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), modifier);
-        }
-
-        default void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
-            this.loopRow(row, col, (r, c) -> this.modifyOne(r, c, modifier));
-        }
-
-        default void modifyRow(final long row, final UnaryFunction<N> modifier) {
-            this.modifyRow(row, 0L, modifier);
-        }
-
         default void modifyMatchingInColumns(final Access1D<N> left, final BinaryFunction<N> function) {
             left.loopAll(r -> this.modifyRow(r, function.first(left.get(r))));
         }
@@ -209,6 +194,21 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
         default void modifyMatchingInRows(final BinaryFunction<N> function, final Access1D<N> right) {
             right.loopAll(c -> this.modifyColumn(c, function.second(right.get(c))));
+        }
+
+        void modifyOne(long row, long col, UnaryFunction<N> modifier);
+
+        default void modifyOne(final long index, final UnaryFunction<N> modifier) {
+            final long tmpStructure = this.countRows();
+            this.modifyOne(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), modifier);
+        }
+
+        default void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
+            this.loopRow(row, col, (r, c) -> this.modifyOne(r, c, modifier));
+        }
+
+        default void modifyRow(final long row, final UnaryFunction<N> modifier) {
+            this.modifyRow(row, 0L, modifier);
         }
 
     }

@@ -127,9 +127,17 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             return this;
         }
 
+        public long nextIndex() {
+            return myIndices[myCursor + 1];
+        }
+
         public NonzeroView<N> previous() {
             myCursor--;
             return this;
+        }
+
+        public long previousIndex() {
+            return myIndices[myCursor - 1];
         }
 
         public boolean tryAdvance(final Consumer<? super NonzeroView<N>> action) {
@@ -156,14 +164,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
                 return null;
             }
-        }
-
-        public long nextIndex() {
-            return myIndices[myCursor + 1];
-        }
-
-        public long previousIndex() {
-            return myIndices[myCursor - 1];
         }
 
     }
