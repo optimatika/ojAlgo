@@ -144,8 +144,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             return this.doBuild(denseArrayFactory, null);
         }
 
-        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> denseArrayFactory,
-                final BinaryFunction<N> accumularor) {
+        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> denseArrayFactory, final BinaryFunction<N> accumularor) {
             ProgrammingError.throwIfNull(denseArrayFactory, accumularor);
             return this.doBuild(denseArrayFactory, accumularor);
         }
