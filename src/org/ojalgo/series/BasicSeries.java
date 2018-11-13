@@ -137,14 +137,14 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             myTimeIndex = timeIndex;
         }
 
-        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> arrayFactory) {
-            ProgrammingError.throwIfNull(arrayFactory);
-            return this.doBuild(arrayFactory, null);
+        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> denseArrayFactory) {
+            ProgrammingError.throwIfNull(denseArrayFactory);
+            return this.doBuild(denseArrayFactory, null);
         }
 
-        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> arrayFactory, final BinaryFunction<N> accumularor) {
-            ProgrammingError.throwIfNull(arrayFactory, accumularor);
-            return this.doBuild(arrayFactory, accumularor);
+        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> denseArrayFactory, final BinaryFunction<N> accumularor) {
+            ProgrammingError.throwIfNull(denseArrayFactory, accumularor);
+            return this.doBuild(denseArrayFactory, accumularor);
         }
 
         public TimeSeriesBuilder<K> reference(final K reference) {
