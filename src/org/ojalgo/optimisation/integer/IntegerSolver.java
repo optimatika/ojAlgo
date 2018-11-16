@@ -328,7 +328,7 @@ public final class IntegerSolver extends GenericSolver {
             nodePrinter.println(this.toString());
         }
 
-        if (!this.isIterationAllowed() || !this.isIterationNecessary()) {
+        if (!this.isIterationAllowed()) {
             if (this.isDebug()) {
                 nodePrinter.println("Reached iterations or time limit - stop!");
                 IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
@@ -568,6 +568,7 @@ public final class IntegerSolver extends GenericSolver {
         if (currentlyTheBest == null) {
 
             myBestResultSoFar = result;
+            this.setState(Optimisation.State.FEASIBLE);
 
         } else if (myMinimisation && (result.getValue() < currentlyTheBest.getValue())) {
 

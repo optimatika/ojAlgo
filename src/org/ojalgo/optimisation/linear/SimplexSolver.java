@@ -592,6 +592,7 @@ public final class SimplexSolver extends LinearSolver {
                 }
 
                 myPoint.switchToPhase2();
+                this.setState(Optimisation.State.FEASIBLE);
             }
         }
 
