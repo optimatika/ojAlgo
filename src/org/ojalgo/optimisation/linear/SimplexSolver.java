@@ -490,9 +490,13 @@ public final class SimplexSolver extends LinearSolver {
             this.logDebugTableau("Initial Tableau");
         }
 
-        while (this.needsAnotherIteration()) {
+        this.resetIterationsCount();
+
+        while (this.isIterationAllowed() && this.needsAnotherIteration()) {
 
             this.performIteration(myPoint);
+
+            this.incrementIterationsCount();
 
             if (this.isDebug() && this.isTableauPrintable()) {
                 this.logDebugTableau("Tableau Iteration");
