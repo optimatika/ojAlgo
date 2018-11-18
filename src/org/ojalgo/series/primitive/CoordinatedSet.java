@@ -34,15 +34,14 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
         final K first = BasicSeries.findLatestFirstKey(uncoordinated);
         final K last = BasicSeries.findEarliestLastKey(uncoordinated);
 
-        final SortedSet<K> tmpAllKeys = new TreeSet<>();
-
+        final SortedSet<K> relevantKeys = new TreeSet<>();
         for (final BasicSeries<K, ?> individual : uncoordinated) {
-            tmpAllKeys.addAll(individual.subMap(first, last).keySet());
+            relevantKeys.addAll(individual.subMap(first, last).keySet());
         }
-        tmpAllKeys.add(last);
+        relevantKeys.add(last);
 
         final int numberOfSeries = uncoordinated.size();
-        final int numberOfKeys = tmpAllKeys.size();
+        final int numberOfKeys = relevantKeys.size();
 
         final PrimitiveSeries[] coordinated = new PrimitiveSeries[numberOfSeries];
 
@@ -54,7 +53,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
             double curVal = Double.NaN;
 
             int k = 0;
-            for (final K key : tmpAllKeys) {
+            for (final K key : relevantKeys) {
                 tmpVal = inputSeries.doubleValue(key);
                 if (Double.isNaN(tmpVal)) {
                     tmpVal = curVal;

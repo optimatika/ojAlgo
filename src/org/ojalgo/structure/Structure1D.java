@@ -48,7 +48,7 @@ public interface Structure1D {
         }
 
         public final T toKey(final long index) {
-            return myKeys.get((int) index);
+            return myKeys.get(Math.toIntExact(index));
         }
 
         final long indexForNewKey(final T newKey) {
