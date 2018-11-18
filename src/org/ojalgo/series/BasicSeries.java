@@ -105,6 +105,12 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             return this.size();
         }
 
+        /**
+         * A natural sequence implies a bidirectional mapping between the keys and long indices. This
+         * {@link IndexMapper} specifies that mapping. Please note that multiple instaces of the key type
+         * could correspnd to the same index, and not all long values are valid indices. The conversion key ->
+         * index - key may not return the original key.
+         */
         IndexMapper<K> mapper();
 
         /**
@@ -117,10 +123,6 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         double put(long index, double value);
 
         V put(long index, V value);
-
-        NaturallySequenced<K, V> resample(CalendarDate.Resolution resolution);
-
-        NaturallySequenced<K, V> resample(K firstKey, K lastKey, CalendarDate.Resolution resolution);
 
         K step(K key);
 
@@ -142,7 +144,8 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             return this.doBuild(denseArrayFactory, null);
         }
 
-        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> denseArrayFactory, final BinaryFunction<N> accumularor) {
+        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> denseArrayFactory,
+                final BinaryFunction<N> accumularor) {
             ProgrammingError.throwIfNull(denseArrayFactory, accumularor);
             return this.doBuild(denseArrayFactory, accumularor);
         }
@@ -296,7 +299,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
 
     /**
      * Some implementations may specify an accumulator function to be used with subsequent put operation with
-     * the same key. If such an accumulator is prsent it should be used here, and in that case the method
+     * the same key. If such an accumulator is present it should be used here, and in that case the method
      * returns the new/accumulated/mixed value. With out an accumulator this method should behave exactly as
      * with any other {@link Map}.
      *

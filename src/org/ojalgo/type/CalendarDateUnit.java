@@ -124,7 +124,7 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
     CalendarDateUnit(final ChronoUnit chronoUnit, final TimeUnit timeUnit, final String label) {
         myChronoUnit = chronoUnit;
         myTimeUnit = timeUnit;
-        myDurationInMillis = myTimeUnit.toMillis(1L);
+        myDurationInMillis = timeUnit.toMillis(1L);
         myHalf = myDurationInMillis / 2L;
         myDurationInNanos = timeUnit.toNanos(1L);
         myLabel = label;
