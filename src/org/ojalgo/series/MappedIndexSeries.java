@@ -36,7 +36,6 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.structure.Structure1D;
-import org.ojalgo.type.CalendarDate.Resolution;
 import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
 
@@ -72,9 +71,9 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
     private final IndexMapper<K> myMapper;
     private String myName = null;
 
-    MappedIndexSeries(final DenseArray.Factory<N> arrayFactory, final IndexMapper<K> indexMapper, final BinaryFunction<N> accumulator) {
+    MappedIndexSeries(final DenseArray.Factory<N> denseArrayFactory, final IndexMapper<K> indexMapper, final BinaryFunction<N> accumulator) {
         super();
-        myDelegate = LongToNumberMap.factory(arrayFactory).make();
+        myDelegate = LongToNumberMap.factory(denseArrayFactory).make();
         myMapper = indexMapper;
         myAccumulator = accumulator;
     }
@@ -244,37 +243,16 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
         }
     }
 
-    public MappedIndexSeries<K, N> resample(final K firstKey, final K lastKey, final Resolution resolution) {
-        return this.subMap(firstKey, this.step(lastKey)).resample(resolution);
-    }
-
-    public MappedIndexSeries<K, N> resample(final Resolution resolution) {
-
-        final long conversion = resolution.toDurationInMillis();
-
-        return new MappedIndexSeries<>(new IndexMapper<K>() {
-
-            public long toIndex(final K key) {
-                return myMapper.toIndex(key) / conversion;
-            }
-
-            public K toKey(final long index) {
-                return myMapper.toKey(index * conversion);
-            }
-
-        }, myDelegate, myAccumulator);
-    }
-
     public K step(final K key) {
         return myMapper.next(key);
     }
 
     @Override
     public MappedIndexSeries<K, N> subMap(final K fromKey, final K toKey) {
-        final long tmpFromIndex = myMapper.toIndex(fromKey);
-        final long tmpToIndex = myMapper.toIndex(toKey);
-        final LongToNumberMap<N> tmpSubMap = myDelegate.subMap(tmpFromIndex, tmpToIndex);
-        return new MappedIndexSeries<>(myMapper, tmpSubMap, myAccumulator);
+        final long fromIndex = myMapper.toIndex(fromKey);
+        final long toIndex = myMapper.toIndex(toKey);
+        final LongToNumberMap<N> delegateSubMap = myDelegate.subMap(fromIndex, toIndex);
+        return new MappedIndexSeries<>(myMapper, delegateSubMap, myAccumulator);
     }
 
     public MappedIndexSeries<K, N> tailMap(final K fromKey) {
