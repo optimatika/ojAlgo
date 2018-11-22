@@ -21,9 +21,12 @@
  */
 package org.ojalgo.type;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalUnit;
 import java.util.Collections;
 import java.util.List;
@@ -142,13 +145,72 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
         return ((epochMilli / myDurationInMillis) * myDurationInMillis) + myHalf;
     }
 
-    public Temporal adjustInto(final Temporal temporal) {
+    public Temporal adjustInto(Temporal temporal) {
+
         if (temporal instanceof CalendarDate) {
+
             long millis = ((CalendarDate) temporal).millis;
             long adjusted = this.adjustInto(millis);
             return new CalendarDate(adjusted);
+
         } else {
-            // TODO Implement adjustments for all other Temporal implementations
+
+            if (CalendarDateUnit.MILLIS.toDurationInMillis() < myDurationInMillis) {
+
+                temporal = temporal.with(ChronoField.MILLI_OF_SECOND, 0L);
+
+                if (CalendarDateUnit.SECOND.toDurationInMillis() < myDurationInMillis) {
+
+                    temporal = temporal.with(ChronoField.SECOND_OF_MINUTE, 0L);
+
+                    if (CalendarDateUnit.MINUTE.toDurationInMillis() < myDurationInMillis) {
+
+                        temporal = temporal.with(ChronoField.MINUTE_OF_HOUR, 0L);
+
+                        if (CalendarDateUnit.HOUR.toDurationInMillis() < myDurationInMillis) {
+
+                            temporal = temporal.with(ChronoField.HOUR_OF_DAY, 12L);
+
+                            if (CalendarDateUnit.DAY.toDurationInMillis() < myDurationInMillis) {
+
+                                if (CalendarDateUnit.WEEK.toDurationInMillis() == myDurationInMillis) {
+
+                                    temporal = temporal.minus(2L, ChronoUnit.DAYS).with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
+
+                                } else if (CalendarDateUnit.MONTH.toDurationInMillis() == myDurationInMillis) {
+
+                                    temporal = temporal.with(TemporalAdjusters.lastDayOfMonth());
+
+                                } else if (CalendarDateUnit.QUARTER.toDurationInMillis() == myDurationInMillis) {
+
+                                    temporal = temporal.with(ChronoField.MONTH_OF_YEAR, 3 + (3 * (temporal.get(ChronoField.MONTH_OF_YEAR) / 3)))
+                                            .with(ChronoField.DAY_OF_MONTH, 1).minus(1L, ChronoUnit.DAYS);
+
+                                } else if (CalendarDateUnit.YEAR.toDurationInMillis() == myDurationInMillis) {
+
+                                    temporal = temporal.with(TemporalAdjusters.lastDayOfYear());
+
+                                } else if (CalendarDateUnit.DECADE.toDurationInMillis() == myDurationInMillis) {
+
+                                    temporal = temporal.with(ChronoField.YEAR, 10 + (10 * (temporal.get(ChronoField.YEAR) / 10)))
+                                            .with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
+
+                                } else if (CalendarDateUnit.CENTURY.toDurationInMillis() == myDurationInMillis) {
+
+                                    temporal = temporal.with(ChronoField.YEAR, 100 + (100 * (temporal.get(ChronoField.YEAR) / 100)))
+                                            .with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
+
+                                } else if (CalendarDateUnit.MILLENIUM.toDurationInMillis() == myDurationInMillis) {
+
+                                    temporal = temporal.with(ChronoField.YEAR, 1000 + (1000 * (temporal.get(ChronoField.YEAR) / 1000)))
+                                            .with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             return temporal;
         }
     }
