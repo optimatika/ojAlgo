@@ -195,11 +195,11 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     }
 
     public static CalendarDate valueOf(OffsetDateTime offsetDateTime) {
-        return new CalendarDate(offsetDateTime.toEpochSecond() * NANOS_PER_SECOND);
+        return new CalendarDate(offsetDateTime.toEpochSecond() * MILLIS_PER_SECOND);
     }
 
     public static CalendarDate valueOf(ZonedDateTime zonedDateTime) {
-        return new CalendarDate(zonedDateTime.toEpochSecond() * NANOS_PER_SECOND);
+        return new CalendarDate(zonedDateTime.toEpochSecond() * MILLIS_PER_SECOND);
     }
 
     static long millis(final TemporalAccessor temporal) {
