@@ -53,13 +53,13 @@ public class ScheduleBuilder {
     public void schedule(final Timer aTimer) {
         if (myStartDate != null) {
             if (myRepetitionUnit != null) {
-                aTimer.scheduleAtFixedRate(myTask, myStartDate, myRepetitionMeassure * myRepetitionUnit.size());
+                aTimer.scheduleAtFixedRate(myTask, myStartDate, myRepetitionMeassure * myRepetitionUnit.toDurationInMillis());
             } else {
                 aTimer.schedule(myTask, myStartDate);
             }
         } else {
             if (myRepetitionUnit != null) {
-                aTimer.scheduleAtFixedRate(myTask, new Date(), myRepetitionMeassure * myRepetitionUnit.size());
+                aTimer.scheduleAtFixedRate(myTask, new Date(), myRepetitionMeassure * myRepetitionUnit.toDurationInMillis());
             } else {
                 aTimer.schedule(myTask, new Date());
             }
@@ -72,7 +72,7 @@ public class ScheduleBuilder {
     }
 
     public ScheduleBuilder start(final int aDelayMeassure, final CalendarDateUnit aDelayUnit) {
-        myStartDate = new Date(System.currentTimeMillis() + (aDelayMeassure * aDelayUnit.size()));
+        myStartDate = new Date(System.currentTimeMillis() + (aDelayMeassure * aDelayUnit.toDurationInMillis()));
         return this;
     }
 

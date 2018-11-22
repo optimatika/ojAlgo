@@ -103,7 +103,7 @@ public final class ImplicitTimeSeries extends PrimitiveTimeSeries {
 
     @Override
     public long getAverageStepSize() {
-        return myResolution.size();
+        return myResolution.toDurationInMillis();
     }
 
     @Override
