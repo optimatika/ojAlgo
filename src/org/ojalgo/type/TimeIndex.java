@@ -680,7 +680,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
     };
 
-    static final long DAY_SIZE = CalendarDateUnit.DAY.size();
+    static final long DAY_SIZE = CalendarDateUnit.DAY.toDurationInMillis();
 
     public abstract IndexMapper<T> from(T reference);
 
