@@ -33,6 +33,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.BigMath;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.optimisation.convex.ConvexSolver;
@@ -785,16 +786,16 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      */
     public Optimisation.Result getVariableValues(final NumberContext validationContext) {
 
-        final int tmpNumberOfVariables = myVariables.size();
+        final int numberOfVariables = myVariables.size();
 
         State retState = State.UNEXPLORED;
         double retValue = Double.NaN;
-        final Array1D<BigDecimal> retSolution = Array1D.BIG.makeZero(tmpNumberOfVariables);
+        final Array1D<BigDecimal> retSolution = Array1D.BIG.makeZero(numberOfVariables);
 
-        boolean tmpAllVarsSomeInfo = true;
+        boolean allVarsSomeInfo = true;
+        boolean shouldCheckGradient = false;
 
-        for (int i = 0; i < tmpNumberOfVariables; i++) {
-
+        for (int i = 0; i < numberOfVariables; i++) {
             final Variable tmpVariable = myVariables.get(i);
 
             if (tmpVariable.getValue() != null) {
@@ -807,18 +808,42 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                     retSolution.set(i, tmpVariable.getLowerLimit());
                 } else if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
                     retSolution.set(i, DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), TWO));
+                    shouldCheckGradient = true;
                 } else if (tmpVariable.isLowerLimitSet()) {
                     retSolution.set(i, tmpVariable.getLowerLimit());
                 } else if (tmpVariable.isUpperLimitSet()) {
                     retSolution.set(i, tmpVariable.getUpperLimit());
                 } else {
                     retSolution.set(i, ZERO);
-                    tmpAllVarsSomeInfo = false; // This var no info
+                    allVarsSomeInfo = false; // This var no info
                 }
             }
         }
 
-        if (tmpAllVarsSomeInfo) {
+        if (shouldCheckGradient && this.isAnyObjectiveQuadratic()) {
+
+            MatrixStore<Double> gradient = this.objective().getAdjustedGradient(retSolution);
+
+            double grad = 0.0;
+            for (int i = 0; i < numberOfVariables; i++) {
+                final Variable tmpVariable = myVariables.get(i);
+
+                if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
+                    grad = gradient.doubleValue(i);
+                    if (this.isMinimisation()) {
+                        grad = -grad;
+                    }
+                    if (grad < 0.0) {
+                        retSolution.set(i, tmpVariable.getLowerLimit());
+                    } else {
+                        retSolution.set(i, tmpVariable.getUpperLimit());
+                    }
+                }
+            }
+
+        }
+
+        if (allVarsSomeInfo) {
             if (this.validate(retSolution, validationContext)) {
                 retState = State.FEASIBLE;
                 retValue = this.objective().evaluate(retSolution).doubleValue();
@@ -1113,23 +1138,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
-    /**
-     * <p>
-     * Most likely you should NOT have been using this method directly. Instead you should have used/called
-     * {@link #maximise()} or {@link #minimise()}.
-     * </P>
-     * <p>
-     * In case you believe it was correct to use this method, you should now use {@link #prepare()} and then
-     * {@link Intermediate#solve(Optimisation.Result)} instead.
-     * </P>
-     *
-     * @deprecated v46
-     */
-    @Deprecated
-    public Optimisation.Result solve(final Optimisation.Result candidate) {
-        return this.prepare().solve(candidate);
-    }
-
     @Override
     public String toString() {
 
@@ -1366,17 +1374,17 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         Intermediate prepared = this.prepare();
-        final Optimisation.Result solver = prepared.solve(null);
+
+        final Optimisation.Result retSolution = prepared.solve(null);
 
         for (int i = 0, limit = myVariables.size(); i < limit; i++) {
             final Variable tmpVariable = myVariables.get(i);
             if (!tmpVariable.isFixed()) {
-                tmpVariable.setValue(options.solution.enforce(solver.get(i)));
+                tmpVariable.setValue(options.solution.enforce(retSolution.get(i)));
             }
         }
 
-        final Access1D<BigDecimal> retSolution = this.getVariableValues();
-        final Optimisation.State retState = solver.getState();
+        final Optimisation.State retState = retSolution.getState();
         final double retValue = this.objective().evaluate(retSolution).doubleValue();
 
         return new Optimisation.Result(retState, retValue, retSolution);

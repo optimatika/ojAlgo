@@ -1396,4 +1396,31 @@ public class ConvexProblems extends OptimisationConvexTests {
         OptimisationConvexTests.assertDirectAndIterativeEquals(myBuilderI, null);
     }
 
+    /**
+     * Model is not convex. Therefore ConvexSolver has a problem. It output a feasible, but not the optimal,
+     * solution. But states it to be "optimal". This test only verifies that if state says optimal, then it
+     * must be the optimal solution. https://github.com/vagmcs/Optimus/issues/25
+     */
+    @Test
+    public void testNotConvexProblem() {
+
+        final ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.addVariable("x").lower(100).upper(200);
+        Variable y = model.addVariable("y").lower(80).upper(170);
+
+        model.addExpression("obj").set(x, y, 1).weight(-1);
+
+        // model.options.debug(ConvexSolver.class);
+        // model.options.validate = false;
+
+        final Optimisation.Result result = model.minimise();
+
+        if (result.getState().isOptimal()) {
+            TestUtils.assertEquals(Access1D.wrap(new double[] { 200, 170 }), result);
+        } else if (result.getState().isFeasible()) {
+            TestUtils.assertTrue(model.validate(result));
+        }
+    }
+
 }

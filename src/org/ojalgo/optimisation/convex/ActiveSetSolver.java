@@ -44,6 +44,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
+    private boolean myInitWithLP = false;
     private MatrixStore<Double> myInvQC;
     private final PrimitiveDenseStore myIterationX;
     private final PrimitiveDenseStore mySlackI;
@@ -200,6 +201,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final Optional<Access1D<?>> tmpMultipliers = resultLP.getMultipliers();
                 if (tmpMultipliers.isPresent()) {
                     this.getSolutionL().fillMatching(tmpMultipliers.get());
+                    myInitWithLP = true;
                 } else {
                     this.getSolutionL().fillAll(ZERO);
                 }
@@ -597,14 +599,16 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             final MatrixStore<Double> slack = this.getSlackI();
             final int[] excl = this.getExcluded();
 
+            PrimitiveDenseStore lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
-                if (options.feasibility.isZero(slack.doubleValue(excl[i])) && (!options.solution.isZero(this.getSolutionL().doubleValue(numbEqus + excl[i])))) {
+                if (options.feasibility.isZero(slack.doubleValue(excl[i]))
+                        && (!myInitWithLP || !options.solution.isZero(lagrange.doubleValue(numbEqus + excl[i])))) {
                     this.include(excl[i]);
                 }
             }
         }
 
-        while (((numbEqus + this.countIncluded()) >= numbVars) && (this.countIncluded() > 0)) {
+        while (((numbEqus + this.countIncluded()) > numbVars) && (this.countIncluded() > 0)) {
             this.shrink();
         }
 
