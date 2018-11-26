@@ -44,7 +44,7 @@ import org.ojalgo.constant.PrimitiveMath;
  */
 public final class CalendarDateDuration extends Number implements TemporalAmount, CalendarDate.Resolution, Comparable<CalendarDateDuration> {
 
-    public static CalendarDateDuration of(long nanos) {
+    static CalendarDateDuration of(long nanos) {
         return new CalendarDateDuration(nanos, CalendarDateUnit.NANOS);
     }
 
