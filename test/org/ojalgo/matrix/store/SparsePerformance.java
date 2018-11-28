@@ -101,7 +101,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         SparsePerformance.touchNonzeros(mtrxA.multiply(mtrxB));
 
-        TestUtils.assertFasterThan(100, CalendarDateUnit.SECOND, clock);
+        TestUtils.assertFasterThan(50, CalendarDateUnit.SECOND, clock);
     }
 
     @Test
