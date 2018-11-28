@@ -96,7 +96,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
             target.reset();
 
-            right.nonzeros().stream(true).forEach(element -> {
+            right.nonzeros().stream(false).forEach(element -> {
                 left.doColumnAXPY(element.row(), element.column(), element.doubleValue(), target);
             });
 
@@ -299,7 +299,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
             target.reset();
 
-            this.nonzeros().stream(true).forEach(element -> {
+            this.nonzeros().stream(false).forEach(element -> {
 
                 final long row = element.row();
                 final long col = element.column();
@@ -311,9 +311,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
                     final long index = Structure2D.index(complexity, col, j);
                     final double addition = value * right.doubleValue(index);
                     if (NumberContext.compare(addition, ZERO) != 0) {
-                        synchronized (target) {
-                            target.add(row, j, addition);
-                        }
+                        target.add(row, j, addition);
                     }
                 }
             });
@@ -421,7 +419,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
             final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
 
-            this.nonzeros().stream(true).forEach(element -> {
+            this.nonzeros().stream(false).forEach(element -> {
 
                 final long row = element.row();
                 final long col = element.column();
@@ -433,9 +431,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
                     final long index = Structure2D.index(numberOfRows, i, row);
                     final double addition = value * left.doubleValue(index);
                     if (NumberContext.compare(addition, ZERO) != 0) {
-                        synchronized (retVal) {
-                            retVal.add(i, col, addition);
-                        }
+                        retVal.add(i, col, addition);
                     }
                 }
             });
@@ -557,15 +553,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         final long first = structure * colX;
         final long limit = first + structure;
 
-        myElements.visitNonzerosInRange(first, limit, (index, value) -> {
-            final double addition = a * value;
-            if (NumberContext.compare(addition, ZERO) != 0) {
-                synchronized (y) {
-                    long rowY = Structure2D.row(index, structure);
-                    y.add(rowY, colY, addition);
-                }
-            }
-        });
+        myElements.visitPrimitiveNonzerosInRange(first, limit, (index, value) -> y.add(Structure2D.row(index, structure), colY, a * value));
     }
 
     void updateNonZeros(final int row, final int col) {

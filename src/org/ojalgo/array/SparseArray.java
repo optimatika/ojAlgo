@@ -65,7 +65,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         /**
          * @param index Index
-         * @param number Value (nonzero) at that index
+         * @param number Number (nonzero) at that index
          */
         void call(long index, N number);
 
@@ -482,7 +482,15 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public void visitNonzerosInRange(long first, long limit, NonzeroPrimitiveCallback visitor) {
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
+        if (this.isPrimitive()) {
+            visitor.invoke(this.doubleValue(index));
+        } else {
+            visitor.invoke(this.get(index));
+        }
+    }
+
+    public void visitPrimitiveNonzerosInRange(long first, long limit, NonzeroPrimitiveCallback visitor) {
 
         int localFirst = this.index(first);
         if (localFirst < 0) {
@@ -495,30 +503,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         for (int i = localFirst; i < localLimit; i++) {
             visitor.call(myIndices[i], myValues.doubleValue(i));
-        }
-    }
-
-    public void visitNonzerosInRangeRefType(long first, long limit, NonzeroReferenceTypeCallback<N> visitor) {
-
-        int localFirst = this.index(first);
-        if (localFirst < 0) {
-            localFirst = -(localFirst + 1);
-        }
-        int localLimit = this.index(limit);
-        if (localLimit < 0) {
-            localLimit = -(localLimit + 1);
-        }
-
-        for (int i = localFirst; i < localLimit; i++) {
-            visitor.call(myIndices[i], myValues.get(i));
-        }
-    }
-
-    public void visitOne(final long index, final VoidFunction<N> visitor) {
-        if (this.isPrimitive()) {
-            visitor.invoke(this.doubleValue(index));
-        } else {
-            visitor.invoke(this.get(index));
         }
     }
 
@@ -540,6 +524,22 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         for (int i = localFirst; i < localLimit; i++) {
             myValues.visitOne(i, visitor);
+        }
+    }
+
+    public void visitReferenceTypeNonzerosInRange(long first, long limit, NonzeroReferenceTypeCallback<N> visitor) {
+
+        int localFirst = this.index(first);
+        if (localFirst < 0) {
+            localFirst = -(localFirst + 1);
+        }
+        int localLimit = this.index(limit);
+        if (localLimit < 0) {
+            localLimit = -(localLimit + 1);
+        }
+
+        for (int i = localFirst; i < localLimit; i++) {
+            visitor.call(myIndices[i], myValues.get(i));
         }
     }
 
