@@ -157,6 +157,8 @@ final class QPESolver extends ConstrainedSolver {
                 this.getSolutionX().fillAll(ZERO);
             }
         }
+
+        this.incrementIterationsCount();
     }
 
     @Override

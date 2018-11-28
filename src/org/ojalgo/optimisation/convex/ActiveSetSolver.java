@@ -440,9 +440,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     final void handleIterationResults(final boolean solved, final PrimitiveDenseStore iterX, final int[] included, final int[] excluded) {
 
+        this.incrementIterationsCount();
+
         final PhysicalStore<Double> soluX = this.getSolutionX();
 
         if (solved) {
+            // Subproblem solved successfully
 
             iterX.modifyMatching(SUBTRACT, soluX);
 
@@ -519,54 +522,64 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 this.setState(State.FEASIBLE);
             }
 
-        } else if (included.length >= 1) {
-            // Subproblem NOT solved successfully
-            // At least 1 active inequality
+        } else if (this.isIterationAllowed()) {
+            // Subproblem NOT solved successfully, but further iterations allowed
 
-            this.shrink();
+            if (included.length >= 1) {
+                // Subproblem NOT solved successfully
+                // At least 1 active inequality
 
-            this.performIteration();
+                this.shrink();
 
-        } else if (!this.isSolvableQ()) {
-            // Subproblem NOT solved successfully
-            // 0 active inequalities
-            // Q not SPD
+                this.performIteration();
 
-            final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
-            final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
-            final double largest = PrimitiveFunction.MAX.invoke(largestInQ, largestInC);
+            } else if (!this.isSolvableQ()) {
+                // Subproblem NOT solved successfully
+                // 0 active inequalities
+                // Q not SPD
 
-            this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
+                final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
+                final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
+                final double largest = PrimitiveFunction.MAX.invoke(largestInQ, largestInC);
 
-            this.computeQ(this.getIterationQ());
+                this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
+                this.computeQ(this.getIterationQ());
 
-            this.getSolutionL().modifyAll((Unary) arg -> {
-                if (Double.isFinite(arg)) {
-                    return arg;
-                } else {
-                    return ZERO;
-                }
-            });
+                this.getSolutionL().modifyAll((Unary) arg -> {
+                    if (Double.isFinite(arg)) {
+                        return arg;
+                    } else {
+                        return ZERO;
+                    }
+                });
 
-            this.resetActivator();
+                this.resetActivator();
+                this.performIteration();
 
-            this.performIteration();
+            } else {
+                // Subproblem NOT solved successfully
+                // 0 active inequalities
+                // Q SPD
+
+                // Should not be possible to end up here, infeasibility among
+                // the equality constraints should have been detected earlier.
+
+                this.setState(State.FAILED);
+            }
 
         } else if (this.checkFeasibility(false)) {
-            // Subproblem NOT solved successfully, but current solution is feasible
-            // 0 active inequalities
-            // Q SPD
+            // Subproblem NOT solved successfully
+            // Further iterations NOT allowed
             // Feasible current solution
 
             this.setState(State.FEASIBLE);
 
         } else {
-            // Subproblem NOT solved successfully, and current solution NOT feasible
-            // 0 active inequalities
-            // Q SPD
-            // Not feasible current solution
+            // Subproblem NOT solved successfully
+            // Further iterations NOT allowed
+            // Current solution somehow NOT feasible
 
-            this.setState(State.INFEASIBLE);
+            this.setState(State.FAILED);
         }
 
         if (this.isDebug()) {

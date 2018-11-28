@@ -75,6 +75,8 @@ final class UnconstrainedSolver extends ConvexSolver {
             this.setState(State.UNBOUNDED);
             this.getSolutionX().fillAll(ZERO);
         }
+
+        this.incrementIterationsCount();
     }
 
 }
