@@ -103,7 +103,7 @@ abstract class AbstractMachine extends BasicMachine {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -113,7 +113,7 @@ abstract class AbstractMachine extends BasicMachine {
         if (!(obj instanceof AbstractMachine)) {
             return false;
         }
-        final AbstractMachine other = (AbstractMachine) obj;
+        AbstractMachine other = (AbstractMachine) obj;
         if (architecture == null) {
             if (other.architecture != null) {
                 return false;
@@ -124,7 +124,7 @@ abstract class AbstractMachine extends BasicMachine {
         if (cache != other.cache) {
             return false;
         }
-        if (units != other.units) {
+        if (cores != other.cores) {
             return false;
         }
         if (units != other.units) {
@@ -147,6 +147,7 @@ abstract class AbstractMachine extends BasicMachine {
         int result = super.hashCode();
         result = (prime * result) + ((architecture == null) ? 0 : architecture.hashCode());
         result = (prime * result) + (int) (cache ^ (cache >>> 32));
+        result = (prime * result) + cores;
         result = (prime * result) + units;
         return result;
     }

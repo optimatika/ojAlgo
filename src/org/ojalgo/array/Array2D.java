@@ -21,7 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -49,8 +48,7 @@ import org.ojalgo.structure.Structure2D;
  * @author apete
  */
 public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Access2D.Sliceable<N>, Access2D.Visitable<N>,
-        Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.Receiver<N>, Mutate2D.Exchangeable, Mutate2D.Mixable<N>,
-        Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N>, Serializable {
+        Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Exchangeable, Mutate2D.Mixable<N> {
 
     public static final class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
@@ -153,20 +151,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return myDelegate.function();
         }
 
-        public final Array2D<N> makeEye(final long rows, final long columns) {
-
-            final BasicArray<N> tmpDelegate = myDelegate.makeStructuredZero(rows, columns);
-
-            final long tmpLimit = Math.min(rows, columns);
-
-            final long tmpIncr = rows + 1L;
-            for (long ij = 0L; ij < tmpLimit; ij++) {
-                tmpDelegate.set(ij * tmpIncr, 1.0);
-            }
-
-            return tmpDelegate.wrapInArray2D(rows);
-        }
-
         public final Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(rows, columns);
@@ -200,14 +184,14 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 for (int i = 0; i < tmpRows; i++) {
                     final Access1D<?> tmpRow = source[i];
                     for (long j = 0L; j < tmpColumns; j++) {
-                        tmpDelegate.set(i + (j * tmpRows), tmpRow.doubleValue(j));
+                        tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.doubleValue(j));
                     }
                 }
             } else {
                 for (int i = 0; i < tmpRows; i++) {
                     final Access1D<?> tmpRow = source[i];
                     for (long j = 0L; j < tmpColumns; j++) {
-                        tmpDelegate.set(i + (j * tmpRows), tmpRow.get(j));
+                        tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.get(j));
                     }
                 }
             }
@@ -225,7 +209,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             for (int i = 0; i < tmpRows; i++) {
                 final double[] tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(i + (j * tmpRows), tmpRow[j]);
+                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
                 }
             }
 
@@ -243,7 +227,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             for (int i = 0; i < tmpRows; i++) {
                 final List<? extends Number> tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(i + (j * tmpRows), tmpRow.get(j));
+                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.get(j));
                 }
             }
 
@@ -260,7 +244,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             for (int i = 0; i < tmpRows; i++) {
                 final Number[] tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(i + (j * tmpRows), tmpRow[j]);
+                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
                 }
             }
 
@@ -290,11 +274,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     private final long myColumnsCount;
     private final BasicArray<N> myDelegate;
     private final long myRowsCount;
-
-    @SuppressWarnings("unused")
-    private Array2D() {
-        this(null, 0L);
-    }
 
     Array2D(final BasicArray<N> delegate, final long structure) {
 
@@ -516,8 +495,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     /**
-     * @param row
-     * @param col
      * @return The row-index of the largest absolute value in a column, starting at the specified row.
      */
     public long indexOfLargestInColumn(final long row, final long col) {
@@ -529,8 +506,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     /**
-     * @param row
-     * @param col
      * @return The column-index of the largest absolute value in a row, starting at the specified column.
      */
     public long indexOfLargestInRow(final long row, final long col) {

@@ -80,8 +80,6 @@ public class Password {
 
     /**
      * @param aPassword An unencrypted (plain text) password
-     * @param aToBytesEncoding
-     * @param aFromBytesEncoding
      * @return An encrypted password
      */
     public static String encrypt(final String aPassword, final String aToBytesEncoding, final String aFromBytesEncoding) {

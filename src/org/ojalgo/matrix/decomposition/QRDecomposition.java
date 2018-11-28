@@ -128,7 +128,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         this.getInPlace().visitDiagonal(aggregator);
 
-        if ((myNumberOfHouseholderTransformations % 2) == 1) {
+        if ((myNumberOfHouseholderTransformations % 2) != 0) {
             return this.scalar().one().negate().multiply(aggregator.get()).get();
         } else {
             return aggregator.get();
@@ -257,9 +257,6 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
     }
 
-    /**
-     * @see org.ojalgo.matrix.decomposition.QR#isFullColumnRank()
-     */
     public boolean isFullRank() {
         return this.getRank() == this.getMinDim();
     }

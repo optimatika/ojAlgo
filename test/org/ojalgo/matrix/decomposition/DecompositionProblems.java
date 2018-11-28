@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.GenericDenseStore;
@@ -178,7 +177,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20091012() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(5, 9));
+        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 9));
 
         final QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.decompose(tmpA);
@@ -232,7 +231,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         final int tmpDim = 5;
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
         final PhysicalStore<Double> tmpI = PrimitiveDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
 
         final LU<Double> tmpDecomp = LU.PRIMITIVE.make();
@@ -260,7 +259,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         final NumberContext tmpEqualsNumberContext = new NumberContext(7, 11);
 
         final int tmpDim = 99;
-        final PhysicalStore<Double> tmpRandom = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        final PhysicalStore<Double> tmpRandom = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
         final PhysicalStore<Double> tmpIdentity = PrimitiveDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
 
         final LU<Double> tmpRefDecomps = new RawLU();
@@ -294,7 +293,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         final int tmpDim = Uniform.randomInteger(2, 6);
 
-        final PhysicalStore<ComplexNumber> tmpSquare = MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim);
+        final PhysicalStore<ComplexNumber> tmpSquare = TestUtils.makeRandomComplexStore(tmpDim, tmpDim);
         final MatrixStore<ComplexNumber> tmpHermitian = tmpSquare.conjugate().multiply(tmpSquare);
         final PhysicalStore<ComplexNumber> tmpExpected = GenericDenseStore.COMPLEX.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> tmpActual;
@@ -336,7 +335,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         final int tmpDim = Uniform.randomInteger(2, 6);
 
-        final PhysicalStore<ComplexNumber> original = MatrixUtils.makeRandomComplexStore(tmpDim + tmpDim, tmpDim);
+        final PhysicalStore<ComplexNumber> original = TestUtils.makeRandomComplexStore(tmpDim + tmpDim, tmpDim);
         final PhysicalStore<ComplexNumber> identity = GenericDenseStore.COMPLEX.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> solution;
 
@@ -421,9 +420,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * This program tests the behavior of the QR and SVD decompositions on matrices with more columns than
      * rows. The desire is to compute a basis for the (right) null space of a matrix.
+     * https://stackoverflow.com/questions/50847140 https://github.com/optimatika/ojAlgo/issues/104
      *
-     * @see https://stackoverflow.com/questions/50847140
-     * @see https://github.com/optimatika/ojAlgo/issues/104
      * @author Paul A. Rubin
      */
     @Test
@@ -475,8 +473,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
     /**
      * There was a problem extracting the eigenpairs (java.lang.ArrayIndexOutOfBoundsException)
-     *
-     * @see https://github.com/optimatika/ojAlgo/issues/105
+     * https://github.com/optimatika/ojAlgo/issues/105
      */
     @Test
     public void testP20180617() {

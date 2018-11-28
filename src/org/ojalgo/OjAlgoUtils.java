@@ -105,6 +105,24 @@ public abstract class OjAlgoUtils {
         return tmpManifestValue != null ? tmpManifestValue : "X.X";
     }
 
+    public static void main(String[] args) {
+        BasicLogger.debug();
+        BasicLogger.debug("####################################################################");
+        BasicLogger.debug("#################### Welcome to oj! Algorithms! ####################");
+        BasicLogger.debug("####################################################################");
+        BasicLogger.debug("{} version {} built by {}.", OjAlgoUtils.getTitle(), OjAlgoUtils.getVersion(), OjAlgoUtils.getVendor());
+        BasicLogger.debug("####################################################################");
+        BasicLogger.debug();
+        BasicLogger.debug("Machine Architecture: {}", VirtualMachine.getArchitecture());
+        BasicLogger.debug("Machine Threads: {}", VirtualMachine.getThreads());
+        BasicLogger.debug("Machine Memory: {}", VirtualMachine.getMemory());
+        BasicLogger.debug();
+        BasicLogger.debug("ojAlgo Environment: {}", ENVIRONMENT);
+        BasicLogger.debug();
+        BasicLogger.debug("System properties: {}", System.getProperties());
+        BasicLogger.debug();
+    }
+
     private OjAlgoUtils() {
         super();
     }

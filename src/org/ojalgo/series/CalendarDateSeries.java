@@ -164,7 +164,7 @@ public final class CalendarDateSeries<N extends Number> extends TreeSeries<Calen
      */
     @SuppressWarnings("unchecked")
     public double put(final CalendarDate key, final double value) {
-        final Double tmpValue = value;
+        final Double tmpValue = Double.valueOf(value);
         final N tmpOldValue = super.put(key.filter(myResolution), (N) tmpValue);
         if (tmpOldValue != null) {
             return tmpOldValue.doubleValue();

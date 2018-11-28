@@ -100,7 +100,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         Raw1D.visit(myDiagonalR, aggregator);
 
-        if ((myNumberOfHouseholderTransformations % 2) == 1) {
+        if ((myNumberOfHouseholderTransformations % 2) != 0) {
             return -aggregator.get();
         } else {
             return aggregator.get();
@@ -341,8 +341,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     /**
      * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
-     *
-     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#doGetInverse(org.ojalgo.matrix.decomposition.DecompositionStore)
      */
     private MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
 

@@ -328,7 +328,7 @@ public final class IntegerSolver extends GenericSolver {
             nodePrinter.println(this.toString());
         }
 
-        if (!this.isIterationAllowed() || !this.isIterationNecessary()) {
+        if (!this.isIterationAllowed()) {
             if (this.isDebug()) {
                 nodePrinter.println("Reached iterations or time limit - stop!");
                 IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
@@ -568,6 +568,7 @@ public final class IntegerSolver extends GenericSolver {
         if (currentlyTheBest == null) {
 
             myBestResultSoFar = result;
+            this.setState(Optimisation.State.FEASIBLE);
 
         } else if (myMinimisation && (result.getValue() < currentlyTheBest.getValue())) {
 
@@ -603,11 +604,12 @@ public final class IntegerSolver extends GenericSolver {
 
     /**
      * Should validate the solver data/input/structue. Even "expensive" validation can be performed as the
-     * method should only be called if {@linkplain Optimisation.Options#validate} is set to true. In addition
-     * to returning true or false the implementation should set the state to either
-     * {@linkplain Optimisation.State#VALID} or {@linkplain Optimisation.State#INVALID} (or possibly
-     * {@linkplain Optimisation.State#FAILED}). Typically the method should be called at the very beginning of
-     * the solve-method.
+     * method should only be called if {@linkplain org.ojalgo.optimisation.Optimisation.Options#validate} is
+     * set to true. In addition to returning true or false the implementation should set the state to either
+     * {@linkplain org.ojalgo.optimisation.Optimisation.State#VALID} or
+     * {@linkplain org.ojalgo.optimisation.Optimisation.State#INVALID} (or possibly
+     * {@linkplain org.ojalgo.optimisation.Optimisation.State#FAILED}). Typically the method should be called
+     * at the very beginning of the solve-method.
      *
      * @return Is the solver instance valid?
      */

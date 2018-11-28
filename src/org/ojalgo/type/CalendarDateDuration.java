@@ -21,7 +21,6 @@
  */
 package org.ojalgo.type;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.time.Period;
 import java.time.temporal.Temporal;
@@ -45,7 +44,11 @@ import org.ojalgo.constant.PrimitiveMath;
  * @see CalendarDateUnit
  * @author apete
  */
-public final class CalendarDateDuration extends Number implements TemporalAmount, CalendarDate.Resolution, Comparable<CalendarDateDuration>, Serializable {
+public final class CalendarDateDuration extends Number implements TemporalAmount, CalendarDate.Resolution, Comparable<CalendarDateDuration> {
+
+    public static CalendarDateDuration of(long nanos) {
+        return new CalendarDateDuration(nanos, CalendarDateUnit.NANOS);
+    }
 
     public final double measure;
     public final CalendarDateUnit unit;
@@ -161,11 +164,11 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
     }
 
     public long toDurationInMillis() {
-        return (long) (measure * unit.size());
+        return Math.round(measure * unit.size());
     }
 
     public long toDurationInNanos() {
-        return (long) (measure * (1_000_000L * unit.size()));
+        return Math.round(measure * (1_000_000L * unit.size()));
     }
 
     @Override

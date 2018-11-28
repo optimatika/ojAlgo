@@ -49,6 +49,12 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
         super();
     }
 
+    @Override
+    public void testFeedForward() {
+        // No example output
+        ;
+    }
+
     /**
      * Test that trainning on multiple different data point improve the results on all examples.
      */
@@ -120,12 +126,6 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
     @Override
     protected NumberContext precision() {
         return PRECISION;
-    }
-
-    @Override
-    public void testFeedForward() {
-        // No example output
-        ;
     }
 
 }

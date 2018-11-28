@@ -24,9 +24,12 @@ package org.ojalgo.matrix;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.RationalFunction;
+import org.ojalgo.matrix.BasicMatrix.PhysicalReceiver;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -35,6 +38,8 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public class SimpleEigenvalueCase extends BasicMatrixTest {
+
+    private static final NumberContext DEFINITION = new NumberContext(7, 14);
 
     public static RationalMatrix getOriginal() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 4.0, -5.0 }, { 2.0, -3.0 } });
@@ -51,18 +56,18 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
-        DEFINITION = new NumberContext(7, 14);
-        EVALUATION = new NumberContext(7, 3);
 
-        myBigAA = SimpleEigenvalueCase.getOriginal();
-        myBigAX = SimpleEigenvalueCase.getMatrixV();
-        myBigAB = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
+        evaluation = new NumberContext(7, 3);
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationalAA = SimpleEigenvalueCase.getOriginal();
+        rationalAX = SimpleEigenvalueCase.getMatrixV();
+        rationalAB = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
+
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }
@@ -70,11 +75,11 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        myExpMtrx = SimpleEigenvalueCase.getOriginal().multiply(SimpleEigenvalueCase.getMatrixV());
+        expMtrx = SimpleEigenvalueCase.getOriginal().multiply(SimpleEigenvalueCase.getMatrixV());
 
-        myActMtrx = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
+        actMtrx = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     @Test
@@ -86,26 +91,28 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         final MatrixStore<Double> tmpV = tmpEigen.getV();
         final MatrixStore<Double> tmpD = tmpEigen.getD();
 
-        myExpMtrx = SimpleEigenvalueCase.getMatrixD();
-        myActMtrx = PrimitiveMatrix.FACTORY.copy(tmpD);
+        expMtrx = SimpleEigenvalueCase.getMatrixD();
+        actMtrx = PrimitiveMatrix.FACTORY.copy(tmpD);
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         final RationalMatrix tmpExpV = SimpleEigenvalueCase.getMatrixV();
-        final PrimitiveMatrix tmpActV = PrimitiveMatrix.FACTORY.copy(tmpV);
+        final RationalMatrix tmpActV = RationalMatrix.FACTORY.copy(tmpV);
 
-        final BasicMatrix tmpMtrx = tmpExpV.divideElements(tmpActV);
+        PhysicalReceiver<RationalNumber, RationalMatrix> tmpCopy = tmpExpV.copy();
+        tmpCopy.modifyMatching(RationalFunction.DIVIDE, tmpActV);
+        final RationalMatrix tmpMtrx = tmpCopy.get();
         double tmpExp;
         double tmpAct;
         for (int j = 0; j < tmpMtrx.countColumns(); j++) {
             tmpExp = tmpMtrx.doubleValue(0, j);
             for (int i = 0; i < tmpMtrx.countRows(); i++) {
                 tmpAct = tmpMtrx.doubleValue(i, j);
-                TestUtils.assertEquals(tmpExp, tmpAct, EVALUATION);
+                TestUtils.assertEquals(tmpExp, tmpAct, evaluation);
             }
         }
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
 }

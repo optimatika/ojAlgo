@@ -58,38 +58,6 @@ public final class SolverTest extends MatrixTaskTests {
     }
 
     @Test
-    public void testUnderdeterminedIterative() {
-
-        final int numEqs = 2;
-        final int numVars = 5;
-
-        final PrimitiveDenseStore body = PrimitiveDenseStore.FACTORY.makeZero(numEqs, numVars);
-        final PrimitiveDenseStore rhs = PrimitiveDenseStore.FACTORY.makeZero(numEqs, 1);
-
-        final PrimitiveDenseStore expected = PrimitiveDenseStore.FACTORY.makeZero(numVars, 1);
-
-        final Random tmpRandom = new Random();
-        for (int i = 0; i < numEqs; i++) {
-
-            double pivotE = tmpRandom.nextDouble();
-            double rhsE = tmpRandom.nextDouble();
-
-            body.set(i, i, pivotE);
-            rhs.set(i, rhsE);
-            expected.set(i, rhsE / pivotE);
-        }
-
-        final JacobiSolver tmpJacobiSolver = new JacobiSolver();
-        TestUtils.assertEquals(expected, tmpJacobiSolver.solve(body, rhs).get());
-
-        final GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
-        TestUtils.assertEquals(expected, tmpGaussSeidelSolver.solve(body, rhs).get());
-
-        final ConjugateGradientSolver tmpConjugateGradientSolver = new ConjugateGradientSolver();
-        TestUtils.assertEquals(expected, tmpConjugateGradientSolver.solve(body, rhs).get());
-    }
-
-    @Test
     public void testFull2X2() {
         this.doCompare(AbstractSolver.FULL_2X2, 2);
     }
@@ -148,6 +116,38 @@ public final class SolverTest extends MatrixTaskTests {
     @Test
     public void testSymmetric5X5() {
         this.doCompare(AbstractSolver.SYMMETRIC_5X5, 5);
+    }
+
+    @Test
+    public void testUnderdeterminedIterative() {
+
+        final int numEqs = 2;
+        final int numVars = 5;
+
+        final PrimitiveDenseStore body = PrimitiveDenseStore.FACTORY.makeZero(numEqs, numVars);
+        final PrimitiveDenseStore rhs = PrimitiveDenseStore.FACTORY.makeZero(numEqs, 1);
+
+        final PrimitiveDenseStore expected = PrimitiveDenseStore.FACTORY.makeZero(numVars, 1);
+
+        final Random tmpRandom = new Random();
+        for (int i = 0; i < numEqs; i++) {
+
+            double pivotE = tmpRandom.nextDouble();
+            double rhsE = tmpRandom.nextDouble();
+
+            body.set(i, i, pivotE);
+            rhs.set(i, rhsE);
+            expected.set(i, rhsE / pivotE);
+        }
+
+        final JacobiSolver tmpJacobiSolver = new JacobiSolver();
+        TestUtils.assertEquals(expected, tmpJacobiSolver.solve(body, rhs).get());
+
+        final GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
+        TestUtils.assertEquals(expected, tmpGaussSeidelSolver.solve(body, rhs).get());
+
+        final ConjugateGradientSolver tmpConjugateGradientSolver = new ConjugateGradientSolver();
+        TestUtils.assertEquals(expected, tmpConjugateGradientSolver.solve(body, rhs).get());
     }
 
     private void doCompare(final SolverTask<Double> fixed, final int dimension) {

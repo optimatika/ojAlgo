@@ -35,8 +35,6 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
-import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.MatrixFactory;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -549,10 +547,10 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20080819() {
 
-        final MatrixFactory<Double, PrimitiveMatrix> tmpMtrxFact = PrimitiveMatrix.FACTORY;
+        final PrimitiveMatrix.Factory tmpMtrxFact = PrimitiveMatrix.FACTORY;
         final NumberContext tmpEvalCntxt = StandardType.DECIMAL_032;
 
-        final BasicMatrix[] tmpMatrices = new PrimitiveMatrix[8];
+        final PrimitiveMatrix[] tmpMatrices = new PrimitiveMatrix[8];
 
         tmpMatrices[0] = tmpMtrxFact.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0 } });
         tmpMatrices[1] = tmpMtrxFact.rows(new double[][] { { 1.0 } });
@@ -771,8 +769,8 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
-     * A lower level version of {@linkplain org.ojalgo.finance.portfolio.PortfolioProblems#testP20090115()}.
-     * The solver returns negative, constraint breaking, variables with STATE == OPTIMAL.
+     * A lower level version of {@linkplain #testP20090115()}. The solver returns negative, constraint
+     * breaking, variables with STATE == OPTIMAL.
      */
     @SuppressWarnings("unchecked")
     @Test

@@ -35,42 +35,6 @@ import org.ojalgo.type.context.NumberContext;
 
 public final class SpecificBranchCase extends MipLibCase {
 
-    @Test
-    public void testVpm2FirstBranch() {
-
-        final File tmpFile = new File(MipLibCase.PATH + "vpm2.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
-
-        TestUtils.assertTrue(tmpModel.validate());
-
-        final ExpressionsBasedModel tmpLowerBranchModel = tmpModel.relax(false);
-        final ExpressionsBasedModel tmpUpperBranchModel = tmpModel.relax(false);
-
-        tmpLowerBranchModel.getVariable(106).upper(BigMath.ZERO);
-        tmpUpperBranchModel.getVariable(106).lower(BigMath.ONE);
-
-        final Optimisation.Result tmpLowerResult = tmpLowerBranchModel.minimise();
-        final Optimisation.Result tmpUpperResult = tmpUpperBranchModel.minimise();
-
-        final State tmpLowerState = tmpLowerResult.getState();
-        final State tmpUpperState = tmpUpperResult.getState();
-
-        if (!tmpLowerState.isFeasible() && !tmpUpperState.isFeasible()) {
-            TestUtils.fail("Both these branches cannot be infeasible!");
-        }
-
-        tmpLowerBranchModel.minimise();
-        if (tmpLowerState.isFeasible() && !tmpLowerBranchModel.validate(new NumberContext(7, 6))) {
-            TestUtils.fail(MipLibCase.SOLUTION_NOT_VALID);
-        }
-
-        tmpUpperBranchModel.minimise();
-        if (tmpUpperState.isFeasible() && !tmpUpperBranchModel.validate(new NumberContext(7, 6))) {
-            TestUtils.fail(MipLibCase.SOLUTION_NOT_VALID);
-        }
-    }
-
     /**
      * 4 nodes that validated to "Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED.
      * Stop this branch!"
@@ -159,6 +123,42 @@ public final class SpecificBranchCase extends MipLibCase {
             TestUtils.assertTrue(model.validate(result, precisionContext, BasicLogger.DEBUG));
         }
 
+    }
+
+    @Test
+    public void testVpm2FirstBranch() {
+
+        final File tmpFile = new File(MipLibCase.PATH + "vpm2.mps");
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
+
+        TestUtils.assertTrue(tmpModel.validate());
+
+        final ExpressionsBasedModel tmpLowerBranchModel = tmpModel.relax(false);
+        final ExpressionsBasedModel tmpUpperBranchModel = tmpModel.relax(false);
+
+        tmpLowerBranchModel.getVariable(106).upper(BigMath.ZERO);
+        tmpUpperBranchModel.getVariable(106).lower(BigMath.ONE);
+
+        final Optimisation.Result tmpLowerResult = tmpLowerBranchModel.minimise();
+        final Optimisation.Result tmpUpperResult = tmpUpperBranchModel.minimise();
+
+        final State tmpLowerState = tmpLowerResult.getState();
+        final State tmpUpperState = tmpUpperResult.getState();
+
+        if (!tmpLowerState.isFeasible() && !tmpUpperState.isFeasible()) {
+            TestUtils.fail("Both these branches cannot be infeasible!");
+        }
+
+        tmpLowerBranchModel.minimise();
+        if (tmpLowerState.isFeasible() && !tmpLowerBranchModel.validate(new NumberContext(7, 6))) {
+            TestUtils.fail(MipLibCase.SOLUTION_NOT_VALID);
+        }
+
+        tmpUpperBranchModel.minimise();
+        if (tmpUpperState.isFeasible() && !tmpUpperBranchModel.validate(new NumberContext(7, 6))) {
+            TestUtils.fail(MipLibCase.SOLUTION_NOT_VALID);
+        }
     }
 
 }

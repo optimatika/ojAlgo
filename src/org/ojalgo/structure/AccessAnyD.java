@@ -215,7 +215,7 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
     }
 
     default Iterable<MatrixView<N>> matrices() {
-        return MatrixView.makeIterable(this);
+        return new MatrixView<>(this);
     }
 
     default short shortValue(long index) {

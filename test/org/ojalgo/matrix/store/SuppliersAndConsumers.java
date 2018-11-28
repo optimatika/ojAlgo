@@ -24,7 +24,7 @@ package org.ojalgo.matrix.store;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 
-public class SuppliersAndConsumers extends AbstractMatrixStoreTest {
+public class SuppliersAndConsumers extends MatrixStoreTests {
 
     @Test
     public void testMultiplyingAndTransposing() {

@@ -28,6 +28,8 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
@@ -41,15 +43,85 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public final class RationalMatrix extends AbstractMatrix<RationalNumber, RationalMatrix> {
+public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMatrix> {
 
-    public static final MatrixFactory<RationalNumber, RationalMatrix> FACTORY = new MatrixFactory<>(RationalMatrix.class, GenericDenseStore.RATIONAL);
+    public static final class DenseReceiver extends
+            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.DenseReceiver {
+
+        DenseReceiver(Factory enclosing, PhysicalStore<RationalNumber> delegate) {
+            enclosing.super(delegate);
+        }
+
+    }
+
+    public static final class Factory
+            extends MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver> {
+
+        Factory() {
+            super(RationalMatrix.class, GenericDenseStore.RATIONAL);
+        }
+
+        @Override
+        RationalMatrix.LogicalBuilder logical(MatrixStore<RationalNumber> delegate) {
+            return new RationalMatrix.LogicalBuilder(this, delegate);
+        }
+
+        @Override
+        RationalMatrix.DenseReceiver physical(PhysicalStore<RationalNumber> delegate) {
+            return new RationalMatrix.DenseReceiver(this, delegate);
+        }
+
+        @Override
+        RationalMatrix.SparseReceiver physical(SparseStore<RationalNumber> delegate) {
+            return new RationalMatrix.SparseReceiver(this, delegate);
+        }
+
+    }
+
+    public static final class LogicalBuilder extends
+            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.Logical {
+
+        LogicalBuilder(Factory enclosing, MatrixStore.LogicalBuilder<RationalNumber> delegate) {
+            enclosing.super(delegate);
+        }
+
+        LogicalBuilder(Factory enclosing, MatrixStore<RationalNumber> store) {
+            enclosing.super(store);
+        }
+
+        @Override
+        LogicalBuilder self() {
+            return this;
+        }
+
+    }
+
+    public static final class SparseReceiver extends
+            MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.SparseReceiver {
+
+        SparseReceiver(Factory enclosing, SparseStore<RationalNumber> delegate) {
+            enclosing.super(delegate);
+        }
+
+    }
+
+    public static final Factory FACTORY = new Factory();
 
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
     RationalMatrix(final MatrixStore<RationalNumber> aStore) {
         super(aStore);
+    }
+
+    @Override
+    public RationalMatrix.DenseReceiver copy() {
+        return new RationalMatrix.DenseReceiver(FACTORY, this.getStore().copy());
+    }
+
+    @Override
+    public RationalMatrix.LogicalBuilder logical() {
+        return new RationalMatrix.LogicalBuilder(FACTORY, this.getStore());
     }
 
     @SuppressWarnings("unchecked")
@@ -96,7 +168,7 @@ public final class RationalMatrix extends AbstractMatrix<RationalNumber, Rationa
     }
 
     @Override
-    MatrixFactory<RationalNumber, RationalMatrix> getFactory() {
+    Factory getFactory() {
         return FACTORY;
     }
 

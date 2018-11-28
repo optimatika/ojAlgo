@@ -24,12 +24,11 @@ package org.ojalgo.netio;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.Formatter;
 import java.util.Locale;
 
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.ComplexMatrix;
-import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
@@ -802,7 +801,7 @@ public abstract class BasicLogger {
         BasicLogger.println(ERROR, message, arguments);
     }
 
-    private static void printmtrx(final Printer appender, final BasicMatrix matrix, final NumberContext context, final boolean plain) {
+    private static void printmtrx(final Printer appender, final Access2D<?> matrix, final NumberContext context, final boolean plain) {
 
         final int tmpRowDim = (int) matrix.countRows();
         final int tmpColDim = (int) matrix.countColumns();
@@ -810,16 +809,12 @@ public abstract class BasicLogger {
         final String[][] tmpElements = new String[tmpRowDim][tmpColDim];
 
         int tmpWidth = 0;
-        Scalar<?> tmpElementNumber;
+        Number tmpElementNumber;
         String tmpElementString;
         for (int j = 0; j < tmpColDim; j++) {
             for (int i = 0; i < tmpRowDim; i++) {
-                tmpElementNumber = matrix.toScalar(i, j);
-                if (plain) {
-                    tmpElementString = tmpElementNumber.toPlainString(context);
-                } else {
-                    tmpElementString = tmpElementNumber.toString(context);
-                }
+                tmpElementNumber = matrix.get(i, j);
+                tmpElementString = BasicLogger.toString(tmpElementNumber, context, plain);
                 tmpWidth = Math.max(tmpWidth, tmpElementString.length());
                 tmpElements[i][j] = tmpElementString;
             }
@@ -827,7 +822,6 @@ public abstract class BasicLogger {
         tmpWidth++;
 
         int tmpPadding;
-        //appender.println();
         for (int i = 0; i < tmpRowDim; i++) {
             for (int j = 0; j < tmpColDim; j++) {
                 tmpElementString = tmpElements[i][j];
@@ -840,6 +834,22 @@ public abstract class BasicLogger {
             appender.println();
         }
 
+    }
+
+    private static String toString(Number number, NumberContext context, boolean plain) {
+        if (plain) {
+            if (number instanceof Scalar<?>) {
+                return ((Scalar<?>) number).toPlainString(context);
+            } else {
+                return context.enforce(new BigDecimal(number.doubleValue())).toPlainString();
+            }
+        } else {
+            if (number instanceof Scalar<?>) {
+                return ((Scalar<?>) number).toString(context);
+            } else {
+                return context.enforce(new BigDecimal(number.doubleValue())).toString();
+            }
+        }
     }
 
     static void println(final Printer appender) {
@@ -862,14 +872,10 @@ public abstract class BasicLogger {
 
     static void printmtrx(final Printer appender, final Access2D<?> matrix, final NumberContext context) {
         if ((appender != null) && (matrix.count() > 0L)) {
-            if (matrix instanceof ComplexMatrix) {
-                BasicLogger.printmtrx(appender, (ComplexMatrix) matrix, context, false);
-            } else if (matrix instanceof BasicMatrix) {
-                BasicLogger.printmtrx(appender, (BasicMatrix) matrix, context, true);
-            } else if (matrix.get(0, 0) instanceof ComplexNumber) {
-                BasicLogger.printmtrx(appender, ComplexMatrix.FACTORY.copy(matrix), context, false);
+            if ((matrix instanceof ComplexMatrix) || (matrix.get(0, 0) instanceof ComplexNumber)) {
+                BasicLogger.printmtrx(appender, matrix, context, false);
             } else {
-                BasicLogger.printmtrx(appender, RationalMatrix.FACTORY.copy(matrix), context, true);
+                BasicLogger.printmtrx(appender, matrix, context, true);
             }
         }
     }

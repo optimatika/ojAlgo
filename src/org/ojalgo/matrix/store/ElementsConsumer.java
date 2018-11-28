@@ -31,7 +31,7 @@ import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate2D;
 
-public interface ElementsConsumer<N extends Number> extends Mutate2D.Receiver<N>, Mutate2D.BiModifiable<N>, Mutate2D.Modifiable<N> {
+public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableReceiver<N> {
 
     class ColumnsRegion<N extends Number> extends ConsumerRegion<N> {
 
@@ -480,16 +480,6 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.Receiver<N>
 
         public void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
             myBase.modifyDiagonal(col, row, modifier);
-        }
-
-        @Override
-        public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
-            myBase.modifyMatching(left, function);
-        }
-
-        @Override
-        public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
-            myBase.modifyMatching(function, right);
         }
 
         public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {

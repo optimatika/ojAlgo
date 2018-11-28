@@ -23,7 +23,6 @@ package org.ojalgo.type;
 
 import static java.time.temporal.ChronoField.*;
 
-import java.io.Serializable;
 import java.time.*;
 import java.time.temporal.*;
 import java.util.Calendar;
@@ -55,7 +54,7 @@ import org.ojalgo.RecoverableCondition;
  * @see CalendarDateUnit
  * @author apete
  */
-public final class CalendarDate implements Temporal, Comparable<CalendarDate>, Serializable {
+public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
 
     /**
      * Extends {@link TemporalAdjuster} but also loosely corresponds to a {@link TemporalUnit} and/or

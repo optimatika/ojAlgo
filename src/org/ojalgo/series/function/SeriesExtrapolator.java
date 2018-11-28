@@ -29,7 +29,6 @@ import org.ojalgo.series.BasicSeries;
  * An extrapolator produces new data points to existing series.
  *
  * @author apete
- * @param <K>
  */
 public abstract class SeriesExtrapolator<K extends Comparable<? super K>> extends SeriesFunction<K> {
 

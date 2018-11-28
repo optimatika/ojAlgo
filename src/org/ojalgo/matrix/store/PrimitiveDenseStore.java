@@ -60,6 +60,7 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -364,6 +365,66 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     static final long SHALLOW_SIZE = MemoryEstimator.estimateObject(PrimitiveDenseStore.class);
 
+    /**
+     * Extracts the argument of the ComplexNumber elements to a new primitive double valued matrix.
+     */
+    public static PrimitiveDenseStore getComplexArgument(final Access2D<ComplexNumber> arg) {
+
+        final long numberOfRows = arg.countRows();
+        final long numberOfColumns = arg.countColumns();
+
+        final PrimitiveDenseStore retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+
+        Mutate1D.copyComplexArgument(arg, retVal);
+
+        return retVal;
+    }
+
+    /**
+     * Extracts the imaginary part of the ComplexNumber elements to a new primitive double valued matrix.
+     */
+    public static PrimitiveDenseStore getComplexImaginary(final Access2D<ComplexNumber> arg) {
+
+        final long numberOfRows = arg.countRows();
+        final long numberOfColumns = arg.countColumns();
+
+        final PrimitiveDenseStore retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+
+        Mutate1D.copyComplexImaginary(arg, retVal);
+
+        return retVal;
+    }
+
+    /**
+     * Extracts the modulus of the ComplexNumber elements to a new primitive double valued matrix.
+     */
+    public static PrimitiveDenseStore getComplexModulus(final Access2D<ComplexNumber> arg) {
+
+        final long numberOfRows = arg.countRows();
+        final long numberOfColumns = arg.countColumns();
+
+        final PrimitiveDenseStore retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+
+        Mutate1D.copyComplexModulus(arg, retVal);
+
+        return retVal;
+    }
+
+    /**
+     * Extracts the real part of the ComplexNumber elements to a new primitive double valued matrix.
+     */
+    public static PrimitiveDenseStore getComplexReal(final Access2D<ComplexNumber> arg) {
+
+        final long numberOfRows = arg.countRows();
+        final long numberOfColumns = arg.countColumns();
+
+        final PrimitiveDenseStore retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+
+        Mutate1D.copyComplexReal(arg, retVal);
+
+        return retVal;
+    }
+
     static PrimitiveDenseStore cast(final Access1D<Double> matrix) {
         if (matrix instanceof PrimitiveDenseStore) {
             return (PrimitiveDenseStore) matrix;
@@ -395,9 +456,13 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     private final PrimitiveMultiplyBoth multiplyBoth;
     private final PrimitiveMultiplyLeft multiplyLeft;
     private final PrimitiveMultiplyNeither multiplyNeither;
+
     private final PrimitiveMultiplyRight multiplyRight;
+
     private final int myColDim;
+
     private final int myRowDim;
+
     private final Array2D<Double> myUtility;
 
     private transient double[] myWorkerColumn;
@@ -879,25 +944,25 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     @Override
     public void modifyAll(final UnaryFunction<Double> modifier) {
 
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
+        final int numberOfRows = myRowDim;
+        final int numberOfCols = myColDim;
 
-        if (tmpColDim > ModifyAll.THRESHOLD) {
+        if (numberOfCols > ModifyAll.THRESHOLD) {
 
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+            final DivideAndConquer conquerer = new DivideAndConquer() {
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    PrimitiveDenseStore.this.modify(tmpRowDim * first, tmpRowDim * limit, 1, modifier);
+                    PrimitiveDenseStore.this.modify(numberOfRows * first, numberOfRows * limit, 1, modifier);
                 }
 
             };
 
-            tmpConquerer.invoke(0, tmpColDim, ModifyAll.THRESHOLD);
+            conquerer.invoke(0, numberOfCols, ModifyAll.THRESHOLD);
 
         } else {
 
-            this.modify(tmpRowDim * 0, tmpRowDim * tmpColDim, 1, modifier);
+            this.modify(0, numberOfRows * numberOfCols, 1, modifier);
         }
     }
 
@@ -909,6 +974,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         myUtility.modifyDiagonal(row, col, modifier);
     }
 
+    @Override
     public void modifyMatching(final Access1D<Double> left, final BinaryFunction<Double> function) {
         final long tmpLimit = FunctionUtils.min(left.count(), this.count(), this.count());
         for (long i = 0L; i < tmpLimit; i++) {
@@ -916,6 +982,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         }
     }
 
+    @Override
     public void modifyMatching(final BinaryFunction<Double> function, final Access1D<Double> right) {
         final long tmpLimit = FunctionUtils.min(this.count(), right.count(), this.count());
         for (long i = 0L; i < tmpLimit; i++) {

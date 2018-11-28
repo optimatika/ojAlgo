@@ -71,6 +71,8 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         MatrixStore.LogicalBuilder<N> makeSingle(N element);
 
+        SparseStore<N> makeSparse(int rowsCount, int columnsCount);
+
         MatrixStore.LogicalBuilder<N> makeWrapper(Access2D<?> access);
 
         MatrixStore.LogicalBuilder<N> makeZero(int rowsCount, int columnsCount);
@@ -414,6 +416,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.COMPLEX, element));
         }
 
+        public SparseStore<ComplexNumber> makeSparse(int rowsCount, int columnsCount) {
+            return SparseStore.COMPLEX.make(rowsCount, columnsCount);
+        }
+
         public LogicalBuilder<ComplexNumber> makeWrapper(final Access2D<?> access) {
             return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.COMPLEX, access));
         }
@@ -432,6 +438,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         public LogicalBuilder<Double> makeSingle(final Double element) {
             return new LogicalBuilder<>(new SingleStore<>(PrimitiveDenseStore.FACTORY, element));
+        }
+
+        public SparseStore<Double> makeSparse(int rowsCount, int columnsCount) {
+            return SparseStore.PRIMITIVE.make(rowsCount, columnsCount);
         }
 
         public LogicalBuilder<Double> makeWrapper(final Access2D<?> access) {
@@ -454,6 +464,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.QUATERNION, element));
         }
 
+        public SparseStore<Quaternion> makeSparse(int rowsCount, int columnsCount) {
+            return SparseStore.QUATERNION.make(rowsCount, columnsCount);
+        }
+
         public LogicalBuilder<Quaternion> makeWrapper(final Access2D<?> access) {
             return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.QUATERNION, access));
         }
@@ -474,6 +488,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.RATIONAL, element));
         }
 
+        public SparseStore<RationalNumber> makeSparse(int rowsCount, int columnsCount) {
+            return SparseStore.RATIONAL.make(rowsCount, columnsCount);
+        }
+
         public LogicalBuilder<RationalNumber> makeWrapper(final Access2D<?> access) {
             return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.RATIONAL, access));
         }
@@ -483,6 +501,38 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         }
 
     };
+
+    static int firstInColumn(final Access1D<?> matrix, final int col, final int defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn(col), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static long firstInColumn(final Access1D<?> matrix, final long col, final long defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn((int) col), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static int firstInRow(final Access1D<?> matrix, final int row, final int defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow(row), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static long firstInRow(final Access1D<?> matrix, final long row, final long defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow((int) row), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    static int limitOfColumn(final Access1D<?> matrix, final int col, final int defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfColumn(col), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    static long limitOfColumn(final Access1D<?> matrix, final long col, final long defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfColumn((int) col), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    static int limitOfRow(final Access1D<?> matrix, final int row, final int defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow(row), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    static long limitOfRow(final Access1D<?> matrix, final long row, final long defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
+    }
 
     default MatrixStore<N> add(final MatrixStore<N> addend) {
         return this.operateOnMatching(this.physical().function().add(), addend).get();
@@ -581,7 +631,6 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
      * The default value is simply <code>0</code>, and if all elements are zeros then
      * <code>this.countColumns()</code>.
      *
-     * @param row
      * @return The column index of the first non-zero element in the specified row
      */
     default int firstInRow(final int row) {
@@ -596,6 +645,46 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return this.toScalar(row, col).isAbsolute();
     }
 
+    default boolean isHermitian() {
+
+        final int numberOfRows = Math.toIntExact(this.countRows());
+        final int numberOfColumns = Math.toIntExact(this.countColumns());
+
+        final Number element = this.get(0L);
+
+        boolean retVal = numberOfRows == numberOfColumns;
+
+        if (element instanceof ComplexNumber) {
+
+            ComplexNumber lowerLeft;
+            ComplexNumber upperRight;
+
+            for (int j = 0; retVal && (j < numberOfColumns); j++) {
+                retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, ComplexNumber.valueOf(this.get(j, j)).i);
+                for (int i = j + 1; retVal && (i < numberOfRows); i++) {
+                    lowerLeft = ComplexNumber.valueOf(this.get(i, j)).conjugate();
+                    upperRight = ComplexNumber.valueOf(this.get(j, i));
+                    retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, lowerLeft.subtract(upperRight).norm());
+                }
+            }
+
+        } else {
+
+            for (int j = 0; retVal && (j < numberOfColumns); j++) {
+                for (int i = j + 1; retVal && (i < numberOfRows); i++) {
+                    retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, this.doubleValue(i, j) - this.doubleValue(j, i));
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    default boolean isNormal() {
+        final MatrixStore<N> conjugate = this.conjugate();
+        return conjugate.multiply(this).equals(this.multiply(conjugate));
+    }
+
     default boolean isSmall(final double comparedTo) {
         return PrimitiveScalar.isSmall(comparedTo, this.norm());
     }
@@ -608,7 +697,6 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
      * The default value is simply <code>this.countRows()</code>, and if all elements are zeros then
      * <code>0</code>.
      *
-     * @param col
      * @return The row index of the first zero element, after all non-zeros, in the specified column (index of
      *         the last non-zero + 1)
      */
@@ -620,7 +708,6 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
      * The default value is simply <code>this.countColumns()</code>, and if all elements are zeros then
      * <code>0</code>.
      *
-     * @param row
      * @return The column index of the first zero element, after all non-zeros, in the specified row (index of
      *         the last non-zero + 1)
      */

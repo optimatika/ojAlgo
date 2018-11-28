@@ -51,7 +51,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * A {@linkplain N} implementation of {@linkplain PhysicalStore}.
+ * A generic implementation of {@linkplain PhysicalStore}.
  *
  * @author apete
  */
@@ -105,6 +105,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
                 public LogicalBuilder<N> makeSingle(final N element) {
                     return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.Factory.this, element));
+                }
+
+                public SparseStore<N> makeSparse(int rowsCount, int columnsCount) {
+                    return new SparseStore<>(GenericDenseStore.Factory.this, rowsCount, columnsCount);
                 }
 
                 public LogicalBuilder<N> makeWrapper(final Access2D<?> access) {
@@ -880,27 +884,27 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     @Override
-    public void modifyAll(final UnaryFunction<N> aFunc) {
+    public void modifyAll(final UnaryFunction<N> modifier) {
 
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
+        final int numberOfRows = myRowDim;
+        final int numberOfCols = myColDim;
 
-        if (tmpColDim > ModifyAll.THRESHOLD) {
+        if (numberOfCols > ModifyAll.THRESHOLD) {
 
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+            final DivideAndConquer conquerer = new DivideAndConquer() {
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    GenericDenseStore.this.modify(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, aFunc);
+                    GenericDenseStore.this.modify(numberOfRows * aFirst, numberOfRows * aLimit, 1, modifier);
                 }
 
             };
 
-            tmpConquerer.invoke(0, tmpColDim, ModifyAll.THRESHOLD);
+            conquerer.invoke(0, numberOfCols, ModifyAll.THRESHOLD);
 
         } else {
 
-            this.modify(tmpRowDim * 0, tmpRowDim * tmpColDim, 1, aFunc);
+            this.modify(0, numberOfRows * numberOfCols, 1, modifier);
         }
     }
 
@@ -912,6 +916,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         myUtility.modifyDiagonal(row, col, modifier);
     }
 
+    @Override
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
         final long tmpLimit = FunctionUtils.min(left.count(), this.count(), this.count());
         for (long i = 0L; i < tmpLimit; i++) {
@@ -919,6 +924,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         }
     }
 
+    @Override
     public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
         final long tmpLimit = FunctionUtils.min(this.count(), right.count(), this.count());
         for (long i = 0L; i < tmpLimit; i++) {

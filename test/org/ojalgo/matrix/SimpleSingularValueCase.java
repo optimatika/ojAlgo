@@ -37,6 +37,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleSingularValueCase extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 1);
+
     public static RationalMatrix getOriginal() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 2.0, 0.0 }, { 0.0, -3.0 }, { 0.0, 0.0 } });
         return tmpMtrx.enforce(DEFINITION);
@@ -57,19 +59,18 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 1);
-        EVALUATION = new NumberContext(7, 9);
+        evaluation = new NumberContext(7, 9);
 
-        myBigAA = SimpleSingularValueCase.getMatrixQ1();
-        myBigAX = SimpleSingularValueCase.getMatrixD();
-        myBigAB = SimpleSingularValueCase.getOriginal();
+        rationalAA = SimpleSingularValueCase.getMatrixQ1();
+        rationalAX = SimpleSingularValueCase.getMatrixD();
+        rationalAB = SimpleSingularValueCase.getOriginal();
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }
@@ -83,7 +84,7 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
         final PhysicalStore<Double> tmpAct = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getMatrixQ1())
                 .multiply(PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getMatrixD())).copy();
 
-        TestUtils.assertEquals(tmpExp, tmpAct, EVALUATION);
+        TestUtils.assertEquals(tmpExp, tmpAct, evaluation);
     }
 
     @Test
@@ -95,7 +96,7 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
         tmpSVD.decompose(tmpA);
 
         //tmpSVD.equals(tmpA, EVALUATION);
-        TestUtils.assertEquals(tmpA, tmpSVD, EVALUATION);
+        TestUtils.assertEquals(tmpA, tmpSVD, evaluation);
     }
 
 }

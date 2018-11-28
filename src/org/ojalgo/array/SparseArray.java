@@ -102,14 +102,42 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             return myIndices[myCursor];
         }
 
+        public NonzeroView<N> iterator() {
+            return new NonzeroView<>(myIndices, myValues, -1, myLastCursor);
+        }
+
+        public void modify(BinaryFunction<N> function, double right) {
+            myValues.set(myCursor, function.invoke(myValues.doubleValue(myCursor), right));
+        }
+
+        public void modify(BinaryFunction<N> function, N right) {
+            myValues.set(myCursor, function.invoke(myValues.get(myCursor), right));
+        }
+
+        public void modify(double left, BinaryFunction<N> function) {
+            myValues.set(myCursor, function.invoke(left, myValues.doubleValue(myCursor)));
+        }
+
+        public void modify(N left, BinaryFunction<N> function) {
+            myValues.set(myCursor, function.invoke(left, myValues.get(myCursor)));
+        }
+
         public NonzeroView<N> next() {
             myCursor++;
             return this;
         }
 
+        public long nextIndex() {
+            return myIndices[myCursor + 1];
+        }
+
         public NonzeroView<N> previous() {
             myCursor--;
             return this;
+        }
+
+        public long previousIndex() {
+            return myIndices[myCursor - 1];
         }
 
         public boolean tryAdvance(final Consumer<? super NonzeroView<N>> action) {
@@ -437,6 +465,27 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             visitor.invoke(this.doubleValue(index));
         } else {
             visitor.invoke(this.get(index));
+        }
+    }
+
+    @Override
+    public void visitRange(long first, long limit, VoidFunction<N> visitor) {
+
+        int localFirst = this.index(first);
+        if (localFirst < 0) {
+            localFirst = -(localFirst + 1);
+        }
+        int localLimit = this.index(limit);
+        if (localLimit < 0) {
+            localLimit = -(localLimit + 1);
+        }
+
+        if ((limit - first) > (localLimit - localFirst)) {
+            visitor.invoke(myZeroValue);
+        }
+
+        for (int i = localFirst; i < localLimit; i++) {
+            myValues.visitOne(i, visitor);
         }
     }
 

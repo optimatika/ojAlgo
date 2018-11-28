@@ -23,7 +23,6 @@ package org.ojalgo.netio;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.io.Writer;
 import java.nio.CharBuffer;
 import java.util.Arrays;
@@ -36,7 +35,7 @@ import org.ojalgo.netio.BasicLogger.Printer;
  *
  * @author apete
  */
-public final class CharacterRing implements CharSequence, Appendable, Serializable, BasicLogger.Buffer {
+public final class CharacterRing implements CharSequence, Appendable, BasicLogger.Buffer {
 
     public static final class OutputStreamBuffer extends OutputStream implements BasicLogger.Buffer {
 

@@ -54,16 +54,20 @@ public interface BasicParser<T> {
 
         if (file.exists() && file.isFile() && file.canRead()) {
 
-            final String tmpPath = file.getPath();
-
             try {
-
-                if (tmpPath.endsWith(".gz")) {
-                    this.parse(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))), skipHeader, consumer);
-                } else if (tmpPath.endsWith(".zip")) {
-                    this.parse(new InputStreamReader(new ZipInputStream(new FileInputStream(file))), skipHeader, consumer);
+                final String path = file.getPath();
+                if (path.endsWith(".gz")) {
+                    try (InputStreamReader reader = new InputStreamReader(new GZIPInputStream(new FileInputStream(file)))) {
+                        this.parse(reader, skipHeader, consumer);
+                    }
+                } else if (path.endsWith(".zip")) {
+                    try (InputStreamReader reader = new InputStreamReader(new ZipInputStream(new FileInputStream(file)))) {
+                        this.parse(reader, skipHeader, consumer);
+                    }
                 } else {
-                    this.parse(new InputStreamReader(new FileInputStream(file)), skipHeader, consumer);
+                    try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file))) {
+                        this.parse(reader, skipHeader, consumer);
+                    }
                 }
 
             } catch (final IOException exception) {
@@ -91,11 +95,11 @@ public interface BasicParser<T> {
 
         String tmpLine = null;
         T tmpItem = null;
-        try (final BufferedReader tmpBufferedReader = new BufferedReader(reader)) {
+        try (final BufferedReader bufferedReader = new BufferedReader(reader)) {
             if (skipHeader) {
-                tmpBufferedReader.readLine();
+                bufferedReader.readLine();
             }
-            while ((tmpLine = tmpBufferedReader.readLine()) != null) {
+            while ((tmpLine = bufferedReader.readLine()) != null) {
                 try {
                     if ((tmpLine.length() > 0) && !tmpLine.startsWith("#") && ((tmpItem = this.parse(tmpLine)) != null)) {
                         consumer.accept(tmpItem);

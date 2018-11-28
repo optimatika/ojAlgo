@@ -41,7 +41,6 @@ public abstract class DivideAndConquer extends Object {
      *
      * @param first The first index, in a range, to include.
      * @param limit The first index NOT to include - last (excl.) index in a range.
-     * @param threshold
      */
     public final void invoke(final int first, final int limit, final int threshold) {
 

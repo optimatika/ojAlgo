@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.ojalgo.array.DenseArray;
@@ -35,6 +34,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Structure2D;
 
 /**
  * <p>
@@ -50,7 +50,7 @@ import org.ojalgo.structure.Mutate2D;
 public interface PhysicalStore<N extends Number>
         extends MatrixStore<N>, Access2D.IndexOf, ElementsConsumer<N>, Mutate2D.Exchangeable, TransformationMatrix.Transformable<N> {
 
-    public static interface Factory<N extends Number, I extends PhysicalStore<N>> extends Factory2D<I>, Serializable {
+    public static interface Factory<N extends Number, I extends PhysicalStore<N>> extends Factory2D<I> {
 
         AggregatorSet<N> aggregator();
 
@@ -66,6 +66,12 @@ public interface PhysicalStore<N extends Number>
             return new ColumnsSupplier<>(this, numberOfRows);
         }
 
+        I makeEye(long rows, long columns);
+
+        default I makeEye(final Structure2D shape) {
+            return this.makeEye(shape.countRows(), shape.countColumns());
+        }
+
         Householder<N> makeHouseholder(int length);
 
         Rotation<N> makeRotation(int low, int high, double cos, double sin);
@@ -74,6 +80,26 @@ public interface PhysicalStore<N extends Number>
 
         default RowsSupplier<N> makeRowsSupplier(final int numberOfColumns) {
             return new RowsSupplier<>(this, numberOfColumns);
+        }
+
+        /**
+         * Make a random Symmetric Positive Definite matrix
+         */
+        default I makeSPD(final int dim) {
+
+            final double[] random = new double[dim];
+            final I retVal = this.makeZero(dim, dim);
+
+            for (int i = 0; i < dim; i++) {
+                random[i] = Math.random();
+                for (int j = 0; j < i; j++) {
+                    retVal.set(i, j, random[i] * random[j]);
+                    retVal.set(j, i, random[j] * random[i]);
+                }
+                retVal.set(i, i, random[i] + 1.0);
+            }
+
+            return retVal;
         }
 
         Scalar.Factory<N> scalar();
@@ -115,7 +141,6 @@ public interface PhysicalStore<N extends Number>
      * @param body The equation system body parameters [A]
      * @param unitDiagonal true if body has ones on the diagonal
      * @param conjugated TODO
-     * @param identity
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 

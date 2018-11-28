@@ -1,6 +1,5 @@
-#FindBugs User Preferences
-#Tue Jul 25 18:26:21 CEST 2017
-cloud_id=edu.umd.cs.findbugs.cloud.doNothingCloud
+#SpotBugs User Preferences
+#Sat Oct 06 09:19:33 CEST 2018
 detectorAppendingToAnObjectOutputStream=AppendingToAnObjectOutputStream|true
 detectorAtomicityProblem=AtomicityProblem|true
 detectorBadAppletConstructor=BadAppletConstructor|false
@@ -140,4 +139,4 @@ detector_threshold=2
 effort=max
 filter_settings=Medium|BAD_PRACTICE,CORRECTNESS,MT_CORRECTNESS,PERFORMANCE,STYLE|false|15
 filter_settings_neg=MALICIOUS_CODE,SECURITY,EXPERIMENTAL,NOISE,I18N|
-run_at_full_build=false
+run_at_full_build=true

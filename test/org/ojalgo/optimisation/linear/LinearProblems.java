@@ -29,8 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.BasicMatrix.PhysicalBuilder;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -160,14 +158,16 @@ public class LinearProblems extends OptimisationLinearTests {
         // A valid solution of 25.8 can be produced with:
         // X1=10, X2=0, X3=8, X4=0, X5=5, X6=23
         final BigDecimal tmpClaimedValue = new BigDecimal("25.8");
-        final PhysicalBuilder<Double, PrimitiveMatrix> tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(6, 1);
+        final PrimitiveMatrix.DenseReceiver tmpBuilder = PrimitiveMatrix.FACTORY.makeDense(6, 1);
         tmpBuilder.set(0, 0, 10);
         tmpBuilder.set(2, 0, 8);
         tmpBuilder.set(4, 0, 5);
         tmpBuilder.set(5, 0, 23);
-        final BasicMatrix tmpFullSolution = tmpBuilder.build();
-        final BasicMatrix tmpOddSolution = tmpFullSolution.selectRows(0, 2, 4);
-        final BasicMatrix tmpEvenSolution = tmpFullSolution.selectRows(1, 3, 5);
+        final PrimitiveMatrix tmpFullSolution = tmpBuilder.build();
+        int[] someRows = { 0, 2, 4 };
+        final PrimitiveMatrix tmpOddSolution = tmpFullSolution.logical().row(someRows).get();
+        int[] someRows1 = { 1, 3, 5 };
+        final PrimitiveMatrix tmpEvenSolution = tmpFullSolution.logical().row(someRows1).get();
         TestUtils.assertEquals("Claimed solution not valid!", true, tmpFullModel.validate(BigArray.FACTORY.copy(tmpFullSolution), new NumberContext(7, 6)));
         final Double tmpActualValue = tmpFullObjective.toFunction().invoke(PrimitiveDenseStore.FACTORY.copy(tmpFullSolution));
         //final BigDecimal tmpActualValue = TypeUtils.toBigDecimal(tmpObjectiveValue);
@@ -183,17 +183,23 @@ public class LinearProblems extends OptimisationLinearTests {
         TestUtils.assertEquals(true, tmpEvenModel.validate(tmpEvenResult, new NumberContext(7, 6)));
         TestUtils.assertEquals(true, tmpOddModel.validate(tmpOddResult, new NumberContext(7, 6)));
         TestUtils.assertEquals(true, tmpFullModel.validate(tmpFullResult, new NumberContext(7, 6)));
+        int[] someRows2 = { 0, 1, 2 };
 
-        TestUtils.assertEquals(tmpEvenSolution, RationalMatrix.FACTORY.columns(tmpEvenResult).selectRows(0, 1, 2), new NumberContext(7, 6));
-        TestUtils.assertEquals(tmpOddSolution, RationalMatrix.FACTORY.columns(tmpOddResult).selectRows(0, 1, 2), new NumberContext(7, 6));
-        TestUtils.assertEquals(tmpFullSolution, RationalMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5), new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpEvenSolution, RationalMatrix.FACTORY.columns(tmpEvenResult).logical().row(someRows2).get(), new NumberContext(7, 6));
+        int[] someRows3 = { 0, 1, 2 };
+        TestUtils.assertEquals(tmpOddSolution, RationalMatrix.FACTORY.columns(tmpOddResult).logical().row(someRows3).get(), new NumberContext(7, 6));
+        int[] someRows4 = { 0, 1, 2, 3, 4, 5 };
+        TestUtils.assertEquals(tmpFullSolution, RationalMatrix.FACTORY.columns(tmpFullResult).logical().row(someRows4).get(), new NumberContext(7, 6));
+        int[] someRows5 = { 0, 1, 2 };
 
-        final BigDecimal tmpEvenValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(
-                tmpEvenObjective.toFunction().invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpEvenResult).selectRows(0, 1, 2)))));
-        final BigDecimal tmpOddValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(
-                tmpOddObjective.toFunction().invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpOddResult).selectRows(0, 1, 2)))));
+        final BigDecimal tmpEvenValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpEvenObjective.toFunction()
+                .invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpEvenResult).logical().row(someRows5).get()))));
+        int[] someRows6 = { 0, 1, 2 };
+        final BigDecimal tmpOddValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpOddObjective.toFunction()
+                .invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpOddResult).logical().row(someRows6).get()))));
+        int[] someRows7 = { 0, 1, 2, 3, 4, 5 };
         final BigDecimal tmpFullValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpFullObjective.toFunction()
-                .invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5)))));
+                .invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpFullResult).logical().row(someRows7).get()))));
 
         TestUtils.assertEquals(0, tmpFullValue.compareTo(tmpEvenValue.add(tmpOddValue)));
         TestUtils.assertEquals(0, tmpClaimedValue.compareTo(tmpFullValue));
@@ -239,7 +245,7 @@ public class LinearProblems extends OptimisationLinearTests {
         tmpExprC3.set(0, ONE);
         tmpExprC3.set(2, NEG);
 
-        final BasicMatrix tmpExpectedSolution = PrimitiveMatrix.FACTORY.makeZero(3, 1);
+        final PrimitiveMatrix tmpExpectedSolution = PrimitiveMatrix.FACTORY.makeZero(3, 1);
 
         final Optimisation.Result tmpResult11 = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResult11.getState());

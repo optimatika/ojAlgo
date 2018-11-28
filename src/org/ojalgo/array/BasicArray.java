@@ -21,8 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.io.Serializable;
-
 import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -50,8 +48,8 @@ import org.ojalgo.structure.StructureAnyD;
  *
  * @author apete
  */
-public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
-        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
+public abstract class BasicArray<N extends Number>
+        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N> {
 
     public static final class Factory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
 
@@ -182,6 +180,16 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     public void modifyAll(final UnaryFunction<N> modifier) {
         this.modify(0L, this.count(), 1L, modifier);
+    }
+
+    public void modifyMatching(Access1D<N> left, BinaryFunction<N> function) {
+        long limit = Math.min(left.count(), this.count());
+        this.modify(0L, limit, 1L, left, function);
+    }
+
+    public void modifyMatching(BinaryFunction<N> function, Access1D<N> right) {
+        long limit = Math.min(this.count(), right.count());
+        this.modify(0L, limit, 1L, function, right);
     }
 
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {

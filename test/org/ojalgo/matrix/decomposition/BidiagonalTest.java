@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -48,7 +47,7 @@ public class BidiagonalTest {
     @Test
     public void testComplexSquareCase() {
 
-        final PhysicalStore<ComplexNumber> tmpOriginal = MatrixUtils.makeRandomComplexStore(4, 4);
+        final PhysicalStore<ComplexNumber> tmpOriginal = TestUtils.makeRandomComplexStore(4, 4);
 
         final Bidiagonal<ComplexNumber> tmpDecomposition = Bidiagonal.COMPLEX.make();
         tmpDecomposition.decompose(tmpOriginal);
@@ -88,7 +87,7 @@ public class BidiagonalTest {
     @Test
     public void testFatRandom() {
 
-        final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(4, 6));
+        final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(4, 6));
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -113,7 +112,7 @@ public class BidiagonalTest {
     @Test
     public void testSquareRandom() {
 
-        final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(5, 5));
+        final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 5));
 
         this.doTestCorrect(tmpMatrix);
     }
@@ -129,7 +128,7 @@ public class BidiagonalTest {
     @Test
     public void testTallRandom() {
 
-        final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(6, 4));
+        final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(6, 4));
 
         this.doTestCorrect(tmpMatrix);
     }

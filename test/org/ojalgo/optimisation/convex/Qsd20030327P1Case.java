@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 
 /**
@@ -32,9 +31,9 @@ import org.ojalgo.matrix.RationalMatrix;
 public class Qsd20030327P1Case extends GenericQPSolverTest {
 
     @Override
-    protected BasicMatrix[] getMatrices() {
+    protected RationalMatrix[] getMatrices() {
 
-        final BasicMatrix[] retVal = new RationalMatrix[8];
+        final RationalMatrix[] retVal = new RationalMatrix[8];
 
         // Equations/Equalities
         retVal[0] = RationalMatrix.FACTORY
