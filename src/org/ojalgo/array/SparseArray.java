@@ -49,6 +49,28 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class SparseArray<N extends Number> extends BasicArray<N> {
 
+    @FunctionalInterface
+    public interface NonzeroPrimitiveCallback {
+
+        /**
+         * @param index Index
+         * @param value Value (nonzero) at that index
+         */
+        void call(long index, double value);
+
+    }
+
+    @FunctionalInterface
+    public interface NonzeroReferenceTypeCallback<N extends Number> {
+
+        /**
+         * @param index Index
+         * @param number Value (nonzero) at that index
+         */
+        void call(long index, N number);
+
+    }
+
     public static final class NonzeroView<N extends Number> implements ElementView1D<N, NonzeroView<N>> {
 
         private int myCursor = -1;
@@ -457,6 +479,38 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             for (int n = 0; n < myActualLength; n++) {
                 consumer.set(myIndices[n], myValues.get(n));
             }
+        }
+    }
+
+    public void visitNonzerosInRange(long first, long limit, NonzeroPrimitiveCallback visitor) {
+
+        int localFirst = this.index(first);
+        if (localFirst < 0) {
+            localFirst = -(localFirst + 1);
+        }
+        int localLimit = this.index(limit);
+        if (localLimit < 0) {
+            localLimit = -(localLimit + 1);
+        }
+
+        for (int i = localFirst; i < localLimit; i++) {
+            visitor.call(myIndices[i], myValues.doubleValue(i));
+        }
+    }
+
+    public void visitNonzerosInRangeRefType(long first, long limit, NonzeroReferenceTypeCallback<N> visitor) {
+
+        int localFirst = this.index(first);
+        if (localFirst < 0) {
+            localFirst = -(localFirst + 1);
+        }
+        int localLimit = this.index(limit);
+        if (localLimit < 0) {
+            localLimit = -(localLimit + 1);
+        }
+
+        for (int i = localFirst; i < localLimit; i++) {
+            visitor.call(myIndices[i], myValues.get(i));
         }
     }
 

@@ -102,22 +102,44 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
                 final long col = element.column();
                 final double value = element.doubleValue();
 
-                final long first = left.firstInColumn((int) row);
-                final long limit = left.limitOfColumn((int) row);
-                for (long i = first; i < limit; i++) {
-                    final double addition = value * left.doubleValue(i, row);
-                    if (NumberContext.compare(addition, ZERO) != 0) {
-                        synchronized (target) {
-                            target.add(i, col, addition);
-                        }
-                    }
-                }
+                left.doColumnAXPY(row, col, value, target);
+
+                //
+
+                //                final long first = left.firstInColumn((int) row);
+                //                final long limit = left.limitOfColumn((int) row);
+                //                for (long i = first; i < limit; i++) {
+                //                    final double addition = value * left.doubleValue(i, row);
+                //                    if (NumberContext.compare(addition, ZERO) != 0) {
+                //                        synchronized (target) {
+                //                            target.add(i, col, addition);
+                //                        }
+                //                    }
+                //                }
             });
 
         } else {
 
             left.multiply(right, target);
         }
+    }
+
+    void doColumnAXPY(long colX, long colY, double a, ElementsConsumer<N> y) {
+
+        long structure = y.countRows();
+
+        final long first = structure * colX;
+        final long limit = first + structure;
+
+        myElements.visitNonzerosInRange(first, limit, (index, value) -> {
+            final double addition = a * value;
+            if (NumberContext.compare(addition, ZERO) != 0) {
+                synchronized (y) {
+                    long rowY = Structure2D.row(index, structure);
+                    y.add(rowY, colY, addition);
+                }
+            }
+        });
     }
 
     private final SparseArray<N> myElements;
