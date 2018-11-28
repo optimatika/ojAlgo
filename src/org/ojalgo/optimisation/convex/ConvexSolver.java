@@ -664,8 +664,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
                 this.performIteration();
 
-                this.incrementIterationsCount();
-
             } while (!this.getState().isFailure() && this.needsAnotherIteration() && this.isIterationAllowed());
         }
 
