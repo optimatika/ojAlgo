@@ -524,8 +524,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             // At least 1 active inequality
 
             this.shrink();
-
-            this.performIteration();
+            
+            if (this.isIterationAllowed())
+                this.performIteration();
+            else
+                this.setState(State.FAILED);
 
         } else if (!this.isSolvableQ()) {
             // Subproblem NOT solved successfully
@@ -548,9 +551,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 }
             });
 
-            this.resetActivator();
-
-            this.performIteration();
+            if (this.isIterationAllowed()) {
+                this.resetActivator();
+                this.performIteration();
+            }
+            else
+                this.setState(State.FAILED);
 
         } else if (this.checkFeasibility(false)) {
             // Subproblem NOT solved successfully, but current solution is feasible
