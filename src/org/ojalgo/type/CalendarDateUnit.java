@@ -183,8 +183,9 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
 
                                 } else if (CalendarDateUnit.QUARTER.toDurationInMillis() == myDurationInMillis) {
 
-                                    temporal = temporal.with(ChronoField.MONTH_OF_YEAR, 3 + (3 * (temporal.get(ChronoField.MONTH_OF_YEAR) / 3)))
-                                            .with(ChronoField.DAY_OF_MONTH, 1).minus(1L, ChronoUnit.DAYS);
+                                    int nextMonth = 3 + (3 * (temporal.get(ChronoField.MONTH_OF_YEAR) / 3));
+                                    temporal = temporal.with(ChronoField.MONTH_OF_YEAR, nextMonth).with(ChronoField.DAY_OF_MONTH, 1L).minus(1L,
+                                            ChronoUnit.DAYS);
 
                                 } else if (CalendarDateUnit.YEAR.toDurationInMillis() == myDurationInMillis) {
 
@@ -192,18 +193,18 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
 
                                 } else if (CalendarDateUnit.DECADE.toDurationInMillis() == myDurationInMillis) {
 
-                                    temporal = temporal.with(ChronoField.YEAR, 10 + (10 * (temporal.get(ChronoField.YEAR) / 10)))
-                                            .with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
+                                    int nextYear = 10 + (10 * (temporal.get(ChronoField.YEAR) / 10));
+                                    temporal = temporal.with(ChronoField.YEAR, nextYear).with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
 
                                 } else if (CalendarDateUnit.CENTURY.toDurationInMillis() == myDurationInMillis) {
 
-                                    temporal = temporal.with(ChronoField.YEAR, 100 + (100 * (temporal.get(ChronoField.YEAR) / 100)))
-                                            .with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
+                                    int nextYear = 100 + (100 * (temporal.get(ChronoField.YEAR) / 100));
+                                    temporal = temporal.with(ChronoField.YEAR, nextYear).with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
 
                                 } else if (CalendarDateUnit.MILLENIUM.toDurationInMillis() == myDurationInMillis) {
 
-                                    temporal = temporal.with(ChronoField.YEAR, 1000 + (1000 * (temporal.get(ChronoField.YEAR) / 1000)))
-                                            .with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
+                                    int nextYear = 1000 + (1000 * (temporal.get(ChronoField.YEAR) / 1000));
+                                    temporal = temporal.with(ChronoField.YEAR, nextYear).with(TemporalAdjusters.firstDayOfYear()).minus(1L, ChronoUnit.DAYS);
                                 }
                             }
                         }
