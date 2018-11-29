@@ -34,6 +34,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -94,19 +95,30 @@ public final class ResourceLocator {
         return new InputStreamReader(this.getInputStream());
     }
 
+    private transient URLConnection myConnection = null;
+
+    public Map<String, List<String>> getResponseHeaders() {
+        return this.openConnection().getHeaderFields();
+    }
+
     public URLConnection openConnection() {
 
-        CookieHandler.setDefault(myCookieHandler);
+        if (myConnection == null) {
 
-        final URL url = this.toURL();
+            CookieHandler.setDefault(myCookieHandler);
 
-        URLConnection connection = null;
-        try {
-            connection = url.openConnection();
-        } catch (final IOException exception) {
-            exception.printStackTrace();
+            final URL url = this.toURL();
+
+            URLConnection connection = null;
+            try {
+                connection = url.openConnection();
+            } catch (final IOException exception) {
+                exception.printStackTrace();
+            }
+            myConnection = connection;
         }
-        return connection;
+
+        return myConnection;
     }
 
     public ResourceLocator parameter(final String key, final String value) {
