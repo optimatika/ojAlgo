@@ -46,7 +46,7 @@ public abstract class TypeCache<T> {
                 }
             }
 
-        }, 0L, aPurgeIntervalMeassure * aPurgeIntervalUnit.size());
+        }, 0L, aPurgeIntervalMeassure * aPurgeIntervalUnit.toDurationInMillis());
     }
 
     @SuppressWarnings("unused")

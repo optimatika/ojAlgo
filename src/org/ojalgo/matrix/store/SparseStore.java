@@ -96,22 +96,8 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
             target.reset();
 
-            right.nonzeros().stream(true).forEach(element -> {
-
-                final long row = element.row();
-                final long col = element.column();
-                final double value = element.doubleValue();
-
-                final long first = left.firstInColumn((int) row);
-                final long limit = left.limitOfColumn((int) row);
-                for (long i = first; i < limit; i++) {
-                    final double addition = value * left.doubleValue(i, row);
-                    if (NumberContext.compare(addition, ZERO) != 0) {
-                        synchronized (target) {
-                            target.add(i, col, addition);
-                        }
-                    }
-                }
+            right.nonzeros().stream(false).forEach(element -> {
+                left.doColumnAXPY(element.row(), element.column(), element.doubleValue(), target);
             });
 
         } else {
@@ -123,7 +109,6 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     private final SparseArray<N> myElements;
     private final int[] myFirsts;
     private final int[] myLimits;
-
     private final ElementsConsumer.FillByMultiplying<N> myMultiplyer;
 
     SparseStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
@@ -314,7 +299,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
             target.reset();
 
-            this.nonzeros().stream(true).forEach(element -> {
+            this.nonzeros().stream(false).forEach(element -> {
 
                 final long row = element.row();
                 final long col = element.column();
@@ -326,9 +311,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
                     final long index = Structure2D.index(complexity, col, j);
                     final double addition = value * right.doubleValue(index);
                     if (NumberContext.compare(addition, ZERO) != 0) {
-                        synchronized (target) {
-                            target.add(row, j, addition);
-                        }
+                        target.add(row, j, addition);
                     }
                 }
             });
@@ -436,7 +419,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
             final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
 
-            this.nonzeros().stream(true).forEach(element -> {
+            this.nonzeros().stream(false).forEach(element -> {
 
                 final long row = element.row();
                 final long col = element.column();
@@ -448,9 +431,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
                     final long index = Structure2D.index(numberOfRows, i, row);
                     final double addition = value * left.doubleValue(index);
                     if (NumberContext.compare(addition, ZERO) != 0) {
-                        synchronized (retVal) {
-                            retVal.add(i, col, addition);
-                        }
+                        retVal.add(i, col, addition);
                     }
                 }
             });
@@ -563,6 +544,16 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     private void updateNonZeros(final long row, final long col) {
         this.updateNonZeros((int) row, (int) col);
+    }
+
+    void doColumnAXPY(long colX, long colY, double a, ElementsConsumer<N> y) {
+
+        long structure = y.countRows();
+
+        final long first = structure * colX;
+        final long limit = first + structure;
+
+        myElements.visitPrimitiveNonzerosInRange(first, limit, (index, value) -> y.add(Structure2D.row(index, structure), colY, a * value));
     }
 
     void updateNonZeros(final int row, final int col) {

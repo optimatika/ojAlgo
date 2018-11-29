@@ -426,12 +426,12 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             col = -1;
         }
 
-        void switchToPhase2() {
-            myPhase1 = false;
-        }
-
         void returnToPhase1() {
             myPhase1 = true;
+        }
+
+        void switchToPhase2() {
+            myPhase1 = false;
         }
 
     }

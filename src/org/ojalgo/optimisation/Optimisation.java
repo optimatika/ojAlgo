@@ -226,7 +226,7 @@ public interface Optimisation {
          * The maximmum number of millis allowed for the solve() command. Executions will be aborted
          * regardless of if a solution has been found or not.
          */
-        public long time_abort = CalendarDateUnit.MILLENIUM.size();
+        public long time_abort = CalendarDateUnit.MILLENIUM.toDurationInMillis();
 
         /**
          * Calculations will be terminated after this amount of time if a feasible solution has been found. If
@@ -234,7 +234,7 @@ public interface Optimisation {
          * {@linkplain #time_abort} is reached. This option is , probably, only of interest with the
          * {@linkplain IntegerSolver}.
          */
-        public long time_suffice = CalendarDateUnit.DAY.size();
+        public long time_suffice = CalendarDateUnit.DAY.toDurationInMillis();
 
         /**
          * If true models and solvers will validate data at various points. Validation is turned off by

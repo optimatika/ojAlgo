@@ -33,9 +33,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.ojalgo.ProgrammingError;
 
@@ -53,7 +53,7 @@ public final class ResourceLocator {
     private final String myHost;
     private String myPath = "";
     private int myPort = -1; // -1 ==> undefined
-    private final Map<String, String> myQueryParameters = new TreeMap<>();
+    private final Map<String, String> myQueryParameters = new LinkedHashMap<>();
     private String myScheme = "https";
 
     public ResourceLocator(final String host) {

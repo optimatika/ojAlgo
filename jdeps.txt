@@ -1,31 +1,28 @@
-sailfish:ojAlgo apete$ jdeps -profile ojalgo-43.1-SNAPSHOT.jar 
-ojalgo-43.1-SNAPSHOT.jar -> /Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/jre/lib/rt.jar (compact1)
-   org.ojalgo (ojalgo-43.1-SNAPSHOT.jar)
+oyster:ojAlgo apete$ jdeps -profile ./target/ojalgo-47.0.0-SNAPSHOT.jar 
+ojalgo-47.0.0-SNAPSHOT.jar -> /Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home/jre/lib/rt.jar (compact1)
+   org.ojalgo (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.util                                          compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.machine                                 ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.access (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo.machine                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.netio                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.algebra (ojalgo-47.0.0-SNAPSHOT.jar)
+      -> java.lang                                          compact1
+   org.ojalgo.ann (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.lang.invoke                                   compact1
-      -> java.math                                          compact1
       -> java.util                                          compact1
-      -> java.util.concurrent.atomic                        compact1
       -> java.util.function                                 compact1
-      -> java.util.stream                                   compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.algebra (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.lang                                          compact1
-   org.ojalgo.array (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.random                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.array (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.io                                            compact1
       -> java.lang                                          compact1
       -> java.lang.invoke                                   compact1
@@ -35,296 +32,237 @@ ojalgo-43.1-SNAPSHOT.jar -> /Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/C
       -> java.nio.channels                                  compact1
       -> java.util                                          compact1
       -> java.util.concurrent                               compact1
+      -> java.util.concurrent.atomic                        compact1
       -> java.util.function                                 compact1
       -> java.util.stream                                   compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.algebra                                 ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array.blas                              ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.machine                                 ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.random                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.array.blas (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.algebra                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array.blas                              ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.machine                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.netio                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.array.blas (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
+      -> java.lang.invoke                                   compact1
       -> java.math                                          compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.algebra                                 ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.concurrent (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo.algebra                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.concurrent (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.lang.invoke                                   compact1
       -> java.util.concurrent                               compact1
       -> java.util.concurrent.atomic                        compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.machine                                 ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.constant (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.machine                                 ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.constant (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.math                                          compact1
       -> java.util                                          compact1
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.finance (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.lang                                          compact1
-      -> java.math                                          compact1
-      -> java.util                                          compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.decomposition                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.random                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.random.process                          ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.series                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.series.primitive                        ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.finance.data (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.io                                            compact1
-      -> java.lang                                          compact1
-      -> java.lang.invoke                                   compact1
-      -> java.net                                           compact1
-      -> java.text                                          compact1
-      -> java.time                                          compact1
-      -> java.util                                          compact1
-      -> java.util.concurrent                               compact1
-      -> java.util.function                                 compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.series                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.keyvalue                           ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.finance.portfolio (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.lang                                          compact1
-      -> java.lang.invoke                                   compact1
-      -> java.math                                          compact1
-      -> java.util                                          compact1
-      -> java.util.function                                 compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.finance                                 ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.finance.portfolio.simulator             ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.optimisation                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.random                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.random.process                          ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.finance.portfolio.simulator (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.lang                                          compact1
-      -> java.math                                          compact1
-      -> java.util                                          compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.finance.portfolio                       ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.random.process                          ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.function (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.function (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.lang.invoke                                   compact1
       -> java.math                                          compact1
       -> java.util.function                                 compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.function.aggregator (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.function.aggregator (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.math                                          compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.function.multiary (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.function.multiary (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
-      -> java.math                                          compact1
-      -> java.util.function                                 compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.function.polynomial (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.function.polynomial (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.math                                          compact1
       -> java.util                                          compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.decomposition                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.series                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.machine (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.decomposition                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.series                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.machine (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.lang.reflect                                  compact1
       -> java.util                                          compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.matrix (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.io                                            compact1
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.netio                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.lang.reflect                                  compact1
       -> java.math                                          compact1
       -> java.util                                          compact1
       -> java.util.function                                 compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.algebra                                 ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array.blas                              ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.decomposition                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store.operation                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.task                             ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.random                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.matrix.decomposition (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.algebra                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.decomposition                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.task                             ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.random                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix.decomposition (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.lang.invoke                                   compact1
-      -> java.math                                          compact1
       -> java.util                                          compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array.blas                              ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.decomposition.function           ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.task                             ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.transformation                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.matrix.decomposition.function (ojalgo-43.1-SNAPSHOT.jar)
+      -> java.util.function                                 compact1
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array.blas                              ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.decomposition.function           ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.task                             ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.transformation                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.netio                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix.decomposition.function (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
-   org.ojalgo.matrix.store (ojalgo-43.1-SNAPSHOT.jar)
+   org.ojalgo.matrix.geometry (ojalgo-47.0.0-SNAPSHOT.jar)
+      -> java.lang                                          compact1
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store.operation                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.transformation                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix.store (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.io                                            compact1
       -> java.lang                                          compact1
       -> java.lang.invoke                                   compact1
-      -> java.math                                          compact1
       -> java.util                                          compact1
       -> java.util.concurrent                               compact1
       -> java.util.function                                 compact1
       -> java.util.stream                                   compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.algebra                                 ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array.blas                              ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.concurrent                              ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.machine                                 ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.decomposition                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store.operation                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.transformation                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.matrix.store.operation (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.algebra                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array.blas                              ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.concurrent                              ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.machine                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.decomposition                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store.operation                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.transformation                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix.store.operation (ojalgo-47.0.0-SNAPSHOT.jar)
+      -> java.lang                                          compact1
+      -> java.lang.invoke                                   compact1
+      -> java.lang.reflect                                  compact1
+      -> java.math                                          compact1
+      -> java.util                                          compact1
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.algebra                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array.blas                              ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.concurrent                              ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.machine                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.transformation                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix.task (ojalgo-47.0.0-SNAPSHOT.jar)
+      -> java.lang                                          compact1
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.decomposition                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix.task.iterative (ojalgo-47.0.0-SNAPSHOT.jar)
+      -> java.lang                                          compact1
+      -> java.math                                          compact1
+      -> java.util                                          compact1
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.task                             ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.netio                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.matrix.transformation (ojalgo-47.0.0-SNAPSHOT.jar)
+      -> java.lang                                          compact1
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.algebra                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.netio (ojalgo-47.0.0-SNAPSHOT.jar)
+      -> java.io                                            compact1
       -> java.lang                                          compact1
       -> java.lang.invoke                                   compact1
       -> java.math                                          compact1
-      -> java.util                                          compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array.blas                              ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.concurrent                              ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.machine                                 ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.transformation                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.matrix.task (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.lang                                          compact1
-      -> java.math                                          compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.decomposition                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.matrix.task.iterative (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.lang                                          compact1
-      -> java.math                                          compact1
-      -> java.util                                          compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.task                             ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.matrix.transformation (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.lang                                          compact1
-      -> java.math                                          compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.netio (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.io                                            compact1
-      -> java.lang                                          compact1
       -> java.net                                           compact1
       -> java.nio                                           compact1
       -> java.security                                      compact1
       -> java.util                                          compact1
       -> java.util.function                                 compact1
       -> java.util.zip                                      compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.random                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.optimisation (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.random                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.io                                            compact1
       -> java.lang                                          compact1
       -> java.lang.invoke                                   compact1
@@ -333,158 +271,173 @@ ojalgo-43.1-SNAPSHOT.jar -> /Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/C
       -> java.util.concurrent.atomic                        compact1
       -> java.util.function                                 compact1
       -> java.util.stream                                   compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.multiary                       ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.optimisation.convex                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.optimisation.integer                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.optimisation.linear                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.optimisation.convex (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.multiary                       ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.netio                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.optimisation.convex                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.optimisation.integer                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.optimisation.linear                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.convex (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.lang.invoke                                   compact1
       -> java.math                                          compact1
       -> java.util                                          compact1
       -> java.util.function                                 compact1
       -> java.util.stream                                   compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.decomposition                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.task.iterative                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.optimisation                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.optimisation.linear                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.optimisation.integer (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.io                                            compact1
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.decomposition                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.task.iterative                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.netio                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.optimisation                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.optimisation.linear                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.integer (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.math                                          compact1
       -> java.util                                          compact1
       -> java.util.concurrent                               compact1
       -> java.util.concurrent.atomic                        compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.concurrent                              ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.multiary                       ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.optimisation                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.optimisation.linear (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.multiary                       ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.netio                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.optimisation                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.optimisation.linear (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.lang.invoke                                   compact1
       -> java.math                                          compact1
       -> java.util                                          compact1
       -> java.util.function                                 compact1
       -> java.util.stream                                   compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.optimisation                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.random (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array.blas                              ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.machine                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.optimisation                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.optimisation.convex                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.random (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.util                                          compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.decomposition                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.random.process (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.decomposition                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.random.process (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.util                                          compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.decomposition                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.random                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.series.primitive                        ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.keyvalue                           ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.scalar (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.decomposition                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.random                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.series.primitive                        ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.keyvalue                           ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.scalar (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
+      -> java.lang.reflect                                  compact1
       -> java.math                                          compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.algebra                                 ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.matrix.store                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.series (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.algebra                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.store                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.matrix.transformation                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.series (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
-      -> java.lang.invoke                                   compact1
       -> java.math                                          compact1
       -> java.time                                          compact1
       -> java.util                                          compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.series.primitive                        ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.keyvalue                           ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.series.function (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.netio                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.series.primitive                        ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.keyvalue                           ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.series.function (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.util                                          compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.series                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.series.primitive (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo.series                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.series.primitive (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.util                                          compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.series                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.tensor (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.series                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.structure (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.lang.invoke                                   compact1
       -> java.util                                          compact1
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.algebra                                 ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.array                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function.aggregator                     ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.type (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.io                                            compact1
+      -> java.util.concurrent.atomic                        compact1
+      -> java.util.function                                 compact1
+      -> java.util.stream                                   compact1
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.tensor (ojalgo-47.0.0-SNAPSHOT.jar)
+      -> java.lang                                          compact1
+      -> java.lang.invoke                                   compact1
+      -> java.util                                          compact1
+      -> org.ojalgo.algebra                                 ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.array                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function.aggregator                     ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.type (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.math                                          compact1
       -> java.time                                          compact1
@@ -492,37 +445,39 @@ ojalgo-43.1-SNAPSHOT.jar -> /Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/C
       -> java.util                                          compact1
       -> java.util.concurrent                               compact1
       -> java.util.concurrent.atomic                        compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.access                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.random                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.scalar                                  ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.context                            ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.format                             ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.type.context (ojalgo-43.1-SNAPSHOT.jar)
-      -> java.io                                            compact1
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.netio                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.random                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.scalar                                  ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.structure                               ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.format                             ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.type.context (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.math                                          compact1
       -> java.text                                          compact1
+      -> java.time.format                                   compact1
+      -> java.time.temporal                                 compact1
       -> java.util                                          compact1
-      -> org.ojalgo                                         ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type                                    ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.type.format                             ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.type.format (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo                                         ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.netio                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type                                    ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.format                             ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.type.format (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.text                                          compact1
       -> java.util                                          compact1
-      -> org.ojalgo.function                                ojalgo-43.1-SNAPSHOT.jar
-   org.ojalgo.type.keyvalue (ojalgo-43.1-SNAPSHOT.jar)
+      -> org.ojalgo.function                                ojalgo-47.0.0-SNAPSHOT.jar
+   org.ojalgo.type.keyvalue (ojalgo-47.0.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.lang.reflect                                  compact1
       -> java.util                                          compact1
       -> java.util.concurrent.atomic                        compact1
-      -> org.ojalgo.constant                                ojalgo-43.1-SNAPSHOT.jar
-      -> org.ojalgo.netio                                   ojalgo-43.1-SNAPSHOT.jar
-sailfish:ojAlgo apete$ 
+      -> org.ojalgo.constant                                ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.netio                                   ojalgo-47.0.0-SNAPSHOT.jar
+      -> org.ojalgo.type.context                            ojalgo-47.0.0-SNAPSHOT.jar
+oyster:ojAlgo apete$ 

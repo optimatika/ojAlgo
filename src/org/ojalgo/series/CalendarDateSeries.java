@@ -52,7 +52,7 @@ public final class CalendarDateSeries<N extends Number> extends TreeSeries<Calen
         myMapper = new IndexMapper<CalendarDate>() {
 
             public long toIndex(final CalendarDate key) {
-                return key.toTimeInMillis(myResolution);
+                return myResolution.adjustInto(key.millis);
             }
 
             public CalendarDate toKey(final long index) {
