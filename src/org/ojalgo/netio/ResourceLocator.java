@@ -25,13 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,10 +41,15 @@ import org.ojalgo.ProgrammingError;
  */
 public final class ResourceLocator {
 
+    public static enum Method {
+        DELETE, GET, HEAD, OPTIONS, POST, PUT, TRACE;
+    }
+
     public static final class Request {
 
         private String myFragment = null;
-        private String myHost;
+        private String myHost = null;
+        private ResourceLocator.Method myMethod = ResourceLocator.Method.GET;
         private String myPath = "";
         private int myPort = -1; // -1 ==> undefined
         private final Map<String, String> myQueryParameters = new LinkedHashMap<>();
@@ -69,6 +68,11 @@ public final class ResourceLocator {
 
         public ResourceLocator.Request host(final String host) {
             myHost = host;
+            return this;
+        }
+
+        public ResourceLocator.Request method(final Method method) {
+            myMethod = method;
             return this;
         }
 
@@ -96,8 +100,8 @@ public final class ResourceLocator {
             return this;
         }
 
-        public Response Response() {
-            return new Response(null);
+        public Response response() {
+            return new Response(this);
         }
 
         /**
@@ -108,7 +112,12 @@ public final class ResourceLocator {
             return this;
         }
 
-        String query() {
+        @Override
+        public String toString() {
+            return this.toURL().toString();
+        }
+
+        private String query() {
 
             if (myQueryParameters.size() >= 1) {
 
@@ -134,7 +143,7 @@ public final class ResourceLocator {
             }
         }
 
-        URL toURL() {
+        private URL toURL() {
             try {
                 final URI uri = new URI(myScheme, null, myHost, myPort, myPath, this.query(), myFragment);
                 return uri.toURL();
@@ -143,15 +152,76 @@ public final class ResourceLocator {
             }
         }
 
+        void configure(HttpURLConnection connection) {
+            try {
+                connection.setRequestMethod(myMethod.name());
+            } catch (ProtocolException exception) {
+                throw new ProgrammingError(exception);
+            }
+        }
+
+        ResourceLocator.Session getSession() {
+            return mySession;
+        }
+
+        URLConnection newConnection() {
+
+            URLConnection retVal = null;
+            try {
+                retVal = this.toURL().openConnection();
+            } catch (final IOException exception) {
+                exception.printStackTrace();
+            }
+            return retVal;
+        }
+
     }
 
     public static final class Response {
 
-        private final ResourceLocator.Request myRequest;
+        private final URLConnection myConnection;
 
         Response(ResourceLocator.Request request) {
+
             super();
-            myRequest = request;
+
+            myConnection = request.newConnection();
+
+            if (myConnection instanceof HttpURLConnection) {
+                request.configure((HttpURLConnection) myConnection);
+            }
+
+            try {
+                Object obj = myConnection.getContent();
+                obj.toString();
+            } catch (IOException exception) {
+                // TODO Auto-generated catch block
+                exception.printStackTrace();
+            }
+        }
+
+        /**
+         * Open a connection and get the input stream.
+         */
+        public InputStream getInputStream() {
+            InputStream retVal = null;
+            try {
+                retVal = myConnection.getInputStream();
+            } catch (final IOException exception) {
+                exception.printStackTrace();
+            }
+            return retVal;
+        }
+
+        public Map<String, List<String>> getResponseHeaders() {
+            return myConnection.getHeaderFields();
+        }
+
+        /**
+         * Open connection and return an input stream reader.
+         */
+        public Reader getStreamReader() {
+            return new InputStreamReader(this.getInputStream());
         }
 
     }
@@ -159,7 +229,9 @@ public final class ResourceLocator {
     public static final class Session {
 
         Session() {
+
             super();
+
         }
 
         public Request request() {
@@ -168,17 +240,55 @@ public final class ResourceLocator {
 
     }
 
-    public static final CookieManager DEFAULT_COOKIE_MANAGER = new CookieManager();
-    private static final Session SESSION = new Session();
+    static {
+
+        final CookieStore delegateCS = new CookieManager().getCookieStore();
+        CookieStore store = new CookieStore() {
+
+            public void add(final URI uri, final HttpCookie cookie) {
+                if (cookie.getMaxAge() == 0L) {
+                    cookie.setMaxAge(-1L);
+                }
+                delegateCS.add(uri, cookie);
+            }
+
+            public List<HttpCookie> get(final URI uri) {
+                return delegateCS.get(uri);
+            }
+
+            public List<HttpCookie> getCookies() {
+                return delegateCS.getCookies();
+            }
+
+            public List<URI> getURIs() {
+                return delegateCS.getURIs();
+            }
+
+            public boolean remove(final URI uri, final HttpCookie cookie) {
+                return delegateCS.remove(uri, cookie);
+            }
+
+            public boolean removeAll() {
+                return delegateCS.removeAll();
+            }
+
+        };
+
+        CookiePolicy policy = CookiePolicy.ACCEPT_ALL;
+
+        CookieManager manager = new CookieManager(store, policy);
+
+        CookieHandler.setDefault(manager);
+
+    }
 
     public static Session session() {
         return new Session();
     }
 
-    private CookieHandler myCookieHandler = DEFAULT_COOKIE_MANAGER;
-
     private transient ResourceLocator.Request myRequest = null;
     private transient ResourceLocator.Response myResponse = null;
+    private final ResourceLocator.Session mySession = new Session();
 
     public ResourceLocator(final String host) {
         super();
@@ -186,7 +296,7 @@ public final class ResourceLocator {
     }
 
     public ResourceLocator cookies(final CookieHandler cookieHandler) {
-        myCookieHandler = cookieHandler;
+        CookieHandler.setDefault(cookieHandler);
         return this;
     }
 
@@ -199,42 +309,22 @@ public final class ResourceLocator {
      * Open a connection and get a stream reader.
      */
     public InputStream getInputStream() {
-
-        final URLConnection connection = this.openConnection();
-
-        InputStream stream = null;
-        try {
-            stream = connection.getInputStream();
-        } catch (final IOException exception) {
-            exception.printStackTrace();
-        }
-        return stream;
-    }
-
-    public Map<String, List<String>> getResponseHeaders() {
-        return this.openConnection().getHeaderFields();
+        return this.response().getInputStream();
     }
 
     /**
      * Open connection and return an input stream reader.
      */
     public Reader getStreamReader() {
-        return new InputStreamReader(this.getInputStream());
+        return this.response().getStreamReader();
     }
 
+    /**
+     * @deprecated v47
+     */
+    @Deprecated
     public URLConnection openConnection() {
-
-        CookieHandler.setDefault(myCookieHandler);
-
-        final URL url = this.request().toURL();
-
-        URLConnection connection = null;
-        try {
-            connection = url.openConnection();
-        } catch (final IOException exception) {
-            exception.printStackTrace();
-        }
-        return connection;
+        return this.request().newConnection();
     }
 
     public ResourceLocator parameter(final String key, final String value) {
@@ -269,20 +359,17 @@ public final class ResourceLocator {
 
     @Override
     public String toString() {
-        return this.request().toURL().toString();
+        return this.request().toString();
     }
 
     private ResourceLocator.Request request() {
         if (myRequest == null) {
-            myRequest = new Request(SESSION);
+            myRequest = new Request(mySession);
         }
         return myRequest;
     }
 
     private ResourceLocator.Response response() {
-        if (myResponse == null) {
-            myResponse = new Response(this.request());
-        }
-        return myResponse;
+        return new Response(this.request());
     }
 }
