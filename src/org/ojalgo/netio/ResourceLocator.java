@@ -47,63 +47,142 @@ import org.ojalgo.ProgrammingError;
  */
 public final class ResourceLocator {
 
-    public static Session session() {
-        return new Session(null);
-    }
-
     public static final class Request {
 
-        private final ResourceLocator myLocator;
+        private String myFragment = null;
+        private String myHost;
+        private String myPath = "";
+        private int myPort = -1; // -1 ==> undefined
+        private final Map<String, String> myQueryParameters = new LinkedHashMap<>();
+        private String myScheme = "https";
+        private final ResourceLocator.Session mySession;
 
-        Request(ResourceLocator locator) {
+        Request(ResourceLocator.Session session) {
             super();
-            myLocator = locator;
+            mySession = session;
+        }
+
+        public ResourceLocator.Request fragment(final String fragment) {
+            myFragment = fragment;
+            return this;
+        }
+
+        public ResourceLocator.Request host(final String host) {
+            myHost = host;
+            return this;
+        }
+
+        public ResourceLocator.Request parameter(final String key, final String value) {
+            ProgrammingError.throwIfNull(key, value);
+            myQueryParameters.put(key, value);
+            return this;
+        }
+
+        public Map<String, String> parameters() {
+            return myQueryParameters;
+        }
+
+        public ResourceLocator.Request path(final String path) {
+            ProgrammingError.throwIfNull(path);
+            myPath = path;
+            return this;
+        }
+
+        /**
+         * The default (null) value is -1.
+         */
+        public ResourceLocator.Request port(final int port) {
+            myPort = port;
+            return this;
         }
 
         public Response Response() {
-            return new Response(myLocator);
+            return new Response(null);
         }
+
+        /**
+         * Protocol The default value is "https"
+         */
+        public ResourceLocator.Request scheme(final String scheme) {
+            myScheme = scheme;
+            return this;
+        }
+
+        String query() {
+
+            if (myQueryParameters.size() >= 1) {
+
+                final StringBuilder retVal = new StringBuilder();
+
+                Entry<String, String> tmpEntry;
+                for (final Iterator<Entry<String, String>> tmpIter = myQueryParameters.entrySet().iterator(); tmpIter.hasNext();) {
+                    tmpEntry = tmpIter.next();
+                    retVal.append(tmpEntry.getKey());
+                    retVal.append('=');
+                    retVal.append(tmpEntry.getValue());
+                    retVal.append('&');
+                }
+
+                // Remove that last '&'
+                retVal.setLength(retVal.length() - 1);
+
+                return retVal.toString();
+
+            } else {
+
+                return null;
+            }
+        }
+
+        URL toURL() {
+            try {
+                final URI uri = new URI(myScheme, null, myHost, myPort, myPath, this.query(), myFragment);
+                return uri.toURL();
+            } catch (final URISyntaxException | MalformedURLException xcptn) {
+                throw new ProgrammingError(xcptn);
+            }
+        }
+
     }
 
     public static final class Response {
 
-        private final ResourceLocator myLocator;
+        private final ResourceLocator.Request myRequest;
 
-        Response(ResourceLocator locator) {
+        Response(ResourceLocator.Request request) {
             super();
-            myLocator = locator;
+            myRequest = request;
         }
 
     }
 
     public static final class Session {
 
-        private final ResourceLocator myLocator;
-
-        Session(ResourceLocator locator) {
+        Session() {
             super();
-            myLocator = locator;
         }
 
         public Request request() {
-            return new Request(myLocator);
+            return new Request(this);
         }
 
     }
 
     public static final CookieManager DEFAULT_COOKIE_MANAGER = new CookieManager();
+    private static final Session SESSION = new Session();
+
+    public static Session session() {
+        return new Session();
+    }
 
     private CookieHandler myCookieHandler = DEFAULT_COOKIE_MANAGER;
-    private String myFragment = null;
-    private final String myHost;
-    private String myPath = "";
-    private int myPort = -1; // -1 ==> undefined
-    private final Map<String, String> myQueryParameters = new LinkedHashMap<>();
-    private String myScheme = "https";
+
+    private transient ResourceLocator.Request myRequest = null;
+    private transient ResourceLocator.Response myResponse = null;
 
     public ResourceLocator(final String host) {
         super();
-        myHost = host;
+        this.request().host(host);
     }
 
     public ResourceLocator cookies(final CookieHandler cookieHandler) {
@@ -112,7 +191,7 @@ public final class ResourceLocator {
     }
 
     public ResourceLocator fragment(final String fragment) {
-        myFragment = fragment;
+        this.request().fragment(fragment);
         return this;
     }
 
@@ -132,6 +211,10 @@ public final class ResourceLocator {
         return stream;
     }
 
+    public Map<String, List<String>> getResponseHeaders() {
+        return this.openConnection().getHeaderFields();
+    }
+
     /**
      * Open connection and return an input stream reader.
      */
@@ -139,45 +222,32 @@ public final class ResourceLocator {
         return new InputStreamReader(this.getInputStream());
     }
 
-    private transient URLConnection myConnection = null;
-
-    public Map<String, List<String>> getResponseHeaders() {
-        return this.openConnection().getHeaderFields();
-    }
-
     public URLConnection openConnection() {
 
-        if (myConnection == null) {
+        CookieHandler.setDefault(myCookieHandler);
 
-            CookieHandler.setDefault(myCookieHandler);
+        final URL url = this.request().toURL();
 
-            final URL url = this.toURL();
-
-            URLConnection connection = null;
-            try {
-                connection = url.openConnection();
-            } catch (final IOException exception) {
-                exception.printStackTrace();
-            }
-            myConnection = connection;
+        URLConnection connection = null;
+        try {
+            connection = url.openConnection();
+        } catch (final IOException exception) {
+            exception.printStackTrace();
         }
-
-        return myConnection;
+        return connection;
     }
 
     public ResourceLocator parameter(final String key, final String value) {
-        ProgrammingError.throwIfNull(key, value);
-        myQueryParameters.put(key, value);
+        this.request().parameter(key, value);
         return this;
     }
 
     public Map<String, String> parameters() {
-        return myQueryParameters;
+        return this.request().parameters();
     }
 
     public ResourceLocator path(final String path) {
-        ProgrammingError.throwIfNull(path);
-        myPath = path;
+        this.request().path(path);
         return this;
     }
 
@@ -185,7 +255,7 @@ public final class ResourceLocator {
      * The default (null) value is -1.
      */
     public ResourceLocator port(final int port) {
-        myPort = port;
+        this.request().port(port);
         return this;
     }
 
@@ -193,48 +263,26 @@ public final class ResourceLocator {
      * Protocol The default value is "https"
      */
     public ResourceLocator scheme(final String scheme) {
-        myScheme = scheme;
+        this.request().scheme(scheme);
         return this;
     }
 
     @Override
     public String toString() {
-        return this.toURL().toString();
+        return this.request().toURL().toString();
     }
 
-    private String query() {
-
-        if (myQueryParameters.size() >= 1) {
-
-            final StringBuilder retVal = new StringBuilder();
-
-            Entry<String, String> tmpEntry;
-            for (final Iterator<Entry<String, String>> tmpIter = myQueryParameters.entrySet().iterator(); tmpIter.hasNext();) {
-                tmpEntry = tmpIter.next();
-                retVal.append(tmpEntry.getKey());
-                retVal.append('=');
-                retVal.append(tmpEntry.getValue());
-                retVal.append('&');
-            }
-
-            // Remove that last '&'
-            retVal.setLength(retVal.length() - 1);
-
-            return retVal.toString();
-
-        } else {
-
-            return null;
+    private ResourceLocator.Request request() {
+        if (myRequest == null) {
+            myRequest = new Request(SESSION);
         }
+        return myRequest;
     }
 
-    URL toURL() {
-        try {
-            final URI uri = new URI(myScheme, null, myHost, myPort, myPath, this.query(), myFragment);
-            return uri.toURL();
-        } catch (final URISyntaxException | MalformedURLException xcptn) {
-            throw new ProgrammingError(xcptn);
+    private ResourceLocator.Response response() {
+        if (myResponse == null) {
+            myResponse = new Response(this.request());
         }
+        return myResponse;
     }
-
 }
