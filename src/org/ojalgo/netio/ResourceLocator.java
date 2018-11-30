@@ -47,6 +47,50 @@ import org.ojalgo.ProgrammingError;
  */
 public final class ResourceLocator {
 
+    public static Session session() {
+        return new Session(null);
+    }
+
+    public static final class Request {
+
+        private final ResourceLocator myLocator;
+
+        Request(ResourceLocator locator) {
+            super();
+            myLocator = locator;
+        }
+
+        public Response Response() {
+            return new Response(myLocator);
+        }
+    }
+
+    public static final class Response {
+
+        private final ResourceLocator myLocator;
+
+        Response(ResourceLocator locator) {
+            super();
+            myLocator = locator;
+        }
+
+    }
+
+    public static final class Session {
+
+        private final ResourceLocator myLocator;
+
+        Session(ResourceLocator locator) {
+            super();
+            myLocator = locator;
+        }
+
+        public Request request() {
+            return new Request(myLocator);
+        }
+
+    }
+
     public static final CookieManager DEFAULT_COOKIE_MANAGER = new CookieManager();
 
     private CookieHandler myCookieHandler = DEFAULT_COOKIE_MANAGER;
