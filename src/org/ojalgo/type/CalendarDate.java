@@ -162,6 +162,13 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         return new Date(instant.toEpochMilli());
     }
 
+    public static LocalDate toLocalDate(final Calendar calendar) {
+        int year = calendar.get(Calendar.YEAR);
+        int month = 1 + calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        return LocalDate.of(year, month, day);
+    }
+
     public static LocalDate toLocalDate(final Instant instant, final ZoneId zone) {
         return CalendarDate.toLocalDateTime(instant, zone).toLocalDate();
     }
