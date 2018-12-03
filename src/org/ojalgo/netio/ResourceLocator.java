@@ -21,16 +21,24 @@
  */
 package org.ojalgo.netio;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.*;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.ojalgo.ProgrammingError;
 
@@ -41,6 +49,158 @@ import org.ojalgo.ProgrammingError;
  */
 public final class ResourceLocator {
 
+    public static class KeyedValues implements Map<String, String> {
+
+        private static String urldecode(String encoded) {
+            try {
+                return URLDecoder.decode(encoded, "UTF-8");
+            } catch (UnsupportedEncodingException exception) {
+                return null;
+            }
+        }
+
+        private static String urlencode(String unencoded) {
+            try {
+                return URLEncoder.encode(unencoded, "UTF-8");
+            } catch (UnsupportedEncodingException exception) {
+                return null;
+            }
+        }
+
+        private final Set<String> myOrderedKeys = new LinkedHashSet<>();
+        private final Properties myValues;
+
+        public KeyedValues() {
+            super();
+            myValues = new Properties();
+        }
+
+        KeyedValues(Properties defaults) {
+            super();
+            myValues = new Properties(defaults);
+        }
+
+        public void clear() {
+            myOrderedKeys.clear();
+            myValues.clear();
+        }
+
+        public boolean containsKey(Object key) {
+            return myValues.containsKey(key);
+        }
+
+        public boolean containsValue(Object value) {
+            return myValues.containsValue(value);
+        }
+
+        public Set<Entry<String, String>> entrySet() {
+            return myValues.entrySet().stream().map(e -> new Entry<String, String>() {
+
+                public String getKey() {
+                    return e.getKey().toString();
+                }
+
+                public String getValue() {
+                    return e.getValue().toString();
+                }
+
+                public String setValue(String value) {
+                    String prev = e.getValue().toString();
+                    e.setValue(value);
+                    return prev;
+                }
+            }).collect(Collectors.toSet());
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof KeyedValues)) {
+                return false;
+            }
+            KeyedValues other = (KeyedValues) obj;
+            return Objects.equals(myOrderedKeys, other.myOrderedKeys) && Objects.equals(myValues, other.myValues);
+        }
+
+        public String get(Object key) {
+            return myValues.getProperty(key.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(myOrderedKeys, myValues);
+        }
+
+        public boolean isEmpty() {
+            return myValues.isEmpty();
+        }
+
+        public Set<String> keySet() {
+            return myValues.stringPropertyNames();
+        }
+
+        /**
+         * Will parse, split and decode the query string into key-value pairs and store those.
+         *
+         * @param query A URL encoded query string
+         */
+        public void parse(String query) {
+            String[] pairs = query.split("&");
+            for (int i = 0; i < pairs.length; i++) {
+                String pair = pairs[i];
+                int split = pair.indexOf("=");
+                String key = pair.substring(0, split);
+                String value = pair.substring(split + 1);
+                this.put(KeyedValues.urldecode(key), KeyedValues.urldecode(value));
+            }
+        }
+
+        public String put(String key, String value) {
+            myOrderedKeys.add(key);
+            return String.valueOf(myValues.setProperty(key, value));
+        }
+
+        public void putAll(Map<? extends String, ? extends String> m) {
+            myValues.putAll(m);
+        }
+
+        public String remove(Object key) {
+            myOrderedKeys.remove(key);
+            return myValues.remove(key).toString();
+        }
+
+        public int size() {
+            return myValues.size();
+        }
+
+        /**
+         * @return A URL encoded query string like: key1=value1&key2=value2...
+         */
+        @Override
+        public String toString() {
+            return myOrderedKeys.stream().map(key -> KeyedValues.urlencode(key) + "=" + KeyedValues.urlencode(myValues.getProperty(key)))
+                    .collect(Collectors.joining("&"));
+        }
+
+        public Collection<String> values() {
+            return myValues.values().stream().map(v -> v.toString()).collect(Collectors.toList());
+        }
+
+        Set<String> getOrderedKeys() {
+            return myOrderedKeys;
+        }
+
+        Properties getValues() {
+            return myValues;
+        }
+
+    }
+
     public static enum Method {
         DELETE, GET, HEAD, OPTIONS, POST, PUT, TRACE;
     }
@@ -50,10 +210,12 @@ public final class ResourceLocator {
         private String myFragment = null;
         private String myHost = null;
         private ResourceLocator.Method myMethod = ResourceLocator.Method.GET;
+        private final KeyedValues myQuery = new KeyedValues();
+        private final KeyedValues myForm = new KeyedValues();
         private String myPath = "";
         private int myPort = -1; // -1 ==> undefined
-        private final Map<String, String> myQueryParameters = new LinkedHashMap<>();
         private String myScheme = "https";
+
         private final ResourceLocator.Session mySession;
 
         Request(ResourceLocator.Session session) {
@@ -61,9 +223,24 @@ public final class ResourceLocator {
             mySession = session;
         }
 
+        Request(ResourceLocator.Session session, URL url) {
+            super();
+            mySession = session;
+
+            myScheme = url.getProtocol();
+            myHost = url.getHost();
+            myPort = url.getPort();
+            myPath = url.getPath();
+            myQuery.parse(url.getQuery());
+        }
+
         public ResourceLocator.Request fragment(final String fragment) {
             myFragment = fragment;
             return this;
+        }
+
+        public String getParameter(String key) {
+            return myQuery.get(key);
         }
 
         public ResourceLocator.Request host(final String host) {
@@ -76,14 +253,20 @@ public final class ResourceLocator {
             return this;
         }
 
-        public ResourceLocator.Request parameter(final String key, final String value) {
+        public ResourceLocator.Request query(final String key, final String value) {
             ProgrammingError.throwIfNull(key, value);
-            myQueryParameters.put(key, value);
+            myQuery.put(key, value);
+            return this;
+        }
+
+        public ResourceLocator.Request form(final String key, final String value) {
+            ProgrammingError.throwIfNull(key, value);
+            myForm.put(key, value);
             return this;
         }
 
         public Map<String, String> parameters() {
-            return myQueryParameters;
+            return myQuery;
         }
 
         public ResourceLocator.Request path(final String path) {
@@ -101,7 +284,7 @@ public final class ResourceLocator {
         }
 
         public Response response() {
-            return new Response(this);
+            return new Response(mySession, this);
         }
 
         /**
@@ -118,28 +301,18 @@ public final class ResourceLocator {
         }
 
         private String query() {
-
-            if (myQueryParameters.size() >= 1) {
-
-                final StringBuilder retVal = new StringBuilder();
-
-                Entry<String, String> tmpEntry;
-                for (final Iterator<Entry<String, String>> tmpIter = myQueryParameters.entrySet().iterator(); tmpIter.hasNext();) {
-                    tmpEntry = tmpIter.next();
-                    retVal.append(tmpEntry.getKey());
-                    retVal.append('=');
-                    retVal.append(tmpEntry.getValue());
-                    retVal.append('&');
-                }
-
-                // Remove that last '&'
-                retVal.setLength(retVal.length() - 1);
-
-                return retVal.toString();
-
-            } else {
-
+            if (myQuery.isEmpty()) {
                 return null;
+            } else {
+                return myQuery.toString();
+            }
+        }
+
+        String form() {
+            if (myForm.isEmpty()) {
+                return null;
+            } else {
+                return myForm.toString();
             }
         }
 
@@ -180,10 +353,13 @@ public final class ResourceLocator {
     public static final class Response {
 
         private final URLConnection myConnection;
+        private final ResourceLocator.Session mySession;
 
-        Response(ResourceLocator.Request request) {
+        Response(ResourceLocator.Session session, ResourceLocator.Request request) {
 
             super();
+
+            mySession = session;
 
             myConnection = request.newConnection();
 
@@ -191,12 +367,14 @@ public final class ResourceLocator {
                 request.configure((HttpURLConnection) myConnection);
             }
 
-            try {
-                Object obj = myConnection.getContent();
-                obj.toString();
-            } catch (IOException exception) {
-                // TODO Auto-generated catch block
-                exception.printStackTrace();
+            String form = request.form();
+            if ((form != null) && (form.length() > 0)) {
+                myConnection.setDoOutput(true);
+                try (DataOutputStream output = new DataOutputStream(myConnection.getOutputStream())) {
+                    output.write(form.getBytes(StandardCharsets.UTF_8.name()));
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
             }
         }
 
@@ -213,6 +391,10 @@ public final class ResourceLocator {
             return retVal;
         }
 
+        public ResourceLocator.Request getRequest() {
+            return new ResourceLocator.Request(mySession, myConnection.getURL());
+        }
+
         public Map<String, List<String>> getResponseHeaders() {
             return myConnection.getHeaderFields();
         }
@@ -224,14 +406,46 @@ public final class ResourceLocator {
             return new InputStreamReader(this.getInputStream());
         }
 
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            String line = null;
+            BufferedReader reader = new BufferedReader(this.getStreamReader());
+            try {
+                while ((line = reader.readLine()) != null) {
+                    builder.append(line);
+                }
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+            return builder.toString();
+        }
+
     }
 
     public static final class Session {
 
+        private final KeyedValues myParameters = new KeyedValues(DEFAULTS.getValues());
+
         Session() {
-
             super();
+        }
 
+        public List<HttpCookie> getCookies() {
+            CookieHandler defaultHandler = CookieHandler.getDefault();
+            if (defaultHandler instanceof CookieManager) {
+                return ((CookieManager) defaultHandler).getCookieStore().getCookies();
+            } else {
+                return Collections.emptyList();
+            }
+        }
+
+        public String getParameter(String key) {
+            return myParameters.get(key);
+        }
+
+        public String putParameter(String key, String value) {
+            return myParameters.put(key, value);
         }
 
         public Request request() {
@@ -239,6 +453,11 @@ public final class ResourceLocator {
         }
 
     }
+
+    /**
+     * Default session parameters
+     */
+    public static ResourceLocator.KeyedValues DEFAULTS = new ResourceLocator.KeyedValues();
 
     static {
 
@@ -282,13 +501,17 @@ public final class ResourceLocator {
 
     }
 
-    public static Session session() {
+    public static ResourceLocator.Session session() {
         return new Session();
     }
 
     private transient ResourceLocator.Request myRequest = null;
     private transient ResourceLocator.Response myResponse = null;
     private final ResourceLocator.Session mySession = new Session();
+
+    public ResourceLocator() {
+        super();
+    }
 
     public ResourceLocator(final String host) {
         super();
@@ -328,7 +551,7 @@ public final class ResourceLocator {
     }
 
     public ResourceLocator parameter(final String key, final String value) {
-        this.request().parameter(key, value);
+        this.request().query(key, value);
         return this;
     }
 
@@ -370,6 +593,7 @@ public final class ResourceLocator {
     }
 
     private ResourceLocator.Response response() {
-        return new Response(this.request());
+        return new Response(mySession, this.request());
     }
+
 }
