@@ -51,22 +51,6 @@ public final class ResourceLocator {
 
     public static class KeyedValues implements Map<String, String> {
 
-        private static String urldecode(String encoded) {
-            try {
-                return URLDecoder.decode(encoded, "UTF-8");
-            } catch (UnsupportedEncodingException exception) {
-                return null;
-            }
-        }
-
-        private static String urlencode(String unencoded) {
-            try {
-                return URLEncoder.encode(unencoded, "UTF-8");
-            } catch (UnsupportedEncodingException exception) {
-                return null;
-            }
-        }
-
         private final Set<String> myOrderedKeys = new LinkedHashSet<>();
         private final Properties myValues;
 
@@ -156,7 +140,7 @@ public final class ResourceLocator {
                 int split = pair.indexOf("=");
                 String key = pair.substring(0, split);
                 String value = pair.substring(split + 1);
-                this.put(KeyedValues.urldecode(key), KeyedValues.urldecode(value));
+                this.put(key, value);
             }
         }
 
@@ -183,8 +167,7 @@ public final class ResourceLocator {
          */
         @Override
         public String toString() {
-            return myOrderedKeys.stream().map(key -> KeyedValues.urlencode(key) + "=" + KeyedValues.urlencode(myValues.getProperty(key)))
-                    .collect(Collectors.joining("&"));
+            return myOrderedKeys.stream().map(key -> key + "=" + myValues.getProperty(key)).collect(Collectors.joining("&"));
         }
 
         public Collection<String> values() {
@@ -207,13 +190,13 @@ public final class ResourceLocator {
 
     public static final class Request {
 
+        private final KeyedValues myForm = new KeyedValues();
         private String myFragment = null;
         private String myHost = null;
         private ResourceLocator.Method myMethod = ResourceLocator.Method.GET;
-        private final KeyedValues myQuery = new KeyedValues();
-        private final KeyedValues myForm = new KeyedValues();
         private String myPath = "";
         private int myPort = -1; // -1 ==> undefined
+        private final KeyedValues myQuery = new KeyedValues();
         private String myScheme = "https";
 
         private final ResourceLocator.Session mySession;
@@ -232,6 +215,17 @@ public final class ResourceLocator {
             myPort = url.getPort();
             myPath = url.getPath();
             myQuery.parse(url.getQuery());
+        }
+
+        public ResourceLocator.Request form(String form) {
+            myQuery.parse(form);
+            return this;
+        }
+
+        public ResourceLocator.Request form(final String key, final String value) {
+            ProgrammingError.throwIfNull(key, value);
+            myForm.put(key, value);
+            return this;
         }
 
         public ResourceLocator.Request fragment(final String fragment) {
@@ -253,18 +247,6 @@ public final class ResourceLocator {
             return this;
         }
 
-        public ResourceLocator.Request query(final String key, final String value) {
-            ProgrammingError.throwIfNull(key, value);
-            myQuery.put(key, value);
-            return this;
-        }
-
-        public ResourceLocator.Request form(final String key, final String value) {
-            ProgrammingError.throwIfNull(key, value);
-            myForm.put(key, value);
-            return this;
-        }
-
         public Map<String, String> parameters() {
             return myQuery;
         }
@@ -280,6 +262,17 @@ public final class ResourceLocator {
          */
         public ResourceLocator.Request port(final int port) {
             myPort = port;
+            return this;
+        }
+
+        public ResourceLocator.Request query(String query) {
+            myQuery.parse(query);
+            return this;
+        }
+
+        public ResourceLocator.Request query(final String key, final String value) {
+            ProgrammingError.throwIfNull(key, value);
+            myQuery.put(key, value);
             return this;
         }
 
@@ -308,14 +301,6 @@ public final class ResourceLocator {
             }
         }
 
-        String form() {
-            if (myForm.isEmpty()) {
-                return null;
-            } else {
-                return myForm.toString();
-            }
-        }
-
         private URL toURL() {
             try {
                 final URI uri = new URI(myScheme, null, myHost, myPort, myPath, this.query(), myFragment);
@@ -330,6 +315,14 @@ public final class ResourceLocator {
                 connection.setRequestMethod(myMethod.name());
             } catch (ProtocolException exception) {
                 throw new ProgrammingError(exception);
+            }
+        }
+
+        String form() {
+            if (myForm.isEmpty()) {
+                return null;
+            } else {
+                return myForm.toString();
             }
         }
 
@@ -354,6 +347,8 @@ public final class ResourceLocator {
 
         private final URLConnection myConnection;
         private final ResourceLocator.Session mySession;
+
+        private transient String myString;
 
         Response(ResourceLocator.Session session, ResourceLocator.Request request) {
 
@@ -408,17 +403,24 @@ public final class ResourceLocator {
 
         @Override
         public String toString() {
-            StringBuilder builder = new StringBuilder();
-            String line = null;
-            BufferedReader reader = new BufferedReader(this.getStreamReader());
-            try {
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line);
+
+            if (myString == null) {
+
+                StringBuilder builder = new StringBuilder();
+                String line = null;
+                BufferedReader reader = new BufferedReader(this.getStreamReader());
+                try {
+                    while ((line = reader.readLine()) != null) {
+                        builder.append(line);
+                    }
+                } catch (IOException exception) {
+                    exception.printStackTrace();
                 }
-            } catch (IOException exception) {
-                exception.printStackTrace();
+                myString = builder.toString();
+
             }
-            return builder.toString();
+
+            return myString;
         }
 
     }
@@ -444,12 +446,21 @@ public final class ResourceLocator {
             return myParameters.get(key);
         }
 
-        public String putParameter(String key, String value) {
-            return myParameters.put(key, value);
+        public ResourceLocator.Session parameter(String key, String value) {
+            myParameters.put(key, value);
+            return this;
         }
 
         public Request request() {
             return new Request(this);
+        }
+
+        public Request request(String url) {
+            try {
+                return new Request(this, new URL(url));
+            } catch (MalformedURLException exception) {
+                throw new ProgrammingError(exception);
+            }
         }
 
     }
@@ -460,64 +471,50 @@ public final class ResourceLocator {
     public static ResourceLocator.KeyedValues DEFAULTS = new ResourceLocator.KeyedValues();
 
     static {
-
-        final CookieStore delegateCS = new CookieManager().getCookieStore();
-        CookieStore store = new CookieStore() {
-
-            public void add(final URI uri, final HttpCookie cookie) {
-                if (cookie.getMaxAge() == 0L) {
-                    cookie.setMaxAge(-1L);
-                }
-                delegateCS.add(uri, cookie);
-            }
-
-            public List<HttpCookie> get(final URI uri) {
-                return delegateCS.get(uri);
-            }
-
-            public List<HttpCookie> getCookies() {
-                return delegateCS.getCookies();
-            }
-
-            public List<URI> getURIs() {
-                return delegateCS.getURIs();
-            }
-
-            public boolean remove(final URI uri, final HttpCookie cookie) {
-                return delegateCS.remove(uri, cookie);
-            }
-
-            public boolean removeAll() {
-                return delegateCS.removeAll();
-            }
-
-        };
-
-        CookiePolicy policy = CookiePolicy.ACCEPT_ALL;
-
-        CookieManager manager = new CookieManager(store, policy);
-
-        CookieHandler.setDefault(manager);
-
+        CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
     }
 
     public static ResourceLocator.Session session() {
         return new Session();
     }
 
+    static String urldecode(String encoded) {
+        try {
+            return URLDecoder.decode(encoded, "UTF-8");
+        } catch (UnsupportedEncodingException exception) {
+            return null;
+        }
+    }
+
+    static String urlencode(String unencoded) {
+        try {
+            return URLEncoder.encode(unencoded, "UTF-8");
+        } catch (UnsupportedEncodingException exception) {
+            return null;
+        }
+    }
+
     private transient ResourceLocator.Request myRequest = null;
-    private transient ResourceLocator.Response myResponse = null;
+
     private final ResourceLocator.Session mySession = new Session();
 
     public ResourceLocator() {
         super();
     }
 
+    /**
+     * @deprecated v47
+     */
+    @Deprecated
     public ResourceLocator(final String host) {
         super();
         this.request().host(host);
     }
 
+    /**
+     * @deprecated v47
+     */
+    @Deprecated
     public ResourceLocator cookies(final CookieHandler cookieHandler) {
         CookieHandler.setDefault(cookieHandler);
         return this;
@@ -530,7 +527,10 @@ public final class ResourceLocator {
 
     /**
      * Open a connection and get a stream reader.
+     *
+     * @deprecated v47
      */
+    @Deprecated
     public InputStream getInputStream() {
         return this.response().getInputStream();
     }
@@ -550,11 +550,6 @@ public final class ResourceLocator {
         return this.request().newConnection();
     }
 
-    public ResourceLocator parameter(final String key, final String value) {
-        this.request().query(key, value);
-        return this;
-    }
-
     public Map<String, String> parameters() {
         return this.request().parameters();
     }
@@ -569,6 +564,11 @@ public final class ResourceLocator {
      */
     public ResourceLocator port(final int port) {
         this.request().port(port);
+        return this;
+    }
+
+    public ResourceLocator query(final String key, final String value) {
+        this.request().query(key, value);
         return this;
     }
 
