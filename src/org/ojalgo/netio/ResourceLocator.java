@@ -52,6 +52,10 @@ public final class ResourceLocator {
     public static class KeyedValues implements Map<String, String> {
 
         private final Set<String> myOrderedKeys = new LinkedHashSet<>();
+        /**
+         * Takes advantage of the fact that java.util.Properties support strings with unicode escape
+         * sequences, and that it can delegate to default values.
+         */
         private final Properties myValues;
 
         public KeyedValues() {
@@ -251,10 +255,6 @@ public final class ResourceLocator {
             return this;
         }
 
-        public Map<String, String> parameters() {
-            return myQuery;
-        }
-
         public ResourceLocator.Request path(final String path) {
             ProgrammingError.throwIfNull(path);
             myPath = path;
@@ -377,19 +377,6 @@ public final class ResourceLocator {
             }
         }
 
-        /**
-         * Open a connection and get the input stream.
-         */
-        public InputStream getInputStream() {
-            InputStream retVal = null;
-            try {
-                retVal = myConnection.getInputStream();
-            } catch (final IOException exception) {
-                exception.printStackTrace();
-            }
-            return retVal;
-        }
-
         public ResourceLocator.Request getRequest() {
             return new ResourceLocator.Request(mySession, myConnection.getURL());
         }
@@ -427,6 +414,19 @@ public final class ResourceLocator {
             return myString;
         }
 
+        /**
+         * Open a connection and get the input stream.
+         */
+        InputStream getInputStream() {
+            InputStream retVal = null;
+            try {
+                retVal = myConnection.getInputStream();
+            } catch (final IOException exception) {
+                exception.printStackTrace();
+            }
+            return retVal;
+        }
+
     }
 
     public static final class Session {
@@ -446,7 +446,7 @@ public final class ResourceLocator {
             }
         }
 
-        public String getParameter(String key) {
+        public String getParameterValue(String key) {
             return myParameters.get(key);
         }
 
@@ -505,21 +505,13 @@ public final class ResourceLocator {
         super();
     }
 
-    /**
-     * @deprecated v47
-     */
-    @Deprecated
     public ResourceLocator(final String url) {
         super();
         myRequest = mySession.request(url);
     }
 
-    /**
-     * @deprecated v47
-     */
-    @Deprecated
-    public ResourceLocator cookies(final CookieHandler cookieHandler) {
-        CookieHandler.setDefault(cookieHandler);
+    public ResourceLocator form(final String key, final String value) {
+        this.request().form(key, value);
         return this;
     }
 
@@ -529,41 +521,24 @@ public final class ResourceLocator {
     }
 
     /**
-     * Open a connection and get a stream reader.
-     *
-     * @deprecated v47
-     */
-    @Deprecated
-    public InputStream getInputStream() {
-        return this.response().getInputStream();
-    }
-
-    /**
      * Open connection and return an input stream reader.
      */
     public Reader getStreamReader() {
         return this.response().getStreamReader();
     }
 
-    /**
-     * @deprecated v47
-     */
-    @Deprecated
-    public URLConnection openConnection() {
-        return this.request().newConnection();
+    public ResourceLocator host(final String host) {
+        this.request().host(host);
+        return this;
     }
 
-    public Map<String, String> parameters() {
-        return this.request().parameters();
+    public ResourceLocator method(final Method method) {
+        this.request().method(method);
+        return this;
     }
 
     public ResourceLocator path(final String path) {
         this.request().path(path);
-        return this;
-    }
-
-    public ResourceLocator host(final String host) {
-        this.request().host(host);
         return this;
     }
 
