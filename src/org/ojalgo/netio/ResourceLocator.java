@@ -135,16 +135,18 @@ public final class ResourceLocator {
         /**
          * Will parse, split and decode the query string into key-value pairs and store those.
          *
-         * @param query A URL encoded query string
+         * @param keysAndValues A query (or form) string
          */
-        public void parse(String query) {
-            String[] pairs = query.split("&");
-            for (int i = 0; i < pairs.length; i++) {
-                String pair = pairs[i];
-                int split = pair.indexOf("=");
-                String key = pair.substring(0, split);
-                String value = pair.substring(split + 1);
-                this.put(key, value);
+        public void parse(String keysAndValues) {
+            if (keysAndValues != null) {
+                String[] pairs = keysAndValues.split("&");
+                for (int i = 0; i < pairs.length; i++) {
+                    String pair = pairs[i];
+                    int split = pair.indexOf("=");
+                    String key = pair.substring(0, split);
+                    String value = pair.substring(split + 1);
+                    this.put(key, value);
+                }
             }
         }
 
@@ -221,6 +223,23 @@ public final class ResourceLocator {
             myQuery.parse(url.getQuery());
         }
 
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof Request)) {
+                return false;
+            }
+            Request other = (Request) obj;
+            return Objects.equals(myForm, other.myForm) && Objects.equals(myFragment, other.myFragment) && Objects.equals(myHost, other.myHost)
+                    && (myMethod == other.myMethod) && Objects.equals(myPath, other.myPath) && (myPort == other.myPort)
+                    && Objects.equals(myQuery, other.myQuery) && Objects.equals(myScheme, other.myScheme) && Objects.equals(mySession, other.mySession);
+        }
+
         public ResourceLocator.Request form(String form) {
             myQuery.parse(form);
             return this;
@@ -243,6 +262,11 @@ public final class ResourceLocator {
 
         public String getQueryValue(String key) {
             return myQuery.get(key);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(myForm, myFragment, myHost, myMethod, myPath, myPort, myQuery, myScheme, mySession);
         }
 
         public ResourceLocator.Request host(final String host) {
@@ -377,8 +401,24 @@ public final class ResourceLocator {
             }
         }
 
+        /**
+         * Will recreate the request that resulted in the final response. If there has been one or more
+         * redirects, then this is NOT the same as the original request.
+         */
         public ResourceLocator.Request getRequest() {
             return new ResourceLocator.Request(mySession, myConnection.getURL());
+        }
+
+        public int getResponseCode() {
+            if (myConnection instanceof HttpURLConnection) {
+                try {
+                    return ((HttpURLConnection) myConnection).getResponseCode();
+                } catch (IOException exception) {
+                    return -1;
+                }
+            } else {
+                return -1;
+            }
         }
 
         public Map<String, List<String>> getResponseHeaders() {
