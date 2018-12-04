@@ -562,6 +562,11 @@ public final class ResourceLocator {
         return this;
     }
 
+    public ResourceLocator host(final String host) {
+        this.request().host(host);
+        return this;
+    }
+
     /**
      * The default (null) value is -1.
      */
