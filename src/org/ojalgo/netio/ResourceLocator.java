@@ -233,7 +233,11 @@ public final class ResourceLocator {
             return this;
         }
 
-        public String getParameter(String key) {
+        public String getFormValue(String key) {
+            return myForm.get(key);
+        }
+
+        public String getQueryValue(String key) {
             return myQuery.get(key);
         }
 
@@ -495,7 +499,6 @@ public final class ResourceLocator {
     }
 
     private transient ResourceLocator.Request myRequest = null;
-
     private final ResourceLocator.Session mySession = new Session();
 
     public ResourceLocator() {
@@ -506,9 +509,9 @@ public final class ResourceLocator {
      * @deprecated v47
      */
     @Deprecated
-    public ResourceLocator(final String host) {
+    public ResourceLocator(final String url) {
         super();
-        this.request().host(host);
+        myRequest = mySession.request(url);
     }
 
     /**
@@ -587,7 +590,7 @@ public final class ResourceLocator {
 
     private ResourceLocator.Request request() {
         if (myRequest == null) {
-            myRequest = new Request(mySession);
+            myRequest = mySession.request();
         }
         return myRequest;
     }
