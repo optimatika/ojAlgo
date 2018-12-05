@@ -33,7 +33,6 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -844,16 +843,16 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
      */
     protected boolean validate() {
 
-        final MatrixStore<Double> tmpQ = this.getMatrixQ();
-        final MatrixStore<Double> tmpC = this.getMatrixC();
+        final MatrixStore<Double> mtrxQ = this.getMatrixQ();
+        final MatrixStore<Double> mtrxC = this.getMatrixC();
 
-        if ((tmpQ == null) || (tmpC == null)) {
+        if ((mtrxQ == null) || (mtrxC == null)) {
             throw new IllegalArgumentException("Neither Q nor C may be null!");
         }
 
-        if (!MatrixUtils.isHermitian(tmpQ)) {
+        if (!mtrxQ.isHermitian()) {
             if (this.isDebug()) {
-                this.log("Q not symmetric!", tmpQ);
+                this.log("Q not symmetric!", mtrxQ);
             }
             throw new IllegalArgumentException("Q must be symmetric!");
         }
@@ -861,19 +860,19 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         if (!mySolverQ.isSPD()) {
             // Not symmetric positive definite. Check if at least positive semidefinite.
 
-            final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(true);
+            final Eigenvalue<Double> decompEvD = Eigenvalue.PRIMITIVE.make(mtrxQ, true);
 
-            tmpEvD.computeValuesOnly(tmpQ);
+            decompEvD.computeValuesOnly(mtrxQ);
 
-            final Array1D<ComplexNumber> tmpEigenvalues = tmpEvD.getEigenvalues();
+            final Array1D<ComplexNumber> eigenvalues = decompEvD.getEigenvalues();
 
-            tmpEvD.reset();
+            decompEvD.reset();
 
-            for (final ComplexNumber tmpValue : tmpEigenvalues) {
-                if ((tmpValue.doubleValue() < ZERO) || !tmpValue.isReal()) {
+            for (final ComplexNumber eigval : eigenvalues) {
+                if (((eigval.doubleValue() < ZERO) && !eigval.isSmall(TEN)) || !eigval.isReal()) {
                     if (this.isDebug()) {
                         this.log("Q not positive semidefinite!");
-                        this.log("The eigenvalues are: {}", tmpEigenvalues);
+                        this.log("The eigenvalues are: {}", eigenvalues);
                     }
                     throw new IllegalArgumentException("Q must be positive semidefinite!");
                 }
