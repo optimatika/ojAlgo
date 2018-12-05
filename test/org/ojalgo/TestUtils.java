@@ -402,6 +402,10 @@ public abstract class TestUtils {
         Assertions.fail(message);
     }
 
+    public static void fail(Throwable problem) {
+        Assertions.fail(problem.getMessage(), problem);
+    }
+
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {
 
         final PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
