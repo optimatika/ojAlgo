@@ -401,10 +401,18 @@ public final class ResourceLocator {
         }
 
         /**
-         * @return The http response code, or -1 if this is not http/hhtps or if the code cannot be discerned
-         *         from the response
+         * Will recreate the request that resulted in the final response. If there has been one or more
+         * redirects, then this is NOT the same as the original request.
          */
-        public int getCode() {
+        public ResourceLocator.Request getRequest() {
+            return new ResourceLocator.Request(mySession, myConnection.getURL());
+        }
+
+        /**
+         * @return The http response status code, or -1 if this is not http/hhtps or if the code cannot be
+         *         discerned from the response
+         */
+        public int getStatusCode() {
             if (myConnection instanceof HttpURLConnection) {
                 try {
                     return ((HttpURLConnection) myConnection).getResponseCode();
@@ -414,14 +422,6 @@ public final class ResourceLocator {
             } else {
                 return -1;
             }
-        }
-
-        /**
-         * Will recreate the request that resulted in the final response. If there has been one or more
-         * redirects, then this is NOT the same as the original request.
-         */
-        public ResourceLocator.Request getRequest() {
-            return new ResourceLocator.Request(mySession, myConnection.getURL());
         }
 
         /**
