@@ -55,7 +55,7 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
     /**
      *
      */
-    MICROS(ChronoUnit.MICROS, TimeUnit.MICROSECONDS, "micros"),
+    MICROS(ChronoUnit.MICROS, TimeUnit.MICROSECONDS, "µs"),
     /**
      *
      */

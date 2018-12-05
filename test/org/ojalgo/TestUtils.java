@@ -352,6 +352,21 @@ public abstract class TestUtils {
         }
     }
 
+    public static void assertInRange(int first, int limit, int actual) {
+        if ((first > actual) || (actual >= limit)) {
+            TestUtils.fail("Not in range!");
+        }
+    }
+
+    public static void assertNotNullOrEmpty(String actual) {
+        if (actual == null) {
+            TestUtils.fail("Is null!");
+        }
+        if (actual.length() <= 0) {
+            TestUtils.fail("Is empty!");
+        }
+    }
+
     public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual) {
         TestUtils.assertStateAndSolution(expected, actual, EQUALS);
     }

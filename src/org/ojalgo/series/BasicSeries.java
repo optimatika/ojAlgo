@@ -65,7 +65,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
 
     /**
      * A series with naturally sequenced keys - given any key there is a natural "next" key, e.g. with a
-     * series of daily values the natural next key is the next day. Further natural sequencing implies a
+     * series of daily values the natural next key is the next day. Further, natural sequencing implies a
      * bidirectional mapping between the keys and long indices.
      *
      * @author apete
@@ -107,9 +107,9 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
 
         /**
          * A natural sequence implies a bidirectional mapping between the keys and long indices. This
-         * {@link IndexMapper} specifies that mapping. Please note that multiple instaces of the key type
-         * could correspnd to the same index, and not all long values are valid indices. The conversion key ->
-         * index - key may not return the original key.
+         * {@link org.ojalgo.structure.Structure1D.IndexMapper} specifies that mapping. Please note that
+         * multiple instaces of the key type could correspnd to the same index, and not all long values are
+         * valid indices. The conversions key -> index -> key may not return the original key.
          */
         IndexMapper<K> mapper();
 
