@@ -438,8 +438,7 @@ public final class ResourceLocator {
 
                 StringBuilder builder = new StringBuilder();
                 String line = null;
-                BufferedReader reader = new BufferedReader(this.getStreamReader());
-                try {
+                try (BufferedReader reader = new BufferedReader(this.getStreamReader())) {
                     while ((line = reader.readLine()) != null) {
                         builder.append(line);
                     }
@@ -447,7 +446,6 @@ public final class ResourceLocator {
                     exception.printStackTrace();
                 }
                 myString = builder.toString();
-
             }
 
             return myString;
