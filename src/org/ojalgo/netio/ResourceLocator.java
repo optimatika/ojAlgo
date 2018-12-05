@@ -31,9 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -133,7 +131,7 @@ public final class ResourceLocator {
         }
 
         /**
-         * Will parse, split and decode the query string into key-value pairs and store those.
+         * Will parse/split the query string into key-value pairs and store those.
          *
          * @param keysAndValues A query (or form) string
          */
@@ -169,7 +167,7 @@ public final class ResourceLocator {
         }
 
         /**
-         * @return A URL encoded query string like: key1=value1&key2=value2...
+         * @return A query string like: key1=value1&key2=value2...
          */
         @Override
         public String toString() {
@@ -305,7 +303,7 @@ public final class ResourceLocator {
         }
 
         public Response response() {
-            return new Response(mySession, this);
+            return new Response(this);
         }
 
         /**
@@ -362,6 +360,7 @@ public final class ResourceLocator {
 
             URLConnection retVal = null;
             try {
+                CookieHandler.setDefault(mySession.getCookieManager());
                 retVal = this.toURL().openConnection();
             } catch (final IOException exception) {
                 exception.printStackTrace();
@@ -378,11 +377,11 @@ public final class ResourceLocator {
 
         private transient String myString;
 
-        Response(ResourceLocator.Session session, ResourceLocator.Request request) {
+        Response(ResourceLocator.Request request) {
 
             super();
 
-            mySession = session;
+            mySession = request.getSession();
 
             myConnection = request.newConnection();
 
@@ -394,7 +393,7 @@ public final class ResourceLocator {
             if ((form != null) && (form.length() > 0)) {
                 myConnection.setDoOutput(true);
                 try (DataOutputStream output = new DataOutputStream(myConnection.getOutputStream())) {
-                    output.write(form.getBytes(StandardCharsets.UTF_8.name()));
+                    output.write(form.getBytes(UTF_8));
                 } catch (IOException exception) {
                     exception.printStackTrace();
                 }
@@ -402,14 +401,10 @@ public final class ResourceLocator {
         }
 
         /**
-         * Will recreate the request that resulted in the final response. If there has been one or more
-         * redirects, then this is NOT the same as the original request.
+         * @return The http response code, or -1 if this is not http/hhtps or if the code cannot be discerned
+         *         from the response
          */
-        public ResourceLocator.Request getRequest() {
-            return new ResourceLocator.Request(mySession, myConnection.getURL());
-        }
-
-        public int getResponseCode() {
+        public int getCode() {
             if (myConnection instanceof HttpURLConnection) {
                 try {
                     return ((HttpURLConnection) myConnection).getResponseCode();
@@ -421,8 +416,12 @@ public final class ResourceLocator {
             }
         }
 
-        public Map<String, List<String>> getResponseHeaders() {
-            return myConnection.getHeaderFields();
+        /**
+         * Will recreate the request that resulted in the final response. If there has been one or more
+         * redirects, then this is NOT the same as the original request.
+         */
+        public ResourceLocator.Request getRequest() {
+            return new ResourceLocator.Request(mySession, myConnection.getURL());
         }
 
         /**
@@ -471,19 +470,11 @@ public final class ResourceLocator {
 
     public static final class Session {
 
+        private final CookieManager myCookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
         private final KeyedValues myParameters = new KeyedValues(DEFAULTS.getValues());
 
         Session() {
             super();
-        }
-
-        public List<HttpCookie> getCookies() {
-            CookieHandler defaultHandler = CookieHandler.getDefault();
-            if (defaultHandler instanceof CookieManager) {
-                return ((CookieManager) defaultHandler).getCookieStore().getCookies();
-            } else {
-                return Collections.emptyList();
-            }
         }
 
         public String getParameterValue(String key) {
@@ -507,6 +498,15 @@ public final class ResourceLocator {
             }
         }
 
+        public void reset() {
+            myParameters.clear();
+            myCookieManager.getCookieStore().removeAll();
+        }
+
+        CookieManager getCookieManager() {
+            return myCookieManager;
+        }
+
     }
 
     /**
@@ -514,9 +514,7 @@ public final class ResourceLocator {
      */
     public static ResourceLocator.KeyedValues DEFAULTS = new ResourceLocator.KeyedValues();
 
-    static {
-        CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
-    }
+    static final String UTF_8 = StandardCharsets.UTF_8.name();
 
     public static ResourceLocator.Session session() {
         return new Session();
@@ -524,7 +522,7 @@ public final class ResourceLocator {
 
     static String urldecode(String encoded) {
         try {
-            return URLDecoder.decode(encoded, "UTF-8");
+            return URLDecoder.decode(encoded, UTF_8);
         } catch (UnsupportedEncodingException exception) {
             return null;
         }
@@ -532,7 +530,7 @@ public final class ResourceLocator {
 
     static String urlencode(String unencoded) {
         try {
-            return URLEncoder.encode(unencoded, "UTF-8");
+            return URLEncoder.encode(unencoded, UTF_8);
         } catch (UnsupportedEncodingException exception) {
             return null;
         }
@@ -616,7 +614,7 @@ public final class ResourceLocator {
     }
 
     private ResourceLocator.Response response() {
-        return new Response(mySession, this.request());
+        return new Response(this.request());
     }
 
 }
