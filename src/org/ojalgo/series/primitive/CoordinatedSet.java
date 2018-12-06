@@ -21,6 +21,7 @@
  */
 package org.ojalgo.series.primitive;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -29,31 +30,36 @@ import org.ojalgo.series.BasicSeries;
 
 public class CoordinatedSet<K extends Comparable<? super K>> {
 
-    public static <K extends Comparable<? super K>> CoordinatedSet<K> from(final List<? extends BasicSeries<K, ?>> uncoordinated) {
+    @SuppressWarnings("unchecked")
+    public static <K extends Comparable<? super K>> CoordinatedSet<K> from(BasicSeries<K, ?>... uncoordinated) {
+        return CoordinatedSet.from(Arrays.asList(uncoordinated));
+    }
 
-        final K first = BasicSeries.findLatestFirstKey(uncoordinated);
-        final K last = BasicSeries.findEarliestLastKey(uncoordinated);
+    public static <K extends Comparable<? super K>> CoordinatedSet<K> from(List<? extends BasicSeries<K, ?>> uncoordinated) {
 
-        final SortedSet<K> relevantKeys = new TreeSet<>();
-        for (final BasicSeries<K, ?> individual : uncoordinated) {
+        K first = BasicSeries.findLatestFirstKey(uncoordinated);
+        K last = BasicSeries.findEarliestLastKey(uncoordinated);
+
+        SortedSet<K> relevantKeys = new TreeSet<>();
+        for (BasicSeries<K, ?> individual : uncoordinated) {
             relevantKeys.addAll(individual.subMap(first, last).keySet());
         }
         relevantKeys.add(last);
 
-        final int numberOfSeries = uncoordinated.size();
-        final int numberOfKeys = relevantKeys.size();
+        int numberOfSeries = uncoordinated.size();
+        int numberOfKeys = relevantKeys.size();
 
-        final PrimitiveSeries[] coordinated = new PrimitiveSeries[numberOfSeries];
+        PrimitiveSeries[] coordinated = new PrimitiveSeries[numberOfSeries];
 
         for (int s = 0; s < numberOfSeries; s++) {
-            final BasicSeries<K, ?> inputSeries = uncoordinated.get(s);
-            final double[] outputSeries = new double[numberOfKeys];
+            BasicSeries<K, ?> inputSeries = uncoordinated.get(s);
+            double[] outputSeries = new double[numberOfKeys];
 
             double tmpVal = Double.NaN;
             double curVal = Double.NaN;
 
             int k = 0;
-            for (final K key : relevantKeys) {
+            for (K key : relevantKeys) {
                 tmpVal = inputSeries.doubleValue(key);
                 if (Double.isNaN(tmpVal)) {
                     tmpVal = curVal;
@@ -72,7 +78,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
     private final K myFirstKey;
     private final K myLastKey;
 
-    private CoordinatedSet(final PrimitiveSeries[] coordinated, final K first, final K last) {
+    private CoordinatedSet(PrimitiveSeries[] coordinated, K first, K last) {
 
         super();
 
@@ -89,7 +95,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
         return myLastKey;
     }
 
-    public PrimitiveSeries getSeries(final int index) {
+    public PrimitiveSeries getSeries(int index) {
         return myCoordinated[index];
     }
 
