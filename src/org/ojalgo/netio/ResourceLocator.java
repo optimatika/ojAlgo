@@ -159,7 +159,8 @@ public final class ResourceLocator {
 
         public String remove(Object key) {
             myOrderedKeys.remove(key);
-            return myValues.remove(key).toString();
+            Object removed = myValues.remove(key);
+            return removed != null ? removed.toString() : null;
         }
 
         public int size() {
