@@ -244,8 +244,12 @@ public final class ResourceLocator {
         }
 
         public ResourceLocator.Request form(final String key, final String value) {
-            ProgrammingError.throwIfNull(key, value);
-            myForm.put(key, value);
+            ProgrammingError.throwIfNull(key);
+            if (value != null) {
+                myForm.put(key, value);
+            } else {
+                myForm.remove(key);
+            }
             return this;
         }
 
@@ -297,8 +301,12 @@ public final class ResourceLocator {
         }
 
         public ResourceLocator.Request query(final String key, final String value) {
-            ProgrammingError.throwIfNull(key, value);
-            myQuery.put(key, value);
+            ProgrammingError.throwIfNull(key);
+            if (value != null) {
+                myQuery.put(key, value);
+            } else {
+                myQuery.remove(key);
+            }
             return this;
         }
 
@@ -492,7 +500,11 @@ public final class ResourceLocator {
         }
 
         public ResourceLocator.Session parameter(String key, String value) {
-            myParameters.put(key, value);
+            if (value != null) {
+                myParameters.put(key, value);
+            } else {
+                myParameters.remove(key);
+            }
             return this;
         }
 
