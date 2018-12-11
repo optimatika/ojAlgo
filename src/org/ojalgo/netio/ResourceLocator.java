@@ -431,6 +431,18 @@ public final class ResourceLocator {
             return new InputStreamReader(this.getInputStream());
         }
 
+        /**
+         * @return true if the status (response) code is in [200,300)
+         */
+        public boolean isResponseOK() {
+            int statusCode = this.getStatusCode();
+            if ((200 <= statusCode) && (statusCode < 300)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         @Override
         public String toString() {
 
