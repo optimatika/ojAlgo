@@ -509,6 +509,11 @@ public final class ResourceLocator {
             return this;
         }
 
+        public void print(BasicLogger.Printer printer) {
+            printer.println("Session parameters: {}", myParameters);
+            printer.println("Session cookies: {}", myCookieManager.getCookieStore().getCookies());
+        }
+
         public Request request() {
             return new Request(this);
         }
