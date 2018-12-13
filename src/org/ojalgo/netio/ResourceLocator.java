@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.netio.BasicLogger.Printer;
 
 /**
  * ResourceLocator - it's a URI/URL builder.
@@ -193,7 +194,7 @@ public final class ResourceLocator {
         DELETE, GET, HEAD, OPTIONS, POST, PUT, TRACE;
     }
 
-    public static final class Request {
+    public static final class Request implements BasicLogger.Printable {
 
         private final KeyedValues myForm = new KeyedValues();
         private String myFragment = null;
@@ -296,6 +297,14 @@ public final class ResourceLocator {
             return this;
         }
 
+        public void print(Printer receiver) {
+            mySession.print(receiver);
+            receiver.println("Request URL: {}", this.toURL());
+            if (myForm.size() > 0) {
+                receiver.println("Request form: {}", myForm);
+            }
+        }
+
         public ResourceLocator.Request query(String query) {
             myQuery.parse(query);
             return this;
@@ -379,7 +388,7 @@ public final class ResourceLocator {
 
     }
 
-    public static final class Response {
+    public static final class Response implements BasicLogger.Printable {
 
         private final URLConnection myConnection;
         private final ResourceLocator.Session mySession;
@@ -452,6 +461,15 @@ public final class ResourceLocator {
             }
         }
 
+        public void print(Printer receiver) {
+            receiver.println("Response body: {}", this.toString());
+            receiver.println("Response headers: {}", myConnection.getHeaderFields());
+            receiver.println("<Recreated>");
+            this.getRequest().print(receiver);
+            receiver.println("</Recreated>");
+            mySession.print(receiver);
+        }
+
         @Override
         public String toString() {
 
@@ -487,7 +505,7 @@ public final class ResourceLocator {
 
     }
 
-    public static final class Session {
+    public static final class Session implements BasicLogger.Printable {
 
         private final CookieManager myCookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
         private final KeyedValues myParameters = new KeyedValues(DEFAULTS.getValues());
@@ -509,9 +527,9 @@ public final class ResourceLocator {
             return this;
         }
 
-        public void print(BasicLogger.Printer printer) {
-            printer.println("Session parameters: {}", myParameters);
-            printer.println("Session cookies: {}", myCookieManager.getCookieStore().getCookies());
+        public void print(BasicLogger.Printer receiver) {
+            receiver.println("Session parameters: {}", myParameters);
+            receiver.println("Session cookies: {}", myCookieManager.getCookieStore().getCookies());
         }
 
         public Request request() {

@@ -159,6 +159,24 @@ public abstract class BasicLogger {
 
     }
 
+    public static interface Printable {
+
+        default void print(Appendable receiver) {
+            this.print(new BasicLogger.AppendablePrinter(receiver));
+        }
+
+        void print(BasicLogger.Printer receiver);
+
+        default void print(PrintStream receiver) {
+            this.print(new BasicLogger.PrintStreamPrinter(receiver));
+        }
+
+        default void print(PrintWriter receiver) {
+            this.print(new BasicLogger.PrintWriterPrinter(receiver));
+        }
+
+    }
+
     public static interface Printer {
 
         /**
