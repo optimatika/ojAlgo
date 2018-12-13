@@ -443,7 +443,9 @@ public final class ResourceLocator {
         }
 
         /**
-         * Open connection and return an input stream reader.
+         * Open connection and return an input stream reader. This method can only be called once on each
+         * instance, and the {@link #toString()} and {@link #print(Printer)} methods delegate to this method.
+         * (Those methods can be called multiple timea.)
          */
         public Reader getStreamReader() {
             return new InputStreamReader(this.getInputStream());
