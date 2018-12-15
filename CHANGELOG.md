@@ -1,4 +1,4 @@
-# v47 [Not yet released]
+# v47.0.0: [Not yet released]
 
 > corresponds to changes in the `develop` branch
 
@@ -35,7 +35,7 @@
 * Refactoring to CalendarDate, CalendarDateUnit and CalendarDateDuration; simplified implementations that are better aligned with the java.time classes.
 
 
-# v46.3 2018-10-12
+# v46.3.0: 2018-10-12
 
 * Now builds a separate test-jar artefact. It contains a test utilities class that can be used by libraries that extend ojAlgo to help test some ojAlgo specific types.
 * Added a main method in org.ojalgo.OjAlgoUtils that output info about the environment.
@@ -44,7 +44,7 @@
 
 * The BasicMatrix interface has been deprecated!!! The various implementations will remain - all of them - but you should use those implementations directly/explicitly rather than the interface.
 
-# v46.2 2018-10-04
+# v46.2.0: 2018-10-04
 
 Nothing in ojAlgo implements Serializable - a few odd classes used to declare that they did, but serialization has never been supported.
 
@@ -61,7 +61,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 
 * Access1D no longer extends Iterable. To iterate over the elements use `elements()`.
 
-# v46.1 2018-09-17
+# v46.1.0: 2018-09-17
 
 ## org.ojalgo.ann
 
@@ -84,7 +84,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 * Added default methods to get all primitive number types from Access1D, Access2D and AccessAnyD and to somewhat modified the ones in AccessScalar: `byteValue(), shortValue(), intValue(), longValue(), floatValue(), doubleValue()`.
 * AccessAnyD now has a method `matrices()` that return a `Iterable<MatrixView<N>>`. On a multi-dimensional data structure you can iterate over its 2D (sub)matrices. Useful when you have a 3-dimensional (or more) data structure that is actually a collection of 2D matrices.
 
-# v46 2018-08-19
+# v46.0.0: 2018-08-19
 
 ## org.ojalgo.access
 
