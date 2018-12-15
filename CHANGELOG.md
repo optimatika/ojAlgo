@@ -1,4 +1,6 @@
-# v47 [Not yet released; corresponds to changes in the `develop` branch]
+# v47 [Not yet released]
+
+> corresponds to changes in the `develop` branch
 
 ## org.ojalgo.array
 
