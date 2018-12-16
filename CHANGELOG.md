@@ -2,7 +2,7 @@
 
 > corresponds to changes in the `develop` branch since the last release
 
-# v47.0.0: [Soon to be released]
+# v47.0.0: 2018-12-16
 
 ## org.ojalgo.array
 
