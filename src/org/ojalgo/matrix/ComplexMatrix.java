@@ -28,6 +28,9 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
@@ -41,9 +44,69 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMatrix> {
+public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatrix> {
 
-    public static final MatrixFactory<ComplexNumber, ComplexMatrix> FACTORY = new MatrixFactory<>(ComplexMatrix.class, GenericDenseStore.COMPLEX);
+    public static final class DenseReceiver extends
+            MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.DenseReceiver {
+
+        DenseReceiver(Factory enclosing, PhysicalStore<ComplexNumber> delegate) {
+            enclosing.super(delegate);
+        }
+
+    }
+
+    public static final class Factory
+            extends MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver> {
+
+        Factory() {
+            super(ComplexMatrix.class, GenericDenseStore.COMPLEX);
+        }
+
+        @Override
+        ComplexMatrix.LogicalBuilder logical(MatrixStore<ComplexNumber> delegate) {
+            return new ComplexMatrix.LogicalBuilder(this, delegate);
+        }
+
+        @Override
+        ComplexMatrix.DenseReceiver physical(PhysicalStore<ComplexNumber> delegate) {
+            return new ComplexMatrix.DenseReceiver(this, delegate);
+        }
+
+        @Override
+        ComplexMatrix.SparseReceiver physical(SparseStore<ComplexNumber> delegate) {
+            return new ComplexMatrix.SparseReceiver(this, delegate);
+        }
+
+    }
+
+    public static final class LogicalBuilder extends
+            MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.Logical {
+
+        LogicalBuilder(Factory enclosing, MatrixStore.LogicalBuilder<ComplexNumber> delegate) {
+            enclosing.super(delegate);
+        }
+
+        LogicalBuilder(Factory enclosing, MatrixStore<ComplexNumber> store) {
+            enclosing.super(store);
+        }
+
+        @Override
+        LogicalBuilder self() {
+            return this;
+        }
+
+    }
+
+    public static final class SparseReceiver extends
+            MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.SparseReceiver {
+
+        SparseReceiver(Factory enclosing, SparseStore<ComplexNumber> delegate) {
+            enclosing.super(delegate);
+        }
+
+    }
+
+    public static final Factory FACTORY = new Factory();
 
     /**
      * This method is for internal use only - YOU should NOT use it!
@@ -52,32 +115,42 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
         super(aStore);
     }
 
+    @Override
+    public ComplexMatrix.DenseReceiver copy() {
+        return new ComplexMatrix.DenseReceiver(FACTORY, this.getStore().copy());
+    }
+
     /**
      * @return A primitive double valued matrix containg this matrix' element arguments
      */
     public PrimitiveMatrix getArgument() {
-        return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexArgument(this.getStore()));
+        return PrimitiveMatrix.FACTORY.instantiate(PrimitiveDenseStore.getComplexArgument(this.getStore()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element imaginary parts
      */
     public PrimitiveMatrix getImaginary() {
-        return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexImaginary(this.getStore()));
+        return PrimitiveMatrix.FACTORY.instantiate(PrimitiveDenseStore.getComplexImaginary(this.getStore()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element modulus
      */
     public PrimitiveMatrix getModulus() {
-        return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexModulus(this.getStore()));
+        return PrimitiveMatrix.FACTORY.instantiate(PrimitiveDenseStore.getComplexModulus(this.getStore()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element real parts
      */
     public PrimitiveMatrix getReal() {
-        return PrimitiveMatrix.FACTORY.instantiate(MatrixUtils.getComplexReal(this.getStore()));
+        return PrimitiveMatrix.FACTORY.instantiate(PrimitiveDenseStore.getComplexReal(this.getStore()));
+    }
+
+    @Override
+    public ComplexMatrix.LogicalBuilder logical() {
+        return new ComplexMatrix.LogicalBuilder(FACTORY, this.getStore());
     }
 
     @SuppressWarnings("unchecked")
@@ -124,7 +197,7 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
     }
 
     @Override
-    MatrixFactory<ComplexNumber, ComplexMatrix> getFactory() {
+    ComplexMatrix.Factory getFactory() {
         return FACTORY;
     }
 

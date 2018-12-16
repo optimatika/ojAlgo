@@ -44,6 +44,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
+    private boolean myInitWithLP = false;
     private MatrixStore<Double> myInvQC;
     private final PrimitiveDenseStore myIterationX;
     private final PrimitiveDenseStore mySlackI;
@@ -200,6 +201,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final Optional<Access1D<?>> tmpMultipliers = resultLP.getMultipliers();
                 if (tmpMultipliers.isPresent()) {
                     this.getSolutionL().fillMatching(tmpMultipliers.get());
+                    myInitWithLP = true;
                 } else {
                     this.getSolutionL().fillAll(ZERO);
                 }
@@ -438,9 +440,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     final void handleIterationResults(final boolean solved, final PrimitiveDenseStore iterX, final int[] included, final int[] excluded) {
 
+        this.incrementIterationsCount();
+
         final PhysicalStore<Double> soluX = this.getSolutionX();
 
         if (solved) {
+            // Subproblem solved successfully
 
             iterX.modifyMatching(SUBTRACT, soluX);
 
@@ -517,54 +522,64 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 this.setState(State.FEASIBLE);
             }
 
-        } else if (included.length >= 1) {
-            // Subproblem NOT solved successfully
-            // At least 1 active inequality
+        } else if (this.isIterationAllowed()) {
+            // Subproblem NOT solved successfully, but further iterations allowed
 
-            this.shrink();
+            if (included.length >= 1) {
+                // Subproblem NOT solved successfully
+                // At least 1 active inequality
 
-            this.performIteration();
+                this.shrink();
 
-        } else if (!this.isSolvableQ()) {
-            // Subproblem NOT solved successfully
-            // 0 active inequalities
-            // Q not SPD
+                this.performIteration();
 
-            final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
-            final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
-            final double largest = PrimitiveFunction.MAX.invoke(largestInQ, largestInC);
+            } else if (!this.isSolvableQ()) {
+                // Subproblem NOT solved successfully
+                // 0 active inequalities
+                // Q not SPD
 
-            this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
+                final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
+                final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
+                final double largest = PrimitiveFunction.MAX.invoke(largestInQ, largestInC);
 
-            this.computeQ(this.getIterationQ());
+                this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
+                this.computeQ(this.getIterationQ());
 
-            this.getSolutionL().modifyAll((Unary) arg -> {
-                if (Double.isFinite(arg)) {
-                    return arg;
-                } else {
-                    return ZERO;
-                }
-            });
+                this.getSolutionL().modifyAll((Unary) arg -> {
+                    if (Double.isFinite(arg)) {
+                        return arg;
+                    } else {
+                        return ZERO;
+                    }
+                });
 
-            this.resetActivator();
+                this.resetActivator();
+                this.performIteration();
 
-            this.performIteration();
+            } else {
+                // Subproblem NOT solved successfully
+                // 0 active inequalities
+                // Q SPD
+
+                // Should not be possible to end up here, infeasibility among
+                // the equality constraints should have been detected earlier.
+
+                this.setState(State.FAILED);
+            }
 
         } else if (this.checkFeasibility(false)) {
-            // Subproblem NOT solved successfully, but current solution is feasible
-            // 0 active inequalities
-            // Q SPD
+            // Subproblem NOT solved successfully
+            // Further iterations NOT allowed
             // Feasible current solution
 
             this.setState(State.FEASIBLE);
 
         } else {
-            // Subproblem NOT solved successfully, and current solution NOT feasible
-            // 0 active inequalities
-            // Q SPD
-            // Not feasible current solution
+            // Subproblem NOT solved successfully
+            // Further iterations NOT allowed
+            // Current solution somehow NOT feasible
 
-            this.setState(State.INFEASIBLE);
+            this.setState(State.FAILED);
         }
 
         if (this.isDebug()) {
@@ -597,14 +612,16 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             final MatrixStore<Double> slack = this.getSlackI();
             final int[] excl = this.getExcluded();
 
+            PrimitiveDenseStore lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
-                if (options.feasibility.isZero(slack.doubleValue(excl[i])) && (!options.solution.isZero(this.getSolutionL().doubleValue(numbEqus + excl[i])))) {
+                if (options.feasibility.isZero(slack.doubleValue(excl[i]))
+                        && (!myInitWithLP || !options.solution.isZero(lagrange.doubleValue(numbEqus + excl[i])))) {
                     this.include(excl[i]);
                 }
             }
         }
 
-        while (((numbEqus + this.countIncluded()) >= numbVars) && (this.countIncluded() > 0)) {
+        while (((numbEqus + this.countIncluded()) > numbVars) && (this.countIncluded() > 0)) {
             this.shrink();
         }
 

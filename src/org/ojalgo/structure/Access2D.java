@@ -195,9 +195,17 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             return this;
         }
 
+        public long nextIndex() {
+            return myDelegate.nextIndex();
+        }
+
         public ElementView<N> previous() {
             myDelegate.previous();
             return this;
+        }
+
+        public long previousIndex() {
+            return myDelegate.previousIndex();
         }
 
         public long row() {
@@ -480,22 +488,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             }
 
         };
-    }
-
-    /**
-     * @deprecated v45 Use {@link #wrap(double[][])} instead
-     */
-    @Deprecated
-    static Access2D<Double> wrapAccess2D(final double[][] target) {
-        return Access2D.wrap(target);
-    }
-
-    /**
-     * @deprecated v45 Use {@link #wrap(N[][])} instead
-     */
-    @Deprecated
-    static <N extends Number> Access2D<N> wrapAccess2D(final N[][] target) {
-        return Access2D.wrap(target);
     }
 
     default <NN extends Number, R extends Mutate2D.Receiver<NN>> Collectable<NN, R> asCollectable2D() {

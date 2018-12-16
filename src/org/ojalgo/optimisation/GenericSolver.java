@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.ProgrammingError;
@@ -78,11 +79,11 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     protected Optimisation.Result buildResult() {
 
-        final MatrixStore<Double> tmpSolution = this.extractSolution();
-        final double tmpValue = this.evaluateFunction(tmpSolution);
-        final Optimisation.State tmpState = this.getState();
+        final MatrixStore<Double> solution = this.extractSolution();
+        final double value = this.evaluateFunction(solution);
+        final Optimisation.State state = this.getState();
 
-        return new Optimisation.Result(tmpState, tmpValue, tmpSolution);
+        return new Optimisation.Result(state, value, solution);
     }
 
     protected final int countIterations() {
@@ -126,7 +127,13 @@ public abstract class GenericSolver implements Optimisation.Solver {
      * respective limits.
      */
     protected final boolean isIterationAllowed() {
-        return (this.countTime() < options.time_abort) && (this.countIterations() < options.iterations_abort);
+        if (myState.isFailure()) {
+            return false;
+        } else if (myState.isFeasible()) {
+            return (this.countTime() < options.time_suffice) && (this.countIterations() < options.iterations_suffice);
+        } else {
+            return (this.countTime() < options.time_abort) && (this.countIterations() < options.iterations_abort);
+        }
     }
 
     protected final boolean isProgress() {
@@ -150,8 +157,13 @@ public abstract class GenericSolver implements Optimisation.Solver {
         myResetTime = System.currentTimeMillis();
     }
 
-    protected final void setState(final State aState) {
-        myState = aState;
+    /**
+     * As the solver algorithm reaches various states it should be recorded here. It's particularly important
+     * to record when a feasible solution has been reached.
+     */
+    protected final void setState(final State state) {
+        Objects.requireNonNull(state);
+        myState = state;
     }
 
 }

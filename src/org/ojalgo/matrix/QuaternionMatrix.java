@@ -28,6 +28,8 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
@@ -41,15 +43,85 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public final class QuaternionMatrix extends AbstractMatrix<Quaternion, QuaternionMatrix> {
+public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMatrix> {
 
-    public static final MatrixFactory<Quaternion, QuaternionMatrix> FACTORY = new MatrixFactory<>(QuaternionMatrix.class, GenericDenseStore.QUATERNION);
+    public static final class DenseReceiver extends
+            MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver>.DenseReceiver {
+
+        DenseReceiver(Factory enclosing, PhysicalStore<Quaternion> delegate) {
+            enclosing.super(delegate);
+        }
+
+    }
+
+    public static final class Factory extends
+            MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver> {
+
+        Factory() {
+            super(QuaternionMatrix.class, GenericDenseStore.QUATERNION);
+        }
+
+        @Override
+        QuaternionMatrix.LogicalBuilder logical(MatrixStore<Quaternion> delegate) {
+            return new QuaternionMatrix.LogicalBuilder(this, delegate);
+        }
+
+        @Override
+        QuaternionMatrix.DenseReceiver physical(PhysicalStore<Quaternion> delegate) {
+            return new QuaternionMatrix.DenseReceiver(this, delegate);
+        }
+
+        @Override
+        QuaternionMatrix.SparseReceiver physical(SparseStore<Quaternion> delegate) {
+            return new QuaternionMatrix.SparseReceiver(this, delegate);
+        }
+
+    }
+
+    public static final class LogicalBuilder extends
+            MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver>.Logical {
+
+        LogicalBuilder(Factory enclosing, MatrixStore.LogicalBuilder<Quaternion> delegate) {
+            enclosing.super(delegate);
+        }
+
+        LogicalBuilder(Factory enclosing, MatrixStore<Quaternion> store) {
+            enclosing.super(store);
+        }
+
+        @Override
+        LogicalBuilder self() {
+            return this;
+        }
+
+    }
+
+    public static final class SparseReceiver extends
+            MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver>.SparseReceiver {
+
+        SparseReceiver(Factory enclosing, SparseStore<Quaternion> delegate) {
+            enclosing.super(delegate);
+        }
+
+    }
+
+    public static final Factory FACTORY = new Factory();
 
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
     QuaternionMatrix(final MatrixStore<Quaternion> aStore) {
         super(aStore);
+    }
+
+    @Override
+    public QuaternionMatrix.DenseReceiver copy() {
+        return new QuaternionMatrix.DenseReceiver(FACTORY, this.getStore().copy());
+    }
+
+    @Override
+    public QuaternionMatrix.LogicalBuilder logical() {
+        return new QuaternionMatrix.LogicalBuilder(FACTORY, this.getStore());
     }
 
     @SuppressWarnings("unchecked")
@@ -96,7 +168,7 @@ public final class QuaternionMatrix extends AbstractMatrix<Quaternion, Quaternio
     }
 
     @Override
-    MatrixFactory<Quaternion, QuaternionMatrix> getFactory() {
+    Factory getFactory() {
         return FACTORY;
     }
 

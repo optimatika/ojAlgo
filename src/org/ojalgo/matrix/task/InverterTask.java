@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.task;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
@@ -165,9 +164,6 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     /**
      * The output must be a "right inverse" and a "generalised inverse".
-     *
-     * @throws RecoverableCondition TODO
-     * @see BasicMatrix#invert()
      */
     default MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
         return this.invert(original, this.preallocate(original));

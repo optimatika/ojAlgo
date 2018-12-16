@@ -36,6 +36,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleLUCase extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 1);
+
     public static RationalMatrix getOrginal() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, -1.0, 0.0 }, { 0.0, 1.0, -1.0 }, { 1.0, 0.0, -1.0 } });
         return tmpMtrx.enforce(DEFINITION);
@@ -51,19 +53,18 @@ public class SimpleLUCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 1);
-        EVALUATION = new NumberContext(7, 9);
+        evaluation = new NumberContext(7, 9);
 
-        myBigAA = SimpleLUCase.getMtrxL();
-        myBigAX = SimpleLUCase.getMtrxU();
-        myBigAB = SimpleLUCase.getOrginal();
+        rationalAA = SimpleLUCase.getMtrxL();
+        rationalAX = SimpleLUCase.getMtrxU();
+        rationalAB = SimpleLUCase.getOrginal();
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }
@@ -71,10 +72,10 @@ public class SimpleLUCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        myExpMtrx = SimpleLUCase.getOrginal();
-        myActMtrx = SimpleLUCase.getMtrxL().multiply(SimpleLUCase.getMtrxU());
+        expMtrx = SimpleLUCase.getOrginal();
+        actMtrx = SimpleLUCase.getMtrxL().multiply(SimpleLUCase.getMtrxU());
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     @Test
@@ -85,7 +86,7 @@ public class SimpleLUCase extends BasicMatrixTest {
         final LU<RationalNumber> tmpLU = LU.RATIONAL.make();
         tmpLU.decompose(GenericDenseStore.RATIONAL.copy(SimpleLUCase.getOrginal()));
 
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(SimpleLUCase.getOrginal()), tmpLU, EVALUATION);
+        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(SimpleLUCase.getOrginal()), tmpLU, evaluation);
     }
 
 }

@@ -35,8 +35,6 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
-import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.MatrixFactory;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -246,6 +244,33 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertFalse(tmpResult.getState().isFeasible());
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel, null);
+    }
+
+    /**
+     * Model is not convex. Therefore ConvexSolver has a problem. It output a feasible, but not the optimal,
+     * solution. But states it to be "optimal". This test only verifies that if state says optimal, then it
+     * must be the optimal solution. https://github.com/vagmcs/Optimus/issues/25
+     */
+    @Test
+    public void testNotConvexProblem() {
+
+        final ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable x = model.addVariable("x").lower(100).upper(200);
+        Variable y = model.addVariable("y").lower(80).upper(170);
+
+        model.addExpression("obj").set(x, y, 1).weight(-1);
+
+        // model.options.debug(ConvexSolver.class);
+        // model.options.validate = false;
+
+        final Optimisation.Result result = model.minimise();
+
+        if (result.getState().isOptimal()) {
+            TestUtils.assertEquals(Access1D.wrap(new double[] { 200, 170 }), result);
+        } else if (result.getState().isFeasible()) {
+            TestUtils.assertTrue(model.validate(result));
+        }
     }
 
     /**
@@ -549,10 +574,10 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20080819() {
 
-        final MatrixFactory<Double, PrimitiveMatrix> tmpMtrxFact = PrimitiveMatrix.FACTORY;
+        final PrimitiveMatrix.Factory tmpMtrxFact = PrimitiveMatrix.FACTORY;
         final NumberContext tmpEvalCntxt = StandardType.DECIMAL_032;
 
-        final BasicMatrix[] tmpMatrices = new PrimitiveMatrix[8];
+        final PrimitiveMatrix[] tmpMatrices = new PrimitiveMatrix[8];
 
         tmpMatrices[0] = tmpMtrxFact.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0 } });
         tmpMatrices[1] = tmpMtrxFact.rows(new double[][] { { 1.0 } });
@@ -771,8 +796,8 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
-     * A lower level version of {@linkplain org.ojalgo.finance.portfolio.PortfolioProblems#testP20090115()}.
-     * The solver returns negative, constraint breaking, variables with STATE == OPTIMAL.
+     * A lower level version of {@linkplain #testP20090115()}. The solver returns negative, constraint
+     * breaking, variables with STATE == OPTIMAL.
      */
     @SuppressWarnings("unchecked")
     @Test

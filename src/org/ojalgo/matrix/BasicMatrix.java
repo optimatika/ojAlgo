@@ -21,22 +21,34 @@
  */
 package org.ojalgo.matrix;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.ojalgo.ProgrammingError;
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.algebra.ScalarOperation;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
+import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
+import org.ojalgo.matrix.store.ElementsSupplier;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.task.DeterminantTask;
+import org.ojalgo.matrix.task.InverterTask;
+import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
@@ -50,74 +62,71 @@ import org.ojalgo.type.context.NumberContext;
  * </p>
  *
  * @author apete
- * @deprecated v46.3 Use the specific implementations instead {@link PrimitiveMatrix}, {@link ComplexMatrix}
- *             or {@link RationalMatrix}.
  */
-@Deprecated
-public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>,
-        ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number>,
-        Access2D<Number>, Access2D.Elements, Access2D.Aggregatable<Number>, Structure2D.ReducibleTo1D<BasicMatrix>, NumberContext.Enforceable<BasicMatrix> {
+abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extends Object implements NormedVectorSpace<M, N>, Operation.Subtraction<M>,
+        Operation.Multiplication<M>, ScalarOperation.Addition<M, N>, ScalarOperation.Division<M, N>, ScalarOperation.Subtraction<M, N>, Access2D<N>,
+        Access2D.Elements, Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
     @SuppressWarnings("unchecked")
-    public static interface LogicalBuilder<N extends Number, I extends BasicMatrix>
-            extends Structure2D.Logical<I, BasicMatrix.LogicalBuilder<N, I>>, Access2D.Collectable<N, PhysicalStore<N>> {
+    static interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
+            extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>> {
 
-        LogicalBuilder<N, I> above(int numberOfRows);
+        LogicalBuilder<N, M> above(int numberOfRows);
 
-        LogicalBuilder<N, I> above(N... elements);
+        LogicalBuilder<N, M> above(N... elements);
 
-        LogicalBuilder<N, I> below(int numberOfRows);
+        LogicalBuilder<N, M> below(int numberOfRows);
 
-        LogicalBuilder<N, I> below(N... elements);
+        LogicalBuilder<N, M> below(N... elements);
 
-        LogicalBuilder<N, I> bidiagonal(boolean upper, boolean assumeOne);
+        LogicalBuilder<N, M> bidiagonal(boolean upper, boolean assumeOne);
 
-        default I build() {
+        default M build() {
             return this.get();
         }
 
-        LogicalBuilder<N, I> column(final int... columns);
+        LogicalBuilder<N, M> column(final int... columns);
 
-        LogicalBuilder<N, I> conjugate();
+        LogicalBuilder<N, M> conjugate();
 
-        LogicalBuilder<N, I> diagonal();
+        LogicalBuilder<N, M> diagonal();
 
-        LogicalBuilder<N, I> hermitian(boolean upper);
+        LogicalBuilder<N, M> hermitian(boolean upper);
 
-        LogicalBuilder<N, I> hessenberg(boolean upper);
+        LogicalBuilder<N, M> hessenberg(boolean upper);
 
-        LogicalBuilder<N, I> left(int numberOfColumns);
+        LogicalBuilder<N, M> left(int numberOfColumns);
 
-        LogicalBuilder<N, I> left(N... elements);
+        LogicalBuilder<N, M> left(N... elements);
 
-        LogicalBuilder<N, I> limits(int rowLimit, int columnLimit);
+        LogicalBuilder<N, M> limits(int rowLimit, int columnLimit);
 
-        LogicalBuilder<N, I> offsets(int rowOffset, int columnOffset);
+        LogicalBuilder<N, M> offsets(int rowOffset, int columnOffset);
 
-        LogicalBuilder<N, I> right(int numberOfColumns);
+        LogicalBuilder<N, M> right(int numberOfColumns);
 
-        LogicalBuilder<N, I> right(N... elements);
+        LogicalBuilder<N, M> right(N... elements);
 
-        LogicalBuilder<N, I> row(final int... rows);
+        LogicalBuilder<N, M> row(final int... rows);
 
-        LogicalBuilder<N, I> superimpose(BasicMatrix matrix);
+        LogicalBuilder<N, M> superimpose(int row, int col, M matrix);
 
-        LogicalBuilder<N, I> superimpose(int row, int col, BasicMatrix matrix);
+        LogicalBuilder<N, M> superimpose(int row, int col, Number matrix);
 
-        LogicalBuilder<N, I> superimpose(int row, int col, Number matrix);
+        LogicalBuilder<N, M> superimpose(M matrix);
 
-        LogicalBuilder<N, I> transpose();
+        LogicalBuilder<N, M> transpose();
 
-        LogicalBuilder<N, I> triangular(boolean upper, boolean assumeOne);
+        LogicalBuilder<N, M> triangular(boolean upper, boolean assumeOne);
 
-        LogicalBuilder<N, I> tridiagonal();
+        LogicalBuilder<N, M> tridiagonal();
 
     }
 
-    public static interface PhysicalBuilder<N extends Number, I extends BasicMatrix>
-            extends Mutate2D.Receiver<N>, Mutate2D.BiModifiable<N>, Mutate2D.Exchangeable, Supplier<I>, Access2D.Collectable<N, PhysicalStore<N>> {
+    static interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
+            extends Mutate2D.ModifiableReceiver<N>, Mutate2D.Exchangeable, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
-        default I build() {
+        default M build() {
             return this.get();
         }
 
@@ -129,14 +138,14 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      *
      * @return The matrix' Frobenius norm
      */
-    public static double calculateFrobeniusNorm(final BasicMatrix matrix) {
+    public static <M extends BasicMatrix<?, M>> double calculateFrobeniusNorm(final M matrix) {
         return matrix.norm();
     }
 
     /**
      * @return The inf-norm or maximum row sum
      */
-    public static double calculateInfinityNorm(final BasicMatrix matrix) {
+    public static <M extends BasicMatrix<?, M>> double calculateInfinityNorm(final M matrix) {
 
         double retVal = PrimitiveMath.ZERO;
 
@@ -151,7 +160,7 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
     /**
      * @return The 1-norm or maximum column sum
      */
-    public static double calculateOneNorm(final BasicMatrix matrix) {
+    public static <M extends BasicMatrix<?, M>> double calculateOneNorm(final M matrix) {
 
         double retVal = PrimitiveMath.ZERO;
 
@@ -163,96 +172,270 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
         return retVal;
     }
 
-    /**
-     * @param row The row index of where to superimpose the top left element of the addend
-     * @param col The column index of where to superimpose the top left element of the addend
-     * @param addend A matrix to superimpose
-     * @return A new matrix
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    BasicMatrix add(int row, int col, Access2D<?> addend);
+    private transient MatrixDecomposition<N> myDecomposition = null;
+    private transient int myHashCode = 0;
+
+    private transient Boolean myHermitian = null;
+
+    private final MatrixStore<N> myStore;
+
+    private transient Boolean mySymmetric = null;
+
+    @SuppressWarnings("unused")
+    private BasicMatrix() {
+
+        this(null);
+
+        ProgrammingError.throwForIllegalInvocation();
+    }
+
+    BasicMatrix(final MatrixStore<N> store) {
+
+        super();
+
+        myStore = store;
+    }
+
+    public M add(final double scalarAddend) {
+
+        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+
+        final N tmpRight = myStore.physical().scalar().cast(scalarAddend);
+
+        retVal.modifyAll(myStore.physical().function().add().second(tmpRight));
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public M add(final M addend) {
+
+        ProgrammingError.throwIfNotEqualDimensions(myStore, addend);
+
+        final PhysicalStore<N> retVal = myStore.physical().copy(addend);
+
+        retVal.modifyMatching(myStore, myStore.physical().function().add());
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public M add(final Number scalarAddend) {
+
+        final org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> tmpPhysical = myStore.physical();
+
+        final PhysicalStore<N> retVal = tmpPhysical.copy(myStore);
+
+        final N tmpRight = tmpPhysical.scalar().cast(scalarAddend);
+
+        retVal.modifyAll(tmpPhysical.function().add().second(tmpRight));
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public N aggregateColumn(final long row, final long col, final Aggregator aggregator) {
+        return myStore.aggregateColumn(row, col, aggregator);
+    }
+
+    public N aggregateDiagonal(final long row, final long col, final Aggregator aggregator) {
+        return myStore.aggregateDiagonal(row, col, aggregator);
+    }
+
+    public N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
+        return myStore.aggregateRange(first, limit, aggregator);
+    }
+
+    public N aggregateRow(final long row, final long col, final Aggregator aggregator) {
+        return myStore.aggregateRow(row, col, aggregator);
+    }
+
+    public M conjugate() {
+        return this.getFactory().instantiate(myStore.conjugate());
+    }
 
     /**
      * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
      */
-    PhysicalBuilder<? extends Number, ? extends BasicMatrix> copy();
+    public abstract BasicMatrix.PhysicalReceiver<N, M> copy();
 
-    /**
-     * Divides the elements of this with the elements of aMtrx. The matrices must have equal dimensions.
-     *
-     * @param aMtrx The denominator elements.
-     * @return A new matrix whos elements are the elements of this divided with the elements of aMtrx.
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    BasicMatrix divideElements(Access2D<?> aMtrx);
+    public long count() {
+        return myStore.count();
+    }
+
+    public long countColumns() {
+        return myStore.countColumns();
+    }
+
+    public long countRows() {
+        return myStore.countRows();
+    }
+
+    public M divide(final double scalarDivisor) {
+
+        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+
+        final N tmpRight = myStore.physical().scalar().cast(scalarDivisor);
+
+        retVal.modifyAll(myStore.physical().function().divide().second(tmpRight));
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public M divide(final Number scalarDivisor) {
+
+        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+
+        final N tmpRight = myStore.physical().scalar().cast(scalarDivisor);
+
+        retVal.modifyAll(myStore.physical().function().divide().second(tmpRight));
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public double doubleValue(final long index) {
+        return myStore.doubleValue(index);
+    }
+
+    public double doubleValue(final long i, final long j) {
+        return myStore.doubleValue(i, j);
+    }
+
+    public M enforce(final NumberContext context) {
+
+        final PhysicalStore<N> tmpCopy = myStore.copy();
+
+        tmpCopy.modifyAll(myStore.physical().function().enforce(context));
+
+        return this.getFactory().instantiate(tmpCopy);
+    }
 
     /**
      * @return true if the frobenius norm of the difference between [this] and [aStore] is zero within the
      *         limits of aCntxt.
      */
-    boolean equals(Access2D<?> another, NumberContext precision);
+    public boolean equals(final Access2D<?> another, final NumberContext precision) {
+        return Access2D.equals(myStore, another, precision);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof Access2D<?>) {
+            return this.equals((Access2D<?>) obj, NumberContext.getGeneral(6));
+        } else {
+            return super.equals(obj);
+        }
+    }
 
     /**
      * BasicMatrix instances are intended to be immutable. If they are it is possible to cache (partial)
      * calculation results. Calling this method should flush any cached calculation results.
      */
-    void flushCache();
+    public void flushCache() {
 
-    /**
-     * @param first The first column to include.
-     * @param limit The limit (exclusive) - the first column not to include.
-     * @return A new matrix with only the specified range of columns
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    BasicMatrix getColumnsRange(final int first, final int limit);
+        myHashCode = 0;
+
+        if (myDecomposition != null) {
+            myDecomposition.reset();
+            myDecomposition = null;
+        }
+
+        myHermitian = null;
+        mySymmetric = null;
+
+    }
+
+    public N get(final long index) {
+        return myStore.get(index);
+    }
+
+    public N get(final long aRow, final long aColumn) {
+        return myStore.get(aRow, aColumn);
+    }
 
     /**
      * Matrix condition (2-norm)
      *
      * @return ratio of largest to smallest singular value.
      */
-    Scalar<?> getCondition();
+    public Scalar<N> getCondition() {
+        return myStore.physical().scalar().convert(this.getComputedSingularValue().getCondition());
+    }
 
     /**
      * @return The matrix' determinant.
      */
-    Scalar<?> getDeterminant();
+    public Scalar<N> getDeterminant() {
 
-    List<Eigenvalue.Eigenpair> getEigenpairs();
+        N tmpDeterminant = null;
+
+        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Determinant)
+                && ((MatrixDecomposition.Determinant<N>) myDecomposition).isComputed()) {
+
+            tmpDeterminant = ((MatrixDecomposition.Determinant<N>) myDecomposition).getDeterminant();
+
+        } else {
+
+            final DeterminantTask<N> tmpTask = this.getTaskDeterminant(myStore);
+
+            if (tmpTask instanceof MatrixDecomposition.Determinant) {
+                myDecomposition = (MatrixDecomposition.Determinant<N>) tmpTask;
+            }
+
+            tmpDeterminant = tmpTask.calculateDeterminant(myStore);
+        }
+
+        return myStore.physical().scalar().convert(tmpDeterminant);
+    }
+
+    public List<Eigenpair> getEigenpairs() {
+
+        if (!this.isSquare()) {
+            throw new ProgrammingError("Only defined for square matrices!");
+        }
+
+        Eigenvalue<N> evd = this.getComputedEigenvalue();
+
+        List<Eigenpair> retVal = new ArrayList<>();
+
+        for (int i = 0, limit = evd.getEigenvalues().size(); i < limit; i++) {
+            retVal.add(evd.getEigenpair(i));
+        }
+
+        retVal.sort(Comparator.reverseOrder());
+
+        return retVal;
+    }
 
     /**
      * The rank of a matrix is the (maximum) number of linearly independent rows or columns it contains. It is
      * also equal to the number of nonzero singular values of the matrix.
      *
      * @return The matrix' rank.
-     * @see MatrixDecomposition.RankRevealing
+     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition.RankRevealing
      */
-    int getRank();
-
-    /**
-     * @param first The first row to include.
-     * @param kimit The limit (exclusive) - the first row not to include.
-     * @return A new matrix with only the specified range of rows
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    BasicMatrix getRowsRange(final int first, final int kimit);
-
-    /**
-     * @deprecated v40 Use {@link SingularValue}
-     */
-    @Deprecated
-    List<? extends Number> getSingularValues();
+    public int getRank() {
+        return this.getRankRevealing(myStore).getRank();
+    }
 
     /**
      * The sum of the diagonal elements.
      *
      * @return The matrix' trace.
      */
-    Scalar<?> getTrace();
+    public Scalar<N> getTrace() {
+
+        final AggregatorFunction<N> tmpAggr = myStore.physical().aggregator().sum();
+
+        myStore.visitDiagonal(tmpAggr);
+
+        return myStore.physical().scalar().convert(tmpAggr.get());
+    }
+
+    @Override
+    public int hashCode() {
+        if (myHashCode == 0) {
+            myHashCode = MatrixUtils.hashCode(myStore);
+        }
+        return myHashCode;
+    }
 
     /**
      * <p>
@@ -279,94 +462,238 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      *
      * @return The "best possible" inverse....
      */
-    BasicMatrix invert();
+    public M invert() {
 
-    /**
-     * @return true if {@linkplain #getRank()} == min({@linkplain #countRows()}, {@linkplain #countColumns()})
-     * @see MatrixDecomposition.RankRevealing
-     */
-    boolean isFullRank();
+        MatrixStore<N> tmpInverse = null;
 
-    boolean isHermitian();
+        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
+                && ((MatrixDecomposition.Solver<?>) myDecomposition).isSolvable()) {
 
-    boolean isSymmetric();
+            tmpInverse = ((MatrixDecomposition.Solver<N>) myDecomposition).getInverse();
 
-    LogicalBuilder<? extends Number, ? extends BasicMatrix> logical();
+        } else {
 
-    /**
-     * [belowRows] is appended below [this]. The two matrices must have the same number of columns.
-     *
-     * @param belowRows The matrix to merge.
-     * @return A new matrix with more rows.
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    BasicMatrix mergeColumns(Access2D<?> belowRows);
+            final InverterTask<N> tmpTask = this.getTaskInverter(myStore);
 
-    /**
-     * [rightColumns] is appended to the right of [this]. The two matrices must have the same number of rows.
-     *
-     * @param rightColumns The matrix to merge.
-     * @return A new matrix with more columns.
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    BasicMatrix mergeRows(Access2D<?> rightColumns);
+            if (tmpTask instanceof MatrixDecomposition.Solver) {
 
-    /**
-     * @deprecated v42 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    BasicMatrix modify(UnaryFunction<? extends Number> aFunc);
+                final MatrixDecomposition.Solver<N> tmpSolver = (MatrixDecomposition.Solver<N>) tmpTask;
+                myDecomposition = tmpSolver;
 
-    /**
-     * Multiplies the elements of this matrix with the elements of aMtrx. The matrices must have equal
-     * dimensions.
-     *
-     * @param aMtrx The elements to multiply by.
-     * @return A new matrix whos elements are the elements of this multiplied with the elements of aMtrx.
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    BasicMatrix multiplyElements(Access2D<?> aMtrx);
+                if (tmpSolver.compute(myStore)) {
+                    tmpInverse = tmpSolver.getInverse();
+                } else {
+                    tmpInverse = null;
+                }
 
-    /**
-     * @param someCols An ordered array of column indeces.
-     * @return A matrix with a subset of, reordered, columns.
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
-     */
-    @Deprecated
-    default BasicMatrix selectColumns(int... someCols) {
-        return this.logical().column(someCols).get();
+            } else {
+
+                try {
+                    tmpInverse = tmpTask.invert(myStore);
+                } catch (final RecoverableCondition xcptn) {
+                    xcptn.printStackTrace();
+                    tmpInverse = null;
+                }
+            }
+        }
+
+        if (tmpInverse == null) {
+            SingularValue<N> computedSVD = this.getComputedSingularValue();
+            myDecomposition = computedSVD;
+            tmpInverse = computedSVD.getInverse();
+        }
+
+        return this.getFactory().instantiate(tmpInverse);
+    }
+
+    public boolean isAbsolute(final long row, final long col) {
+        return myStore.isAbsolute(row, col);
     }
 
     /**
-     * @param someRows An ordered array of row indeces.
-     * @return A matrix with a subset of, reordered, rows.
-     * @deprecated v46 Use {@link #logical()} or {@link #copy()} instead
+     * @return true if {@linkplain #getRank()} == min({@linkplain #countRows()}, {@linkplain #countColumns()})
+     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition.RankRevealing
      */
-    @Deprecated
-    default BasicMatrix selectRows(int... someRows) {
-        return this.logical().row(someRows).get();
+    public boolean isFullRank() {
+        return this.getRankRevealing(myStore).isFullRank();
+        // return this.getRank() == Math.min(myStore.countRows(), myStore.countColumns());
+    }
+
+    public boolean isHermitian() {
+        if (myHermitian == null) {
+            myHermitian = this.isSquare() && myStore.equals(myStore.conjugate(), NumberContext.getGeneral(6));
+        }
+        return myHermitian.booleanValue();
+    }
+
+    public boolean isSmall(final double comparedTo) {
+        return myStore.isSmall(comparedTo);
+    }
+
+    public boolean isSmall(final long row, final long col, final double comparedTo) {
+        return myStore.isSmall(row, col, comparedTo);
+    }
+
+    public boolean isSymmetric() {
+        if (mySymmetric == null) {
+            mySymmetric = this.isSquare() && myStore.equals(myStore.transpose(), NumberContext.getGeneral(6));
+        }
+        return mySymmetric.booleanValue();
+    }
+
+    public abstract BasicMatrix.LogicalBuilder<N, M> logical();
+
+    public M multiply(final double scalarMultiplicand) {
+
+        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+
+        final N tmpRight = myStore.physical().scalar().cast(scalarMultiplicand);
+
+        retVal.modifyAll(myStore.physical().function().multiply().second(tmpRight));
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public M multiply(final M multiplicand) {
+
+        ProgrammingError.throwIfMultiplicationNotPossible(myStore, multiplicand);
+
+        return this.getFactory().instantiate(myStore.multiply(this.cast(multiplicand).get()));
+    }
+
+    public M multiply(final Number scalarMultiplicand) {
+
+        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+
+        final N tmpRight = myStore.physical().scalar().cast(scalarMultiplicand);
+
+        retVal.modifyAll(myStore.physical().function().multiply().second(tmpRight));
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public M negate() {
+
+        final PhysicalStore<N> retVal = myStore.copy();
+
+        retVal.modifyAll(myStore.physical().function().negate());
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    /**
+     * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
+     * the sum of the square of the singular values. This definition fits the requirements of
+     * {@linkplain NormedVectorSpace#norm()}.
+     *
+     * @return The matrix' Frobenius norm
+     */
+    public double norm() {
+        return myStore.norm();
+    }
+
+    public M reduceColumns(Aggregator aggregator) {
+        return this.getFactory().instantiate(myStore.reduceColumns(aggregator).get());
+    }
+
+    public M reduceRows(Aggregator aggregator) {
+        return this.getFactory().instantiate(myStore.reduceRows(aggregator).get());
+    }
+
+    public M signum() {
+        return this.getFactory().instantiate(myStore.signum());
     }
 
     /**
      * <p>
-     * This method solves a system of linear equations: [this][X]=[aRHS]. A combination of columns in [this]
-     * should produce a column(s) in [aRHS]. It is ok for [aRHS] to have more than 1 column.
+     * This method solves a system of linear equations: [this][X]=[rhs]. A combination of columns in [this]
+     * should produce a column(s) in [rhs]. It is ok for [aRHS] to have more than 1 column.
      * </p>
      * <ul>
      * <li>If the problem is over-qualified an approximate solution is returned.</li>
      * <li>If the problem is under-qualified one possible solution is returned.</li>
      * </ul>
      * <p>
-     * Remember that: [X][this]=[aRHS] is equivalent to [this]<sup>T</sup>[X]<sup>T</sup>=[aRHS]<sup>T</sup>
+     * Remember that: [X][this]=[rhs] is equivalent to [this]<sup>T</sup>[X]<sup>T</sup>=[rhs]<sup>T</sup>
      * </p>
      *
-     * @param aRHS The right hand side of the equation.
+     * @param rhs The right hand side of the equation.
      * @return The solution, [X].
      */
-    BasicMatrix solve(Access2D<?> aRHS);
+    public M solve(final Access2D<?> rhs) {
+
+        MatrixStore<N> tmpSolution = null;
+
+        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
+                && ((MatrixDecomposition.Solver<?>) myDecomposition).isSolvable()) {
+
+            tmpSolution = ((MatrixDecomposition.Solver<N>) myDecomposition).getSolution(this.cast(rhs));
+
+        } else {
+
+            final SolverTask<N> tmpTask = this.getTaskSolver(myStore, rhs);
+
+            if (tmpTask instanceof MatrixDecomposition.Solver) {
+
+                final MatrixDecomposition.Solver<N> tmpSolver = (MatrixDecomposition.Solver<N>) tmpTask;
+                myDecomposition = tmpSolver;
+
+                if (tmpSolver.compute(myStore)) {
+                    tmpSolution = tmpSolver.getSolution(this.cast(rhs));
+                } else {
+                    tmpSolution = null;
+                }
+
+            } else {
+
+                try {
+                    tmpSolution = tmpTask.solve(myStore, rhs);
+                } catch (final RecoverableCondition xcptn) {
+                    xcptn.printStackTrace();
+                    tmpSolution = null;
+                }
+            }
+        }
+
+        return this.getFactory().instantiate(tmpSolution);
+    }
+
+    public M subtract(final double scalarSubtrahend) {
+
+        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+
+        final N tmpRight = myStore.physical().scalar().cast(scalarSubtrahend);
+
+        retVal.modifyAll(myStore.physical().function().subtract().second(tmpRight));
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public M subtract(final M subtrahend) {
+
+        ProgrammingError.throwIfNotEqualDimensions(myStore, subtrahend);
+
+        final PhysicalStore<N> retVal = myStore.physical().copy(subtrahend);
+
+        retVal.modifyMatching(myStore, myStore.physical().function().subtract());
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public M subtract(final Number scalarSubtrahend) {
+
+        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+
+        final N tmpRight = myStore.physical().scalar().cast(scalarSubtrahend);
+
+        retVal.modifyAll(myStore.physical().function().subtract().second(tmpRight));
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public void supplyTo(PhysicalStore<N> receiver) {
+        myStore.supplyTo(receiver);
+    }
 
     /**
      * Extracts one element of this matrix as a Scalar.
@@ -375,7 +702,14 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @param col A column index.
      * @return One matrix element
      */
-    Scalar<?> toScalar(long row, long col);
+    public Scalar<N> toScalar(final long row, final long col) {
+        return myStore.toScalar(row, col);
+    }
+
+    @Override
+    public String toString() {
+        return Access2D.toString(this);
+    }
 
     /**
      * Transposes this matrix. For complex matrices conjugate() and transpose() are NOT EQUAL.
@@ -383,6 +717,79 @@ public interface BasicMatrix extends NormedVectorSpace<BasicMatrix, Number>, Ope
      * @return A matrix that is the transpose of this matrix.
      * @see org.ojalgo.matrix.BasicMatrix#conjugate()
      */
-    BasicMatrix transpose();
+    public M transpose() {
+        return this.getFactory().instantiate(myStore.transpose());
+    }
+
+    private final Eigenvalue<N> getComputedEigenvalue() {
+
+        if (!this.isComputedEigenvalue()) {
+            myDecomposition = Eigenvalue.make(myStore);
+            myDecomposition.decompose(myStore);
+        }
+
+        return (Eigenvalue<N>) myDecomposition;
+    }
+
+    private final SingularValue<N> getComputedSingularValue() {
+
+        if (!this.isComputedSingularValue()) {
+            myDecomposition = SingularValue.make(myStore);
+            myDecomposition.decompose(myStore);
+        }
+
+        return (SingularValue<N>) myDecomposition;
+    }
+
+    private MatrixDecomposition.RankRevealing<N> getRankRevealing(final MatrixStore<N> store) {
+
+        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.RankRevealing)
+                && ((MatrixDecomposition.RankRevealing<?>) myDecomposition).isComputed()) {
+
+        } else {
+
+            if (store.isTall()) {
+                myDecomposition = this.getDecompositionQR(store);
+            } else if (store.isFat()) {
+                myDecomposition = this.getDecompositionSingularValue(store);
+            } else {
+                myDecomposition = this.getDecompositionLU(store);
+            }
+
+            myDecomposition.decompose(store);
+        }
+
+        return (MatrixDecomposition.RankRevealing<N>) myDecomposition;
+    }
+
+    private boolean isComputedEigenvalue() {
+        return (myDecomposition != null) && (myDecomposition instanceof Eigenvalue) && myDecomposition.isComputed();
+    }
+
+    private boolean isComputedSingularValue() {
+        return (myDecomposition != null) && (myDecomposition instanceof SingularValue) && myDecomposition.isComputed();
+    }
+
+    abstract ElementsSupplier<N> cast(Access1D<?> matrix);
+
+    abstract Eigenvalue<N> getDecompositionEigenvalue(Structure2D typical);
+
+    abstract LU<N> getDecompositionLU(Structure2D typical);
+
+    abstract QR<N> getDecompositionQR(Structure2D typical);
+
+    abstract SingularValue<N> getDecompositionSingularValue(Structure2D typical);
+
+    abstract MatrixFactory<N, M, ? extends LogicalBuilder<N, M>, ? extends PhysicalReceiver<N, M>, ? extends PhysicalReceiver<N, M>> getFactory();
+
+    final MatrixStore<N> getStore() {
+        return myStore;
+    }
+
+    abstract DeterminantTask<N> getTaskDeterminant(final MatrixStore<N> template);
+
+    abstract InverterTask<N> getTaskInverter(final MatrixStore<N> template);
+
+    abstract SolverTask<N> getTaskSolver(MatrixStore<N> templateBody, Access2D<?> templateRHS);
 
 }

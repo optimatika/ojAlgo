@@ -316,30 +316,6 @@ public interface Access1D<N extends Number> extends Structure1D {
     }
 
     /**
-     * @deprecated v45 Use {@link #wrap(double[])} instead
-     */
-    @Deprecated
-    static Access1D<Double> wrapAccess1D(final double[] target) {
-        return Access1D.wrap(target);
-    }
-
-    /**
-     * @deprecated v45 Use {@link #wrap(List<? extends N>)} instead
-     */
-    @Deprecated
-    static <N extends Number> Access1D<N> wrapAccess1D(final List<? extends N> target) {
-        return Access1D.wrap(target);
-    }
-
-    /**
-     * @deprecated v45 Use {@link #wrap(N[])} instead
-     */
-    @Deprecated
-    static <N extends Number> Access1D<N> wrapAccess1D(final N[] target) {
-        return Access1D.wrap(target);
-    }
-
-    /**
      * Transforms this {@link Access1D} to a {@link Access1D.Collectable} of a different {@link Number} type.
      */
     default <NN extends Number, R extends Mutate1D.Receiver<NN>> Collectable<NN, R> asCollectable1D() {

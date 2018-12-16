@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -208,8 +207,6 @@ public interface MatrixDecomposition<N extends Number> {
 
         /**
          * The output must be a "right inverse" and a "generalised inverse".
-         *
-         * @see BasicMatrix#invert()
          */
         MatrixStore<N> getInverse();
 
@@ -267,9 +264,6 @@ public interface MatrixDecomposition<N extends Number> {
          *
          * @return true if this matrix decomposition is in a state to be able to deliver an inverse or an
          *         equation system solution (with some degree of numerical stability).
-         * @see #isComputed()
-         * @see #getSolution(Collectable)
-         * @see #getInverse()
          */
         boolean isSolvable();
 

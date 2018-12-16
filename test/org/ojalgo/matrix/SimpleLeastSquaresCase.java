@@ -34,6 +34,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleLeastSquaresCase extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 4);
+
     public static RationalMatrix getBody() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 }, { -1.0, 1.0, 0.0 }, { -1.0, 0.0, 1.0 }, { 0.0, -1.0, 1.0 } });
@@ -61,19 +63,18 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
         return tmpMtrx.enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 4);
-        EVALUATION = new NumberContext(4, 4); // TODO Something must be wrong here!
+        evaluation = new NumberContext(4, 4); // TODO Something must be wrong here!
 
-        myBigAA = SimpleLeastSquaresCase.getFactorR();
-        myBigAX = SimpleLeastSquaresCase.getSolution();
-        myBigAB = SimpleLeastSquaresCase.getTransformedRHS();
+        rationalAA = SimpleLeastSquaresCase.getFactorR();
+        rationalAX = SimpleLeastSquaresCase.getSolution();
+        rationalAB = SimpleLeastSquaresCase.getTransformedRHS();
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }
@@ -81,10 +82,10 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        myExpMtrx = SimpleLeastSquaresCase.getTransformedRHS();
-        myActMtrx = SimpleLeastSquaresCase.getFactorR().multiply(SimpleLeastSquaresCase.getSolution());
+        expMtrx = SimpleLeastSquaresCase.getTransformedRHS();
+        actMtrx = SimpleLeastSquaresCase.getFactorR().multiply(SimpleLeastSquaresCase.getSolution());
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
     @Test
@@ -92,10 +93,10 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
 
         // Solve
 
-        myExpMtrx = SimpleLeastSquaresCase.getSolution();
-        myActMtrx = SimpleLeastSquaresCase.getBody().solve(SimpleLeastSquaresCase.getRHS());
+        expMtrx = SimpleLeastSquaresCase.getSolution();
+        actMtrx = SimpleLeastSquaresCase.getBody().solve(SimpleLeastSquaresCase.getRHS());
 
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
 
 }

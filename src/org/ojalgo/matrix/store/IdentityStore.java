@@ -93,9 +93,9 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
 
     public MatrixStore<N> multiply(final double scalar) {
 
-        final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), this.getColDim());
+        final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
 
-        retVal.loopDiagonal(0L, 0L, (r, c) -> retVal.set(r, c, scalar));
+        retVal.fillDiagonal(this.physical().scalar().cast(scalar));
 
         return retVal;
     }
@@ -107,9 +107,9 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
 
     public MatrixStore<N> multiply(final N scalar) {
 
-        final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), this.getColDim());
+        final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
 
-        retVal.loopDiagonal(0L, 0L, (r, c) -> retVal.set(r, c, scalar));
+        retVal.fillDiagonal(scalar);
 
         return retVal;
     }

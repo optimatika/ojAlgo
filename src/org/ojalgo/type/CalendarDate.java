@@ -38,7 +38,7 @@ import org.ojalgo.RecoverableCondition;
  * <p>
  * Originally, long before Java 8 and its new Date and Time API, this class was designed to provide an
  * immutable complement to the existing {@linkplain Date} and {@linkplain Calendar} classes and to have
- * easy/direct access to the underlying millisecond value.
+ * easy/direct access to the underlying epoch millisecond value.
  * </p>
  * <p>
  * In terms of the newer API it most closely corresponds to an {@linkplain Instant}, but does not have its
@@ -58,21 +58,36 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
 
     /**
      * Extends {@link TemporalAdjuster} but also loosely corresponds to a {@link TemporalUnit} and/or
-     * {@link TemporalAmount}
+     * {@link TemporalAmount}.
      *
      * @author apete
      */
     public static interface Resolution extends TemporalAdjuster {
 
-        CalendarDate adjustInto(Calendar temporal);
+        /**
+         * Will increment the input epochMilli by the size/duration of this timeline resolution.
+         */
+        default long addTo(long epochMilli) {
+            return epochMilli + this.toDurationInMillis();
+        }
 
-        CalendarDate adjustInto(Date temporal);
+        /**
+         * Maps a range of instances in time to a single instance.
+         */
+        default long adjustInto(long epochMilli) {
+            long duration = this.toDurationInMillis();
+            long half = duration / 2L;
+            return ((epochMilli / duration) * duration) + half;
+        }
 
-        CalendarDate adjustInto(Temporal temporal);
-
+        /**
+         * The size/duration of a timeline resolution "unit".
+         */
         long toDurationInMillis();
 
-        long toDurationInNanos();
+        default long toDurationInNanos() {
+            return this.toDurationInMillis() * NANOS_PER_MILLIS;
+        }
 
     }
 
@@ -99,20 +114,20 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         }
     }
 
-    public static CalendarDate make(final Calendar calendar, final CalendarDateUnit resolution) {
-        return new CalendarDate(resolution.toTimeInMillis(calendar));
+    public static CalendarDate make(final Calendar calendar, final CalendarDate.Resolution resolution) {
+        return new CalendarDate(resolution.adjustInto(calendar.getTimeInMillis()));
     }
 
-    public static CalendarDate make(final CalendarDateUnit resolution) {
-        return new CalendarDate(resolution.toTimeInMillis(System.currentTimeMillis()));
+    public static CalendarDate make(final CalendarDate.Resolution resolution) {
+        return new CalendarDate(resolution.adjustInto(System.currentTimeMillis()));
     }
 
-    public static CalendarDate make(final Date date, final CalendarDateUnit resolution) {
-        return new CalendarDate(resolution.toTimeInMillis(date));
+    public static CalendarDate make(final Date date, final CalendarDate.Resolution resolution) {
+        return new CalendarDate(resolution.adjustInto(date.getTime()));
     }
 
-    public static CalendarDate make(final long timeInMIllis, final CalendarDateUnit resolution) {
-        return new CalendarDate(resolution.toTimeInMillis(timeInMIllis));
+    public static CalendarDate make(final long timeInMIllis, final CalendarDate.Resolution resolution) {
+        return new CalendarDate(resolution.adjustInto(timeInMIllis));
     }
 
     public static CalendarDate now() {
@@ -147,6 +162,13 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         return new Date(instant.toEpochMilli());
     }
 
+    public static LocalDate toLocalDate(final Calendar calendar) {
+        int year = calendar.get(Calendar.YEAR);
+        int month = 1 + calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        return LocalDate.of(year, month, day);
+    }
+
     public static LocalDate toLocalDate(final Instant instant, final ZoneId zone) {
         return CalendarDate.toLocalDateTime(instant, zone).toLocalDate();
     }
@@ -177,6 +199,14 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
 
     public static CalendarDate valueOf(final Instant instant) {
         return new CalendarDate(instant.toEpochMilli());
+    }
+
+    public static CalendarDate valueOf(OffsetDateTime offsetDateTime) {
+        return new CalendarDate(offsetDateTime.toEpochSecond() * MILLIS_PER_SECOND);
+    }
+
+    public static CalendarDate valueOf(ZonedDateTime zonedDateTime) {
+        return new CalendarDate(zonedDateTime.toEpochSecond() * MILLIS_PER_SECOND);
     }
 
     static long millis(final TemporalAccessor temporal) {
@@ -297,9 +327,9 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
 
     public CalendarDate filter(final CalendarDateUnit resolution) {
         if (resolution.isCalendarUnit()) {
-            return new CalendarDate(resolution.toTimeInMillis(this.toCalendar()));
+            return (CalendarDate) resolution.adjustInto(this);
         } else {
-            return new CalendarDate(resolution.toTimeInMillis(millis));
+            return new CalendarDate(resolution.adjustInto(millis));
         }
     }
 
@@ -362,11 +392,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     }
 
     public CalendarDate step(final int aStepCount, final CalendarDateUnit aStepUnit) {
-        if (aStepUnit.isCalendarUnit()) {
-            return new CalendarDate(aStepUnit.step(this.toCalendar(), aStepCount));
-        } else {
-            return new CalendarDate(aStepUnit.step(millis, aStepCount));
-        }
+        return new CalendarDate(millis + (aStepCount * aStepUnit.toDurationInMillis()));
     }
 
     public Calendar toCalendar() {
@@ -467,14 +493,6 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         return StandardType.SQL_DATETIME.format(this.toDate());
     }
 
-    public long toTimeInMillis(final CalendarDateUnit resolution) {
-        if (resolution.isCalendarUnit()) {
-            return resolution.toTimeInMillis(this.toCalendar());
-        } else {
-            return resolution.toTimeInMillis(millis);
-        }
-    }
-
     public ZonedDateTime toZonedDateTime(final ZoneOffset offset) {
         return ZonedDateTime.of(this.toLocalDateTime(offset), offset);
     }
@@ -487,6 +505,10 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         } else {
             return unit.between(this, endExclusive);
         }
+    }
+
+    public CalendarDate with(TemporalAdjuster adjuster) {
+        return (CalendarDate) Temporal.super.with(adjuster);
     }
 
     public CalendarDate with(final TemporalField field, final long newValue) {

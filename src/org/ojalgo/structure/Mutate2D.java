@@ -35,26 +35,6 @@ import org.ojalgo.function.UnaryFunction;
  */
 public interface Mutate2D extends Structure2D, Mutate1D {
 
-    interface BiModifiable<N extends Number> extends Mutate2D.Modifiable<N>, Mutate1D.BiModifiable<N> {
-
-        default void modifyMatchingInColumns(final Access1D<N> left, final BinaryFunction<N> function) {
-            left.loopAll(r -> this.modifyRow(r, function.first(left.get(r))));
-        }
-
-        default void modifyMatchingInColumns(final BinaryFunction<N> function, final Access1D<N> right) {
-            right.loopAll(r -> this.modifyRow(r, function.second(right.get(r))));
-        }
-
-        default void modifyMatchingInRows(final Access1D<N> left, final BinaryFunction<N> function) {
-            left.loopAll(c -> this.modifyColumn(c, function.first(left.get(c))));
-        }
-
-        default void modifyMatchingInRows(final BinaryFunction<N> function, final Access1D<N> right) {
-            right.loopAll(c -> this.modifyColumn(c, function.second(right.get(c))));
-        }
-
-    }
-
     /**
      * A few operations with no 1D or AnyD counterpart.
      *
@@ -200,6 +180,22 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.modifyDiagonal(0L, 0L, modifier);
         }
 
+        default void modifyMatchingInColumns(final Access1D<N> left, final BinaryFunction<N> function) {
+            left.loopAll(r -> this.modifyRow(r, function.first(left.get(r))));
+        }
+
+        default void modifyMatchingInColumns(final BinaryFunction<N> function, final Access1D<N> right) {
+            right.loopAll(r -> this.modifyRow(r, function.second(right.get(r))));
+        }
+
+        default void modifyMatchingInRows(final Access1D<N> left, final BinaryFunction<N> function) {
+            left.loopAll(c -> this.modifyColumn(c, function.first(left.get(c))));
+        }
+
+        default void modifyMatchingInRows(final BinaryFunction<N> function, final Access1D<N> right) {
+            right.loopAll(c -> this.modifyColumn(c, function.second(right.get(c))));
+        }
+
         void modifyOne(long row, long col, UnaryFunction<N> modifier);
 
         default void modifyOne(final long index, final UnaryFunction<N> modifier) {
@@ -214,6 +210,15 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         default void modifyRow(final long row, final UnaryFunction<N> modifier) {
             this.modifyRow(row, 0L, modifier);
         }
+
+    }
+
+    /**
+     * A utility interface to simplify declaring to implement "everything mutable".
+     *
+     * @author apete
+     */
+    interface ModifiableReceiver<N extends Number> extends Modifiable<N>, Receiver<N> {
 
     }
 

@@ -55,11 +55,6 @@ public interface Householder<N extends Number> extends TransformationMatrix<N, P
             myFactory = factory;
         }
 
-        @SuppressWarnings("unused")
-        private Generic() {
-            this(null, 0);
-        }
-
         public final Householder.Generic<N> copy(final Householder<N> source) {
 
             first = source.first();
@@ -156,11 +151,6 @@ public interface Householder<N extends Number> extends TransformationMatrix<N, P
             vector = new double[aDim];
             beta = PrimitiveMath.ZERO;
             first = 0;
-        }
-
-        @SuppressWarnings("unused")
-        private Primitive() {
-            this(0);
         }
 
         public final Householder.Primitive copy(final Householder<Double> source) {

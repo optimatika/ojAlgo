@@ -40,30 +40,31 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class LargerCholeskyCase extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = new NumberContext(7, 4);
+
     public static RationalMatrix getOriginal() {
 
-        final PhysicalStore<ComplexNumber> randomComplex = MatrixUtils.makeRandomComplexStore(9, 9);
+        final PhysicalStore<ComplexNumber> randomComplex = TestUtils.makeRandomComplexStore(9, 9);
 
         return RationalMatrix.FACTORY.copy(randomComplex.multiply(randomComplex.conjugate()));
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = new NumberContext(7, 4);
-        EVALUATION = new NumberContext(7, 3);
+        evaluation = new NumberContext(7, 3);
 
-        myBigAB = LargerCholeskyCase.getOriginal();
+        rationalAB = LargerCholeskyCase.getOriginal();
 
         final Cholesky<RationalNumber> tmpCholesky = Cholesky.RATIONAL.make();
-        tmpCholesky.decompose(GenericDenseStore.RATIONAL.copy(myBigAB));
+        tmpCholesky.decompose(GenericDenseStore.RATIONAL.copy(rationalAB));
 
-        myBigAA = RationalMatrix.FACTORY.copy(tmpCholesky.getL());
-        myBigAX = myBigAA.transpose();
+        rationalAA = RationalMatrix.FACTORY.copy(tmpCholesky.getL());
+        rationalAX = rationalAA.transpose();
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }
@@ -80,11 +81,11 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        final BasicMatrix tmpMtrx = LargerCholeskyCase.getOriginal();
+        final RationalMatrix tmpMtrx = LargerCholeskyCase.getOriginal();
         final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
         tmpDecomp.decompose(PrimitiveDenseStore.FACTORY.copy(tmpMtrx));
 
-        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpMtrx), tmpDecomp, EVALUATION);
+        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpMtrx), tmpDecomp, evaluation);
     }
 
 }

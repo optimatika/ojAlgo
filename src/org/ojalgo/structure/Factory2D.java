@@ -42,12 +42,6 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
     I copy(Access2D<?> source);
 
-    I makeEye(long rows, long columns);
-
-    default I makeEye(final Structure2D shape) {
-        return this.makeEye(shape.countRows(), shape.countColumns());
-    }
-
     I makeFilled(long rows, long columns, NullaryFunction<?> supplier);
 
     default I makeFilled(final Structure2D shape, final NullaryFunction<?> supplier) {

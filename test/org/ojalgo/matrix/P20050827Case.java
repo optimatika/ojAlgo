@@ -39,6 +39,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class P20050827Case extends BasicMatrixTest {
 
+    private static final NumberContext DEFINITION = NumberContext.getGeneral(12);
+
     /**
      * @return A fat, 3x5, matrix with complex valued elements.
      */
@@ -62,19 +64,18 @@ public class P20050827Case extends BasicMatrixTest {
         return ComplexMatrix.FACTORY.copy(tmpArray).enforce(DEFINITION);
     }
 
-    @BeforeEach
     @Override
+    @BeforeEach
     public void setUp() {
 
-        DEFINITION = NumberContext.getGeneral(12);
-        EVALUATION = NumberContext.getGeneral(6).newPrecision(12);
+        evaluation = NumberContext.getGeneral(6).newPrecision(12);
 
-        myBigAA = RationalMatrix.FACTORY.copy(P20050827Case.getProblematic());
-        myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
-        myBigAB = myBigAA;
+        rationalAA = RationalMatrix.FACTORY.copy(P20050827Case.getProblematic());
+        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
+        rationalAB = rationalAA;
 
-        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
-        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
 
         super.setUp();
     }
@@ -108,7 +109,7 @@ public class P20050827Case extends BasicMatrixTest {
             TestUtils.assertTrue(tmpBig.toScalar(ij, ij).toString(), tmpBig.get(ij, ij).isReal());
         }
 
-        TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpBigTrace.get(), tmpSmallTrace.get(), EVALUATION);
+        TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpBigTrace.get(), tmpSmallTrace.get(), evaluation);
     }
 
     @Test
@@ -121,8 +122,8 @@ public class P20050827Case extends BasicMatrixTest {
         final ComplexNumber tmpExpected = ComplexFunction.ROOT.invoke(tmpVal, 2);
         final ComplexNumber tmpActual = ComplexNumber.valueOf(tmpProblematic.aggregateAll(Aggregator.NORM2));
 
-        TestUtils.assertEquals(tmpExpected.norm(), tmpActual.norm(), EVALUATION);
-        TestUtils.assertEquals(tmpExpected, tmpActual, EVALUATION);
+        TestUtils.assertEquals(tmpExpected.norm(), tmpActual.norm(), evaluation);
+        TestUtils.assertEquals(tmpExpected, tmpActual, evaluation);
 
     }
 

@@ -51,7 +51,7 @@ public class QRTest {
      * its own conjugate transpose.
      */
     private static MatrixStore<ComplexNumber> makeHermitianMatrix() {
-        final PhysicalStore<ComplexNumber> tmpBase = MatrixUtils.makeRandomComplexStore(DIMENSION, DIMENSION);
+        final PhysicalStore<ComplexNumber> tmpBase = TestUtils.makeRandomComplexStore(DIMENSION, DIMENSION);
         return tmpBase.multiply(tmpBase.conjugate());
     }
 

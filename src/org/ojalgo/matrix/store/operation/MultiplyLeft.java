@@ -26,11 +26,12 @@ import java.util.Arrays;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyLeft;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyLeft;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure2D;
 
 public final class MultiplyLeft extends MatrixOperation {
 
@@ -95,10 +96,8 @@ public final class MultiplyLeft extends MatrixOperation {
 
         double tmp00 = PrimitiveMath.ZERO;
 
-        final int tmpLeftStruct = (int) (left.count() / complexity); // The number of rows in the product- and left-matrix.
-
         for (int c = 0; c < complexity; c++) {
-            tmp00 += left.doubleValue(c * tmpLeftStruct) * right[c];
+            tmp00 += left.doubleValue(c) * right[c];
         }
 
         product[0] = tmp00;
@@ -618,11 +617,11 @@ public final class MultiplyLeft extends MatrixOperation {
         final double[] leftColumn = new double[structure];
         for (int c = 0; c < complexity; c++) {
 
-            final int firstInLeftColumn = MatrixUtils.firstInColumn(left, c, 0);
-            final int limitOfLeftColumn = MatrixUtils.limitOfColumn(left, c, structure);
+            final int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
+            final int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
-                leftColumn[i] = left.doubleValue(i + (c * structure));
+                leftColumn[i] = left.doubleValue(Structure2D.index(structure, i, c));
             }
 
             for (int j = firstColumn; j < columnLimit; j++) {
@@ -639,11 +638,11 @@ public final class MultiplyLeft extends MatrixOperation {
         final N[] leftColumn = scalar.newArrayInstance(structure);
         for (int c = 0; c < complexity; c++) {
 
-            final int firstInLeftColumn = MatrixUtils.firstInColumn(left, c, 0);
-            final int limitOfLeftColumn = MatrixUtils.limitOfColumn(left, c, structure);
+            final int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
+            final int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
-                leftColumn[i] = left.get(i + (c * structure));
+                leftColumn[i] = left.get(Structure2D.index(structure, i, c));
             }
 
             for (int j = firstColumn; j < columnLimit; j++) {

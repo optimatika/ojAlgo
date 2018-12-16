@@ -236,9 +236,6 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      * When solving an equation system [A][X]=[B] ([mxn][nxb]=[mxb]) the preallocated memory/matrix will
      * typically be either mxb or nxb.
      * </p>
-     *
-     * @param templateBody
-     * @param templateRHS
      */
     PhysicalStore<N> preallocate(Structure2D templateBody, Structure2D templateRHS);
 

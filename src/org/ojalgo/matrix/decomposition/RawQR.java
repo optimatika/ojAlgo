@@ -341,8 +341,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     /**
      * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
-     *
-     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#doGetInverse(org.ojalgo.matrix.decomposition.DecompositionStore)
      */
     private MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
 

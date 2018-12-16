@@ -26,9 +26,7 @@ import java.time.Period;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.ojalgo.constant.PrimitiveMath;
@@ -46,6 +44,10 @@ import org.ojalgo.constant.PrimitiveMath;
  */
 public final class CalendarDateDuration extends Number implements TemporalAmount, CalendarDate.Resolution, Comparable<CalendarDateDuration> {
 
+    static CalendarDateDuration of(long nanos) {
+        return new CalendarDateDuration(nanos, CalendarDateUnit.NANOS);
+    }
+
     public final double measure;
     public final CalendarDateUnit unit;
 
@@ -61,23 +63,27 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
         this(PrimitiveMath.ZERO, CalendarDateUnit.MILLIS);
     }
 
+    public long addTo(long epochMilli) {
+        return epochMilli + this.toDurationInMillis();
+    }
+
     public Temporal addTo(final Temporal temporal) {
-        return temporal.plus(this.toDurationInMillis(), CalendarDateUnit.MILLIS);
+        if (temporal instanceof CalendarDate) {
+            return new CalendarDate(((CalendarDate) temporal).millis + this.toDurationInMillis());
+        } else {
+            return unit.addTo(temporal, Math.round(measure));
+        }
     }
 
-    public CalendarDate adjustInto(final Calendar temporal) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public CalendarDate adjustInto(final Date temporal) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public CalendarDate adjustInto(final Temporal temporal) {
-        // TODO Auto-generated method stub
-        return null;
+    public Temporal adjustInto(final Temporal temporal) {
+        if (temporal instanceof CalendarDate) {
+            long millis = ((CalendarDate) temporal).millis;
+            long adjusted = this.adjustInto(millis);
+            return new CalendarDate(adjusted);
+        } else {
+            // TODO Implement adjustments for all other Temporal implementations
+            return temporal;
+        }
     }
 
     public int compareTo(final CalendarDateDuration reference) {
@@ -160,11 +166,11 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
     }
 
     public long toDurationInMillis() {
-        return (long) (measure * unit.size());
+        return Math.round(measure * unit.toDurationInMillis());
     }
 
     public long toDurationInNanos() {
-        return (long) (measure * (1_000_000L * unit.size()));
+        return Math.round(measure * (CalendarDate.NANOS_PER_MILLIS * unit.toDurationInMillis()));
     }
 
     @Override

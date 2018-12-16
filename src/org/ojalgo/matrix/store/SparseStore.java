@@ -31,14 +31,16 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView2D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -48,25 +50,60 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
         SparseStore<N> make(long rowsCount, long columnsCount);
 
+        default SparseStore<N> make(Structure2D shape) {
+            return this.make(shape.countRows(), shape.countColumns());
+        }
+
     }
 
     public static final SparseStore.Factory<ComplexNumber> COMPLEX = (rowsCount, columnsCount) -> SparseStore.makeComplex((int) rowsCount, (int) columnsCount);
 
     public static final SparseStore.Factory<Double> PRIMITIVE = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
 
+    public static final SparseStore.Factory<Quaternion> QUATERNION = (rowsCount, columnsCount) -> SparseStore.makeQuaternion((int) rowsCount,
+            (int) columnsCount);
+
     public static final SparseStore.Factory<RationalNumber> RATIONAL = (rowsCount, columnsCount) -> SparseStore.makeRational((int) rowsCount,
             (int) columnsCount);
 
     public static SparseStore<ComplexNumber> makeComplex(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(GenericDenseStore.COMPLEX, rowsCount, columnsCount);
+        return SparseStore.makeSparse(GenericDenseStore.COMPLEX, rowsCount, columnsCount);
     }
 
     public static SparseStore<Double> makePrimitive(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount);
+        return SparseStore.makeSparse(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount);
+    }
+
+    public static SparseStore<Quaternion> makeQuaternion(final int rowsCount, final int columnsCount) {
+        return SparseStore.makeSparse(GenericDenseStore.QUATERNION, rowsCount, columnsCount);
     }
 
     public static SparseStore<RationalNumber> makeRational(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(GenericDenseStore.RATIONAL, rowsCount, columnsCount);
+        return SparseStore.makeSparse(GenericDenseStore.RATIONAL, rowsCount, columnsCount);
+    }
+
+    static <N extends Number> SparseStore<N> makeSparse(PhysicalStore.Factory<N, ?> physical, long numberOfRows, long numberOfColumns) {
+        return new SparseStore<>(physical, Math.toIntExact(numberOfRows), Math.toIntExact(numberOfColumns));
+    }
+
+    static <N extends Number> SparseStore<N> makeSparse(PhysicalStore.Factory<N, ?> physical, Structure2D shape) {
+        return SparseStore.makeSparse(physical, shape.countRows(), shape.countColumns());
+    }
+
+    static <N extends Number> void multiply(final SparseStore<N> left, final SparseStore<N> right, final ElementsConsumer<N> target) {
+
+        if (left.isPrimitive()) {
+
+            target.reset();
+
+            right.nonzeros().stream(false).forEach(element -> {
+                left.doColumnAXPY(element.row(), element.column(), element.doubleValue(), target);
+            });
+
+        } else {
+
+            left.multiply(right, target);
+        }
     }
 
     private final SparseArray<N> myElements;
@@ -128,17 +165,17 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     public int firstInColumn(final int col) {
 
-        final int tmpRowDim = myFirsts.length;
+        final long structure = myFirsts.length;
 
-        final int tmpRangeFirst = tmpRowDim * col;
-        final int tmpRangeLimit = tmpRowDim * (col + 1);
+        final long rangeFirst = structure * col;
+        final long rangeLimit = structure * (col + 1);
 
-        final long tmpFirstInRange = myElements.firstInRange(tmpRangeFirst, tmpRangeLimit);
+        final long firstInRange = myElements.firstInRange(rangeFirst, rangeLimit);
 
-        if (tmpRangeFirst == tmpFirstInRange) {
+        if (rangeFirst == firstInRange) {
             return 0;
         } else {
-            return (int) (tmpFirstInRange % tmpRowDim);
+            return (int) (firstInRange % structure);
         }
     }
 
@@ -153,17 +190,17 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     @Override
     public int limitOfColumn(final int col) {
 
-        final int tmpRowDim = myFirsts.length;
+        final long structure = myFirsts.length;
 
-        final int tmpRangeFirst = tmpRowDim * col;
-        final int tmpRangeLimit = tmpRangeFirst + tmpRowDim;
+        final long rangeFirst = structure * col;
+        final long rangeLimit = rangeFirst + structure;
 
-        final long tmpLimitOfRange = myElements.limitOfRange(tmpRangeFirst, tmpRangeLimit);
+        final long limitOfRange = myElements.limitOfRange(rangeFirst, rangeLimit);
 
-        if (tmpRangeLimit == tmpLimitOfRange) {
-            return tmpRowDim;
+        if (rangeLimit == limitOfRange) {
+            return (int) structure;
         } else {
-            return (int) tmpLimitOfRange % tmpRowDim;
+            return (int) (limitOfRange % structure);
         }
     }
 
@@ -251,28 +288,30 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
 
-        if (this.isPrimitive()) {
+        if (right instanceof SparseStore<?>) {
 
-            final long structure = this.countColumns();
+            SparseStore.multiply(this, (SparseStore<N>) right, target);
+
+        } else if (this.isPrimitive()) {
+
+            final long complexity = this.countColumns();
             final long numberOfColumns = target.countColumns();
 
             target.reset();
 
-            this.nonzeros().stream(true).forEach(element -> {
+            this.nonzeros().stream(false).forEach(element -> {
 
                 final long row = element.row();
                 final long col = element.column();
-                final double val = element.doubleValue();
+                final double value = element.doubleValue();
 
-                final long first = MatrixUtils.firstInRow(right, col, 0L);
-                final long limit = MatrixUtils.limitOfRow(right, col, numberOfColumns);
+                final long first = MatrixStore.firstInRow(right, col, 0L);
+                final long limit = MatrixStore.limitOfRow(right, col, numberOfColumns);
                 for (long j = first; j < limit; j++) {
-                    final long index = Structure2D.index(structure, col, j);
-                    final double addition = val * right.doubleValue(index);
+                    final long index = Structure2D.index(complexity, col, j);
+                    final double addition = value * right.doubleValue(index);
                     if (NumberContext.compare(addition, ZERO) != 0) {
-                        synchronized (target) {
-                            target.add(row, j, addition);
-                        }
+                        target.add(row, j, addition);
                     }
                 }
             });
@@ -285,7 +324,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     public MatrixStore<N> multiply(final double scalar) {
 
-        final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), this.getColDim());
+        final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
 
         if (this.isPrimitive()) {
 
@@ -306,18 +345,31 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
+
+        long numberOfRows = this.countRows();
+        long numberOfColumns = right.countColumns();
+
         if (right instanceof SparseStore) {
-            final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), (int) right.countColumns());
-            this.multiply(right, retVal);
+
+            final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
+
+            SparseStore.multiply(this, (SparseStore<N>) right, retVal);
+
             return retVal;
+
         } else {
-            return super.multiply(right);
+
+            final PhysicalStore<N> retVal = this.physical().makeZero(numberOfRows, numberOfColumns);
+
+            this.multiply(right, retVal);
+
+            return retVal;
         }
     }
 
     public MatrixStore<N> multiply(final N scalar) {
 
-        final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), this.getColDim());
+        final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), this);
 
         if (this.isPrimitive()) {
 
@@ -350,8 +402,70 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public ElementsSupplier<N> premultiply(final Access1D<N> left) {
-        // TODO Auto-generated method stub
-        return super.premultiply(left);
+
+        long complexity = this.countRows();
+        long numberOfColumns = this.countColumns();
+        long numberOfRows = left.count() / complexity;
+
+        if (left instanceof SparseStore<?>) {
+
+            final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
+
+            SparseStore.multiply((SparseStore<N>) left, this, retVal);
+
+            return retVal;
+
+        } else if (this.isPrimitive()) {
+
+            final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
+
+            this.nonzeros().stream(false).forEach(element -> {
+
+                final long row = element.row();
+                final long col = element.column();
+                final double value = element.doubleValue();
+
+                final long first = MatrixStore.firstInColumn(left, row, 0L);
+                final long limit = MatrixStore.limitOfColumn(left, row, numberOfRows);
+                for (long i = first; i < limit; i++) {
+                    final long index = Structure2D.index(numberOfRows, i, row);
+                    final double addition = value * left.doubleValue(index);
+                    if (NumberContext.compare(addition, ZERO) != 0) {
+                        retVal.add(i, col, addition);
+                    }
+                }
+            });
+
+            return retVal;
+
+        } else {
+
+            return super.premultiply(left);
+        }
+    }
+
+    public void reduceColumns(Aggregator aggregator, Mutate1D receiver) {
+        if (aggregator == Aggregator.SUM) {
+            if (this.isPrimitive()) {
+                this.nonzeros().forEach(element -> receiver.add(element.column(), element.doubleValue()));
+            } else {
+                this.nonzeros().forEach(element -> receiver.add(element.column(), element.get()));
+            }
+        } else {
+            super.reduceColumns(aggregator, receiver);
+        }
+    }
+
+    public void reduceRows(Aggregator aggregator, Mutate1D receiver) {
+        if (aggregator == Aggregator.SUM) {
+            if (this.isPrimitive()) {
+                this.nonzeros().forEach(element -> receiver.add(element.row(), element.doubleValue()));
+            } else {
+                this.nonzeros().forEach(element -> receiver.add(element.row(), element.get()));
+            }
+        } else {
+            super.reduceColumns(aggregator, receiver);
+        }
     }
 
     public ElementsConsumer<N> regionByColumns(final int... columns) {
@@ -430,6 +544,16 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     private void updateNonZeros(final long row, final long col) {
         this.updateNonZeros((int) row, (int) col);
+    }
+
+    void doColumnAXPY(long colX, long colY, double a, ElementsConsumer<N> y) {
+
+        long structure = y.countRows();
+
+        final long first = structure * colX;
+        final long limit = first + structure;
+
+        myElements.visitPrimitiveNonzerosInRange(first, limit, (index, value) -> y.add(Structure2D.row(index, structure), colY, a * value));
     }
 
     void updateNonZeros(final int row, final int col) {

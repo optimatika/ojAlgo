@@ -37,15 +37,21 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.decomposition.Tridiagonal;
+import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.operation.MatrixOperation;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.type.CalendarDateDuration;
+import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.Stopwatch;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -339,6 +345,28 @@ public abstract class TestUtils {
         Assertions.assertFalse(condition, message);
     }
 
+    public static void assertFasterThan(double limitMeassure, CalendarDateUnit limitUnit, Stopwatch actualTimer) {
+        CalendarDateDuration duration = actualTimer.stop(limitUnit);
+        if (duration.measure > limitMeassure) {
+            TestUtils.fail(duration.toString() + " > " + new CalendarDateDuration(limitMeassure, limitUnit));
+        }
+    }
+
+    public static void assertInRange(int first, int limit, int actual) {
+        if ((first > actual) || (actual >= limit)) {
+            TestUtils.fail("Not in range!");
+        }
+    }
+
+    public static void assertNotNullOrEmpty(String actual) {
+        if (actual == null) {
+            TestUtils.fail("Is null!");
+        }
+        if (actual.length() <= 0) {
+            TestUtils.fail("Is empty!");
+        }
+    }
+
     public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual) {
         TestUtils.assertStateAndSolution(expected, actual, EQUALS);
     }
@@ -387,6 +415,25 @@ public abstract class TestUtils {
 
     public static void fail(final String message) {
         Assertions.fail(message);
+    }
+
+    public static void fail(Throwable problem) {
+        Assertions.fail(problem.getMessage(), problem);
+    }
+
+    public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {
+
+        final PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
+
+        final Uniform tmpArgGen = new Uniform(PrimitiveMath.ZERO, PrimitiveMath.TWO_PI);
+
+        for (int j = 0; j < numberOfColumns; j++) {
+            for (int i = 0; i < numberOfRows; i++) {
+                retVal.set(i, j, ComplexNumber.makePolar(PrimitiveMath.E, tmpArgGen.doubleValue()).add(PrimitiveMath.PI));
+            }
+        }
+
+        return retVal;
     }
 
     public static void minimiseAllBranchLimits() {

@@ -25,8 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
@@ -41,7 +39,7 @@ public class StoreProblems extends MatrixStoreTests {
     @Test
     public void testP20071210() {
 
-        BasicMatrix A, Bu, K, sx, currentState;
+        PrimitiveMatrix A, Bu, K, sx, currentState;
 
         final double[][] a = { { 1, 2 }, { 3, 4 } };
         A = PrimitiveMatrix.FACTORY.rows(a);
@@ -51,16 +49,16 @@ public class StoreProblems extends MatrixStoreTests {
         K = PrimitiveMatrix.FACTORY.makeEye(2, 2);
         final int hp = 2 * OjAlgoUtils.ENVIRONMENT.threads;
 
-        final BasicMatrix eye = PrimitiveMatrix.FACTORY.makeEye(A.countRows(), A.countColumns());
-        final BasicMatrix Aprime = A.subtract(Bu.multiply(K));
-        BasicMatrix Apow = PrimitiveMatrix.FACTORY.copy(Aprime);
-        final BasicMatrix tmp = Aprime.subtract(eye);
+        final PrimitiveMatrix eye = PrimitiveMatrix.FACTORY.makeEye(A);
+        final PrimitiveMatrix Aprime = A.subtract(Bu.multiply(K));
+        PrimitiveMatrix Apow = PrimitiveMatrix.FACTORY.copy(Aprime);
+        final PrimitiveMatrix tmp = Aprime.subtract(eye);
         sx = PrimitiveMatrix.FACTORY.copy(eye);
-        sx = sx.mergeColumns(tmp);
+        sx = sx.logical().below(tmp).get();
 
         //loop runs hp-2 times, which means the first elements of the matrices must be "hardcoded"
         for (int i = 0; i < (hp - 2); i++) {
-            sx = sx.mergeColumns(tmp.multiply(Apow));
+            sx = sx.logical().below(tmp.multiply(Apow)).get();
             Apow = Apow.multiply(Apow);
         }
         currentState = PrimitiveMatrix.FACTORY.makeZero(A.countRows(), 1);
@@ -77,8 +75,8 @@ public class StoreProblems extends MatrixStoreTests {
 
         final int tmpDim = 9;
 
-        final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpMtrxB = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        final PhysicalStore<Double> tmpMtrxB = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
         final PhysicalStore<Double> tmpMtrxC = PrimitiveDenseStore.FACTORY.makeZero(tmpDim, tmpDim);
 
         PhysicalStore<Double> tmpExpected;
