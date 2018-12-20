@@ -69,11 +69,11 @@ public class Exponential extends AbstractContinuous {
         }
     }
 
-    public double getQuantile(final double probality) {
+    public double getQuantile(final double probability) {
 
-        this.checkProbabilty(probality);
+        this.checkProbabilty(probability);
 
-        return PrimitiveFunction.LOG.invoke(ONE - probality) / -myRate;
+        return PrimitiveFunction.LOG.invoke(ONE - probability) / -myRate;
     }
 
     @Override

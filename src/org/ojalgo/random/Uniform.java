@@ -102,11 +102,11 @@ public class Uniform extends AbstractContinuous {
         return retVal;
     }
 
-    public double getQuantile(final double probality) {
+    public double getQuantile(final double probability) {
 
-        this.checkProbabilty(probality);
+        this.checkProbabilty(probability);
 
-        return myLower + (probality * myRange);
+        return myLower + (probability * myRange);
     }
 
     @Override

@@ -70,8 +70,8 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
      * @see org.ojalgo.random.Distribution#getVariance()
      */
     public double getVariance() {
-        final double tmpStandardDeviation = this.getStandardDeviation();
-        return tmpStandardDeviation * tmpStandardDeviation;
+        final double stdDev = this.getStandardDeviation();
+        return stdDev * stdDev;
     }
 
     @Override
@@ -88,6 +88,10 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
         return (long) this.generate();
     }
 
+    public SampleSet newSampleSet(int numberOfSamples) {
+        return SampleSet.make(this, numberOfSamples);
+    }
+
     public void setSeed(final long seed) {
         myRandom.setSeed(seed);
     }
@@ -97,8 +101,8 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
         return this.getExpected() + "±" + this.getStandardDeviation();
     }
 
-    protected void checkProbabilty(final double aProbabilty) {
-        if ((aProbabilty < ZERO) || (ONE < aProbabilty)) {
+    protected void checkProbabilty(final double probabilty) {
+        if ((probabilty < ZERO) || (ONE < probabilty)) {
             throw new IllegalArgumentException("Probabilty must be [0,1]");
         }
     }

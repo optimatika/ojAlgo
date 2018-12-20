@@ -104,11 +104,11 @@ public class LogNormal extends AbstractContinuous {
         return myNormal.getProbability(PrimitiveFunction.LOG.invoke(value)) / value;
     }
 
-    public double getQuantile(final double probality) {
+    public double getQuantile(final double probability) {
 
-        this.checkProbabilty(probality);
+        this.checkProbabilty(probability);
 
-        return PrimitiveFunction.EXP.invoke(myNormal.getQuantile(probality));
+        return PrimitiveFunction.EXP.invoke(myNormal.getQuantile(probability));
     }
 
     @Override

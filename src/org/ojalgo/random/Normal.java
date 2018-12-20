@@ -65,11 +65,11 @@ public class Normal extends AbstractContinuous {
         return PrimitiveFunction.EXP.invoke((tmpVal * tmpVal) / -TWO) / (myScale * SQRT_TWO_PI);
     }
 
-    public double getQuantile(final double probality) {
+    public double getQuantile(final double probability) {
 
-        this.checkProbabilty(probality);
+        this.checkProbabilty(probability);
 
-        return (myScale * SQRT_TWO * RandomUtils.erfi((TWO * probality) - ONE)) + myLocation;
+        return (myScale * SQRT_TWO * RandomUtils.erfi((TWO * probability) - ONE)) + myLocation;
     }
 
     @Override

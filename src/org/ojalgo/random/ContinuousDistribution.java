@@ -55,9 +55,9 @@ public interface ContinuousDistribution extends Distribution {
      * <a href="http://en.wikipedia.org/wiki/Quantile_function">WikipediA</a> The input probability absolutely
      * has to be [0.0, 1.0], but values close to 0.0 and 1.0 may be problematic
      *
-     * @param probality P(&lt;=x)
+     * @param probability P(&lt;=x)
      * @return x
      */
-    double getQuantile(double probality);
+    double getQuantile(double probability);
 
 }
