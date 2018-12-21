@@ -23,63 +23,53 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+public class TDistribution extends AbstractContinuous {
 
-/**
- * Under general conditions, the sum of a large number of random variables is approximately normally
- * distributed (the central limit theorem).
- *
- * @author apete
- */
-public class Normal extends AbstractContinuous {
+    private final double myDegreesOfFreedom;
 
-    private static final long serialVersionUID = 7164712313114018919L;
-
-    private final double myLocation;
-    private final double myScale;
-
-    public Normal() {
-        this(ZERO, ONE);
-    }
-
-    public Normal(final double location, final double scale) {
-
+    public TDistribution(double degreesOfFreedom) {
         super();
-
-        myLocation = location;
-        myScale = scale;
+        myDegreesOfFreedom = degreesOfFreedom;
     }
 
-    public double getDensity(final double value) {
-
-        final double tmpVal = (value - myLocation) / myScale;
-
-        return PrimitiveFunction.EXP.invoke((tmpVal * tmpVal) / -TWO) / (myScale * SQRT_TWO_PI);
+    public double getDensity(double value) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
-    public double getDistribution(final double value) {
-        return (ONE + RandomUtils.erf((value - myLocation) / (myScale * SQRT_TWO))) / TWO;
+    public double getDistribution(double value) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
     public double getExpected() {
-        return myLocation;
+        if (myDegreesOfFreedom > ONE) {
+            return ZERO;
+        } else {
+            return NaN;
+        }
     }
 
-    public double getQuantile(final double probability) {
-
-        this.checkProbabilty(probability);
-
-        return (myScale * SQRT_TWO * RandomUtils.erfi((TWO * probability) - ONE)) + myLocation;
+    public double getQuantile(double probability) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
     @Override
-    public double getStandardDeviation() {
-        return myScale;
+    public double getVariance() {
+        if (myDegreesOfFreedom > TWO) {
+            return myDegreesOfFreedom / (myDegreesOfFreedom - TWO);
+        } else if (myDegreesOfFreedom > ONE) {
+            return POSITIVE_INFINITY;
+        } else {
+            return NaN;
+        }
     }
 
     @Override
     protected double generate() {
-        return (this.random().nextGaussian() * myScale) + myLocation;
+        // TODO Auto-generated method stub
+        return 0;
     }
 
 }

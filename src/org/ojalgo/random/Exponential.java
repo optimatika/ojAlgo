@@ -49,6 +49,14 @@ public class Exponential extends AbstractContinuous {
         myRate = aRate;
     }
 
+    public double getDensity(final double value) {
+        if (value < ZERO) {
+            return ZERO;
+        } else {
+            return myRate * PrimitiveFunction.EXP.invoke(-myRate * value);
+        }
+    }
+
     public double getDistribution(final double value) {
         if (value < ZERO) {
             return ZERO;
@@ -59,14 +67,6 @@ public class Exponential extends AbstractContinuous {
 
     public double getExpected() {
         return ONE / myRate;
-    }
-
-    public double getProbability(final double value) {
-        if (value < ZERO) {
-            return ZERO;
-        } else {
-            return myRate * PrimitiveFunction.EXP.invoke(-myRate * value);
-        }
     }
 
     public double getQuantile(final double probability) {

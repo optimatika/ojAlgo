@@ -74,6 +74,17 @@ public class Uniform extends AbstractContinuous {
         myRange = range;
     }
 
+    public double getDensity(final double value) {
+
+        double retVal = ZERO;
+
+        if ((myLower <= value) && (value <= (myLower + myRange))) {
+            retVal = ONE / myRange;
+        }
+
+        return retVal;
+    }
+
     public double getDistribution(final double value) {
 
         double retVal = ZERO;
@@ -89,17 +100,6 @@ public class Uniform extends AbstractContinuous {
 
     public double getExpected() {
         return myLower + (myRange / TWO);
-    }
-
-    public double getProbability(final double value) {
-
-        double retVal = ZERO;
-
-        if ((myLower <= value) && (value <= (myLower + myRange))) {
-            retVal = ONE / myRange;
-        }
-
-        return retVal;
     }
 
     public double getQuantile(final double probability) {
