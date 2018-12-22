@@ -23,23 +23,50 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-abstract class AbstractContinuous extends RandomNumber implements ContinuousDistribution {
+/**
+ * https://en.wikipedia.org/wiki/Cauchy_distribution
+ *
+ * @author apete
+ */
+public class Cauchy extends AbstractContinuous {
 
-    AbstractContinuous() {
+    private final double myLocation;
+    private final double myScale;
+
+    public Cauchy() {
+        this(ZERO, ONE);
+    }
+
+    public Cauchy(double location, double scale) {
         super();
+        myLocation = location;
+        myScale = scale;
     }
 
-    public final double getLowerConfidenceQuantile(final double confidence) {
-        return this.getQuantile((ONE - confidence) / TWO);
+    public double getDensity(double value) {
+        return ONE / (PI * myScale * (ONE + Math.pow((value - myLocation) / myScale, TWO)));
     }
 
-    public final double getUpperConfidenceQuantile(final double confidence) {
-        return this.getQuantile(ONE - ((ONE - confidence) / TWO));
+    public double getDistribution(double value) {
+        return HALF + (Math.atan((value - myLocation) / myScale) / PI);
+    }
+
+    public double getQuantile(double probability) {
+        return myLocation + (myScale * Math.tan(PI * (probability - HALF)));
+    }
+
+    public double getExpected() {
+        return NaN;
     }
 
     @Override
-    protected double generate() {
-        return this.getQuantile(this.random().nextDouble());
+    public double getStandardDeviation() {
+        return NaN;
+    }
+
+    @Override
+    public double getVariance() {
+        return NaN;
     }
 
 }

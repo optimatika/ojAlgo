@@ -76,7 +76,7 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
 
     @Override
     public final int intValue() {
-        return (int) this.generate();
+        return (int) this.longValue();
     }
 
     public final Double invoke() {
@@ -85,7 +85,7 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
 
     @Override
     public final long longValue() {
-        return (long) this.generate();
+        return Math.round(this.generate());
     }
 
     public SampleSet newSampleSet(int numberOfSamples) {

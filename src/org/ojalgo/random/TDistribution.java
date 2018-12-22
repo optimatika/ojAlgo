@@ -25,16 +25,127 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 public class TDistribution extends AbstractContinuous {
 
+    static final class Degree1 extends TDistribution {
+
+        private final Cauchy myCauchy = new Cauchy();
+
+        Degree1() {
+            super(ONE);
+        }
+
+        @Override
+        public double getDensity(double value) {
+            return myCauchy.getDensity(value);
+        }
+
+        @Override
+        public double getDistribution(double value) {
+            return myCauchy.getDistribution(value);
+        }
+
+        @Override
+        public double getQuantile(double probability) {
+            return myCauchy.getQuantile(probability);
+        }
+
+        @Override
+        protected double generate() {
+            return myCauchy.generate();
+        }
+
+    }
+
+    static final class Degree2 extends TDistribution {
+
+        public Degree2() {
+            super(TWO);
+        }
+
+        @Override
+        public double getDensity(double value) {
+            return ONE / Math.pow(TWO + (value * value), THREE / TWO);
+        }
+
+        @Override
+        public double getDistribution(double value) {
+            return HALF + (value / (TWO * Math.sqrt(TWO + (value * value))));
+        }
+
+    }
+
+    static final class Degree3 extends TDistribution {
+
+        public Degree3() {
+            super(THREE);
+        }
+
+        @Override
+        public double getDensity(double value) {
+            return (SIX * Math.sqrt(THREE)) / (PI * Math.pow(THREE + (value * value), TWO));
+        }
+
+    }
+
+    static final class DegreeInfinity extends TDistribution {
+
+        private final Normal myNormal = new Normal();
+
+        public DegreeInfinity() {
+            super(POSITIVE_INFINITY);
+        }
+
+        @Override
+        public double getDensity(double value) {
+            return myNormal.getDensity(value);
+        }
+
+        @Override
+        public double getDistribution(double value) {
+            return myNormal.getDistribution(value);
+        }
+
+        @Override
+        public double getQuantile(double probability) {
+            return myNormal.getQuantile(probability);
+        }
+
+        @Override
+        protected double generate() {
+            return myNormal.generate();
+        }
+
+    }
+
+    public static TDistribution make(int degreesOfFreedom) {
+        switch (degreesOfFreedom) {
+        case 1:
+            return new Degree1();
+        case 2:
+            return new Degree2();
+        case 3:
+            return new Degree3();
+        case Integer.MAX_VALUE:
+            return new DegreeInfinity();
+        default:
+            return new TDistribution(degreesOfFreedom);
+        }
+
+    }
+
+    /**
+     * The density and distribution functions share a common constant factor
+     */
+    private final double myCommonFactor;
     private final double myDegreesOfFreedom;
 
     public TDistribution(double degreesOfFreedom) {
         super();
         myDegreesOfFreedom = degreesOfFreedom;
+        myCommonFactor = RandomUtils.gamma((degreesOfFreedom + ONE) / TWO) / (Math.sqrt(degreesOfFreedom * PI) * RandomUtils.gamma(degreesOfFreedom / TWO));
     }
 
     public double getDensity(double value) {
-        // TODO Auto-generated method stub
-        return 0;
+        return myCommonFactor * Math.pow(ONE + ((value * value) / myDegreesOfFreedom), (NEG - myDegreesOfFreedom) / TWO);
     }
 
     public double getDistribution(double value) {
@@ -64,12 +175,6 @@ public class TDistribution extends AbstractContinuous {
         } else {
             return NaN;
         }
-    }
-
-    @Override
-    protected double generate() {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
 }
