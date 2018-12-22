@@ -71,6 +71,12 @@ public class TDistribution extends AbstractContinuous {
             return HALF + (value / (TWO * Math.sqrt(TWO + (value * value))));
         }
 
+        @Override
+        public double getQuantile(double probability) {
+            double alpha = FOUR * probability * (ONE - probability);
+            return TWO * (probability - HALF) * Math.sqrt(TWO / alpha);
+        }
+
     }
 
     static final class Degree3 extends TDistribution {
@@ -82,6 +88,22 @@ public class TDistribution extends AbstractContinuous {
         @Override
         public double getDensity(double value) {
             return (SIX * Math.sqrt(THREE)) / (PI * Math.pow(THREE + (value * value), TWO));
+        }
+
+    }
+
+    static final class Degree4 extends TDistribution {
+
+        public Degree4() {
+            super(FOUR);
+        }
+
+        @Override
+        public double getQuantile(double probability) {
+            double alpha = FOUR * probability * (ONE - probability);
+            double sqrt = Math.sqrt(alpha);
+            double q = Math.cos(THIRD * Math.acos(sqrt)) / sqrt;
+            return Math.signum(probability - HALF) * TWO * Math.sqrt(q - ONE);
         }
 
     }
@@ -124,28 +146,29 @@ public class TDistribution extends AbstractContinuous {
             return new Degree2();
         case 3:
             return new Degree3();
+        case 4:
+            return new Degree4();
         case Integer.MAX_VALUE:
             return new DegreeInfinity();
         default:
             return new TDistribution(degreesOfFreedom);
         }
-
     }
 
     /**
      * The density and distribution functions share a common constant factor
      */
-    private final double myCommonFactor;
+    private final double myConstant;
     private final double myDegreesOfFreedom;
 
     public TDistribution(double degreesOfFreedom) {
         super();
         myDegreesOfFreedom = degreesOfFreedom;
-        myCommonFactor = RandomUtils.gamma((degreesOfFreedom + ONE) / TWO) / (Math.sqrt(degreesOfFreedom * PI) * RandomUtils.gamma(degreesOfFreedom / TWO));
+        myConstant = RandomUtils.gamma((degreesOfFreedom + ONE) / TWO) / (Math.sqrt(degreesOfFreedom * PI) * RandomUtils.gamma(degreesOfFreedom / TWO));
     }
 
     public double getDensity(double value) {
-        return myCommonFactor * Math.pow(ONE + ((value * value) / myDegreesOfFreedom), (NEG - myDegreesOfFreedom) / TWO);
+        return myConstant * Math.pow(ONE + ((value * value) / myDegreesOfFreedom), (NEG - myDegreesOfFreedom) / TWO);
     }
 
     public double getDistribution(double value) {
