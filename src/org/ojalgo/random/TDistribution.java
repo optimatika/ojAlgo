@@ -79,22 +79,6 @@ public class TDistribution extends AbstractContinuous {
 
     }
 
-    static final class Degree4 extends TDistribution {
-
-        public Degree4() {
-            super(FOUR);
-        }
-
-        @Override
-        public double getQuantile(double probability) {
-            double alpha = FOUR * probability * (ONE - probability);
-            double q = Math.cos(THIRD * Math.acos(Math.sqrt(alpha))) / Math.sqrt(alpha);
-            // TODO Auto-generated method stub
-            return Math.signum(probability - HALF) * TWO * Math.sqrt(q - ONE);
-        }
-
-    }
-
     static final class Degree3 extends TDistribution {
 
         public Degree3() {
@@ -104,6 +88,22 @@ public class TDistribution extends AbstractContinuous {
         @Override
         public double getDensity(double value) {
             return (SIX * Math.sqrt(THREE)) / (PI * Math.pow(THREE + (value * value), TWO));
+        }
+
+    }
+
+    static final class Degree4 extends TDistribution {
+
+        public Degree4() {
+            super(FOUR);
+        }
+
+        @Override
+        public double getQuantile(double probability) {
+            double alpha = FOUR * probability * (ONE - probability);
+            double sqrt = Math.sqrt(alpha);
+            double q = Math.cos(THIRD * Math.acos(sqrt)) / sqrt;
+            return Math.signum(probability - HALF) * TWO * Math.sqrt(q - ONE);
         }
 
     }
