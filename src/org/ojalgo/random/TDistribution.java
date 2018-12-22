@@ -129,23 +129,22 @@ public class TDistribution extends AbstractContinuous {
         default:
             return new TDistribution(degreesOfFreedom);
         }
-
     }
 
     /**
      * The density and distribution functions share a common constant factor
      */
-    private final double myCommonFactor;
+    private final double myConstant;
     private final double myDegreesOfFreedom;
 
     public TDistribution(double degreesOfFreedom) {
         super();
         myDegreesOfFreedom = degreesOfFreedom;
-        myCommonFactor = RandomUtils.gamma((degreesOfFreedom + ONE) / TWO) / (Math.sqrt(degreesOfFreedom * PI) * RandomUtils.gamma(degreesOfFreedom / TWO));
+        myConstant = RandomUtils.gamma((degreesOfFreedom + ONE) / TWO) / (Math.sqrt(degreesOfFreedom * PI) * RandomUtils.gamma(degreesOfFreedom / TWO));
     }
 
     public double getDensity(double value) {
-        return myCommonFactor * Math.pow(ONE + ((value * value) / myDegreesOfFreedom), (NEG - myDegreesOfFreedom) / TWO);
+        return myConstant * Math.pow(ONE + ((value * value) / myDegreesOfFreedom), (NEG - myDegreesOfFreedom) / TWO);
     }
 
     public double getDistribution(double value) {
