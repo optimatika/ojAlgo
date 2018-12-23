@@ -30,6 +30,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.structure.Access1D;
@@ -41,7 +42,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  * @author Chris Lucas
  */
-public class RandomNumberTest {
+public class RandomNumberTest extends RandomTests {
 
     // A wrapper for two-parameter random numbers to make it easier to generalize tests. Easy to extend to single-parameter random numbers,
     // or just apply as-is by having one throw-away parameter.
@@ -139,17 +140,25 @@ public class RandomNumberTest {
     @Test
     public void testERFandERFI() {
 
-        final double tmpError = 1E-14 / PrimitiveMath.THREE;
-        double tmpExpected = -1.5;
-        double tmpActual;
+        final double precision = 1E-14;
+        double expected = -1.5;
+        double actual;
 
-        while (tmpExpected <= 1.5) {
+        while (expected <= 1.5) {
+            actual = RandomUtils.erfi(RandomUtils.erf(expected));
+            TestUtils.assertEquals(expected, actual, precision);
+            expected += 0.1;
+        }
 
-            tmpActual = RandomUtils.erfi(RandomUtils.erf(tmpExpected));
-
-            TestUtils.assertEquals(tmpExpected, tmpActual, tmpError);
-
-            tmpExpected += 0.5;
+        if (DEBUG) {
+            for (int i = -10; i <= 10; i++) {
+                double d = i / 2.0;
+                double erf = RandomUtils.erf(d);
+                double erfi = RandomUtils.erfi(erf);
+                double err = Math.abs(erfi - d);
+                double mag = Math.abs(erfi);
+                BasicLogger.debug("{} => {} => {} : {} : {}", d, erf, erfi, err, err / mag);
+            }
         }
     }
 

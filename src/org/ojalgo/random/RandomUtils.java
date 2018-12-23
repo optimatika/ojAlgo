@@ -29,6 +29,13 @@ public abstract class RandomUtils {
 
     private static final double[] C;
 
+    /**
+     * For the Lanczos approximation of the gamma function
+     */
+    private static final double[] L9 = { 0.99999999999980993227684700473478, 676.520368121885098567009190444019, -1259.13921672240287047156078755283,
+            771.3234287776530788486528258894, -176.61502916214059906584551354, 12.507343278686904814458936853, -0.13857109526572011689554707,
+            9.984369578019570859563e-6, 1.50563273514931155834e-7 };
+
     static {
 
         C = new double[1000];
@@ -41,13 +48,6 @@ public abstract class RandomUtils {
             }
         }
     }
-
-    /**
-     * For the Lanczos approximation of the gamma function
-     */
-    private static final double[] L9 = { 0.99999999999980993227684700473478, 676.520368121885098567009190444019, -1259.13921672240287047156078755283,
-            771.3234287776530788486528258894, -176.61502916214059906584551354, 12.507343278686904814458936853, -0.13857109526572011689554707,
-            9.984369578019570859563e-6, 1.50563273514931155834e-7 };
 
     /**
      * @param aSumOfValues The sum of all values in a sample set
@@ -64,21 +64,32 @@ public abstract class RandomUtils {
      * <a href="http://en.wikipedia.org/wiki/Error_function">erf()&nbsp;@&nbsp;Wikipedia</a> <br>
      * <a href="http://mathworld.wolfram.com/Erf.html">erf()&nbsp;@&nbsp;Wolfram MathWorld</a>
      */
-    public static double erf(final double anArg) {
+    public static double erf(final double arg) {
 
-        double retVal = ZERO;
-        final double tmpSqr = anArg * anArg;
-        double tmpVal;
+        if (arg < -FOUR) {
 
-        for (int n = 0; n <= 60; n++) {
-            tmpVal = anArg / ((2 * n) + 1);
-            for (int i = 1; i <= n; i++) {
-                tmpVal *= -tmpSqr / i;
+            return NEG;
+
+        } else if (arg > FOUR) {
+
+            return ONE;
+
+        } else {
+
+            double retVal = ZERO;
+            final double squared = arg * arg;
+            double tmpVal;
+
+            for (int n = 0; n <= 100; n++) {
+                tmpVal = arg / ((2 * n) + 1);
+                for (int i = 1; i <= n; i++) {
+                    tmpVal *= -squared / i;
+                }
+                retVal += tmpVal;
             }
-            retVal += tmpVal;
-        }
 
-        return (TWO * retVal) / SQRT_PI;
+            return (TWO * retVal) / SQRT_PI;
+        }
     }
 
     /**
@@ -95,15 +106,27 @@ public abstract class RandomUtils {
      * <a href="http://en.wikipedia.org/wiki/Error_function">erf()&nbsp;@&nbsp;Wikipedia</a> <br>
      * <a href="http://mathworld.wolfram.com/Erf.html">erf()&nbsp;@&nbsp;Wolfram MathWorld</a>
      */
-    public static double erfi(final double anArg) {
+    public static double erfi(final double arg) {
 
-        double retVal = ZERO;
+        if (Math.abs(arg) > ONE) {
+            return NaN;
+        } else if (arg == NEG) {
+            return NEGATIVE_INFINITY;
+        } else if (arg == ONE) {
+            return POSITIVE_INFINITY;
+        } else {
 
-        for (int k = 500; k >= 0; k--) {
-            retVal += (C[k] * (PrimitiveFunction.POW.invoke((SQRT_PI * anArg) / TWO, (2 * k) + 1))) / ((2 * k) + 1);
+            double retVal = ZERO;
+
+            double base = (SQRT_PI * arg) / TWO;
+            for (int k = 500; k >= 0; k--) {
+                int kk1 = (2 * k) + 1;
+                double power = Math.pow(base, kk1);
+                retVal += (C[k] / kk1) * power;
+            }
+
+            return retVal;
         }
-
-        return retVal;
     }
 
     public static double factorial(final int aVal) {
