@@ -88,6 +88,33 @@ public class RandomNumberTest extends RandomTests {
         }
     }
 
+    public static void compareDensity(ContinuousDistribution expected, ContinuousDistribution actual) {
+        for (int d = -20; d < 21; d++) { // -2 .. 2
+            double value = d / 10.0;
+            double e = expected.getDensity(value);
+            double a = actual.getDensity(value);
+            TestUtils.assertEquals(e, a, 0.000001);
+        }
+    }
+
+    public static void compareDistribution(ContinuousDistribution expected, ContinuousDistribution actual) {
+        for (int d = -20; d < 21; d++) { // -2 .. 2
+            double value = d / 10.0;
+            double e = expected.getDistribution(-value);
+            double a = actual.getDistribution(-value);
+            TestUtils.assertEquals(e, a, 0.0001);
+        }
+    }
+
+    public static void compareQuantile(ContinuousDistribution expected, ContinuousDistribution actual) {
+        for (int t = 1; t < 10; t++) { // 0.1 .. 0.9
+            double probability = t / 10.0;
+            double e = expected.getQuantile(probability);
+            double a = actual.getQuantile(probability);
+            TestUtils.assertEquals(e, a, 0.0000001);
+        }
+    }
+
     /**
      * Tests that the error function implementation returns correct confidence intervals for +/- 6 standard
      * deviations. They are all correct to at least 10 decimal places.
@@ -399,7 +426,6 @@ public class RandomNumberTest extends RandomTests {
 
             TestUtils.assertEquals(tmpExpected, tmpActual, 5.0E-3);
         }
-
     }
 
     @Test
@@ -428,6 +454,28 @@ public class RandomNumberTest extends RandomTests {
             TestUtils.assertEquals(tmpDistrName, tmpExpected, tmpActual, TENTH);
         }
 
+    }
+
+    @Test
+    public void testTDistributionFreedomCases() {
+
+        RandomNumberTest.compareDensity(new TDistribution.Degree1(), new TDistribution(ONE));
+        RandomNumberTest.compareDensity(new TDistribution.Degree2(), new TDistribution(TWO));
+        RandomNumberTest.compareDensity(new TDistribution.Degree3(), new TDistribution(THREE));
+        RandomNumberTest.compareDensity(new TDistribution.Degree4(), new TDistribution(FOUR));
+        //        RandomNumberTest.compareDensity(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE));
+
+        //        RandomNumberTest.compareDistribution(new TDistribution.Degree1(), new TDistribution(ONE));
+        //        RandomNumberTest.compareDistribution(new TDistribution.Degree2(), new TDistribution(TWO));
+        //        RandomNumberTest.compareDistribution(new TDistribution.Degree3(), new TDistribution(THREE));
+        //        RandomNumberTest.compareDistribution(new TDistribution.Degree4(), new TDistribution(FOUR));
+        //        RandomNumberTest.compareDistribution(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE));
+
+        //        RandomNumberTest.compareQuantile(new TDistribution.Degree1(), new TDistribution(ONE));
+        //        RandomNumberTest.compareQuantile(new TDistribution.Degree2(), new TDistribution(TWO));
+        //        RandomNumberTest.compareQuantile(new TDistribution.Degree3(), new TDistribution(THREE));
+        //        RandomNumberTest.compareQuantile(new TDistribution.Degree4(), new TDistribution(FOUR));
+        //        RandomNumberTest.compareQuantile(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE));
     }
 
     @Test
