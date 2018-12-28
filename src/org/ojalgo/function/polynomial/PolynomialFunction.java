@@ -42,8 +42,8 @@ public interface PolynomialFunction<N extends Number>
 
     void set(Access1D<?> coefficients);
 
-    void set(final int aPower, final double aCoefficient);
+    void set(final int power, final double coefficient);
 
-    void set(final int aPower, final N aCoefficient);
+    void set(final int power, final N coefficient);
 
 }
