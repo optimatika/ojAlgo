@@ -344,14 +344,32 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         i = imaginary;
     }
 
+    /**
+     * Performs the binary operation '+' with a complex number.
+     * @param arg the complex number to add
+     * @return a complex number {@literal Z = ((Re(this) + Re(arg)) + (Im(this) + Im(arg))i)}
+     */
     public ComplexNumber add(final ComplexNumber arg) {
         return new ComplexNumber(myRealValue + arg.doubleValue(), i + arg.i);
     }
 
+    /**
+     * Performs the binary operation '+' with a real number
+     * @param arg the real number to add
+     * @return a complex number {@literal Z = ((Re(this) + arg) + Im(this)i)}
+     */
     public ComplexNumber add(final double arg) {
         return new ComplexNumber(myRealValue + arg, i);
     }
 
+    /**
+     * Compares the specified {@code reference} and this.
+     * The numerical comparison uses following order : {@literal |Z| -> Re(Z) -> Im(Z)}.
+     * @param reference the complex number to compare with
+     * @return a negative value if {@code reference} is numerically greater than this,
+     * {@code 0} if this and {@code reference} are numerically equal or
+     * a positive value if {@code reference} is numerically lesser than this.
+     */
     public int compareTo(final ComplexNumber reference) {
 
         int retVal = 0;
@@ -365,6 +383,11 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return retVal;
     }
 
+    /**
+     * Returns the conjugate of this complex number.
+     * A complex number conjugate is its reflexion about the real axis.
+     * @return a complex number Z = (Re(this) - Im(this)i)
+     */
     public ComplexNumber conjugate() {
         return new ComplexNumber(myRealValue, -i);
     }
@@ -381,6 +404,11 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return 2L;
     }
 
+    /**
+     * Performs the binary operation '/' with a complex number.
+     * @param arg the complex number to divide by
+     * @return a complex number {@literal Z = this / arg}
+     */
     public ComplexNumber divide(final ComplexNumber arg) {
 
         final double tmpRe = arg.doubleValue();
@@ -402,6 +430,11 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
     }
 
+    /**
+     * Performs the binary operation '/' with a real number.
+     * @param arg the real number to divide by
+     * @return a complex number {@literal Z = ((Re(this) / arg) + (Im(this) / arg)i)}
+     */
     public ComplexNumber divide(final double arg) {
         return new ComplexNumber(myRealValue / arg, i / arg);
     }
@@ -529,6 +562,10 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return (int) this.doubleValue();
     }
 
+    /**
+     * Performs the unary operation '1/x'
+     * @return the complex number Z inverse of this, satisfies {@literal Z * this = 1}
+     */
     @Override
     public ComplexNumber invert() {
         return ComplexNumber.makePolar(PrimitiveMath.ONE / this.norm(), -this.phase());
@@ -558,6 +595,11 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return (long) this.doubleValue();
     }
 
+    /**
+     * Performs the binary operation '*' with a complex number.
+     * @param arg the complex number to multiply by
+     * @return a complex number {@literal Z = this * arg}
+     */
     @Override
     public ComplexNumber multiply(final ComplexNumber arg) {
 
@@ -567,20 +609,40 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return new ComplexNumber((myRealValue * tmpRe) - (i * tmpIm), (myRealValue * tmpIm) + (i * tmpRe));
     }
 
+    /**
+     * Performs the binary operation '*' with a real number.
+     * @param arg the real number to multiply by
+     * @return a complex number Z = ((Re(this) * arg) + Im(this) * arg))
+     */
     @Override
     public ComplexNumber multiply(final double arg) {
         return new ComplexNumber(myRealValue * arg, i * arg);
     }
 
+    /**
+     * Performs the unary operation '-'.
+     * @return a complex number Z = -this
+     */
     @Override
     public ComplexNumber negate() {
         return new ComplexNumber(-myRealValue, -i);
     }
 
+    /**
+     * Returns the norm of this complex number.
+     * The norm of a complex number is defined by |Z| = (ZZ<sup>*</sup>)<sup>1/2</sup>.
+     * @return the norm of this complex number.
+     */
     public double norm() {
         return PrimitiveFunction.HYPOT.invoke(myRealValue, i);
     }
 
+    /**
+     * Returns the phase of this complex number.
+     * The phase of a complex number Z is the angle between the positive real axis and
+     * the straight line defined by origin and Z in complex plane.
+     * @return the phase of this complex number
+     */
     public double phase() {
         return Math.atan2(i, myRealValue);
     }
@@ -593,10 +655,20 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
     }
 
+    /**
+     * Performs the binary operation '-' with a complex number.
+     * @param arg the complex number to subtract
+     * @return a complex number Z = this - {@code arg}
+     */
     public ComplexNumber subtract(final ComplexNumber arg) {
         return new ComplexNumber(myRealValue - arg.doubleValue(), i - arg.i);
     }
 
+    /**
+     * Performs the binary operation '-' with a real number.
+     * @param arg the real number to subtract
+     * @return a complex number Z = ((Re(this) - arg) + Im(this)i)
+     */
     @Override
     public ComplexNumber subtract(final double arg) {
         return new ComplexNumber(myRealValue - arg, i);
