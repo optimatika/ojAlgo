@@ -24,6 +24,7 @@ package org.ojalgo.random;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.special.ErrorFunction;
 
 /**
  * Under general conditions, the sum of a large number of random variables is approximately normally
@@ -58,7 +59,7 @@ public class Normal extends AbstractContinuous {
     }
 
     public double getDistribution(final double value) {
-        return (ONE + RandomUtils.erf((value - myLocation) / (myScale * SQRT_TWO))) / TWO;
+        return (ONE + ErrorFunction.erf((value - myLocation) / (myScale * SQRT_TWO))) / TWO;
     }
 
     public double getExpected() {
@@ -69,7 +70,7 @@ public class Normal extends AbstractContinuous {
 
         this.checkProbabilty(probability);
 
-        return (myScale * SQRT_TWO * RandomUtils.erfi((TWO * probability) - ONE)) + myLocation;
+        return (myScale * SQRT_TWO * ErrorFunction.erfi((TWO * probability) - ONE)) + myLocation;
     }
 
     @Override

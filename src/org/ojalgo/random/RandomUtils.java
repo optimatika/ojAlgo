@@ -23,110 +23,56 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.special.ErrorFunction;
+import org.ojalgo.function.special.Gamma;
 
 public abstract class RandomUtils {
 
-    private static final double[] C;
-
     /**
-     * For the Lanczos approximation of the gamma function
-     */
-    private static final double[] L9 = { 0.99999999999980993227684700473478, 676.520368121885098567009190444019, -1259.13921672240287047156078755283,
-            771.3234287776530788486528258894, -176.61502916214059906584551354, 12.507343278686904814458936853, -0.13857109526572011689554707,
-            9.984369578019570859563e-6, 1.50563273514931155834e-7 };
-
-    static {
-
-        C = new double[1000];
-
-        C[0] = ONE;
-        for (int k = 1; k < C.length; k++) {
-            C[k] = ZERO;
-            for (int m = 0; m <= (k - 1); m++) {
-                C[k] += (C[m] * C[k - 1 - m]) / ((m + 1) * ((2 * m) + 1));
-            }
-        }
-    }
-
-    /**
-     * @param aSumOfValues The sum of all values in a sample set
-     * @param aSumOfSquaredValues The sum of all squared values, in a sample set
-     * @param aValuesCount The number of values in the sample set
+     * @param sumOfValues The sum of all values in a sample set
+     * @param sumOfSquaredValues The sum of all squared values, in a sample set
+     * @param numberOfValues The number of values in the sample set
      * @return The sample set's variance
+     * @deprecated Use {@link SampleSet#calculateVariance(double,double,int)} instead
      */
-    public static double calculateVariance(final double aSumOfValues, final double aSumOfSquaredValues, final int aValuesCount) {
-        return ((aValuesCount * aSumOfSquaredValues) - (aSumOfValues * aSumOfValues)) / (aValuesCount * (aValuesCount - 1));
+    public static double calculateVariance(final double sumOfValues, final double sumOfSquaredValues, final int numberOfValues) {
+        return SampleSet.calculateVariance(sumOfValues, sumOfSquaredValues, numberOfValues);
     }
 
     /**
      * Error Function <br>
      * <a href="http://en.wikipedia.org/wiki/Error_function">erf()&nbsp;@&nbsp;Wikipedia</a> <br>
      * <a href="http://mathworld.wolfram.com/Erf.html">erf()&nbsp;@&nbsp;Wolfram MathWorld</a>
+     * 
+     * @deprecated Use {@link ErrorFunction#erf(double)} instead
      */
+    @Deprecated
     public static double erf(final double arg) {
-
-        if (arg < -FOUR) {
-
-            return NEG;
-
-        } else if (arg > FOUR) {
-
-            return ONE;
-
-        } else {
-
-            double retVal = ZERO;
-            final double squared = arg * arg;
-            double tmpVal;
-
-            for (int n = 0; n <= 100; n++) {
-                tmpVal = arg / ((2 * n) + 1);
-                for (int i = 1; i <= n; i++) {
-                    tmpVal *= -squared / i;
-                }
-                retVal += tmpVal;
-            }
-
-            return (TWO * retVal) / SQRT_PI;
-        }
+        return ErrorFunction.erf(arg);
     }
 
     /**
      * Complementary Error Function <br>
      * <a href="http://en.wikipedia.org/wiki/Error_function">erf()&nbsp;@&nbsp;Wikipedia</a> <br>
      * <a href="http://mathworld.wolfram.com/Erf.html">erf()&nbsp;@&nbsp;Wolfram MathWorld</a>
+     * 
+     * @deprecated Use {@link ErrorFunction#erfc(double)} instead
      */
+    @Deprecated
     public static double erfc(final double anArg) {
-        return ONE - RandomUtils.erf(anArg);
+        return ErrorFunction.erfc(anArg);
     }
 
     /**
      * Inverse Error Function <br>
      * <a href="http://en.wikipedia.org/wiki/Error_function">erf()&nbsp;@&nbsp;Wikipedia</a> <br>
      * <a href="http://mathworld.wolfram.com/Erf.html">erf()&nbsp;@&nbsp;Wolfram MathWorld</a>
+     * 
+     * @deprecated Use {@link ErrorFunction#erfi(double)} instead
      */
+    @Deprecated
     public static double erfi(final double arg) {
-
-        if (Math.abs(arg) > ONE) {
-            return NaN;
-        } else if (arg == NEG) {
-            return NEGATIVE_INFINITY;
-        } else if (arg == ONE) {
-            return POSITIVE_INFINITY;
-        } else {
-
-            double retVal = ZERO;
-
-            double base = (SQRT_PI * arg) / TWO;
-            for (int k = 500; k >= 0; k--) {
-                int kk1 = (2 * k) + 1;
-                double power = Math.pow(base, kk1);
-                retVal += (C[k] / kk1) * power;
-            }
-
-            return retVal;
-        }
+        return ErrorFunction.erfi(arg);
     }
 
     public static double factorial(final int aVal) {
@@ -144,33 +90,10 @@ public abstract class RandomUtils {
      * Lanczos approximation. The abritray constant is 7, and there are 9 coefficients used. Essentially the
      * algorithm is taken from <a href="http://en.wikipedia.org/wiki/Lanczos_approximation">WikipediA</a> ,
      * but it's modified a bit and I found more exact coefficients somewhere else.
+     * @deprecated Use {@link Gamma#gamma(double)} instead
      */
     public static double gamma(final double arg) {
-
-        if ((arg <= ZERO) && (PrimitiveFunction.ABS.invoke(arg % ONE) < MACHINE_EPSILON)) {
-
-            return NaN;
-
-        } else {
-
-            if (arg < HALF) {
-
-                return PI / (PrimitiveFunction.SIN.invoke(PI * arg) * RandomUtils.gamma(ONE - arg));
-
-            } else {
-
-                final double z = arg - ONE;
-
-                double x = L9[0];
-                for (int i = 1; i < L9.length; i++) {
-                    x += L9[i] / (z + i);
-                }
-
-                final double t = z + (7 + HALF);
-
-                return SQRT_TWO_PI * PrimitiveFunction.POW.invoke(t, z + HALF) * PrimitiveFunction.EXP.invoke(-t) * x;
-            }
-        }
+        return Gamma.gamma(arg);
     }
 
     /**
