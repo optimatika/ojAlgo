@@ -40,11 +40,11 @@ abstract class AbstractPolynomial<N extends Number> implements PolynomialFunctio
         this(null);
     }
 
-    protected AbstractPolynomial(final Array1D<N> someCoefficients) {
+    protected AbstractPolynomial(final Array1D<N> coefficients) {
 
         super();
 
-        myCoefficients = someCoefficients;
+        myCoefficients = coefficients;
     }
 
     public final PolynomialFunction<N> buildDerivative() {
@@ -87,8 +87,8 @@ abstract class AbstractPolynomial<N extends Number> implements PolynomialFunctio
         return myCoefficients.size() - 1;
     }
 
-    public final double doubleValue(final long aPower) {
-        return myCoefficients.doubleValue(aPower);
+    public final double doubleValue(final long power) {
+        return myCoefficients.doubleValue(power);
     }
 
     public final void estimate(final List<? extends Number> x, final List<? extends Number> y) {
@@ -99,8 +99,8 @@ abstract class AbstractPolynomial<N extends Number> implements PolynomialFunctio
         this.estimate(samples.accessKeys(), samples.accessValues());
     }
 
-    public final N get(final long aPower) {
-        return myCoefficients.get(aPower);
+    public final N get(final long power) {
+        return myCoefficients.get(power);
     }
 
     public final double invoke(final double arg) {
@@ -116,14 +116,14 @@ abstract class AbstractPolynomial<N extends Number> implements PolynomialFunctio
         return retVal;
     }
 
-    public final void set(final int aPower, final double aNmbr) {
-        myCoefficients.set(aPower, aNmbr);
+    public final void set(final int power, final double coefficient) {
+        myCoefficients.set(power, coefficient);
         myDerivative = null;
         myPrimitive = null;
     }
 
-    public final void set(final int aPower, final N aNmbr) {
-        myCoefficients.set(aPower, aNmbr);
+    public final void set(final int power, final N coefficient) {
+        myCoefficients.set(power, coefficient);
         myDerivative = null;
         myPrimitive = null;
     }
@@ -132,10 +132,10 @@ abstract class AbstractPolynomial<N extends Number> implements PolynomialFunctio
         return myCoefficients.size();
     }
 
-    protected abstract N getDerivativeFactor(int aPower);
+    protected abstract N getDerivativeFactor(int power);
 
-    protected abstract N getPrimitiveFactor(int aPower);
+    protected abstract N getPrimitiveFactor(int power);
 
-    protected abstract AbstractPolynomial<N> makeInstance(int aSize);
+    protected abstract AbstractPolynomial<N> makeInstance(int size);
 
 }
