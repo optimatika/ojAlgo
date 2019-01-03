@@ -139,12 +139,33 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     };
 
+    /**
+     * Complex number {@code i}, satisfies i<sup>2</sup> = -1;
+     */
     public static final ComplexNumber I = new ComplexNumber(PrimitiveMath.ZERO, PrimitiveMath.ONE);
+    /**
+     * Complex number Z = (+∞ + 0.0i)
+     */
     public static final ComplexNumber INFINITY = ComplexNumber.makePolar(Double.POSITIVE_INFINITY, PrimitiveMath.ZERO);
+    /**
+     * Complex number Z = (NaN + NaNi)
+     */
     public static final ComplexNumber NaN = ComplexNumber.of(PrimitiveMath.NaN, PrimitiveMath.NaN);
+    /**
+     * Complex number Z = (-1.0 + 0.0i)
+     */
     public static final ComplexNumber NEG = ComplexNumber.valueOf(PrimitiveMath.NEG);
+    /**
+     * Complex number Z = (1.0 + 0.0i)
+     */
     public static final ComplexNumber ONE = ComplexNumber.valueOf(PrimitiveMath.ONE);
+    /**
+     * Complex number Z = (2.0 + 0.0i)
+     */
     public static final ComplexNumber TWO = ComplexNumber.valueOf(PrimitiveMath.TWO);
+    /**
+     * Complex number Z = (0.0 + 0.0i)
+     */
     public static final ComplexNumber ZERO = ComplexNumber.valueOf(PrimitiveMath.ZERO);
 
     private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * PrimitiveScalar.CONTEXT.epsilon();
@@ -158,22 +179,47 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return value.isAbsolute();
     }
 
+    /**
+     * Test if {@code value} is infinite.
+     * A complex number is infinite if its real part and/or its imaginary part is infinite.
+     * @param value the complex number to test
+     * @return true if the specified value is infinite (real and/or imaginary part) otherwise false
+     */
     public static boolean isInfinite(final ComplexNumber value) {
         return Double.isInfinite(value.doubleValue()) || Double.isInfinite(value.i);
     }
 
+    /**
+     * Test if {@code value} is NaN.
+     * A complex number is NaN if its real and/or its imaginary part is NaN.
+     * @param value the complex number to test
+     * @return true if the specified value is NaN (real and/or imaginary part) otherwise false
+     */
     public static boolean isNaN(final ComplexNumber value) {
         return Double.isNaN(value.doubleValue()) || Double.isNaN(value.i);
     }
 
+    /**
+     * Test if {@code value} is real.
+     * A complex number Z is real if and only if {@literal Im(Z) = 0.0}.
+     * @param value the complex number to test
+     * @return true if the imaginary part of the specified value is null otherwise false
+     */
     public static boolean isReal(final ComplexNumber value) {
         return value.isReal();
     }
+
 
     public static boolean isSmall(final double comparedTo, final ComplexNumber value) {
         return value.isSmall(comparedTo);
     }
 
+    /**
+     * Static factory method returning a complex number from polar coordinates
+     * @param norm the complex number's norm
+     * @param phase the complex number's phase
+     * @return a complex number
+     */
     public static ComplexNumber makePolar(final double norm, final double phase) {
 
         double tmpStdPhase = phase % PrimitiveMath.TWO_PI;
@@ -215,6 +261,12 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return new Normalised(PrimitiveFunction.COS.invoke(angle), PrimitiveFunction.SIN.invoke(angle));
     }
 
+    /**
+     * Static factory method returning a complex number from cartesian coordinates.
+     * @param real the complex number's real part
+     * @param imaginary the complex number's imaginary part
+     * @return a complex number
+     */
     public static ComplexNumber of(final double real, final double imaginary) {
         if (PrimitiveScalar.CONTEXT.isSmall(real, imaginary)) {
             return new ComplexNumber(real);
@@ -223,10 +275,22 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
     }
 
+    /**
+     * Static factory method returning a complex number from a real value
+     * @param value the complex number's real part
+     * @return a complex number Z = ({@code value} + 0.0i)
+     */
     public static ComplexNumber valueOf(final double value) {
         return new ComplexNumber(value);
     }
 
+    /**
+     * Static factory method returning a complex number from arbitrary number
+     * @param number a numeric value
+     * @return {@link ComplexNumber#ZERO} if {@code number} is null otherwise the double value of {@code number}
+     * @see Number
+     * @see Number#doubleValue()
+     */
     public static ComplexNumber valueOf(final Number number) {
 
         if (number != null) {
@@ -251,6 +315,9 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     private final boolean myRealForSure;
     private final double myRealValue;
 
+    /**
+     * Complex number constructor, returns {@link ComplexNumber#ZERO}
+     */
     public ComplexNumber() {
         this(PrimitiveMath.ZERO);
     }
@@ -277,14 +344,32 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         i = imaginary;
     }
 
+    /**
+     * Performs the binary operation '+' with a complex number.
+     * @param arg the complex number to add
+     * @return a complex number {@literal Z = ((Re(this) + Re(arg)) + (Im(this) + Im(arg))i)}
+     */
     public ComplexNumber add(final ComplexNumber arg) {
         return new ComplexNumber(myRealValue + arg.doubleValue(), i + arg.i);
     }
 
+    /**
+     * Performs the binary operation '+' with a real number
+     * @param arg the real number to add
+     * @return a complex number {@literal Z = ((Re(this) + arg) + Im(this)i)}
+     */
     public ComplexNumber add(final double arg) {
         return new ComplexNumber(myRealValue + arg, i);
     }
 
+    /**
+     * Compares the specified {@code reference} and this.
+     * The numerical comparison uses following order : {@literal |Z| -> Re(Z) -> Im(Z)}.
+     * @param reference the complex number to compare with
+     * @return a negative value if {@code reference} is numerically greater than this,
+     * {@code 0} if this and {@code reference} are numerically equal or
+     * a positive value if {@code reference} is numerically lesser than this.
+     */
     public int compareTo(final ComplexNumber reference) {
 
         int retVal = 0;
@@ -298,6 +383,11 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return retVal;
     }
 
+    /**
+     * Returns the conjugate of this complex number.
+     * A complex number conjugate is its reflexion about the real axis.
+     * @return a complex number Z = (Re(this) - Im(this)i)
+     */
     public ComplexNumber conjugate() {
         return new ComplexNumber(myRealValue, -i);
     }
@@ -314,6 +404,11 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return 2L;
     }
 
+    /**
+     * Performs the binary operation '/' with a complex number.
+     * @param arg the complex number to divide by
+     * @return a complex number {@literal Z = this / arg}
+     */
     public ComplexNumber divide(final ComplexNumber arg) {
 
         final double tmpRe = arg.doubleValue();
@@ -335,6 +430,11 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
     }
 
+    /**
+     * Performs the binary operation '/' with a real number.
+     * @param arg the real number to divide by
+     * @return a complex number {@literal Z = ((Re(this) / arg) + (Im(this) / arg)i)}
+     */
     public ComplexNumber divide(final double arg) {
         return new ComplexNumber(myRealValue / arg, i / arg);
     }
@@ -462,6 +562,10 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return (int) this.doubleValue();
     }
 
+    /**
+     * Performs the unary operation '1/x'
+     * @return the complex number Z inverse of this, satisfies {@literal Z * this = 1}
+     */
     @Override
     public ComplexNumber invert() {
         return ComplexNumber.makePolar(PrimitiveMath.ONE / this.norm(), -this.phase());
@@ -491,6 +595,11 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return (long) this.doubleValue();
     }
 
+    /**
+     * Performs the binary operation '*' with a complex number.
+     * @param arg the complex number to multiply by
+     * @return a complex number {@literal Z = this * arg}
+     */
     @Override
     public ComplexNumber multiply(final ComplexNumber arg) {
 
@@ -500,20 +609,40 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return new ComplexNumber((myRealValue * tmpRe) - (i * tmpIm), (myRealValue * tmpIm) + (i * tmpRe));
     }
 
+    /**
+     * Performs the binary operation '*' with a real number.
+     * @param arg the real number to multiply by
+     * @return a complex number Z = ((Re(this) * arg) + Im(this) * arg))
+     */
     @Override
     public ComplexNumber multiply(final double arg) {
         return new ComplexNumber(myRealValue * arg, i * arg);
     }
 
+    /**
+     * Performs the unary operation '-'.
+     * @return a complex number Z = -this
+     */
     @Override
     public ComplexNumber negate() {
         return new ComplexNumber(-myRealValue, -i);
     }
 
+    /**
+     * Returns the norm of this complex number.
+     * The norm of a complex number is defined by |Z| = (ZZ<sup>*</sup>)<sup>1/2</sup>.
+     * @return the norm of this complex number.
+     */
     public double norm() {
         return PrimitiveFunction.HYPOT.invoke(myRealValue, i);
     }
 
+    /**
+     * Returns the phase of this complex number.
+     * The phase of a complex number Z is the angle between the positive real axis and
+     * the straight line defined by origin and Z in complex plane.
+     * @return the phase of this complex number
+     */
     public double phase() {
         return Math.atan2(i, myRealValue);
     }
@@ -526,10 +655,20 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
     }
 
+    /**
+     * Performs the binary operation '-' with a complex number.
+     * @param arg the complex number to subtract
+     * @return a complex number Z = this - {@code arg}
+     */
     public ComplexNumber subtract(final ComplexNumber arg) {
         return new ComplexNumber(myRealValue - arg.doubleValue(), i - arg.i);
     }
 
+    /**
+     * Performs the binary operation '-' with a real number.
+     * @param arg the real number to subtract
+     * @return a complex number Z = ((Re(this) - arg) + Im(this)i)
+     */
     @Override
     public ComplexNumber subtract(final double arg) {
         return new ComplexNumber(myRealValue - arg, i);
