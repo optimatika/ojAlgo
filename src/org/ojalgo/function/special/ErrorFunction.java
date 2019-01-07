@@ -78,8 +78,8 @@ public abstract class ErrorFunction {
      * <a href="http://en.wikipedia.org/wiki/Error_function">erf()&nbsp;@&nbsp;Wikipedia</a> <br>
      * <a href="http://mathworld.wolfram.com/Erf.html">erf()&nbsp;@&nbsp;Wolfram MathWorld</a>
      */
-    public static double erfc(final double anArg) {
-        return ONE - ErrorFunction.erf(anArg);
+    public static double erfc(final double arg) {
+        return ONE - ErrorFunction.erf(arg);
     }
 
     /**

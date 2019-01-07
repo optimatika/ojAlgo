@@ -21,11 +21,17 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-
+import org.ojalgo.function.special.Combinatorial;
 import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.function.special.Gamma;
 
+/**
+ * RandomUtils
+ *
+ * @deprecated v48
+ * @author apete
+ */
+@Deprecated
 public abstract class RandomUtils {
 
     /**
@@ -33,8 +39,9 @@ public abstract class RandomUtils {
      * @param sumOfSquaredValues The sum of all squared values, in a sample set
      * @param numberOfValues The number of values in the sample set
      * @return The sample set's variance
-     * @deprecated Use {@link SampleSet#calculateVariance(double,double,int)} instead
+     * @deprecated v48 Use {@link SampleSet#calculateVariance(double,double,int)} instead
      */
+    @Deprecated
     public static double calculateVariance(final double sumOfValues, final double sumOfSquaredValues, final int numberOfValues) {
         return SampleSet.calculateVariance(sumOfValues, sumOfSquaredValues, numberOfValues);
     }
@@ -43,8 +50,8 @@ public abstract class RandomUtils {
      * Error Function <br>
      * <a href="http://en.wikipedia.org/wiki/Error_function">erf()&nbsp;@&nbsp;Wikipedia</a> <br>
      * <a href="http://mathworld.wolfram.com/Erf.html">erf()&nbsp;@&nbsp;Wolfram MathWorld</a>
-     * 
-     * @deprecated Use {@link ErrorFunction#erf(double)} instead
+     *
+     * @deprecated v48 Use {@link ErrorFunction#erf(double)} instead
      */
     @Deprecated
     public static double erf(final double arg) {
@@ -55,8 +62,8 @@ public abstract class RandomUtils {
      * Complementary Error Function <br>
      * <a href="http://en.wikipedia.org/wiki/Error_function">erf()&nbsp;@&nbsp;Wikipedia</a> <br>
      * <a href="http://mathworld.wolfram.com/Erf.html">erf()&nbsp;@&nbsp;Wolfram MathWorld</a>
-     * 
-     * @deprecated Use {@link ErrorFunction#erfc(double)} instead
+     *
+     * @deprecated v48 Use {@link ErrorFunction#erfc(double)} instead
      */
     @Deprecated
     public static double erfc(final double anArg) {
@@ -67,31 +74,30 @@ public abstract class RandomUtils {
      * Inverse Error Function <br>
      * <a href="http://en.wikipedia.org/wiki/Error_function">erf()&nbsp;@&nbsp;Wikipedia</a> <br>
      * <a href="http://mathworld.wolfram.com/Erf.html">erf()&nbsp;@&nbsp;Wolfram MathWorld</a>
-     * 
-     * @deprecated Use {@link ErrorFunction#erfi(double)} instead
+     *
+     * @deprecated v48 Use {@link ErrorFunction#erfi(double)} instead
      */
     @Deprecated
     public static double erfi(final double arg) {
         return ErrorFunction.erfi(arg);
     }
 
+    /**
+     * @deprecated v48 Use {@link Combinatorial#factorial(int)} instead
+     */
+    @Deprecated
     public static double factorial(final int aVal) {
-
-        double retVal = ONE;
-
-        for (int i = 2; i <= aVal; i++) {
-            retVal *= i;
-        }
-
-        return retVal;
+        return Combinatorial.factorial(aVal);
     }
 
     /**
      * Lanczos approximation. The abritray constant is 7, and there are 9 coefficients used. Essentially the
      * algorithm is taken from <a href="http://en.wikipedia.org/wiki/Lanczos_approximation">WikipediA</a> ,
      * but it's modified a bit and I found more exact coefficients somewhere else.
-     * @deprecated Use {@link Gamma#gamma(double)} instead
+     *
+     * @deprecated v48 Use {@link Gamma#gamma(double)} instead
      */
+    @Deprecated
     public static double gamma(final double arg) {
         return Gamma.gamma(arg);
     }
@@ -100,39 +106,43 @@ public abstract class RandomUtils {
      * @param n The number of elements in the set
      * @param k A vector of subset sizes the sum of which must equal the size of the full set
      * @return The number of ways the set can be partioned in to subsets of the given sizes
+     * @deprecated v48 Use {@link Combinatorial#partitions(int,int[])} instead
      */
+    @Deprecated
     public static int partitions(final int n, final int[] k) {
-        int retVal = (int) RandomUtils.factorial(n);
-        for (int i = 0; i < k.length; i++) {
-            retVal /= RandomUtils.factorial(k[i]);
-        }
-        return retVal;
+        return Combinatorial.partitions(n, k);
     }
 
     /**
      * @param n The number of elements in the set
      * @return The number of permutations of the set
+     * @deprecated v48 Use {@link Combinatorial#permutations(int)} instead
      */
+    @Deprecated
     public static int permutations(final int n) {
-        return (int) RandomUtils.factorial(n);
+        return Combinatorial.permutations(n);
     }
 
     /**
      * @param n The number of elements in the set
      * @param k The number of elements in the subset
      * @return The number of subsets to the set
+     * @deprecated v48 Use {@link Combinatorial#subsets(int,int)} instead
      */
+    @Deprecated
     public static int subsets(final int n, final int k) {
-        return (int) (RandomUtils.factorial(n) / (RandomUtils.factorial(k) * RandomUtils.factorial(n - k)));
+        return Combinatorial.subsets(n, k);
     }
 
     /**
      * @param n The number of elements in the set
      * @param k The size of the tuple
      * @return The number of ordered k-tuples (variations) of the set
+     * @deprecated v48 Use {@link Combinatorial#variations(int,int)} instead
      */
+    @Deprecated
     public static int variations(final int n, final int k) {
-        return (int) (RandomUtils.factorial(n) / RandomUtils.factorial(n - k));
+        return Combinatorial.variations(n, k);
     }
 
     private RandomUtils() {
