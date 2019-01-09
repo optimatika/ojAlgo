@@ -514,6 +514,7 @@ public final class ResourceLocator {
 
         Session() {
             super();
+            CookieHandler.setDefault(myCookieManager);
         }
 
         public String getParameterValue(String key) {
