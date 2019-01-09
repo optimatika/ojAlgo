@@ -79,11 +79,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     ProgrammingError.throwForIllegalInvocation();
                 }
 
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    ProgrammingError.throwForIllegalInvocation();
-                    return null;
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myCount = 0;
                     myNumber = ZERO;
@@ -120,10 +115,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     myCount += result.intValue();
                 }
 
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myCount = 0;
                     return this;
@@ -157,10 +148,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return result1.max(result2);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ZERO;
                     return this;
@@ -192,10 +179,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 public void merge(final BigDecimal result) {
                     this.invoke(result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return result1.max(result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -235,10 +218,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return BigFunction.MIN.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = VERY_POSITIVE;
                     return this;
@@ -270,10 +249,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 public void merge(final BigDecimal result) {
                     this.invoke(result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -309,10 +284,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return HYPOT.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ZERO;
                     return this;
@@ -346,10 +317,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return MULTIPLY.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ONE;
                     return this;
@@ -381,10 +348,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 public void merge(final BigDecimal result) {
                     myNumber = MULTIPLY.invoke(myNumber, result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return MULTIPLY.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -426,10 +389,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return BigFunction.MIN.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = VERY_POSITIVE;
                     return this;
@@ -463,10 +422,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myNumber = ZERO;
                     return this;
@@ -498,10 +453,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 public void merge(final BigDecimal result) {
                     myNumber = ADD.invoke(myNumber, result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {

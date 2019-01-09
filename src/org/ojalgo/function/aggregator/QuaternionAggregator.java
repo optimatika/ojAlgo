@@ -80,11 +80,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     ProgrammingError.throwForIllegalInvocation();
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    ProgrammingError.throwForIllegalInvocation();
-                    return null;
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myCount = 0;
                     myNumber = Quaternion.ZERO;
@@ -121,10 +116,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     myCount += result.intValue();
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myCount = 0;
                     return this;
@@ -155,10 +146,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public void merge(final Quaternion result) {
                     this.invoke(result);
-                }
-
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return QuaternionFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Quaternion> reset() {
@@ -192,10 +179,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public void merge(final Quaternion result) {
                     this.invoke(result);
-                }
-
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return QuaternionFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Quaternion> reset() {
@@ -235,10 +218,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     this.invoke(result);
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return QuaternionFunction.MIN.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myNumber = Quaternion.INFINITY;
                     return this;
@@ -270,10 +249,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public void merge(final Quaternion result) {
                     this.invoke(result);
-                }
-
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Quaternion> reset() {
@@ -310,10 +285,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     this.invoke(result);
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return HYPOT.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myNumber = Quaternion.ZERO;
                     return this;
@@ -347,10 +318,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     this.invoke(result);
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return MULTIPLY.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myNumber = Quaternion.ONE;
                     return this;
@@ -381,10 +348,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public void merge(final Quaternion result) {
                     myNumber = myNumber.multiply(result);
-                }
-
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return MULTIPLY.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Quaternion> reset() {
@@ -426,10 +389,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     this.invoke(result);
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return QuaternionFunction.MIN.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myNumber = Quaternion.INFINITY;
                     return this;
@@ -463,10 +422,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     this.invoke(result);
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myNumber = Quaternion.ZERO;
                     return this;
@@ -498,10 +453,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public void merge(final Quaternion result) {
                     myNumber = myNumber.add(result);
-                }
-
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Quaternion> reset() {

@@ -36,12 +36,6 @@ public interface AggregatorFunction<N extends Number> extends VoidFunction<N>, A
      */
     void merge(N result);
 
-    /**
-     * @deprecated v45 Use {@link #merge(Number)} instead
-     */
-    @Deprecated
-    N merge(N result1, N result2);
-
     AggregatorFunction<N> reset();
 
     Scalar<N> toScalar();
