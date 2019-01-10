@@ -25,8 +25,8 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.random.LogNormal;
-import org.ojalgo.random.RandomUtils;
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access1D;
 
@@ -179,7 +179,7 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
 
         final double tmpScale = PrimitiveFunction.SQRT.invoke(tmpVar);
 
-        return PrimitiveFunction.EXP.invoke(tmpLocation - (tmpScale * SQRT_TWO * RandomUtils.erfi(confidence)));
+        return PrimitiveFunction.EXP.invoke(tmpLocation - (tmpScale * SQRT_TWO * ErrorFunction.erfi(confidence)));
     }
 
     @Override
@@ -196,7 +196,7 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
 
         final double tmpScale = PrimitiveFunction.SQRT.invoke(tmpVar);
 
-        return PrimitiveFunction.EXP.invoke(tmpLocation + (tmpScale * SQRT_TWO * RandomUtils.erfi(confidence)));
+        return PrimitiveFunction.EXP.invoke(tmpLocation + (tmpScale * SQRT_TWO * ErrorFunction.erfi(confidence)));
     }
 
     @Override

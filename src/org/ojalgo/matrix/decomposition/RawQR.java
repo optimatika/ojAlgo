@@ -360,7 +360,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         if ((int) preallocated.countRows() != m) {
             throw new IllegalArgumentException("RawStore row dimensions must agree.");
         }
-        if (!this.isFullColumnRank()) {
+        if (!this.isFullRank()) {
             throw new RuntimeException("RawStore is rank deficient.");
         }
 
@@ -395,7 +395,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        return this.isFullColumnRank();
+        return this.isFullRank();
     }
 
 }

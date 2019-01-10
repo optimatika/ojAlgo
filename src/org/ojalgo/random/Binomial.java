@@ -24,6 +24,7 @@ package org.ojalgo.random;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.special.CombinatorialFunctions;
 
 /**
  * The frequency in aCount indepedent trials, each with probability aProbability, has a binomial distribution.
@@ -54,7 +55,7 @@ public class Binomial extends AbstractDiscrete {
     }
 
     public double getProbability(final int value) {
-        return RandomUtils.subsets(myCount, value) * PrimitiveFunction.POW.invoke(myProbability, value)
+        return CombinatorialFunctions.subsets(myCount, value) * PrimitiveFunction.POW.invoke(myProbability, value)
                 * PrimitiveFunction.POW.invoke(ONE - myProbability, myCount - value);
     }
 

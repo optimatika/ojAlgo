@@ -33,7 +33,7 @@ import org.ojalgo.netio.BasicLogger;
  *
  * @author apete
  */
-public class QuantileTest {
+public class QuantileTest extends RandomTests {
 
     @Test
     public void testExponential() {

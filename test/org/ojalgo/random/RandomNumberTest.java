@@ -30,6 +30,10 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.special.CombinatorialFunctions;
+import org.ojalgo.function.special.ErrorFunction;
+import org.ojalgo.function.special.GammaFunction;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.structure.Access1D;
@@ -41,7 +45,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  * @author Chris Lucas
  */
-public class RandomNumberTest {
+public class RandomNumberTest extends RandomTests {
 
     // A wrapper for two-parameter random numbers to make it easier to generalize tests. Easy to extend to single-parameter random numbers,
     // or just apply as-is by having one throw-away parameter.
@@ -87,6 +91,33 @@ public class RandomNumberTest {
         }
     }
 
+    public static void compareDensity(ContinuousDistribution expected, ContinuousDistribution actual) {
+        for (int d = -20; d < 21; d++) { // -2 .. 2
+            double value = d / 10.0;
+            double e = expected.getDensity(value);
+            double a = actual.getDensity(value);
+            TestUtils.assertEquals(e, a, 0.000001);
+        }
+    }
+
+    public static void compareDistribution(ContinuousDistribution expected, ContinuousDistribution actual) {
+        for (int d = -20; d < 21; d++) { // -2 .. 2
+            double value = d / 10.0;
+            double e = expected.getDistribution(-value);
+            double a = actual.getDistribution(-value);
+            TestUtils.assertEquals(e, a, 0.0001);
+        }
+    }
+
+    public static void compareQuantile(ContinuousDistribution expected, ContinuousDistribution actual) {
+        for (int t = 1; t < 10; t++) { // 0.1 .. 0.9
+            double probability = t / 10.0;
+            double e = expected.getQuantile(probability);
+            double a = actual.getQuantile(probability);
+            TestUtils.assertEquals(e, a, 0.0000001);
+        }
+    }
+
     /**
      * Tests that the error function implementation returns correct confidence intervals for +/- 6 standard
      * deviations. They are all correct to at least 10 decimal places.
@@ -100,56 +131,64 @@ public class RandomNumberTest {
 
         tmpStdDevCount = ZERO;
         tmpConfidence = ZERO;
-        TestUtils.assertEquals(tmpConfidence, RandomUtils.erf(tmpStdDevCount / SQRT_TWO), tmpError);
-        TestUtils.assertEquals(-tmpConfidence, RandomUtils.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(tmpConfidence, ErrorFunction.erf(tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(-tmpConfidence, ErrorFunction.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
 
         tmpStdDevCount = ONE;
         tmpConfidence = 0.682689492137;
-        TestUtils.assertEquals(tmpConfidence, RandomUtils.erf(tmpStdDevCount / SQRT_TWO), tmpError);
-        TestUtils.assertEquals(-tmpConfidence, RandomUtils.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(tmpConfidence, ErrorFunction.erf(tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(-tmpConfidence, ErrorFunction.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
 
         tmpStdDevCount = TWO;
         tmpConfidence = 0.954499736104;
-        TestUtils.assertEquals(tmpConfidence, RandomUtils.erf(tmpStdDevCount / SQRT_TWO), tmpError);
-        TestUtils.assertEquals(-tmpConfidence, RandomUtils.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(tmpConfidence, ErrorFunction.erf(tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(-tmpConfidence, ErrorFunction.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
 
         tmpStdDevCount = THREE;
         tmpConfidence = 0.997300203937;
-        TestUtils.assertEquals(tmpConfidence, RandomUtils.erf(tmpStdDevCount / SQRT_TWO), tmpError);
-        TestUtils.assertEquals(-tmpConfidence, RandomUtils.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(tmpConfidence, ErrorFunction.erf(tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(-tmpConfidence, ErrorFunction.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
 
         tmpStdDevCount = FOUR;
         tmpConfidence = 0.999936657516;
-        TestUtils.assertEquals(tmpConfidence, RandomUtils.erf(tmpStdDevCount / SQRT_TWO), tmpError);
-        TestUtils.assertEquals(-tmpConfidence, RandomUtils.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(tmpConfidence, ErrorFunction.erf(tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(-tmpConfidence, ErrorFunction.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
 
         tmpStdDevCount = FIVE;
         tmpConfidence = 0.999999426697;
-        TestUtils.assertEquals(tmpConfidence, RandomUtils.erf(tmpStdDevCount / SQRT_TWO), tmpError);
-        TestUtils.assertEquals(-tmpConfidence, RandomUtils.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(tmpConfidence, ErrorFunction.erf(tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(-tmpConfidence, ErrorFunction.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
 
         tmpError = new NumberContext(7, 8).epsilon();
 
         tmpStdDevCount = SIX;
         tmpConfidence = 0.999999998027;
-        TestUtils.assertEquals(tmpConfidence, RandomUtils.erf(tmpStdDevCount / SQRT_TWO), tmpError);
-        TestUtils.assertEquals(-tmpConfidence, RandomUtils.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(tmpConfidence, ErrorFunction.erf(tmpStdDevCount / SQRT_TWO), tmpError);
+        TestUtils.assertEquals(-tmpConfidence, ErrorFunction.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
     }
 
     @Test
     public void testERFandERFI() {
 
-        final double tmpError = 1E-14 / PrimitiveMath.THREE;
-        double tmpExpected = -1.5;
-        double tmpActual;
+        final double precision = 1E-14;
+        double expected = -1.5;
+        double actual;
 
-        while (tmpExpected <= 1.5) {
+        while (expected <= 1.5) {
+            actual = ErrorFunction.erfi(ErrorFunction.erf(expected));
+            TestUtils.assertEquals(expected, actual, precision);
+            expected += 0.1;
+        }
 
-            tmpActual = RandomUtils.erfi(RandomUtils.erf(tmpExpected));
-
-            TestUtils.assertEquals(tmpExpected, tmpActual, tmpError);
-
-            tmpExpected += 0.5;
+        if (DEBUG) {
+            for (int i = -10; i <= 10; i++) {
+                double d = i / 2.0;
+                double erf = ErrorFunction.erf(d);
+                double erfi = ErrorFunction.erfi(erf);
+                double err = Math.abs(erfi - d);
+                double mag = Math.abs(erfi);
+                BasicLogger.debug("{} => {} => {} : {} : {}", d, erf, erfi, err, err / mag);
+            }
         }
     }
 
@@ -162,35 +201,35 @@ public class RandomNumberTest {
 
         tmpConfidenceLevel = 0.80;
         tmpExpected = 1.28155;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * ErrorFunction.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.90;
         tmpExpected = 1.64485;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * ErrorFunction.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.95;
         tmpExpected = 1.95996;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * ErrorFunction.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.98;
         tmpExpected = 2.32635;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * ErrorFunction.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.99;
         tmpExpected = 2.57583;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * ErrorFunction.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.995;
         tmpExpected = 2.80703;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * ErrorFunction.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.998;
         tmpExpected = 3.09023;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * ErrorFunction.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.999;
         tmpExpected = 3.29052;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * ErrorFunction.erfi(tmpConfidenceLevel), tmpNewScale);
     }
 
     @Test
@@ -221,49 +260,49 @@ public class RandomNumberTest {
         final double tmpEps = 0.000005;
 
         // From a table of values 1.0 <= x <= 2.0
-        TestUtils.assertEquals(ONE, RandomUtils.gamma(1.0), 1E-14 / THREE);
-        TestUtils.assertEquals(0.95135, RandomUtils.gamma(1.10), tmpEps);
-        TestUtils.assertEquals(0.91817, RandomUtils.gamma(1.20), tmpEps);
-        TestUtils.assertEquals(0.89747, RandomUtils.gamma(1.30), tmpEps);
-        TestUtils.assertEquals(0.88726, RandomUtils.gamma(1.40), tmpEps);
-        TestUtils.assertEquals(0.88623, RandomUtils.gamma(1.50), tmpEps);
-        TestUtils.assertEquals(0.89352, RandomUtils.gamma(1.60), tmpEps);
-        TestUtils.assertEquals(0.90864, RandomUtils.gamma(1.70), tmpEps);
-        TestUtils.assertEquals(0.93138, RandomUtils.gamma(1.80), tmpEps);
-        TestUtils.assertEquals(0.96177, RandomUtils.gamma(1.90), tmpEps);
-        TestUtils.assertEquals(ONE, RandomUtils.gamma(2.0), 1E-14 / THREE);
+        TestUtils.assertEquals(ONE, GammaFunction.gamma(1.0), 1E-14 / THREE);
+        TestUtils.assertEquals(0.95135, GammaFunction.gamma(1.10), tmpEps);
+        TestUtils.assertEquals(0.91817, GammaFunction.gamma(1.20), tmpEps);
+        TestUtils.assertEquals(0.89747, GammaFunction.gamma(1.30), tmpEps);
+        TestUtils.assertEquals(0.88726, GammaFunction.gamma(1.40), tmpEps);
+        TestUtils.assertEquals(0.88623, GammaFunction.gamma(1.50), tmpEps);
+        TestUtils.assertEquals(0.89352, GammaFunction.gamma(1.60), tmpEps);
+        TestUtils.assertEquals(0.90864, GammaFunction.gamma(1.70), tmpEps);
+        TestUtils.assertEquals(0.93138, GammaFunction.gamma(1.80), tmpEps);
+        TestUtils.assertEquals(0.96177, GammaFunction.gamma(1.90), tmpEps);
+        TestUtils.assertEquals(ONE, GammaFunction.gamma(2.0), 1E-14 / THREE);
 
         // Values larger than 2.0 and smaller than 1.0
-        TestUtils.assertEquals("π", RandomUtils.gamma(PI), (PI - ONE) * (PI - TWO) * RandomUtils.gamma(PI - TWO), 1E-14 / THREE);
-        TestUtils.assertEquals("0.5", RandomUtils.gamma(HALF), RandomUtils.gamma(HALF + ONE) / HALF, 1E-14 / THREE);
-        TestUtils.assertEquals("0.25", RandomUtils.gamma(QUARTER), RandomUtils.gamma(QUARTER + ONE) / QUARTER, 1E-14 / THREE);
-        TestUtils.assertEquals("0.1", RandomUtils.gamma(TENTH), RandomUtils.gamma(TENTH + ONE) / TENTH, tmpEps);
-        TestUtils.assertEquals("0.01", RandomUtils.gamma(HUNDREDTH), RandomUtils.gamma(HUNDREDTH + ONE) / HUNDREDTH, tmpEps);
-        TestUtils.assertEquals("0.001", RandomUtils.gamma(THOUSANDTH), RandomUtils.gamma(THOUSANDTH + ONE) / THOUSANDTH, tmpEps);
+        TestUtils.assertEquals("π", GammaFunction.gamma(PI), (PI - ONE) * (PI - TWO) * GammaFunction.gamma(PI - TWO), 1E-14 / THREE);
+        TestUtils.assertEquals("0.5", GammaFunction.gamma(HALF), GammaFunction.gamma(HALF + ONE) / HALF, 1E-14 / THREE);
+        TestUtils.assertEquals("0.25", GammaFunction.gamma(QUARTER), GammaFunction.gamma(QUARTER + ONE) / QUARTER, 1E-14 / THREE);
+        TestUtils.assertEquals("0.1", GammaFunction.gamma(TENTH), GammaFunction.gamma(TENTH + ONE) / TENTH, tmpEps);
+        TestUtils.assertEquals("0.01", GammaFunction.gamma(HUNDREDTH), GammaFunction.gamma(HUNDREDTH + ONE) / HUNDREDTH, tmpEps);
+        TestUtils.assertEquals("0.001", GammaFunction.gamma(THOUSANDTH), GammaFunction.gamma(THOUSANDTH + ONE) / THOUSANDTH, tmpEps);
 
         // Should align with n! for positve integers
         for (int n = 0; n < 10; n++) {
-            TestUtils.assertEquals("n!:" + n, RandomUtils.factorial(n), RandomUtils.gamma(n + ONE), tmpEps);
+            TestUtils.assertEquals("n!:" + n, CombinatorialFunctions.factorial(n), GammaFunction.gamma(n + ONE), tmpEps);
         }
 
         // Negative values
-        TestUtils.assertEquals("-0.5", RandomUtils.gamma(-0.5), RandomUtils.gamma(HALF) / (-0.5), tmpEps);
-        TestUtils.assertEquals("-1.5", RandomUtils.gamma(-1.5), RandomUtils.gamma(HALF) / (-1.5 * -0.5), tmpEps);
-        TestUtils.assertEquals("-2.5", RandomUtils.gamma(-2.5), RandomUtils.gamma(HALF) / (-2.5 * -1.5 * -0.5), tmpEps);
-        TestUtils.assertEquals("-3.5", RandomUtils.gamma(-3.5), RandomUtils.gamma(HALF) / (-3.5 * -2.5 * -1.5 * -0.5), tmpEps);
-        TestUtils.assertEquals("-4.5", RandomUtils.gamma(-4.5), RandomUtils.gamma(HALF) / (-4.5 * -3.5 * -2.5 * -1.5 * -0.5), tmpEps);
+        TestUtils.assertEquals("-0.5", GammaFunction.gamma(-0.5), GammaFunction.gamma(HALF) / (-0.5), tmpEps);
+        TestUtils.assertEquals("-1.5", GammaFunction.gamma(-1.5), GammaFunction.gamma(HALF) / (-1.5 * -0.5), tmpEps);
+        TestUtils.assertEquals("-2.5", GammaFunction.gamma(-2.5), GammaFunction.gamma(HALF) / (-2.5 * -1.5 * -0.5), tmpEps);
+        TestUtils.assertEquals("-3.5", GammaFunction.gamma(-3.5), GammaFunction.gamma(HALF) / (-3.5 * -2.5 * -1.5 * -0.5), tmpEps);
+        TestUtils.assertEquals("-4.5", GammaFunction.gamma(-4.5), GammaFunction.gamma(HALF) / (-4.5 * -3.5 * -2.5 * -1.5 * -0.5), tmpEps);
 
         // Should be undefined for 0, -1, -2, -3...
         for (int n = 0; n < 10; n++) {
-            TestUtils.assertTrue("-" + n, Double.isNaN(RandomUtils.gamma(NEG * n)));
+            TestUtils.assertTrue("-" + n, Double.isNaN(GammaFunction.gamma(NEG * n)));
         }
 
         final NumberContext tmpEval = new NumberContext(10, 10);
 
         // Positive half integer
         for (int n = 0; n < 10; n++) {
-            TestUtils.assertEquals(n + ".5", (SQRT_PI * RandomUtils.factorial(2 * n)) / (PrimitiveFunction.POW.invoke(FOUR, n) * RandomUtils.factorial(n)),
-                    RandomUtils.gamma(n + HALF), tmpEval);
+            TestUtils.assertEquals(n + ".5", (SQRT_PI * CombinatorialFunctions.factorial(2 * n)) / (PrimitiveFunction.POW.invoke(FOUR, n) * CombinatorialFunctions.factorial(n)),
+                    GammaFunction.gamma(n + HALF), tmpEval);
         }
 
     }
@@ -390,7 +429,6 @@ public class RandomNumberTest {
 
             TestUtils.assertEquals(tmpExpected, tmpActual, 5.0E-3);
         }
-
     }
 
     @Test
@@ -422,6 +460,28 @@ public class RandomNumberTest {
     }
 
     @Test
+    public void testTDistributionFreedomCases() {
+
+        RandomNumberTest.compareDensity(new TDistribution.Degree1(), new TDistribution(ONE));
+        RandomNumberTest.compareDensity(new TDistribution.Degree2(), new TDistribution(TWO));
+        RandomNumberTest.compareDensity(new TDistribution.Degree3(), new TDistribution(THREE));
+        RandomNumberTest.compareDensity(new TDistribution.Degree4(), new TDistribution(FOUR));
+        //        RandomNumberTest.compareDensity(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE));
+
+        //        RandomNumberTest.compareDistribution(new TDistribution.Degree1(), new TDistribution(ONE));
+        //        RandomNumberTest.compareDistribution(new TDistribution.Degree2(), new TDistribution(TWO));
+        //        RandomNumberTest.compareDistribution(new TDistribution.Degree3(), new TDistribution(THREE));
+        //        RandomNumberTest.compareDistribution(new TDistribution.Degree4(), new TDistribution(FOUR));
+        //        RandomNumberTest.compareDistribution(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE));
+
+        //        RandomNumberTest.compareQuantile(new TDistribution.Degree1(), new TDistribution(ONE));
+        //        RandomNumberTest.compareQuantile(new TDistribution.Degree2(), new TDistribution(TWO));
+        //        RandomNumberTest.compareQuantile(new TDistribution.Degree3(), new TDistribution(THREE));
+        //        RandomNumberTest.compareQuantile(new TDistribution.Degree4(), new TDistribution(FOUR));
+        //        RandomNumberTest.compareQuantile(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE));
+    }
+
+    @Test
     @Tag("unstable")
     public void testVariance() {
 
@@ -445,7 +505,7 @@ public class RandomNumberTest {
             s2 += tmpVal * tmpVal;
         }
 
-        tmpActualVar = RandomUtils.calculateVariance(s, s2, tmpValues.length);
+        tmpActualVar = SampleSet.calculateVariance(s, s2, tmpValues.length);
 
         TestUtils.assertEquals(tmpExpectedVar, tmpActualVar, THOUSAND * (1E-14 / THREE)); // TODO Large numerical difference, which is better?
     }

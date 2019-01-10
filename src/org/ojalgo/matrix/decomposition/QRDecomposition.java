@@ -306,7 +306,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     @Override
     protected boolean checkSolvability() {
-        return this.isComputed() && this.isFullColumnRank();
+        return this.isComputed() && this.isFullRank();
     }
 
     /**

@@ -118,14 +118,6 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
 
     MatrixStore<N> getR();
 
-    /**
-     * @deprecated v44 Use {@link #isFullRank()} instead
-     */
-    @Deprecated
-    default boolean isFullColumnRank() {
-        return this.isFullRank();
-    }
-
     default boolean isOrdered() {
         return false;
     }

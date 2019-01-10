@@ -470,4 +470,14 @@ public final class SampleSet implements Access1D<Double> {
         return mySortedCopy;
     }
 
+    /**
+     * @param sumOfValues The sum of all values in a sample set
+     * @param sumOfSquaredValues The sum of all squared values, in a sample set
+     * @param numberOfValues The number of values in the sample set
+     * @return The sample set's variance
+     */
+    public static double calculateVariance(final double sumOfValues, final double sumOfSquaredValues, final int numberOfValues) {
+        return ((numberOfValues * sumOfSquaredValues) - (sumOfValues * sumOfValues)) / (numberOfValues * (numberOfValues - 1));
+    }
+
 }

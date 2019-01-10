@@ -37,4 +37,9 @@ abstract class AbstractContinuous extends RandomNumber implements ContinuousDist
         return this.getQuantile(ONE - ((ONE - confidence) / TWO));
     }
 
+    @Override
+    protected double generate() {
+        return this.getQuantile(this.random().nextDouble());
+    }
+
 }

@@ -24,6 +24,7 @@ package org.ojalgo.random;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.special.GammaFunction;
 
 /**
  * Useful as length of life distribution in reliability theory.
@@ -50,14 +51,14 @@ public class Weibull extends RandomNumber {
     }
 
     public double getExpected() {
-        return RandomUtils.gamma(ONE + (ONE / myShape)) / myRate;
+        return GammaFunction.gamma(ONE + (ONE / myShape)) / myRate;
     }
 
     @Override
     public double getVariance() {
 
-        final double tmpA = RandomUtils.gamma(ONE + (TWO / myShape));
-        final double tmpB = RandomUtils.gamma(ONE + (ONE / myShape));
+        final double tmpA = GammaFunction.gamma(ONE + (TWO / myShape));
+        final double tmpB = GammaFunction.gamma(ONE + (ONE / myShape));
 
         return (tmpA - (tmpB * tmpB)) / (myRate * myRate);
     }

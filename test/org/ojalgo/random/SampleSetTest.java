@@ -30,7 +30,7 @@ import org.ojalgo.array.Primitive64Array;
  *
  * @author apete
  */
-public class SampleSetTest {
+public class SampleSetTest extends RandomTests {
 
     @Test
     public void testEmptySet() {

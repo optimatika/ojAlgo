@@ -74,6 +74,17 @@ public class Uniform extends AbstractContinuous {
         myRange = range;
     }
 
+    public double getDensity(final double value) {
+
+        double retVal = ZERO;
+
+        if ((myLower <= value) && (value <= (myLower + myRange))) {
+            retVal = ONE / myRange;
+        }
+
+        return retVal;
+    }
+
     public double getDistribution(final double value) {
 
         double retVal = ZERO;
@@ -91,22 +102,11 @@ public class Uniform extends AbstractContinuous {
         return myLower + (myRange / TWO);
     }
 
-    public double getProbability(final double value) {
+    public double getQuantile(final double probability) {
 
-        double retVal = ZERO;
+        this.checkProbabilty(probability);
 
-        if ((myLower <= value) && (value <= (myLower + myRange))) {
-            retVal = ONE / myRange;
-        }
-
-        return retVal;
-    }
-
-    public double getQuantile(final double probality) {
-
-        this.checkProbabilty(probality);
-
-        return myLower + (probality * myRange);
+        return myLower + (probability * myRange);
     }
 
     @Override

@@ -78,11 +78,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     ProgrammingError.throwForIllegalInvocation();
                 }
 
-                public Double merge(final Double result1, final Double result2) {
-                    ProgrammingError.throwForIllegalInvocation();
-                    return null;
-                }
-
                 public AggregatorFunction<Double> reset() {
                     myCount = 0;
                     myValue = ZERO;
@@ -119,10 +114,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     myCount += result.intValue();
                 }
 
-                public Double merge(final Double result1, final Double result2) {
-                    return (double) (result1.intValue() + result2.intValue());
-                }
-
                 public AggregatorFunction<Double> reset() {
                     myCount = 0;
                     return this;
@@ -156,10 +147,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double result1, final Double result2) {
-                    return PrimitiveFunction.MAX.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Double> reset() {
                     myValue = ZERO;
                     return this;
@@ -191,10 +178,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 public void merge(final Double result) {
                     this.invoke(result.doubleValue());
-                }
-
-                public Double merge(final Double result1, final Double result2) {
-                    return PrimitiveFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -234,10 +217,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double result1, final Double result2) {
-                    return PrimitiveFunction.MIN.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Double> reset() {
                     myValue = POSITIVE_INFINITY;
                     return this;
@@ -269,10 +248,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 public void merge(final Double result) {
                     this.invoke(result.doubleValue());
-                }
-
-                public Double merge(final Double result1, final Double result2) {
-                    return PrimitiveFunction.ABS.invoke(result1) + PrimitiveFunction.ABS.invoke(result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -310,10 +285,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double result1, final Double result2) {
-                    return PrimitiveFunction.HYPOT.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Double> reset() {
                     myValue = ZERO;
                     return this;
@@ -347,10 +318,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double result1, final Double result2) {
-                    return result1 * result2;
-                }
-
                 public AggregatorFunction<Double> reset() {
                     myValue = ONE;
                     return this;
@@ -382,10 +349,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 public void merge(final Double result) {
                     myValue *= result;
-                }
-
-                public Double merge(final Double result1, final Double result2) {
-                    return result1 * result2;
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -429,10 +392,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double result1, final Double result2) {
-                    return PrimitiveFunction.MIN.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Double> reset() {
                     myValue = POSITIVE_INFINITY;
                     return this;
@@ -466,10 +425,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                     this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double result1, final Double result2) {
-                    return result1 + result2;
-                }
-
                 public AggregatorFunction<Double> reset() {
                     myValue = ZERO;
                     return this;
@@ -501,10 +456,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 public void merge(final Double result) {
                     myValue += result;
-                }
-
-                public Double merge(final Double result1, final Double result2) {
-                    return result1 + result2;
                 }
 
                 public AggregatorFunction<Double> reset() {

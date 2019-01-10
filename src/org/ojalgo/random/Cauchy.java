@@ -23,64 +23,50 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.special.ErrorFunction;
-
 /**
- * Under general conditions, the sum of a large number of random variables is approximately normally
- * distributed (the central limit theorem).
+ * https://en.wikipedia.org/wiki/Cauchy_distribution
  *
  * @author apete
  */
-public class Normal extends AbstractContinuous {
-
-    private static final long serialVersionUID = 7164712313114018919L;
+public class Cauchy extends AbstractContinuous {
 
     private final double myLocation;
     private final double myScale;
 
-    public Normal() {
+    public Cauchy() {
         this(ZERO, ONE);
     }
 
-    public Normal(final double location, final double scale) {
-
+    public Cauchy(double location, double scale) {
         super();
-
         myLocation = location;
         myScale = scale;
     }
 
-    public double getDensity(final double value) {
-
-        final double tmpVal = (value - myLocation) / myScale;
-
-        return PrimitiveFunction.EXP.invoke((tmpVal * tmpVal) / -TWO) / (myScale * SQRT_TWO_PI);
+    public double getDensity(double value) {
+        return ONE / (PI * myScale * (ONE + Math.pow((value - myLocation) / myScale, TWO)));
     }
 
-    public double getDistribution(final double value) {
-        return (ONE + ErrorFunction.erf((value - myLocation) / (myScale * SQRT_TWO))) / TWO;
+    public double getDistribution(double value) {
+        return HALF + (Math.atan((value - myLocation) / myScale) / PI);
+    }
+
+    public double getQuantile(double probability) {
+        return myLocation + (myScale * Math.tan(PI * (probability - HALF)));
     }
 
     public double getExpected() {
-        return myLocation;
-    }
-
-    public double getQuantile(final double probability) {
-
-        this.checkProbabilty(probability);
-
-        return (myScale * SQRT_TWO * ErrorFunction.erfi((TWO * probability) - ONE)) + myLocation;
+        return NaN;
     }
 
     @Override
     public double getStandardDeviation() {
-        return myScale;
+        return NaN;
     }
 
     @Override
-    protected double generate() {
-        return (this.random().nextGaussian() * myScale) + myLocation;
+    public double getVariance() {
+        return NaN;
     }
 
 }

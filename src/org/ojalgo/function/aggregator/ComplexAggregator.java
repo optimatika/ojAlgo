@@ -79,11 +79,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     ProgrammingError.throwForIllegalInvocation();
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    ProgrammingError.throwForIllegalInvocation();
-                    return null;
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myCount = 0;
                     myNumber = ComplexNumber.ZERO;
@@ -120,10 +115,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     myCount += result.intValue();
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myCount = 0;
                     return this;
@@ -154,10 +145,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 public void merge(final ComplexNumber result) {
                     this.invoke(result);
-                }
-
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ComplexFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -191,10 +178,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 public void merge(final ComplexNumber result) {
                     this.invoke(result);
-                }
-
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ComplexFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -234,10 +217,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ComplexFunction.MIN.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.INFINITY;
                     return this;
@@ -269,10 +248,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 public void merge(final ComplexNumber result) {
                     this.invoke(result);
-                }
-
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -309,10 +284,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return HYPOT.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ZERO;
                     return this;
@@ -346,10 +317,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return MULTIPLY.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ONE;
                     return this;
@@ -380,10 +347,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 public void merge(final ComplexNumber result) {
                     myNumber = myNumber.multiply(result);
-                }
-
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return MULTIPLY.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -425,10 +388,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ComplexFunction.MIN.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.INFINITY;
                     return this;
@@ -462,10 +421,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ZERO;
                     return this;
@@ -497,10 +452,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 public void merge(final ComplexNumber result) {
                     myNumber = myNumber.add(result);
-                }
-
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {

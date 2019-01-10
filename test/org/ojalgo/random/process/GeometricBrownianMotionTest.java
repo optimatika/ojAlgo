@@ -29,11 +29,11 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.ContinuousDistribution;
 import org.ojalgo.random.LogNormal;
 import org.ojalgo.random.Normal;
-import org.ojalgo.random.RandomUtils;
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.type.context.NumberContext;
 
@@ -235,7 +235,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
 
             final LogNormal tmpDist = tmpProc.getDistribution(tmpStep);
 
-            RandomUtils.erfi(0.95);
+            ErrorFunction.erfi(0.95);
 
             final double tmpProcUpper = tmpProc.getUpperConfidenceQuantile(tmpStep, 0.95);
             final double tmpProcFact = PrimitiveFunction.SQRT.invoke(tmpProcUpper / tmpProc.getLowerConfidenceQuantile(tmpStep, 0.95));

@@ -139,19 +139,6 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return result;
     }
 
-    /**
-     * Initialise all weights and biases with random numbers.
-     *
-     * @deprecated v46.1 No need to call this - it's done for you.
-     */
-    @Deprecated
-    public NetworkBuilder randomise() {
-        for (int i = 0, limit = myANN.countCalculationLayers(); i < limit; i++) {
-            myANN.getLayer(i).randomise();
-        }
-        return this;
-    }
-
     public NetworkBuilder rate(double rate) {
         myLearningRate = rate;
         return this;

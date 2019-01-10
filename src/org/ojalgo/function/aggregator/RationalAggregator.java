@@ -80,11 +80,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     ProgrammingError.throwForIllegalInvocation();
                 }
 
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    ProgrammingError.throwForIllegalInvocation();
-                    return null;
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myCount = 0;
                     myNumber = RationalNumber.ZERO;
@@ -121,10 +116,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     myCount += result.intValue();
                 }
 
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myCount = 0;
                     return this;
@@ -155,10 +146,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public void merge(final RationalNumber result) {
                     this.invoke(result);
-                }
-
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    return RationalFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<RationalNumber> reset() {
@@ -192,10 +179,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public void merge(final RationalNumber result) {
                     this.invoke(result);
-                }
-
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    return RationalFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<RationalNumber> reset() {
@@ -235,10 +218,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     this.invoke(result);
                 }
 
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    return RationalFunction.MIN.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.POSITIVE_INFINITY;
                     return this;
@@ -270,10 +249,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public void merge(final RationalNumber result) {
                     this.invoke(result);
-                }
-
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<RationalNumber> reset() {
@@ -310,10 +285,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     this.invoke(result);
                 }
 
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    return HYPOT.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.ZERO;
                     return this;
@@ -347,10 +318,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     this.invoke(result);
                 }
 
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    return MULTIPLY.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.ONE;
                     return this;
@@ -382,10 +349,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public void merge(final RationalNumber result) {
                     myNumber = myNumber.multiply(result);
-                }
-
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    return MULTIPLY.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<RationalNumber> reset() {
@@ -427,10 +390,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     this.invoke(result);
                 }
 
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    return RationalFunction.MIN.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.POSITIVE_INFINITY;
                     return this;
@@ -464,10 +423,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                     this.invoke(result);
                 }
 
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<RationalNumber> reset() {
                     myNumber = RationalNumber.ZERO;
                     return this;
@@ -499,10 +454,6 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
                 public void merge(final RationalNumber result) {
                     myNumber = myNumber.add(result);
-                }
-
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<RationalNumber> reset() {

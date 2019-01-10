@@ -24,8 +24,8 @@ package org.ojalgo.random.process;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.random.Normal;
-import org.ojalgo.random.RandomUtils;
 
 public final class WienerProcess extends AbstractProcess<Normal> {
 
@@ -69,7 +69,7 @@ public final class WienerProcess extends AbstractProcess<Normal> {
 
     @Override
     double getLowerConfidenceQuantile(final double stepSize, final double confidence) {
-        return this.getValue() - (PrimitiveFunction.SQRT.invoke(stepSize) * SQRT_TWO * RandomUtils.erfi(confidence));
+        return this.getValue() - (PrimitiveFunction.SQRT.invoke(stepSize) * SQRT_TWO * ErrorFunction.erfi(confidence));
     }
 
     @Override
@@ -79,7 +79,7 @@ public final class WienerProcess extends AbstractProcess<Normal> {
 
     @Override
     double getUpperConfidenceQuantile(final double stepSize, final double confidence) {
-        return this.getValue() + (PrimitiveFunction.SQRT.invoke(stepSize) * SQRT_TWO * RandomUtils.erfi(confidence));
+        return this.getValue() + (PrimitiveFunction.SQRT.invoke(stepSize) * SQRT_TWO * ErrorFunction.erfi(confidence));
     }
 
     @Override

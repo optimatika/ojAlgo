@@ -162,10 +162,6 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return myWeights.doubleValue(input, output);
     }
 
-    void randomise() {
-        this.randomise(myWeights.countRows());
-    }
-
     void setActivator(ArtificialNeuralNetwork.Activator activator) {
         myActivator = activator;
     }
