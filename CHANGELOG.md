@@ -1,6 +1,19 @@
-# v48.0.0: [Not yet released]
+> Removal of code that has been deprecated past 1 major release is typically not mentioned
 
-> corresponds to changes in the `develop` branch since the last release
+# [Not yet released]
+
+> Corresponds to changes in the `develop` branch since the last release
+
+## org.ojalgo.function
+
+* New package org.ojalgo.function.special with currently 3 new classes: CombinatorialFunctions, ErrorFunction and GammaFunction.
+
+## org.ojalgo.random
+
+* New Cauchy distribution RandomNumber.
+* Partial implementation of Student's TDistribution
+* Deprecated the RandomUtils class and moved its various methods to classes in the new org.ojalgo.function.special package.
+* For continuous distributions the getProbability methods has been renamed getDensity.
 
 # v47.0.0: 2018-12-16
 
