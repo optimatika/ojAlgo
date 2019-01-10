@@ -23,7 +23,12 @@ package org.ojalgo.function.special;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-public abstract class Combinatorial {
+/**
+ * https://reference.wolfram.com/language/tutorial/CombinatorialFunctions.html
+ *
+ * @author apete
+ */
+public abstract class CombinatorialFunctions {
 
     public static double factorial(final int arg) {
 
@@ -42,9 +47,9 @@ public abstract class Combinatorial {
      * @return The number of ways the set can be partioned in to subsets of the given sizes
      */
     public static int partitions(final int n, final int[] k) {
-        int retVal = (int) factorial(n);
+        int retVal = (int) CombinatorialFunctions.factorial(n);
         for (int i = 0; i < k.length; i++) {
-            retVal /= factorial(k[i]);
+            retVal /= CombinatorialFunctions.factorial(k[i]);
         }
         return retVal;
     }
@@ -54,7 +59,7 @@ public abstract class Combinatorial {
      * @return The number of permutations of the set
      */
     public static int permutations(final int n) {
-        return (int) factorial(n);
+        return (int) CombinatorialFunctions.factorial(n);
     }
 
     /**
@@ -63,7 +68,7 @@ public abstract class Combinatorial {
      * @return The number of subsets to the set
      */
     public static int subsets(final int n, final int k) {
-        return (int) (factorial(n) / (factorial(k) * factorial(n - k)));
+        return (int) (CombinatorialFunctions.factorial(n) / (CombinatorialFunctions.factorial(k) * CombinatorialFunctions.factorial(n - k)));
     }
 
     /**
@@ -72,10 +77,10 @@ public abstract class Combinatorial {
      * @return The number of ordered k-tuples (variations) of the set
      */
     public static int variations(final int n, final int k) {
-        return (int) (factorial(n) / factorial(n - k));
+        return (int) (CombinatorialFunctions.factorial(n) / CombinatorialFunctions.factorial(n - k));
     }
 
-    private Combinatorial() {
+    private CombinatorialFunctions() {
     }
 
 }

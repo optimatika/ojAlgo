@@ -21,7 +21,7 @@
  */
 package org.ojalgo.random;
 
-import org.ojalgo.function.special.Combinatorial;
+import org.ojalgo.function.special.CombinatorialFunctions;
 import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.function.special.GammaFunction;
 
@@ -83,11 +83,11 @@ public abstract class RandomUtils {
     }
 
     /**
-     * @deprecated v48 Use {@link Combinatorial#factorial(int)} instead
+     * @deprecated v48 Use {@link CombinatorialFunctions#factorial(int)} instead
      */
     @Deprecated
     public static double factorial(final int aVal) {
-        return Combinatorial.factorial(aVal);
+        return CombinatorialFunctions.factorial(aVal);
     }
 
     /**
@@ -106,43 +106,43 @@ public abstract class RandomUtils {
      * @param n The number of elements in the set
      * @param k A vector of subset sizes the sum of which must equal the size of the full set
      * @return The number of ways the set can be partioned in to subsets of the given sizes
-     * @deprecated v48 Use {@link Combinatorial#partitions(int,int[])} instead
+     * @deprecated v48 Use {@link CombinatorialFunctions#partitions(int,int[])} instead
      */
     @Deprecated
     public static int partitions(final int n, final int[] k) {
-        return Combinatorial.partitions(n, k);
+        return CombinatorialFunctions.partitions(n, k);
     }
 
     /**
      * @param n The number of elements in the set
      * @return The number of permutations of the set
-     * @deprecated v48 Use {@link Combinatorial#permutations(int)} instead
+     * @deprecated v48 Use {@link CombinatorialFunctions#permutations(int)} instead
      */
     @Deprecated
     public static int permutations(final int n) {
-        return Combinatorial.permutations(n);
+        return CombinatorialFunctions.permutations(n);
     }
 
     /**
      * @param n The number of elements in the set
      * @param k The number of elements in the subset
      * @return The number of subsets to the set
-     * @deprecated v48 Use {@link Combinatorial#subsets(int,int)} instead
+     * @deprecated v48 Use {@link CombinatorialFunctions#subsets(int,int)} instead
      */
     @Deprecated
     public static int subsets(final int n, final int k) {
-        return Combinatorial.subsets(n, k);
+        return CombinatorialFunctions.subsets(n, k);
     }
 
     /**
      * @param n The number of elements in the set
      * @param k The size of the tuple
      * @return The number of ordered k-tuples (variations) of the set
-     * @deprecated v48 Use {@link Combinatorial#variations(int,int)} instead
+     * @deprecated v48 Use {@link CombinatorialFunctions#variations(int,int)} instead
      */
     @Deprecated
     public static int variations(final int n, final int k) {
-        return Combinatorial.variations(n, k);
+        return CombinatorialFunctions.variations(n, k);
     }
 
     private RandomUtils() {

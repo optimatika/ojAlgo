@@ -30,7 +30,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.special.Combinatorial;
+import org.ojalgo.function.special.CombinatorialFunctions;
 import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.function.special.GammaFunction;
 import org.ojalgo.netio.BasicLogger;
@@ -282,7 +282,7 @@ public class RandomNumberTest extends RandomTests {
 
         // Should align with n! for positve integers
         for (int n = 0; n < 10; n++) {
-            TestUtils.assertEquals("n!:" + n, Combinatorial.factorial(n), GammaFunction.gamma(n + ONE), tmpEps);
+            TestUtils.assertEquals("n!:" + n, CombinatorialFunctions.factorial(n), GammaFunction.gamma(n + ONE), tmpEps);
         }
 
         // Negative values
@@ -301,7 +301,7 @@ public class RandomNumberTest extends RandomTests {
 
         // Positive half integer
         for (int n = 0; n < 10; n++) {
-            TestUtils.assertEquals(n + ".5", (SQRT_PI * Combinatorial.factorial(2 * n)) / (PrimitiveFunction.POW.invoke(FOUR, n) * Combinatorial.factorial(n)),
+            TestUtils.assertEquals(n + ".5", (SQRT_PI * CombinatorialFunctions.factorial(2 * n)) / (PrimitiveFunction.POW.invoke(FOUR, n) * CombinatorialFunctions.factorial(n)),
                     GammaFunction.gamma(n + HALF), tmpEval);
         }
 
