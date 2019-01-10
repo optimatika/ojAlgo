@@ -23,7 +23,7 @@ package org.ojalgo.random;
 
 import org.ojalgo.function.special.Combinatorial;
 import org.ojalgo.function.special.ErrorFunction;
-import org.ojalgo.function.special.Gamma;
+import org.ojalgo.function.special.GammaFunction;
 
 /**
  * RandomUtils
@@ -95,11 +95,11 @@ public abstract class RandomUtils {
      * algorithm is taken from <a href="http://en.wikipedia.org/wiki/Lanczos_approximation">WikipediA</a> ,
      * but it's modified a bit and I found more exact coefficients somewhere else.
      *
-     * @deprecated v48 Use {@link Gamma#gamma(double)} instead
+     * @deprecated v48 Use {@link GammaFunction#gamma(double)} instead
      */
     @Deprecated
     public static double gamma(final double arg) {
-        return Gamma.gamma(arg);
+        return GammaFunction.gamma(arg);
     }
 
     /**

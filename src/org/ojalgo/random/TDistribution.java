@@ -23,7 +23,7 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.special.Gamma;
+import org.ojalgo.function.special.GammaFunction;
 
 public class TDistribution extends AbstractContinuous {
 
@@ -166,7 +166,7 @@ public class TDistribution extends AbstractContinuous {
     public TDistribution(double degreesOfFreedom) {
         super();
         myDegreesOfFreedom = degreesOfFreedom;
-        myConstant = Gamma.gamma((degreesOfFreedom + ONE) / TWO) / (Math.sqrt(degreesOfFreedom * PI) * Gamma.gamma(degreesOfFreedom / TWO));
+        myConstant = GammaFunction.gamma((degreesOfFreedom + ONE) / TWO) / (Math.sqrt(degreesOfFreedom * PI) * GammaFunction.gamma(degreesOfFreedom / TWO));
     }
 
     public double getDensity(double value) {

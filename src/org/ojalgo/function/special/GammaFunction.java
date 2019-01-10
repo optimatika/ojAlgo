@@ -25,7 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.PrimitiveFunction;
 
-public abstract class Gamma {
+public abstract class GammaFunction {
 
     /**
      * For the Lanczos approximation of the gamma function
@@ -49,15 +49,15 @@ public abstract class Gamma {
 
             if (arg < HALF) {
 
-                return PI / (PrimitiveFunction.SIN.invoke(PI * arg) * Gamma.gamma(ONE - arg));
+                return PI / (PrimitiveFunction.SIN.invoke(PI * arg) * GammaFunction.gamma(ONE - arg));
 
             } else {
 
                 final double z = arg - ONE;
 
-                double x = Gamma.L9[0];
-                for (int i = 1; i < Gamma.L9.length; i++) {
-                    x += Gamma.L9[i] / (z + i);
+                double x = GammaFunction.L9[0];
+                for (int i = 1; i < GammaFunction.L9.length; i++) {
+                    x += GammaFunction.L9[i] / (z + i);
                 }
 
                 final double t = z + (7 + HALF);
@@ -67,7 +67,7 @@ public abstract class Gamma {
         }
     }
 
-    private Gamma() {
+    private GammaFunction() {
     }
 
 }
