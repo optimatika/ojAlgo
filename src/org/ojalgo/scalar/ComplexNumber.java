@@ -180,8 +180,9 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     }
 
     /**
-     * Test if {@code value} is infinite.
-     * A complex number is infinite if its real part and/or its imaginary part is infinite.
+     * Test if {@code value} is infinite. A complex number is infinite if its real part and/or its imaginary
+     * part is infinite.
+     * 
      * @param value the complex number to test
      * @return true if the specified value is infinite (real and/or imaginary part) otherwise false
      */
@@ -190,8 +191,8 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     }
 
     /**
-     * Test if {@code value} is NaN.
-     * A complex number is NaN if its real and/or its imaginary part is NaN.
+     * Test if {@code value} is NaN. A complex number is NaN if its real and/or its imaginary part is NaN.
+     * 
      * @param value the complex number to test
      * @return true if the specified value is NaN (real and/or imaginary part) otherwise false
      */
@@ -200,8 +201,8 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     }
 
     /**
-     * Test if {@code value} is real.
-     * A complex number Z is real if and only if {@literal Im(Z) = 0.0}.
+     * Test if {@code value} is real. A complex number Z is real if and only if {@literal Im(Z) = 0.0}.
+     * 
      * @param value the complex number to test
      * @return true if the imaginary part of the specified value is null otherwise false
      */
@@ -209,13 +210,13 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return value.isReal();
     }
 
-
     public static boolean isSmall(final double comparedTo, final ComplexNumber value) {
         return value.isSmall(comparedTo);
     }
 
     /**
      * Static factory method returning a complex number from polar coordinates
+     * 
      * @param norm the complex number's norm
      * @param phase the complex number's phase
      * @return a complex number
@@ -263,6 +264,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Static factory method returning a complex number from cartesian coordinates.
+     * 
      * @param real the complex number's real part
      * @param imaginary the complex number's imaginary part
      * @return a complex number
@@ -277,6 +279,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Static factory method returning a complex number from a real value
+     * 
      * @param value the complex number's real part
      * @return a complex number Z = ({@code value} + 0.0i)
      */
@@ -286,8 +289,10 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Static factory method returning a complex number from arbitrary number
+     * 
      * @param number a numeric value
-     * @return {@link ComplexNumber#ZERO} if {@code number} is null otherwise the double value of {@code number}
+     * @return {@link ComplexNumber#ZERO} if {@code number} is null otherwise the double value of
+     *         {@code number}
      * @see Number
      * @see Number#doubleValue()
      */
@@ -346,6 +351,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '+' with a complex number.
+     * 
      * @param arg the complex number to add
      * @return a complex number {@literal Z = ((Re(this) + Re(arg)) + (Im(this) + Im(arg))i)}
      */
@@ -355,6 +361,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '+' with a real number
+     * 
      * @param arg the real number to add
      * @return a complex number {@literal Z = ((Re(this) + arg) + Im(this)i)}
      */
@@ -363,12 +370,13 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     }
 
     /**
-     * Compares the specified {@code reference} and this.
-     * The numerical comparison uses following order : {@literal |Z| -> Re(Z) -> Im(Z)}.
+     * Compares the specified {@code reference} and this. The numerical comparison uses following order :
+     * {@literal |Z| -> Re(Z) -> Im(Z)}.
+     * 
      * @param reference the complex number to compare with
-     * @return a negative value if {@code reference} is numerically greater than this,
-     * {@code 0} if this and {@code reference} are numerically equal or
-     * a positive value if {@code reference} is numerically lesser than this.
+     * @return a negative value if {@code reference} is numerically greater than this, {@code 0} if this and
+     *         {@code reference} are numerically equal or a positive value if {@code reference} is numerically
+     *         lesser than this.
      */
     public int compareTo(final ComplexNumber reference) {
 
@@ -384,8 +392,9 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     }
 
     /**
-     * Returns the conjugate of this complex number.
-     * A complex number conjugate is its reflexion about the real axis.
+     * Returns the conjugate of this complex number. A complex number conjugate is its reflexion about the
+     * real axis.
+     * 
      * @return a complex number Z = (Re(this) - Im(this)i)
      */
     public ComplexNumber conjugate() {
@@ -406,6 +415,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '/' with a complex number.
+     * 
      * @param arg the complex number to divide by
      * @return a complex number {@literal Z = this / arg}
      */
@@ -432,6 +442,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '/' with a real number.
+     * 
      * @param arg the real number to divide by
      * @return a complex number {@literal Z = ((Re(this) / arg) + (Im(this) / arg)i)}
      */
@@ -564,6 +575,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the unary operation '1/x'
+     * 
      * @return the complex number Z inverse of this, satisfies {@literal Z * this = 1}
      */
     @Override
@@ -597,6 +609,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '*' with a complex number.
+     * 
      * @param arg the complex number to multiply by
      * @return a complex number {@literal Z = this * arg}
      */
@@ -611,6 +624,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '*' with a real number.
+     * 
      * @param arg the real number to multiply by
      * @return a complex number Z = ((Re(this) * arg) + Im(this) * arg))
      */
@@ -621,6 +635,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the unary operation '-'.
+     * 
      * @return a complex number Z = -this
      */
     @Override
@@ -629,8 +644,9 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     }
 
     /**
-     * Returns the norm of this complex number.
-     * The norm of a complex number is defined by |Z| = (ZZ<sup>*</sup>)<sup>1/2</sup>.
+     * Returns the norm of this complex number. The norm of a complex number is defined by |Z| =
+     * (ZZ<sup>*</sup>)<sup>1/2</sup>.
+     * 
      * @return the norm of this complex number.
      */
     public double norm() {
@@ -638,9 +654,9 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     }
 
     /**
-     * Returns the phase of this complex number.
-     * The phase of a complex number Z is the angle between the positive real axis and
-     * the straight line defined by origin and Z in complex plane.
+     * Returns the phase of this complex number. The phase of a complex number Z is the angle between the
+     * positive real axis and the straight line defined by origin and Z in complex plane.
+     * 
      * @return the phase of this complex number
      */
     public double phase() {
@@ -657,6 +673,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '-' with a complex number.
+     * 
      * @param arg the complex number to subtract
      * @return a complex number Z = this - {@code arg}
      */
@@ -666,6 +683,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '-' with a real number.
+     * 
      * @param arg the real number to subtract
      * @return a complex number Z = ((Re(this) - arg) + Im(this)i)
      */
