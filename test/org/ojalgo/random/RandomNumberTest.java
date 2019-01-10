@@ -272,12 +272,16 @@ public class RandomNumberTest extends RandomTests {
         TestUtils.assertEquals(ONE, org.ojalgo.function.special.Gamma.gamma(2.0), 1E-14 / THREE);
 
         // Values larger than 2.0 and smaller than 1.0
-        TestUtils.assertEquals("π", org.ojalgo.function.special.Gamma.gamma(PI), (PI - ONE) * (PI - TWO) * org.ojalgo.function.special.Gamma.gamma(PI - TWO), 1E-14 / THREE);
+        TestUtils.assertEquals("π", org.ojalgo.function.special.Gamma.gamma(PI), (PI - ONE) * (PI - TWO) * org.ojalgo.function.special.Gamma.gamma(PI - TWO),
+                1E-14 / THREE);
         TestUtils.assertEquals("0.5", org.ojalgo.function.special.Gamma.gamma(HALF), org.ojalgo.function.special.Gamma.gamma(HALF + ONE) / HALF, 1E-14 / THREE);
-        TestUtils.assertEquals("0.25", org.ojalgo.function.special.Gamma.gamma(QUARTER), org.ojalgo.function.special.Gamma.gamma(QUARTER + ONE) / QUARTER, 1E-14 / THREE);
+        TestUtils.assertEquals("0.25", org.ojalgo.function.special.Gamma.gamma(QUARTER), org.ojalgo.function.special.Gamma.gamma(QUARTER + ONE) / QUARTER,
+                1E-14 / THREE);
         TestUtils.assertEquals("0.1", org.ojalgo.function.special.Gamma.gamma(TENTH), org.ojalgo.function.special.Gamma.gamma(TENTH + ONE) / TENTH, tmpEps);
-        TestUtils.assertEquals("0.01", org.ojalgo.function.special.Gamma.gamma(HUNDREDTH), org.ojalgo.function.special.Gamma.gamma(HUNDREDTH + ONE) / HUNDREDTH, tmpEps);
-        TestUtils.assertEquals("0.001", org.ojalgo.function.special.Gamma.gamma(THOUSANDTH), org.ojalgo.function.special.Gamma.gamma(THOUSANDTH + ONE) / THOUSANDTH, tmpEps);
+        TestUtils.assertEquals("0.01", org.ojalgo.function.special.Gamma.gamma(HUNDREDTH), org.ojalgo.function.special.Gamma.gamma(HUNDREDTH + ONE) / HUNDREDTH,
+                tmpEps);
+        TestUtils.assertEquals("0.001", org.ojalgo.function.special.Gamma.gamma(THOUSANDTH),
+                org.ojalgo.function.special.Gamma.gamma(THOUSANDTH + ONE) / THOUSANDTH, tmpEps);
 
         // Should align with n! for positve integers
         for (int n = 0; n < 10; n++) {
@@ -287,9 +291,12 @@ public class RandomNumberTest extends RandomTests {
         // Negative values
         TestUtils.assertEquals("-0.5", org.ojalgo.function.special.Gamma.gamma(-0.5), org.ojalgo.function.special.Gamma.gamma(HALF) / (-0.5), tmpEps);
         TestUtils.assertEquals("-1.5", org.ojalgo.function.special.Gamma.gamma(-1.5), org.ojalgo.function.special.Gamma.gamma(HALF) / (-1.5 * -0.5), tmpEps);
-        TestUtils.assertEquals("-2.5", org.ojalgo.function.special.Gamma.gamma(-2.5), org.ojalgo.function.special.Gamma.gamma(HALF) / (-2.5 * -1.5 * -0.5), tmpEps);
-        TestUtils.assertEquals("-3.5", org.ojalgo.function.special.Gamma.gamma(-3.5), org.ojalgo.function.special.Gamma.gamma(HALF) / (-3.5 * -2.5 * -1.5 * -0.5), tmpEps);
-        TestUtils.assertEquals("-4.5", org.ojalgo.function.special.Gamma.gamma(-4.5), org.ojalgo.function.special.Gamma.gamma(HALF) / (-4.5 * -3.5 * -2.5 * -1.5 * -0.5), tmpEps);
+        TestUtils.assertEquals("-2.5", org.ojalgo.function.special.Gamma.gamma(-2.5), org.ojalgo.function.special.Gamma.gamma(HALF) / (-2.5 * -1.5 * -0.5),
+                tmpEps);
+        TestUtils.assertEquals("-3.5", org.ojalgo.function.special.Gamma.gamma(-3.5),
+                org.ojalgo.function.special.Gamma.gamma(HALF) / (-3.5 * -2.5 * -1.5 * -0.5), tmpEps);
+        TestUtils.assertEquals("-4.5", org.ojalgo.function.special.Gamma.gamma(-4.5),
+                org.ojalgo.function.special.Gamma.gamma(HALF) / (-4.5 * -3.5 * -2.5 * -1.5 * -0.5), tmpEps);
 
         // Should be undefined for 0, -1, -2, -3...
         for (int n = 0; n < 10; n++) {
