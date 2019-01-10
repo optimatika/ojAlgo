@@ -26,13 +26,13 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 public abstract class Combinatorial {
 
     public static double factorial(final int arg) {
-    
+
         double retVal = ONE;
-    
+
         for (int i = 2; i <= arg; i++) {
             retVal *= i;
         }
-    
+
         return retVal;
     }
 
