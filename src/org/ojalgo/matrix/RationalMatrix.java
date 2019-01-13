@@ -21,7 +21,9 @@
  */
 package org.ojalgo.matrix;
 
+import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LDL;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
@@ -148,8 +150,18 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     }
 
     @Override
+    Cholesky<RationalNumber> getDecompositionCholesky(Structure2D typical) {
+        return Cholesky.RATIONAL.make(typical);
+    }
+
+    @Override
     Eigenvalue<RationalNumber> getDecompositionEigenvalue(Structure2D typical) {
         return Eigenvalue.RATIONAL.make(typical, this.isHermitian());
+    }
+
+    @Override
+    LDL<RationalNumber> getDecompositionLDL(Structure2D typical) {
+        return LDL.RATIONAL.make(typical);
     }
 
     @Override

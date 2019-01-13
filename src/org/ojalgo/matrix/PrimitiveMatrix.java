@@ -21,7 +21,9 @@
  */
 package org.ojalgo.matrix;
 
+import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LDL;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
@@ -151,8 +153,18 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
     }
 
     @Override
+    Cholesky<Double> getDecompositionCholesky(Structure2D typical) {
+        return Cholesky.PRIMITIVE.make(typical);
+    }
+
+    @Override
     Eigenvalue<Double> getDecompositionEigenvalue(Structure2D typical) {
         return Eigenvalue.PRIMITIVE.make(typical, this.isHermitian());
+    }
+
+    @Override
+    LDL<Double> getDecompositionLDL(Structure2D typical) {
+        return LDL.PRIMITIVE.make(typical);
     }
 
     @Override

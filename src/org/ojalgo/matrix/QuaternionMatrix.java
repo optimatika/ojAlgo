@@ -21,7 +21,9 @@
  */
 package org.ojalgo.matrix;
 
+import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LDL;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
@@ -148,8 +150,18 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     }
 
     @Override
+    Cholesky<Quaternion> getDecompositionCholesky(Structure2D typical) {
+        return Cholesky.QUATERNION.make(typical);
+    }
+
+    @Override
     Eigenvalue<Quaternion> getDecompositionEigenvalue(Structure2D typical) {
         return Eigenvalue.QUATERNION.make(typical, this.isHermitian());
+    }
+
+    @Override
+    LDL<Quaternion> getDecompositionLDL(Structure2D typical) {
+        return LDL.QUATERNION.make(typical);
     }
 
     @Override

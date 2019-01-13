@@ -35,8 +35,11 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
+import org.ojalgo.matrix.decomposition.LDL;
+import org.ojalgo.matrix.decomposition.LDU;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
@@ -174,11 +177,9 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     private transient MatrixDecomposition<N> myDecomposition = null;
     private transient int myHashCode = 0;
-
     private transient Boolean myHermitian = null;
-
+    private transient Boolean mySPD = null;
     private final MatrixStore<N> myStore;
-
     private transient Boolean mySymmetric = null;
 
     @SuppressWarnings("unused")
@@ -607,7 +608,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
     /**
      * <p>
      * This method solves a system of linear equations: [this][X]=[rhs]. A combination of columns in [this]
-     * should produce a column(s) in [rhs]. It is ok for [aRHS] to have more than 1 column.
+     * should produce a column(s) in [rhs]. It is ok for [rhs] to have more than 1 column.
      * </p>
      * <ul>
      * <li>If the problem is over-qualified an approximate solution is returned.</li>
@@ -772,7 +773,28 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     abstract ElementsSupplier<N> cast(Access1D<?> matrix);
 
+    abstract Cholesky<N> getDecompositionCholesky(Structure2D typical);
+
     abstract Eigenvalue<N> getDecompositionEigenvalue(Structure2D typical);
+
+    abstract LDL<N> getDecompositionLDL(Structure2D typical);
+
+    LDU<N> getDecompositionLDU(Structure2D typical) {
+
+        if ((myDecomposition != null) && (myDecomposition instanceof LDU)) {
+            return (LDU<N>) myDecomposition;
+        }
+
+        if ((myHermitian != null) && myHermitian.booleanValue()) {
+            if ((mySPD != null) && mySPD.booleanValue()) {
+                return (LDU<N>) (myDecomposition = this.getDecompositionCholesky(typical));
+            } else {
+                return (LDU<N>) (myDecomposition = this.getDecompositionLDL(typical));
+            }
+        } else {
+            return (LDU<N>) (myDecomposition = this.getDecompositionLDU(typical));
+        }
+    }
 
     abstract LU<N> getDecompositionLU(Structure2D typical);
 
