@@ -254,4 +254,8 @@ public interface Structure1D {
         Structure1D.loopRange(0L, this.count(), callback);
     }
 
+    default int size() {
+        return Math.toIntExact(this.count());
+    }
+
 }

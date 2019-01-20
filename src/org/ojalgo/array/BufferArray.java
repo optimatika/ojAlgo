@@ -523,7 +523,7 @@ public abstract class BufferArray extends PlainArray<Double> {
     }
 
     @Override
-    protected int size() {
+    public int size() {
         return myBuffer.capacity();
     }
 

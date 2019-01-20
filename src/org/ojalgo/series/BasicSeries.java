@@ -101,10 +101,6 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             }
         }
 
-        default long count() {
-            return this.size();
-        }
-
         /**
          * A natural sequence implies a bidirectional mapping between the keys and long indices. This
          * {@link org.ojalgo.structure.Structure1D.IndexMapper} specifies that mapping. Please note that
@@ -125,6 +121,10 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         V put(long index, V value);
 
         K step(K key);
+
+        default int size() {
+            return Access1D.super.size();
+        }
 
     }
 

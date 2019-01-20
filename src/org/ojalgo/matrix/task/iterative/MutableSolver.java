@@ -112,8 +112,4 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
         myDelegate.setIterationsLimit(iterationsLimit);
     }
 
-    protected long size() {
-        return mySize;
-    }
-
 }

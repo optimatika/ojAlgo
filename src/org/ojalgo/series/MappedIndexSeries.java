@@ -98,6 +98,10 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
         return null;
     }
 
+    public long count() {
+        return this.size();
+    }
+
     public double doubleValue(final K key) {
         return myDelegate.doubleValue(myMapper.toIndex(key));
     }

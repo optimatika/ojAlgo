@@ -568,7 +568,7 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     @Override
-    protected int size() {
+    public int size() {
         return data.length;
     }
 

@@ -285,7 +285,7 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
     }
 
     @Override
-    protected final int size() {
+    public final int size() {
         return data.length;
     }
 

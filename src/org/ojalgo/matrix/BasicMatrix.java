@@ -135,6 +135,8 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     }
 
+    private static final NumberContext EQUALS = NumberContext.getGeneral(8, 12);
+
     /**
      * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
      * the sum of the square of the singular values.
@@ -309,19 +311,19 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
     }
 
     /**
-     * @return true if the frobenius norm of the difference between [this] and [aStore] is zero within the
-     *         limits of aCntxt.
+     * @return true if the frobenius norm of the difference between [this] and [another] is zero within the
+     *         limits of [precision].
      */
     public boolean equals(final Access2D<?> another, final NumberContext precision) {
         return Access2D.equals(myStore, another, precision);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (obj instanceof Access2D<?>) {
-            return this.equals((Access2D<?>) obj, NumberContext.getGeneral(6));
+    public boolean equals(final Object other) {
+        if (other instanceof Access2D<?>) {
+            return Access2D.equals(myStore, (Access2D<?>) other, EQUALS);
         } else {
-            return super.equals(obj);
+            return super.equals(other);
         }
     }
 
@@ -517,12 +519,11 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
      */
     public boolean isFullRank() {
         return this.getRankRevealing(myStore).isFullRank();
-        // return this.getRank() == Math.min(myStore.countRows(), myStore.countColumns());
     }
 
     public boolean isHermitian() {
         if (myHermitian == null) {
-            myHermitian = this.isSquare() && myStore.equals(myStore.conjugate(), NumberContext.getGeneral(6));
+            myHermitian = this.isSquare() && myStore.equals(myStore.conjugate(), EQUALS);
         }
         return myHermitian.booleanValue();
     }
@@ -537,7 +538,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     public boolean isSymmetric() {
         if (mySymmetric == null) {
-            mySymmetric = this.isSquare() && myStore.equals(myStore.transpose(), NumberContext.getGeneral(6));
+            mySymmetric = this.isSquare() && myStore.equals(myStore.transpose(), EQUALS);
         }
         return mySymmetric.booleanValue();
     }
