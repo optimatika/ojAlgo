@@ -22,6 +22,8 @@
 package org.ojalgo.optimisation;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -667,6 +669,43 @@ public final class Expression extends ModelEntity<Expression> {
 
     int countQuadraticFactors() {
         return myQuadratic.size();
+    }
+
+    boolean doIntegerRounding() {
+
+        BigInteger gcd = null;
+        for (BigDecimal coeff : myLinear.values()) {
+            if (coeff.scale() != 0) {
+                return false; // Non-integer coefficient
+            }
+            if (gcd != null) {
+                gcd = gcd.gcd(coeff.unscaledValue().abs());
+            } else {
+                gcd = coeff.unscaledValue().abs();
+            }
+            if (gcd.equals(BigInteger.ONE)) {
+                return false; // gcd == 1, no point
+            }
+        }
+
+        BigDecimal divisor = new BigDecimal(gcd, 0);
+
+        for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
+            BigDecimal value = entry.getValue();
+            entry.setValue(value.divide(divisor, RoundingMode.UNNECESSARY));
+        }
+
+        BigDecimal lower = this.getLowerLimit();
+        if (lower != null) {
+            this.lower(lower.divide(divisor, RoundingMode.CEILING));
+        }
+
+        BigDecimal upper = this.getUpperLimit();
+        if (upper != null) {
+            this.upper(upper.divide(divisor, RoundingMode.FLOOR));
+        }
+
+        return true;
     }
 
     Set<Variable> getBinaryVariables(final Set<IntIndex> fixedVariables) {
