@@ -1372,7 +1372,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     Optimisation.Result optimise() {
 
-        if (PRESOLVERS.size() > 0) {
+        if (!myWorkCopy && (PRESOLVERS.size() > 0)) {
             this.scanEntities();
         }
 
