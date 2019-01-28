@@ -20,16 +20,31 @@ import org.junit.jupiter.api.Test;
 @Disabled("Underscored before JUnit 5")
 public final class MipCase extends MipLibCase {
 
+    /**
+     * <ul>
+     * <li>2019-01-28: MacPro sufficed 300s - expected: <-4783.733392> but was: <-4763.2729736></li>
+     * </ul>
+     */
     @Test
     public void testGen_ip002() {
         MipLibCase.assertMinMaxVal("gen-ip002.mps", new BigDecimal("-4783.733392"), null, false, null);
     }
 
+    /**
+     * <ul>
+     * <li>2019-01-28: MacPro sufficed 300s - expected: <6840.966> but was: <6852.406055845></li>
+     * </ul>
+     */
     @Test
     public void testGen_ip054() {
         MipLibCase.assertMinMaxVal("gen-ip054.mps", new BigDecimal("6840.966"), null, false, null);
     }
 
+    /**
+     * <ul>
+     * <li>2019-01-28: MacPro found optimal solution in 19s</li>
+     * </ul>
+     */
     @Test
     public void testMarkshare_4_0() {
         MipLibCase.assertMinMaxVal("markshare_4_0.mps", new BigDecimal("1"), null, false, null);
@@ -42,6 +57,7 @@ public final class MipCase extends MipLibCase {
      * 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
      * <li>2018-08-16: MacPro sufficed with optimal solution</li>
+     * <li>2019-01-28: MacPro sufficed 300s - <1.0> but was: <4.999999999999991></li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare_5_0()
@@ -60,6 +76,7 @@ public final class MipCase extends MipLibCase {
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
      * was:<5.0></li>
      * <li>2018-08-16: MacPro sufficed: <1.0> but was: <8.0></li>
+     * <li>2019-01-28: MacPro sufficed 300s - expected: <1.0> but was: <8.000000000000066></li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare1()
@@ -78,6 +95,7 @@ public final class MipCase extends MipLibCase {
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
      * was:<19.00000000000008></li>
      * <li>2018-08-16: MacPro sufficed: <1.0> but was: <14.0></li>
+     * <li>2019-01-28: MacPro sufficed 300s - expected: <1.0> but was: <16.00000000000005></li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare2()
@@ -99,6 +117,7 @@ public final class MipCase extends MipLibCase {
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
      * <li>2018-08-16: MacPro sufficed with optimal solution</li>
+     * <li>2019-01-28: MacPro sufficed with optimal solution after 300s</li>
      * </ul>
      *
      * @see RelaxedLpCase#testMas76()
@@ -117,6 +136,7 @@ public final class MipCase extends MipLibCase {
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<2.07405081E7>
      * but was:<2.45509922222574E7></li>
      * <li>2018-08-16: MacPro sufficed: <2.07405081E7> but was: <2.4337382015089516E7></li>
+     * <li>2019-01-28: MacPro sufficed 300s - expected: <2.07405081E7> but was: <2.4548449266857613E7></li>
      * </ul>
      *
      * @see RelaxedLpCase#testModglob()
@@ -126,6 +146,11 @@ public final class MipCase extends MipLibCase {
         MipLibCase.assertMinMaxVal("modglob.mps", new BigDecimal("2.07405081e+07"), null, false, null);
     }
 
+    /**
+     * <ul>
+     * <li>2019-01-28: MacPro sufficed with optimal solution after 300s</li>
+     * </ul>
+     */
     @Test
     public void testNeos5() {
         MipLibCase.assertMinMaxVal("neos5.mps", new BigDecimal("15"), null, false, null);
@@ -137,6 +162,7 @@ public final class MipCase extends MipLibCase {
      * </li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Aborted with no integer solution</li>
      * <li>2018-08-16: MacPro aborted with no integer solution</li>
+     * <li>2019-01-28: MacPro aborted with no integer solution 900s</li>
      * </ul>
      *
      * @see RelaxedLpCase#testNeos911880()
@@ -153,6 +179,7 @@ public final class MipCase extends MipLibCase {
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
      * <li>2018-08-16: MacPro sufficed with optimal solution</li>
+     * <li>2019-01-28: MacPro sufficed 300s - expected: <-41.0> but was: <-40.0></li>
      * </ul>
      *
      * @see RelaxedLpCase#testNoswot()
@@ -186,6 +213,7 @@ public final class MipCase extends MipLibCase {
      * <li>2018-02-07: MacPro (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s</li>
      * <li>2018-04-47: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s</li>
      * <li>2018-08-16: MacPro sufficed: <11.0> but was: <14.0></li>
+     * <li>2019-01-28: MacPro sufficed 300s: expected: <11.0> but was: <14.000000000000073></li>
      * </ul>
      *
      * @see RelaxedLpCase#testPk1()
@@ -202,6 +230,7 @@ public final class MipCase extends MipLibCase {
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<7350.0> but
      * was:<7580.0></li>
      * <li>2018-08-16: MacPro sufficed: <7350.0> but was: <7490.0></li>
+     * <li>2019-01-28: MacPro sufficed 300s: expected: <7350.0> but was: <7490.0></li>
      * </ul>
      *
      * @see RelaxedLpCase#testPp08a()
@@ -217,6 +246,7 @@ public final class MipCase extends MipLibCase {
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<7350.0> but
      * was:<7500.0></li>
      * <li>2018-08-16: MacPro sufficed: <7350.0> but was: <7580.0></li>
+     * <li>2019-01-28: MacPro sufficed 300s: expected: <7350.0> but was: <7550.000000000001></li>
      * </ul>
      *
      * @see RelaxedLpCase#testPp08aCUTS()
@@ -232,6 +262,7 @@ public final class MipCase extends MipLibCase {
      * <1012900.999999></li>
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Aborted with no integer solution</li>
      * <li>2018-08-16: MacPro sufficed: <764772.0> but was: <1256281.99999962></li>
+     * <li>2019-01-28: MacPro sufficed 300s: expected: <764772.0> but was: <1256281.99999962></li>
      * </ul>
      *
      * @see RelaxedLpCase#testTimtab1()
@@ -249,6 +280,7 @@ public final class MipCase extends MipLibCase {
      * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<13.75> but
      * was:<16.0></li>
      * <li>2018-08-16: MacPro sufficed: <13.75> but was: <16.5></li>
+     * <li>2019-01-28: MacPro sufficed 300s: <13.75> but was: <16.5></li>
      * </ul>
      *
      * @see RelaxedLpCase#testVpm2()
