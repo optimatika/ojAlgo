@@ -50,6 +50,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     }
 
     /**
+     * https://miplib.zib.de/instance_details_gen-ip002.html
      * <ul>
      * <li>2019-01-28: MacPro sufficed 300s - expected: <-4783.733392> but was: <-4763.2729736></li>
      * </ul>
@@ -76,6 +77,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     }
 
     /**
+     * https://miplib.zib.de/instance_details_gen-ip054.html
      * <ul>
      * <li>2019-01-28: MacPro sufficed 300s - expected: <6840.966> but was: <6852.406055845></li>
      * </ul>
@@ -94,6 +96,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     }
 
     /**
+     * https://miplib.zib.de/instance_details_markshare_4_0.html
      * <ul>
      * <li>2019-01-28: MacPro found optimal solution in 19s</li>
      * </ul>
@@ -104,6 +107,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     }
 
     /**
+     * https://miplib.zib.de/instance_details_markshare_5_0.html
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal solution after 4h</li>
      * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 2.0 rather than 1.0 after
@@ -121,6 +125,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     }
 
     /**
+     * https://miplib.zib.de/instance_details_markshare1.html
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with integer solution 6.0 rather than 1.0 after 4h
      * expected:<1.0> but was:<5.999999999999929></li>
