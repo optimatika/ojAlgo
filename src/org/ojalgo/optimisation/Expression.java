@@ -674,35 +674,35 @@ public final class Expression extends ModelEntity<Expression> {
     boolean doIntegerRounding() {
 
         BigInteger gcd = null;
+        int maxScale = Integer.MIN_VALUE;
         for (BigDecimal coeff : myLinear.values()) {
-            if (coeff.scale() != 0) {
-                return false; // Non-integer coefficient
-            }
+            BigDecimal abs = coeff.stripTrailingZeros().abs();
+            maxScale = Math.max(maxScale, abs.scale());
             if (gcd != null) {
-                gcd = gcd.gcd(coeff.unscaledValue().abs());
+                gcd = gcd.gcd(abs.unscaledValue());
             } else {
-                gcd = coeff.unscaledValue().abs();
+                gcd = abs.unscaledValue();
             }
             if (gcd.equals(BigInteger.ONE)) {
                 return false; // gcd == 1, no point
             }
         }
 
-        BigDecimal divisor = new BigDecimal(gcd, 0);
+        BigDecimal divisor = new BigDecimal(gcd, maxScale);
 
         for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
             BigDecimal value = entry.getValue();
-            entry.setValue(value.divide(divisor, RoundingMode.UNNECESSARY));
+            entry.setValue(value.divide(divisor, 0, RoundingMode.UNNECESSARY));
         }
 
         BigDecimal lower = this.getLowerLimit();
         if (lower != null) {
-            this.lower(lower.divide(divisor, RoundingMode.CEILING));
+            this.lower(lower.divide(divisor, 0, RoundingMode.CEILING));
         }
 
         BigDecimal upper = this.getUpperLimit();
         if (upper != null) {
-            this.upper(upper.divide(divisor, RoundingMode.FLOOR));
+            this.upper(upper.divide(divisor, 0, RoundingMode.FLOOR));
         }
 
         return true;

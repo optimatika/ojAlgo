@@ -29,8 +29,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashMap;
 
+import org.ojalgo.netio.ASCII;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -188,7 +190,9 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         }
 
         public void setRowValue(final String rowName, final BigDecimal value) {
-            myRows.get(rowName).getExpression().set(myVariable, value);
+            Row row = myRows.get(rowName);
+            Expression expression = row.getExpression();
+            expression.set(myVariable, value);
         }
 
         /**
@@ -392,7 +396,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
             //it returns an empty String if two newlines appear in a row.
             while ((tmpLine = tmpBufferedFileReader.readLine()) != null) {
 
-                //        BasicLogger.logDebug("Line: {}.", tmpLine);
+                // BasicLogger.debug("Line: {}", tmpLine);
 
                 if ((tmpLine.length() == 0) || tmpLine.startsWith(COMMENT)) {
                     // Skip this line
@@ -419,7 +423,6 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
     private final String[] myFields = new String[6];
     private boolean myIntegerMarker = false;
     private String myName;
-
     private final HashMap<String, Row> myRows = new HashMap<>();
 
     MathProgSysModel() {
@@ -532,15 +535,42 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
     private void extractFields(final String line) {
 
-        final int tmpLength = line.length();
+        Arrays.fill(myFields, null);
 
-        int tmpFirst = 0;
-        int tmpLimit = tmpFirst;
-        for (int i = 0; i < myFields.length; i++) {
-            tmpLimit = Math.min(FIELD_LIMITS[i], tmpLength);
-            myFields[i] = line.substring(tmpFirst, tmpLimit).trim();
-            tmpFirst = tmpLimit;
+        final int length = line.length();
+
+        char tecken;
+
+        int first = -1;
+        int limit = -1;
+
+        int field = 0;
+
+        boolean word = false;
+
+        for (int i = 0; i < length; i++) {
+            tecken = line.charAt(i);
+            if (!word && !ASCII.isSpace(tecken)) {
+                word = true;
+                first = i;
+            } else if (word && ASCII.isSpace(tecken)) {
+                word = false;
+                limit = i;
+            }
+            if (word && ((i + 1) == length)) {
+                word = false;
+                limit = i + 1;
+            }
+            if (limit > first) {
+                if ((field == 0) && (first >= 12)) {
+                    myFields[field++] = "";
+                }
+                myFields[field++] = line.substring(first, limit);
+                first = -1;
+                limit = -1;
+            }
         }
+
     }
 
     FileSection identifySection(final String line) {
@@ -580,7 +610,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         this.extractFields(line);
 
-        //      BasicLogger.logDebug("{}: {}.", aSection, Arrays.toString(myFields));
+        // BasicLogger.debug("{}: {}", section, Arrays.toString(myFields));
 
         switch (section) {
 
@@ -612,25 +642,21 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         case COLUMNS:
 
-            if (myFields[2].indexOf("MARKER") != -1) {
+            if (myFields[1].indexOf("MARKER") != -1) {
 
-                if (myFields[4].indexOf("INTORG") != -1) {
+                if (myFields[2].indexOf("INTORG") != -1) {
                     myIntegerMarker = true;
-                } else if (myFields[4].indexOf("INTEND") != -1) {
+                } else if (myFields[2].indexOf("INTEND") != -1) {
                     myIntegerMarker = false;
                 }
 
             } else {
 
-                if (!myColumns.containsKey(myFields[1])) {
-                    myColumns.put(myFields[1], new Column(myFields[1]));
-                }
+                final Column tmpColumn = myColumns.computeIfAbsent(myFields[0], key -> new Column(key));
 
-                final Column tmpColumn = myColumns.get(myFields[1]);
-
-                tmpColumn.setRowValue(myFields[2], new BigDecimal(myFields[3]));
-                if (myFields[4].length() != 0) {
-                    tmpColumn.setRowValue(myFields[4], new BigDecimal(myFields[5]));
+                tmpColumn.setRowValue(myFields[1], new BigDecimal(myFields[2]));
+                if (myFields[3] != null) {
+                    tmpColumn.setRowValue(myFields[3], new BigDecimal(myFields[4]));
                 }
 
                 if (myIntegerMarker) {
@@ -643,27 +669,27 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         case RHS:
 
-            myRows.get(myFields[2]).rhs(new BigDecimal(myFields[3]));
+            myRows.get(myFields[1]).rhs(new BigDecimal(myFields[2]));
 
-            if (myFields[4].length() != 0) {
-                myRows.get(myFields[4]).rhs(new BigDecimal(myFields[5]));
+            if (myFields[3] != null) {
+                myRows.get(myFields[3]).rhs(new BigDecimal(myFields[4]));
             }
 
             break;
 
         case RANGES:
 
-            myRows.get(myFields[2]).range(new BigDecimal(myFields[3]));
+            myRows.get(myFields[1]).range(new BigDecimal(myFields[2]));
 
-            if (myFields[4].length() != 0) {
-                myRows.get(myFields[4]).range(new BigDecimal(myFields[5]));
+            if (myFields[3] != null) {
+                myRows.get(myFields[3]).range(new BigDecimal(myFields[4]));
             }
 
             break;
 
         case BOUNDS:
 
-            myColumns.get(myFields[2]).bound(BoundType.valueOf(myFields[0]), myFields[3].length() == 0 ? null : new BigDecimal(myFields[3]));
+            myColumns.get(myFields[2]).bound(BoundType.valueOf(myFields[0]), myFields[3] != null ? new BigDecimal(myFields[3]) : null);
 
             break;
 

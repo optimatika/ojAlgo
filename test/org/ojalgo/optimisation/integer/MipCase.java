@@ -20,6 +20,21 @@ import org.junit.jupiter.api.Test;
 @Disabled("Underscored before JUnit 5")
 public final class MipCase extends MipLibCase {
 
+    @Test
+    public void testGen_ip002() {
+        MipLibCase.assertMinMaxVal("gen-ip002.mps", new BigDecimal("-4783.733392"), null, false, null);
+    }
+
+    @Test
+    public void testGen_ip054() {
+        MipLibCase.assertMinMaxVal("gen-ip054.mps", new BigDecimal("6840.966"), null, false, null);
+    }
+
+    @Test
+    public void testMarkshare_4_0() {
+        MipLibCase.assertMinMaxVal("markshare_4_0.mps", new BigDecimal("1"), null, false, null);
+    }
+
     /**
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal solution after 4h</li>
@@ -109,6 +124,11 @@ public final class MipCase extends MipLibCase {
     @Test
     public void testModglob() {
         MipLibCase.assertMinMaxVal("modglob.mps", new BigDecimal("2.07405081e+07"), null, false, null);
+    }
+
+    @Test
+    public void testNeos5() {
+        MipLibCase.assertMinMaxVal("neos5.mps", new BigDecimal("15"), null, false, null);
     }
 
     /**
