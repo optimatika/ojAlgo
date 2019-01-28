@@ -144,8 +144,6 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      * <li>2018-08-16: sufficed with optimal solution</li>
      * <li>2019-01-28: 300s expected: <1.0> but was: <1.9999999999999953></li>
      * </ul>
-     *
-     * @see RelaxedLpCase#testMarkshare_5_0()
      */
     @Test
     public void testMarkshare_5_0() {
@@ -165,8 +163,6 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      * <li>2018-08-16: sufficed: <1.0> but was: <8.0></li>
      * <li>2019-01-28: 300s expected: <1.0> but was: <6.000000000000018></li>
      * </ul>
-     *
-     * @see RelaxedLpCase#testMarkshare1()
      */
     @Test
     public void testMarkshare1() {
@@ -200,8 +196,6 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      * <li>2018-08-16: sufficed: <11.0> but was: <14.0></li>
      * <li>2019-01-28: 300s expected: <11.0> but was: <11.999999999999979></li>
      * </ul>
-     *
-     * @see RelaxedLpCase#testPk1()
      */
     @Test
     public void testPk1() {

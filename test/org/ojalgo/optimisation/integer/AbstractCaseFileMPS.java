@@ -20,6 +20,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.MathProgSysModel;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.CalendarDateUnit;
@@ -32,7 +33,6 @@ import org.ojalgo.type.context.NumberContext;
  */
 abstract class AbstractCaseFileMPS extends OptimisationIntegerTests {
 
-    protected static final String COMPOSITION_NOT_VALID = " Composition not valid!";
     protected static final String PATH = "./test/org/ojalgo/optimisation/integer/";
     protected static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
@@ -46,16 +46,21 @@ abstract class AbstractCaseFileMPS extends OptimisationIntegerTests {
             BasicLogger.DEBUG.println();
         }
 
-        final File tmpFile = new File(PATH + modelName);
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
+        final File file = new File(PATH + modelName);
+        final ExpressionsBasedModel model = MathProgSysModel.make(file).getExpressionsBasedModel();
+
+        if (DEBUG) {
+            BasicLogger.DEBUG.println();
+            BasicLogger.DEBUG.println(model);
+            BasicLogger.DEBUG.println();
+        }
 
         if (relax) {
-            tmpModel.relax(true);
+            model.relax(true);
         }
 
         if (solution != null) {
-            for (final Variable tmpVariable : tmpModel.getVariables()) {
+            for (final Variable tmpVariable : model.getVariables()) {
                 final BigDecimal tmpValue = solution.get(tmpVariable.getName());
                 if (tmpValue != null) {
                     tmpVariable.setValue(tmpValue);
@@ -63,26 +68,25 @@ abstract class AbstractCaseFileMPS extends OptimisationIntegerTests {
                     tmpVariable.setValue(BigMath.ZERO);
                 }
             }
-            if (!tmpModel.validate(new NumberContext(7, 4))) {
+            if (!model.validate(new NumberContext(7, 4))) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
         }
 
-        // tmpModel.options.mip_gap = 0.001;
-        tmpModel.options.time_suffice = 5L * CalendarDateUnit.MINUTE.toDurationInMillis();
-        tmpModel.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
-        // tmpModel.options.iterations_suffice = 1000;
+        model.options.time_suffice = 5L * CalendarDateUnit.MINUTE.toDurationInMillis();
+        model.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
 
-        tmpModel.options.progress(IntegerSolver.class);
-        tmpModel.options.validate = false;
+        model.options.debug(GenericSolver.class);
+        // model.options.progress(IntegerSolver.class);
+        // model.options.validate = true;
 
-        TestUtils.assertTrue(tmpModel.validate());
+        TestUtils.assertTrue(model.validate());
 
         if (expMinVal != null) {
 
-            final double tmpMinimum = tmpModel.minimise().getValue();
+            final double tmpMinimum = model.minimise().getValue();
 
-            if (!tmpModel.validate(new NumberContext(7, 6))) {
+            if (!model.validate(new NumberContext(7, 6))) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
 
@@ -93,9 +97,9 @@ abstract class AbstractCaseFileMPS extends OptimisationIntegerTests {
 
         if (expMaxVal != null) {
 
-            final double tmpMaximum = tmpModel.maximise().getValue();
+            final double tmpMaximum = model.maximise().getValue();
 
-            if (!tmpModel.validate(new NumberContext(7, 6))) {
+            if (!model.validate(new NumberContext(7, 6))) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
 
