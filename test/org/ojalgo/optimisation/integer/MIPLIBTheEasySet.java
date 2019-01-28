@@ -27,6 +27,10 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
 
     /**
      * https://miplib.zib.de/instance_details_b-ball.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s suffice with optimal solution</li>
+     * </ul>
      */
     @Test
     public void testB_ball() {
@@ -35,6 +39,10 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
 
     /**
      * https://miplib.zib.de/instance_details_ej.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 900s terminated without finding any feasible solution</li>
+     * </ul>
      */
     @Test
     public void testEj() {
@@ -43,6 +51,10 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
 
     /**
      * https://miplib.zib.de/instance_details_flugpl.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 1s finsihed with optimal solution</li>
+     * </ul>
      */
     @Test
     public void testFlugpl() {
@@ -52,7 +64,8 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     /**
      * https://miplib.zib.de/instance_details_gen-ip002.html
      * <ul>
-     * <li>2019-01-28: MacPro sufficed 300s - expected: <-4783.733392> but was: <-4763.2729736></li>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <-4783.733392> but was: <-4778.1844607></li>
      * </ul>
      */
     @Test
@@ -62,6 +75,10 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
 
     /**
      * https://miplib.zib.de/instance_details_gen-ip021.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <2361.45419519> but was: <2362.7631500641996></li>
+     * </ul>
      */
     @Test
     public void testGen_ip021() {
@@ -70,6 +87,10 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
 
     /**
      * https://miplib.zib.de/instance_details_gen-ip036.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <-4606.67961> but was: <-4602.60643892></li>
+     * </ul>
      */
     @Test
     public void testGen_ip036() {
@@ -79,7 +100,8 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     /**
      * https://miplib.zib.de/instance_details_gen-ip054.html
      * <ul>
-     * <li>2019-01-28: MacPro sufficed 300s - expected: <6840.966> but was: <6852.406055845></li>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <6840.966> but was: <6852.1883509></li>
      * </ul>
      */
     @Test
@@ -89,16 +111,21 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
 
     /**
      * https://miplib.zib.de/instance_details_gr4x6.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 0s finsihed with optimal solution</li>
+     * </ul>
      */
     @Test
     public void testGr4x6() {
-        AbstractCaseFileMPS.assertMinMaxVal("gr4x6.mps", new BigDecimal("202.349999999998"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("gr4x6.mps", new BigDecimal("202.35"), null, false, null);
     }
 
     /**
      * https://miplib.zib.de/instance_details_markshare_4_0.html
      * <ul>
-     * <li>2019-01-28: MacPro found optimal solution in 19s</li>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 15s finsihed with optimal solution</li>
      * </ul>
      */
     @Test
@@ -109,12 +136,13 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     /**
      * https://miplib.zib.de/instance_details_markshare_5_0.html
      * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal solution after 4h</li>
-     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 2.0 rather than 1.0 after
+     * Mac Pro (Early 2009)
+     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal solution after 4h</li>
+     * <li>2018-01-08: (suffice=5min abort=1h) Stopped with integer solution 2.0 rather than 1.0 after
      * 5min</li>
-     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
-     * <li>2018-08-16: MacPro sufficed with optimal solution</li>
-     * <li>2019-01-28: MacPro sufficed 300s - <1.0> but was: <4.999999999999991></li>
+     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
+     * <li>2018-08-16: sufficed with optimal solution</li>
+     * <li>2019-01-28: 300s expected: <1.0> but was: <1.9999999999999953></li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare_5_0()
@@ -127,14 +155,15 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     /**
      * https://miplib.zib.de/instance_details_markshare1.html
      * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with integer solution 6.0 rather than 1.0 after 4h
+     * Mac Pro (Early 2009)
+     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with integer solution 6.0 rather than 1.0 after 4h
      * expected:<1.0> but was:<5.999999999999929></li>
-     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 5.0 rather than 1.0 after
+     * <li>2018-01-08: (suffice=5min abort=1h) Stopped with integer solution 5.0 rather than 1.0 after
      * 5min</li>
-     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
+     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
      * was:<5.0></li>
-     * <li>2018-08-16: MacPro sufficed: <1.0> but was: <8.0></li>
-     * <li>2019-01-28: MacPro sufficed 300s - expected: <1.0> but was: <8.000000000000066></li>
+     * <li>2018-08-16: sufficed: <1.0> but was: <8.0></li>
+     * <li>2019-01-28: 300s expected: <1.0> but was: <6.000000000000018></li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare1()
@@ -147,7 +176,8 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     /**
      * https://miplib.zib.de/instance_details_neos5.html
      * <ul>
-     * <li>2019-01-28: MacPro sufficed with optimal solution after 300s</li>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s suffice with optimal solution</li>
      * </ul>
      */
     @Test
@@ -158,16 +188,17 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     /**
      * https://miplib.zib.de/instance_details_pk1.html
      * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 1h50min</li>
-     * <li>2013-12-08: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 412s</li>
-     * <li>2015-11-07: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 372s</li>
-     * <li>2017-10-20: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 796s</li>
-     * <li>2017-10-20: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
-     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution</li>
-     * <li>2018-02-07: MacPro (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s</li>
-     * <li>2018-04-47: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s</li>
-     * <li>2018-08-16: MacPro sufficed: <11.0> but was: <14.0></li>
-     * <li>2019-01-28: MacPro sufficed 300s: expected: <11.0> but was: <14.000000000000073></li>
+     * Mac Pro (Early 2009)
+     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal integer solution after 1h50min</li>
+     * <li>2013-12-08: (suffice=4h abort=8h) Stopped with optimal integer solution after 412s</li>
+     * <li>2015-11-07: (suffice=4h abort=8h) Stopped with optimal integer solution after 372s</li>
+     * <li>2017-10-20: (suffice=4h abort=8h) Stopped with optimal integer solution after 796s</li>
+     * <li>2017-10-20: (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
+     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution</li>
+     * <li>2018-02-07: (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s</li>
+     * <li>2018-04-47: (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s</li>
+     * <li>2018-08-16: sufficed: <11.0> but was: <14.0></li>
+     * <li>2019-01-28: 300s expected: <11.0> but was: <11.999999999999979></li>
      * </ul>
      *
      * @see RelaxedLpCase#testPk1()
