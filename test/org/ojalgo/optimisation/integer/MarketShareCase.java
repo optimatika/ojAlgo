@@ -99,7 +99,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
     private static ExpressionsBasedModel makeModel() {
 
-        final File tmpFile = new File(MipLibCase.PATH + "markshare_5_0.mps");
+        final File tmpFile = new File(AbstractCaseFileMPS.PATH + "markshare_5_0.mps");
 
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
 

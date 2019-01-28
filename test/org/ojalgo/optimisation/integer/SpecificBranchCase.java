@@ -33,7 +33,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.type.context.NumberContext;
 
-public final class SpecificBranchCase extends MipLibCase {
+public final class SpecificBranchCase extends AbstractCaseFileMPS {
 
     /**
      * 4 nodes that validated to "Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED.
@@ -42,7 +42,7 @@ public final class SpecificBranchCase extends MipLibCase {
     @Test
     public void testNoswotN4() {
 
-        final File file = new File(MipLibCase.PATH + "noswot.mps");
+        final File file = new File(AbstractCaseFileMPS.PATH + "noswot.mps");
         final MathProgSysModel mps = MathProgSysModel.make(file);
         final ExpressionsBasedModel model = mps.getExpressionsBasedModel();
 
@@ -128,7 +128,7 @@ public final class SpecificBranchCase extends MipLibCase {
     @Test
     public void testVpm2FirstBranch() {
 
-        final File tmpFile = new File(MipLibCase.PATH + "vpm2.mps");
+        final File tmpFile = new File(AbstractCaseFileMPS.PATH + "vpm2.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
@@ -152,12 +152,12 @@ public final class SpecificBranchCase extends MipLibCase {
 
         tmpLowerBranchModel.minimise();
         if (tmpLowerState.isFeasible() && !tmpLowerBranchModel.validate(new NumberContext(7, 6))) {
-            TestUtils.fail(MipLibCase.SOLUTION_NOT_VALID);
+            TestUtils.fail(AbstractCaseFileMPS.SOLUTION_NOT_VALID);
         }
 
         tmpUpperBranchModel.minimise();
         if (tmpUpperState.isFeasible() && !tmpUpperBranchModel.validate(new NumberContext(7, 6))) {
-            TestUtils.fail(MipLibCase.SOLUTION_NOT_VALID);
+            TestUtils.fail(AbstractCaseFileMPS.SOLUTION_NOT_VALID);
         }
     }
 

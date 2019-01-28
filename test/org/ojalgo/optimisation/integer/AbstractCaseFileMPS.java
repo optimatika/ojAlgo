@@ -26,13 +26,11 @@ import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * http://miplib.zib.de/miplib2003/ Not all problems/models available at that site are solved by any solver.
- * The problems that are considered "easy" are those that can be solved within an hour using a commercial
- * solver (I assume on commodity hardware). If ojAlgo could solve even 1 of these problems...
+ * Base class for MPS-file based tests.
  *
  * @author apete
  */
-abstract class MipLibCase extends OptimisationIntegerTests {
+abstract class AbstractCaseFileMPS extends OptimisationIntegerTests {
 
     protected static final String COMPOSITION_NOT_VALID = " Composition not valid!";
     protected static final String PATH = "./test/org/ojalgo/optimisation/integer/";
@@ -70,7 +68,7 @@ abstract class MipLibCase extends OptimisationIntegerTests {
             }
         }
 
-        tmpModel.options.mip_gap = 0.001;
+        // tmpModel.options.mip_gap = 0.001;
         tmpModel.options.time_suffice = 5L * CalendarDateUnit.MINUTE.toDurationInMillis();
         tmpModel.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
         // tmpModel.options.iterations_suffice = 1000;

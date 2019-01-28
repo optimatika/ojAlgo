@@ -27,7 +27,7 @@ import java.util.HashMap;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public final class RelaxedLpCase extends MipLibCase {
+public final class RelaxedLpCase extends AbstractCaseFileMPS {
 
     /**
      * <p>
@@ -45,7 +45,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testMarkshare_5_0() {
-        MipLibCase.assertMinMaxVal("markshare_5_0.mps", new BigDecimal("0.00000000e+00"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("markshare_5_0.mps", new BigDecimal("0.00000000e+00"), null, true, null);
     }
 
     /**
@@ -64,7 +64,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testMarkshare1() {
-        MipLibCase.assertMinMaxVal("markshare1.mps", new BigDecimal("0.00000000e+00"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("markshare1.mps", new BigDecimal("0.00000000e+00"), null, true, null);
     }
 
     /**
@@ -83,7 +83,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testMarkshare2() {
-        MipLibCase.assertMinMaxVal("markshare2.mps", new BigDecimal("0.00000000e+00"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("markshare2.mps", new BigDecimal("0.00000000e+00"), null, true, null);
     }
 
     /**
@@ -102,7 +102,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testMas76() {
-        MipLibCase.assertMinMaxVal("mas76.mps", new BigDecimal("3.88939036e+04"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("mas76.mps", new BigDecimal("3.88939036e+04"), null, true, null);
     }
 
     /**
@@ -121,7 +121,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testModglob() {
-        MipLibCase.assertMinMaxVal("modglob.mps", new BigDecimal("2.04309476e+07"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("modglob.mps", new BigDecimal("2.04309476e+07"), null, true, null);
     }
 
     /**
@@ -140,7 +140,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testNeos911880() {
-        MipLibCase.assertMinMaxVal("neos-911880.mps", new BigDecimal("23.26"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("neos-911880.mps", new BigDecimal("23.26"), null, true, null);
     }
 
     /**
@@ -159,7 +159,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testNoswot() {
-        MipLibCase.assertMinMaxVal("noswot.mps", new BigDecimal("-43.0"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("noswot.mps", new BigDecimal("-43.0"), null, true, null);
 
     }
 
@@ -179,7 +179,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testP2m2p1m1p0n100() {
-        MipLibCase.assertMinMaxVal("p2m2p1m1p0n100.mps", new BigDecimal("80424"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("p2m2p1m1p0n100.mps", new BigDecimal("80424"), null, true, null);
     }
 
     /**
@@ -291,7 +291,7 @@ public final class RelaxedLpCase extends MipLibCase {
         tmpSolution.put("x85", BigDecimal.valueOf(0));
         tmpSolution.put("x86", BigDecimal.valueOf(0));
 
-        MipLibCase.assertMinMaxVal("pk1.mps", new BigDecimal("1.47389881e-09"), null, true, tmpSolution);
+        AbstractCaseFileMPS.assertMinMaxVal("pk1.mps", new BigDecimal("1.47389881e-09"), null, true, tmpSolution);
     }
 
     /**
@@ -310,7 +310,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testPp08a() {
-        MipLibCase.assertMinMaxVal("pp08a.mps", new BigDecimal("2.74834524e+03"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("pp08a.mps", new BigDecimal("2.74834524e+03"), null, true, null);
     }
 
     /**
@@ -329,7 +329,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testPp08aCUTS() {
-        MipLibCase.assertMinMaxVal("pp08aCUTS.mps", new BigDecimal("5.48060616e+03"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("pp08aCUTS.mps", new BigDecimal("5.48060616e+03"), null, true, null);
     }
 
     /**
@@ -348,7 +348,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testTimtab1() {
-        MipLibCase.assertMinMaxVal("timtab1.mps", new BigDecimal("2.86940000e+04"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("timtab1.mps", new BigDecimal("2.86940000e+04"), null, true, null);
     }
 
     /**
@@ -367,7 +367,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testVpm2() {
-        MipLibCase.assertMinMaxVal("vpm2.mps", new BigDecimal("9.88926460e+00"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("vpm2.mps", new BigDecimal("9.88926460e+00"), null, true, null);
     }
 
 }
