@@ -14,6 +14,7 @@ package org.ojalgo.optimisation.integer;
 
 import java.math.BigDecimal;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author apete
  */
+@Disabled()
 public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
 
     /**

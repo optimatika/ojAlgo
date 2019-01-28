@@ -20,7 +20,6 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.MathProgSysModel;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.CalendarDateUnit;
@@ -76,9 +75,9 @@ abstract class AbstractCaseFileMPS extends OptimisationIntegerTests {
         model.options.time_suffice = 5L * CalendarDateUnit.MINUTE.toDurationInMillis();
         model.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
 
-        model.options.debug(GenericSolver.class);
+        // model.options.debug(IntegerSolver.class);
         // model.options.progress(IntegerSolver.class);
-        // model.options.validate = true;
+        // model.options.validate = false;
 
         TestUtils.assertTrue(model.validate());
 

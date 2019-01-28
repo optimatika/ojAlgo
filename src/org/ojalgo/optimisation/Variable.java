@@ -195,10 +195,6 @@ public final class Variable extends ModelEntity<Variable> {
         return retVal;
     }
 
-    public Variable relax() {
-        return this.integer(false);
-    }
-
     public void setInteger(final boolean integer) {
         myInteger = integer;
     }
@@ -258,10 +254,14 @@ public final class Variable extends ModelEntity<Variable> {
 
     @Override
     protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender) {
+        return this.validate(value, context, appender, false);
+    }
+
+    boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender, boolean relaxed) {
 
         boolean retVal = super.validate(value, context, appender);
 
-        if (retVal && myInteger) {
+        if (retVal && !relaxed && myInteger) {
             try {
                 context.enforce(value).longValueExact();
             } catch (final ArithmeticException ex) {

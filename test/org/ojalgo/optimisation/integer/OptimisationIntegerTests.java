@@ -19,6 +19,6 @@ package org.ojalgo.optimisation.integer;
  */
 public abstract class OptimisationIntegerTests {
 
-    static final boolean DEBUG = true;
+    static final boolean DEBUG = false;
 
 }
