@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Underscored before JUnit 5")
+@Disabled("Far too slow")
 public final class MipCase extends AbstractCaseFileMPS {
 
     /**
@@ -185,6 +185,7 @@ public final class MipCase extends AbstractCaseFileMPS {
      * @see RelaxedLpCase#testNoswot()
      */
     @Test
+    @Disabled("https://github.com/optimatika/ojAlgo/issues/120")
     public void testNoswot() {
         AbstractCaseFileMPS.assertMinMaxVal("noswot.mps", new BigDecimal("-4.10000000e+01"), null, false, null);
     }

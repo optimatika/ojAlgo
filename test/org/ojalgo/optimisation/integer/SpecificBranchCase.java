@@ -23,6 +23,7 @@ package org.ojalgo.optimisation.integer;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
@@ -40,6 +41,7 @@ public final class SpecificBranchCase extends AbstractCaseFileMPS {
      * Stop this branch!"
      */
     @Test
+    @Disabled("https://github.com/optimatika/ojAlgo/issues/120")
     public void testNoswotN4() {
 
         final File file = new File(AbstractCaseFileMPS.PATH + "noswot.mps");
