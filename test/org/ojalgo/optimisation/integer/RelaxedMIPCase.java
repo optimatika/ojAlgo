@@ -29,6 +29,114 @@ import org.junit.jupiter.api.Test;
 public class RelaxedMIPCase extends AbstractCaseFileMPS {
 
     /**
+     * https://miplib.zib.de/instance_details_b-ball.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s suffice with optimal solution</li>
+     * </ul>
+     */
+    @Test
+    public void testB_ball() {
+        AbstractCaseFileMPS.assertMinMaxVal("b-ball.mps", "-1.5", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_ej.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 900s terminated without finding any feasible solution</li>
+     * </ul>
+     */
+    @Test
+    public void testEj() {
+        AbstractCaseFileMPS.assertMinMaxVal("ej.mps", "25508", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_flugpl.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 1s finsihed with optimal solution</li>
+     * </ul>
+     */
+    @Test
+    public void testFlugpl() {
+        AbstractCaseFileMPS.assertMinMaxVal("flugpl.mps", "1201500", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip002.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <-4783.733392> but was: <-4778.1844607></li>
+     * </ul>
+     */
+    @Test
+    public void testGen_ip002() {
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip002.mps", "-4783.733392", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip021.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <2361.45419519> but was: <2362.7631500641996></li>
+     * </ul>
+     */
+    @Test
+    public void testGen_ip021() {
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip021.mps", "2361.45419519", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip036.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <-4606.67961> but was: <-4602.60643892></li>
+     * </ul>
+     */
+    @Test
+    public void testGen_ip036() {
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip036.mps", "-4606.67961", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip054.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <6840.966> but was: <6852.1883509></li>
+     * </ul>
+     */
+    @Test
+    public void testGen_ip054() {
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip054.mps", "6840.966", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gr4x6.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 0s finsihed with optimal solution</li>
+     * </ul>
+     */
+    @Test
+    public void testGr4x6() {
+        AbstractCaseFileMPS.assertMinMaxVal("gr4x6.mps", "202.35", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_markshare_4_0.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 15s finsihed with optimal solution</li>
+     * </ul>
+     */
+    @Test
+    public void testMarkshare_4_0() {
+        AbstractCaseFileMPS.assertMinMaxVal("markshare_4_0.mps", "1", null, true, null);
+    }
+
+    /**
      * <p>
      * <a href="http://miplib.zib.de/miplib2010/markshare_5_0.php">MIPLIB 2010</a>
      * https://miplib.zib.de/instance_details_markshare_5_0.html
@@ -126,6 +234,18 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
     }
 
     /**
+     * https://miplib.zib.de/instance_details_neos5.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s suffice with optimal solution</li>
+     * </ul>
+     */
+    @Test
+    public void testNeos5() {
+        AbstractCaseFileMPS.assertMinMaxVal("neos5.mps", "15", null, true, null);
+    }
+
+    /**
      * <p>
      * <a href="http://miplib.zib.de/miplib2010/neos-911880.php">MIPLIB 2010</a>
      * </p>
@@ -180,6 +300,27 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
     @Test
     public void testP2m2p1m1p0n100() {
         AbstractCaseFileMPS.assertMinMaxVal("p2m2p1m1p0n100.mps", "80424", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_pk1.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal integer solution after 1h50min</li>
+     * <li>2013-12-08: (suffice=4h abort=8h) Stopped with optimal integer solution after 412s</li>
+     * <li>2015-11-07: (suffice=4h abort=8h) Stopped with optimal integer solution after 372s</li>
+     * <li>2017-10-20: (suffice=4h abort=8h) Stopped with optimal integer solution after 796s</li>
+     * <li>2017-10-20: (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
+     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution</li>
+     * <li>2018-02-07: (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s</li>
+     * <li>2018-04-47: (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s</li>
+     * <li>2018-08-16: sufficed: <11.0> but was: <14.0></li>
+     * <li>2019-01-28: 300s expected: <11.0> but was: <11.999999999999979></li>
+     * </ul>
+     */
+    @Test
+    public void testPk1() {
+        AbstractCaseFileMPS.assertMinMaxVal("pk1.mps", "1.10000000e+01", null, true, null);
     }
 
     /**
@@ -367,149 +508,6 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
     @Test
     public void testVpm2() {
         AbstractCaseFileMPS.assertMinMaxVal("vpm2.mps", "9.88926460e+00", null, true, null);
-    }
-
-    //
-
-    /**
-     * https://miplib.zib.de/instance_details_b-ball.html
-     * <ul>
-     * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s suffice with optimal solution</li>
-     * </ul>
-     */
-    @Test
-    public void testB_ball() {
-        AbstractCaseFileMPS.assertMinMaxVal("b-ball.mps", "-1.5", null, true, null);
-    }
-
-    /**
-     * https://miplib.zib.de/instance_details_ej.html
-     * <ul>
-     * Mac Pro (Early 2009)
-     * <li>2019-01-28: 900s terminated without finding any feasible solution</li>
-     * </ul>
-     */
-    @Test
-    public void testEj() {
-        AbstractCaseFileMPS.assertMinMaxVal("ej.mps", "25508", null, true, null);
-    }
-
-    /**
-     * https://miplib.zib.de/instance_details_flugpl.html
-     * <ul>
-     * Mac Pro (Early 2009)
-     * <li>2019-01-28: 1s finsihed with optimal solution</li>
-     * </ul>
-     */
-    @Test
-    public void testFlugpl() {
-        AbstractCaseFileMPS.assertMinMaxVal("flugpl.mps", "1201500", null, true, null);
-    }
-
-    /**
-     * https://miplib.zib.de/instance_details_gen-ip002.html
-     * <ul>
-     * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s expected: <-4783.733392> but was: <-4778.1844607></li>
-     * </ul>
-     */
-    @Test
-    public void testGen_ip002() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip002.mps", "-4783.733392", null, true, null);
-    }
-
-    /**
-     * https://miplib.zib.de/instance_details_gen-ip021.html
-     * <ul>
-     * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s expected: <2361.45419519> but was: <2362.7631500641996></li>
-     * </ul>
-     */
-    @Test
-    public void testGen_ip021() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip021.mps", "2361.45419519", null, true, null);
-    }
-
-    /**
-     * https://miplib.zib.de/instance_details_gen-ip036.html
-     * <ul>
-     * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s expected: <-4606.67961> but was: <-4602.60643892></li>
-     * </ul>
-     */
-    @Test
-    public void testGen_ip036() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip036.mps", "-4606.67961", null, true, null);
-    }
-
-    /**
-     * https://miplib.zib.de/instance_details_gen-ip054.html
-     * <ul>
-     * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s expected: <6840.966> but was: <6852.1883509></li>
-     * </ul>
-     */
-    @Test
-    public void testGen_ip054() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip054.mps", "6840.966", null, true, null);
-    }
-
-    /**
-     * https://miplib.zib.de/instance_details_gr4x6.html
-     * <ul>
-     * Mac Pro (Early 2009)
-     * <li>2019-01-28: 0s finsihed with optimal solution</li>
-     * </ul>
-     */
-    @Test
-    public void testGr4x6() {
-        AbstractCaseFileMPS.assertMinMaxVal("gr4x6.mps", "202.35", null, true, null);
-    }
-
-    /**
-     * https://miplib.zib.de/instance_details_markshare_4_0.html
-     * <ul>
-     * Mac Pro (Early 2009)
-     * <li>2019-01-28: 15s finsihed with optimal solution</li>
-     * </ul>
-     */
-    @Test
-    public void testMarkshare_4_0() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare_4_0.mps", "1", null, true, null);
-    }
-
-    /**
-     * https://miplib.zib.de/instance_details_neos5.html
-     * <ul>
-     * Mac Pro (Early 2009)
-     * <li>2019-01-28: 300s suffice with optimal solution</li>
-     * </ul>
-     */
-    @Test
-    public void testNeos5() {
-        AbstractCaseFileMPS.assertMinMaxVal("neos5.mps", "15", null, true, null);
-    }
-
-    /**
-     * https://miplib.zib.de/instance_details_pk1.html
-     * <ul>
-     * Mac Pro (Early 2009)
-     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal integer solution after 1h50min</li>
-     * <li>2013-12-08: (suffice=4h abort=8h) Stopped with optimal integer solution after 412s</li>
-     * <li>2015-11-07: (suffice=4h abort=8h) Stopped with optimal integer solution after 372s</li>
-     * <li>2017-10-20: (suffice=4h abort=8h) Stopped with optimal integer solution after 796s</li>
-     * <li>2017-10-20: (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
-     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution</li>
-     * <li>2018-02-07: (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s</li>
-     * <li>2018-04-47: (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s</li>
-     * <li>2018-08-16: sufficed: <11.0> but was: <14.0></li>
-     * <li>2019-01-28: 300s expected: <11.0> but was: <11.999999999999979></li>
-     * </ul>
-     */
-    @Test
-    public void testPk1() {
-        AbstractCaseFileMPS.assertMinMaxVal("pk1.mps", "1.10000000e+01", null, true, null);
     }
 
 }
