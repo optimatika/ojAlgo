@@ -1,6 +1,6 @@
 /*
  * Copyright 1997-2018 Optimatika Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software
+ * obtaining a copy of this software and associated documentation files (the "Software", to deal in the Software
  * without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
  * subject to the following conditions: The above copyright notice and this permission notice shall be included in all
@@ -12,8 +12,6 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -24,8 +22,8 @@ import org.junit.jupiter.api.Test;
  *
  * @author apete
  */
-@Disabled()
-public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
+//@Disabled()
+public class MIPLIBTheEasySet extends AbstractCaseFileMPS {
 
     /**
      * https://miplib.zib.de/instance_details_b-ball.html
@@ -36,7 +34,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testB_ball() {
-        AbstractCaseFileMPS.assertMinMaxVal("b-ball.mps", new BigDecimal("-1.5"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("b-ball.mps", "-1.5", null, false, null);
     }
 
     /**
@@ -47,8 +45,9 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      * </ul>
      */
     @Test
+    @Disabled
     public void testEj() {
-        AbstractCaseFileMPS.assertMinMaxVal("ej.mps", new BigDecimal("25508"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("ej.mps", "25508", null, false, null);
     }
 
     /**
@@ -60,7 +59,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testFlugpl() {
-        AbstractCaseFileMPS.assertMinMaxVal("flugpl.mps", new BigDecimal("1201500"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("flugpl.mps", "1201500", null, false, null);
     }
 
     /**
@@ -72,7 +71,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testGen_ip002() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip002.mps", new BigDecimal("-4783.733392"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip002.mps", "-4783.733392", null, false, null);
     }
 
     /**
@@ -84,7 +83,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testGen_ip021() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip021.mps", new BigDecimal("2361.45419519"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip021.mps", "2361.45419519", null, false, null);
     }
 
     /**
@@ -96,7 +95,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testGen_ip036() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip036.mps", new BigDecimal("-4606.67961"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip036.mps", "-4606.67961", null, false, null);
     }
 
     /**
@@ -108,7 +107,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testGen_ip054() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip054.mps", new BigDecimal("6840.966"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip054.mps", "6840.966", null, false, null);
     }
 
     /**
@@ -120,7 +119,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testGr4x6() {
-        AbstractCaseFileMPS.assertMinMaxVal("gr4x6.mps", new BigDecimal("202.35"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("gr4x6.mps", "202.35", null, false, null);
     }
 
     /**
@@ -132,7 +131,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testMarkshare_4_0() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare_4_0.mps", new BigDecimal("1"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("markshare_4_0.mps", "1", null, false, null);
     }
 
     /**
@@ -149,7 +148,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testMarkshare_5_0() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare_5_0.mps", new BigDecimal("1.00000000e+00"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("markshare_5_0.mps", "1.00000000e+00", null, false, null);
     }
 
     /**
@@ -168,7 +167,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testMarkshare1() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare1.mps", new BigDecimal("1.00000000e+00"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("markshare1.mps", "1.00000000e+00", null, false, null);
     }
 
     /**
@@ -180,7 +179,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testNeos5() {
-        AbstractCaseFileMPS.assertMinMaxVal("neos5.mps", new BigDecimal("15"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("neos5.mps", "15", null, false, null);
     }
 
     /**
@@ -201,7 +200,7 @@ public final class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testPk1() {
-        AbstractCaseFileMPS.assertMinMaxVal("pk1.mps", new BigDecimal("1.10000000e+01"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("pk1.mps", "1.10000000e+01", null, false, null);
     }
 
 }

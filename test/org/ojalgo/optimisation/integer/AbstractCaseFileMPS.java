@@ -35,8 +35,11 @@ abstract class AbstractCaseFileMPS extends OptimisationIntegerTests {
     protected static final String PATH = "./test/org/ojalgo/optimisation/integer/";
     protected static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
-    protected static void assertMinMaxVal(final String modelName, final BigDecimal expMinVal, final BigDecimal expMaxVal, final boolean relax,
+    protected static void assertMinMaxVal(final String modelName, final String expMinValString, final String expMaxValString, final boolean relax,
             final Map<String, BigDecimal> solution) {
+
+        BigDecimal expMinVal = expMinValString != null ? new BigDecimal(expMinValString) : null;
+        BigDecimal expMaxVal = expMaxValString != null ? new BigDecimal(expMaxValString) : null;
 
         if (DEBUG) {
             BasicLogger.DEBUG.println();

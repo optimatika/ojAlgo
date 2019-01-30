@@ -12,79 +12,17 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Some test cases from MIPLIB added a long time ago. These tests are typically a bit harder than
+ * {@linkplain MIPLIBTheEasySet}.
+ *
+ * @author apete
+ */
 @Disabled("Far too slow")
 public final class MipCase extends AbstractCaseFileMPS {
-
-    /**
-     * <ul>
-     * <li>2019-01-28: MacPro sufficed 300s - expected: <-4783.733392> but was: <-4763.2729736></li>
-     * </ul>
-     */
-    @Test
-    public void testGen_ip002() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip002.mps", new BigDecimal("-4783.733392"), null, false, null);
-    }
-
-    /**
-     * <ul>
-     * <li>2019-01-28: MacPro sufficed 300s - expected: <6840.966> but was: <6852.406055845></li>
-     * </ul>
-     */
-    @Test
-    public void testGen_ip054() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip054.mps", new BigDecimal("6840.966"), null, false, null);
-    }
-
-    /**
-     * <ul>
-     * <li>2019-01-28: MacPro found optimal solution in 19s</li>
-     * </ul>
-     */
-    @Test
-    public void testMarkshare_4_0() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare_4_0.mps", new BigDecimal("1"), null, false, null);
-    }
-
-    /**
-     * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal solution after 4h</li>
-     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 2.0 rather than 1.0 after
-     * 5min</li>
-     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
-     * <li>2018-08-16: MacPro sufficed with optimal solution</li>
-     * <li>2019-01-28: MacPro sufficed 300s - <1.0> but was: <4.999999999999991></li>
-     * </ul>
-     *
-     * @see RelaxedLpCase#testMarkshare_5_0()
-     */
-    @Test
-    public void testMarkshare_5_0() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare_5_0.mps", new BigDecimal("1.00000000e+00"), null, false, null);
-    }
-
-    /**
-     * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with integer solution 6.0 rather than 1.0 after 4h
-     * expected:<1.0> but was:<5.999999999999929></li>
-     * <li>2018-01-08: MacPro (suffice=5min abort=1h) Stopped with integer solution 5.0 rather than 1.0 after
-     * 5min</li>
-     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
-     * was:<5.0></li>
-     * <li>2018-08-16: MacPro sufficed: <1.0> but was: <8.0></li>
-     * <li>2019-01-28: MacPro sufficed 300s - expected: <1.0> but was: <8.000000000000066></li>
-     * </ul>
-     *
-     * @see RelaxedLpCase#testMarkshare1()
-     */
-    @Test
-    public void testMarkshare1() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare1.mps", new BigDecimal("1.00000000e+00"), null, false, null);
-    }
 
     /**
      * <ul>
@@ -98,11 +36,11 @@ public final class MipCase extends AbstractCaseFileMPS {
      * <li>2019-01-28: MacPro sufficed 300s - expected: <1.0> but was: <16.00000000000005></li>
      * </ul>
      *
-     * @see RelaxedLpCase#testMarkshare2()
+     * @see RelaxedMIPCase#testMarkshare2()
      */
     @Test
     public void testMarkshare2() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare2.mps", new BigDecimal("1.00000000e+00"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("markshare2.mps", "1", null, false, null);
     }
 
     /**
@@ -120,11 +58,11 @@ public final class MipCase extends AbstractCaseFileMPS {
      * <li>2019-01-28: MacPro sufficed with optimal solution after 300s</li>
      * </ul>
      *
-     * @see RelaxedLpCase#testMas76()
+     * @see RelaxedMIPCase#testMas76()
      */
     @Test
     public void testMas76() {
-        AbstractCaseFileMPS.assertMinMaxVal("mas76.mps", new BigDecimal("4.00050541e+04"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("mas76.mps", "4.00050541e+04", null, false, null);
     }
 
     /**
@@ -139,21 +77,11 @@ public final class MipCase extends AbstractCaseFileMPS {
      * <li>2019-01-28: MacPro sufficed 300s - expected: <2.07405081E7> but was: <2.4548449266857613E7></li>
      * </ul>
      *
-     * @see RelaxedLpCase#testModglob()
+     * @see RelaxedMIPCase#testModglob()
      */
     @Test
     public void testModglob() {
-        AbstractCaseFileMPS.assertMinMaxVal("modglob.mps", new BigDecimal("2.07405081e+07"), null, false, null);
-    }
-
-    /**
-     * <ul>
-     * <li>2019-01-28: MacPro sufficed with optimal solution after 300s</li>
-     * </ul>
-     */
-    @Test
-    public void testNeos5() {
-        AbstractCaseFileMPS.assertMinMaxVal("neos5.mps", new BigDecimal("15"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("modglob.mps", "2.07405081e+07", null, false, null);
     }
 
     /**
@@ -165,11 +93,11 @@ public final class MipCase extends AbstractCaseFileMPS {
      * <li>2019-01-28: MacPro aborted with no integer solution 900s</li>
      * </ul>
      *
-     * @see RelaxedLpCase#testNeos911880()
+     * @see RelaxedMIPCase#testNeos911880()
      */
     @Test
     public void testNeos911880() {
-        AbstractCaseFileMPS.assertMinMaxVal("neos-911880.mps", new BigDecimal("54.76"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("neos-911880.mps", "54.76", null, false, null);
     }
 
     /**
@@ -182,46 +110,12 @@ public final class MipCase extends AbstractCaseFileMPS {
      * <li>2019-01-28: MacPro sufficed 300s - expected: <-41.0> but was: <-40.0></li>
      * </ul>
      *
-     * @see RelaxedLpCase#testNoswot()
+     * @see RelaxedMIPCase#testNoswot()
      */
     @Test
     @Disabled("https://github.com/optimatika/ojAlgo/issues/120")
     public void testNoswot() {
-        AbstractCaseFileMPS.assertMinMaxVal("noswot.mps", new BigDecimal("-4.10000000e+01"), null, false, null);
-    }
-
-    /**
-     * <ul>
-     * <li>Doesn't work</li>
-     * </ul>
-     *
-     * @see RelaxedLpCase#testP2m2p1m1p0n100()
-     */
-    @Test
-    @Disabled("Need to fix handle infeasible case")
-    public void testP2m2p1m1p0n100() {
-        AbstractCaseFileMPS.assertMinMaxVal("p2m2p1m1p0n100.mps", new BigDecimal("Infeasible"), null, true, null);
-    }
-
-    /**
-     * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 1h50min</li>
-     * <li>2013-12-08: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 412s</li>
-     * <li>2015-11-07: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 372s</li>
-     * <li>2017-10-20: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 796s</li>
-     * <li>2017-10-20: MacPro (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
-     * <li>2018-02-07: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution</li>
-     * <li>2018-02-07: MacPro (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s</li>
-     * <li>2018-04-47: MacPro (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s</li>
-     * <li>2018-08-16: MacPro sufficed: <11.0> but was: <14.0></li>
-     * <li>2019-01-28: MacPro sufficed 300s: expected: <11.0> but was: <14.000000000000073></li>
-     * </ul>
-     *
-     * @see RelaxedLpCase#testPk1()
-     */
-    @Test
-    public void testPk1() {
-        AbstractCaseFileMPS.assertMinMaxVal("pk1.mps", new BigDecimal("1.10000000e+01"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("noswot.mps", "-4.10000000e+01", null, false, null);
     }
 
     /**
@@ -234,11 +128,11 @@ public final class MipCase extends AbstractCaseFileMPS {
      * <li>2019-01-28: MacPro sufficed 300s: expected: <7350.0> but was: <7490.0></li>
      * </ul>
      *
-     * @see RelaxedLpCase#testPp08a()
+     * @see RelaxedMIPCase#testPp08a()
      */
     @Test
     public void testPp08a() {
-        AbstractCaseFileMPS.assertMinMaxVal("pp08a.mps", new BigDecimal("7.35000000e+03"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("pp08a.mps", "7.35000000e+03", null, false, null);
     }
 
     /**
@@ -250,11 +144,11 @@ public final class MipCase extends AbstractCaseFileMPS {
      * <li>2019-01-28: MacPro sufficed 300s: expected: <7350.0> but was: <7550.000000000001></li>
      * </ul>
      *
-     * @see RelaxedLpCase#testPp08aCUTS()
+     * @see RelaxedMIPCase#testPp08aCUTS()
      */
     @Test
     public void testPp08aCUTS() {
-        AbstractCaseFileMPS.assertMinMaxVal("pp08aCUTS.mps", new BigDecimal("7.35000000e+03"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("pp08aCUTS.mps", "7.35000000e+03", null, false, null);
     }
 
     /**
@@ -266,11 +160,11 @@ public final class MipCase extends AbstractCaseFileMPS {
      * <li>2019-01-28: MacPro sufficed 300s: expected: <764772.0> but was: <1256281.99999962></li>
      * </ul>
      *
-     * @see RelaxedLpCase#testTimtab1()
+     * @see RelaxedMIPCase#testTimtab1()
      */
     @Test
     public void testTimtab1() {
-        AbstractCaseFileMPS.assertMinMaxVal("timtab1.mps", new BigDecimal("7.64772000e+05"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("timtab1.mps", "7.64772000e+05", null, false, null);
     }
 
     /**
@@ -284,11 +178,11 @@ public final class MipCase extends AbstractCaseFileMPS {
      * <li>2019-01-28: MacPro sufficed 300s: <13.75> but was: <16.5></li>
      * </ul>
      *
-     * @see RelaxedLpCase#testVpm2()
+     * @see RelaxedMIPCase#testVpm2()
      */
     @Test
     public void testVpm2() {
-        AbstractCaseFileMPS.assertMinMaxVal("vpm2.mps", new BigDecimal("1.37500000e+01"), null, false, null);
+        AbstractCaseFileMPS.assertMinMaxVal("vpm2.mps", "1.37500000e+01", null, false, null);
     }
 
 }
