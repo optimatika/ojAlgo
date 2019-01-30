@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author apete
  */
-//@Disabled()
+@Disabled()
 public class MIPLIBTheEasySet extends AbstractCaseFileMPS {
 
     /**

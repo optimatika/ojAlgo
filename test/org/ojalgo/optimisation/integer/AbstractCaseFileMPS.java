@@ -32,6 +32,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 abstract class AbstractCaseFileMPS extends OptimisationIntegerTests {
 
+    private static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
+
     protected static final String PATH = "./test/org/ojalgo/optimisation/integer/";
     protected static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
@@ -58,7 +60,12 @@ abstract class AbstractCaseFileMPS extends OptimisationIntegerTests {
         }
 
         if (relax) {
+
             model.relax(true);
+
+            for (Variable tmpVar : model.getVariables()) {
+                tmpVar.relax();
+            }
         }
 
         if (solution != null) {
@@ -86,28 +93,26 @@ abstract class AbstractCaseFileMPS extends OptimisationIntegerTests {
 
         if (expMinVal != null) {
 
-            final double tmpMinimum = model.minimise().getValue();
+            final double minimum = model.minimise().getValue();
 
-            if (!model.validate(new NumberContext(7, 6))) {
+            if (!model.validate(PRECISION)) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
 
-            final double tmpExpected = expMinVal.doubleValue();
-            final double tmpError = expMinVal.ulp().doubleValue();
-            TestUtils.assertEquals(tmpExpected, tmpMinimum, tmpError);
+            final double expected = expMinVal.doubleValue();
+            TestUtils.assertEquals(expected, minimum, PRECISION);
         }
 
         if (expMaxVal != null) {
 
-            final double tmpMaximum = model.maximise().getValue();
+            final double maximum = model.maximise().getValue();
 
-            if (!model.validate(new NumberContext(7, 6))) {
+            if (!model.validate(PRECISION)) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
 
-            final double tmpExpected = expMaxVal.doubleValue();
-            final double tmpError = expMaxVal.ulp().doubleValue();
-            TestUtils.assertEquals(tmpExpected, tmpMaximum, tmpError);
+            final double expected = expMaxVal.doubleValue();
+            TestUtils.assertEquals(expected, maximum, PRECISION);
         }
     }
 
