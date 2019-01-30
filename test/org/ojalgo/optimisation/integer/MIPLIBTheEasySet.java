@@ -12,6 +12,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,6 +33,7 @@ public class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      * </ul>
      */
     @Test
+    @Tag("slow")
     public void testB_ball() {
         AbstractCaseFileMPS.assertMinMaxVal("b-ball.mps", "-1.5", null, false, null);
     }
@@ -80,6 +82,7 @@ public class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      * </ul>
      */
     @Test
+    @Tag("slow")
     public void testNeos5() {
         AbstractCaseFileMPS.assertMinMaxVal("neos5.mps", "15", null, false, null);
     }
@@ -101,6 +104,7 @@ public class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      * </ul>
      */
     @Test
+    @Tag("slow")
     public void testPk1() {
         AbstractCaseFileMPS.assertMinMaxVal("pk1.mps", "1.10000000e+01", null, false, null);
     }
