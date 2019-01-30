@@ -21,8 +21,104 @@ import org.junit.jupiter.api.Test;
  *
  * @author apete
  */
-@Disabled("Far too slow")
+@Disabled("Too slow")
 public final class MipCase extends AbstractCaseFileMPS {
+
+    /**
+     * https://miplib.zib.de/instance_details_ej.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 900s terminated without finding any feasible solution</li>
+     * </ul>
+     */
+    @Test
+    public void testEj() {
+        AbstractCaseFileMPS.assertMinMaxVal("ej.mps", "25508", null, false, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip002.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <-4783.733392> but was: <-4778.1844607></li>
+     * </ul>
+     */
+    @Test
+    public void testGen_ip002() {
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip002.mps", "-4783.733392", null, false, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip021.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <2361.45419519> but was: <2362.7631500641996></li>
+     * </ul>
+     */
+    @Test
+    public void testGen_ip021() {
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip021.mps", "2361.45419519", null, false, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip036.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <-4606.67961> but was: <-4602.60643892></li>
+     * </ul>
+     */
+    @Test
+    public void testGen_ip036() {
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip036.mps", "-4606.67961", null, false, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip054.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <6840.966> but was: <6852.1883509></li>
+     * </ul>
+     */
+    @Test
+    public void testGen_ip054() {
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip054.mps", "6840.966", null, false, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_markshare_5_0.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal solution after 4h</li>
+     * <li>2018-01-08: (suffice=5min abort=1h) Stopped with integer solution 2.0 rather than 1.0 after
+     * 5min</li>
+     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with optimal solution</li>
+     * <li>2018-08-16: sufficed with optimal solution</li>
+     * <li>2019-01-28: 300s expected: <1.0> but was: <1.9999999999999953></li>
+     * </ul>
+     */
+    @Test
+    public void testMarkshare_5_0() {
+        AbstractCaseFileMPS.assertMinMaxVal("markshare_5_0.mps", "1.00000000e+00", null, false, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_markshare1.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with integer solution 6.0 rather than 1.0 after 4h
+     * expected:<1.0> but was:<5.999999999999929></li>
+     * <li>2018-01-08: (suffice=5min abort=1h) Stopped with integer solution 5.0 rather than 1.0 after
+     * 5min</li>
+     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Sufficed with expected:<1.0> but
+     * was:<5.0></li>
+     * <li>2018-08-16: sufficed: <1.0> but was: <8.0></li>
+     * <li>2019-01-28: 300s expected: <1.0> but was: <6.000000000000018></li>
+     * </ul>
+     */
+    @Test
+    public void testMarkshare1() {
+        AbstractCaseFileMPS.assertMinMaxVal("markshare1.mps", "1.00000000e+00", null, false, null);
+    }
 
     /**
      * <ul>
