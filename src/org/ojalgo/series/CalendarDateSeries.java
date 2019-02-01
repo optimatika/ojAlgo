@@ -84,6 +84,10 @@ public final class CalendarDateSeries<N extends Number> extends TreeSeries<Calen
         myMapper = mapper;
     }
 
+    public long count() {
+        return this.size();
+    }
+
     public double doubleValue(final long index) {
         return this.doubleValue(myMapper.toKey(index));
     }

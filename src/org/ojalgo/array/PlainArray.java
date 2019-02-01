@@ -240,8 +240,6 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
 
     protected abstract void set(final int index, final Number number);
 
-    protected abstract int size();
-
     protected abstract void sortAscending();
 
     protected abstract void sortDescending();
