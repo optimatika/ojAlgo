@@ -671,7 +671,7 @@ public final class Expression extends ModelEntity<Expression> {
         return myQuadratic.size();
     }
 
-    boolean doIntegerRounding() {
+    void doIntegerRounding() {
 
         BigInteger gcd = null;
         int maxScale = Integer.MIN_VALUE;
@@ -684,7 +684,7 @@ public final class Expression extends ModelEntity<Expression> {
                 gcd = abs.unscaledValue();
             }
             if (gcd.equals(BigInteger.ONE)) {
-                return false; // gcd == 1, no point
+                return; // gcd == 1, no point
             }
         }
 
@@ -704,8 +704,6 @@ public final class Expression extends ModelEntity<Expression> {
         if (upper != null) {
             this.upper(upper.divide(divisor, 0, RoundingMode.FLOOR));
         }
-
-        return true;
     }
 
     Set<Variable> getBinaryVariables(final Set<IntIndex> fixedVariables) {

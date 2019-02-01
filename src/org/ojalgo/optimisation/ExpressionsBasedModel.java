@@ -1317,7 +1317,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             if (tmpExpression.isConstraint()) {
                 Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
                 if (tmpExpression.isLinearAndAllInteger()) {
-                    tmpExpression.doIntegerRounding();
+                    Presolvers.INTEGER_ROUNDING.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
                 }
             }
         }
