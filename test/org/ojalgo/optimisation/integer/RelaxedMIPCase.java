@@ -2,7 +2,7 @@
  * Copyright 1997-2018 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
+ * of this software and associated documentation files (the "Software", to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -24,14 +24,122 @@ package org.ojalgo.optimisation.integer;
 import java.math.BigDecimal;
 import java.util.HashMap;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public final class RelaxedLpCase extends MipLibCase {
+public class RelaxedMIPCase extends AbstractCaseFileMPS {
+
+    /**
+     * https://miplib.zib.de/instance_details_b-ball.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s suffice with optimal solution</li>
+     * </ul>
+     */
+    @Test
+    public void testB_ball() {
+        AbstractCaseFileMPS.assertMinMaxVal("b-ball.mps", "-1.818181818181818", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_ej.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 900s terminated without finding any feasible solution</li>
+     * </ul>
+     */
+    @Test
+    public void testEj() {
+        AbstractCaseFileMPS.assertMinMaxVal("ej.mps", "1", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_flugpl.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 1s finsihed with optimal solution</li>
+     * </ul>
+     */
+    @Test
+    public void testFlugpl() {
+        AbstractCaseFileMPS.assertMinMaxVal("flugpl.mps", "1167185.7255923203", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip002.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <-4783.733392> but was: <-4778.1844607></li>
+     * </ul>
+     */
+    @Test
+    public void testGen_ip002() {
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip002.mps", "-4840.541961300889", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip021.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <2361.45419519> but was: <2362.7631500641996></li>
+     * </ul>
+     */
+    @Test
+    public void testGen_ip021() {
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip021.mps", "2327.84258448875", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip036.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <-4606.67961> but was: <-4602.60643892></li>
+     * </ul>
+     */
+    @Test
+    public void testGen_ip036() {
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip036.mps", "-4632.29815287346", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gen-ip054.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s expected: <6840.966> but was: <6852.1883509></li>
+     * </ul>
+     */
+    @Test
+    public void testGen_ip054() {
+        AbstractCaseFileMPS.assertMinMaxVal("gen-ip054.mps", "6765.2090427", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_gr4x6.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 0s finsihed with optimal solution</li>
+     * </ul>
+     */
+    @Test
+    public void testGr4x6() {
+        AbstractCaseFileMPS.assertMinMaxVal("gr4x6.mps", "185.55", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_markshare_4_0.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 15s finsihed with optimal solution</li>
+     * </ul>
+     */
+    @Test
+    public void testMarkshare_4_0() {
+        AbstractCaseFileMPS.assertMinMaxVal("markshare_4_0.mps", "0", null, true, null);
+    }
 
     /**
      * <p>
      * <a href="http://miplib.zib.de/miplib2010/markshare_5_0.php">MIPLIB 2010</a>
+     * https://miplib.zib.de/instance_details_markshare_5_0.html
      * </p>
      * <p>
      * N/A in MIPLIB 2003
@@ -45,10 +153,11 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testMarkshare_5_0() {
-        MipLibCase.assertMinMaxVal("markshare_5_0.mps", new BigDecimal("0.00000000e+00"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("markshare_5_0.mps", "0.00000000e+00", null, true, null);
     }
 
     /**
+     * https://miplib.zib.de/instance_details_markshare1.html
      * <p>
      * N/A in MIPLIB 2010
      * </p>
@@ -64,7 +173,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testMarkshare1() {
-        MipLibCase.assertMinMaxVal("markshare1.mps", new BigDecimal("0.00000000e+00"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("markshare1.mps", "0", null, true, null);
     }
 
     /**
@@ -83,7 +192,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testMarkshare2() {
-        MipLibCase.assertMinMaxVal("markshare2.mps", new BigDecimal("0.00000000e+00"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("markshare2.mps", "0", null, true, null);
     }
 
     /**
@@ -102,7 +211,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testMas76() {
-        MipLibCase.assertMinMaxVal("mas76.mps", new BigDecimal("3.88939036e+04"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("mas76.mps", "3.88939036e+04", null, true, null);
     }
 
     /**
@@ -121,7 +230,19 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testModglob() {
-        MipLibCase.assertMinMaxVal("modglob.mps", new BigDecimal("2.04309476e+07"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("modglob.mps", "2.04309476e+07", null, true, null);
+    }
+
+    /**
+     * https://miplib.zib.de/instance_details_neos5.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2019-01-28: 300s suffice with optimal solution</li>
+     * </ul>
+     */
+    @Test
+    public void testNeos5() {
+        AbstractCaseFileMPS.assertMinMaxVal("neos5.mps", "13", null, true, null);
     }
 
     /**
@@ -140,7 +261,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testNeos911880() {
-        MipLibCase.assertMinMaxVal("neos-911880.mps", new BigDecimal("23.26"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("neos-911880.mps", "23.26", null, true, null);
     }
 
     /**
@@ -159,8 +280,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testNoswot() {
-        MipLibCase.assertMinMaxVal("noswot.mps", new BigDecimal("-43.0"), null, true, null);
-
+        AbstractCaseFileMPS.assertMinMaxVal("noswot.mps", "-43", null, true, null);
     }
 
     /**
@@ -179,7 +299,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testP2m2p1m1p0n100() {
-        MipLibCase.assertMinMaxVal("p2m2p1m1p0n100.mps", new BigDecimal("80424"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("p2m2p1m1p0n100.mps", "80424", null, true, null);
     }
 
     /**
@@ -195,9 +315,22 @@ public final class RelaxedLpCase extends MipLibCase {
      * <p>
      * MIP: 1.10000000e+01
      * </p>
+     * https://miplib.zib.de/instance_details_pk1.html
+     * <ul>
+     * Mac Pro (Early 2009)
+     * <li>2013-04-01: (suffice=4h abort=8h) Stopped with optimal integer solution after 1h50min</li>
+     * <li>2013-12-08: (suffice=4h abort=8h) Stopped with optimal integer solution after 412s</li>
+     * <li>2015-11-07: (suffice=4h abort=8h) Stopped with optimal integer solution after 372s</li>
+     * <li>2017-10-20: (suffice=4h abort=8h) Stopped with optimal integer solution after 796s</li>
+     * <li>2017-10-20: (suffice=5min abort=1h) Stopped with optimal integer solution after 5min</li>
+     * <li>2018-02-07: (suffice=5min, abort=15min, mip_gap=0.001) Suffice with optimal solution</li>
+     * <li>2018-02-07: (suffice=15min, abort=15min, mip_gap=0.001) Found optimal solution in 344s</li>
+     * <li>2018-04-47: (suffice=5min, abort=15min, mip_gap=0.001) Found optimal solution in 227s</li>
+     * <li>2018-08-16: sufficed: <11.0> but was: <14.0></li>
+     * <li>2019-01-28: 300s expected: <11.0> but was: <11.999999999999979></li>
+     * </ul>
      */
     @Test
-    @Disabled("Underscored before JUnit 5")
     public void testPk1() {
 
         // Solution obtained from lp_solve_5.5.2.0 with relaxed integer constraints
@@ -291,7 +424,7 @@ public final class RelaxedLpCase extends MipLibCase {
         tmpSolution.put("x85", BigDecimal.valueOf(0));
         tmpSolution.put("x86", BigDecimal.valueOf(0));
 
-        MipLibCase.assertMinMaxVal("pk1.mps", new BigDecimal("1.47389881e-09"), null, true, tmpSolution);
+        AbstractCaseFileMPS.assertMinMaxVal("pk1.mps", "0", null, true, tmpSolution);
     }
 
     /**
@@ -310,7 +443,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testPp08a() {
-        MipLibCase.assertMinMaxVal("pp08a.mps", new BigDecimal("2.74834524e+03"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("pp08a.mps", "2.74834524e+03", null, true, null);
     }
 
     /**
@@ -329,7 +462,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testPp08aCUTS() {
-        MipLibCase.assertMinMaxVal("pp08aCUTS.mps", new BigDecimal("5.48060616e+03"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("pp08aCUTS.mps", "5.48060616e+03", null, true, null);
     }
 
     /**
@@ -348,7 +481,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testTimtab1() {
-        MipLibCase.assertMinMaxVal("timtab1.mps", new BigDecimal("2.86940000e+04"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("timtab1.mps", "2.86940000e+04", null, true, null);
     }
 
     /**
@@ -367,7 +500,7 @@ public final class RelaxedLpCase extends MipLibCase {
      */
     @Test
     public void testVpm2() {
-        MipLibCase.assertMinMaxVal("vpm2.mps", new BigDecimal("9.88926460e+00"), null, true, null);
+        AbstractCaseFileMPS.assertMinMaxVal("vpm2.mps", "9.88926460e+00", null, true, null);
     }
 
 }

@@ -191,6 +191,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         private final ExpressionsBasedModel myModel;
         private transient Optimisation.Solver mySolver = null;
 
+        @Override
+        public String toString() {
+            return myModel.toString();
+        }
+
         Intermediate(final ExpressionsBasedModel model) {
             super();
             myModel = model;
@@ -463,12 +468,14 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private final List<Variable> myPositiveVariables = new ArrayList<>();
     private final ArrayList<Variable> myVariables = new ArrayList<>();
     private final boolean myWorkCopy;
+    private boolean myRelaxed;
 
     public ExpressionsBasedModel() {
 
         super();
 
         myWorkCopy = false;
+        myRelaxed = false;
     }
 
     public ExpressionsBasedModel(final Collection<? extends Variable> variables) {
@@ -480,6 +487,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         myWorkCopy = false;
+        myRelaxed = false;
     }
 
     public ExpressionsBasedModel(final Optimisation.Options someOptions) {
@@ -487,6 +495,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         super(someOptions);
 
         myWorkCopy = false;
+        myRelaxed = false;
     }
 
     public ExpressionsBasedModel(final Variable... variables) {
@@ -498,6 +507,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         myWorkCopy = false;
+        myRelaxed = false;
     }
 
     ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean workCopy, final boolean allEntities) {
@@ -519,6 +529,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         myWorkCopy = workCopy;
+        myRelaxed = workCopy;
     }
 
     public Expression addExpression() {
@@ -970,6 +981,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public boolean isAnyVariableInteger() {
 
+        if (myRelaxed) {
+            return false;
+        }
+
         boolean retVal = false;
 
         final int tmpLength = myVariables.size();
@@ -1120,8 +1135,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         final ExpressionsBasedModel retVal = inPlace ? this : new ExpressionsBasedModel(this, true, true);
 
-        for (final Variable tmpVariable : retVal.getVariables()) {
-            tmpVariable.relax();
+        if (inPlace) {
+            myRelaxed = true;
         }
 
         return retVal;
@@ -1203,7 +1218,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         for (int i = 0; retVal && (i < size); i++) {
             final Variable tmpVariable = myVariables.get(i);
             final BigDecimal value = solution.get(i);
-            retVal &= tmpVariable.validate(value, context, appender);
+            retVal &= tmpVariable.validate(value, context, appender, myRelaxed);
         }
 
         if (retVal) {
@@ -1301,6 +1316,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
             if (tmpExpression.isConstraint()) {
                 Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
+                if (tmpExpression.isLinearAndAllInteger()) {
+                    Presolvers.INTEGER_ROUNDING.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
+                }
             }
         }
 
@@ -1369,7 +1387,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     Optimisation.Result optimise() {
 
-        if (PRESOLVERS.size() > 0) {
+        if (!myWorkCopy && (PRESOLVERS.size() > 0)) {
             this.scanEntities();
         }
 

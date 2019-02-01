@@ -258,21 +258,7 @@ public final class Variable extends ModelEntity<Variable> {
 
     @Override
     protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender) {
-
-        boolean retVal = super.validate(value, context, appender);
-
-        if (retVal && myInteger) {
-            try {
-                context.enforce(value).longValueExact();
-            } catch (final ArithmeticException ex) {
-                if (appender != null) {
-                    appender.println(value + " ! Integer: " + this.getName());
-                }
-                retVal = false;
-            }
-        }
-
-        return retVal;
+        return this.validate(value, context, appender, false);
     }
 
     IntIndex getIndex() {
@@ -302,6 +288,24 @@ public final class Variable extends ModelEntity<Variable> {
 
     void setUnbounded(final boolean uncorrelated) {
         myUnbounded = uncorrelated;
+    }
+
+    boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender, boolean relaxed) {
+
+        boolean retVal = super.validate(value, context, appender);
+
+        if (retVal && !relaxed && myInteger) {
+            try {
+                context.enforce(value).longValueExact();
+            } catch (final ArithmeticException ex) {
+                if (appender != null) {
+                    appender.println(value + " ! Integer: " + this.getName());
+                }
+                retVal = false;
+            }
+        }
+
+        return retVal;
     }
 
 }

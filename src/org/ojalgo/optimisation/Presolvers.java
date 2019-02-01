@@ -151,6 +151,17 @@ public abstract class Presolvers {
 
     };
 
+    public static final ExpressionsBasedModel.Presolver INTEGER_ROUNDING = new ExpressionsBasedModel.Presolver(20) {
+
+        @Override
+        public boolean simplify(Expression expression, Set<IntIndex> fixedVariables, BigDecimal fixedValue, Function<IntIndex, Variable> variableResolver,
+                NumberContext precision) {
+            expression.doIntegerRounding();
+            return false;
+        }
+
+    };
+
     /**
      * If the expression is linear and contributes to the objective function, then the contributions are
      * transferred to the variables and the weight of the expression set to null.
