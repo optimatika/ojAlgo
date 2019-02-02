@@ -86,7 +86,7 @@ abstract class AbstractCaseFileMPS extends OptimisationIntegerTests {
         model.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
 
         // model.options.debug(IntegerSolver.class);
-        model.options.progress(IntegerSolver.class);
+        // model.options.progress(IntegerSolver.class);
         // model.options.validate = false;
 
         TestUtils.assertTrue(model.validate());
