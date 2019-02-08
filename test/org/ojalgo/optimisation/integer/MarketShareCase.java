@@ -27,6 +27,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.MathProgSysModel;
+import org.ojalgo.optimisation.ModelFileMPS;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
@@ -99,7 +100,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
     private static ExpressionsBasedModel makeModel() {
 
-        final File tmpFile = new File(AbstractCaseFileMPS.PATH + "markshare_5_0.mps");
+        final File tmpFile = new File(ModelFileMPS.PATH + "markshare_5_0.mps");
 
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
 

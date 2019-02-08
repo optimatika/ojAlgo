@@ -14,6 +14,7 @@ package org.ojalgo.optimisation.integer;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.ojalgo.optimisation.ModelFileMPS;
 
 /**
  * Problems/models from "The Easy Set" - instances that could be solved within less than 1h (by top tier
@@ -23,7 +24,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author apete
  */
-public class MIPLIBTheEasySet extends AbstractCaseFileMPS {
+public class MIPLIBTheEasySet extends OptimisationIntegerTests {
 
     /**
      * https://miplib.zib.de/instance_details_b-ball.html
@@ -35,7 +36,7 @@ public class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     @Test
     @Tag("slow")
     public void testB_ball() {
-        AbstractCaseFileMPS.assertMinMaxVal("b-ball.mps", "-1.5", null, false, null);
+        ModelFileMPS.assertMinMaxVal("b-ball.mps", "-1.5", null, false, null);
     }
 
     /**
@@ -47,7 +48,7 @@ public class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testFlugpl() {
-        AbstractCaseFileMPS.assertMinMaxVal("flugpl.mps", "1201500", null, false, null);
+        ModelFileMPS.assertMinMaxVal("flugpl.mps", "1201500", null, false, null);
     }
 
     /**
@@ -59,7 +60,7 @@ public class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testGr4x6() {
-        AbstractCaseFileMPS.assertMinMaxVal("gr4x6.mps", "202.35", null, false, null);
+        ModelFileMPS.assertMinMaxVal("gr4x6.mps", "202.35", null, false, null);
     }
 
     /**
@@ -71,7 +72,7 @@ public class MIPLIBTheEasySet extends AbstractCaseFileMPS {
      */
     @Test
     public void testMarkshare_4_0() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare_4_0.mps", "1", null, false, null);
+        ModelFileMPS.assertMinMaxVal("markshare_4_0.mps", "1", null, false, null);
     }
 
     /**
@@ -84,7 +85,7 @@ public class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     @Test
     @Tag("slow")
     public void testNeos5() {
-        AbstractCaseFileMPS.assertMinMaxVal("neos5.mps", "15", null, false, null);
+        ModelFileMPS.assertMinMaxVal("neos5.mps", "15", null, false, null);
     }
 
     /**
@@ -106,7 +107,7 @@ public class MIPLIBTheEasySet extends AbstractCaseFileMPS {
     @Test
     @Tag("slow")
     public void testPk1() {
-        AbstractCaseFileMPS.assertMinMaxVal("pk1.mps", "1.10000000e+01", null, false, null);
+        ModelFileMPS.assertMinMaxVal("pk1.mps", "1.10000000e+01", null, false, null);
     }
 
 }

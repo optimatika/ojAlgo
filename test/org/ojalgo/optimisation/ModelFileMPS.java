@@ -10,7 +10,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ojalgo.optimisation.integer;
+package org.ojalgo.optimisation;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.MathProgSysModel;
 import org.ojalgo.optimisation.Variable;
@@ -30,34 +29,34 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-abstract class AbstractCaseFileMPS extends OptimisationIntegerTests {
+public interface ModelFileMPS {
 
-    private static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
+    static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
 
-    protected static final String PATH = "./test/org/ojalgo/optimisation/integer/";
-    protected static final String SOLUTION_NOT_VALID = "Solution not valid!";
+    static final String PATH = "./test/org/ojalgo/optimisation/integer/";
+    static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
-    protected static void assertMinMaxVal(final String modelName, final String expMinValString, final String expMaxValString, final boolean relax,
+    static void assertMinMaxVal(final String modelName, final String expMinValString, final String expMaxValString, final boolean relax,
             final Map<String, BigDecimal> solution) {
 
         BigDecimal expMinVal = expMinValString != null ? new BigDecimal(expMinValString) : null;
         BigDecimal expMaxVal = expMaxValString != null ? new BigDecimal(expMaxValString) : null;
 
-        if (DEBUG) {
-            BasicLogger.DEBUG.println();
-            BasicLogger.DEBUG.println();
-            BasicLogger.DEBUG.println(modelName);
-            BasicLogger.DEBUG.println();
-        }
+        //        if (DEBUG) {
+        //            BasicLogger.DEBUG.println();
+        //            BasicLogger.DEBUG.println();
+        //            BasicLogger.DEBUG.println(modelName);
+        //            BasicLogger.DEBUG.println();
+        //        }
 
         final File file = new File(PATH + modelName);
         final ExpressionsBasedModel model = MathProgSysModel.make(file).getExpressionsBasedModel();
 
-        if (DEBUG) {
-            BasicLogger.DEBUG.println();
-            BasicLogger.DEBUG.println(model);
-            BasicLogger.DEBUG.println();
-        }
+        //        if (DEBUG) {
+        //            BasicLogger.DEBUG.println();
+        //            BasicLogger.DEBUG.println(model);
+        //            BasicLogger.DEBUG.println();
+        //        }
 
         if (relax) {
 

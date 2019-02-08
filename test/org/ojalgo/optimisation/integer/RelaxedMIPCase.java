@@ -25,8 +25,9 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
+import org.ojalgo.optimisation.ModelFileMPS;
 
-public class RelaxedMIPCase extends AbstractCaseFileMPS {
+public class RelaxedMIPCase extends OptimisationIntegerTests {
 
     /**
      * https://miplib.zib.de/instance_details_b-ball.html
@@ -37,7 +38,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testB_ball() {
-        AbstractCaseFileMPS.assertMinMaxVal("b-ball.mps", "-1.818181818181818", null, true, null);
+        ModelFileMPS.assertMinMaxVal("b-ball.mps", "-1.818181818181818", null, true, null);
     }
 
     /**
@@ -49,7 +50,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testEj() {
-        AbstractCaseFileMPS.assertMinMaxVal("ej.mps", "1", null, true, null);
+        ModelFileMPS.assertMinMaxVal("ej.mps", "1", null, true, null);
     }
 
     /**
@@ -61,7 +62,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testFlugpl() {
-        AbstractCaseFileMPS.assertMinMaxVal("flugpl.mps", "1167185.7255923203", null, true, null);
+        ModelFileMPS.assertMinMaxVal("flugpl.mps", "1167185.7255923203", null, true, null);
     }
 
     /**
@@ -73,7 +74,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testGen_ip002() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip002.mps", "-4840.541961300889", null, true, null);
+        ModelFileMPS.assertMinMaxVal("gen-ip002.mps", "-4840.541961300889", null, true, null);
     }
 
     /**
@@ -85,7 +86,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testGen_ip021() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip021.mps", "2327.84258448875", null, true, null);
+        ModelFileMPS.assertMinMaxVal("gen-ip021.mps", "2327.84258448875", null, true, null);
     }
 
     /**
@@ -97,7 +98,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testGen_ip036() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip036.mps", "-4632.29815287346", null, true, null);
+        ModelFileMPS.assertMinMaxVal("gen-ip036.mps", "-4632.29815287346", null, true, null);
     }
 
     /**
@@ -109,7 +110,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testGen_ip054() {
-        AbstractCaseFileMPS.assertMinMaxVal("gen-ip054.mps", "6765.2090427", null, true, null);
+        ModelFileMPS.assertMinMaxVal("gen-ip054.mps", "6765.2090427", null, true, null);
     }
 
     /**
@@ -121,7 +122,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testGr4x6() {
-        AbstractCaseFileMPS.assertMinMaxVal("gr4x6.mps", "185.55", null, true, null);
+        ModelFileMPS.assertMinMaxVal("gr4x6.mps", "185.55", null, true, null);
     }
 
     /**
@@ -133,7 +134,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testMarkshare_4_0() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare_4_0.mps", "0", null, true, null);
+        ModelFileMPS.assertMinMaxVal("markshare_4_0.mps", "0", null, true, null);
     }
 
     /**
@@ -153,7 +154,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testMarkshare_5_0() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare_5_0.mps", "0.00000000e+00", null, true, null);
+        ModelFileMPS.assertMinMaxVal("markshare_5_0.mps", "0.00000000e+00", null, true, null);
     }
 
     /**
@@ -173,7 +174,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testMarkshare1() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare1.mps", "0", null, true, null);
+        ModelFileMPS.assertMinMaxVal("markshare1.mps", "0", null, true, null);
     }
 
     /**
@@ -192,7 +193,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testMarkshare2() {
-        AbstractCaseFileMPS.assertMinMaxVal("markshare2.mps", "0", null, true, null);
+        ModelFileMPS.assertMinMaxVal("markshare2.mps", "0", null, true, null);
     }
 
     /**
@@ -211,7 +212,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testMas76() {
-        AbstractCaseFileMPS.assertMinMaxVal("mas76.mps", "3.88939036e+04", null, true, null);
+        ModelFileMPS.assertMinMaxVal("mas76.mps", "3.88939036e+04", null, true, null);
     }
 
     /**
@@ -230,7 +231,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testModglob() {
-        AbstractCaseFileMPS.assertMinMaxVal("modglob.mps", "2.04309476e+07", null, true, null);
+        ModelFileMPS.assertMinMaxVal("modglob.mps", "2.04309476e+07", null, true, null);
     }
 
     /**
@@ -242,7 +243,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testNeos5() {
-        AbstractCaseFileMPS.assertMinMaxVal("neos5.mps", "13", null, true, null);
+        ModelFileMPS.assertMinMaxVal("neos5.mps", "13", null, true, null);
     }
 
     /**
@@ -261,7 +262,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testNeos911880() {
-        AbstractCaseFileMPS.assertMinMaxVal("neos-911880.mps", "23.26", null, true, null);
+        ModelFileMPS.assertMinMaxVal("neos-911880.mps", "23.26", null, true, null);
     }
 
     /**
@@ -280,7 +281,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testNoswot() {
-        AbstractCaseFileMPS.assertMinMaxVal("noswot.mps", "-43", null, true, null);
+        ModelFileMPS.assertMinMaxVal("noswot.mps", "-43", null, true, null);
     }
 
     /**
@@ -299,7 +300,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testP2m2p1m1p0n100() {
-        AbstractCaseFileMPS.assertMinMaxVal("p2m2p1m1p0n100.mps", "80424", null, true, null);
+        ModelFileMPS.assertMinMaxVal("p2m2p1m1p0n100.mps", "80424", null, true, null);
     }
 
     /**
@@ -424,7 +425,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
         tmpSolution.put("x85", BigDecimal.valueOf(0));
         tmpSolution.put("x86", BigDecimal.valueOf(0));
 
-        AbstractCaseFileMPS.assertMinMaxVal("pk1.mps", "0", null, true, tmpSolution);
+        ModelFileMPS.assertMinMaxVal("pk1.mps", "0", null, true, tmpSolution);
     }
 
     /**
@@ -443,7 +444,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testPp08a() {
-        AbstractCaseFileMPS.assertMinMaxVal("pp08a.mps", "2.74834524e+03", null, true, null);
+        ModelFileMPS.assertMinMaxVal("pp08a.mps", "2.74834524e+03", null, true, null);
     }
 
     /**
@@ -462,7 +463,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testPp08aCUTS() {
-        AbstractCaseFileMPS.assertMinMaxVal("pp08aCUTS.mps", "5.48060616e+03", null, true, null);
+        ModelFileMPS.assertMinMaxVal("pp08aCUTS.mps", "5.48060616e+03", null, true, null);
     }
 
     /**
@@ -481,7 +482,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testTimtab1() {
-        AbstractCaseFileMPS.assertMinMaxVal("timtab1.mps", "2.86940000e+04", null, true, null);
+        ModelFileMPS.assertMinMaxVal("timtab1.mps", "2.86940000e+04", null, true, null);
     }
 
     /**
@@ -500,7 +501,7 @@ public class RelaxedMIPCase extends AbstractCaseFileMPS {
      */
     @Test
     public void testVpm2() {
-        AbstractCaseFileMPS.assertMinMaxVal("vpm2.mps", "9.88926460e+00", null, true, null);
+        ModelFileMPS.assertMinMaxVal("vpm2.mps", "9.88926460e+00", null, true, null);
     }
 
 }
