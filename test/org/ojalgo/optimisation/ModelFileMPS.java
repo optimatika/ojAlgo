@@ -18,9 +18,6 @@ import java.util.Map;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.MathProgSysModel;
-import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
 
@@ -33,7 +30,7 @@ public interface ModelFileMPS {
 
     static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
 
-    static final String PATH = "./test/org/ojalgo/optimisation/integer/";
+    static final String PATH = "./resources/org/ojalgo/optimisation/integer/";
     static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
     static void assertMinMaxVal(final String modelName, final String expMinValString, final String expMaxValString, final boolean relax,

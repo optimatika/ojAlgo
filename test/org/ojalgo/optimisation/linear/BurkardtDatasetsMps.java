@@ -34,7 +34,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
-    private static final String PATH = "./test/org/ojalgo/optimisation/linear/";
+    private static final String PATH = "./resources/org/ojalgo/optimisation/linear/";
     private static final NumberContext PRECISION = new NumberContext(7, 6);
     private static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
