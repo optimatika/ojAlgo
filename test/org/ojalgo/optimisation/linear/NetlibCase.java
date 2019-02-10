@@ -47,7 +47,7 @@ public class NetlibCase extends OptimisationLinearTests {
 
         // tmpModel.options.debug(LinearSolver.class);
 
-        this.assertMinMaxVal(tmpModel, new BigDecimal("-3.0812149846E+01"), null);
+        NetlibCase.assertMinMaxVal(tmpModel, new BigDecimal("-3.0812149846E+01"), null);
     }
 
     /**
@@ -60,7 +60,7 @@ public class NetlibCase extends OptimisationLinearTests {
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
-        this.assertMinMaxVal(tmpModel, new BigDecimal("-3.1501872802E+02"), null);
+        NetlibCase.assertMinMaxVal(tmpModel, new BigDecimal("-3.1501872802E+02"), null);
     }
 
     /**
@@ -73,7 +73,7 @@ public class NetlibCase extends OptimisationLinearTests {
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
-        this.assertMinMaxVal(tmpModel, new BigDecimal("-1.74990012991E+03"), null);
+        NetlibCase.assertMinMaxVal(tmpModel, new BigDecimal("-1.74990012991E+03"), null);
     }
 
     /**
@@ -86,7 +86,7 @@ public class NetlibCase extends OptimisationLinearTests {
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
-        this.assertMinMaxVal(tmpModel, new BigDecimal("-7.0000000000E+01"), null);
+        NetlibCase.assertMinMaxVal(tmpModel, new BigDecimal("-7.0000000000E+01"), null);
     }
 
     /**
@@ -99,29 +99,27 @@ public class NetlibCase extends OptimisationLinearTests {
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
-        this.assertMinMaxVal(tmpModel, new BigDecimal("-4.1573224074E+02"), null);
+        NetlibCase.assertMinMaxVal(tmpModel, new BigDecimal("-4.1573224074E+02"), null);
     }
 
-    private void assertMinMaxVal(final ExpressionsBasedModel aModel, final BigDecimal aExpMinVal, final BigDecimal aExpMaxVal) {
+    static void assertMinMaxVal(final ExpressionsBasedModel model, final BigDecimal expMinVal, final BigDecimal expMaxVal) {
 
-        // aModel.options.debug(LinearSolver.class);
+        TestUtils.assertTrue(model.validate());
 
-        TestUtils.assertTrue(aModel.validate());
+        if (expMinVal != null) {
 
-        if (aExpMinVal != null) {
+            TestUtils.assertEquals(expMinVal.doubleValue(), model.minimise().getValue(), PRECISION);
 
-            TestUtils.assertEquals(aExpMinVal.doubleValue(), aModel.minimise().getValue(), PRECISION);
-
-            if (!aModel.validate(PRECISION)) {
+            if (!model.validate(PRECISION)) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
         }
 
-        if (aExpMaxVal != null) {
+        if (expMaxVal != null) {
 
-            TestUtils.assertEquals(aExpMaxVal.doubleValue(), aModel.maximise().getValue(), PRECISION);
+            TestUtils.assertEquals(expMaxVal.doubleValue(), model.maximise().getValue(), PRECISION);
 
-            if (!aModel.validate(PRECISION)) {
+            if (!model.validate(PRECISION)) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
         }
