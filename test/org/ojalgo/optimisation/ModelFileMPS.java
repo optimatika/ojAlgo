@@ -27,34 +27,51 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface ModelFileMPS {
+public class ModelFileMPS {
+
+    private static final String OPT_RSRC = "./rsrc/optimisation/";
+
+    public static final String INT_PATH = OPT_RSRC + "miplib/";
+
+    public static final String LIN_PATH = OPT_RSRC + "netlib/old/";
+
+    public static String SOLUTION_NOT_VALID = "Solution not valid!";
 
     static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
 
-    static final String PATH = "./resources/org/ojalgo/optimisation/integer/";
-    static final String SOLUTION_NOT_VALID = "Solution not valid!";
+    public static void assertMinMaxVal(final ExpressionsBasedModel model, final BigDecimal expMinVal, final BigDecimal expMaxVal) {
 
-    static void assertMinMaxVal(final String modelName, final String expMinValString, final String expMaxValString, final boolean relax,
-            final Map<String, BigDecimal> solution) {
+        TestUtils.assertTrue(model.validate());
+
+        if (expMinVal != null) {
+
+            TestUtils.assertEquals(expMinVal.doubleValue(), model.minimise().getValue(), PRECISION);
+
+            if (!model.validate(PRECISION)) {
+                TestUtils.fail(SOLUTION_NOT_VALID);
+            }
+        }
+
+        if (expMaxVal != null) {
+
+            TestUtils.assertEquals(expMaxVal.doubleValue(), model.maximise().getValue(), PRECISION);
+
+            if (!model.validate(PRECISION)) {
+                TestUtils.fail(SOLUTION_NOT_VALID);
+            }
+        }
+    }
+
+    public static ExpressionsBasedModel assertMinMaxVal(String dataset, final String modelName, final String expMinValString, final String expMaxValString,
+            final boolean relax, NumberContext precision, final Map<String, BigDecimal> solution) {
 
         BigDecimal expMinVal = expMinValString != null ? new BigDecimal(expMinValString) : null;
         BigDecimal expMaxVal = expMaxValString != null ? new BigDecimal(expMaxValString) : null;
 
-        //        if (DEBUG) {
-        //            BasicLogger.DEBUG.println();
-        //            BasicLogger.DEBUG.println();
-        //            BasicLogger.DEBUG.println(modelName);
-        //            BasicLogger.DEBUG.println();
-        //        }
-
-        final File file = new File(PATH + modelName);
+        final File file = new File(OPT_RSRC + dataset + "/" + modelName);
         final ExpressionsBasedModel model = MathProgSysModel.make(file).getExpressionsBasedModel();
 
-        //        if (DEBUG) {
-        //            BasicLogger.DEBUG.println();
-        //            BasicLogger.DEBUG.println(model);
-        //            BasicLogger.DEBUG.println();
-        //        }
+        TestUtils.assertTrue(model.validate());
 
         if (relax) {
 
@@ -62,20 +79,6 @@ public interface ModelFileMPS {
 
             for (Variable tmpVar : model.getVariables()) {
                 tmpVar.relax();
-            }
-        }
-
-        if (solution != null) {
-            for (final Variable tmpVariable : model.getVariables()) {
-                final BigDecimal tmpValue = solution.get(tmpVariable.getName());
-                if (tmpValue != null) {
-                    tmpVariable.setValue(tmpValue);
-                } else {
-                    tmpVariable.setValue(BigMath.ZERO);
-                }
-            }
-            if (!model.validate(new NumberContext(7, 4))) {
-                TestUtils.fail(SOLUTION_NOT_VALID);
             }
         }
 
@@ -92,25 +95,41 @@ public interface ModelFileMPS {
 
             final double minimum = model.minimise().getValue();
 
-            if (!model.validate(PRECISION)) {
+            if (!model.validate(precision)) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
 
             final double expected = expMinVal.doubleValue();
-            TestUtils.assertEquals(expected, minimum, PRECISION);
+            TestUtils.assertEquals(expected, minimum, precision);
         }
 
         if (expMaxVal != null) {
 
             final double maximum = model.maximise().getValue();
 
-            if (!model.validate(PRECISION)) {
+            if (!model.validate(precision)) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
 
             final double expected = expMaxVal.doubleValue();
-            TestUtils.assertEquals(expected, maximum, PRECISION);
+            TestUtils.assertEquals(expected, maximum, precision);
         }
+
+        if (solution != null) {
+            for (final Variable tmpVariable : model.getVariables()) {
+                final BigDecimal tmpValue = solution.get(tmpVariable.getName());
+                if (tmpValue != null) {
+                    tmpVariable.setValue(tmpValue);
+                } else {
+                    tmpVariable.setValue(BigMath.ZERO);
+                }
+            }
+            if (!model.validate(precision)) {
+                TestUtils.fail(SOLUTION_NOT_VALID);
+            }
+        }
+
+        return model;
     }
 
 }

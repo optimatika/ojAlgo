@@ -58,7 +58,7 @@
         <testSourceDirectory>test</testSourceDirectory>
         <testResources>
             <testResource>
-                <directory>resources</directory>
+                <directory>rsrc</directory>
             </testResource>
         </testResources>
         <plugins>

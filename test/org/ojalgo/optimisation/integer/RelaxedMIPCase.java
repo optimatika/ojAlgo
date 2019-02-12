@@ -23,11 +23,19 @@ package org.ojalgo.optimisation.integer;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.optimisation.ModelFileMPS;
+import org.ojalgo.type.context.NumberContext;
 
 public class RelaxedMIPCase extends OptimisationIntegerTests {
+
+    static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
+
+    static void doStandardTest(final String modelName, final String expMinValString, final String expMaxValString, final Map<String, BigDecimal> solution) {
+        ModelFileMPS.assertMinMaxVal("miplib", modelName, expMinValString, expMaxValString, true, PRECISION, solution);
+    }
 
     /**
      * https://miplib.zib.de/instance_details_b-ball.html
@@ -38,7 +46,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testB_ball() {
-        ModelFileMPS.assertMinMaxVal("b-ball.mps", "-1.818181818181818", null, true, null);
+        RelaxedMIPCase.doStandardTest("b-ball.mps", "-1.818181818181818", null, null);
     }
 
     /**
@@ -50,7 +58,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testEj() {
-        ModelFileMPS.assertMinMaxVal("ej.mps", "1", null, true, null);
+        RelaxedMIPCase.doStandardTest("ej.mps", "1", null, null);
     }
 
     /**
@@ -62,7 +70,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testFlugpl() {
-        ModelFileMPS.assertMinMaxVal("flugpl.mps", "1167185.7255923203", null, true, null);
+        RelaxedMIPCase.doStandardTest("flugpl.mps", "1167185.7255923203", null, null);
     }
 
     /**
@@ -74,7 +82,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testGen_ip002() {
-        ModelFileMPS.assertMinMaxVal("gen-ip002.mps", "-4840.541961300889", null, true, null);
+        RelaxedMIPCase.doStandardTest("gen-ip002.mps", "-4840.541961300889", null, null);
     }
 
     /**
@@ -86,7 +94,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testGen_ip021() {
-        ModelFileMPS.assertMinMaxVal("gen-ip021.mps", "2327.84258448875", null, true, null);
+        RelaxedMIPCase.doStandardTest("gen-ip021.mps", "2327.84258448875", null, null);
     }
 
     /**
@@ -98,7 +106,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testGen_ip036() {
-        ModelFileMPS.assertMinMaxVal("gen-ip036.mps", "-4632.29815287346", null, true, null);
+        RelaxedMIPCase.doStandardTest("gen-ip036.mps", "-4632.29815287346", null, null);
     }
 
     /**
@@ -110,7 +118,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testGen_ip054() {
-        ModelFileMPS.assertMinMaxVal("gen-ip054.mps", "6765.2090427", null, true, null);
+        RelaxedMIPCase.doStandardTest("gen-ip054.mps", "6765.2090427", null, null);
     }
 
     /**
@@ -122,7 +130,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testGr4x6() {
-        ModelFileMPS.assertMinMaxVal("gr4x6.mps", "185.55", null, true, null);
+        RelaxedMIPCase.doStandardTest("gr4x6.mps", "185.55", null, null);
     }
 
     /**
@@ -134,7 +142,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testMarkshare_4_0() {
-        ModelFileMPS.assertMinMaxVal("markshare_4_0.mps", "0", null, true, null);
+        RelaxedMIPCase.doStandardTest("markshare_4_0.mps", "0", null, null);
     }
 
     /**
@@ -154,7 +162,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testMarkshare_5_0() {
-        ModelFileMPS.assertMinMaxVal("markshare_5_0.mps", "0.00000000e+00", null, true, null);
+        RelaxedMIPCase.doStandardTest("markshare_5_0.mps", "0.00000000e+00", null, null);
     }
 
     /**
@@ -174,7 +182,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testMarkshare1() {
-        ModelFileMPS.assertMinMaxVal("markshare1.mps", "0", null, true, null);
+        RelaxedMIPCase.doStandardTest("markshare1.mps", "0", null, null);
     }
 
     /**
@@ -193,7 +201,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testMarkshare2() {
-        ModelFileMPS.assertMinMaxVal("markshare2.mps", "0", null, true, null);
+        RelaxedMIPCase.doStandardTest("markshare2.mps", "0", null, null);
     }
 
     /**
@@ -212,7 +220,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testMas76() {
-        ModelFileMPS.assertMinMaxVal("mas76.mps", "3.88939036e+04", null, true, null);
+        RelaxedMIPCase.doStandardTest("mas76.mps", "3.88939036e+04", null, null);
     }
 
     /**
@@ -231,7 +239,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testModglob() {
-        ModelFileMPS.assertMinMaxVal("modglob.mps", "2.04309476e+07", null, true, null);
+        RelaxedMIPCase.doStandardTest("modglob.mps", "2.04309476e+07", null, null);
     }
 
     /**
@@ -243,7 +251,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testNeos5() {
-        ModelFileMPS.assertMinMaxVal("neos5.mps", "13", null, true, null);
+        RelaxedMIPCase.doStandardTest("neos5.mps", "13", null, null);
     }
 
     /**
@@ -262,7 +270,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testNeos911880() {
-        ModelFileMPS.assertMinMaxVal("neos-911880.mps", "23.26", null, true, null);
+        RelaxedMIPCase.doStandardTest("neos-911880.mps", "23.26", null, null);
     }
 
     /**
@@ -281,7 +289,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testNoswot() {
-        ModelFileMPS.assertMinMaxVal("noswot.mps", "-43", null, true, null);
+        RelaxedMIPCase.doStandardTest("noswot.mps", "-43", null, null);
     }
 
     /**
@@ -300,7 +308,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testP2m2p1m1p0n100() {
-        ModelFileMPS.assertMinMaxVal("p2m2p1m1p0n100.mps", "80424", null, true, null);
+        RelaxedMIPCase.doStandardTest("p2m2p1m1p0n100.mps", "80424", null, null);
     }
 
     /**
@@ -425,7 +433,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
         tmpSolution.put("x85", BigDecimal.valueOf(0));
         tmpSolution.put("x86", BigDecimal.valueOf(0));
 
-        ModelFileMPS.assertMinMaxVal("pk1.mps", "0", null, true, tmpSolution);
+        RelaxedMIPCase.doStandardTest("pk1.mps", "0", null, tmpSolution);
     }
 
     /**
@@ -444,7 +452,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testPp08a() {
-        ModelFileMPS.assertMinMaxVal("pp08a.mps", "2.74834524e+03", null, true, null);
+        RelaxedMIPCase.doStandardTest("pp08a.mps", "2.74834524e+03", null, null);
     }
 
     /**
@@ -463,7 +471,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testPp08aCUTS() {
-        ModelFileMPS.assertMinMaxVal("pp08aCUTS.mps", "5.48060616e+03", null, true, null);
+        RelaxedMIPCase.doStandardTest("pp08aCUTS.mps", "5.48060616e+03", null, null);
     }
 
     /**
@@ -482,7 +490,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testTimtab1() {
-        ModelFileMPS.assertMinMaxVal("timtab1.mps", "2.86940000e+04", null, true, null);
+        RelaxedMIPCase.doStandardTest("timtab1.mps", "2.86940000e+04", null, null);
     }
 
     /**
@@ -501,7 +509,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests {
      */
     @Test
     public void testVpm2() {
-        ModelFileMPS.assertMinMaxVal("vpm2.mps", "9.88926460e+00", null, true, null);
+        RelaxedMIPCase.doStandardTest("vpm2.mps", "9.88926460e+00", null, null);
     }
 
 }

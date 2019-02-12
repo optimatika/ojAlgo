@@ -14,7 +14,6 @@ package org.ojalgo.optimisation.linear;
 
 import static org.ojalgo.constant.BigMath.*;
 
-import java.io.File;
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
@@ -22,21 +21,23 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.MathProgSysModel;
+import org.ojalgo.optimisation.ModelFileMPS;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * A collection of datasets found here: http://people.sc.fsu.edu/~burkardt/datasets/mps/mps.html
+ * A small collection of datasets found here: http://people.sc.fsu.edu/~jburkardt/datasets/mps/maros.mps
  *
  * @author apete
  */
 public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
-    private static final String PATH = "./resources/org/ojalgo/optimisation/linear/";
-    private static final NumberContext PRECISION = new NumberContext(7, 6);
-    private static final String SOLUTION_NOT_VALID = "Solution not valid!";
+    static NumberContext PRECISION = new NumberContext(11, 9);
+
+    static ExpressionsBasedModel doStandardTest(String modelName, String expMinValString, String expMaxValString) {
+        return ModelFileMPS.assertMinMaxVal("burkardt", modelName, expMinValString, expMaxValString, false, BurkardtDatasetsMps.PRECISION, null);
+    }
 
     /**
      * Defines a problem of 57 rows and 97 columns. Seems to be the same model as adlittle at netlib. Netlib
@@ -51,23 +52,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
      */
     @Test
     public void testMPSadlittle() {
-
-        final File tmpFile = new File(PATH + "adlittle.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
-
-        //tmpModel.options.debug(LinearSolver.class);
-
-        TestUtils.assertTrue(tmpModel.validate());
-
-        final BigDecimal tmpExpVal = new BigDecimal("225494.96316238446"); // Stated to be .22549496316e+6
-        final double tmpActVal = tmpModel.minimise().getValue();
-
-        TestUtils.assertEquals(tmpExpVal.doubleValue(), tmpActVal, PRECISION);
-
-        if (!tmpModel.validate(PRECISION)) {
-            TestUtils.fail(SOLUTION_NOT_VALID);
-        }
+        BurkardtDatasetsMps.doStandardTest("adlittle.mps", "225494.96316238446", null);
     }
 
     /**
@@ -78,20 +63,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
      */
     @Test
     public void testMPSafiro() {
-
-        final File tmpFile = new File(PATH + "afiro.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
-
-        TestUtils.assertTrue(tmpModel.validate());
-
-        final BigDecimal tmpExpVal = new BigDecimal("-.46475314286e+3");
-        final double tmpActVal = tmpModel.minimise().getValue();
-        TestUtils.assertEquals(tmpExpVal.doubleValue(), tmpActVal, PRECISION);
-
-        if (!tmpModel.validate(PRECISION)) {
-            TestUtils.fail(SOLUTION_NOT_VALID);
-        }
+        BurkardtDatasetsMps.doStandardTest("afiro.mps", "-.46475314286e+3", null);
     }
 
     /**
@@ -100,12 +72,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
      */
     @Test
     public void testMPSempstest() {
-
-        final File tmpFile = new File(PATH + "empstest.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
-
-        this.assertMinMaxVal(tmpModel, null, null);
+        BurkardtDatasetsMps.doStandardTest("empstest.mps", null, null);
     }
 
     /**
@@ -115,12 +82,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
      */
     @Test
     public void testMPSmaros() {
-
-        final File tmpFile = new File(PATH + "maros.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
-
-        this.assertMinMaxVal(tmpModel, BigFunction.DIVIDE.invoke(new BigDecimal("385"), THREE), new BigDecimal("197.5"));
+        BurkardtDatasetsMps.doStandardTest("maros.mps", BigFunction.DIVIDE.invoke(new BigDecimal("385"), THREE).toString(), "197.5");
     }
 
     /**
@@ -129,12 +91,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
      */
     @Test
     public void testMPSnazareth() {
-
-        final File tmpFile = new File(PATH + "nazareth.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
-
-        this.assertMinMaxVal(tmpModel, null, BigFunction.DIVIDE.invoke(HUNDRED.add(TEN), THREE));
+        BurkardtDatasetsMps.doStandardTest("nazareth.mps", null, BigFunction.DIVIDE.invoke(HUNDRED.add(TEN), THREE).toString());
     }
 
     /**
@@ -145,86 +102,57 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
     @Test
     public void testMPStestprob() {
 
+        ExpressionsBasedModel parsedModel = BurkardtDatasetsMps.doStandardTest("testprob.mps", "54", "80");
+
         final Variable tmpXONE = new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
         final Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
         final Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
 
         final Variable[] tmpVariables = new Variable[] { tmpXONE, tmpYTWO, tmpZTHREE };
 
-        final ExpressionsBasedModel tmpExpModel = new ExpressionsBasedModel(tmpVariables);
+        final ExpressionsBasedModel reimplementedModel = new ExpressionsBasedModel(tmpVariables);
 
-        final Expression tmpLIM1 = tmpExpModel.addExpression("LIM1");
+        final Expression tmpLIM1 = reimplementedModel.addExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM1.set(v, new BigDecimal[] { ONE, ONE, ZERO }[v]);
         }
         tmpLIM1.upper(FIVE);
 
-        final Expression tmpLIM2 = tmpExpModel.addExpression("LIM2");
+        final Expression tmpLIM2 = reimplementedModel.addExpression("LIM2");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM2.set(v, new BigDecimal[] { ONE, ZERO, ONE }[v]);
         }
         tmpLIM2.lower(TEN);
 
-        final Expression tmpMYEQN = tmpExpModel.addExpression("MYEQN");
+        final Expression tmpMYEQN = reimplementedModel.addExpression("MYEQN");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpMYEQN.set(v, new BigDecimal[] { ZERO, ONE.negate(), ONE }[v]);
         }
         tmpMYEQN.level(SEVEN);
 
-        TestUtils.assertTrue(tmpExpModel.validate());
+        TestUtils.assertTrue(reimplementedModel.validate());
+        TestUtils.assertTrue(parsedModel.validate());
 
-        final File tmpFile = new File(PATH + "testprob.mps");
-        final MathProgSysModel tmpActModel = MathProgSysModel.make(tmpFile);
+        final Result tmpExpMinRes = reimplementedModel.minimise();
+        final Result tmpActMinRes = parsedModel.minimise();
 
-        TestUtils.assertTrue(tmpActModel.validate());
-
-        final Result tmpExpMinRes = tmpExpModel.minimise();
-        final Result tmpActMinRes = tmpActModel.minimise();
-
-        TestUtils.assertEquals(tmpExpMinRes.getValue(), tmpActMinRes.getValue(), PRECISION);
+        TestUtils.assertEquals(tmpExpMinRes.getValue(), tmpActMinRes.getValue(), BurkardtDatasetsMps.PRECISION);
 
         TestUtils.assertEquals(tmpVariables.length, tmpExpMinRes.count());
         TestUtils.assertEquals(tmpVariables.length, tmpActMinRes.count());
 
-        TestUtils.assertEquals(tmpExpMinRes, tmpActMinRes, PRECISION);
+        TestUtils.assertEquals(tmpExpMinRes, tmpActMinRes, BurkardtDatasetsMps.PRECISION);
 
         for (int i = 0; i < tmpVariables.length; i++) {
-            TestUtils.assertEquals(tmpVariables[i].getName(), tmpExpMinRes.doubleValue(i), tmpActMinRes.doubleValue(i), PRECISION);
+            TestUtils.assertEquals(tmpVariables[i].getName(), tmpExpMinRes.doubleValue(i), tmpActMinRes.doubleValue(i), BurkardtDatasetsMps.PRECISION);
         }
 
-        if (!tmpExpModel.validate(tmpExpMinRes, PRECISION)) {
-            TestUtils.fail(SOLUTION_NOT_VALID);
+        if (!reimplementedModel.validate(tmpExpMinRes, BurkardtDatasetsMps.PRECISION)) {
+            TestUtils.fail(ModelFileMPS.SOLUTION_NOT_VALID);
         }
 
-        if (!tmpActModel.validate(tmpActMinRes, PRECISION)) {
-            TestUtils.fail(SOLUTION_NOT_VALID);
-        }
-
-        this.assertMinMaxVal(tmpActModel.getExpressionsBasedModel(), new BigDecimal("54"), new BigDecimal("80"));
-    }
-
-    private void assertMinMaxVal(final ExpressionsBasedModel model, final BigDecimal expMinVal, final BigDecimal expMaxVal) {
-
-        //model.options.debug(LinearSolver.class);
-
-        TestUtils.assertTrue(model.validate());
-
-        if (expMinVal != null) {
-
-            TestUtils.assertEquals(expMinVal.doubleValue(), model.minimise().getValue(), PRECISION);
-
-            if (!model.validate(PRECISION)) {
-                TestUtils.fail(SOLUTION_NOT_VALID);
-            }
-        }
-
-        if (expMaxVal != null) {
-
-            TestUtils.assertEquals(expMaxVal.doubleValue(), model.maximise().getValue(), PRECISION);
-
-            if (!model.validate(PRECISION)) {
-                TestUtils.fail(SOLUTION_NOT_VALID);
-            }
+        if (!parsedModel.validate(tmpActMinRes, BurkardtDatasetsMps.PRECISION)) {
+            TestUtils.fail(ModelFileMPS.SOLUTION_NOT_VALID);
         }
     }
 }

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.optimisation.ModelFileMPS;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Some test cases from MIPLIB added a long time ago. These tests are typically a bit harder than
@@ -27,6 +28,12 @@ import org.ojalgo.optimisation.ModelFileMPS;
 @Tag("slow")
 public final class MipCase extends OptimisationIntegerTests {
 
+    static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
+
+    static void doStandardTest(final String modelName, final String expMinValString, final String expMaxValString) {
+        ModelFileMPS.assertMinMaxVal("miplib", modelName, expMinValString, expMaxValString, false, PRECISION, null);
+    }
+
     /**
      * https://miplib.zib.de/instance_details_ej.html
      * <ul>
@@ -36,7 +43,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testEj() {
-        ModelFileMPS.assertMinMaxVal("ej.mps", "25508", null, false, null);
+        MipCase.doStandardTest("ej.mps", "25508", null);
     }
 
     /**
@@ -48,7 +55,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testGen_ip002() {
-        ModelFileMPS.assertMinMaxVal("gen-ip002.mps", "-4783.733392", null, false, null);
+        MipCase.doStandardTest("gen-ip002.mps", "-4783.733392", null);
     }
 
     /**
@@ -60,7 +67,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testGen_ip021() {
-        ModelFileMPS.assertMinMaxVal("gen-ip021.mps", "2361.45419519", null, false, null);
+        MipCase.doStandardTest("gen-ip021.mps", "2361.45419519", null);
     }
 
     /**
@@ -72,7 +79,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testGen_ip036() {
-        ModelFileMPS.assertMinMaxVal("gen-ip036.mps", "-4606.67961", null, false, null);
+        MipCase.doStandardTest("gen-ip036.mps", "-4606.67961", null);
     }
 
     /**
@@ -84,7 +91,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testGen_ip054() {
-        ModelFileMPS.assertMinMaxVal("gen-ip054.mps", "6840.966", null, false, null);
+        MipCase.doStandardTest("gen-ip054.mps", "6840.966", null);
     }
 
     /**
@@ -101,7 +108,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testMarkshare_5_0() {
-        ModelFileMPS.assertMinMaxVal("markshare_5_0.mps", "1.00000000e+00", null, false, null);
+        MipCase.doStandardTest("markshare_5_0.mps", "1.00000000e+00", null);
     }
 
     /**
@@ -120,7 +127,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testMarkshare1() {
-        ModelFileMPS.assertMinMaxVal("markshare1.mps", "1.00000000e+00", null, false, null);
+        MipCase.doStandardTest("markshare1.mps", "1.00000000e+00", null);
     }
 
     /**
@@ -139,7 +146,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testMarkshare2() {
-        ModelFileMPS.assertMinMaxVal("markshare2.mps", "1", null, false, null);
+        MipCase.doStandardTest("markshare2.mps", "1", null);
     }
 
     /**
@@ -161,7 +168,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testMas76() {
-        ModelFileMPS.assertMinMaxVal("mas76.mps", "4.00050541e+04", null, false, null);
+        MipCase.doStandardTest("mas76.mps", "4.00050541e+04", null);
     }
 
     /**
@@ -180,7 +187,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testModglob() {
-        ModelFileMPS.assertMinMaxVal("modglob.mps", "2.07405081e+07", null, false, null);
+        MipCase.doStandardTest("modglob.mps", "2.07405081e+07", null);
     }
 
     /**
@@ -196,7 +203,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testNeos911880() {
-        ModelFileMPS.assertMinMaxVal("neos-911880.mps", "54.76", null, false, null);
+        MipCase.doStandardTest("neos-911880.mps", "54.76", null);
     }
 
     /**
@@ -214,7 +221,7 @@ public final class MipCase extends OptimisationIntegerTests {
     @Test
     @Disabled("https://github.com/optimatika/ojAlgo/issues/120")
     public void testNoswot() {
-        ModelFileMPS.assertMinMaxVal("noswot.mps", "-4.10000000e+01", null, false, null);
+        MipCase.doStandardTest("noswot.mps", "-4.10000000e+01", null);
     }
 
     /**
@@ -231,7 +238,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testPp08a() {
-        ModelFileMPS.assertMinMaxVal("pp08a.mps", "7.35000000e+03", null, false, null);
+        MipCase.doStandardTest("pp08a.mps", "7.35000000e+03", null);
     }
 
     /**
@@ -247,7 +254,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testPp08aCUTS() {
-        ModelFileMPS.assertMinMaxVal("pp08aCUTS.mps", "7.35000000e+03", null, false, null);
+        MipCase.doStandardTest("pp08aCUTS.mps", "7.35000000e+03", null);
     }
 
     /**
@@ -263,7 +270,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testTimtab1() {
-        ModelFileMPS.assertMinMaxVal("timtab1.mps", "7.64772000e+05", null, false, null);
+        MipCase.doStandardTest("timtab1.mps", "7.64772000e+05", null);
     }
 
     /**
@@ -281,7 +288,7 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     @Test
     public void testVpm2() {
-        ModelFileMPS.assertMinMaxVal("vpm2.mps", "1.37500000e+01", null, false, null);
+        MipCase.doStandardTest("vpm2.mps", "1.37500000e+01", null);
     }
 
 }

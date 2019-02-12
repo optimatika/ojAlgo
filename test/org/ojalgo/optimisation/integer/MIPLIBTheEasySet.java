@@ -15,6 +15,7 @@ package org.ojalgo.optimisation.integer;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.optimisation.ModelFileMPS;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Problems/models from "The Easy Set" - instances that could be solved within less than 1h (by top tier
@@ -26,6 +27,12 @@ import org.ojalgo.optimisation.ModelFileMPS;
  */
 public class MIPLIBTheEasySet extends OptimisationIntegerTests {
 
+    static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
+
+    static void doStandardTest(final String modelName, final String expMinValString, final String expMaxValString) {
+        ModelFileMPS.assertMinMaxVal("miplib", modelName, expMinValString, expMaxValString, false, PRECISION, null);
+    }
+
     /**
      * https://miplib.zib.de/instance_details_b-ball.html
      * <ul>
@@ -36,7 +43,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests {
     @Test
     @Tag("slow")
     public void testB_ball() {
-        ModelFileMPS.assertMinMaxVal("b-ball.mps", "-1.5", null, false, null);
+        MIPLIBTheEasySet.doStandardTest("b-ball.mps", "-1.5", null);
     }
 
     /**
@@ -48,7 +55,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests {
      */
     @Test
     public void testFlugpl() {
-        ModelFileMPS.assertMinMaxVal("flugpl.mps", "1201500", null, false, null);
+        MIPLIBTheEasySet.doStandardTest("flugpl.mps", "1201500", null);
     }
 
     /**
@@ -60,7 +67,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests {
      */
     @Test
     public void testGr4x6() {
-        ModelFileMPS.assertMinMaxVal("gr4x6.mps", "202.35", null, false, null);
+        MIPLIBTheEasySet.doStandardTest("gr4x6.mps", "202.35", null);
     }
 
     /**
@@ -72,7 +79,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests {
      */
     @Test
     public void testMarkshare_4_0() {
-        ModelFileMPS.assertMinMaxVal("markshare_4_0.mps", "1", null, false, null);
+        MIPLIBTheEasySet.doStandardTest("markshare_4_0.mps", "1", null);
     }
 
     /**
@@ -85,7 +92,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests {
     @Test
     @Tag("slow")
     public void testNeos5() {
-        ModelFileMPS.assertMinMaxVal("neos5.mps", "15", null, false, null);
+        MIPLIBTheEasySet.doStandardTest("neos5.mps", "15", null);
     }
 
     /**
@@ -107,7 +114,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests {
     @Test
     @Tag("slow")
     public void testPk1() {
-        ModelFileMPS.assertMinMaxVal("pk1.mps", "1.10000000e+01", null, false, null);
+        MIPLIBTheEasySet.doStandardTest("pk1.mps", "1.10000000e+01", null);
     }
 
 }

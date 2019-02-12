@@ -113,7 +113,7 @@ public final class SpecificBranchCase extends OptimisationIntegerTests {
     @Test
     public void testVpm2FirstBranch() {
 
-        final File tmpFile = new File(ModelFileMPS.PATH + "vpm2.mps");
+        final File tmpFile = new File(ModelFileMPS.INT_PATH + "vpm2.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
@@ -146,7 +146,7 @@ public final class SpecificBranchCase extends OptimisationIntegerTests {
 
     private void doNodeTest(int[] lower, int[] upper) {
 
-        final File file = new File(ModelFileMPS.PATH + "noswot.mps");
+        final File file = new File(ModelFileMPS.INT_PATH + "noswot.mps");
         final MathProgSysModel mps = MathProgSysModel.make(file);
         final ExpressionsBasedModel orgMmodel = mps.getExpressionsBasedModel();
 
