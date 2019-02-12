@@ -30,7 +30,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
 
     static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
 
-    static void doStandardTest(final String modelName, final String expMinValString, final String expMaxValString) {
+    static void doTest(final String modelName, final String expMinValString, final String expMaxValString) {
         ModelFileMPS.makeAndAssert("miplib", modelName, expMinValString, expMaxValString, false, PRECISION, null);
     }
 
@@ -43,7 +43,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testEj() {
-        MipCase.doStandardTest("ej.mps", "25508", null);
+        MipCase.doTest("ej.mps", "25508", null);
     }
 
     /**
@@ -55,7 +55,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testGen_ip002() {
-        MipCase.doStandardTest("gen-ip002.mps", "-4783.733392", null);
+        MipCase.doTest("gen-ip002.mps", "-4783.733392", null);
     }
 
     /**
@@ -67,7 +67,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testGen_ip021() {
-        MipCase.doStandardTest("gen-ip021.mps", "2361.45419519", null);
+        MipCase.doTest("gen-ip021.mps", "2361.45419519", null);
     }
 
     /**
@@ -79,7 +79,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testGen_ip036() {
-        MipCase.doStandardTest("gen-ip036.mps", "-4606.67961", null);
+        MipCase.doTest("gen-ip036.mps", "-4606.67961", null);
     }
 
     /**
@@ -91,7 +91,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testGen_ip054() {
-        MipCase.doStandardTest("gen-ip054.mps", "6840.966", null);
+        MipCase.doTest("gen-ip054.mps", "6840.966", null);
     }
 
     /**
@@ -108,7 +108,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testMarkshare_5_0() {
-        MipCase.doStandardTest("markshare_5_0.mps", "1.00000000e+00", null);
+        MipCase.doTest("markshare_5_0.mps", "1.00000000e+00", null);
     }
 
     /**
@@ -127,7 +127,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testMarkshare1() {
-        MipCase.doStandardTest("markshare1.mps", "1.00000000e+00", null);
+        MipCase.doTest("markshare1.mps", "1.00000000e+00", null);
     }
 
     /**
@@ -146,7 +146,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testMarkshare2() {
-        MipCase.doStandardTest("markshare2.mps", "1", null);
+        MipCase.doTest("markshare2.mps", "1", null);
     }
 
     /**
@@ -168,7 +168,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testMas76() {
-        MipCase.doStandardTest("mas76.mps", "4.00050541e+04", null);
+        MipCase.doTest("mas76.mps", "4.00050541e+04", null);
     }
 
     /**
@@ -187,7 +187,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testModglob() {
-        MipCase.doStandardTest("modglob.mps", "2.07405081e+07", null);
+        MipCase.doTest("modglob.mps", "2.07405081e+07", null);
     }
 
     /**
@@ -203,7 +203,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testNeos911880() {
-        MipCase.doStandardTest("neos-911880.mps", "54.76", null);
+        MipCase.doTest("neos-911880.mps", "54.76", null);
     }
 
     /**
@@ -221,7 +221,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
     @Test
     @Disabled("https://github.com/optimatika/ojAlgo/issues/120")
     public void testNoswot() {
-        MipCase.doStandardTest("noswot.mps", "-4.10000000e+01", null);
+        MipCase.doTest("noswot.mps", "-4.10000000e+01", null);
     }
 
     /**
@@ -238,7 +238,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testPp08a() {
-        MipCase.doStandardTest("pp08a.mps", "7.35000000e+03", null);
+        MipCase.doTest("pp08a.mps", "7.35000000e+03", null);
     }
 
     /**
@@ -254,7 +254,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testPp08aCUTS() {
-        MipCase.doStandardTest("pp08aCUTS.mps", "7.35000000e+03", null);
+        MipCase.doTest("pp08aCUTS.mps", "7.35000000e+03", null);
     }
 
     /**
@@ -270,7 +270,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testTimtab1() {
-        MipCase.doStandardTest("timtab1.mps", "7.64772000e+05", null);
+        MipCase.doTest("timtab1.mps", "7.64772000e+05", null);
     }
 
     /**
@@ -288,7 +288,7 @@ public final class MipCase extends OptimisationIntegerTests implements ModelFile
      */
     @Test
     public void testVpm2() {
-        MipCase.doStandardTest("vpm2.mps", "1.37500000e+01", null);
+        MipCase.doTest("vpm2.mps", "1.37500000e+01", null);
     }
 
 }

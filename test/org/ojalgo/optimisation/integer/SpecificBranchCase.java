@@ -37,6 +37,8 @@ import org.ojalgo.type.context.NumberContext;
 
 public final class SpecificBranchCase extends OptimisationIntegerTests implements ModelFileMPS {
 
+    public static final String INT_PATH = ModelFileMPS.OPTIMISATION_RSRC + "miplib/";
+
     /**
      * 4 nodes that validated to "Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED.
      * Stop this branch!"
@@ -113,7 +115,7 @@ public final class SpecificBranchCase extends OptimisationIntegerTests implement
     @Test
     public void testVpm2FirstBranch() {
 
-        final File tmpFile = new File(ModelFileMPS.INT_PATH + "vpm2.mps");
+        final File tmpFile = new File(SpecificBranchCase.INT_PATH + "vpm2.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
@@ -146,7 +148,7 @@ public final class SpecificBranchCase extends OptimisationIntegerTests implement
 
     private void doNodeTest(int[] lower, int[] upper) {
 
-        final File file = new File(ModelFileMPS.INT_PATH + "noswot.mps");
+        final File file = new File(SpecificBranchCase.INT_PATH + "noswot.mps");
         final MathProgSysModel mps = MathProgSysModel.make(file);
         final ExpressionsBasedModel orgMmodel = mps.getExpressionsBasedModel();
 

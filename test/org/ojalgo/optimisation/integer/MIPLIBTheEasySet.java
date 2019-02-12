@@ -29,7 +29,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
 
     static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
 
-    static void doStandardTest(final String modelName, final String expMinValString, final String expMaxValString) {
+    static void doTest(final String modelName, final String expMinValString, final String expMaxValString) {
         ModelFileMPS.makeAndAssert("miplib", modelName, expMinValString, expMaxValString, false, PRECISION, null);
     }
 
@@ -43,7 +43,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     @Test
     @Tag("slow")
     public void testB_ball() {
-        MIPLIBTheEasySet.doStandardTest("b-ball.mps", "-1.5", null);
+        MIPLIBTheEasySet.doTest("b-ball.mps", "-1.5", null);
     }
 
     /**
@@ -55,7 +55,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      */
     @Test
     public void testFlugpl() {
-        MIPLIBTheEasySet.doStandardTest("flugpl.mps", "1201500", null);
+        MIPLIBTheEasySet.doTest("flugpl.mps", "1201500", null);
     }
 
     /**
@@ -67,7 +67,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      */
     @Test
     public void testGr4x6() {
-        MIPLIBTheEasySet.doStandardTest("gr4x6.mps", "202.35", null);
+        MIPLIBTheEasySet.doTest("gr4x6.mps", "202.35", null);
     }
 
     /**
@@ -79,7 +79,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
      */
     @Test
     public void testMarkshare_4_0() {
-        MIPLIBTheEasySet.doStandardTest("markshare_4_0.mps", "1", null);
+        MIPLIBTheEasySet.doTest("markshare_4_0.mps", "1", null);
     }
 
     /**
@@ -92,7 +92,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     @Test
     @Tag("slow")
     public void testNeos5() {
-        MIPLIBTheEasySet.doStandardTest("neos5.mps", "15", null);
+        MIPLIBTheEasySet.doTest("neos5.mps", "15", null);
     }
 
     /**
@@ -114,7 +114,7 @@ public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelF
     @Test
     @Tag("slow")
     public void testPk1() {
-        MIPLIBTheEasySet.doStandardTest("pk1.mps", "1.10000000e+01", null);
+        MIPLIBTheEasySet.doTest("pk1.mps", "1.10000000e+01", null);
     }
 
 }

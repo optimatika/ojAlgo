@@ -12,7 +12,6 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,7 +25,6 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.MathProgSysModel;
 import org.ojalgo.optimisation.ModelFileMPS;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
@@ -100,11 +98,13 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
 
     private static ExpressionsBasedModel makeModel() {
 
-        final File tmpFile = new File(ModelFileMPS.INT_PATH + "markshare_5_0.mps");
+        //        final File tmpFile = new File(ModelFileMPS.INT_PATH + "markshare_5_0.mps");
+        //
+        //        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        //
+        //        return tmpMPS.getExpressionsBasedModel();
 
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-
-        return tmpMPS.getExpressionsBasedModel();
+        return ModelFileMPS.makeModel("miplib", "markshare_5_0.mps", false);
     }
 
     @Test

@@ -33,7 +33,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
 
     static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
 
-    static void doStandardTest(final String name, final String expMinValString, final String expMaxValString, final Map<String, BigDecimal> solution) {
+    static void doTest(final String name, final String expMinValString, final String expMaxValString, final Map<String, BigDecimal> solution) {
         ModelFileMPS.makeAndAssert("miplib", name, expMinValString, expMaxValString, true, PRECISION, solution);
     }
 
@@ -46,7 +46,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testB_ball() {
-        RelaxedMIPCase.doStandardTest("b-ball.mps", "-1.818181818181818", null, null);
+        RelaxedMIPCase.doTest("b-ball.mps", "-1.818181818181818", null, null);
     }
 
     /**
@@ -58,7 +58,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testEj() {
-        RelaxedMIPCase.doStandardTest("ej.mps", "1", null, null);
+        RelaxedMIPCase.doTest("ej.mps", "1", null, null);
     }
 
     /**
@@ -70,7 +70,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testFlugpl() {
-        RelaxedMIPCase.doStandardTest("flugpl.mps", "1167185.7255923203", null, null);
+        RelaxedMIPCase.doTest("flugpl.mps", "1167185.7255923203", null, null);
     }
 
     /**
@@ -82,7 +82,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testGen_ip002() {
-        RelaxedMIPCase.doStandardTest("gen-ip002.mps", "-4840.541961300889", null, null);
+        RelaxedMIPCase.doTest("gen-ip002.mps", "-4840.541961300889", null, null);
     }
 
     /**
@@ -94,7 +94,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testGen_ip021() {
-        RelaxedMIPCase.doStandardTest("gen-ip021.mps", "2327.84258448875", null, null);
+        RelaxedMIPCase.doTest("gen-ip021.mps", "2327.84258448875", null, null);
     }
 
     /**
@@ -106,7 +106,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testGen_ip036() {
-        RelaxedMIPCase.doStandardTest("gen-ip036.mps", "-4632.29815287346", null, null);
+        RelaxedMIPCase.doTest("gen-ip036.mps", "-4632.29815287346", null, null);
     }
 
     /**
@@ -118,7 +118,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testGen_ip054() {
-        RelaxedMIPCase.doStandardTest("gen-ip054.mps", "6765.2090427", null, null);
+        RelaxedMIPCase.doTest("gen-ip054.mps", "6765.2090427", null, null);
     }
 
     /**
@@ -130,7 +130,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testGr4x6() {
-        RelaxedMIPCase.doStandardTest("gr4x6.mps", "185.55", null, null);
+        RelaxedMIPCase.doTest("gr4x6.mps", "185.55", null, null);
     }
 
     /**
@@ -142,7 +142,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testMarkshare_4_0() {
-        RelaxedMIPCase.doStandardTest("markshare_4_0.mps", "0", null, null);
+        RelaxedMIPCase.doTest("markshare_4_0.mps", "0", null, null);
     }
 
     /**
@@ -162,7 +162,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testMarkshare_5_0() {
-        RelaxedMIPCase.doStandardTest("markshare_5_0.mps", "0.00000000e+00", null, null);
+        RelaxedMIPCase.doTest("markshare_5_0.mps", "0.00000000e+00", null, null);
     }
 
     /**
@@ -182,7 +182,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testMarkshare1() {
-        RelaxedMIPCase.doStandardTest("markshare1.mps", "0", null, null);
+        RelaxedMIPCase.doTest("markshare1.mps", "0", null, null);
     }
 
     /**
@@ -201,7 +201,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testMarkshare2() {
-        RelaxedMIPCase.doStandardTest("markshare2.mps", "0", null, null);
+        RelaxedMIPCase.doTest("markshare2.mps", "0", null, null);
     }
 
     /**
@@ -220,7 +220,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testMas76() {
-        RelaxedMIPCase.doStandardTest("mas76.mps", "3.88939036e+04", null, null);
+        RelaxedMIPCase.doTest("mas76.mps", "3.88939036e+04", null, null);
     }
 
     /**
@@ -239,7 +239,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testModglob() {
-        RelaxedMIPCase.doStandardTest("modglob.mps", "2.04309476e+07", null, null);
+        RelaxedMIPCase.doTest("modglob.mps", "2.04309476e+07", null, null);
     }
 
     /**
@@ -251,7 +251,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testNeos5() {
-        RelaxedMIPCase.doStandardTest("neos5.mps", "13", null, null);
+        RelaxedMIPCase.doTest("neos5.mps", "13", null, null);
     }
 
     /**
@@ -270,7 +270,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testNeos911880() {
-        RelaxedMIPCase.doStandardTest("neos-911880.mps", "23.26", null, null);
+        RelaxedMIPCase.doTest("neos-911880.mps", "23.26", null, null);
     }
 
     /**
@@ -289,7 +289,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testNoswot() {
-        RelaxedMIPCase.doStandardTest("noswot.mps", "-43", null, null);
+        RelaxedMIPCase.doTest("noswot.mps", "-43", null, null);
     }
 
     /**
@@ -308,7 +308,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testP2m2p1m1p0n100() {
-        RelaxedMIPCase.doStandardTest("p2m2p1m1p0n100.mps", "80424", null, null);
+        RelaxedMIPCase.doTest("p2m2p1m1p0n100.mps", "80424", null, null);
     }
 
     /**
@@ -433,7 +433,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
         tmpSolution.put("x85", BigDecimal.valueOf(0));
         tmpSolution.put("x86", BigDecimal.valueOf(0));
 
-        RelaxedMIPCase.doStandardTest("pk1.mps", "0", null, tmpSolution);
+        RelaxedMIPCase.doTest("pk1.mps", "0", null, tmpSolution);
     }
 
     /**
@@ -452,7 +452,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testPp08a() {
-        RelaxedMIPCase.doStandardTest("pp08a.mps", "2.74834524e+03", null, null);
+        RelaxedMIPCase.doTest("pp08a.mps", "2.74834524e+03", null, null);
     }
 
     /**
@@ -471,7 +471,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testPp08aCUTS() {
-        RelaxedMIPCase.doStandardTest("pp08aCUTS.mps", "5.48060616e+03", null, null);
+        RelaxedMIPCase.doTest("pp08aCUTS.mps", "5.48060616e+03", null, null);
     }
 
     /**
@@ -490,7 +490,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testTimtab1() {
-        RelaxedMIPCase.doStandardTest("timtab1.mps", "2.86940000e+04", null, null);
+        RelaxedMIPCase.doTest("timtab1.mps", "2.86940000e+04", null, null);
     }
 
     /**
@@ -509,7 +509,7 @@ public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFil
      */
     @Test
     public void testVpm2() {
-        RelaxedMIPCase.doStandardTest("vpm2.mps", "9.88926460e+00", null, null);
+        RelaxedMIPCase.doTest("vpm2.mps", "9.88926460e+00", null, null);
     }
 
 }

@@ -35,7 +35,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
 
     static NumberContext PRECISION = new NumberContext(11, 9);
 
-    static ExpressionsBasedModel doStandardTest(String modelName, String expMinValString, String expMaxValString) {
+    static ExpressionsBasedModel doTest(String modelName, String expMinValString, String expMaxValString) {
         return ModelFileMPS.makeAndAssert("burkardt", modelName, expMinValString, expMaxValString, false, BurkardtDatasetsMps.PRECISION, null);
     }
 
@@ -52,7 +52,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSadlittle() {
-        BurkardtDatasetsMps.doStandardTest("adlittle.mps", "225494.96316238446", null);
+        BurkardtDatasetsMps.doTest("adlittle.mps", "225494.96316238446", null);
     }
 
     /**
@@ -63,7 +63,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSafiro() {
-        BurkardtDatasetsMps.doStandardTest("afiro.mps", "-.46475314286e+3", null);
+        BurkardtDatasetsMps.doTest("afiro.mps", "-.46475314286e+3", null);
     }
 
     /**
@@ -72,7 +72,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSempstest() {
-        BurkardtDatasetsMps.doStandardTest("empstest.mps", null, null);
+        BurkardtDatasetsMps.doTest("empstest.mps", null, null);
     }
 
     /**
@@ -82,7 +82,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSmaros() {
-        BurkardtDatasetsMps.doStandardTest("maros.mps", BigFunction.DIVIDE.invoke(new BigDecimal("385"), THREE).toString(), "197.5");
+        BurkardtDatasetsMps.doTest("maros.mps", BigFunction.DIVIDE.invoke(new BigDecimal("385"), THREE).toString(), "197.5");
     }
 
     /**
@@ -91,7 +91,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSnazareth() {
-        BurkardtDatasetsMps.doStandardTest("nazareth.mps", null, BigFunction.DIVIDE.invoke(HUNDRED.add(TEN), THREE).toString());
+        BurkardtDatasetsMps.doTest("nazareth.mps", null, BigFunction.DIVIDE.invoke(HUNDRED.add(TEN), THREE).toString());
     }
 
     /**
@@ -102,7 +102,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
     @Test
     public void testMPStestprob() {
 
-        ExpressionsBasedModel parsedModel = BurkardtDatasetsMps.doStandardTest("testprob.mps", "54", "80");
+        ExpressionsBasedModel parsedModel = BurkardtDatasetsMps.doTest("testprob.mps", "54", "80");
 
         final Variable tmpXONE = new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
         final Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);

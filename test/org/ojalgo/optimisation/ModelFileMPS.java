@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
+import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
@@ -29,20 +30,35 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface ModelFileMPS {
 
-    String OPT_RSRC = "./rsrc/optimisation/";
-
-    String INT_PATH = OPT_RSRC + "miplib/";
+    String OPTIMISATION_RSRC = "./rsrc/optimisation/";
     String SOLUTION_NOT_VALID = "Solution not valid!";
 
-    public static ExpressionsBasedModel makeAndAssert(String dataset, final String modelName, final String expMinValString, final String expMaxValString,
-            final boolean relax, NumberContext precision, final Map<String, BigDecimal> solution) {
+    public static void assertValues(final ExpressionsBasedModel model, BigDecimal expMinVal, BigDecimal expMaxVal, final Map<String, BigDecimal> solution,
+            NumberContext precision) {
 
-        final ExpressionsBasedModel model = ModelFileMPS.makeModel(dataset, modelName, relax);
+        TestUtils.assertTrue(model.validate());
 
-        BigDecimal expMinVal = expMinValString != null ? new BigDecimal(expMinValString) : null;
-        BigDecimal expMaxVal = expMaxValString != null ? new BigDecimal(expMaxValString) : null;
+        if (expMinVal != null) {
 
-        ModelFileMPS.assertValues(model, expMinVal, expMaxVal, precision);
+            Result result = model.minimise();
+
+            TestUtils.assertStateNotLessThanFeasible(result);
+
+            TestUtils.assertEquals(expMinVal, result.getValue(), precision);
+
+            TestUtils.assertTrue(ModelFileMPS.SOLUTION_NOT_VALID, model.validate(result, precision));
+        }
+
+        if (expMaxVal != null) {
+
+            Result result = model.maximise();
+
+            TestUtils.assertStateNotLessThanFeasible(result);
+
+            TestUtils.assertEquals(expMaxVal, result.getValue(), precision);
+
+            TestUtils.assertTrue(ModelFileMPS.SOLUTION_NOT_VALID, model.validate(result, precision));
+        }
 
         if (solution != null) {
             for (final Variable tmpVariable : model.getVariables()) {
@@ -57,42 +73,24 @@ public interface ModelFileMPS {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
         }
+    }
+
+    public static ExpressionsBasedModel makeAndAssert(String dataset, final String modelName, final String expMinValString, final String expMaxValString,
+            final boolean relax, NumberContext precision, final Map<String, BigDecimal> solution) {
+
+        final ExpressionsBasedModel model = ModelFileMPS.makeModel(dataset, modelName, relax);
+
+        BigDecimal expMinVal = expMinValString != null ? new BigDecimal(expMinValString) : null;
+        BigDecimal expMaxVal = expMaxValString != null ? new BigDecimal(expMaxValString) : null;
+
+        ModelFileMPS.assertValues(model, expMinVal, expMaxVal, solution, precision);
 
         return model;
     }
 
-    public static void assertValues(final ExpressionsBasedModel model, BigDecimal expMinVal, BigDecimal expMaxVal, NumberContext precision) {
-
-        TestUtils.assertTrue(model.validate());
-
-        if (expMinVal != null) {
-
-            final double minimum = model.minimise().getValue();
-
-            if (!model.validate(precision)) {
-                TestUtils.fail(SOLUTION_NOT_VALID);
-            }
-
-            final double expected = expMinVal.doubleValue();
-            TestUtils.assertEquals(expected, minimum, precision);
-        }
-
-        if (expMaxVal != null) {
-
-            final double maximum = model.maximise().getValue();
-
-            if (!model.validate(precision)) {
-                TestUtils.fail(SOLUTION_NOT_VALID);
-            }
-
-            final double expected = expMaxVal.doubleValue();
-            TestUtils.assertEquals(expected, maximum, precision);
-        }
-    }
-
     public static ExpressionsBasedModel makeModel(String dataset, final String name, final boolean relax) {
 
-        final File file = new File(OPT_RSRC + dataset + "/" + name);
+        final File file = new File(OPTIMISATION_RSRC + dataset + "/" + name);
         final ExpressionsBasedModel model = MathProgSysModel.make(file).getExpressionsBasedModel();
 
         TestUtils.assertTrue(model.validate());
@@ -112,6 +110,8 @@ public interface ModelFileMPS {
         // model.options.debug(IntegerSolver.class);
         model.options.progress(IntegerSolver.class);
         // model.options.validate = false;
+
+        TestUtils.assertTrue(model.validate());
 
         return model;
     }
