@@ -12,37 +12,29 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import java.io.File;
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.Test;
-import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.MathProgSysModel;
 import org.ojalgo.optimisation.ModelFileMPS;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * A collection of datasets found here: http://www-new.mcs.anl.gov/otc/Guide/TestProblems/LPtest/
  *
  * @author apete
  */
-public class NetlibCase extends OptimisationLinearTests {
+public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS {
+
+    static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
+
+    static void doStandardTest(final String name, final String expMinValString, final String expMaxValString) {
+        ModelFileMPS.makeAndAssert("netlib", name, expMinValString, expMaxValString, false, PRECISION, null);
+    }
 
     /**
      * OK! 2010-04-19 lp_solve => -30.81214985
      */
     @Test
     public void testBlend() {
-
-        final File tmpFile = new File(ModelFileMPS.LIN_PATH + "blend.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
-
-        //tmpModel.options.problem = new NumberContext(32, 8, RoundingMode.HALF_EVEN);
-        //tmpModel.options.solution = new NumberContext(16, 10, RoundingMode.HALF_EVEN);
-
-        // tmpModel.options.debug(LinearSolver.class);
-
-        ModelFileMPS.assertMinMaxVal(tmpModel, new BigDecimal("-3.0812149846E+01"), null);
+        NetlibCase.doStandardTest("BLEND.SIF", "-3.0812149846E+01", null);
     }
 
     /**
@@ -50,12 +42,7 @@ public class NetlibCase extends OptimisationLinearTests {
      */
     @Test
     public void testBoeing2() {
-
-        final File tmpFile = new File(ModelFileMPS.LIN_PATH + "boeing2.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
-
-        ModelFileMPS.assertMinMaxVal(tmpModel, new BigDecimal("-3.1501872802E+02"), null);
+        NetlibCase.doStandardTest("BOEING2.SIF", "-3.1501872802E+02", null);
     }
 
     /**
@@ -63,12 +50,7 @@ public class NetlibCase extends OptimisationLinearTests {
      */
     @Test
     public void testKb2() {
-
-        final File tmpFile = new File(ModelFileMPS.LIN_PATH + "kb2.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
-
-        ModelFileMPS.assertMinMaxVal(tmpModel, new BigDecimal("-1.74990012991E+03"), null);
+        NetlibCase.doStandardTest("KB2.SIF", "-1.74990012991E+03", null);
     }
 
     /**
@@ -76,12 +58,7 @@ public class NetlibCase extends OptimisationLinearTests {
      */
     @Test
     public void testSc50b() {
-
-        final File tmpFile = new File(ModelFileMPS.LIN_PATH + "sc50b.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
-
-        ModelFileMPS.assertMinMaxVal(tmpModel, new BigDecimal("-7.0000000000E+01"), null);
+        NetlibCase.doStandardTest("SC50B.SIF", "-7.0000000000E+01", null);
     }
 
     /**
@@ -89,11 +66,7 @@ public class NetlibCase extends OptimisationLinearTests {
      */
     @Test
     public void testShare2b() {
-
-        final File tmpFile = new File(ModelFileMPS.LIN_PATH + "share2b.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
-
-        ModelFileMPS.assertMinMaxVal(tmpModel, new BigDecimal("-4.1573224074E+02"), null);
+        NetlibCase.doStandardTest("SHARE2B.SIF", "-4.1573224074E+02", null);
     }
+
 }

@@ -27,67 +27,41 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public class ModelFileMPS {
+public interface ModelFileMPS {
 
-    private static final String OPT_RSRC = "./rsrc/optimisation/";
+    String OPT_RSRC = "./rsrc/optimisation/";
 
-    public static final String INT_PATH = OPT_RSRC + "miplib/";
+    String INT_PATH = OPT_RSRC + "miplib/";
+    String SOLUTION_NOT_VALID = "Solution not valid!";
 
-    public static final String LIN_PATH = OPT_RSRC + "netlib/old/";
-
-    public static String SOLUTION_NOT_VALID = "Solution not valid!";
-
-    static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
-
-    public static void assertMinMaxVal(final ExpressionsBasedModel model, final BigDecimal expMinVal, final BigDecimal expMaxVal) {
-
-        TestUtils.assertTrue(model.validate());
-
-        if (expMinVal != null) {
-
-            TestUtils.assertEquals(expMinVal.doubleValue(), model.minimise().getValue(), PRECISION);
-
-            if (!model.validate(PRECISION)) {
-                TestUtils.fail(SOLUTION_NOT_VALID);
-            }
-        }
-
-        if (expMaxVal != null) {
-
-            TestUtils.assertEquals(expMaxVal.doubleValue(), model.maximise().getValue(), PRECISION);
-
-            if (!model.validate(PRECISION)) {
-                TestUtils.fail(SOLUTION_NOT_VALID);
-            }
-        }
-    }
-
-    public static ExpressionsBasedModel assertMinMaxVal(String dataset, final String modelName, final String expMinValString, final String expMaxValString,
+    public static ExpressionsBasedModel makeAndAssert(String dataset, final String modelName, final String expMinValString, final String expMaxValString,
             final boolean relax, NumberContext precision, final Map<String, BigDecimal> solution) {
+
+        final ExpressionsBasedModel model = ModelFileMPS.makeModel(dataset, modelName, relax);
 
         BigDecimal expMinVal = expMinValString != null ? new BigDecimal(expMinValString) : null;
         BigDecimal expMaxVal = expMaxValString != null ? new BigDecimal(expMaxValString) : null;
 
-        final File file = new File(OPT_RSRC + dataset + "/" + modelName);
-        final ExpressionsBasedModel model = MathProgSysModel.make(file).getExpressionsBasedModel();
+        ModelFileMPS.assertValues(model, expMinVal, expMaxVal, precision);
 
-        TestUtils.assertTrue(model.validate());
-
-        if (relax) {
-
-            model.relax(true);
-
-            for (Variable tmpVar : model.getVariables()) {
-                tmpVar.relax();
+        if (solution != null) {
+            for (final Variable tmpVariable : model.getVariables()) {
+                final BigDecimal tmpValue = solution.get(tmpVariable.getName());
+                if (tmpValue != null) {
+                    tmpVariable.setValue(tmpValue);
+                } else {
+                    tmpVariable.setValue(BigMath.ZERO);
+                }
+            }
+            if (!model.validate(precision)) {
+                TestUtils.fail(SOLUTION_NOT_VALID);
             }
         }
 
-        model.options.time_suffice = 5L * CalendarDateUnit.MINUTE.toDurationInMillis();
-        model.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
+        return model;
+    }
 
-        // model.options.debug(IntegerSolver.class);
-        model.options.progress(IntegerSolver.class);
-        // model.options.validate = false;
+    public static void assertValues(final ExpressionsBasedModel model, BigDecimal expMinVal, BigDecimal expMaxVal, NumberContext precision) {
 
         TestUtils.assertTrue(model.validate());
 
@@ -114,20 +88,30 @@ public class ModelFileMPS {
             final double expected = expMaxVal.doubleValue();
             TestUtils.assertEquals(expected, maximum, precision);
         }
+    }
 
-        if (solution != null) {
-            for (final Variable tmpVariable : model.getVariables()) {
-                final BigDecimal tmpValue = solution.get(tmpVariable.getName());
-                if (tmpValue != null) {
-                    tmpVariable.setValue(tmpValue);
-                } else {
-                    tmpVariable.setValue(BigMath.ZERO);
-                }
-            }
-            if (!model.validate(precision)) {
-                TestUtils.fail(SOLUTION_NOT_VALID);
+    public static ExpressionsBasedModel makeModel(String dataset, final String name, final boolean relax) {
+
+        final File file = new File(OPT_RSRC + dataset + "/" + name);
+        final ExpressionsBasedModel model = MathProgSysModel.make(file).getExpressionsBasedModel();
+
+        TestUtils.assertTrue(model.validate());
+
+        if (relax) {
+
+            model.relax(true);
+
+            for (Variable tmpVar : model.getVariables()) {
+                tmpVar.relax();
             }
         }
+
+        model.options.time_suffice = 5L * CalendarDateUnit.MINUTE.toDurationInMillis();
+        model.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
+
+        // model.options.debug(IntegerSolver.class);
+        model.options.progress(IntegerSolver.class);
+        // model.options.validate = false;
 
         return model;
     }

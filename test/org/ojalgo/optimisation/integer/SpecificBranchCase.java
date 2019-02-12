@@ -35,7 +35,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.type.context.NumberContext;
 
-public final class SpecificBranchCase extends OptimisationIntegerTests {
+public final class SpecificBranchCase extends OptimisationIntegerTests implements ModelFileMPS {
 
     /**
      * 4 nodes that validated to "Node solution marked as OPTIMAL, but is actually INVALID/INFEASIBLE/FAILED.

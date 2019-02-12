@@ -29,12 +29,12 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.optimisation.ModelFileMPS;
 import org.ojalgo.type.context.NumberContext;
 
-public class RelaxedMIPCase extends OptimisationIntegerTests {
+public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFileMPS {
 
     static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
 
-    static void doStandardTest(final String modelName, final String expMinValString, final String expMaxValString, final Map<String, BigDecimal> solution) {
-        ModelFileMPS.assertMinMaxVal("miplib", modelName, expMinValString, expMaxValString, true, PRECISION, solution);
+    static void doStandardTest(final String name, final String expMinValString, final String expMaxValString, final Map<String, BigDecimal> solution) {
+        ModelFileMPS.makeAndAssert("miplib", name, expMinValString, expMaxValString, true, PRECISION, solution);
     }
 
     /**

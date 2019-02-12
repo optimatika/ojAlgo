@@ -31,12 +31,12 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public class BurkardtDatasetsMps extends OptimisationLinearTests {
+public class BurkardtDatasetsMps extends OptimisationLinearTests implements ModelFileMPS {
 
     static NumberContext PRECISION = new NumberContext(11, 9);
 
     static ExpressionsBasedModel doStandardTest(String modelName, String expMinValString, String expMaxValString) {
-        return ModelFileMPS.assertMinMaxVal("burkardt", modelName, expMinValString, expMaxValString, false, BurkardtDatasetsMps.PRECISION, null);
+        return ModelFileMPS.makeAndAssert("burkardt", modelName, expMinValString, expMaxValString, false, BurkardtDatasetsMps.PRECISION, null);
     }
 
     /**

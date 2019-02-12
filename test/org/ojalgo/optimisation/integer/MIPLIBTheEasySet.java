@@ -25,12 +25,12 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public class MIPLIBTheEasySet extends OptimisationIntegerTests {
+public class MIPLIBTheEasySet extends OptimisationIntegerTests implements ModelFileMPS {
 
     static final NumberContext PRECISION = NumberContext.getGeneral(8, 6);
 
     static void doStandardTest(final String modelName, final String expMinValString, final String expMaxValString) {
-        ModelFileMPS.assertMinMaxVal("miplib", modelName, expMinValString, expMaxValString, false, PRECISION, null);
+        ModelFileMPS.makeAndAssert("miplib", modelName, expMinValString, expMaxValString, false, PRECISION, null);
     }
 
     /**

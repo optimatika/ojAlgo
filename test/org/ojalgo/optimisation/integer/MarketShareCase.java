@@ -40,7 +40,7 @@ import org.ojalgo.type.context.NumberContext;
  * http://miplib.zib.de/miplib2010/markshare_5_0.php Objective Value min < MIP < max: 0.00000000e+00 <
  * 1.00000000e+00 < ?
  */
-public final class MarketShareCase extends OptimisationIntegerTests {
+public final class MarketShareCase extends OptimisationIntegerTests implements ModelFileMPS {
 
     private static final BigDecimal OBJECTIVE_MIP = new BigDecimal(1);
     private static final Map<String, BigDecimal> SOLUTION;
