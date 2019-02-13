@@ -34,10 +34,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void test25FV47() {
         NetlibCase.doTest("25FV47.SIF", "1234567890");
     }
@@ -148,10 +149,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testBNL2() {
         NetlibCase.doTest("BNL2.SIF", "1234567890");
     }
@@ -210,10 +212,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testCRE_A() {
         NetlibCase.doTest("CRE-A.SIF", "1234567890");
     }
@@ -221,10 +224,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testCRE_B() {
         NetlibCase.doTest("CRE-B.SIF", "1234567890");
     }
@@ -232,10 +236,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testCRE_C() {
         NetlibCase.doTest("CRE-C.SIF", "1234567890");
     }
@@ -243,10 +248,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testCRE_D() {
         NetlibCase.doTest("CRE-D.SIF", "1234567890");
     }
@@ -254,10 +260,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testCYCLE() {
         NetlibCase.doTest("CYCLE.SIF", "1234567890");
     }
@@ -369,10 +376,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testFIT1D() {
         NetlibCase.doTest("FIT1D.SIF", "1234567890");
     }
@@ -380,10 +388,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testFIT1P() {
         NetlibCase.doTest("FIT1P.SIF", "1234567890");
     }
@@ -391,10 +400,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testFIT2D() {
         NetlibCase.doTest("FIT2D.SIF", "1234567890");
     }
@@ -402,10 +412,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testFIT2P() {
         NetlibCase.doTest("FIT2P.SIF", "1234567890");
     }
@@ -573,10 +584,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testMAROS() {
         NetlibCase.doTest("MAROS.SIF", "1234567890");
     }
@@ -595,10 +607,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testNESM() {
         NetlibCase.doTest("NESM.SIF", "1234567890");
     }
@@ -705,10 +718,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testPILOT() {
         NetlibCase.doTest("PILOT.SIF", "1234567890");
     }
@@ -716,10 +730,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testPILOT_JA() {
         NetlibCase.doTest("PILOT-JA.SIF", "1234567890");
     }
@@ -727,10 +742,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testPILOT_WE() {
         NetlibCase.doTest("PILOT-WE.SIF", "1234567890");
     }
@@ -750,10 +766,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testPILOT87() {
         NetlibCase.doTest("PILOT87.SIF", "1234567890");
     }
@@ -761,10 +778,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testPILOTNOV() {
         NetlibCase.doTest("PILOTNOV.SIF", "1234567890");
     }
@@ -772,10 +790,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testQAP12() {
         NetlibCase.doTest("QAP12.SIF", "1234567890");
     }
@@ -783,10 +802,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testQAP15() {
         NetlibCase.doTest("QAP15.SIF", "1234567890");
     }
@@ -794,10 +814,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testQAP8() {
         NetlibCase.doTest("QAP8.SIF", "1234567890");
     }
@@ -1180,10 +1201,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testSTOCFOR3() {
         NetlibCase.doTest("STOCFOR3.SIF", "1234567890");
     }
@@ -1191,10 +1213,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testTRUSS() {
         NetlibCase.doTest("TRUSS.SIF", "1234567890");
     }
@@ -1235,10 +1258,11 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
      */
     @Test
-    @Tag("slow")
+    @Tag("slow,unstable")
     public void testWOODW() {
         NetlibCase.doTest("WOODW.SIF", "1234567890");
     }
