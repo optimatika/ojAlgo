@@ -375,6 +375,10 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
     }
 
     private static final String COMMENT = "*";
+    /**
+     * Seems to be used in problem headers/comment to mark references to authors and such
+     */
+    private static final String COMMENT_REF = "&";
     private static final String EMPTY = "";
     private static final int[] FIELD_LIMITS = new int[] { 3, 12, 22, 36, 47, 61 };
     private static final String SPACE = " ";
@@ -398,7 +402,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
                 // BasicLogger.debug("Line: {}", tmpLine);
 
-                if ((tmpLine.length() == 0) || tmpLine.startsWith(COMMENT)) {
+                if ((tmpLine.length() == 0) || tmpLine.startsWith(COMMENT) || tmpLine.startsWith(COMMENT_REF)) {
                     // Skip this line
                 } else if (tmpLine.startsWith(SPACE)) {
                     retVal.parseSectionLine(tmpSection, tmpLine);
@@ -586,7 +590,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
             tmpArgument = EMPTY;
         }
 
-        //      BasicLogger.logDebug("Section: {},\tArgument: {}.", tmpSection, tmpArgument);
+        // BasicLogger.debug("Section: {},\tArgument: {}.", tmpSection, tmpArgument);
 
         final FileSection retVal = FileSection.valueOf(tmpSection);
 

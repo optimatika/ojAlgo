@@ -209,40 +209,44 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testCRE_A() {
         NetlibCase.doTest("CRE-A.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testCRE_B() {
         NetlibCase.doTest("CRE-B.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testCRE_C() {
         NetlibCase.doTest("CRE-C.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testCRE_D() {
         NetlibCase.doTest("CRE-D.SIF", "1234567890");
     }
@@ -317,7 +321,7 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
      * </pre>
      */
     @Test
-    @Disabled
+    @Disabled("File format problem")
     public void testDFL001() {
         NetlibCase.doTest("DFL001.SIF", "1234567890");
     }
@@ -411,7 +415,7 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
      * </pre>
      */
     @Test
-    @Disabled
+    @Disabled("File format problem")
     public void testFORPLAN() {
         NetlibCase.doTest("FORPLAN.SIF", "1234567890");
     }
@@ -432,7 +436,7 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
      * </pre>
      */
     @Test
-    @Disabled
+    @Disabled("File format problem")
     public void testGFRD_PNC() {
         NetlibCase.doTest("GFRD-PNC.SIF", "1234567890");
     }
@@ -514,40 +518,44 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testKEN_07() {
         NetlibCase.doTest("KEN-07.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testKEN_11() {
         NetlibCase.doTest("KEN-11.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testKEN_13() {
         NetlibCase.doTest("KEN-13.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testKEN_18() {
         NetlibCase.doTest("KEN-18.SIF", "1234567890");
     }
@@ -597,80 +605,88 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testOSA_07() {
         NetlibCase.doTest("OSA-07.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testOSA_14() {
         NetlibCase.doTest("OSA-14.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testOSA_30() {
         NetlibCase.doTest("OSA-30.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testOSA_60() {
         NetlibCase.doTest("OSA-60.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testPDS_02() {
         NetlibCase.doTest("PDS-02.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testPDS_06() {
         NetlibCase.doTest("PDS-06.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testPDS_10() {
         NetlibCase.doTest("PDS-10.SIF", "1234567890");
     }
 
     /**
      * <pre>
+     * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * </pre>
      */
     @Test
-    @Disabled
+    @Tag("slow")
     public void testPDS_20() {
         NetlibCase.doTest("PDS-20.SIF", "1234567890");
     }
@@ -1090,7 +1106,7 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
      * </pre>
      */
     @Test
-    @Disabled
+    @Disabled("File format problem")
     public void testSIERRA() {
         NetlibCase.doTest("SIERRA.SIF", "1234567890");
     }
