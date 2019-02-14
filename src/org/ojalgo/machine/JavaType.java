@@ -23,12 +23,12 @@ package org.ojalgo.machine;
 
 public enum JavaType {
 
-    BYTE(byte.class, 8, 1L), SHORT(short.class, 16, 2L), INT(int.class, 32, 4L), LONG(long.class, 64, 8L), FLOAT(float.class, 32, 4L), DOUBLE(double.class, 64,
-            8L), BOOLEAN(boolean.class, 1, 1L), CHAR(char.class, 16, 2L),
+    BOOLEAN(boolean.class, 1, 1L), BYTE(byte.class, 8, 1L), CHAR(char.class, 16, 2L), DOUBLE(double.class, 64, 8L), FLOAT(float.class, 32, 4L), INT(int.class,
+            32, 4L), LONG(long.class, 64, 8L),
     /**
      * 4 bytes with 32-bit JVM or 64-bit JVM with compressed pointers (All JVM:s assigned less than 32GB)
      */
-    REFERENCE(Object.class, 64, 4L);
+    REFERENCE(Object.class, 64, 4L), SHORT(short.class, 16, 2L);
 
     public static final JavaType match(final Class<?> aClass) {
         for (final JavaType tmpType : JavaType.values()) {
@@ -40,8 +40,8 @@ public enum JavaType {
     }
 
     private final int myInformationBits;
-    private final long myMemoryBytes;
     private final Class<?> myJavaClass;
+    private final long myMemoryBytes;
 
     JavaType(final Class<?> aClass, final int informationBits, final long memoryBytes) {
         myJavaClass = aClass;
