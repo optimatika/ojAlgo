@@ -873,8 +873,10 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         final int numbCols = numberOfProblemVariables + numberOfSlackVariables + numberOfConstraints + 1;
         final int totCount = numbRows * numbCols; //  Total number of elements in a dense tableau
 
+        // Max number of elements in CPU cache
         long maxCount = OjAlgoUtils.ENVIRONMENT.getCacheElements(JavaType.DOUBLE.memory());
-        if (totCount <= maxCount) {
+
+        if ((totCount <= maxCount) || (numberOfProblemVariables <= numberOfConstraints)) {
             return new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
         } else {
             return new SparseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
