@@ -428,6 +428,9 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
     private final Map<String, Column> myColumns = new HashMap<>();
     private final ExpressionsBasedModel myDelegate;
     private final String[] myFields = new String[6];
+    private String myIdBOUNDS = null;
+    private String myIdRANGES = null;
+    private String myIdRHS = null;
     private boolean myIntegerMarker = false;
     private String myName;
     private final Map<String, Row> myRows = new HashMap<>();
@@ -681,6 +684,12 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
             this.extractFields(line, myRows);
 
+            if (myIdRHS == null) {
+                myIdRHS = myFields[1];
+            } else if (!myIdRHS.equals(myFields[1])) {
+                break;
+            }
+
             myRows.get(myFields[2]).rhs(new BigDecimal(myFields[3]));
 
             if (myFields[4] != null) {
@@ -693,6 +702,12 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
             this.extractFields(line, myRows);
 
+            if (myIdRANGES == null) {
+                myIdRANGES = myFields[1];
+            } else if (!myIdRANGES.equals(myFields[1])) {
+                break;
+            }
+
             myRows.get(myFields[2]).range(new BigDecimal(myFields[3]));
 
             if (myFields[4] != null) {
@@ -704,6 +719,12 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         case BOUNDS:
 
             this.extractFields(line, myColumns);
+
+            if (myIdBOUNDS == null) {
+                myIdBOUNDS = myFields[1];
+            } else if (!myIdBOUNDS.equals(myFields[1])) {
+                break;
+            }
 
             myColumns.get(myFields[2]).bound(BoundType.valueOf(myFields[0]), myFields[3] != null ? new BigDecimal(myFields[3]) : null);
 
