@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.structure.Access1D;
@@ -46,7 +47,6 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
     public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<MathProgSysModel, S> {
 
     }
-
     /**
      * BoundType used with the BOUNDS section.
      *
@@ -74,7 +74,6 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         BV(), FR(), FX(), LI(), LO(), MI(), PL(), SC(), UI(), UP();
 
     }
-
     final class Column extends Object {
 
         private boolean mySemicontinuous = false;
@@ -207,7 +206,6 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         }
 
     }
-
     /**
      * @author apete
      */
@@ -382,6 +380,10 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
     private static final String EMPTY = "";
     private static final int[] FIELD_FIRSTS = new int[] { 1, 4, 14, 24, 39, 49 };
     private static final int[] FIELD_LIMITS = new int[] { 4, 14, 24, 39, 49, 64 };
+    private static final String INTEND = "INTEND";
+    private static final String INTORG = "INTORG";
+    private static final String MARKER = "MARKER";
+    private static final String MAX = "MAX";
     private static final String SPACE = " ";
 
     public static MathProgSysModel make(final File file) {
@@ -423,12 +425,12 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
-    private final HashMap<String, Column> myColumns = new HashMap<>();
+    private final Map<String, Column> myColumns = new HashMap<>();
     private final ExpressionsBasedModel myDelegate;
     private final String[] myFields = new String[6];
     private boolean myIntegerMarker = false;
     private String myName;
-    private final HashMap<String, Row> myRows = new HashMap<>();
+    private final Map<String, Row> myRows = new HashMap<>();
 
     MathProgSysModel() {
 
@@ -538,6 +540,48 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         return myDelegate.validate(solution, context);
     }
 
+    private String[] extractFields(String line, Map<String, ?> verifier) {
+
+        myFields[0] = line.substring(FIELD_FIRSTS[0], FIELD_LIMITS[0]).trim();
+        myFields[1] = line.substring(FIELD_FIRSTS[1], FIELD_LIMITS[1]).trim();
+
+        int first = -1;
+        int limit = -1;
+
+        int field = 2;
+
+        char tecken;
+
+        boolean word = false;
+
+        for (int i = FIELD_FIRSTS[field]; i < line.length(); i++) {
+            tecken = line.charAt(i);
+            if (!word && !ASCII.isSpace(tecken)) {
+                word = true;
+                first = i;
+            } else if (word && ASCII.isSpace(tecken)) {
+                word = false;
+                limit = i;
+            }
+            if (word && ((i + 1) == line.length())) {
+                word = false;
+                limit = i + 1;
+            }
+            if (limit > first) {
+                String key = line.substring(first, limit);
+                if (((field % 2) == 0) && !verifier.containsKey(key)) {
+                    word = true;
+                } else {
+                    myFields[field++] = key;
+                    first = -1;
+                }
+                limit = -1;
+            }
+        }
+
+        return myFields;
+    }
+
     FileSection identifySection(final String line) {
 
         final int tmpSplit = line.indexOf(SPACE);
@@ -575,17 +619,6 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         Arrays.fill(myFields, null);
 
-        final int length = line.length();
-
-        char tecken;
-
-        int first = -1;
-        int limit = -1;
-
-        int field = 0;
-
-        boolean word = false;
-
         switch (section) {
 
         case NAME:
@@ -594,7 +627,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         case OBJSENSE:
 
-            if (line.contains("MAX")) {
+            if (line.contains(MAX)) {
                 this.setMaximisation();
             } else {
                 this.setMinimisation();
@@ -618,49 +651,17 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         case COLUMNS:
 
-            if (line.contains("MARKER")) {
+            if (line.contains(MARKER)) {
 
-                if (line.contains("INTORG")) {
+                if (line.contains(INTORG)) {
                     myIntegerMarker = true;
-                } else if (line.contains("INTEND")) {
+                } else if (line.contains(INTEND)) {
                     myIntegerMarker = false;
                 }
 
             } else {
 
-                myFields[1] = line.substring(FIELD_FIRSTS[1], FIELD_LIMITS[1]).trim();
-
-                first = -1;
-                limit = -1;
-
-                field = 2;
-
-                word = false;
-
-                for (int i = FIELD_FIRSTS[field]; i < length; i++) {
-                    tecken = line.charAt(i);
-                    if (!word && !ASCII.isSpace(tecken)) {
-                        word = true;
-                        first = i;
-                    } else if (word && ASCII.isSpace(tecken)) {
-                        word = false;
-                        limit = i;
-                    }
-                    if (word && ((i + 1) == length)) {
-                        word = false;
-                        limit = i + 1;
-                    }
-                    if (limit > first) {
-                        String colKey = line.substring(first, limit);
-                        if (((field % 2) == 0) && !myRows.containsKey(colKey)) {
-                            word = true;
-                        } else {
-                            myFields[field++] = colKey;
-                            first = -1;
-                            limit = -1;
-                        }
-                    }
-                }
+                this.extractFields(line, myRows);
 
                 final Column tmpColumn = myColumns.computeIfAbsent(myFields[1], key -> new Column(key));
 
@@ -678,39 +679,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         case RHS:
 
-            myFields[1] = line.substring(FIELD_FIRSTS[1], FIELD_LIMITS[1]).trim();
-
-            first = -1;
-            limit = -1;
-
-            field = 2;
-
-            word = false;
-
-            for (int i = FIELD_FIRSTS[field]; i < length; i++) {
-                tecken = line.charAt(i);
-                if (!word && !ASCII.isSpace(tecken)) {
-                    word = true;
-                    first = i;
-                } else if (word && ASCII.isSpace(tecken)) {
-                    word = false;
-                    limit = i;
-                }
-                if (word && ((i + 1) == length)) {
-                    word = false;
-                    limit = i + 1;
-                }
-                if (limit > first) {
-                    String colKey = line.substring(first, limit);
-                    if (((field % 2) == 0) && !myRows.containsKey(colKey)) {
-                        word = true;
-                    } else {
-                        myFields[field++] = colKey;
-                        first = -1;
-                        limit = -1;
-                    }
-                }
-            }
+            this.extractFields(line, myRows);
 
             myRows.get(myFields[2]).rhs(new BigDecimal(myFields[3]));
 
@@ -722,39 +691,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         case RANGES:
 
-            myFields[1] = line.substring(FIELD_FIRSTS[1], FIELD_LIMITS[1]).trim();
-
-            first = -1;
-            limit = -1;
-
-            field = 2;
-
-            word = false;
-
-            for (int i = FIELD_FIRSTS[field]; i < length; i++) {
-                tecken = line.charAt(i);
-                if (!word && !ASCII.isSpace(tecken)) {
-                    word = true;
-                    first = i;
-                } else if (word && ASCII.isSpace(tecken)) {
-                    word = false;
-                    limit = i;
-                }
-                if (word && ((i + 1) == length)) {
-                    word = false;
-                    limit = i + 1;
-                }
-                if (limit > first) {
-                    String colKey = line.substring(first, limit);
-                    if (((field % 2) == 0) && !myRows.containsKey(colKey)) {
-                        word = true;
-                    } else {
-                        myFields[field++] = colKey;
-                        first = -1;
-                        limit = -1;
-                    }
-                }
-            }
+            this.extractFields(line, myRows);
 
             myRows.get(myFields[2]).range(new BigDecimal(myFields[3]));
 
@@ -766,40 +703,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         case BOUNDS:
 
-            myFields[0] = line.substring(FIELD_FIRSTS[0], FIELD_LIMITS[0]).trim();
-            myFields[1] = line.substring(FIELD_FIRSTS[1], FIELD_LIMITS[1]).trim();
-
-            first = -1;
-            limit = -1;
-
-            field = 2;
-
-            word = false;
-
-            for (int i = FIELD_FIRSTS[field]; i < length; i++) {
-                tecken = line.charAt(i);
-                if (!word && !ASCII.isSpace(tecken)) {
-                    word = true;
-                    first = i;
-                } else if (word && ASCII.isSpace(tecken)) {
-                    word = false;
-                    limit = i;
-                }
-                if (word && ((i + 1) == length)) {
-                    word = false;
-                    limit = i + 1;
-                }
-                if (limit > first) {
-                    String colKey = line.substring(first, limit);
-                    if (((field % 2) == 0) && !myColumns.containsKey(colKey)) {
-                        word = true;
-                    } else {
-                        myFields[field++] = colKey;
-                        first = -1;
-                        limit = -1;
-                    }
-                }
-            }
+            this.extractFields(line, myColumns);
 
             myColumns.get(myFields[2]).bound(BoundType.valueOf(myFields[0]), myFields[3] != null ? new BigDecimal(myFields[3]) : null);
 
