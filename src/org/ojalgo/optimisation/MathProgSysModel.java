@@ -44,9 +44,6 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
-    public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<MathProgSysModel, S> {
-
-    }
     /**
      * BoundType used with the BOUNDS section.
      *
