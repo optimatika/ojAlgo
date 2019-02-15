@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.optimisation.ModelFileMPS;
@@ -354,7 +353,6 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
      * </pre>
      */
     @Test
-    @Disabled("File format problem")
     public void testDFL001() {
         NetlibCase.doTest("DFL001.SIF", "1234567890");
     }
@@ -475,12 +473,14 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
 
     /**
      * <pre>
+     * 2019-02-15: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-15: Objective defined by ojAlgo's current result
      * </pre>
      */
     @Test
-    @Disabled("File format problem")
+    @Tag("slow")
     public void testGFRD_PNC() {
-        NetlibCase.doTest("GFRD-PNC.SIF", "1234567890");
+        NetlibCase.doTest("GFRD-PNC.SIF", "6902235.999548811");
     }
 
     /**
@@ -596,7 +596,6 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     @Test
     @Tag("slow")
     @Tag("unstable")
-    @Disabled("File format problem")
     public void testKEN_13() {
         NetlibCase.doTest("KEN-13.SIF", "1234567890");
     }
@@ -610,7 +609,6 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     @Test
     @Tag("slow")
     @Tag("unstable")
-    @Disabled("File format problem")
     public void testKEN_18() {
         NetlibCase.doTest("KEN-18.SIF", "1234567890");
     }
@@ -712,7 +710,6 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     @Test
     @Tag("slow")
     @Tag("unstable")
-    @Disabled("File format problem")
     public void testOSA_60() {
         NetlibCase.doTest("OSA-60.SIF", "1234567890");
     }
@@ -752,7 +749,6 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     @Test
     @Tag("slow")
     @Tag("unstable")
-    @Disabled("File format problem")
     public void testPDS_10() {
         NetlibCase.doTest("PDS-10.SIF", "1234567890");
     }
@@ -1219,7 +1215,6 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
      * </pre>
      */
     @Test
-    @Disabled("File format problem")
     public void testSIERRA() {
         NetlibCase.doTest("SIERRA.SIF", "1234567890");
     }
