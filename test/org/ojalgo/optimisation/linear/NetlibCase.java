@@ -655,6 +655,18 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
 
     /**
      * <pre>
+     * 2019-02-15: Tagged as slow since too large for promotional/community version of CPLEX
+     * 2019-02-15: Objective defined by ojAlgo's current result
+     * </pre>
+     */
+    @Test
+    @Tag("slow")
+    public void testMODSZK1() {
+        NetlibCase.doTest("MODSZK1.SIF", "320.6197293824883");
+    }
+
+    /**
+     * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
      * </pre>
