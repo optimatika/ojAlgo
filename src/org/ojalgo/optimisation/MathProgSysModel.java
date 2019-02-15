@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import org.ojalgo.netio.ASCII;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -402,7 +401,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
             //it returns an empty String if two newlines appear in a row.
             while ((tmpLine = tmpBufferedFileReader.readLine()) != null) {
 
-                BasicLogger.debug("Line: {}", tmpLine);
+                // BasicLogger.debug("Line: {}", tmpLine);
 
                 if ((tmpLine.length() == 0) || tmpLine.startsWith(COMMENT) || tmpLine.startsWith(COMMENT_REF)) {
                     // Skip this line
@@ -552,7 +551,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
             tmpArgument = EMPTY;
         }
 
-        BasicLogger.debug("Section: {},\tArgument: {}.", tmpSection, tmpArgument);
+        // BasicLogger.debug("Section: {},\tArgument: {}.", tmpSection, tmpArgument);
 
         final FileSection retVal = FileSection.valueOf(tmpSection);
 
@@ -629,14 +628,16 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
             } else {
 
+                myFields[1] = line.substring(FIELD_FIRSTS[1], FIELD_LIMITS[1]).trim();
+
                 first = -1;
                 limit = -1;
 
-                field = 0;
+                field = 2;
 
                 word = false;
 
-                for (int i = 0; i < length; i++) {
+                for (int i = FIELD_FIRSTS[field]; i < length; i++) {
                     tecken = line.charAt(i);
                     if (!word && !ASCII.isSpace(tecken)) {
                         word = true;
@@ -650,40 +651,43 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
                         limit = i + 1;
                     }
                     if (limit > first) {
-                        if ((field == 0) && (first >= 12)) {
-                            myFields[field++] = "";
+                        String colKey = line.substring(first, limit);
+                        if (((field % 2) == 0) && !myRows.containsKey(colKey)) {
+                            word = true;
+                        } else {
+                            myFields[field++] = colKey;
+                            first = -1;
+                            limit = -1;
                         }
-                        myFields[field++] = line.substring(first, limit);
-                        first = -1;
-                        limit = -1;
                     }
                 }
 
-                final Column tmpColumn = myColumns.computeIfAbsent(myFields[0], key -> new Column(key));
+                final Column tmpColumn = myColumns.computeIfAbsent(myFields[1], key -> new Column(key));
 
-                tmpColumn.setRowValue(myFields[1], new BigDecimal(myFields[2]));
-                if (myFields[3] != null) {
-                    tmpColumn.setRowValue(myFields[3], new BigDecimal(myFields[4]));
+                tmpColumn.setRowValue(myFields[2], new BigDecimal(myFields[3]));
+                if (myFields[4] != null) {
+                    tmpColumn.setRowValue(myFields[4], new BigDecimal(myFields[5]));
                 }
 
                 if (myIntegerMarker) {
                     tmpColumn.integer(myIntegerMarker);
                 }
-
             }
 
             break;
 
         case RHS:
 
+            myFields[1] = line.substring(FIELD_FIRSTS[1], FIELD_LIMITS[1]).trim();
+
             first = -1;
             limit = -1;
 
-            field = 0;
+            field = 2;
 
             word = false;
 
-            for (int i = 0; i < length; i++) {
+            for (int i = FIELD_FIRSTS[field]; i < length; i++) {
                 tecken = line.charAt(i);
                 if (!word && !ASCII.isSpace(tecken)) {
                     word = true;
@@ -697,31 +701,37 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
                     limit = i + 1;
                 }
                 if (limit > first) {
-                    if ((field == 0) && (first >= 12)) {
-                        myFields[field++] = "";
+                    String colKey = line.substring(first, limit);
+                    if (((field % 2) == 0) && !myRows.containsKey(colKey)) {
+                        word = true;
+                    } else {
+                        myFields[field++] = colKey;
+                        first = -1;
+                        limit = -1;
                     }
-                    myFields[field++] = line.substring(first, limit);
-                    first = -1;
-                    limit = -1;
                 }
             }
 
-            myRows.get(myFields[1]).rhs(new BigDecimal(myFields[2]));
+            myRows.get(myFields[2]).rhs(new BigDecimal(myFields[3]));
 
-            if (myFields[3] != null) {
-                myRows.get(myFields[3]).rhs(new BigDecimal(myFields[4]));
+            if (myFields[4] != null) {
+                myRows.get(myFields[4]).rhs(new BigDecimal(myFields[5]));
             }
 
             break;
 
         case RANGES:
 
+            myFields[1] = line.substring(FIELD_FIRSTS[1], FIELD_LIMITS[1]).trim();
+
             first = -1;
             limit = -1;
-            field = 0;
+
+            field = 2;
+
             word = false;
 
-            for (int i = 0; i < length; i++) {
+            for (int i = FIELD_FIRSTS[field]; i < length; i++) {
                 tecken = line.charAt(i);
                 if (!word && !ASCII.isSpace(tecken)) {
                     word = true;
@@ -735,33 +745,38 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
                     limit = i + 1;
                 }
                 if (limit > first) {
-                    if ((field == 0) && (first >= 12)) {
-                        myFields[field++] = "";
+                    String colKey = line.substring(first, limit);
+                    if (((field % 2) == 0) && !myRows.containsKey(colKey)) {
+                        word = true;
+                    } else {
+                        myFields[field++] = colKey;
+                        first = -1;
+                        limit = -1;
                     }
-                    myFields[field++] = line.substring(first, limit);
-                    first = -1;
-                    limit = -1;
                 }
             }
 
-            myRows.get(myFields[1]).range(new BigDecimal(myFields[2]));
+            myRows.get(myFields[2]).range(new BigDecimal(myFields[3]));
 
-            if (myFields[3] != null) {
-                myRows.get(myFields[3]).range(new BigDecimal(myFields[4]));
+            if (myFields[4] != null) {
+                myRows.get(myFields[4]).range(new BigDecimal(myFields[5]));
             }
 
             break;
 
         case BOUNDS:
 
+            myFields[0] = line.substring(FIELD_FIRSTS[0], FIELD_LIMITS[0]).trim();
+            myFields[1] = line.substring(FIELD_FIRSTS[1], FIELD_LIMITS[1]).trim();
+
             first = -1;
             limit = -1;
 
-            field = 0;
+            field = 2;
 
             word = false;
 
-            for (int i = 0; i < length; i++) {
+            for (int i = FIELD_FIRSTS[field]; i < length; i++) {
                 tecken = line.charAt(i);
                 if (!word && !ASCII.isSpace(tecken)) {
                     word = true;
@@ -775,12 +790,14 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
                     limit = i + 1;
                 }
                 if (limit > first) {
-                    if ((field == 0) && (first >= 12)) {
-                        myFields[field++] = "";
+                    String colKey = line.substring(first, limit);
+                    if (((field % 2) == 0) && !myColumns.containsKey(colKey)) {
+                        word = true;
+                    } else {
+                        myFields[field++] = colKey;
+                        first = -1;
+                        limit = -1;
                     }
-                    myFields[field++] = line.substring(first, limit);
-                    first = -1;
-                    limit = -1;
                 }
             }
 
@@ -797,7 +814,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
             break;
         }
 
-        BasicLogger.debug("{}: {}", section, Arrays.toString(myFields));
+        // BasicLogger.debug("{}: {}", section, Arrays.toString(myFields));
     }
 
 }

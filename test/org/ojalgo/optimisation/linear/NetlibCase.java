@@ -453,12 +453,12 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
 
     /**
      * <pre>
+     * 2019-02-14: Objective obtained/verified by CPLEX
      * </pre>
      */
     @Test
-    @Disabled("File format problem")
     public void testFORPLAN() {
-        NetlibCase.doTest("FORPLAN.SIF", "1234567890");
+        NetlibCase.doTest("FORPLAN.SIF", "-664.2189612722054");
     }
 
     /**
