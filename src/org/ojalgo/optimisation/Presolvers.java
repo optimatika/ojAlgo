@@ -95,6 +95,10 @@ public abstract class Presolvers {
      * Verifies that the variable is actually referenced/used in some expression. If not then that variable
      * can either be fixed or marked as unbounded. Also makes sure integer variables have integer lower/upper
      * bounds (if they exist).
+     * 
+     * <pre>
+     * 2019-02-15: Turned this off. Very slow for large models
+     * </pre>
      */
     public static final ExpressionsBasedModel.VariableAnalyser FIXED_OR_UNBOUNDED = new ExpressionsBasedModel.VariableAnalyser(4) {
 
