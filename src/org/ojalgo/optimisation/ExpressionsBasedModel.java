@@ -433,20 +433,20 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     }
 
-    public static boolean addFallbackIntegration(final Integration<?> integration) {
+    public static boolean addFallbackSolver(final Integration<?> integration) {
         return FALLBACK_INTEGRATIONS.add(integration);
     }
 
     /**
-     * @deprecated v48 Use either {@link #addPreferredIntegration(Integration)} or
-     *             {@link #addFallbackIntegration(Integration)} instead
+     * @deprecated v48 Use either {@link #addPreferredSolver(Integration)} or
+     *             {@link #addFallbackSolver(Integration)} instead
      */
     @Deprecated
     public static boolean addIntegration(final Integration<?> integration) {
-        return ExpressionsBasedModel.addPreferredIntegration(integration);
+        return ExpressionsBasedModel.addPreferredSolver(integration);
     }
 
-    public static boolean addPreferredIntegration(final Integration<?> integration) {
+    public static boolean addPreferredSolver(final Integration<?> integration) {
         return PREFERRED_INTEGRATIONS.add(integration);
     }
 

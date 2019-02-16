@@ -77,7 +77,6 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     private BigDecimal myContributionWeight = null;
     private BigDecimal myLowerLimit = null;
     private final String myName;
-
     private BigDecimal myUpperLimit = null;
 
     @SuppressWarnings("unused")
@@ -221,14 +220,14 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
             if (lower instanceof BigDecimal) {
                 myLowerLimit = (BigDecimal) lower;
             } else if (Double.isFinite(lower.doubleValue())) {
-                BigDecimal tmpLimit = TypeUtils.toBigDecimal(lower);
-                final BigDecimal tmpMagnitude = tmpLimit.abs();
-                if (tmpMagnitude.compareTo(LARGEST) >= 0) {
-                    tmpLimit = null;
-                } else if (tmpMagnitude.compareTo(SMALLEST) <= 0) {
-                    tmpLimit = BigMath.ZERO;
+                BigDecimal limit = TypeUtils.toBigDecimal(lower);
+                final BigDecimal magnitude = limit.abs();
+                if (magnitude.compareTo(LARGEST) >= 0) {
+                    limit = null;
+                } else if (magnitude.compareTo(SMALLEST) <= 0) {
+                    limit = BigMath.ZERO;
                 }
-                myLowerLimit = tmpLimit;
+                myLowerLimit = limit;
             }
         }
         return (ME) this;
@@ -256,14 +255,14 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
             if (upper instanceof BigDecimal) {
                 myUpperLimit = (BigDecimal) upper;
             } else if (Double.isFinite(upper.doubleValue())) {
-                BigDecimal tmpLimit = TypeUtils.toBigDecimal(upper);
-                final BigDecimal tmpMagnitude = tmpLimit.abs();
-                if (tmpMagnitude.compareTo(LARGEST) >= 0) {
-                    tmpLimit = null;
-                } else if (tmpMagnitude.compareTo(SMALLEST) <= 0) {
-                    tmpLimit = BigMath.ZERO;
+                BigDecimal limit = TypeUtils.toBigDecimal(upper);
+                final BigDecimal magnitude = limit.abs();
+                if (magnitude.compareTo(LARGEST) >= 0) {
+                    limit = null;
+                } else if (magnitude.compareTo(SMALLEST) <= 0) {
+                    limit = BigMath.ZERO;
                 }
-                myUpperLimit = tmpLimit;
+                myUpperLimit = limit;
             }
         }
         return (ME) this;
