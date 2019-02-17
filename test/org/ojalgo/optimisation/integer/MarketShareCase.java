@@ -12,7 +12,6 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,7 +25,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.MathProgSysModel;
+import org.ojalgo.optimisation.ModelFileMPS;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
@@ -39,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
  * http://miplib.zib.de/miplib2010/markshare_5_0.php Objective Value min < MIP < max: 0.00000000e+00 <
  * 1.00000000e+00 < ?
  */
-public final class MarketShareCase extends OptimisationIntegerTests {
+public final class MarketShareCase extends OptimisationIntegerTests implements ModelFileMPS {
 
     private static final BigDecimal OBJECTIVE_MIP = new BigDecimal(1);
     private static final Map<String, BigDecimal> SOLUTION;
@@ -99,11 +98,13 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
     private static ExpressionsBasedModel makeModel() {
 
-        final File tmpFile = new File(AbstractCaseFileMPS.PATH + "markshare_5_0.mps");
+        //        final File tmpFile = new File(ModelFileMPS.INT_PATH + "markshare_5_0.mps");
+        //
+        //        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        //
+        //        return tmpMPS.getExpressionsBasedModel();
 
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-
-        return tmpMPS.getExpressionsBasedModel();
+        return ModelFileMPS.makeModel("miplib", "markshare_5_0.mps", false);
     }
 
     @Test

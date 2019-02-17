@@ -283,24 +283,28 @@ public abstract class TestUtils {
         TestUtils.assertEquals(message, expected, actual, EQUALS);
     }
 
-    public static void assertEquals(final String message, final Number expected, final Number actual, final NumberContext context) {
+    public static void assertEquals(final String message, final Number expected, final Number actual, final NumberContext precision) {
 
         if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
 
             final Quaternion tmpExpected = Quaternion.valueOf(expected);
             final Quaternion tmpActual = Quaternion.valueOf(actual);
 
-            if (!!context.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
-                Assertions.fail(() -> message + " (scalar)" + ": " + expected + " != " + actual);
+            if (!!precision.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
+                // Assertions.fail(() -> message + " (scalar)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (scalar)" + ": " + expected + " != " + actual);
             }
-            if (!!context.isDifferent(tmpExpected.i, tmpActual.i)) {
-                Assertions.fail(() -> message + " (i)" + ": " + expected + " != " + actual);
+            if (!!precision.isDifferent(tmpExpected.i, tmpActual.i)) {
+                // Assertions.fail(() -> message + " (i)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (i)" + ": " + expected + " != " + actual);
             }
-            if (!!context.isDifferent(tmpExpected.j, tmpActual.j)) {
-                Assertions.fail(() -> message + " (j)" + ": " + expected + " != " + actual);
+            if (!!precision.isDifferent(tmpExpected.j, tmpActual.j)) {
+                // Assertions.fail(() -> message + " (j)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (j)" + ": " + expected + " != " + actual);
             }
-            if (!!context.isDifferent(tmpExpected.k, tmpActual.k)) {
-                Assertions.fail(() -> message + " (k)" + ": " + expected + " != " + actual);
+            if (!!precision.isDifferent(tmpExpected.k, tmpActual.k)) {
+                // Assertions.fail(() -> message + " (k)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (k)" + ": " + expected + " != " + actual);
             }
 
         } else if ((expected instanceof ComplexNumber) || (actual instanceof ComplexNumber)) {
@@ -308,17 +312,20 @@ public abstract class TestUtils {
             final ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
             final ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
 
-            if (!!context.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
-                Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
+            if (!!precision.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
+                // Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (real)" + ": " + expected + " != " + actual);
             }
-            if (!!context.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
-                Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
+            if (!!precision.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
+                // Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (imaginary)" + ": " + expected + " != " + actual);
             }
 
         } else {
 
-            if (context.isDifferent(expected.doubleValue(), actual.doubleValue())) {
-                Assertions.fail(() -> message + ": " + expected + " != " + actual);
+            if (precision.isDifferent(expected.doubleValue(), actual.doubleValue())) {
+                // Assertions.fail(() -> message + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + ": " + expected + " != " + actual);
             }
         }
     }

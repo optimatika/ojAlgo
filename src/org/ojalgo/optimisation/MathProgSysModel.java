@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.structure.Access1D;
@@ -42,10 +43,6 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public final class MathProgSysModel extends AbstractModel<GenericSolver> {
-
-    public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<MathProgSysModel, S> {
-
-    }
 
     /**
      * BoundType used with the BOUNDS section.
@@ -74,7 +71,6 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         BV(), FR(), FX(), LI(), LO(), MI(), PL(), SC(), UI(), UP();
 
     }
-
     final class Column extends Object {
 
         private boolean mySemicontinuous = false;
@@ -207,7 +203,6 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         }
 
     }
-
     /**
      * @author apete
      */
@@ -375,8 +370,17 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
     }
 
     private static final String COMMENT = "*";
+    /**
+     * Seems to be used in problem headers/comment to mark references to authors and such
+     */
+    private static final String COMMENT_REF = "&";
     private static final String EMPTY = "";
-    private static final int[] FIELD_LIMITS = new int[] { 3, 12, 22, 36, 47, 61 };
+    private static final int[] FIELD_FIRSTS = new int[] { 1, 4, 14, 24, 39, 49 };
+    private static final int[] FIELD_LIMITS = new int[] { 4, 14, 24, 39, 49, 64 };
+    private static final String INTEND = "INTEND";
+    private static final String INTORG = "INTORG";
+    private static final String MARKER = "MARKER";
+    private static final String MAX = "MAX";
     private static final String SPACE = " ";
 
     public static MathProgSysModel make(final File file) {
@@ -398,7 +402,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
                 // BasicLogger.debug("Line: {}", tmpLine);
 
-                if ((tmpLine.length() == 0) || tmpLine.startsWith(COMMENT)) {
+                if ((tmpLine.length() == 0) || tmpLine.startsWith(COMMENT) || tmpLine.startsWith(COMMENT_REF)) {
                     // Skip this line
                 } else if (tmpLine.startsWith(SPACE)) {
                     retVal.parseSectionLine(tmpSection, tmpLine);
@@ -418,12 +422,15 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
-    private final HashMap<String, Column> myColumns = new HashMap<>();
+    private final Map<String, Column> myColumns = new HashMap<>();
     private final ExpressionsBasedModel myDelegate;
     private final String[] myFields = new String[6];
+    private String myIdBOUNDS = null;
+    private String myIdRANGES = null;
+    private String myIdRHS = null;
     private boolean myIntegerMarker = false;
     private String myName;
-    private final HashMap<String, Row> myRows = new HashMap<>();
+    private final Map<String, Row> myRows = new HashMap<>();
 
     MathProgSysModel() {
 
@@ -533,22 +540,21 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         return myDelegate.validate(solution, context);
     }
 
-    private void extractFields(final String line) {
+    private String[] extractFields(String line, Map<String, ?> verifier) {
 
-        Arrays.fill(myFields, null);
-
-        final int length = line.length();
-
-        char tecken;
+        myFields[0] = line.substring(FIELD_FIRSTS[0], FIELD_LIMITS[0]).trim();
+        myFields[1] = line.substring(FIELD_FIRSTS[1], FIELD_LIMITS[1]).trim();
 
         int first = -1;
         int limit = -1;
 
-        int field = 0;
+        int field = 2;
+
+        char tecken;
 
         boolean word = false;
 
-        for (int i = 0; i < length; i++) {
+        for (int i = FIELD_FIRSTS[field]; i < line.length(); i++) {
             tecken = line.charAt(i);
             if (!word && !ASCII.isSpace(tecken)) {
                 word = true;
@@ -557,20 +563,23 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
                 word = false;
                 limit = i;
             }
-            if (word && ((i + 1) == length)) {
+            if (word && ((i + 1) == line.length())) {
                 word = false;
                 limit = i + 1;
             }
             if (limit > first) {
-                if ((field == 0) && (first >= 12)) {
-                    myFields[field++] = "";
+                String key = line.substring(first, limit);
+                if (((field % 2) == 0) && !verifier.containsKey(key)) {
+                    word = true;
+                } else {
+                    myFields[field++] = key;
+                    first = -1;
                 }
-                myFields[field++] = line.substring(first, limit);
-                first = -1;
                 limit = -1;
             }
         }
 
+        return myFields;
     }
 
     FileSection identifySection(final String line) {
@@ -586,7 +595,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
             tmpArgument = EMPTY;
         }
 
-        //      BasicLogger.logDebug("Section: {},\tArgument: {}.", tmpSection, tmpArgument);
+        // BasicLogger.debug("Section: {},\tArgument: {}.", tmpSection, tmpArgument);
 
         final FileSection retVal = FileSection.valueOf(tmpSection);
 
@@ -608,9 +617,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
     void parseSectionLine(final FileSection section, final String line) {
 
-        this.extractFields(line);
-
-        // BasicLogger.debug("{}: {}", section, Arrays.toString(myFields));
+        Arrays.fill(myFields, null);
 
         switch (section) {
 
@@ -620,7 +627,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         case OBJSENSE:
 
-            if (myFields[0].equals("MAX")) {
+            if (line.contains(MAX)) {
                 this.setMaximisation();
             } else {
                 this.setMinimisation();
@@ -634,60 +641,87 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         case ROWS:
 
-            final Row tmpRow = new Row(myFields[1], RowType.valueOf(myFields[0]));
+            myFields[0] = line.substring(FIELD_FIRSTS[0], FIELD_LIMITS[0]).trim();
+            myFields[1] = line.substring(FIELD_FIRSTS[1]).trim();
 
-            myRows.put(myFields[1], tmpRow);
+            final Row newRow = new Row(myFields[1], RowType.valueOf(myFields[0]));
+            myRows.put(myFields[1], newRow);
 
             break;
 
         case COLUMNS:
 
-            if (myFields[1].indexOf("MARKER") != -1) {
+            if (line.contains(MARKER)) {
 
-                if (myFields[2].indexOf("INTORG") != -1) {
+                if (line.contains(INTORG)) {
                     myIntegerMarker = true;
-                } else if (myFields[2].indexOf("INTEND") != -1) {
+                } else if (line.contains(INTEND)) {
                     myIntegerMarker = false;
                 }
 
             } else {
 
-                final Column tmpColumn = myColumns.computeIfAbsent(myFields[0], key -> new Column(key));
+                this.extractFields(line, myRows);
 
-                tmpColumn.setRowValue(myFields[1], new BigDecimal(myFields[2]));
-                if (myFields[3] != null) {
-                    tmpColumn.setRowValue(myFields[3], new BigDecimal(myFields[4]));
+                final Column tmpColumn = myColumns.computeIfAbsent(myFields[1], key -> new Column(key));
+
+                tmpColumn.setRowValue(myFields[2], new BigDecimal(myFields[3]));
+                if (myFields[4] != null) {
+                    tmpColumn.setRowValue(myFields[4], new BigDecimal(myFields[5]));
                 }
 
                 if (myIntegerMarker) {
                     tmpColumn.integer(myIntegerMarker);
                 }
-
             }
 
             break;
 
         case RHS:
 
-            myRows.get(myFields[1]).rhs(new BigDecimal(myFields[2]));
+            this.extractFields(line, myRows);
 
-            if (myFields[3] != null) {
-                myRows.get(myFields[3]).rhs(new BigDecimal(myFields[4]));
+            if (myIdRHS == null) {
+                myIdRHS = myFields[1];
+            } else if (!myIdRHS.equals(myFields[1])) {
+                break;
+            }
+
+            myRows.get(myFields[2]).rhs(new BigDecimal(myFields[3]));
+
+            if (myFields[4] != null) {
+                myRows.get(myFields[4]).rhs(new BigDecimal(myFields[5]));
             }
 
             break;
 
         case RANGES:
 
-            myRows.get(myFields[1]).range(new BigDecimal(myFields[2]));
+            this.extractFields(line, myRows);
 
-            if (myFields[3] != null) {
-                myRows.get(myFields[3]).range(new BigDecimal(myFields[4]));
+            if (myIdRANGES == null) {
+                myIdRANGES = myFields[1];
+            } else if (!myIdRANGES.equals(myFields[1])) {
+                break;
+            }
+
+            myRows.get(myFields[2]).range(new BigDecimal(myFields[3]));
+
+            if (myFields[4] != null) {
+                myRows.get(myFields[4]).range(new BigDecimal(myFields[5]));
             }
 
             break;
 
         case BOUNDS:
+
+            this.extractFields(line, myColumns);
+
+            if (myIdBOUNDS == null) {
+                myIdBOUNDS = myFields[1];
+            } else if (!myIdBOUNDS.equals(myFields[1])) {
+                break;
+            }
 
             myColumns.get(myFields[2]).bound(BoundType.valueOf(myFields[0]), myFields[3] != null ? new BigDecimal(myFields[3]) : null);
 
@@ -701,6 +735,8 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
             break;
         }
+
+        // BasicLogger.debug("{}: {}", section, Arrays.toString(myFields));
     }
 
 }

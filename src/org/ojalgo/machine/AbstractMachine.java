@@ -28,7 +28,7 @@ abstract class AbstractMachine extends BasicMachine {
     static final long K = 1024L;
 
     static long elements(final long availableMemory, final long elementSize) {
-        return (availableMemory - 16L) / elementSize;
+        return availableMemory / elementSize;
     }
 
     public final String architecture;//x86_64
