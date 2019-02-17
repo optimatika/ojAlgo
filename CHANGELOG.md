@@ -11,8 +11,13 @@
 ## org.ojalgo.optimisation
 
 * New presolver in ExpressionsBasedModel – INTEGER_ROUNDING. It performs integer rounding of expression bounds.
+* The presolver FIXED_OR_UNBOUNDED has been (temporarely) turned off.
 * Modified what happends when you relax an integer model. Now the variables are kept as integer variables, but the model set a flag that it is relaxed. This means the presolvers can now make use of the integer property and thus perform better.
 * The MPS file parser has been modified to not strictly use field index ranges, but instead more freely interpret whitespace as a delimiter. This is in line with commonly used MPS format extensions and allows ojAlgo to correctly parse/use a larger set of models.
+* Major extension and refactoring of optimisation test cases. In particular the test cases in ojAlgo are now available to the various solver integration modules in ojAlgo-extensions.
+* When adding a solver integration to ExpressionsBasedModel it is now possible to differentiate between preferred and fallback solvers - addIntegration() has been replaced with addPreferredSolver() and addFallbackSolver().
+* Fixed a concurrency related problem with the sparse simplex solver.
+* Changed how the linear solver switches between dense and sparse internal storage (makes some model up to 10x faster).
 
 ## org.ojalgo.random
 
