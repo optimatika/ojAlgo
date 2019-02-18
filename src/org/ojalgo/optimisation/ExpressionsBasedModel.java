@@ -427,7 +427,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     static {
         ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
-        ExpressionsBasedModel.addPresolver(Presolvers.OPPOSITE_SIGN);
+        // ExpressionsBasedModel.addPresolver(Presolvers.OPPOSITE_SIGN);
         // ExpressionsBasedModel.addPresolver(Presolvers.BINARY_VALUE);
         // ExpressionsBasedModel.addPresolver(Presolvers.BIGSTUFF);
 
@@ -1444,10 +1444,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             needToRepeat = false;
 
             for (final Expression expr : this.getExpressions()) {
-                if (expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
+                if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
                     fixedValue = options.solution.enforce(expr.calculateFixedValue(fixedVariables));
                     for (final Presolver presolver : PRESOLVERS) {
-                        needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.feasibility);
+                        if (!needToRepeat) {
+                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.feasibility);
+                        }
                     }
                 }
             }

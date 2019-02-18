@@ -95,7 +95,7 @@ public abstract class Presolvers {
      * Verifies that the variable is actually referenced/used in some expression. If not then that variable
      * can either be fixed or marked as unbounded. Also makes sure integer variables have integer lower/upper
      * bounds (if they exist).
-     * 
+     *
      * <pre>
      * 2019-02-15: Turned this off. Very slow for large models
      * </pre>
@@ -283,41 +283,21 @@ public abstract class Presolvers {
         public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
                 final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
-            boolean didFixVariable = false;
+            final HashSet<IntIndex> remainingLinear = new HashSet<>(expression.getLinearKeySet());
+            remainingLinear.removeAll(fixedVariables);
 
-            if (expression.countLinearFactors() <= (fixedVariables.size() + 2)) {
-                // This constraint can possibly be reduced to 0, 1 or 2 remaining linear factors
-
-                final HashSet<IntIndex> remainingLinear = new HashSet<>(expression.getLinearKeySet());
-                remainingLinear.removeAll(fixedVariables);
-
-                switch (remainingLinear.size()) {
-
-                case 0:
-
-                    didFixVariable = Presolvers.doCase0(expression, fixedValue, remainingLinear, variableResolver, precision);
-                    break;
-
-                case 1:
-
-                    didFixVariable = Presolvers.doCase1(expression, fixedValue, remainingLinear, variableResolver, precision);
-                    break;
-
-                case 2:
-
-                    didFixVariable = Presolvers.doCase2(expression, fixedValue, remainingLinear, variableResolver, precision);
-                    break;
-
-                default:
-
-                    break;
-                }
-
+            switch (remainingLinear.size()) {
+            case 0:
+                return Presolvers.doCase0(expression, fixedValue, remainingLinear, variableResolver, precision);
+            case 1:
+                return Presolvers.doCase1(expression, fixedValue, remainingLinear, variableResolver, precision);
+            case 2:
+                // return Presolvers.doCase2(expression, fixedValue, remainingLinear, variableResolver, precision);
+            default:
+                return Presolvers.doCaseN(expression, fixedValue, remainingLinear, variableResolver, precision);
             }
 
-            return didFixVariable;
         }
-
     };
 
     /**
@@ -565,6 +545,66 @@ public abstract class Presolvers {
         variableB.lower(newLowerB).upper(newUpperB);
 
         return variableA.isEqualityConstraint() || variableB.isEqualityConstraint();
+    }
+
+    static boolean doCaseN(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
+            final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
+
+        boolean didFixVariable = false;
+
+        BigDecimal compLowLim = expression.getLowerLimit();
+        if ((compLowLim != null) && (fixedValue.signum() != 0)) {
+            compLowLim = compLowLim.subtract(fixedValue);
+        }
+
+        BigDecimal compUppLim = expression.getUpperLimit();
+        if ((compUppLim != null) && (fixedValue.signum() != 0)) {
+            compUppLim = compUppLim.subtract(fixedValue);
+        }
+
+        if ((compLowLim != null) && (compLowLim.signum() >= 0) && expression.isNegativeOn(remaining)) {
+
+            if (compLowLim.signum() == 0) {
+
+                for (final IntIndex indexOfFree : remaining) {
+                    final Variable freeVariable = variableResolver.apply(indexOfFree);
+
+                    if (freeVariable.validate(ZERO, precision, null)) {
+                        freeVariable.setFixed(ZERO);
+                        didFixVariable = true;
+                    } else {
+                        expression.setInfeasible();
+                    }
+                }
+
+            } else {
+
+                expression.setInfeasible();
+            }
+        }
+
+        if ((compUppLim != null) && (compUppLim.signum() <= 0) && expression.isPositiveOn(remaining)) {
+
+            if (compUppLim.signum() == 0) {
+
+                for (final IntIndex indexOfFree : remaining) {
+                    final Variable freeVariable = variableResolver.apply(indexOfFree);
+
+                    if (freeVariable.validate(ZERO, precision, null)) {
+                        freeVariable.setFixed(ZERO);
+                        didFixVariable = true;
+                    } else {
+                        expression.setInfeasible();
+                    }
+                }
+
+            } else {
+
+                expression.setInfeasible();
+            }
+        }
+
+        return didFixVariable;
     }
 
 }

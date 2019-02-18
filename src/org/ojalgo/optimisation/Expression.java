@@ -807,7 +807,9 @@ public final class Expression extends ModelEntity<Expression> {
      * @param fixedVariables The indices of the fixed variables
      * @return true if none of the free (not fixed) variables can make a positve contribution to the
      *         expression value
+     * @deprecated v48
      */
+    @Deprecated
     boolean isNegative(final Set<IntIndex> fixedVariables) {
 
         boolean retVal = !this.isAnyQuadraticFactorNonZero();
@@ -831,10 +833,36 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     /**
+     * @param subset The indices of a variable subset
+     * @return true if none of the variables in the subset can make a positve contribution to the expression
+     *         value
+     */
+    boolean isNegativeOn(final Set<IntIndex> subset) {
+
+        if (!this.isAnyQuadraticFactorNonZero()) {
+            for (IntIndex index : subset) {
+                final Variable setVar = myModel.getVariable(index);
+                int signum = myLinear.get(index).signum();
+                if ((signum < 0) && setVar.isLowerLimitSet() && (setVar.getLowerLimit().signum() >= 0)) {
+                    ;
+                } else if ((signum > 0) && setVar.isUpperLimitSet() && (setVar.getUpperLimit().signum() <= 0)) {
+                    ;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @param fixedVariables The indices of the fixed variables
      * @return true if none of the free (not fixed) variables can make a negative contribution to the
      *         expression value
+     * @deprecated v48
      */
+    @Deprecated
     boolean isPositive(final Set<IntIndex> fixedVariables) {
 
         boolean retVal = !this.isAnyQuadraticFactorNonZero();
@@ -855,6 +883,30 @@ public final class Expression extends ModelEntity<Expression> {
         }
 
         return retVal;
+    }
+
+    /**
+     * @param subset The indices of a variable subset
+     * @return true if none of the variables in the subset can make a negative contribution to the expression
+     *         value
+     */
+    boolean isPositiveOn(final Set<IntIndex> subset) {
+
+        if (!this.isAnyQuadraticFactorNonZero()) {
+            for (IntIndex index : subset) {
+                final Variable setVar = myModel.getVariable(index);
+                int signum = myLinear.get(index).signum();
+                if ((signum > 0) && setVar.isLowerLimitSet() && (setVar.getLowerLimit().signum() >= 0)) {
+                    ;
+                } else if ((signum < 0) && setVar.isUpperLimitSet() && (setVar.getUpperLimit().signum() <= 0)) {
+                    ;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     boolean isRedundant() {
