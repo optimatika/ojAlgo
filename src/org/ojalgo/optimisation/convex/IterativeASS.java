@@ -190,7 +190,7 @@ final class IterativeASS extends ActiveSetSolver {
     @Override
     protected void performIteration() {
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             this.log("\nPerformIteration {}", 1 + this.countIterations());
             this.log(this.toActivatorString());
         }
@@ -226,7 +226,7 @@ final class IterativeASS extends ActiveSetSolver {
 
                 final double tmpRelativeError = myS.resolve(this.getSolutionL());
 
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     this.log("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(incl));
                 }
 

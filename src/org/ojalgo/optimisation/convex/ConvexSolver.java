@@ -817,7 +817,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             this.getSolutionGeneral(this.getIterationRHS(), preallocated);
             return true;
         } else {
-            if (this.isDebug()) {
+            if (this.isLogDebug()) {
                 options.logger_appender.println("KKT system unsolvable!");
                 options.logger_appender.printmtrx("KKT", this.getIterationKKT().collect(FACTORY));
                 options.logger_appender.printmtrx("RHS", this.getIterationRHS().collect(FACTORY));
@@ -851,7 +851,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
         if (!mtrxQ.isHermitian()) {
-            if (this.isDebug()) {
+            if (this.isLogDebug()) {
                 this.log("Q not symmetric!", mtrxQ);
             }
             throw new IllegalArgumentException("Q must be symmetric!");
@@ -870,7 +870,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             for (final ComplexNumber eigval : eigenvalues) {
                 if (((eigval.doubleValue() < ZERO) && !eigval.isSmall(TEN)) || !eigval.isReal()) {
-                    if (this.isDebug()) {
+                    if (this.isLogDebug()) {
                         this.log("Q not positive semidefinite!");
                         this.log("The eigenvalues are: {}", eigenvalues);
                     }

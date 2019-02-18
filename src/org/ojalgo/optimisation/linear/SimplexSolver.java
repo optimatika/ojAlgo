@@ -460,7 +460,7 @@ public final class SimplexSolver extends LinearSolver {
 
         myPoint = new IterationPoint();
 
-        if (this.isDebug() && this.isTableauPrintable()) {
+        if (this.isLogDebug() && this.isTableauPrintable()) {
             this.logDebugTableau("Tableau Created");
         }
     }
@@ -486,7 +486,7 @@ public final class SimplexSolver extends LinearSolver {
 
     public Result solve(final Result kickStarter) {
 
-        if (this.isDebug() && this.isTableauPrintable()) {
+        if (this.isLogDebug() && this.isTableauPrintable()) {
             this.logDebugTableau("Initial Tableau");
         }
 
@@ -498,7 +498,7 @@ public final class SimplexSolver extends LinearSolver {
 
             this.incrementIterationsCount();
 
-            if (this.isDebug() && this.isTableauPrintable()) {
+            if (this.isLogDebug() && this.isTableauPrintable()) {
                 this.logDebugTableau("Tableau Iteration");
             }
         }
@@ -572,7 +572,7 @@ public final class SimplexSolver extends LinearSolver {
     @Override
     protected boolean needsAnotherIteration() {
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             this.log("\nNeeds Another Iteration? Phase={} Artificials={} Objective={}", this.phase(), myTableau.countBasisDeficit(), this.objective());
         }
 
@@ -586,7 +586,7 @@ public final class SimplexSolver extends LinearSolver {
 
             if (!myTableau.isBasicArtificials() || options.feasibility.isZero(tmpPhaseOneValue)) {
 
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     this.log("\nSwitching to Phase2 with {} artificial variable(s) still in the basis.\n", myTableau.countBasicArtificials());
                     // this.debug("Reduced artificial costs:\n{}", this.sliceTableauRow(myPoint.getRowObjective()).copy(this.getExcluded()));
                 }
@@ -634,7 +634,7 @@ public final class SimplexSolver extends LinearSolver {
             }
         }
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             if (retVal) {
                 this.log("\n==>>\tRow: {},\tExit: {},\tColumn/Enter: {}.\n", myPoint.row, myTableau.getBasisColumnIndex(myPoint.row), myPoint.col);
             } else {
@@ -657,7 +657,7 @@ public final class SimplexSolver extends LinearSolver {
 
         final int[] tmpExcluded = myTableau.getExcluded();
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             if (options.validate) {
                 this.log("\nfindNextPivotCol (index of most negative value) among these:\n{}",
                         Array1D.PRIMITIVE64.copy(myTableau.sliceTableauRow(this.getRowObjective())).copy(tmpExcluded));
@@ -681,7 +681,7 @@ public final class SimplexSolver extends LinearSolver {
             if (tmpVal < tmpMinVal) {
                 retVal = tmpCol;
                 tmpMinVal = tmpVal;
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     this.log("Col: {}\t=>\tReduced Contribution Weight: {}.", tmpCol, tmpVal);
                 }
             }
@@ -695,7 +695,7 @@ public final class SimplexSolver extends LinearSolver {
         final int tmpNumerCol = myTableau.countConstraints() + myTableau.countVariables();
         final int tmpDenomCol = myPoint.col;
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             if (options.validate) {
                 final Access1D<Double> tmpNumerators = myTableau.sliceTableauColumn(tmpNumerCol);
                 final Access1D<Double> tmpDenominators = myTableau.sliceTableauColumn(tmpDenomCol);
@@ -750,7 +750,7 @@ public final class SimplexSolver extends LinearSolver {
                 retVal = i;
                 tmpMinRatio = tmpRatio;
 
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     this.log("Row: {}\t=>\tRatio: {},\tNumerator/RHS: {}, \tDenominator/Pivot: {}.", i, tmpRatio, tmpNumer, tmpDenom);
                 }
             }
@@ -767,7 +767,7 @@ public final class SimplexSolver extends LinearSolver {
 
         myTableau.pivot(pivot);
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             this.log("Iteration Point <{},{}>\tPivot: {} => {}\tRHS: {} => {}.", pivot.row, pivot.col, tmpPivotElement,
                     myTableau.doubleValue(pivot.row, pivot.col), tmpPivotRHS, myTableau.doubleValue(pivot.row, tmpColRHS));
         }
@@ -783,7 +783,7 @@ public final class SimplexSolver extends LinearSolver {
 
             if ((tmpMinVal < ZERO) && !options.feasibility.isZero(tmpMinVal)) {
                 this.log("\nNegative RHS! {}", tmpMinVal);
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     this.log("Entire RHS columns: {}\n", tmpRHS);
                 }
             }

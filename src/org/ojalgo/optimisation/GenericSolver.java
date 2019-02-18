@@ -117,10 +117,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
         return myIterationsCount.incrementAndGet();
     }
 
-    protected final boolean isDebug() {
-        return options.logger_detailed && this.isProgress();
-    }
-
     /**
      * Should be called at the start of an iteration (before it actually starts) to check if you should abort
      * instead. Will return false if either the iterations count or the execution time has reached their
@@ -136,8 +132,25 @@ public abstract class GenericSolver implements Optimisation.Solver {
         }
     }
 
-    protected final boolean isProgress() {
+    /**
+     * Detailed debug logging
+     */
+    protected final boolean isLogDebug() {
+        return options.logger_detailed && this.isLogProgress();
+    }
+
+    /**
+     * Cursory progress logging (at least)
+     */
+    protected final boolean isLogProgress() {
         return (options.logger_appender != null) && (options.logger_solver.isAssignableFrom(this.getClass()));
+    }
+
+    /**
+     * No logging
+     */
+    protected final boolean isLogOff() {
+        return (options.logger_appender == null) || (!options.logger_solver.isAssignableFrom(this.getClass()));
     }
 
     protected final void log(final String descripttion, final Access2D<?> matrix) {

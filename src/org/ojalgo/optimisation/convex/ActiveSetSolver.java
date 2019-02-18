@@ -221,7 +221,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.getSolutionX().fillAll(ZERO);
         }
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
 
             this.log("Initial solution: {}", this.getSolutionX().copy().asList());
             if (this.getMatrixAE() != null) {
@@ -238,7 +238,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     @Override
     protected final boolean needsAnotherIteration() {
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             this.log("\nNeedsAnotherIteration?");
             this.log(myActivator.toString());
         }
@@ -253,7 +253,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
         }
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             this.log("Suggested to include: {}", tmpToInclude);
             this.log("Suggested to exclude: {}", tmpToExclude);
         }
@@ -301,7 +301,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         // final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
         final MatrixStore<Double> tmpLI = this.getSolutionL().logical().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded).get();
 
-        if (this.isDebug() && (tmpLI.count() > 0L)) {
+        if (this.isLogDebug() && (tmpLI.count() > 0L)) {
             this.log("Looking for the largest negative lagrange multiplier among these: {}.", tmpLI.copy().asList());
         }
 
@@ -314,7 +314,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !options.solution.isZero(tmpVal)) {
                     tmpMin = tmpVal;
                     retVal = i;
-                    if (this.isDebug()) {
+                    if (this.isLogDebug()) {
                         this.log("Best so far: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[i]);
                     }
                 }
@@ -332,7 +332,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !options.solution.isZero(tmpVal)) {
                 tmpMin = tmpVal;
                 retVal = tmpIndexOfLast;
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     this.log("Only the last included needs to be excluded: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[retVal]);
                 }
             }
@@ -449,7 +449,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             iterX.modifyMatching(SUBTRACT, soluX);
 
-            if (this.isDebug()) {
+            if (this.isLogDebug()) {
                 this.log("Current: {}", soluX.asList());
                 this.log("Step: {}", iterX.asList());
             }
@@ -466,7 +466,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                     final PhysicalStore<Double> slack = this.getSlackI();
 
-                    if (this.isDebug()) {
+                    if (this.isLogDebug()) {
 
                         final MatrixStore<Double> change = this.getMatrixAI(excluded).get().multiply(iterX);
 
@@ -489,11 +489,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                         if ((tmpD > ZERO) && (tmpVal >= ZERO) && (tmpVal < stepLength) && !options.solution.isSmall(normStepX, tmpD)) {
                             stepLength = tmpVal;
                             this.setConstraintToInclude(excluded[i]);
-                            if (this.isDebug()) {
+                            if (this.isLogDebug()) {
                                 this.log("Best so far: {} @ {} ({}).", stepLength, i, this.getConstraintToInclude());
                             }
                             // } else if ((tmpVal == ZERO) && this.isDebug()) {
-                        } else if ((NumberContext.compare(tmpVal, ZERO) == 0) && this.isDebug()) {
+                        } else if ((NumberContext.compare(tmpVal, ZERO) == 0) && this.isLogDebug()) {
                             this.log("Zero, but still not good...");
                             this.log("Numer/slack: {}", tmpN);
                             this.log("Denom/chang: {}", tmpD);
@@ -512,10 +512,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 this.setState(State.APPROXIMATE);
 
-            } else if (this.isDebug()) {
+            } else if (this.isLogDebug()) {
                 // Zero solution
 
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     this.log("Step too small!");
                 }
 
@@ -582,7 +582,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.setState(State.FAILED);
         }
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             this.log("Post iteration");
             this.log("\tSolution: {}", soluX.copy().asList());
             this.log("\tL: {}", this.getSolutionL().asList());
@@ -625,7 +625,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.shrink();
         }
 
-        if (this.isDebug() && ((numbEqus + this.countIncluded()) > numbVars)) {
+        if (this.isLogDebug() && ((numbEqus + this.countIncluded()) > numbVars)) {
             this.log("Redundant contraints!");
         }
     }
