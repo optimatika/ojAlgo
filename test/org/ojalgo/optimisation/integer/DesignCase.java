@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.Expression;
@@ -76,6 +77,7 @@ public class DesignCase {
      * 1.7976931348623157E308
      */
     @Test
+    @Tag("unstable")
     public void testSimpleTSP() {
 
         final int n = 6;
