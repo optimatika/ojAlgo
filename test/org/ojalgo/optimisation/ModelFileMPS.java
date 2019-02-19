@@ -107,7 +107,8 @@ public interface ModelFileMPS {
         model.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
 
         // model.options.debug(IntegerSolver.class);
-        // model.options.progress(GenericSolver.class);
+        // model.options.progress(IntegerSolver.class);
+        // model.options.progress(LinearSolver.class);
         // model.options.validate = false;
 
         TestUtils.assertTrue(model.validate());
