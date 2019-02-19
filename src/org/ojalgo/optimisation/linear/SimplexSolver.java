@@ -460,6 +460,19 @@ public final class SimplexSolver extends LinearSolver {
 
         myPoint = new IterationPoint();
 
+        if (this.isLogProgress()) {
+            this.log("");
+            this.log("Created SimplexSolver");
+            this.log("countVariables: {}", tableau.countVariables());
+            this.log("countProblemVariables: {}", tableau.countProblemVariables());
+            this.log("countSlackVariables: {}", tableau.countSlackVariables());
+            this.log("countArtificialVariables: {}", tableau.countArtificialVariables());
+            this.log("countVariablesTotally: {}", tableau.countVariablesTotally());
+            this.log("countConstraints: {}", tableau.countConstraints());
+            this.log("countBasicArtificials: {}", tableau.countBasicArtificials());
+            this.log("countBasisDeficit: {}", tableau.countBasisDeficit());
+        }
+
         if (this.isLogDebug() && this.isTableauPrintable()) {
             this.logDebugTableau("Tableau Created");
         }

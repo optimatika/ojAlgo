@@ -202,7 +202,11 @@ public abstract class Presolvers {
     /**
      * Checks the sign of the limits and the sign of the expression parameters to deduce variables that in
      * fact can only be zero.
+     *
+     * @deprecated v48 Has been replaced by
+     *             {@link #doCaseN(Expression, BigDecimal, HashSet, Function, NumberContext)}
      */
+    @Deprecated
     public static final ExpressionsBasedModel.Presolver OPPOSITE_SIGN = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
@@ -292,11 +296,11 @@ public abstract class Presolvers {
             case 1:
                 return Presolvers.doCase1(expression, fixedValue, remainingLinear, variableResolver, precision);
             case 2:
-                // return Presolvers.doCase2(expression, fixedValue, remainingLinear, variableResolver, precision);
-            default:
+                return Presolvers.doCaseN(expression, fixedValue, remainingLinear, variableResolver, precision)
+                        || Presolvers.doCase2(expression, fixedValue, remainingLinear, variableResolver, precision);
+            default: // 3 or more
                 return Presolvers.doCaseN(expression, fixedValue, remainingLinear, variableResolver, precision);
             }
-
         }
     };
 
@@ -426,12 +430,12 @@ public abstract class Presolvers {
         final BigDecimal oldUpperA = variableA.getUpperLimit();
         final BigDecimal varMaxContrA;
         final BigDecimal varMinContrA;
-        if (factorA.signum() == 1) {
-            varMaxContrA = oldUpperA != null ? factorA.multiply(oldUpperA) : null;
-            varMinContrA = oldLowerA != null ? factorA.multiply(oldLowerA) : null;
-        } else {
+        if (factorA.signum() == -1) {
             varMinContrA = oldUpperA != null ? factorA.multiply(oldUpperA) : null;
             varMaxContrA = oldLowerA != null ? factorA.multiply(oldLowerA) : null;
+        } else {
+            varMaxContrA = oldUpperA != null ? factorA.multiply(oldUpperA) : null;
+            varMinContrA = oldLowerA != null ? factorA.multiply(oldLowerA) : null;
         }
 
         final Variable variableB = variableResolver.apply(tmpIterator.next());
@@ -440,12 +444,12 @@ public abstract class Presolvers {
         final BigDecimal oldUpperB = variableB.getUpperLimit();
         final BigDecimal varMaxContrB;
         final BigDecimal varMinContrB;
-        if (factorB.signum() == 1) {
-            varMaxContrB = oldUpperB != null ? factorB.multiply(oldUpperB) : null;
-            varMinContrB = oldLowerB != null ? factorB.multiply(oldLowerB) : null;
-        } else {
+        if (factorB.signum() == -1) {
             varMinContrB = oldUpperB != null ? factorB.multiply(oldUpperB) : null;
             varMaxContrB = oldLowerB != null ? factorB.multiply(oldLowerB) : null;
+        } else {
+            varMaxContrB = oldUpperB != null ? factorB.multiply(oldUpperB) : null;
+            varMinContrB = oldLowerB != null ? factorB.multiply(oldLowerB) : null;
         }
 
         final BigDecimal exprLower = expression.getLowerLimit() != null ? expression.getLowerLimit().subtract(fixedValue) : null;
@@ -541,12 +545,30 @@ public abstract class Presolvers {
             }
         }
 
+        //        if ((newLowerA != null) && !newLowerA.equals(oldLowerA)) {
+        //            BasicLogger.debug(variableA);
+        //        }
+        //        if ((newUpperA != null) && !newUpperA.equals(oldUpperA)) {
+        //            BasicLogger.debug(variableA);
+        //        }
+        //
+        //        if ((newLowerB != null) && !newLowerB.equals(oldLowerB)) {
+        //            BasicLogger.debug(variableB);
+        //        }
+        //        if ((newUpperB != null) && !newUpperB.equals(oldUpperB)) {
+        //            BasicLogger.debug(variableB);
+        //        }
+
         variableA.lower(newLowerA).upper(newUpperA);
         variableB.lower(newLowerB).upper(newUpperB);
 
         return variableA.isEqualityConstraint() || variableB.isEqualityConstraint();
     }
 
+    /**
+     * Checks the sign of the limits and the sign of the expression parameters to deduce variables that in
+     * fact can only be zero.
+     */
     static boolean doCaseN(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
             final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
