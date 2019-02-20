@@ -45,29 +45,25 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+        public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
                 final Function<IntIndex, Variable> resolver, final NumberContext precision) {
 
             boolean didFixVariable = false;
 
-            final Set<Variable> binaryVariables = expression.getBinaryVariables(fixed);
+            final Set<Variable> binaryVariables = expression.getBinaryVariables(remaining);
 
             if (binaryVariables.size() > 0) {
 
-                BigDecimal compUppLim = upper;
-
-                BigDecimal compLowLim = lower;
-
-                if ((compUppLim != null) && expression.isPositive(fixed)) {
+                if ((upper != null) && expression.isPositiveOn(remaining)) {
                     for (final Variable binVar : binaryVariables) {
-                        if (expression.get(binVar).compareTo(compUppLim) > 0) {
+                        if (expression.get(binVar).compareTo(upper) > 0) {
                             binVar.setFixed(ZERO);
                             didFixVariable = true;
                         }
                     }
-                } else if ((compLowLim != null) && expression.isNegative(fixed)) {
+                } else if ((lower != null) && expression.isNegativeOn(remaining)) {
                     for (final Variable binVar : binaryVariables) {
-                        if (expression.get(binVar).compareTo(compLowLim) < 0) {
+                        if (expression.get(binVar).compareTo(lower) < 0) {
                             binVar.setFixed(ZERO);
                             didFixVariable = true;
                         }
@@ -148,8 +144,8 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver INTEGER_ROUNDING = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
-        public boolean simplify(Expression expression, Set<IntIndex> fixed, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
-                Function<IntIndex, Variable> resolver, NumberContext precision) {
+        public boolean simplify(Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, Function<IntIndex, Variable> resolver,
+                NumberContext precision) {
             expression.doIntegerRounding();
             return false;
         }
@@ -163,7 +159,7 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver LINEAR_OBJECTIVE = new ExpressionsBasedModel.Presolver(10) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+        public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
                 final Function<IntIndex, Variable> resolver, final NumberContext precision) {
 
             if (expression.isObjective() && expression.isFunctionLinear()) {
@@ -200,7 +196,7 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver OPPOSITE_SIGN = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+        public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
                 final Function<IntIndex, Variable> resolver, final NumberContext precision) {
             return Presolvers.doCaseN(expression, remaining, lower, upper, resolver, precision);
         }
@@ -214,7 +210,7 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver ZERO_ONE_TWO = new ExpressionsBasedModel.Presolver(10) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+        public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
                 final Function<IntIndex, Variable> resolver, final NumberContext precision) {
 
             switch (remaining.size()) {

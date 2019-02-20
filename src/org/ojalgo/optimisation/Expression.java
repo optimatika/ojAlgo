@@ -706,12 +706,12 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    Set<Variable> getBinaryVariables(final Set<IntIndex> fixedVariables) {
+    Set<Variable> getBinaryVariables(final Set<IntIndex> subset) {
 
         final HashSet<Variable> retVal = new HashSet<>();
 
         for (final IntIndex varInd : myLinear.keySet()) {
-            if (!fixedVariables.contains(varInd)) {
+            if (subset.contains(varInd)) {
                 final Variable variable = myModel.getVariable(varInd.index);
                 if (variable.isBinary()) {
                     retVal.add(variable);

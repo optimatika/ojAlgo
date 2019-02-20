@@ -340,8 +340,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
          * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
          *         typically when/if a variable was fixed.
          */
-        public abstract boolean simplify(Expression expression, Set<IntIndex> fixed, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
-                Function<IntIndex, Variable> resolver, NumberContext precision);
+        public abstract boolean simplify(Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, Function<IntIndex, Variable> resolver,
+                NumberContext precision);
 
         @Override
         boolean isApplicable(final Expression target) {
@@ -1338,11 +1338,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             BigDecimal lower = tmpExpression.getLowerLimit();
             BigDecimal upper = tmpExpression.getUpperLimit();
 
-            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, allVars, lower, upper, this::getVariable, options.feasibility);
+            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, allVars, lower, upper, this::getVariable, options.feasibility);
             if (tmpExpression.isConstraint()) {
-                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, allVars, lower, upper, this::getVariable, options.feasibility);
+                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, allVars, lower, upper, this::getVariable, options.feasibility);
                 if (tmpExpression.isLinearAndAllInteger()) {
-                    Presolvers.INTEGER_ROUNDING.simplify(tmpExpression, fixedVariables, allVars, lower, upper, this::getVariable, options.feasibility);
+                    Presolvers.INTEGER_ROUNDING.simplify(tmpExpression, allVars, lower, upper, this::getVariable, options.feasibility);
                 }
             }
         }
@@ -1471,8 +1471,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
                     for (final Presolver presolver : PRESOLVERS) {
                         if (!needToRepeat) {
-                            needToRepeat |= presolver.simplify(expr, fixedVariables, myTemporary, compensatedLowerLimit, compensatedUpperLimit,
-                                    this::getVariable, options.feasibility);
+                            needToRepeat |= presolver.simplify(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, this::getVariable,
+                                    options.feasibility);
                         }
                     }
                 }
