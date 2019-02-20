@@ -45,8 +45,8 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, final BigDecimal value, final Function<IntIndex, Variable> resolver,
-                final NumberContext precision, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+                final Function<IntIndex, Variable> resolver, final NumberContext precision) {
 
             boolean didFixVariable = false;
 
@@ -148,8 +148,8 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver INTEGER_ROUNDING = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
-        public boolean simplify(Expression expression, Set<IntIndex> fixed, BigDecimal value, Function<IntIndex, Variable> resolver, NumberContext precision,
-                Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper) {
+        public boolean simplify(Expression expression, Set<IntIndex> fixed, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+                Function<IntIndex, Variable> resolver, NumberContext precision) {
             expression.doIntegerRounding();
             return false;
         }
@@ -163,8 +163,8 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver LINEAR_OBJECTIVE = new ExpressionsBasedModel.Presolver(10) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, final BigDecimal value, final Function<IntIndex, Variable> resolver,
-                final NumberContext precision, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+                final Function<IntIndex, Variable> resolver, final NumberContext precision) {
 
             if (expression.isObjective() && expression.isFunctionLinear()) {
 
@@ -194,15 +194,15 @@ public abstract class Presolvers {
      * fact can only be zero.
      *
      * @deprecated v48 Has been replaced by
-     *             {@link #doCaseN(Expression, BigDecimal, HashSet, Function, NumberContext, BigDecimal, BigDecimal)}
+     *             {@link #doCaseN(Expression, HashSet, BigDecimal, BigDecimal, Function, NumberContext)}
      */
     @Deprecated
     public static final ExpressionsBasedModel.Presolver OPPOSITE_SIGN = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, final BigDecimal value, final Function<IntIndex, Variable> resolver,
-                final NumberContext precision, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper) {
-            return Presolvers.doCaseN(expression, value, remaining, resolver, precision, lower, upper);
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+                final Function<IntIndex, Variable> resolver, final NumberContext precision) {
+            return Presolvers.doCaseN(expression, remaining, lower, upper, resolver, precision);
         }
 
     };
@@ -214,44 +214,35 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver ZERO_ONE_TWO = new ExpressionsBasedModel.Presolver(10) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, final BigDecimal value, final Function<IntIndex, Variable> resolver,
-                final NumberContext precision, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+                final Function<IntIndex, Variable> resolver, final NumberContext precision) {
 
             switch (remaining.size()) {
             case 0:
-                return Presolvers.doCase0(expression, value, remaining, resolver, precision, lower, upper);
+                return Presolvers.doCase0(expression, remaining, lower, upper, resolver, precision);
             case 1:
-                return Presolvers.doCase1(expression, value, remaining, resolver, precision, lower, upper);
+                return Presolvers.doCase1(expression, remaining, lower, upper, resolver, precision);
             case 2:
                 /*
                  * doCaseN(...) does something that doCase2(...) does not, and it's necessary. Possibly
                  * doCase2(...) can be removed completely - complicated code that doesn't seem to do
                  * accomplish very much.
                  */
-                return Presolvers.doCaseN(expression, value, remaining, resolver, precision, lower, upper)
-                        || Presolvers.doCase2(expression, value, remaining, resolver, precision, lower, upper);
+                return Presolvers.doCaseN(expression, remaining, lower, upper, resolver, precision)
+                        || Presolvers.doCase2(expression, remaining, lower, upper, resolver, precision);
             default: // 3 or more
-                return Presolvers.doCaseN(expression, value, remaining, resolver, precision, lower, upper);
+                return Presolvers.doCaseN(expression, remaining, lower, upper, resolver, precision);
             }
         }
     };
 
     /**
      * This constraint expression has 0 remaining free variable. It is entirely redundant.
-     *
-     * @param lower TODO
-     * @param upper TODO
      */
-    static boolean doCase0(final Expression expression, final BigDecimal value, final Set<IntIndex> remaining, final Function<IntIndex, Variable> resolver,
-            final NumberContext precision, BigDecimal lower, BigDecimal upper) {
+    static boolean doCase0(final Expression expression, final Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+            final Function<IntIndex, Variable> resolver, final NumberContext precision) {
 
         expression.setRedundant();
-
-        //        if (expression.validate(value, precision, null)) {
-        //            expression.level(value);
-        //        } else {
-        //            expression.setInfeasible();
-        //        }
 
         if ((lower != null) && precision.isMoreThan(ZERO, lower)) {
             expression.setInfeasible();
@@ -266,12 +257,9 @@ public abstract class Presolvers {
     /**
      * This constraint expression has 1 remaining free variable. The lower/upper limits can be transferred to
      * that variable, and the expression marked as redundant.
-     *
-     * @param lower TODO
-     * @param upper TODO
      */
-    static boolean doCase1(final Expression expression, final BigDecimal value, final Set<IntIndex> remaining, final Function<IntIndex, Variable> resolver,
-            final NumberContext precision, BigDecimal lower, BigDecimal upper) {
+    static boolean doCase1(final Expression expression, final Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+            final Function<IntIndex, Variable> resolver, final NumberContext precision) {
 
         final IntIndex index = remaining.iterator().next();
         final Variable variable = resolver.apply(index);
@@ -280,22 +268,20 @@ public abstract class Presolvers {
         final BigDecimal oldUpper = variable.getUpperLimit();
         final BigDecimal varMaxContr;
         final BigDecimal varMinContr;
-        if (factor.signum() == 1) {
-            varMaxContr = oldUpper != null ? factor.multiply(oldUpper) : null;
-            varMinContr = oldLower != null ? factor.multiply(oldLower) : null;
-        } else {
+        if (factor.signum() == -1) {
             varMinContr = oldUpper != null ? factor.multiply(oldUpper) : null;
             varMaxContr = oldLower != null ? factor.multiply(oldLower) : null;
+        } else {
+            varMaxContr = oldUpper != null ? factor.multiply(oldUpper) : null;
+            varMinContr = oldLower != null ? factor.multiply(oldLower) : null;
         }
 
-        final BigDecimal exprLower = lower;
-        if ((exprLower != null) && (varMaxContr != null) && precision.isLessThan(exprLower, varMaxContr)) {
+        if ((lower != null) && (varMaxContr != null) && precision.isLessThan(lower, varMaxContr)) {
             expression.setInfeasible();
             return false || false;
         }
 
-        final BigDecimal exprUpper = upper;
-        if ((exprUpper != null) && (varMinContr != null) && precision.isMoreThan(exprUpper, varMinContr)) {
+        if ((upper != null) && (varMinContr != null) && precision.isMoreThan(upper, varMinContr)) {
             expression.setInfeasible();
             return false;
         }
@@ -303,7 +289,7 @@ public abstract class Presolvers {
         if (expression.isEqualityConstraint()) {
             // Simple case with equality constraint
 
-            final BigDecimal solution = DIVIDE.invoke(exprUpper, factor);
+            final BigDecimal solution = DIVIDE.invoke(upper, factor);
 
             if (variable.validate(solution, precision, null)) {
                 variable.setFixed(solution);
@@ -314,8 +300,8 @@ public abstract class Presolvers {
         } else {
             // More general case
 
-            BigDecimal solutionLower = exprLower != null ? DIVIDE.invoke(exprLower, factor) : null;
-            BigDecimal solutionUpper = exprUpper != null ? DIVIDE.invoke(exprUpper, factor) : null;
+            BigDecimal solutionLower = lower != null ? DIVIDE.invoke(lower, factor) : null;
+            BigDecimal solutionUpper = upper != null ? DIVIDE.invoke(upper, factor) : null;
             if (factor.signum() < 0) {
                 final BigDecimal tmpVal = solutionLower;
                 solutionLower = solutionUpper;
@@ -363,12 +349,9 @@ public abstract class Presolvers {
     /**
      * Checks if bounds on either of the variables (together with the expressions's bounds) implies tighter
      * bounds on the other variable.
-     *
-     * @param lower TODO
-     * @param upper TODO
      */
-    static boolean doCase2(final Expression expression, final BigDecimal value, final Set<IntIndex> remaining, final Function<IntIndex, Variable> resolver,
-            final NumberContext precision, BigDecimal lower, BigDecimal upper) {
+    static boolean doCase2(final Expression expression, final Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+            final Function<IntIndex, Variable> resolver, final NumberContext precision) {
 
         final Iterator<IntIndex> tmpIterator = remaining.iterator();
 
@@ -400,14 +383,12 @@ public abstract class Presolvers {
             varMinContrB = oldLowerB != null ? factorB.multiply(oldLowerB) : null;
         }
 
-        final BigDecimal exprLower = lower;
-        if ((exprLower != null) && (varMaxContrA != null) && (varMaxContrB != null) && precision.isLessThan(exprLower, varMaxContrA.add(varMaxContrB))) {
+        if ((lower != null) && (varMaxContrA != null) && (varMaxContrB != null) && precision.isLessThan(lower, varMaxContrA.add(varMaxContrB))) {
             expression.setInfeasible();
             return false;
         }
 
-        final BigDecimal exprUpper = upper;
-        if ((exprUpper != null) && (varMinContrA != null) && (varMinContrB != null) && precision.isMoreThan(exprUpper, varMinContrA.add(varMinContrB))) {
+        if ((upper != null) && (varMinContrA != null) && (varMinContrB != null) && precision.isMoreThan(upper, varMinContrA.add(varMinContrB))) {
             expression.setInfeasible();
             return false;
         }
@@ -417,10 +398,10 @@ public abstract class Presolvers {
         BigDecimal newLowerB = oldLowerB;
         BigDecimal newUpperB = oldUpperB;
 
-        if (exprLower != null) {
+        if (lower != null) {
 
-            if ((varMaxContrB != null) && (varMaxContrB.compareTo(exprLower) < 0)) {
-                BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varMaxContrB), factorA);
+            if ((varMaxContrB != null) && (varMaxContrB.compareTo(lower) < 0)) {
+                BigDecimal newLimit = DIVIDE.invoke(lower.subtract(varMaxContrB), factorA);
 
                 newLimit = oldLowerA != null ? oldLowerA.max(newLimit) : newLimit;
                 newLimit = oldUpperA != null ? oldUpperA.min(newLimit) : newLimit;
@@ -432,8 +413,8 @@ public abstract class Presolvers {
                 }
             }
 
-            if ((varMaxContrA != null) && (varMaxContrA.compareTo(exprLower) < 0)) {
-                BigDecimal newLimit = DIVIDE.invoke(exprLower.subtract(varMaxContrA), factorB);
+            if ((varMaxContrA != null) && (varMaxContrA.compareTo(lower) < 0)) {
+                BigDecimal newLimit = DIVIDE.invoke(lower.subtract(varMaxContrA), factorB);
 
                 newLimit = oldLowerB != null ? oldLowerB.max(newLimit) : newLimit;
                 newLimit = oldUpperB != null ? oldUpperB.min(newLimit) : newLimit;
@@ -446,10 +427,10 @@ public abstract class Presolvers {
             }
         }
 
-        if (exprUpper != null) {
+        if (upper != null) {
 
-            if ((varMinContrB != null) && (varMinContrB.compareTo(exprUpper) > 0)) {
-                BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varMinContrB), factorA);
+            if ((varMinContrB != null) && (varMinContrB.compareTo(upper) > 0)) {
+                BigDecimal newLimit = DIVIDE.invoke(upper.subtract(varMinContrB), factorA);
 
                 newLimit = oldLowerA != null ? oldLowerA.max(newLimit) : newLimit;
                 newLimit = oldUpperA != null ? oldUpperA.min(newLimit) : newLimit;
@@ -461,8 +442,8 @@ public abstract class Presolvers {
                 }
             }
 
-            if ((varMinContrA != null) && (varMinContrA.compareTo(exprUpper) > 0)) {
-                BigDecimal newLimit = DIVIDE.invoke(exprUpper.subtract(varMinContrA), factorB);
+            if ((varMinContrA != null) && (varMinContrA.compareTo(upper) > 0)) {
+                BigDecimal newLimit = DIVIDE.invoke(upper.subtract(varMinContrA), factorB);
 
                 newLimit = oldLowerB != null ? oldLowerB.max(newLimit) : newLimit;
                 newLimit = oldUpperB != null ? oldUpperB.min(newLimit) : newLimit;
@@ -493,45 +474,24 @@ public abstract class Presolvers {
             }
         }
 
-        //        if ((newLowerA != null) && !newLowerA.equals(oldLowerA)) {
-        //            BasicLogger.debug(variableA);
-        //        }
-        //        if ((newUpperA != null) && !newUpperA.equals(oldUpperA)) {
-        //            BasicLogger.debug(variableA);
-        //        }
-        //
-        //        if ((newLowerB != null) && !newLowerB.equals(oldLowerB)) {
-        //            BasicLogger.debug(variableB);
-        //        }
-        //        if ((newUpperB != null) && !newUpperB.equals(oldUpperB)) {
-        //            BasicLogger.debug(variableB);
-        //        }
-
         variableA.lower(newLowerA).upper(newUpperA);
         variableB.lower(newLowerB).upper(newUpperB);
 
-        return variableA.isEqualityConstraint() || variableB.isEqualityConstraint();
+        return variableA.isFixed() || variableB.isFixed();
     }
 
     /**
      * Checks the sign of the limits and the sign of the expression parameters to deduce variables that in
      * fact can only be zero.
-     *
-     * @param lower TODO
-     * @param upper TODO
      */
-    static boolean doCaseN(final Expression expression, final BigDecimal value, final Set<IntIndex> remaining, final Function<IntIndex, Variable> resolver,
-            final NumberContext precision, BigDecimal lower, BigDecimal upper) {
+    static boolean doCaseN(final Expression expression, final Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+            final Function<IntIndex, Variable> resolver, final NumberContext precision) {
 
         boolean didFixVariable = false;
 
-        BigDecimal compLowLim = lower;
+        if ((lower != null) && (lower.signum() >= 0) && expression.isNegativeOn(remaining)) {
 
-        BigDecimal compUppLim = upper;
-
-        if ((compLowLim != null) && (compLowLim.signum() >= 0) && expression.isNegativeOn(remaining)) {
-
-            if (compLowLim.signum() == 0) {
+            if (lower.signum() == 0) {
 
                 for (final IntIndex indexOfFree : remaining) {
                     final Variable freeVariable = resolver.apply(indexOfFree);
@@ -550,9 +510,9 @@ public abstract class Presolvers {
             }
         }
 
-        if ((compUppLim != null) && (compUppLim.signum() <= 0) && expression.isPositiveOn(remaining)) {
+        if ((upper != null) && (upper.signum() <= 0) && expression.isPositiveOn(remaining)) {
 
-            if (compUppLim.signum() == 0) {
+            if (upper.signum() == 0) {
 
                 for (final IntIndex indexOfFree : remaining) {
                     final Variable freeVariable = resolver.apply(indexOfFree);

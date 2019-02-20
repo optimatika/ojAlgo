@@ -152,8 +152,7 @@ public class ExpressionsBasedModelTest {
         expr3.set(varX, TWO.negate());
         expr3.set(varA, NEG);
 
-        Presolvers.ZERO_ONE_TWO.simplify(expr3, fixedVariables, fixedValue, model::getVariable, precision, expr3.getLinearKeySet(), expr3.getLowerLimit(),
-                expr3.getUpperLimit());
+        Presolvers.ZERO_ONE_TWO.simplify(expr3, fixedVariables, expr3.getLinearKeySet(), expr3.getLowerLimit(), expr3.getUpperLimit(), model::getVariable, precision);
 
         TestUtils.assertEquals(TWO.negate(), varA.getUpperLimit(), precision);
 
@@ -162,8 +161,7 @@ public class ExpressionsBasedModelTest {
         expr2.set(varX, TWO.negate());
         expr2.set(varY, NEG);
 
-        Presolvers.ZERO_ONE_TWO.simplify(expr2, fixedVariables, fixedValue, model::getVariable, precision, expr2.getLinearKeySet(), expr2.getLowerLimit(),
-                expr2.getUpperLimit());
+        Presolvers.ZERO_ONE_TWO.simplify(expr2, fixedVariables, expr2.getLinearKeySet(), expr2.getLowerLimit(), expr2.getUpperLimit(), model::getVariable, precision);
 
         TestUtils.assertEquals(TWO.negate(), varY.getUpperLimit(), precision);
 
@@ -172,8 +170,7 @@ public class ExpressionsBasedModelTest {
         expr1.set(varX, TWO.negate());
         expr1.set(varZ, ONE);
 
-        Presolvers.ZERO_ONE_TWO.simplify(expr1, fixedVariables, fixedValue, model::getVariable, precision, expr1.getLinearKeySet(), expr1.getLowerLimit(),
-                expr1.getUpperLimit());
+        Presolvers.ZERO_ONE_TWO.simplify(expr1, fixedVariables, expr1.getLinearKeySet(), expr1.getLowerLimit(), expr1.getUpperLimit(), model::getVariable, precision);
 
         TestUtils.assertEquals(TWO, varZ.getLowerLimit(), precision);
 

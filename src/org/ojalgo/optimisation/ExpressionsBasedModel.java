@@ -340,8 +340,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
          * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
          *         typically when/if a variable was fixed.
          */
-        public abstract boolean simplify(Expression expression, Set<IntIndex> fixed, BigDecimal value, Function<IntIndex, Variable> resolver,
-                NumberContext precision, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper);
+        public abstract boolean simplify(Expression expression, Set<IntIndex> fixed, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
+                Function<IntIndex, Variable> resolver, NumberContext precision);
 
         @Override
         boolean isApplicable(final Expression target) {
@@ -1338,12 +1338,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             BigDecimal lower = tmpExpression.getLowerLimit();
             BigDecimal upper = tmpExpression.getUpperLimit();
 
-            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility, allVars, lower, upper);
+            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, allVars, lower, upper, this::getVariable, options.feasibility);
             if (tmpExpression.isConstraint()) {
-                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility, allVars, lower, upper);
+                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, allVars, lower, upper, this::getVariable, options.feasibility);
                 if (tmpExpression.isLinearAndAllInteger()) {
-                    Presolvers.INTEGER_ROUNDING.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility, allVars, lower,
-                            upper);
+                    Presolvers.INTEGER_ROUNDING.simplify(tmpExpression, fixedVariables, allVars, lower, upper, this::getVariable, options.feasibility);
                 }
             }
         }
@@ -1452,7 +1451,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         do {
 
             final Set<IntIndex> fixedVariables = this.getFixedVariables();
-            BigDecimal fixedValue;
+
             BigDecimal compensatedLowerLimit;
             BigDecimal compensatedUpperLimit;
 
@@ -1462,7 +1461,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                 if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
 
                     BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
-                    fixedValue = options.solution.enforce(calculateSetValue);
+
                     compensatedLowerLimit = expr.getCompensatedLowerLimit(calculateSetValue);
                     compensatedUpperLimit = expr.getCompensatedUpperLimit(calculateSetValue);
 
@@ -1472,8 +1471,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
                     for (final Presolver presolver : PRESOLVERS) {
                         if (!needToRepeat) {
-                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.feasibility, myTemporary,
-                                    compensatedLowerLimit, compensatedUpperLimit);
+                            needToRepeat |= presolver.simplify(expr, fixedVariables, myTemporary, compensatedLowerLimit, compensatedUpperLimit,
+                                    this::getVariable, options.feasibility);
                         }
                     }
                 }
