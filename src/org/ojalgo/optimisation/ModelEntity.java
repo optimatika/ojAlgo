@@ -435,6 +435,14 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         this.appendRightPart(builder);
     }
 
+    final BigDecimal getCompensatedLowerLimit(BigDecimal compensation) {
+        return myLowerLimit != null ? myLowerLimit.subtract(compensation) : null;
+    }
+
+    final BigDecimal getCompensatedUpperLimit(BigDecimal compensation) {
+        return myUpperLimit != null ? myUpperLimit.subtract(compensation) : null;
+    }
+
     boolean isInfeasible() {
         return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0);
     }

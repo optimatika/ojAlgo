@@ -627,30 +627,30 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     /**
-     * Calculates this expression's fixed value - the fixed variables' part of this expression. Will never
-     * return null.
+     * Calculates this expression's value - the subset variables' part of this expression. Will never return
+     * null.
      */
-    BigDecimal calculateFixedValue(final Collection<IntIndex> fixedVariables) {
+    BigDecimal calculateSetValue(final Collection<IntIndex> subset) {
 
         BigDecimal retVal = BigMath.ZERO;
 
-        if (fixedVariables.size() > 0) {
+        if (subset.size() > 0) {
 
-            for (final IntIndex tmpKey : myLinear.keySet()) {
-                if (fixedVariables.contains(tmpKey)) {
-                    final BigDecimal tmpFactor = this.get(tmpKey);
-                    final BigDecimal tmpValue = myModel.getVariable(tmpKey.index).getValue();
-                    retVal = retVal.add(tmpFactor.multiply(tmpValue));
+            for (final IntIndex linKey : myLinear.keySet()) {
+                if (subset.contains(linKey)) {
+                    final BigDecimal coefficient = this.get(linKey);
+                    final BigDecimal value = myModel.getVariable(linKey.index).getValue();
+                    retVal = retVal.add(coefficient.multiply(value));
                 }
             }
 
-            for (final IntRowColumn tmpKey : myQuadratic.keySet()) {
-                if (fixedVariables.contains(new IntIndex(tmpKey.row))) {
-                    if (fixedVariables.contains(new IntIndex(tmpKey.column))) {
-                        final BigDecimal tmpFactor = this.get(tmpKey);
-                        final BigDecimal tmpRowValue = myModel.getVariable(tmpKey.row).getValue();
-                        final BigDecimal tmpColValue = myModel.getVariable(tmpKey.column).getValue();
-                        retVal = retVal.add(tmpFactor.multiply(tmpRowValue).multiply(tmpColValue));
+            for (final IntRowColumn quadKey : myQuadratic.keySet()) {
+                if (subset.contains(new IntIndex(quadKey.row))) {
+                    if (subset.contains(new IntIndex(quadKey.column))) {
+                        final BigDecimal coefficient = this.get(quadKey);
+                        final BigDecimal rowValue = myModel.getVariable(quadKey.row).getValue();
+                        final BigDecimal colValue = myModel.getVariable(quadKey.column).getValue();
+                        retVal = retVal.add(coefficient.multiply(rowValue).multiply(colValue));
                     }
                 }
             }

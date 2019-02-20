@@ -334,11 +334,15 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         /**
+         * @param remaining TODO
+         * @param lower TODO
+         * @param upper TODO
          * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
          *         typically when/if a variable was fixed.
          */
-        public abstract boolean simplify(Expression expression, Set<IntIndex> fixedVariables, BigDecimal fixedValue,
-                Function<IntIndex, Variable> variableResolver, NumberContext precision);
+        public abstract boolean simplify(Expression expression, Set<IntIndex> fixed, BigDecimal value,
+                Function<IntIndex, Variable> resolver, NumberContext precision, Set<IntIndex> remaining, BigDecimal lower,
+                BigDecimal upper);
 
         @Override
         boolean isApplicable(final Expression target) {
@@ -482,6 +486,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private transient int[] myPositiveIndices = null;
     private final List<Variable> myPositiveVariables = new ArrayList<>();
     private boolean myRelaxed;
+    /**
+     * Temporary storage for some expresssion specific subset of variables
+     */
+    private final Set<IntIndex> myTemporary = new HashSet<>();
     private final ArrayList<Variable> myVariables = new ArrayList<>();
     private final boolean myWorkCopy;
 
@@ -1326,11 +1334,15 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         final BigDecimal fixedValue = BigMath.ZERO;
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
+
+            Set<IntIndex> allVars = tmpExpression.getLinearKeySet();
+
+            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility, allVars, null, null);
             if (tmpExpression.isConstraint()) {
-                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
+                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility, allVars, null, null);
                 if (tmpExpression.isLinearAndAllInteger()) {
-                    Presolvers.INTEGER_ROUNDING.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
+                    Presolvers.INTEGER_ROUNDING.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility, allVars, null,
+                            null);
                 }
             }
         }
@@ -1440,15 +1452,26 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
             final Set<IntIndex> fixedVariables = this.getFixedVariables();
             BigDecimal fixedValue;
+            BigDecimal compensatedLowerLimit;
+            BigDecimal compensatedUpperLimit;
 
             needToRepeat = false;
 
             for (final Expression expr : this.getExpressions()) {
                 if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
-                    fixedValue = options.solution.enforce(expr.calculateFixedValue(fixedVariables));
+
+                    fixedValue = options.solution.enforce(expr.calculateSetValue(fixedVariables));
+                    compensatedLowerLimit = expr.getCompensatedLowerLimit(fixedValue);
+                    compensatedUpperLimit = expr.getCompensatedUpperLimit(fixedValue);
+
+                    myTemporary.clear();
+                    myTemporary.addAll(expr.getLinearKeySet());
+                    myTemporary.removeAll(fixedVariables);
+
                     for (final Presolver presolver : PRESOLVERS) {
                         if (!needToRepeat) {
-                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.feasibility);
+                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.feasibility, myTemporary,
+                                    compensatedLowerLimit, compensatedUpperLimit);
                         }
                     }
                 }

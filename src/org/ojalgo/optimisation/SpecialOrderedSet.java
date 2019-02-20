@@ -47,21 +47,22 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
      * The program logic here does not assume variables to be binary or even integer
      */
     @Override
-    public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-            final Function<IntIndex, Variable> variableResolver, NumberContext precision) {
+    public boolean simplify(final Expression expression, final Set<IntIndex> fixed, final BigDecimal value,
+            final Function<IntIndex, Variable> resolver, NumberContext precision, Set<IntIndex> remaining, BigDecimal lower,
+            BigDecimal upper) {
 
         if (!expression.equals(myExpression)) {
             return false;
         }
 
-        if (fixedVariables.size() == 0) {
+        if (fixed.size() == 0) {
             return false;
         }
 
         int first = -1, limit = -1;
         for (int i = 0; i < mySequence.length; i++) {
             final IntIndex index = mySequence[1];
-            if (fixedVariables.contains(index) && (variableResolver.apply(index).getValue().signum() != 0)) {
+            if (fixed.contains(index) && (resolver.apply(index).getValue().signum() != 0)) {
                 if (first == -1) {
                     first = i;
                 }
@@ -79,8 +80,8 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
 
         for (int i = first + 1; i < limit; i++) {
             final IntIndex index = mySequence[i];
-            final Variable variable = variableResolver.apply(index);
-            if (fixedVariables.contains(index)) {
+            final Variable variable = resolver.apply(index);
+            if (fixed.contains(index)) {
                 if (variable.getValue().signum() == 0) {
                     expression.setInfeasible();
                 }
@@ -92,12 +93,12 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
             }
         }
 
-        final int remaining = myType - count;
-        if ((count > 0) && (remaining > 0)) {
-            for (int i = 0, lim = first - remaining; i < lim; i++) {
+        final int remainingCount = myType - count;
+        if ((count > 0) && (remainingCount > 0)) {
+            for (int i = 0, lim = first - remainingCount; i < lim; i++) {
                 final IntIndex index = mySequence[i];
-                final Variable variable = variableResolver.apply(index);
-                if (fixedVariables.contains(index)) {
+                final Variable variable = resolver.apply(index);
+                if (fixed.contains(index)) {
                     if (variable.getValue().signum() != 0) {
                         expression.setInfeasible();
                     }
@@ -106,10 +107,10 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
                     didFixVariable = true;
                 }
             }
-            for (int i = limit + remaining, lim = mySequence.length; i < lim; i++) {
+            for (int i = limit + remainingCount, lim = mySequence.length; i < lim; i++) {
                 final IntIndex index = mySequence[i];
-                final Variable variable = variableResolver.apply(index);
-                if (fixedVariables.contains(index)) {
+                final Variable variable = resolver.apply(index);
+                if (fixed.contains(index)) {
                     if (variable.getValue().signum() != 0) {
                         expression.setInfeasible();
                     }

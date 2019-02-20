@@ -45,37 +45,38 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, final BigDecimal value,
+                final Function<IntIndex, Variable> resolver, final NumberContext precision, Set<IntIndex> remaining, BigDecimal lower,
+                BigDecimal upper) {
 
             boolean didFixVariable = false;
 
-            final Set<Variable> binaryVariables = expression.getBinaryVariables(fixedVariables);
+            final Set<Variable> binaryVariables = expression.getBinaryVariables(fixed);
 
             if (binaryVariables.size() > 0) {
 
                 BigDecimal compUppLim = expression.getUpperLimit();
                 if (compUppLim != null) {
-                    if (fixedValue.signum() != 0) {
-                        compUppLim = compUppLim.subtract(fixedValue);
+                    if (value.signum() != 0) {
+                        compUppLim = compUppLim.subtract(value);
                     }
                 }
 
                 BigDecimal compLowLim = expression.getLowerLimit();
                 if (compLowLim != null) {
-                    if (fixedValue.signum() != 0) {
-                        compLowLim = compLowLim.subtract(fixedValue);
+                    if (value.signum() != 0) {
+                        compLowLim = compLowLim.subtract(value);
                     }
                 }
 
-                if ((compUppLim != null) && expression.isPositive(fixedVariables)) {
+                if ((compUppLim != null) && expression.isPositive(fixed)) {
                     for (final Variable binVar : binaryVariables) {
                         if (expression.get(binVar).compareTo(compUppLim) > 0) {
                             binVar.setFixed(ZERO);
                             didFixVariable = true;
                         }
                     }
-                } else if ((compLowLim != null) && expression.isNegative(fixedVariables)) {
+                } else if ((compLowLim != null) && expression.isNegative(fixed)) {
                     for (final Variable binVar : binaryVariables) {
                         if (expression.get(binVar).compareTo(compLowLim) < 0) {
                             binVar.setFixed(ZERO);
@@ -158,8 +159,8 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver INTEGER_ROUNDING = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
-        public boolean simplify(Expression expression, Set<IntIndex> fixedVariables, BigDecimal fixedValue, Function<IntIndex, Variable> variableResolver,
-                NumberContext precision) {
+        public boolean simplify(Expression expression, Set<IntIndex> fixed, BigDecimal value, Function<IntIndex, Variable> resolver,
+                NumberContext precision, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper) {
             expression.doIntegerRounding();
             return false;
         }
@@ -173,8 +174,9 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver LINEAR_OBJECTIVE = new ExpressionsBasedModel.Presolver(10) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, final BigDecimal value,
+                final Function<IntIndex, Variable> resolver, final NumberContext precision, Set<IntIndex> remaining, BigDecimal lower,
+                BigDecimal upper) {
 
             if (expression.isObjective() && expression.isFunctionLinear()) {
 
@@ -184,7 +186,7 @@ public abstract class Presolvers {
                 BigDecimal varWeight;
                 BigDecimal contribution;
                 for (final Entry<IntIndex, BigDecimal> entry : expression.getLinearEntrySet()) {
-                    tmpVariable = variableResolver.apply(entry.getKey());
+                    tmpVariable = resolver.apply(entry.getKey());
                     varWeight = tmpVariable.getContributionWeight();
                     contribution = exprWeight.multiply(entry.getValue());
                     varWeight = varWeight != null ? varWeight.add(contribution) : contribution;
@@ -210,29 +212,30 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver OPPOSITE_SIGN = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, final BigDecimal value,
+                final Function<IntIndex, Variable> resolver, final NumberContext precision, Set<IntIndex> remaining, BigDecimal lower,
+                BigDecimal upper) {
 
             boolean didFixVariable = false;
 
             BigDecimal tmpCompLowLim = expression.getLowerLimit();
-            if ((tmpCompLowLim != null) && (fixedValue.signum() != 0)) {
-                tmpCompLowLim = tmpCompLowLim.subtract(fixedValue);
+            if ((tmpCompLowLim != null) && (value.signum() != 0)) {
+                tmpCompLowLim = tmpCompLowLim.subtract(value);
             }
 
             BigDecimal tmpCompUppLim = expression.getUpperLimit();
-            if ((tmpCompUppLim != null) && (fixedValue.signum() != 0)) {
-                tmpCompUppLim = tmpCompUppLim.subtract(fixedValue);
+            if ((tmpCompUppLim != null) && (value.signum() != 0)) {
+                tmpCompUppLim = tmpCompUppLim.subtract(value);
             }
 
-            if ((tmpCompLowLim != null) && (tmpCompLowLim.signum() >= 0) && expression.isNegative(fixedVariables)) {
+            if ((tmpCompLowLim != null) && (tmpCompLowLim.signum() >= 0) && expression.isNegative(fixed)) {
 
                 if (tmpCompLowLim.signum() == 0) {
 
                     for (final IntIndex tmpLinear : expression.getLinearKeySet()) {
-                        if (!fixedVariables.contains(tmpLinear)) {
+                        if (!fixed.contains(tmpLinear)) {
 
-                            final Variable tmpFreeVariable = variableResolver.apply(tmpLinear);
+                            final Variable tmpFreeVariable = resolver.apply(tmpLinear);
 
                             if (tmpFreeVariable.validate(ZERO, precision, null)) {
                                 tmpFreeVariable.setFixed(ZERO);
@@ -249,13 +252,13 @@ public abstract class Presolvers {
                 }
             }
 
-            if ((tmpCompUppLim != null) && (tmpCompUppLim.signum() <= 0) && expression.isPositive(fixedVariables)) {
+            if ((tmpCompUppLim != null) && (tmpCompUppLim.signum() <= 0) && expression.isPositive(fixed)) {
 
                 if (tmpCompUppLim.signum() == 0) {
 
                     for (final IntIndex tmpLinear : expression.getLinearKeySet()) {
-                        if (!fixedVariables.contains(tmpLinear)) {
-                            final Variable tmpFreeVariable = variableResolver.apply(tmpLinear);
+                        if (!fixed.contains(tmpLinear)) {
+                            final Variable tmpFreeVariable = resolver.apply(tmpLinear);
 
                             if (tmpFreeVariable.validate(ZERO, precision, null)) {
                                 tmpFreeVariable.setFixed(ZERO);
@@ -284,22 +287,24 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver ZERO_ONE_TWO = new ExpressionsBasedModel.Presolver(10) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables, final BigDecimal fixedValue,
-                final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixed, final BigDecimal value,
+                final Function<IntIndex, Variable> resolver, final NumberContext precision, Set<IntIndex> remaining, BigDecimal lower,
+                BigDecimal upper) {
 
-            final HashSet<IntIndex> remainingLinear = new HashSet<>(expression.getLinearKeySet());
-            remainingLinear.removeAll(fixedVariables);
-
-            switch (remainingLinear.size()) {
+            switch (remaining.size()) {
             case 0:
-                return Presolvers.doCase0(expression, fixedValue, remainingLinear, variableResolver, precision);
+                return Presolvers.doCase0(expression, value, remaining, resolver, precision);
             case 1:
-                return Presolvers.doCase1(expression, fixedValue, remainingLinear, variableResolver, precision);
+                return Presolvers.doCase1(expression, value, remaining, resolver, precision);
             case 2:
-                return Presolvers.doCaseN(expression, fixedValue, remainingLinear, variableResolver, precision)
-                        || Presolvers.doCase2(expression, fixedValue, remainingLinear, variableResolver, precision);
+                /*
+                 * doCaseN does something that doCase2 does not, and it's necessary. Possibly doCase2 can be
+                 * removed completely - complicated code that doesn't seem to do accomplish very much
+                 */
+                return Presolvers.doCaseN(expression, value, remaining, resolver, precision)
+                        || Presolvers.doCase2(expression, value, remaining, resolver, precision);
             default: // 3 or more
-                return Presolvers.doCaseN(expression, fixedValue, remainingLinear, variableResolver, precision);
+                return Presolvers.doCaseN(expression, value, remaining, resolver, precision);
             }
         }
     };
@@ -307,7 +312,7 @@ public abstract class Presolvers {
     /**
      * This constraint expression has 0 remaining free variable. It is entirely redundant.
      */
-    static boolean doCase0(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
+    static boolean doCase0(final Expression expression, final BigDecimal fixedValue, final Set<IntIndex> remaining,
             final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
         expression.setRedundant();
@@ -325,7 +330,7 @@ public abstract class Presolvers {
      * This constraint expression has 1 remaining free variable. The lower/upper limits can be transferred to
      * that variable, and the expression marked as redundant.
      */
-    static boolean doCase1(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
+    static boolean doCase1(final Expression expression, final BigDecimal fixedValue, final Set<IntIndex> remaining,
             final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
         final IntIndex index = remaining.iterator().next();
@@ -419,7 +424,7 @@ public abstract class Presolvers {
      * Checks if bounds on either of the variables (together with the expressions's bounds) implies tighter
      * bounds on the other variable.
      */
-    static boolean doCase2(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
+    static boolean doCase2(final Expression expression, final BigDecimal fixedValue, final Set<IntIndex> remaining,
             final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
         final Iterator<IntIndex> tmpIterator = remaining.iterator();
@@ -569,7 +574,7 @@ public abstract class Presolvers {
      * Checks the sign of the limits and the sign of the expression parameters to deduce variables that in
      * fact can only be zero.
      */
-    static boolean doCaseN(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining,
+    static boolean doCaseN(final Expression expression, final BigDecimal fixedValue, final Set<IntIndex> remaining,
             final Function<IntIndex, Variable> variableResolver, final NumberContext precision) {
 
         boolean didFixVariable = false;
