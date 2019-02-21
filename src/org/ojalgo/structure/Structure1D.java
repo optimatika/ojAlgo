@@ -139,10 +139,7 @@ public interface Structure1D {
 
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = (prime * result) + index;
-            return result;
+            return Integer.hashCode(index);
         }
 
         @Override
@@ -200,10 +197,7 @@ public interface Structure1D {
 
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = (prime * result) + (int) (index ^ (index >>> 32));
-            return result;
+            return Long.hashCode(index);
         }
 
         @Override
