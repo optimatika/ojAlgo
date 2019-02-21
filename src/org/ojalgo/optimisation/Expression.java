@@ -805,35 +805,6 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     /**
-     * @param fixedVariables The indices of the fixed variables
-     * @return true if none of the free (not fixed) variables can make a positve contribution to the
-     *         expression value
-     * @deprecated v48
-     */
-    @Deprecated
-    boolean isNegative(final Set<IntIndex> fixedVariables) {
-
-        boolean retVal = !this.isAnyQuadraticFactorNonZero();
-
-        if (retVal) {
-            for (final Entry<IntIndex, BigDecimal> tmpLinear : this.getLinearEntrySet()) {
-                if (retVal && !fixedVariables.contains(tmpLinear.getKey())) {
-                    final Variable tmpFreeVariable = myModel.getVariable(tmpLinear.getKey().index);
-                    if ((tmpLinear.getValue().signum() < 0) && tmpFreeVariable.isLowerLimitSet() && (tmpFreeVariable.getLowerLimit().signum() >= 0)) {
-                        retVal &= true;
-                    } else if ((tmpLinear.getValue().signum() > 0) && tmpFreeVariable.isUpperLimitSet() && (tmpFreeVariable.getUpperLimit().signum() <= 0)) {
-                        retVal &= true;
-                    } else {
-                        retVal &= false;
-                    }
-                }
-            }
-        }
-
-        return retVal;
-    }
-
-    /**
      * @param subset The indices of a variable subset
      * @return true if none of the variables in the subset can make a positve contribution to the expression
      *         value
@@ -855,35 +826,6 @@ public final class Expression extends ModelEntity<Expression> {
         }
 
         return true;
-    }
-
-    /**
-     * @param fixedVariables The indices of the fixed variables
-     * @return true if none of the free (not fixed) variables can make a negative contribution to the
-     *         expression value
-     * @deprecated v48
-     */
-    @Deprecated
-    boolean isPositive(final Set<IntIndex> fixedVariables) {
-
-        boolean retVal = !this.isAnyQuadraticFactorNonZero();
-
-        if (retVal) {
-            for (final Entry<IntIndex, BigDecimal> tmpLinear : this.getLinearEntrySet()) {
-                if (retVal && !fixedVariables.contains(tmpLinear.getKey())) {
-                    final Variable tmpFreeVariable = myModel.getVariable(tmpLinear.getKey().index);
-                    if ((tmpLinear.getValue().signum() > 0) && tmpFreeVariable.isLowerLimitSet() && (tmpFreeVariable.getLowerLimit().signum() >= 0)) {
-                        retVal &= true;
-                    } else if ((tmpLinear.getValue().signum() < 0) && tmpFreeVariable.isUpperLimitSet() && (tmpFreeVariable.getUpperLimit().signum() <= 0)) {
-                        retVal &= true;
-                    } else {
-                        retVal &= false;
-                    }
-                }
-            }
-        }
-
-        return retVal;
     }
 
     /**
