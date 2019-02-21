@@ -147,14 +147,7 @@ public final class Variable extends ModelEntity<Variable> {
      * Variable can only be 0 or 1.
      */
     public boolean isBinary() {
-
-        boolean retVal = this.isInteger();
-
-        retVal &= this.isLowerConstraint() && (this.getLowerLimit().compareTo(ZERO) == 0);
-
-        retVal &= this.isUpperConstraint() && (this.getUpperLimit().compareTo(ONE) == 0);
-
-        return retVal;
+        return myInteger && this.isClosedRange(ZERO, ONE);
     }
 
     /**

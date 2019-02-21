@@ -455,6 +455,14 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0);
     }
 
+    /**
+     * @return true if both the lower and upper limits are defined, and the range is defined by lower and
+     *         upper.
+     */
+    boolean isClosedRange(BigDecimal lower, BigDecimal upper) {
+        return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(lower) == 0) && (myUpperLimit.compareTo(upper) == 0);
+    }
+
     void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
         largest.invoke(ONE);
         smallest.invoke(ONE);

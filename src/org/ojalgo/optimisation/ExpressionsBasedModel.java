@@ -476,6 +476,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private final HashSet<IntIndex> myFixedVariables = new HashSet<>();
     private transient int[] myFreeIndices = null;
     private final List<Variable> myFreeVariables = new ArrayList<>();
+    private transient boolean myInfeasible = false;
     private transient int[] myIntegerIndices = null;
     private final List<Variable> myIntegerVariables = new ArrayList<>();
     private transient int[] myNegativeIndices = null;
@@ -544,7 +545,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             if (allEntities || tmpExpression.isObjective() || (tmpExpression.isConstraint() && !tmpExpression.isRedundant())) {
                 myExpressions.put(tmpExpression.getName(), tmpExpression.copy(this, !workCopy));
             } else {
-                // BasicLogger.DEBUG.println("Discarding expression: {}", tmpExpression);
+                BasicLogger.DEBUG.println("Discarding expression: {}", tmpExpression);
             }
         }
 
@@ -1151,7 +1152,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public ExpressionsBasedModel relax(final boolean inPlace) {
 
-        final ExpressionsBasedModel retVal = inPlace ? this : new ExpressionsBasedModel(this, true, true);
+        final ExpressionsBasedModel retVal = inPlace ? this : new ExpressionsBasedModel(this, true, false);
 
         if (inPlace) {
             myRelaxed = true;
@@ -1400,14 +1401,17 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     boolean isInfeasible() {
+        if (myInfeasible) {
+            return true;
+        }
         for (final Expression tmpExpression : myExpressions.values()) {
             if (tmpExpression.isInfeasible()) {
-                return true;
+                return myInfeasible = true;
             }
         }
         for (final Variable tmpVariable : myVariables) {
             if (tmpVariable.isInfeasible()) {
-                return true;
+                return myInfeasible = true;
             }
         }
         return false;
@@ -1442,7 +1446,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     final void presolve() {
 
-        myExpressions.values().forEach(expr -> expr.reset());
+        //  myExpressions.values().forEach(expr -> expr.reset());
 
         boolean needToRepeat = false;
 
@@ -1478,6 +1482,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         } while (needToRepeat);
 
         this.categoriseVariables();
+    }
+
+    void setInfeasible() {
+        myInfeasible = true;
     }
 
 }

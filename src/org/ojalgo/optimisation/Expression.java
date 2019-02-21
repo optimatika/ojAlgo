@@ -856,17 +856,13 @@ public final class Expression extends ModelEntity<Expression> {
         return myRedundant;
     }
 
-    void reset() {
-        myInfeasible = false;
-        myRedundant = false;
-    }
-
     Variable resolve(Structure1D.IntIndex index) {
         return myModel.getVariable(index);
     }
 
     void setInfeasible() {
         myInfeasible = true;
+        myModel.setInfeasible();
     }
 
     void setRedundant() {
