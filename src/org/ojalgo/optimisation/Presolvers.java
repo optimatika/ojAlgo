@@ -39,7 +39,7 @@ public abstract class Presolvers {
      * If an expression contains at least 1 binary variable and all non-fixed variable weights are of the same
      * sign (positive or negative) then it is possible the check the validity of "1" for each of the binary
      * variables. (Doesn't seem to work and/or is not effective.)
-     * 
+     *
      * @deprecated v48 Has been replaced by
      *             {@link #doCaseN(Expression, Set, BigDecimal, BigDecimal, NumberContext)}
      */
@@ -226,6 +226,8 @@ public abstract class Presolvers {
      */
     static boolean doCase1(final Expression expression, final Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
 
+        expression.setRedundant();
+
         final IntIndex index = remaining.iterator().next();
         final Variable variable = expression.resolve(index);
         final BigDecimal factor = expression.get(index);
@@ -300,8 +302,6 @@ public abstract class Presolvers {
                 expression.setInfeasible();
             }
         }
-
-        expression.setRedundant();
 
         if (variable.isEqualityConstraint()) {
             variable.setValue(variable.getLowerLimit());
