@@ -39,37 +39,16 @@ public abstract class Presolvers {
      * If an expression contains at least 1 binary variable and all non-fixed variable weights are of the same
      * sign (positive or negative) then it is possible the check the validity of "1" for each of the binary
      * variables. (Doesn't seem to work and/or is not effective.)
+     * 
+     * @deprecated v48 Has been replaced by
+     *             {@link #doCaseN(Expression, Set, BigDecimal, BigDecimal, NumberContext)}
      */
+    @Deprecated
     public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
 
         @Override
         public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
-
-            boolean didFixVariable = false;
-
-            final Set<Variable> binaryVariables = expression.getBinaryVariables(remaining);
-
-            if (binaryVariables.size() > 0) {
-
-                if ((upper != null) && expression.isPositiveOn(remaining)) {
-                    for (final Variable binVar : binaryVariables) {
-                        if (expression.get(binVar).compareTo(upper) > 0) {
-                            binVar.setFixed(ZERO);
-                            didFixVariable = true;
-                        }
-                    }
-                } else if ((lower != null) && expression.isNegativeOn(remaining)) {
-                    for (final Variable binVar : binaryVariables) {
-                        if (expression.get(binVar).compareTo(lower) < 0) {
-                            binVar.setFixed(ZERO);
-                            didFixVariable = true;
-                        }
-                    }
-                }
-
-            }
-
-            return didFixVariable;
+            return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
         }
 
     };
@@ -473,45 +452,63 @@ public abstract class Presolvers {
 
         boolean didFixVariable = false;
 
-        if ((lower != null) && (lower.signum() >= 0) && expression.isNegativeOn(remaining)) {
+        if ((lower != null) && expression.isNegativeOn(remaining)) {
 
-            if (lower.signum() == 0) {
+            int signum = lower.signum();
+
+            if (signum > 0) {
+
+                expression.setInfeasible();
+                return false;
+
+            } else {
 
                 for (final IntIndex indexOfFree : remaining) {
                     final Variable freeVariable = expression.resolve(indexOfFree);
 
-                    if (freeVariable.validate(ZERO, precision, null)) {
+                    if (signum == 0) {
+                        if (freeVariable.validate(ZERO, precision, null)) {
+                            freeVariable.setFixed(ZERO);
+                            didFixVariable = true;
+                        } else {
+                            expression.setInfeasible();
+                            return false;
+                        }
+                    } else if (freeVariable.isBinary() && (expression.get(freeVariable).compareTo(lower) < 0)) {
                         freeVariable.setFixed(ZERO);
                         didFixVariable = true;
-                    } else {
-                        expression.setInfeasible();
                     }
                 }
-
-            } else {
-
-                expression.setInfeasible();
             }
         }
 
-        if ((upper != null) && (upper.signum() <= 0) && expression.isPositiveOn(remaining)) {
+        if ((upper != null) && expression.isPositiveOn(remaining)) {
 
-            if (upper.signum() == 0) {
+            int signum = upper.signum();
+
+            if (signum < 0) {
+
+                expression.setInfeasible();
+                return false;
+
+            } else {
 
                 for (final IntIndex indexOfFree : remaining) {
                     final Variable freeVariable = expression.resolve(indexOfFree);
 
-                    if (freeVariable.validate(ZERO, precision, null)) {
+                    if (signum == 0) {
+                        if (freeVariable.validate(ZERO, precision, null)) {
+                            freeVariable.setFixed(ZERO);
+                            didFixVariable = true;
+                        } else {
+                            expression.setInfeasible();
+                            return false;
+                        }
+                    } else if (freeVariable.isBinary() && (expression.get(freeVariable).compareTo(upper) > 0)) {
                         freeVariable.setFixed(ZERO);
                         didFixVariable = true;
-                    } else {
-                        expression.setInfeasible();
                     }
                 }
-
-            } else {
-
-                expression.setInfeasible();
             }
         }
 
