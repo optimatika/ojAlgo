@@ -47,6 +47,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.TypeUtils;
@@ -916,6 +917,10 @@ public final class Expression extends ModelEntity<Expression> {
     void reset() {
         myInfeasible = false;
         myRedundant = false;
+    }
+
+    Variable resolve(Structure1D.IntIndex index) {
+        return myModel.getVariable(index);
     }
 
     void setInfeasible() {

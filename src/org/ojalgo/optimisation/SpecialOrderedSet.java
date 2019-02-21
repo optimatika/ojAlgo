@@ -23,7 +23,6 @@ package org.ojalgo.optimisation;
 
 import java.math.BigDecimal;
 import java.util.Set;
-import java.util.function.Function;
 
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
@@ -47,8 +46,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
      * The program logic here does not assume variables to be binary or even integer
      */
     @Override
-    public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper,
-            final Function<IntIndex, Variable> resolver, NumberContext precision) {
+    public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, NumberContext precision) {
 
         if (!expression.equals(myExpression)) {
             return false;
@@ -61,7 +59,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
         int first = -1, limit = -1;
         for (int i = 0; i < mySequence.length; i++) {
             final IntIndex index = mySequence[1];
-            if (!remaining.contains(index) && (resolver.apply(index).getValue().signum() != 0)) {
+            if (!remaining.contains(index) && (expression.resolve(index).getValue().signum() != 0)) {
                 if (first == -1) {
                     first = i;
                 }
@@ -79,7 +77,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
 
         for (int i = first + 1; i < limit; i++) {
             final IntIndex index = mySequence[i];
-            final Variable variable = resolver.apply(index);
+            final Variable variable = expression.resolve(index);
             if (!remaining.contains(index)) {
                 if (variable.getValue().signum() == 0) {
                     expression.setInfeasible();
@@ -96,7 +94,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
         if ((count > 0) && (remainingCount > 0)) {
             for (int i = 0, lim = first - remainingCount; i < lim; i++) {
                 final IntIndex index = mySequence[i];
-                final Variable variable = resolver.apply(index);
+                final Variable variable = expression.resolve(index);
                 if (!remaining.contains(index)) {
                     if (variable.getValue().signum() != 0) {
                         expression.setInfeasible();
@@ -108,7 +106,7 @@ class SpecialOrderedSet extends ExpressionsBasedModel.Presolver {
             }
             for (int i = limit + remainingCount, lim = mySequence.length; i < lim; i++) {
                 final IntIndex index = mySequence[i];
-                final Variable variable = resolver.apply(index);
+                final Variable variable = expression.resolve(index);
                 if (!remaining.contains(index)) {
                     if (variable.getValue().signum() != 0) {
                         expression.setInfeasible();
