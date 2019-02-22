@@ -670,7 +670,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      * @return A stream of variables that are constraints and not fixed
      */
     public Stream<Variable> bounds() {
-        return this.variables().filter((final Variable v) -> v.isConstraint());
+        return this.variables().filter(v -> v.isConstraint() && !v.isFixed());
     }
 
     /**

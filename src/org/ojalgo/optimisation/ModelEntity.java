@@ -169,7 +169,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     }
 
     public final boolean isConstraint() {
-        return this.isLowerLimitSet() || this.isUpperLimitSet();
+        return (myLowerLimit != null) || (myUpperLimit != null);
     }
 
     public final boolean isContributionWeightSet() {
@@ -177,11 +177,11 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     }
 
     public final boolean isEqualityConstraint() {
-        return this.isLowerLimitSet() && this.isUpperLimitSet() && (myLowerLimit.compareTo(myUpperLimit) == 0);
+        return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) == 0);
     }
 
     public final boolean isLowerConstraint() {
-        return this.isLowerLimitSet() && !this.isEqualityConstraint();
+        return (myLowerLimit != null) && !this.isEqualityConstraint();
     }
 
     public final boolean isLowerLimitSet() {
@@ -189,11 +189,11 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     }
 
     public final boolean isObjective() {
-        return this.isContributionWeightSet() && (myContributionWeight.signum() != 0);
+        return (myContributionWeight != null) && (myContributionWeight.signum() != 0);
     }
 
     public final boolean isUpperConstraint() {
-        return this.isUpperLimitSet() && !this.isEqualityConstraint();
+        return (myUpperLimit != null) && !this.isEqualityConstraint();
     }
 
     public final boolean isUpperLimitSet() {
@@ -435,24 +435,20 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         this.appendRightPart(builder);
     }
 
-    final BigDecimal getCompensatedLowerLimit(BigDecimal compensation, NumberContext precision) {
-        return myLowerLimit != null ? precision.enforce(myLowerLimit.subtract(compensation)) : null;
-    }
-
-    final BigDecimal getCompensatedUpperLimit(BigDecimal compensation, NumberContext precision) {
-        return myUpperLimit != null ? precision.enforce(myUpperLimit.subtract(compensation)) : null;
-    }
-
     final BigDecimal getCompensatedLowerLimit(BigDecimal compensation) {
         return myLowerLimit != null ? myLowerLimit.subtract(compensation) : null;
+    }
+
+    final BigDecimal getCompensatedLowerLimit(BigDecimal compensation, NumberContext precision) {
+        return myLowerLimit != null ? precision.enforce(myLowerLimit.subtract(compensation)) : null;
     }
 
     final BigDecimal getCompensatedUpperLimit(BigDecimal compensation) {
         return myUpperLimit != null ? myUpperLimit.subtract(compensation) : null;
     }
 
-    boolean isInfeasible() {
-        return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0);
+    final BigDecimal getCompensatedUpperLimit(BigDecimal compensation, NumberContext precision) {
+        return myUpperLimit != null ? precision.enforce(myUpperLimit.subtract(compensation)) : null;
     }
 
     /**
@@ -461,6 +457,10 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      */
     boolean isClosedRange(BigDecimal lower, BigDecimal upper) {
         return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(lower) == 0) && (myUpperLimit.compareTo(upper) == 0);
+    }
+
+    boolean isInfeasible() {
+        return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0);
     }
 
     void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
