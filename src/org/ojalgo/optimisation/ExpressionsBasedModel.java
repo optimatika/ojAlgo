@@ -31,7 +31,6 @@ import java.util.stream.Stream;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.Printer;
@@ -1328,9 +1327,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     private void scanEntities() {
 
-        final Set<IntIndex> fixedVariables = Collections.emptySet();
-        final BigDecimal fixedValue = BigMath.ZERO;
-
         for (final Expression tmpExpression : myExpressions.values()) {
 
             Set<IntIndex> allVars = tmpExpression.getLinearKeySet();
@@ -1346,9 +1342,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             }
         }
 
-        //        for (final Variable tmpVariable : myVariables) {
-        //            Presolvers.FIXED_OR_UNBOUNDED.simplify(tmpVariable, this);
-        //        }
+        for (final Variable tmpVariable : myVariables) {
+            Presolvers.FIXED_OR_UNBOUNDED.simplify(tmpVariable, this);
+        }
     }
 
     Stream<Expression> expressions() {
@@ -1426,6 +1422,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         if (!myWorkCopy && (PRESOLVERS.size() > 0)) {
             this.scanEntities();
         }
+
+        //        myExpressions.entrySet()
+        //                .forEach(e -> BasicLogger.debug("{} => {} with {}", e.getKey(), e.getValue().countLinearFactors(), e.getValue().countIntegerFactors()));
 
         Intermediate prepared = this.prepare();
 

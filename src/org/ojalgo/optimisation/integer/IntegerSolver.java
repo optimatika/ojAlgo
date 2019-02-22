@@ -124,8 +124,6 @@ public final class IntegerSolver extends GenericSolver {
 
             final Boolean retVal = IntegerSolver.this.compute(myKey, nodeModel.prepare(), myPrinter);
 
-            IntegerSolver.this.recycleNodeModel(nodeModel);
-
             return retVal;
         }
 
@@ -596,10 +594,6 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         myIntegerSolutionsCount.incrementAndGet();
-    }
-
-    protected void recycleNodeModel(ExpressionsBasedModel model) {
-        //  myModelPool.giveBack(model);
     }
 
     /**

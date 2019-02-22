@@ -668,6 +668,10 @@ public final class Expression extends ModelEntity<Expression> {
         return myLinear.size();
     }
 
+    long countIntegerFactors() {
+        return myLinear.keySet().stream().map(this::resolve).filter(v -> v.isInteger()).count();
+    }
+
     int countQuadraticFactors() {
         return myQuadratic.size();
     }
