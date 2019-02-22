@@ -34,6 +34,7 @@ import java.util.Set;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.BigMath;
+import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -592,6 +593,11 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
+    private BigDecimal toPositiveFraction(BigDecimal noninteger) {
+        BigDecimal intPart = noninteger.setScale(0, RoundingMode.FLOOR);
+        return noninteger.subtract(intPart);
+    }
+
     protected void appendMiddlePart(final StringBuilder builder, final Access1D<BigDecimal> currentSolution) {
 
         builder.append(this.getName());
@@ -664,12 +670,12 @@ public final class Expression extends ModelEntity<Expression> {
         return new Expression(this, destinationModel, deep);
     }
 
-    int countLinearFactors() {
-        return myLinear.size();
-    }
-
     long countIntegerFactors() {
         return myLinear.keySet().stream().map(this::resolve).filter(v -> v.isInteger()).count();
+    }
+
+    int countLinearFactors() {
+        return myLinear.size();
     }
 
     int countQuadraticFactors() {
@@ -709,6 +715,54 @@ public final class Expression extends ModelEntity<Expression> {
         if (upper != null) {
             this.upper(upper.divide(divisor, 0, RoundingMode.FLOOR));
         }
+    }
+
+    Expression doMixedIntegerRounding() {
+
+        if (!this.isEqualityConstraint()) {
+            return null;
+        }
+
+        BigDecimal posFracLevel = this.toPositiveFraction(this.getLowerLimit());
+        if (posFracLevel.signum() <= 0) {
+            return null;
+        }
+        BigDecimal cmpFracLevel = BigMath.ONE.subtract(posFracLevel);
+
+        Expression retVal = myModel.addExpression(this.getName() + "(MIR)");
+
+        for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
+            Variable variable = this.resolve(entry.getKey());
+
+            if (!variable.isLowerLimitSet() || (variable.getLowerLimit().compareTo(BigMath.ZERO) < 0)) {
+                return null;
+            }
+
+            BigDecimal coeff = entry.getValue();
+
+            if (variable.isInteger()) {
+
+                BigDecimal posFracCoeff = this.toPositiveFraction(coeff);
+
+                if (posFracCoeff.compareTo(posFracLevel) <= 0) {
+                    retVal.set(variable, BigFunction.DIVIDE.invoke(posFracCoeff, posFracLevel));
+                } else {
+                    BigDecimal cmpFracCoeff = BigMath.ONE.subtract(posFracCoeff);
+                    retVal.set(variable, BigFunction.DIVIDE.invoke(cmpFracCoeff, cmpFracLevel));
+                }
+
+            } else {
+
+                if (coeff.signum() == 1) {
+                    retVal.set(variable, BigFunction.DIVIDE.invoke(coeff, posFracLevel));
+                } else if (coeff.signum() == -1) {
+                    BigDecimal negCoeff = coeff.negate();
+                    retVal.set(variable, BigFunction.DIVIDE.invoke(negCoeff, cmpFracLevel));
+                }
+            }
+        }
+
+        return retVal.lower(BigMath.ONE);
     }
 
     Set<Variable> getBinaryVariables(final Set<IntIndex> subset) {

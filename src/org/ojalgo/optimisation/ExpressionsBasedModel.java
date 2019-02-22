@@ -1336,9 +1336,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, allVars, lower, upper, options.feasibility);
             if (tmpExpression.isConstraint()) {
                 Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, allVars, lower, upper, options.feasibility);
-                if (tmpExpression.isLinearAndAllInteger()) {
-                    Presolvers.INTEGER_ROUNDING.simplify(tmpExpression, allVars, lower, upper, options.feasibility);
-                }
+                Presolvers.INTEGER_ROUNDING.simplify(tmpExpression, allVars, lower, upper, options.feasibility);
             }
         }
 

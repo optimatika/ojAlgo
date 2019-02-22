@@ -121,7 +121,11 @@ public abstract class Presolvers {
 
         @Override
         public boolean simplify(Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, NumberContext precision) {
-            expression.doIntegerRounding();
+            if (expression.isLinearAndAllInteger()) {
+                expression.doIntegerRounding();
+            } else if (expression.isEqualityConstraint() && expression.isLinearAndAnyInteger()) {
+                // expression.doMixedIntegerRounding();
+            }
             return false;
         }
 
@@ -145,9 +149,12 @@ public abstract class Presolvers {
                 BigDecimal contribution;
                 for (final Entry<IntIndex, BigDecimal> entry : expression.getLinearEntrySet()) {
                     tmpVariable = expression.resolve(entry.getKey());
+
                     varWeight = tmpVariable.getContributionWeight();
                     contribution = exprWeight.multiply(entry.getValue());
+
                     varWeight = varWeight != null ? varWeight.add(contribution) : contribution;
+
                     tmpVariable.weight(varWeight);
                 }
 

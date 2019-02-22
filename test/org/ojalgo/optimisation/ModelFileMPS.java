@@ -19,6 +19,7 @@ import java.util.Map;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
 
@@ -107,7 +108,7 @@ public interface ModelFileMPS {
         model.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
 
         // model.options.debug(IntegerSolver.class);
-        // model.options.progress(IntegerSolver.class);
+        model.options.progress(IntegerSolver.class);
         // model.options.progress(LinearSolver.class);
         // model.options.validate = false;
 
