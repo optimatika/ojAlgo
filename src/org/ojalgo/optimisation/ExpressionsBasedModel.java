@@ -427,10 +427,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     static {
         ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
-        // ExpressionsBasedModel.addPresolver(Presolvers.OPPOSITE_SIGN);
-        // ExpressionsBasedModel.addPresolver(Presolvers.BINARY_VALUE);
-        // ExpressionsBasedModel.addPresolver(Presolvers.BIGSTUFF);
-
     }
 
     public static boolean addFallbackSolver(final Integration<?> integration) {
@@ -471,8 +467,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return PRESOLVERS.remove(presolver);
     }
 
-    private final HashMap<String, Expression> myExpressions = new HashMap<>();
-    private final HashSet<IntIndex> myFixedVariables = new HashSet<>();
+    private final Map<String, Expression> myExpressions = new HashMap<>();
+    private final Set<IntIndex> myFixedVariables = new HashSet<>();
     private transient int[] myFreeIndices = null;
     private final List<Variable> myFreeVariables = new ArrayList<>();
     private transient boolean myInfeasible = false;
@@ -482,6 +478,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private final List<Variable> myNegativeVariables = new ArrayList<>();
     private transient int[] myPositiveIndices = null;
     private final List<Variable> myPositiveVariables = new ArrayList<>();
+    private final Set<IntIndex> myReferences = new HashSet<>();
     private boolean myRelaxed;
     /**
      * Temporary storage for some expresssion specific subset of variables
@@ -682,6 +679,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public ExpressionsBasedModel copy() {
         return new ExpressionsBasedModel(this, false, true);
+    }
+
+    public ExpressionsBasedModel snapshot() {
+        return new ExpressionsBasedModel(this, true, false);
     }
 
     public int countExpressions() {
@@ -1327,22 +1328,31 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     private void scanEntities() {
 
-        for (final Expression tmpExpression : myExpressions.values()) {
+        boolean anyVarInt = this.isAnyVariableInteger();
 
-            Set<IntIndex> allVars = tmpExpression.getLinearKeySet();
-            BigDecimal lower = tmpExpression.getLowerLimit();
-            BigDecimal upper = tmpExpression.getUpperLimit();
+        for (final Expression tmpExpr : myExpressions.values()) {
 
-            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, allVars, lower, upper, options.feasibility);
-            if (tmpExpression.isConstraint()) {
-                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, allVars, lower, upper, options.feasibility);
-                Presolvers.INTEGER_ROUNDING.simplify(tmpExpression, allVars, lower, upper, options.feasibility);
+            Set<IntIndex> allVars = tmpExpr.getLinearKeySet();
+            BigDecimal lower = tmpExpr.getLowerLimit();
+            BigDecimal upper = tmpExpr.getUpperLimit();
+
+            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+            Presolvers.ZERO_ONE_TWO.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+            if (anyVarInt) {
+                Presolvers.INTEGER_EXPRESSION_ROUNDING.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
             }
         }
 
-        for (final Variable tmpVariable : myVariables) {
-            Presolvers.FIXED_OR_UNBOUNDED.simplify(tmpVariable, this);
+        for (final Variable tmpVar : myVariables) {
+            Presolvers.UNREFERENCED.simplify(tmpVar, this);
+            if (anyVarInt) {
+                Presolvers.INTEGER_VARIABLE_ROUNDING.simplify(tmpVar, this);
+            }
         }
+    }
+
+    void addReference(IntIndex index) {
+        myReferences.add(index);
     }
 
     Stream<Expression> expressions() {
@@ -1409,6 +1419,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             }
         }
         return false;
+    }
+
+    boolean isReferenced(Variable variable) {
+        return myReferences.contains(variable.getIndex());
     }
 
     boolean isUnbounded() {

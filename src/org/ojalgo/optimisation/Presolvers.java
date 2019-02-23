@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.ojalgo.constant.BigMath;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
@@ -53,78 +54,27 @@ public abstract class Presolvers {
 
     };
 
-    /**
-     * Verifies that the variable is actually referenced/used in some expression. If not then that variable
-     * can either be fixed or marked as unbounded. Also makes sure integer variables have integer lower/upper
-     * bounds (if they exist).
-     *
-     * <pre>
-     * 2019-02-15: Turned this off. Very slow for large models
-     * </pre>
-     */
-    public static final ExpressionsBasedModel.VariableAnalyser FIXED_OR_UNBOUNDED = new ExpressionsBasedModel.VariableAnalyser(4) {
-
-        @Override
-        public boolean simplify(final Variable variable, final ExpressionsBasedModel model) {
-
-            if (variable.isInteger()) {
-                BigDecimal tmpLimit;
-                if (((tmpLimit = variable.getUpperLimit()) != null) && (tmpLimit.scale() > 0)) {
-                    variable.upper(tmpLimit.setScale(0, RoundingMode.FLOOR));
-                }
-                if (((tmpLimit = variable.getLowerLimit()) != null) && (tmpLimit.scale() > 0)) {
-                    variable.lower(tmpLimit.setScale(0, RoundingMode.CEILING));
-                }
-            }
-
-            if (variable.isObjective() && !variable.isFixed() && !variable.isUnbounded()) {
-
-                final boolean includedAnywhere = model.expressions().anyMatch(expr -> expr.includes(variable));
-                if (!includedAnywhere) {
-
-                    final int weightSignum = variable.getContributionWeight().signum();
-
-                    if (model.isMaximisation() && (weightSignum == -1)) {
-                        if (variable.isLowerLimitSet()) {
-                            variable.setFixed(variable.getLowerLimit());
-                        } else {
-                            variable.setUnbounded(true);
-                        }
-                    } else if (model.isMinimisation() && (weightSignum == 1)) {
-                        if (variable.isLowerLimitSet()) {
-                            variable.setFixed(variable.getLowerLimit());
-                        } else {
-                            variable.setUnbounded(true);
-                        }
-                    } else if (model.isMaximisation() && (weightSignum == 1)) {
-                        if (variable.isUpperLimitSet()) {
-                            variable.setFixed(variable.getUpperLimit());
-                        } else {
-                            variable.setUnbounded(true);
-                        }
-                    } else if (model.isMinimisation() && (weightSignum == -1)) {
-                        if (variable.isUpperLimitSet()) {
-                            variable.setFixed(variable.getUpperLimit());
-                        } else {
-                            variable.setUnbounded(true);
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-
-    };
-
-    public static final ExpressionsBasedModel.Presolver INTEGER_ROUNDING = new ExpressionsBasedModel.Presolver(20) {
+    public static final ExpressionsBasedModel.Presolver INTEGER_EXPRESSION_ROUNDING = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
         public boolean simplify(Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, NumberContext precision) {
             if (expression.isLinearAndAllInteger()) {
                 expression.doIntegerRounding();
-            } else if (expression.isEqualityConstraint() && expression.isLinearAndAnyInteger()) {
-                // expression.doMixedIntegerRounding();
+            }
+            return false;
+        }
+
+    };
+
+    /**
+     * Makes sure integer variables have integer lower/upper bounds (if they exist).
+     */
+    public static final ExpressionsBasedModel.VariableAnalyser INTEGER_VARIABLE_ROUNDING = new ExpressionsBasedModel.VariableAnalyser(4) {
+
+        @Override
+        public boolean simplify(Variable variable, ExpressionsBasedModel model) {
+            if (variable.isInteger()) {
+                variable.doIntegerRounding();
             }
             return false;
         }
@@ -159,6 +109,7 @@ public abstract class Presolvers {
                 }
 
                 expression.weight(null);
+
             }
 
             return false;
@@ -184,6 +135,62 @@ public abstract class Presolvers {
     };
 
     /**
+     * Verifies that the variable is actually referenced/used in some expression. If not then that variable
+     * can either be fixed or marked as unbounded.
+     *
+     * <pre>
+     * 2019-02-15: Turned this off. Very slow for large models
+     * 2019-02-22: Turned this on again, different implementation
+     * </pre>
+     */
+    public static final ExpressionsBasedModel.VariableAnalyser UNREFERENCED = new ExpressionsBasedModel.VariableAnalyser(4) {
+
+        @Override
+        public boolean simplify(final Variable variable, final ExpressionsBasedModel model) {
+
+            if (!model.isReferenced(variable)) {
+
+                if (variable.isObjective()) {
+                    final int weightSignum = variable.getContributionWeight().signum();
+
+                    if (model.isMaximisation() && (weightSignum == -1)) {
+                        if (variable.isLowerLimitSet()) {
+                            variable.setFixed(variable.getLowerLimit());
+                        } else {
+                            variable.setUnbounded(true);
+                        }
+                    } else if (model.isMinimisation() && (weightSignum == 1)) {
+                        if (variable.isLowerLimitSet()) {
+                            variable.setFixed(variable.getLowerLimit());
+                        } else {
+                            variable.setUnbounded(true);
+                        }
+                    } else if (model.isMaximisation() && (weightSignum == 1)) {
+                        if (variable.isUpperLimitSet()) {
+                            variable.setFixed(variable.getUpperLimit());
+                        } else {
+                            variable.setUnbounded(true);
+                        }
+                    } else if (model.isMinimisation() && (weightSignum == -1)) {
+                        if (variable.isUpperLimitSet()) {
+                            variable.setFixed(variable.getUpperLimit());
+                        } else {
+                            variable.setUnbounded(true);
+                        }
+                    }
+
+                } else if (!variable.isValueSet()) {
+                    variable.setValue(BigMath.ZERO);
+                    variable.level(variable.getValue());
+                }
+            }
+
+            return false;
+        }
+
+    };
+
+    /**
      * Looks for constraint expressions with 0, 1 or 2 non-fixed variables. Transfers the constraints of the
      * expressions to the variables and then (if possible) marks the expression as redundant.
      */
@@ -192,20 +199,28 @@ public abstract class Presolvers {
         @Override
         public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
 
-            switch (remaining.size()) {
-            case 0:
-                return Presolvers.doCase0(expression, remaining, lower, upper, precision);
-            case 1:
-                return Presolvers.doCase1(expression, remaining, lower, upper, precision);
-            case 2:
-                /*
-                 * doCaseN(...) does something that doCase2(...) does not, and it's necessary. Possibly
-                 * doCase2(...) can be removed completely - complicated code that doesn't seem to do
-                 * accomplish very much.
-                 */
-                return Presolvers.doCaseN(expression, remaining, lower, upper, precision) || Presolvers.doCase2(expression, remaining, lower, upper, precision);
-            default: // 3 or more
-                return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
+            if (expression.isConstraint()) {
+
+                switch (remaining.size()) {
+                case 0:
+                    return Presolvers.doCase0(expression, remaining, lower, upper, precision);
+                case 1:
+                    return Presolvers.doCase1(expression, remaining, lower, upper, precision);
+                case 2:
+                    /*
+                     * doCaseN(...) does something that doCase2(...) does not, and it's necessary. Possibly
+                     * doCase2(...) can be removed completely - complicated code that doesn't seem to do
+                     * accomplish very much.
+                     */
+                    return Presolvers.doCaseN(expression, remaining, lower, upper, precision)
+                            || Presolvers.doCase2(expression, remaining, lower, upper, precision);
+                default: // 3 or more
+                    return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
+                }
+
+            } else {
+
+                return false;
             }
         }
     };

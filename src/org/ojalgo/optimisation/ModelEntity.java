@@ -361,6 +361,8 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         myUpperLimit = null;
     }
 
+    protected abstract void doIntegerRounding();
+
     protected final int getAdjustmentExponent() {
 
         if (myAdjustmentExponent == Integer.MIN_VALUE) {

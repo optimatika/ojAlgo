@@ -36,6 +36,10 @@ public interface StructureAnyD extends Structure1D {
 
     public final class IntReference implements Comparable<IntReference> {
 
+        public static IntReference of(final int... aReference) {
+            return new IntReference(aReference);
+        }
+
         public final int[] reference;
 
         public IntReference(final int... aReference) {
@@ -101,6 +105,10 @@ public interface StructureAnyD extends Structure1D {
     }
 
     public final class LongReference implements Comparable<LongReference> {
+
+        public static LongReference of(final long... aReference) {
+            return new LongReference(aReference);
+        }
 
         public final long[] reference;
 

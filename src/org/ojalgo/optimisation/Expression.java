@@ -430,6 +430,10 @@ public final class Expression extends ModelEntity<Expression> {
         return this.set(new IntRowColumn(row, column), value);
     }
 
+    public Expression set(final IntIndex row, final IntIndex column, final Number value) {
+        return this.set(new IntRowColumn(row, column), value);
+    }
+
     public Expression set(final int index, final Number value) {
         return this.set(myModel.getVariable(index), value);
     }
@@ -442,6 +446,7 @@ public final class Expression extends ModelEntity<Expression> {
 
             if (tmpValue.signum() != 0) {
                 myLinear.put(key, tmpValue);
+                myModel.addReference(key);
             } else {
                 myLinear.remove(key);
             }
@@ -462,6 +467,8 @@ public final class Expression extends ModelEntity<Expression> {
 
             if (tmpValue.signum() != 0) {
                 myQuadratic.put(key, tmpValue);
+                myModel.addReference(key.getRow());
+                myModel.addReference(key.getColumn());
             } else {
                 myQuadratic.remove(key);
             }
@@ -622,6 +629,42 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
+    @Override
+    protected void doIntegerRounding() {
+
+        BigInteger gcd = null;
+        int maxScale = Integer.MIN_VALUE;
+        for (BigDecimal coeff : myLinear.values()) {
+            BigDecimal abs = coeff.stripTrailingZeros().abs();
+            maxScale = Math.max(maxScale, abs.scale());
+            if (gcd != null) {
+                gcd = gcd.gcd(abs.unscaledValue());
+            } else {
+                gcd = abs.unscaledValue();
+            }
+            if (gcd.equals(BigInteger.ONE)) {
+                return; // gcd == 1, no point
+            }
+        }
+
+        BigDecimal divisor = new BigDecimal(gcd, maxScale);
+
+        for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
+            BigDecimal value = entry.getValue();
+            entry.setValue(value.divide(divisor, 0, RoundingMode.UNNECESSARY));
+        }
+
+        BigDecimal lower = this.getLowerLimit();
+        if (lower != null) {
+            this.lower(lower.divide(divisor, 0, RoundingMode.CEILING));
+        }
+
+        BigDecimal upper = this.getUpperLimit();
+        if (upper != null) {
+            this.upper(upper.divide(divisor, 0, RoundingMode.FLOOR));
+        }
+    }
+
     void appendToString(final StringBuilder aStringBuilder, final Access1D<BigDecimal> aCurrentState) {
 
         this.appendLeftPart(aStringBuilder);
@@ -680,41 +723,6 @@ public final class Expression extends ModelEntity<Expression> {
 
     int countQuadraticFactors() {
         return myQuadratic.size();
-    }
-
-    void doIntegerRounding() {
-
-        BigInteger gcd = null;
-        int maxScale = Integer.MIN_VALUE;
-        for (BigDecimal coeff : myLinear.values()) {
-            BigDecimal abs = coeff.stripTrailingZeros().abs();
-            maxScale = Math.max(maxScale, abs.scale());
-            if (gcd != null) {
-                gcd = gcd.gcd(abs.unscaledValue());
-            } else {
-                gcd = abs.unscaledValue();
-            }
-            if (gcd.equals(BigInteger.ONE)) {
-                return; // gcd == 1, no point
-            }
-        }
-
-        BigDecimal divisor = new BigDecimal(gcd, maxScale);
-
-        for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
-            BigDecimal value = entry.getValue();
-            entry.setValue(value.divide(divisor, 0, RoundingMode.UNNECESSARY));
-        }
-
-        BigDecimal lower = this.getLowerLimit();
-        if (lower != null) {
-            this.lower(lower.divide(divisor, 0, RoundingMode.CEILING));
-        }
-
-        BigDecimal upper = this.getUpperLimit();
-        if (upper != null) {
-            this.upper(upper.divide(divisor, 0, RoundingMode.FLOOR));
-        }
     }
 
     Expression doMixedIntegerRounding() {

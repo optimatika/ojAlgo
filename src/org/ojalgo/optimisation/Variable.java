@@ -24,6 +24,7 @@ package org.ojalgo.optimisation;
 import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Structure1D.IntIndex;
@@ -247,6 +248,17 @@ public final class Variable extends ModelEntity<Variable> {
 
         myIndex = null;
         myValue = null;
+    }
+
+    @Override
+    protected void doIntegerRounding() {
+        BigDecimal limit;
+        if (((limit = this.getUpperLimit()) != null) && (limit.scale() > 0)) {
+            this.upper(limit.setScale(0, RoundingMode.FLOOR));
+        }
+        if (((limit = this.getLowerLimit()) != null) && (limit.scale() > 0)) {
+            this.lower(limit.setScale(0, RoundingMode.CEILING));
+        }
     }
 
     @Override
