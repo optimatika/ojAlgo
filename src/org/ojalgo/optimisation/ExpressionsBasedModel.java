@@ -1033,27 +1033,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         if (constrExpr != null) {
 
-            //            int maxScale = 0;
-            //            for (final Entry<IntIndex, BigDecimal> entry : constrExpr.getLinearEntrySet()) {
-            //                maxScale = Math.max(maxScale, entry.getValue().scale());
-            //            }
-            //
-            //            long gcd = -1L;
-            //            for (final Entry<IntIndex, BigDecimal> entry : constrExpr.getLinearEntrySet()) {
-            //                final long tmpLongValue = Math.abs(entry.getValue().setScale(maxScale).unscaledValue().longValue());
-            //                if (gcd == -1L) {
-            //                    gcd = tmpLongValue;
-            //                } else {
-            //                    gcd = RationalNumber.gcd(gcd, tmpLongValue);
-            //                }
-            //            }
-            //            if (upper != null) {
-            //                final BigDecimal tmpSetScale = upper.setScale(maxScale, RoundingMode.FLOOR);
-            //                final long tmpLongValue = tmpSetScale.unscaledValue().longValue();
-            //                upper = new BigDecimal(tmpLongValue).divide(new BigDecimal(gcd), maxScale, RoundingMode.FLOOR);
-            //            }
-
             constrExpr.lower(lower).upper(upper);
+
+            if (constrExpr.isLinearAndAllInteger()) {
+                constrExpr.doIntegerRounding();
+            }
         }
     }
 
