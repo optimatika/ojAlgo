@@ -430,12 +430,12 @@ public final class Expression extends ModelEntity<Expression> {
         return this.set(new IntRowColumn(row, column), value);
     }
 
-    public Expression set(final IntIndex row, final IntIndex column, final Number value) {
-        return this.set(new IntRowColumn(row, column), value);
-    }
-
     public Expression set(final int index, final Number value) {
         return this.set(myModel.getVariable(index), value);
+    }
+
+    public Expression set(final IntIndex row, final IntIndex column, final Number value) {
+        return this.set(new IntRowColumn(row, column), value);
     }
 
     public Expression set(final IntIndex key, final Number value) {
