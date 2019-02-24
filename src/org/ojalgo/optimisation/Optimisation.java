@@ -152,7 +152,7 @@ public interface Optimisation {
 
     }
 
-    public static final class Options implements Optimisation, Cloneable {
+    public static final class Options implements Optimisation {
 
         /**
          * Used to determine/validate feasibility. Are the constraints violated or not? Are the variable
@@ -250,18 +250,6 @@ public interface Optimisation {
         }
 
         /**
-         * @deprecated Since v45 Wont be Cloneable either
-         */
-        @Deprecated
-        public Options copy() {
-            try {
-                return (Options) this.clone();
-            } catch (final CloneNotSupportedException exception) {
-                return null;
-            }
-        }
-
-        /**
          * Will configure detailed dubug logging and validation
          */
         public void debug(final Class<? extends Optimisation.Solver> solver) {
@@ -296,14 +284,6 @@ public interface Optimisation {
             myConfigurator = configurator;
         }
 
-        /**
-         * @deprecated Since v45 Don't copy or clone these, create them the waynyou need them.
-         */
-        @Override
-        @Deprecated
-        protected Object clone() throws CloneNotSupportedException {
-            return super.clone();
-        }
     }
 
     public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result> {

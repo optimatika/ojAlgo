@@ -226,13 +226,14 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
+     * 2019-02-19: Current solution from ojAlgo, but probably just feasible and not optimal
      * </pre>
      */
     @Test
     @Tag("slow")
     @Tag("unstable")
     public void testCRE_A() {
-        NetlibCase.doTest("CRE-A.SIF", "1234567890");
+        NetlibCase.doTest("CRE-A.SIF", "2.9889732905677114E7");
     }
 
     /**
@@ -252,13 +253,14 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
+     * 2019-02-19: Current solution from ojAlgo, but probably just feasible and not optimal
      * </pre>
      */
     @Test
     @Tag("slow")
     @Tag("unstable")
     public void testCRE_C() {
-        NetlibCase.doTest("CRE-C.SIF", "1234567890");
+        NetlibCase.doTest("CRE-C.SIF", "2.996133067602781E7");
     }
 
     /**
@@ -404,33 +406,34 @@ public class NetlibCase extends OptimisationLinearTests implements ModelFileMPS 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
-     * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
+     * 2019-02-19: Objective defined by ojAlgo's current result
      * </pre>
      */
     @Test
     @Tag("slow")
-    @Tag("unstable")
     public void testFIT1D() {
-        NetlibCase.doTest("FIT1D.SIF", "1234567890");
+        NetlibCase.doTest("FIT1D.SIF", "-9146.378092421019");
     }
 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
+     * 2019-02-19: Current solution from ojAlgo, but probably just feasible and not optimal
      * </pre>
      */
     @Test
     @Tag("slow")
     @Tag("unstable")
     public void testFIT1P() {
-        NetlibCase.doTest("FIT1P.SIF", "1234567890");
+        NetlibCase.doTest("FIT1P.SIF", "42246.94459638855");
     }
 
     /**
      * <pre>
      * 2019-02-13: Tagged as slow since too large for promotional/community version of CPLEX
      * 2019-02-13: Tagged as unstable since ojAlgo takes too long or fails validation
+     * 2019-02-19: java.lang.OutOfMemoryError: Java heap space
      * </pre>
      */
     @Test

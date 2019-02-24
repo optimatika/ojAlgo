@@ -101,6 +101,10 @@ public interface Structure1D {
 
     public final class IntIndex implements Comparable<IntIndex> {
 
+        public static IntIndex of(int index) {
+            return new IntIndex(index);
+        }
+
         public final int index;
 
         public IntIndex(final int anIndex) {
@@ -139,10 +143,7 @@ public interface Structure1D {
 
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = (prime * result) + index;
-            return result;
+            return Integer.hashCode(index);
         }
 
         @Override
@@ -161,6 +162,10 @@ public interface Structure1D {
     }
 
     public final class LongIndex implements Comparable<LongIndex> {
+
+        public static LongIndex of(long index) {
+            return new LongIndex(index);
+        }
 
         public final long index;
 
@@ -200,10 +205,7 @@ public interface Structure1D {
 
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = (prime * result) + (int) (index ^ (index >>> 32));
-            return result;
+            return Long.hashCode(index);
         }
 
         @Override

@@ -34,6 +34,8 @@ public interface Structure2D extends Structure1D {
 
         public final int column;
         public final int row;
+        private transient IntIndex myColumn = null;
+        private transient IntIndex myRow = null;
 
         public IntRowColumn(final int aRow, final int aCol) {
 
@@ -41,6 +43,17 @@ public interface Structure2D extends Structure1D {
 
             row = aRow;
             column = aCol;
+        }
+
+        public IntRowColumn(final IntIndex aRow, final IntIndex aCol) {
+
+            super();
+
+            row = aRow.index;
+            column = aCol.index;
+
+            myRow = aRow;
+            myColumn = aCol;
         }
 
         @SuppressWarnings("unused")
@@ -81,6 +94,20 @@ public interface Structure2D extends Structure1D {
             return true;
         }
 
+        public IntIndex getColumn() {
+            if (myColumn == null) {
+                myColumn = IntIndex.of(column);
+            }
+            return myColumn;
+        }
+
+        public IntIndex getRow() {
+            if (myRow == null) {
+                myRow = IntIndex.of(row);
+            }
+            return myRow;
+        }
+
         @Override
         public int hashCode() {
             final int prime = 31;
@@ -118,6 +145,8 @@ public interface Structure2D extends Structure1D {
 
         public final long column;
         public final long row;
+        private transient LongIndex myColumn = null;
+        private transient LongIndex myRow = null;
 
         public LongRowColumn(final long aRow, final long aCol) {
 
@@ -125,6 +154,17 @@ public interface Structure2D extends Structure1D {
 
             row = aRow;
             column = aCol;
+        }
+
+        public LongRowColumn(final LongIndex aRow, final LongIndex aCol) {
+
+            super();
+
+            row = aRow.index;
+            column = aCol.index;
+
+            myRow = aRow;
+            myColumn = aCol;
         }
 
         @SuppressWarnings("unused")
@@ -163,6 +203,20 @@ public interface Structure2D extends Structure1D {
                 return false;
             }
             return true;
+        }
+
+        public LongIndex getColumn() {
+            if (myColumn == null) {
+                myColumn = LongIndex.of(column);
+            }
+            return myColumn;
+        }
+
+        public LongIndex getRow() {
+            if (myRow == null) {
+                myRow = LongIndex.of(row);
+            }
+            return myRow;
         }
 
         @Override

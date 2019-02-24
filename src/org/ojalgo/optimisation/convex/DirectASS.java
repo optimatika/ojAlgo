@@ -53,7 +53,7 @@ final class DirectASS extends ActiveSetSolver {
     @Override
     protected void performIteration() {
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             this.log("\nPerformIteration {}", 1 + this.countIterations());
             this.log(this.toActivatorString());
         }
@@ -95,7 +95,7 @@ final class DirectASS extends ActiveSetSolver {
                 final ElementsSupplier<Double> tmpS = tmpInvQAT.premultiply(iterA);
                 // TODO Symmetric, only need to calculate half the Schur complement, and only 1 row/column changes per iteration
 
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     BasicLogger.debug("Negated Schur complement: " + Arrays.toString(incl), tmpS.get());
                 }
 
@@ -103,7 +103,7 @@ final class DirectASS extends ActiveSetSolver {
 
                     this.getSolutionGeneral(this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB), iterL);
 
-                    if (this.isDebug()) {
+                    if (this.isLogDebug()) {
                         this.log("Relative error {} in solution for L={}", PrimitiveMath.NaN, iterL);
                     }
 

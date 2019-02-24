@@ -80,7 +80,7 @@ public final class IntegerSolver extends GenericSolver {
     final class BranchAndBoundNodeTask extends RecursiveTask<Boolean> {
 
         private final NodeKey myKey;
-        private final PrinterBuffer myPrinter = IntegerSolver.this.isDebug() ? new CharacterRing().asPrinter() : null;
+        private final PrinterBuffer myPrinter = IntegerSolver.this.isLogDebug() ? new CharacterRing().asPrinter() : null;
 
         private BranchAndBoundNodeTask(final NodeKey key) {
 
@@ -123,8 +123,6 @@ public final class IntegerSolver extends GenericSolver {
             }
 
             final Boolean retVal = IntegerSolver.this.compute(myKey, nodeModel.prepare(), myPrinter);
-
-            IntegerSolver.this.recycleNodeModel(nodeModel);
 
             return retVal;
         }
@@ -253,7 +251,7 @@ public final class IntegerSolver extends GenericSolver {
 
         super(solverOptions);
 
-        myIntegerModel = model.simplify();
+        myIntegerModel = model.snapshot();
         myFunction = myIntegerModel.objective().toFunction();
 
         myMinimisation = myIntegerModel.isMinimisation();
@@ -321,7 +319,7 @@ public final class IntegerSolver extends GenericSolver {
 
     protected Boolean compute(NodeKey nodeKey, final ExpressionsBasedModel.Intermediate nodeModel, PrinterBuffer nodePrinter) {
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             nodePrinter.println();
             nodePrinter.println("Branch&Bound Node");
             nodePrinter.println(nodeKey.toString());
@@ -329,7 +327,7 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         if (!this.isIterationAllowed()) {
-            if (this.isDebug()) {
+            if (this.isLogDebug()) {
                 nodePrinter.println("Reached iterations or time limit - stop!");
                 IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
             }
@@ -346,12 +344,12 @@ public final class IntegerSolver extends GenericSolver {
         // Increment when/if an iteration was actually performed
         this.incrementIterationsCount();
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             nodePrinter.println("Node Result: {}", nodeResult);
         }
 
         if (nodeResult.getState().isOptimal()) {
-            if (this.isDebug()) {
+            if (this.isLogDebug()) {
                 nodePrinter.println("Node solved to optimality!");
             }
 
@@ -371,7 +369,7 @@ public final class IntegerSolver extends GenericSolver {
             final double tmpSolutionValue = this.evaluateFunction(nodeResult);
 
             if (branchIntegerIndex == -1) {
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     nodePrinter.println("Integer solution! Store it among the others, and stop this branch!");
                 }
 
@@ -379,7 +377,7 @@ public final class IntegerSolver extends GenericSolver {
 
                 this.markInteger(nodeKey, null, tmpIntegerSolutionResult);
 
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     nodePrinter.println(this.getBestResultSoFar().toString());
                     BasicLogger.debug();
                     BasicLogger.debug(this.toString());
@@ -391,7 +389,7 @@ public final class IntegerSolver extends GenericSolver {
                 return true;
 
             } else {
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     nodePrinter.println("Not an Integer Solution: " + tmpSolutionValue);
                 }
 
@@ -399,7 +397,7 @@ public final class IntegerSolver extends GenericSolver {
 
                 if (this.isGoodEnoughToContinueBranching(tmpSolutionValue)) {
 
-                    if (this.isDebug()) {
+                    if (this.isLogDebug()) {
                         nodePrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, variableValue,
                                 nodeModel.getVariable(this.getGlobalIndex(branchIntegerIndex)));
                         IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
@@ -443,7 +441,7 @@ public final class IntegerSolver extends GenericSolver {
                     }
 
                 } else {
-                    if (this.isDebug()) {
+                    if (this.isLogDebug()) {
                         nodePrinter.println("Can't find better integer solutions - stop this branch!");
                         IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
                     }
@@ -454,7 +452,7 @@ public final class IntegerSolver extends GenericSolver {
             }
 
         } else {
-            if (this.isDebug()) {
+            if (this.isLogDebug()) {
                 nodePrinter.println("Failed to solve node problem - stop this branch!");
                 IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
             }
@@ -558,7 +556,7 @@ public final class IntegerSolver extends GenericSolver {
 
     protected synchronized void markInteger(final NodeKey key, final ExpressionsBasedModel model, final Optimisation.Result result) {
 
-        if (this.isProgress()) {
+        if (this.isLogProgress()) {
             this.log("New integer solution {}", result);
             this.log("\t@ node {}", key);
         }
@@ -580,7 +578,7 @@ public final class IntegerSolver extends GenericSolver {
 
         } else {
 
-            if (this.isDebug()) {
+            if (this.isLogDebug()) {
                 this.log("Previously best {}", myBestResultSoFar);
             }
         }
@@ -596,10 +594,6 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         myIntegerSolutionsCount.incrementAndGet();
-    }
-
-    protected void recycleNodeModel(ExpressionsBasedModel model) {
-        //  myModelPool.giveBack(model);
     }
 
     /**

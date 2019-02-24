@@ -24,12 +24,16 @@ package org.ojalgo.optimisation;
 import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.structure.Structure1D.IntIndex;
+import org.ojalgo.type.context.NumberContext;
 
 public class ExpressionsBasedModelTest {
 
@@ -126,6 +130,49 @@ public class ExpressionsBasedModelTest {
         tmpYTWO.lower(ONE).upper(NEG);
 
         TestUtils.assertFalse(tmpModel.validate());
+
+    }
+
+    @Test
+    public void testPresolverCase2() {
+
+        NumberContext precision = NumberContext.getGeneral(14, 12);
+        Set<IntIndex> fixedVariables = Collections.emptySet();
+        BigDecimal fixedValue = ZERO;
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        Variable varX = model.addVariable("X").lower(ONE);
+        Variable varY = model.addVariable("Y");
+        Variable varZ = model.addVariable("Z").lower(ZERO);
+        Variable varA = model.addVariable("A").upper(THREE);
+
+        Expression expr3 = model.addExpression("Test3").lower(ZERO);
+
+        expr3.set(varX, TWO.negate());
+        expr3.set(varA, NEG);
+
+        Presolvers.ZERO_ONE_TWO.simplify(expr3, expr3.getLinearKeySet(), expr3.getLowerLimit(), expr3.getUpperLimit(), precision);
+
+        TestUtils.assertEquals(TWO.negate(), varA.getUpperLimit(), precision);
+
+        Expression expr2 = model.addExpression("Test2").lower(ZERO);
+
+        expr2.set(varX, TWO.negate());
+        expr2.set(varY, NEG);
+
+        Presolvers.ZERO_ONE_TWO.simplify(expr2, expr2.getLinearKeySet(), expr2.getLowerLimit(), expr2.getUpperLimit(), precision);
+
+        TestUtils.assertEquals(TWO.negate(), varY.getUpperLimit(), precision);
+
+        Expression expr1 = model.addExpression("Test1").lower(ZERO);
+
+        expr1.set(varX, TWO.negate());
+        expr1.set(varZ, ONE);
+
+        Presolvers.ZERO_ONE_TWO.simplify(expr1, expr1.getLinearKeySet(), expr1.getLowerLimit(), expr1.getUpperLimit(), precision);
+
+        TestUtils.assertEquals(TWO, varZ.getLowerLimit(), precision);
 
     }
 
