@@ -90,7 +90,7 @@ public abstract class Presolvers {
         @Override
         public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
 
-            if (expression.isObjective() && expression.isFunctionLinear()) {
+            if (expression.isFunctionLinear()) {
 
                 final BigDecimal exprWeight = expression.getContributionWeight();
 
@@ -199,28 +199,20 @@ public abstract class Presolvers {
         @Override
         public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
 
-            if (expression.isConstraint()) {
-
-                switch (remaining.size()) {
-                case 0:
-                    return Presolvers.doCase0(expression, remaining, lower, upper, precision);
-                case 1:
-                    return Presolvers.doCase1(expression, remaining, lower, upper, precision);
-                case 2:
-                    /*
-                     * doCaseN(...) does something that doCase2(...) does not, and it's necessary. Possibly
-                     * doCase2(...) can be removed completely - complicated code that doesn't seem to do
-                     * accomplish very much.
-                     */
-                    return Presolvers.doCaseN(expression, remaining, lower, upper, precision)
-                            || Presolvers.doCase2(expression, remaining, lower, upper, precision);
-                default: // 3 or more
-                    return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
-                }
-
-            } else {
-
-                return false;
+            switch (remaining.size()) {
+            case 0:
+                return Presolvers.doCase0(expression, remaining, lower, upper, precision);
+            case 1:
+                return Presolvers.doCase1(expression, remaining, lower, upper, precision);
+            case 2:
+                /*
+                 * doCaseN(...) does something that doCase2(...) does not, and it's necessary. Possibly
+                 * doCase2(...) can be removed completely - complicated code that doesn't seem to do
+                 * accomplish very much.
+                 */
+                return Presolvers.doCaseN(expression, remaining, lower, upper, precision) || Presolvers.doCase2(expression, remaining, lower, upper, precision);
+            default: // 3 or more
+                return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
             }
         }
     };

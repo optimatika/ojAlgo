@@ -1320,17 +1320,23 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             BigDecimal lower = tmpExpr.getLowerLimit();
             BigDecimal upper = tmpExpr.getUpperLimit();
 
-            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
-            Presolvers.ZERO_ONE_TWO.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
-            if (anyVarInt) {
-                Presolvers.INTEGER_EXPRESSION_ROUNDING.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+            if (tmpExpr.isObjective()) {
+                Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+            }
+            if (tmpExpr.isConstraint()) {
+                Presolvers.ZERO_ONE_TWO.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+                if (anyVarInt) {
+                    Presolvers.INTEGER_EXPRESSION_ROUNDING.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+                }
             }
         }
 
         for (final Variable tmpVar : myVariables) {
             Presolvers.UNREFERENCED.simplify(tmpVar, this);
-            if (anyVarInt) {
-                Presolvers.INTEGER_VARIABLE_ROUNDING.simplify(tmpVar, this);
+            if (tmpVar.isConstraint()) {
+                if (anyVarInt) {
+                    Presolvers.INTEGER_VARIABLE_ROUNDING.simplify(tmpVar, this);
+                }
             }
         }
     }
