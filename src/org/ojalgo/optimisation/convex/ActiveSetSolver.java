@@ -36,7 +36,6 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.IndexSelector;
-import org.ojalgo.type.context.NumberContext;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
 
@@ -243,42 +242,30 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.log(myActivator.toString());
         }
 
-        int tmpToInclude = -1;
-        int tmpToExclude = -1;
+        int toInclude = -1;
+        int toExclude = -1;
 
-        if (this.hasInequalityConstraints()) {
-            tmpToInclude = this.suggestConstraintToInclude();
-            if (tmpToInclude == -1) {
-                tmpToExclude = this.suggestConstraintToExclude();
+        if ((toInclude = this.suggestConstraintToInclude()) >= 0) {
+            if (this.isLogDebug()) {
+                this.log("Suggested to include: {}", toInclude);
             }
-        }
-
-        if (this.isLogDebug()) {
-            this.log("Suggested to include: {}", tmpToInclude);
-            this.log("Suggested to exclude: {}", tmpToExclude);
-        }
-
-        if (tmpToExclude == -1) {
-            if (tmpToInclude == -1) {
-                // Suggested to do nothing
+            myActivator.include(toInclude);
+            this.setState(State.APPROXIMATE);
+            return true;
+        } else {
+            if ((toExclude = this.suggestConstraintToExclude()) >= 0) {
+                if (this.isLogDebug()) {
+                    this.log("Suggested to exclude: {}", toExclude);
+                }
+                this.exclude(toExclude);
+                this.setState(State.APPROXIMATE);
+                return true;
+            } else {
+                if (this.isLogDebug()) {
+                    this.log("Stop!");
+                }
                 this.setState(State.OPTIMAL);
                 return false;
-            } else {
-                // Only suggested to include
-                myActivator.include(tmpToInclude);
-                this.setState(State.APPROXIMATE);
-                return true;
-            }
-        } else {
-            if (tmpToInclude == -1) {
-                this.exclude(tmpToExclude);
-                this.setState(State.APPROXIMATE);
-                return true;
-            } else {
-                this.exclude(tmpToExclude);
-                myActivator.include(tmpToInclude);
-                this.setState(State.APPROXIMATE);
-                return true;
             }
         }
     }
@@ -292,6 +279,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         int retVal = -1;
 
         final int[] tmpIncluded = myActivator.getIncluded();
+
         final int tmpLastIncluded = myActivator.getLastIncluded();
         int tmpIndexOfLast = -1;
 
@@ -482,25 +470,23 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                         final SparseArray<Double> excludedInequalityRow = this.getMatrixAI(excluded[i]);
 
-                        final double tmpN = slack.doubleValue(excluded[i]); // Current slack
-                        final double tmpD = excludedInequalityRow.dot(iterX); // Proposed slack change
-                        final double tmpVal = options.feasibility.isSmall(tmpD, tmpN) ? ZERO : tmpN / tmpD;
+                        final double currentSlack = slack.doubleValue(excluded[i]);
+                        final double slackChange = excludedInequalityRow.dot(iterX);
+                        final double fraction = options.feasibility.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
 
-                        if ((tmpD > ZERO) && (tmpVal >= ZERO) && (tmpVal < stepLength) && !options.solution.isSmall(normStepX, tmpD)) {
-                            stepLength = tmpVal;
-                            this.setConstraintToInclude(excluded[i]);
-                            if (this.isLogDebug()) {
-                                this.log("Best so far: {} @ {} ({}).", stepLength, i, this.getConstraintToInclude());
+                        if ((slackChange <= ZERO) || options.solution.isSmall(normStepX, slackChange)) {
+                            // This constraint not affected
+                        } else if (fraction >= ZERO) {
+                            // Must check the step length
+                            if (fraction < stepLength) {
+                                stepLength = fraction;
+                                this.setConstraintToInclude(excluded[i]);
+                                if (this.isLogDebug()) {
+                                    this.log("Best so far: {} @ {} ({}).", stepLength, i, this.getConstraintToInclude());
+                                }
                             }
-                            // } else if ((tmpVal == ZERO) && this.isDebug()) {
-                        } else if ((NumberContext.compare(tmpVal, ZERO) == 0) && this.isLogDebug()) {
-                            this.log("Zero, but still not good...");
-                            this.log("Numer/slack: {}", tmpN);
-                            this.log("Denom/chang: {}", tmpD);
-                            this.log("Small:       {}", options.solution.isSmall(normStepX, tmpD));
                         }
                     }
-
                 }
 
                 if (stepLength > ZERO) { // It is possible that it becomes == 0.0

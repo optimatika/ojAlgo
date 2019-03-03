@@ -819,8 +819,8 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         } else {
             if (this.isLogDebug()) {
                 options.logger_appender.println("KKT system unsolvable!");
-                options.logger_appender.printmtrx("KKT", this.getIterationKKT().collect(FACTORY));
-                options.logger_appender.printmtrx("RHS", this.getIterationRHS().collect(FACTORY));
+                //                options.logger_appender.printmtrx("KKT", this.getIterationKKT().collect(FACTORY));
+                //                options.logger_appender.printmtrx("RHS", this.getIterationRHS().collect(FACTORY));
             }
             return false;
         }

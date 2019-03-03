@@ -80,7 +80,8 @@ public final class IntegerSolver extends GenericSolver {
     final class BranchAndBoundNodeTask extends RecursiveTask<Boolean> {
 
         private final NodeKey myKey;
-        private final PrinterBuffer myPrinter = IntegerSolver.this.isLogDebug() ? new CharacterRing().asPrinter() : null;
+        private final PrinterBuffer myPrinter = (IntegerSolver.this.options.validate || IntegerSolver.this.isLogProgress()) ? new CharacterRing().asPrinter()
+                : null;
 
         private BranchAndBoundNodeTask(final NodeKey key) {
 
