@@ -66,21 +66,27 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     }
 
     private void handleIterationFailure(final int[] included) {
+
         if (this.isIterationAllowed()) {
-            // Subproblem NOT solved successfully, but further iterations allowed
 
-            if (included.length >= 1) {
-                // Subproblem NOT solved successfully
-                // At least 1 active inequality
+            if (this.isSolvableQ()) {
+                // There must be a problem with the constraints
 
-                this.shrink();
+                if (included.length >= 1) {
+                    // At least 1 active inequality
 
-                this.performIteration();
+                    this.shrink();
+                    this.performIteration();
 
-            } else if (!this.isSolvableQ()) {
-                // Subproblem NOT solved successfully
-                // 0 active inequalities
-                // Q not SPD
+                } else {
+                    // Should not be possible to end up here, infeasibility among
+                    // the equality constraints should have been detected earlier.
+
+                    this.setState(State.FAILED);
+                }
+
+            } else {
+                // Patch Q
 
                 final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
                 final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
@@ -99,28 +105,14 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 this.resetActivator();
                 this.performIteration();
-
-            } else {
-                // Subproblem NOT solved successfully
-                // 0 active inequalities
-                // Q SPD
-
-                // Should not be possible to end up here, infeasibility among
-                // the equality constraints should have been detected earlier.
-
-                this.setState(State.FAILED);
             }
 
         } else if (this.checkFeasibility(false)) {
-            // Subproblem NOT solved successfully
-            // Further iterations NOT allowed
             // Feasible current solution
 
             this.setState(State.FEASIBLE);
 
         } else {
-            // Subproblem NOT solved successfully
-            // Further iterations NOT allowed
             // Current solution somehow NOT feasible
 
             this.setState(State.FAILED);
