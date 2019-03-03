@@ -65,6 +65,165 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         mySlackI = PrimitiveDenseStore.FACTORY.makeZero(tmpCountInequalityConstraints, 1L);
     }
 
+    private void handleIterationFailure(final int[] included) {
+        if (this.isIterationAllowed()) {
+            // Subproblem NOT solved successfully, but further iterations allowed
+
+            if (included.length >= 1) {
+                // Subproblem NOT solved successfully
+                // At least 1 active inequality
+
+                this.shrink();
+
+                this.performIteration();
+
+            } else if (!this.isSolvableQ()) {
+                // Subproblem NOT solved successfully
+                // 0 active inequalities
+                // Q not SPD
+
+                final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
+                final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
+                final double largest = PrimitiveFunction.MAX.invoke(largestInQ, largestInC);
+
+                this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
+                this.computeQ(this.getIterationQ());
+
+                this.getSolutionL().modifyAll((Unary) arg -> {
+                    if (Double.isFinite(arg)) {
+                        return arg;
+                    } else {
+                        return ZERO;
+                    }
+                });
+
+                this.resetActivator();
+                this.performIteration();
+
+            } else {
+                // Subproblem NOT solved successfully
+                // 0 active inequalities
+                // Q SPD
+
+                // Should not be possible to end up here, infeasibility among
+                // the equality constraints should have been detected earlier.
+
+                this.setState(State.FAILED);
+            }
+
+        } else if (this.checkFeasibility(false)) {
+            // Subproblem NOT solved successfully
+            // Further iterations NOT allowed
+            // Feasible current solution
+
+            this.setState(State.FEASIBLE);
+
+        } else {
+            // Subproblem NOT solved successfully
+            // Further iterations NOT allowed
+            // Current solution somehow NOT feasible
+
+            this.setState(State.FAILED);
+        }
+    }
+
+    private void handleIterationSolution(final PrimitiveDenseStore iterX, final int[] excluded) {
+        // Subproblem solved successfully
+
+        final PhysicalStore<Double> soluX = this.getSolutionX();
+
+        iterX.modifyMatching(SUBTRACT, soluX);
+
+        if (this.isLogDebug()) {
+            this.log("Current: {}", soluX.asList());
+            this.log("Step: {}", iterX.asList());
+        }
+
+        final double normCurrentX = soluX.aggregateAll(Aggregator.NORM2);
+        final double normStepX = iterX.aggregateAll(Aggregator.NORM2);
+        if (!options.solution.isSmall(normCurrentX, normStepX)
+                && (options.solution.isSmall(ONE, normCurrentX) || !options.solution.isSmall(normStepX, normCurrentX))) {
+            // Non-zero && non-freak solution
+
+            double stepLength = ONE;
+
+            if (excluded.length > 0) {
+
+                final PhysicalStore<Double> slack = this.getSlackI();
+
+                if (this.isLogDebug()) {
+
+                    final MatrixStore<Double> change = this.getMatrixAI(excluded).get().multiply(iterX);
+
+                    final PhysicalStore<Double> steps = slack.copy();
+                    steps.modifyMatching(DIVIDE, change);
+
+                    this.log("Numer/slack: {}", slack.asList());
+                    this.log("Denom/chang: {}", change.copy().asList());
+                    this.log("Looking for the largest possible step length (smallest positive scalar) among these: {}).", steps.asList());
+                }
+
+                for (int i = 0; i < excluded.length; i++) {
+
+                    final SparseArray<Double> excludedInequalityRow = this.getMatrixAI(excluded[i]);
+
+                    final double currentSlack = slack.doubleValue(excluded[i]);
+                    final double slackChange = excludedInequalityRow.dot(iterX);
+                    final double fraction = options.feasibility.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
+
+                    if ((slackChange <= ZERO) || options.solution.isSmall(normStepX, slackChange)) {
+                        // This constraint not affected
+                    } else if (fraction >= ZERO) {
+                        // Must check the step length
+                        if (fraction < stepLength) {
+                            stepLength = fraction;
+                            this.setConstraintToInclude(excluded[i]);
+                            if (this.isLogDebug()) {
+                                this.log("Best so far: {} @ {} ({}).", stepLength, i, this.getConstraintToInclude());
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (stepLength > ZERO) { // It is possible that it becomes == 0.0
+                iterX.axpy(stepLength, soluX);
+            } else if (((this.getConstraintToInclude() >= 0) && (myActivator.getLastExcluded() == this.getConstraintToInclude()))
+                    && (myActivator.getLastIncluded() == this.getConstraintToInclude())) {
+                this.setConstraintToInclude(-1);
+            }
+
+            this.setState(State.APPROXIMATE);
+
+        } else if (this.isLogDebug()) {
+            // Zero solution
+
+            if (this.isLogDebug()) {
+                this.log("Step too small!");
+            }
+
+            this.setState(State.FEASIBLE);
+        }
+
+        if (this.isLogDebug()) {
+            this.log("Post iteration");
+            this.log("\tSolution: {}", soluX.copy().asList());
+            this.log("\tL: {}", this.getSolutionL().asList());
+            if ((this.getMatrixAE() != null) && (this.getMatrixAE().count() > 0)) {
+                this.log("\tE-slack: {}", this.getSE().copy().asList());
+                if (!options.feasibility.isZero(this.getSE().aggregateAll(Aggregator.LARGEST).doubleValue())) {
+                    // throw new IllegalStateException("E-slack!");
+                }
+            }
+
+            this.log("\tI-slack: {}", mySlackI.copy().asList());
+            if (!options.feasibility.isZero(mySlackI.aggregateAll(Aggregator.LARGEST).doubleValue())) {
+                // throw new IllegalStateException("I-slack!");
+            }
+
+        }
+    }
+
     private final void shrink() {
 
         final int[] incl = myActivator.getIncluded();
@@ -430,160 +589,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         this.incrementIterationsCount();
 
-        final PhysicalStore<Double> soluX = this.getSolutionX();
-
         if (solved) {
-            // Subproblem solved successfully
-
-            iterX.modifyMatching(SUBTRACT, soluX);
-
-            if (this.isLogDebug()) {
-                this.log("Current: {}", soluX.asList());
-                this.log("Step: {}", iterX.asList());
-            }
-
-            final double normCurrentX = soluX.aggregateAll(Aggregator.NORM2);
-            final double normStepX = iterX.aggregateAll(Aggregator.NORM2);
-            if (!options.solution.isSmall(normCurrentX, normStepX)
-                    && (options.solution.isSmall(ONE, normCurrentX) || !options.solution.isSmall(normStepX, normCurrentX))) {
-                // Non-zero && non-freak solution
-
-                double stepLength = ONE;
-
-                if (excluded.length > 0) {
-
-                    final PhysicalStore<Double> slack = this.getSlackI();
-
-                    if (this.isLogDebug()) {
-
-                        final MatrixStore<Double> change = this.getMatrixAI(excluded).get().multiply(iterX);
-
-                        final PhysicalStore<Double> steps = slack.copy();
-                        steps.modifyMatching(DIVIDE, change);
-
-                        this.log("Numer/slack: {}", slack.asList());
-                        this.log("Denom/chang: {}", change.copy().asList());
-                        this.log("Looking for the largest possible step length (smallest positive scalar) among these: {}).", steps.asList());
-                    }
-
-                    for (int i = 0; i < excluded.length; i++) {
-
-                        final SparseArray<Double> excludedInequalityRow = this.getMatrixAI(excluded[i]);
-
-                        final double currentSlack = slack.doubleValue(excluded[i]);
-                        final double slackChange = excludedInequalityRow.dot(iterX);
-                        final double fraction = options.feasibility.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
-
-                        if ((slackChange <= ZERO) || options.solution.isSmall(normStepX, slackChange)) {
-                            // This constraint not affected
-                        } else if (fraction >= ZERO) {
-                            // Must check the step length
-                            if (fraction < stepLength) {
-                                stepLength = fraction;
-                                this.setConstraintToInclude(excluded[i]);
-                                if (this.isLogDebug()) {
-                                    this.log("Best so far: {} @ {} ({}).", stepLength, i, this.getConstraintToInclude());
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (stepLength > ZERO) { // It is possible that it becomes == 0.0
-                    iterX.axpy(stepLength, soluX);
-                } else if (((this.getConstraintToInclude() >= 0) && (myActivator.getLastExcluded() == this.getConstraintToInclude()))
-                        && (myActivator.getLastIncluded() == this.getConstraintToInclude())) {
-                    this.setConstraintToInclude(-1);
-                }
-
-                this.setState(State.APPROXIMATE);
-
-            } else if (this.isLogDebug()) {
-                // Zero solution
-
-                if (this.isLogDebug()) {
-                    this.log("Step too small!");
-                }
-
-                this.setState(State.FEASIBLE);
-            }
-
-        } else if (this.isIterationAllowed()) {
-            // Subproblem NOT solved successfully, but further iterations allowed
-
-            if (included.length >= 1) {
-                // Subproblem NOT solved successfully
-                // At least 1 active inequality
-
-                this.shrink();
-
-                this.performIteration();
-
-            } else if (!this.isSolvableQ()) {
-                // Subproblem NOT solved successfully
-                // 0 active inequalities
-                // Q not SPD
-
-                final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
-                final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
-                final double largest = PrimitiveFunction.MAX.invoke(largestInQ, largestInC);
-
-                this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
-                this.computeQ(this.getIterationQ());
-
-                this.getSolutionL().modifyAll((Unary) arg -> {
-                    if (Double.isFinite(arg)) {
-                        return arg;
-                    } else {
-                        return ZERO;
-                    }
-                });
-
-                this.resetActivator();
-                this.performIteration();
-
-            } else {
-                // Subproblem NOT solved successfully
-                // 0 active inequalities
-                // Q SPD
-
-                // Should not be possible to end up here, infeasibility among
-                // the equality constraints should have been detected earlier.
-
-                this.setState(State.FAILED);
-            }
-
-        } else if (this.checkFeasibility(false)) {
-            // Subproblem NOT solved successfully
-            // Further iterations NOT allowed
-            // Feasible current solution
-
-            this.setState(State.FEASIBLE);
-
+            this.handleIterationSolution(iterX, excluded);
         } else {
-            // Subproblem NOT solved successfully
-            // Further iterations NOT allowed
-            // Current solution somehow NOT feasible
-
-            this.setState(State.FAILED);
-        }
-
-        if (this.isLogDebug()) {
-            this.log("Post iteration");
-            this.log("\tSolution: {}", soluX.copy().asList());
-            this.log("\tL: {}", this.getSolutionL().asList());
-            if ((this.getMatrixAE() != null) && (this.getMatrixAE().count() > 0)) {
-                this.log("\tE-slack: {}", this.getSE().copy().asList());
-                if (!options.feasibility.isZero(this.getSE().aggregateAll(Aggregator.LARGEST).doubleValue())) {
-                    // throw new IllegalStateException("E-slack!");
-                }
-            }
-
-            this.log("\tI-slack: {}", mySlackI.copy().asList());
-            if (!options.feasibility.isZero(mySlackI.aggregateAll(Aggregator.LARGEST).doubleValue())) {
-                // throw new IllegalStateException("I-slack!");
-            }
-
+            this.handleIterationFailure(included);
         }
     }
 
