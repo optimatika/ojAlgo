@@ -250,7 +250,7 @@ public interface Optimisation {
         }
 
         /**
-         * Will configure detailed dubug logging and validation
+         * Will configure detailed debug logging and validation
          */
         public void debug(final Class<? extends Optimisation.Solver> solver) {
             logger_solver = solver;
