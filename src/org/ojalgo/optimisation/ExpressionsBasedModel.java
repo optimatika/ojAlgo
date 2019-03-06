@@ -541,7 +541,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             if (allEntities || tmpExpression.isObjective() || (tmpExpression.isConstraint() && !tmpExpression.isRedundant())) {
                 myExpressions.put(tmpExpression.getName(), tmpExpression.copy(this, !workCopy));
             } else {
-                BasicLogger.DEBUG.println("Discarding expression: {}", tmpExpression);
+                // BasicLogger.DEBUG.println("Discarding expression: {}", tmpExpression);
             }
         }
 

@@ -190,7 +190,7 @@ final class IterativeASS extends ActiveSetSolver {
     @Override
     protected void performIteration() {
 
-        if (this.isLogDebug()) {
+        if (this.isLogProgress()) {
             this.log("\nPerformIteration {}", 1 + this.countIterations());
             this.log(this.toActivatorString());
         }

@@ -72,6 +72,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (this.isSolvableQ()) {
                 // There must be a problem with the constraints
 
+                if (this.isLogProgress()) {
+                    this.log("Constraints problem!");
+                }
+
                 if (included.length >= 1) {
                     // At least 1 active inequality
 
@@ -178,11 +182,14 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 }
             }
 
-            if (stepLength > ZERO) { // It is possible that it becomes == 0.0
-                iterX.axpy(stepLength, soluX);
-            } else if (((this.getConstraintToInclude() >= 0) && (myActivator.getLastExcluded() == this.getConstraintToInclude()))
-                    && (myActivator.getLastIncluded() == this.getConstraintToInclude())) {
+            if ((stepLength == ZERO) && (this.getConstraintToInclude() == this.getLastExcluded())) {
+                // Break cycle on redundant constraints
                 this.setConstraintToInclude(-1);
+            } else if (stepLength > ZERO) {
+                iterX.axpy(stepLength, soluX);
+                if (this.isLogProgress()) {
+                    this.log("Performing update with step length {} on constraint {}", stepLength, this.getConstraintToInclude());
+                }
             }
 
             this.setState(State.APPROXIMATE);
@@ -471,9 +478,17 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !options.solution.isZero(tmpVal)) {
                 tmpMin = tmpVal;
                 retVal = tmpIndexOfLast;
-                if (this.isLogDebug()) {
+                if (this.isLogProgress()) {
                     this.log("Only the last included needs to be excluded: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[retVal]);
                 }
+            }
+        }
+
+        if (this.isLogProgress()) {
+            if (retVal < 0) {
+                this.log("Nothing to exclude");
+            } else {
+                this.log("Suggest to exclude: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[retVal]);
             }
         }
 
