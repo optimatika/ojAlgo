@@ -1009,7 +1009,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         boolean retVal = false;
 
         for (int i = 0, limit = myVariables.size(); !retVal && (i < limit); i++) {
-            retVal |= myVariables.get(i).isInteger();
+            Variable variable = myVariables.get(i);
+            retVal |= (variable.isInteger() && !variable.isFixed());
         }
 
         return retVal;
