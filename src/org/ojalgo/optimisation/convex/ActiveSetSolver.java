@@ -47,6 +47,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private MatrixStore<Double> myInvQC;
     private final PrimitiveDenseStore myIterationX;
     private final PrimitiveDenseStore mySlackI;
+
     private final PrimitiveDenseStore mySolutionL;
 
     ActiveSetSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
@@ -183,18 +184,25 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
 
             if ((stepLength == ZERO) && (this.getConstraintToInclude() == this.getLastExcluded())) {
+                if (this.isLogProgress()) {
+                    this.log("Break cycle on redundant constraints because step length {} on constraint {}", stepLength, this.getConstraintToInclude());
+                }
                 // Break cycle on redundant constraints
                 this.setConstraintToInclude(-1);
             } else if (stepLength > ZERO) {
-                iterX.axpy(stepLength, soluX);
                 if (this.isLogProgress()) {
-                    this.log("Performing update with step length {} on constraint {}", stepLength, this.getConstraintToInclude());
+                    this.log("Performing update with step length {} adding constraint {}", stepLength, this.getConstraintToInclude());
+                }
+                iterX.axpy(stepLength, soluX);
+            } else {
+                if (this.isLogProgress()) {
+                    this.log("Do nothing because step length {} but add constraint {}", stepLength, this.getConstraintToInclude());
                 }
             }
 
             this.setState(State.APPROXIMATE);
 
-        } else if (this.isLogDebug()) {
+        } else {
             // Zero solution
 
             if (this.isLogDebug()) {
