@@ -166,7 +166,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                     final double currentSlack = slack.doubleValue(excluded[i]);
                     final double slackChange = excludedInequalityRow.dot(iterX);
-                    final double fraction = options.feasibility.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
+                    final double fraction = (Math.signum(currentSlack) == Math.signum(Math.signum(currentSlack)))
+                            && options.feasibility.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
 
                     if ((slackChange <= ZERO) || options.solution.isSmall(normStepX, slackChange)) {
                         // This constraint not affected
@@ -183,7 +184,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 }
             }
 
-            if ((stepLength == ZERO) && (this.getConstraintToInclude() == this.getLastExcluded())) {
+            if (options.solution.isZero(stepLength) && (this.getConstraintToInclude() == this.getLastExcluded())) {
                 if (this.isLogProgress()) {
                     this.log("Break cycle on redundant constraints because step length {} on constraint {}", stepLength, this.getConstraintToInclude());
                 }
@@ -214,20 +215,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         if (this.isLogDebug()) {
             this.log("Post iteration");
-            this.log("\tSolution: {}", soluX.copy().asList());
+            this.log("\tSolution: {}", soluX.asList());
             this.log("\tL: {}", this.getSolutionL().asList());
             if ((this.getMatrixAE() != null) && (this.getMatrixAE().count() > 0)) {
                 this.log("\tE-slack: {}", this.getSE().copy().asList());
-                if (!options.feasibility.isZero(this.getSE().aggregateAll(Aggregator.LARGEST).doubleValue())) {
-                    // throw new IllegalStateException("E-slack!");
-                }
             }
-
-            this.log("\tI-slack: {}", mySlackI.copy().asList());
-            if (!options.feasibility.isZero(mySlackI.aggregateAll(Aggregator.LARGEST).doubleValue())) {
-                // throw new IllegalStateException("I-slack!");
-            }
-
+            this.log("\tI-slack: {}", this.getSlackI().asList());
         }
     }
 
@@ -608,6 +601,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.handleIterationSolution(iterX, excluded);
         } else {
             this.handleIterationFailure(included);
+        }
+
+        if (options.validate && !this.checkFeasibility(false)) {
+            this.log("Problem!");
         }
     }
 
