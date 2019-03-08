@@ -197,7 +197,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 iterX.axpy(stepLength, soluX);
             } else {
                 if (this.isLogProgress()) {
-                    this.log("Do nothing because step length {} but add constraint {}", stepLength, this.getConstraintToInclude());
+                    this.log("Do nothing because step length {} and size {} but add constraint {}", stepLength, normStepX, this.getConstraintToInclude());
                 }
             }
 
