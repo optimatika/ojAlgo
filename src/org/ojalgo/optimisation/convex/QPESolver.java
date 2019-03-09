@@ -23,11 +23,14 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import java.math.RoundingMode;
+
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Solves optimisation problems of the form:
@@ -39,6 +42,8 @@ import org.ojalgo.optimisation.Optimisation;
  * @author apete
  */
 final class QPESolver extends ConstrainedSolver {
+
+    static NumberContext FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
 
     private boolean myFeasible = false;
 
@@ -57,7 +62,7 @@ final class QPESolver extends ConstrainedSolver {
 
         final MatrixStore<Double> tmpSE = this.getSE();
         for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
-            if (!options.feasibility.isZero(tmpSE.doubleValue(i))) {
+            if (!FEASIBILITY.isZero(tmpSE.doubleValue(i))) {
                 retVal = false;
             }
         }
