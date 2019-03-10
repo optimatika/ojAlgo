@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,6 +33,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -451,7 +453,15 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     }
 
+    static NumberContext ALGORITHM_ACCURACY = new NumberContext(12, 14, RoundingMode.HALF_DOWN);
+    static NumberContext CHECK_FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
     static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
+    static NumberContext FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
+    static NumberContext INCLUDE_CONSTRAINT = new NumberContext(12, 14, RoundingMode.HALF_DOWN);
+    static NumberContext ITERATION_FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
+    static NumberContext NEGATIVE_LAGRANGE = new NumberContext(12, 14, RoundingMode.HALF_DOWN);
+    static final double RELATIVELY_SMALL = PrimitiveFunction.SQRT.invoke(MACHINE_EPSILON);
+    static NumberContext SLACK_ZERO = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
 
     public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
 

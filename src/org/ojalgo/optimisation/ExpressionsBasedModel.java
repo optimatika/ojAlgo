@@ -1426,9 +1426,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             this.scanEntities();
         }
 
-        //        myExpressions.entrySet()
-        //                .forEach(e -> BasicLogger.debug("{} => {} with {}", e.getKey(), e.getValue().countLinearFactors(), e.getValue().countIntegerFactors()));
-
         Intermediate prepared = this.prepare();
 
         final Optimisation.Result retSolution = prepared.solve(null);
@@ -1436,7 +1433,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         for (int i = 0, limit = myVariables.size(); i < limit; i++) {
             final Variable tmpVariable = myVariables.get(i);
             if (!tmpVariable.isFixed()) {
-                tmpVariable.setValue(options.solution.enforce(retSolution.get(i)));
+                tmpVariable.setValue(options.solution.toBigDecimal(retSolution.doubleValue(i)));
             }
         }
 

@@ -22,6 +22,7 @@
 package org.ojalgo.optimisation.linear;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import org.ojalgo.array.Primitive64Array;
@@ -36,6 +37,7 @@ import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
+import org.ojalgo.type.context.NumberContext;
 
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
@@ -195,6 +197,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         }
 
     }
+
+    static NumberContext CHECK_FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
+    static NumberContext EPSILON = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
+    static NumberContext FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
+    static NumberContext NEXT_PIVOT = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
 
     public static LinearSolver.Builder getBuilder() {
         return new LinearSolver.Builder();

@@ -435,9 +435,9 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
      */
     public BigDecimal toBigDecimal(final double number) {
 
-        final BigDecimal tmpDecimal = myMathContext.getPrecision() > 0 ? new BigDecimal(number, myMathContext) : new BigDecimal(number);
+        final BigDecimal decimal = myMathContext.getPrecision() > 0 ? new BigDecimal(number, myMathContext) : new BigDecimal(number);
 
-        return this.scale(tmpDecimal);
+        return this.scale(decimal);
     }
 
     /**
@@ -485,13 +485,10 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
 
         if (myScale > Integer.MIN_VALUE) {
             retVal = retVal.setScale(myScale, myMathContext.getRoundingMode());
+            retVal = retVal.stripTrailingZeros();
         }
 
-        if (retVal.signum() == 0) {
-            return BigMath.ZERO;
-        } else {
-            return retVal.stripTrailingZeros();
-        }
+        return retVal;
     }
 
     @Override
