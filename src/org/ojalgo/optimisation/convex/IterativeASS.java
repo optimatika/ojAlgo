@@ -260,9 +260,9 @@ final class IterativeASS extends ActiveSetSolver {
     }
 
     @Override
-    void resetActivator() {
+    void resetActivator(boolean useLagrange) {
 
-        super.resetActivator();
+        super.resetActivator(useLagrange);
 
         final int numbEqus = this.countEqualityConstraints();
         final int numbVars = this.countVariables();

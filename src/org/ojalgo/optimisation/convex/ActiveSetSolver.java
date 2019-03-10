@@ -41,7 +41,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
-    private boolean myInitWithLP = false;
     private MatrixStore<Double> myInvQC;
     private final PrimitiveDenseStore myIterationX;
     private final PrimitiveDenseStore mySlackI;
@@ -105,7 +104,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     }
                 });
 
-                this.resetActivator();
+                this.resetActivator(true);
                 this.performIteration();
             }
 
@@ -345,6 +344,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
         }
 
+        boolean initWithLP = false;
+
         if (!feasible) {
 
             final Result resultLP = this.solveLP();
@@ -356,7 +357,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final Optional<Access1D<?>> tmpMultipliers = resultLP.getMultipliers();
                 if (tmpMultipliers.isPresent()) {
                     this.getSolutionL().fillMatching(tmpMultipliers.get());
-                    myInitWithLP = true;
+                    initWithLP = true;
                 } else {
                     this.getSolutionL().fillAll(ZERO);
                 }
@@ -367,7 +368,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             this.setState(State.FEASIBLE);
 
-            this.resetActivator();
+            this.resetActivator(initWithLP);
 
         } else {
 
@@ -605,7 +606,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
     }
 
-    void resetActivator() {
+    void resetActivator(boolean useLagrange) {
 
         myActivator.excludeAll();
 
@@ -619,10 +620,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             PrimitiveDenseStore lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
                 if (ConvexSolver.SLACK_ZERO.isZero(slack.doubleValue(excl[i]))
-                        && (!myInitWithLP || !ConvexSolver.INCLUDE_CONSTRAINT.isZero(lagrange.doubleValue(numbEqus + excl[i])))) {
+                        && (!useLagrange || !ConvexSolver.INCLUDE_CONSTRAINT.isZero(lagrange.doubleValue(numbEqus + excl[i])))) {
                     if (this.isLogDebug()) {
-                        this.log("Will inlcude ineq {} with slack={} L={} and LP={}", i, slack.doubleValue(excl[i]), lagrange.doubleValue(numbEqus + excl[i]),
-                                myInitWithLP);
+                        this.log("Will inlcude ineq {} with slack={} L={}", i, slack.doubleValue(excl[i]), lagrange.doubleValue(numbEqus + excl[i]));
                     }
                     this.include(excl[i]);
                 }
