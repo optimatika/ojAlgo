@@ -618,7 +618,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             PrimitiveDenseStore lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
-                if (ConvexSolver.SLACK_ZERO.isZero(slack.doubleValue(excl[i])) && (!myInitWithLP || !ConvexSolver.INCLUDE_CONSTRAINT.isZero(lagrange.doubleValue(numbEqus + excl[i])))) {
+                if (ConvexSolver.SLACK_ZERO.isZero(slack.doubleValue(excl[i]))
+                        && (!myInitWithLP || !ConvexSolver.INCLUDE_CONSTRAINT.isZero(lagrange.doubleValue(numbEqus + excl[i])))) {
+                    if (this.isLogDebug()) {
+                        this.log("Will inlcude ineq {} with slack={} L={} and LP={}", i, slack.doubleValue(excl[i]), lagrange.doubleValue(numbEqus + excl[i]),
+                                myInitWithLP);
+                    }
                     this.include(excl[i]);
                 }
             }
