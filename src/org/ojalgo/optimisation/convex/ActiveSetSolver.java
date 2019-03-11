@@ -30,6 +30,8 @@ import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.PrimitiveFunction.Unary;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -223,7 +225,48 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
     }
 
+    private final void shrink2() {
+
+        final int[] incl = myActivator.getIncluded();
+        int lastIncluded = myActivator.getLastIncluded();
+
+        AggregatorFunction<Double> aggregator = PrimitiveAggregator.NORM2.get();
+        SparseArray<Double> lastRow = this.getMatrixAI(lastIncluded);
+        lastRow.visitAll(aggregator);
+        double lastNorm = aggregator.doubleValue();
+
+        int toExclude = lastIncluded;
+        double maxWeight = ZERO;
+
+        for (int i = 0; i < incl.length; i++) {
+            aggregator.reset();
+            SparseArray<Double> inclRow = this.getMatrixAI(incl[i]);
+            inclRow.visitAll(aggregator);
+            double inclNorm = aggregator.doubleValue();
+            final double weight = Math.abs(lastRow.dot(inclRow)) / lastNorm / inclNorm;
+            if (weight > maxWeight) {
+                maxWeight = weight;
+                toExclude = incl[i];
+            }
+        }
+        if (this.isLogDebug()) {
+            this.log("Will shrink using {}", toExclude);
+        }
+        this.exclude(toExclude);
+    }
+
+    private boolean myShrinkSwitch = true;
+
     private final void shrink() {
+        if (myShrinkSwitch) {
+            this.shrink1();
+        } else {
+            this.shrink2();
+        }
+        myShrinkSwitch = !myShrinkSwitch;
+    }
+
+    private final void shrink1() {
 
         final int[] incl = myActivator.getIncluded();
 
