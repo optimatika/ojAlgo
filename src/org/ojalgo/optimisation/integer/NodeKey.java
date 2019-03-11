@@ -41,7 +41,7 @@ final class NodeKey implements Comparable<NodeKey> {
      * Same scale as the default {@linkplain org.ojalgo.optimisation.Optimisation.Options#feasibility} and
      * half its precision.
      */
-    private static final NumberContext FEASIBILITY = new NumberContext(6, 8);
+    private static final NumberContext FEASIBILITY = new NumberContext(7, 6);
     private static final AtomicLong GENERATOR = new AtomicLong();
 
     private final int[] myLowerBounds;

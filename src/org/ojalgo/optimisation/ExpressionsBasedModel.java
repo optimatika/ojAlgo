@@ -541,7 +541,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             if (allEntities || tmpExpression.isObjective() || (tmpExpression.isConstraint() && !tmpExpression.isRedundant())) {
                 myExpressions.put(tmpExpression.getName(), tmpExpression.copy(this, !workCopy));
             } else {
-                BasicLogger.DEBUG.println("Discarding expression: {}", tmpExpression);
+                // BasicLogger.DEBUG.println("Discarding expression: {}", tmpExpression);
             }
         }
 
@@ -1009,7 +1009,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         boolean retVal = false;
 
         for (int i = 0, limit = myVariables.size(); !retVal && (i < limit); i++) {
-            retVal |= myVariables.get(i).isInteger();
+            Variable variable = myVariables.get(i);
+            retVal |= (variable.isInteger() && !variable.isFixed());
         }
 
         return retVal;
@@ -1425,9 +1426,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             this.scanEntities();
         }
 
-        //        myExpressions.entrySet()
-        //                .forEach(e -> BasicLogger.debug("{} => {} with {}", e.getKey(), e.getValue().countLinearFactors(), e.getValue().countIntegerFactors()));
-
         Intermediate prepared = this.prepare();
 
         final Optimisation.Result retSolution = prepared.solve(null);
@@ -1435,7 +1433,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         for (int i = 0, limit = myVariables.size(); i < limit; i++) {
             final Variable tmpVariable = myVariables.get(i);
             if (!tmpVariable.isFixed()) {
-                tmpVariable.setValue(options.solution.enforce(retSolution.get(i)));
+                tmpVariable.setValue(options.solution.toBigDecimal(retSolution.doubleValue(i)));
             }
         }
 

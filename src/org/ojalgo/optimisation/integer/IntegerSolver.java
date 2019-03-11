@@ -339,8 +339,8 @@ public final class IntegerSolver extends GenericSolver {
             nodeKey.enforceBounds(nodeModel, this.getIntegerIndices());
         }
 
-        final Optimisation.Result bestResultSoFar = this.getBestResultSoFar();
-        final Optimisation.Result nodeResult = nodeModel.solve(bestResultSoFar);
+        final Optimisation.Result bestEstimate = this.getBestEstimate();
+        final Optimisation.Result nodeResult = nodeModel.solve(bestEstimate);
 
         // Increment when/if an iteration was actually performed
         this.incrementIterationsCount();
@@ -498,6 +498,10 @@ public final class IntegerSolver extends GenericSolver {
 
             return new Optimisation.Result(tmpSate, tmpValue, tmpSolution);
         }
+    }
+
+    protected Optimisation.Result getBestEstimate() {
+        return new Optimisation.Result(Optimisation.State.APPROXIMATE, this.getBestResultSoFar());
     }
 
     protected MatrixStore<Double> getGradient(final Access1D<Double> solution) {

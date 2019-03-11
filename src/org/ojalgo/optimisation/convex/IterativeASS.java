@@ -190,7 +190,7 @@ final class IterativeASS extends ActiveSetSolver {
     @Override
     protected void performIteration() {
 
-        if (this.isLogDebug()) {
+        if (this.isLogProgress()) {
             this.log("\nPerformIteration {}", 1 + this.countIterations());
             this.log(this.toActivatorString());
         }
@@ -227,7 +227,7 @@ final class IterativeASS extends ActiveSetSolver {
                 final double tmpRelativeError = myS.resolve(this.getSolutionL());
 
                 if (this.isLogDebug()) {
-                    this.log("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(incl));
+                    this.log("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(incl).toRawCopy1D());
                 }
 
                 final ElementsSupplier<Double> tmpRHS = this.getIterationL(incl).premultiply(this.getIterationA().transpose())
@@ -260,9 +260,9 @@ final class IterativeASS extends ActiveSetSolver {
     }
 
     @Override
-    void resetActivator() {
+    void resetActivator(boolean useLagrange) {
 
-        super.resetActivator();
+        super.resetActivator(useLagrange);
 
         final int numbEqus = this.countEqualityConstraints();
         final int numbVars = this.countVariables();

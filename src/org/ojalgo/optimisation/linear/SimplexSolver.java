@@ -447,10 +447,11 @@ public final class SimplexSolver extends LinearSolver {
         }
     }
 
+    private LongToNumberMap<Double> myFixedVariables = null;
+
     private final IterationPoint myPoint;
 
     private final SimplexTableau myTableau;
-    private LongToNumberMap<Double> myFixedVariables = null;
 
     SimplexSolver(final SimplexTableau tableau, final Optimisation.Options solverOptions) {
 
@@ -597,7 +598,7 @@ public final class SimplexSolver extends LinearSolver {
             // final double tmpPhaseOneValue = myTransposedTableau.doubleValue(this.countConstraints() + this.countVariables(), myPoint.getRowObjective());
             final double tmpPhaseOneValue = myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
 
-            if (!myTableau.isBasicArtificials() || options.feasibility.isZero(tmpPhaseOneValue)) {
+            if (!myTableau.isBasicArtificials() || LinearSolver.FEASIBILITY.isZero(tmpPhaseOneValue)) {
 
                 if (this.isLogDebug()) {
                     this.log("\nSwitching to Phase2 with {} artificial variable(s) still in the basis.\n", myTableau.countBasicArtificials());
@@ -682,7 +683,7 @@ public final class SimplexSolver extends LinearSolver {
         int retVal = -1;
 
         double tmpVal;
-        double tmpMinVal = myPoint.isPhase2() ? -options.feasibility.epsilon() : ZERO;
+        double tmpMinVal = myPoint.isPhase2() ? -LinearSolver.EPSILON.epsilon() : ZERO;
         //double tmpMinVal = ZERO;
 
         int tmpCol;
@@ -741,14 +742,14 @@ public final class SimplexSolver extends LinearSolver {
             // tmpNumer = PrimitiveFunction.ABS.invoke(myTransposedTableau.doubleValue(tmpNumerCol, i));
             tmpNumer = PrimitiveFunction.ABS.invoke(myTableau.doubleValue(i, tmpNumerCol));
 
-            if (options.feasibility.isSmall(tmpNumer, tmpDenom)) {
+            if (LinearSolver.NEXT_PIVOT.isSmall(tmpNumer, tmpDenom)) {
 
                 tmpRatio = MACHINE_LARGEST;
 
             } else {
 
                 if (tmpSpecialCase) {
-                    if (options.feasibility.isSmall(tmpDenom, tmpNumer)) {
+                    if (LinearSolver.NEXT_PIVOT.isSmall(tmpDenom, tmpNumer)) {
                         tmpRatio = MACHINE_EPSILON;
                     } else {
                         tmpRatio = MACHINE_LARGEST;
@@ -794,7 +795,7 @@ public final class SimplexSolver extends LinearSolver {
             tmpRHS.visitAll(tmpMinAggr);
             final double tmpMinVal = tmpMinAggr.doubleValue();
 
-            if ((tmpMinVal < ZERO) && !options.feasibility.isZero(tmpMinVal)) {
+            if ((tmpMinVal < ZERO) && !LinearSolver.CHECK_FEASIBILITY.isZero(tmpMinVal)) {
                 this.log("\nNegative RHS! {}", tmpMinVal);
                 if (this.isLogDebug()) {
                     this.log("Entire RHS columns: {}\n", tmpRHS);

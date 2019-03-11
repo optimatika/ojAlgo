@@ -35,6 +35,7 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.type.context.NumberContext;
 
 public class FinancePortfolioProblem extends OptimisationConvexTests {
 
@@ -123,7 +124,7 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
 
         TestUtils.assertStateNotLessThanOptimal(result);
         TestUtils.assertTrue(model.validate());
-        TestUtils.assertTrue(model.validate(result));
+        TestUtils.assertTrue(model.validate(result, new NumberContext(8, 8), BasicLogger.ERROR));
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(model);
     }

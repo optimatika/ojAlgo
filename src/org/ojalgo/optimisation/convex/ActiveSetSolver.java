@@ -30,6 +30,8 @@ import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.PrimitiveFunction.Unary;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -39,11 +41,8 @@ import org.ojalgo.type.IndexSelector;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
 
-    private static final double RELATIVELY_SMALL = PrimitiveFunction.SQRT.invoke(MACHINE_EPSILON);
-
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
-    private boolean myInitWithLP = false;
     private MatrixStore<Double> myInvQC;
     private final PrimitiveDenseStore myIterationX;
     private final PrimitiveDenseStore mySlackI;
@@ -66,27 +65,37 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     }
 
     private void handleIterationFailure(final int[] included) {
+
         if (this.isIterationAllowed()) {
-            // Subproblem NOT solved successfully, but further iterations allowed
 
-            if (included.length >= 1) {
-                // Subproblem NOT solved successfully
-                // At least 1 active inequality
+            if (this.isSolvableQ()) {
+                // There must be a problem with the constraints
 
-                this.shrink();
+                if (this.isLogProgress()) {
+                    this.log("Constraints problem!");
+                }
 
-                this.performIteration();
+                if (included.length >= 1) {
+                    // At least 1 active inequality
 
-            } else if (!this.isSolvableQ()) {
-                // Subproblem NOT solved successfully
-                // 0 active inequalities
-                // Q not SPD
+                    this.shrink();
+                    this.performIteration();
+
+                } else {
+                    // Should not be possible to end up here, infeasibility among
+                    // the equality constraints should have been detected earlier.
+
+                    this.setState(State.FAILED);
+                }
+
+            } else {
+                // Patch Q
 
                 final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
                 final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
                 final double largest = PrimitiveFunction.MAX.invoke(largestInQ, largestInC);
 
-                this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
+                this.getIterationQ().modifyDiagonal(ADD.second(largest * ConvexSolver.RELATIVELY_SMALL));
                 this.computeQ(this.getIterationQ());
 
                 this.getSolutionL().modifyAll((Unary) arg -> {
@@ -97,30 +106,16 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     }
                 });
 
-                this.resetActivator();
+                this.resetActivator(true);
                 this.performIteration();
-
-            } else {
-                // Subproblem NOT solved successfully
-                // 0 active inequalities
-                // Q SPD
-
-                // Should not be possible to end up here, infeasibility among
-                // the equality constraints should have been detected earlier.
-
-                this.setState(State.FAILED);
             }
 
         } else if (this.checkFeasibility(false)) {
-            // Subproblem NOT solved successfully
-            // Further iterations NOT allowed
             // Feasible current solution
 
             this.setState(State.FEASIBLE);
 
         } else {
-            // Subproblem NOT solved successfully
-            // Further iterations NOT allowed
             // Current solution somehow NOT feasible
 
             this.setState(State.FAILED);
@@ -139,10 +134,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.log("Step: {}", iterX.asList());
         }
 
-        final double normCurrentX = soluX.aggregateAll(Aggregator.NORM2);
-        final double normStepX = iterX.aggregateAll(Aggregator.NORM2);
+        final double normCurrentX = soluX.aggregateAll(Aggregator.LARGEST);
+        final double normStepX = iterX.aggregateAll(Aggregator.LARGEST);
         if (!options.solution.isSmall(normCurrentX, normStepX)
-                && (options.solution.isSmall(ONE, normCurrentX) || !options.solution.isSmall(normStepX, normCurrentX))) {
+                && (ConvexSolver.ALGORITHM_ACCURACY.isSmall(ONE, normCurrentX) || !ConvexSolver.ALGORITHM_ACCURACY.isSmall(normStepX, normCurrentX))) {
             // Non-zero && non-freak solution
 
             double stepLength = ONE;
@@ -169,9 +164,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                     final double currentSlack = slack.doubleValue(excluded[i]);
                     final double slackChange = excludedInequalityRow.dot(iterX);
-                    final double fraction = options.feasibility.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
+                    final double fraction = (Math.signum(currentSlack) == Math.signum(Math.signum(currentSlack)))
+                            && ConvexSolver.ITERATION_FEASIBILITY.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
 
-                    if ((slackChange <= ZERO) || options.solution.isSmall(normStepX, slackChange)) {
+                    if ((slackChange <= ZERO) || ConvexSolver.ALGORITHM_ACCURACY.isSmall(normStepX, slackChange)) {
                         // This constraint not affected
                     } else if (fraction >= ZERO) {
                         // Must check the step length
@@ -186,16 +182,26 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 }
             }
 
-            if (stepLength > ZERO) { // It is possible that it becomes == 0.0
-                iterX.axpy(stepLength, soluX);
-            } else if (((this.getConstraintToInclude() >= 0) && (myActivator.getLastExcluded() == this.getConstraintToInclude()))
-                    && (myActivator.getLastIncluded() == this.getConstraintToInclude())) {
+            if (ConvexSolver.ALGORITHM_ACCURACY.isZero(stepLength) && (this.getConstraintToInclude() == this.getLastExcluded())) {
+                if (this.isLogProgress()) {
+                    this.log("Break cycle on redundant constraints because step length {} on constraint {}", stepLength, this.getConstraintToInclude());
+                }
+                // Break cycle on redundant constraints
                 this.setConstraintToInclude(-1);
+            } else if (stepLength > ZERO) {
+                if (this.isLogProgress()) {
+                    this.log("Performing update with step length {} adding constraint {}", stepLength, this.getConstraintToInclude());
+                }
+                iterX.axpy(stepLength, soluX);
+            } else {
+                if (this.isLogProgress()) {
+                    this.log("Do nothing because step length {} and size {} but add constraint {}", stepLength, normStepX, this.getConstraintToInclude());
+                }
             }
 
             this.setState(State.APPROXIMATE);
 
-        } else if (this.isLogDebug()) {
+        } else {
             // Zero solution
 
             if (this.isLogDebug()) {
@@ -207,24 +213,60 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         if (this.isLogDebug()) {
             this.log("Post iteration");
-            this.log("\tSolution: {}", soluX.copy().asList());
+            this.log("\tSolution: {}", soluX.asList());
             this.log("\tL: {}", this.getSolutionL().asList());
             if ((this.getMatrixAE() != null) && (this.getMatrixAE().count() > 0)) {
                 this.log("\tE-slack: {}", this.getSE().copy().asList());
-                if (!options.feasibility.isZero(this.getSE().aggregateAll(Aggregator.LARGEST).doubleValue())) {
-                    // throw new IllegalStateException("E-slack!");
-                }
             }
-
-            this.log("\tI-slack: {}", mySlackI.copy().asList());
-            if (!options.feasibility.isZero(mySlackI.aggregateAll(Aggregator.LARGEST).doubleValue())) {
-                // throw new IllegalStateException("I-slack!");
+            this.log("\tI-slack: {}", this.getSlackI().asList());
+            if (this.getSlackI().aggregateAll(Aggregator.MINIMUM) < -0.000001) {
+                this.log("Negative slack!");
             }
-
         }
     }
 
+    private final void shrink2() {
+
+        final int[] incl = myActivator.getIncluded();
+        int lastIncluded = myActivator.getLastIncluded();
+
+        AggregatorFunction<Double> aggregator = PrimitiveAggregator.NORM2.get();
+        SparseArray<Double> lastRow = this.getMatrixAI(lastIncluded);
+        lastRow.visitAll(aggregator);
+        double lastNorm = aggregator.doubleValue();
+
+        int toExclude = lastIncluded;
+        double maxWeight = ZERO;
+
+        for (int i = 0; i < incl.length; i++) {
+            aggregator.reset();
+            SparseArray<Double> inclRow = this.getMatrixAI(incl[i]);
+            inclRow.visitAll(aggregator);
+            double inclNorm = aggregator.doubleValue();
+            final double weight = Math.abs(lastRow.dot(inclRow)) / lastNorm / inclNorm;
+            if (weight > maxWeight) {
+                maxWeight = weight;
+                toExclude = incl[i];
+            }
+        }
+        if (this.isLogDebug()) {
+            this.log("Will shrink using {}", toExclude);
+        }
+        this.exclude(toExclude);
+    }
+
+    private boolean myShrinkSwitch = true;
+
     private final void shrink() {
+        if (myShrinkSwitch) {
+            this.shrink1();
+        } else {
+            this.shrink2();
+        }
+        myShrinkSwitch = !myShrinkSwitch;
+    }
+
+    private final void shrink1() {
 
         final int[] incl = myActivator.getIncluded();
 
@@ -254,7 +296,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (this.hasEqualityConstraints()) {
                 final MatrixStore<Double> tmpSE = this.getSE();
                 for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
-                    if (!options.feasibility.isZero(tmpSE.doubleValue(i))) {
+                    if (!ConvexSolver.CHECK_FEASIBILITY.isZero(tmpSE.doubleValue(i))) {
                         retVal = false;
                     }
                 }
@@ -265,7 +307,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final MatrixStore<Double> tmpSI = this.getSlackI();
                 for (int i = 0; retVal && (i < tmpIncluded.length); i++) {
                     final double tmpSlack = tmpSI.doubleValue(tmpIncluded[i]);
-                    if ((tmpSlack < ZERO) && !options.feasibility.isZero(tmpSlack)) {
+                    if ((tmpSlack < ZERO) && !ConvexSolver.CHECK_FEASIBILITY.isZero(tmpSlack)) {
                         retVal = false;
                     }
                 }
@@ -278,7 +320,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             final MatrixStore<Double> tmpSI = this.getSlackI();
             for (int e = 0; retVal && (e < tmpExcluded.length); e++) {
                 final double tmpSlack = tmpSI.doubleValue(tmpExcluded[e]);
-                if ((tmpSlack < ZERO) && !options.feasibility.isZero(tmpSlack)) {
+                if ((tmpSlack < ZERO) && !ConvexSolver.CHECK_FEASIBILITY.isZero(tmpSlack)) {
                     retVal = false;
                 }
             }
@@ -348,6 +390,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
         }
 
+        boolean initWithLP = false;
+
         if (!feasible) {
 
             final Result resultLP = this.solveLP();
@@ -359,7 +403,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final Optional<Access1D<?>> tmpMultipliers = resultLP.getMultipliers();
                 if (tmpMultipliers.isPresent()) {
                     this.getSolutionL().fillMatching(tmpMultipliers.get());
-                    myInitWithLP = true;
+                    initWithLP = true;
                 } else {
                     this.getSolutionL().fillAll(ZERO);
                 }
@@ -370,7 +414,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             this.setState(State.FEASIBLE);
 
-            this.resetActivator();
+            this.resetActivator(initWithLP);
 
         } else {
 
@@ -388,6 +432,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (this.getMatrixAI() != null) {
                 this.log("Initial I-slack: {}", this.getSlackI().copy().asList());
             }
+            if (this.getSlackI().aggregateAll(Aggregator.MINIMUM) < -0.000001) {
+                this.log("Negative slack!");
+            }
+
         }
 
         return this.getState().isFeasible();
@@ -458,7 +506,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 tmpVal = tmpLI.doubleValue(i, 0);
 
-                if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !options.solution.isZero(tmpVal)) {
+                if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !ConvexSolver.NEGATIVE_LAGRANGE.isZero(tmpVal)) {
                     tmpMin = tmpVal;
                     retVal = i;
                     if (this.isLogDebug()) {
@@ -476,12 +524,20 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             tmpVal = tmpLI.doubleValue(tmpIndexOfLast, 0);
 
-            if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !options.solution.isZero(tmpVal)) {
+            if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !ConvexSolver.NEGATIVE_LAGRANGE.isZero(tmpVal)) {
                 tmpMin = tmpVal;
                 retVal = tmpIndexOfLast;
-                if (this.isLogDebug()) {
+                if (this.isLogProgress()) {
                     this.log("Only the last included needs to be excluded: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[retVal]);
                 }
+            }
+        }
+
+        if (this.isLogProgress()) {
+            if (retVal < 0) {
+                this.log("Nothing to exclude");
+            } else {
+                this.log("Suggest to exclude: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[retVal]);
             }
         }
 
@@ -594,9 +650,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         } else {
             this.handleIterationFailure(included);
         }
+
+        if (options.validate && !this.checkFeasibility(false)) {
+            this.log("Problem!");
+        }
     }
 
-    void resetActivator() {
+    void resetActivator(boolean useLagrange) {
 
         myActivator.excludeAll();
 
@@ -604,14 +664,19 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final int numbVars = this.countVariables();
 
         if (this.hasInequalityConstraints()) {
-            final MatrixStore<Double> slack = this.getSlackI();
+            final MatrixStore<Double> inqSlack = this.getSlackI();
             final int[] excl = this.getExcluded();
 
             PrimitiveDenseStore lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
-                if (options.feasibility.isZero(slack.doubleValue(excl[i]))
-                        && (!myInitWithLP || !options.solution.isZero(lagrange.doubleValue(numbEqus + excl[i])))) {
-                    this.include(excl[i]);
+                double slack = inqSlack.doubleValue(excl[i]);
+                if (ConvexSolver.ALGORITHM_ACCURACY.isZero(slack)) {
+                    if (!useLagrange || !ConvexSolver.ALGORITHM_ACCURACY.isZero(lagrange.doubleValue(numbEqus + excl[i]))) {
+                        if (this.isLogDebug()) {
+                            this.log("Will inlcude ineq {} with slack={} L={}", i, slack, lagrange.doubleValue(numbEqus + excl[i]));
+                        }
+                        this.include(excl[i]);
+                    }
                 }
             }
         }
@@ -627,6 +692,37 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     void setConstraintToInclude(final int constraintToInclude) {
         myConstraintToInclude = constraintToInclude;
+    }
+
+    void cleanActivations() {
+
+        final int numbEqus = this.countEqualityConstraints();
+        final int numbVars = this.countVariables();
+
+        if (this.hasInequalityConstraints()) {
+            final MatrixStore<Double> slack = this.getSlackI();
+            final int[] incl = this.getIncluded();
+
+            PrimitiveDenseStore lagrange = this.getSolutionL();
+            for (int i = 0; i < incl.length; i++) {
+                double slac = slack.doubleValue(incl[i]);
+                double lagr = lagrange.doubleValue(numbEqus + incl[i]);
+                if (!ConvexSolver.SLACK_ZERO.isZero(slac) || ((lagr < ZERO) && !ConvexSolver.INCLUDE_CONSTRAINT.isZero(lagr))) {
+                    if (this.isLogDebug()) {
+                        this.log("Will exclude ineq {} with slack={} L={}", i, slac, lagr);
+                    }
+                    this.exclude(incl[i]);
+                }
+            }
+        }
+
+        while (((numbEqus + this.countIncluded()) > numbVars) && (this.countIncluded() > 0)) {
+            this.shrink();
+        }
+
+        if (this.isLogDebug() && ((numbEqus + this.countIncluded()) > numbVars)) {
+            this.log("Redundant contraints!");
+        }
     }
 
 }

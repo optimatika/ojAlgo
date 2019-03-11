@@ -328,6 +328,10 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
         }
     }
 
+    public CalendarDateDuration newDuration(double meassure) {
+        return new CalendarDateDuration(meassure, this);
+    }
+
     public long toDurationInMillis() {
         return myDurationInMillis;
     }

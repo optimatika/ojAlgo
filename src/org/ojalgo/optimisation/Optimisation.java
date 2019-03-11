@@ -217,10 +217,12 @@ public interface Optimisation {
         public NumberContext print = NumberContext.getGeneral(8, 10);
 
         /**
-         * Used when copying the solver's solution back to the model (converting from double to BigDecimal).
-         * Variable values, dual variable values, lagrange multipliers...
+         * Describes the (required/sufficient) accuracy of the solution. It is used when copying the solver's
+         * solution back to the model (converting from double to BigDecimal). Specific solvers may also use
+         * this as a stopping criteria or similar. The default essentially copies the numbers as is –
+         * corresponding to full double precision.
          */
-        public NumberContext solution = new NumberContext(12, 14, RoundingMode.HALF_DOWN);
+        public NumberContext solution = new NumberContext(16, 14, RoundingMode.HALF_DOWN);
 
         /**
          * The maximmum number of millis allowed for the solve() command. Executions will be aborted
@@ -250,7 +252,7 @@ public interface Optimisation {
         }
 
         /**
-         * Will configure detailed dubug logging and validation
+         * Will configure detailed debug logging and validation
          */
         public void debug(final Class<? extends Optimisation.Solver> solver) {
             logger_solver = solver;

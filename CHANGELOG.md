@@ -17,6 +17,7 @@
 * When adding a solver integration to ExpressionsBasedModel it is now possible to differentiate between preferred and fallback solvers - addIntegration() has been replaced with addPreferredSolver() and addFallbackSolver().
 * Fixed a concurrency related problem with the sparse simplex solver.
 * Changed how the linear solver switches between dense and sparse internal storage (makes some model up to 10x faster).
+* Tweaking of ConvexSolver internals – several small changes that in combination makes a big difference on some numerically challenging problems.
 
 ## org.ojalgo.random
 
