@@ -227,7 +227,7 @@ final class IterativeASS extends ActiveSetSolver {
                 final double tmpRelativeError = myS.resolve(this.getSolutionL());
 
                 if (this.isLogDebug()) {
-                    this.log("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(incl));
+                    this.log("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(incl).toRawCopy1D());
                 }
 
                 final ElementsSupplier<Double> tmpRHS = this.getIterationL(incl).premultiply(this.getIterationA().transpose())

@@ -217,6 +217,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 this.log("\tE-slack: {}", this.getSE().copy().asList());
             }
             this.log("\tI-slack: {}", this.getSlackI().asList());
+            if (this.getSlackI().aggregateAll(Aggregator.MINIMUM) < -0.000001) {
+                this.log("Negative slack!");
+            }
         }
     }
 
@@ -386,6 +389,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (this.getMatrixAI() != null) {
                 this.log("Initial I-slack: {}", this.getSlackI().copy().asList());
             }
+            if (this.getSlackI().aggregateAll(Aggregator.MINIMUM) < -0.000001) {
+                this.log("Negative slack!");
+            }
+
         }
 
         return this.getState().isFeasible();
@@ -614,17 +621,19 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final int numbVars = this.countVariables();
 
         if (this.hasInequalityConstraints()) {
-            final MatrixStore<Double> slack = this.getSlackI();
+            final MatrixStore<Double> inqSlack = this.getSlackI();
             final int[] excl = this.getExcluded();
 
             PrimitiveDenseStore lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
-                if (ConvexSolver.SLACK_ZERO.isZero(slack.doubleValue(excl[i]))
-                        && (!useLagrange || !ConvexSolver.INCLUDE_CONSTRAINT.isZero(lagrange.doubleValue(numbEqus + excl[i])))) {
-                    if (this.isLogDebug()) {
-                        this.log("Will inlcude ineq {} with slack={} L={}", i, slack.doubleValue(excl[i]), lagrange.doubleValue(numbEqus + excl[i]));
+                double slack = inqSlack.doubleValue(excl[i]);
+                if (ConvexSolver.ALGORITHM_ACCURACY.isZero(slack)) {
+                    if (!useLagrange || !ConvexSolver.ALGORITHM_ACCURACY.isZero(lagrange.doubleValue(numbEqus + excl[i]))) {
+                        if (this.isLogDebug()) {
+                            this.log("Will inlcude ineq {} with slack={} L={}", i, slack, lagrange.doubleValue(numbEqus + excl[i]));
+                        }
+                        this.include(excl[i]);
                     }
-                    this.include(excl[i]);
                 }
             }
         }
@@ -640,6 +649,37 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     void setConstraintToInclude(final int constraintToInclude) {
         myConstraintToInclude = constraintToInclude;
+    }
+
+    void cleanActivations() {
+
+        final int numbEqus = this.countEqualityConstraints();
+        final int numbVars = this.countVariables();
+
+        if (this.hasInequalityConstraints()) {
+            final MatrixStore<Double> slack = this.getSlackI();
+            final int[] incl = this.getIncluded();
+
+            PrimitiveDenseStore lagrange = this.getSolutionL();
+            for (int i = 0; i < incl.length; i++) {
+                double slac = slack.doubleValue(incl[i]);
+                double lagr = lagrange.doubleValue(numbEqus + incl[i]);
+                if (!ConvexSolver.SLACK_ZERO.isZero(slac) || ((lagr < ZERO) && !ConvexSolver.INCLUDE_CONSTRAINT.isZero(lagr))) {
+                    if (this.isLogDebug()) {
+                        this.log("Will exclude ineq {} with slack={} L={}", i, slac, lagr);
+                    }
+                    this.exclude(incl[i]);
+                }
+            }
+        }
+
+        while (((numbEqus + this.countIncluded()) > numbVars) && (this.countIncluded() > 0)) {
+            this.shrink();
+        }
+
+        if (this.isLogDebug() && ((numbEqus + this.countIncluded()) > numbVars)) {
+            this.log("Redundant contraints!");
+        }
     }
 
 }
