@@ -10,13 +10,13 @@
 
 ## org.ojalgo.optimisation
 
-* Refactoring of the presolvers. Among other things there are now presolvers that perform integer rounding. Previously existing presolvers have also been improved.
+* Refactoring of the presolvers. Among other things there are now presolvers that perform integer rounding. Previously existing presolvers have also been improved. There is also new presolver that removes (obviously) redundant constraints.
 * Modified what happends when you relax an integer model. Now the variables are kept as integer variables, but the model set a flag that it is relaxed. This means the presolvers can now make use of the integer property and thus perform better.
 * The MPS file parser has been modified to not strictly use field index ranges, but instead more freely interpret whitespace as a delimiter. This is in line with commonly used MPS format extensions and allows ojAlgo to correctly parse/use a larger set of models.
 * Major extension and refactoring of optimisation test cases. In particular the test cases in ojAlgo are now available to the various solver integration modules in ojAlgo-extensions.
 * When adding a solver integration to ExpressionsBasedModel it is now possible to differentiate between preferred and fallback solvers - addIntegration() has been replaced with addPreferredSolver() and addFallbackSolver().
 * Fixed a concurrency related problem with the sparse simplex solver.
-* Changed how the linear solver switches between dense and sparse internal storage (makes some model up to 10x faster).
+* There is now an options 'options.sparse' that control if sparse/iterative solvers should e favoured over dense/direct solvers, or not.
 * Tweaking of ConvexSolver internals – several small changes that in combination makes a big difference on some numerically challenging problems.
 
 ## org.ojalgo.random
