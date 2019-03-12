@@ -40,6 +40,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexSolver.AlgorithmStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -867,19 +868,31 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     static final Array1D.Factory<Double> ARRAY1D_FACTORY = Array1D.factory(Primitive64Array.FACTORY);
     static final DenseArray.Factory<Double> DENSE_FACTORY = Primitive64Array.FACTORY;
 
-    protected static SimplexTableau make(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables) {
+    protected static SimplexTableau make(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables,
+            Optimisation.Options options) {
 
         final int numbRows = numberOfConstraints + 2;
         final int numbCols = numberOfProblemVariables + numberOfSlackVariables + numberOfConstraints + 1;
         final int totCount = numbRows * numbCols; //  Total number of elements in a dense tableau
 
-        // Max number of elements in CPU cache
-        long maxCount = OjAlgoUtils.ENVIRONMENT.getCacheElements(JavaType.DOUBLE.memory());
+        if (options.sparse == null) {
 
-        if ((totCount <= maxCount) || (numberOfProblemVariables <= numberOfConstraints)) {
-            return new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
-        } else {
+            // Max number of elements in CPU cache
+            long maxCount = OjAlgoUtils.ENVIRONMENT.getCacheElements(JavaType.DOUBLE.memory());
+
+            if ((totCount <= maxCount) || ((numberOfProblemVariables <= numberOfConstraints) && (totCount <= (2L * maxCount)))) {
+                return new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
+            } else {
+                return new SparseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
+            }
+
+        } else if (options.sparse) {
+
             return new SparseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
+
+        } else {
+
+            return new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
         }
     }
 

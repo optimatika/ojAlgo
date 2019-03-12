@@ -106,7 +106,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         public LinearSolver build(final ConvexSolver.Builder convexBuilder, final Optimisation.Options options) {
 
-            final SimplexTableau tableau = SimplexSolver.build(convexBuilder);
+            final SimplexTableau tableau = SimplexSolver.build(convexBuilder, options);
 
             return new SimplexSolver(tableau, options);
         }
@@ -215,7 +215,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         final int numbVars = convex.countVariables();
 
-        final SimplexTableau tableau = SimplexSolver.build(convex);
+        final SimplexTableau tableau = SimplexSolver.build(convex, options);
 
         final LinearSolver solver = new SimplexSolver(tableau, options);
 
