@@ -121,7 +121,7 @@ public abstract class Presolvers {
      * Calculates the min and max value of this expression based on the variables' individual bounds. Then
      * compares those with the expression's bounds.
      */
-    public static final ExpressionsBasedModel.Presolver REDUNDANT_CONSTRAINT = new ExpressionsBasedModel.Presolver(99) {
+    public static final ExpressionsBasedModel.Presolver REDUNDANT_CONSTRAINT = new ExpressionsBasedModel.Presolver(Integer.MAX_VALUE) {
 
         @Override
         public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
