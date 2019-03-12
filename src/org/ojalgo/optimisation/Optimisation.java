@@ -225,6 +225,19 @@ public interface Optimisation {
         public NumberContext solution = new NumberContext(16, 14, RoundingMode.HALF_DOWN);
 
         /**
+         * Controls if sparse/iterative solvers should be favoured over dense/direct alternatives.
+         * Sparse/iterative alternatives are usually preferable with larger models, but there are also
+         * algorithmical differences that could make one alternative better than the other for a (your)
+         * specific case. There are 3 different possibilities for this option:
+         * <ol>
+         * <li><b>TRUE</b> Will use the sparse linear solver and the iterative convex solver.</li>
+         * <li><b>FALSE</b> Will use the dense linear solver and the direct convex solver.</li>
+         * <li><b>NULL</b> ojAlgo will use some logic to choose for you.</li>
+         * </ol>
+         */
+        public Boolean sparse = null;
+
+        /**
          * The maximmum number of millis allowed for the solve() command. Executions will be aborted
          * regardless of if a solution has been found or not.
          */

@@ -421,7 +421,11 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             this.validate();
 
             if (this.hasInequalityConstraints()) {
-                return new IterativeASS(this, options);
+                if ((options.sparse == null) || options.sparse) {
+                    return new IterativeASS(this, options);
+                } else {
+                    return new DirectASS(this, options);
+                }
             } else if (this.hasEqualityConstraints()) {
                 return new QPESolver(this, options);
             } else {

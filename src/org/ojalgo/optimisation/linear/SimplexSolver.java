@@ -38,6 +38,7 @@ import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.machine.JavaType;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -86,13 +87,13 @@ public final class SimplexSolver extends LinearSolver {
 
     }
 
-    static SimplexTableau build(final ConvexSolver.Builder convex) {
+    static SimplexTableau build(final ConvexSolver.Builder convex, Optimisation.Options options) {
 
         final int numbVars = convex.countVariables();
         final int numbEqus = convex.countEqualityConstraints();
         final int numbInes = convex.countInequalityConstraints();
 
-        final SimplexTableau retVal = SimplexTableau.make(numbEqus + numbInes, numbVars + numbVars, numbInes);
+        final SimplexTableau retVal = SimplexTableau.make(numbEqus + numbInes, numbVars + numbVars, numbInes, options);
 
         final Mutate1D obj = retVal.objective();
 
@@ -168,7 +169,7 @@ public final class SimplexSolver extends LinearSolver {
         final int tmpProblVarCount = tmpPosVariables.size() + tmpNegVariables.size();
         final int tmpSlackVarCount = tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size() + tmpVarsNegLo.size()
                 + tmpVarsNegUp.size();
-        final SimplexTableau retVal = SimplexTableau.make(tmpConstraiCount, tmpProblVarCount, tmpSlackVarCount);
+        final SimplexTableau retVal = SimplexTableau.make(tmpConstraiCount, tmpProblVarCount, tmpSlackVarCount, model.options);
 
         final int tmpPosVarsBaseIndex = 0;
         final int tmpNegVarsBaseIndex = tmpPosVarsBaseIndex + tmpPosVariables.size();
@@ -440,7 +441,7 @@ public final class SimplexSolver extends LinearSolver {
         //        BasicLogger.DEBUG.printmtrx("Sparse", retVal);
         //        BasicLogger.DEBUG.printmtrx("Dense", retVal.toDense());
 
-        if (retVal.getOvercapacity() <= OjAlgoUtils.ENVIRONMENT.getCacheElements(8L)) {
+        if ((model.options.sparse == null) && (retVal.getOvercapacity() <= OjAlgoUtils.ENVIRONMENT.getCacheElements(JavaType.DOUBLE.memory()))) {
             return retVal.toDense();
         } else {
             return retVal;
