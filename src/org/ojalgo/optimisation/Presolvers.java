@@ -118,6 +118,90 @@ public abstract class Presolvers {
     };
 
     /**
+     * Calculates the min and max value of this expression based on the variables' individual bounds. Then
+     * compares those with the expression's bounds.
+     */
+    public static final ExpressionsBasedModel.Presolver REDUNDANT_CONSTRAINT = new ExpressionsBasedModel.Presolver(Integer.MAX_VALUE) {
+
+        @Override
+        public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
+
+            if (expression.isFunctionLinear()) {
+
+                BigDecimal min = BigMath.ZERO;
+                BigDecimal max = BigMath.ZERO;
+
+                for (IntIndex index : remaining) {
+                    Variable variable = expression.resolve(index);
+
+                    BigDecimal coefficient = expression.get(index);
+
+                    if (coefficient.signum() < 0) {
+                        if (max != null) {
+                            if (variable.isLowerLimitSet()) {
+                                max = max.add(coefficient.multiply(variable.getLowerLimit()));
+                            } else {
+                                max = null;
+                            }
+                        }
+                        if (min != null) {
+                            if (variable.isUpperLimitSet()) {
+                                min = min.add(coefficient.multiply(variable.getUpperLimit()));
+                            } else {
+                                min = null;
+                            }
+                        }
+                    } else {
+                        if (max != null) {
+                            if (variable.isUpperLimitSet()) {
+                                max = max.add(coefficient.multiply(variable.getUpperLimit()));
+                            } else {
+                                max = null;
+                            }
+                        }
+                        if (min != null) {
+                            if (variable.isLowerLimitSet()) {
+                                min = min.add(coefficient.multiply(variable.getLowerLimit()));
+                            } else {
+                                min = null;
+                            }
+                        }
+                    }
+                }
+
+                boolean upperRedundant = false;
+                if (upper != null) {
+                    if ((min != null) && (min.compareTo(upper) > 0)) {
+                        expression.setInfeasible();
+                    } else if ((max != null) && (max.compareTo(upper) <= 0)) {
+                        upperRedundant = true;
+                    }
+                } else {
+                    upperRedundant = true;
+                }
+
+                boolean lowerRedundant = false;
+                if (lower != null) {
+                    if ((max != null) && (max.compareTo(lower) < 0)) {
+                        expression.setInfeasible();
+                    } else if ((min != null) && (min.compareTo(lower) >= 0)) {
+                        lowerRedundant = true;
+                    }
+                } else {
+                    lowerRedundant = true;
+                }
+
+                if (lowerRedundant & upperRedundant) {
+                    expression.setRedundant();
+                }
+            }
+
+            return false;
+        }
+
+    };
+
+    /**
      * Checks the sign of the limits and the sign of the expression parameters to deduce variables that in
      * fact can only be zero.
      *

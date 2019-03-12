@@ -427,6 +427,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     static {
         ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
+        ExpressionsBasedModel.addPresolver(Presolvers.REDUNDANT_CONSTRAINT);
     }
 
     public static boolean addFallbackSolver(final Integration<?> integration) {
