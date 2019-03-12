@@ -232,7 +232,7 @@ public interface Optimisation {
          * <ol>
          * <li><b>TRUE</b> Will use the sparse linear solver and the iterative convex solver.</li>
          * <li><b>FALSE</b> Will use the dense linear solver and the direct convex solver.</li>
-         * <li><b>NULL</b> ojAlgo will use some logic to choose for you.</li>
+         * <li><b>NULL</b> ojAlgo will use some logic to choose for you. This is the default.</li>
          * </ol>
          */
         public Boolean sparse = null;
