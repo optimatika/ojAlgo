@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.MathContext;
+import java.util.Arrays;
 
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -224,10 +225,10 @@ final class IterativeASS extends ActiveSetSolver {
             } else {
                 // Actual/normal optimisation problem
 
-                final double tmpRelativeError = myS.resolve(this.getSolutionL());
+                final double relativeError = myS.resolve(this.getSolutionL());
 
                 if (this.isLogDebug()) {
-                    this.log("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(incl).toRawCopy1D());
+                    this.log("Relative error {} in solution for L={}", relativeError, Arrays.toString(this.getIterationL(incl).toRawCopy1D()));
                 }
 
                 final ElementsSupplier<Double> tmpRHS = this.getIterationL(incl).premultiply(this.getIterationA().transpose())

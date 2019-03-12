@@ -463,7 +463,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     static NumberContext FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
     static NumberContext INCLUDE_CONSTRAINT = new NumberContext(12, 14, RoundingMode.HALF_DOWN);
     static NumberContext ITERATION_FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
-    static NumberContext NEGATIVE_LAGRANGE = new NumberContext(12, 8, RoundingMode.HALF_DOWN);
+    static NumberContext NEGATIVE_LAGRANGE = new NumberContext(12, 4, RoundingMode.HALF_DOWN);
     static final double RELATIVELY_SMALL = PrimitiveFunction.SQRT.invoke(MACHINE_EPSILON);
     static NumberContext SLACK_ZERO = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
 

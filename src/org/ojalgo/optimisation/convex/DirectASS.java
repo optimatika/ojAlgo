@@ -39,7 +39,7 @@ import org.ojalgo.optimisation.Optimisation;
  * when [AE][X] == [BE]<br>
  * and [AI][X] &lt;= [BI]
  * </p>
- * Where [AE] and [BE] are optinal.
+ * Where [AE] and [BE] are optional.
  *
  * @author apete
  */
@@ -49,7 +49,6 @@ final class DirectASS extends ActiveSetSolver {
         super(matrices, solverOptions);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void performIteration() {
 
