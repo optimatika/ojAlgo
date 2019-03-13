@@ -45,6 +45,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private int myConstraintToInclude = -1;
     private MatrixStore<Double> myInvQC;
     private final PrimitiveDenseStore myIterationX;
+    private boolean myShrinkSwitch = true;
     private final PrimitiveDenseStore mySlackI;
     private final PrimitiveDenseStore mySolutionL;
 
@@ -129,13 +130,14 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         iterX.modifyMatching(SUBTRACT, soluX);
 
-        if (this.isLogDebug()) {
-            this.log("Current: {}", soluX.asList());
-            this.log("Step: {}", iterX.asList());
-        }
-
         final double normCurrentX = soluX.aggregateAll(Aggregator.LARGEST);
         final double normStepX = iterX.aggregateAll(Aggregator.LARGEST);
+
+        if (this.isLogDebug()) {
+            this.log("Current: {} - {}", normCurrentX, soluX.asList());
+            this.log("Step: {} - {}", normStepX, iterX.asList());
+        }
+
         if (!options.solution.isSmall(normCurrentX, normStepX)
                 && (ConvexSolver.ALGORITHM_ACCURACY.isSmall(ONE, normCurrentX) || !ConvexSolver.ALGORITHM_ACCURACY.isSmall(normStepX, normCurrentX))) {
             // Non-zero && non-freak solution
@@ -175,7 +177,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                             stepLength = fraction;
                             this.setConstraintToInclude(excluded[i]);
                             if (this.isLogDebug()) {
-                                this.log("Best so far: {} @ {} ({}).", stepLength, i, this.getConstraintToInclude());
+                                this.log("Best so far: {} @ {} ({}).", stepLength, i, excluded[i]);
                             }
                         }
                     }
@@ -186,7 +188,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 if (this.isLogProgress()) {
                     this.log("Break cycle on redundant constraints because step length {} on constraint {}", stepLength, this.getConstraintToInclude());
                 }
-                // Break cycle on redundant constraints
                 this.setConstraintToInclude(-1);
             } else if (stepLength > ZERO) {
                 if (this.isLogProgress()) {
@@ -225,7 +226,48 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
     }
 
-    private final void shrink2() {
+    private final void shrink() {
+
+        int toExclude = this.suggestConstraintToExclude();
+
+        if (toExclude < 0) {
+            if (myShrinkSwitch) {
+                toExclude = this.suggestUsingLagrangeMagnitude();
+            } else {
+                toExclude = this.suggestUsingVectorProjection();
+            }
+            myShrinkSwitch = !myShrinkSwitch;
+        }
+
+        if (this.isLogDebug()) {
+            this.log("Will remove {}", toExclude);
+        }
+        this.exclude(toExclude);
+    }
+
+    private final int suggestUsingLagrangeMagnitude() {
+
+        final int[] incl = myActivator.getIncluded();
+
+        final PrimitiveDenseStore soluL = this.getSolutionL();
+        final int numbEqus = this.countEqualityConstraints();
+
+        int toExclude = incl[0];
+        double maxWeight = ZERO;
+
+        for (int i = 0; i < incl.length; i++) {
+            final double value = soluL.doubleValue(numbEqus + incl[i]);
+            final double weight = PrimitiveFunction.ABS.invoke(value) * PrimitiveFunction.MAX.invoke(-value, ONE);
+            if (weight > maxWeight) {
+                maxWeight = weight;
+                toExclude = incl[i];
+            }
+        }
+
+        return toExclude;
+    }
+
+    private final int suggestUsingVectorProjection() {
 
         final int[] incl = myActivator.getIncluded();
         int lastIncluded = myActivator.getLastIncluded();
@@ -237,7 +279,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         int toExclude = lastIncluded;
         double maxWeight = ZERO;
-
+        // The weight is the absolute value of the cosine of the angle between the vectors (the constraint rows).
         for (int i = 0; i < incl.length; i++) {
             aggregator.reset();
             SparseArray<Double> inclRow = this.getMatrixAI(incl[i]);
@@ -249,42 +291,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 toExclude = incl[i];
             }
         }
-        if (this.isLogDebug()) {
-            this.log("Will shrink using {}", toExclude);
-        }
-        this.exclude(toExclude);
-    }
 
-    private boolean myShrinkSwitch = true;
-
-    private final void shrink() {
-        if (myShrinkSwitch) {
-            this.shrink1();
-        } else {
-            this.shrink2();
-        }
-        myShrinkSwitch = !myShrinkSwitch;
-    }
-
-    private final void shrink1() {
-
-        final int[] incl = myActivator.getIncluded();
-
-        final PrimitiveDenseStore soluL = this.getSolutionL();
-        final int numbEqus = this.countEqualityConstraints();
-
-        int toExclude = incl[0];
-        double maxWeight = ZERO;
-
-        for (int i = 0; i < incl.length; i++) {
-            final double tmpValue = soluL.doubleValue(numbEqus + incl[i]);
-            final double tmpWeight = PrimitiveFunction.ABS.invoke(tmpValue) * PrimitiveFunction.MAX.invoke(-tmpValue, ONE);
-            if (tmpWeight > maxWeight) {
-                maxWeight = tmpWeight;
-                toExclude = incl[i];
-            }
-        }
-        this.exclude(toExclude);
+        return toExclude;
     }
 
     protected boolean checkFeasibility(final boolean onlyExcluded) {
@@ -446,7 +454,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         if (this.isLogDebug()) {
             this.log("\nNeedsAnotherIteration?");
-            this.log(myActivator.toString());
         }
 
         int toInclude = -1;
@@ -554,6 +561,37 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     protected String toActivatorString() {
         return myActivator.toString();
+    }
+
+    void cleanActivations() {
+
+        final int numbEqus = this.countEqualityConstraints();
+        final int numbVars = this.countVariables();
+
+        if (this.hasInequalityConstraints()) {
+            final MatrixStore<Double> slack = this.getSlackI();
+            final int[] incl = this.getIncluded();
+
+            PrimitiveDenseStore lagrange = this.getSolutionL();
+            for (int i = 0; i < incl.length; i++) {
+                double slac = slack.doubleValue(incl[i]);
+                double lagr = lagrange.doubleValue(numbEqus + incl[i]);
+                if (!ConvexSolver.SLACK_ZERO.isZero(slac) || ((lagr < ZERO) && !ConvexSolver.INCLUDE_CONSTRAINT.isZero(lagr))) {
+                    if (this.isLogDebug()) {
+                        this.log("Will exclude ineq {} with slack={} L={}", i, slac, lagr);
+                    }
+                    this.exclude(incl[i]);
+                }
+            }
+        }
+
+        while (((numbEqus + this.countIncluded()) > numbVars) && (this.countIncluded() > 0)) {
+            this.shrink();
+        }
+
+        if (this.isLogDebug() && ((numbEqus + this.countIncluded()) > numbVars)) {
+            this.log("Redundant contraints!");
+        }
     }
 
     @Override
@@ -692,37 +730,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     void setConstraintToInclude(final int constraintToInclude) {
         myConstraintToInclude = constraintToInclude;
-    }
-
-    void cleanActivations() {
-
-        final int numbEqus = this.countEqualityConstraints();
-        final int numbVars = this.countVariables();
-
-        if (this.hasInequalityConstraints()) {
-            final MatrixStore<Double> slack = this.getSlackI();
-            final int[] incl = this.getIncluded();
-
-            PrimitiveDenseStore lagrange = this.getSolutionL();
-            for (int i = 0; i < incl.length; i++) {
-                double slac = slack.doubleValue(incl[i]);
-                double lagr = lagrange.doubleValue(numbEqus + incl[i]);
-                if (!ConvexSolver.SLACK_ZERO.isZero(slac) || ((lagr < ZERO) && !ConvexSolver.INCLUDE_CONSTRAINT.isZero(lagr))) {
-                    if (this.isLogDebug()) {
-                        this.log("Will exclude ineq {} with slack={} L={}", i, slac, lagr);
-                    }
-                    this.exclude(incl[i]);
-                }
-            }
-        }
-
-        while (((numbEqus + this.countIncluded()) > numbVars) && (this.countIncluded() > 0)) {
-            this.shrink();
-        }
-
-        if (this.isLogDebug() && ((numbEqus + this.countIncluded()) > numbVars)) {
-            this.log("Redundant contraints!");
-        }
     }
 
 }
