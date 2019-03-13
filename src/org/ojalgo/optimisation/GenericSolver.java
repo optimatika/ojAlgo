@@ -114,7 +114,11 @@ public abstract class GenericSolver implements Optimisation.Solver {
      * iteration is completed.
      */
     protected final int incrementIterationsCount() {
-        return myIterationsCount.incrementAndGet();
+        int iterationsDone = myIterationsCount.incrementAndGet();
+        if (this.isLogProgress() && ((iterationsDone % 1000) == 0)) {
+            this.log("Done {} iterations in {}.", iterationsDone, this.getClass().getSimpleName());
+        }
+        return iterationsDone;
     }
 
     /**
