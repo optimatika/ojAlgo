@@ -92,6 +92,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             } else {
                 // Patch Q
 
+                if (this.isLogProgress()) {
+                    this.log("Q problem!");
+                }
+
                 final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
                 final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
                 final double largest = PrimitiveFunction.MAX.invoke(largestInQ, largestInC);
