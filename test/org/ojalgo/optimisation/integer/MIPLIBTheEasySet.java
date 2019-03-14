@@ -18,9 +18,9 @@ import org.ojalgo.optimisation.ModelFileMPS;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Problems/models from "The Easy Set" - instances that could be solved within less than 1h (by top tier
- * native code solvers on modern powerful hardware). https://miplib.zib.de/set_easy.html Here we limit the set
- * to instances with <=100 variables and constraints that are not infeasible. Problems that CPLEX can't solve
+ * Problems/models from "The Easy Set" - instances that can be solved in less than 1h (by top tier native code
+ * solvers on modern powerful hardware). https://miplib.zib.de/set_easy.html Here we limit the set further to
+ * instances with <=100 variables and constraints that are not infeasible. Problems that CPLEX can't solve
  * within about a minute are also removed from the set. That left 6 problem instances.
  *
  * @author apete
