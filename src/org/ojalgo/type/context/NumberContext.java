@@ -410,24 +410,44 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         return NumberContext.isZero(value, myZeroError);
     }
 
+    /**
+     * @deprecated v48 Use {@link #withFormat(NumberStyle,Locale)} instead
+     */
+    @Deprecated
     public NumberContext newFormat(final NumberStyle style, final Locale locale) {
-        return new NumberContext(style.getFormat(locale));
+        return this.withFormat(style, locale);
     }
 
+    /**
+     * @deprecated v48 Use {@link #withMathContext(MathContext)} instead
+     */
+    @Deprecated
     public NumberContext newMathContext(final MathContext context) {
-        return new NumberContext(this.format(), context.getPrecision(), this.getScale(), context.getRoundingMode());
+        return this.withMathContext(context);
     }
 
+    /**
+     * @deprecated v48 Use {@link #withPrecision(int)} instead
+     */
+    @Deprecated
     public NumberContext newPrecision(final int precision) {
-        return new NumberContext(this.format(), precision, this.getScale(), this.getRoundingMode());
+        return this.withPrecision(precision);
     }
 
+    /**
+     * @deprecated v48 Use {@link #withRoundingMode(RoundingMode)} instead
+     */
+    @Deprecated
     public NumberContext newRoundingMode(final RoundingMode mode) {
-        return new NumberContext(this.format(), this.getPrecision(), this.getScale(), mode);
+        return this.withRoundingMode(mode);
     }
 
+    /**
+     * @deprecated v48 Use {@link #withScale(int)} instead
+     */
+    @Deprecated
     public NumberContext newScale(final int scale) {
-        return new NumberContext(this.format(), this.getPrecision(), scale, this.getRoundingMode());
+        return this.withScale(scale);
     }
 
     /**
@@ -479,11 +499,39 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         return this.getClass().getSimpleName() + " " + myMathContext.getPrecision() + ":" + myScale + " " + myMathContext.getRoundingMode().toString();
     }
 
+    public NumberContext withFormat(final NumberStyle style, final Locale locale) {
+        return new NumberContext(style.getFormat(locale));
+    }
+
+    public NumberContext withMathContext(final MathContext context) {
+        return new NumberContext(this.format(), context.getPrecision(), this.getScale(), context.getRoundingMode());
+    }
+
+    public NumberContext withoutPrecision() {
+        return new NumberContext(this.format(), 0, this.getScale(), this.getRoundingMode());
+    }
+
+    public NumberContext withoutScale() {
+        return new NumberContext(this.format(), this.getPrecision(), DEFAULT_SCALE, this.getRoundingMode());
+    }
+
+    public NumberContext withPrecision(final int precision) {
+        return new NumberContext(this.format(), precision, this.getScale(), this.getRoundingMode());
+    }
+
+    public NumberContext withRoundingMode(final RoundingMode mode) {
+        return new NumberContext(this.format(), this.getPrecision(), this.getScale(), mode);
+    }
+
+    public NumberContext withScale(final int scale) {
+        return new NumberContext(this.format(), this.getPrecision(), scale, this.getRoundingMode());
+    }
+
     private BigDecimal scale(final BigDecimal number) {
 
         BigDecimal retVal = number;
 
-        if (myScale > Integer.MIN_VALUE) {
+        if (myScale > DEFAULT_SCALE) {
             retVal = retVal.setScale(myScale, myMathContext.getRoundingMode());
             retVal = retVal.stripTrailingZeros();
         }

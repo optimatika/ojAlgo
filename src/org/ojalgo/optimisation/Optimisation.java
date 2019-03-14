@@ -31,6 +31,7 @@ import org.ojalgo.array.BigArray;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -206,7 +207,7 @@ public interface Optimisation {
          * The MIP gap is the difference between the best integer solution found so far and a node's
          * non-integer solution. The relative MIP gap is that difference divided by the optimal value
          * (approximated by the currently best integer solution). If the gap (absolute or relative) is smaller
-         * than this value, then the corresponding branch i terminated as it is deemed unlikely or too
+         * than this value, then the corresponding branch is terminated as it is deemed unlikely or too
          * "expensive" to find better integer solutions there.
          */
         public double mip_gap = 1.0E-4;
@@ -241,7 +242,7 @@ public interface Optimisation {
          * The maximmum number of millis allowed for the solve() command. Executions will be aborted
          * regardless of if a solution has been found or not.
          */
-        public long time_abort = CalendarDateUnit.MILLENIUM.toDurationInMillis();
+        public long time_abort = CalendarDateUnit.DAY.toDurationInMillis();
 
         /**
          * Calculations will be terminated after this amount of time if a feasible solution has been found. If
@@ -249,7 +250,7 @@ public interface Optimisation {
          * {@linkplain #time_abort} is reached. This option is , probably, only of interest with the
          * {@linkplain IntegerSolver}.
          */
-        public long time_suffice = CalendarDateUnit.DAY.toDurationInMillis();
+        public long time_suffice = CalendarDateUnit.HOUR.toDurationInMillis();
 
         /**
          * If true models and solvers will validate data at various points. Validation is turned off by
@@ -262,6 +263,12 @@ public interface Optimisation {
 
         public Options() {
             super();
+        }
+
+        public Options abort(CalendarDateDuration duration) {
+            ProgrammingError.throwIfNull(duration);
+            time_abort = duration.toDurationInMillis();
+            return this;
         }
 
         /**
@@ -297,6 +304,12 @@ public interface Optimisation {
         public void setConfigurator(final Object configurator) {
             ProgrammingError.throwIfNull(configurator);
             myConfigurator = configurator;
+        }
+
+        public Options suffice(CalendarDateDuration duration) {
+            ProgrammingError.throwIfNull(duration);
+            time_suffice = duration.toDurationInMillis();
+            return this;
         }
 
     }

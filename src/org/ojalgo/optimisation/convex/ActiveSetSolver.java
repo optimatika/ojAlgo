@@ -204,8 +204,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 }
             }
 
-            this.setState(State.APPROXIMATE);
-
         } else {
             // Zero solution
 
@@ -468,7 +466,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 this.log("Suggested to include: {}", toInclude);
             }
             myActivator.include(toInclude);
-            this.setState(State.APPROXIMATE);
             return true;
         } else {
             if ((toExclude = this.suggestConstraintToExclude()) >= 0) {
@@ -476,7 +473,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     this.log("Suggested to exclude: {}", toExclude);
                 }
                 this.exclude(toExclude);
-                this.setState(State.APPROXIMATE);
                 return true;
             } else {
                 if (this.isLogDebug()) {

@@ -50,7 +50,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class ExtremeElementsCase {
 
-    static final NumberContext PRECISION = new NumberContext().newPrecision(12).newScale(148);
+    static final NumberContext PRECISION = new NumberContext().withPrecision(12).withScale(148);
 
     private static void performInvertTest(final PrimitiveDenseStore original, final InverterTask<Double> task, final NumberContext context) {
 

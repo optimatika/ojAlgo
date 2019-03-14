@@ -38,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class SimpleQRCase extends BasicMatrixTest {
 
-    private static final NumberContext DEFINITION = NumberContext.getGeneral(9).newScale(18);
+    private static final NumberContext DEFINITION = NumberContext.getGeneral(9).withScale(18);
 
     public static RationalMatrix getOriginal() {
         final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0 }, { 2.0, 3.0 }, { 2.0, 1.0 } });
@@ -60,7 +60,7 @@ public class SimpleQRCase extends BasicMatrixTest {
     @BeforeEach
     public void setUp() {
 
-        evaluation = evaluation.newScale(9).newPrecision(15);
+        evaluation = evaluation.withScale(9).withPrecision(15);
 
         rationalAA = SimpleQRCase.getFactorQ();
         rationalAX = SimpleQRCase.getFactorR();

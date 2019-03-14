@@ -63,7 +63,7 @@ public class P20061119Case extends BasicMatrixTest {
     @BeforeEach
     public void setUp() {
 
-        evaluation = NumberContext.getGeneral(8).newPrecision(14);
+        evaluation = NumberContext.getGeneral(8).withPrecision(14);
 
         rationalAA = P20061119Case.getProblematic();
         rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);

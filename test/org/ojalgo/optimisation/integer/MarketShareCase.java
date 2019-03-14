@@ -176,7 +176,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
 
         TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), tmpModel.options.feasibility);
 
-        final NumberContext tmpContext = tmpModel.options.solution.newScale(13);
+        final NumberContext tmpContext = tmpModel.options.solution.withScale(13);
         for (final Variable tmpVariable : tmpModel.getVariables()) {
             final String tmpName = tmpVariable.getName();
             final double tmpExpected = SOLUTION.get(tmpName).doubleValue();

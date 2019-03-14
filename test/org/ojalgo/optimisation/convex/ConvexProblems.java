@@ -183,7 +183,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         //        tmpModel.options.validate = false;
         final Result tmpActualResult = tmpModel.minimise();
 
-        final NumberContext tmpAccuracy = StandardType.PERCENT.newPrecision(5);
+        final NumberContext tmpAccuracy = StandardType.PERCENT.withPrecision(5);
 
         TestUtils.assertTrue(tmpModel.validate(Array1D.BIG.copy(expected), tmpAccuracy));
         TestUtils.assertTrue(tmpModel.validate(tmpActualResult, tmpAccuracy));

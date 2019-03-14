@@ -51,7 +51,7 @@ public class P20071019Case extends BasicMatrixTest {
     @BeforeEach
     public void setUp() {
 
-        evaluation = evaluation.newPrecision(14);
+        evaluation = evaluation.withPrecision(14);
 
         rationalAA = P20071019Case.getFatProblematic().multiply(P20071019Case.getTallProblematic()).enforce(DEFINITION);
         rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
