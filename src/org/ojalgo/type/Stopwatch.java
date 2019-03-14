@@ -56,6 +56,38 @@ public class Stopwatch {
         myStart = System.nanoTime();
     }
 
+    public long countMillis() {
+        return this.countNanos() / CalendarDate.NANOS_PER_MILLIS;
+    }
+
+    public long countNanos() {
+        return System.nanoTime() - myStart;
+    }
+
+    public boolean isLessThan(CalendarDateDuration duration) {
+        return this.isLessThanNanos(duration.toDurationInNanos());
+    }
+
+    public boolean isLessThanMillis(long millis) {
+        return this.isLessThanNanos(millis * CalendarDate.NANOS_PER_MILLIS);
+    }
+
+    public boolean isLessThanNanos(long nanos) {
+        return this.countNanos() < nanos;
+    }
+
+    public boolean isMoreThan(CalendarDateDuration duration) {
+        return this.isMoreThanNanos(duration.toDurationInNanos());
+    }
+
+    public boolean isMoreThanMillis(long millis) {
+        return this.isMoreThanNanos(millis * CalendarDate.NANOS_PER_MILLIS);
+    }
+
+    public boolean isMoreThanNanos(long nanos) {
+        return this.countNanos() > nanos;
+    }
+
     /**
      * Reset the start-instant
      */
@@ -69,7 +101,7 @@ public class Stopwatch {
      * @return The duration since instantiation or reset.
      */
     public CalendarDateDuration stop() {
-        return CalendarDateDuration.of(System.nanoTime() - myStart);
+        return CalendarDateDuration.of(this.countNanos());
     }
 
     public CalendarDateDuration stop(final CalendarDateUnit unit) {

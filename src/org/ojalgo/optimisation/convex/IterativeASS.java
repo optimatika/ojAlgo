@@ -70,7 +70,7 @@ final class IterativeASS extends ActiveSetSolver {
             //this.getDelegate().setRelaxationFactor(1.5);
 
             // ConjugateGradient
-            this.setAccuracyContext(NumberContext.getMath(MathContext.DECIMAL64).newPrecision(9));
+            this.setAccuracyContext(NumberContext.getMath(MathContext.DECIMAL64).withPrecision(9));
 
             myIterationRows = new Equation[(int) myFullDim];
 

@@ -68,7 +68,7 @@ public class P20050827Case extends BasicMatrixTest {
     @BeforeEach
     public void setUp() {
 
-        evaluation = NumberContext.getGeneral(6).newPrecision(12);
+        evaluation = NumberContext.getGeneral(6).withPrecision(12);
 
         rationalAA = RationalMatrix.FACTORY.copy(P20050827Case.getProblematic());
         rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);

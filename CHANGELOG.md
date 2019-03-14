@@ -18,6 +18,7 @@
 * Fixed a concurrency related problem with the sparse simplex solver.
 * There is now an options 'options.sparse' that control if sparse/iterative solvers should be favoured over dense/direct solvers, or not.
 * Tweaking of ConvexSolver internals – several small changes that in combination makes a big difference on some numerically challenging problems.
+* Fixed a bug in ConvexSolver (ActiveSetSolver) that caused the `suffice` stopping conditions to not be considered since the state was set to APPROXIMATE raher than FEASIBLE.
 
 ## org.ojalgo.random
 
@@ -25,6 +26,10 @@
 * Partial implementation of Student's TDistribution
 * Deprecated the RandomUtils class and moved its various methods to classes in the new org.ojalgo.function.special package.
 * For continuous distributions the getProbability methods has been renamed getDensity.
+
+## org.ojalgo.type
+
+* Additions to Stopwatch that make it easier to compare with time limits in various forms.
 
 # v47.0.0: 2018-12-16
 

@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
+import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,6 +30,8 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.type.Stopwatch;
+import org.ojalgo.type.context.NumberContext;
 
 public abstract class GenericSolver implements Optimisation.Solver {
 
@@ -55,11 +58,13 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     }
 
+    protected static final NumberContext ACCURACY = new NumberContext(12, 14, RoundingMode.HALF_EVEN);
+
     public final Optimisation.Options options;
 
     private final AtomicInteger myIterationsCount = new AtomicInteger(0);
-    private long myResetTime;
     private State myState = State.UNEXPLORED;
+    private final Stopwatch myStopwatch = new Stopwatch();
 
     @SuppressWarnings("unused")
     private GenericSolver() {
@@ -91,7 +96,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
     }
 
     protected final long countTime() {
-        return System.currentTimeMillis() - myResetTime;
+        return myStopwatch.countMillis();
     }
 
     protected final void error(final String messagePattern, final Object... arguments) {
@@ -144,17 +149,17 @@ public abstract class GenericSolver implements Optimisation.Solver {
     }
 
     /**
-     * Cursory progress logging (at least)
-     */
-    protected final boolean isLogProgress() {
-        return (options.logger_appender != null) && (options.logger_solver.isAssignableFrom(this.getClass()));
-    }
-
-    /**
      * No logging
      */
     protected final boolean isLogOff() {
         return (options.logger_appender == null) || (!options.logger_solver.isAssignableFrom(this.getClass()));
+    }
+
+    /**
+     * Cursory progress logging (at least)
+     */
+    protected final boolean isLogProgress() {
+        return (options.logger_appender != null) && (options.logger_solver.isAssignableFrom(this.getClass()));
     }
 
     protected final void log(final String descripttion, final Access2D<?> matrix) {
@@ -171,7 +176,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     protected final void resetIterationsCount() {
         myIterationsCount.set(0);
-        myResetTime = System.currentTimeMillis();
+        myStopwatch.reset();
     }
 
     /**

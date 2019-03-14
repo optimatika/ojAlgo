@@ -42,7 +42,7 @@ public class TestJama {
 
     private static Cholesky<Double> CHOLESKY = new RawCholesky();
     private static Eigenvalue<Double> EIGENVALUE = new RawEigenvalue.Dynamic();
-    private static NumberContext EVAL_CNTXT = NumberContext.getGeneral(8).newPrecision(15);
+    private static NumberContext EVAL_CNTXT = NumberContext.getGeneral(8).withPrecision(15);
     private static LU<Double> LU = new RawLU();
     private static QR<Double> QR = new RawQR();
     private static SingularValue<Double> SINGULAR_VALUE = new RawSingularValue();
