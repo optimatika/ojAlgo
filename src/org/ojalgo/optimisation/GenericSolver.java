@@ -30,6 +30,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.Stopwatch;
 import org.ojalgo.type.context.NumberContext;
 
@@ -121,7 +122,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
     protected final int incrementIterationsCount() {
         int iterationsDone = myIterationsCount.incrementAndGet();
         if (this.isLogProgress() && ((iterationsDone % 1000) == 0)) {
-            this.log("Done {} iterations in {}.", iterationsDone, this.getClass().getSimpleName());
+            this.log("Done {} {} iterations after {}.", iterationsDone, this.getClass().getSimpleName(), myStopwatch.stop(CalendarDateUnit.SECOND));
         }
         return iterationsDone;
     }
