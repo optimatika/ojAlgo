@@ -96,7 +96,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
+public final class ExpressionsBasedModel extends AbstractModel {
 
     public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<ExpressionsBasedModel, S> {
 
