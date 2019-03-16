@@ -42,7 +42,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class MathProgSysModel extends AbstractModel<GenericSolver> {
+public final class MathProgSysModel {
 
     /**
      * BoundType used with the BOUNDS section.
@@ -430,18 +430,16 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
     private String myIdRHS = null;
     private boolean myIntegerMarker = false;
     private String myName;
+
     private final Map<String, Row> myRows = new HashMap<>();
 
     MathProgSysModel() {
 
         super();
 
-        myDelegate = new ExpressionsBasedModel(options);
-
-        this.setMinimisation();
+        myDelegate = new ExpressionsBasedModel();
     }
 
-    @Override
     public void dispose() {
         myDelegate.dispose();
         myRows.clear();
@@ -516,10 +514,10 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
      * </p>
      */
     public Optimisation.Result solve() {
-        if (this.isMaximisation()) {
-            return myDelegate.maximise();
-        } else {
+        if (myDelegate.isMinimisation()) {
             return myDelegate.minimise();
+        } else {
+            return myDelegate.maximise();
         }
     }
 
@@ -628,9 +626,9 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         case OBJSENSE:
 
             if (line.contains(MAX)) {
-                this.setMaximisation();
+                myDelegate.setMaximisation();
             } else {
-                this.setMinimisation();
+                myDelegate.setMinimisation();
             }
 
             break;
