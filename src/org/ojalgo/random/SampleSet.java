@@ -33,6 +33,16 @@ import org.ojalgo.type.context.NumberContext;
 
 public final class SampleSet implements Access1D<Double> {
 
+    /**
+     * @param sumOfValues The sum of all values in a sample set
+     * @param sumOfSquaredValues The sum of all squared values, in a sample set
+     * @param numberOfValues The number of values in the sample set
+     * @return The sample set's variance
+     */
+    public static double calculateVariance(final double sumOfValues, final double sumOfSquaredValues, final int numberOfValues) {
+        return ((numberOfValues * sumOfSquaredValues) - (sumOfValues * sumOfValues)) / (numberOfValues * (numberOfValues - 1));
+    }
+
     public static SampleSet make() {
         return new SampleSet(Primitive64Array.make(4));
     }
@@ -51,6 +61,10 @@ public final class SampleSet implements Access1D<Double> {
 
     public static SampleSet wrap(final Access1D<?> someSamples) {
         return new SampleSet(someSamples);
+    }
+
+    public static SampleSet wrap(final double[] someSamples) {
+        return SampleSet.wrap(Access1D.wrap(someSamples));
     }
 
     private transient double myMax = NaN;
@@ -468,16 +482,6 @@ public final class SampleSet implements Access1D<Double> {
         }
 
         return mySortedCopy;
-    }
-
-    /**
-     * @param sumOfValues The sum of all values in a sample set
-     * @param sumOfSquaredValues The sum of all squared values, in a sample set
-     * @param numberOfValues The number of values in the sample set
-     * @return The sample set's variance
-     */
-    public static double calculateVariance(final double sumOfValues, final double sumOfSquaredValues, final int numberOfValues) {
-        return ((numberOfValues * sumOfSquaredValues) - (sumOfValues * sumOfValues)) / (numberOfValues * (numberOfValues - 1));
     }
 
 }
