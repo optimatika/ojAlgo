@@ -114,6 +114,11 @@ public class RowView<N extends Number> implements Access1D<N>, Iterable<RowView<
         return StreamSupport.stream(this, parallel);
     }
 
+    @Override
+    public final String toString() {
+        return Access1D.toString(this);
+    }
+
     public boolean tryAdvance(Consumer<? super RowView<N>> action) {
         if (this.hasNext()) {
             action.accept(this.next());

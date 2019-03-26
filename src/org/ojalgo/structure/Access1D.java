@@ -222,6 +222,11 @@ public interface Access1D<N extends Number> extends Structure1D {
                 return access.doubleValue(index);
             }
 
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
+            }
+
         };
     }
 
@@ -261,6 +266,26 @@ public interface Access1D<N extends Number> extends Structure1D {
         return retVal;
     }
 
+    static String toString(Access1D<?> access) {
+        int size = access.size();
+        switch (size) {
+        case 0:
+            return "{ }";
+        case 1:
+            return "{ " + access.get(0) + " }";
+        default:
+            StringBuilder builder = new StringBuilder();
+            builder.append("{ ");
+            builder.append(access.get(0));
+            for (int i = 1; i < size; i++) {
+                builder.append(", ");
+                builder.append(access.get(i));
+            }
+            builder.append(" }");
+            return builder.toString();
+        }
+    }
+
     static Access1D<Double> wrap(final double[] target) {
         return new Access1D<Double>() {
 
@@ -274,6 +299,11 @@ public interface Access1D<N extends Number> extends Structure1D {
 
             public Double get(final long index) {
                 return target[(int) index];
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
             }
 
         };
@@ -294,6 +324,11 @@ public interface Access1D<N extends Number> extends Structure1D {
                 return target.get((int) index);
             }
 
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
+            }
+
         };
     }
 
@@ -310,6 +345,11 @@ public interface Access1D<N extends Number> extends Structure1D {
 
             public N get(final long index) {
                 return target[(int) index];
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
             }
 
         };

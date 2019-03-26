@@ -235,6 +235,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
                 return this.doubleValue(index);
             }
 
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
+            }
+
         });
 
         retVal.multipliers(result.getMultipliers().get());

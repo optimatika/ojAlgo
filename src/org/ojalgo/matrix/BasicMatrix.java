@@ -709,7 +709,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return Access2D.toString(this);
     }
 

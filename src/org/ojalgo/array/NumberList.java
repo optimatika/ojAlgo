@@ -413,6 +413,11 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         return array;
     }
 
+    @Override
+    public String toString() {
+        return Access1D.toString(this);
+    }
+
     public void visitOne(final long index, final VoidFunction<N> visitor) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();

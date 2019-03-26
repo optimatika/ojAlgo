@@ -271,6 +271,11 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     return -tmpSliceRange.doubleValue(index);
                 }
 
+                @Override
+                public String toString() {
+                    return Access1D.toString(this);
+                }
+
             };
         }
 
@@ -704,6 +709,11 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     return -tmpSliceRange.doubleValue(index);
                 }
 
+                @Override
+                public String toString() {
+                    return Access1D.toString(this);
+                }
+
             };
         }
 
@@ -722,6 +732,11 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
                     public Double get(final long index) {
                         return myRows[(int) index].get(col);
+                    }
+
+                    @Override
+                    public String toString() {
+                        return Access1D.toString(this);
                     }
 
                 };
