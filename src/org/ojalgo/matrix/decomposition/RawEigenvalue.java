@@ -85,7 +85,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         @Override
         protected boolean doDecompose(final double[][] data, final boolean valuesOnly) {
 
-            if (this.checkSymmetry()) {
+            if (this.isHermitian()) {
                 this.doSymmetric(data, valuesOnly);
             } else {
                 this.doGeneral(data, valuesOnly);

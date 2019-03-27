@@ -128,19 +128,17 @@ public final class SampleSet implements Access1D<Double> {
 
         double retVal = ZERO;
 
-        final double tmpThisMean = this.getMean();
-        final double tmpThatMean = anotherSampleSet.getMean();
+        final double thisMean = this.getMean();
+        final double thatMean = anotherSampleSet.getMean();
 
-        final long tmpLimit = Math.min(mySamples.count(), anotherSampleSet.count());
+        final long limit = Math.min(mySamples.count(), anotherSampleSet.count());
 
-        final Access1D<?> tmpValues = anotherSampleSet.getSamples();
-
-        for (long i = 0L; i < tmpLimit; i++) {
-            retVal += (mySamples.doubleValue(i) - tmpThisMean) * (tmpValues.doubleValue(i) - tmpThatMean);
+        final Access1D<?> otherValues = anotherSampleSet.getSamples();
+        for (long i = 0L; i < limit; i++) {
+            retVal += (mySamples.doubleValue(i) - thisMean) * (otherValues.doubleValue(i) - thatMean);
         }
 
-        retVal /= (tmpLimit - 1L);
-
+        retVal /= (limit - 1L);
         return retVal;
     }
 
