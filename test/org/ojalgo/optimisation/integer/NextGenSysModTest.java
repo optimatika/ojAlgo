@@ -23,6 +23,7 @@ package org.ojalgo.optimisation.integer;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -1289,6 +1290,78 @@ public class NextGenSysModTest {
         TestUtils.assertEquals(Access1D.wrap(expected), actual, accuracy);
     }
 
+    static Optimisation.Result buildAndSolveSequentially(CaseData data) {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.options.solution = SOLUTION_ACCURACY;
+
+        int numberOfAssets = data.numberOfAssets();
+
+        double[] returnVctr = data.getReturnVctr();
+        double[] marginVctr = data.getMarginVctr();
+        double[] betaVctr = data.getBetaVctr();
+
+        SampleSet marginSamples = SampleSet.wrap(marginVctr);
+        SampleSet betaSamples = SampleSet.wrap(betaVctr);
+
+        double marginLimit = marginSamples.getQuartile1();
+        double betaLimit = betaSamples.getQuartile3();
+
+        Expression marginExpr = model.addExpression("Margin").lower(marginLimit);
+        Expression betaExpr = model.addExpression("Beta").upper(betaLimit);
+        Expression totalExpr = model.addExpression("100%").level(BigMath.ONE);
+
+        for (int j = 0; j < numberOfAssets; j++) {
+
+            Variable weightVar = model.addVariable("X" + j).weight(returnVctr[j]).lower(BigMath.ZERO).upper(BigMath.HALF);
+
+            marginExpr.set(weightVar, marginVctr[j]);
+            betaExpr.set(weightVar, betaVctr[j]);
+            totalExpr.set(weightVar, BigMath.ONE);
+        }
+
+        Optimisation.Result linRes = model.maximise();
+        if (!linRes.getState().isFeasible()) {
+            return linRes;
+        }
+
+        Expression varianceExpr = model.addExpression("Variance").weight(BigFunction.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
+        for (int j = 0; j < numberOfAssets; j++) {
+            for (int i = 0; i < numberOfAssets; i++) {
+                varianceExpr.set(i, j, data.getCovariance(i, j));
+            }
+        }
+
+        Optimisation.Result quadRes = model.maximise();
+        if (!quadRes.getState().isFeasible()) {
+            // This should not happen, but if it does return the linear solution since it was atleast feasible
+            return linRes;
+        }
+
+        Expression budgetExpr = model.addExpression("Budget").upper(Math.toIntExact(Math.round(Math.sqrt(numberOfAssets))));
+        for (int j = 0; j < numberOfAssets; j++) {
+
+            Variable weightVar = model.getVariable(j);
+
+            if (weightVar.getValue().compareTo(BigMath.ZERO) == 0) {
+
+                weightVar.level(BigMath.ZERO);
+
+            } else {
+
+                Variable activationVar = model.addVariable(weightVar.getName() + "_Activator").binary();
+
+                budgetExpr.set(activationVar, BigMath.ONE);
+
+                model.addExpression("Trigger_" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigDecimal.valueOf(-0.05))
+                        .lower(BigMath.ZERO);
+                model.addExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
+            }
+        }
+
+        return model.maximise();
+    }
+
     static ExpressionsBasedModel buildModel(CaseData data) {
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel();
@@ -1372,6 +1445,11 @@ public class NextGenSysModTest {
     }
 
     protected void doTest(CaseData testCase) {
+
+        Result seq = NextGenSysModTest.buildAndSolveSequentially(testCase);
+
+        BasicLogger.debug(Arrays.toString(testCase.getOptimisationSolution()));
+        BasicLogger.debug(seq);
 
         ExpressionsBasedModel model = NextGenSysModTest.buildModel(testCase);
 
