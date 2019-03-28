@@ -8,6 +8,10 @@
 
 * New package org.ojalgo.function.special with currently 3 new classes: CombinatorialFunctions, ErrorFunction and GammaFunction.
 
+## org.ojalgo.matrix
+
+* Fixed a problem with one of the Eigenvalue implementations - it would check for symmetric/hermitian but then failed to make use of the results.
+
 ## org.ojalgo.optimisation
 
 * Refactoring of the presolvers. Among other things there are now presolvers that perform integer rounding. Previously existing presolvers have also been improved. There is also a new presolver that removes (obviously) redundant constraints.
