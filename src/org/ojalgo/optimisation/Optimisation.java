@@ -26,7 +26,6 @@ import java.math.RoundingMode;
 import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
@@ -430,7 +429,7 @@ public interface Optimisation {
 
         @Override
         public String toString() {
-            return myState + " " + myValue + " @ " + Array1D.PRIMITIVE64.copy(mySolution);
+            return myState + " " + myValue + " @ " + Access1D.toString(mySolution);
         }
 
     }

@@ -668,7 +668,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     @Override
     public String toString() {
-        return myDelegate.toString();
+        return Access2D.toString(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

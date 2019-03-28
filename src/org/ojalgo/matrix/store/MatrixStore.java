@@ -826,6 +826,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
                 return MatrixStore.this.get(row + index, col);
             }
 
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
+            }
+
         };
     }
 
@@ -842,6 +847,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
             public N get(final long index) {
                 return MatrixStore.this.get(row + index, col + index);
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
             }
 
         };
@@ -862,6 +872,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
                 return MatrixStore.this.get(first + index);
             }
 
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
+            }
+
         };
     }
 
@@ -878,6 +893,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
             public N get(final long index) {
                 return MatrixStore.this.get(row, col + index);
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
             }
 
         };

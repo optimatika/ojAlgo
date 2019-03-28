@@ -23,8 +23,6 @@ package org.ojalgo.series.primitive;
 
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.util.Arrays;
-
 import org.ojalgo.array.Array1D;
 import org.ojalgo.structure.Access1D;
 
@@ -167,8 +165,8 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
     }
 
     @Override
-    public String toString() {
-        return "PrimitiveSeries [values()=" + Arrays.toString(this.values()) + "]";
+    public final String toString() {
+        return Access1D.toString(this);
     }
 
     public abstract double value(final int index);

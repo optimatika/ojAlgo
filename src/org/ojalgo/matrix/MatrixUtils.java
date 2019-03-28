@@ -326,6 +326,11 @@ public abstract class MatrixUtils {
                 return (int) matrix.count();
             }
 
+            @Override
+            public final String toString() {
+                return Access2D.toString(this);
+            }
+
         };
     }
 

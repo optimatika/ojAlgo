@@ -21,14 +21,44 @@
  */
 package org.ojalgo.series.primitive;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.series.BasicSeries;
 
 public class CoordinatedSet<K extends Comparable<? super K>> {
+
+    public static final class Builder<K extends Comparable<? super K>> {
+
+        private final List<Supplier<BasicSeries<K, ?>>> mySuppliers = new ArrayList<>();
+
+        public CoordinatedSet.Builder<K> add(Supplier<BasicSeries<K, ?>> supplier) {
+            mySuppliers.add(supplier);
+            return this;
+        }
+
+        public CoordinatedSet<K> build() {
+
+            List<BasicSeries<K, ?>> uncoordinated = new ArrayList<>();
+
+            for (Supplier<BasicSeries<K, ?>> supplier : mySuppliers) {
+                uncoordinated.add(supplier.get());
+            }
+
+            return CoordinatedSet.from(uncoordinated);
+        }
+    }
+
+    public static <K extends Comparable<? super K>> CoordinatedSet.Builder<K> builder() {
+        return new CoordinatedSet.Builder<K>();
+    }
 
     @SuppressWarnings("unchecked")
     public static <K extends Comparable<? super K>> CoordinatedSet<K> from(BasicSeries<K, ?>... uncoordinated) {
@@ -93,6 +123,18 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
 
     public K getLastKey() {
         return myLastKey;
+    }
+
+    public MatrixStore<Double> getSamples() {
+        return PrimitiveDenseStore.FACTORY.columns(myCoordinated);
+    }
+
+    public MatrixStore<Double> getSamples(UnaryOperator<PrimitiveSeries> operator) {
+        PrimitiveSeries[] operated = new PrimitiveSeries[myCoordinated.length];
+        for (int i = 0; i < operated.length; i++) {
+            operated[i] = operator.apply(myCoordinated[i]);
+        }
+        return PrimitiveDenseStore.FACTORY.columns(operated);
     }
 
     public PrimitiveSeries getSeries(int index) {

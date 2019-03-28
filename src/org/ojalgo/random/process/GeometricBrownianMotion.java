@@ -31,8 +31,14 @@ import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access1D;
 
 /**
- * Diffusion process defined by a stochastic differential equation: dX = r X dt + s X dW A stochastic process
- * is said to follow a geometric Brownian motion if it satisfies this stochastic differential equation.
+ * Diffusion process defined by a stochastic differential equation:
+ *
+ * <pre>
+ * dX = r X dt + s X dW
+ * </pre>
+ *
+ * A stochastic process is said to follow a geometric Brownian motion if it satisfies this stochastic
+ * differential equation.
  *
  * @author apete
  */
@@ -47,15 +53,15 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
      */
     public static GeometricBrownianMotion estimate(final Access1D<?> seriesOfSamples, final double samplePeriod) {
 
-        final int tmpSizeMinusOne = (int) (seriesOfSamples.count() - 1);
-        final Array1D<Double> tmpLogDiffSeries = Array1D.PRIMITIVE64.makeZero(tmpSizeMinusOne);
-        for (int i = 0; i < tmpSizeMinusOne; i++) {
-            tmpLogDiffSeries.set(i, PrimitiveFunction.LOG.invoke(seriesOfSamples.doubleValue(i + 1) / seriesOfSamples.doubleValue(i)));
+        final int sizeMinusOne = seriesOfSamples.size() - 1;
+        final Array1D<Double> logDiffSeries = Array1D.PRIMITIVE64.makeZero(sizeMinusOne);
+        for (int i = 0; i < sizeMinusOne; i++) {
+            logDiffSeries.set(i, PrimitiveFunction.LOG.invoke(seriesOfSamples.doubleValue(i + 1) / seriesOfSamples.doubleValue(i)));
         }
-        final SampleSet tmpSampleSet = SampleSet.wrap(tmpLogDiffSeries);
+        final SampleSet sampleSet = SampleSet.wrap(logDiffSeries);
 
-        final double tmpExp = tmpSampleSet.getMean();
-        final double tmpVar = tmpSampleSet.getVariance();
+        final double tmpExp = sampleSet.getMean();
+        final double tmpVar = sampleSet.getVariance();
 
         final double tmpDiff = PrimitiveFunction.SQRT.invoke(tmpVar / samplePeriod);
         final double tmpDrift = (tmpExp / samplePeriod) + ((tmpDiff * tmpDiff) / TWO);

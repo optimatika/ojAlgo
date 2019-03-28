@@ -115,6 +115,11 @@ public class ColumnView<N extends Number>
         return StreamSupport.stream(this, parallel);
     }
 
+    @Override
+    public final String toString() {
+        return Access1D.toString(this);
+    }
+
     public boolean tryAdvance(Consumer<? super ColumnView<N>> action) {
         if (this.hasNext()) {
             action.accept(this.next());

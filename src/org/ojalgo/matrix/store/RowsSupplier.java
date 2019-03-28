@@ -101,6 +101,11 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
         }
     }
 
+    @Override
+    public final String toString() {
+        return Access2D.toString(this);
+    }
+
     SparseArray<N> addRow(final SparseArray<N> rowToAdd) {
         if (myRows.add(rowToAdd)) {
             return rowToAdd;

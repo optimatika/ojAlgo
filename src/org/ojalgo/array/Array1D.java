@@ -605,6 +605,11 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return this.sliceRange(first, limit);
     }
 
+    @Override
+    public String toString() {
+        return Access1D.toString(this);
+    }
+
     public void visitAll(final VoidFunction<N> visitor) {
         myDelegate.visit(myFirst, myLimit, myStep, visitor);
     }

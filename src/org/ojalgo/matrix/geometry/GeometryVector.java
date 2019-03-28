@@ -89,4 +89,9 @@ abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> im
         this.set((int) row, value.doubleValue());
     }
 
+    @Override
+    public final String toString() {
+        return Access1D.toString(this);
+    }
+
 }

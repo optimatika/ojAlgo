@@ -66,21 +66,4 @@ final class HouseholderColumn<N extends Number> extends ColumnView<N> implements
         myFirst = (int) row;
     }
 
-    @Override
-    public String toString() {
-
-        final StringBuilder retVal = new StringBuilder("{ ");
-
-        final int tmpLastIndex = (int) this.count() - 1;
-        for (int i = 0; i < tmpLastIndex; i++) {
-            retVal.append(this.get(i));
-            retVal.append(", ");
-        }
-        retVal.append(this.get(tmpLastIndex));
-
-        retVal.append(" }");
-
-        return retVal.toString();
-    }
-
 }

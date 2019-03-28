@@ -87,8 +87,8 @@ abstract class DiagonalAccess<N extends Number, D extends Access1D<N> & Mutate1D
     }
 
     @Override
-    public String toString() {
-        return "DiagonalAccess [mainDiagonal=" + mainDiagonal + ", subdiagonal=" + subdiagonal + ", superdiagonal=" + superdiagonal + "]";
+    public final String toString() {
+        return Access2D.toString(this);
     }
 
     int getDimension() {

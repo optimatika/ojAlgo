@@ -113,6 +113,11 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterable<Matri
         ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
+    @Override
+    public final String toString() {
+        return Access2D.toString(this);
+    }
+
     protected void setIndex(final long matrix) {
         myOffset = matrix * myCount;
     }
