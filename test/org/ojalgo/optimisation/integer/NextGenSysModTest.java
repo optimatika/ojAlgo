@@ -1127,7 +1127,7 @@ public class NextGenSysModTest {
 
     }
 
-    static abstract class CaseData {
+    public static abstract class CaseData {
 
         private final double[][] myCovarianceMtrx;
         private final double[][] myDataSetMtrx;
@@ -1290,12 +1290,12 @@ public class NextGenSysModTest {
         TestUtils.assertEquals(Access1D.wrap(expected), actual, accuracy);
     }
 
-    static Optimisation.Result buildAndSolveSequentially(CaseData data) {
+    public static Optimisation.Result buildAndSolveSequentially(CaseData data) {
+
+        int numberOfAssets = data.numberOfAssets();
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
         model.options.solution = SOLUTION_ACCURACY;
-
-        int numberOfAssets = data.numberOfAssets();
 
         double[] returnVctr = data.getReturnVctr();
         double[] marginVctr = data.getMarginVctr();
