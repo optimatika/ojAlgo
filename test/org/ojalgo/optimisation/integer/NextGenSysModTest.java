@@ -23,20 +23,12 @@ package org.ojalgo.optimisation.integer;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
-import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.PrimitiveMatrix;
-import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -45,7 +37,6 @@ import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 public class NextGenSysModTest {
@@ -1188,85 +1179,6 @@ public class NextGenSysModTest {
             return myCovarianceMtrx.length;
         }
 
-        public PrimitiveMatrix toCorrelations() {
-
-            // re-implementation of a method from FinanceUtils
-
-            Access2D<Double> covariances = Access2D.wrap(this.getCovarianceMtrx());
-
-            final int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
-
-            MatrixStore<Double> covarianceMtrx = MatrixStore.PRIMITIVE.makeWrapper(covariances).get();
-
-            final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(covarianceMtrx, true);
-            tmpEvD.decompose(covarianceMtrx);
-
-            final MatrixStore<Double> tmpV = tmpEvD.getV();
-            final PhysicalStore<Double> tmpD = tmpEvD.getD().copy();
-
-            final double largest = tmpEvD.getEigenvalues().get(0).norm();
-            final double limit = largest * size * PrimitiveFunction.SQRT.invoke(PrimitiveMath.MACHINE_EPSILON);
-
-            for (int ij = 0; ij < size; ij++) {
-                if (tmpD.doubleValue(ij, ij) < limit) {
-                    tmpD.set(ij, ij, limit);
-                }
-            }
-
-            final MatrixStore<Double> tmpLeft = tmpV;
-            final MatrixStore<Double> tmpMiddle = tmpD;
-            final MatrixStore<Double> tmpRight = tmpLeft.transpose();
-
-            covarianceMtrx = tmpLeft.multiply(tmpMiddle).multiply(tmpRight);
-
-            final PrimitiveMatrix.DenseReceiver retVal = PrimitiveMatrix.FACTORY.makeDense(size, size);
-
-            final double[] tmpVolatilities = new double[size];
-            for (int ij = 0; ij < size; ij++) {
-                tmpVolatilities[ij] = PrimitiveFunction.SQRT.invoke(covarianceMtrx.doubleValue(ij, ij));
-            }
-
-            for (int j = 0; j < size; j++) {
-                final double tmpColVol = tmpVolatilities[j];
-                retVal.set(j, j, PrimitiveMath.ONE);
-                for (int i = j + 1; i < size; i++) {
-                    final double tmpCovariance = covarianceMtrx.doubleValue(i, j);
-                    final double tmpCorrelation = tmpCovariance / (tmpVolatilities[i] * tmpColVol);
-                    retVal.set(i, j, tmpCorrelation);
-                    retVal.set(j, i, tmpCorrelation);
-                }
-            }
-
-            return retVal.get();
-        }
-
-        public PrimitiveMatrix toVolatilities() {
-
-            // re-implementation of a method from FinanceUtils
-
-            Access2D<Double> covariances = Access2D.wrap(this.getCovarianceMtrx());
-
-            final int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
-
-            final PrimitiveMatrix.DenseReceiver retVal = PrimitiveMatrix.FACTORY.makeDense(size);
-
-            MatrixStore<Double> covarianceMtrx = MatrixStore.PRIMITIVE.makeWrapper(covariances).get();
-
-            double largest = covarianceMtrx.aggregateDiagonal(Aggregator.LARGEST);
-            double limit = largest * size * PrimitiveFunction.SQRT.invoke(PrimitiveMath.MACHINE_EPSILON);
-
-            for (int ij = 0; ij < size; ij++) {
-                final double variance = covariances.doubleValue(ij, ij);
-                if (variance < limit) {
-                    retVal.set(ij, PrimitiveFunction.SQRT.invoke(limit));
-                } else {
-                    retVal.set(ij, PrimitiveFunction.SQRT.invoke(variance));
-                }
-            }
-
-            return retVal.get();
-        }
-
     }
 
     public static final Case010A CASE_010A = new Case010A();
@@ -1290,7 +1202,7 @@ public class NextGenSysModTest {
         TestUtils.assertEquals(Access1D.wrap(expected), actual, accuracy);
     }
 
-    public static Optimisation.Result buildAndSolveSequentially(CaseData data) {
+    public static Optimisation.Result solveSequentially(CaseData data) {
 
         int numberOfAssets = data.numberOfAssets();
 
@@ -1446,14 +1358,17 @@ public class NextGenSysModTest {
 
     protected void doTest(CaseData testCase) {
 
-        Result seq = NextGenSysModTest.buildAndSolveSequentially(testCase);
-
-        BasicLogger.debug(Arrays.toString(testCase.getOptimisationSolution()));
-        BasicLogger.debug(seq);
+        Result estimate = NextGenSysModTest.solveSequentially(testCase);
+        if (OptimisationIntegerTests.DEBUG) {
+            BasicLogger.debug("Estimate: {}", estimate);
+        }
 
         ExpressionsBasedModel model = NextGenSysModTest.buildModel(testCase);
 
         Result result = model.maximise();
+        if (OptimisationIntegerTests.DEBUG) {
+            BasicLogger.debug("Result: {}", result);
+        }
 
         NextGenSysModTest.assertSolution(model, testCase.getOptimisationSolution(), result, VALIDATION_ACCURACY);
     }
