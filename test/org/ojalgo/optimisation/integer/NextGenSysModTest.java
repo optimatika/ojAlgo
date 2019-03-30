@@ -66,8 +66,8 @@ public class NextGenSysModTest {
                         0.024499027467744947, 0.011543351051513556, 0.011662166620020871, 0.07551465164636477 } };
         public static final double[][] dataSetMtrx = { { 0.05, 0.05, 0.07, 0.04, 0.09, 0.04, 0.14, 0.05, 0.05, 0.11 },
                 { 0.08, 0.62, 0.64, 0.2, 0.35, 0.1, 0.71, 0.38, 0.49, 0.35 }, { 1.04, 1.13, 1.12, 1.1, 0.98, 0.91, 1.88, 0.31, 0.17, 1.03 } };
-        public static final double[] optimisationSolution = { 0.0, 0.0, 0.0, 0.0, 0.17527123922235188, 0.32472876077764795, 0.0, 0.0, 0.5000000000000001, 0.0,
-                -0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, -0.0, 1.0, 0.0 };
+        public static final double[] optimisationSolution = { 0.0, 0.0, 0.0, 0.0, 0.1752712392223518, 0.324728760777648, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0,
+                1.0, 1.0, 0.0, 0.0, 1.0, 0.0 };
 
         Case010A() {
             super(covarianceMtrx, dataSetMtrx, optimisationSolution);
@@ -161,8 +161,8 @@ public class NextGenSysModTest {
                 { 0.05, 0.05, 0.07, 0.04, 0.09, 0.04, 0.14, 0.05, 0.05, 0.11, 0.09, 0.12, 0.06, 0.1, 0.05, 0.05, 0.11, 0.11, 0.06, 0.09 },
                 { 0.08, 0.62, 0.64, 0.2, 0.35, 0.1, 0.71, 0.38, 0.49, 0.35, 0.5, 0.33, 0.55, 0.48, 0.04, 0.19, 0.58, 0.55, 0.67, 0.63 },
                 { 1.04, 1.13, 1.12, 1.1, 0.98, 0.91, 1.88, 0.31, 0.17, 1.03, 0.78, 1.43, 0.71, 0.61, 0.87, 0.69, 0.88, 0.82, 1.21, 1.69 } };
-        public static final double[] optimisationSolution = { 0.0, 0.0, 0.0, 0.0, 0.1586426015089988, 0.0, 0.0, 0.0, 0.38265285466215904, 0.0, 0.0, 0.0, 0.0,
-                0.12046798151975485, 0.3382365623090873, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.0, 0.0, -0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -0.0, 0.0, 0.0, 1.0, 1.0,
+        public static final double[] optimisationSolution = { 0.0, 0.0, 0.0, 0.0, 0.15864260150899884, 0.0, 0.0, 0.0, 0.38265285466215915, 0.0, 0.0, 0.0, 0.0,
+                0.12046798151975475, 0.3382365623090873, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0,
                 0.0, 0.0, 0.0, 0.0, 0.0 };
 
         Case020A() {
@@ -332,9 +332,9 @@ public class NextGenSysModTest {
                         0.21, 0.7, 0.21, 0.38, 0.37, 0.83 },
                 { 1.11, 1.48, 1.66, 0.64, 1.75, 0.85, 0.09, 2.11, 1.38, 0.91, 1.27, 1.11, 0.0, 1.2, 0.85, 0.23, 0.8, 1.23, 1.77, 1.57, 1.14, 1.67, 0.19, 0.91,
                         0.47, 0.62, 0.43, 0.74, 1.44, 2.32 } };
-        public static final double[] optimisationSolution = { 0.0, 0.12062536654195671, 0.0, 0.0, 0.0, 0.0, 0.0, 0.43968731672902156, 0.0, 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.4396873167290217, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-                0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+        public static final double[] optimisationSolution = { 0.0, 0.12062708652718095, 0.0, 0.0, 0.0, 0.0, 0.0, 0.43968645673640950, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.43968645673640950, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
         Case030B() {
             super(covarianceMtrx, dataSetMtrx, optimisationSolution);
@@ -632,10 +632,10 @@ public class NextGenSysModTest {
                         0.65, 0.55, 0.31, 0.57, 0.02, 0.03, 0.25, 0.23, 0.24, 0.26, 0.07, 0.55, 0.44, 0.22, 0.5, 0.31 },
                 { 1.04, 1.13, 1.12, 1.1, 1.24, 0.98, 0.91, 1.88, 0.31, 0.17, 1.03, 0.78, 1.43, 0.71, 0.61, 0.87, 0.69, 1.6, 0.88, 0.82, 1.21, 1.56, 1.69, 1.42,
                         1.21, 1.89, 0.95, 0.93, 1.37, 0.85, 0.87, 1.81, 1.48, 0.92, 0.62, 0.72, 1.36, 0.25, 1.12, 1.45 } };
-        public static final double[] optimisationSolution = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.45812189175179713, 0.0, 0.0, 0.0, 0.0, 0.0,
-                0.2976785213579259, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06713826405116388, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.07963317741696738,
-                0.0, 0.0974281454221456, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 };
+        public static final double[] optimisationSolution = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.45812725759818357, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.29767030499290004, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.06713941593467697, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.07963530212652209,
+                0.0, 0.09742771934771734, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 };
 
         Case040B() {
             super(covarianceMtrx, dataSetMtrx, optimisationSolution);
@@ -1106,9 +1106,9 @@ public class NextGenSysModTest {
                 { 1.04, 1.13, 1.12, 1.1, 1.24, 0.98, 0.91, 1.88, 0.31, 0.17, 1.03, 0.78, 1.43, 0.71, 0.61, 0.87, 0.69, 1.6, 0.88, 0.82, 1.21, 1.56, 1.69, 1.42,
                         1.21, 1.89, 0.95, 0.93, 1.37, 0.85, 0.87, 1.81, 1.48, 0.92, 0.62, 0.72, 1.36, 0.25, 1.12, 1.45, 1.12, 0.94, 1.79, 1.67, 1.46, 0.82,
                         0.22, 1.69, 1.32, 1.25 } };
-        public static final double[] optimisationSolution = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.27927395085568707, 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, 0.0537583184497918, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.05, 0.0, 0.05, 0.0, 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, 0.0, 0.0, 0.06696773069452111, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+        public static final double[] optimisationSolution = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.27927998649368463, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.05376189760925540, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.05, 0.0, 0.05, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.06695811589705995, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 1.0, 0.0, 0.0, 0.0 };
 
@@ -1202,6 +1202,58 @@ public class NextGenSysModTest {
         TestUtils.assertEquals(Access1D.wrap(expected), actual, accuracy);
     }
 
+    public static ExpressionsBasedModel buildModel(CaseData data) {
+
+        ExpressionsBasedModel retVal = new ExpressionsBasedModel();
+
+        int numberOfAssets = data.numberOfAssets();
+
+        double[] returnVctr = data.getReturnVctr();
+        double[] marginVctr = data.getMarginVctr();
+        double[] betaVctr = data.getBetaVctr();
+
+        SampleSet marginSamples = SampleSet.wrap(marginVctr);
+        SampleSet betaSamples = SampleSet.wrap(betaVctr);
+
+        double marginLimit = marginSamples.getQuartile1();
+        double betaLimit = betaSamples.getQuartile3();
+
+        Expression marginExpr = retVal.addExpression("Margin").lower(marginLimit);
+        Expression betaExpr = retVal.addExpression("Beta").upper(betaLimit);
+        Expression totalExpr = retVal.addExpression("100%").level(BigMath.ONE);
+        Expression budgetExpr = retVal.addExpression("Budget").upper(Math.toIntExact(Math.round(Math.sqrt(numberOfAssets))));
+        Expression varianceExpr = retVal.addExpression("Variance").weight(BigFunction.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
+
+        for (int j = 0; j < numberOfAssets; j++) {
+
+            Variable weightVar = retVal.addVariable("X" + j).weight(returnVctr[j]).lower(BigMath.ZERO).upper(BigMath.HALF);
+
+            marginExpr.set(weightVar, marginVctr[j]);
+            betaExpr.set(weightVar, betaVctr[j]);
+            totalExpr.set(weightVar, BigMath.ONE);
+
+            for (int i = 0; i < numberOfAssets; i++) {
+                varianceExpr.set(i, j, data.getCovariance(i, j));
+            }
+        }
+
+        for (int j = 0; j < numberOfAssets; j++) {
+
+            Variable weightVar = retVal.getVariable(j);
+            Variable activationVar = retVal.addVariable(weightVar.getName() + "_Activator").binary();
+
+            budgetExpr.set(activationVar, BigMath.ONE);
+
+            retVal.addExpression("Trigger_" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigDecimal.valueOf(-0.05))
+                    .lower(BigMath.ZERO);
+            retVal.addExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
+        }
+
+        retVal.options.solution = SOLUTION_ACCURACY;
+
+        return retVal;
+    }
+
     public static Optimisation.Result solveSequentially(CaseData data) {
 
         int numberOfAssets = data.numberOfAssets();
@@ -1274,58 +1326,6 @@ public class NextGenSysModTest {
         return model.maximise();
     }
 
-    static ExpressionsBasedModel buildModel(CaseData data) {
-
-        ExpressionsBasedModel retVal = new ExpressionsBasedModel();
-
-        int numberOfAssets = data.numberOfAssets();
-
-        double[] returnVctr = data.getReturnVctr();
-        double[] marginVctr = data.getMarginVctr();
-        double[] betaVctr = data.getBetaVctr();
-
-        SampleSet marginSamples = SampleSet.wrap(marginVctr);
-        SampleSet betaSamples = SampleSet.wrap(betaVctr);
-
-        double marginLimit = marginSamples.getQuartile1();
-        double betaLimit = betaSamples.getQuartile3();
-
-        Expression marginExpr = retVal.addExpression("Margin").lower(marginLimit);
-        Expression betaExpr = retVal.addExpression("Beta").upper(betaLimit);
-        Expression totalExpr = retVal.addExpression("100%").level(BigMath.ONE);
-        Expression budgetExpr = retVal.addExpression("Budget").upper(Math.toIntExact(Math.round(Math.sqrt(numberOfAssets))));
-        Expression varianceExpr = retVal.addExpression("Variance").weight(BigFunction.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
-
-        for (int j = 0; j < numberOfAssets; j++) {
-
-            Variable weightVar = retVal.addVariable("X" + j).weight(returnVctr[j]).lower(BigMath.ZERO).upper(BigMath.HALF);
-
-            marginExpr.set(weightVar, marginVctr[j]);
-            betaExpr.set(weightVar, betaVctr[j]);
-            totalExpr.set(weightVar, BigMath.ONE);
-
-            for (int i = 0; i < numberOfAssets; i++) {
-                varianceExpr.set(i, j, data.getCovariance(i, j));
-            }
-        }
-
-        for (int j = 0; j < numberOfAssets; j++) {
-
-            Variable weightVar = retVal.getVariable(j);
-            Variable activationVar = retVal.addVariable(weightVar.getName() + "_Activator").binary();
-
-            budgetExpr.set(activationVar, BigMath.ONE);
-
-            retVal.addExpression("Trigger_" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigDecimal.valueOf(-0.05))
-                    .lower(BigMath.ZERO);
-            retVal.addExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
-        }
-
-        retVal.options.solution = SOLUTION_ACCURACY;
-
-        return retVal;
-    }
-
     @Test
     public void testCase010A() {
         this.doTest(CASE_010A);
@@ -1344,15 +1344,12 @@ public class NextGenSysModTest {
     @Test
     @Tag("unstable")
     public void testCase040B() {
-        // Quickly returns the wrong solution
         this.doTest(CASE_040B);
     }
 
     @Test
-    @Tag("slow")
     @Tag("unstable")
     public void testCase050B() {
-        // Gets stuck, and takes forever
         this.doTest(CASE_050B);
     }
 
@@ -1367,10 +1364,13 @@ public class NextGenSysModTest {
 
         Result result = model.maximise();
         if (OptimisationIntegerTests.DEBUG) {
-            BasicLogger.debug("Result: {}", result);
+            BasicLogger.debug("  Result: {}", result);
         }
 
         NextGenSysModTest.assertSolution(model, testCase.getOptimisationSolution(), result, VALIDATION_ACCURACY);
+
+        double error = Math.abs((estimate.getValue() - result.getValue()) / result.getValue());
+        TestUtils.assertTrue(error < 0.1);
     }
 
 }
