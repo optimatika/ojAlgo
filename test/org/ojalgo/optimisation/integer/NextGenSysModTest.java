@@ -40,7 +40,6 @@ import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
-@Tag("unstable")
 public class NextGenSysModTest {
 
     public static final class Case010A extends CaseData {
@@ -1350,49 +1349,81 @@ public class NextGenSysModTest {
     }
 
     @Test
-    public void testCase010A() {
-        this.doTest(CASE_010A);
+    public void testAllInOneCase010A() {
+        this.doTestAllInOne(CASE_010A);
     }
 
     @Test
-    public void testCase020A() {
-        this.doTest(CASE_020A);
+    @Tag("unstable")
+    public void testAllInOneCase020A() {
+        this.doTestAllInOne(CASE_020A);
     }
 
     @Test
-    public void testCase030B() {
-        this.doTest(CASE_030B);
+    @Tag("unstable")
+    public void testAllInOneCase030B() {
+        this.doTestAllInOne(CASE_030B);
     }
 
     @Test
-    public void testCase040B() {
-        this.doTest(CASE_040B);
+    @Tag("unstable")
+    public void testAllInOneCase040B() {
+        this.doTestAllInOne(CASE_040B);
     }
 
     @Test
-    public void testCase050B() {
-        this.doTest(CASE_050B);
+    @Tag("unstable")
+    public void testAllInOneCase050B() {
+        this.doTestAllInOne(CASE_050B);
     }
 
-    protected void doTest(CaseData testCase) {
+    @Test
+    public void testSequentialCase010A() {
+        this.doTestSequential(CASE_010A);
+    }
 
-        Result estimate = NextGenSysModTest.solveSequentially(testCase);
-        if (OptimisationIntegerTests.DEBUG) {
-            BasicLogger.debug("Estimate: {}", estimate);
-        }
-        TestUtils.assertTrue(estimate.getValue() >= (testCase.getEstimatedValue() - (10 * PrimitiveMath.MACHINE_EPSILON)));
+    @Test
+    public void testSequentialCase020A() {
+        this.doTestSequential(CASE_020A);
+    }
+
+    @Test
+    public void testSequentialCase030B() {
+        this.doTestSequential(CASE_030B);
+    }
+
+    @Test
+    public void testSequentialCase040B() {
+        this.doTestSequential(CASE_040B);
+    }
+
+    @Test
+    public void testSequentialCase050B() {
+        this.doTestSequential(CASE_050B);
+    }
+
+    protected void doTestAllInOne(CaseData testCase) {
 
         ExpressionsBasedModel model = NextGenSysModTest.buildModel(testCase);
 
         Result result = model.maximise();
+
         if (OptimisationIntegerTests.DEBUG) {
             BasicLogger.debug("  Result: {}", result);
         }
 
         NextGenSysModTest.assertSolution(model, testCase.getOptimisationSolution(), result, VALIDATION_ACCURACY);
+    }
 
-        double error = Math.abs((estimate.getValue() - result.getValue()) / result.getValue());
-        TestUtils.assertTrue(error < 0.1);
+    protected void doTestSequential(CaseData testCase) {
+
+        Result estimate = NextGenSysModTest.solveSequentially(testCase);
+
+        if (OptimisationIntegerTests.DEBUG) {
+            BasicLogger.debug("Estimate: {}", estimate);
+        }
+
+        TestUtils.assertTrue(estimate.getValue() >= (testCase.getEstimatedValue() - (10 * PrimitiveMath.MACHINE_EPSILON)));
     }
 
 }
