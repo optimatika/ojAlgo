@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.BigMath;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
@@ -71,7 +72,7 @@ public class NextGenSysModTest {
                 1.0, 1.0, 0.0, 0.0, 1.0, 0.0 };
 
         Case010A() {
-            super(covarianceMtrx, dataSetMtrx, optimisationSolution);
+            super(covarianceMtrx, dataSetMtrx, optimisationSolution, -0.5805630399168837, -0.5805630399168837);
         }
 
     }
@@ -167,7 +168,7 @@ public class NextGenSysModTest {
                 0.0, 0.0, 0.0, 0.0, 0.0 };
 
         Case020A() {
-            super(covarianceMtrx, dataSetMtrx, optimisationSolution);
+            super(covarianceMtrx, dataSetMtrx, optimisationSolution, -0.37262238039708406, -0.37262238039708406);
         }
 
     }
@@ -338,7 +339,7 @@ public class NextGenSysModTest {
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
         Case030B() {
-            super(covarianceMtrx, dataSetMtrx, optimisationSolution);
+            super(covarianceMtrx, dataSetMtrx, optimisationSolution, 0.18148166043548658, 0.18148166043548658);
         }
 
     }
@@ -639,7 +640,7 @@ public class NextGenSysModTest {
                 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 };
 
         Case040B() {
-            super(covarianceMtrx, dataSetMtrx, optimisationSolution);
+            super(covarianceMtrx, dataSetMtrx, optimisationSolution, -0.046208831442687004, -0.046208831442687010);
         }
 
     }
@@ -1114,7 +1115,7 @@ public class NextGenSysModTest {
                 0.0, 1.0, 0.0, 0.0, 0.0 };
 
         Case050B() {
-            super(covarianceMtrx, dataSetMtrx, optimisationSolution);
+            super(covarianceMtrx, dataSetMtrx, optimisationSolution, -0.009423725847017339, -0.008263637132839593);
         }
 
     }
@@ -1123,13 +1124,17 @@ public class NextGenSysModTest {
 
         private final double[][] myCovarianceMtrx;
         private final double[][] myDataSetMtrx;
+        private final double myEstimatedValue;
+        private final double myOptimalValue;
         private final double[] myOptimisationSolution;
 
-        CaseData(double[][] covarianceMtrx, double[][] dataSetMtrx, double[] optimisationSolution) {
+        CaseData(double[][] covarianceMtrx, double[][] dataSetMtrx, double[] optimisationSolution, double estimatedValue, double optimalValue) {
             super();
             myCovarianceMtrx = covarianceMtrx;
             myDataSetMtrx = dataSetMtrx;
             myOptimisationSolution = optimisationSolution;
+            myEstimatedValue = estimatedValue;
+            myOptimalValue = optimalValue;
         }
 
         public double getBeta(int asset) {
@@ -1152,6 +1157,13 @@ public class NextGenSysModTest {
             return myDataSetMtrx;
         }
 
+        /**
+         * @return Optimal value from the sequential model
+         */
+        public double getEstimatedValue() {
+            return myEstimatedValue;
+        }
+
         public double getMargin(int asset) {
             return myDataSetMtrx[1][asset];
         }
@@ -1160,6 +1172,16 @@ public class NextGenSysModTest {
             return myDataSetMtrx[1];
         }
 
+        /**
+         * @return Optimal value from the all-in-one model
+         */
+        public double getOptimalValue() {
+            return myOptimalValue;
+        }
+
+        /**
+         * @return Optimal solution from the all-in-one model
+         */
         public double[] getOptimisationSolution() {
             return myOptimisationSolution;
         }
@@ -1358,6 +1380,7 @@ public class NextGenSysModTest {
         if (OptimisationIntegerTests.DEBUG) {
             BasicLogger.debug("Estimate: {}", estimate);
         }
+        TestUtils.assertTrue(estimate.getValue() >= (testCase.getEstimatedValue() - (10 * PrimitiveMath.MACHINE_EPSILON)));
 
         ExpressionsBasedModel model = NextGenSysModTest.buildModel(testCase);
 
