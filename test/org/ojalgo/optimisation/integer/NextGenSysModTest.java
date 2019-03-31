@@ -39,6 +39,7 @@ import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
+@Tag("unstable")
 public class NextGenSysModTest {
 
     public static final class Case010A extends CaseData {
@@ -1342,13 +1343,11 @@ public class NextGenSysModTest {
     }
 
     @Test
-    @Tag("unstable")
     public void testCase040B() {
         this.doTest(CASE_040B);
     }
 
     @Test
-    @Tag("unstable")
     public void testCase050B() {
         this.doTest(CASE_050B);
     }
