@@ -11,6 +11,7 @@
 ## org.ojalgo.matrix
 
 * Fixed a problem with one of the Eigenvalue implementations - it would check for symmetric/hermitian but then failed to make use of the results.
+* Fixed a problem with some of the Eigenvalue implementations regarding ordering of the eigenvales/eigenvectors – they were not always ordered in descending absolut order (used to consider the sign).
 
 ## org.ojalgo.optimisation
 
@@ -30,6 +31,7 @@
 * Partial implementation of Student's TDistribution
 * Deprecated the RandomUtils class and moved its various methods to classes in the new org.ojalgo.function.special package.
 * For continuous distributions the getProbability methods has been renamed getDensity.
+* Minor performance improvement to SampleSet when calling getStandardDeviation() repeatedly.
 
 ## org.ojalgo.type
 
