@@ -784,8 +784,8 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 
-    @SuppressWarnings("unchecked")
-    public M columns(final List<? extends Number>... source) {
+    @SafeVarargs
+    public final M columns(final List<? extends Number>... source) {
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 

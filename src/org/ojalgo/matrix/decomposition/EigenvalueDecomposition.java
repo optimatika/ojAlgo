@@ -44,9 +44,9 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         for (int i = 0; i < length; i++) {
 
             int k = i;
-            double p = d[i];
+            double p = Math.abs(d[i]);
             for (int j = i + 1; j < size; j++) {
-                if (d[j] > p) {
+                if (Math.abs(d[j]) > p) {
                     k = j;
                     p = d[j];
                 }

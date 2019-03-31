@@ -75,6 +75,7 @@ public final class SampleSet implements Access1D<Double> {
     private transient double myQuartile3 = NaN;
     private Access1D<?> mySamples;
     private transient double[] mySortedCopy = null;
+    private transient double myStandardDeviation = NaN;
     private transient double myVariance = NaN;
 
     @SuppressWarnings("unused")
@@ -289,7 +290,12 @@ public final class SampleSet implements Access1D<Double> {
     }
 
     public double getStandardDeviation() {
-        return SQRT.invoke(this.getVariance());
+
+        if (Double.isNaN(myStandardDeviation)) {
+            myStandardDeviation = SQRT.invoke(this.getVariance());
+        }
+
+        return myStandardDeviation;
     }
 
     /**
@@ -354,6 +360,7 @@ public final class SampleSet implements Access1D<Double> {
 
         myMean = NaN;
         myVariance = NaN;
+        myStandardDeviation = NaN;
 
         myQuartile1 = NaN;
         myQuartile2 = NaN;
