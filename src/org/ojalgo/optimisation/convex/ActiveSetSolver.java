@@ -698,8 +698,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         myActivator.excludeAll();
 
-        final int numbEqus = this.countEqualityConstraints();
-        final int numbVars = this.countVariables();
+        int numbEqus = this.countEqualityConstraints();
+        int numbVars = this.countVariables();
+        int maxToInclude = numbVars - numbEqus;
+
+        if (this.isLogDebug() && (numbEqus > numbVars)) {
+            this.log("Redundant contraints!");
+        }
 
         if (this.hasInequalityConstraints()) {
             final MatrixStore<Double> inqSlack = this.getSlackI();
@@ -708,7 +713,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             PrimitiveDenseStore lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
                 double slack = inqSlack.doubleValue(excl[i]);
-                if (ConvexSolver.ALGORITHM_ACCURACY.isZero(slack)) {
+                if (ConvexSolver.ALGORITHM_ACCURACY.isZero(slack) && (this.countIncluded() < maxToInclude)) {
                     if (!useLagrange || !ConvexSolver.ALGORITHM_ACCURACY.isZero(lagrange.doubleValue(numbEqus + excl[i]))) {
                         if (this.isLogDebug()) {
                             this.log("Will inlcude ineq {} with slack={} L={}", i, slack, lagrange.doubleValue(numbEqus + excl[i]));
@@ -717,14 +722,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     }
                 }
             }
-        }
-
-        while (((numbEqus + this.countIncluded()) > numbVars) && (this.countIncluded() > 0)) {
-            this.shrink();
-        }
-
-        if (this.isLogDebug() && ((numbEqus + this.countIncluded()) > numbVars)) {
-            this.log("Redundant contraints!");
         }
     }
 
