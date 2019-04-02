@@ -35,6 +35,7 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.IndexSelector;
@@ -143,7 +144,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
 
         if (!options.solution.isSmall(normCurrentX, normStepX)
-                && (ConvexSolver.ALGORITHM_ACCURACY.isSmall(ONE, normCurrentX) || !ConvexSolver.ALGORITHM_ACCURACY.isSmall(normStepX, normCurrentX))) {
+                && (GenericSolver.ACCURACY.isSmall(ONE, normCurrentX) || !GenericSolver.ACCURACY.isSmall(normStepX, normCurrentX))) {
             // Non-zero && non-freak solution
 
             double stepLength = ONE;
@@ -173,7 +174,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     final double fraction = (Math.signum(currentSlack) == Math.signum(Math.signum(currentSlack)))
                             && ConvexSolver.ITERATION_FEASIBILITY.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
 
-                    if ((slackChange <= ZERO) || ConvexSolver.ALGORITHM_ACCURACY.isSmall(normStepX, slackChange)) {
+                    if ((slackChange <= ZERO) || GenericSolver.ACCURACY.isSmall(normStepX, slackChange)) {
                         // This constraint not affected
                     } else if (fraction >= ZERO) {
                         // Must check the step length
@@ -188,7 +189,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 }
             }
 
-            if (ConvexSolver.ALGORITHM_ACCURACY.isZero(stepLength) && (this.getConstraintToInclude() == this.getLastExcluded())) {
+            if (GenericSolver.ACCURACY.isZero(stepLength) && (this.getConstraintToInclude() == this.getLastExcluded())) {
                 if (this.isLogProgress()) {
                     this.log("Break cycle on redundant constraints because step length {} on constraint {}", stepLength, this.getConstraintToInclude());
                 }
@@ -513,7 +514,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 tmpVal = tmpLI.doubleValue(i, 0);
 
-                if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !ConvexSolver.NEGATIVE_LAGRANGE.isZero(tmpVal)) {
+                if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !GenericSolver.ACCURACY.isZero(tmpVal)) {
                     tmpMin = tmpVal;
                     retVal = i;
                     if (this.isLogDebug()) {
@@ -531,7 +532,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             tmpVal = tmpLI.doubleValue(tmpIndexOfLast, 0);
 
-            if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !ConvexSolver.NEGATIVE_LAGRANGE.isZero(tmpVal)) {
+            if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !GenericSolver.ACCURACY.isZero(tmpVal)) {
                 tmpMin = tmpVal;
                 retVal = tmpIndexOfLast;
                 if (this.isLogProgress()) {
@@ -576,7 +577,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             for (int i = 0; i < incl.length; i++) {
                 double slac = slack.doubleValue(incl[i]);
                 double lagr = lagrange.doubleValue(numbEqus + incl[i]);
-                if (!ConvexSolver.SLACK_ZERO.isZero(slac) || ((lagr < ZERO) && !ConvexSolver.INCLUDE_CONSTRAINT.isZero(lagr))) {
+                if (!ConvexSolver.SLACK_ZERO.isZero(slac) || ((lagr < ZERO) && !GenericSolver.ACCURACY.isZero(lagr))) {
                     if (this.isLogDebug()) {
                         this.log("Will exclude ineq {} with slack={} L={}", i, slac, lagr);
                     }
@@ -713,8 +714,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             PrimitiveDenseStore lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
                 double slack = inqSlack.doubleValue(excl[i]);
-                if (ConvexSolver.ALGORITHM_ACCURACY.isZero(slack) && (this.countIncluded() < maxToInclude)) {
-                    if (!useLagrange || !ConvexSolver.ALGORITHM_ACCURACY.isZero(lagrange.doubleValue(numbEqus + excl[i]))) {
+                if (GenericSolver.ACCURACY.isZero(slack) && (this.countIncluded() < maxToInclude)) {
+                    if (!useLagrange || !GenericSolver.ACCURACY.isZero(lagrange.doubleValue(numbEqus + excl[i]))) {
                         if (this.isLogDebug()) {
                             this.log("Will inlcude ineq {} with slack={} L={}", i, slack, lagrange.doubleValue(numbEqus + excl[i]));
                         }

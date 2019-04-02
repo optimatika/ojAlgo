@@ -457,15 +457,12 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     }
 
-    static NumberContext ALGORITHM_ACCURACY = new NumberContext(12, 14, RoundingMode.HALF_DOWN);
-    static NumberContext CHECK_FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
+    static final NumberContext CHECK_FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
     static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
-    static NumberContext FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
-    static NumberContext INCLUDE_CONSTRAINT = new NumberContext(12, 14, RoundingMode.HALF_DOWN);
-    static NumberContext ITERATION_FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
-    static NumberContext NEGATIVE_LAGRANGE = new NumberContext(12, 4, RoundingMode.HALF_DOWN);
+    static final NumberContext FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
+    static final NumberContext ITERATION_FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
     static final double RELATIVELY_SMALL = PrimitiveFunction.SQRT.invoke(MACHINE_EPSILON);
-    static NumberContext SLACK_ZERO = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
+    static final NumberContext SLACK_ZERO = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
 
     public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
 
