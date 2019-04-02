@@ -26,7 +26,6 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.TestUtils;
@@ -69,44 +68,44 @@ public class ConvexProblems extends OptimisationConvexTests {
     static void builAndTestModel(final PrimitiveDenseStore[] matrices, final PrimitiveDenseStore expectedSolution, final NumberContext modelValidationContext,
             final boolean testSolverDirectly) {
 
-        final MatrixStore<Double> tmpPartQ = expectedSolution.transpose().multiply(matrices[2].multiply(expectedSolution));
-        final MatrixStore<Double> tmpPartC = matrices[3].transpose().multiply(expectedSolution);
+        final MatrixStore<Double> partQ = expectedSolution.transpose().multiply(matrices[2].multiply(expectedSolution));
+        final MatrixStore<Double> partC = matrices[3].transpose().multiply(expectedSolution);
 
-        final double tmpExpectedValue = tmpPartQ.multiply(HALF.doubleValue()).subtract(tmpPartC).doubleValue(0);
+        final double expectedValue = partQ.multiply(HALF.doubleValue()).subtract(partC).doubleValue(0);
+        final Optimisation.Result expectedResult = new Optimisation.Result(Optimisation.State.OPTIMAL, expectedValue, expectedSolution);
 
-        final Optimisation.Result tmpExpectedResult = new Optimisation.Result(Optimisation.State.OPTIMAL, tmpExpectedValue, expectedSolution);
-
-        final ExpressionsBasedModel tmpModel = ConvexProblems.buildModel(matrices, expectedSolution);
-
-        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel, modelValidationContext);
+        final ExpressionsBasedModel initialisedModel = ConvexProblems.buildModel(matrices, expectedSolution);
 
         if (DEBUG) {
-            tmpModel.options.debug(ConvexSolver.class);
-            tmpModel.options.validate = false;
+            initialisedModel.options.debug(ConvexSolver.class);
+            initialisedModel.options.validate = false;
         }
 
-        TestUtils.assertTrue("Expected solution not ok!", tmpModel.validate(tmpExpectedResult, modelValidationContext));
-        TestUtils.assertTrue("Expected solution not ok!", tmpModel.validate(modelValidationContext)); // The expected solution is written to the variables
+        TestUtils.assertTrue("Expected solution not ok!", initialisedModel.validate(expectedResult, modelValidationContext));
+        TestUtils.assertTrue("Expected solution not ok!", initialisedModel.validate(modelValidationContext)); // The expected solution is written to the variables
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(initialisedModel, modelValidationContext);
 
         // When/if the correct/optimal solution is used to kickStart ojAlgo should return that solution
-        final Result tmpInitialisedModelResult = tmpModel.minimise();
-        TestUtils.assertStateNotLessThanOptimal(tmpInitialisedModelResult);
-        TestUtils.assertEquals(tmpExpectedResult, tmpInitialisedModelResult, modelValidationContext);
-        TestUtils.assertEquals(tmpExpectedValue, tmpInitialisedModelResult.getValue(), modelValidationContext);
-        TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().evaluate(tmpInitialisedModelResult).doubleValue(), modelValidationContext);
-        TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
+        final Result initialisedModelResult = initialisedModel.minimise();
+        TestUtils.assertStateNotLessThanOptimal(initialisedModelResult);
+        TestUtils.assertEquals(expectedResult, initialisedModelResult, modelValidationContext);
+        TestUtils.assertEquals(expectedValue, initialisedModelResult.getValue(), modelValidationContext);
+        TestUtils.assertEquals(expectedValue, initialisedModel.objective().evaluate(initialisedModelResult).doubleValue(), modelValidationContext);
+        TestUtils.assertEquals(expectedValue, initialisedModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
 
-        for (final Variable tmpVariable : tmpModel.getVariables()) {
-            tmpVariable.setValue(null);
-        }
+        final ExpressionsBasedModel uninitialisedModel = ConvexProblems.buildModel(matrices, expectedSolution);
+        // Clear initial variable values
+        uninitialisedModel.getVariables().forEach(variable -> variable.setValue(null));
 
-        // Initial variable values have been cleared
-        final Result tmpUninitialisedModelResult = tmpModel.minimise();
-        TestUtils.assertStateNotLessThanOptimal(tmpUninitialisedModelResult);
-        TestUtils.assertEquals(tmpExpectedResult, tmpUninitialisedModelResult, modelValidationContext);
-        TestUtils.assertEquals(tmpExpectedValue, tmpUninitialisedModelResult.getValue(), modelValidationContext);
-        TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().evaluate(tmpUninitialisedModelResult).doubleValue(), modelValidationContext);
-        TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
+        OptimisationConvexTests.assertDirectAndIterativeEquals(uninitialisedModel, modelValidationContext);
+
+        final Result uninitialisedModelResult = uninitialisedModel.minimise();
+        TestUtils.assertStateNotLessThanOptimal(uninitialisedModelResult);
+        TestUtils.assertEquals(expectedResult, uninitialisedModelResult, modelValidationContext);
+        TestUtils.assertEquals(expectedValue, uninitialisedModelResult.getValue(), modelValidationContext);
+        TestUtils.assertEquals(expectedValue, uninitialisedModel.objective().evaluate(uninitialisedModelResult).doubleValue(), modelValidationContext);
+        TestUtils.assertEquals(expectedValue, uninitialisedModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
 
         if (testSolverDirectly) {
 
@@ -117,11 +116,14 @@ public class ConvexProblems extends OptimisationConvexTests {
             final Optimisation.Result tmpResult = tmpSolver.solve();
 
             TestUtils.assertStateNotLessThanOptimal(tmpResult);
-            TestUtils.assertEquals(tmpExpectedResult, tmpResult, NumberContext.getGeneral(2, 4));
-            TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().evaluate(tmpResult).doubleValue(), NumberContext.getGeneral(4, 8));
+            TestUtils.assertEquals(expectedResult, tmpResult, NumberContext.getGeneral(2, 4));
+            TestUtils.assertEquals(expectedValue, uninitialisedModel.objective().evaluate(tmpResult).doubleValue(), NumberContext.getGeneral(4, 8));
         }
     }
 
+    /**
+     * Build model, and initialise variable values to the expected solution
+     */
     static ExpressionsBasedModel buildModel(final PrimitiveDenseStore[] matrices, final PrimitiveDenseStore expectedSolution) {
 
         final ExpressionsBasedModel retVal = new ExpressionsBasedModel();
@@ -1068,7 +1070,6 @@ public class ConvexProblems extends OptimisationConvexTests {
      * </p>
      */
     @Test
-    @Tag("unstable")
     public void testP20111205() {
 
         final PrimitiveDenseStore tmpAE = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, -1.0, -1.0, 1.0 },
@@ -1116,9 +1117,9 @@ public class ConvexProblems extends OptimisationConvexTests {
         tmpMatrices[5] = tmpBI;
 
         // The original AMPL/LOQO solution was given with 6 digits precision and never more than 9 decimals
-        final NumberContext tmpAccuracy = NumberContext.getGeneral(3, 3); // ojAlgo can only get roughly the same solution
+        final NumberContext accuracy = NumberContext.getGeneral(3, 3); // ojAlgo can only get roughly the same solution
 
-        ConvexProblems.builAndTestModel(tmpMatrices, tmpExpected, tmpAccuracy, true);
+        ConvexProblems.builAndTestModel(tmpMatrices, tmpExpected, accuracy, true);
     }
 
     /**
