@@ -462,8 +462,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     static final NumberContext FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
     static final NumberContext ITERATION_FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
     static final double RELATIVELY_SMALL = PrimitiveFunction.SQRT.invoke(MACHINE_EPSILON);
-    static final NumberContext SLACK_ZERO = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
-
     public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
 
         destinationBuilder.reset();

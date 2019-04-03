@@ -564,37 +564,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return myActivator.toString();
     }
 
-    void cleanActivations() {
-
-        final int numbEqus = this.countEqualityConstraints();
-        final int numbVars = this.countVariables();
-
-        if (this.hasInequalityConstraints()) {
-            final MatrixStore<Double> slack = this.getSlackI();
-            final int[] incl = this.getIncluded();
-
-            PrimitiveDenseStore lagrange = this.getSolutionL();
-            for (int i = 0; i < incl.length; i++) {
-                double slac = slack.doubleValue(incl[i]);
-                double lagr = lagrange.doubleValue(numbEqus + incl[i]);
-                if (!ConvexSolver.SLACK_ZERO.isZero(slac) || ((lagr < ZERO) && !GenericSolver.ACCURACY.isZero(lagr))) {
-                    if (this.isLogDebug()) {
-                        this.log("Will exclude ineq {} with slack={} L={}", i, slac, lagr);
-                    }
-                    this.exclude(incl[i]);
-                }
-            }
-        }
-
-        while (((numbEqus + this.countIncluded()) > numbVars) && (this.countIncluded() > 0)) {
-            this.shrink();
-        }
-
-        if (this.isLogDebug() && ((numbEqus + this.countIncluded()) > numbVars)) {
-            this.log("Redundant contraints!");
-        }
-    }
-
     @Override
     final int countIterationConstraints() {
         return this.countEqualityConstraints() + this.countIncluded();
