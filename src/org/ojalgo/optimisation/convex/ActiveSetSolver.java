@@ -35,6 +35,7 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.IndexSelector;
@@ -100,7 +101,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
                 final double largest = PrimitiveFunction.MAX.invoke(largestInQ, largestInC);
 
-                this.getIterationQ().modifyDiagonal(ADD.second(largest * ConvexSolver.RELATIVELY_SMALL));
+                this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
                 this.computeQ(this.getIterationQ());
 
                 this.getSolutionL().modifyAll((Unary) arg -> {
@@ -143,7 +144,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
 
         if (!options.solution.isSmall(normCurrentX, normStepX)
-                && (ConvexSolver.ALGORITHM_ACCURACY.isSmall(ONE, normCurrentX) || !ConvexSolver.ALGORITHM_ACCURACY.isSmall(normStepX, normCurrentX))) {
+                && (GenericSolver.ACCURACY.isSmall(ONE, normCurrentX) || !GenericSolver.ACCURACY.isSmall(normStepX, normCurrentX))) {
             // Non-zero && non-freak solution
 
             double stepLength = ONE;
@@ -171,9 +172,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     final double currentSlack = slack.doubleValue(excluded[i]);
                     final double slackChange = excludedInequalityRow.dot(iterX);
                     final double fraction = (Math.signum(currentSlack) == Math.signum(Math.signum(currentSlack)))
-                            && ConvexSolver.ITERATION_FEASIBILITY.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
+                            && GenericSolver.ACCURACY.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
 
-                    if ((slackChange <= ZERO) || ConvexSolver.ALGORITHM_ACCURACY.isSmall(normStepX, slackChange)) {
+                    if ((slackChange <= ZERO) || GenericSolver.ACCURACY.isSmall(normStepX, slackChange)) {
                         // This constraint not affected
                     } else if (fraction >= ZERO) {
                         // Must check the step length
@@ -188,7 +189,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 }
             }
 
-            if (ConvexSolver.ALGORITHM_ACCURACY.isZero(stepLength) && (this.getConstraintToInclude() == this.getLastExcluded())) {
+            if (GenericSolver.ACCURACY.isZero(stepLength) && (this.getConstraintToInclude() == this.getLastExcluded())) {
                 if (this.isLogProgress()) {
                     this.log("Break cycle on redundant constraints because step length {} on constraint {}", stepLength, this.getConstraintToInclude());
                 }
@@ -306,7 +307,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (this.hasEqualityConstraints()) {
                 final MatrixStore<Double> tmpSE = this.getSE();
                 for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
-                    if (!ConvexSolver.CHECK_FEASIBILITY.isZero(tmpSE.doubleValue(i))) {
+                    if (!GenericSolver.ACCURACY.isZero(tmpSE.doubleValue(i))) {
                         retVal = false;
                     }
                 }
@@ -317,7 +318,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final MatrixStore<Double> tmpSI = this.getSlackI();
                 for (int i = 0; retVal && (i < tmpIncluded.length); i++) {
                     final double tmpSlack = tmpSI.doubleValue(tmpIncluded[i]);
-                    if ((tmpSlack < ZERO) && !ConvexSolver.CHECK_FEASIBILITY.isZero(tmpSlack)) {
+                    if ((tmpSlack < ZERO) && !GenericSolver.ACCURACY.isZero(tmpSlack)) {
                         retVal = false;
                     }
                 }
@@ -330,7 +331,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             final MatrixStore<Double> tmpSI = this.getSlackI();
             for (int e = 0; retVal && (e < tmpExcluded.length); e++) {
                 final double tmpSlack = tmpSI.doubleValue(tmpExcluded[e]);
-                if ((tmpSlack < ZERO) && !ConvexSolver.CHECK_FEASIBILITY.isZero(tmpSlack)) {
+                if ((tmpSlack < ZERO) && !GenericSolver.ACCURACY.isZero(tmpSlack)) {
                     retVal = false;
                 }
             }
@@ -513,7 +514,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 tmpVal = tmpLI.doubleValue(i, 0);
 
-                if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !ConvexSolver.NEGATIVE_LAGRANGE.isZero(tmpVal)) {
+                if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !GenericSolver.ACCURACY.isZero(tmpVal)) {
                     tmpMin = tmpVal;
                     retVal = i;
                     if (this.isLogDebug()) {
@@ -531,7 +532,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             tmpVal = tmpLI.doubleValue(tmpIndexOfLast, 0);
 
-            if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !ConvexSolver.NEGATIVE_LAGRANGE.isZero(tmpVal)) {
+            if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !GenericSolver.ACCURACY.isZero(tmpVal)) {
                 tmpMin = tmpVal;
                 retVal = tmpIndexOfLast;
                 if (this.isLogProgress()) {
@@ -561,37 +562,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     protected String toActivatorString() {
         return myActivator.toString();
-    }
-
-    void cleanActivations() {
-
-        final int numbEqus = this.countEqualityConstraints();
-        final int numbVars = this.countVariables();
-
-        if (this.hasInequalityConstraints()) {
-            final MatrixStore<Double> slack = this.getSlackI();
-            final int[] incl = this.getIncluded();
-
-            PrimitiveDenseStore lagrange = this.getSolutionL();
-            for (int i = 0; i < incl.length; i++) {
-                double slac = slack.doubleValue(incl[i]);
-                double lagr = lagrange.doubleValue(numbEqus + incl[i]);
-                if (!ConvexSolver.SLACK_ZERO.isZero(slac) || ((lagr < ZERO) && !ConvexSolver.INCLUDE_CONSTRAINT.isZero(lagr))) {
-                    if (this.isLogDebug()) {
-                        this.log("Will exclude ineq {} with slack={} L={}", i, slac, lagr);
-                    }
-                    this.exclude(incl[i]);
-                }
-            }
-        }
-
-        while (((numbEqus + this.countIncluded()) > numbVars) && (this.countIncluded() > 0)) {
-            this.shrink();
-        }
-
-        if (this.isLogDebug() && ((numbEqus + this.countIncluded()) > numbVars)) {
-            this.log("Redundant contraints!");
-        }
     }
 
     @Override
@@ -713,8 +683,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             PrimitiveDenseStore lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
                 double slack = inqSlack.doubleValue(excl[i]);
-                if (ConvexSolver.ALGORITHM_ACCURACY.isZero(slack) && (this.countIncluded() < maxToInclude)) {
-                    if (!useLagrange || !ConvexSolver.ALGORITHM_ACCURACY.isZero(lagrange.doubleValue(numbEqus + excl[i]))) {
+                if (GenericSolver.ACCURACY.isZero(slack) && (this.countIncluded() < maxToInclude)) {
+                    if (!useLagrange || !GenericSolver.ACCURACY.isZero(lagrange.doubleValue(numbEqus + excl[i]))) {
                         if (this.isLogDebug()) {
                             this.log("Will inlcude ineq {} with slack={} L={}", i, slack, lagrange.doubleValue(numbEqus + excl[i]));
                         }

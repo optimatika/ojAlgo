@@ -59,7 +59,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     }
 
-    protected static final NumberContext ACCURACY = new NumberContext(12, 14, RoundingMode.HALF_EVEN);
+    protected static final NumberContext ACCURACY = new NumberContext(12, 14, RoundingMode.HALF_DOWN);
 
     public final Optimisation.Options options;
 

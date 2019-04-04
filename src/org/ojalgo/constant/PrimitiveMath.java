@@ -75,6 +75,7 @@ public abstract class PrimitiveMath {
 
     public static final double POSITIVE_INFINITY = Double.POSITIVE_INFINITY;
     public static final double NEGATIVE_INFINITY = Double.NEGATIVE_INFINITY;
+    public static final double RELATIVELY_SMALL = POW.invoke(2.0, -26.0);
     public static final double NaN = Double.NaN;
     public static final double MACHINE_LARGEST = Double.MAX_VALUE;
     /**

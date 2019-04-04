@@ -1354,7 +1354,6 @@ public class NextGenSysModTest {
     }
 
     @Test
-    @Tag("unstable")
     public void testAllInOneCase020A() {
         this.doTestAllInOne(CASE_020A);
     }
