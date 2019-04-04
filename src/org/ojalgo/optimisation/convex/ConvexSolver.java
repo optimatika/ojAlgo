@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,7 +32,6 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -41,7 +39,6 @@ import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
@@ -276,7 +273,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             } else {
 
-                myAI = FACTORY.makeRowsSupplier((int) mtrxAI.countColumns());
+                myAI = PrimitiveDenseStore.FACTORY.makeRowsSupplier((int) mtrxAI.countColumns());
                 myAI.addRows((int) mtrxAI.countRows());
 
                 if (mtrxAI instanceof SparseStore) {
@@ -457,11 +454,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     }
 
-    static final NumberContext CHECK_FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
-    static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
-    static final NumberContext FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
-    static final NumberContext ITERATION_FEASIBILITY = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
-    static final double RELATIVELY_SMALL = PrimitiveFunction.SQRT.invoke(MACHINE_EPSILON);
     public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
 
         destinationBuilder.reset();
@@ -480,7 +472,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         if (numbEqExpr > 0) {
 
             final SparseStore<Double> mtrxAE = SparseStore.PRIMITIVE.make(numbEqExpr, numbVars);
-            final PhysicalStore<Double> mtrxBE = FACTORY.makeZero(numbEqExpr, 1);
+            final PhysicalStore<Double> mtrxBE = PrimitiveDenseStore.FACTORY.makeZero(numbEqExpr, 1);
 
             for (int i = 0; i < numbEqExpr; i++) {
 
@@ -504,7 +496,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         PhysicalStore<Double> mtrxQ = null;
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
-            mtrxQ = FACTORY.makeZero(numbVars, numbVars);
+            mtrxQ = PrimitiveDenseStore.FACTORY.makeZero(numbVars, numbVars);
 
             final BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? SUBTRACT : ADD;
             UnaryFunction<Double> tmpModifier;
@@ -521,7 +513,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         PhysicalStore<Double> mtrxC = null;
         if (tmpObjExpr.isAnyLinearFactorNonZero()) {
-            mtrxC = FACTORY.makeZero(numbVars, 1);
+            mtrxC = PrimitiveDenseStore.FACTORY.makeZero(numbVars, 1);
             if (sourceModel.isMinimisation()) {
                 for (final IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
                     final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
@@ -559,8 +551,8 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         if ((numbUpExpr + numbUpVar + numbLoExpr + numbLoVar) > 0) {
 
-            final RowsSupplier<Double> mtrxAI = FACTORY.makeRowsSupplier(numbVars);
-            final PhysicalStore<Double> mtrxBI = FACTORY.makeZero(numbUpExpr + numbUpVar + numbLoExpr + numbLoVar, 1);
+            final RowsSupplier<Double> mtrxAI = PrimitiveDenseStore.FACTORY.makeRowsSupplier(numbVars);
+            final PhysicalStore<Double> mtrxBI = PrimitiveDenseStore.FACTORY.makeZero(numbUpExpr + numbUpVar + numbLoExpr + numbLoVar, 1);
 
             if (numbUpExpr > 0) {
                 for (int i = 0; i < numbUpExpr; i++) {
@@ -636,7 +628,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         myMatrices = matrices;
 
-        mySolutionX = FACTORY.makeZero(this.countVariables(), 1L);
+        mySolutionX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
 
         mySolverQ = Cholesky.make(this.getMatrixQ());
         mySolverGeneral = LU.make(this.getMatrixQ());

@@ -210,7 +210,6 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
     private final double myEpsilon;
     private final MathContext myMathContext;
     private final double myRoundingFactor;
-
     private final int myScale;
     private final double myZeroError;
 

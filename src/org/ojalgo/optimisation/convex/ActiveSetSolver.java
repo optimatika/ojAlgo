@@ -101,7 +101,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
                 final double largest = PrimitiveFunction.MAX.invoke(largestInQ, largestInC);
 
-                this.getIterationQ().modifyDiagonal(ADD.second(largest * ConvexSolver.RELATIVELY_SMALL));
+                this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
                 this.computeQ(this.getIterationQ());
 
                 this.getSolutionL().modifyAll((Unary) arg -> {
@@ -172,7 +172,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     final double currentSlack = slack.doubleValue(excluded[i]);
                     final double slackChange = excludedInequalityRow.dot(iterX);
                     final double fraction = (Math.signum(currentSlack) == Math.signum(Math.signum(currentSlack)))
-                            && ConvexSolver.ITERATION_FEASIBILITY.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
+                            && GenericSolver.ACCURACY.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
 
                     if ((slackChange <= ZERO) || GenericSolver.ACCURACY.isSmall(normStepX, slackChange)) {
                         // This constraint not affected
@@ -307,7 +307,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (this.hasEqualityConstraints()) {
                 final MatrixStore<Double> tmpSE = this.getSE();
                 for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
-                    if (!ConvexSolver.CHECK_FEASIBILITY.isZero(tmpSE.doubleValue(i))) {
+                    if (!GenericSolver.ACCURACY.isZero(tmpSE.doubleValue(i))) {
                         retVal = false;
                     }
                 }
@@ -318,7 +318,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final MatrixStore<Double> tmpSI = this.getSlackI();
                 for (int i = 0; retVal && (i < tmpIncluded.length); i++) {
                     final double tmpSlack = tmpSI.doubleValue(tmpIncluded[i]);
-                    if ((tmpSlack < ZERO) && !ConvexSolver.CHECK_FEASIBILITY.isZero(tmpSlack)) {
+                    if ((tmpSlack < ZERO) && !GenericSolver.ACCURACY.isZero(tmpSlack)) {
                         retVal = false;
                     }
                 }
@@ -331,7 +331,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             final MatrixStore<Double> tmpSI = this.getSlackI();
             for (int e = 0; retVal && (e < tmpExcluded.length); e++) {
                 final double tmpSlack = tmpSI.doubleValue(tmpExcluded[e]);
-                if ((tmpSlack < ZERO) && !ConvexSolver.CHECK_FEASIBILITY.isZero(tmpSlack)) {
+                if ((tmpSlack < ZERO) && !GenericSolver.ACCURACY.isZero(tmpSlack)) {
                     retVal = false;
                 }
             }
