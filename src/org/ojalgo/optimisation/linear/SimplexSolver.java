@@ -45,6 +45,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
@@ -86,6 +87,9 @@ public final class SimplexSolver extends LinearSolver {
     interface AlgorithmStore {
 
     }
+
+    private static final NumberContext PHASE1 = ACCURACY.withScale(8);
+    private static final NumberContext RATIO = ACCURACY.withScale(8);
 
     static SimplexTableau build(final ConvexSolver.Builder convex, Optimisation.Options options) {
 
@@ -449,9 +453,7 @@ public final class SimplexSolver extends LinearSolver {
     }
 
     private LongToNumberMap<Double> myFixedVariables = null;
-
     private final IterationPoint myPoint;
-
     private final SimplexTableau myTableau;
 
     SimplexSolver(final SimplexTableau tableau, final Optimisation.Options solverOptions) {
@@ -596,14 +598,12 @@ public final class SimplexSolver extends LinearSolver {
 
         if (myPoint.isPhase1()) {
 
-            // final double tmpPhaseOneValue = myTransposedTableau.doubleValue(this.countConstraints() + this.countVariables(), myPoint.getRowObjective());
-            final double tmpPhaseOneValue = myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
+            final double phaseOneValue = myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
 
-            if (!myTableau.isBasicArtificials() || LinearSolver.FEASIBILITY.isZero(tmpPhaseOneValue)) {
+            if (!myTableau.isBasicArtificials() || PHASE1.isZero(phaseOneValue)) {
 
                 if (this.isLogDebug()) {
                     this.log("\nSwitching to Phase2 with {} artificial variable(s) still in the basis.\n", myTableau.countBasicArtificials());
-                    // this.debug("Reduced artificial costs:\n{}", this.sliceTableauRow(myPoint.getRowObjective()).copy(this.getExcluded()));
                 }
 
                 myPoint.switchToPhase2();
@@ -684,7 +684,7 @@ public final class SimplexSolver extends LinearSolver {
         int retVal = -1;
 
         double tmpVal;
-        double tmpMinVal = myPoint.isPhase2() ? -LinearSolver.EPSILON.epsilon() : ZERO;
+        double tmpMinVal = myPoint.isPhase2() ? -GenericSolver.ACCURACY.epsilon() : ZERO;
         //double tmpMinVal = ZERO;
 
         int tmpCol;
@@ -724,8 +724,7 @@ public final class SimplexSolver extends LinearSolver {
         }
 
         int retVal = -1;
-        double tmpNumer = NaN, tmpDenom = NaN, tmpRatio = NaN;
-        double tmpMinRatio = MACHINE_LARGEST;
+        double numer = NaN, denom = NaN, ratio = NaN, minRatio = MACHINE_LARGEST;
 
         final int tmpConstraintsCount = myTableau.countConstraints();
 
@@ -734,39 +733,37 @@ public final class SimplexSolver extends LinearSolver {
         for (int i = 0; i < tmpConstraintsCount; i++) {
 
             // Phase 2 with artificials still in the basis
-            final boolean tmpSpecialCase = tmpPhase2 && (myTableau.getBasisColumnIndex(i) < 0);
+            final boolean specialCase = tmpPhase2 && (myTableau.getBasisColumnIndex(i) < 0);
 
-            // tmpDenom = myTransposedTableau.doubleValue(tmpDenomCol, i);
-            tmpDenom = myTableau.doubleValue(i, tmpDenomCol);
+            denom = myTableau.doubleValue(i, tmpDenomCol);
 
             // Should always be >=0.0, but very small numbers may "accidentally" get a negative sign.
-            // tmpNumer = PrimitiveFunction.ABS.invoke(myTransposedTableau.doubleValue(tmpNumerCol, i));
-            tmpNumer = PrimitiveFunction.ABS.invoke(myTableau.doubleValue(i, tmpNumerCol));
+            numer = PrimitiveFunction.ABS.invoke(myTableau.doubleValue(i, tmpNumerCol));
 
-            if (LinearSolver.NEXT_PIVOT.isSmall(tmpNumer, tmpDenom)) {
+            if (RATIO.isSmall(numer, denom)) {
 
-                tmpRatio = MACHINE_LARGEST;
+                ratio = MACHINE_LARGEST;
 
             } else {
 
-                if (tmpSpecialCase) {
-                    if (LinearSolver.NEXT_PIVOT.isSmall(tmpDenom, tmpNumer)) {
-                        tmpRatio = MACHINE_EPSILON;
+                if (specialCase) {
+                    if (RATIO.isSmall(denom, numer)) {
+                        ratio = MACHINE_EPSILON;
                     } else {
-                        tmpRatio = MACHINE_LARGEST;
+                        ratio = MACHINE_LARGEST;
                     }
                 } else {
-                    tmpRatio = tmpNumer / tmpDenom;
+                    ratio = numer / denom;
                 }
             }
 
-            if ((tmpSpecialCase || (tmpDenom > ZERO)) && (tmpRatio >= ZERO) && (tmpRatio < tmpMinRatio)) {
+            if ((specialCase || (denom > ZERO)) && (ratio >= ZERO) && (ratio < minRatio)) {
 
                 retVal = i;
-                tmpMinRatio = tmpRatio;
+                minRatio = ratio;
 
                 if (this.isLogDebug()) {
-                    this.log("Row: {}\t=>\tRatio: {},\tNumerator/RHS: {}, \tDenominator/Pivot: {}.", i, tmpRatio, tmpNumer, tmpDenom);
+                    this.log("Row: {}\t=>\tRatio: {},\tNumerator/RHS: {}, \tDenominator/Pivot: {}.", i, ratio, numer, denom);
                 }
             }
         }
@@ -796,7 +793,7 @@ public final class SimplexSolver extends LinearSolver {
             tmpRHS.visitAll(tmpMinAggr);
             final double tmpMinVal = tmpMinAggr.doubleValue();
 
-            if ((tmpMinVal < ZERO) && !LinearSolver.CHECK_FEASIBILITY.isZero(tmpMinVal)) {
+            if ((tmpMinVal < ZERO) && !GenericSolver.ACCURACY.isZero(tmpMinVal)) {
                 this.log("\nNegative RHS! {}", tmpMinVal);
                 if (this.isLogDebug()) {
                     this.log("Entire RHS columns: {}\n", tmpRHS);
