@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function;
+package org.ojalgo.function.special;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
