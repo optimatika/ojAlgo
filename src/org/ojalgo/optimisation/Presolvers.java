@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.function.BigFunction.*;
 import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;

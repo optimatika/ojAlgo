@@ -21,8 +21,6 @@
  */
 package org.ojalgo.function.tmp;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
-
 public class TemporaryFunction {
 
 }

@@ -32,67 +32,67 @@ public class PrimitivePrefixTest {
     @Test
     public void testPrefixes() {
 
-        final double tmpTen = PrimitivePrefix.DEKA;
+        final double tmpTen = PrimitiveMath.Prefix.DEKA;
 
         double tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, -24);
-        TestUtils.assertEquals("yocto, y", tmpNumber, PrimitivePrefix.YOCTO, myTolerance);
+        TestUtils.assertEquals("yocto, y", tmpNumber, PrimitiveMath.Prefix.YOCTO, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, -21);
-        TestUtils.assertEquals("zepto, z", tmpNumber, PrimitivePrefix.ZEPTO, myTolerance);
+        TestUtils.assertEquals("zepto, z", tmpNumber, PrimitiveMath.Prefix.ZEPTO, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, -18);
-        TestUtils.assertEquals("atto, a", tmpNumber, PrimitivePrefix.ATTO, myTolerance);
+        TestUtils.assertEquals("atto, a", tmpNumber, PrimitiveMath.Prefix.ATTO, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, -15);
-        TestUtils.assertEquals("femto, f", tmpNumber, PrimitivePrefix.FEMTO, myTolerance);
+        TestUtils.assertEquals("femto, f", tmpNumber, PrimitiveMath.Prefix.FEMTO, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, -12);
-        TestUtils.assertEquals("pico, p", tmpNumber, PrimitivePrefix.PICO, myTolerance);
+        TestUtils.assertEquals("pico, p", tmpNumber, PrimitiveMath.Prefix.PICO, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, -9);
-        TestUtils.assertEquals("nano, n", tmpNumber, PrimitivePrefix.NANO, myTolerance);
+        TestUtils.assertEquals("nano, n", tmpNumber, PrimitiveMath.Prefix.NANO, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, -6);
-        TestUtils.assertEquals("micro, my", tmpNumber, PrimitivePrefix.MICRO, myTolerance);
+        TestUtils.assertEquals("micro, my", tmpNumber, PrimitiveMath.Prefix.MICRO, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, -3);
-        TestUtils.assertEquals("milli, m", tmpNumber, PrimitivePrefix.MILLI, myTolerance);
+        TestUtils.assertEquals("milli, m", tmpNumber, PrimitiveMath.Prefix.MILLI, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, -2);
-        TestUtils.assertEquals("centi, c", tmpNumber, PrimitivePrefix.CENTI, myTolerance);
+        TestUtils.assertEquals("centi, c", tmpNumber, PrimitiveMath.Prefix.CENTI, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, -1);
-        TestUtils.assertEquals("deci, d", tmpNumber, PrimitivePrefix.DECI, myTolerance);
+        TestUtils.assertEquals("deci, d", tmpNumber, PrimitiveMath.Prefix.DECI, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, 1);
-        TestUtils.assertEquals("deka, da", tmpNumber, PrimitivePrefix.DEKA, myTolerance);
+        TestUtils.assertEquals("deka, da", tmpNumber, PrimitiveMath.Prefix.DEKA, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, 2);
-        TestUtils.assertEquals("hecto, h", tmpNumber, PrimitivePrefix.HECTO, myTolerance);
+        TestUtils.assertEquals("hecto, h", tmpNumber, PrimitiveMath.Prefix.HECTO, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, 3);
-        TestUtils.assertEquals("kilo, k", tmpNumber, PrimitivePrefix.KILO, myTolerance);
+        TestUtils.assertEquals("kilo, k", tmpNumber, PrimitiveMath.Prefix.KILO, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, 6);
-        TestUtils.assertEquals("mega, M", tmpNumber, PrimitivePrefix.MEGA, myTolerance);
+        TestUtils.assertEquals("mega, M", tmpNumber, PrimitiveMath.Prefix.MEGA, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, 9);
-        TestUtils.assertEquals("giga, G", tmpNumber, PrimitivePrefix.GIGA, myTolerance);
+        TestUtils.assertEquals("giga, G", tmpNumber, PrimitiveMath.Prefix.GIGA, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, 12);
-        TestUtils.assertEquals("tera, T", tmpNumber, PrimitivePrefix.TERA, myTolerance);
+        TestUtils.assertEquals("tera, T", tmpNumber, PrimitiveMath.Prefix.TERA, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, 15);
-        TestUtils.assertEquals("peta, P", tmpNumber, PrimitivePrefix.PETA, myTolerance);
+        TestUtils.assertEquals("peta, P", tmpNumber, PrimitiveMath.Prefix.PETA, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, 18);
-        TestUtils.assertEquals("exa, E", tmpNumber, PrimitivePrefix.EXA, myTolerance);
+        TestUtils.assertEquals("exa, E", tmpNumber, PrimitiveMath.Prefix.EXA, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, 21);
-        TestUtils.assertEquals("zetta, CmplxNmbr", tmpNumber, PrimitivePrefix.ZETTA, myTolerance);
+        TestUtils.assertEquals("zetta, CmplxNmbr", tmpNumber, PrimitiveMath.Prefix.ZETTA, myTolerance);
 
         tmpNumber = PrimitiveMath.POWER.invoke(tmpTen, 24);
-        TestUtils.assertEquals("yotta, Y", tmpNumber, PrimitivePrefix.YOTTA, myTolerance);
+        TestUtils.assertEquals("yotta, Y", tmpNumber, PrimitiveMath.Prefix.YOTTA, myTolerance);
     }
 
 }

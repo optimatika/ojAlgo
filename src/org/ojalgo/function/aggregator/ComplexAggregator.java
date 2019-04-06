@@ -21,8 +21,6 @@
  */
 package org.ojalgo.function.aggregator;
 
-import static org.ojalgo.function.ComplexFunction.*;
-
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.ComplexMath;
 import org.ojalgo.function.constant.PrimitiveMath;

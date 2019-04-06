@@ -24,11 +24,8 @@ package org.ojalgo.function.constant;
 import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.function.MissingMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.PrimitiveFunction.Binary;
-import org.ojalgo.function.PrimitiveFunction.Parameter;
-import org.ojalgo.function.PrimitiveFunction.Unary;
-import org.ojalgo.function.constant.tmp.MissingMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 
 public abstract class PrimitiveMath {

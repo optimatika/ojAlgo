@@ -21,8 +21,6 @@
  */
 package org.ojalgo.scalar;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;

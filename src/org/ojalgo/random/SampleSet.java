@@ -21,7 +21,6 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;

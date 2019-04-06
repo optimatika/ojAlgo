@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import org.ojalgo.function.BigFunction;
-import org.ojalgo.function.constant.tmp.MissingMath;
+import org.ojalgo.function.MissingMath;
 
 public abstract class BigMath {
 
@@ -357,7 +357,6 @@ public abstract class BigMath {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg, final int param) {
-
             return MissingMath.root(arg, param);
         }
 

@@ -21,7 +21,6 @@
  */
 package org.ojalgo.function;
 
-import static org.ojalgo.function.ComplexFunction.*;
 import static org.ojalgo.scalar.ComplexNumber.*;
 
 import org.junit.jupiter.api.Test;

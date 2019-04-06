@@ -21,8 +21,6 @@
  */
 package org.ojalgo.function.aggregator;
 
-import static org.ojalgo.function.QuaternionFunction.*;
-
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.constant.QuaternionMath;

@@ -21,8 +21,6 @@
  */
 package org.ojalgo.function;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
-
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;

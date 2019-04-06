@@ -22,9 +22,6 @@
 package org.ojalgo.function.constant;
 
 import org.ojalgo.function.QuaternionFunction;
-import org.ojalgo.function.QuaternionFunction.Binary;
-import org.ojalgo.function.QuaternionFunction.Parameter;
-import org.ojalgo.function.QuaternionFunction.Unary;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
 

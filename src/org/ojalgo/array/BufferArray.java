@@ -21,7 +21,6 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.io.File;

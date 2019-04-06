@@ -21,8 +21,6 @@
  */
 package org.ojalgo.series.primitive;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
-
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access1D;

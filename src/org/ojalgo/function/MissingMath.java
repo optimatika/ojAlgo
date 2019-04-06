@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function.constant.tmp;
+package org.ojalgo.function;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -60,13 +60,31 @@ public abstract class MissingMath {
 
             return arg;
 
+        } else if (param == 2) {
+
+            final BigDecimal bigArg = arg.round(MathContext.DECIMAL128);
+            final BigDecimal bigParam = BigDecimal.valueOf(param);
+
+            BigDecimal retVal = BigDecimal.ZERO;
+            final double primArg = bigArg.doubleValue();
+            if (!Double.isInfinite(primArg) && !Double.isNaN(primArg)) {
+                retVal = BigDecimal.valueOf(Math.pow(primArg, 1.0 / param)); // Intial guess
+            }
+
+            BigDecimal shouldBeZero;
+            while ((shouldBeZero = retVal.multiply(retVal, MathContext.DECIMAL128).subtract(bigArg)).signum() != 0) {
+                retVal = retVal.subtract(shouldBeZero.divide(bigParam.multiply(retVal.pow(param - 1)), MathContext.DECIMAL128));
+            }
+
+            return retVal;
+
         } else {
 
             final BigDecimal bigArg = arg.round(MathContext.DECIMAL128);
             final BigDecimal bigParam = BigDecimal.valueOf(param);
 
             BigDecimal retVal = BigDecimal.ZERO;
-            final double primArg = arg.doubleValue();
+            final double primArg = bigArg.doubleValue();
             if (!Double.isInfinite(primArg) && !Double.isNaN(primArg)) {
                 retVal = BigDecimal.valueOf(Math.pow(primArg, 1.0 / param)); // Intial guess
             }

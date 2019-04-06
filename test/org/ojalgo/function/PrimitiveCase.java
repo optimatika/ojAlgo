@@ -21,7 +21,6 @@
  */
 package org.ojalgo.function;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Test;

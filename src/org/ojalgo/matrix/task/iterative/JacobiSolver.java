@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;

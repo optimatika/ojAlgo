@@ -21,8 +21,6 @@
  */
 package org.ojalgo.function.aggregator;
 
-import static org.ojalgo.function.RationalFunction.*;
-
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.constant.RationalMath;

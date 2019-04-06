@@ -21,7 +21,6 @@
  */
 package org.ojalgo.ann;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.BasicFunction;

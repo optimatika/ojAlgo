@@ -24,9 +24,6 @@ package org.ojalgo.function.constant;
 import java.math.BigDecimal;
 
 import org.ojalgo.function.RationalFunction;
-import org.ojalgo.function.RationalFunction.Binary;
-import org.ojalgo.function.RationalFunction.Parameter;
-import org.ojalgo.function.RationalFunction.Unary;
 import org.ojalgo.scalar.RationalNumber;
 
 public abstract class RationalMath {
