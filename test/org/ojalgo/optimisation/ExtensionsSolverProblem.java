@@ -24,7 +24,7 @@ package org.ojalgo.optimisation;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * Optimisation "problems" originally reported as issues with some of the external solver intergrations in

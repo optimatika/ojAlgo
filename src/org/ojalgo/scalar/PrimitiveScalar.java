@@ -24,8 +24,7 @@ package org.ojalgo.scalar;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -231,11 +230,11 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
     }
 
     public double norm() {
-        return PrimitiveFunction.ABS.invoke(myValue);
+        return PrimitiveMath.ABS.invoke(myValue);
     }
 
     public PrimitiveScalar signum() {
-        return new PrimitiveScalar(PrimitiveFunction.SIGNUM.invoke(myValue));
+        return new PrimitiveScalar(PrimitiveMath.SIGNUM.invoke(myValue));
     }
 
     public PrimitiveScalar subtract(final double arg) {

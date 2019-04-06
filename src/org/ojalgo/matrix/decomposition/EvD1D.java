@@ -1,8 +1,9 @@
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -13,14 +14,14 @@ public abstract class EvD1D {
      */
     public static double[][] hqr2(final double[] mtrxH, final double[] mtrxV, final boolean allTheWay) {
 
-        final int tmpDiagDim = (int) SQRT.invoke(mtrxH.length);
+        final int tmpDiagDim = (int) PrimitiveMath.SQRT.invoke(mtrxH.length);
         final int tmpDiagDimMinusOne = tmpDiagDim - 1;
 
         // Store roots isolated by balanc and compute matrix norm
         double tmpVal = ZERO;
         for (int j = 0; j < tmpDiagDim; j++) {
             for (int i = Math.min(j + 1, tmpDiagDim - 1); i >= 0; i--) {
-                tmpVal += ABS.invoke(mtrxH[i + (tmpDiagDim * j)]);
+                tmpVal += PrimitiveMath.ABS.invoke(mtrxH[i + (tmpDiagDim * j)]);
             }
         }
         final double tmpNorm1 = tmpVal;
@@ -40,12 +41,12 @@ public abstract class EvD1D {
             // Look for single small sub-diagonal element
             int l = tmpMainIterIndex;
             while (l > 0) {
-                s = ABS.invoke(mtrxH[(l - 1) + (tmpDiagDim * (l - 1))]) + ABS.invoke(mtrxH[l + (tmpDiagDim * l)]);
+                s = PrimitiveMath.ABS.invoke(mtrxH[(l - 1) + (tmpDiagDim * (l - 1))]) + PrimitiveMath.ABS.invoke(mtrxH[l + (tmpDiagDim * l)]);
                 // if (s ==  ZERO) {
                 if (NumberContext.compare(s, ZERO) == 0) {
                     s = tmpNorm1;
                 }
-                if (ABS.invoke(mtrxH[l + (tmpDiagDim * (l - 1))]) < (MACHINE_EPSILON * s)) {
+                if (PrimitiveMath.ABS.invoke(mtrxH[l + (tmpDiagDim * (l - 1))]) < (MACHINE_EPSILON * s)) {
                     break;
                 }
                 l--;
@@ -65,7 +66,7 @@ public abstract class EvD1D {
                 w = mtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))] * mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * tmpMainIterIndex)];
                 p = (mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))] - mtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)]) / 2.0;
                 q = (p * p) + w;
-                z = SQRT.invoke(ABS.invoke(q));
+                z = PrimitiveMath.SQRT.invoke(PrimitiveMath.ABS.invoke(q));
                 mtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)] = mtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)] + exshift;
                 mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))] = mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))]
                         + exshift;
@@ -87,10 +88,10 @@ public abstract class EvD1D {
                     e[tmpMainIterIndex - 1] = ZERO;
                     e[tmpMainIterIndex] = ZERO;
                     x = mtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))];
-                    s = ABS.invoke(x) + ABS.invoke(z);
+                    s = PrimitiveMath.ABS.invoke(x) + PrimitiveMath.ABS.invoke(z);
                     p = x / s;
                     q = z / s;
-                    r = SQRT.invoke((p * p) + (q * q));
+                    r = PrimitiveMath.SQRT.invoke((p * p) + (q * q));
                     p = p / r;
                     q = q / r;
 
@@ -143,8 +144,8 @@ public abstract class EvD1D {
                     for (int i = 0; i <= tmpMainIterIndex; i++) {
                         mtrxH[i + (tmpDiagDim * i)] -= x;
                     }
-                    s = ABS.invoke(mtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))])
-                            + ABS.invoke(mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 2))]);
+                    s = PrimitiveMath.ABS.invoke(mtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))])
+                            + PrimitiveMath.ABS.invoke(mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 2))]);
                     x = y = 0.75 * s;
                     w = -0.4375 * s * s;
                 }
@@ -154,7 +155,7 @@ public abstract class EvD1D {
                     s = (y - x) / 2.0;
                     s = (s * s) + w;
                     if (s > 0) {
-                        s = SQRT.invoke(s);
+                        s = PrimitiveMath.SQRT.invoke(s);
                         if (y < x) {
                             s = -s;
                         }
@@ -178,15 +179,15 @@ public abstract class EvD1D {
                     p = (((r * s) - w) / mtrxH[(m + 1) + (tmpDiagDim * m)]) + mtrxH[m + (tmpDiagDim * (m + 1))];
                     q = mtrxH[(m + 1) + (tmpDiagDim * (m + 1))] - z - r - s;
                     r = mtrxH[(m + 2) + (tmpDiagDim * (m + 1))];
-                    s = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
+                    s = PrimitiveMath.ABS.invoke(p) + PrimitiveMath.ABS.invoke(q) + PrimitiveMath.ABS.invoke(r);
                     p = p / s;
                     q = q / s;
                     r = r / s;
                     if (m == l) {
                         break;
                     }
-                    if ((ABS.invoke(mtrxH[m + (tmpDiagDim * (m - 1))]) * (ABS.invoke(q) + ABS.invoke(r))) < (MACHINE_EPSILON * (ABS.invoke(p)
-                            * (ABS.invoke(mtrxH[(m - 1) + (tmpDiagDim * (m - 1))]) + ABS.invoke(z) + ABS.invoke(mtrxH[(m + 1) + (tmpDiagDim * (m + 1))]))))) {
+                    if ((PrimitiveMath.ABS.invoke(mtrxH[m + (tmpDiagDim * (m - 1))]) * (PrimitiveMath.ABS.invoke(q) + PrimitiveMath.ABS.invoke(r))) < (MACHINE_EPSILON * (PrimitiveMath.ABS.invoke(p)
+                            * (PrimitiveMath.ABS.invoke(mtrxH[(m - 1) + (tmpDiagDim * (m - 1))]) + PrimitiveMath.ABS.invoke(z) + PrimitiveMath.ABS.invoke(mtrxH[(m + 1) + (tmpDiagDim * (m + 1))]))))) {
                         break;
                     }
                     m--;
@@ -206,7 +207,7 @@ public abstract class EvD1D {
                         p = mtrxH[k + (tmpDiagDim * (k - 1))];
                         q = mtrxH[(k + 1) + (tmpDiagDim * (k - 1))];
                         r = (notlast ? mtrxH[(k + 2) + (tmpDiagDim * (k - 1))] : ZERO);
-                        x = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
+                        x = PrimitiveMath.ABS.invoke(p) + PrimitiveMath.ABS.invoke(q) + PrimitiveMath.ABS.invoke(r);
                         // if (x ==  ZERO) {
                         if (NumberContext.compare(x, ZERO) == 0) {
                             continue;
@@ -216,7 +217,7 @@ public abstract class EvD1D {
                         r = r / x;
                     }
 
-                    s = SQRT.invoke((p * p) + (q * q) + (r * r));
+                    s = PrimitiveMath.SQRT.invoke((p * p) + (q * q) + (r * r));
                     if (p < 0) {
                         s = -s;
                     }
@@ -273,7 +274,7 @@ public abstract class EvD1D {
         // Backsubstitute to find vectors of upper triangular form
         // if (allTheWay && (tmpNorm1 !=  ZERO)) {
         if (allTheWay && (NumberContext.compare(tmpNorm1, ZERO) != 0)) {
-            final int tmpDiagDim1 = (int) SQRT.invoke(mtrxH.length);
+            final int tmpDiagDim1 = (int) PrimitiveMath.SQRT.invoke(mtrxH.length);
             final int tmpDiagDimMinusOne1 = tmpDiagDim1 - 1;
 
             // BasicLogger.debug("r={}, s={}, z={}", r, s, z);
@@ -320,7 +321,7 @@ public abstract class EvD1D {
                                 q1 = ((d[i] - p1) * (d[i] - p1)) + (e[i] * e[i]);
                                 t = ((x1 * s) - (z * r)) / q1;
                                 mtrxH[i + (tmpDiagDim1 * ij)] = t;
-                                if (ABS.invoke(x1) > ABS.invoke(z)) {
+                                if (PrimitiveMath.ABS.invoke(x1) > PrimitiveMath.ABS.invoke(z)) {
                                     mtrxH[(i + 1) + (tmpDiagDim1 * ij)] = (-r - (w1 * t)) / x1;
                                 } else {
                                     mtrxH[(i + 1) + (tmpDiagDim1 * ij)] = (-s - (y1 * t)) / z;
@@ -328,7 +329,7 @@ public abstract class EvD1D {
                             }
 
                             // Overflow control
-                            t = ABS.invoke(mtrxH[i + (tmpDiagDim1 * ij)]);
+                            t = PrimitiveMath.ABS.invoke(mtrxH[i + (tmpDiagDim1 * ij)]);
                             if (((MACHINE_EPSILON * t) * t) > 1) {
                                 for (int j = i; j <= ij; j++) {
                                     mtrxH[j + (tmpDiagDim1 * ij)] = mtrxH[j + (tmpDiagDim1 * ij)] / t;
@@ -342,7 +343,7 @@ public abstract class EvD1D {
                     int l = ij - 1;
 
                     // Last vector component imaginary so matrix is triangular
-                    if (ABS.invoke(mtrxH[ij + (tmpDiagDim1 * (ij - 1))]) > ABS.invoke(mtrxH[(ij - 1) + (tmpDiagDim1 * ij)])) {
+                    if (PrimitiveMath.ABS.invoke(mtrxH[ij + (tmpDiagDim1 * (ij - 1))]) > PrimitiveMath.ABS.invoke(mtrxH[(ij - 1) + (tmpDiagDim1 * ij)])) {
                         mtrxH[(ij - 1) + (tmpDiagDim1 * (ij - 1))] = q1 / mtrxH[ij + (tmpDiagDim1 * (ij - 1))];
                         mtrxH[(ij - 1) + (tmpDiagDim1 * ij)] = -(mtrxH[ij + (tmpDiagDim1 * ij)] - p1) / mtrxH[ij + (tmpDiagDim1 * (ij - 1))];
                     } else {
@@ -393,7 +394,7 @@ public abstract class EvD1D {
                                 vi = (d[i] - p1) * 2.0 * q1;
                                 // if ((vr ==  ZERO) & (vi ==  ZERO)) {
                                 if ((NumberContext.compare(vr, ZERO) == 0) && (NumberContext.compare(vi, ZERO) == 0)) {
-                                    vr = MACHINE_EPSILON * tmpNorm1 * (ABS.invoke(w1) + ABS.invoke(q1) + ABS.invoke(x1) + ABS.invoke(y1) + ABS.invoke(z));
+                                    vr = MACHINE_EPSILON * tmpNorm1 * (PrimitiveMath.ABS.invoke(w1) + PrimitiveMath.ABS.invoke(q1) + PrimitiveMath.ABS.invoke(x1) + PrimitiveMath.ABS.invoke(y1) + PrimitiveMath.ABS.invoke(z));
                                 }
 
                                 final ComplexNumber tmpX = ComplexNumber.of((((x1 * r) - (z * ra)) + (q1 * sa)), ((x1 * s) - (z * sa) - (q1 * ra)));
@@ -406,7 +407,7 @@ public abstract class EvD1D {
                                 mtrxH[i + (tmpDiagDim1 * (ij - 1))] = tmpZ.doubleValue();
                                 mtrxH[i + (tmpDiagDim1 * ij)] = tmpZ.i;
 
-                                if (ABS.invoke(x1) > (ABS.invoke(z) + ABS.invoke(q1))) {
+                                if (PrimitiveMath.ABS.invoke(x1) > (PrimitiveMath.ABS.invoke(z) + PrimitiveMath.ABS.invoke(q1))) {
                                     mtrxH[(i + 1) + (tmpDiagDim1 * (ij - 1))] = ((-ra - (w1 * mtrxH[i + (tmpDiagDim1 * (ij - 1))]))
                                             + (q1 * mtrxH[i + (tmpDiagDim1 * ij)])) / x1;
                                     mtrxH[(i + 1)
@@ -427,7 +428,7 @@ public abstract class EvD1D {
                             }
 
                             // Overflow control
-                            t = MAX.invoke(ABS.invoke(mtrxH[i + (tmpDiagDim1 * (ij - 1))]), ABS.invoke(mtrxH[i + (tmpDiagDim1 * ij)]));
+                            t = PrimitiveMath.MAX.invoke(PrimitiveMath.ABS.invoke(mtrxH[i + (tmpDiagDim1 * (ij - 1))]), PrimitiveMath.ABS.invoke(mtrxH[i + (tmpDiagDim1 * ij)]));
                             if (((MACHINE_EPSILON * t) * t) > 1) {
                                 for (int j = i; j <= ij; j++) {
                                     mtrxH[j + (tmpDiagDim1 * (ij - 1))] = mtrxH[j + (tmpDiagDim1 * (ij - 1))] / t;
@@ -471,7 +472,7 @@ public abstract class EvD1D {
             double tmpColNorm1 = ZERO;
 
             for (int i = m; i < size; i++) {
-                tmpColNorm1 += ABS.invoke(mtrxH[i + (size * ij)]);
+                tmpColNorm1 += PrimitiveMath.ABS.invoke(mtrxH[i + (size * ij)]);
             }
 
             // if (tmpColNorm1 !=  ZERO) {
@@ -483,7 +484,7 @@ public abstract class EvD1D {
                     vctrWork[i] = mtrxH[i + (size * ij)] / tmpColNorm1;
                     tmpInvBeta += vctrWork[i] * vctrWork[i];
                 }
-                double g = SQRT.invoke(tmpInvBeta);
+                double g = PrimitiveMath.SQRT.invoke(tmpInvBeta);
                 if (vctrWork[m] > 0) {
                     g = -g;
                 }

@@ -21,14 +21,14 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.BasicArray;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -123,7 +123,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
     public int getRank() {
 
-        final double tolerance = SQRT.invoke(this.getAlgorithmEpsilon());
+        final double tolerance = PrimitiveMath.SQRT.invoke(this.getAlgorithmEpsilon());
         int rank = 0;
 
         final DecompositionStore<N> inPlaceStore = this.getInPlace();
@@ -278,8 +278,8 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
             // Do the calculations...
             final double tmpVal = tmpInPlace.doubleValue(ij, ij);
-            myMaxDiag = MAX.invoke(myMaxDiag, tmpVal);
-            myMinDiag = MIN.invoke(myMinDiag, tmpVal);
+            myMaxDiag = PrimitiveMath.MAX.invoke(myMaxDiag, tmpVal);
+            myMinDiag = PrimitiveMath.MIN.invoke(myMinDiag, tmpVal);
             if (tmpVal > PrimitiveMath.ZERO) {
 
                 tmpInPlace.modifyOne(ij, ij, tmpSqrtFunc);

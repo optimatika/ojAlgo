@@ -21,23 +21,17 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.ONE;
-import static org.ojalgo.constant.PrimitiveMath.EIGHT;
-import static org.ojalgo.constant.PrimitiveMath.TWO;
-import static org.ojalgo.constant.PrimitiveMath.ZERO;
-
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.BigAggregator;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -50,7 +44,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.Constraint, Optimisation.Objective, Comparable<ME> {
 
-    private static final double _32_0 = EIGHT + EIGHT + EIGHT + EIGHT;
+    private static final double _32_0 = PrimitiveMath.EIGHT + PrimitiveMath.EIGHT + PrimitiveMath.EIGHT + PrimitiveMath.EIGHT;
     private static final BigDecimal LARGEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_LARGEST), new MathContext(8, RoundingMode.DOWN));
     private static final BigDecimal SMALLEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_SMALLEST), new MathContext(8, RoundingMode.UP));
 
@@ -58,8 +52,8 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
     static int getAdjustmentExponent(final double largest, final double smallest) {
 
-        final double tmpLargestExp = largest > ZERO ? PrimitiveFunction.LOG10.invoke(largest) : ZERO;
-        final double tmpSmallestExp = smallest > ZERO ? PrimitiveFunction.LOG10.invoke(smallest) : -EIGHT;
+        final double tmpLargestExp = largest > PrimitiveMath.ZERO ? PrimitiveMath.LOG10.invoke(largest) : PrimitiveMath.ZERO;
+        final double tmpSmallestExp = smallest > PrimitiveMath.ZERO ? PrimitiveMath.LOG10.invoke(smallest) : -PrimitiveMath.EIGHT;
 
         if ((tmpLargestExp - tmpSmallestExp) > ModelEntity._32_0) {
 
@@ -67,7 +61,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
         } else {
 
-            final double tmpNegatedAverage = (tmpLargestExp + tmpSmallestExp) / (-TWO);
+            final double tmpNegatedAverage = (tmpLargestExp + tmpSmallestExp) / (-PrimitiveMath.TWO);
 
             return (int) Math.round(tmpNegatedAverage);
         }
@@ -225,7 +219,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
                 if (magnitude.compareTo(LARGEST) >= 0) {
                     limit = null;
                 } else if (magnitude.compareTo(SMALLEST) <= 0) {
-                    limit = BigMath.ZERO;
+                    limit = org.ojalgo.function.constant.BigMath.ZERO;
                 }
                 myLowerLimit = limit;
             }
@@ -260,7 +254,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
                 if (magnitude.compareTo(LARGEST) >= 0) {
                     limit = null;
                 } else if (magnitude.compareTo(SMALLEST) <= 0) {
-                    limit = BigMath.ZERO;
+                    limit = org.ojalgo.function.constant.BigMath.ZERO;
                 }
                 myUpperLimit = limit;
             }
@@ -466,8 +460,8 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     }
 
     void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
-        largest.invoke(ONE);
-        smallest.invoke(ONE);
+        largest.invoke(BigMath.ONE);
+        smallest.invoke(BigMath.ONE);
         if (myLowerLimit != null) {
             largest.invoke(myLowerLimit);
             smallest.invoke(myLowerLimit);

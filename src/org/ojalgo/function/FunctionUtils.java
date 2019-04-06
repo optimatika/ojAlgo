@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function;
 
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 
 public abstract class FunctionUtils {

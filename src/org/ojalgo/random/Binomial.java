@@ -21,9 +21,9 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.CombinatorialFunctions;
 
 /**
@@ -55,8 +55,8 @@ public class Binomial extends AbstractDiscrete {
     }
 
     public double getProbability(final int value) {
-        return CombinatorialFunctions.subsets(myCount, value) * PrimitiveFunction.POW.invoke(myProbability, value)
-                * PrimitiveFunction.POW.invoke(ONE - myProbability, myCount - value);
+        return CombinatorialFunctions.subsets(myCount, value) * PrimitiveMath.POW.invoke(myProbability, value)
+                * PrimitiveMath.POW.invoke(ONE - myProbability, myCount - value);
     }
 
     @Override

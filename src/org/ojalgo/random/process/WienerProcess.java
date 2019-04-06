@@ -21,9 +21,9 @@
  */
 package org.ojalgo.random.process;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.random.Normal;
 
@@ -47,7 +47,7 @@ public final class WienerProcess extends AbstractProcess<Normal> {
     }
 
     public Normal getDistribution(final double evaluationPoint) {
-        return new Normal(this.getValue(), PrimitiveFunction.SQRT.invoke(evaluationPoint));
+        return new Normal(this.getValue(), PrimitiveMath.SQRT.invoke(evaluationPoint));
     }
 
     @Override
@@ -57,7 +57,7 @@ public final class WienerProcess extends AbstractProcess<Normal> {
 
     @Override
     protected double step(final double currentValue, final double stepSize, final double normalisedRandomIncrement) {
-        final double retVal = currentValue + (PrimitiveFunction.SQRT.invoke(stepSize) * normalisedRandomIncrement);
+        final double retVal = currentValue + (PrimitiveMath.SQRT.invoke(stepSize) * normalisedRandomIncrement);
         this.setValue(retVal);
         return retVal;
     }
@@ -69,17 +69,17 @@ public final class WienerProcess extends AbstractProcess<Normal> {
 
     @Override
     double getLowerConfidenceQuantile(final double stepSize, final double confidence) {
-        return this.getValue() - (PrimitiveFunction.SQRT.invoke(stepSize) * SQRT_TWO * ErrorFunction.erfi(confidence));
+        return this.getValue() - (PrimitiveMath.SQRT.invoke(stepSize) * SQRT_TWO * ErrorFunction.erfi(confidence));
     }
 
     @Override
     double getStandardDeviation(final double stepSize) {
-        return PrimitiveFunction.SQRT.invoke(stepSize);
+        return PrimitiveMath.SQRT.invoke(stepSize);
     }
 
     @Override
     double getUpperConfidenceQuantile(final double stepSize, final double confidence) {
-        return this.getValue() + (PrimitiveFunction.SQRT.invoke(stepSize) * SQRT_TWO * ErrorFunction.erfi(confidence));
+        return this.getValue() + (PrimitiveMath.SQRT.invoke(stepSize) * SQRT_TWO * ErrorFunction.erfi(confidence));
     }
 
     @Override

@@ -24,10 +24,10 @@ package org.ojalgo.array;
 import java.util.List;
 
 import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;

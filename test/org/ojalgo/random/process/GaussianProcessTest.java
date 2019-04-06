@@ -21,13 +21,13 @@
  */
 package org.ojalgo.random.process;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.process.GaussianField.Mean;
@@ -58,7 +58,7 @@ public class GaussianProcessTest {
 
                 final double tmpL = 1.0;
 
-                double retVal = tmpSF * tmpSF * PrimitiveFunction.EXP.invoke(-PrimitiveFunction.POW.invoke(anArg1 - anArg2, TWO) / (TWO * tmpL * tmpL));
+                double retVal = tmpSF * tmpSF * PrimitiveMath.EXP.invoke(-PrimitiveMath.POW.invoke(anArg1 - anArg2, TWO) / (TWO * tmpL * tmpL));
 
                 if (anArg1 == anArg2) {
                     retVal += tmpSN * tmpSN;

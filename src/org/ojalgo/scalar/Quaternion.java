@@ -24,8 +24,7 @@ package org.ojalgo.scalar;
 import java.math.BigDecimal;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -281,7 +280,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
             return new Quaternion(norm);
 
-        } else if (PrimitiveFunction.ABS.invoke(tmpAngle - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
+        } else if (PrimitiveMath.ABS.invoke(tmpAngle - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
 
             return new Quaternion(-norm);
 
@@ -289,7 +288,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
             double tmpScalar = PrimitiveMath.ZERO;
             if (norm != PrimitiveMath.ZERO) {
-                final double tmpCos = PrimitiveFunction.COS.invoke(tmpAngle);
+                final double tmpCos = PrimitiveMath.COS.invoke(tmpAngle);
                 if (tmpCos != PrimitiveMath.ZERO) {
                     tmpScalar = norm * tmpCos;
                 }
@@ -299,7 +298,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
             double tmpJ = PrimitiveMath.ZERO;
             double tmpK = PrimitiveMath.ZERO;
             if (norm != PrimitiveMath.ZERO) {
-                final double tmpSin = PrimitiveFunction.SIN.invoke(tmpAngle);
+                final double tmpSin = PrimitiveMath.SIN.invoke(tmpAngle);
                 if (tmpSin != PrimitiveMath.ZERO) {
                     tmpI = unit[0] * norm * tmpSin;
                     tmpJ = unit[1] * norm * tmpSin;
@@ -314,7 +313,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
     public static Versor makeRotation(final RotationAxis axis, final double angle) {
 
-        final double tmpScalar = PrimitiveFunction.COS.invoke(angle);
+        final double tmpScalar = PrimitiveMath.COS.invoke(angle);
 
         double tmpI = PrimitiveMath.ZERO;
         double tmpJ = PrimitiveMath.ZERO;
@@ -324,17 +323,17 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
         case X:
 
-            tmpI = PrimitiveFunction.SIN.invoke(angle);
+            tmpI = PrimitiveMath.SIN.invoke(angle);
             break;
 
         case Y:
 
-            tmpJ = PrimitiveFunction.SIN.invoke(angle);
+            tmpJ = PrimitiveMath.SIN.invoke(angle);
             break;
 
         case Z:
 
-            tmpK = PrimitiveFunction.SIN.invoke(angle);
+            tmpK = PrimitiveMath.SIN.invoke(angle);
             break;
 
         default:
@@ -500,7 +499,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
     }
 
     public double angle() {
-        return PrimitiveFunction.ACOS.invoke(myScalar / this.norm());
+        return PrimitiveMath.ACOS.invoke(myScalar / this.norm());
     }
 
     public int compareTo(final Quaternion reference) {
@@ -710,7 +709,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
     }
 
     public double getVectorLength() {
-        return PrimitiveFunction.SQRT.invoke(this.calculateSumOfSquaresVector());
+        return PrimitiveMath.SQRT.invoke(this.calculateSumOfSquaresVector());
     }
 
     @Override
@@ -822,7 +821,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
     }
 
     public double norm() {
-        return PrimitiveFunction.SQRT.invoke(this.calculateSumOfSquaresAll());
+        return PrimitiveMath.SQRT.invoke(this.calculateSumOfSquaresAll());
     }
 
     public double scalar() {
@@ -968,7 +967,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         } else {
             retVal.append(" + ");
         }
-        retVal.append(Double.toString(PrimitiveFunction.ABS.invoke(i)));
+        retVal.append(Double.toString(PrimitiveMath.ABS.invoke(i)));
         retVal.append("i");
 
         if (j < PrimitiveMath.ZERO) {
@@ -976,7 +975,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         } else {
             retVal.append(" + ");
         }
-        retVal.append(Double.toString(PrimitiveFunction.ABS.invoke(j)));
+        retVal.append(Double.toString(PrimitiveMath.ABS.invoke(j)));
         retVal.append("j");
 
         if (k < PrimitiveMath.ZERO) {
@@ -984,7 +983,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         } else {
             retVal.append(" + ");
         }
-        retVal.append(Double.toString(PrimitiveFunction.ABS.invoke(k)));
+        retVal.append(Double.toString(PrimitiveMath.ABS.invoke(k)));
         retVal.append("k)");
 
         return retVal.toString();

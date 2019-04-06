@@ -21,9 +21,9 @@
  */
 package org.ojalgo.type.keyvalue;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.ASCII;
 
 public final class LongToDouble implements KeyValue<Long, Double> {

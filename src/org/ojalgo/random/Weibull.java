@@ -21,9 +21,9 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.GammaFunction;
 
 /**
@@ -65,7 +65,7 @@ public class Weibull extends RandomNumber {
 
     @Override
     protected double generate() {
-        return PrimitiveFunction.POW.invoke(-PrimitiveFunction.LOG.invoke(this.random().nextDouble()), ONE / myShape) / myRate;
+        return PrimitiveMath.POW.invoke(-PrimitiveMath.LOG.invoke(this.random().nextDouble()), ONE / myShape) / myRate;
     }
 
 }

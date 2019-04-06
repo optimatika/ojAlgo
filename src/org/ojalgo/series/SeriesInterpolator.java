@@ -24,7 +24,7 @@ package org.ojalgo.series;
 import java.math.BigDecimal;
 import java.util.TreeMap;
 
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;

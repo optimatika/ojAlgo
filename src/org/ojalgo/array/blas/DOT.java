@@ -23,8 +23,8 @@ package org.ojalgo.array.blas;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 

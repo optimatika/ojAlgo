@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.constant.BigMath;
+import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;

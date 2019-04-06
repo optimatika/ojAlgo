@@ -24,9 +24,8 @@ package org.ojalgo.function.aggregator;
 import static org.ojalgo.function.ComplexFunction.*;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.ComplexFunction;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.ComplexMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -140,7 +139,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                 }
 
                 public void invoke(final ComplexNumber anArg) {
-                    myNumber = ComplexFunction.MAX.invoke(myNumber, ABS.invoke(anArg));
+                    myNumber = ComplexMath.MAX.invoke(myNumber, ComplexMath.ABS.invoke(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -173,7 +172,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                 }
 
                 public void invoke(final ComplexNumber anArg) {
-                    myNumber = ComplexFunction.MAX.invoke(myNumber, anArg);
+                    myNumber = ComplexMath.MAX.invoke(myNumber, anArg);
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -210,7 +209,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                 }
 
                 public void invoke(final ComplexNumber anArg) {
-                    myNumber = ComplexFunction.MIN.invoke(myNumber, anArg);
+                    myNumber = ComplexMath.MIN.invoke(myNumber, anArg);
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -268,7 +267,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                 private ComplexNumber myNumber = ComplexNumber.ZERO;
 
                 public ComplexNumber get() {
-                    return ComplexNumber.valueOf(PrimitiveFunction.SQRT.invoke(myNumber.norm()));
+                    return ComplexNumber.valueOf(PrimitiveMath.SQRT.invoke(myNumber.norm()));
                 }
 
                 public int intValue() {
@@ -380,7 +379,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 public void invoke(final ComplexNumber anArg) {
                     if (!ComplexNumber.isSmall(PrimitiveMath.ONE, anArg)) {
-                        myNumber = ComplexFunction.MIN.invoke(myNumber, ABS.invoke(anArg));
+                        myNumber = ComplexMath.MIN.invoke(myNumber, ComplexMath.ABS.invoke(anArg));
                     }
                 }
 

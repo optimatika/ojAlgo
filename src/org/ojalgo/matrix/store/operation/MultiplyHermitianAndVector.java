@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.scalar.Scalar;
 

@@ -21,9 +21,9 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * Distribution of length of life when no aging. Describes the time between events in a Poisson process, i.e.
@@ -53,7 +53,7 @@ public class Exponential extends AbstractContinuous {
         if (value < ZERO) {
             return ZERO;
         } else {
-            return myRate * PrimitiveFunction.EXP.invoke(-myRate * value);
+            return myRate * PrimitiveMath.EXP.invoke(-myRate * value);
         }
     }
 
@@ -61,7 +61,7 @@ public class Exponential extends AbstractContinuous {
         if (value < ZERO) {
             return ZERO;
         } else {
-            return ONE - PrimitiveFunction.EXP.invoke(-myRate * value);
+            return ONE - PrimitiveMath.EXP.invoke(-myRate * value);
         }
     }
 
@@ -73,7 +73,7 @@ public class Exponential extends AbstractContinuous {
 
         this.checkProbabilty(probability);
 
-        return PrimitiveFunction.LOG.invoke(ONE - probability) / -myRate;
+        return PrimitiveMath.LOG.invoke(ONE - probability) / -myRate;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class Exponential extends AbstractContinuous {
 
     @Override
     protected double generate() {
-        return -PrimitiveFunction.LOG.invoke(this.random().nextDouble()) / myRate;
+        return -PrimitiveMath.LOG.invoke(this.random().nextDouble()) / myRate;
     }
 
 }

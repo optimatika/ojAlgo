@@ -21,12 +21,12 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access2D;
@@ -45,7 +45,7 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
 
         final int tmpCountRows = equations.size();
         for (int r = 0; r < tmpCountRows; r++) {
-            tmpNormRHS = PrimitiveFunction.HYPOT.invoke(tmpNormRHS, equations.get(r).getRHS());
+            tmpNormRHS = PrimitiveMath.HYPOT.invoke(tmpNormRHS, equations.get(r).getRHS());
         }
 
         int tmpIterations = 0;
@@ -58,7 +58,7 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
             tmpNormErr = ZERO;
 
             for (int r = 0; r < tmpCountRows; r++) {
-                tmpNormErr = PrimitiveFunction.HYPOT.invoke(tmpNormErr, equations.get(r).adjust(solution, tmpRelaxationFactor));
+                tmpNormErr = PrimitiveMath.HYPOT.invoke(tmpNormErr, equations.get(r).adjust(solution, tmpRelaxationFactor));
             }
 
             tmpIterations++;

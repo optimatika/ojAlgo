@@ -21,11 +21,11 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 
@@ -39,7 +39,7 @@ public final class Normal1D extends RandomNumber1D {
         final Array1D<Double> tmpStdDev = Array1D.PRIMITIVE64.makeZero(tmpDim);
 
         for (int ij = 0; ij < tmpDim; ij++) {
-            tmpStdDev.set(ij, PrimitiveFunction.SQRT.invoke(covariances.doubleValue(ij, ij)));
+            tmpStdDev.set(ij, PrimitiveMath.SQRT.invoke(covariances.doubleValue(ij, ij)));
         }
 
         double tmpCorrelation;
@@ -71,7 +71,7 @@ public final class Normal1D extends RandomNumber1D {
         myLocations = Array1D.PRIMITIVE64.copy(locations);
         myScales = Array1D.PRIMITIVE64.makeZero(tmpDim);
         for (int ij = 0; ij < tmpDim; ij++) {
-            myScales.set(ij, PrimitiveFunction.SQRT.invoke(covariances.doubleValue(ij, ij)));
+            myScales.set(ij, PrimitiveMath.SQRT.invoke(covariances.doubleValue(ij, ij)));
         }
     }
 

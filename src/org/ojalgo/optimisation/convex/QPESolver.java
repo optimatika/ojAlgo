@@ -21,9 +21,9 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -139,7 +139,7 @@ final class QPESolver extends ConstrainedSolver {
             this.setState(State.OPTIMAL);
 
             if (myFeasible) {
-                this.getSolutionX().modifyMatching(PrimitiveFunction.ADD, tmpIterX);
+                this.getSolutionX().modifyMatching(PrimitiveMath.ADD, tmpIterX);
             } else {
                 this.getSolutionX().fillMatching(tmpIterX);
             }

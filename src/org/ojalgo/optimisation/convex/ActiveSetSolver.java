@@ -21,17 +21,17 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Optional;
 
 import org.ojalgo.array.SparseArray;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.PrimitiveFunction.Unary;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -99,9 +99,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
                 final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
-                final double largest = PrimitiveFunction.MAX.invoke(largestInQ, largestInC);
+                final double largest = PrimitiveMath.MAX.invoke(largestInQ, largestInC);
 
-                this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
+                this.getIterationQ().modifyDiagonal(PrimitiveMath.ADD.second(largest * RELATIVELY_SMALL));
                 this.computeQ(this.getIterationQ());
 
                 this.getSolutionL().modifyAll((Unary) arg -> {
@@ -133,7 +133,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         final PhysicalStore<Double> soluX = this.getSolutionX();
 
-        iterX.modifyMatching(SUBTRACT, soluX);
+        iterX.modifyMatching(PrimitiveMath.SUBTRACT, soluX);
 
         final double normCurrentX = soluX.aggregateAll(Aggregator.LARGEST);
         final double normStepX = iterX.aggregateAll(Aggregator.LARGEST);
@@ -158,7 +158,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     final MatrixStore<Double> change = this.getMatrixAI(excluded).get().multiply(iterX);
 
                     final PhysicalStore<Double> steps = slack.copy();
-                    steps.modifyMatching(DIVIDE, change);
+                    steps.modifyMatching(PrimitiveMath.DIVIDE, change);
 
                     this.log("Numer/slack: {}", slack.asList());
                     this.log("Denom/chang: {}", change.copy().asList());
@@ -260,7 +260,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         for (int i = 0; i < incl.length; i++) {
             final double value = soluL.doubleValue(numbEqus + incl[i]);
-            final double weight = PrimitiveFunction.ABS.invoke(value) * PrimitiveFunction.MAX.invoke(-value, ONE);
+            final double weight = PrimitiveMath.ABS.invoke(value) * PrimitiveMath.MAX.invoke(-value, ONE);
             if (weight > maxWeight) {
                 maxWeight = weight;
                 toExclude = incl[i];

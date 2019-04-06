@@ -21,14 +21,13 @@
  */
 package org.ojalgo.random.process;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.ContinuousDistribution;
@@ -53,11 +52,11 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
 
             for (int m = 0; m <= 2; m++) {
 
-                final double tmpExpected = PrimitiveFunction.POW.invoke(TEN, m);
+                final double tmpExpected = PrimitiveMath.POW.invoke(TEN, m);
 
                 for (int s = -2; s <= 2; s++) {
 
-                    final double tmpVariance = PrimitiveFunction.POW.invoke(TEN, s);
+                    final double tmpVariance = PrimitiveMath.POW.invoke(TEN, s);
 
                     final GeometricBrownianMotion tmpProcess = GeometricBrownianMotion.make(tmpExpected, tmpVariance);
 
@@ -138,7 +137,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         final int tmpPeriods = 10000;
 
         final double tmpFactoryExpected = 1.05;
-        final double tmpFactoryStdDev = PrimitiveFunction.ABS.invoke(new Normal(0.0, (tmpFactoryExpected - ONE)).doubleValue());
+        final double tmpFactoryStdDev = PrimitiveMath.ABS.invoke(new Normal(0.0, (tmpFactoryExpected - ONE)).doubleValue());
         final Normal tmpFactoryDistr = new Normal(tmpFactoryExpected, tmpFactoryStdDev);
         TestUtils.assertEquals("Factory Expected", tmpFactoryExpected, tmpFactoryDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
         TestUtils.assertEquals("Factory Std Dev", tmpFactoryStdDev, tmpFactoryDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
@@ -153,7 +152,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         final Primitive64Array tmpLogDiffs = Primitive64Array.make(tmpPeriods);
         for (int t = 0; t < tmpPeriods; t++) {
             tmpQuotient.data[t] = tmpRawValues.data[t + 1] / tmpRawValues.data[t];
-            tmpLogDiffs.data[t] = PrimitiveFunction.LOG.invoke(tmpRawValues.data[t + 1]) - PrimitiveFunction.LOG.invoke(tmpRawValues.data[t]);
+            tmpLogDiffs.data[t] = PrimitiveMath.LOG.invoke(tmpRawValues.data[t + 1]) - PrimitiveMath.LOG.invoke(tmpRawValues.data[t]);
         }
         final SampleSet tmpQuotientSet = SampleSet.wrap(tmpQuotient);
         final SampleSet tmpLogDiffsSet = SampleSet.wrap(tmpLogDiffs);
@@ -210,10 +209,10 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         TestUtils.assertEquals(tmpQuotienVal, tmpProcessVal, tmpDeltaVar);
 
         tmpFactoryVal = tmpRawValues.data[tmpPeriods];
-        tmpQuotienVal = PrimitiveFunction.POW.invoke(tmpQuotienDistr.getExpected(), tmpPeriods);
-        tmpLogDiffVal = PrimitiveFunction.POW.invoke(tmpLogDiffDistr.getExpected(), tmpPeriods);
+        tmpQuotienVal = PrimitiveMath.POW.invoke(tmpQuotienDistr.getExpected(), tmpPeriods);
+        tmpLogDiffVal = PrimitiveMath.POW.invoke(tmpLogDiffDistr.getExpected(), tmpPeriods);
         tmpProcessVal = tmpProcess.getExpected(tmpPeriods);
-        tmpGeometrVal = PrimitiveFunction.POW.invoke(tmpProcessDistr.getGeometricMean(), tmpPeriods);
+        tmpGeometrVal = PrimitiveMath.POW.invoke(tmpProcessDistr.getGeometricMean(), tmpPeriods);
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Final Value", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
@@ -238,9 +237,9 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
             ErrorFunction.erfi(0.95);
 
             final double tmpProcUpper = tmpProc.getUpperConfidenceQuantile(tmpStep, 0.95);
-            final double tmpProcFact = PrimitiveFunction.SQRT.invoke(tmpProcUpper / tmpProc.getLowerConfidenceQuantile(tmpStep, 0.95));
+            final double tmpProcFact = PrimitiveMath.SQRT.invoke(tmpProcUpper / tmpProc.getLowerConfidenceQuantile(tmpStep, 0.95));
             final double tmpDistUpper = tmpDist.getQuantile(0.975);
-            final double tmpDistFact = PrimitiveFunction.SQRT.invoke(tmpDistUpper / tmpDist.getQuantile(0.025));
+            final double tmpDistFact = PrimitiveMath.SQRT.invoke(tmpDistUpper / tmpDist.getQuantile(0.025));
 
             if (RandomProcessTests.DEBUG) {
                 BasicLogger.debug("Step={} ProcFact={} DistFact={} ProcMedian={} DistMedian={} expected={} median={}", tmpStep, tmpProcFact, tmpDistFact,

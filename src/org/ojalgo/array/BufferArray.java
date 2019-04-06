@@ -21,8 +21,8 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,7 +38,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -48,6 +47,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -456,7 +456,7 @@ public abstract class BufferArray extends PlainArray<Double> {
         double tmpValue;
 
         for (int i = first; i < limit; i += step) {
-            tmpValue = ABS.invoke(this.doubleValue(i));
+            tmpValue = PrimitiveMath.ABS.invoke(this.doubleValue(i));
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = i;

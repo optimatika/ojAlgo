@@ -23,6 +23,7 @@ package org.ojalgo.constant;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;
 
 public class PrimitiveMathTest {

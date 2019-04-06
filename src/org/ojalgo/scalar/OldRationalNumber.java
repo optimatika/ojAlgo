@@ -25,8 +25,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -425,7 +424,7 @@ final class OldRationalNumber extends Number implements Scalar<OldRationalNumber
     }
 
     public double norm() {
-        return PrimitiveFunction.ABS.invoke(this.doubleValue());
+        return PrimitiveMath.ABS.invoke(this.doubleValue());
     }
 
     public OldRationalNumber signum() {

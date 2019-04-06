@@ -25,9 +25,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.constant.ComplexMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.P20030422Case;
 import org.ojalgo.matrix.P20030512Case;
 import org.ojalgo.matrix.P20030528Case;
@@ -116,7 +117,7 @@ public class SingularValueTest {
         final PhysicalStore<Double> tmpBaseMtrx = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        final Array1D<Double> tmpExpectedSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveFunction.SQRT.invoke(5.0), 0.0 });
+        final Array1D<Double> tmpExpectedSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
         final ComplexNumber[] tmpScales = new ComplexNumber[] { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
                 ComplexNumber.makePolar(1.0, -Math.PI / 2.0), ComplexNumber.makePolar(1.0, Math.PI / 4.0),
@@ -128,7 +129,7 @@ public class SingularValueTest {
         for (final ComplexNumber tmpScale : tmpScales) {
 
             final PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericDenseStore.COMPLEX.transpose(tmpBaseMtrx);
-            tmpOriginalMtrx.modifyAll(ComplexFunction.MULTIPLY.first(tmpScale));
+            tmpOriginalMtrx.modifyAll(ComplexMath.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx);
             final MatrixStore<ComplexNumber> tmpReconstructed = tmpBidiagonal.reconstruct();
@@ -152,7 +153,7 @@ public class SingularValueTest {
             }
 
             final PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericDenseStore.COMPLEX.copy(tmpBaseMtrx);
-            tmpOriginalMtrx.modifyAll(ComplexFunction.MULTIPLY.first(tmpScale));
+            tmpOriginalMtrx.modifyAll(ComplexMath.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx.conjugate());
             tmpSVD.decompose(tmpOriginalMtrx);

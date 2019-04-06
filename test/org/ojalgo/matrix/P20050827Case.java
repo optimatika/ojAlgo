@@ -25,8 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array2D;
-import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.ComplexMath;
 import org.ojalgo.random.Normal;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
@@ -119,7 +119,7 @@ public class P20050827Case extends BasicMatrixTest {
 
         final ComplexMatrix tmpMtrx = tmpProblematic.multiply(tmpProblematic.conjugate());
         final ComplexNumber tmpVal = tmpMtrx.getTrace().get();
-        final ComplexNumber tmpExpected = ComplexFunction.ROOT.invoke(tmpVal, 2);
+        final ComplexNumber tmpExpected = ComplexMath.ROOT.invoke(tmpVal, 2);
         final ComplexNumber tmpActual = ComplexNumber.valueOf(tmpProblematic.aggregateAll(Aggregator.NORM2));
 
         TestUtils.assertEquals(tmpExpected.norm(), tmpActual.norm(), evaluation);

@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
@@ -77,8 +77,8 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
 
         double initialError = 0.0, trainedError = 0.0;
         for (int i = 0; i < trainedErrors.length; i++) {
-            initialError = PrimitiveFunction.HYPOT.invoke(initialError, initialErrors[i]);
-            trainedError = PrimitiveFunction.HYPOT.invoke(trainedError, trainedErrors[i]);
+            initialError = PrimitiveMath.HYPOT.invoke(initialError, initialErrors[i]);
+            trainedError = PrimitiveMath.HYPOT.invoke(trainedError, trainedErrors[i]);
         }
 
         TestUtils.assertTrue(initialError >= trainedError);

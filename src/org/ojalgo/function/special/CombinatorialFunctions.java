@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function.special;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 /**
  * https://reference.wolfram.com/language/tutorial/CombinatorialFunctions.html

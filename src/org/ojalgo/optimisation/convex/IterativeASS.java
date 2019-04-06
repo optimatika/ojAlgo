@@ -21,13 +21,14 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.MathContext;
 import java.util.Arrays;
 
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -232,7 +233,7 @@ final class IterativeASS extends ActiveSetSolver {
                 }
 
                 final ElementsSupplier<Double> tmpRHS = this.getIterationL(incl).premultiply(this.getIterationA().transpose())
-                        .operateOnMatching(this.getIterationC(), SUBTRACT);
+                        .operateOnMatching(this.getIterationC(), PrimitiveMath.SUBTRACT);
                 this.getSolutionQ(tmpRHS, iterX);
             }
         }
@@ -277,7 +278,7 @@ final class IterativeASS extends ActiveSetSolver {
             final MatrixStore<Double> iterB = this.getIterationB();
 
             final MatrixStore<Double> tmpCols = this.getSolutionQ(iterA.transpose());
-            final MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB).get();
+            final MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(iterA).operateOnMatching(PrimitiveMath.SUBTRACT, iterB).get();
 
             for (int j = 0; j < numbEqus; j++) {
                 myS.add(j, tmpCols.sliceColumn(j), tmpRHS.doubleValue(j), numbVars);

@@ -21,10 +21,10 @@
  */
 package org.ojalgo.random.process;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.random.Exponential;
 import org.ojalgo.random.Poisson;
 
@@ -85,7 +85,7 @@ public final class PoissonProcess extends AbstractProcess<Poisson> {
 
     @Override
     double getStandardDeviation(final double stepSize) {
-        return PrimitiveFunction.SQRT.invoke(myRate * stepSize);
+        return PrimitiveMath.SQRT.invoke(myRate * stepSize);
     }
 
     @Override

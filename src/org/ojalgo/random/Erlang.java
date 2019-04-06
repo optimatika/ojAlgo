@@ -21,9 +21,9 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * Distribution of the sum of aCount random variables with an exponential distribution with parameter aLambda.
@@ -64,7 +64,7 @@ public class Erlang extends RandomNumber {
         double tmpVal = ZERO;
 
         for (int i = 0; i < myCount; i++) {
-            tmpVal -= PrimitiveFunction.LOG.invoke(this.random().nextDouble());
+            tmpVal -= PrimitiveMath.LOG.invoke(this.random().nextDouble());
         }
 
         return tmpVal / myRate;

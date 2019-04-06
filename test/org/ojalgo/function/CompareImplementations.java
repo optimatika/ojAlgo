@@ -21,13 +21,18 @@
  */
 package org.ojalgo.function;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.ComplexMath;
+import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.constant.QuaternionMath;
+import org.ojalgo.function.constant.RationalMath;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -50,19 +55,19 @@ public class CompareImplementations {
 
     @Test
     public void testABS() {
-        this.assertUnary(BigFunction.ABS, ComplexFunction.ABS, PrimitiveFunction.ABS, QuaternionFunction.ABS, RationalFunction.ABS, AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.ABS, ComplexMath.ABS, PrimitiveMath.ABS, QuaternionMath.ABS, RationalMath.ABS, AROUND_ZERO.doubleValue());
     }
 
     @Test
     public void testACOS() {
 
-        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, NEG);
-        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, NEG / SQRT_TWO);
-        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, -HALF);
-        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, ZERO);
-        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, HALF);
-        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, ONE / SQRT_TWO);
-        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, ONE);
+        this.assertUnary(BigMath.ACOS, ComplexMath.ACOS, PrimitiveMath.ACOS, QuaternionMath.ACOS, RationalMath.ACOS, NEG);
+        this.assertUnary(BigMath.ACOS, ComplexMath.ACOS, PrimitiveMath.ACOS, QuaternionMath.ACOS, RationalMath.ACOS, NEG / SQRT_TWO);
+        this.assertUnary(BigMath.ACOS, ComplexMath.ACOS, PrimitiveMath.ACOS, QuaternionMath.ACOS, RationalMath.ACOS, -HALF);
+        this.assertUnary(BigMath.ACOS, ComplexMath.ACOS, PrimitiveMath.ACOS, QuaternionMath.ACOS, RationalMath.ACOS, ZERO);
+        this.assertUnary(BigMath.ACOS, ComplexMath.ACOS, PrimitiveMath.ACOS, QuaternionMath.ACOS, RationalMath.ACOS, HALF);
+        this.assertUnary(BigMath.ACOS, ComplexMath.ACOS, PrimitiveMath.ACOS, QuaternionMath.ACOS, RationalMath.ACOS, ONE / SQRT_TWO);
+        this.assertUnary(BigMath.ACOS, ComplexMath.ACOS, PrimitiveMath.ACOS, QuaternionMath.ACOS, RationalMath.ACOS, ONE);
 
     }
 
@@ -71,282 +76,282 @@ public class CompareImplementations {
 
         //        this.assertUnary(BigFunction.ACOSH, ComplexFunction.ACOSH, PrimitiveFunction.ACOSH, RationalFunction.ACOSH, POSITIVE.doubleValue());
 
-        this.assertUnary(BigFunction.ACOSH, ComplexFunction.ACOSH, PrimitiveFunction.ACOSH, QuaternionFunction.ACOSH, RationalFunction.ACOSH, PI);
-        this.assertUnary(BigFunction.ACOSH, ComplexFunction.ACOSH, PrimitiveFunction.ACOSH, QuaternionFunction.ACOSH, RationalFunction.ACOSH, E);
-        this.assertUnary(BigFunction.ACOSH, ComplexFunction.ACOSH, PrimitiveFunction.ACOSH, QuaternionFunction.ACOSH, RationalFunction.ACOSH, TWO);
-        this.assertUnary(BigFunction.ACOSH, ComplexFunction.ACOSH, PrimitiveFunction.ACOSH, QuaternionFunction.ACOSH, RationalFunction.ACOSH, HALF_PI);
-        this.assertUnary(BigFunction.ACOSH, ComplexFunction.ACOSH, PrimitiveFunction.ACOSH, QuaternionFunction.ACOSH, RationalFunction.ACOSH, ONE);
+        this.assertUnary(BigMath.ACOSH, ComplexMath.ACOSH, PrimitiveMath.ACOSH, QuaternionMath.ACOSH, RationalMath.ACOSH, PI);
+        this.assertUnary(BigMath.ACOSH, ComplexMath.ACOSH, PrimitiveMath.ACOSH, QuaternionMath.ACOSH, RationalMath.ACOSH, E);
+        this.assertUnary(BigMath.ACOSH, ComplexMath.ACOSH, PrimitiveMath.ACOSH, QuaternionMath.ACOSH, RationalMath.ACOSH, TWO);
+        this.assertUnary(BigMath.ACOSH, ComplexMath.ACOSH, PrimitiveMath.ACOSH, QuaternionMath.ACOSH, RationalMath.ACOSH, HALF_PI);
+        this.assertUnary(BigMath.ACOSH, ComplexMath.ACOSH, PrimitiveMath.ACOSH, QuaternionMath.ACOSH, RationalMath.ACOSH, ONE);
     }
 
     @Test
     public void testADD() {
-        this.assertBinary(BigFunction.ADD, ComplexFunction.ADD, PrimitiveFunction.ADD, QuaternionFunction.ADD, RationalFunction.ADD, POSITIVE.doubleValue(),
+        this.assertBinary(BigMath.ADD, ComplexMath.ADD, PrimitiveMath.ADD, QuaternionMath.ADD, RationalMath.ADD, POSITIVE.doubleValue(),
                 POSITIVE.doubleValue());
     }
 
     @Test
     public void testASIN() {
 
-        this.assertUnary(BigFunction.ASIN, ComplexFunction.ASIN, PrimitiveFunction.ASIN, QuaternionFunction.ASIN, RationalFunction.ASIN,
+        this.assertUnary(BigMath.ASIN, ComplexMath.ASIN, PrimitiveMath.ASIN, QuaternionMath.ASIN, RationalMath.ASIN,
                 AROUND_ZERO.doubleValue());
 
-        this.assertUnary(BigFunction.ASIN, ComplexFunction.ASIN, PrimitiveFunction.ASIN, QuaternionFunction.ASIN, RationalFunction.ASIN, ONE);
-        this.assertUnary(BigFunction.ASIN, ComplexFunction.ASIN, PrimitiveFunction.ASIN, QuaternionFunction.ASIN, RationalFunction.ASIN, ZERO);
-        this.assertUnary(BigFunction.ASIN, ComplexFunction.ASIN, PrimitiveFunction.ASIN, QuaternionFunction.ASIN, RationalFunction.ASIN, NEG);
+        this.assertUnary(BigMath.ASIN, ComplexMath.ASIN, PrimitiveMath.ASIN, QuaternionMath.ASIN, RationalMath.ASIN, ONE);
+        this.assertUnary(BigMath.ASIN, ComplexMath.ASIN, PrimitiveMath.ASIN, QuaternionMath.ASIN, RationalMath.ASIN, ZERO);
+        this.assertUnary(BigMath.ASIN, ComplexMath.ASIN, PrimitiveMath.ASIN, QuaternionMath.ASIN, RationalMath.ASIN, NEG);
     }
 
     @Test
     public void testASINH() {
 
-        this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH,
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH,
                 AROUND_ZERO.doubleValue());
 
-        this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH, PI);
-        this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH, E);
-        this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH, TWO);
-        this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH, HALF_PI);
-        this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH, ONE);
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, PI);
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, E);
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, TWO);
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, HALF_PI);
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, ONE);
 
-        this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH, ZERO);
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, ZERO);
 
-        this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH, NEG);
-        this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH, -HALF_PI);
-        this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH, -TWO);
-        this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH, -E);
-        this.assertUnary(BigFunction.ASINH, ComplexFunction.ASINH, PrimitiveFunction.ASINH, QuaternionFunction.ASINH, RationalFunction.ASINH, -PI);
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, NEG);
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, -HALF_PI);
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, -TWO);
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, -E);
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, -PI);
     }
 
     @Test
     public void testATAN() {
 
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN,
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN,
                 AROUND_ZERO.doubleValue());
 
         //        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, RationalFunction.ATAN, MAX_VALUE);
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, PI);
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, E);
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, TWO);
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, HALF_PI);
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, ONE);
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, PI);
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, E);
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, TWO);
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, HALF_PI);
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, ONE);
 
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN,
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN,
                 AROUND_ZERO.doubleValue());
 
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, NEG);
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, -HALF_PI);
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, -TWO);
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, -E);
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, -PI);
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, MACHINE_SMALLEST);
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, NEG);
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, -HALF_PI);
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, -TWO);
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, -E);
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, -PI);
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, MACHINE_SMALLEST);
     }
 
     @Test
     public void testATAN2() {
 
-        this.assertBinary(BigFunction.ATAN2, ComplexFunction.ATAN2, PrimitiveFunction.ATAN2, QuaternionFunction.ATAN2, RationalFunction.ATAN2, ONE, TWO);
-        this.assertBinary(BigFunction.ATAN2, ComplexFunction.ATAN2, PrimitiveFunction.ATAN2, QuaternionFunction.ATAN2, RationalFunction.ATAN2, TWO, ONE);
-        this.assertBinary(BigFunction.ATAN2, ComplexFunction.ATAN2, PrimitiveFunction.ATAN2, QuaternionFunction.ATAN2, RationalFunction.ATAN2, ONE, HALF);
-        this.assertBinary(BigFunction.ATAN2, ComplexFunction.ATAN2, PrimitiveFunction.ATAN2, QuaternionFunction.ATAN2, RationalFunction.ATAN2, HALF, ONE);
+        this.assertBinary(BigMath.ATAN2, ComplexMath.ATAN2, PrimitiveMath.ATAN2, QuaternionMath.ATAN2, RationalMath.ATAN2, ONE, TWO);
+        this.assertBinary(BigMath.ATAN2, ComplexMath.ATAN2, PrimitiveMath.ATAN2, QuaternionMath.ATAN2, RationalMath.ATAN2, TWO, ONE);
+        this.assertBinary(BigMath.ATAN2, ComplexMath.ATAN2, PrimitiveMath.ATAN2, QuaternionMath.ATAN2, RationalMath.ATAN2, ONE, HALF);
+        this.assertBinary(BigMath.ATAN2, ComplexMath.ATAN2, PrimitiveMath.ATAN2, QuaternionMath.ATAN2, RationalMath.ATAN2, HALF, ONE);
 
-        this.assertBinary(BigFunction.ATAN2, ComplexFunction.ATAN2, PrimitiveFunction.ATAN2, QuaternionFunction.ATAN2, RationalFunction.ATAN2, ZERO, ONE);
+        this.assertBinary(BigMath.ATAN2, ComplexMath.ATAN2, PrimitiveMath.ATAN2, QuaternionMath.ATAN2, RationalMath.ATAN2, ZERO, ONE);
 
     }
 
     @Test
     public void testATANH() {
 
-        this.assertUnary(BigFunction.ATANH, ComplexFunction.ATANH, PrimitiveFunction.ATANH, QuaternionFunction.ATANH, RationalFunction.ATANH,
+        this.assertUnary(BigMath.ATANH, ComplexMath.ATANH, PrimitiveMath.ATANH, QuaternionMath.ATANH, RationalMath.ATANH,
                 AROUND_ZERO.doubleValue());
 
         //    this.assertUnary(BigFunction.ATANH, ComplexFunction.ATANH, PrimitiveFunction.ATANH, RationalFunction.ATANH, ONE);
-        this.assertUnary(BigFunction.ATANH, ComplexFunction.ATANH, PrimitiveFunction.ATANH, QuaternionFunction.ATANH, RationalFunction.ATANH, ZERO);
+        this.assertUnary(BigMath.ATANH, ComplexMath.ATANH, PrimitiveMath.ATANH, QuaternionMath.ATANH, RationalMath.ATANH, ZERO);
         //  this.assertUnary(BigFunction.ATANH, ComplexFunction.ATANH, PrimitiveFunction.ATANH, RationalFunction.ATANH, NEG);
     }
 
     @Test
     public void testCARDINALITY() {
-        this.assertUnary(BigFunction.CARDINALITY, ComplexFunction.CARDINALITY, PrimitiveFunction.CARDINALITY, QuaternionFunction.CARDINALITY,
-                RationalFunction.CARDINALITY, AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.CARDINALITY, ComplexMath.CARDINALITY, PrimitiveMath.CARDINALITY, QuaternionMath.CARDINALITY,
+                RationalMath.CARDINALITY, AROUND_ZERO.doubleValue());
     }
 
     @Test
     @Tag("unstable")
     public void testCBRT() {
 
-        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT,
+        this.assertUnary(BigMath.CBRT, ComplexMath.CBRT, PrimitiveMath.CBRT, QuaternionMath.CBRT, RationalMath.CBRT,
                 POSITIVE.doubleValue());
 
-        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, PI);
-        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, E);
-        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, TWO);
-        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, HALF_PI);
-        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, ONE);
+        this.assertUnary(BigMath.CBRT, ComplexMath.CBRT, PrimitiveMath.CBRT, QuaternionMath.CBRT, RationalMath.CBRT, PI);
+        this.assertUnary(BigMath.CBRT, ComplexMath.CBRT, PrimitiveMath.CBRT, QuaternionMath.CBRT, RationalMath.CBRT, E);
+        this.assertUnary(BigMath.CBRT, ComplexMath.CBRT, PrimitiveMath.CBRT, QuaternionMath.CBRT, RationalMath.CBRT, TWO);
+        this.assertUnary(BigMath.CBRT, ComplexMath.CBRT, PrimitiveMath.CBRT, QuaternionMath.CBRT, RationalMath.CBRT, HALF_PI);
+        this.assertUnary(BigMath.CBRT, ComplexMath.CBRT, PrimitiveMath.CBRT, QuaternionMath.CBRT, RationalMath.CBRT, ONE);
 
-        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, ZERO);
+        this.assertUnary(BigMath.CBRT, ComplexMath.CBRT, PrimitiveMath.CBRT, QuaternionMath.CBRT, RationalMath.CBRT, ZERO);
     }
 
     @Test
     public void testCEIL() {
-        this.assertUnary(BigFunction.CEIL, ComplexFunction.CEIL, PrimitiveFunction.CEIL, QuaternionFunction.CEIL, RationalFunction.CEIL,
+        this.assertUnary(BigMath.CEIL, ComplexMath.CEIL, PrimitiveMath.CEIL, QuaternionMath.CEIL, RationalMath.CEIL,
                 AROUND_ZERO.doubleValue());
-        this.assertUnary(BigFunction.CEIL, ComplexFunction.CEIL, PrimitiveFunction.CEIL, QuaternionFunction.CEIL, RationalFunction.CEIL, HALF);
-        this.assertUnary(BigFunction.CEIL, ComplexFunction.CEIL, PrimitiveFunction.CEIL, QuaternionFunction.CEIL, RationalFunction.CEIL, -HALF);
+        this.assertUnary(BigMath.CEIL, ComplexMath.CEIL, PrimitiveMath.CEIL, QuaternionMath.CEIL, RationalMath.CEIL, HALF);
+        this.assertUnary(BigMath.CEIL, ComplexMath.CEIL, PrimitiveMath.CEIL, QuaternionMath.CEIL, RationalMath.CEIL, -HALF);
     }
 
     @Test
     public void testCONJUGATE() {
-        this.assertUnary(BigFunction.CONJUGATE, ComplexFunction.CONJUGATE, PrimitiveFunction.CONJUGATE, QuaternionFunction.CONJUGATE,
-                RationalFunction.CONJUGATE, AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.CONJUGATE, ComplexMath.CONJUGATE, PrimitiveMath.CONJUGATE, QuaternionMath.CONJUGATE,
+                RationalMath.CONJUGATE, AROUND_ZERO.doubleValue());
     }
 
     @Test
     public void testCOS() {
 
-        this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.COS, ComplexMath.COS, PrimitiveMath.COS, QuaternionMath.COS, RationalMath.COS, AROUND_ZERO.doubleValue());
 
-        this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, PI);
-        this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, E);
-        this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, TWO);
-        this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, HALF_PI);
-        this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, ONE);
+        this.assertUnary(BigMath.COS, ComplexMath.COS, PrimitiveMath.COS, QuaternionMath.COS, RationalMath.COS, PI);
+        this.assertUnary(BigMath.COS, ComplexMath.COS, PrimitiveMath.COS, QuaternionMath.COS, RationalMath.COS, E);
+        this.assertUnary(BigMath.COS, ComplexMath.COS, PrimitiveMath.COS, QuaternionMath.COS, RationalMath.COS, TWO);
+        this.assertUnary(BigMath.COS, ComplexMath.COS, PrimitiveMath.COS, QuaternionMath.COS, RationalMath.COS, HALF_PI);
+        this.assertUnary(BigMath.COS, ComplexMath.COS, PrimitiveMath.COS, QuaternionMath.COS, RationalMath.COS, ONE);
 
-        this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, ZERO);
+        this.assertUnary(BigMath.COS, ComplexMath.COS, PrimitiveMath.COS, QuaternionMath.COS, RationalMath.COS, ZERO);
 
-        this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, NEG);
-        this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, -HALF_PI);
-        this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, -TWO);
-        this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, -E);
-        this.assertUnary(BigFunction.COS, ComplexFunction.COS, PrimitiveFunction.COS, QuaternionFunction.COS, RationalFunction.COS, -PI);
+        this.assertUnary(BigMath.COS, ComplexMath.COS, PrimitiveMath.COS, QuaternionMath.COS, RationalMath.COS, NEG);
+        this.assertUnary(BigMath.COS, ComplexMath.COS, PrimitiveMath.COS, QuaternionMath.COS, RationalMath.COS, -HALF_PI);
+        this.assertUnary(BigMath.COS, ComplexMath.COS, PrimitiveMath.COS, QuaternionMath.COS, RationalMath.COS, -TWO);
+        this.assertUnary(BigMath.COS, ComplexMath.COS, PrimitiveMath.COS, QuaternionMath.COS, RationalMath.COS, -E);
+        this.assertUnary(BigMath.COS, ComplexMath.COS, PrimitiveMath.COS, QuaternionMath.COS, RationalMath.COS, -PI);
     }
 
     @Test
     public void testCOSH() {
 
-        this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH,
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH,
                 AROUND_ZERO.doubleValue());
 
-        this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH, PI);
-        this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH, E);
-        this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH, TWO);
-        this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH, HALF_PI);
-        this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH, ONE);
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, PI);
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, E);
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, TWO);
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, HALF_PI);
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, ONE);
 
-        this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH, ZERO);
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, ZERO);
 
-        this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH, NEG);
-        this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH, -HALF_PI);
-        this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH, -TWO);
-        this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH, -E);
-        this.assertUnary(BigFunction.COSH, ComplexFunction.COSH, PrimitiveFunction.COSH, QuaternionFunction.COSH, RationalFunction.COSH, -PI);
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, NEG);
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, -HALF_PI);
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, -TWO);
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, -E);
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, -PI);
     }
 
     @Test
     public void testDIVIDE() {
-        this.assertBinary(BigFunction.DIVIDE, ComplexFunction.DIVIDE, PrimitiveFunction.DIVIDE, QuaternionFunction.DIVIDE, RationalFunction.DIVIDE,
+        this.assertBinary(BigMath.DIVIDE, ComplexMath.DIVIDE, PrimitiveMath.DIVIDE, QuaternionMath.DIVIDE, RationalMath.DIVIDE,
                 POSITIVE.doubleValue(), POSITIVE.doubleValue());
     }
 
     @Test
     public void testEXP() {
 
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, TEN);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, TEN);
 
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, PI);
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, E);
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, TWO);
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, HALF_PI);
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, ONE);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, PI);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, E);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, TWO);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, HALF_PI);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, ONE);
 
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, MACHINE_SMALLEST);
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, ZERO);
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, -MACHINE_SMALLEST);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, MACHINE_SMALLEST);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, ZERO);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, -MACHINE_SMALLEST);
 
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, NEG);
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, -HALF_PI);
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, -TWO);
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, -E);
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, -PI);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, NEG);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, -HALF_PI);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, -TWO);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, -E);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, -PI);
 
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, -TEN);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, -TEN);
 
-        this.assertUnary(BigFunction.EXP, ComplexFunction.EXP, PrimitiveFunction.EXP, QuaternionFunction.EXP, RationalFunction.EXP, -HUNDRED);
+        this.assertUnary(BigMath.EXP, ComplexMath.EXP, PrimitiveMath.EXP, QuaternionMath.EXP, RationalMath.EXP, -HUNDRED);
 
     }
 
     @Test
     public void testEXPM1() {
-        this.assertUnary(BigFunction.EXPM1, ComplexFunction.EXPM1, PrimitiveFunction.EXPM1, QuaternionFunction.EXPM1, RationalFunction.EXPM1,
+        this.assertUnary(BigMath.EXPM1, ComplexMath.EXPM1, PrimitiveMath.EXPM1, QuaternionMath.EXPM1, RationalMath.EXPM1,
                 AROUND_ZERO.doubleValue());
     }
 
     @Test
     public void testFLOOR() {
-        this.assertUnary(BigFunction.FLOOR, ComplexFunction.FLOOR, PrimitiveFunction.FLOOR, QuaternionFunction.FLOOR, RationalFunction.FLOOR,
+        this.assertUnary(BigMath.FLOOR, ComplexMath.FLOOR, PrimitiveMath.FLOOR, QuaternionMath.FLOOR, RationalMath.FLOOR,
                 AROUND_ZERO.doubleValue());
-        this.assertUnary(BigFunction.FLOOR, ComplexFunction.FLOOR, PrimitiveFunction.FLOOR, QuaternionFunction.FLOOR, RationalFunction.FLOOR, HALF);
-        this.assertUnary(BigFunction.FLOOR, ComplexFunction.FLOOR, PrimitiveFunction.FLOOR, QuaternionFunction.FLOOR, RationalFunction.FLOOR, -HALF);
+        this.assertUnary(BigMath.FLOOR, ComplexMath.FLOOR, PrimitiveMath.FLOOR, QuaternionMath.FLOOR, RationalMath.FLOOR, HALF);
+        this.assertUnary(BigMath.FLOOR, ComplexMath.FLOOR, PrimitiveMath.FLOOR, QuaternionMath.FLOOR, RationalMath.FLOOR, -HALF);
     }
 
     @Test
     public void testHYPOT() {
-        this.assertBinary(BigFunction.HYPOT, ComplexFunction.HYPOT, PrimitiveFunction.HYPOT, QuaternionFunction.HYPOT, RationalFunction.HYPOT,
+        this.assertBinary(BigMath.HYPOT, ComplexMath.HYPOT, PrimitiveMath.HYPOT, QuaternionMath.HYPOT, RationalMath.HYPOT,
                 POSITIVE.doubleValue(), POSITIVE.doubleValue());
     }
 
     @Test
     public void testINVERT() {
-        this.assertUnary(BigFunction.INVERT, ComplexFunction.INVERT, PrimitiveFunction.INVERT, QuaternionFunction.INVERT, RationalFunction.INVERT,
+        this.assertUnary(BigMath.INVERT, ComplexMath.INVERT, PrimitiveMath.INVERT, QuaternionMath.INVERT, RationalMath.INVERT,
                 POSITIVE.doubleValue());
     }
 
     @Test
     public void testLOG() {
 
-        this.assertUnary(BigFunction.LOG, ComplexFunction.LOG, PrimitiveFunction.LOG, QuaternionFunction.LOG, RationalFunction.LOG, THOUSAND);
-        this.assertUnary(BigFunction.LOG, ComplexFunction.LOG, PrimitiveFunction.LOG, QuaternionFunction.LOG, RationalFunction.LOG, HUNDRED);
-        this.assertUnary(BigFunction.LOG, ComplexFunction.LOG, PrimitiveFunction.LOG, QuaternionFunction.LOG, RationalFunction.LOG, TEN);
-        this.assertUnary(BigFunction.LOG, ComplexFunction.LOG, PrimitiveFunction.LOG, QuaternionFunction.LOG, RationalFunction.LOG, ONE);
-        this.assertUnary(BigFunction.LOG, ComplexFunction.LOG, PrimitiveFunction.LOG, QuaternionFunction.LOG, RationalFunction.LOG, TENTH);
-        this.assertUnary(BigFunction.LOG, ComplexFunction.LOG, PrimitiveFunction.LOG, QuaternionFunction.LOG, RationalFunction.LOG, HUNDREDTH);
-        this.assertUnary(BigFunction.LOG, ComplexFunction.LOG, PrimitiveFunction.LOG, QuaternionFunction.LOG, RationalFunction.LOG, THOUSANDTH);
+        this.assertUnary(BigMath.LOG, ComplexMath.LOG, PrimitiveMath.LOG, QuaternionMath.LOG, RationalMath.LOG, THOUSAND);
+        this.assertUnary(BigMath.LOG, ComplexMath.LOG, PrimitiveMath.LOG, QuaternionMath.LOG, RationalMath.LOG, HUNDRED);
+        this.assertUnary(BigMath.LOG, ComplexMath.LOG, PrimitiveMath.LOG, QuaternionMath.LOG, RationalMath.LOG, TEN);
+        this.assertUnary(BigMath.LOG, ComplexMath.LOG, PrimitiveMath.LOG, QuaternionMath.LOG, RationalMath.LOG, ONE);
+        this.assertUnary(BigMath.LOG, ComplexMath.LOG, PrimitiveMath.LOG, QuaternionMath.LOG, RationalMath.LOG, TENTH);
+        this.assertUnary(BigMath.LOG, ComplexMath.LOG, PrimitiveMath.LOG, QuaternionMath.LOG, RationalMath.LOG, HUNDREDTH);
+        this.assertUnary(BigMath.LOG, ComplexMath.LOG, PrimitiveMath.LOG, QuaternionMath.LOG, RationalMath.LOG, THOUSANDTH);
 
     }
 
     @Test
     public void testLOG10() {
-        this.assertUnary(BigFunction.LOG10, ComplexFunction.LOG10, PrimitiveFunction.LOG10, QuaternionFunction.LOG10, RationalFunction.LOG10,
+        this.assertUnary(BigMath.LOG10, ComplexMath.LOG10, PrimitiveMath.LOG10, QuaternionMath.LOG10, RationalMath.LOG10,
                 POSITIVE.doubleValue());
     }
 
     @Test
     public void testLOG1P() {
-        this.assertUnary(BigFunction.LOG1P, ComplexFunction.LOG1P, PrimitiveFunction.LOG1P, QuaternionFunction.LOG1P, RationalFunction.LOG1P,
+        this.assertUnary(BigMath.LOG1P, ComplexMath.LOG1P, PrimitiveMath.LOG1P, QuaternionMath.LOG1P, RationalMath.LOG1P,
                 POSITIVE.doubleValue());
     }
 
     @Test
     @Tag("unstable")
     public void testMAX() {
-        this.assertBinary(BigFunction.MAX, ComplexFunction.MAX, PrimitiveFunction.MAX, QuaternionFunction.MAX, RationalFunction.MAX, AROUND_ZERO.doubleValue(),
+        this.assertBinary(BigMath.MAX, ComplexMath.MAX, PrimitiveMath.MAX, QuaternionMath.MAX, RationalMath.MAX, AROUND_ZERO.doubleValue(),
                 POSITIVE.doubleValue());
     }
 
     @Test
     @Tag("unstable")
     public void testMIN() {
-        this.assertBinary(BigFunction.MIN, ComplexFunction.MIN, PrimitiveFunction.MIN, QuaternionFunction.MIN, RationalFunction.MIN, AROUND_ZERO.doubleValue(),
+        this.assertBinary(BigMath.MIN, ComplexMath.MIN, PrimitiveMath.MIN, QuaternionMath.MIN, RationalMath.MIN, AROUND_ZERO.doubleValue(),
                 POSITIVE.doubleValue());
     }
 
     @Test
     public void testMULTIPLY() {
-        this.assertBinary(BigFunction.MULTIPLY, ComplexFunction.MULTIPLY, PrimitiveFunction.MULTIPLY, QuaternionFunction.MULTIPLY, RationalFunction.MULTIPLY,
+        this.assertBinary(BigMath.MULTIPLY, ComplexMath.MULTIPLY, PrimitiveMath.MULTIPLY, QuaternionMath.MULTIPLY, RationalMath.MULTIPLY,
                 AROUND_ZERO.doubleValue(), POSITIVE.doubleValue());
     }
 
     @Test
     public void testNEGATE() {
-        this.assertUnary(BigFunction.NEGATE, ComplexFunction.NEGATE, PrimitiveFunction.NEGATE, QuaternionFunction.NEGATE, RationalFunction.NEGATE,
+        this.assertUnary(BigMath.NEGATE, ComplexMath.NEGATE, PrimitiveMath.NEGATE, QuaternionMath.NEGATE, RationalMath.NEGATE,
                 AROUND_ZERO.doubleValue());
     }
 
@@ -355,25 +360,25 @@ public class CompareImplementations {
 
         // Only defined for non-negative (absolute) first aruments
 
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, HUNDREDTH, NINE);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, THOUSANDTH, SEVEN);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, TENTH, EIGHT);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, ONE, SIX);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, HALF_PI, FIVE);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, TWO, FOUR);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, E, THREE);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, PI, TWO);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, SQRT_PI, ONE);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, HUNDREDTH, NINE);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, THOUSANDTH, SEVEN);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, TENTH, EIGHT);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, ONE, SIX);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, HALF_PI, FIVE);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, TWO, FOUR);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, E, THREE);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, PI, TWO);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, SQRT_PI, ONE);
 
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, SQRT_TWO_PI, SQRT_TWO_PI);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, SQRT_TWO_PI, ZERO);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, THOUSANDTH, SQRT_TWO_PI);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, THOUSANDTH, ZERO);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, SQRT_TWO_PI, SQRT_TWO_PI);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, SQRT_TWO_PI, ZERO);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, THOUSANDTH, SQRT_TWO_PI);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, THOUSANDTH, ZERO);
 
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, SQRT_TWO_PI, -SQRT_TWO_PI);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, SQRT_TWO_PI, -ZERO);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, THOUSANDTH, -SQRT_TWO_PI);
-        this.assertBinary(BigFunction.POW, ComplexFunction.POW, PrimitiveFunction.POW, QuaternionFunction.POW, RationalFunction.POW, THOUSANDTH, -ZERO);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, SQRT_TWO_PI, -SQRT_TWO_PI);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, SQRT_TWO_PI, -ZERO);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, THOUSANDTH, -SQRT_TWO_PI);
+        this.assertBinary(BigMath.POW, ComplexMath.POW, PrimitiveMath.POW, QuaternionMath.POW, RationalMath.POW, THOUSANDTH, -ZERO);
 
     }
 
@@ -383,162 +388,162 @@ public class CompareImplementations {
         //        this.assertParameter(BigFunction.POWER, ComplexFunction.POWER, PrimitiveFunction.POWER, QuaternionFunction.POWER, RationalFunction.POWER,
         //                AROUND_ZERO.doubleValue(), Uniform.randomInteger(1, 10));
 
-        this.assertParameter(BigFunction.POWER, ComplexFunction.POWER, PrimitiveFunction.POWER, QuaternionFunction.POWER, RationalFunction.POWER, PI, 2);
-        this.assertParameter(BigFunction.POWER, ComplexFunction.POWER, PrimitiveFunction.POWER, QuaternionFunction.POWER, RationalFunction.POWER, E, 3);
-        this.assertParameter(BigFunction.POWER, ComplexFunction.POWER, PrimitiveFunction.POWER, QuaternionFunction.POWER, RationalFunction.POWER, TWO, 4);
-        this.assertParameter(BigFunction.POWER, ComplexFunction.POWER, PrimitiveFunction.POWER, QuaternionFunction.POWER, RationalFunction.POWER, HALF_PI, 5);
-        this.assertParameter(BigFunction.POWER, ComplexFunction.POWER, PrimitiveFunction.POWER, QuaternionFunction.POWER, RationalFunction.POWER, ONE, 6);
+        this.assertParameter(BigMath.POWER, ComplexMath.POWER, PrimitiveMath.POWER, QuaternionMath.POWER, RationalMath.POWER, PI, 2);
+        this.assertParameter(BigMath.POWER, ComplexMath.POWER, PrimitiveMath.POWER, QuaternionMath.POWER, RationalMath.POWER, E, 3);
+        this.assertParameter(BigMath.POWER, ComplexMath.POWER, PrimitiveMath.POWER, QuaternionMath.POWER, RationalMath.POWER, TWO, 4);
+        this.assertParameter(BigMath.POWER, ComplexMath.POWER, PrimitiveMath.POWER, QuaternionMath.POWER, RationalMath.POWER, HALF_PI, 5);
+        this.assertParameter(BigMath.POWER, ComplexMath.POWER, PrimitiveMath.POWER, QuaternionMath.POWER, RationalMath.POWER, ONE, 6);
 
-        this.assertParameter(BigFunction.POWER, ComplexFunction.POWER, PrimitiveFunction.POWER, QuaternionFunction.POWER, RationalFunction.POWER, ZERO, 7);
+        this.assertParameter(BigMath.POWER, ComplexMath.POWER, PrimitiveMath.POWER, QuaternionMath.POWER, RationalMath.POWER, ZERO, 7);
     }
 
     @Test
     public void testRINT() {
 
-        this.assertUnary(BigFunction.RINT, ComplexFunction.RINT, PrimitiveFunction.RINT, QuaternionFunction.RINT, RationalFunction.RINT,
+        this.assertUnary(BigMath.RINT, ComplexMath.RINT, PrimitiveMath.RINT, QuaternionMath.RINT, RationalMath.RINT,
                 AROUND_ZERO.doubleValue());
 
-        this.assertUnary(BigFunction.RINT, ComplexFunction.RINT, PrimitiveFunction.RINT, QuaternionFunction.RINT, RationalFunction.RINT, HALF);
+        this.assertUnary(BigMath.RINT, ComplexMath.RINT, PrimitiveMath.RINT, QuaternionMath.RINT, RationalMath.RINT, HALF);
 
-        this.assertUnary(BigFunction.RINT, ComplexFunction.RINT, PrimitiveFunction.RINT, QuaternionFunction.RINT, RationalFunction.RINT, -HALF);
+        this.assertUnary(BigMath.RINT, ComplexMath.RINT, PrimitiveMath.RINT, QuaternionMath.RINT, RationalMath.RINT, -HALF);
 
-        this.assertUnary(BigFunction.RINT, ComplexFunction.RINT, PrimitiveFunction.RINT, QuaternionFunction.RINT, RationalFunction.RINT, ONE + HALF);
+        this.assertUnary(BigMath.RINT, ComplexMath.RINT, PrimitiveMath.RINT, QuaternionMath.RINT, RationalMath.RINT, ONE + HALF);
 
-        this.assertUnary(BigFunction.RINT, ComplexFunction.RINT, PrimitiveFunction.RINT, QuaternionFunction.RINT, RationalFunction.RINT, -(ONE + HALF));
+        this.assertUnary(BigMath.RINT, ComplexMath.RINT, PrimitiveMath.RINT, QuaternionMath.RINT, RationalMath.RINT, -(ONE + HALF));
 
     }
 
     @Test
     @Tag("unstable")
     public void testROOT() {
-        this.assertParameter(BigFunction.ROOT, ComplexFunction.ROOT, PrimitiveFunction.ROOT, QuaternionFunction.ROOT, RationalFunction.ROOT,
+        this.assertParameter(BigMath.ROOT, ComplexMath.ROOT, PrimitiveMath.ROOT, QuaternionMath.ROOT, RationalMath.ROOT,
                 POSITIVE.doubleValue(), Uniform.randomInteger(1, 10));
     }
 
     @Test
     public void testSCALE() {
-        this.assertParameter(BigFunction.SCALE, ComplexFunction.SCALE, PrimitiveFunction.SCALE, QuaternionFunction.SCALE, RationalFunction.SCALE,
+        this.assertParameter(BigMath.SCALE, ComplexMath.SCALE, PrimitiveMath.SCALE, QuaternionMath.SCALE, RationalMath.SCALE,
                 AROUND_ZERO.doubleValue(), Uniform.randomInteger(1, 10));
     }
 
     @Test
     public void testSIGNUM() {
-        this.assertUnary(BigFunction.SIGNUM, ComplexFunction.SIGNUM, PrimitiveFunction.SIGNUM, QuaternionFunction.SIGNUM, RationalFunction.SIGNUM,
+        this.assertUnary(BigMath.SIGNUM, ComplexMath.SIGNUM, PrimitiveMath.SIGNUM, QuaternionMath.SIGNUM, RationalMath.SIGNUM,
                 AROUND_ZERO.doubleValue());
     }
 
     @Test
     public void testSIN() {
 
-        this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.SIN, ComplexMath.SIN, PrimitiveMath.SIN, QuaternionMath.SIN, RationalMath.SIN, AROUND_ZERO.doubleValue());
 
-        this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, PI);
-        this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, E);
-        this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, TWO);
-        this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, HALF_PI);
-        this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, ONE);
+        this.assertUnary(BigMath.SIN, ComplexMath.SIN, PrimitiveMath.SIN, QuaternionMath.SIN, RationalMath.SIN, PI);
+        this.assertUnary(BigMath.SIN, ComplexMath.SIN, PrimitiveMath.SIN, QuaternionMath.SIN, RationalMath.SIN, E);
+        this.assertUnary(BigMath.SIN, ComplexMath.SIN, PrimitiveMath.SIN, QuaternionMath.SIN, RationalMath.SIN, TWO);
+        this.assertUnary(BigMath.SIN, ComplexMath.SIN, PrimitiveMath.SIN, QuaternionMath.SIN, RationalMath.SIN, HALF_PI);
+        this.assertUnary(BigMath.SIN, ComplexMath.SIN, PrimitiveMath.SIN, QuaternionMath.SIN, RationalMath.SIN, ONE);
 
-        this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, ZERO);
+        this.assertUnary(BigMath.SIN, ComplexMath.SIN, PrimitiveMath.SIN, QuaternionMath.SIN, RationalMath.SIN, ZERO);
 
-        this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, NEG);
-        this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, -HALF_PI);
-        this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, -TWO);
-        this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, -E);
-        this.assertUnary(BigFunction.SIN, ComplexFunction.SIN, PrimitiveFunction.SIN, QuaternionFunction.SIN, RationalFunction.SIN, -PI);
+        this.assertUnary(BigMath.SIN, ComplexMath.SIN, PrimitiveMath.SIN, QuaternionMath.SIN, RationalMath.SIN, NEG);
+        this.assertUnary(BigMath.SIN, ComplexMath.SIN, PrimitiveMath.SIN, QuaternionMath.SIN, RationalMath.SIN, -HALF_PI);
+        this.assertUnary(BigMath.SIN, ComplexMath.SIN, PrimitiveMath.SIN, QuaternionMath.SIN, RationalMath.SIN, -TWO);
+        this.assertUnary(BigMath.SIN, ComplexMath.SIN, PrimitiveMath.SIN, QuaternionMath.SIN, RationalMath.SIN, -E);
+        this.assertUnary(BigMath.SIN, ComplexMath.SIN, PrimitiveMath.SIN, QuaternionMath.SIN, RationalMath.SIN, -PI);
     }
 
     @Test
     public void testSINH() {
 
-        this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH,
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH,
                 AROUND_ZERO.doubleValue());
 
-        this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH, PI);
-        this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH, E);
-        this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH, TWO);
-        this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH, HALF_PI);
-        this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH, ONE);
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, PI);
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, E);
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, TWO);
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, HALF_PI);
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, ONE);
 
-        this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH, ZERO);
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, ZERO);
 
-        this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH, NEG);
-        this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH, -HALF_PI);
-        this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH, -TWO);
-        this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH, -E);
-        this.assertUnary(BigFunction.SINH, ComplexFunction.SINH, PrimitiveFunction.SINH, QuaternionFunction.SINH, RationalFunction.SINH, -PI);
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, NEG);
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, -HALF_PI);
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, -TWO);
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, -E);
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, -PI);
     }
 
     @Test
     public void testSQRT() {
 
-        this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT,
+        this.assertUnary(BigMath.SQRT, ComplexMath.SQRT, PrimitiveMath.SQRT, QuaternionMath.SQRT, RationalMath.SQRT,
                 POSITIVE.doubleValue());
 
-        this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT, PI);
-        this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT, E);
-        this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT, TWO);
-        this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT, HALF_PI);
-        this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT, ONE);
+        this.assertUnary(BigMath.SQRT, ComplexMath.SQRT, PrimitiveMath.SQRT, QuaternionMath.SQRT, RationalMath.SQRT, PI);
+        this.assertUnary(BigMath.SQRT, ComplexMath.SQRT, PrimitiveMath.SQRT, QuaternionMath.SQRT, RationalMath.SQRT, E);
+        this.assertUnary(BigMath.SQRT, ComplexMath.SQRT, PrimitiveMath.SQRT, QuaternionMath.SQRT, RationalMath.SQRT, TWO);
+        this.assertUnary(BigMath.SQRT, ComplexMath.SQRT, PrimitiveMath.SQRT, QuaternionMath.SQRT, RationalMath.SQRT, HALF_PI);
+        this.assertUnary(BigMath.SQRT, ComplexMath.SQRT, PrimitiveMath.SQRT, QuaternionMath.SQRT, RationalMath.SQRT, ONE);
 
-        this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT, ZERO);
+        this.assertUnary(BigMath.SQRT, ComplexMath.SQRT, PrimitiveMath.SQRT, QuaternionMath.SQRT, RationalMath.SQRT, ZERO);
     }
 
     @Test
     public void testSQRT1PX2() {
-        this.assertUnary(BigFunction.SQRT1PX2, ComplexFunction.SQRT1PX2, PrimitiveFunction.SQRT1PX2, QuaternionFunction.SQRT1PX2, RationalFunction.SQRT1PX2,
+        this.assertUnary(BigMath.SQRT1PX2, ComplexMath.SQRT1PX2, PrimitiveMath.SQRT1PX2, QuaternionMath.SQRT1PX2, RationalMath.SQRT1PX2,
                 POSITIVE.doubleValue());
     }
 
     @Test
     public void testSUBTRACT() {
-        this.assertBinary(BigFunction.SUBTRACT, ComplexFunction.SUBTRACT, PrimitiveFunction.SUBTRACT, QuaternionFunction.SUBTRACT, RationalFunction.SUBTRACT,
+        this.assertBinary(BigMath.SUBTRACT, ComplexMath.SUBTRACT, PrimitiveMath.SUBTRACT, QuaternionMath.SUBTRACT, RationalMath.SUBTRACT,
                 POSITIVE.doubleValue(), POSITIVE.doubleValue());
     }
 
     @Test
     public void testTAN() {
 
-        this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, QuaternionFunction.TAN, RationalFunction.TAN, AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.TAN, ComplexMath.TAN, PrimitiveMath.TAN, QuaternionMath.TAN, RationalMath.TAN, AROUND_ZERO.doubleValue());
 
-        this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, QuaternionFunction.TAN, RationalFunction.TAN, PI);
-        this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, QuaternionFunction.TAN, RationalFunction.TAN, E);
-        this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, QuaternionFunction.TAN, RationalFunction.TAN, TWO);
+        this.assertUnary(BigMath.TAN, ComplexMath.TAN, PrimitiveMath.TAN, QuaternionMath.TAN, RationalMath.TAN, PI);
+        this.assertUnary(BigMath.TAN, ComplexMath.TAN, PrimitiveMath.TAN, QuaternionMath.TAN, RationalMath.TAN, E);
+        this.assertUnary(BigMath.TAN, ComplexMath.TAN, PrimitiveMath.TAN, QuaternionMath.TAN, RationalMath.TAN, TWO);
         //     this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, RationalFunction.TAN, HALF_PI);
-        this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, QuaternionFunction.TAN, RationalFunction.TAN, ONE);
+        this.assertUnary(BigMath.TAN, ComplexMath.TAN, PrimitiveMath.TAN, QuaternionMath.TAN, RationalMath.TAN, ONE);
 
-        this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, QuaternionFunction.TAN, RationalFunction.TAN, ZERO);
+        this.assertUnary(BigMath.TAN, ComplexMath.TAN, PrimitiveMath.TAN, QuaternionMath.TAN, RationalMath.TAN, ZERO);
 
-        this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, QuaternionFunction.TAN, RationalFunction.TAN, NEG);
+        this.assertUnary(BigMath.TAN, ComplexMath.TAN, PrimitiveMath.TAN, QuaternionMath.TAN, RationalMath.TAN, NEG);
         //    this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, RationalFunction.TAN, -HALF_PI);
-        this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, QuaternionFunction.TAN, RationalFunction.TAN, -TWO);
-        this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, QuaternionFunction.TAN, RationalFunction.TAN, -E);
-        this.assertUnary(BigFunction.TAN, ComplexFunction.TAN, PrimitiveFunction.TAN, QuaternionFunction.TAN, RationalFunction.TAN, -PI);
+        this.assertUnary(BigMath.TAN, ComplexMath.TAN, PrimitiveMath.TAN, QuaternionMath.TAN, RationalMath.TAN, -TWO);
+        this.assertUnary(BigMath.TAN, ComplexMath.TAN, PrimitiveMath.TAN, QuaternionMath.TAN, RationalMath.TAN, -E);
+        this.assertUnary(BigMath.TAN, ComplexMath.TAN, PrimitiveMath.TAN, QuaternionMath.TAN, RationalMath.TAN, -PI);
     }
 
     @Test
     public void testTANH() {
 
-        this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH,
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH,
                 AROUND_ZERO.doubleValue());
 
-        this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH, PI);
-        this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH, E);
-        this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH, TWO);
-        this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH, HALF_PI);
-        this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH, ONE);
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, PI);
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, E);
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, TWO);
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, HALF_PI);
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, ONE);
 
-        this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH, ZERO);
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, ZERO);
 
-        this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH, NEG);
-        this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH, -HALF_PI);
-        this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH, -TWO);
-        this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH, -E);
-        this.assertUnary(BigFunction.TANH, ComplexFunction.TANH, PrimitiveFunction.TANH, QuaternionFunction.TANH, RationalFunction.TANH, -PI);
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, NEG);
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, -HALF_PI);
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, -TWO);
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, -E);
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, -PI);
     }
 
     @Test
     public void testVALUE() {
-        this.assertUnary(BigFunction.VALUE, ComplexFunction.VALUE, PrimitiveFunction.VALUE, QuaternionFunction.VALUE, RationalFunction.VALUE,
+        this.assertUnary(BigMath.VALUE, ComplexMath.VALUE, PrimitiveMath.VALUE, QuaternionMath.VALUE, RationalMath.VALUE,
                 AROUND_ZERO.doubleValue());
     }
 

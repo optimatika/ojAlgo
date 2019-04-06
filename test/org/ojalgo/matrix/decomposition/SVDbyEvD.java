@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -80,7 +80,7 @@ public class SVDbyEvD {
         final PhysicalStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveFunction.SQRT.invoke(5.0), 0.0 });
+        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }
@@ -116,8 +116,8 @@ public class SVDbyEvD {
         // Check that the, left and right, singular values are correct
         for (int ij = 0; ij < singularValues.length; ij++) {
             final double expected = singularValues.doubleValue(ij);
-            final double leftActual = PrimitiveFunction.SQRT.invoke(PrimitiveFunction.ABS.invoke(leftD.doubleValue(ij, ij)));
-            final double rightActual = PrimitiveFunction.SQRT.invoke(PrimitiveFunction.ABS.invoke(rightD.doubleValue(ij, ij)));
+            final double leftActual = PrimitiveMath.SQRT.invoke(PrimitiveMath.ABS.invoke(leftD.doubleValue(ij, ij)));
+            final double rightActual = PrimitiveMath.SQRT.invoke(PrimitiveMath.ABS.invoke(rightD.doubleValue(ij, ij)));
             TestUtils.assertEquals("Left " + ij, expected, leftActual, CONTEXT);
             TestUtils.assertEquals("Right " + ij, expected, rightActual, CONTEXT);
         }

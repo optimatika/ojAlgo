@@ -21,13 +21,11 @@
  */
 package org.ojalgo.function;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -85,417 +83,225 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     }
 
-    public static final Unary ABS = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.abs(arg);
-        }
-
-    };
-
-    public static final Unary ACOS = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.acos(arg);
-        }
-
-    };
-
-    public static final Unary ACOSH = new Unary() {
-
-        public final double invoke(final double arg) {
-            return LOG.invoke(arg + SQRT.invoke((arg * arg) - ONE));
-        }
-
-    };
-
-    public static final Binary ADD = new Binary() {
-
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return arg1 + arg2;
-        }
-
-    };
-
-    public static final Unary ASIN = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.asin(arg);
-        }
-
-    };
-
-    public static final Unary ASINH = new Unary() {
-
-        public final double invoke(final double arg) {
-            return LOG.invoke(arg + SQRT.invoke((arg * arg) + ONE));
-        }
-
-    };
-
-    public static final Unary ATAN = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.atan(arg);
-        }
-
-    };
-
-    public static final Binary ATAN2 = new Binary() {
-
-        public final double invoke(final double arg1, final double arg2) {
-            return Math.atan2(arg1, arg2);
-        }
-
-    };
-
-    public static final Unary ATANH = new Unary() {
-
-        public final double invoke(final double arg) {
-            return LOG.invoke((ONE + arg) / (ONE - arg)) / TWO;
-        }
-
-    };
-
-    public static final Unary CARDINALITY = new Unary() {
-
-        public final double invoke(final double arg) {
-            return PrimitiveScalar.isSmall(PrimitiveMath.ONE, arg) ? ZERO : ONE;
-        }
-
-    };
-
-    public static final Unary CBRT = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.cbrt(arg);
-        }
-
-    };
-
-    public static final Unary CEIL = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.ceil(arg);
-        }
-
-    };
-
-    public static final Unary CONJUGATE = new Unary() {
-
-        public final double invoke(final double arg) {
-            return arg;
-        }
-
-    };
-
-    public static final Unary COS = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.cos(arg);
-        }
-
-    };
-
-    public static final Unary COSH = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.cosh(arg);
-        }
-
-    };
-
-    public static final Binary DIVIDE = new Binary() {
-
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return arg1 / arg2;
-        }
-
-    };
-
-    public static final Unary EXP = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.exp(arg);
-        }
-
-    };
-
-    public static final Unary EXPM1 = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.expm1(arg);
-        }
-
-    };
-
-    public static final Unary FLOOR = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.floor(arg);
-        }
-
-    };
-
-    public static final Binary HYPOT = new Binary() {
-
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-
-            if (Double.isNaN(arg1) || Double.isNaN(arg2)) {
-                return NaN;
-            }
-
-            final double abs1 = ABS.invoke(arg1);
-            final double abs2 = ABS.invoke(arg2);
-
-            double retVal = ZERO;
-
-            if (abs1 > abs2) {
-                retVal = abs1 * SQRT1PX2.invoke(abs2 / abs1);
-            } else if (abs2 > ZERO) {
-                retVal = abs2 * SQRT1PX2.invoke(abs1 / abs2);
-            }
-
-            return retVal;
-        }
-
-    };
-
-    public static final Unary INVERT = new Unary() {
-
-        public final double invoke(final double arg) {
-            return ONE / arg;
-        }
-
-    };
-
-    public static final Unary LOG = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.log(arg);
-        }
-
-    };
-
-    public static final Unary LOG10 = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.log10(arg);
-        }
-
-    };
-
-    public static final Unary LOG1P = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.log1p(arg);
-        }
-
-    };
-
-    public static final Unary LOGISTIC = new Unary() {
-
-        public final double invoke(final double arg) {
-            return ONE / (ONE + Math.exp(-arg));
-        }
-
-    };
-
-    public static final Unary LOGIT = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.log(ONE / (ONE - arg));
-        }
-
-    };
-
-    public static final Binary MAX = new Binary() {
-
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return Math.max(arg1, arg2);
-        }
-
-    };
-
-    public static final Binary MIN = new Binary() {
-
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return Math.min(arg1, arg2);
-        }
-
-    };
-
-    public static final Binary MULTIPLY = new Binary() {
-
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return arg1 * arg2;
-        }
-
-    };
-
-    public static final Unary NEGATE = new Unary() {
-
-        public final double invoke(final double arg) {
-            return -arg;
-        }
-
-    };
-
-    public static final Binary POW = new Binary() {
-
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return Math.pow(arg1, arg2);
-        }
-
-    };
-
-    public static final Parameter POWER = new Parameter() {
-
-        @Override
-        public final double invoke(final double arg, int param) {
-
-            if (param < 0) {
-
-                return INVERT.invoke(POWER.invoke(arg, -param));
-
-            } else {
-
-                double retVal = ONE;
-
-                while (param > 0) {
-                    retVal = retVal * arg;
-                    param--;
-                }
-
-                return retVal;
-            }
-        }
-
-    };
-
-    public static final Unary RINT = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.rint(arg);
-        }
-
-    };
-
-    public static final Parameter ROOT = new Parameter() {
-
-        @Override
-        public final double invoke(final double arg, final int param) {
-
-            if (param != 0) {
-                return POW.invoke(arg, ONE / param);
-            } else {
-                throw new IllegalArgumentException();
-            }
-        }
-
-    };
-
-    public static final Parameter SCALE = new Parameter() {
-
-        @Override
-        public final double invoke(final double arg, int param) {
-
-            if (param < 0) {
-                throw new ProgrammingError("Cannot have exponents smaller than zero.");
-            }
-
-            long tmpFactor = 1l;
-            final long tmp10 = (long) TEN;
-
-            while (param > 0) {
-                tmpFactor *= tmp10;
-                param--;
-            }
-
-            return RINT.invoke(tmpFactor * arg) / tmpFactor;
-        }
-
-    };
-
-    public static final Unary SIGNUM = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.signum(arg);
-        }
-
-    };
-
-    public static final Unary SIN = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.sin(arg);
-        }
-
-    };
-
-    public static final Unary SINH = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.sinh(arg);
-        }
-
-    };
-
-    public static final Unary SQRT = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.sqrt(arg);
-        }
-
-    };
-
-    public static final Unary SQRT1PX2 = new Unary() {
-
-        public final double invoke(final double arg) {
-            return SQRT.invoke(ONE + (arg * arg));
-        }
-
-    };
-
-    public static final Binary SUBTRACT = new Binary() {
-
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return arg1 - arg2;
-        }
-
-    };
-
-    public static final Unary TAN = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.tan(arg);
-        }
-
-    };
-
-    public static final Unary TANH = new Unary() {
-
-        public final double invoke(final double arg) {
-            return Math.tanh(arg);
-        }
-
-    };
-
-    public static final Unary VALUE = new Unary() {
-
-        public final double invoke(final double arg) {
-            return arg;
-        }
-
-    };
+    /**
+     * @deprecated Use {@link PrimitiveMath#ABS} instead
+     */
+    public static final Unary ABS = PrimitiveMath.ABS;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#ACOS} instead
+     */
+    public static final Unary ACOS = PrimitiveMath.ACOS;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#ACOSH} instead
+     */
+    public static final Unary ACOSH = PrimitiveMath.ACOSH;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#ADD} instead
+     */
+    public static final Binary ADD = PrimitiveMath.ADD;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#ASIN} instead
+     */
+    public static final Unary ASIN = PrimitiveMath.ASIN;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#ASINH} instead
+     */
+    public static final Unary ASINH = PrimitiveMath.ASINH;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#ATAN} instead
+     */
+    public static final Unary ATAN = PrimitiveMath.ATAN;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#ATAN2} instead
+     */
+    public static final Binary ATAN2 = PrimitiveMath.ATAN2;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#ATANH} instead
+     */
+    public static final Unary ATANH = PrimitiveMath.ATANH;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#CARDINALITY} instead
+     */
+    public static final Unary CARDINALITY = PrimitiveMath.CARDINALITY;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#CBRT} instead
+     */
+    public static final Unary CBRT = PrimitiveMath.CBRT;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#CEIL} instead
+     */
+    public static final Unary CEIL = PrimitiveMath.CEIL;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#CONJUGATE} instead
+     */
+    public static final Unary CONJUGATE = PrimitiveMath.CONJUGATE;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#COS} instead
+     */
+    public static final Unary COS = PrimitiveMath.COS;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#COSH} instead
+     */
+    public static final Unary COSH = PrimitiveMath.COSH;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#DIVIDE} instead
+     */
+    public static final Binary DIVIDE = PrimitiveMath.DIVIDE;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#EXP} instead
+     */
+    public static final Unary EXP = PrimitiveMath.EXP;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#EXPM1} instead
+     */
+    public static final Unary EXPM1 = PrimitiveMath.EXPM1;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#FLOOR} instead
+     */
+    public static final Unary FLOOR = PrimitiveMath.FLOOR;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#HYPOT} instead
+     */
+    public static final Binary HYPOT = PrimitiveMath.HYPOT;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#INVERT} instead
+     */
+    public static final Unary INVERT = PrimitiveMath.INVERT;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#LOG} instead
+     */
+    public static final Unary LOG = PrimitiveMath.LOG;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#LOG10} instead
+     */
+    public static final Unary LOG10 = PrimitiveMath.LOG10;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#LOG1P} instead
+     */
+    public static final Unary LOG1P = PrimitiveMath.LOG1P;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#LOGISTIC} instead
+     */
+    public static final Unary LOGISTIC = PrimitiveMath.LOGISTIC;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#LOGIT} instead
+     */
+    public static final Unary LOGIT = PrimitiveMath.LOGIT;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#MAX} instead
+     */
+    public static final Binary MAX = PrimitiveMath.MAX;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#MIN} instead
+     */
+    public static final Binary MIN = PrimitiveMath.MIN;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#MULTIPLY} instead
+     */
+    public static final Binary MULTIPLY = PrimitiveMath.MULTIPLY;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#NEGATE} instead
+     */
+    public static final Unary NEGATE = PrimitiveMath.NEGATE;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#POW} instead
+     */
+    public static final Binary POW = PrimitiveMath.POW;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#POWER} instead
+     */
+    public static final Parameter POWER = PrimitiveMath.POWER;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#RINT} instead
+     */
+    public static final Unary RINT = PrimitiveMath.RINT;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#ROOT} instead
+     */
+    public static final Parameter ROOT = PrimitiveMath.ROOT;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#SCALE} instead
+     */
+    public static final Parameter SCALE = PrimitiveMath.SCALE;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#SIGNUM} instead
+     */
+    public static final Unary SIGNUM = PrimitiveMath.SIGNUM;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#SIN} instead
+     */
+    public static final Unary SIN = PrimitiveMath.SIN;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#SINH} instead
+     */
+    public static final Unary SINH = PrimitiveMath.SINH;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#SQRT} instead
+     */
+    public static final Unary SQRT = PrimitiveMath.SQRT;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#SQRT1PX2} instead
+     */
+    public static final Unary SQRT1PX2 = PrimitiveMath.SQRT1PX2;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#SUBTRACT} instead
+     */
+    public static final Binary SUBTRACT = PrimitiveMath.SUBTRACT;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#TAN} instead
+     */
+    public static final Unary TAN = PrimitiveMath.TAN;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#TANH} instead
+     */
+    public static final Unary TANH = PrimitiveMath.TANH;
+
+    /**
+     * @deprecated Use {@link PrimitiveMath#VALUE} instead
+     */
+    public static final Unary VALUE = PrimitiveMath.VALUE;
 
     private static final PrimitiveFunction SET = new PrimitiveFunction();
 
@@ -509,22 +315,22 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     @Override
     public UnaryFunction<Double> abs() {
-        return ABS;
+        return PrimitiveMath.ABS;
     }
 
     @Override
     public UnaryFunction<Double> acos() {
-        return ACOS;
+        return PrimitiveMath.ACOS;
     }
 
     @Override
     public UnaryFunction<Double> acosh() {
-        return ACOSH;
+        return PrimitiveMath.ACOSH;
     }
 
     @Override
     public BinaryFunction<Double> add() {
-        return ADD;
+        return PrimitiveMath.ADD;
     }
 
     @Override
@@ -534,62 +340,62 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     @Override
     public UnaryFunction<Double> asin() {
-        return ASIN;
+        return PrimitiveMath.ASIN;
     }
 
     @Override
     public UnaryFunction<Double> asinh() {
-        return ASINH;
+        return PrimitiveMath.ASINH;
     }
 
     @Override
     public UnaryFunction<Double> atan() {
-        return ATAN;
+        return PrimitiveMath.ATAN;
     }
 
     @Override
     public BinaryFunction<Double> atan2() {
-        return ATAN2;
+        return PrimitiveMath.ATAN2;
     }
 
     @Override
     public UnaryFunction<Double> atanh() {
-        return ATANH;
+        return PrimitiveMath.ATANH;
     }
 
     @Override
     public UnaryFunction<Double> cardinality() {
-        return CARDINALITY;
+        return PrimitiveMath.CARDINALITY;
     }
 
     @Override
     public UnaryFunction<Double> cbrt() {
-        return CBRT;
+        return PrimitiveMath.CBRT;
     }
 
     @Override
     public UnaryFunction<Double> ceil() {
-        return CEIL;
+        return PrimitiveMath.CEIL;
     }
 
     @Override
     public UnaryFunction<Double> conjugate() {
-        return CONJUGATE;
+        return PrimitiveMath.CONJUGATE;
     }
 
     @Override
     public UnaryFunction<Double> cos() {
-        return COS;
+        return PrimitiveMath.COS;
     }
 
     @Override
     public UnaryFunction<Double> cosh() {
-        return COSH;
+        return PrimitiveMath.COSH;
     }
 
     @Override
     public BinaryFunction<Double> divide() {
-        return DIVIDE;
+        return PrimitiveMath.DIVIDE;
     }
 
     @Override
@@ -599,142 +405,142 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     @Override
     public UnaryFunction<Double> exp() {
-        return EXP;
+        return PrimitiveMath.EXP;
     }
 
     @Override
     public UnaryFunction<Double> expm1() {
-        return EXPM1;
+        return PrimitiveMath.EXPM1;
     }
 
     @Override
     public UnaryFunction<Double> floor() {
-        return FLOOR;
+        return PrimitiveMath.FLOOR;
     }
 
     @Override
     public BinaryFunction<Double> hypot() {
-        return HYPOT;
+        return PrimitiveMath.HYPOT;
     }
 
     @Override
     public UnaryFunction<Double> invert() {
-        return INVERT;
+        return PrimitiveMath.INVERT;
     }
 
     @Override
     public UnaryFunction<Double> log() {
-        return LOG;
+        return PrimitiveMath.LOG;
     }
 
     @Override
     public UnaryFunction<Double> log10() {
-        return LOG10;
+        return PrimitiveMath.LOG10;
     }
 
     @Override
     public UnaryFunction<Double> log1p() {
-        return LOG1P;
+        return PrimitiveMath.LOG1P;
     }
 
     @Override
     public UnaryFunction<Double> logistic() {
-        return LOGISTIC;
+        return PrimitiveMath.LOGISTIC;
     }
 
     @Override
     public UnaryFunction<Double> logit() {
-        return LOGIT;
+        return PrimitiveMath.LOGIT;
     }
 
     @Override
     public BinaryFunction<Double> max() {
-        return MAX;
+        return PrimitiveMath.MAX;
     }
 
     @Override
     public BinaryFunction<Double> min() {
-        return MIN;
+        return PrimitiveMath.MIN;
     }
 
     @Override
     public BinaryFunction<Double> multiply() {
-        return MULTIPLY;
+        return PrimitiveMath.MULTIPLY;
     }
 
     @Override
     public UnaryFunction<Double> negate() {
-        return NEGATE;
+        return PrimitiveMath.NEGATE;
     }
 
     @Override
     public BinaryFunction<Double> pow() {
-        return POW;
+        return PrimitiveMath.POW;
     }
 
     @Override
     public ParameterFunction<Double> power() {
-        return POWER;
+        return PrimitiveMath.POWER;
     }
 
     @Override
     public UnaryFunction<Double> rint() {
-        return RINT;
+        return PrimitiveMath.RINT;
     }
 
     @Override
     public ParameterFunction<Double> root() {
-        return ROOT;
+        return PrimitiveMath.ROOT;
     }
 
     @Override
     public ParameterFunction<Double> scale() {
-        return SCALE;
+        return PrimitiveMath.SCALE;
     }
 
     @Override
     public UnaryFunction<Double> signum() {
-        return SIGNUM;
+        return PrimitiveMath.SIGNUM;
     }
 
     @Override
     public UnaryFunction<Double> sin() {
-        return SIN;
+        return PrimitiveMath.SIN;
     }
 
     @Override
     public UnaryFunction<Double> sinh() {
-        return SINH;
+        return PrimitiveMath.SINH;
     }
 
     @Override
     public UnaryFunction<Double> sqrt() {
-        return SQRT;
+        return PrimitiveMath.SQRT;
     }
 
     @Override
     public UnaryFunction<Double> sqrt1px2() {
-        return SQRT1PX2;
+        return PrimitiveMath.SQRT1PX2;
     }
 
     @Override
     public BinaryFunction<Double> subtract() {
-        return SUBTRACT;
+        return PrimitiveMath.SUBTRACT;
     }
 
     @Override
     public UnaryFunction<Double> tan() {
-        return TAN;
+        return PrimitiveMath.TAN;
     }
 
     @Override
     public UnaryFunction<Double> tanh() {
-        return TANH;
+        return PrimitiveMath.TANH;
     }
 
     @Override
     public UnaryFunction<Double> value() {
-        return VALUE;
+        return PrimitiveMath.VALUE;
     }
 
 }

@@ -25,8 +25,8 @@ import java.util.Arrays;
 
 import org.ojalgo.array.ArrayAnyD;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 final class AnyTensor<N extends Number> implements Tensor<N> {
 

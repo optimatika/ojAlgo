@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.MathContext;
 import java.util.ArrayList;

@@ -27,8 +27,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.ojalgo.array.Raw1D;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ExpressionsBasedModel.Intermediate;
@@ -224,7 +223,7 @@ final class NodeKey implements Comparable<NodeKey> {
 
     private double feasible(final int index, final double value, boolean validate) {
 
-        double feasibilityAdjusted = PrimitiveFunction.MIN.invoke(PrimitiveFunction.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
+        double feasibilityAdjusted = PrimitiveMath.MIN.invoke(PrimitiveMath.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
 
         if (validate && FEASIBILITY.isDifferent(feasibilityAdjusted, value)) {
             BasicLogger.error("Obviously infeasible value {}: {} <= {} <= {} @ {}", index, myLowerBounds[index], value, myUpperBounds[index], this);
@@ -252,7 +251,7 @@ final class NodeKey implements Comparable<NodeKey> {
 
         final double tmpFeasibleValue = this.feasible(branchIntegerIndex, value, false);
 
-        final int tmpFloor = (int) PrimitiveFunction.FLOOR.invoke(tmpFeasibleValue);
+        final int tmpFloor = (int) PrimitiveMath.FLOOR.invoke(tmpFeasibleValue);
 
         int oldVal = tmpUBs[branchIntegerIndex];
 
@@ -276,7 +275,7 @@ final class NodeKey implements Comparable<NodeKey> {
 
         final double tmpFeasibleValue = this.feasible(branchIntegerIndex, value, false);
 
-        final int tmpCeil = (int) PrimitiveFunction.CEIL.invoke(tmpFeasibleValue);
+        final int tmpCeil = (int) PrimitiveMath.CEIL.invoke(tmpFeasibleValue);
 
         int oldVal = tmpLBs[branchIntegerIndex];
 
@@ -313,7 +312,7 @@ final class NodeKey implements Comparable<NodeKey> {
 
         final double feasibleValue = this.feasible(index, value, true);
 
-        return PrimitiveFunction.ABS.invoke(feasibleValue - PrimitiveFunction.RINT.invoke(feasibleValue));
+        return PrimitiveMath.ABS.invoke(feasibleValue - PrimitiveMath.RINT.invoke(feasibleValue));
     }
 
     BigDecimal getLowerBound(final int index) {

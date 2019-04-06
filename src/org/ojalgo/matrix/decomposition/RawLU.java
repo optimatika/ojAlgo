@@ -21,13 +21,14 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Raw2D;
 import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -244,7 +245,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
             // Find pivot and exchange if necessary.
             int p = j;
             for (int i = j + 1; i < tmpRowDim; i++) {
-                if (ABS.invoke(tmpColJ[i]) > ABS.invoke(tmpColJ[p])) {
+                if (PrimitiveMath.ABS.invoke(tmpColJ[i]) > PrimitiveMath.ABS.invoke(tmpColJ[p])) {
                     p = i;
                 }
             }

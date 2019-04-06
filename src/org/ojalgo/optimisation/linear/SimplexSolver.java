@@ -21,8 +21,8 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,9 +35,9 @@ import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -715,7 +715,7 @@ public final class SimplexSolver extends LinearSolver {
                 final Access1D<Double> tmpNumerators = myTableau.sliceTableauColumn(tmpNumerCol);
                 final Access1D<Double> tmpDenominators = myTableau.sliceTableauColumn(tmpDenomCol);
                 final Array1D<Double> tmpRatios = Array1D.PRIMITIVE64.copy(tmpNumerators);
-                tmpRatios.modifyMatching(DIVIDE, tmpDenominators);
+                tmpRatios.modifyMatching(PrimitiveMath.DIVIDE, tmpDenominators);
                 this.log("\nfindNextPivotRow (smallest positive ratio) among these:\nNumerators={}\nDenominators={}\nRatios={}", tmpNumerators, tmpDenominators,
                         tmpRatios);
             } else {
@@ -738,7 +738,7 @@ public final class SimplexSolver extends LinearSolver {
             denom = myTableau.doubleValue(i, tmpDenomCol);
 
             // Should always be >=0.0, but very small numbers may "accidentally" get a negative sign.
-            numer = PrimitiveFunction.ABS.invoke(myTableau.doubleValue(i, tmpNumerCol));
+            numer = PrimitiveMath.ABS.invoke(myTableau.doubleValue(i, tmpNumerCol));
 
             if (RATIO.isSmall(numer, denom)) {
 

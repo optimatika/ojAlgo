@@ -23,7 +23,7 @@ package org.ojalgo.scalar;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -181,7 +181,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
     }
 
     public final double norm() {
-        return PrimitiveFunction.ABS.invoke(this.doubleValue());
+        return PrimitiveMath.ABS.invoke(this.doubleValue());
     }
 
     public final S signum() {

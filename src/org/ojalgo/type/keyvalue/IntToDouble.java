@@ -21,7 +21,7 @@
  */
 package org.ojalgo.type.keyvalue;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.type.context.NumberContext;

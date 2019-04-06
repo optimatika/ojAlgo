@@ -21,13 +21,13 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.BigFunction;
+import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileMPS;
@@ -91,7 +91,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSmaros() {
-        BurkardtDatasetsMps.doTest("maros.mps", BigFunction.DIVIDE.invoke(new BigDecimal("385"), THREE).toString(), "197.5");
+        BurkardtDatasetsMps.doTest("maros.mps", BigMath.DIVIDE.invoke(new BigDecimal("385"), THREE).toString(), "197.5");
     }
 
     /**
@@ -100,7 +100,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
      */
     @Test
     public void testMPSnazareth() {
-        BurkardtDatasetsMps.doTest("nazareth.mps", null, BigFunction.DIVIDE.invoke(HUNDRED.add(TEN), THREE).toString());
+        BurkardtDatasetsMps.doTest("nazareth.mps", null, BigMath.DIVIDE.invoke(HUNDRED.add(TEN), THREE).toString());
     }
 
     /**

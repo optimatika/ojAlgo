@@ -21,11 +21,10 @@
  */
 package org.ojalgo.function.aggregator;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -140,7 +139,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 }
 
                 public void invoke(final double anArg) {
-                    myValue = PrimitiveFunction.MAX.invoke(myValue, PrimitiveFunction.ABS.invoke(anArg));
+                    myValue = PrimitiveMath.MAX.invoke(myValue, PrimitiveMath.ABS.invoke(anArg));
                 }
 
                 public void merge(final Double result) {
@@ -173,7 +172,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 }
 
                 public void invoke(final double anArg) {
-                    myValue = PrimitiveFunction.MAX.invoke(myValue, anArg);
+                    myValue = PrimitiveMath.MAX.invoke(myValue, anArg);
                 }
 
                 public void merge(final Double result) {
@@ -210,7 +209,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 }
 
                 public void invoke(final double anArg) {
-                    myValue = PrimitiveFunction.MIN.invoke(myValue, anArg);
+                    myValue = PrimitiveMath.MIN.invoke(myValue, anArg);
                 }
 
                 public void merge(final Double result) {
@@ -243,7 +242,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 }
 
                 public void invoke(final double anArg) {
-                    myValue += PrimitiveFunction.ABS.invoke(anArg);
+                    myValue += PrimitiveMath.ABS.invoke(anArg);
                 }
 
                 public void merge(final Double result) {
@@ -269,7 +268,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 public double doubleValue() {
                     //return myValue; // more than 100x slower
-                    return PrimitiveFunction.SQRT.invoke(myValue);
+                    return PrimitiveMath.SQRT.invoke(myValue);
                 }
 
                 public int intValue() {
@@ -381,10 +380,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 }
 
                 public void invoke(final double anArg) {
-                    final double tmpArg = PrimitiveFunction.ABS.invoke(anArg);
+                    final double tmpArg = PrimitiveMath.ABS.invoke(anArg);
                     // if (tmpArg != ZERO) {
                     if (NumberContext.compare(tmpArg, ZERO) != 0) {
-                        myValue = PrimitiveFunction.MIN.invoke(myValue, tmpArg);
+                        myValue = PrimitiveMath.MIN.invoke(myValue, tmpArg);
                     }
                 }
 

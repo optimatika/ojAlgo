@@ -24,7 +24,7 @@ package org.ojalgo.matrix;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.RationalFunction;
+import org.ojalgo.function.constant.RationalMath;
 import org.ojalgo.matrix.BasicMatrix.PhysicalReceiver;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -100,7 +100,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         final RationalMatrix tmpActV = RationalMatrix.FACTORY.copy(tmpV);
 
         PhysicalReceiver<RationalNumber, RationalMatrix> tmpCopy = tmpExpV.copy();
-        tmpCopy.modifyMatching(RationalFunction.DIVIDE, tmpActV);
+        tmpCopy.modifyMatching(RationalMath.DIVIDE, tmpActV);
         final RationalMatrix tmpMtrx = tmpCopy.get();
         double tmpExp;
         double tmpAct;

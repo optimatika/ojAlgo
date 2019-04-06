@@ -1,10 +1,9 @@
 package org.ojalgo.array;
 
 import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.machine.Hardware;
 import org.ojalgo.scalar.Scalar.Factory;
 
@@ -31,10 +30,10 @@ final class DenseCapacityStrategy<N extends Number> {
         double tmpInitialCapacity = count;
 
         while (tmpInitialCapacity > DenseArray.MAX_ARRAY_SIZE) {
-            tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
+            tmpInitialCapacity = PrimitiveMath.SQRT.invoke(tmpInitialCapacity);
         }
 
-        tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
+        tmpInitialCapacity = PrimitiveMath.SQRT.invoke(tmpInitialCapacity);
         return 2 * (int) tmpInitialCapacity;
     }
 

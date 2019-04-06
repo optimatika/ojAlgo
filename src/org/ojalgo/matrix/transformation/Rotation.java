@@ -22,9 +22,8 @@
 package org.ojalgo.matrix.transformation;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -158,7 +157,7 @@ public abstract class Rotation<N extends Number> implements TransformationMatrix
     }
 
     public static Primitive makePrimitive(final int aLowerIndex, final int aHigherIndex, final double anAngle) {
-        return new Primitive(aLowerIndex, aHigherIndex, PrimitiveFunction.COS.invoke(anAngle), PrimitiveFunction.SIN.invoke(anAngle));
+        return new Primitive(aLowerIndex, aHigherIndex, PrimitiveMath.COS.invoke(anAngle), PrimitiveMath.SIN.invoke(anAngle));
     }
 
     static Rotation<Double>[] rotationsP(final PhysicalStore<Double> matrix, final int low, final int high, final Rotation<Double>[] results) {
@@ -178,18 +177,18 @@ public abstract class Rotation<N extends Number> implements TransformationMatrix
         final double sg; // sin Givens
 
         if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, y)) {
-            cg = PrimitiveFunction.SIGNUM.invoke(x);
+            cg = PrimitiveMath.SIGNUM.invoke(x);
             sg = PrimitiveMath.ZERO;
         } else if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, x)) {
-            sg = PrimitiveFunction.SIGNUM.invoke(y);
+            sg = PrimitiveMath.SIGNUM.invoke(y);
             cg = PrimitiveMath.ZERO;
-        } else if (PrimitiveFunction.ABS.invoke(y) > PrimitiveFunction.ABS.invoke(x)) {
+        } else if (PrimitiveMath.ABS.invoke(y) > PrimitiveMath.ABS.invoke(x)) {
             t = x / y; // cot
-            sg = PrimitiveFunction.SIGNUM.invoke(y) / PrimitiveFunction.SQRT1PX2.invoke(t);
+            sg = PrimitiveMath.SIGNUM.invoke(y) / PrimitiveMath.SQRT1PX2.invoke(t);
             cg = sg * t;
         } else {
             t = y / x; // tan
-            cg = PrimitiveFunction.SIGNUM.invoke(x) / PrimitiveFunction.SQRT1PX2.invoke(t);
+            cg = PrimitiveMath.SIGNUM.invoke(x) / PrimitiveMath.SQRT1PX2.invoke(t);
             sg = cg * t;
         }
 
@@ -198,10 +197,10 @@ public abstract class Rotation<N extends Number> implements TransformationMatrix
         final double b2 = (cg * (a01 + a10)) + (sg * (a11 - a00)); // b01 + b10
 
         t = (b11 - b00) / b2;
-        t = PrimitiveFunction.SIGNUM.invoke(t) / (PrimitiveFunction.SQRT1PX2.invoke(t) + PrimitiveFunction.ABS.invoke(t)); // tan Jacobi
+        t = PrimitiveMath.SIGNUM.invoke(t) / (PrimitiveMath.SQRT1PX2.invoke(t) + PrimitiveMath.ABS.invoke(t)); // tan Jacobi
 
         // Annihilate - Jacobi
-        final double cj = PrimitiveMath.ONE / PrimitiveFunction.SQRT1PX2.invoke(t); // cos Jacobi
+        final double cj = PrimitiveMath.ONE / PrimitiveMath.SQRT1PX2.invoke(t); // cos Jacobi
         final double sj = cj * t; // sin Jacobi
 
         results[1] = new Rotation.Primitive(low, high, cj, sj); // Jacobi

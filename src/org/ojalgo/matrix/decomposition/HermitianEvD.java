@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Optional;
 
@@ -30,10 +30,10 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.GenericDenseStore;
@@ -123,11 +123,11 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
             e_l = e[l];
 
             // Find small subdiagonal element
-            magnitude = MAX.invoke(magnitude, ABS.invoke(d_l) + ABS.invoke(e_l));
+            magnitude = PrimitiveMath.MAX.invoke(magnitude, PrimitiveMath.ABS.invoke(d_l) + PrimitiveMath.ABS.invoke(e_l));
             epsilon = MACHINE_EPSILON * magnitude;
 
             m = l;
-            while ((m < limit) && (ABS.invoke(e[m]) > epsilon)) {
+            while ((m < limit) && (PrimitiveMath.ABS.invoke(e[m]) > epsilon)) {
                 m++;
             }
 
@@ -138,7 +138,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
                     // Compute implicit shift
 
                     double p = (d[l + 1] - d_l) / (e_l + e_l);
-                    double r = HYPOT.invoke(p, ONE);
+                    double r = PrimitiveMath.HYPOT.invoke(p, ONE);
                     if (p < ZERO) {
                         r = -r;
                     }
@@ -160,7 +160,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
                         d_i = d[i];
                         e_i = e[i];
 
-                        r = HYPOT.invoke(p, e_i);
+                        r = PrimitiveMath.HYPOT.invoke(p, e_i);
 
                         e[i + 1] = sin1 * r;
 
@@ -180,7 +180,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
                     d_l = d[l] = cos1 * p;
                     e_l = e[l] = sin1 * p;
 
-                } while (ABS.invoke(e[l]) > epsilon); // Check for convergence
+                } while (PrimitiveMath.ABS.invoke(e[l]) > epsilon); // Check for convergence
             } // End if (m > l)
 
             d[l] += shift;

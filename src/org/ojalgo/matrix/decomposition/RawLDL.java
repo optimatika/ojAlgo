@@ -21,11 +21,12 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.blas.DOT;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -195,7 +196,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         preallocated.substituteForwards(tmpBody, true, false, true);
 
         for (int i = 0; i < preallocated.countRows(); i++) {
-            preallocated.modifyRow(i, 0, DIVIDE.second(tmpBody.doubleValue(i, i)));
+            preallocated.modifyRow(i, 0, PrimitiveMath.DIVIDE.second(tmpBody.doubleValue(i, i)));
         }
 
         preallocated.substituteBackwards(tmpBody, true, true, true);
@@ -212,7 +213,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         preallocated.substituteForwards(tmpBody, true, false, false);
 
         for (int i = 0; i < preallocated.countRows(); i++) {
-            preallocated.modifyRow(i, 0, DIVIDE.second(tmpBody.doubleValue(i, i)));
+            preallocated.modifyRow(i, 0, PrimitiveMath.DIVIDE.second(tmpBody.doubleValue(i, i)));
         }
 
         preallocated.substituteBackwards(tmpBody, true, true, false);

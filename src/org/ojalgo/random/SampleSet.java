@@ -21,13 +21,14 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -164,7 +165,7 @@ public final class SampleSet implements Access1D<Double> {
 
         final long tmpLimit = mySamples.count();
         for (long i = 0L; i < tmpLimit; i++) {
-            retVal = MAX.invoke(retVal, ABS.invoke(mySamples.doubleValue(i)));
+            retVal = PrimitiveMath.MAX.invoke(retVal, PrimitiveMath.ABS.invoke(mySamples.doubleValue(i)));
         }
 
         return retVal;
@@ -189,7 +190,7 @@ public final class SampleSet implements Access1D<Double> {
 
             final long tmpLimit = mySamples.count();
             for (long i = 0L; i < tmpLimit; i++) {
-                myMax = MAX.invoke(myMax, mySamples.doubleValue(i));
+                myMax = PrimitiveMath.MAX.invoke(myMax, mySamples.doubleValue(i));
             }
         }
 
@@ -231,7 +232,7 @@ public final class SampleSet implements Access1D<Double> {
 
             final long tmpLimit = mySamples.count();
             for (long i = 0L; i < tmpLimit; i++) {
-                myMin = MIN.invoke(myMin, mySamples.doubleValue(i));
+                myMin = PrimitiveMath.MIN.invoke(myMin, mySamples.doubleValue(i));
             }
         }
 
@@ -283,7 +284,7 @@ public final class SampleSet implements Access1D<Double> {
 
         final long tmpLimit = mySamples.count();
         for (long i = 0L; i < tmpLimit; i++) {
-            retVal = MIN.invoke(retVal, ABS.invoke(mySamples.doubleValue(i)));
+            retVal = PrimitiveMath.MIN.invoke(retVal, PrimitiveMath.ABS.invoke(mySamples.doubleValue(i)));
         }
 
         return retVal;
@@ -292,7 +293,7 @@ public final class SampleSet implements Access1D<Double> {
     public double getStandardDeviation() {
 
         if (Double.isNaN(myStandardDeviation)) {
-            myStandardDeviation = SQRT.invoke(this.getVariance());
+            myStandardDeviation = PrimitiveMath.SQRT.invoke(this.getVariance());
         }
 
         return myStandardDeviation;

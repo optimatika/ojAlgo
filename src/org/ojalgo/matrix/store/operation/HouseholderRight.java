@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.store.operation;
 
 import org.ojalgo.array.blas.AXPY;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.Scalar;
 
