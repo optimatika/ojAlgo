@@ -341,7 +341,7 @@ public abstract class BigMath {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg, final int param) {
-            return arg.pow(param);
+            return MissingMath.power(arg, param);
         }
 
     };

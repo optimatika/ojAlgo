@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function;
+package org.ojalgo.function.constant;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
@@ -28,6 +28,13 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.BigFunction;
+import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.ComplexFunction;
+import org.ojalgo.function.ParameterFunction;
+import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.RationalFunction;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.ComplexMath;
 import org.ojalgo.function.constant.PrimitiveMath;

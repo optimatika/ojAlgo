@@ -50,6 +50,24 @@ public abstract class MissingMath {
         return Math.log(1.0 / (1.0 - arg));
     }
 
+    public static BigDecimal power(final BigDecimal arg, final int param) {
+        switch (param) {
+        case 0:
+            return BigDecimal.ONE;
+        case 1:
+            return arg;
+        case 2:
+            return arg.multiply(arg, MathContext.DECIMAL128);
+        case 3:
+            return arg.multiply(arg).multiply(arg, MathContext.DECIMAL128);
+        case 4:
+            BigDecimal arg2 = arg.multiply(arg);
+            return arg2.multiply(arg2, MathContext.DECIMAL128);
+        default:
+            return arg.pow(param, MathContext.DECIMAL128);
+        }
+    }
+
     public static BigDecimal root(final BigDecimal arg, final int param) {
 
         if (param <= 0) {
@@ -59,24 +77,6 @@ public abstract class MissingMath {
         } else if (param == 1) {
 
             return arg;
-
-        } else if (param == 2) {
-
-            final BigDecimal bigArg = arg.round(MathContext.DECIMAL128);
-            final BigDecimal bigParam = BigDecimal.valueOf(param);
-
-            BigDecimal retVal = BigDecimal.ZERO;
-            final double primArg = bigArg.doubleValue();
-            if (!Double.isInfinite(primArg) && !Double.isNaN(primArg)) {
-                retVal = BigDecimal.valueOf(Math.pow(primArg, 1.0 / param)); // Intial guess
-            }
-
-            BigDecimal shouldBeZero;
-            while ((shouldBeZero = retVal.multiply(retVal, MathContext.DECIMAL128).subtract(bigArg)).signum() != 0) {
-                retVal = retVal.subtract(shouldBeZero.divide(bigParam.multiply(retVal.pow(param - 1)), MathContext.DECIMAL128));
-            }
-
-            return retVal;
 
         } else {
 
@@ -90,7 +90,7 @@ public abstract class MissingMath {
             }
 
             BigDecimal shouldBeZero;
-            while ((shouldBeZero = retVal.pow(param, MathContext.DECIMAL128).subtract(bigArg)).signum() != 0) {
+            while ((shouldBeZero = MissingMath.power(retVal, param).subtract(bigArg)).signum() != 0) {
                 retVal = retVal.subtract(shouldBeZero.divide(bigParam.multiply(retVal.pow(param - 1)), MathContext.DECIMAL128));
             }
 

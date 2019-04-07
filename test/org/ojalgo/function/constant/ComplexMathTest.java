@@ -19,13 +19,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function;
+package org.ojalgo.function.constant;
 
+import static org.ojalgo.function.constant.ComplexMath.*;
 import static org.ojalgo.scalar.ComplexNumber.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.ComplexMath;
 
 /**
  * Tests that {@linkplain org.ojalgo.function.ComplexFunction} functions work correctly with complex valued
@@ -33,36 +33,36 @@ import org.ojalgo.function.constant.ComplexMath;
  *
  * @author apete
  */
-public class ComplexCase {
+public class ComplexMathTest {
 
     @Test
     public void testDIVIDE() {
-        TestUtils.assertEquals(ONE, ComplexMath.DIVIDE.invoke(I, I));
+        TestUtils.assertEquals(ONE, DIVIDE.invoke(I, I));
     }
 
     @Test
     public void testMULTIPLY() {
-        TestUtils.assertEquals(NEG, ComplexMath.MULTIPLY.invoke(I, I));
+        TestUtils.assertEquals(NEG, MULTIPLY.invoke(I, I));
     }
 
     @Test
     public void testPOWER() {
-        TestUtils.assertEquals(NEG, ComplexMath.POWER.invoke(I, 2));
+        TestUtils.assertEquals(NEG, POWER.invoke(I, 2));
     }
 
     @Test
     public void testROOT() {
-        TestUtils.assertEquals(I, ComplexMath.ROOT.invoke(NEG, 2));
+        TestUtils.assertEquals(I, ROOT.invoke(NEG, 2));
     }
 
     @Test
     public void testSQRT() {
-        TestUtils.assertEquals(I, ComplexMath.SQRT.invoke(NEG));
+        TestUtils.assertEquals(I, SQRT.invoke(NEG));
     }
 
     @Test
     public void testSUBTRACT() {
-        TestUtils.assertEquals(ZERO, ComplexMath.SUBTRACT.invoke(I, I));
+        TestUtils.assertEquals(ZERO, SUBTRACT.invoke(I, I));
     }
 
 }
