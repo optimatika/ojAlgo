@@ -4,9 +4,15 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## org.ojalgo.constant
+
+* Everything in this package has been moved to org.ojalgo.function.constant
+
 ## org.ojalgo.function
 
-* New package org.ojalgo.function.special with currently 3 new classes: CombinatorialFunctions, ErrorFunction and GammaFunction.
+* New package org.ojalgo.function.special with currently 4 new classes: CombinatorialFunctions, ErrorFunction, GammaFunction and MissingMath.
+* New package org.ojalgo.function.constant with constants related to doing basic maths on different types.
+* Moved constants defined in various classes to the new org.ojalgo.function.constant package, and deprecated a ffew others that will be made private.
 
 ## org.ojalgo.matrix
 
