@@ -75,223 +75,267 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     }
 
     /**
-     * @deprecated Use {@link QuaternionMath#ABS} instead
+     * @deprecated v48 Use {@link QuaternionMath#ABS} instead
      */
+    @Deprecated
     public static final Unary ABS = QuaternionMath.ABS;
 
     /**
-     * @deprecated Use {@link QuaternionMath#ACOS} instead
+     * @deprecated v48 Use {@link QuaternionMath#ACOS} instead
      */
+    @Deprecated
     public static final Unary ACOS = QuaternionMath.ACOS;
 
     /**
-     * @deprecated Use {@link QuaternionMath#ACOSH} instead
+     * @deprecated v48 Use {@link QuaternionMath#ACOSH} instead
      */
+    @Deprecated
     public static final Unary ACOSH = QuaternionMath.ACOSH;
 
     /**
-     * @deprecated Use {@link QuaternionMath#ADD} instead
+     * @deprecated v48 Use {@link QuaternionMath#ADD} instead
      */
+    @Deprecated
     public static final Binary ADD = QuaternionMath.ADD;
 
     /**
-     * @deprecated Use {@link QuaternionMath#ASIN} instead
+     * @deprecated v48 Use {@link QuaternionMath#ASIN} instead
      */
+    @Deprecated
     public static final Unary ASIN = QuaternionMath.ASIN;
 
     /**
-     * @deprecated Use {@link QuaternionMath#ASINH} instead
+     * @deprecated v48 Use {@link QuaternionMath#ASINH} instead
      */
+    @Deprecated
     public static final Unary ASINH = QuaternionMath.ASINH;
 
     /**
-     * @deprecated Use {@link QuaternionMath#ATAN} instead
+     * @deprecated v48 Use {@link QuaternionMath#ATAN} instead
      */
+    @Deprecated
     public static final Unary ATAN = QuaternionMath.ATAN;
 
     /**
-     * @deprecated Use {@link QuaternionMath#ATAN2} instead
+     * @deprecated v48 Use {@link QuaternionMath#ATAN2} instead
      */
+    @Deprecated
     public static final Binary ATAN2 = QuaternionMath.ATAN2;
 
     /**
-     * @deprecated Use {@link QuaternionMath#ATANH} instead
+     * @deprecated v48 Use {@link QuaternionMath#ATANH} instead
      */
+    @Deprecated
     public static final Unary ATANH = QuaternionMath.ATANH;
 
     /**
-     * @deprecated Use {@link QuaternionMath#CARDINALITY} instead
+     * @deprecated v48 Use {@link QuaternionMath#CARDINALITY} instead
      */
+    @Deprecated
     public static final Unary CARDINALITY = QuaternionMath.CARDINALITY;
 
     /**
-     * @deprecated Use {@link QuaternionMath#CBRT} instead
+     * @deprecated v48 Use {@link QuaternionMath#CBRT} instead
      */
+    @Deprecated
     public static final Unary CBRT = QuaternionMath.CBRT;
 
     /**
-     * @deprecated Use {@link QuaternionMath#CEIL} instead
+     * @deprecated v48 Use {@link QuaternionMath#CEIL} instead
      */
+    @Deprecated
     public static final Unary CEIL = QuaternionMath.CEIL;
 
     /**
-     * @deprecated Use {@link QuaternionMath#CONJUGATE} instead
+     * @deprecated v48 Use {@link QuaternionMath#CONJUGATE} instead
      */
+    @Deprecated
     public static final Unary CONJUGATE = QuaternionMath.CONJUGATE;
 
     /**
-     * @deprecated Use {@link QuaternionMath#COS} instead
+     * @deprecated v48 Use {@link QuaternionMath#COS} instead
      */
+    @Deprecated
     public static final Unary COS = QuaternionMath.COS;
 
     /**
-     * @deprecated Use {@link QuaternionMath#COSH} instead
+     * @deprecated v48 Use {@link QuaternionMath#COSH} instead
      */
+    @Deprecated
     public static final Unary COSH = QuaternionMath.COSH;
 
     /**
-     * @deprecated Use {@link QuaternionMath#DIVIDE} instead
+     * @deprecated v48 Use {@link QuaternionMath#DIVIDE} instead
      */
+    @Deprecated
     public static final Binary DIVIDE = QuaternionMath.DIVIDE;
 
     /**
-     * @deprecated Use {@link QuaternionMath#EXP} instead
+     * @deprecated v48 Use {@link QuaternionMath#EXP} instead
      */
+    @Deprecated
     public static final Unary EXP = QuaternionMath.EXP;
 
     /**
-     * @deprecated Use {@link QuaternionMath#EXPM1} instead
+     * @deprecated v48 Use {@link QuaternionMath#EXPM1} instead
      */
+    @Deprecated
     public static final Unary EXPM1 = QuaternionMath.EXPM1;
 
     /**
-     * @deprecated Use {@link QuaternionMath#FLOOR} instead
+     * @deprecated v48 Use {@link QuaternionMath#FLOOR} instead
      */
+    @Deprecated
     public static final Unary FLOOR = QuaternionMath.FLOOR;
 
     /**
-     * @deprecated Use {@link QuaternionMath#HYPOT} instead
+     * @deprecated v48 Use {@link QuaternionMath#HYPOT} instead
      */
+    @Deprecated
     public static final Binary HYPOT = QuaternionMath.HYPOT;
 
     /**
-     * @deprecated Use {@link QuaternionMath#INVERT} instead
+     * @deprecated v48 Use {@link QuaternionMath#INVERT} instead
      */
+    @Deprecated
     public static final Unary INVERT = QuaternionMath.INVERT;
 
     /**
-     * @deprecated Use {@link QuaternionMath#LOG} instead
+     * @deprecated v48 Use {@link QuaternionMath#LOG} instead
      */
+    @Deprecated
     public static final Unary LOG = QuaternionMath.LOG;
 
     /**
-     * @deprecated Use {@link QuaternionMath#LOG10} instead
+     * @deprecated v48 Use {@link QuaternionMath#LOG10} instead
      */
+    @Deprecated
     public static final Unary LOG10 = QuaternionMath.LOG10;
 
     /**
-     * @deprecated Use {@link QuaternionMath#LOG1P} instead
+     * @deprecated v48 Use {@link QuaternionMath#LOG1P} instead
      */
+    @Deprecated
     public static final Unary LOG1P = QuaternionMath.LOG1P;
 
     /**
-     * @deprecated Use {@link QuaternionMath#LOGISTIC} instead
+     * @deprecated v48 Use {@link QuaternionMath#LOGISTIC} instead
      */
+    @Deprecated
     public static final Unary LOGISTIC = QuaternionMath.LOGISTIC;
 
     /**
-     * @deprecated Use {@link QuaternionMath#LOGIT} instead
+     * @deprecated v48 Use {@link QuaternionMath#LOGIT} instead
      */
+    @Deprecated
     public static final Unary LOGIT = QuaternionMath.LOGIT;
 
     /**
-     * @deprecated Use {@link QuaternionMath#MAX} instead
+     * @deprecated v48 Use {@link QuaternionMath#MAX} instead
      */
+    @Deprecated
     public static final Binary MAX = QuaternionMath.MAX;
 
     /**
-     * @deprecated Use {@link QuaternionMath#MIN} instead
+     * @deprecated v48 Use {@link QuaternionMath#MIN} instead
      */
+    @Deprecated
     public static final Binary MIN = QuaternionMath.MIN;
 
     /**
-     * @deprecated Use {@link QuaternionMath#MULTIPLY} instead
+     * @deprecated v48 Use {@link QuaternionMath#MULTIPLY} instead
      */
+    @Deprecated
     public static final Binary MULTIPLY = QuaternionMath.MULTIPLY;
 
     /**
-     * @deprecated Use {@link QuaternionMath#NEGATE} instead
+     * @deprecated v48 Use {@link QuaternionMath#NEGATE} instead
      */
+    @Deprecated
     public static final Unary NEGATE = QuaternionMath.NEGATE;
 
     /**
-     * @deprecated Use {@link QuaternionMath#POW} instead
+     * @deprecated v48 Use {@link QuaternionMath#POW} instead
      */
+    @Deprecated
     public static final Binary POW = QuaternionMath.POW;
 
     /**
-     * @deprecated Use {@link QuaternionMath#POWER} instead
+     * @deprecated v48 Use {@link QuaternionMath#POWER} instead
      */
+    @Deprecated
     public static final Parameter POWER = QuaternionMath.POWER;
 
     /**
-     * @deprecated Use {@link QuaternionMath#RINT} instead
+     * @deprecated v48 Use {@link QuaternionMath#RINT} instead
      */
+    @Deprecated
     public static final Unary RINT = QuaternionMath.RINT;
 
     /**
-     * @deprecated Use {@link QuaternionMath#ROOT} instead
+     * @deprecated v48 Use {@link QuaternionMath#ROOT} instead
      */
+    @Deprecated
     public static final Parameter ROOT = QuaternionMath.ROOT;
 
     /**
-     * @deprecated Use {@link QuaternionMath#SCALE} instead
+     * @deprecated v48 Use {@link QuaternionMath#SCALE} instead
      */
+    @Deprecated
     public static final Parameter SCALE = QuaternionMath.SCALE;
 
     /**
-     * @deprecated Use {@link QuaternionMath#SIGNUM} instead
+     * @deprecated v48 Use {@link QuaternionMath#SIGNUM} instead
      */
+    @Deprecated
     public static final Unary SIGNUM = QuaternionMath.SIGNUM;
 
     /**
-     * @deprecated Use {@link QuaternionMath#SIN} instead
+     * @deprecated v48 Use {@link QuaternionMath#SIN} instead
      */
+    @Deprecated
     public static final Unary SIN = QuaternionMath.SIN;
 
     /**
-     * @deprecated Use {@link QuaternionMath#SINH} instead
+     * @deprecated v48 Use {@link QuaternionMath#SINH} instead
      */
+    @Deprecated
     public static final Unary SINH = QuaternionMath.SINH;
 
     /**
-     * @deprecated Use {@link QuaternionMath#SQRT} instead
+     * @deprecated v48 Use {@link QuaternionMath#SQRT} instead
      */
+    @Deprecated
     public static final Unary SQRT = QuaternionMath.SQRT;
 
     /**
-     * @deprecated Use {@link QuaternionMath#SQRT1PX2} instead
+     * @deprecated v48 Use {@link QuaternionMath#SQRT1PX2} instead
      */
+    @Deprecated
     public static final Unary SQRT1PX2 = QuaternionMath.SQRT1PX2;
 
     /**
-     * @deprecated Use {@link QuaternionMath#SUBTRACT} instead
+     * @deprecated v48 Use {@link QuaternionMath#SUBTRACT} instead
      */
+    @Deprecated
     public static final Binary SUBTRACT = QuaternionMath.SUBTRACT;
 
     /**
-     * @deprecated Use {@link QuaternionMath#TAN} instead
+     * @deprecated v48 Use {@link QuaternionMath#TAN} instead
      */
+    @Deprecated
     public static final Unary TAN = QuaternionMath.TAN;
 
     /**
-     * @deprecated Use {@link QuaternionMath#TANH} instead
+     * @deprecated v48 Use {@link QuaternionMath#TANH} instead
      */
+    @Deprecated
     public static final Unary TANH = QuaternionMath.TANH;
 
     /**
-     * @deprecated Use {@link QuaternionMath#VALUE} instead
+     * @deprecated v48 Use {@link QuaternionMath#VALUE} instead
      */
+    @Deprecated
     public static final Unary VALUE = QuaternionMath.VALUE;
 
     private static final QuaternionFunction SET = new QuaternionFunction();

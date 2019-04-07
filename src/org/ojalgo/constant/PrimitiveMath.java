@@ -21,6 +21,10 @@
  */
 package org.ojalgo.constant;
 
+/**
+ * @author apete
+ * @deprectaed v48 Use {@link org.ojalgo.function.constant.PrimitiveMath} instead.
+ */
 public abstract class PrimitiveMath extends org.ojalgo.function.constant.PrimitiveMath {
 
 }

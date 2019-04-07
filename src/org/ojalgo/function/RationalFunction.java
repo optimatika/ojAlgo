@@ -80,223 +80,267 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     }
 
     /**
-     * @deprecated Use {@link RationalMath#ABS} instead
+     * @deprecated v48 Use {@link RationalMath#ABS} instead
      */
+    @Deprecated
     public static final Unary ABS = RationalMath.ABS;
 
     /**
-     * @deprecated Use {@link RationalMath#ACOS} instead
+     * @deprecated v48 Use {@link RationalMath#ACOS} instead
      */
+    @Deprecated
     public static final Unary ACOS = RationalMath.ACOS;
 
     /**
-     * @deprecated Use {@link RationalMath#ACOSH} instead
+     * @deprecated v48 Use {@link RationalMath#ACOSH} instead
      */
+    @Deprecated
     public static final Unary ACOSH = RationalMath.ACOSH;
 
     /**
-     * @deprecated Use {@link RationalMath#ADD} instead
+     * @deprecated v48 Use {@link RationalMath#ADD} instead
      */
+    @Deprecated
     public static final Binary ADD = RationalMath.ADD;
 
     /**
-     * @deprecated Use {@link RationalMath#ASIN} instead
+     * @deprecated v48 Use {@link RationalMath#ASIN} instead
      */
+    @Deprecated
     public static final Unary ASIN = RationalMath.ASIN;
 
     /**
-     * @deprecated Use {@link RationalMath#ASINH} instead
+     * @deprecated v48 Use {@link RationalMath#ASINH} instead
      */
+    @Deprecated
     public static final Unary ASINH = RationalMath.ASINH;
 
     /**
-     * @deprecated Use {@link RationalMath#ATAN} instead
+     * @deprecated v48 Use {@link RationalMath#ATAN} instead
      */
+    @Deprecated
     public static final Unary ATAN = RationalMath.ATAN;
 
     /**
-     * @deprecated Use {@link RationalMath#ATAN2} instead
+     * @deprecated v48 Use {@link RationalMath#ATAN2} instead
      */
+    @Deprecated
     public static final Binary ATAN2 = RationalMath.ATAN2;
 
     /**
-     * @deprecated Use {@link RationalMath#ATANH} instead
+     * @deprecated v48 Use {@link RationalMath#ATANH} instead
      */
+    @Deprecated
     public static final Unary ATANH = RationalMath.ATANH;
 
     /**
-     * @deprecated Use {@link RationalMath#CARDINALITY} instead
+     * @deprecated v48 Use {@link RationalMath#CARDINALITY} instead
      */
+    @Deprecated
     public static final Unary CARDINALITY = RationalMath.CARDINALITY;
 
     /**
-     * @deprecated Use {@link RationalMath#CBRT} instead
+     * @deprecated v48 Use {@link RationalMath#CBRT} instead
      */
+    @Deprecated
     public static final Unary CBRT = RationalMath.CBRT;
 
     /**
-     * @deprecated Use {@link RationalMath#CEIL} instead
+     * @deprecated v48 Use {@link RationalMath#CEIL} instead
      */
+    @Deprecated
     public static final Unary CEIL = RationalMath.CEIL;
 
     /**
-     * @deprecated Use {@link RationalMath#CONJUGATE} instead
+     * @deprecated v48 Use {@link RationalMath#CONJUGATE} instead
      */
+    @Deprecated
     public static final Unary CONJUGATE = RationalMath.CONJUGATE;
 
     /**
-     * @deprecated Use {@link RationalMath#COS} instead
+     * @deprecated v48 Use {@link RationalMath#COS} instead
      */
+    @Deprecated
     public static final Unary COS = RationalMath.COS;
 
     /**
-     * @deprecated Use {@link RationalMath#COSH} instead
+     * @deprecated v48 Use {@link RationalMath#COSH} instead
      */
+    @Deprecated
     public static final Unary COSH = RationalMath.COSH;
 
     /**
-     * @deprecated Use {@link RationalMath#DIVIDE} instead
+     * @deprecated v48 Use {@link RationalMath#DIVIDE} instead
      */
+    @Deprecated
     public static final Binary DIVIDE = RationalMath.DIVIDE;
 
     /**
-     * @deprecated Use {@link RationalMath#EXP} instead
+     * @deprecated v48 Use {@link RationalMath#EXP} instead
      */
+    @Deprecated
     public static final Unary EXP = RationalMath.EXP;
 
     /**
-     * @deprecated Use {@link RationalMath#EXPM1} instead
+     * @deprecated v48 Use {@link RationalMath#EXPM1} instead
      */
+    @Deprecated
     public static final Unary EXPM1 = RationalMath.EXPM1;
 
     /**
-     * @deprecated Use {@link RationalMath#FLOOR} instead
+     * @deprecated v48 Use {@link RationalMath#FLOOR} instead
      */
+    @Deprecated
     public static final Unary FLOOR = RationalMath.FLOOR;
 
     /**
-     * @deprecated Use {@link RationalMath#HYPOT} instead
+     * @deprecated v48 Use {@link RationalMath#HYPOT} instead
      */
+    @Deprecated
     public static final Binary HYPOT = RationalMath.HYPOT;
 
     /**
-     * @deprecated Use {@link RationalMath#INVERT} instead
+     * @deprecated v48 Use {@link RationalMath#INVERT} instead
      */
+    @Deprecated
     public static final Unary INVERT = RationalMath.INVERT;
 
     /**
-     * @deprecated Use {@link RationalMath#LOG} instead
+     * @deprecated v48 Use {@link RationalMath#LOG} instead
      */
+    @Deprecated
     public static final Unary LOG = RationalMath.LOG;
 
     /**
-     * @deprecated Use {@link RationalMath#LOG10} instead
+     * @deprecated v48 Use {@link RationalMath#LOG10} instead
      */
+    @Deprecated
     public static final Unary LOG10 = RationalMath.LOG10;
 
     /**
-     * @deprecated Use {@link RationalMath#LOG1P} instead
+     * @deprecated v48 Use {@link RationalMath#LOG1P} instead
      */
+    @Deprecated
     public static final Unary LOG1P = RationalMath.LOG1P;
 
     /**
-     * @deprecated Use {@link RationalMath#LOGISTIC} instead
+     * @deprecated v48 Use {@link RationalMath#LOGISTIC} instead
      */
+    @Deprecated
     public static final Unary LOGISTIC = RationalMath.LOGISTIC;
 
     /**
-     * @deprecated Use {@link RationalMath#LOGIT} instead
+     * @deprecated v48 Use {@link RationalMath#LOGIT} instead
      */
+    @Deprecated
     public static final Unary LOGIT = RationalMath.LOGIT;
 
     /**
-     * @deprecated Use {@link RationalMath#MAX} instead
+     * @deprecated v48 Use {@link RationalMath#MAX} instead
      */
+    @Deprecated
     public static final Binary MAX = RationalMath.MAX;
 
     /**
-     * @deprecated Use {@link RationalMath#MIN} instead
+     * @deprecated v48 Use {@link RationalMath#MIN} instead
      */
+    @Deprecated
     public static final Binary MIN = RationalMath.MIN;
 
     /**
-     * @deprecated Use {@link RationalMath#MULTIPLY} instead
+     * @deprecated v48 Use {@link RationalMath#MULTIPLY} instead
      */
+    @Deprecated
     public static final Binary MULTIPLY = RationalMath.MULTIPLY;
 
     /**
-     * @deprecated Use {@link RationalMath#NEGATE} instead
+     * @deprecated v48 Use {@link RationalMath#NEGATE} instead
      */
+    @Deprecated
     public static final Unary NEGATE = RationalMath.NEGATE;
 
     /**
-     * @deprecated Use {@link RationalMath#POW} instead
+     * @deprecated v48 Use {@link RationalMath#POW} instead
      */
+    @Deprecated
     public static final Binary POW = RationalMath.POW;
 
     /**
-     * @deprecated Use {@link RationalMath#POWER} instead
+     * @deprecated v48 Use {@link RationalMath#POWER} instead
      */
+    @Deprecated
     public static final Parameter POWER = RationalMath.POWER;
 
     /**
-     * @deprecated Use {@link RationalMath#RINT} instead
+     * @deprecated v48 Use {@link RationalMath#RINT} instead
      */
+    @Deprecated
     public static final Unary RINT = RationalMath.RINT;
 
     /**
-     * @deprecated Use {@link RationalMath#ROOT} instead
+     * @deprecated v48 Use {@link RationalMath#ROOT} instead
      */
+    @Deprecated
     public static final Parameter ROOT = RationalMath.ROOT;
 
     /**
-     * @deprecated Use {@link RationalMath#SCALE} instead
+     * @deprecated v48 Use {@link RationalMath#SCALE} instead
      */
+    @Deprecated
     public static final Parameter SCALE = RationalMath.SCALE;
 
     /**
-     * @deprecated Use {@link RationalMath#SIGNUM} instead
+     * @deprecated v48 Use {@link RationalMath#SIGNUM} instead
      */
+    @Deprecated
     public static final Unary SIGNUM = RationalMath.SIGNUM;
 
     /**
-     * @deprecated Use {@link RationalMath#SIN} instead
+     * @deprecated v48 Use {@link RationalMath#SIN} instead
      */
+    @Deprecated
     public static final Unary SIN = RationalMath.SIN;
 
     /**
-     * @deprecated Use {@link RationalMath#SINH} instead
+     * @deprecated v48 Use {@link RationalMath#SINH} instead
      */
+    @Deprecated
     public static final Unary SINH = RationalMath.SINH;
 
     /**
-     * @deprecated Use {@link RationalMath#SQRT} instead
+     * @deprecated v48 Use {@link RationalMath#SQRT} instead
      */
+    @Deprecated
     public static final Unary SQRT = RationalMath.SQRT;
 
     /**
-     * @deprecated Use {@link RationalMath#SQRT1PX2} instead
+     * @deprecated v48 Use {@link RationalMath#SQRT1PX2} instead
      */
+    @Deprecated
     public static final Unary SQRT1PX2 = RationalMath.SQRT1PX2;
 
     /**
-     * @deprecated Use {@link RationalMath#SUBTRACT} instead
+     * @deprecated v48 Use {@link RationalMath#SUBTRACT} instead
      */
+    @Deprecated
     public static final Binary SUBTRACT = RationalMath.SUBTRACT;
 
     /**
-     * @deprecated Use {@link RationalMath#TAN} instead
+     * @deprecated v48 Use {@link RationalMath#TAN} instead
      */
+    @Deprecated
     public static final Unary TAN = RationalMath.TAN;
 
     /**
-     * @deprecated Use {@link RationalMath#TANH} instead
+     * @deprecated v48 Use {@link RationalMath#TANH} instead
      */
+    @Deprecated
     public static final Unary TANH = RationalMath.TANH;
 
     /**
-     * @deprecated Use {@link RationalMath#VALUE} instead
+     * @deprecated v48 Use {@link RationalMath#VALUE} instead
      */
+    @Deprecated
     public static final Unary VALUE = RationalMath.VALUE;
 
     private static final RationalFunction SET = new RationalFunction();

@@ -85,265 +85,265 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     }
 
     /**
-     * @deprecated Use {@link BigMath#ABS} instead
+     * @deprecated v48 Use {@link BigMath#ABS} instead
      */
     @Deprecated
     public static final Unary ABS = BigMath.ABS;
 
     /**
-     * @deprecated Use {@link BigMath#ACOS} instead
+     * @deprecated v48 Use {@link BigMath#ACOS} instead
      */
     @Deprecated
     public static final Unary ACOS = BigMath.ACOS;
 
     /**
-     * @deprecated Use {@link BigMath#ACOSH} instead
+     * @deprecated v48 Use {@link BigMath#ACOSH} instead
      */
     @Deprecated
     public static final Unary ACOSH = BigMath.ACOSH;
 
     /**
-     * @deprecated Use {@link BigMath#ADD} instead
+     * @deprecated v48 Use {@link BigMath#ADD} instead
      */
     @Deprecated
     public static final Binary ADD = BigMath.ADD;
 
     /**
-     * @deprecated Use {@link BigMath#ASIN} instead
+     * @deprecated v48 Use {@link BigMath#ASIN} instead
      */
     @Deprecated
     public static final Unary ASIN = BigMath.ASIN;
 
     /**
-     * @deprecated Use {@link BigMath#ASINH} instead
+     * @deprecated v48 Use {@link BigMath#ASINH} instead
      */
     @Deprecated
     public static final Unary ASINH = BigMath.ASINH;
 
     /**
-     * @deprecated Use {@link BigMath#ATAN} instead
+     * @deprecated v48 Use {@link BigMath#ATAN} instead
      */
     @Deprecated
     public static final Unary ATAN = BigMath.ATAN;
 
     /**
-     * @deprecated Use {@link BigMath#ATAN2} instead
+     * @deprecated v48 Use {@link BigMath#ATAN2} instead
      */
     @Deprecated
     public static final Binary ATAN2 = BigMath.ATAN2;
 
     /**
-     * @deprecated Use {@link BigMath#ATANH} instead
+     * @deprecated v48 Use {@link BigMath#ATANH} instead
      */
     @Deprecated
     public static final Unary ATANH = BigMath.ATANH;
 
     /**
-     * @deprecated Use {@link BigMath#CARDINALITY} instead
+     * @deprecated v48 Use {@link BigMath#CARDINALITY} instead
      */
     @Deprecated
     public static final Unary CARDINALITY = BigMath.CARDINALITY;
 
     /**
-     * @deprecated Use {@link BigMath#CBRT} instead
+     * @deprecated v48 Use {@link BigMath#CBRT} instead
      */
     @Deprecated
     public static final Unary CBRT = BigMath.CBRT;
 
     /**
-     * @deprecated Use {@link BigMath#CEIL} instead
+     * @deprecated v48 Use {@link BigMath#CEIL} instead
      */
     @Deprecated
     public static final Unary CEIL = BigMath.CEIL;
 
     /**
-     * @deprecated Use {@link BigMath#CONJUGATE} instead
+     * @deprecated v48 Use {@link BigMath#CONJUGATE} instead
      */
     @Deprecated
     public static final Unary CONJUGATE = BigMath.CONJUGATE;
 
     /**
-     * @deprecated Use {@link BigMath#COS} instead
+     * @deprecated v48 Use {@link BigMath#COS} instead
      */
     @Deprecated
     public static final Unary COS = BigMath.COS;
 
     /**
-     * @deprecated Use {@link BigMath#COSH} instead
+     * @deprecated v48 Use {@link BigMath#COSH} instead
      */
     @Deprecated
     public static final Unary COSH = BigMath.COSH;
 
     /**
-     * @deprecated Use {@link BigMath#DIVIDE} instead
+     * @deprecated v48 Use {@link BigMath#DIVIDE} instead
      */
     @Deprecated
     public static final Binary DIVIDE = BigMath.DIVIDE;
 
     /**
-     * @deprecated Use {@link BigMath#EXP} instead
+     * @deprecated v48 Use {@link BigMath#EXP} instead
      */
     @Deprecated
     public static final Unary EXP = BigMath.EXP;
 
     /**
-     * @deprecated Use {@link BigMath#EXPM1} instead
+     * @deprecated v48 Use {@link BigMath#EXPM1} instead
      */
     @Deprecated
     public static final Unary EXPM1 = BigMath.EXPM1;
 
     /**
-     * @deprecated Use {@link BigMath#FLOOR} instead
+     * @deprecated v48 Use {@link BigMath#FLOOR} instead
      */
     @Deprecated
     public static final Unary FLOOR = BigMath.FLOOR;
 
     /**
-     * @deprecated Use {@link BigMath#HYPOT} instead
+     * @deprecated v48 Use {@link BigMath#HYPOT} instead
      */
     @Deprecated
     public static final Binary HYPOT = BigMath.HYPOT;
 
     /**
-     * @deprecated Use {@link BigMath#INVERT} instead
+     * @deprecated v48 Use {@link BigMath#INVERT} instead
      */
     @Deprecated
     public static final Unary INVERT = BigMath.INVERT;
 
     /**
-     * @deprecated Use {@link BigMath#LOG} instead
+     * @deprecated v48 Use {@link BigMath#LOG} instead
      */
     @Deprecated
     public static final Unary LOG = BigMath.LOG;
 
     /**
-     * @deprecated Use {@link BigMath#LOG10} instead
+     * @deprecated v48 Use {@link BigMath#LOG10} instead
      */
     @Deprecated
     public static final Unary LOG10 = BigMath.LOG10;
 
     /**
-     * @deprecated Use {@link BigMath#LOG1P} instead
+     * @deprecated v48 Use {@link BigMath#LOG1P} instead
      */
     @Deprecated
     public static final Unary LOG1P = BigMath.LOG1P;
 
     /**
-     * @deprecated Use {@link BigMath#LOGISTIC} instead
+     * @deprecated v48 Use {@link BigMath#LOGISTIC} instead
      */
     @Deprecated
     public static final Unary LOGISTIC = BigMath.LOGISTIC;
 
     /**
-     * @deprecated Use {@link BigMath#LOGIT} instead
+     * @deprecated v48 Use {@link BigMath#LOGIT} instead
      */
     @Deprecated
     public static final Unary LOGIT = BigMath.LOGIT;
 
     /**
-     * @deprecated Use {@link BigMath#MAX} instead
+     * @deprecated v48 Use {@link BigMath#MAX} instead
      */
     @Deprecated
     public static final Binary MAX = BigMath.MAX;
 
     /**
-     * @deprecated Use {@link BigMath#MIN} instead
+     * @deprecated v48 Use {@link BigMath#MIN} instead
      */
     @Deprecated
     public static final Binary MIN = BigMath.MIN;
 
     /**
-     * @deprecated Use {@link BigMath#MULTIPLY} instead
+     * @deprecated v48 Use {@link BigMath#MULTIPLY} instead
      */
     @Deprecated
     public static final Binary MULTIPLY = BigMath.MULTIPLY;
 
     /**
-     * @deprecated Use {@link BigMath#NEGATE} instead
+     * @deprecated v48 Use {@link BigMath#NEGATE} instead
      */
     @Deprecated
     public static final Unary NEGATE = BigMath.NEGATE;
 
     /**
-     * @deprecated Use {@link BigMath#POW} instead
+     * @deprecated v48 Use {@link BigMath#POW} instead
      */
     @Deprecated
     public static final Binary POW = BigMath.POW;
 
     /**
-     * @deprecated Use {@link BigMath#POWER} instead
+     * @deprecated v48 Use {@link BigMath#POWER} instead
      */
     @Deprecated
     public static final Parameter POWER = BigMath.POWER;
 
     /**
-     * @deprecated Use {@link BigMath#RINT} instead
+     * @deprecated v48 Use {@link BigMath#RINT} instead
      */
     @Deprecated
     public static final Unary RINT = BigMath.RINT;
 
     /**
-     * @deprecated Use {@link BigMath#ROOT} instead
+     * @deprecated v48 Use {@link BigMath#ROOT} instead
      */
     @Deprecated
     public static final Parameter ROOT = BigMath.ROOT;
 
     /**
-     * @deprecated Use {@link BigMath#SCALE} instead
+     * @deprecated v48 Use {@link BigMath#SCALE} instead
      */
     @Deprecated
     public static final Parameter SCALE = BigMath.SCALE;
 
     /**
-     * @deprecated Use {@link BigMath#SIGNUM} instead
+     * @deprecated v48 Use {@link BigMath#SIGNUM} instead
      */
     @Deprecated
     public static final Unary SIGNUM = BigMath.SIGNUM;
 
     /**
-     * @deprecated Use {@link BigMath#SIN} instead
+     * @deprecated v48 Use {@link BigMath#SIN} instead
      */
     @Deprecated
     public static final Unary SIN = BigMath.SIN;
 
     /**
-     * @deprecated Use {@link BigMath#SINH} instead
+     * @deprecated v48 Use {@link BigMath#SINH} instead
      */
     @Deprecated
     public static final Unary SINH = BigMath.SINH;
 
     /**
-     * @deprecated Use {@link BigMath#SQRT} instead
+     * @deprecated v48 Use {@link BigMath#SQRT} instead
      */
     @Deprecated
     public static final Unary SQRT = BigMath.SQRT;
 
     /**
-     * @deprecated Use {@link BigMath#SQRT1PX2} instead
+     * @deprecated v48 Use {@link BigMath#SQRT1PX2} instead
      */
     @Deprecated
     public static final Unary SQRT1PX2 = BigMath.SQRT1PX2;
 
     /**
-     * @deprecated Use {@link BigMath#SUBTRACT} instead
+     * @deprecated v48 Use {@link BigMath#SUBTRACT} instead
      */
     @Deprecated
     public static final Binary SUBTRACT = BigMath.SUBTRACT;
 
     /**
-     * @deprecated Use {@link BigMath#TAN} instead
+     * @deprecated v48 Use {@link BigMath#TAN} instead
      */
     @Deprecated
     public static final Unary TAN = BigMath.TAN;
 
     /**
-     * @deprecated Use {@link BigMath#TANH} instead
+     * @deprecated v48 Use {@link BigMath#TANH} instead
      */
     @Deprecated
     public static final Unary TANH = BigMath.TANH;
 
     /**
-     * @deprecated Use {@link BigMath#VALUE} instead
+     * @deprecated v48 Use {@link BigMath#VALUE} instead
      */
     @Deprecated
     public static final Unary VALUE = BigMath.VALUE;

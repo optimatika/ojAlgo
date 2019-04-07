@@ -23,6 +23,10 @@ package org.ojalgo.constant;
 
 import org.ojalgo.function.constant.PrimitiveMath;
 
+/**
+ * @author apete
+ * @deprectaed v48 Use {@link org.ojalgo.function.constant.PrimitiveMath.Prefix} instead.
+ */
 public abstract class PrimitivePrefix extends PrimitiveMath.Prefix {
 
 }

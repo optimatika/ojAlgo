@@ -23,6 +23,10 @@ package org.ojalgo.constant;
 
 import org.ojalgo.function.constant.BigMath;
 
+/**
+ * @author apete
+ * @deprectaed v48 Use {@link org.ojalgo.function.constant.BigMath.Prefix} instead.
+ */
 public abstract class BigPrefix extends BigMath.Prefix {
 
 }

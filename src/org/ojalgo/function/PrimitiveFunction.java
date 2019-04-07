@@ -82,223 +82,267 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     }
 
     /**
-     * @deprecated Use {@link PrimitiveMath#ABS} instead
+     * @deprecated v48 Use {@link PrimitiveMath#ABS} instead
      */
+    @Deprecated
     public static final Unary ABS = PrimitiveMath.ABS;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#ACOS} instead
+     * @deprecated v48 Use {@link PrimitiveMath#ACOS} instead
      */
+    @Deprecated
     public static final Unary ACOS = PrimitiveMath.ACOS;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#ACOSH} instead
+     * @deprecated v48 Use {@link PrimitiveMath#ACOSH} instead
      */
+    @Deprecated
     public static final Unary ACOSH = PrimitiveMath.ACOSH;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#ADD} instead
+     * @deprecated v48 Use {@link PrimitiveMath#ADD} instead
      */
+    @Deprecated
     public static final Binary ADD = PrimitiveMath.ADD;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#ASIN} instead
+     * @deprecated v48 Use {@link PrimitiveMath#ASIN} instead
      */
+    @Deprecated
     public static final Unary ASIN = PrimitiveMath.ASIN;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#ASINH} instead
+     * @deprecated v48 Use {@link PrimitiveMath#ASINH} instead
      */
+    @Deprecated
     public static final Unary ASINH = PrimitiveMath.ASINH;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#ATAN} instead
+     * @deprecated v48 Use {@link PrimitiveMath#ATAN} instead
      */
+    @Deprecated
     public static final Unary ATAN = PrimitiveMath.ATAN;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#ATAN2} instead
+     * @deprecated v48 Use {@link PrimitiveMath#ATAN2} instead
      */
+    @Deprecated
     public static final Binary ATAN2 = PrimitiveMath.ATAN2;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#ATANH} instead
+     * @deprecated v48 Use {@link PrimitiveMath#ATANH} instead
      */
+    @Deprecated
     public static final Unary ATANH = PrimitiveMath.ATANH;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#CARDINALITY} instead
+     * @deprecated v48 Use {@link PrimitiveMath#CARDINALITY} instead
      */
+    @Deprecated
     public static final Unary CARDINALITY = PrimitiveMath.CARDINALITY;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#CBRT} instead
+     * @deprecated v48 Use {@link PrimitiveMath#CBRT} instead
      */
+    @Deprecated
     public static final Unary CBRT = PrimitiveMath.CBRT;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#CEIL} instead
+     * @deprecated v48 Use {@link PrimitiveMath#CEIL} instead
      */
+    @Deprecated
     public static final Unary CEIL = PrimitiveMath.CEIL;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#CONJUGATE} instead
+     * @deprecated v48 Use {@link PrimitiveMath#CONJUGATE} instead
      */
+    @Deprecated
     public static final Unary CONJUGATE = PrimitiveMath.CONJUGATE;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#COS} instead
+     * @deprecated v48 Use {@link PrimitiveMath#COS} instead
      */
+    @Deprecated
     public static final Unary COS = PrimitiveMath.COS;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#COSH} instead
+     * @deprecated v48 Use {@link PrimitiveMath#COSH} instead
      */
+    @Deprecated
     public static final Unary COSH = PrimitiveMath.COSH;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#DIVIDE} instead
+     * @deprecated v48 Use {@link PrimitiveMath#DIVIDE} instead
      */
+    @Deprecated
     public static final Binary DIVIDE = PrimitiveMath.DIVIDE;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#EXP} instead
+     * @deprecated v48 Use {@link PrimitiveMath#EXP} instead
      */
+    @Deprecated
     public static final Unary EXP = PrimitiveMath.EXP;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#EXPM1} instead
+     * @deprecated v48 Use {@link PrimitiveMath#EXPM1} instead
      */
+    @Deprecated
     public static final Unary EXPM1 = PrimitiveMath.EXPM1;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#FLOOR} instead
+     * @deprecated v48 Use {@link PrimitiveMath#FLOOR} instead
      */
+    @Deprecated
     public static final Unary FLOOR = PrimitiveMath.FLOOR;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#HYPOT} instead
+     * @deprecated v48 Use {@link PrimitiveMath#HYPOT} instead
      */
+    @Deprecated
     public static final Binary HYPOT = PrimitiveMath.HYPOT;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#INVERT} instead
+     * @deprecated v48 Use {@link PrimitiveMath#INVERT} instead
      */
+    @Deprecated
     public static final Unary INVERT = PrimitiveMath.INVERT;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#LOG} instead
+     * @deprecated v48 Use {@link PrimitiveMath#LOG} instead
      */
+    @Deprecated
     public static final Unary LOG = PrimitiveMath.LOG;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#LOG10} instead
+     * @deprecated v48 Use {@link PrimitiveMath#LOG10} instead
      */
+    @Deprecated
     public static final Unary LOG10 = PrimitiveMath.LOG10;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#LOG1P} instead
+     * @deprecated v48 Use {@link PrimitiveMath#LOG1P} instead
      */
+    @Deprecated
     public static final Unary LOG1P = PrimitiveMath.LOG1P;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#LOGISTIC} instead
+     * @deprecated v48 Use {@link PrimitiveMath#LOGISTIC} instead
      */
+    @Deprecated
     public static final Unary LOGISTIC = PrimitiveMath.LOGISTIC;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#LOGIT} instead
+     * @deprecated v48 Use {@link PrimitiveMath#LOGIT} instead
      */
+    @Deprecated
     public static final Unary LOGIT = PrimitiveMath.LOGIT;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#MAX} instead
+     * @deprecated v48 Use {@link PrimitiveMath#MAX} instead
      */
+    @Deprecated
     public static final Binary MAX = PrimitiveMath.MAX;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#MIN} instead
+     * @deprecated v48 Use {@link PrimitiveMath#MIN} instead
      */
+    @Deprecated
     public static final Binary MIN = PrimitiveMath.MIN;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#MULTIPLY} instead
+     * @deprecated v48 Use {@link PrimitiveMath#MULTIPLY} instead
      */
+    @Deprecated
     public static final Binary MULTIPLY = PrimitiveMath.MULTIPLY;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#NEGATE} instead
+     * @deprecated v48 Use {@link PrimitiveMath#NEGATE} instead
      */
+    @Deprecated
     public static final Unary NEGATE = PrimitiveMath.NEGATE;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#POW} instead
+     * @deprecated v48 Use {@link PrimitiveMath#POW} instead
      */
+    @Deprecated
     public static final Binary POW = PrimitiveMath.POW;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#POWER} instead
+     * @deprecated v48 Use {@link PrimitiveMath#POWER} instead
      */
+    @Deprecated
     public static final Parameter POWER = PrimitiveMath.POWER;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#RINT} instead
+     * @deprecated v48 Use {@link PrimitiveMath#RINT} instead
      */
+    @Deprecated
     public static final Unary RINT = PrimitiveMath.RINT;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#ROOT} instead
+     * @deprecated v48 Use {@link PrimitiveMath#ROOT} instead
      */
+    @Deprecated
     public static final Parameter ROOT = PrimitiveMath.ROOT;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#SCALE} instead
+     * @deprecated v48 Use {@link PrimitiveMath#SCALE} instead
      */
+    @Deprecated
     public static final Parameter SCALE = PrimitiveMath.SCALE;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#SIGNUM} instead
+     * @deprecated v48 Use {@link PrimitiveMath#SIGNUM} instead
      */
+    @Deprecated
     public static final Unary SIGNUM = PrimitiveMath.SIGNUM;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#SIN} instead
+     * @deprecated v48 Use {@link PrimitiveMath#SIN} instead
      */
+    @Deprecated
     public static final Unary SIN = PrimitiveMath.SIN;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#SINH} instead
+     * @deprecated v48 Use {@link PrimitiveMath#SINH} instead
      */
+    @Deprecated
     public static final Unary SINH = PrimitiveMath.SINH;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#SQRT} instead
+     * @deprecated v48 Use {@link PrimitiveMath#SQRT} instead
      */
+    @Deprecated
     public static final Unary SQRT = PrimitiveMath.SQRT;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#SQRT1PX2} instead
+     * @deprecated v48 Use {@link PrimitiveMath#SQRT1PX2} instead
      */
+    @Deprecated
     public static final Unary SQRT1PX2 = PrimitiveMath.SQRT1PX2;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#SUBTRACT} instead
+     * @deprecated v48 Use {@link PrimitiveMath#SUBTRACT} instead
      */
+    @Deprecated
     public static final Binary SUBTRACT = PrimitiveMath.SUBTRACT;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#TAN} instead
+     * @deprecated v48 Use {@link PrimitiveMath#TAN} instead
      */
+    @Deprecated
     public static final Unary TAN = PrimitiveMath.TAN;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#TANH} instead
+     * @deprecated v48 Use {@link PrimitiveMath#TANH} instead
      */
+    @Deprecated
     public static final Unary TANH = PrimitiveMath.TANH;
 
     /**
-     * @deprecated Use {@link PrimitiveMath#VALUE} instead
+     * @deprecated v48 Use {@link PrimitiveMath#VALUE} instead
      */
+    @Deprecated
     public static final Unary VALUE = PrimitiveMath.VALUE;
 
     private static final PrimitiveFunction SET = new PrimitiveFunction();

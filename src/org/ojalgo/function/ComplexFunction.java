@@ -75,223 +75,267 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     }
 
     /**
-     * @deprecated Use {@link ComplexMath#ABS} instead
+     * @deprecated v48 Use {@link ComplexMath#ABS} instead
      */
+    @Deprecated
     public static final Unary ABS = ComplexMath.ABS;
 
     /**
-     * @deprecated Use {@link ComplexMath#ACOS} instead
+     * @deprecated v48 Use {@link ComplexMath#ACOS} instead
      */
+    @Deprecated
     public static final Unary ACOS = ComplexMath.ACOS;
 
     /**
-     * @deprecated Use {@link ComplexMath#ACOSH} instead
+     * @deprecated v48 Use {@link ComplexMath#ACOSH} instead
      */
+    @Deprecated
     public static final Unary ACOSH = ComplexMath.ACOSH;
 
     /**
-     * @deprecated Use {@link ComplexMath#ADD} instead
+     * @deprecated v48 Use {@link ComplexMath#ADD} instead
      */
+    @Deprecated
     public static final Binary ADD = ComplexMath.ADD;
 
     /**
-     * @deprecated Use {@link ComplexMath#ASIN} instead
+     * @deprecated v48 Use {@link ComplexMath#ASIN} instead
      */
+    @Deprecated
     public static final Unary ASIN = ComplexMath.ASIN;
 
     /**
-     * @deprecated Use {@link ComplexMath#ASINH} instead
+     * @deprecated v48 Use {@link ComplexMath#ASINH} instead
      */
+    @Deprecated
     public static final Unary ASINH = ComplexMath.ASINH;
 
     /**
-     * @deprecated Use {@link ComplexMath#ATAN} instead
+     * @deprecated v48 Use {@link ComplexMath#ATAN} instead
      */
+    @Deprecated
     public static final Unary ATAN = ComplexMath.ATAN;
 
     /**
-     * @deprecated Use {@link ComplexMath#ATAN2} instead
+     * @deprecated v48 Use {@link ComplexMath#ATAN2} instead
      */
+    @Deprecated
     public static final Binary ATAN2 = ComplexMath.ATAN2;
 
     /**
-     * @deprecated Use {@link ComplexMath#ATANH} instead
+     * @deprecated v48 Use {@link ComplexMath#ATANH} instead
      */
+    @Deprecated
     public static final Unary ATANH = ComplexMath.ATANH;
 
     /**
-     * @deprecated Use {@link ComplexMath#CARDINALITY} instead
+     * @deprecated v48 Use {@link ComplexMath#CARDINALITY} instead
      */
+    @Deprecated
     public static final Unary CARDINALITY = ComplexMath.CARDINALITY;
 
     /**
-     * @deprecated Use {@link ComplexMath#CBRT} instead
+     * @deprecated v48 Use {@link ComplexMath#CBRT} instead
      */
+    @Deprecated
     public static final Unary CBRT = ComplexMath.CBRT;
 
     /**
-     * @deprecated Use {@link ComplexMath#CEIL} instead
+     * @deprecated v48 Use {@link ComplexMath#CEIL} instead
      */
+    @Deprecated
     public static final Unary CEIL = ComplexMath.CEIL;
 
     /**
-     * @deprecated Use {@link ComplexMath#CONJUGATE} instead
+     * @deprecated v48 Use {@link ComplexMath#CONJUGATE} instead
      */
+    @Deprecated
     public static final Unary CONJUGATE = ComplexMath.CONJUGATE;
 
     /**
-     * @deprecated Use {@link ComplexMath#COS} instead
+     * @deprecated v48 Use {@link ComplexMath#COS} instead
      */
+    @Deprecated
     public static final Unary COS = ComplexMath.COS;
 
     /**
-     * @deprecated Use {@link ComplexMath#COSH} instead
+     * @deprecated v48 Use {@link ComplexMath#COSH} instead
      */
+    @Deprecated
     public static final Unary COSH = ComplexMath.COSH;
 
     /**
-     * @deprecated Use {@link ComplexMath#DIVIDE} instead
+     * @deprecated v48 Use {@link ComplexMath#DIVIDE} instead
      */
+    @Deprecated
     public static final Binary DIVIDE = ComplexMath.DIVIDE;
 
     /**
-     * @deprecated Use {@link ComplexMath#EXP} instead
+     * @deprecated v48 Use {@link ComplexMath#EXP} instead
      */
+    @Deprecated
     public static final Unary EXP = ComplexMath.EXP;
 
     /**
-     * @deprecated Use {@link ComplexMath#EXPM1} instead
+     * @deprecated v48 Use {@link ComplexMath#EXPM1} instead
      */
+    @Deprecated
     public static final Unary EXPM1 = ComplexMath.EXPM1;
 
     /**
-     * @deprecated Use {@link ComplexMath#FLOOR} instead
+     * @deprecated v48 Use {@link ComplexMath#FLOOR} instead
      */
+    @Deprecated
     public static final Unary FLOOR = ComplexMath.FLOOR;
 
     /**
-     * @deprecated Use {@link ComplexMath#HYPOT} instead
+     * @deprecated v48 Use {@link ComplexMath#HYPOT} instead
      */
+    @Deprecated
     public static final Binary HYPOT = ComplexMath.HYPOT;
 
     /**
-     * @deprecated Use {@link ComplexMath#INVERT} instead
+     * @deprecated v48 Use {@link ComplexMath#INVERT} instead
      */
+    @Deprecated
     public static final Unary INVERT = ComplexMath.INVERT;
 
     /**
-     * @deprecated Use {@link ComplexMath#LOG} instead
+     * @deprecated v48 Use {@link ComplexMath#LOG} instead
      */
+    @Deprecated
     public static final Unary LOG = ComplexMath.LOG;
 
     /**
-     * @deprecated Use {@link ComplexMath#LOG10} instead
+     * @deprecated v48 Use {@link ComplexMath#LOG10} instead
      */
+    @Deprecated
     public static final Unary LOG10 = ComplexMath.LOG10;
 
     /**
-     * @deprecated Use {@link ComplexMath#LOG1P} instead
+     * @deprecated v48 Use {@link ComplexMath#LOG1P} instead
      */
+    @Deprecated
     public static final Unary LOG1P = ComplexMath.LOG1P;
 
     /**
-     * @deprecated Use {@link ComplexMath#LOGISTIC} instead
+     * @deprecated v48 Use {@link ComplexMath#LOGISTIC} instead
      */
+    @Deprecated
     public static final Unary LOGISTIC = ComplexMath.LOGISTIC;
 
     /**
-     * @deprecated Use {@link ComplexMath#LOGIT} instead
+     * @deprecated v48 Use {@link ComplexMath#LOGIT} instead
      */
+    @Deprecated
     public static final Unary LOGIT = ComplexMath.LOGIT;
 
     /**
-     * @deprecated Use {@link ComplexMath#MAX} instead
+     * @deprecated v48 Use {@link ComplexMath#MAX} instead
      */
+    @Deprecated
     public static final Binary MAX = ComplexMath.MAX;
 
     /**
-     * @deprecated Use {@link ComplexMath#MIN} instead
+     * @deprecated v48 Use {@link ComplexMath#MIN} instead
      */
+    @Deprecated
     public static final Binary MIN = ComplexMath.MIN;
 
     /**
-     * @deprecated Use {@link ComplexMath#MULTIPLY} instead
+     * @deprecated v48 Use {@link ComplexMath#MULTIPLY} instead
      */
+    @Deprecated
     public static final Binary MULTIPLY = ComplexMath.MULTIPLY;
 
     /**
-     * @deprecated Use {@link ComplexMath#NEGATE} instead
+     * @deprecated v48 Use {@link ComplexMath#NEGATE} instead
      */
+    @Deprecated
     public static final Unary NEGATE = ComplexMath.NEGATE;
 
     /**
-     * @deprecated Use {@link ComplexMath#POW} instead
+     * @deprecated v48 Use {@link ComplexMath#POW} instead
      */
+    @Deprecated
     public static final Binary POW = ComplexMath.POW;
 
     /**
-     * @deprecated Use {@link ComplexMath#POWER} instead
+     * @deprecated v48 Use {@link ComplexMath#POWER} instead
      */
+    @Deprecated
     public static final Parameter POWER = ComplexMath.POWER;
 
     /**
-     * @deprecated Use {@link ComplexMath#RINT} instead
+     * @deprecated v48 Use {@link ComplexMath#RINT} instead
      */
+    @Deprecated
     public static final Unary RINT = ComplexMath.RINT;
 
     /**
-     * @deprecated Use {@link ComplexMath#ROOT} instead
+     * @deprecated v48 Use {@link ComplexMath#ROOT} instead
      */
+    @Deprecated
     public static final Parameter ROOT = ComplexMath.ROOT;
 
     /**
-     * @deprecated Use {@link ComplexMath#SCALE} instead
+     * @deprecated v48 Use {@link ComplexMath#SCALE} instead
      */
+    @Deprecated
     public static final Parameter SCALE = ComplexMath.SCALE;
 
     /**
-     * @deprecated Use {@link ComplexMath#SIGNUM} instead
+     * @deprecated v48 Use {@link ComplexMath#SIGNUM} instead
      */
+    @Deprecated
     public static final Unary SIGNUM = ComplexMath.SIGNUM;
 
     /**
-     * @deprecated Use {@link ComplexMath#SIN} instead
+     * @deprecated v48 Use {@link ComplexMath#SIN} instead
      */
+    @Deprecated
     public static final Unary SIN = ComplexMath.SIN;
 
     /**
-     * @deprecated Use {@link ComplexMath#SINH} instead
+     * @deprecated v48 Use {@link ComplexMath#SINH} instead
      */
+    @Deprecated
     public static final Unary SINH = ComplexMath.SINH;
 
     /**
-     * @deprecated Use {@link ComplexMath#SQRT} instead
+     * @deprecated v48 Use {@link ComplexMath#SQRT} instead
      */
+    @Deprecated
     public static final Unary SQRT = ComplexMath.SQRT;
 
     /**
-     * @deprecated Use {@link ComplexMath#SQRT1PX2} instead
+     * @deprecated v48 Use {@link ComplexMath#SQRT1PX2} instead
      */
+    @Deprecated
     public static final Unary SQRT1PX2 = ComplexMath.SQRT1PX2;
 
     /**
-     * @deprecated Use {@link ComplexMath#SUBTRACT} instead
+     * @deprecated v48 Use {@link ComplexMath#SUBTRACT} instead
      */
+    @Deprecated
     public static final Binary SUBTRACT = ComplexMath.SUBTRACT;
 
     /**
-     * @deprecated Use {@link ComplexMath#TAN} instead
+     * @deprecated v48 Use {@link ComplexMath#TAN} instead
      */
+    @Deprecated
     public static final Unary TAN = ComplexMath.TAN;
 
     /**
-     * @deprecated Use {@link ComplexMath#TANH} instead
+     * @deprecated v48 Use {@link ComplexMath#TANH} instead
      */
+    @Deprecated
     public static final Unary TANH = ComplexMath.TANH;
 
     /**
-     * @deprecated Use {@link ComplexMath#VALUE} instead
+     * @deprecated v48 Use {@link ComplexMath#VALUE} instead
      */
+    @Deprecated
     public static final Unary VALUE = ComplexMath.VALUE;
 
     private static final ComplexFunction SET = new ComplexFunction();

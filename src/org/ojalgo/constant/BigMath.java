@@ -21,6 +21,9 @@
  */
 package org.ojalgo.constant;
 
+/**
+ * @deprectaed v48 Use {@link org.ojalgo.function.constant.BigMath} instead.
+ */
 public abstract class BigMath extends org.ojalgo.function.constant.BigMath {
 
 }

@@ -119,12 +119,12 @@ public abstract class AggregatorSet<N extends Number> {
     public abstract AggregatorFunction<N> minimum();
 
     /**
-     * Equivalent to, but probably faster than, norm(1);
+     * Sum of absolute values
      */
     public abstract AggregatorFunction<N> norm1();
 
     /**
-     * Equivalent to, but probably faster than, norm(2);
+     * Square root of sum of squared values
      */
     public abstract AggregatorFunction<N> norm2();
 
