@@ -445,7 +445,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     @Override
     public Unary enforce(final NumberContext context) {
-        return t -> context.enforce(t);
+        return arg -> context.enforce(arg);
     }
 
     @Override

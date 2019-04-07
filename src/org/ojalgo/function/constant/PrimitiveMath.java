@@ -23,7 +23,6 @@ package org.ojalgo.function.constant;
 
 import java.util.Arrays;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -153,373 +152,49 @@ public abstract class PrimitiveMath {
         return index >= 0 ? index : Math.max(-(index + 2), 0);
     }
 
-    public static final PrimitiveFunction.Unary ABS = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.abs(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary ACOS = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.acos(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary ACOSH = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return MissingMath.acosh(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Binary ADD = new PrimitiveFunction.Binary() {
-    
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return arg1 + arg2;
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary ASIN = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.asin(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary ASINH = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return MissingMath.asinh(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary ATAN = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.atan(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Binary ATAN2 = new PrimitiveFunction.Binary() {
-    
-        public final double invoke(final double arg1, final double arg2) {
-            return Math.atan2(arg1, arg2);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary ATANH = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return MissingMath.atanh(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary CARDINALITY = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return PrimitiveScalar.isSmall(ONE, arg) ? ZERO : ONE;
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary CBRT = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.cbrt(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary CEIL = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.ceil(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary CONJUGATE = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return arg;
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary COS = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.cos(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary COSH = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.cosh(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Binary DIVIDE = new PrimitiveFunction.Binary() {
-    
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return arg1 / arg2;
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary EXP = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.exp(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary EXPM1 = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.expm1(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary FLOOR = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.floor(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Binary HYPOT = new PrimitiveFunction.Binary() {
-    
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-    
-            if (Double.isNaN(arg1) || Double.isNaN(arg2)) {
-                return NaN;
-            }
-    
-            final double abs1 = ABS.invoke(arg1);
-            final double abs2 = ABS.invoke(arg2);
-    
-            double retVal = ZERO;
-    
-            if (abs1 > abs2) {
-                retVal = abs1 * SQRT1PX2.invoke(abs2 / abs1);
-            } else if (abs2 > ZERO) {
-                retVal = abs2 * SQRT1PX2.invoke(abs1 / abs2);
-            }
-    
-            return retVal;
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary INVERT = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return ONE / arg;
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary LOG = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.log(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary LOG10 = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.log10(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary LOG1P = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.log1p(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary LOGISTIC = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return MissingMath.logistic(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary LOGIT = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return MissingMath.logit(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Binary MAX = new PrimitiveFunction.Binary() {
-    
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return Math.max(arg1, arg2);
-        }
-    
-    };
-    public static final PrimitiveFunction.Binary MIN = new PrimitiveFunction.Binary() {
-    
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return Math.min(arg1, arg2);
-        }
-    
-    };
-    public static final PrimitiveFunction.Binary MULTIPLY = new PrimitiveFunction.Binary() {
-    
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return arg1 * arg2;
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary NEGATE = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return -arg;
-        }
-    
-    };
-    public static final PrimitiveFunction.Binary POW = new PrimitiveFunction.Binary() {
-    
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return Math.pow(arg1, arg2);
-        }
-    
-    };
-    public static final PrimitiveFunction.Parameter POWER = new PrimitiveFunction.Parameter() {
-    
-        @Override
-        public final double invoke(final double arg, int param) {
-    
-            if (param < 0) {
-    
-                return INVERT.invoke(POWER.invoke(arg, -param));
-    
-            } else {
-    
-                double retVal = ONE;
-    
-                while (param > 0) {
-                    retVal = retVal * arg;
-                    param--;
-                }
-    
-                return retVal;
-            }
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary RINT = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.rint(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Parameter ROOT = new PrimitiveFunction.Parameter() {
-    
-        @Override
-        public final double invoke(final double arg, final int param) {
-    
-            if (param != 0) {
-                return POW.invoke(arg, ONE / param);
-            } else {
-                throw new IllegalArgumentException();
-            }
-        }
-    
-    };
-    public static final PrimitiveFunction.Parameter SCALE = new PrimitiveFunction.Parameter() {
-    
-        @Override
-        public final double invoke(final double arg, int param) {
-    
-            if (param < 0) {
-                throw new ProgrammingError("Cannot have exponents smaller than zero.");
-            }
-    
-            long tmpFactor = 1l;
-            final long tmp10 = (long) TEN;
-    
-            while (param > 0) {
-                tmpFactor *= tmp10;
-                param--;
-            }
-    
-            return RINT.invoke(tmpFactor * arg) / tmpFactor;
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary SIGNUM = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.signum(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary SIN = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.sin(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary SINH = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.sinh(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary SQRT = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.sqrt(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary SQRT1PX2 = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return SQRT.invoke(ONE + (arg * arg));
-        }
-    
-    };
-    public static final PrimitiveFunction.Binary SUBTRACT = new PrimitiveFunction.Binary() {
-    
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return arg1 - arg2;
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary TAN = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.tan(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary TANH = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return Math.tanh(arg);
-        }
-    
-    };
-    public static final PrimitiveFunction.Unary VALUE = new PrimitiveFunction.Unary() {
-    
-        public final double invoke(final double arg) {
-            return arg;
-        }
-    
-    };
+    public static final PrimitiveFunction.Unary ABS = arg -> Math.abs(arg);
+    public static final PrimitiveFunction.Unary ACOS = arg -> Math.acos(arg);
+    public static final PrimitiveFunction.Unary ACOSH = arg -> MissingMath.acosh(arg);
+    public static final PrimitiveFunction.Binary ADD = (arg1, arg2) -> arg1 + arg2;
+    public static final PrimitiveFunction.Unary ASIN = arg -> Math.asin(arg);
+    public static final PrimitiveFunction.Unary ASINH = arg -> MissingMath.asinh(arg);
+    public static final PrimitiveFunction.Unary ATAN = arg -> Math.atan(arg);
+    public static final PrimitiveFunction.Binary ATAN2 = (arg1, arg2) -> Math.atan2(arg1, arg2);
+    public static final PrimitiveFunction.Unary ATANH = arg -> MissingMath.atanh(arg);
+    public static final PrimitiveFunction.Unary CARDINALITY = arg -> PrimitiveScalar.isSmall(ONE, arg) ? ZERO : ONE;
+    public static final PrimitiveFunction.Unary CBRT = arg -> Math.cbrt(arg);
+    public static final PrimitiveFunction.Unary CEIL = arg -> Math.ceil(arg);
+    public static final PrimitiveFunction.Unary CONJUGATE = arg -> arg;
+    public static final PrimitiveFunction.Unary COS = arg -> Math.cos(arg);
+    public static final PrimitiveFunction.Unary COSH = arg -> Math.cosh(arg);
+    public static final PrimitiveFunction.Binary DIVIDE = (arg1, arg2) -> arg1 / arg2;
+    public static final PrimitiveFunction.Unary EXP = arg -> Math.exp(arg);
+    public static final PrimitiveFunction.Unary EXPM1 = arg -> Math.expm1(arg);
+    public static final PrimitiveFunction.Unary FLOOR = arg -> Math.floor(arg);
+    public static final PrimitiveFunction.Binary HYPOT = (arg1, arg2) -> MissingMath.hypot(arg1, arg2);
+    public static final PrimitiveFunction.Unary INVERT = arg -> ONE / arg;
+    public static final PrimitiveFunction.Unary LOG = arg -> Math.log(arg);
+    public static final PrimitiveFunction.Unary LOG10 = arg -> Math.log10(arg);
+    public static final PrimitiveFunction.Unary LOG1P = arg -> Math.log1p(arg);
+    public static final PrimitiveFunction.Unary LOGISTIC = arg -> MissingMath.logistic(arg);
+    public static final PrimitiveFunction.Unary LOGIT = arg -> MissingMath.logit(arg);
+    public static final PrimitiveFunction.Binary MAX = (arg1, arg2) -> Math.max(arg1, arg2);
+    public static final PrimitiveFunction.Binary MIN = (arg1, arg2) -> Math.min(arg1, arg2);
+    public static final PrimitiveFunction.Binary MULTIPLY = (arg1, arg2) -> arg1 * arg2;
+    public static final PrimitiveFunction.Unary NEGATE = arg -> -arg;
+    public static final PrimitiveFunction.Binary POW = (arg1, arg2) -> Math.pow(arg1, arg2);
+    public static final PrimitiveFunction.Parameter POWER = (arg, param) -> MissingMath.power(arg, param);
+    public static final PrimitiveFunction.Unary RINT = arg -> Math.rint(arg);
+    public static final PrimitiveFunction.Parameter ROOT = (arg, param) -> MissingMath.root(arg, param);
+    public static final PrimitiveFunction.Parameter SCALE = (arg, param) -> MissingMath.scale(arg, param);
+    public static final PrimitiveFunction.Unary SIGNUM = arg -> Math.signum(arg);
+    public static final PrimitiveFunction.Unary SIN = arg -> Math.sin(arg);
+    public static final PrimitiveFunction.Unary SINH = arg -> Math.sinh(arg);
+    public static final PrimitiveFunction.Unary SQRT = arg -> Math.sqrt(arg);
+    public static final PrimitiveFunction.Unary SQRT1PX2 = arg -> MissingMath.sqrt1px2(arg);
+    public static final PrimitiveFunction.Binary SUBTRACT = (arg1, arg2) -> arg1 - arg2;
+    public static final PrimitiveFunction.Unary TAN = arg -> Math.tan(arg);
+    public static final PrimitiveFunction.Unary TANH = arg -> Math.tanh(arg);
+    public static final PrimitiveFunction.Unary VALUE = arg -> arg;
 
 }
