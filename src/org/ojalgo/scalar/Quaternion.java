@@ -38,7 +38,7 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
 public class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>,
         TransformationMatrix<Double, PhysicalStore<Double>>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
-    public static enum RotationAxis {
+    public enum RotationAxis {
 
         X(0, new double[] { 1.0, 0.0, 0.0 }), Y(1, new double[] { 0.0, 1.0, 0.0 }), Z(2, new double[] { 0.0, 0.0, 1.0 });
 
@@ -242,6 +242,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
     public static final Quaternion K = new Versor(PrimitiveMath.ZERO, PrimitiveMath.ZERO, PrimitiveMath.ONE);
     public static final Quaternion NEG = new Versor(PrimitiveMath.NEG);
     public static final Quaternion ONE = new Versor(PrimitiveMath.ONE);
+    public static final Quaternion TWO = new Quaternion(PrimitiveMath.TWO);
     public static final Quaternion ZERO = new Quaternion();
 
     private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * PrimitiveScalar.CONTEXT.epsilon();

@@ -103,6 +103,11 @@ public abstract class BigMath {
     public static final BigDecimal VERY_NEGATIVE = new BigDecimal(Long.MIN_VALUE);
     public static final BigDecimal VERY_POSITIVE = new BigDecimal(Long.MAX_VALUE);
 
+    /*
+     * The lambdas below should not (cannot) reference each other. Delegate to some other 'type' or code in
+     * org.ojalgo.function.special.MissingMath.
+     */
+
     public static final BigFunction.Unary ABS = arg -> arg.abs();
     public static final BigFunction.Unary ACOS = arg -> BigDecimal.valueOf(Math.acos(arg.doubleValue()));
     public static final BigFunction.Unary ACOSH = arg -> BigDecimal.valueOf(MissingMath.acosh(arg.doubleValue()));

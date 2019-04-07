@@ -64,8 +64,10 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
 
     };
 
-    public static final BigScalar ONE = new BigScalar(BigMath.ONE);
-    public static final BigScalar ZERO = new BigScalar();
+    public static final BigScalar NEG = new BigScalar(BigDecimal.ONE.negate());
+    public static final BigScalar ONE = new BigScalar(BigDecimal.ONE);
+    public static final BigScalar TWO = new BigScalar(BigDecimal.ONE.add(BigDecimal.ONE));
+    public static final BigScalar ZERO = new BigScalar(BigDecimal.ZERO);
 
     static final NumberContext CONTEXT = NumberContext.getMath(MathContext.DECIMAL128);
 

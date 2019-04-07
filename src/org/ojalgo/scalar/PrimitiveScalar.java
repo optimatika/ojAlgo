@@ -59,9 +59,11 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
     };
 
     public static final PrimitiveScalar NaN = new PrimitiveScalar(PrimitiveMath.NaN);
+    public static final PrimitiveScalar NEG = new PrimitiveScalar(PrimitiveMath.NEG);
     public static final PrimitiveScalar NEGATIVE_INFINITY = new PrimitiveScalar(PrimitiveMath.NEGATIVE_INFINITY);
     public static final PrimitiveScalar ONE = new PrimitiveScalar(PrimitiveMath.ONE);
     public static final PrimitiveScalar POSITIVE_INFINITY = new PrimitiveScalar(PrimitiveMath.POSITIVE_INFINITY);
+    public static final PrimitiveScalar TWO = new PrimitiveScalar(PrimitiveMath.TWO);
     public static final PrimitiveScalar ZERO = new PrimitiveScalar(PrimitiveMath.ZERO);
 
     static final NumberContext CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);

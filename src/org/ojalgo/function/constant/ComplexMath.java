@@ -29,6 +29,11 @@ import org.ojalgo.scalar.PrimitiveScalar;
 
 public abstract class ComplexMath {
 
+    /*
+     * The lambdas below should not (cannot) reference each other. Delegate to some other 'type' or code in
+     * org.ojalgo.function.special.MissingMath.
+     */
+
     public static final ComplexFunction.Unary ABS = new ComplexFunction.Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {

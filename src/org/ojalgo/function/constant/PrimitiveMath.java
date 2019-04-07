@@ -152,6 +152,11 @@ public abstract class PrimitiveMath {
         return index >= 0 ? index : Math.max(-(index + 2), 0);
     }
 
+    /*
+     * The lambdas below should not (cannot) reference each other. Implementations must be written in terms of
+     * java.lang.Math and/or org.ojalgo.function.special.MissingMath.
+     */
+
     public static final PrimitiveFunction.Unary ABS = arg -> Math.abs(arg);
     public static final PrimitiveFunction.Unary ACOS = arg -> Math.acos(arg);
     public static final PrimitiveFunction.Unary ACOSH = arg -> MissingMath.acosh(arg);

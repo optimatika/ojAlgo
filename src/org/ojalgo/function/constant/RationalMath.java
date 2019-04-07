@@ -99,8 +99,14 @@ public abstract class RationalMath {
     public static final RationalNumber SQRT_PI = RationalNumber.valueOf(BigMath.SQRT_PI);
     public static final RationalNumber SQRT_TWO_PI = RationalNumber.valueOf(BigMath.SQRT_TWO_PI);
 
-    public static final RationalNumber VERY_NEGATIVE = RationalNumber.of(Long.MIN_VALUE, 1L);
-    public static final RationalNumber VERY_POSITIVE = RationalNumber.of(Long.MAX_VALUE, 1L);
+    public static final RationalNumber NaN = RationalNumber.NaN;
+    public static final RationalNumber POSITIVE_INFINITY = RationalNumber.POSITIVE_INFINITY;
+    public static final RationalNumber NEGATIVE_INFINITY = RationalNumber.NEGATIVE_INFINITY;
+
+    /*
+     * The lambdas below should not (cannot) reference each other. Delegate to some other 'type' or code in
+     * org.ojalgo.function.special.MissingMath.
+     */
 
     public static final RationalFunction.Unary ABS = new RationalFunction.Unary() {
 

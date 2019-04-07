@@ -63,13 +63,14 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     public static final RationalNumber MAX_VALUE = new RationalNumber(Long.MAX_VALUE, 1L);
     public static final RationalNumber MIN_VALUE = new RationalNumber(Long.MIN_VALUE, 1L);
     public static final RationalNumber NaN = new RationalNumber(0L, 0L);
+    public static final RationalNumber NEG = new RationalNumber(-1L, 1L);
     public static final RationalNumber NEGATIVE_INFINITY = new RationalNumber(-1L, 0L);
     public static final RationalNumber ONE = new RationalNumber(1L, 1L);
     public static final RationalNumber POSITIVE_INFINITY = new RationalNumber(1L, 0L);
     public static final RationalNumber TWO = new RationalNumber(2L, 1L);
     public static final RationalNumber ZERO = new RationalNumber(0L, 1L);
-    private static final String DIVIDE = " / ";
 
+    private static final String DIVIDE = " / ";
     private static final String LEFT = "(";
     private static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitLength();
     private static final RationalNumber MINUS_ONE = ONE.negate();
