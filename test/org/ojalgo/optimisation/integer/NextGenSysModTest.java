@@ -27,9 +27,8 @@ import java.math.RoundingMode;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.BigFunction;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -1244,7 +1243,7 @@ public class NextGenSysModTest {
         Expression betaExpr = retVal.addExpression("Beta").upper(betaLimit);
         Expression totalExpr = retVal.addExpression("100%").level(BigMath.ONE);
         Expression budgetExpr = retVal.addExpression("Budget").upper(Math.toIntExact(Math.round(Math.sqrt(numberOfAssets))));
-        Expression varianceExpr = retVal.addExpression("Variance").weight(BigFunction.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
+        Expression varianceExpr = retVal.addExpression("Variance").weight(BigMath.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
 
         for (int j = 0; j < numberOfAssets; j++) {
 
@@ -1311,7 +1310,7 @@ public class NextGenSysModTest {
             return linRes;
         }
 
-        Expression varianceExpr = model.addExpression("Variance").weight(BigFunction.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
+        Expression varianceExpr = model.addExpression("Variance").weight(BigMath.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
         for (int j = 0; j < numberOfAssets; j++) {
             for (int i = 0; i < numberOfAssets; i++) {
                 varianceExpr.set(i, j, data.getCovariance(i, j));

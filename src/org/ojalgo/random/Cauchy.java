@@ -21,7 +21,7 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 /**
  * https://en.wikipedia.org/wiki/Cauchy_distribution

@@ -24,7 +24,7 @@ package org.ojalgo.array;
 import java.util.Arrays;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 public class SetGetTest extends BasicArrayTest {
 

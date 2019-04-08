@@ -23,7 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;

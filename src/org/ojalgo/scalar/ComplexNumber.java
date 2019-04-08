@@ -25,8 +25,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -232,7 +231,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
             return new ComplexNumber(norm);
 
-        } else if (PrimitiveFunction.ABS.invoke(tmpStdPhase - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
+        } else if (PrimitiveMath.ABS.invoke(tmpStdPhase - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
 
             return new ComplexNumber(-norm);
 
@@ -240,7 +239,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
             double tmpRe = PrimitiveMath.ZERO;
             if (norm != PrimitiveMath.ZERO) {
-                final double tmpCos = PrimitiveFunction.COS.invoke(tmpStdPhase);
+                final double tmpCos = PrimitiveMath.COS.invoke(tmpStdPhase);
                 if (tmpCos != PrimitiveMath.ZERO) {
                     tmpRe = norm * tmpCos;
                 }
@@ -248,7 +247,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
             double tmpIm = PrimitiveMath.ZERO;
             if (norm != PrimitiveMath.ZERO) {
-                final double tmpSin = PrimitiveFunction.SIN.invoke(tmpStdPhase);
+                final double tmpSin = PrimitiveMath.SIN.invoke(tmpStdPhase);
                 if (tmpSin != PrimitiveMath.ZERO) {
                     tmpIm = norm * tmpSin;
                 }
@@ -259,7 +258,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     }
 
     public static Normalised makeRotation(final double angle) {
-        return new Normalised(PrimitiveFunction.COS.invoke(angle), PrimitiveFunction.SIN.invoke(angle));
+        return new Normalised(PrimitiveMath.COS.invoke(angle), PrimitiveMath.SIN.invoke(angle));
     }
 
     /**
@@ -424,7 +423,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         final double tmpRe = arg.doubleValue();
         final double tmpIm = arg.i;
 
-        if (PrimitiveFunction.ABS.invoke(tmpRe) > PrimitiveFunction.ABS.invoke(tmpIm)) {
+        if (PrimitiveMath.ABS.invoke(tmpRe) > PrimitiveMath.ABS.invoke(tmpIm)) {
 
             final double r = tmpIm / tmpRe;
             final double d = tmpRe + (r * tmpIm);
@@ -650,7 +649,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
      * @return the norm of this complex number.
      */
     public double norm() {
-        return PrimitiveFunction.HYPOT.invoke(myRealValue, i);
+        return PrimitiveMath.HYPOT.invoke(myRealValue, i);
     }
 
     /**
@@ -757,7 +756,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         } else {
             retVal.append(PLUS);
         }
-        retVal.append(Double.toString(PrimitiveFunction.ABS.invoke(tmpIm)));
+        retVal.append(Double.toString(PrimitiveMath.ABS.invoke(tmpIm)));
 
         return retVal.append(RIGHT).toString();
     }

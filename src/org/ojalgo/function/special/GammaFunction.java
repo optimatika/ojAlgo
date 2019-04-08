@@ -21,9 +21,9 @@
  */
 package org.ojalgo.function.special;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 public abstract class GammaFunction {
 
@@ -41,7 +41,7 @@ public abstract class GammaFunction {
      */
     public static double gamma(final double arg) {
 
-        if ((arg <= ZERO) && (PrimitiveFunction.ABS.invoke(arg % ONE) < MACHINE_EPSILON)) {
+        if ((arg <= ZERO) && (PrimitiveMath.ABS.invoke(arg % ONE) < MACHINE_EPSILON)) {
 
             return NaN;
 
@@ -49,7 +49,7 @@ public abstract class GammaFunction {
 
             if (arg < HALF) {
 
-                return PI / (PrimitiveFunction.SIN.invoke(PI * arg) * GammaFunction.gamma(ONE - arg));
+                return PI / (PrimitiveMath.SIN.invoke(PI * arg) * GammaFunction.gamma(ONE - arg));
 
             } else {
 
@@ -62,7 +62,7 @@ public abstract class GammaFunction {
 
                 final double t = z + (7 + HALF);
 
-                return SQRT_TWO_PI * PrimitiveFunction.POW.invoke(t, z + HALF) * PrimitiveFunction.EXP.invoke(-t) * x;
+                return SQRT_TWO_PI * PrimitiveMath.POW.invoke(t, z + HALF) * PrimitiveMath.EXP.invoke(-t) * x;
             }
         }
     }

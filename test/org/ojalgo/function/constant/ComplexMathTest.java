@@ -19,9 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function;
+package org.ojalgo.function.constant;
 
-import static org.ojalgo.function.ComplexFunction.*;
+import static org.ojalgo.function.constant.ComplexMath.*;
 import static org.ojalgo.scalar.ComplexNumber.*;
 
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import org.ojalgo.TestUtils;
  *
  * @author apete
  */
-public class ComplexCase {
+public class ComplexMathTest {
 
     @Test
     public void testDIVIDE() {

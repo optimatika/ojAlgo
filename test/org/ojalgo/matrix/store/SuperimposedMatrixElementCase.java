@@ -24,7 +24,7 @@ package org.ojalgo.matrix.store;
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.ojalgo.constant.BigMath;
+import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;

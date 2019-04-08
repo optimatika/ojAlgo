@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.EconomySize;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -170,7 +170,7 @@ public class DesignCase {
         final PhysicalStore<Double> tmpX = tmpQR.getSolution(tmpB).copy();
 
         // BasicLogger.debug("Straigt X: " + tmpX.toString());
-        tmpB.modifyMatching(PrimitiveFunction.SUBTRACT, tmpA.multiply(tmpX));
+        tmpB.modifyMatching(PrimitiveMath.SUBTRACT, tmpA.multiply(tmpX));
         // BasicLogger.debug("Residual B: " + tmpB.toString());
 
     }
@@ -234,11 +234,11 @@ public class DesignCase {
         final PhysicalStore<Double> nullspacePriQR = decompPriQR.getQ().logical().offsets(0, decompPriQR.getRank()).get().copy();
         final PhysicalStore<Double> nullspacePriSVD = decompPriSVD.getQ2().logical().offsets(0, decompPriSVD.getRank()).get().copy();
 
-        final double scalePriQR = PrimitiveFunction.ABS.invoke(nullspacePriQR.doubleValue(0));
-        nullspacePriQR.modifyAll(PrimitiveFunction.DIVIDE.second(scalePriQR));
+        final double scalePriQR = PrimitiveMath.ABS.invoke(nullspacePriQR.doubleValue(0));
+        nullspacePriQR.modifyAll(PrimitiveMath.DIVIDE.second(scalePriQR));
 
-        final double scalePriSVD = PrimitiveFunction.ABS.invoke(nullspacePriSVD.doubleValue(0));
-        nullspacePriSVD.modifyAll(PrimitiveFunction.DIVIDE.second(scalePriSVD));
+        final double scalePriSVD = PrimitiveMath.ABS.invoke(nullspacePriSVD.doubleValue(0));
+        nullspacePriSVD.modifyAll(PrimitiveMath.DIVIDE.second(scalePriSVD));
 
         final PrimitiveDenseStore nullspace = PrimitiveDenseStore.FACTORY.columns(new double[] { -1, -26, 16 });
 
@@ -254,7 +254,7 @@ public class DesignCase {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
-        Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveFunction.SQRT.invoke(5.0), 0.0 });
+        Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
         final SingularValue<Double> tmpOldDecomp = new SingularValueDecomposition.Primitive();
         tmpOldDecomp.decompose(tmpOriginalMatrix);

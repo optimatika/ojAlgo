@@ -24,7 +24,7 @@ package org.ojalgo.matrix.store;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
@@ -157,7 +157,7 @@ public class StoreProblems extends MatrixStoreTests {
         PrimitiveDenseStore x = PrimitiveDenseStore.FACTORY.rows(_x);
         PrimitiveDenseStore y = PrimitiveDenseStore.FACTORY.rows(_y);
 
-        ElementsSupplier<Double> diff = y.operateOnMatching(x, PrimitiveFunction.SUBTRACT);
+        ElementsSupplier<Double> diff = y.operateOnMatching(x, PrimitiveMath.SUBTRACT);
         ElementsSupplier<Double> transp = diff.transpose();
 
         TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.rows(exp), diff.get());

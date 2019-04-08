@@ -21,8 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.List;
 import java.util.Set;
@@ -33,6 +32,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -498,7 +498,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
             mtrxQ = PrimitiveDenseStore.FACTORY.makeZero(numbVars, numbVars);
 
-            final BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? SUBTRACT : ADD;
+            final BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? PrimitiveMath.SUBTRACT : PrimitiveMath.ADD;
             UnaryFunction<Double> tmpModifier;
             for (final IntRowColumn tmpKey : tmpObjExpr.getQuadraticKeySet()) {
                 final int tmpRow = sourceModel.indexOfFreeVariable(tmpKey.row);
@@ -756,7 +756,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     }
 
     protected MatrixStore<Double> getSE() {
-        return this.getSolutionX().premultiply(this.getMatrixAE()).operateOnMatching(this.getMatrixBE(), SUBTRACT).get();
+        return this.getSolutionX().premultiply(this.getMatrixAE()).operateOnMatching(this.getMatrixBE(), PrimitiveMath.SUBTRACT).get();
     }
 
     protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {

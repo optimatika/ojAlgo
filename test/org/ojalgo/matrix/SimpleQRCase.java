@@ -24,7 +24,7 @@ package org.ojalgo.matrix;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -46,13 +46,13 @@ public class SimpleQRCase extends BasicMatrixTest {
     }
 
     private static RationalMatrix getFactorQ() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveFunction.SQRT.invoke(2.0) },
-                { 2.0 / 3.0, -1.0 / PrimitiveFunction.SQRT.invoke(2.0) } });
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveMath.SQRT.invoke(2.0) },
+                { 2.0 / 3.0, -1.0 / PrimitiveMath.SQRT.invoke(2.0) } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     private static RationalMatrix getFactorR() {
-        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveFunction.SQRT.invoke(2.0) } });
+        final RationalMatrix tmpMtrx = RationalMatrix.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveMath.SQRT.invoke(2.0) } });
         return tmpMtrx.enforce(DEFINITION);
     }
 

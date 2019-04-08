@@ -21,8 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +45,7 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.matrix.MatrixUtils;
@@ -1028,7 +1028,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     public void negateColumn(final int column) {
-        myUtility.modifyColumn(0, column, NEGATE);
+        myUtility.modifyColumn(0, column, PrimitiveMath.NEGATE);
     }
 
     public PhysicalStore.Factory<Double, PrimitiveDenseStore> physical() {
@@ -1192,11 +1192,11 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             }
         } else {
             if (!Double.isNaN(tmpTransf.cos)) {
-                myUtility.modifyRow(tmpLow, 0L, MULTIPLY.second(tmpTransf.cos));
+                myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
             } else if (!Double.isNaN(tmpTransf.sin)) {
-                myUtility.modifyRow(tmpLow, 0L, DIVIDE.second(tmpTransf.sin));
+                myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
             } else {
-                myUtility.modifyRow(tmpLow, 0, NEGATE);
+                myUtility.modifyRow(tmpLow, 0, PrimitiveMath.NEGATE);
             }
         }
     }
@@ -1246,11 +1246,11 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             }
         } else {
             if (!Double.isNaN(tmpTransf.cos)) {
-                myUtility.modifyColumn(0L, tmpHigh, MULTIPLY.second(tmpTransf.cos));
+                myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
             } else if (!Double.isNaN(tmpTransf.sin)) {
-                myUtility.modifyColumn(0L, tmpHigh, DIVIDE.second(tmpTransf.sin));
+                myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
             } else {
-                myUtility.modifyColumn(0, tmpHigh, NEGATE);
+                myUtility.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
             }
         }
     }

@@ -22,7 +22,7 @@
 package org.ojalgo.function.polynomial;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;

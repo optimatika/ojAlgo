@@ -1,8 +1,8 @@
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;
 
 public abstract class EvD2D {
@@ -34,7 +34,7 @@ public abstract class EvD2D {
         double norm = ZERO;
         for (int i = 0; i < size; i++) {
             for (int j = Math.max(i - 1, 0); j < size; j++) {
-                norm = norm + ABS.invoke(mtrxH[i][j]);
+                norm = norm + PrimitiveMath.ABS.invoke(mtrxH[i][j]);
             }
         }
 
@@ -47,12 +47,12 @@ public abstract class EvD2D {
 
             int l = n;
             while (l > 0) {
-                s = ABS.invoke(mtrxH[l - 1][l - 1]) + ABS.invoke(mtrxH[l][l]);
+                s = PrimitiveMath.ABS.invoke(mtrxH[l - 1][l - 1]) + PrimitiveMath.ABS.invoke(mtrxH[l][l]);
                 // if (s == ZERO) {
                 if (NumberContext.compare(s, ZERO) == 0) {
                     s = norm;
                 }
-                if (ABS.invoke(mtrxH[l][l - 1]) < (MACHINE_EPSILON * s)) {
+                if (PrimitiveMath.ABS.invoke(mtrxH[l][l - 1]) < (MACHINE_EPSILON * s)) {
                     break;
                 }
                 l--;
@@ -74,7 +74,7 @@ public abstract class EvD2D {
                 w = mtrxH[n][n - 1] * mtrxH[n - 1][n];
                 p = (mtrxH[n - 1][n - 1] - mtrxH[n][n]) / TWO;
                 q = (p * p) + w;
-                z = SQRT.invoke(ABS.invoke(q));
+                z = PrimitiveMath.SQRT.invoke(PrimitiveMath.ABS.invoke(q));
                 mtrxH[n][n] = mtrxH[n][n] + exshift;
                 mtrxH[n - 1][n - 1] = mtrxH[n - 1][n - 1] + exshift;
                 x = mtrxH[n][n];
@@ -96,10 +96,10 @@ public abstract class EvD2D {
                     e[n - 1] = ZERO;
                     e[n] = ZERO;
                     x = mtrxH[n][n - 1];
-                    s = ABS.invoke(x) + ABS.invoke(z);
+                    s = PrimitiveMath.ABS.invoke(x) + PrimitiveMath.ABS.invoke(z);
                     p = x / s;
                     q = z / s;
-                    r = SQRT.invoke((p * p) + (q * q));
+                    r = PrimitiveMath.SQRT.invoke((p * p) + (q * q));
                     p = p / r;
                     q = q / r;
 
@@ -159,7 +159,7 @@ public abstract class EvD2D {
                     for (int i = 0; i <= n; i++) {
                         mtrxH[i][i] -= x;
                     }
-                    s = ABS.invoke(mtrxH[n][n - 1]) + ABS.invoke(mtrxH[n - 1][n - 2]);
+                    s = PrimitiveMath.ABS.invoke(mtrxH[n][n - 1]) + PrimitiveMath.ABS.invoke(mtrxH[n - 1][n - 2]);
                     x = y = 0.75 * s;
                     w = -0.4375 * s * s;
                 }
@@ -170,7 +170,7 @@ public abstract class EvD2D {
                     s = (y - x) / TWO;
                     s = (s * s) + w;
                     if (s > 0) {
-                        s = SQRT.invoke(s);
+                        s = PrimitiveMath.SQRT.invoke(s);
                         if (y < x) {
                             s = -s;
                         }
@@ -195,15 +195,15 @@ public abstract class EvD2D {
                     p = (((r * s) - w) / mtrxH[m + 1][m]) + mtrxH[m][m + 1];
                     q = mtrxH[m + 1][m + 1] - z - r - s;
                     r = mtrxH[m + 2][m + 1];
-                    s = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
+                    s = PrimitiveMath.ABS.invoke(p) + PrimitiveMath.ABS.invoke(q) + PrimitiveMath.ABS.invoke(r);
                     p = p / s;
                     q = q / s;
                     r = r / s;
                     if (m == l) {
                         break;
                     }
-                    if ((ABS.invoke(mtrxH[m][m - 1]) * (ABS.invoke(q) + ABS.invoke(r))) < (MACHINE_EPSILON
-                            * (ABS.invoke(p) * (ABS.invoke(mtrxH[m - 1][m - 1]) + ABS.invoke(z) + ABS.invoke(mtrxH[m + 1][m + 1]))))) {
+                    if ((PrimitiveMath.ABS.invoke(mtrxH[m][m - 1]) * (PrimitiveMath.ABS.invoke(q) + PrimitiveMath.ABS.invoke(r))) < (MACHINE_EPSILON
+                            * (PrimitiveMath.ABS.invoke(p) * (PrimitiveMath.ABS.invoke(mtrxH[m - 1][m - 1]) + PrimitiveMath.ABS.invoke(z) + PrimitiveMath.ABS.invoke(mtrxH[m + 1][m + 1]))))) {
                         break;
                     }
                     m--;
@@ -224,7 +224,7 @@ public abstract class EvD2D {
                         p = mtrxH[k][k - 1];
                         q = mtrxH[k + 1][k - 1];
                         r = (notlast ? mtrxH[k + 2][k - 1] : ZERO);
-                        x = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
+                        x = PrimitiveMath.ABS.invoke(p) + PrimitiveMath.ABS.invoke(q) + PrimitiveMath.ABS.invoke(r);
                         // if (x == ZERO) {
                         if (NumberContext.compare(x, ZERO) == 0) {
                             continue;
@@ -234,7 +234,7 @@ public abstract class EvD2D {
                         r = r / x;
                     }
 
-                    s = SQRT.invoke((p * p) + (q * q) + (r * r));
+                    s = PrimitiveMath.SQRT.invoke((p * p) + (q * q) + (r * r));
                     if (p < 0) {
                         s = -s;
                     }
@@ -339,7 +339,7 @@ public abstract class EvD2D {
                             q = ((d[i] - p) * (d[i] - p)) + (e[i] * e[i]);
                             t = ((x * s) - (z * r)) / q;
                             mtrxH[i][n] = t;
-                            if (ABS.invoke(x) > ABS.invoke(z)) {
+                            if (PrimitiveMath.ABS.invoke(x) > PrimitiveMath.ABS.invoke(z)) {
                                 mtrxH[i + 1][n] = (-r - (w * t)) / x;
                             } else {
                                 mtrxH[i + 1][n] = (-s - (y * t)) / z;
@@ -348,7 +348,7 @@ public abstract class EvD2D {
 
                         // Overflow control
 
-                        t = ABS.invoke(mtrxH[i][n]);
+                        t = PrimitiveMath.ABS.invoke(mtrxH[i][n]);
                         if (((MACHINE_EPSILON * t) * t) > 1) {
                             for (int j = i; j <= n; j++) {
                                 mtrxH[j][n] = mtrxH[j][n] / t;
@@ -366,7 +366,7 @@ public abstract class EvD2D {
 
                 // Last vector component imaginary so matrix is triangular
 
-                if (ABS.invoke(mtrxH[n][n - 1]) > ABS.invoke(mtrxH[n - 1][n])) {
+                if (PrimitiveMath.ABS.invoke(mtrxH[n][n - 1]) > PrimitiveMath.ABS.invoke(mtrxH[n - 1][n])) {
                     mtrxH[n - 1][n - 1] = q / mtrxH[n][n - 1];
                     mtrxH[n - 1][n] = -(mtrxH[n][n] - p) / mtrxH[n][n - 1];
                 } else {
@@ -406,12 +406,12 @@ public abstract class EvD2D {
                             vi = (d[i] - p) * TWO * q;
                             // if ((vr == ZERO) & (vi == ZERO)) {
                             if ((NumberContext.compare(vr, ZERO) == 0) && (NumberContext.compare(vi, ZERO) == 0)) {
-                                vr = MACHINE_EPSILON * norm * (ABS.invoke(w) + ABS.invoke(q) + ABS.invoke(x) + ABS.invoke(y) + ABS.invoke(z));
+                                vr = MACHINE_EPSILON * norm * (PrimitiveMath.ABS.invoke(w) + PrimitiveMath.ABS.invoke(q) + PrimitiveMath.ABS.invoke(x) + PrimitiveMath.ABS.invoke(y) + PrimitiveMath.ABS.invoke(z));
                             }
                             EvD2D.cdiv(((x * r) - (z * ra)) + (q * sa), (x * s) - (z * sa) - (q * ra), vr, vi, cdiv);
                             mtrxH[i][n - 1] = cdiv[0];
                             mtrxH[i][n] = cdiv[1];
-                            if (ABS.invoke(x) > (ABS.invoke(z) + ABS.invoke(q))) {
+                            if (PrimitiveMath.ABS.invoke(x) > (PrimitiveMath.ABS.invoke(z) + PrimitiveMath.ABS.invoke(q))) {
                                 mtrxH[i + 1][n - 1] = ((-ra - (w * mtrxH[i][n - 1])) + (q * mtrxH[i][n])) / x;
                                 mtrxH[i + 1][n] = (-sa - (w * mtrxH[i][n]) - (q * mtrxH[i][n - 1])) / x;
                             } else {
@@ -422,7 +422,7 @@ public abstract class EvD2D {
                         }
 
                         // Overflow control
-                        t = MAX.invoke(ABS.invoke(mtrxH[i][n - 1]), ABS.invoke(mtrxH[i][n]));
+                        t = PrimitiveMath.MAX.invoke(PrimitiveMath.ABS.invoke(mtrxH[i][n - 1]), PrimitiveMath.ABS.invoke(mtrxH[i][n]));
                         if (((MACHINE_EPSILON * t) * t) > 1) {
                             for (int j = i; j <= n; j++) {
                                 mtrxH[j][n - 1] = mtrxH[j][n - 1] / t;
@@ -468,7 +468,7 @@ public abstract class EvD2D {
             double scale = ZERO;
 
             for (int i = m; i <= sizeM1; i++) {
-                scale = scale + ABS.invoke(mtrxH[i][ij]);
+                scale = scale + PrimitiveMath.ABS.invoke(mtrxH[i][ij]);
             }
 
             // if (scale != ZERO) {
@@ -481,7 +481,7 @@ public abstract class EvD2D {
                     vctrWork[i] = mtrxH[i][ij] / scale;
                     h += vctrWork[i] * vctrWork[i];
                 }
-                double g = SQRT.invoke(h);
+                double g = PrimitiveMath.SQRT.invoke(h);
                 if (vctrWork[m] > 0) {
                     g = -g;
                 }
@@ -555,7 +555,7 @@ public abstract class EvD2D {
      */
     private static void cdiv(final double xr, final double xi, final double yr, final double yi, final double[] cdiv) {
         double r, d;
-        if (ABS.invoke(yr) > ABS.invoke(yi)) {
+        if (PrimitiveMath.ABS.invoke(yr) > PrimitiveMath.ABS.invoke(yi)) {
             r = yi / yr;
             d = yr + (r * yi);
             cdiv[0] = (xr + (r * xi)) / d;

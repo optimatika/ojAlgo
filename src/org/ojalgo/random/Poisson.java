@@ -21,9 +21,9 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.CombinatorialFunctions;
 
 /**
@@ -58,7 +58,7 @@ public class Poisson extends AbstractDiscrete {
     }
 
     public double getProbability(final int value) {
-        return (PrimitiveFunction.EXP.invoke(-myLambda) * PrimitiveFunction.POW.invoke(myLambda, value)) / CombinatorialFunctions.factorial(value);
+        return (PrimitiveMath.EXP.invoke(-myLambda) * PrimitiveMath.POW.invoke(myLambda, value)) / CombinatorialFunctions.factorial(value);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class Poisson extends AbstractDiscrete {
 
             retVal++;
 
-            tmpVal -= PrimitiveFunction.LOG.invoke(this.random().nextDouble()) / myLambda;
+            tmpVal -= PrimitiveMath.LOG.invoke(this.random().nextDouble()) / myLambda;
         }
 
         return retVal;

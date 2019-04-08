@@ -27,8 +27,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Assertions;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Bidiagonal;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -230,8 +229,8 @@ public abstract class TestUtils {
         double tmpFrobNormDiff = 0.0;
         double tmpFrobNormExpt = 0.0;
         for (long i = 0L; i < expected.count(); i++) {
-            tmpFrobNormDiff = PrimitiveFunction.HYPOT.invoke(tmpFrobNormDiff, actual.doubleValue(i) - expected.doubleValue(i));
-            tmpFrobNormExpt = PrimitiveFunction.HYPOT.invoke(tmpFrobNormExpt, expected.doubleValue(i));
+            tmpFrobNormDiff = PrimitiveMath.HYPOT.invoke(tmpFrobNormDiff, actual.doubleValue(i) - expected.doubleValue(i));
+            tmpFrobNormExpt = PrimitiveMath.HYPOT.invoke(tmpFrobNormExpt, expected.doubleValue(i));
         }
         TestUtils.assertTrue(message + ", large norm differences " + tmpFrobNormDiff + " !<< " + tmpFrobNormExpt,
                 context.isSmall(tmpFrobNormExpt, tmpFrobNormDiff));

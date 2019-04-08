@@ -21,8 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.*;
-import static org.ojalgo.function.BigFunction.*;
+import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -31,6 +30,7 @@ import java.util.stream.Stream;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.Printer;
@@ -840,7 +840,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
                 if (tmpVariable.isEqualityConstraint()) {
                     retSolution.set(i, tmpVariable.getLowerLimit());
                 } else if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
-                    retSolution.set(i, DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), TWO));
+                    retSolution.set(i, BigMath.DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), TWO));
                     shouldCheckGradient = true;
                 } else if (tmpVariable.isLowerLimitSet()) {
                     retSolution.set(i, tmpVariable.getLowerLimit());

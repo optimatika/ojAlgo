@@ -24,10 +24,10 @@ package org.ojalgo.structure;
 import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**

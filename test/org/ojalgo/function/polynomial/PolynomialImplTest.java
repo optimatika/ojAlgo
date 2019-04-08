@@ -23,7 +23,7 @@ package org.ojalgo.function.polynomial;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;

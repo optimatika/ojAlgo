@@ -31,10 +31,9 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.algebra.ScalarOperation;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
@@ -156,7 +155,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
         final long tmpLimit = matrix.countRows();
         for (long i = 0L; i < tmpLimit; i++) {
-            retVal = PrimitiveFunction.MAX.invoke(retVal, matrix.aggregateRow(i, Aggregator.NORM1).doubleValue());
+            retVal = PrimitiveMath.MAX.invoke(retVal, matrix.aggregateRow(i, Aggregator.NORM1).doubleValue());
         }
 
         return retVal;
@@ -171,7 +170,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
         final long tmpLimit = matrix.countColumns();
         for (long j = 0L; j < tmpLimit; j++) {
-            retVal = PrimitiveFunction.MAX.invoke(retVal, matrix.aggregateColumn(j, Aggregator.NORM1).doubleValue());
+            retVal = PrimitiveMath.MAX.invoke(retVal, matrix.aggregateColumn(j, Aggregator.NORM1).doubleValue());
         }
 
         return retVal;

@@ -22,7 +22,7 @@
 package org.ojalgo.machine;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicLogger;
 
@@ -125,7 +125,7 @@ public final class VirtualMachine extends AbstractMachine {
     }
 
     public int getAvailableDim2D(final long elementSize) {
-        return (int) PrimitiveFunction.SQRT.invoke(AbstractMachine.elements(this.getAvailableMemory(), elementSize));
+        return (int) PrimitiveMath.SQRT.invoke(AbstractMachine.elements(this.getAvailableMemory(), elementSize));
     }
 
     public long getAvailableMemory() {

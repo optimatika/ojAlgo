@@ -21,7 +21,7 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 import java.util.Spliterator.OfDouble;
@@ -44,6 +44,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -274,13 +275,13 @@ public class Primitive64Array extends PrimitiveArray {
 
     static void invoke(final double[] data, final int first, final int limit, final int step, final double left, final BinaryFunction<Double> function,
             final double[] right) {
-        if (function == PrimitiveFunction.ADD) {
+        if (function == PrimitiveMath.ADD) {
             Primitive64Array.add(data, first, limit, step, left, right);
-        } else if (function == PrimitiveFunction.DIVIDE) {
+        } else if (function == PrimitiveMath.DIVIDE) {
             Primitive64Array.divide(data, first, limit, step, left, right);
-        } else if (function == PrimitiveFunction.MULTIPLY) {
+        } else if (function == PrimitiveMath.MULTIPLY) {
             Primitive64Array.multiply(data, first, limit, step, left, right);
-        } else if (function == PrimitiveFunction.SUBTRACT) {
+        } else if (function == PrimitiveMath.SUBTRACT) {
             Primitive64Array.subtract(data, first, limit, step, left, right);
         } else {
             for (int i = first; i < limit; i += step) {
@@ -291,13 +292,13 @@ public class Primitive64Array extends PrimitiveArray {
 
     static void invoke(final double[] data, final int first, final int limit, final int step, final double[] left, final BinaryFunction<Double> function,
             final double right) {
-        if (function == PrimitiveFunction.ADD) {
+        if (function == PrimitiveMath.ADD) {
             Primitive64Array.add(data, first, limit, step, left, right);
-        } else if (function == PrimitiveFunction.DIVIDE) {
+        } else if (function == PrimitiveMath.DIVIDE) {
             Primitive64Array.divide(data, first, limit, step, left, right);
-        } else if (function == PrimitiveFunction.MULTIPLY) {
+        } else if (function == PrimitiveMath.MULTIPLY) {
             Primitive64Array.multiply(data, first, limit, step, left, right);
-        } else if (function == PrimitiveFunction.SUBTRACT) {
+        } else if (function == PrimitiveMath.SUBTRACT) {
             Primitive64Array.subtract(data, first, limit, step, left, right);
         } else {
             for (int i = first; i < limit; i += step) {
@@ -308,13 +309,13 @@ public class Primitive64Array extends PrimitiveArray {
 
     static void invoke(final double[] data, final int first, final int limit, final int step, final double[] left, final BinaryFunction<Double> function,
             final double[] right) {
-        if (function == PrimitiveFunction.ADD) {
+        if (function == PrimitiveMath.ADD) {
             Primitive64Array.add(data, first, limit, step, left, right);
-        } else if (function == PrimitiveFunction.DIVIDE) {
+        } else if (function == PrimitiveMath.DIVIDE) {
             Primitive64Array.divide(data, first, limit, step, left, right);
-        } else if (function == PrimitiveFunction.MULTIPLY) {
+        } else if (function == PrimitiveMath.MULTIPLY) {
             Primitive64Array.multiply(data, first, limit, step, left, right);
-        } else if (function == PrimitiveFunction.SUBTRACT) {
+        } else if (function == PrimitiveMath.SUBTRACT) {
             Primitive64Array.subtract(data, first, limit, step, left, right);
         } else {
             for (int i = first; i < limit; i += step) {
@@ -331,7 +332,7 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     static void invoke(final double[] data, final int first, final int limit, final int step, final double[] values, final UnaryFunction<Double> function) {
-        if (function == PrimitiveFunction.NEGATE) {
+        if (function == PrimitiveMath.NEGATE) {
             Primitive64Array.negate(data, first, limit, step, values);
         } else if (function instanceof FixedFirst<?>) {
             final FixedFirst<Double> tmpFunc = (FixedFirst<Double>) function;

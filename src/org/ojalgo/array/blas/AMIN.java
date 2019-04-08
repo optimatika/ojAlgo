@@ -21,8 +21,7 @@
  */
 package org.ojalgo.array.blas;
 
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * Given a vector x, the i?amin functions return the position of the vector element x[i] that has the smallest
@@ -41,7 +40,7 @@ public abstract class AMIN implements BLAS1 {
         double candidate;
 
         for (int i = first; i < limit; i += step) {
-            candidate = PrimitiveFunction.ABS.invoke(data[i]);
+            candidate = PrimitiveMath.ABS.invoke(data[i]);
             if (candidate < smallest) {
                 smallest = candidate;
                 retVal = i;

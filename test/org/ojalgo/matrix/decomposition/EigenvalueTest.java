@@ -21,8 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.MathContext;
 
@@ -31,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20050125Case;
 import org.ojalgo.matrix.P20061119Case;
@@ -149,14 +149,14 @@ public class EigenvalueTest {
         final int tmpLength = tmpData.length;
 
         final Array1D<ComplexNumber> tmpExpVals = Array1D.COMPLEX.makeZero(2);
-        tmpExpVals.set(0, ComplexNumber.of(0.0, THREE * SQRT.invoke(THREE)));
+        tmpExpVals.set(0, ComplexNumber.of(0.0, THREE * PrimitiveMath.SQRT.invoke(THREE)));
         tmpExpVals.set(1, tmpExpVals.get(0).conjugate());
 
         final Array2D<ComplexNumber> tmpExpVecs = Array2D.COMPLEX.makeZero(2, 2);
         tmpExpVecs.set(0, 0, ComplexNumber.of(THREE, ZERO));
-        tmpExpVecs.set(1, 0, ComplexNumber.of(ONE, -SQRT.invoke(THREE)));
+        tmpExpVecs.set(1, 0, ComplexNumber.of(ONE, -PrimitiveMath.SQRT.invoke(THREE)));
         tmpExpVecs.set(0, 1, ComplexNumber.of(THREE, ZERO));
-        tmpExpVecs.set(1, 1, ComplexNumber.of(ONE, SQRT.invoke(THREE)));
+        tmpExpVecs.set(1, 1, ComplexNumber.of(ONE, PrimitiveMath.SQRT.invoke(THREE)));
 
         final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(tmpA, false);
         tmpEvD.decompose(tmpA);

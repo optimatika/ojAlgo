@@ -21,8 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -33,8 +32,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -112,7 +111,7 @@ public final class IntegerSolver extends GenericSolver {
 
                 final double bestIntegerSolutionValue = IntegerSolver.this.getBestResultSoFar().getValue();
 
-                double nudge = MAX.invoke(ABS.invoke(bestIntegerSolutionValue) * options.mip_gap, options.mip_gap);
+                double nudge = PrimitiveMath.MAX.invoke(PrimitiveMath.ABS.invoke(bestIntegerSolutionValue) * options.mip_gap, options.mip_gap);
 
                 if (nodeModel.isMinimisation()) {
                     final BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, options.feasibility);
@@ -532,8 +531,8 @@ public final class IntegerSolver extends GenericSolver {
 
             final double bestIntegerValue = bestResultSoFar.getValue();
 
-            final double absoluteGap = PrimitiveFunction.ABS.invoke(bestIntegerValue - relaxedNodeValue);
-            final double relativeGap = PrimitiveFunction.ABS.invoke(absoluteGap / bestIntegerValue);
+            final double absoluteGap = PrimitiveMath.ABS.invoke(bestIntegerValue - relaxedNodeValue);
+            final double relativeGap = PrimitiveMath.ABS.invoke(absoluteGap / bestIntegerValue);
 
             if (myMinimisation) {
                 return (relaxedNodeValue < bestIntegerValue) && (relativeGap > options.mip_gap) && (absoluteGap > options.mip_gap);
@@ -634,7 +633,7 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     void addIntegerSignificance(final int index, final double significance) {
-        myIntegerSignificances[index] = HYPOT.invoke(myIntegerSignificances[index], significance);
+        myIntegerSignificances[index] = PrimitiveMath.HYPOT.invoke(myIntegerSignificances[index], significance);
     }
 
     int countExploredNodes() {

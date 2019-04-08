@@ -25,8 +25,8 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;

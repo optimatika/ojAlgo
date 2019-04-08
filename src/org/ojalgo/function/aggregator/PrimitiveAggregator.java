@@ -21,11 +21,10 @@
  */
 package org.ojalgo.function.aggregator;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -48,6 +47,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
     }
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Double>> AVERAGE = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -88,6 +91,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Double>> CARDINALITY = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -123,6 +130,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Double>> LARGEST = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -140,7 +151,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 }
 
                 public void invoke(final double anArg) {
-                    myValue = PrimitiveFunction.MAX.invoke(myValue, PrimitiveFunction.ABS.invoke(anArg));
+                    myValue = PrimitiveMath.MAX.invoke(myValue, PrimitiveMath.ABS.invoke(anArg));
                 }
 
                 public void merge(final Double result) {
@@ -156,6 +167,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Double>> MAX = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -173,7 +188,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 }
 
                 public void invoke(final double anArg) {
-                    myValue = PrimitiveFunction.MAX.invoke(myValue, anArg);
+                    myValue = PrimitiveMath.MAX.invoke(myValue, anArg);
                 }
 
                 public void merge(final Double result) {
@@ -189,6 +204,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Double>> MIN = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -210,7 +229,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 }
 
                 public void invoke(final double anArg) {
-                    myValue = PrimitiveFunction.MIN.invoke(myValue, anArg);
+                    myValue = PrimitiveMath.MIN.invoke(myValue, anArg);
                 }
 
                 public void merge(final Double result) {
@@ -226,6 +245,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Double>> NORM1 = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -243,7 +266,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 }
 
                 public void invoke(final double anArg) {
-                    myValue += PrimitiveFunction.ABS.invoke(anArg);
+                    myValue += PrimitiveMath.ABS.invoke(anArg);
                 }
 
                 public void merge(final Double result) {
@@ -259,6 +282,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Double>> NORM2 = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -269,7 +296,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 public double doubleValue() {
                     //return myValue; // more than 100x slower
-                    return PrimitiveFunction.SQRT.invoke(myValue);
+                    return PrimitiveMath.SQRT.invoke(myValue);
                 }
 
                 public int intValue() {
@@ -294,6 +321,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Double>> PRODUCT = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -327,6 +358,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Double>> PRODUCT2 = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -360,6 +395,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Double>> SMALLEST = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -381,10 +420,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 }
 
                 public void invoke(final double anArg) {
-                    final double tmpArg = PrimitiveFunction.ABS.invoke(anArg);
+                    final double tmpArg = PrimitiveMath.ABS.invoke(anArg);
                     // if (tmpArg != ZERO) {
                     if (NumberContext.compare(tmpArg, ZERO) != 0) {
-                        myValue = PrimitiveFunction.MIN.invoke(myValue, tmpArg);
+                        myValue = PrimitiveMath.MIN.invoke(myValue, tmpArg);
                     }
                 }
 
@@ -401,6 +440,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Double>> SUM = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -434,6 +477,10 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Double>> SUM2 = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override

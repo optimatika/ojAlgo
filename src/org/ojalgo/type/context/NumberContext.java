@@ -30,11 +30,10 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.format.NumberStyle;
 
 /**
@@ -204,7 +203,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
     }
 
     private static boolean isZero(final double value, final double tolerance) {
-        return (PrimitiveFunction.ABS.invoke(value) <= tolerance);
+        return (PrimitiveMath.ABS.invoke(value) <= tolerance);
     }
 
     private final double myEpsilon;
@@ -236,7 +235,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         myMathContext = new MathContext(precision, mode);
 
         if (precision > 0) {
-            myEpsilon = PrimitiveFunction.MAX.invoke(PrimitiveMath.MACHINE_EPSILON, PrimitiveFunction.POW.invoke(PrimitiveMath.TEN, 1 - precision));
+            myEpsilon = PrimitiveMath.MAX.invoke(PrimitiveMath.MACHINE_EPSILON, PrimitiveMath.POW.invoke(PrimitiveMath.TEN, 1 - precision));
         } else {
             myEpsilon = PrimitiveMath.MACHINE_EPSILON;
         }
@@ -244,9 +243,9 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         myScale = scale;
 
         if (scale > Integer.MIN_VALUE) {
-            myZeroError = PrimitiveFunction.MAX.invoke(PrimitiveMath.MACHINE_SMALLEST,
-                    PrimitiveMath.HALF * PrimitiveFunction.POW.invoke(PrimitiveMath.TEN, -scale));
-            myRoundingFactor = PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, scale);
+            myZeroError = PrimitiveMath.MAX.invoke(PrimitiveMath.MACHINE_SMALLEST,
+                    PrimitiveMath.HALF * PrimitiveMath.POW.invoke(PrimitiveMath.TEN, -scale));
+            myRoundingFactor = PrimitiveMath.POWER.invoke(PrimitiveMath.TEN, scale);
         } else {
             myZeroError = PrimitiveMath.MACHINE_SMALLEST;
             myRoundingFactor = PrimitiveMath.ONE;
@@ -284,7 +283,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
      * {@linkplain StrictMath#rint(double)}.
      */
     public double enforce(final double number) {
-        return PrimitiveFunction.RINT.invoke(myRoundingFactor * number) / myRoundingFactor;
+        return PrimitiveMath.RINT.invoke(myRoundingFactor * number) / myRoundingFactor;
     }
 
     @Override
@@ -397,7 +396,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
     }
 
     public boolean isSmall(final double comparedTo, final double value) {
-        final double tmpComparedTo = PrimitiveFunction.ABS.invoke(comparedTo);
+        final double tmpComparedTo = PrimitiveMath.ABS.invoke(comparedTo);
         if (NumberContext.isZero(tmpComparedTo, myZeroError)) {
             return NumberContext.isZero(value, myZeroError);
         } else {
@@ -545,7 +544,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
 
             final DecimalFormat tmpDF = (DecimalFormat) format;
 
-            final int tmpModScale = myScale - (int) PrimitiveFunction.LOG10.invoke(tmpDF.getMultiplier());
+            final int tmpModScale = myScale - (int) PrimitiveMath.LOG10.invoke(tmpDF.getMultiplier());
 
             tmpDF.setMaximumFractionDigits(tmpModScale);
             tmpDF.setMinimumFractionDigits(Math.min(2, tmpModScale));

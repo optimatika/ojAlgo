@@ -29,7 +29,7 @@ import java.time.temporal.TemporalUnit;
 import java.util.Collections;
 import java.util.List;
 
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * <p>

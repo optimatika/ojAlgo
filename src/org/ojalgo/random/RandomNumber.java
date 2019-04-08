@@ -21,12 +21,12 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Random;
 
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * RandomNumber
@@ -60,7 +60,7 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
      * @see org.ojalgo.random.Distribution#getVariance()
      */
     public double getStandardDeviation() {
-        return PrimitiveFunction.SQRT.invoke(this.getVariance());
+        return PrimitiveMath.SQRT.invoke(this.getVariance());
     }
 
     /**

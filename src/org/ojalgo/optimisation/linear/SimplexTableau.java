@@ -21,8 +21,7 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.array.Array1D;
@@ -33,10 +32,9 @@ import org.ojalgo.array.Raw1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.blas.AXPY;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -144,11 +142,11 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             double pivotElement = pivotBody.doubleValue(pivotCol);
 
-            if (PrimitiveFunction.ABS.invoke(pivotElement) < ONE) {
-                final UnaryFunction<Double> tmpModifier = DIVIDE.second(pivotElement);
+            if (PrimitiveMath.ABS.invoke(pivotElement) < ONE) {
+                final UnaryFunction<Double> tmpModifier = PrimitiveMath.DIVIDE.second(pivotElement);
                 pivotBody.modifyAll(tmpModifier);
             } else if (pivotElement != ONE) {
-                final UnaryFunction<Double> tmpModifier = MULTIPLY.second(ONE / pivotElement);
+                final UnaryFunction<Double> tmpModifier = PrimitiveMath.MULTIPLY.second(ONE / pivotElement);
                 pivotBody.modifyAll(tmpModifier);
             }
 
@@ -233,10 +231,10 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             final int col = iterationPoint.col;
 
             final double pivotElement = myTransposed.doubleValue(col, row);
-            if (PrimitiveFunction.ABS.invoke(pivotElement) < ONE) {
-                myTransposed.modifyColumn(0, row, DIVIDE.second(pivotElement));
+            if (PrimitiveMath.ABS.invoke(pivotElement) < ONE) {
+                myTransposed.modifyColumn(0, row, PrimitiveMath.DIVIDE.second(pivotElement));
             } else if (pivotElement != ONE) {
-                myTransposed.modifyColumn(0, row, MULTIPLY.second(ONE / pivotElement));
+                myTransposed.modifyColumn(0, row, PrimitiveMath.MULTIPLY.second(ONE / pivotElement));
             }
 
             int structure = (int) myTransposed.countRows();
@@ -579,12 +577,12 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             double pivotElement = pivotBody.doubleValue(pivotCol);
 
-            if (PrimitiveFunction.ABS.invoke(pivotElement) < ONE) {
-                final UnaryFunction<Double> tmpModifier = DIVIDE.second(pivotElement);
+            if (PrimitiveMath.ABS.invoke(pivotElement) < ONE) {
+                final UnaryFunction<Double> tmpModifier = PrimitiveMath.DIVIDE.second(pivotElement);
                 pivotBody.modifyAll(tmpModifier);
                 return tmpModifier.invoke(pivotRHS);
             } else if (pivotElement != ONE) {
-                final UnaryFunction<Double> tmpModifier = MULTIPLY.second(ONE / pivotElement);
+                final UnaryFunction<Double> tmpModifier = PrimitiveMath.MULTIPLY.second(ONE / pivotElement);
                 pivotBody.modifyAll(tmpModifier);
                 return tmpModifier.invoke(pivotRHS);
             } else {

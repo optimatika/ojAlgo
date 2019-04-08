@@ -24,9 +24,8 @@ package org.ojalgo.scalar;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.function.BigFunction;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -65,8 +64,10 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
 
     };
 
-    public static final BigScalar ONE = new BigScalar(BigMath.ONE);
-    public static final BigScalar ZERO = new BigScalar();
+    public static final BigScalar NEG = new BigScalar(BigDecimal.ONE.negate());
+    public static final BigScalar ONE = new BigScalar(BigDecimal.ONE);
+    public static final BigScalar TWO = new BigScalar(BigDecimal.ONE.add(BigDecimal.ONE));
+    public static final BigScalar ZERO = new BigScalar(BigDecimal.ZERO);
 
     static final NumberContext CONTEXT = NumberContext.getMath(MathContext.DECIMAL128);
 
@@ -228,11 +229,11 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
     }
 
     public double norm() {
-        return PrimitiveFunction.ABS.invoke(myNumber.doubleValue());
+        return PrimitiveMath.ABS.invoke(myNumber.doubleValue());
     }
 
     public BigScalar signum() {
-        return new BigScalar(BigFunction.SIGNUM.invoke(myNumber));
+        return new BigScalar(BigMath.SIGNUM.invoke(myNumber));
     }
 
     public BigScalar subtract(final BigDecimal arg) {

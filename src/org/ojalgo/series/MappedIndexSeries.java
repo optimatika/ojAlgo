@@ -31,8 +31,8 @@ import java.util.UUID;
 
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.LongToNumberMap;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.structure.Structure1D;

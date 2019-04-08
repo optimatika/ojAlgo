@@ -21,11 +21,11 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 
 /**
@@ -40,7 +40,7 @@ public class QuantileTest extends RandomTests {
 
         for (int e = -2; e <= 2; e++) {
 
-            final Exponential tmpDistribution = new Exponential(PrimitiveFunction.POW.invoke(TEN, e));
+            final Exponential tmpDistribution = new Exponential(PrimitiveMath.POW.invoke(TEN, e));
 
             this.doTest(tmpDistribution);
         }
@@ -53,7 +53,7 @@ public class QuantileTest extends RandomTests {
 
             for (int s = -2; s <= 2; s++) {
 
-                final LogNormal tmpDistribution = new LogNormal(PrimitiveFunction.POW.invoke(TEN, m), PrimitiveFunction.POW.invoke(TEN, s));
+                final LogNormal tmpDistribution = new LogNormal(PrimitiveMath.POW.invoke(TEN, m), PrimitiveMath.POW.invoke(TEN, s));
 
                 this.doTest(tmpDistribution);
             }
@@ -67,7 +67,7 @@ public class QuantileTest extends RandomTests {
 
             for (int s = -2; s <= 2; s++) {
 
-                final Normal tmpDistribution = new Normal(PrimitiveFunction.POW.invoke(TEN, m), PrimitiveFunction.POW.invoke(TEN, s));
+                final Normal tmpDistribution = new Normal(PrimitiveMath.POW.invoke(TEN, m), PrimitiveMath.POW.invoke(TEN, s));
 
                 this.doTest(tmpDistribution);
             }
@@ -81,7 +81,7 @@ public class QuantileTest extends RandomTests {
 
             for (int s = -2; s <= 2; s++) {
 
-                final Uniform tmpDistribution = new Uniform(PrimitiveFunction.POW.invoke(TEN, m), PrimitiveFunction.POW.invoke(TEN, s));
+                final Uniform tmpDistribution = new Uniform(PrimitiveMath.POW.invoke(TEN, m), PrimitiveMath.POW.invoke(TEN, s));
 
                 this.doTest(tmpDistribution);
             }

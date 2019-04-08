@@ -24,7 +24,7 @@ package org.ojalgo.function.polynomial;
 import java.math.BigDecimal;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.constant.BigMath;
+import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;

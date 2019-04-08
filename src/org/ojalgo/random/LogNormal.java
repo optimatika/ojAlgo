@@ -21,10 +21,10 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access1D;
 
 /**
@@ -46,7 +46,7 @@ public class LogNormal extends AbstractContinuous {
         final Array1D<Double> tmpLogSamples = Array1D.PRIMITIVE64.makeZero(tmpSize);
 
         for (int i = 0; i < tmpSize; i++) {
-            tmpLogSamples.set(i, PrimitiveFunction.LOG.invoke(rawSamples.doubleValue(i)));
+            tmpLogSamples.set(i, PrimitiveMath.LOG.invoke(rawSamples.doubleValue(i)));
         }
 
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpLogSamples);
@@ -56,10 +56,10 @@ public class LogNormal extends AbstractContinuous {
 
     public static LogNormal make(final double aExpected, final double aVariance) {
 
-        final double tmpVar = PrimitiveFunction.LOG1P.invoke(aVariance / (aExpected * aExpected));
+        final double tmpVar = PrimitiveMath.LOG1P.invoke(aVariance / (aExpected * aExpected));
 
-        final double tmpMean = PrimitiveFunction.LOG.invoke(aExpected) - (HALF * tmpVar);
-        final double tmpStdDev = PrimitiveFunction.SQRT.invoke(tmpVar);
+        final double tmpMean = PrimitiveMath.LOG.invoke(aExpected) - (HALF * tmpVar);
+        final double tmpStdDev = PrimitiveMath.SQRT.invoke(tmpVar);
 
         return new LogNormal(tmpMean, tmpStdDev);
     }
@@ -82,39 +82,39 @@ public class LogNormal extends AbstractContinuous {
     }
 
     public double getDensity(final double value) {
-        return myNormal.getDensity(PrimitiveFunction.LOG.invoke(value)) / value;
+        return myNormal.getDensity(PrimitiveMath.LOG.invoke(value)) / value;
     }
 
     public double getDistribution(final double value) {
-        return myNormal.getDistribution(PrimitiveFunction.LOG.invoke(value));
+        return myNormal.getDistribution(PrimitiveMath.LOG.invoke(value));
     }
 
     public double getExpected() {
-        return PrimitiveFunction.EXP.invoke(myNormal.getExpected() + (myNormal.getVariance() * HALF));
+        return PrimitiveMath.EXP.invoke(myNormal.getExpected() + (myNormal.getVariance() * HALF));
     }
 
     /**
      * The geometric mean is also the median
      */
     public double getGeometricMean() {
-        return PrimitiveFunction.EXP.invoke(myNormal.getExpected());
+        return PrimitiveMath.EXP.invoke(myNormal.getExpected());
     }
 
     public double getGeometricStandardDeviation() {
-        return PrimitiveFunction.EXP.invoke(myNormal.getStandardDeviation());
+        return PrimitiveMath.EXP.invoke(myNormal.getStandardDeviation());
     }
 
     public double getQuantile(final double probability) {
 
         this.checkProbabilty(probability);
 
-        return PrimitiveFunction.EXP.invoke(myNormal.getQuantile(probability));
+        return PrimitiveMath.EXP.invoke(myNormal.getQuantile(probability));
     }
 
     @Override
     public double getVariance() {
         final double tmpVariance = myNormal.getVariance();
-        return PrimitiveFunction.EXPM1.invoke(tmpVariance) * PrimitiveFunction.EXP.invoke((TWO * myNormal.getExpected()) + tmpVariance);
+        return PrimitiveMath.EXPM1.invoke(tmpVariance) * PrimitiveMath.EXP.invoke((TWO * myNormal.getExpected()) + tmpVariance);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class LogNormal extends AbstractContinuous {
 
     @Override
     protected double generate() {
-        return PrimitiveFunction.EXP.invoke(myNormal.generate());
+        return PrimitiveMath.EXP.invoke(myNormal.generate());
     }
 
 }

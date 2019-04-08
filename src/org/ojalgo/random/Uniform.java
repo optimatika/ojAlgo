@@ -21,9 +21,9 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * Certain waiting times. Rounding errors.
@@ -38,7 +38,7 @@ public class Uniform extends AbstractContinuous {
      * @return An integer: 0 &lt;= ? &lt; limit
      */
     public static int randomInteger(final int limit) {
-        return (int) PrimitiveFunction.FLOOR.invoke(limit * Math.random());
+        return (int) PrimitiveMath.FLOOR.invoke(limit * Math.random());
     }
 
     /**
@@ -52,7 +52,7 @@ public class Uniform extends AbstractContinuous {
      * @return An integer: 0 &lt;= ? &lt; limit
      */
     public static long randomInteger(final long limit) {
-        return (long) PrimitiveFunction.FLOOR.invoke(limit * Math.random());
+        return (long) PrimitiveMath.FLOOR.invoke(limit * Math.random());
     }
 
     private final double myLower;

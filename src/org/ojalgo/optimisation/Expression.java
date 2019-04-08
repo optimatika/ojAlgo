@@ -33,12 +33,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.ConstantFunction;
 import org.ojalgo.function.multiary.LinearFunction;
@@ -298,7 +297,7 @@ public final class Expression extends ModelEntity<Expression> {
 
         final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(myModel.countVariables(), 1);
 
-        final BinaryFunction<Double> tmpBaseFunc = PrimitiveFunction.ADD;
+        final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         double tmpAdjustedFactor;
         UnaryFunction<Double> tmpModFunc;
         for (final IntRowColumn tmpKey : this.getQuadraticKeySet()) {
@@ -323,7 +322,7 @@ public final class Expression extends ModelEntity<Expression> {
         final int tmpCountVariables = myModel.countVariables();
         final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpCountVariables, tmpCountVariables);
 
-        final BinaryFunction<Double> tmpBaseFunc = PrimitiveFunction.ADD;
+        final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         UnaryFunction<Double> tmpModFunc;
         for (final IntRowColumn tmpKey : this.getQuadraticKeySet()) {
             tmpModFunc = tmpBaseFunc.second(this.getAdjustedQuadraticFactor(tmpKey));
@@ -753,19 +752,19 @@ public final class Expression extends ModelEntity<Expression> {
                 BigDecimal posFracCoeff = this.toPositiveFraction(coeff);
 
                 if (posFracCoeff.compareTo(posFracLevel) <= 0) {
-                    retVal.set(variable, BigFunction.DIVIDE.invoke(posFracCoeff, posFracLevel));
+                    retVal.set(variable, BigMath.DIVIDE.invoke(posFracCoeff, posFracLevel));
                 } else {
                     BigDecimal cmpFracCoeff = BigMath.ONE.subtract(posFracCoeff);
-                    retVal.set(variable, BigFunction.DIVIDE.invoke(cmpFracCoeff, cmpFracLevel));
+                    retVal.set(variable, BigMath.DIVIDE.invoke(cmpFracCoeff, cmpFracLevel));
                 }
 
             } else {
 
                 if (coeff.signum() == 1) {
-                    retVal.set(variable, BigFunction.DIVIDE.invoke(coeff, posFracLevel));
+                    retVal.set(variable, BigMath.DIVIDE.invoke(coeff, posFracLevel));
                 } else if (coeff.signum() == -1) {
                     BigDecimal negCoeff = coeff.negate();
-                    retVal.set(variable, BigFunction.DIVIDE.invoke(negCoeff, cmpFracLevel));
+                    retVal.set(variable, BigMath.DIVIDE.invoke(negCoeff, cmpFracLevel));
                 }
             }
         }
