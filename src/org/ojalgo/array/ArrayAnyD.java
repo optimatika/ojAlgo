@@ -42,15 +42,16 @@ import org.ojalgo.structure.AccessAnyD;
 import org.ojalgo.structure.FactoryAnyD;
 import org.ojalgo.structure.MutateAnyD;
 import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.structure.TransformationAnyD;
 
 /**
  * ArrayAnyD
  *
  * @author apete
  */
-public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, AccessAnyD.Visitable<N>,
-        AccessAnyD.Aggregatable<N>, StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, AccessAnyD.Sliceable<N>,
-        MutateAnyD.ModifiableReceiver<N>, MutateAnyD.Mixable<N> {
+public final class ArrayAnyD<N extends Number>
+        implements AccessAnyD<N>, AccessAnyD.Visitable<N>, AccessAnyD.Aggregatable<N>, AccessAnyD.Sliceable<N>, AccessAnyD.Elements, AccessAnyD.IndexOf,
+        StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, MutateAnyD.Transformable<N>, MutateAnyD.Mixable<N> {
 
     public static final class Factory<N extends Number> implements FactoryAnyD<ArrayAnyD<N>> {
 
@@ -61,29 +62,29 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
             myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
-        public final ArrayAnyD<N> copy(final AccessAnyD<?> source) {
+        public ArrayAnyD<N> copy(final AccessAnyD<?> source) {
             return myDelegate.copy(source).wrapInArrayAnyD(source.shape());
         }
 
         @Override
-        public final FunctionSet<N> function() {
+        public FunctionSet<N> function() {
             return myDelegate.function();
         }
 
-        public final ArrayAnyD<N> makeFilled(final long[] structure, final NullaryFunction<?> supplier) {
+        public ArrayAnyD<N> makeFilled(final long[] structure, final NullaryFunction<?> supplier) {
             return myDelegate.makeFilled(StructureAnyD.count(structure), supplier).wrapInArrayAnyD(structure);
         }
 
-        public final ArrayAnyD<N> makeSparse(final long... structure) {
+        public ArrayAnyD<N> makeSparse(final long... structure) {
             return myDelegate.makeStructuredZero(structure).wrapInArrayAnyD(structure);
         }
 
-        public final ArrayAnyD<N> makeZero(final long... structure) {
+        public ArrayAnyD<N> makeZero(final long... structure) {
             return myDelegate.makeToBeFilled(structure).wrapInArrayAnyD(structure);
         }
 
         @Override
-        public final Scalar.Factory<N> scalar() {
+        public Scalar.Factory<N> scalar() {
             return myDelegate.scalar();
         }
 
@@ -448,6 +449,10 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         return retVal.toString();
     }
 
+    public void transform(TransformationAnyD<N> transformation) {
+        transformation.transform(this);
+    }
+
     public void visitAll(final VoidFunction<N> visitor) {
         myDelegate.visit(0L, this.count(), 1L, visitor);
     }
@@ -472,7 +477,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         this.loop(initial, dimension, (f, l, s) -> myDelegate.visit(f, l, s, visitor));
     }
 
-    final BasicArray<N> getDelegate() {
+    BasicArray<N> getDelegate() {
         return myDelegate;
     }
 

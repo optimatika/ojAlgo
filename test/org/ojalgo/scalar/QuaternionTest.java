@@ -275,7 +275,7 @@ public class QuaternionTest extends ScalarTests {
         TestUtils.assertEquals(vctrResult, quatResult.vector());
 
         final PhysicalStore<Double> vector = randomPureQuat.vector();
-        vector.transform(normalizedRandomRotation);
+        normalizedRandomRotation.transform(vector);
 
         TestUtils.assertEquals(vctrResult, vector);
     }

@@ -31,8 +31,8 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * 1-dimensional accessor (get) methods. The nested interfaces declare additional methods that indirectly
- * requires that the elements has been accessed, but they do not extends the main/outer interface. A
+ * 1-dimensional accessor (get) methods. The nested interfaces declare additional methods that implicitly
+ * require that the elements have been accessed, but they do not extends the main/outer interface. A
  * 1D-structure can be vistiable, aggregatable and/or expose various element properties without allowing
  * explicit access to its elements.
  *
@@ -71,20 +71,27 @@ public interface Access1D<N extends Number> extends Structure1D {
 
     }
 
+    /**
+     * @deprecated v48 Will be removed
+     */
+    @Deprecated
     public interface Elements extends Structure1D {
 
         /**
          * @see Scalar#isAbsolute()
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         boolean isAbsolute(long index);
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         default boolean isAllSmall(final double comparedTo) {
             boolean retVal = true;
-            final long tmpLimit = this.count();
-            for (long i = 0L; retVal && (i < tmpLimit); i++) {
+            for (long i = 0L, limit = this.count(); retVal && (i < limit); i++) {
                 retVal &= this.isSmall(i, comparedTo);
             }
             return retVal;
@@ -92,7 +99,9 @@ public interface Access1D<N extends Number> extends Structure1D {
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         boolean isSmall(long index, double comparedTo);
 
     }
@@ -177,12 +186,24 @@ public interface Access1D<N extends Number> extends Structure1D {
 
     }
 
+    /**
+     * @deprecated v48 Will be removed
+     */
+    @Deprecated
     public interface IndexOf extends Structure1D {
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         default long indexOfLargest() {
             return this.indexOfLargestInRange(0L, this.count());
         }
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         long indexOfLargestInRange(final long first, final long limit);
 
     }

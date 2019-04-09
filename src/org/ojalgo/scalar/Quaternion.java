@@ -29,14 +29,15 @@ import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
+import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>,
-        TransformationMatrix<Double, PhysicalStore<Double>>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+public class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, Transformation2D<Double>,
+        Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public enum RotationAxis {
 
@@ -127,7 +128,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         }
 
         @Override
-        public void transform(final PhysicalStore<Double> matrix) {
+        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
 
             final double s = this.doubleValue();
 
@@ -158,40 +159,40 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
             final double r21 = 2.0 * (tmp1 + tmp2);
             final double r12 = 2.0 * (tmp1 - tmp2);
 
-            if (matrix.count() == 3L) {
+            if (transformable.count() == 3L) {
 
-                final double x = matrix.doubleValue(0);
-                final double y = matrix.doubleValue(1);
-                final double z = matrix.doubleValue(2);
+                final double x = transformable.doubleValue(0);
+                final double y = transformable.doubleValue(1);
+                final double z = transformable.doubleValue(2);
 
-                matrix.set(0, (r00 * x) + (r01 * y) + (r02 * z));
-                matrix.set(1, (r10 * x) + (r11 * y) + (r12 * z));
-                matrix.set(2, (r20 * x) + (r21 * y) + (r22 * z));
+                transformable.set(0, (r00 * x) + (r01 * y) + (r02 * z));
+                transformable.set(1, (r10 * x) + (r11 * y) + (r12 * z));
+                transformable.set(2, (r20 * x) + (r21 * y) + (r22 * z));
 
-            } else if (matrix.countRows() == 3L) {
+            } else if (transformable.countRows() == 3L) {
 
-                for (long c = 0L, limit = matrix.countColumns(); c < limit; c++) {
+                for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
 
-                    final double x = matrix.doubleValue(0, c);
-                    final double y = matrix.doubleValue(1, c);
-                    final double z = matrix.doubleValue(2, c);
+                    final double x = transformable.doubleValue(0, c);
+                    final double y = transformable.doubleValue(1, c);
+                    final double z = transformable.doubleValue(2, c);
 
-                    matrix.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
-                    matrix.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
-                    matrix.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
+                    transformable.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
+                    transformable.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
+                    transformable.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
                 }
 
-            } else if (matrix.countColumns() == 3L) {
+            } else if (transformable.countColumns() == 3L) {
 
-                for (long r = 0L, limit = matrix.countRows(); r < limit; r++) {
+                for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
 
-                    final double x = matrix.doubleValue(r, 0);
-                    final double y = matrix.doubleValue(r, 1);
-                    final double z = matrix.doubleValue(r, 2);
+                    final double x = transformable.doubleValue(r, 0);
+                    final double y = transformable.doubleValue(r, 1);
+                    final double z = transformable.doubleValue(r, 2);
 
-                    matrix.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
-                    matrix.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
-                    matrix.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
+                    transformable.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
+                    transformable.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
+                    transformable.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
                 }
 
             } else {
@@ -1028,7 +1029,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         return retVal.toString();
     }
 
-    public void transform(final PhysicalStore<Double> matrix) {
+    public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
 
         final double s = myScalar;
 
@@ -1061,40 +1062,40 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         final double r21 = 2.0 * (tmp1 + tmp2) * invs;
         final double r12 = 2.0 * (tmp1 - tmp2) * invs;
 
-        if (matrix.count() == 3L) {
+        if (transformable.count() == 3L) {
 
-            final double x = matrix.doubleValue(0);
-            final double y = matrix.doubleValue(1);
-            final double z = matrix.doubleValue(2);
+            final double x = transformable.doubleValue(0);
+            final double y = transformable.doubleValue(1);
+            final double z = transformable.doubleValue(2);
 
-            matrix.set(0, (r00 * x) + (r01 * y) + (r02 * z));
-            matrix.set(1, (r10 * x) + (r11 * y) + (r12 * z));
-            matrix.set(2, (r20 * x) + (r21 * y) + (r22 * z));
+            transformable.set(0, (r00 * x) + (r01 * y) + (r02 * z));
+            transformable.set(1, (r10 * x) + (r11 * y) + (r12 * z));
+            transformable.set(2, (r20 * x) + (r21 * y) + (r22 * z));
 
-        } else if (matrix.countRows() == 3L) {
+        } else if (transformable.countRows() == 3L) {
 
-            for (long c = 0L, limit = matrix.countColumns(); c < limit; c++) {
+            for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
 
-                final double x = matrix.doubleValue(0, c);
-                final double y = matrix.doubleValue(1, c);
-                final double z = matrix.doubleValue(2, c);
+                final double x = transformable.doubleValue(0, c);
+                final double y = transformable.doubleValue(1, c);
+                final double z = transformable.doubleValue(2, c);
 
-                matrix.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
-                matrix.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
-                matrix.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
+                transformable.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
+                transformable.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
+                transformable.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
             }
 
-        } else if (matrix.countColumns() == 3L) {
+        } else if (transformable.countColumns() == 3L) {
 
-            for (long r = 0L, limit = matrix.countRows(); r < limit; r++) {
+            for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
 
-                final double x = matrix.doubleValue(r, 0);
-                final double y = matrix.doubleValue(r, 1);
-                final double z = matrix.doubleValue(r, 2);
+                final double x = transformable.doubleValue(r, 0);
+                final double y = transformable.doubleValue(r, 1);
+                final double z = transformable.doubleValue(r, 2);
 
-                matrix.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
-                matrix.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
-                matrix.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
+                transformable.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
+                transformable.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
+                transformable.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
             }
 
         } else {

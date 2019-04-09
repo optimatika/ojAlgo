@@ -70,23 +70,23 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class PrimitiveDenseStore extends Primitive64Array implements PhysicalStore<Double>, DecompositionStore<Double> {
 
-    public static interface PrimitiveMultiplyBoth extends ElementsConsumer.FillByMultiplying<Double> {
+    public interface PrimitiveMultiplyBoth extends ElementsConsumer.FillByMultiplying<Double> {
 
     }
 
-    public static interface PrimitiveMultiplyLeft {
+    public interface PrimitiveMultiplyLeft {
 
         void invoke(double[] product, Access1D<?> left, int complexity, double[] right);
 
     }
 
-    public static interface PrimitiveMultiplyNeither {
+    public interface PrimitiveMultiplyNeither {
 
         void invoke(double[] product, double[] left, int complexity, double[] right);
 
     }
 
-    public static interface PrimitiveMultiplyRight {
+    public interface PrimitiveMultiplyRight {
 
         void invoke(double[] product, double[] left, int complexity, Access1D<?> right);
 
@@ -900,7 +900,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Primitive) destination);
     }
 
-    public final MatrixStore<Double> get() {
+    public MatrixStore<Double> get() {
         return this;
     }
 
@@ -1035,23 +1035,23 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return FACTORY;
     }
 
-    public final ElementsConsumer<Double> regionByColumns(final int... columns) {
+    public ElementsConsumer<Double> regionByColumns(final int... columns) {
         return new ElementsConsumer.ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
-    public final ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
+    public ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
         return new ElementsConsumer.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
-    public final ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
+    public ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
         return new ElementsConsumer.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
-    public final ElementsConsumer<Double> regionByRows(final int... rows) {
+    public ElementsConsumer<Double> regionByRows(final int... rows) {
         return new ElementsConsumer.RowsRegion<>(this, multiplyBoth, rows);
     }
 
-    public final ElementsConsumer<Double> regionByTransposing() {
+    public ElementsConsumer<Double> regionByTransposing() {
         return new ElementsConsumer.TransposedRegion<>(this, multiplyBoth);
     }
 

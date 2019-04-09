@@ -39,6 +39,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.structure.Transformation2D;
 
 /**
  * MatrixFactory creates instances of classes that implement the {@linkplain org.ojalgo.matrix.BasicMatrix}
@@ -743,6 +744,14 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
 
         public void supplyTo(PhysicalStore<N> receiver) {
             myDelegate.supplyTo(receiver);
+        }
+
+        public void transform(Transformation2D<N> transformation) {
+            if (mySafe) {
+                transformation.transform(myDelegate);
+            } else {
+                throw new IllegalStateException();
+            }
         }
     }
 

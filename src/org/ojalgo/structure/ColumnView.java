@@ -53,6 +53,10 @@ public class ColumnView<N extends Number>
         this(access, -1L, access.countColumns() - 1L);
     }
 
+    ColumnView(final Access2D<N> access, final long column) {
+        this(access, column, access.countColumns() - 1L);
+    }
+
     public int characteristics() {
         return CHARACTERISTICS;
     }

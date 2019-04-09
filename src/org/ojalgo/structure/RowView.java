@@ -52,6 +52,10 @@ public class RowView<N extends Number> implements Access1D<N>, Iterable<RowView<
         this(access, -1L, access.countRows() - 1L);
     }
 
+    RowView(final Access2D<N> access, final long row) {
+        this(access, row, access.countRows() - 1L);
+    }
+
     public int characteristics() {
         return CHARACTERISTICS;
     }

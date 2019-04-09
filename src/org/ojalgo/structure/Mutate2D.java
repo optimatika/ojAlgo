@@ -238,6 +238,12 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     }
 
+    interface Transformable<N extends Number> extends ModifiableReceiver<N> {
+
+        void transform(Transformation2D<N> transformation);
+
+    }
+
     default void add(final long index, final double addend) {
         final long tmpStructure = this.countRows();
         this.add(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), addend);

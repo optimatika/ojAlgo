@@ -83,8 +83,16 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
+    /**
+     * @deprecated v48 Will be removed
+     */
+    @Deprecated
     public interface Elements extends Structure2D, Access1D.Elements {
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         default boolean isAbsolute(final long index) {
             final long tmpStructure = this.countRows();
             return this.isAbsolute(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure));
@@ -92,19 +100,25 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         /**
          * @see Scalar#isAbsolute()
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         boolean isAbsolute(long row, long col);
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         default boolean isColumnSmall(final long col, final double comparedTo) {
             return this.isColumnSmall(0L, col, comparedTo);
         }
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         default boolean isColumnSmall(final long row, final long col, final double comparedTo) {
             boolean retVal = true;
             final long tmpLimit = this.countRows();
@@ -116,14 +130,18 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         default boolean isRowSmall(final long row, final double comparedTo) {
             return this.isRowSmall(row, 0L, comparedTo);
         }
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         default boolean isRowSmall(final long row, final long col, final double comparedTo) {
             boolean retVal = true;
             final long tmpLimit = this.countColumns();
@@ -133,6 +151,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             return retVal;
         }
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         default boolean isSmall(final long index, final double comparedTo) {
             final long tmpStructure = this.countRows();
             return this.isSmall(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), comparedTo);
@@ -140,7 +162,9 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         boolean isSmall(long row, long col, double comparedTo);
 
     }
@@ -225,8 +249,16 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
+    /**
+     * @deprecated v48 Will be removed
+     */
+    @Deprecated
     public interface IndexOf extends Structure2D, Access1D.IndexOf {
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         default long indexOfLargestInColumn(final long col) {
             return this.indexOfLargestInColumn(0L, col);
         }
@@ -235,9 +267,15 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
          * @param row First row to investigate
          * @param col The column
          * @return The row-index of the largest absolute value in a column, starting at the specified row.
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         long indexOfLargestInColumn(final long row, final long col);
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         default long indexOfLargestInRow(final long row) {
             return this.indexOfLargestInRow(row, 0L);
         }
@@ -246,9 +284,15 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
          * @param row The row
          * @param col The first column to investigate
          * @return The column-index of the largest absolute value in a row, starting at the specified column.
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         long indexOfLargestInRow(final long row, final long col);
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         default long indexOfLargestOnDiagonal() {
             return this.indexOfLargestOnDiagonal(0L);
         }
@@ -257,7 +301,9 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
          * @param first The first row/column to investigate
          * @return The row/column-index of the largest absolute value on the main diagonal, starting at the
          *         specified row/column.
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         long indexOfLargestOnDiagonal(final long first);
 
     }
@@ -266,6 +312,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         default Access1D<N> sliceColumn(final long col) {
             return this.sliceColumn(0L, col);
+            // return new ColumnView<N>(this, col);
         }
 
         Access1D<N> sliceColumn(long row, long col);

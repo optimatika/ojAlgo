@@ -28,13 +28,13 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.structure.Transformation2D;
 
 /**
  * <p>
@@ -47,10 +47,9 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Number>
-        extends MatrixStore<N>, Access2D.IndexOf, ElementsConsumer<N>, Mutate2D.Exchangeable, TransformationMatrix.Transformable<N> {
+public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2D.Elements, Access2D.IndexOf, ElementsConsumer<N>, Mutate2D.Exchangeable {
 
-    public static interface Factory<N extends Number, I extends PhysicalStore<N>> extends Factory2D<I> {
+    public interface Factory<N extends Number, I extends PhysicalStore<N>> extends Factory2D<I> {
 
         AggregatorSet<N> aggregator();
 
@@ -143,6 +142,10 @@ public interface PhysicalStore<N extends Number>
      * @param conjugated TODO
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
+
+    default void transform(Transformation2D<N> transformation) {
+        transformation.transform(this);
+    }
 
     void transformLeft(Householder<N> transformation, int firstColumn);
 

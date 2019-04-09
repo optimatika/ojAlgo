@@ -28,7 +28,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
-public abstract class Rotation<N extends Number> implements TransformationMatrix<N, PhysicalStore<N>> {
+public abstract class Rotation<N extends Number> {
 
     public static final class Generic<N extends Number & Scalar<N>> extends Rotation<N> {
 
