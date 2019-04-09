@@ -8,6 +8,10 @@
 
 * Everything in this package has been moved to org.ojalgo.function.constant
 
+## org.ojalgo.data
+
+* New package that currently only contains an (also new) class DataPreprocessors. The intention is that this is where various data preprocessors utilities will go.
+
 ## org.ojalgo.function
 
 * New package org.ojalgo.function.special with currently 4 new classes: CombinatorialFunctions, ErrorFunction, GammaFunction and MissingMath.
@@ -18,6 +22,7 @@
 
 * Fixed a problem with one of the Eigenvalue implementations - it would check for symmetric/hermitian but then failed to make use of the results.
 * Fixed a problem with some of the Eigenvalue implementations regarding ordering of the eigenvales/eigenvectors – they were not always ordered in descending absolut order (used to consider the sign).
+* The interface TransformationMatrix has been removed. Partly this functionality has been revoked, and partially replaced by the new Transformation2D interface.
 
 ## org.ojalgo.optimisation
 
@@ -38,6 +43,12 @@
 * Deprecated the RandomUtils class and moved its various methods to classes in the new org.ojalgo.function.special package.
 * For continuous distributions the getProbability methods has been renamed getDensity.
 * Minor performance improvement to SampleSet when calling getStandardDeviation() repeatedly.
+
+## org.ojalgo.structure
+
+* New interfaces Transformation1D, Transformation2D and TransformationAnyD as well as Mutate1D.Transformable, Mutate2D.Transformable and MutateAnyD.Transformable. The Transformation?D interfaces are functional. With them you can write custom "mutators" that can be used on everything that implements the Transformable interfaces.
+* The interfaces Access1D.Elements, Access1D.IndexOf, Access2D.Elements, Access2D.IndexOf, AccessAnyD.Elements and AccessAnyD.IndexOf have been deprecated.
+
 
 ## org.ojalgo.type
 
