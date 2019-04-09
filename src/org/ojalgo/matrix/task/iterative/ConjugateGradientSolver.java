@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,12 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -72,7 +72,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         for (int r = 0; r < tmpCountRows; r++) {
             final Equation tmpRow = equations.get(r);
             double tmpVal = tmpRow.getRHS();
-            tmpNormRHS = PrimitiveFunction.HYPOT.invoke(tmpNormRHS, tmpVal);
+            tmpNormRHS = PrimitiveMath.HYPOT.invoke(tmpNormRHS, tmpVal);
             tmpVal -= tmpRow.dot(solution);
             tmpResidual.set(tmpRow.index, tmpVal);
             tmpPreconditioned.set(tmpRow.index, tmpVal / tmpRow.getPivot()); // precondition
@@ -116,15 +116,15 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             for (int r = 0; r < tmpCountRows; r++) {
                 final Equation tmpRow = equations.get(r);
                 final double tmpValue = tmpResidual.doubleValue(tmpRow.index);
-                tmpNormErr = PrimitiveFunction.HYPOT.invoke(tmpNormErr, tmpValue);
+                tmpNormErr = PrimitiveMath.HYPOT.invoke(tmpNormErr, tmpValue);
                 tmpPreconditioned.set(tmpRow.index, tmpValue / tmpRow.getPivot());
             }
 
             zr1 = tmpPreconditioned.dot(tmpResidual);
             tmpGradientCorrectionFactor = zr1 / zr0;
 
-            tmpDirection.modifyAll(PrimitiveFunction.MULTIPLY.second(tmpGradientCorrectionFactor));
-            tmpDirection.modifyMatching(PrimitiveFunction.ADD, tmpPreconditioned);
+            tmpDirection.modifyAll(PrimitiveMath.MULTIPLY.second(tmpGradientCorrectionFactor));
+            tmpDirection.modifyMatching(PrimitiveMath.ADD, tmpPreconditioned);
 
             tmpIterations++;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,12 @@
  */
 package org.ojalgo.function.aggregator;
 
-import static org.ojalgo.constant.BigMath.*;
-import static org.ojalgo.function.BigFunction.*;
+import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.BigFunction;
+import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.Scalar;
 
@@ -49,6 +48,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
     }
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> AVERAGE = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -59,7 +62,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private BigDecimal myNumber = ZERO;
 
                 public BigDecimal get() {
-                    return DIVIDE.invoke(myNumber, BigDecimal.valueOf(myCount));
+                    return BigMath.DIVIDE.invoke(myNumber, BigDecimal.valueOf(myCount));
                 }
 
                 public int intValue() {
@@ -68,7 +71,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 public void invoke(final BigDecimal anArg) {
                     myCount++;
-                    myNumber = ADD.invoke(myNumber, anArg);
+                    myNumber = BigMath.ADD.invoke(myNumber, anArg);
                 }
 
                 public boolean isMergeable() {
@@ -77,11 +80,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 public void merge(final BigDecimal result) {
                     ProgrammingError.throwForIllegalInvocation();
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    ProgrammingError.throwForIllegalInvocation();
-                    return null;
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -94,6 +92,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> CARDINALITY = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -120,10 +122,6 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                     myCount += result.intValue();
                 }
 
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<BigDecimal> reset() {
                     myCount = 0;
                     return this;
@@ -133,6 +131,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> LARGEST = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -150,15 +152,11 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public void invoke(final BigDecimal anArg) {
-                    myNumber = BigFunction.MAX.invoke(myNumber, ABS.invoke(anArg));
+                    myNumber = BigMath.MAX.invoke(myNumber, BigMath.ABS.invoke(anArg));
                 }
 
                 public void merge(final BigDecimal result) {
                     this.invoke(result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return result1.max(result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -170,6 +168,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> MAX = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -187,15 +189,11 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public void invoke(final BigDecimal anArg) {
-                    myNumber = BigFunction.MAX.invoke(myNumber, anArg);
+                    myNumber = BigMath.MAX.invoke(myNumber, anArg);
                 }
 
                 public void merge(final BigDecimal result) {
                     this.invoke(result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return result1.max(result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -207,6 +205,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> MIN = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -228,15 +230,11 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public void invoke(final BigDecimal anArg) {
-                    myNumber = BigFunction.MIN.invoke(myNumber, anArg);
+                    myNumber = BigMath.MIN.invoke(myNumber, anArg);
                 }
 
                 public void merge(final BigDecimal result) {
                     this.invoke(result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return BigFunction.MIN.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -248,6 +246,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> NORM1 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -265,15 +267,11 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public void invoke(final BigDecimal anArg) {
-                    myNumber = ADD.invoke(myNumber, anArg.abs());
+                    myNumber = BigMath.ADD.invoke(myNumber, anArg.abs());
                 }
 
                 public void merge(final BigDecimal result) {
                     this.invoke(result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -285,6 +283,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> NORM2 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -294,7 +296,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 private BigDecimal myNumber = ZERO;
 
                 public BigDecimal get() {
-                    return SQRT.invoke(myNumber);
+                    return BigMath.SQRT.invoke(myNumber);
                 }
 
                 public int intValue() {
@@ -302,15 +304,11 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public void invoke(final BigDecimal anArg) {
-                    myNumber = ADD.invoke(myNumber, MULTIPLY.invoke(anArg, anArg));
+                    myNumber = BigMath.ADD.invoke(myNumber, BigMath.MULTIPLY.invoke(anArg, anArg));
                 }
 
                 public void merge(final BigDecimal result) {
                     this.invoke(result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return HYPOT.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -322,6 +320,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> PRODUCT = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -339,15 +341,11 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public void invoke(final BigDecimal anArg) {
-                    myNumber = MULTIPLY.invoke(myNumber, anArg);
+                    myNumber = BigMath.MULTIPLY.invoke(myNumber, anArg);
                 }
 
                 public void merge(final BigDecimal result) {
                     this.invoke(result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return MULTIPLY.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -359,6 +357,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> PRODUCT2 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -376,15 +378,11 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public void invoke(final BigDecimal anArg) {
-                    myNumber = MULTIPLY.invoke(myNumber, MULTIPLY.invoke(anArg, anArg));
+                    myNumber = BigMath.MULTIPLY.invoke(myNumber, BigMath.MULTIPLY.invoke(anArg, anArg));
                 }
 
                 public void merge(final BigDecimal result) {
-                    myNumber = MULTIPLY.invoke(myNumber, result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return MULTIPLY.invoke(result1, result2);
+                    myNumber = BigMath.MULTIPLY.invoke(myNumber, result);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -396,6 +394,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> SMALLEST = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -418,16 +420,12 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
                 public void invoke(final BigDecimal anArg) {
                     if (anArg.signum() != 0) {
-                        myNumber = BigFunction.MIN.invoke(myNumber, ABS.invoke(anArg));
+                        myNumber = BigMath.MIN.invoke(myNumber, BigMath.ABS.invoke(anArg));
                     }
                 }
 
                 public void merge(final BigDecimal result) {
                     this.invoke(result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return BigFunction.MIN.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -439,6 +437,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> SUM = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -456,15 +458,11 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public void invoke(final BigDecimal anArg) {
-                    myNumber = ADD.invoke(myNumber, anArg);
+                    myNumber = BigMath.ADD.invoke(myNumber, anArg);
                 }
 
                 public void merge(final BigDecimal result) {
                     this.invoke(result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -476,6 +474,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> SUM2 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -493,15 +495,11 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public void invoke(final BigDecimal anArg) {
-                    myNumber = ADD.invoke(myNumber, MULTIPLY.invoke(anArg, anArg));
+                    myNumber = BigMath.ADD.invoke(myNumber, BigMath.MULTIPLY.invoke(anArg, anArg));
                 }
 
                 public void merge(final BigDecimal result) {
-                    myNumber = ADD.invoke(myNumber, result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return ADD.invoke(result1, result2);
+                    myNumber = BigMath.ADD.invoke(myNumber, result);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {

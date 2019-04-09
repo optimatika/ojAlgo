@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,13 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate2D;
@@ -61,7 +61,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         Stopwatch clock = new Stopwatch();
 
-        mtrxA.operateOnMatching(MULTIPLY, mtrxB);
+        mtrxA.operateOnMatching(PrimitiveMath.MULTIPLY, mtrxB);
 
         SparsePerformance.touchNonzeros(mtrxA);
 
@@ -72,7 +72,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         clock.reset();
 
-        mtrxA.operateOnMatching(MULTIPLY, mtrxB);
+        mtrxA.operateOnMatching(PrimitiveMath.MULTIPLY, mtrxB);
 
         SparsePerformance.touchNonzeros(mtrxA);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.HermitianEvD.SimultaneousPrimitive;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -50,7 +49,10 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class ExtremeElementsCase {
 
-    static final NumberContext PRECISION = new NumberContext().newPrecision(12).newScale(148);
+    /**
+     * 146 = (308/2) - (16/2)
+     */
+    static final NumberContext PRECISION = new NumberContext(12, 146);
 
     private static void performInvertTest(final PrimitiveDenseStore original, final InverterTask<Double> task, final NumberContext context) {
 
@@ -96,7 +98,7 @@ public class ExtremeElementsCase {
 
                 // exp = 308 could potentially create numbers that are 2E308 which is larger than Double.MAX_VALUE
                 for (int exp = 0; exp < 308; exp++) {
-                    final double tmpScale = PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, large ? exp : -exp);
+                    final double tmpScale = PrimitiveMath.POWER.invoke(PrimitiveMath.TEN, large ? exp : -exp);
 
                     final PrimitiveDenseStore tmpOriginal = MatrixUtils.makeSPD(dim);
                     if (DEBUG) {
@@ -104,7 +106,7 @@ public class ExtremeElementsCase {
                         BasicLogger.debug("Original (unscaled) {}", tmpOriginal.toString());
 
                     }
-                    tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(tmpScale));
+                    tmpOriginal.modifyAll(PrimitiveMath.MULTIPLY.second(tmpScale));
 
                     ExtremeElementsCase.performInvertTest(tmpOriginal, InverterTask.PRIMITIVE.make(tmpOriginal), tmpContext);
 
@@ -132,7 +134,7 @@ public class ExtremeElementsCase {
 
                 // exp = 308 could potentially create numbers that are 2E308 which is larger than Double.MAX_VALUE
                 for (int exp = 0; exp < 308; exp++) {
-                    final double tmpScale = PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, large ? exp : -exp);
+                    final double tmpScale = PrimitiveMath.POWER.invoke(PrimitiveMath.TEN, large ? exp : -exp);
 
                     final PrimitiveDenseStore tmpBody = MatrixUtils.makeSPD(dim);
                     final PrimitiveDenseStore tmpRHS = PrimitiveDenseStore.FACTORY.makeFilled(dim, 1, new Uniform());
@@ -141,7 +143,7 @@ public class ExtremeElementsCase {
                         BasicLogger.debug("Body (unscaled) {}", tmpBody.toString());
                         BasicLogger.debug("RHS (unscaled) {}", tmpRHS.toString());
                     }
-                    final UnaryFunction<Double> tmpModifier = PrimitiveFunction.MULTIPLY.second(tmpScale);
+                    final UnaryFunction<Double> tmpModifier = PrimitiveMath.MULTIPLY.second(tmpScale);
                     tmpBody.modifyAll(tmpModifier);
                     tmpRHS.modifyAll(tmpModifier);
 
@@ -251,7 +253,7 @@ public class ExtremeElementsCase {
                         0.08840622324485663, 0.027751515547194034, 1.3573911039439759, 0.2885504830370714 },
                 { 0.3946701200769135, 0.6971828004646068, 0.5104204536764679, 0.528012240705021, 0.5336077726660703, 0.7746238203382216, 0.19971798116519177,
                         0.06269328624082444, 0.2885504830370714, 1.8073801497932753 } });
-        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 307)));
+        tmpOriginal.modifyAll(PrimitiveMath.MULTIPLY.second(PrimitiveMath.POWER.invoke(PrimitiveMath.TEN, 307)));
 
         final RawEigenvalue.Symmetric tmpAlgorithm = new RawEigenvalue.Symmetric();
 
@@ -265,7 +267,7 @@ public class ExtremeElementsCase {
 
         final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.509726074514643, 0.6439543946598099, 1.2096354379603502 },
                 { 0.6439543946598099, 1.134228320145167, 0.8341376835908743 }, { 1.2096354379603502, 0.8341376835908743, 1.6999093634457072 } });
-        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 155)));
+        tmpOriginal.modifyAll(PrimitiveMath.MULTIPLY.second(PrimitiveMath.POWER.invoke(PrimitiveMath.TEN, 155)));
 
         final SimultaneousPrimitive tmpAlgorithm = new HermitianEvD.SimultaneousPrimitive();
 
@@ -290,7 +292,7 @@ public class ExtremeElementsCase {
                         { 0.5763579411022435, 0.6010777087922337, 0.6478032355134435, 1.7248031476721892, 0.6562158066095086, 0.5794240042274624 },
                         { 0.7199441830503458, 0.7508223087524556, 0.8091884190528792, 0.6562158066095086, 1.905371077260138, 0.7237740848430495 },
                         { 0.6356947473097578, 0.6629594475153139, 0.7144954285155056, 0.5794240042274624, 0.7237740848430495, 1.7994225826534653 } });
-        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 307)));
+        tmpOriginal.modifyAll(PrimitiveMath.MULTIPLY.second(PrimitiveMath.POWER.invoke(PrimitiveMath.TEN, 307)));
 
         final RawSingularValue tmpAlgorithm = new RawSingularValue();
 
@@ -314,7 +316,7 @@ public class ExtremeElementsCase {
                 { 0.38338065513999414, 0.4992935723573937, 0.5488258051522601, 0.283871509914158, 0.14125097541024584, 1.5782194777321448, 0.4006954489432253 },
                 { 0.45947212690705896, 0.5983908592318098, 0.6577540014446122, 0.3402129050589385, 0.16928576136879764, 0.4006954489432253,
                         1.6929815829013701 } });
-        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 307)));
+        tmpOriginal.modifyAll(PrimitiveMath.MULTIPLY.second(PrimitiveMath.POWER.invoke(PrimitiveMath.TEN, 307)));
 
         final SingularValueDecomposition.Primitive tmpAlgorithm = new SingularValueDecomposition.Primitive();
 
@@ -328,7 +330,7 @@ public class ExtremeElementsCase {
 
         final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 1.7755876870972727, 0.5243083105843722 }, { 0.5243083105843722, 1.6760142267686806 } });
-        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 155)));
+        tmpOriginal.modifyAll(PrimitiveMath.MULTIPLY.second(PrimitiveMath.POWER.invoke(PrimitiveMath.TEN, 155)));
 
         final InverterTask<Double> tmpAlgorithm = InverterTask.PRIMITIVE.make(tmpOriginal);
 
@@ -433,7 +435,7 @@ public class ExtremeElementsCase {
         final PrimitiveDenseStore tmpBody = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.7259687987824925 } });
         final PrimitiveDenseStore tmpRHS = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.6533251061005759 } });
 
-        final UnaryFunction<Double> tmpSecond = PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, -16));
+        final UnaryFunction<Double> tmpSecond = PrimitiveMath.MULTIPLY.second(PrimitiveMath.POWER.invoke(PrimitiveMath.TEN, -16));
         tmpBody.modifyAll(tmpSecond);
         tmpRHS.modifyAll(tmpSecond);
 

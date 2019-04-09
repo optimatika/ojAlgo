@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,11 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -69,15 +69,15 @@ public final class JacobiSolver extends StationaryIterativeSolver {
         final double tmpRelaxation = this.getRelaxationFactor();
         do {
 
-            current.premultiply(tmpBody).operateOnMatching(tmpRHS, SUBTRACT).supplyTo(incremetReceiver);
+            current.premultiply(tmpBody).operateOnMatching(tmpRHS, PrimitiveMath.SUBTRACT).supplyTo(incremetReceiver);
             tmpNormErr = tmpIncrement.aggregateAll(Aggregator.NORM2);
-            tmpIncrement.modifyMatching(DIVIDE, tmpBodyDiagonal);
+            tmpIncrement.modifyMatching(PrimitiveMath.DIVIDE, tmpBodyDiagonal);
 
             if (this.getAccuracyContext().isDifferent(ONE, tmpRelaxation)) {
                 tmpIncrement.multiply(tmpRelaxation);
             }
 
-            current.modifyMatching(ADD, tmpIncrement);
+            current.modifyMatching(PrimitiveMath.ADD, tmpIncrement);
 
             tmpIterations++;
 

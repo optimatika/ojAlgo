@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Assertions;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Bidiagonal;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -230,8 +229,8 @@ public abstract class TestUtils {
         double tmpFrobNormDiff = 0.0;
         double tmpFrobNormExpt = 0.0;
         for (long i = 0L; i < expected.count(); i++) {
-            tmpFrobNormDiff = PrimitiveFunction.HYPOT.invoke(tmpFrobNormDiff, actual.doubleValue(i) - expected.doubleValue(i));
-            tmpFrobNormExpt = PrimitiveFunction.HYPOT.invoke(tmpFrobNormExpt, expected.doubleValue(i));
+            tmpFrobNormDiff = PrimitiveMath.HYPOT.invoke(tmpFrobNormDiff, actual.doubleValue(i) - expected.doubleValue(i));
+            tmpFrobNormExpt = PrimitiveMath.HYPOT.invoke(tmpFrobNormExpt, expected.doubleValue(i));
         }
         TestUtils.assertTrue(message + ", large norm differences " + tmpFrobNormDiff + " !<< " + tmpFrobNormExpt,
                 context.isSmall(tmpFrobNormExpt, tmpFrobNormDiff));
@@ -283,24 +282,28 @@ public abstract class TestUtils {
         TestUtils.assertEquals(message, expected, actual, EQUALS);
     }
 
-    public static void assertEquals(final String message, final Number expected, final Number actual, final NumberContext context) {
+    public static void assertEquals(final String message, final Number expected, final Number actual, final NumberContext precision) {
 
         if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
 
             final Quaternion tmpExpected = Quaternion.valueOf(expected);
             final Quaternion tmpActual = Quaternion.valueOf(actual);
 
-            if (!!context.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
-                Assertions.fail(() -> message + " (scalar)" + ": " + expected + " != " + actual);
+            if (!!precision.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
+                // Assertions.fail(() -> message + " (scalar)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (scalar)" + ": " + expected + " != " + actual);
             }
-            if (!!context.isDifferent(tmpExpected.i, tmpActual.i)) {
-                Assertions.fail(() -> message + " (i)" + ": " + expected + " != " + actual);
+            if (!!precision.isDifferent(tmpExpected.i, tmpActual.i)) {
+                // Assertions.fail(() -> message + " (i)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (i)" + ": " + expected + " != " + actual);
             }
-            if (!!context.isDifferent(tmpExpected.j, tmpActual.j)) {
-                Assertions.fail(() -> message + " (j)" + ": " + expected + " != " + actual);
+            if (!!precision.isDifferent(tmpExpected.j, tmpActual.j)) {
+                // Assertions.fail(() -> message + " (j)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (j)" + ": " + expected + " != " + actual);
             }
-            if (!!context.isDifferent(tmpExpected.k, tmpActual.k)) {
-                Assertions.fail(() -> message + " (k)" + ": " + expected + " != " + actual);
+            if (!!precision.isDifferent(tmpExpected.k, tmpActual.k)) {
+                // Assertions.fail(() -> message + " (k)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (k)" + ": " + expected + " != " + actual);
             }
 
         } else if ((expected instanceof ComplexNumber) || (actual instanceof ComplexNumber)) {
@@ -308,17 +311,20 @@ public abstract class TestUtils {
             final ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
             final ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
 
-            if (!!context.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
-                Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
+            if (!!precision.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
+                // Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (real)" + ": " + expected + " != " + actual);
             }
-            if (!!context.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
-                Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
+            if (!!precision.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
+                // Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (imaginary)" + ": " + expected + " != " + actual);
             }
 
         } else {
 
-            if (context.isDifferent(expected.doubleValue(), actual.doubleValue())) {
-                Assertions.fail(() -> message + ": " + expected + " != " + actual);
+            if (precision.isDifferent(expected.doubleValue(), actual.doubleValue())) {
+                // Assertions.fail(() -> message + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + ": " + expected + " != " + actual);
             }
         }
     }

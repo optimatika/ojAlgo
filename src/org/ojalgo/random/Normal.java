@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,10 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.ErrorFunction;
 
 /**
  * Under general conditions, the sum of a large number of random variables is approximately normally
@@ -50,26 +51,26 @@ public class Normal extends AbstractContinuous {
         myScale = scale;
     }
 
+    public double getDensity(final double value) {
+
+        final double tmpVal = (value - myLocation) / myScale;
+
+        return PrimitiveMath.EXP.invoke((tmpVal * tmpVal) / -TWO) / (myScale * SQRT_TWO_PI);
+    }
+
     public double getDistribution(final double value) {
-        return (ONE + RandomUtils.erf((value - myLocation) / (myScale * SQRT_TWO))) / TWO;
+        return (ONE + ErrorFunction.erf((value - myLocation) / (myScale * SQRT_TWO))) / TWO;
     }
 
     public double getExpected() {
         return myLocation;
     }
 
-    public double getProbability(final double value) {
+    public double getQuantile(final double probability) {
 
-        final double tmpVal = (value - myLocation) / myScale;
+        this.checkProbabilty(probability);
 
-        return PrimitiveFunction.EXP.invoke((tmpVal * tmpVal) / -TWO) / (myScale * SQRT_TWO_PI);
-    }
-
-    public double getQuantile(final double probality) {
-
-        this.checkProbabilty(probality);
-
-        return (myScale * SQRT_TWO * RandomUtils.erfi((TWO * probality) - ONE)) + myLocation;
+        return (myScale * SQRT_TWO * ErrorFunction.erfi((TWO * probability) - ONE)) + myLocation;
     }
 
     @Override

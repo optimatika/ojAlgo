@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,23 +21,17 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.ONE;
-import static org.ojalgo.constant.PrimitiveMath.EIGHT;
-import static org.ojalgo.constant.PrimitiveMath.TWO;
-import static org.ojalgo.constant.PrimitiveMath.ZERO;
-
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.BigAggregator;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -50,7 +44,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.Constraint, Optimisation.Objective, Comparable<ME> {
 
-    private static final double _32_0 = EIGHT + EIGHT + EIGHT + EIGHT;
+    private static final double _32_0 = PrimitiveMath.EIGHT + PrimitiveMath.EIGHT + PrimitiveMath.EIGHT + PrimitiveMath.EIGHT;
     private static final BigDecimal LARGEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_LARGEST), new MathContext(8, RoundingMode.DOWN));
     private static final BigDecimal SMALLEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_SMALLEST), new MathContext(8, RoundingMode.UP));
 
@@ -58,8 +52,8 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
     static int getAdjustmentExponent(final double largest, final double smallest) {
 
-        final double tmpLargestExp = largest > ZERO ? PrimitiveFunction.LOG10.invoke(largest) : ZERO;
-        final double tmpSmallestExp = smallest > ZERO ? PrimitiveFunction.LOG10.invoke(smallest) : -EIGHT;
+        final double tmpLargestExp = largest > PrimitiveMath.ZERO ? PrimitiveMath.LOG10.invoke(largest) : PrimitiveMath.ZERO;
+        final double tmpSmallestExp = smallest > PrimitiveMath.ZERO ? PrimitiveMath.LOG10.invoke(smallest) : -PrimitiveMath.EIGHT;
 
         if ((tmpLargestExp - tmpSmallestExp) > ModelEntity._32_0) {
 
@@ -67,7 +61,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
         } else {
 
-            final double tmpNegatedAverage = (tmpLargestExp + tmpSmallestExp) / (-TWO);
+            final double tmpNegatedAverage = (tmpLargestExp + tmpSmallestExp) / (-PrimitiveMath.TWO);
 
             return (int) Math.round(tmpNegatedAverage);
         }
@@ -77,7 +71,6 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     private BigDecimal myContributionWeight = null;
     private BigDecimal myLowerLimit = null;
     private final String myName;
-
     private BigDecimal myUpperLimit = null;
 
     @SuppressWarnings("unused")
@@ -170,7 +163,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     }
 
     public final boolean isConstraint() {
-        return this.isLowerLimitSet() || this.isUpperLimitSet();
+        return (myLowerLimit != null) || (myUpperLimit != null);
     }
 
     public final boolean isContributionWeightSet() {
@@ -178,11 +171,11 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     }
 
     public final boolean isEqualityConstraint() {
-        return this.isLowerLimitSet() && this.isUpperLimitSet() && (myLowerLimit.compareTo(myUpperLimit) == 0);
+        return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) == 0);
     }
 
     public final boolean isLowerConstraint() {
-        return this.isLowerLimitSet() && !this.isEqualityConstraint();
+        return (myLowerLimit != null) && !this.isEqualityConstraint();
     }
 
     public final boolean isLowerLimitSet() {
@@ -190,11 +183,11 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     }
 
     public final boolean isObjective() {
-        return this.isContributionWeightSet() && (myContributionWeight.signum() != 0);
+        return (myContributionWeight != null) && (myContributionWeight.signum() != 0);
     }
 
     public final boolean isUpperConstraint() {
-        return this.isUpperLimitSet() && !this.isEqualityConstraint();
+        return (myUpperLimit != null) && !this.isEqualityConstraint();
     }
 
     public final boolean isUpperLimitSet() {
@@ -221,14 +214,14 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
             if (lower instanceof BigDecimal) {
                 myLowerLimit = (BigDecimal) lower;
             } else if (Double.isFinite(lower.doubleValue())) {
-                BigDecimal tmpLimit = TypeUtils.toBigDecimal(lower);
-                final BigDecimal tmpMagnitude = tmpLimit.abs();
-                if (tmpMagnitude.compareTo(LARGEST) >= 0) {
-                    tmpLimit = null;
-                } else if (tmpMagnitude.compareTo(SMALLEST) <= 0) {
-                    tmpLimit = BigMath.ZERO;
+                BigDecimal limit = TypeUtils.toBigDecimal(lower);
+                final BigDecimal magnitude = limit.abs();
+                if (magnitude.compareTo(LARGEST) >= 0) {
+                    limit = null;
+                } else if (magnitude.compareTo(SMALLEST) <= 0) {
+                    limit = org.ojalgo.function.constant.BigMath.ZERO;
                 }
-                myLowerLimit = tmpLimit;
+                myLowerLimit = limit;
             }
         }
         return (ME) this;
@@ -256,14 +249,14 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
             if (upper instanceof BigDecimal) {
                 myUpperLimit = (BigDecimal) upper;
             } else if (Double.isFinite(upper.doubleValue())) {
-                BigDecimal tmpLimit = TypeUtils.toBigDecimal(upper);
-                final BigDecimal tmpMagnitude = tmpLimit.abs();
-                if (tmpMagnitude.compareTo(LARGEST) >= 0) {
-                    tmpLimit = null;
-                } else if (tmpMagnitude.compareTo(SMALLEST) <= 0) {
-                    tmpLimit = BigMath.ZERO;
+                BigDecimal limit = TypeUtils.toBigDecimal(upper);
+                final BigDecimal magnitude = limit.abs();
+                if (magnitude.compareTo(LARGEST) >= 0) {
+                    limit = null;
+                } else if (magnitude.compareTo(SMALLEST) <= 0) {
+                    limit = org.ojalgo.function.constant.BigMath.ZERO;
                 }
-                myUpperLimit = tmpLimit;
+                myUpperLimit = limit;
             }
         }
         return (ME) this;
@@ -362,6 +355,8 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         myUpperLimit = null;
     }
 
+    protected abstract void doIntegerRounding();
+
     protected final int getAdjustmentExponent() {
 
         if (myAdjustmentExponent == Integer.MIN_VALUE) {
@@ -436,13 +431,37 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         this.appendRightPart(builder);
     }
 
+    final BigDecimal getCompensatedLowerLimit(BigDecimal compensation) {
+        return myLowerLimit != null ? myLowerLimit.subtract(compensation) : null;
+    }
+
+    final BigDecimal getCompensatedLowerLimit(BigDecimal compensation, NumberContext precision) {
+        return myLowerLimit != null ? precision.enforce(myLowerLimit.subtract(compensation)) : null;
+    }
+
+    final BigDecimal getCompensatedUpperLimit(BigDecimal compensation) {
+        return myUpperLimit != null ? myUpperLimit.subtract(compensation) : null;
+    }
+
+    final BigDecimal getCompensatedUpperLimit(BigDecimal compensation, NumberContext precision) {
+        return myUpperLimit != null ? precision.enforce(myUpperLimit.subtract(compensation)) : null;
+    }
+
+    /**
+     * @return true if both the lower and upper limits are defined, and the range is defined by lower and
+     *         upper.
+     */
+    boolean isClosedRange(BigDecimal lower, BigDecimal upper) {
+        return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(lower) == 0) && (myUpperLimit.compareTo(upper) == 0);
+    }
+
     boolean isInfeasible() {
         return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0);
     }
 
     void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
-        largest.invoke(ONE);
-        smallest.invoke(ONE);
+        largest.invoke(BigMath.ONE);
+        smallest.invoke(BigMath.ONE);
         if (myLowerLimit != null) {
             largest.invoke(myLowerLimit);
             smallest.invoke(myLowerLimit);

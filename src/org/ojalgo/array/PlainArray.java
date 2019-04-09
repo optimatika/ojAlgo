@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -239,8 +239,6 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
     protected abstract void set(final int index, final double value);
 
     protected abstract void set(final int index, final Number number);
-
-    protected abstract int size();
 
     protected abstract void sortAscending();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -82,6 +82,10 @@ public final class CalendarDateSeries<N extends Number> extends TreeSeries<Calen
 
         myResolution = resolution;
         myMapper = mapper;
+    }
+
+    public long count() {
+        return this.size();
     }
 
     public double doubleValue(final long index) {

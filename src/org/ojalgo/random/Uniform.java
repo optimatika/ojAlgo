@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,9 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * Certain waiting times. Rounding errors.
@@ -38,7 +38,7 @@ public class Uniform extends AbstractContinuous {
      * @return An integer: 0 &lt;= ? &lt; limit
      */
     public static int randomInteger(final int limit) {
-        return (int) PrimitiveFunction.FLOOR.invoke(limit * Math.random());
+        return (int) PrimitiveMath.FLOOR.invoke(limit * Math.random());
     }
 
     /**
@@ -52,7 +52,7 @@ public class Uniform extends AbstractContinuous {
      * @return An integer: 0 &lt;= ? &lt; limit
      */
     public static long randomInteger(final long limit) {
-        return (long) PrimitiveFunction.FLOOR.invoke(limit * Math.random());
+        return (long) PrimitiveMath.FLOOR.invoke(limit * Math.random());
     }
 
     private final double myLower;
@@ -74,6 +74,17 @@ public class Uniform extends AbstractContinuous {
         myRange = range;
     }
 
+    public double getDensity(final double value) {
+
+        double retVal = ZERO;
+
+        if ((myLower <= value) && (value <= (myLower + myRange))) {
+            retVal = ONE / myRange;
+        }
+
+        return retVal;
+    }
+
     public double getDistribution(final double value) {
 
         double retVal = ZERO;
@@ -91,22 +102,11 @@ public class Uniform extends AbstractContinuous {
         return myLower + (myRange / TWO);
     }
 
-    public double getProbability(final double value) {
+    public double getQuantile(final double probability) {
 
-        double retVal = ZERO;
+        this.checkProbabilty(probability);
 
-        if ((myLower <= value) && (value <= (myLower + myRange))) {
-            retVal = ONE / myRange;
-        }
-
-        return retVal;
-    }
-
-    public double getQuantile(final double probality) {
-
-        this.checkProbabilty(probality);
-
-        return myLower + (probality * myRange);
+        return myLower + (probability * myRange);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,13 @@
 package org.ojalgo.array;
 
 import org.ojalgo.array.blas.AMAX;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.netio.ASCII;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
@@ -198,24 +197,7 @@ public abstract class BasicArray<N extends Number>
 
     @Override
     public String toString() {
-
-        final StringBuilder retVal = new StringBuilder();
-
-        retVal.append(ASCII.LCB);
-        retVal.append(ASCII.SP);
-        final int tmpLength = (int) this.count();
-        if (tmpLength >= 1) {
-            retVal.append(this.get(0).toString());
-            for (int i = 1; i < tmpLength; i++) {
-                retVal.append(ASCII.COMMA);
-                retVal.append(ASCII.SP);
-                retVal.append(this.get(i).toString());
-            }
-            retVal.append(ASCII.SP);
-        }
-        retVal.append(ASCII.RCB);
-
-        return retVal.toString();
+        return Access1D.toString(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

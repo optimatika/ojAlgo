@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,7 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.array.Array1D;
@@ -33,12 +32,13 @@ import org.ojalgo.array.Raw1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.blas.AXPY;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.machine.JavaType;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexSolver.AlgorithmStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -142,11 +142,11 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             double pivotElement = pivotBody.doubleValue(pivotCol);
 
-            if (PrimitiveFunction.ABS.invoke(pivotElement) < ONE) {
-                final UnaryFunction<Double> tmpModifier = DIVIDE.second(pivotElement);
+            if (PrimitiveMath.ABS.invoke(pivotElement) < ONE) {
+                final UnaryFunction<Double> tmpModifier = PrimitiveMath.DIVIDE.second(pivotElement);
                 pivotBody.modifyAll(tmpModifier);
             } else if (pivotElement != ONE) {
-                final UnaryFunction<Double> tmpModifier = MULTIPLY.second(ONE / pivotElement);
+                final UnaryFunction<Double> tmpModifier = PrimitiveMath.MULTIPLY.second(ONE / pivotElement);
                 pivotBody.modifyAll(tmpModifier);
             }
 
@@ -231,10 +231,10 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             final int col = iterationPoint.col;
 
             final double pivotElement = myTransposed.doubleValue(col, row);
-            if (PrimitiveFunction.ABS.invoke(pivotElement) < ONE) {
-                myTransposed.modifyColumn(0, row, DIVIDE.second(pivotElement));
+            if (PrimitiveMath.ABS.invoke(pivotElement) < ONE) {
+                myTransposed.modifyColumn(0, row, PrimitiveMath.DIVIDE.second(pivotElement));
             } else if (pivotElement != ONE) {
-                myTransposed.modifyColumn(0, row, MULTIPLY.second(ONE / pivotElement));
+                myTransposed.modifyColumn(0, row, PrimitiveMath.MULTIPLY.second(ONE / pivotElement));
             }
 
             int structure = (int) myTransposed.countRows();
@@ -267,6 +267,11 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
                 public Double get(final long index) {
                     return -tmpSliceRange.doubleValue(index);
+                }
+
+                @Override
+                public String toString() {
+                    return Access1D.toString(this);
                 }
 
             };
@@ -443,6 +448,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         private final DenseArray<Double> myPhase1Weights;
         private final Array1D<Double> myRHS;
         private final SparseArray<Double>[] myRows;
+        private final SparseArray.SparseFactory<Double> mySparseFactory;
         private double myValue = ZERO;
 
         @SuppressWarnings("unchecked")
@@ -450,12 +456,15 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             super(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
 
+            long initial = Math.max(5L, Math.round(Math.sqrt(Math.min(numberOfConstraints, numberOfProblemVariables))));
+            mySparseFactory = SparseArray.factory(Primitive64Array.FACTORY).initial(initial);
+
             // Including artificial variables
             final int totNumbVars = this.countVariablesTotally();
 
             myRows = new SparseArray[numberOfConstraints];
             for (int r = 0; r < numberOfConstraints; r++) {
-                myRows[r] = SPARSE_FACTORY.make(totNumbVars);
+                myRows[r] = mySparseFactory.make(totNumbVars);
             }
 
             myRHS = ARRAY1D_FACTORY.makeZero(numberOfConstraints);
@@ -568,12 +577,12 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             double pivotElement = pivotBody.doubleValue(pivotCol);
 
-            if (PrimitiveFunction.ABS.invoke(pivotElement) < ONE) {
-                final UnaryFunction<Double> tmpModifier = DIVIDE.second(pivotElement);
+            if (PrimitiveMath.ABS.invoke(pivotElement) < ONE) {
+                final UnaryFunction<Double> tmpModifier = PrimitiveMath.DIVIDE.second(pivotElement);
                 pivotBody.modifyAll(tmpModifier);
                 return tmpModifier.invoke(pivotRHS);
             } else if (pivotElement != ONE) {
-                final UnaryFunction<Double> tmpModifier = MULTIPLY.second(ONE / pivotElement);
+                final UnaryFunction<Double> tmpModifier = PrimitiveMath.MULTIPLY.second(ONE / pivotElement);
                 pivotBody.modifyAll(tmpModifier);
                 return tmpModifier.invoke(pivotRHS);
             } else {
@@ -597,7 +606,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             final int totNumbVars = this.countVariablesTotally();
 
-            SparseArray<Double> auxiliaryRow = SPARSE_FACTORY.make(totNumbVars);
+            SparseArray<Double> auxiliaryRow = mySparseFactory.make(totNumbVars);
             double auxiliaryRHS = ZERO;
 
             if (currentRHS > value) {
@@ -698,6 +707,11 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     return -tmpSliceRange.doubleValue(index);
                 }
 
+                @Override
+                public String toString() {
+                    return Access1D.toString(this);
+                }
+
             };
         }
 
@@ -716,6 +730,11 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
                     public Double get(final long index) {
                         return myRows[(int) index].get(col);
+                    }
+
+                    @Override
+                    public String toString() {
+                        return Access1D.toString(this);
                     }
 
                 };
@@ -861,23 +880,36 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
     static final Array1D.Factory<Double> ARRAY1D_FACTORY = Array1D.factory(Primitive64Array.FACTORY);
     static final DenseArray.Factory<Double> DENSE_FACTORY = Primitive64Array.FACTORY;
-    static final SparseArray.SparseFactory<Double> SPARSE_FACTORY = SparseArray.factory(Primitive64Array.FACTORY).initial(3);
 
-    protected static SimplexTableau make(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables) {
+    protected static SimplexTableau make(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables,
+            Optimisation.Options options) {
 
         final int numbRows = numberOfConstraints + 2;
         final int numbCols = numberOfProblemVariables + numberOfSlackVariables + numberOfConstraints + 1;
-        final int totCount = numbRows * numbCols;
+        final int totCount = numbRows * numbCols; //  Total number of elements in a dense tableau
 
-        if (totCount <= OjAlgoUtils.ENVIRONMENT.getCacheElements(8L)) {
-            return new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
-        } else {
+        if (options.sparse == null) {
+
+            // Max number of elements in CPU cache
+            long maxCount = OjAlgoUtils.ENVIRONMENT.getCacheElements(JavaType.DOUBLE.memory());
+
+            if ((totCount <= maxCount) || ((numberOfProblemVariables <= numberOfConstraints) && (totCount <= (2L * maxCount)))) {
+                return new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
+            } else {
+                return new SparseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
+            }
+
+        } else if (options.sparse) {
+
             return new SparseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
+
+        } else {
+
+            return new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
         }
     }
 
     private final int[] myBasis;
-
     private transient Mutate2D myConstraintsBody = null;
     private transient Mutate1D myConstraintsRHS = null;
     private final int myNumberOfConstraints;

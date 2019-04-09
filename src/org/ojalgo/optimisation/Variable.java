@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,10 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Structure1D.IntIndex;
@@ -147,14 +148,7 @@ public final class Variable extends ModelEntity<Variable> {
      * Variable can only be 0 or 1.
      */
     public boolean isBinary() {
-
-        boolean retVal = this.isInteger();
-
-        retVal &= this.isLowerConstraint() && (this.getLowerLimit().compareTo(ZERO) == 0);
-
-        retVal &= this.isUpperConstraint() && (this.getUpperLimit().compareTo(ONE) == 0);
-
-        return retVal;
+        return myInteger && this.isClosedRange(ZERO, ONE);
     }
 
     /**
@@ -257,22 +251,19 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender) {
-
-        boolean retVal = super.validate(value, context, appender);
-
-        if (retVal && myInteger) {
-            try {
-                context.enforce(value).longValueExact();
-            } catch (final ArithmeticException ex) {
-                if (appender != null) {
-                    appender.println(value + " ! Integer: " + this.getName());
-                }
-                retVal = false;
-            }
+    protected void doIntegerRounding() {
+        BigDecimal limit;
+        if (((limit = this.getUpperLimit()) != null) && (limit.scale() > 0)) {
+            this.upper(limit.setScale(0, RoundingMode.FLOOR));
         }
+        if (((limit = this.getLowerLimit()) != null) && (limit.scale() > 0)) {
+            this.lower(limit.setScale(0, RoundingMode.CEILING));
+        }
+    }
 
-        return retVal;
+    @Override
+    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender) {
+        return this.validate(value, context, appender, false);
     }
 
     IntIndex getIndex() {
@@ -302,6 +293,24 @@ public final class Variable extends ModelEntity<Variable> {
 
     void setUnbounded(final boolean uncorrelated) {
         myUnbounded = uncorrelated;
+    }
+
+    boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender, boolean relaxed) {
+
+        boolean retVal = super.validate(value, context, appender);
+
+        if (retVal && !relaxed && myInteger) {
+            try {
+                context.enforce(value).longValueExact();
+            } catch (final ArithmeticException ex) {
+                if (appender != null) {
+                    appender.println(value + " ! Integer: " + this.getName());
+                }
+                retVal = false;
+            }
+        }
+
+        return retVal;
     }
 
 }

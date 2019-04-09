@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,11 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 
 /**
@@ -33,14 +33,14 @@ import org.ojalgo.netio.BasicLogger;
  *
  * @author apete
  */
-public class QuantileTest {
+public class QuantileTest extends RandomTests {
 
     @Test
     public void testExponential() {
 
         for (int e = -2; e <= 2; e++) {
 
-            final Exponential tmpDistribution = new Exponential(PrimitiveFunction.POW.invoke(TEN, e));
+            final Exponential tmpDistribution = new Exponential(PrimitiveMath.POW.invoke(TEN, e));
 
             this.doTest(tmpDistribution);
         }
@@ -53,7 +53,7 @@ public class QuantileTest {
 
             for (int s = -2; s <= 2; s++) {
 
-                final LogNormal tmpDistribution = new LogNormal(PrimitiveFunction.POW.invoke(TEN, m), PrimitiveFunction.POW.invoke(TEN, s));
+                final LogNormal tmpDistribution = new LogNormal(PrimitiveMath.POW.invoke(TEN, m), PrimitiveMath.POW.invoke(TEN, s));
 
                 this.doTest(tmpDistribution);
             }
@@ -67,7 +67,7 @@ public class QuantileTest {
 
             for (int s = -2; s <= 2; s++) {
 
-                final Normal tmpDistribution = new Normal(PrimitiveFunction.POW.invoke(TEN, m), PrimitiveFunction.POW.invoke(TEN, s));
+                final Normal tmpDistribution = new Normal(PrimitiveMath.POW.invoke(TEN, m), PrimitiveMath.POW.invoke(TEN, s));
 
                 this.doTest(tmpDistribution);
             }
@@ -81,7 +81,7 @@ public class QuantileTest {
 
             for (int s = -2; s <= 2; s++) {
 
-                final Uniform tmpDistribution = new Uniform(PrimitiveFunction.POW.invoke(TEN, m), PrimitiveFunction.POW.invoke(TEN, s));
+                final Uniform tmpDistribution = new Uniform(PrimitiveMath.POW.invoke(TEN, m), PrimitiveMath.POW.invoke(TEN, s));
 
                 this.doTest(tmpDistribution);
             }

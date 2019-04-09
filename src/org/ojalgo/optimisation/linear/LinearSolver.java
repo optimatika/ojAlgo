@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
@@ -104,7 +104,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         public LinearSolver build(final ConvexSolver.Builder convexBuilder, final Optimisation.Options options) {
 
-            final SimplexTableau tableau = SimplexSolver.build(convexBuilder);
+            final SimplexTableau tableau = SimplexSolver.build(convexBuilder, options);
 
             return new SimplexSolver(tableau, options);
         }
@@ -160,13 +160,13 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             for (int p = 0; p < tmpCountPositives; p++) {
                 final Variable tmpVariable = tmpPositives.get(p);
                 final int tmpIndex = model.indexOf(tmpVariable);
-                tmpSolverSolution.set(p, PrimitiveFunction.MAX.invoke(modelState.doubleValue(tmpIndex), 0.0));
+                tmpSolverSolution.set(p, PrimitiveMath.MAX.invoke(modelState.doubleValue(tmpIndex), 0.0));
             }
 
             for (int n = 0; n < tmpCountNegatives; n++) {
                 final Variable tmpVariable = tmpNegatives.get(n);
                 final int tmpIndex = model.indexOf(tmpVariable);
-                tmpSolverSolution.set(tmpCountPositives + n, PrimitiveFunction.MAX.invoke(-modelState.doubleValue(tmpIndex), 0.0));
+                tmpSolverSolution.set(tmpCountPositives + n, PrimitiveMath.MAX.invoke(-modelState.doubleValue(tmpIndex), 0.0));
             }
 
             return new Result(modelState.getState(), modelState.getValue(), tmpSolverSolution);
@@ -208,7 +208,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         final int numbVars = convex.countVariables();
 
-        final SimplexTableau tableau = SimplexSolver.build(convex);
+        final SimplexTableau tableau = SimplexSolver.build(convex, options);
 
         final LinearSolver solver = new SimplexSolver(tableau, options);
 
@@ -226,6 +226,11 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             public Double get(final long index) {
                 return this.doubleValue(index);
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
             }
 
         });

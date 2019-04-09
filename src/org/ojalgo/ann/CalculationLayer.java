@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,10 @@
  */
 package org.ojalgo.ann;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.BasicFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
@@ -94,7 +94,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
     }
 
     public PrimitiveDenseStore invoke(Access1D<Double> input) {
-        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
+        myWeights.premultiply(input).operateOnMatching(PrimitiveMath.ADD, myBias).supplyTo(myOutput);
         myOutput.modifyAll(myActivator.getFunction(myOutput));
         return myOutput;
     }
@@ -125,7 +125,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
 
     void adjust(final Access1D<Double> layerInput, PrimitiveDenseStore downstreamGradient, double learningRate, PrimitiveDenseStore upstreamGradient) {
 
-        downstreamGradient.modifyMatching(MULTIPLY, myOutput.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
+        downstreamGradient.modifyMatching(PrimitiveMath.MULTIPLY, myOutput.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
 
         if (upstreamGradient != null) {
             // No need to do this multiplication for the input layer
@@ -160,10 +160,6 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
 
     double getWeight(int input, int output) {
         return myWeights.doubleValue(input, output);
-    }
-
-    void randomise() {
-        this.randomise(myWeights.countRows());
     }
 
     void setActivator(ArtificialNeuralNetwork.Activator activator) {

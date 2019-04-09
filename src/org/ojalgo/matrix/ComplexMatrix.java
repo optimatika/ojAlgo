@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,9 @@
  */
 package org.ojalgo.matrix;
 
+import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LDL;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
@@ -177,8 +179,18 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     }
 
     @Override
+    Cholesky<ComplexNumber> getDecompositionCholesky(Structure2D typical) {
+        return Cholesky.COMPLEX.make(typical);
+    }
+
+    @Override
     Eigenvalue<ComplexNumber> getDecompositionEigenvalue(Structure2D typical) {
         return Eigenvalue.COMPLEX.make(typical, this.isHermitian());
+    }
+
+    @Override
+    LDL<ComplexNumber> getDecompositionLDL(Structure2D typical) {
+        return LDL.COMPLEX.make(typical);
     }
 
     @Override

@@ -1,8 +1,60 @@
-# v48.0.0: [Not yet released]
+> Removal of code that has been deprecated past 1 major release is typically not mentioned
 
-> corresponds to changes in the `develop` branch since the last release
+# [Not yet released]
 
-# v47.0.0: [Soon to be released]
+> Corresponds to changes in the `develop` branch since the last release
+
+## org.ojalgo.constant
+
+* Everything in this package has been moved to org.ojalgo.function.constant
+
+## org.ojalgo.data
+
+* New package that currently only contains an (also new) class DataPreprocessors. The intention is that this is where various data preprocessors utilities will go.
+
+## org.ojalgo.function
+
+* New package org.ojalgo.function.special with currently 4 new classes: CombinatorialFunctions, ErrorFunction, GammaFunction and MissingMath.
+* New package org.ojalgo.function.constant with constants related to doing basic maths on different types.
+* Moved constants defined in various classes to the new org.ojalgo.function.constant package, and deprecated a ffew others that will be made private.
+
+## org.ojalgo.matrix
+
+* Fixed a problem with one of the Eigenvalue implementations - it would check for symmetric/hermitian but then failed to make use of the results.
+* Fixed a problem with some of the Eigenvalue implementations regarding ordering of the eigenvales/eigenvectors – they were not always ordered in descending absolut order (used to consider the sign).
+* The interface TransformationMatrix has been removed. Partly this functionality has been revoked, and partially replaced by the new Transformation2D interface.
+
+## org.ojalgo.optimisation
+
+* Refactoring of the presolvers. Among other things there are now presolvers that perform integer rounding. Previously existing presolvers have also been improved. There is also a new presolver that removes (obviously) redundant constraints.
+* Modified what happends when you relax an integer model. Now the variables are kept as integer variables, but the model set a flag that it is relaxed. This means the presolvers can now make use of the integer property and thus perform better.
+* The MPS file parser, MathProgSysModel, has been modified to not strictly use field index ranges, but instead more freely interpret whitespace as a delimiter. This is in line with commonly used MPS format extensions and allows ojAlgo to correctly parse/use a larger set of models. Further MathProgSysModel is no longer a model – it no longer implements Optimisation.Model. This should/will be a model file parser, and nothinng else.
+* Major extension and refactoring of optimisation test cases. In particular the test cases in ojAlgo are now available to the various solver integration modules in ojAlgo-extensions.
+* When adding a solver integration to ExpressionsBasedModel it is now possible to differentiate between preferred and fallback solvers - addIntegration() has been replaced with addPreferredSolver() and addFallbackSolver().
+* Fixed a concurrency related problem with the sparse simplex solver.
+* There is now an options 'options.sparse' that control if sparse/iterative solvers should be favoured over dense/direct solvers, or not.
+* Tweaking of ConvexSolver internals – several small changes that in combination makes a big difference on some numerically challenging problems.
+* Fixed a bug in ConvexSolver (ActiveSetSolver) that caused the `suffice` stopping conditions to not be considered since the state was set to APPROXIMATE raher than FEASIBLE.
+
+## org.ojalgo.random
+
+* New Cauchy distribution RandomNumber.
+* Partial implementation of Student's TDistribution
+* Deprecated the RandomUtils class and moved its various methods to classes in the new org.ojalgo.function.special package.
+* For continuous distributions the getProbability methods has been renamed getDensity.
+* Minor performance improvement to SampleSet when calling getStandardDeviation() repeatedly.
+
+## org.ojalgo.structure
+
+* New interfaces Transformation1D, Transformation2D and TransformationAnyD as well as Mutate1D.Transformable, Mutate2D.Transformable and MutateAnyD.Transformable. The Transformation?D interfaces are functional. With them you can write custom "mutators" that can be used on everything that implements the Transformable interfaces.
+* The interfaces Access1D.Elements, Access1D.IndexOf, Access2D.Elements, Access2D.IndexOf, AccessAnyD.Elements and AccessAnyD.IndexOf have been deprecated.
+
+
+## org.ojalgo.type
+
+* Additions to Stopwatch that make it easier to compare with time limits in various forms.
+
+# v47.0.0: 2018-12-16
 
 ## org.ojalgo.array
 

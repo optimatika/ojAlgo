@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,11 @@
  */
 package org.ojalgo.scalar;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -65,13 +63,14 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     public static final RationalNumber MAX_VALUE = new RationalNumber(Long.MAX_VALUE, 1L);
     public static final RationalNumber MIN_VALUE = new RationalNumber(Long.MIN_VALUE, 1L);
     public static final RationalNumber NaN = new RationalNumber(0L, 0L);
+    public static final RationalNumber NEG = new RationalNumber(-1L, 1L);
     public static final RationalNumber NEGATIVE_INFINITY = new RationalNumber(-1L, 0L);
     public static final RationalNumber ONE = new RationalNumber(1L, 1L);
     public static final RationalNumber POSITIVE_INFINITY = new RationalNumber(1L, 0L);
     public static final RationalNumber TWO = new RationalNumber(2L, 1L);
     public static final RationalNumber ZERO = new RationalNumber(0L, 1L);
-    private static final String DIVIDE = " / ";
 
+    private static final String DIVIDE = " / ";
     private static final String LEFT = "(";
     private static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitLength();
     private static final RationalNumber MINUS_ONE = ONE.negate();
@@ -595,7 +594,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public double norm() {
-        return ABS.invoke(this.doubleValue());
+        return PrimitiveMath.ABS.invoke(this.doubleValue());
     }
 
     public RationalNumber signum() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,16 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.*;
-import static org.ojalgo.function.BigFunction.*;
+import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.constant.BigMath;
+import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.Printer;
@@ -98,7 +96,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
+public final class ExpressionsBasedModel extends AbstractModel {
 
     public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<ExpressionsBasedModel, S> {
 
@@ -270,6 +268,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             return retVal;
         }
 
+        @Override
+        public String toString() {
+            return myModel.toString();
+        }
+
         public void update(final int index) {
             this.update(myModel.getVariable(index));
         }
@@ -329,11 +332,13 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         /**
+         * @param remaining TODO
+         * @param lower TODO
+         * @param upper TODO
          * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
          *         typically when/if a variable was fixed.
          */
-        public abstract boolean simplify(Expression expression, Set<IntIndex> fixedVariables, BigDecimal fixedValue,
-                Function<IntIndex, Variable> variableResolver, NumberContext precision);
+        public abstract boolean simplify(Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, NumberContext precision);
 
         @Override
         boolean isApplicable(final Expression target) {
@@ -410,25 +415,36 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     private static final ConvexSolver.ModelIntegration CONVEX_INTEGRATION = new ConvexSolver.ModelIntegration();
+    private static final List<ExpressionsBasedModel.Integration<?>> FALLBACK_INTEGRATIONS = new ArrayList<>();
     private static final IntegerSolver.ModelIntegration INTEGER_INTEGRATION = new IntegerSolver.ModelIntegration();
-    private static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
     private static final LinearSolver.ModelIntegration LINEAR_INTEGRATION = new LinearSolver.ModelIntegration();
     private static final String NEW_LINE = "\n";
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
+    private static final List<ExpressionsBasedModel.Integration<?>> PREFERRED_INTEGRATIONS = new ArrayList<>();
     private static final TreeSet<Presolver> PRESOLVERS = new TreeSet<>();
     private static final String START_END = "############################################\n";
 
     static {
         ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
-        ExpressionsBasedModel.addPresolver(Presolvers.OPPOSITE_SIGN);
-        // ExpressionsBasedModel.addPresolver(Presolvers.BINARY_VALUE);
-        // ExpressionsBasedModel.addPresolver(Presolvers.BIGSTUFF);
-
+        ExpressionsBasedModel.addPresolver(Presolvers.REDUNDANT_CONSTRAINT);
     }
 
+    public static boolean addFallbackSolver(final Integration<?> integration) {
+        return FALLBACK_INTEGRATIONS.add(integration);
+    }
+
+    /**
+     * @deprecated v48 Use either {@link #addPreferredSolver(Integration)} or
+     *             {@link #addFallbackSolver(Integration)} instead
+     */
+    @Deprecated
     public static boolean addIntegration(final Integration<?> integration) {
-        return INTEGRATIONS.add(integration);
+        return ExpressionsBasedModel.addPreferredSolver(integration);
+    }
+
+    public static boolean addPreferredSolver(final Integration<?> integration) {
+        return PREFERRED_INTEGRATIONS.add(integration);
     }
 
     public static boolean addPresolver(final Presolver presolver) {
@@ -436,7 +452,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     public static void clearIntegrations() {
-        INTEGRATIONS.clear();
+        PREFERRED_INTEGRATIONS.clear();
+        FALLBACK_INTEGRATIONS.clear();
     }
 
     public static void clearPresolvers() {
@@ -444,23 +461,30 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     public static boolean removeIntegration(final Integration<?> integration) {
-        return INTEGRATIONS.remove(integration);
+        return PREFERRED_INTEGRATIONS.remove(integration) | FALLBACK_INTEGRATIONS.remove(integration);
     }
 
     public static boolean removePresolver(final Presolver presolver) {
         return PRESOLVERS.remove(presolver);
     }
 
-    private final HashMap<String, Expression> myExpressions = new HashMap<>();
-    private final HashSet<IntIndex> myFixedVariables = new HashSet<>();
+    private final Map<String, Expression> myExpressions = new HashMap<>();
+    private final Set<IntIndex> myFixedVariables = new HashSet<>();
     private transient int[] myFreeIndices = null;
     private final List<Variable> myFreeVariables = new ArrayList<>();
+    private transient boolean myInfeasible = false;
     private transient int[] myIntegerIndices = null;
     private final List<Variable> myIntegerVariables = new ArrayList<>();
     private transient int[] myNegativeIndices = null;
     private final List<Variable> myNegativeVariables = new ArrayList<>();
     private transient int[] myPositiveIndices = null;
     private final List<Variable> myPositiveVariables = new ArrayList<>();
+    private final Set<IntIndex> myReferences = new HashSet<>();
+    private boolean myRelaxed;
+    /**
+     * Temporary storage for some expresssion specific subset of variables
+     */
+    private final Set<IntIndex> myTemporary = new HashSet<>();
     private final ArrayList<Variable> myVariables = new ArrayList<>();
     private final boolean myWorkCopy;
 
@@ -469,6 +493,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         super();
 
         myWorkCopy = false;
+        myRelaxed = false;
     }
 
     public ExpressionsBasedModel(final Collection<? extends Variable> variables) {
@@ -480,6 +505,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         myWorkCopy = false;
+        myRelaxed = false;
     }
 
     public ExpressionsBasedModel(final Optimisation.Options someOptions) {
@@ -487,6 +513,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         super(someOptions);
 
         myWorkCopy = false;
+        myRelaxed = false;
     }
 
     public ExpressionsBasedModel(final Variable... variables) {
@@ -498,6 +525,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         myWorkCopy = false;
+        myRelaxed = false;
     }
 
     ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean workCopy, final boolean allEntities) {
@@ -519,6 +547,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         myWorkCopy = workCopy;
+        myRelaxed = workCopy;
     }
 
     public Expression addExpression() {
@@ -639,7 +668,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      * @return A stream of variables that are constraints and not fixed
      */
     public Stream<Variable> bounds() {
-        return this.variables().filter((final Variable v) -> v.isConstraint());
+        return this.variables().filter(v -> v.isConstraint() && !v.isFixed());
     }
 
     /**
@@ -651,6 +680,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public ExpressionsBasedModel copy() {
         return new ExpressionsBasedModel(this, false, true);
+    }
+
+    public ExpressionsBasedModel snapshot() {
+        return new ExpressionsBasedModel(this, true, false);
     }
 
     public int countExpressions() {
@@ -807,7 +840,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                 if (tmpVariable.isEqualityConstraint()) {
                     retSolution.set(i, tmpVariable.getLowerLimit());
                 } else if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
-                    retSolution.set(i, DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), TWO));
+                    retSolution.set(i, BigMath.DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), TWO));
                     shouldCheckGradient = true;
                 } else if (tmpVariable.isLowerLimitSet()) {
                     retSolution.set(i, tmpVariable.getLowerLimit());
@@ -970,12 +1003,15 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public boolean isAnyVariableInteger() {
 
+        if (myRelaxed) {
+            return false;
+        }
+
         boolean retVal = false;
 
-        final int tmpLength = myVariables.size();
-
-        for (int i = 0; !retVal && (i < tmpLength); i++) {
-            retVal |= myVariables.get(i).isInteger();
+        for (int i = 0, limit = myVariables.size(); !retVal && (i < limit); i++) {
+            Variable variable = myVariables.get(i);
+            retVal |= (variable.isInteger() && !variable.isFixed());
         }
 
         return retVal;
@@ -999,27 +1035,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         if (constrExpr != null) {
 
-            //            int maxScale = 0;
-            //            for (final Entry<IntIndex, BigDecimal> entry : constrExpr.getLinearEntrySet()) {
-            //                maxScale = Math.max(maxScale, entry.getValue().scale());
-            //            }
-            //
-            //            long gcd = -1L;
-            //            for (final Entry<IntIndex, BigDecimal> entry : constrExpr.getLinearEntrySet()) {
-            //                final long tmpLongValue = Math.abs(entry.getValue().setScale(maxScale).unscaledValue().longValue());
-            //                if (gcd == -1L) {
-            //                    gcd = tmpLongValue;
-            //                } else {
-            //                    gcd = RationalNumber.gcd(gcd, tmpLongValue);
-            //                }
-            //            }
-            //            if (upper != null) {
-            //                final BigDecimal tmpSetScale = upper.setScale(maxScale, RoundingMode.FLOOR);
-            //                final long tmpLongValue = tmpSetScale.unscaledValue().longValue();
-            //                upper = new BigDecimal(tmpLongValue).divide(new BigDecimal(gcd), maxScale, RoundingMode.FLOOR);
-            //            }
-
             constrExpr.lower(lower).upper(upper);
+
+            if (constrExpr.isLinearAndAllInteger()) {
+                constrExpr.doIntegerRounding();
+            }
         }
     }
 
@@ -1118,10 +1138,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public ExpressionsBasedModel relax(final boolean inPlace) {
 
-        final ExpressionsBasedModel retVal = inPlace ? this : new ExpressionsBasedModel(this, true, true);
+        final ExpressionsBasedModel retVal = inPlace ? this : new ExpressionsBasedModel(this, true, false);
 
-        for (final Variable tmpVariable : retVal.getVariables()) {
-            tmpVariable.relax();
+        if (inPlace) {
+            myRelaxed = true;
         }
 
         return retVal;
@@ -1203,7 +1223,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         for (int i = 0; retVal && (i < size); i++) {
             final Variable tmpVariable = myVariables.get(i);
             final BigDecimal value = solution.get(i);
-            retVal &= tmpVariable.validate(value, context, appender);
+            retVal &= tmpVariable.validate(value, context, appender, myRelaxed);
         }
 
         if (retVal) {
@@ -1294,19 +1314,37 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     private void scanEntities() {
 
-        final Set<IntIndex> fixedVariables = Collections.emptySet();
-        final BigDecimal fixedValue = BigMath.ZERO;
+        boolean anyVarInt = this.isAnyVariableInteger();
 
-        for (final Expression tmpExpression : myExpressions.values()) {
-            Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
-            if (tmpExpression.isConstraint()) {
-                Presolvers.ZERO_ONE_TWO.simplify(tmpExpression, fixedVariables, fixedValue, this::getVariable, options.feasibility);
+        for (final Expression tmpExpr : myExpressions.values()) {
+
+            Set<IntIndex> allVars = tmpExpr.getLinearKeySet();
+            BigDecimal lower = tmpExpr.getLowerLimit();
+            BigDecimal upper = tmpExpr.getUpperLimit();
+
+            if (tmpExpr.isObjective()) {
+                Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+            }
+            if (tmpExpr.isConstraint()) {
+                Presolvers.ZERO_ONE_TWO.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+                if (anyVarInt) {
+                    Presolvers.INTEGER_EXPRESSION_ROUNDING.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+                }
             }
         }
 
-        for (final Variable tmpVariable : myVariables) {
-            Presolvers.FIXED_OR_UNBOUNDED.simplify(tmpVariable, this);
+        for (final Variable tmpVar : myVariables) {
+            Presolvers.UNREFERENCED.simplify(tmpVar, this);
+            if (tmpVar.isConstraint()) {
+                if (anyVarInt) {
+                    Presolvers.INTEGER_VARIABLE_ROUNDING.simplify(tmpVar, this);
+                }
+            }
         }
+    }
+
+    void addReference(IntIndex index) {
+        myReferences.add(index);
     }
 
     Stream<Expression> expressions() {
@@ -1317,9 +1355,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         ExpressionsBasedModel.Integration<?> retVal = null;
 
-        for (final ExpressionsBasedModel.Integration<?> tmpIntegration : INTEGRATIONS) {
-            if (tmpIntegration.isCapable(this)) {
-                retVal = tmpIntegration;
+        for (final ExpressionsBasedModel.Integration<?> preferred : PREFERRED_INTEGRATIONS) {
+            if (preferred.isCapable(this)) {
+                retVal = preferred;
                 break;
             }
         }
@@ -1339,6 +1377,15 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         if (retVal == null) {
+            for (final ExpressionsBasedModel.Integration<?> fallback : FALLBACK_INTEGRATIONS) {
+                if (fallback.isCapable(this)) {
+                    retVal = fallback;
+                    break;
+                }
+            }
+        }
+
+        if (retVal == null) {
             throw new ProgrammingError("No solver integration available that can handle this model!");
         }
 
@@ -1350,17 +1397,24 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     boolean isInfeasible() {
+        if (myInfeasible) {
+            return true;
+        }
         for (final Expression tmpExpression : myExpressions.values()) {
             if (tmpExpression.isInfeasible()) {
-                return true;
+                return myInfeasible = true;
             }
         }
         for (final Variable tmpVariable : myVariables) {
             if (tmpVariable.isInfeasible()) {
-                return true;
+                return myInfeasible = true;
             }
         }
         return false;
+    }
+
+    boolean isReferenced(Variable variable) {
+        return myReferences.contains(variable.getIndex());
     }
 
     boolean isUnbounded() {
@@ -1369,7 +1423,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     Optimisation.Result optimise() {
 
-        if (PRESOLVERS.size() > 0) {
+        if (!myWorkCopy && (PRESOLVERS.size() > 0)) {
             this.scanEntities();
         }
 
@@ -1380,7 +1434,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         for (int i = 0, limit = myVariables.size(); i < limit; i++) {
             final Variable tmpVariable = myVariables.get(i);
             if (!tmpVariable.isFixed()) {
-                tmpVariable.setValue(options.solution.enforce(retSolution.get(i)));
+                tmpVariable.setValue(options.solution.toBigDecimal(retSolution.doubleValue(i)));
             }
         }
 
@@ -1392,23 +1446,34 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     final void presolve() {
 
-        myExpressions.values().forEach(expr -> expr.reset());
+        //  myExpressions.values().forEach(expr -> expr.reset());
 
         boolean needToRepeat = false;
 
         do {
 
             final Set<IntIndex> fixedVariables = this.getFixedVariables();
-            BigDecimal fixedValue;
+
+            BigDecimal compensatedLowerLimit;
+            BigDecimal compensatedUpperLimit;
 
             needToRepeat = false;
 
             for (final Expression expr : this.getExpressions()) {
                 if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
-                    fixedValue = options.solution.enforce(expr.calculateFixedValue(fixedVariables));
+
+                    BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
+
+                    compensatedLowerLimit = expr.getCompensatedLowerLimit(calculateSetValue);
+                    compensatedUpperLimit = expr.getCompensatedUpperLimit(calculateSetValue);
+
+                    myTemporary.clear();
+                    myTemporary.addAll(expr.getLinearKeySet());
+                    myTemporary.removeAll(fixedVariables);
+
                     for (final Presolver presolver : PRESOLVERS) {
                         if (!needToRepeat) {
-                            needToRepeat |= presolver.simplify(expr, fixedVariables, fixedValue, this::getVariable, options.feasibility);
+                            needToRepeat |= presolver.simplify(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility);
                         }
                     }
                 }
@@ -1417,6 +1482,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         } while (needToRepeat);
 
         this.categoriseVariables();
+    }
+
+    void setInfeasible() {
+        myInfeasible = true;
     }
 
 }

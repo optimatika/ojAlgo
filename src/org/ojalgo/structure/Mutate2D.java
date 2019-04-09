@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -235,6 +235,12 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         default boolean isAcceptable(final Structure2D supplier) {
             return (this.countRows() >= supplier.countRows()) && (this.countColumns() >= supplier.countColumns());
         }
+
+    }
+
+    interface Transformable<N extends Number> extends ModifiableReceiver<N> {
+
+        void transform(Transformation2D<N> transformation);
 
     }
 

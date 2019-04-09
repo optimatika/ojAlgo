@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,8 @@ import java.util.UUID;
 
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.LongToNumberMap;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.structure.Structure1D;
@@ -96,6 +96,10 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
 
     public Comparator<? super K> comparator() {
         return null;
+    }
+
+    public long count() {
+        return this.size();
     }
 
     public double doubleValue(final K key) {

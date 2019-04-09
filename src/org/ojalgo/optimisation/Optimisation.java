@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,11 @@ import java.math.RoundingMode;
 import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -152,7 +152,7 @@ public interface Optimisation {
 
     }
 
-    public static final class Options implements Optimisation, Cloneable {
+    public static final class Options implements Optimisation {
 
         /**
          * Used to determine/validate feasibility. Are the constraints violated or not? Are the variable
@@ -206,7 +206,7 @@ public interface Optimisation {
          * The MIP gap is the difference between the best integer solution found so far and a node's
          * non-integer solution. The relative MIP gap is that difference divided by the optimal value
          * (approximated by the currently best integer solution). If the gap (absolute or relative) is smaller
-         * than this value, then the corresponding branch i terminated as it is deemed unlikely or too
+         * than this value, then the corresponding branch is terminated as it is deemed unlikely or too
          * "expensive" to find better integer solutions there.
          */
         public double mip_gap = 1.0E-4;
@@ -217,16 +217,31 @@ public interface Optimisation {
         public NumberContext print = NumberContext.getGeneral(8, 10);
 
         /**
-         * Used when copying the solver's solution back to the model (converting from double to BigDecimal).
-         * Variable values, dual variable values, lagrange multipliers...
+         * Describes the (required/sufficient) accuracy of the solution. It is used when copying the solver's
+         * solution back to the model (converting from double to BigDecimal). Specific solvers may also use
+         * this as a stopping criteria or similar. The default essentially copies the numbers as is –
+         * corresponding to full double precision.
          */
-        public NumberContext solution = new NumberContext(12, 14, RoundingMode.HALF_DOWN);
+        public NumberContext solution = new NumberContext(16, 14, RoundingMode.HALF_DOWN);
+
+        /**
+         * Controls if sparse/iterative solvers should be favoured over dense/direct alternatives.
+         * Sparse/iterative alternatives are usually preferable with larger models, but there are also
+         * algorithmical differences that could make one alternative better than the other for a (your)
+         * specific case. There are 3 different possibilities for this option:
+         * <ol>
+         * <li><b>TRUE</b> Will use the sparse linear solver and the iterative convex solver.</li>
+         * <li><b>FALSE</b> Will use the dense linear solver and the direct convex solver.</li>
+         * <li><b>NULL</b> ojAlgo will use some logic to choose for you. This is the default.</li>
+         * </ol>
+         */
+        public Boolean sparse = null;
 
         /**
          * The maximmum number of millis allowed for the solve() command. Executions will be aborted
          * regardless of if a solution has been found or not.
          */
-        public long time_abort = CalendarDateUnit.MILLENIUM.toDurationInMillis();
+        public long time_abort = CalendarDateUnit.DAY.toDurationInMillis();
 
         /**
          * Calculations will be terminated after this amount of time if a feasible solution has been found. If
@@ -234,7 +249,7 @@ public interface Optimisation {
          * {@linkplain #time_abort} is reached. This option is , probably, only of interest with the
          * {@linkplain IntegerSolver}.
          */
-        public long time_suffice = CalendarDateUnit.DAY.toDurationInMillis();
+        public long time_suffice = CalendarDateUnit.HOUR.toDurationInMillis();
 
         /**
          * If true models and solvers will validate data at various points. Validation is turned off by
@@ -249,20 +264,14 @@ public interface Optimisation {
             super();
         }
 
-        /**
-         * @deprecated Since v45 Wont be Cloneable either
-         */
-        @Deprecated
-        public Options copy() {
-            try {
-                return (Options) this.clone();
-            } catch (final CloneNotSupportedException exception) {
-                return null;
-            }
+        public Options abort(CalendarDateDuration duration) {
+            ProgrammingError.throwIfNull(duration);
+            time_abort = duration.toDurationInMillis();
+            return this;
         }
 
         /**
-         * Will configure detailed dubug logging and validation
+         * Will configure detailed debug logging and validation
          */
         public void debug(final Class<? extends Optimisation.Solver> solver) {
             logger_solver = solver;
@@ -296,14 +305,12 @@ public interface Optimisation {
             myConfigurator = configurator;
         }
 
-        /**
-         * @deprecated Since v45 Don't copy or clone these, create them the waynyou need them.
-         */
-        @Override
-        @Deprecated
-        protected Object clone() throws CloneNotSupportedException {
-            return super.clone();
+        public Options suffice(CalendarDateDuration duration) {
+            ProgrammingError.throwIfNull(duration);
+            time_suffice = duration.toDurationInMillis();
+            return this;
         }
+
     }
 
     public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result> {
@@ -422,7 +429,7 @@ public interface Optimisation {
 
         @Override
         public String toString() {
-            return myState + " " + myValue + " @ " + Array1D.PRIMITIVE64.copy(mySolution);
+            return myState + " " + myValue + " @ " + Access1D.toString(mySolution);
         }
 
     }

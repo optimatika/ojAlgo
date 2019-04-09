@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ import java.time.temporal.TemporalUnit;
 import java.util.Collections;
 import java.util.List;
 
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * <p>
@@ -170,7 +170,7 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
     }
 
     public long toDurationInNanos() {
-        return Math.round(measure * (CalendarDate.NANOS_PER_MILLIS * unit.toDurationInMillis()));
+        return Math.round(measure * unit.toDurationInNanos());
     }
 
     @Override

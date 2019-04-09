@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,8 @@ package org.ojalgo.array.blas;
 import java.math.BigDecimal;
 
 import org.ojalgo.array.BasicArray;
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.function.BigFunction;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -46,7 +45,7 @@ public abstract class AMAX implements BLAS1 {
         double tmpValue;
 
         for (long i = first; i < limit; i += step) {
-            tmpValue = PrimitiveFunction.ABS.invoke(data.doubleValue(i));
+            tmpValue = PrimitiveMath.ABS.invoke(data.doubleValue(i));
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = i;
@@ -62,7 +61,7 @@ public abstract class AMAX implements BLAS1 {
         BigDecimal tmpValue;
 
         for (int i = first; i < limit; i += step) {
-            tmpValue = BigFunction.ABS.invoke(data[i]);
+            tmpValue = BigMath.ABS.invoke(data[i]);
             if (tmpValue.compareTo(tmpLargest) > 0) {
                 tmpLargest = tmpValue;
                 retVal = i;
@@ -78,7 +77,7 @@ public abstract class AMAX implements BLAS1 {
         double candidate;
 
         for (int i = first; i < limit; i += step) {
-            candidate = PrimitiveFunction.ABS.invoke(data[i]);
+            candidate = PrimitiveMath.ABS.invoke(data[i]);
             if (candidate > largest) {
                 largest = candidate;
                 retVal = i;

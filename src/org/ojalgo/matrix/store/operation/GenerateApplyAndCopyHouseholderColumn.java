@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,7 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -42,7 +41,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
 
         double tmpNormInf = PrimitiveMath.ZERO; // Copy column and calculate its infinity-norm.
         for (int i = row; i < structure; i++) {
-            tmpNormInf = PrimitiveFunction.MAX.invoke(tmpNormInf, PrimitiveFunction.ABS.invoke(tmpVector[i] = data[i + tmpColBase]));
+            tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[i] = data[i + tmpColBase]));
         }
 
         boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
@@ -61,7 +60,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
 
             double tmpScale = tmpVector[row] / tmpNormInf;
             tmpNorm2 += tmpScale * tmpScale;
-            tmpNorm2 = PrimitiveFunction.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
+            tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
 
             if (tmpScale <= PrimitiveMath.ZERO) {
                 data[(row + tmpColBase)] = tmpNorm2 * tmpNormInf;
@@ -77,7 +76,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
                 data[i + tmpColBase] = tmpVector[i] /= tmpScale;
             }
 
-            destination.beta = PrimitiveFunction.ABS.invoke(tmpScale) / tmpNorm2;
+            destination.beta = PrimitiveMath.ABS.invoke(tmpScale) / tmpNorm2;
         }
 
         return retVal;
@@ -93,7 +92,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
 
         double tmpNormInf = PrimitiveMath.ZERO;
         for (int i = row; i < structure; i++) {
-            tmpNormInf = PrimitiveFunction.MAX.invoke(tmpNormInf, (tmpVector[i] = data[i + tmpColBase]).norm());
+            tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, (tmpVector[i] = data[i + tmpColBase]).norm());
         }
 
         boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
@@ -113,7 +112,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
 
             Scalar<N> tmpScale = tmpVector[row].divide(tmpNormInf);
             tmpNorm2 += tmpScale.norm() * tmpScale.norm();
-            tmpNorm2 = PrimitiveFunction.SQRT.invoke(tmpNorm2);
+            tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2);
 
             // data[row + tmpColBase] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
             data[(row + (col * structure))] = tmpScale.signum().multiply(tmpNorm2 * tmpNormInf).get();

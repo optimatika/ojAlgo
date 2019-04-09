@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
+import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,6 +30,9 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.Stopwatch;
+import org.ojalgo.type.context.NumberContext;
 
 public abstract class GenericSolver implements Optimisation.Solver {
 
@@ -55,11 +59,13 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     }
 
+    protected static final NumberContext ACCURACY = new NumberContext(12, 14, RoundingMode.HALF_DOWN);
+
     public final Optimisation.Options options;
 
     private final AtomicInteger myIterationsCount = new AtomicInteger(0);
-    private long myResetTime;
     private State myState = State.UNEXPLORED;
+    private final Stopwatch myStopwatch = new Stopwatch();
 
     @SuppressWarnings("unused")
     private GenericSolver() {
@@ -91,7 +97,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
     }
 
     protected final long countTime() {
-        return System.currentTimeMillis() - myResetTime;
+        return myStopwatch.countMillis();
     }
 
     protected final void error(final String messagePattern, final Object... arguments) {
@@ -114,11 +120,11 @@ public abstract class GenericSolver implements Optimisation.Solver {
      * iteration is completed.
      */
     protected final int incrementIterationsCount() {
-        return myIterationsCount.incrementAndGet();
-    }
-
-    protected final boolean isDebug() {
-        return options.logger_detailed && this.isProgress();
+        int iterationsDone = myIterationsCount.incrementAndGet();
+        if (this.isLogProgress() && ((iterationsDone % 1000) == 0)) {
+            this.log("Done {} {} iterations after {}.", iterationsDone, this.getClass().getSimpleName(), myStopwatch.stop(CalendarDateUnit.SECOND));
+        }
+        return iterationsDone;
     }
 
     /**
@@ -136,7 +142,24 @@ public abstract class GenericSolver implements Optimisation.Solver {
         }
     }
 
-    protected final boolean isProgress() {
+    /**
+     * Detailed debug logging
+     */
+    protected final boolean isLogDebug() {
+        return options.logger_detailed && this.isLogProgress();
+    }
+
+    /**
+     * No logging
+     */
+    protected final boolean isLogOff() {
+        return (options.logger_appender == null) || (!options.logger_solver.isAssignableFrom(this.getClass()));
+    }
+
+    /**
+     * Cursory progress logging (at least)
+     */
+    protected final boolean isLogProgress() {
         return (options.logger_appender != null) && (options.logger_solver.isAssignableFrom(this.getClass()));
     }
 
@@ -154,7 +177,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     protected final void resetIterationsCount() {
         myIterationsCount.set(0);
-        myResetTime = System.currentTimeMillis();
+        myStopwatch.reset();
     }
 
     /**

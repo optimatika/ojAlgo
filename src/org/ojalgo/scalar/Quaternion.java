@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,22 +24,22 @@ package org.ojalgo.scalar;
 import java.math.BigDecimal;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
+import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>,
-        TransformationMatrix<Double, PhysicalStore<Double>>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+public class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, Transformation2D<Double>,
+        Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
-    public static enum RotationAxis {
+    public enum RotationAxis {
 
         X(0, new double[] { 1.0, 0.0, 0.0 }), Y(1, new double[] { 0.0, 1.0, 0.0 }), Z(2, new double[] { 0.0, 0.0, 1.0 });
 
@@ -128,7 +128,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         }
 
         @Override
-        public void transform(final PhysicalStore<Double> matrix) {
+        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
 
             final double s = this.doubleValue();
 
@@ -159,40 +159,40 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
             final double r21 = 2.0 * (tmp1 + tmp2);
             final double r12 = 2.0 * (tmp1 - tmp2);
 
-            if (matrix.count() == 3L) {
+            if (transformable.count() == 3L) {
 
-                final double x = matrix.doubleValue(0);
-                final double y = matrix.doubleValue(1);
-                final double z = matrix.doubleValue(2);
+                final double x = transformable.doubleValue(0);
+                final double y = transformable.doubleValue(1);
+                final double z = transformable.doubleValue(2);
 
-                matrix.set(0, (r00 * x) + (r01 * y) + (r02 * z));
-                matrix.set(1, (r10 * x) + (r11 * y) + (r12 * z));
-                matrix.set(2, (r20 * x) + (r21 * y) + (r22 * z));
+                transformable.set(0, (r00 * x) + (r01 * y) + (r02 * z));
+                transformable.set(1, (r10 * x) + (r11 * y) + (r12 * z));
+                transformable.set(2, (r20 * x) + (r21 * y) + (r22 * z));
 
-            } else if (matrix.countRows() == 3L) {
+            } else if (transformable.countRows() == 3L) {
 
-                for (long c = 0L, limit = matrix.countColumns(); c < limit; c++) {
+                for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
 
-                    final double x = matrix.doubleValue(0, c);
-                    final double y = matrix.doubleValue(1, c);
-                    final double z = matrix.doubleValue(2, c);
+                    final double x = transformable.doubleValue(0, c);
+                    final double y = transformable.doubleValue(1, c);
+                    final double z = transformable.doubleValue(2, c);
 
-                    matrix.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
-                    matrix.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
-                    matrix.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
+                    transformable.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
+                    transformable.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
+                    transformable.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
                 }
 
-            } else if (matrix.countColumns() == 3L) {
+            } else if (transformable.countColumns() == 3L) {
 
-                for (long r = 0L, limit = matrix.countRows(); r < limit; r++) {
+                for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
 
-                    final double x = matrix.doubleValue(r, 0);
-                    final double y = matrix.doubleValue(r, 1);
-                    final double z = matrix.doubleValue(r, 2);
+                    final double x = transformable.doubleValue(r, 0);
+                    final double y = transformable.doubleValue(r, 1);
+                    final double z = transformable.doubleValue(r, 2);
 
-                    matrix.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
-                    matrix.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
-                    matrix.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
+                    transformable.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
+                    transformable.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
+                    transformable.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
                 }
 
             } else {
@@ -243,6 +243,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
     public static final Quaternion K = new Versor(PrimitiveMath.ZERO, PrimitiveMath.ZERO, PrimitiveMath.ONE);
     public static final Quaternion NEG = new Versor(PrimitiveMath.NEG);
     public static final Quaternion ONE = new Versor(PrimitiveMath.ONE);
+    public static final Quaternion TWO = new Quaternion(PrimitiveMath.TWO);
     public static final Quaternion ZERO = new Quaternion();
 
     private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * PrimitiveScalar.CONTEXT.epsilon();
@@ -281,7 +282,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
             return new Quaternion(norm);
 
-        } else if (PrimitiveFunction.ABS.invoke(tmpAngle - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
+        } else if (PrimitiveMath.ABS.invoke(tmpAngle - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
 
             return new Quaternion(-norm);
 
@@ -289,7 +290,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
             double tmpScalar = PrimitiveMath.ZERO;
             if (norm != PrimitiveMath.ZERO) {
-                final double tmpCos = PrimitiveFunction.COS.invoke(tmpAngle);
+                final double tmpCos = PrimitiveMath.COS.invoke(tmpAngle);
                 if (tmpCos != PrimitiveMath.ZERO) {
                     tmpScalar = norm * tmpCos;
                 }
@@ -299,7 +300,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
             double tmpJ = PrimitiveMath.ZERO;
             double tmpK = PrimitiveMath.ZERO;
             if (norm != PrimitiveMath.ZERO) {
-                final double tmpSin = PrimitiveFunction.SIN.invoke(tmpAngle);
+                final double tmpSin = PrimitiveMath.SIN.invoke(tmpAngle);
                 if (tmpSin != PrimitiveMath.ZERO) {
                     tmpI = unit[0] * norm * tmpSin;
                     tmpJ = unit[1] * norm * tmpSin;
@@ -314,7 +315,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
     public static Versor makeRotation(final RotationAxis axis, final double angle) {
 
-        final double tmpScalar = PrimitiveFunction.COS.invoke(angle);
+        final double tmpScalar = PrimitiveMath.COS.invoke(angle);
 
         double tmpI = PrimitiveMath.ZERO;
         double tmpJ = PrimitiveMath.ZERO;
@@ -324,17 +325,17 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
         case X:
 
-            tmpI = PrimitiveFunction.SIN.invoke(angle);
+            tmpI = PrimitiveMath.SIN.invoke(angle);
             break;
 
         case Y:
 
-            tmpJ = PrimitiveFunction.SIN.invoke(angle);
+            tmpJ = PrimitiveMath.SIN.invoke(angle);
             break;
 
         case Z:
 
-            tmpK = PrimitiveFunction.SIN.invoke(angle);
+            tmpK = PrimitiveMath.SIN.invoke(angle);
             break;
 
         default:
@@ -500,7 +501,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
     }
 
     public double angle() {
-        return PrimitiveFunction.ACOS.invoke(myScalar / this.norm());
+        return PrimitiveMath.ACOS.invoke(myScalar / this.norm());
     }
 
     public int compareTo(final Quaternion reference) {
@@ -710,7 +711,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
     }
 
     public double getVectorLength() {
-        return PrimitiveFunction.SQRT.invoke(this.calculateSumOfSquaresVector());
+        return PrimitiveMath.SQRT.invoke(this.calculateSumOfSquaresVector());
     }
 
     @Override
@@ -822,7 +823,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
     }
 
     public double norm() {
-        return PrimitiveFunction.SQRT.invoke(this.calculateSumOfSquaresAll());
+        return PrimitiveMath.SQRT.invoke(this.calculateSumOfSquaresAll());
     }
 
     public double scalar() {
@@ -968,7 +969,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         } else {
             retVal.append(" + ");
         }
-        retVal.append(Double.toString(PrimitiveFunction.ABS.invoke(i)));
+        retVal.append(Double.toString(PrimitiveMath.ABS.invoke(i)));
         retVal.append("i");
 
         if (j < PrimitiveMath.ZERO) {
@@ -976,7 +977,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         } else {
             retVal.append(" + ");
         }
-        retVal.append(Double.toString(PrimitiveFunction.ABS.invoke(j)));
+        retVal.append(Double.toString(PrimitiveMath.ABS.invoke(j)));
         retVal.append("j");
 
         if (k < PrimitiveMath.ZERO) {
@@ -984,7 +985,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         } else {
             retVal.append(" + ");
         }
-        retVal.append(Double.toString(PrimitiveFunction.ABS.invoke(k)));
+        retVal.append(Double.toString(PrimitiveMath.ABS.invoke(k)));
         retVal.append("k)");
 
         return retVal.toString();
@@ -1028,7 +1029,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         return retVal.toString();
     }
 
-    public void transform(final PhysicalStore<Double> matrix) {
+    public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
 
         final double s = myScalar;
 
@@ -1061,40 +1062,40 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         final double r21 = 2.0 * (tmp1 + tmp2) * invs;
         final double r12 = 2.0 * (tmp1 - tmp2) * invs;
 
-        if (matrix.count() == 3L) {
+        if (transformable.count() == 3L) {
 
-            final double x = matrix.doubleValue(0);
-            final double y = matrix.doubleValue(1);
-            final double z = matrix.doubleValue(2);
+            final double x = transformable.doubleValue(0);
+            final double y = transformable.doubleValue(1);
+            final double z = transformable.doubleValue(2);
 
-            matrix.set(0, (r00 * x) + (r01 * y) + (r02 * z));
-            matrix.set(1, (r10 * x) + (r11 * y) + (r12 * z));
-            matrix.set(2, (r20 * x) + (r21 * y) + (r22 * z));
+            transformable.set(0, (r00 * x) + (r01 * y) + (r02 * z));
+            transformable.set(1, (r10 * x) + (r11 * y) + (r12 * z));
+            transformable.set(2, (r20 * x) + (r21 * y) + (r22 * z));
 
-        } else if (matrix.countRows() == 3L) {
+        } else if (transformable.countRows() == 3L) {
 
-            for (long c = 0L, limit = matrix.countColumns(); c < limit; c++) {
+            for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
 
-                final double x = matrix.doubleValue(0, c);
-                final double y = matrix.doubleValue(1, c);
-                final double z = matrix.doubleValue(2, c);
+                final double x = transformable.doubleValue(0, c);
+                final double y = transformable.doubleValue(1, c);
+                final double z = transformable.doubleValue(2, c);
 
-                matrix.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
-                matrix.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
-                matrix.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
+                transformable.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
+                transformable.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
+                transformable.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
             }
 
-        } else if (matrix.countColumns() == 3L) {
+        } else if (transformable.countColumns() == 3L) {
 
-            for (long r = 0L, limit = matrix.countRows(); r < limit; r++) {
+            for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
 
-                final double x = matrix.doubleValue(r, 0);
-                final double y = matrix.doubleValue(r, 1);
-                final double z = matrix.doubleValue(r, 2);
+                final double x = transformable.doubleValue(r, 0);
+                final double y = transformable.doubleValue(r, 1);
+                final double z = transformable.doubleValue(r, 2);
 
-                matrix.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
-                matrix.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
-                matrix.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
+                transformable.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
+                transformable.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
+                transformable.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
             }
 
         } else {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,8 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * 1-dimensional accessor (get) methods. The nested interfaces declare additional methods that indirectly
- * requires that the elements has been accessed, but they do not extends the main/outer interface. A
+ * 1-dimensional accessor (get) methods. The nested interfaces declare additional methods that implicitly
+ * require that the elements have been accessed, but they do not extends the main/outer interface. A
  * 1D-structure can be vistiable, aggregatable and/or expose various element properties without allowing
  * explicit access to its elements.
  *
@@ -71,20 +71,27 @@ public interface Access1D<N extends Number> extends Structure1D {
 
     }
 
+    /**
+     * @deprecated v48 Will be removed
+     */
+    @Deprecated
     public interface Elements extends Structure1D {
 
         /**
          * @see Scalar#isAbsolute()
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         boolean isAbsolute(long index);
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         default boolean isAllSmall(final double comparedTo) {
             boolean retVal = true;
-            final long tmpLimit = this.count();
-            for (long i = 0L; retVal && (i < tmpLimit); i++) {
+            for (long i = 0L, limit = this.count(); retVal && (i < limit); i++) {
                 retVal &= this.isSmall(i, comparedTo);
             }
             return retVal;
@@ -92,7 +99,9 @@ public interface Access1D<N extends Number> extends Structure1D {
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         boolean isSmall(long index, double comparedTo);
 
     }
@@ -177,12 +186,24 @@ public interface Access1D<N extends Number> extends Structure1D {
 
     }
 
+    /**
+     * @deprecated v48 Will be removed
+     */
+    @Deprecated
     public interface IndexOf extends Structure1D {
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         default long indexOfLargest() {
             return this.indexOfLargestInRange(0L, this.count());
         }
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         long indexOfLargestInRange(final long first, final long limit);
 
     }
@@ -220,6 +241,11 @@ public interface Access1D<N extends Number> extends Structure1D {
 
             public Double get(final long index) {
                 return access.doubleValue(index);
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
             }
 
         };
@@ -261,6 +287,26 @@ public interface Access1D<N extends Number> extends Structure1D {
         return retVal;
     }
 
+    static String toString(Access1D<?> access) {
+        int size = access.size();
+        switch (size) {
+        case 0:
+            return "{ }";
+        case 1:
+            return "{ " + access.get(0) + " }";
+        default:
+            StringBuilder builder = new StringBuilder();
+            builder.append("{ ");
+            builder.append(access.get(0));
+            for (int i = 1; i < size; i++) {
+                builder.append(", ");
+                builder.append(access.get(i));
+            }
+            builder.append(" }");
+            return builder.toString();
+        }
+    }
+
     static Access1D<Double> wrap(final double[] target) {
         return new Access1D<Double>() {
 
@@ -274,6 +320,11 @@ public interface Access1D<N extends Number> extends Structure1D {
 
             public Double get(final long index) {
                 return target[(int) index];
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
             }
 
         };
@@ -294,6 +345,11 @@ public interface Access1D<N extends Number> extends Structure1D {
                 return target.get((int) index);
             }
 
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
+            }
+
         };
     }
 
@@ -310,6 +366,11 @@ public interface Access1D<N extends Number> extends Structure1D {
 
             public N get(final long index) {
                 return target[(int) index];
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
             }
 
         };

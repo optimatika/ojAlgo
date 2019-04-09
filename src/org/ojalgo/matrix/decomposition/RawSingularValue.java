@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,13 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.DOT;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
@@ -110,7 +110,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             retVal += tmpVal * tmpVal;
         }
 
-        return SQRT.invoke(retVal);
+        return PrimitiveMath.SQRT.invoke(retVal);
     }
 
     @Override
@@ -302,7 +302,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 // Compute 2-norm of k-th column without under/overflow.
                 nrm = ZERO;
                 for (int i = k; i < m; i++) {
-                    nrm = HYPOT.invoke(nrm, tmpArr[i]);
+                    nrm = PrimitiveMath.HYPOT.invoke(nrm, tmpArr[i]);
                 }
 
                 // Form k-th Householder column-vector.
@@ -345,7 +345,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 // Compute 2-norm without under/overflow.
                 nrm = ZERO;
                 for (int i = k + 1; i < n; i++) {
-                    nrm = HYPOT.invoke(nrm, e[i]);
+                    nrm = PrimitiveMath.HYPOT.invoke(nrm, e[i]);
                 }
 
                 if (nrm != ZERO) {

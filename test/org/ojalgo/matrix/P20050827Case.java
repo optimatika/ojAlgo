@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array2D;
-import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.ComplexMath;
 import org.ojalgo.random.Normal;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
@@ -68,7 +68,7 @@ public class P20050827Case extends BasicMatrixTest {
     @BeforeEach
     public void setUp() {
 
-        evaluation = NumberContext.getGeneral(6).newPrecision(12);
+        evaluation = NumberContext.getGeneral(6).withPrecision(12);
 
         rationalAA = RationalMatrix.FACTORY.copy(P20050827Case.getProblematic());
         rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
@@ -119,7 +119,7 @@ public class P20050827Case extends BasicMatrixTest {
 
         final ComplexMatrix tmpMtrx = tmpProblematic.multiply(tmpProblematic.conjugate());
         final ComplexNumber tmpVal = tmpMtrx.getTrace().get();
-        final ComplexNumber tmpExpected = ComplexFunction.ROOT.invoke(tmpVal, 2);
+        final ComplexNumber tmpExpected = ComplexMath.ROOT.invoke(tmpVal, 2);
         final ComplexNumber tmpActual = ComplexNumber.valueOf(tmpProblematic.aggregateAll(Aggregator.NORM2));
 
         TestUtils.assertEquals(tmpExpected.norm(), tmpActual.norm(), evaluation);

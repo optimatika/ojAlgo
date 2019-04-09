@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,13 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
@@ -48,7 +49,7 @@ final class QPESolver extends ConstrainedSolver {
 
         super(matrices, solverOptions);
 
-        myIterationX = FACTORY.makeZero(this.countVariables(), 1L);
+        myIterationX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
     }
 
     private boolean isFeasible() {
@@ -57,7 +58,7 @@ final class QPESolver extends ConstrainedSolver {
 
         final MatrixStore<Double> tmpSE = this.getSE();
         for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
-            if (!options.feasibility.isZero(tmpSE.doubleValue(i))) {
+            if (!GenericSolver.ACCURACY.isZero(tmpSE.doubleValue(i))) {
                 retVal = false;
             }
         }
@@ -99,7 +100,7 @@ final class QPESolver extends ConstrainedSolver {
         boolean solved = false;
 
         final PrimitiveDenseStore tmpIterX = myIterationX;
-        final PrimitiveDenseStore tmpIterL = FACTORY.makeZero(tmpIterA.countRows(), 1L);
+        final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(tmpIterA.countRows(), 1L);
 
         if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (solved = this.isSolvableQ())) {
             // Q is SPD
@@ -125,7 +126,7 @@ final class QPESolver extends ConstrainedSolver {
         if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
-            final PrimitiveDenseStore tmpXL = FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
+            final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
 
             if (solved = this.solveFullKKT(tmpXL)) {
                 tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
@@ -138,7 +139,7 @@ final class QPESolver extends ConstrainedSolver {
             this.setState(State.OPTIMAL);
 
             if (myFeasible) {
-                this.getSolutionX().modifyMatching(PrimitiveFunction.ADD, tmpIterX);
+                this.getSolutionX().modifyMatching(PrimitiveMath.ADD, tmpIterX);
             } else {
                 this.getSolutionX().fillMatching(tmpIterX);
             }

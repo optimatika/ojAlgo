@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,11 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
@@ -62,10 +61,10 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Access2D<N>, Access2D.Elements, Access2D.Visitable<N>, Access2D.Aggregatable<N>,
-        Structure2D.ReducibleTo1D<ElementsSupplier<N>>, Access2D.Sliceable<N>, NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>> {
+public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>,
+        Access2D.Elements, Structure2D.ReducibleTo1D<ElementsSupplier<N>>, NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>> {
 
-    public static interface Factory<N extends Number> {
+    public interface Factory<N extends Number> {
 
         MatrixStore.LogicalBuilder<N> makeIdentity(int dimension);
 
@@ -150,47 +149,43 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             myStore = matrixStore;
         }
 
-        public final LogicalBuilder<N> above(final int numberOfRows) {
+        public LogicalBuilder<N> above(final int numberOfRows) {
             final ZeroStore<N> tmpUpperStore = new ZeroStore<>(myStore.physical(), numberOfRows, (int) myStore.countColumns());
             myStore = new AboveBelowStore<>(tmpUpperStore, myStore);
             return this;
         }
 
-        @SafeVarargs
-        public final LogicalBuilder<N> above(final MatrixStore<N>... upperStore) {
+        public LogicalBuilder<N> above(final MatrixStore<N>... upperStore) {
             final MatrixStore<N> tmpUpperStore = LogicalBuilder.buildRow((int) myStore.countColumns(), upperStore);
             myStore = new AboveBelowStore<>(tmpUpperStore, myStore);
             return this;
         }
 
-        @SafeVarargs
-        public final LogicalBuilder<N> above(final N... elements) {
+        public LogicalBuilder<N> above(final N... elements) {
             final MatrixStore<N> tmpUpperStore = LogicalBuilder.buildRow(myStore.physical(), (int) myStore.countColumns(), elements);
             myStore = new AboveBelowStore<>(tmpUpperStore, myStore);
             return this;
         }
 
-        public final LogicalBuilder<N> below(final int numberOfRows) {
+        public LogicalBuilder<N> below(final int numberOfRows) {
             final ZeroStore<N> tmpLowerStore = new ZeroStore<>(myStore.physical(), numberOfRows, (int) myStore.countColumns());
             myStore = new AboveBelowStore<>(myStore, tmpLowerStore);
             return this;
         }
 
-        @SafeVarargs
-        public final LogicalBuilder<N> below(final MatrixStore<N>... lowerStore) {
+        public LogicalBuilder<N> below(final MatrixStore<N>... lowerStore) {
             final MatrixStore<N> tmpLowerStore = LogicalBuilder.buildRow((int) myStore.countColumns(), lowerStore);
             myStore = new AboveBelowStore<>(myStore, tmpLowerStore);
             return this;
         }
 
-        @SafeVarargs
-        public final LogicalBuilder<N> below(final N... elements) {
+        public LogicalBuilder<N> below(final N... elements) {
             final MatrixStore<N> tmpLowerStore = LogicalBuilder.buildRow(myStore.physical(), (int) myStore.countColumns(), elements);
             myStore = new AboveBelowStore<>(myStore, tmpLowerStore);
             return this;
         }
 
-        public final LogicalBuilder<N> bidiagonal(final boolean upper, final boolean assumeOne) {
+        public LogicalBuilder<N> bidiagonal(final boolean upper, final boolean assumeOne) {
             if (upper) {
                 myStore = new UpperTriangularStore<>(new LowerHessenbergStore<>(myStore), assumeOne);
             } else {
@@ -199,12 +194,12 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
-        public final LogicalBuilder<N> column(final int... columns) {
+        public LogicalBuilder<N> column(final int... columns) {
             myStore = new ColumnsStore<>(myStore, columns);
             return this;
         }
 
-        public final LogicalBuilder<N> conjugate() {
+        public LogicalBuilder<N> conjugate() {
             if (myStore instanceof ConjugatedStore) {
                 myStore = ((ConjugatedStore<N>) myStore).getOriginal();
             } else {
@@ -213,34 +208,33 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
-        public final PhysicalStore<N> copy() {
+        public PhysicalStore<N> copy() {
             return myStore.copy();
         }
 
-        public final long count() {
+        public long count() {
             return myStore.count();
         }
 
-        public final long countColumns() {
+        public long countColumns() {
             return myStore.countColumns();
         }
 
-        public final long countRows() {
+        public long countRows() {
             return myStore.countRows();
         }
 
-        public final LogicalBuilder<N> diagonal() {
+        public LogicalBuilder<N> diagonal() {
             myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, false), false);
             return this;
         }
 
-        public final LogicalBuilder<N> diagonal(final boolean assumeOne) {
+        public LogicalBuilder<N> diagonal(final boolean assumeOne) {
             myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, assumeOne), assumeOne);
             return this;
         }
 
-        @SafeVarargs
-        public final LogicalBuilder<N> diagonally(final MatrixStore<N>... diagonally) {
+        public LogicalBuilder<N> diagonally(final MatrixStore<N>... diagonally) {
 
             final PhysicalStore.Factory<N, ?> tmpFactory = myStore.physical();
 
@@ -267,11 +261,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
-        public final MatrixStore<N> get() {
+        public MatrixStore<N> get() {
             return myStore;
         }
 
-        public final LogicalBuilder<N> hermitian(final boolean upper) {
+        public LogicalBuilder<N> hermitian(final boolean upper) {
             if (upper) {
                 myStore = new UpperHermitianStore<>(myStore);
             } else {
@@ -280,7 +274,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
-        public final LogicalBuilder<N> hessenberg(final boolean upper) {
+        public LogicalBuilder<N> hessenberg(final boolean upper) {
             if (upper) {
                 myStore = new UpperHessenbergStore<>(myStore);
             } else {
@@ -289,21 +283,19 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
-        public final LogicalBuilder<N> left(final int numberOfColumns) {
+        public LogicalBuilder<N> left(final int numberOfColumns) {
             final MatrixStore<N> tmpLeftStore = new ZeroStore<>(myStore.physical(), (int) myStore.countRows(), numberOfColumns);
             myStore = new LeftRightStore<>(tmpLeftStore, myStore);
             return this;
         }
 
-        @SafeVarargs
-        public final LogicalBuilder<N> left(final MatrixStore<N>... left) {
+        public LogicalBuilder<N> left(final MatrixStore<N>... left) {
             final MatrixStore<N> tmpLeftStore = LogicalBuilder.buildColumn((int) myStore.countRows(), left);
             myStore = new LeftRightStore<>(tmpLeftStore, myStore);
             return this;
         }
 
-        @SafeVarargs
-        public final LogicalBuilder<N> left(final N... elements) {
+        public LogicalBuilder<N> left(final N... elements) {
             final MatrixStore<N> tmpLeftStore = LogicalBuilder.buildColumn(myStore.physical(), (int) myStore.countRows(), elements);
             myStore = new LeftRightStore<>(tmpLeftStore, myStore);
             return this;
@@ -313,62 +305,60 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
          * Setting either limit to &lt; 0 is interpreted as "no limit" (useful when you only want to limit
          * either the rows or columns, and don't know the size of the other)
          */
-        public final LogicalBuilder<N> limits(final int rowLimit, final int columnLimit) {
+        public LogicalBuilder<N> limits(final int rowLimit, final int columnLimit) {
             myStore = new LimitStore<>(rowLimit < 0 ? (int) myStore.countRows() : rowLimit, columnLimit < 0 ? (int) myStore.countColumns() : columnLimit,
                     myStore);
             return this;
         }
 
-        public final LogicalBuilder<N> offsets(final int rowOffset, final int columnOffset) {
+        public LogicalBuilder<N> offsets(final int rowOffset, final int columnOffset) {
             myStore = new OffsetStore<>(myStore, rowOffset < 0 ? 0 : rowOffset, columnOffset < 0 ? 0 : columnOffset);
             return this;
         }
 
-        public final PhysicalStore.Factory<N, ?> physical() {
+        public PhysicalStore.Factory<N, ?> physical() {
             return myStore.physical();
         }
 
-        public final LogicalBuilder<N> right(final int numberOfColumns) {
+        public LogicalBuilder<N> right(final int numberOfColumns) {
             final MatrixStore<N> tmpRightStore = new ZeroStore<>(myStore.physical(), (int) myStore.countRows(), numberOfColumns);
             myStore = new LeftRightStore<>(myStore, tmpRightStore);
             return this;
         }
 
-        @SafeVarargs
-        public final LogicalBuilder<N> right(final MatrixStore<N>... right) {
+        public LogicalBuilder<N> right(final MatrixStore<N>... right) {
             final MatrixStore<N> tmpRightStore = LogicalBuilder.buildColumn((int) myStore.countRows(), right);
             myStore = new LeftRightStore<>(myStore, tmpRightStore);
             return this;
         }
 
-        @SafeVarargs
-        public final LogicalBuilder<N> right(final N... elements) {
+        public LogicalBuilder<N> right(final N... elements) {
             final MatrixStore<N> tmpRightStore = LogicalBuilder.buildColumn(myStore.physical(), (int) myStore.countRows(), elements);
             myStore = new LeftRightStore<>(myStore, tmpRightStore);
             return this;
         }
 
-        public final LogicalBuilder<N> row(final int... rows) {
+        public LogicalBuilder<N> row(final int... rows) {
             myStore = new RowsStore<>(myStore, rows);
             return this;
         }
 
-        public final LogicalBuilder<N> superimpose(final int row, final int col, final MatrixStore<N> matrix) {
+        public LogicalBuilder<N> superimpose(final int row, final int col, final MatrixStore<N> matrix) {
             myStore = new SuperimposedStore<>(myStore, row, col, matrix);
             return this;
         }
 
-        public final LogicalBuilder<N> superimpose(final int row, final int col, final Number matrix) {
+        public LogicalBuilder<N> superimpose(final int row, final int col, final Number matrix) {
             myStore = new SuperimposedStore<>(myStore, row, col, new SingleStore<>(myStore.physical(), matrix));
             return this;
         }
 
-        public final LogicalBuilder<N> superimpose(final MatrixStore<N> matrix) {
+        public LogicalBuilder<N> superimpose(final MatrixStore<N> matrix) {
             myStore = new SuperimposedStore<>(myStore, 0, 0, matrix);
             return this;
         }
 
-        public final void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final ElementsConsumer<N> receiver) {
             if (receiver.isAcceptable(this)) {
                 receiver.accept(this.get());
             } else {
@@ -381,7 +371,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return myStore.toString();
         }
 
-        public final LogicalBuilder<N> transpose() {
+        public LogicalBuilder<N> transpose() {
             if (myStore instanceof TransposedStore) {
                 myStore = ((TransposedStore<N>) myStore).getOriginal();
             } else {
@@ -390,7 +380,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
-        public final LogicalBuilder<N> triangular(final boolean upper, final boolean assumeOne) {
+        public LogicalBuilder<N> triangular(final boolean upper, final boolean assumeOne) {
             if (upper) {
                 myStore = new UpperTriangularStore<>(myStore, assumeOne);
             } else {
@@ -399,14 +389,14 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
-        public final LogicalBuilder<N> tridiagonal() {
+        public LogicalBuilder<N> tridiagonal() {
             myStore = new UpperHessenbergStore<>(new LowerHessenbergStore<>(myStore));
             return this;
         }
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+    Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         public LogicalBuilder<ComplexNumber> makeIdentity(final int dimension) {
             return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.COMPLEX, dimension));
@@ -430,7 +420,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     };
 
-    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+    Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         public LogicalBuilder<Double> makeIdentity(final int dimension) {
             return new LogicalBuilder<>(new IdentityStore<>(PrimitiveDenseStore.FACTORY, dimension));
@@ -454,7 +444,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     };
 
-    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+    Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         public LogicalBuilder<Quaternion> makeIdentity(final int dimension) {
             return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.QUATERNION, dimension));
@@ -478,7 +468,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     };
 
-    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+    Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         public LogicalBuilder<RationalNumber> makeIdentity(final int dimension) {
             return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.RATIONAL, dimension));
@@ -776,7 +766,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         } else {
             // Bringing it closer to what the operator norm would be
             // In case of representing a ComplexNumber or Quaternion as a matrix this will match their norms
-            return frobeniusNorm / PrimitiveFunction.SQRT.invoke(Math.min(this.countRows(), this.countColumns()));
+            return frobeniusNorm / PrimitiveMath.SQRT.invoke(Math.min(this.countRows(), this.countColumns()));
         }
     }
 
@@ -826,6 +816,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
                 return MatrixStore.this.get(row + index, col);
             }
 
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
+            }
+
         };
     }
 
@@ -842,6 +837,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
             public N get(final long index) {
                 return MatrixStore.this.get(row + index, col + index);
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
             }
 
         };
@@ -862,6 +862,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
                 return MatrixStore.this.get(first + index);
             }
 
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
+            }
+
         };
     }
 
@@ -878,6 +883,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
             public N get(final long index) {
                 return MatrixStore.this.get(row, col + index);
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
             }
 
         };

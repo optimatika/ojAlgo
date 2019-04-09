@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ abstract class AbstractMachine extends BasicMachine {
     static final long K = 1024L;
 
     static long elements(final long availableMemory, final long elementSize) {
-        return (availableMemory - 16L) / elementSize;
+        return availableMemory / elementSize;
     }
 
     public final String architecture;//x86_64

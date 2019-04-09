@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,9 @@
  */
 package org.ojalgo.function.aggregator;
 
-import static org.ojalgo.function.QuaternionFunction.*;
-
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.QuaternionFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.constant.QuaternionMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.Scalar;
@@ -49,6 +46,10 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
     }
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Quaternion>> AVERAGE = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
@@ -80,11 +81,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     ProgrammingError.throwForIllegalInvocation();
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    ProgrammingError.throwForIllegalInvocation();
-                    return null;
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myCount = 0;
                     myNumber = Quaternion.ZERO;
@@ -95,6 +91,10 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Quaternion>> CARDINALITY = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
@@ -121,10 +121,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     myCount += result.intValue();
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myCount = 0;
                     return this;
@@ -133,6 +129,11 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
             };
         }
     };
+
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Quaternion>> LARGEST = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
@@ -150,15 +151,11 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                 }
 
                 public void invoke(final Quaternion anArg) {
-                    myNumber = QuaternionFunction.MAX.invoke(myNumber, ABS.invoke(anArg));
+                    myNumber = QuaternionMath.MAX.invoke(myNumber, QuaternionMath.ABS.invoke(anArg));
                 }
 
                 public void merge(final Quaternion result) {
                     this.invoke(result);
-                }
-
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return QuaternionFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Quaternion> reset() {
@@ -170,6 +167,10 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Quaternion>> MAX = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
@@ -187,15 +188,11 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                 }
 
                 public void invoke(final Quaternion anArg) {
-                    myNumber = QuaternionFunction.MAX.invoke(myNumber, anArg);
+                    myNumber = QuaternionMath.MAX.invoke(myNumber, anArg);
                 }
 
                 public void merge(final Quaternion result) {
                     this.invoke(result);
-                }
-
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return QuaternionFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Quaternion> reset() {
@@ -207,6 +204,10 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Quaternion>> MIN = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
@@ -228,15 +229,11 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                 }
 
                 public void invoke(final Quaternion anArg) {
-                    myNumber = QuaternionFunction.MIN.invoke(myNumber, anArg);
+                    myNumber = QuaternionMath.MIN.invoke(myNumber, anArg);
                 }
 
                 public void merge(final Quaternion result) {
                     this.invoke(result);
-                }
-
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return QuaternionFunction.MIN.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Quaternion> reset() {
@@ -248,6 +245,10 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Quaternion>> NORM1 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
@@ -272,10 +273,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     this.invoke(result);
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myNumber = Quaternion.ZERO;
                     return this;
@@ -285,6 +282,10 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Quaternion>> NORM2 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
@@ -294,7 +295,7 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                 private Quaternion myNumber = Quaternion.ZERO;
 
                 public Quaternion get() {
-                    return Quaternion.valueOf(PrimitiveFunction.SQRT.invoke(myNumber.norm()));
+                    return Quaternion.valueOf(PrimitiveMath.SQRT.invoke(myNumber.norm()));
                 }
 
                 public int intValue() {
@@ -310,10 +311,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     this.invoke(result);
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return HYPOT.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myNumber = Quaternion.ZERO;
                     return this;
@@ -323,6 +320,10 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Quaternion>> PRODUCT = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
@@ -347,10 +348,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     this.invoke(result);
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return MULTIPLY.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myNumber = Quaternion.ONE;
                     return this;
@@ -359,6 +356,11 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
             };
         }
     };
+
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Quaternion>> PRODUCT2 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
@@ -383,10 +385,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     myNumber = myNumber.multiply(result);
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return MULTIPLY.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myNumber = Quaternion.ONE;
                     return this;
@@ -396,6 +394,10 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Quaternion>> SMALLEST = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
@@ -418,16 +420,12 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public void invoke(final Quaternion anArg) {
                     if (!Quaternion.isSmall(PrimitiveMath.ONE, anArg)) {
-                        myNumber = QuaternionFunction.MIN.invoke(myNumber, ABS.invoke(anArg));
+                        myNumber = QuaternionMath.MIN.invoke(myNumber, QuaternionMath.ABS.invoke(anArg));
                     }
                 }
 
                 public void merge(final Quaternion result) {
                     this.invoke(result);
-                }
-
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return QuaternionFunction.MIN.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Quaternion> reset() {
@@ -439,6 +437,10 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Quaternion>> SUM = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
@@ -463,10 +465,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
                     this.invoke(result);
                 }
 
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<Quaternion> reset() {
                     myNumber = Quaternion.ZERO;
                     return this;
@@ -476,6 +474,10 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<Quaternion>> SUM2 = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
         @Override
@@ -498,10 +500,6 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
                 public void merge(final Quaternion result) {
                     myNumber = myNumber.add(result);
-                }
-
-                public Quaternion merge(final Quaternion result1, final Quaternion result2) {
-                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Quaternion> reset() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,8 @@
  */
 package org.ojalgo.series.primitive;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
-
-import java.util.Arrays;
-
 import org.ojalgo.array.Array1D;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access1D;
 
 public abstract class PrimitiveSeries implements Access1D<Double> {
@@ -43,11 +40,11 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
     }
 
     public PrimitiveSeries add(final double addend) {
-        return new UnaryFunctionSeries(this, ADD.second(addend));
+        return new UnaryFunctionSeries(this, PrimitiveMath.ADD.second(addend));
     }
 
     public PrimitiveSeries add(final PrimitiveSeries addend) {
-        return new BinaryFunctionSeries(this, ADD, addend);
+        return new BinaryFunctionSeries(this, PrimitiveMath.ADD, addend);
     }
 
     public PrimitiveSeries copy() {
@@ -70,11 +67,11 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
     }
 
     public PrimitiveSeries divide(final double divisor) {
-        return new UnaryFunctionSeries(this, DIVIDE.second(divisor));
+        return new UnaryFunctionSeries(this, PrimitiveMath.DIVIDE.second(divisor));
     }
 
     public PrimitiveSeries divide(final PrimitiveSeries divisor) {
-        return new BinaryFunctionSeries(this, DIVIDE, divisor);
+        return new BinaryFunctionSeries(this, PrimitiveMath.DIVIDE, divisor);
     }
 
     public final double doubleValue(final long index) {
@@ -82,7 +79,7 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
     }
 
     public PrimitiveSeries exp() {
-        return new UnaryFunctionSeries(this, EXP);
+        return new UnaryFunctionSeries(this, PrimitiveMath.EXP);
     }
 
     public final Double get(final int index) {
@@ -94,15 +91,15 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
     }
 
     public PrimitiveSeries log() {
-        return new UnaryFunctionSeries(this, LOG);
+        return new UnaryFunctionSeries(this, PrimitiveMath.LOG);
     }
 
     public PrimitiveSeries multiply(final double multiplicand) {
-        return new UnaryFunctionSeries(this, MULTIPLY.second(multiplicand));
+        return new UnaryFunctionSeries(this, PrimitiveMath.MULTIPLY.second(multiplicand));
     }
 
     public PrimitiveSeries multiply(final PrimitiveSeries multiplicand) {
-        return new BinaryFunctionSeries(this, MULTIPLY, multiplicand);
+        return new BinaryFunctionSeries(this, PrimitiveMath.MULTIPLY, multiplicand);
     }
 
     /**
@@ -155,11 +152,11 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
     public abstract int size();
 
     public PrimitiveSeries subtract(final double subtrahend) {
-        return new UnaryFunctionSeries(this, SUBTRACT.second(subtrahend));
+        return new UnaryFunctionSeries(this, PrimitiveMath.SUBTRACT.second(subtrahend));
     }
 
     public PrimitiveSeries subtract(final PrimitiveSeries subtrahend) {
-        return new BinaryFunctionSeries(this, SUBTRACT, subtrahend);
+        return new BinaryFunctionSeries(this, PrimitiveMath.SUBTRACT, subtrahend);
     }
 
     public final DataSeries toDataSeries() {
@@ -167,8 +164,8 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
     }
 
     @Override
-    public String toString() {
-        return "PrimitiveSeries [values()=" + Arrays.toString(this.values()) + "]";
+    public final String toString() {
+        return Access1D.toString(this);
     }
 
     public abstract double value(final int index);

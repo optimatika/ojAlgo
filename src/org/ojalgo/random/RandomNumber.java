@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,12 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Random;
 
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * RandomNumber
@@ -60,7 +60,7 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
      * @see org.ojalgo.random.Distribution#getVariance()
      */
     public double getStandardDeviation() {
-        return PrimitiveFunction.SQRT.invoke(this.getVariance());
+        return PrimitiveMath.SQRT.invoke(this.getVariance());
     }
 
     /**
@@ -70,13 +70,13 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
      * @see org.ojalgo.random.Distribution#getVariance()
      */
     public double getVariance() {
-        final double tmpStandardDeviation = this.getStandardDeviation();
-        return tmpStandardDeviation * tmpStandardDeviation;
+        final double stdDev = this.getStandardDeviation();
+        return stdDev * stdDev;
     }
 
     @Override
     public final int intValue() {
-        return (int) this.generate();
+        return (int) this.longValue();
     }
 
     public final Double invoke() {
@@ -85,7 +85,11 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
 
     @Override
     public final long longValue() {
-        return (long) this.generate();
+        return Math.round(this.generate());
+    }
+
+    public SampleSet newSampleSet(int numberOfSamples) {
+        return SampleSet.make(this, numberOfSamples);
     }
 
     public void setSeed(final long seed) {
@@ -97,8 +101,8 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
         return this.getExpected() + "±" + this.getStandardDeviation();
     }
 
-    protected void checkProbabilty(final double aProbabilty) {
-        if ((aProbabilty < ZERO) || (ONE < aProbabilty)) {
+    protected void checkProbabilty(final double probabilty) {
+        if ((probabilty < ZERO) || (ONE < probabilty)) {
             throw new IllegalArgumentException("Probabilty must be [0,1]");
         }
     }

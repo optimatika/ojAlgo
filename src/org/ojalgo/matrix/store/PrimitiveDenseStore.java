@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +45,7 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.matrix.MatrixUtils;
@@ -70,23 +70,23 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class PrimitiveDenseStore extends Primitive64Array implements PhysicalStore<Double>, DecompositionStore<Double> {
 
-    public static interface PrimitiveMultiplyBoth extends ElementsConsumer.FillByMultiplying<Double> {
+    public interface PrimitiveMultiplyBoth extends ElementsConsumer.FillByMultiplying<Double> {
 
     }
 
-    public static interface PrimitiveMultiplyLeft {
+    public interface PrimitiveMultiplyLeft {
 
         void invoke(double[] product, Access1D<?> left, int complexity, double[] right);
 
     }
 
-    public static interface PrimitiveMultiplyNeither {
+    public interface PrimitiveMultiplyNeither {
 
         void invoke(double[] product, double[] left, int complexity, double[] right);
 
     }
 
-    public static interface PrimitiveMultiplyRight {
+    public interface PrimitiveMultiplyRight {
 
         void invoke(double[] product, double[] left, int complexity, Access1D<?> right);
 
@@ -900,7 +900,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Primitive) destination);
     }
 
-    public final MatrixStore<Double> get() {
+    public MatrixStore<Double> get() {
         return this;
     }
 
@@ -1028,30 +1028,30 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     public void negateColumn(final int column) {
-        myUtility.modifyColumn(0, column, NEGATE);
+        myUtility.modifyColumn(0, column, PrimitiveMath.NEGATE);
     }
 
     public PhysicalStore.Factory<Double, PrimitiveDenseStore> physical() {
         return FACTORY;
     }
 
-    public final ElementsConsumer<Double> regionByColumns(final int... columns) {
+    public ElementsConsumer<Double> regionByColumns(final int... columns) {
         return new ElementsConsumer.ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
-    public final ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
+    public ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
         return new ElementsConsumer.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
-    public final ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
+    public ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
         return new ElementsConsumer.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
-    public final ElementsConsumer<Double> regionByRows(final int... rows) {
+    public ElementsConsumer<Double> regionByRows(final int... rows) {
         return new ElementsConsumer.RowsRegion<>(this, multiplyBoth, rows);
     }
 
-    public final ElementsConsumer<Double> regionByTransposing() {
+    public ElementsConsumer<Double> regionByTransposing() {
         return new ElementsConsumer.TransposedRegion<>(this, multiplyBoth);
     }
 
@@ -1192,11 +1192,11 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             }
         } else {
             if (!Double.isNaN(tmpTransf.cos)) {
-                myUtility.modifyRow(tmpLow, 0L, MULTIPLY.second(tmpTransf.cos));
+                myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
             } else if (!Double.isNaN(tmpTransf.sin)) {
-                myUtility.modifyRow(tmpLow, 0L, DIVIDE.second(tmpTransf.sin));
+                myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
             } else {
-                myUtility.modifyRow(tmpLow, 0, NEGATE);
+                myUtility.modifyRow(tmpLow, 0, PrimitiveMath.NEGATE);
             }
         }
     }
@@ -1246,11 +1246,11 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             }
         } else {
             if (!Double.isNaN(tmpTransf.cos)) {
-                myUtility.modifyColumn(0L, tmpHigh, MULTIPLY.second(tmpTransf.cos));
+                myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
             } else if (!Double.isNaN(tmpTransf.sin)) {
-                myUtility.modifyColumn(0L, tmpHigh, DIVIDE.second(tmpTransf.sin));
+                myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
             } else {
-                myUtility.modifyColumn(0, tmpHigh, NEGATE);
+                myUtility.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
             }
         }
     }

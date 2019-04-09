@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,17 +21,27 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 public final class SampleSet implements Access1D<Double> {
+
+    /**
+     * @param sumOfValues The sum of all values in a sample set
+     * @param sumOfSquaredValues The sum of all squared values, in a sample set
+     * @param numberOfValues The number of values in the sample set
+     * @return The sample set's variance
+     */
+    public static double calculateVariance(final double sumOfValues, final double sumOfSquaredValues, final int numberOfValues) {
+        return ((numberOfValues * sumOfSquaredValues) - (sumOfValues * sumOfValues)) / (numberOfValues * (numberOfValues - 1));
+    }
 
     public static SampleSet make() {
         return new SampleSet(Primitive64Array.make(4));
@@ -53,6 +63,10 @@ public final class SampleSet implements Access1D<Double> {
         return new SampleSet(someSamples);
     }
 
+    public static SampleSet wrap(final double[] someSamples) {
+        return SampleSet.wrap(Access1D.wrap(someSamples));
+    }
+
     private transient double myMax = NaN;
     private transient double myMean = NaN;
     private transient double myMin = NaN;
@@ -61,6 +75,7 @@ public final class SampleSet implements Access1D<Double> {
     private transient double myQuartile3 = NaN;
     private Access1D<?> mySamples;
     private transient double[] mySortedCopy = null;
+    private transient double myStandardDeviation = NaN;
     private transient double myVariance = NaN;
 
     @SuppressWarnings("unused")
@@ -114,19 +129,17 @@ public final class SampleSet implements Access1D<Double> {
 
         double retVal = ZERO;
 
-        final double tmpThisMean = this.getMean();
-        final double tmpThatMean = anotherSampleSet.getMean();
+        final double thisMean = this.getMean();
+        final double thatMean = anotherSampleSet.getMean();
 
-        final long tmpLimit = Math.min(mySamples.count(), anotherSampleSet.count());
+        final long limit = Math.min(mySamples.count(), anotherSampleSet.count());
 
-        final Access1D<?> tmpValues = anotherSampleSet.getSamples();
-
-        for (long i = 0L; i < tmpLimit; i++) {
-            retVal += (mySamples.doubleValue(i) - tmpThisMean) * (tmpValues.doubleValue(i) - tmpThatMean);
+        final Access1D<?> otherValues = anotherSampleSet.getSamples();
+        for (long i = 0L; i < limit; i++) {
+            retVal += (mySamples.doubleValue(i) - thisMean) * (otherValues.doubleValue(i) - thatMean);
         }
 
-        retVal /= (tmpLimit - 1L);
-
+        retVal /= (limit - 1L);
         return retVal;
     }
 
@@ -151,7 +164,7 @@ public final class SampleSet implements Access1D<Double> {
 
         final long tmpLimit = mySamples.count();
         for (long i = 0L; i < tmpLimit; i++) {
-            retVal = MAX.invoke(retVal, ABS.invoke(mySamples.doubleValue(i)));
+            retVal = PrimitiveMath.MAX.invoke(retVal, PrimitiveMath.ABS.invoke(mySamples.doubleValue(i)));
         }
 
         return retVal;
@@ -176,7 +189,7 @@ public final class SampleSet implements Access1D<Double> {
 
             final long tmpLimit = mySamples.count();
             for (long i = 0L; i < tmpLimit; i++) {
-                myMax = MAX.invoke(myMax, mySamples.doubleValue(i));
+                myMax = PrimitiveMath.MAX.invoke(myMax, mySamples.doubleValue(i));
             }
         }
 
@@ -218,7 +231,7 @@ public final class SampleSet implements Access1D<Double> {
 
             final long tmpLimit = mySamples.count();
             for (long i = 0L; i < tmpLimit; i++) {
-                myMin = MIN.invoke(myMin, mySamples.doubleValue(i));
+                myMin = PrimitiveMath.MIN.invoke(myMin, mySamples.doubleValue(i));
             }
         }
 
@@ -270,14 +283,19 @@ public final class SampleSet implements Access1D<Double> {
 
         final long tmpLimit = mySamples.count();
         for (long i = 0L; i < tmpLimit; i++) {
-            retVal = MIN.invoke(retVal, ABS.invoke(mySamples.doubleValue(i)));
+            retVal = PrimitiveMath.MIN.invoke(retVal, PrimitiveMath.ABS.invoke(mySamples.doubleValue(i)));
         }
 
         return retVal;
     }
 
     public double getStandardDeviation() {
-        return SQRT.invoke(this.getVariance());
+
+        if (Double.isNaN(myStandardDeviation)) {
+            myStandardDeviation = PrimitiveMath.SQRT.invoke(this.getVariance());
+        }
+
+        return myStandardDeviation;
     }
 
     /**
@@ -305,12 +323,11 @@ public final class SampleSet implements Access1D<Double> {
 
         double retVal = ZERO;
 
-        final double tmpMean = this.getMean();
-        double tmpVal;
-        final long tmpLimit = mySamples.count();
-        for (long i = 0L; i < tmpLimit; i++) {
-            tmpVal = mySamples.doubleValue(i) - tmpMean;
-            retVal += (tmpVal * tmpVal);
+        final double mean = this.getMean();
+        double deviation;
+        for (long i = 0L, limit = mySamples.count(); i < limit; i++) {
+            deviation = mySamples.doubleValue(i) - mean;
+            retVal += (deviation * deviation);
         }
 
         return retVal;
@@ -342,6 +359,7 @@ public final class SampleSet implements Access1D<Double> {
 
         myMean = NaN;
         myVariance = NaN;
+        myStandardDeviation = NaN;
 
         myQuartile1 = NaN;
         myQuartile2 = NaN;

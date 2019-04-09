@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,32 +21,32 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Optional;
 
 import org.ojalgo.array.SparseArray;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.PrimitiveFunction.Unary;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.IndexSelector;
-import org.ojalgo.type.context.NumberContext;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
-
-    private static final double RELATIVELY_SMALL = PrimitiveFunction.SQRT.invoke(MACHINE_EPSILON);
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
     private boolean myInitWithLP = false;
     private MatrixStore<Double> myInvQC;
     private final PrimitiveDenseStore myIterationX;
+    private boolean myShrinkSwitch = true;
     private final PrimitiveDenseStore mySlackI;
     private final PrimitiveDenseStore mySolutionL;
 
@@ -66,7 +66,189 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         mySlackI = PrimitiveDenseStore.FACTORY.makeZero(tmpCountInequalityConstraints, 1L);
     }
 
+    private void handleIterationFailure(final int[] included) {
+
+        if (this.isIterationAllowed()) {
+
+            if (this.isSolvableQ()) {
+                // There must be a problem with the constraints
+
+                if (this.isLogProgress()) {
+                    this.log("Constraints problem!");
+                }
+
+                if (included.length >= 1) {
+                    // At least 1 active inequality
+
+                    this.shrink();
+                    this.performIteration();
+
+                } else {
+                    // Should not be possible to end up here, infeasibility among
+                    // the equality constraints should have been detected earlier.
+
+                    this.setState(State.FAILED);
+                }
+
+            } else {
+                // Patch Q
+
+                if (this.isLogProgress()) {
+                    this.log("Q problem!");
+                }
+
+                final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
+                final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
+                final double largest = PrimitiveMath.MAX.invoke(largestInQ, largestInC);
+
+                this.getIterationQ().modifyDiagonal(PrimitiveMath.ADD.second(largest * RELATIVELY_SMALL));
+                this.computeQ(this.getIterationQ());
+
+                this.getSolutionL().modifyAll((Unary) arg -> {
+                    if (Double.isFinite(arg)) {
+                        return arg;
+                    } else {
+                        return ZERO;
+                    }
+                });
+
+                this.resetActivator(true);
+                this.performIteration();
+            }
+
+        } else if (this.checkFeasibility(false)) {
+            // Feasible current solution
+
+            this.setState(State.FEASIBLE);
+
+        } else {
+            // Current solution somehow NOT feasible
+
+            this.setState(State.FAILED);
+        }
+    }
+
+    private void handleIterationSolution(final PrimitiveDenseStore iterX, final int[] excluded) {
+        // Subproblem solved successfully
+
+        final PhysicalStore<Double> soluX = this.getSolutionX();
+
+        iterX.modifyMatching(PrimitiveMath.SUBTRACT, soluX);
+
+        final double normCurrentX = soluX.aggregateAll(Aggregator.LARGEST);
+        final double normStepX = iterX.aggregateAll(Aggregator.LARGEST);
+
+        if (this.isLogDebug()) {
+            this.log("Current: {} - {}", normCurrentX, soluX.asList());
+            this.log("Step: {} - {}", normStepX, iterX.asList());
+        }
+
+        if (!options.solution.isSmall(normCurrentX, normStepX)
+                && (GenericSolver.ACCURACY.isSmall(ONE, normCurrentX) || !GenericSolver.ACCURACY.isSmall(normStepX, normCurrentX))) {
+            // Non-zero && non-freak solution
+
+            double stepLength = ONE;
+
+            if (excluded.length > 0) {
+
+                final PhysicalStore<Double> slack = this.getSlackI();
+
+                if (this.isLogDebug()) {
+
+                    final MatrixStore<Double> change = this.getMatrixAI(excluded).get().multiply(iterX);
+
+                    final PhysicalStore<Double> steps = slack.copy();
+                    steps.modifyMatching(PrimitiveMath.DIVIDE, change);
+
+                    this.log("Numer/slack: {}", slack.asList());
+                    this.log("Denom/chang: {}", change.copy().asList());
+                    this.log("Looking for the largest possible step length (smallest positive scalar) among these: {}).", steps.asList());
+                }
+
+                for (int i = 0; i < excluded.length; i++) {
+
+                    final SparseArray<Double> excludedInequalityRow = this.getMatrixAI(excluded[i]);
+
+                    final double currentSlack = slack.doubleValue(excluded[i]);
+                    final double slackChange = excludedInequalityRow.dot(iterX);
+                    final double fraction = (Math.signum(currentSlack) == Math.signum(Math.signum(currentSlack)))
+                            && GenericSolver.ACCURACY.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
+
+                    if ((slackChange <= ZERO) || GenericSolver.ACCURACY.isSmall(normStepX, slackChange)) {
+                        // This constraint not affected
+                    } else if (fraction >= ZERO) {
+                        // Must check the step length
+                        if (fraction < stepLength) {
+                            stepLength = fraction;
+                            this.setConstraintToInclude(excluded[i]);
+                            if (this.isLogDebug()) {
+                                this.log("Best so far: {} @ {} ({}).", stepLength, i, excluded[i]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (GenericSolver.ACCURACY.isZero(stepLength) && (this.getConstraintToInclude() == this.getLastExcluded())) {
+                if (this.isLogProgress()) {
+                    this.log("Break cycle on redundant constraints because step length {} on constraint {}", stepLength, this.getConstraintToInclude());
+                }
+                this.setConstraintToInclude(-1);
+            } else if (stepLength > ZERO) {
+                if (this.isLogProgress()) {
+                    this.log("Performing update with step length {} adding constraint {}", stepLength, this.getConstraintToInclude());
+                }
+                iterX.axpy(stepLength, soluX);
+            } else {
+                if (this.isLogProgress()) {
+                    this.log("Do nothing because step length {} and size {} but add constraint {}", stepLength, normStepX, this.getConstraintToInclude());
+                }
+            }
+
+        } else {
+            // Zero solution
+
+            if (this.isLogDebug()) {
+                this.log("Step too small!");
+            }
+
+            this.setState(State.FEASIBLE);
+        }
+
+        if (this.isLogDebug()) {
+            this.log("Post iteration");
+            this.log("\tSolution: {}", soluX.asList());
+            this.log("\tL: {}", this.getSolutionL().asList());
+            if ((this.getMatrixAE() != null) && (this.getMatrixAE().count() > 0)) {
+                this.log("\tE-slack: {}", this.getSE().copy().asList());
+            }
+            this.log("\tI-slack: {}", this.getSlackI().asList());
+            if (this.getSlackI().aggregateAll(Aggregator.MINIMUM) < -0.000001) {
+                this.log("Negative slack!");
+            }
+        }
+    }
+
     private final void shrink() {
+
+        int toExclude = this.suggestConstraintToExclude();
+
+        if (toExclude < 0) {
+            if (myShrinkSwitch) {
+                toExclude = this.suggestUsingLagrangeMagnitude();
+            } else {
+                toExclude = this.suggestUsingVectorProjection();
+            }
+            myShrinkSwitch = !myShrinkSwitch;
+        }
+
+        if (this.isLogDebug()) {
+            this.log("Will remove {}", toExclude);
+        }
+        this.exclude(toExclude);
+    }
+
+    private final int suggestUsingLagrangeMagnitude() {
 
         final int[] incl = myActivator.getIncluded();
 
@@ -77,14 +259,43 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         double maxWeight = ZERO;
 
         for (int i = 0; i < incl.length; i++) {
-            final double tmpValue = soluL.doubleValue(numbEqus + incl[i]);
-            final double tmpWeight = PrimitiveFunction.ABS.invoke(tmpValue) * PrimitiveFunction.MAX.invoke(-tmpValue, ONE);
-            if (tmpWeight > maxWeight) {
-                maxWeight = tmpWeight;
+            final double value = soluL.doubleValue(numbEqus + incl[i]);
+            final double weight = PrimitiveMath.ABS.invoke(value) * PrimitiveMath.MAX.invoke(-value, ONE);
+            if (weight > maxWeight) {
+                maxWeight = weight;
                 toExclude = incl[i];
             }
         }
-        this.exclude(toExclude);
+
+        return toExclude;
+    }
+
+    private final int suggestUsingVectorProjection() {
+
+        final int[] incl = myActivator.getIncluded();
+        int lastIncluded = myActivator.getLastIncluded();
+
+        AggregatorFunction<Double> aggregator = PrimitiveAggregator.NORM2.get();
+        SparseArray<Double> lastRow = this.getMatrixAI(lastIncluded);
+        lastRow.visitAll(aggregator);
+        double lastNorm = aggregator.doubleValue();
+
+        int toExclude = lastIncluded;
+        double maxWeight = ZERO;
+        // The weight is the absolute value of the cosine of the angle between the vectors (the constraint rows).
+        for (int i = 0; i < incl.length; i++) {
+            aggregator.reset();
+            SparseArray<Double> inclRow = this.getMatrixAI(incl[i]);
+            inclRow.visitAll(aggregator);
+            double inclNorm = aggregator.doubleValue();
+            final double weight = Math.abs(lastRow.dot(inclRow)) / lastNorm / inclNorm;
+            if (weight > maxWeight) {
+                maxWeight = weight;
+                toExclude = incl[i];
+            }
+        }
+
+        return toExclude;
     }
 
     protected boolean checkFeasibility(final boolean onlyExcluded) {
@@ -96,7 +307,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (this.hasEqualityConstraints()) {
                 final MatrixStore<Double> tmpSE = this.getSE();
                 for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
-                    if (!options.feasibility.isZero(tmpSE.doubleValue(i))) {
+                    if (!GenericSolver.ACCURACY.isZero(tmpSE.doubleValue(i))) {
                         retVal = false;
                     }
                 }
@@ -107,7 +318,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final MatrixStore<Double> tmpSI = this.getSlackI();
                 for (int i = 0; retVal && (i < tmpIncluded.length); i++) {
                     final double tmpSlack = tmpSI.doubleValue(tmpIncluded[i]);
-                    if ((tmpSlack < ZERO) && !options.feasibility.isZero(tmpSlack)) {
+                    if ((tmpSlack < ZERO) && !GenericSolver.ACCURACY.isZero(tmpSlack)) {
                         retVal = false;
                     }
                 }
@@ -120,7 +331,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             final MatrixStore<Double> tmpSI = this.getSlackI();
             for (int e = 0; retVal && (e < tmpExcluded.length); e++) {
                 final double tmpSlack = tmpSI.doubleValue(tmpExcluded[e]);
-                if ((tmpSlack < ZERO) && !options.feasibility.isZero(tmpSlack)) {
+                if ((tmpSlack < ZERO) && !GenericSolver.ACCURACY.isZero(tmpSlack)) {
                     retVal = false;
                 }
             }
@@ -190,6 +401,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
         }
 
+        boolean initWithLP = false;
+
         if (!feasible) {
 
             final Result resultLP = this.solveLP();
@@ -201,7 +414,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final Optional<Access1D<?>> tmpMultipliers = resultLP.getMultipliers();
                 if (tmpMultipliers.isPresent()) {
                     this.getSolutionL().fillMatching(tmpMultipliers.get());
-                    myInitWithLP = true;
+                    initWithLP = true;
                 } else {
                     this.getSolutionL().fillAll(ZERO);
                 }
@@ -212,7 +425,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             this.setState(State.FEASIBLE);
 
-            this.resetActivator();
+            this.resetActivator(initWithLP);
 
         } else {
 
@@ -221,7 +434,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.getSolutionX().fillAll(ZERO);
         }
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
 
             this.log("Initial solution: {}", this.getSolutionX().copy().asList());
             if (this.getMatrixAE() != null) {
@@ -230,6 +443,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (this.getMatrixAI() != null) {
                 this.log("Initial I-slack: {}", this.getSlackI().copy().asList());
             }
+            if (this.getSlackI().aggregateAll(Aggregator.MINIMUM) < -0.000001) {
+                this.log("Negative slack!");
+            }
+
         }
 
         return this.getState().isFeasible();
@@ -238,47 +455,32 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     @Override
     protected final boolean needsAnotherIteration() {
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             this.log("\nNeedsAnotherIteration?");
-            this.log(myActivator.toString());
         }
 
-        int tmpToInclude = -1;
-        int tmpToExclude = -1;
+        int toInclude = -1;
+        int toExclude = -1;
 
-        if (this.hasInequalityConstraints()) {
-            tmpToInclude = this.suggestConstraintToInclude();
-            if (tmpToInclude == -1) {
-                tmpToExclude = this.suggestConstraintToExclude();
+        if ((toInclude = this.suggestConstraintToInclude()) >= 0) {
+            if (this.isLogDebug()) {
+                this.log("Suggested to include: {}", toInclude);
             }
-        }
-
-        if (this.isDebug()) {
-            this.log("Suggested to include: {}", tmpToInclude);
-            this.log("Suggested to exclude: {}", tmpToExclude);
-        }
-
-        if (tmpToExclude == -1) {
-            if (tmpToInclude == -1) {
-                // Suggested to do nothing
+            myActivator.include(toInclude);
+            return true;
+        } else {
+            if ((toExclude = this.suggestConstraintToExclude()) >= 0) {
+                if (this.isLogDebug()) {
+                    this.log("Suggested to exclude: {}", toExclude);
+                }
+                this.exclude(toExclude);
+                return true;
+            } else {
+                if (this.isLogDebug()) {
+                    this.log("Stop!");
+                }
                 this.setState(State.OPTIMAL);
                 return false;
-            } else {
-                // Only suggested to include
-                myActivator.include(tmpToInclude);
-                this.setState(State.APPROXIMATE);
-                return true;
-            }
-        } else {
-            if (tmpToInclude == -1) {
-                this.exclude(tmpToExclude);
-                this.setState(State.APPROXIMATE);
-                return true;
-            } else {
-                this.exclude(tmpToExclude);
-                myActivator.include(tmpToInclude);
-                this.setState(State.APPROXIMATE);
-                return true;
             }
         }
     }
@@ -292,6 +494,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         int retVal = -1;
 
         final int[] tmpIncluded = myActivator.getIncluded();
+
         final int tmpLastIncluded = myActivator.getLastIncluded();
         int tmpIndexOfLast = -1;
 
@@ -301,7 +504,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         // final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
         final MatrixStore<Double> tmpLI = this.getSolutionL().logical().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded).get();
 
-        if (this.isDebug() && (tmpLI.count() > 0L)) {
+        if (this.isLogDebug() && (tmpLI.count() > 0L)) {
             this.log("Looking for the largest negative lagrange multiplier among these: {}.", tmpLI.copy().asList());
         }
 
@@ -311,10 +514,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 tmpVal = tmpLI.doubleValue(i, 0);
 
-                if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !options.solution.isZero(tmpVal)) {
+                if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !GenericSolver.ACCURACY.isZero(tmpVal)) {
                     tmpMin = tmpVal;
                     retVal = i;
-                    if (this.isDebug()) {
+                    if (this.isLogDebug()) {
                         this.log("Best so far: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[i]);
                     }
                 }
@@ -329,12 +532,20 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             tmpVal = tmpLI.doubleValue(tmpIndexOfLast, 0);
 
-            if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !options.solution.isZero(tmpVal)) {
+            if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !GenericSolver.ACCURACY.isZero(tmpVal)) {
                 tmpMin = tmpVal;
                 retVal = tmpIndexOfLast;
-                if (this.isDebug()) {
+                if (this.isLogProgress()) {
                     this.log("Only the last included needs to be excluded: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[retVal]);
                 }
+            }
+        }
+
+        if (this.isLogProgress()) {
+            if (retVal < 0) {
+                this.log("Nothing to exclude");
+            } else {
+                this.log("Suggest to exclude: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[retVal]);
             }
         }
 
@@ -442,191 +653,45 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         this.incrementIterationsCount();
 
-        final PhysicalStore<Double> soluX = this.getSolutionX();
-
         if (solved) {
-            // Subproblem solved successfully
-
-            iterX.modifyMatching(SUBTRACT, soluX);
-
-            if (this.isDebug()) {
-                this.log("Current: {}", soluX.asList());
-                this.log("Step: {}", iterX.asList());
-            }
-
-            final double normCurrentX = soluX.aggregateAll(Aggregator.NORM2);
-            final double normStepX = iterX.aggregateAll(Aggregator.NORM2);
-            if (!options.solution.isSmall(normCurrentX, normStepX)
-                    && (options.solution.isSmall(ONE, normCurrentX) || !options.solution.isSmall(normStepX, normCurrentX))) {
-                // Non-zero && non-freak solution
-
-                double stepLength = ONE;
-
-                if (excluded.length > 0) {
-
-                    final PhysicalStore<Double> slack = this.getSlackI();
-
-                    if (this.isDebug()) {
-
-                        final MatrixStore<Double> change = this.getMatrixAI(excluded).get().multiply(iterX);
-
-                        final PhysicalStore<Double> steps = slack.copy();
-                        steps.modifyMatching(DIVIDE, change);
-
-                        this.log("Numer/slack: {}", slack.asList());
-                        this.log("Denom/chang: {}", change.copy().asList());
-                        this.log("Looking for the largest possible step length (smallest positive scalar) among these: {}).", steps.asList());
-                    }
-
-                    for (int i = 0; i < excluded.length; i++) {
-
-                        final SparseArray<Double> excludedInequalityRow = this.getMatrixAI(excluded[i]);
-
-                        final double tmpN = slack.doubleValue(excluded[i]); // Current slack
-                        final double tmpD = excludedInequalityRow.dot(iterX); // Proposed slack change
-                        final double tmpVal = options.feasibility.isSmall(tmpD, tmpN) ? ZERO : tmpN / tmpD;
-
-                        if ((tmpD > ZERO) && (tmpVal >= ZERO) && (tmpVal < stepLength) && !options.solution.isSmall(normStepX, tmpD)) {
-                            stepLength = tmpVal;
-                            this.setConstraintToInclude(excluded[i]);
-                            if (this.isDebug()) {
-                                this.log("Best so far: {} @ {} ({}).", stepLength, i, this.getConstraintToInclude());
-                            }
-                            // } else if ((tmpVal == ZERO) && this.isDebug()) {
-                        } else if ((NumberContext.compare(tmpVal, ZERO) == 0) && this.isDebug()) {
-                            this.log("Zero, but still not good...");
-                            this.log("Numer/slack: {}", tmpN);
-                            this.log("Denom/chang: {}", tmpD);
-                            this.log("Small:       {}", options.solution.isSmall(normStepX, tmpD));
-                        }
-                    }
-
-                }
-
-                if (stepLength > ZERO) { // It is possible that it becomes == 0.0
-                    iterX.axpy(stepLength, soluX);
-                } else if (((this.getConstraintToInclude() >= 0) && (myActivator.getLastExcluded() == this.getConstraintToInclude()))
-                        && (myActivator.getLastIncluded() == this.getConstraintToInclude())) {
-                    this.setConstraintToInclude(-1);
-                }
-
-                this.setState(State.APPROXIMATE);
-
-            } else if (this.isDebug()) {
-                // Zero solution
-
-                if (this.isDebug()) {
-                    this.log("Step too small!");
-                }
-
-                this.setState(State.FEASIBLE);
-            }
-
-        } else if (this.isIterationAllowed()) {
-            // Subproblem NOT solved successfully, but further iterations allowed
-
-            if (included.length >= 1) {
-                // Subproblem NOT solved successfully
-                // At least 1 active inequality
-
-                this.shrink();
-
-                this.performIteration();
-
-            } else if (!this.isSolvableQ()) {
-                // Subproblem NOT solved successfully
-                // 0 active inequalities
-                // Q not SPD
-
-                final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
-                final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
-                final double largest = PrimitiveFunction.MAX.invoke(largestInQ, largestInC);
-
-                this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
-                this.computeQ(this.getIterationQ());
-
-                this.getSolutionL().modifyAll((Unary) arg -> {
-                    if (Double.isFinite(arg)) {
-                        return arg;
-                    } else {
-                        return ZERO;
-                    }
-                });
-
-                this.resetActivator();
-                this.performIteration();
-
-            } else {
-                // Subproblem NOT solved successfully
-                // 0 active inequalities
-                // Q SPD
-
-                // Should not be possible to end up here, infeasibility among
-                // the equality constraints should have been detected earlier.
-
-                this.setState(State.FAILED);
-            }
-
-        } else if (this.checkFeasibility(false)) {
-            // Subproblem NOT solved successfully
-            // Further iterations NOT allowed
-            // Feasible current solution
-
-            this.setState(State.FEASIBLE);
-
+            this.handleIterationSolution(iterX, excluded);
         } else {
-            // Subproblem NOT solved successfully
-            // Further iterations NOT allowed
-            // Current solution somehow NOT feasible
-
-            this.setState(State.FAILED);
+            this.handleIterationFailure(included);
         }
 
-        if (this.isDebug()) {
-            this.log("Post iteration");
-            this.log("\tSolution: {}", soluX.copy().asList());
-            this.log("\tL: {}", this.getSolutionL().asList());
-            if ((this.getMatrixAE() != null) && (this.getMatrixAE().count() > 0)) {
-                this.log("\tE-slack: {}", this.getSE().copy().asList());
-                if (!options.feasibility.isZero(this.getSE().aggregateAll(Aggregator.LARGEST).doubleValue())) {
-                    // throw new IllegalStateException("E-slack!");
-                }
-            }
-
-            this.log("\tI-slack: {}", mySlackI.copy().asList());
-            if (!options.feasibility.isZero(mySlackI.aggregateAll(Aggregator.LARGEST).doubleValue())) {
-                // throw new IllegalStateException("I-slack!");
-            }
-
+        if (options.validate && !this.checkFeasibility(false)) {
+            this.log("Problem!");
         }
     }
 
-    void resetActivator() {
+    void resetActivator(boolean useLagrange) {
 
         myActivator.excludeAll();
 
-        final int numbEqus = this.countEqualityConstraints();
-        final int numbVars = this.countVariables();
+        int numbEqus = this.countEqualityConstraints();
+        int numbVars = this.countVariables();
+        int maxToInclude = numbVars - numbEqus;
+
+        if (this.isLogDebug() && (numbEqus > numbVars)) {
+            this.log("Redundant contraints!");
+        }
 
         if (this.hasInequalityConstraints()) {
-            final MatrixStore<Double> slack = this.getSlackI();
+            final MatrixStore<Double> inqSlack = this.getSlackI();
             final int[] excl = this.getExcluded();
 
             PrimitiveDenseStore lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
-                if (options.feasibility.isZero(slack.doubleValue(excl[i]))
-                        && (!myInitWithLP || !options.solution.isZero(lagrange.doubleValue(numbEqus + excl[i])))) {
-                    this.include(excl[i]);
+                double slack = inqSlack.doubleValue(excl[i]);
+                if (GenericSolver.ACCURACY.isZero(slack) && (this.countIncluded() < maxToInclude)) {
+                    if (!useLagrange || !GenericSolver.ACCURACY.isZero(lagrange.doubleValue(numbEqus + excl[i]))) {
+                        if (this.isLogDebug()) {
+                            this.log("Will inlcude ineq {} with slack={} L={}", i, slack, lagrange.doubleValue(numbEqus + excl[i]));
+                        }
+                        this.include(excl[i]);
+                    }
                 }
             }
-        }
-
-        while (((numbEqus + this.countIncluded()) > numbVars) && (this.countIncluded() > 0)) {
-            this.shrink();
-        }
-
-        if (this.isDebug() && ((numbEqus + this.countIncluded()) > numbVars)) {
-            this.log("Redundant contraints!");
         }
     }
 

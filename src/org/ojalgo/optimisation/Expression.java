@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,8 @@
 package org.ojalgo.optimisation;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,11 +33,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.ConstantFunction;
 import org.ojalgo.function.multiary.LinearFunction;
@@ -45,6 +47,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
 import org.ojalgo.type.TypeUtils;
@@ -294,7 +297,7 @@ public final class Expression extends ModelEntity<Expression> {
 
         final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(myModel.countVariables(), 1);
 
-        final BinaryFunction<Double> tmpBaseFunc = PrimitiveFunction.ADD;
+        final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         double tmpAdjustedFactor;
         UnaryFunction<Double> tmpModFunc;
         for (final IntRowColumn tmpKey : this.getQuadraticKeySet()) {
@@ -319,7 +322,7 @@ public final class Expression extends ModelEntity<Expression> {
         final int tmpCountVariables = myModel.countVariables();
         final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpCountVariables, tmpCountVariables);
 
-        final BinaryFunction<Double> tmpBaseFunc = PrimitiveFunction.ADD;
+        final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         UnaryFunction<Double> tmpModFunc;
         for (final IntRowColumn tmpKey : this.getQuadraticKeySet()) {
             tmpModFunc = tmpBaseFunc.second(this.getAdjustedQuadraticFactor(tmpKey));
@@ -430,6 +433,10 @@ public final class Expression extends ModelEntity<Expression> {
         return this.set(myModel.getVariable(index), value);
     }
 
+    public Expression set(final IntIndex row, final IntIndex column, final Number value) {
+        return this.set(new IntRowColumn(row, column), value);
+    }
+
     public Expression set(final IntIndex key, final Number value) {
 
         if (key != null) {
@@ -438,6 +445,7 @@ public final class Expression extends ModelEntity<Expression> {
 
             if (tmpValue.signum() != 0) {
                 myLinear.put(key, tmpValue);
+                myModel.addReference(key);
             } else {
                 myLinear.remove(key);
             }
@@ -458,6 +466,8 @@ public final class Expression extends ModelEntity<Expression> {
 
             if (tmpValue.signum() != 0) {
                 myQuadratic.put(key, tmpValue);
+                myModel.addReference(key.getRow());
+                myModel.addReference(key.getColumn());
             } else {
                 myQuadratic.remove(key);
             }
@@ -589,6 +599,11 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
+    private BigDecimal toPositiveFraction(BigDecimal noninteger) {
+        BigDecimal intPart = noninteger.setScale(0, RoundingMode.FLOOR);
+        return noninteger.subtract(intPart);
+    }
+
     protected void appendMiddlePart(final StringBuilder builder, final Access1D<BigDecimal> currentSolution) {
 
         builder.append(this.getName());
@@ -613,6 +628,42 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
+    @Override
+    protected void doIntegerRounding() {
+
+        BigInteger gcd = null;
+        int maxScale = Integer.MIN_VALUE;
+        for (BigDecimal coeff : myLinear.values()) {
+            BigDecimal abs = coeff.stripTrailingZeros().abs();
+            maxScale = Math.max(maxScale, abs.scale());
+            if (gcd != null) {
+                gcd = gcd.gcd(abs.unscaledValue());
+            } else {
+                gcd = abs.unscaledValue();
+            }
+            if (gcd.equals(BigInteger.ONE)) {
+                return; // gcd == 1, no point
+            }
+        }
+
+        BigDecimal divisor = new BigDecimal(gcd, maxScale);
+
+        for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
+            BigDecimal value = entry.getValue();
+            entry.setValue(value.divide(divisor, 0, RoundingMode.UNNECESSARY));
+        }
+
+        BigDecimal lower = this.getLowerLimit();
+        if (lower != null) {
+            this.lower(lower.divide(divisor, 0, RoundingMode.CEILING));
+        }
+
+        BigDecimal upper = this.getUpperLimit();
+        if (upper != null) {
+            this.upper(upper.divide(divisor, 0, RoundingMode.FLOOR));
+        }
+    }
+
     void appendToString(final StringBuilder aStringBuilder, final Access1D<BigDecimal> aCurrentState) {
 
         this.appendLeftPart(aStringBuilder);
@@ -625,30 +676,30 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     /**
-     * Calculates this expression's fixed value - the fixed variables' part of this expression. Will never
-     * return null.
+     * Calculates this expression's value - the subset variables' part of this expression. Will never return
+     * null.
      */
-    BigDecimal calculateFixedValue(final Collection<IntIndex> fixedVariables) {
+    BigDecimal calculateSetValue(final Collection<IntIndex> subset) {
 
         BigDecimal retVal = BigMath.ZERO;
 
-        if (fixedVariables.size() > 0) {
+        if (subset.size() > 0) {
 
-            for (final IntIndex tmpKey : myLinear.keySet()) {
-                if (fixedVariables.contains(tmpKey)) {
-                    final BigDecimal tmpFactor = this.get(tmpKey);
-                    final BigDecimal tmpValue = myModel.getVariable(tmpKey.index).getValue();
-                    retVal = retVal.add(tmpFactor.multiply(tmpValue));
+            for (final IntIndex linKey : myLinear.keySet()) {
+                if (subset.contains(linKey)) {
+                    final BigDecimal coefficient = this.get(linKey);
+                    final BigDecimal value = myModel.getVariable(linKey.index).getValue();
+                    retVal = retVal.add(coefficient.multiply(value));
                 }
             }
 
-            for (final IntRowColumn tmpKey : myQuadratic.keySet()) {
-                if (fixedVariables.contains(new IntIndex(tmpKey.row))) {
-                    if (fixedVariables.contains(new IntIndex(tmpKey.column))) {
-                        final BigDecimal tmpFactor = this.get(tmpKey);
-                        final BigDecimal tmpRowValue = myModel.getVariable(tmpKey.row).getValue();
-                        final BigDecimal tmpColValue = myModel.getVariable(tmpKey.column).getValue();
-                        retVal = retVal.add(tmpFactor.multiply(tmpRowValue).multiply(tmpColValue));
+            for (final IntRowColumn quadKey : myQuadratic.keySet()) {
+                if (subset.contains(new IntIndex(quadKey.row))) {
+                    if (subset.contains(new IntIndex(quadKey.column))) {
+                        final BigDecimal coefficient = this.get(quadKey);
+                        final BigDecimal rowValue = myModel.getVariable(quadKey.row).getValue();
+                        final BigDecimal colValue = myModel.getVariable(quadKey.column).getValue();
+                        retVal = retVal.add(coefficient.multiply(rowValue).multiply(colValue));
                     }
                 }
             }
@@ -661,6 +712,10 @@ public final class Expression extends ModelEntity<Expression> {
         return new Expression(this, destinationModel, deep);
     }
 
+    long countIntegerFactors() {
+        return myLinear.keySet().stream().map(this::resolve).filter(v -> v.isInteger()).count();
+    }
+
     int countLinearFactors() {
         return myLinear.size();
     }
@@ -669,12 +724,60 @@ public final class Expression extends ModelEntity<Expression> {
         return myQuadratic.size();
     }
 
-    Set<Variable> getBinaryVariables(final Set<IntIndex> fixedVariables) {
+    Expression doMixedIntegerRounding() {
+
+        if (!this.isEqualityConstraint()) {
+            return null;
+        }
+
+        BigDecimal posFracLevel = this.toPositiveFraction(this.getLowerLimit());
+        if (posFracLevel.signum() <= 0) {
+            return null;
+        }
+        BigDecimal cmpFracLevel = BigMath.ONE.subtract(posFracLevel);
+
+        Expression retVal = myModel.addExpression(this.getName() + "(MIR)");
+
+        for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
+            Variable variable = this.resolve(entry.getKey());
+
+            if (!variable.isLowerLimitSet() || (variable.getLowerLimit().compareTo(BigMath.ZERO) < 0)) {
+                return null;
+            }
+
+            BigDecimal coeff = entry.getValue();
+
+            if (variable.isInteger()) {
+
+                BigDecimal posFracCoeff = this.toPositiveFraction(coeff);
+
+                if (posFracCoeff.compareTo(posFracLevel) <= 0) {
+                    retVal.set(variable, BigMath.DIVIDE.invoke(posFracCoeff, posFracLevel));
+                } else {
+                    BigDecimal cmpFracCoeff = BigMath.ONE.subtract(posFracCoeff);
+                    retVal.set(variable, BigMath.DIVIDE.invoke(cmpFracCoeff, cmpFracLevel));
+                }
+
+            } else {
+
+                if (coeff.signum() == 1) {
+                    retVal.set(variable, BigMath.DIVIDE.invoke(coeff, posFracLevel));
+                } else if (coeff.signum() == -1) {
+                    BigDecimal negCoeff = coeff.negate();
+                    retVal.set(variable, BigMath.DIVIDE.invoke(negCoeff, cmpFracLevel));
+                }
+            }
+        }
+
+        return retVal.lower(BigMath.ONE);
+    }
+
+    Set<Variable> getBinaryVariables(final Set<IntIndex> subset) {
 
         final HashSet<Variable> retVal = new HashSet<>();
 
         for (final IntIndex varInd : myLinear.keySet()) {
-            if (!fixedVariables.contains(varInd)) {
+            if (subset.contains(varInd)) {
                 final Variable variable = myModel.getVariable(varInd.index);
                 if (variable.isBinary()) {
                     retVal.add(variable);
@@ -767,70 +870,64 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     /**
-     * @param fixedVariables The indices of the fixed variables
-     * @return true if none of the free (not fixed) variables can make a positve contribution to the
-     *         expression value
+     * @param subset The indices of a variable subset
+     * @return true if none of the variables in the subset can make a positve contribution to the expression
+     *         value
      */
-    boolean isNegative(final Set<IntIndex> fixedVariables) {
+    boolean isNegativeOn(final Set<IntIndex> subset) {
 
-        boolean retVal = !this.isAnyQuadraticFactorNonZero();
-
-        if (retVal) {
-            for (final Entry<IntIndex, BigDecimal> tmpLinear : this.getLinearEntrySet()) {
-                if (retVal && !fixedVariables.contains(tmpLinear.getKey())) {
-                    final Variable tmpFreeVariable = myModel.getVariable(tmpLinear.getKey().index);
-                    if ((tmpLinear.getValue().signum() < 0) && tmpFreeVariable.isLowerLimitSet() && (tmpFreeVariable.getLowerLimit().signum() >= 0)) {
-                        retVal &= true;
-                    } else if ((tmpLinear.getValue().signum() > 0) && tmpFreeVariable.isUpperLimitSet() && (tmpFreeVariable.getUpperLimit().signum() <= 0)) {
-                        retVal &= true;
-                    } else {
-                        retVal &= false;
-                    }
+        if (!this.isAnyQuadraticFactorNonZero()) {
+            for (IntIndex index : subset) {
+                final Variable setVar = myModel.getVariable(index);
+                int signum = myLinear.get(index).signum();
+                if ((signum < 0) && setVar.isLowerLimitSet() && (setVar.getLowerLimit().signum() >= 0)) {
+                    ;
+                } else if ((signum > 0) && setVar.isUpperLimitSet() && (setVar.getUpperLimit().signum() <= 0)) {
+                    ;
+                } else {
+                    return false;
                 }
             }
         }
 
-        return retVal;
+        return true;
     }
 
     /**
-     * @param fixedVariables The indices of the fixed variables
-     * @return true if none of the free (not fixed) variables can make a negative contribution to the
-     *         expression value
+     * @param subset The indices of a variable subset
+     * @return true if none of the variables in the subset can make a negative contribution to the expression
+     *         value
      */
-    boolean isPositive(final Set<IntIndex> fixedVariables) {
+    boolean isPositiveOn(final Set<IntIndex> subset) {
 
-        boolean retVal = !this.isAnyQuadraticFactorNonZero();
-
-        if (retVal) {
-            for (final Entry<IntIndex, BigDecimal> tmpLinear : this.getLinearEntrySet()) {
-                if (retVal && !fixedVariables.contains(tmpLinear.getKey())) {
-                    final Variable tmpFreeVariable = myModel.getVariable(tmpLinear.getKey().index);
-                    if ((tmpLinear.getValue().signum() > 0) && tmpFreeVariable.isLowerLimitSet() && (tmpFreeVariable.getLowerLimit().signum() >= 0)) {
-                        retVal &= true;
-                    } else if ((tmpLinear.getValue().signum() < 0) && tmpFreeVariable.isUpperLimitSet() && (tmpFreeVariable.getUpperLimit().signum() <= 0)) {
-                        retVal &= true;
-                    } else {
-                        retVal &= false;
-                    }
+        if (!this.isAnyQuadraticFactorNonZero()) {
+            for (IntIndex index : subset) {
+                final Variable setVar = myModel.getVariable(index);
+                int signum = myLinear.get(index).signum();
+                if ((signum > 0) && setVar.isLowerLimitSet() && (setVar.getLowerLimit().signum() >= 0)) {
+                    ;
+                } else if ((signum < 0) && setVar.isUpperLimitSet() && (setVar.getUpperLimit().signum() <= 0)) {
+                    ;
+                } else {
+                    return false;
                 }
             }
         }
 
-        return retVal;
+        return true;
     }
 
     boolean isRedundant() {
         return myRedundant;
     }
 
-    void reset() {
-        myInfeasible = false;
-        myRedundant = false;
+    Variable resolve(Structure1D.IntIndex index) {
+        return myModel.getVariable(index);
     }
 
     void setInfeasible() {
         myInfeasible = true;
+        myModel.setInfeasible();
     }
 
     void setRedundant() {

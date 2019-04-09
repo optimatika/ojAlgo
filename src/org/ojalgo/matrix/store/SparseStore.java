@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
@@ -46,7 +46,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public final class SparseStore<N extends Number> extends FactoryStore<N> implements ElementsConsumer<N> {
 
-    public static interface Factory<N extends Number> {
+    public interface Factory<N extends Number> {
 
         SparseStore<N> make(long rowsCount, long columnsCount);
 

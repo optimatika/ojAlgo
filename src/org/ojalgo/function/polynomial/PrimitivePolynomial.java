@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
 package org.ojalgo.function.polynomial;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -30,12 +30,12 @@ import org.ojalgo.structure.Access1D;
 
 public class PrimitivePolynomial extends AbstractPolynomial<Double> {
 
-    public PrimitivePolynomial(final int aDegree) {
-        super(Array1D.PRIMITIVE64.makeZero(aDegree + 1));
+    public PrimitivePolynomial(final int degree) {
+        super(Array1D.PRIMITIVE64.makeZero(degree + 1));
     }
 
-    PrimitivePolynomial(final Array1D<Double> someCoefficients) {
-        super(someCoefficients);
+    PrimitivePolynomial(final Array1D<Double> coefficients) {
+        super(coefficients);
     }
 
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
@@ -78,31 +78,31 @@ public class PrimitivePolynomial extends AbstractPolynomial<Double> {
         return this.invoke(arg.doubleValue());
     }
 
-    public void set(final Access1D<?> someCoefficient) {
-        final int tmpLimit = (int) Math.min(this.count(), someCoefficient.count());
+    public void set(final Access1D<?> coefficients) {
+        final int tmpLimit = (int) Math.min(this.count(), coefficients.count());
         for (int p = 0; p < tmpLimit; p++) {
-            this.set(p, someCoefficient.doubleValue(p));
+            this.set(p, coefficients.doubleValue(p));
         }
     }
 
     @Override
-    protected Double getDerivativeFactor(final int aPower) {
-        final int tmpNextIndex = aPower + 1;
+    protected Double getDerivativeFactor(final int power) {
+        final int tmpNextIndex = power + 1;
         return tmpNextIndex * this.doubleValue(tmpNextIndex);
     }
 
     @Override
-    protected Double getPrimitiveFactor(final int aPower) {
-        if (aPower <= 0) {
+    protected Double getPrimitiveFactor(final int power) {
+        if (power <= 0) {
             return PrimitiveMath.ZERO;
         } else {
-            return this.doubleValue(aPower - 1) / aPower;
+            return this.doubleValue(power - 1) / power;
         }
     }
 
     @Override
-    protected AbstractPolynomial<Double> makeInstance(final int aSize) {
-        return new PrimitivePolynomial(Array1D.PRIMITIVE64.makeZero(aSize));
+    protected AbstractPolynomial<Double> makeInstance(final int size) {
+        return new PrimitivePolynomial(Array1D.PRIMITIVE64.makeZero(size));
     }
 
 }

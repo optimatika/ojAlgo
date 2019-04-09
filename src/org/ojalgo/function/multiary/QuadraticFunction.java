@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -82,16 +82,16 @@ public final class QuadraticFunction<N extends Number> extends AbstractMultiary<
     @Override
     public MatrixStore<N> getGradient(final Access1D<N> point) {
 
-        final PhysicalStore<N> tmpPreallocated = myFactors.physical().makeZero(this.arity(), 1L);
+        final PhysicalStore<N> retVal = myFactors.physical().makeZero(this.arity(), 1L);
 
-        this.getHessian(point).multiply(point, tmpPreallocated);
+        this.getHessian(point).multiply(point, retVal);
 
-        return tmpPreallocated;
+        return retVal;
     }
 
     @Override
     public MatrixStore<N> getHessian(final Access1D<N> point) {
-        return myFactors.logical().superimpose(0, 0, myFactors.conjugate()).get();
+        return myFactors.logical().superimpose(myFactors.conjugate()).get();
     }
 
     @Override

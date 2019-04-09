@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,15 +21,14 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.COPY;
 import org.ojalgo.concurrent.DivideAndConquer;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -190,7 +189,7 @@ public final class HouseholderHermitian extends MatrixOperation {
             // Calc the norm of the row/col to zero out - to avoid under/overflow.
             for (int k = 0; k < i; k++) {
                 // scale += PrimitiveFunction.ABS.invoke(d[k]);
-                scale = PrimitiveFunction.MAX.invoke(scale, PrimitiveFunction.ABS.invoke(d[k]));
+                scale = PrimitiveMath.MAX.invoke(scale, PrimitiveMath.ABS.invoke(d[k]));
             }
 
             if (scale == PrimitiveMath.ZERO) {
@@ -210,7 +209,7 @@ public final class HouseholderHermitian extends MatrixOperation {
                     h += tmpVal * tmpVal; // d[k] * d[k]
                 }
                 f = d[l];
-                g = PrimitiveFunction.SQRT.invoke(h);
+                g = PrimitiveMath.SQRT.invoke(h);
                 if (f > 0) {
                     g = -g;
                 }
@@ -320,7 +319,7 @@ public final class HouseholderHermitian extends MatrixOperation {
             if (l > 0) {
 
                 for (int k = 0; k < i; k++) {
-                    scale += PrimitiveFunction.ABS.invoke(data[i + (k * tmpRowDim)]);
+                    scale += PrimitiveMath.ABS.invoke(data[i + (k * tmpRowDim)]);
                 }
 
                 // if (scale == PrimitiveMath.ZERO) {
@@ -332,7 +331,7 @@ public final class HouseholderHermitian extends MatrixOperation {
                         h += data[i + (k * tmpRowDim)] * data[i + (k * tmpRowDim)];
                     }
                     f = data[i + (l * tmpRowDim)];
-                    g = (f >= PrimitiveMath.ZERO) ? -PrimitiveFunction.SQRT.invoke(h) : PrimitiveFunction.SQRT.invoke(h);
+                    g = (f >= PrimitiveMath.ZERO) ? -PrimitiveMath.SQRT.invoke(h) : PrimitiveMath.SQRT.invoke(h);
                     e[i] = scale * g;
                     h -= f * g;
                     data[i + (l * tmpRowDim)] = f - g;

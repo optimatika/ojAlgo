@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.array.blas;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * The ?asum routine computes the sum of the magnitudes of elements of a real vector, or the sum of magnitudes
@@ -35,7 +35,7 @@ public abstract class ASUM implements BLAS1 {
     public static double invoke(final double[] data, final int first, final int limit, final int step) {
         double retVal = 0D;
         for (int i = first; i < limit; i += step) {
-            retVal += PrimitiveFunction.ABS.invoke(data[i]);
+            retVal += PrimitiveMath.ABS.invoke(data[i]);
         }
         return retVal;
     }

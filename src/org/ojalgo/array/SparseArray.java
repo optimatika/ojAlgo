@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,12 +26,11 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.LongStream;
 
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -715,7 +714,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             final long tmpIndex = myIndices[i];
             if ((tmpIndex >= first) && (tmpIndex < limit)) {
                 if (((tmpIndex - first) % step) == 0L) {
-                    tmpValue = PrimitiveFunction.ABS.invoke(myValues.doubleValue(i));
+                    tmpValue = PrimitiveMath.ABS.invoke(myValues.doubleValue(i));
                     if (tmpValue > tmpLargest) {
                         tmpLargest = tmpValue;
                         retVal = i;

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
-abstract class AbstractModel<S extends Optimisation.Solver> implements Optimisation.Model {
+abstract class AbstractModel implements Optimisation.Model {
 
     public final Optimisation.Options options;
 

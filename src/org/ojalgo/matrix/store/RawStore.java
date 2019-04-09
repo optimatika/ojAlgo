@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.io.BufferedReader;
 import java.io.StreamTokenizer;
@@ -34,7 +33,6 @@ import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.Raw1D;
 import org.ojalgo.array.Raw2D;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -45,6 +43,7 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.matrix.transformation.Householder;
@@ -784,25 +783,25 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
     public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
         if (left == this) {
             final double[][] tmpRight = RawStore.convert(right, data.length).data;
-            if (function == ADD) {
+            if (function == PrimitiveMath.ADD) {
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = data[i][j] + tmpRight[i][j];
                     }
                 }
-            } else if (function == DIVIDE) {
+            } else if (function == PrimitiveMath.DIVIDE) {
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = data[i][j] / tmpRight[i][j];
                     }
                 }
-            } else if (function == MULTIPLY) {
+            } else if (function == PrimitiveMath.MULTIPLY) {
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = data[i][j] * tmpRight[i][j];
                     }
                 }
-            } else if (function == SUBTRACT) {
+            } else if (function == PrimitiveMath.SUBTRACT) {
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = data[i][j] - tmpRight[i][j];
@@ -813,25 +812,25 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             }
         } else if (right == this) {
             final double[][] tmpLeft = RawStore.convert(left, data.length).data;
-            if (function == ADD) {
+            if (function == PrimitiveMath.ADD) {
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = tmpLeft[i][j] + data[i][j];
                     }
                 }
-            } else if (function == DIVIDE) {
+            } else if (function == PrimitiveMath.DIVIDE) {
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = tmpLeft[i][j] / data[i][j];
                     }
                 }
-            } else if (function == MULTIPLY) {
+            } else if (function == PrimitiveMath.MULTIPLY) {
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = tmpLeft[i][j] * data[i][j];
                     }
                 }
-            } else if (function == SUBTRACT) {
+            } else if (function == PrimitiveMath.SUBTRACT) {
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = tmpLeft[i][j] - data[i][j];
@@ -968,7 +967,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             tmpRow = data[i];
 
             for (int j = 0; j < myNumberOfColumns; j++) {
-                tmpValue = PrimitiveFunction.ABS.invoke(tmpRow[j]);
+                tmpValue = PrimitiveMath.ABS.invoke(tmpRow[j]);
                 if (tmpValue > tmpLargest) {
                     tmpLargest = tmpValue;
                     retVal = Structure2D.index(tmpRowDim, i, j);
@@ -988,7 +987,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         double tmpValue;
 
         for (int i = (int) row; i < tmpRowDim; i++) {
-            tmpValue = PrimitiveFunction.ABS.invoke(data[i][(int) col]);
+            tmpValue = PrimitiveMath.ABS.invoke(data[i][(int) col]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = i;
@@ -1010,7 +1009,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         for (int index = 0; index < this.count(); index++) {
             final int i = Structure2D.row(index, tmpRowDim);
             final int j = Structure2D.column(index, tmpRowDim);
-            tmpValue = PrimitiveFunction.ABS.invoke(data[i][j]);
+            tmpValue = PrimitiveMath.ABS.invoke(data[i][j]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = index;
@@ -1028,7 +1027,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         final double[] tmpRow = data[(int) row];
 
         for (int j = (int) col; j < myNumberOfColumns; j++) {
-            tmpValue = PrimitiveFunction.ABS.invoke(tmpRow[j]);
+            tmpValue = PrimitiveMath.ABS.invoke(tmpRow[j]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = j;
@@ -1047,7 +1046,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         double tmpValue;
 
         for (int i = (int) first, j = (int) first; (i < tmpRowDim) && (j < myNumberOfColumns); i++, j++) {
-            tmpValue = PrimitiveFunction.ABS.invoke(data[i][j]);
+            tmpValue = PrimitiveMath.ABS.invoke(data[i][j]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = i;
@@ -1284,11 +1283,11 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             }
         } else {
             if (!Double.isNaN(tmpTransf.cos)) {
-                this.modifyRow(tmpLow, 0, MULTIPLY.second(tmpTransf.cos));
+                this.modifyRow(tmpLow, 0, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
             } else if (!Double.isNaN(tmpTransf.sin)) {
-                this.modifyRow(tmpLow, 0, DIVIDE.second(tmpTransf.sin));
+                this.modifyRow(tmpLow, 0, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
             } else {
-                this.modifyRow(tmpLow, 0, NEGATE);
+                this.modifyRow(tmpLow, 0, PrimitiveMath.NEGATE);
             }
         }
     }
@@ -1350,11 +1349,11 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             }
         } else {
             if (!Double.isNaN(tmpTransf.cos)) {
-                this.modifyColumn(0, tmpHigh, MULTIPLY.second(tmpTransf.cos));
+                this.modifyColumn(0, tmpHigh, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
             } else if (!Double.isNaN(tmpTransf.sin)) {
-                this.modifyColumn(0, tmpHigh, DIVIDE.second(tmpTransf.sin));
+                this.modifyColumn(0, tmpHigh, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
             } else {
-                this.modifyColumn(0, tmpHigh, NEGATE);
+                this.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
             }
         }
     }

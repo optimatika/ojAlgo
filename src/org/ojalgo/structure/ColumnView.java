@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,10 @@ public class ColumnView<N extends Number>
 
     protected ColumnView(final Access2D<N> access) {
         this(access, -1L, access.countColumns() - 1L);
+    }
+
+    ColumnView(final Access2D<N> access, final long column) {
+        this(access, column, access.countColumns() - 1L);
     }
 
     public int characteristics() {
@@ -113,6 +117,11 @@ public class ColumnView<N extends Number>
 
     public Stream<ColumnView<N>> stream(final boolean parallel) {
         return StreamSupport.stream(this, parallel);
+    }
+
+    @Override
+    public final String toString() {
+        return Access1D.toString(this);
     }
 
     public boolean tryAdvance(Consumer<? super ColumnView<N>> action) {

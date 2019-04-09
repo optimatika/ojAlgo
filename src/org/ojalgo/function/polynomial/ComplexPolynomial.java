@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +30,12 @@ import org.ojalgo.structure.Access1D;
 
 public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
 
-    public ComplexPolynomial(final int aDegree) {
-        super(Array1D.COMPLEX.makeZero(aDegree + 1));
+    public ComplexPolynomial(final int degree) {
+        super(Array1D.COMPLEX.makeZero(degree + 1));
     }
 
-    ComplexPolynomial(final Array1D<ComplexNumber> someCoefficients) {
-        super(someCoefficients);
+    ComplexPolynomial(final Array1D<ComplexNumber> coefficients) {
+        super(coefficients);
     }
 
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
@@ -87,31 +87,31 @@ public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
         return retVal;
     }
 
-    public void set(final Access1D<?> someCoefficient) {
-        final int tmpLimit = (int) Math.min(this.size(), someCoefficient.count());
+    public void set(final Access1D<?> coefficients) {
+        final int tmpLimit = (int) Math.min(this.size(), coefficients.count());
         for (int p = 0; p < tmpLimit; p++) {
-            this.set(p, ComplexNumber.valueOf(someCoefficient.get(p)));
+            this.set(p, ComplexNumber.valueOf(coefficients.get(p)));
         }
     }
 
     @Override
-    protected ComplexNumber getDerivativeFactor(final int aPower) {
-        final int tmpNextIndex = aPower + 1;
+    protected ComplexNumber getDerivativeFactor(final int power) {
+        final int tmpNextIndex = power + 1;
         return this.get(tmpNextIndex).multiply(tmpNextIndex);
     }
 
     @Override
-    protected ComplexNumber getPrimitiveFactor(final int aPower) {
-        if (aPower <= 0) {
+    protected ComplexNumber getPrimitiveFactor(final int power) {
+        if (power <= 0) {
             return ComplexNumber.ZERO;
         } else {
-            return this.get(aPower - 1).divide(aPower);
+            return this.get(power - 1).divide(power);
         }
     }
 
     @Override
-    protected AbstractPolynomial<ComplexNumber> makeInstance(final int aSize) {
-        return new ComplexPolynomial(Array1D.COMPLEX.makeZero(aSize));
+    protected AbstractPolynomial<ComplexNumber> makeInstance(final int size) {
+        return new ComplexPolynomial(Array1D.COMPLEX.makeZero(size));
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ import org.ojalgo.array.Primitive64Array;
  *
  * @author apete
  */
-public class SampleSetTest {
+public class SampleSetTest extends RandomTests {
 
     @Test
     public void testEmptySet() {

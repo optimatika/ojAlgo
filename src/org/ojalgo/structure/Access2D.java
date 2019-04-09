@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -83,8 +83,16 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
+    /**
+     * @deprecated v48 Will be removed
+     */
+    @Deprecated
     public interface Elements extends Structure2D, Access1D.Elements {
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         default boolean isAbsolute(final long index) {
             final long tmpStructure = this.countRows();
             return this.isAbsolute(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure));
@@ -92,19 +100,25 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         /**
          * @see Scalar#isAbsolute()
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         boolean isAbsolute(long row, long col);
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         default boolean isColumnSmall(final long col, final double comparedTo) {
             return this.isColumnSmall(0L, col, comparedTo);
         }
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         default boolean isColumnSmall(final long row, final long col, final double comparedTo) {
             boolean retVal = true;
             final long tmpLimit = this.countRows();
@@ -116,14 +130,18 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         default boolean isRowSmall(final long row, final double comparedTo) {
             return this.isRowSmall(row, 0L, comparedTo);
         }
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         default boolean isRowSmall(final long row, final long col, final double comparedTo) {
             boolean retVal = true;
             final long tmpLimit = this.countColumns();
@@ -133,6 +151,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             return retVal;
         }
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         default boolean isSmall(final long index, final double comparedTo) {
             final long tmpStructure = this.countRows();
             return this.isSmall(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), comparedTo);
@@ -140,7 +162,9 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         /**
          * @see Scalar#isSmall(double)
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         boolean isSmall(long row, long col, double comparedTo);
 
     }
@@ -225,8 +249,16 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
+    /**
+     * @deprecated v48 Will be removed
+     */
+    @Deprecated
     public interface IndexOf extends Structure2D, Access1D.IndexOf {
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         default long indexOfLargestInColumn(final long col) {
             return this.indexOfLargestInColumn(0L, col);
         }
@@ -235,9 +267,15 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
          * @param row First row to investigate
          * @param col The column
          * @return The row-index of the largest absolute value in a column, starting at the specified row.
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         long indexOfLargestInColumn(final long row, final long col);
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         default long indexOfLargestInRow(final long row) {
             return this.indexOfLargestInRow(row, 0L);
         }
@@ -246,9 +284,15 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
          * @param row The row
          * @param col The first column to investigate
          * @return The column-index of the largest absolute value in a row, starting at the specified column.
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         long indexOfLargestInRow(final long row, final long col);
 
+        /**
+         * @deprecated v48 Will be removed
+         */
+        @Deprecated
         default long indexOfLargestOnDiagonal() {
             return this.indexOfLargestOnDiagonal(0L);
         }
@@ -257,7 +301,9 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
          * @param first The first row/column to investigate
          * @return The row/column-index of the largest absolute value on the main diagonal, starting at the
          *         specified row/column.
+         * @deprecated v48 Will be removed
          */
+        @Deprecated
         long indexOfLargestOnDiagonal(final long first);
 
     }
@@ -266,6 +312,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         default Access1D<N> sliceColumn(final long col) {
             return this.sliceColumn(0L, col);
+            // return new ColumnView<N>(this, col);
         }
 
         Access1D<N> sliceColumn(long row, long col);
@@ -350,6 +397,11 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
                 return access.doubleValue(row, col);
             }
 
+            @Override
+            public final String toString() {
+                return Access2D.toString(this);
+            }
+
         };
     }
 
@@ -397,41 +449,41 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     static String toString(final Access2D<?> matrix) {
 
-        final StringBuilder retVal = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
 
-        final int tmpRowDim = (int) matrix.countRows();
-        final int tmpColDim = (int) matrix.countColumns();
+        int numbRows = Math.toIntExact(matrix.countRows());
+        int numbCols = Math.toIntExact(matrix.countColumns());
 
-        retVal.append(matrix.getClass().getName());
-        retVal.append(' ').append('<').append(' ').append(tmpRowDim).append(' ').append('x').append(' ').append(tmpColDim).append(' ').append('>');
+        builder.append(matrix.getClass().getName());
+        builder.append(' ').append('<').append(' ').append(numbRows).append(' ').append('x').append(' ').append(numbCols).append(' ').append('>');
 
-        if ((tmpRowDim > 0) && (tmpColDim > 0) && (tmpRowDim <= 50) && (tmpColDim <= 50) && ((tmpRowDim * tmpColDim) <= 200)) {
+        if ((numbRows > 0) && (numbCols > 0) && (numbRows <= 50) && (numbCols <= 50) && ((numbRows * numbCols) <= 200)) {
 
             // First element
-            retVal.append("\n{ { ").append(matrix.get(0, 0));
+            builder.append("\n{ { ").append(matrix.get(0, 0));
 
             // Rest of the first row
-            for (int j = 1; j < tmpColDim; j++) {
-                retVal.append(",\t").append(matrix.get(0, j));
+            for (int j = 1; j < numbCols; j++) {
+                builder.append(",\t").append(matrix.get(0, j));
             }
 
             // For each of the remaining rows
-            for (int i = 1; i < tmpRowDim; i++) {
+            for (int i = 1; i < numbRows; i++) {
 
                 // First column
-                retVal.append(" },\n{ ").append(matrix.get(i, 0));
+                builder.append(" },\n{ ").append(matrix.get(i, 0));
 
                 // Remaining columns
-                for (int j = 1; j < tmpColDim; j++) {
-                    retVal.append(",\t").append(matrix.get(i, j));
+                for (int j = 1; j < numbCols; j++) {
+                    builder.append(",\t").append(matrix.get(i, j));
                 }
             }
 
             // Finish
-            retVal.append(" } }");
+            builder.append(" } }");
         }
 
-        return retVal.toString();
+        return builder.toString();
     }
 
     static Access2D<Double> wrap(final double[][] target) {
@@ -455,6 +507,11 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
             public Double get(final long row, final long col) {
                 return target[(int) row][(int) col];
+            }
+
+            @Override
+            public final String toString() {
+                return Access2D.toString(this);
             }
 
         };
@@ -485,6 +542,11 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
             public N get(final long row, final long col) {
                 return target[(int) row][(int) col];
+            }
+
+            @Override
+            public final String toString() {
+                return Access2D.toString(this);
             }
 
         };

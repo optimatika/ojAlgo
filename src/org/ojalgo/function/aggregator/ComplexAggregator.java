@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,9 @@
  */
 package org.ojalgo.function.aggregator;
 
-import static org.ojalgo.function.ComplexFunction.*;
-
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.ComplexFunction;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.ComplexMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -49,6 +46,10 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
     }
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> AVERAGE = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
@@ -79,11 +80,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     ProgrammingError.throwForIllegalInvocation();
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    ProgrammingError.throwForIllegalInvocation();
-                    return null;
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myCount = 0;
                     myNumber = ComplexNumber.ZERO;
@@ -94,6 +90,10 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> CARDINALITY = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
@@ -120,10 +120,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     myCount += result.intValue();
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myCount = 0;
                     return this;
@@ -132,6 +128,11 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
             };
         }
     };
+
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> LARGEST = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
@@ -149,15 +150,11 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                 }
 
                 public void invoke(final ComplexNumber anArg) {
-                    myNumber = ComplexFunction.MAX.invoke(myNumber, ABS.invoke(anArg));
+                    myNumber = ComplexMath.MAX.invoke(myNumber, ComplexMath.ABS.invoke(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {
                     this.invoke(result);
-                }
-
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ComplexFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -169,6 +166,10 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> MAX = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
@@ -186,15 +187,11 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                 }
 
                 public void invoke(final ComplexNumber anArg) {
-                    myNumber = ComplexFunction.MAX.invoke(myNumber, anArg);
+                    myNumber = ComplexMath.MAX.invoke(myNumber, anArg);
                 }
 
                 public void merge(final ComplexNumber result) {
                     this.invoke(result);
-                }
-
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ComplexFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -206,6 +203,10 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> MIN = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
@@ -227,15 +228,11 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                 }
 
                 public void invoke(final ComplexNumber anArg) {
-                    myNumber = ComplexFunction.MIN.invoke(myNumber, anArg);
+                    myNumber = ComplexMath.MIN.invoke(myNumber, anArg);
                 }
 
                 public void merge(final ComplexNumber result) {
                     this.invoke(result);
-                }
-
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ComplexFunction.MIN.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -247,6 +244,10 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> NORM1 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
@@ -271,10 +272,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ZERO;
                     return this;
@@ -284,6 +281,10 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> NORM2 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
@@ -293,7 +294,7 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                 private ComplexNumber myNumber = ComplexNumber.ZERO;
 
                 public ComplexNumber get() {
-                    return ComplexNumber.valueOf(PrimitiveFunction.SQRT.invoke(myNumber.norm()));
+                    return ComplexNumber.valueOf(PrimitiveMath.SQRT.invoke(myNumber.norm()));
                 }
 
                 public int intValue() {
@@ -309,10 +310,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return HYPOT.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ZERO;
                     return this;
@@ -322,6 +319,10 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> PRODUCT = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
@@ -346,10 +347,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return MULTIPLY.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ONE;
                     return this;
@@ -358,6 +355,11 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
             };
         }
     };
+
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> PRODUCT2 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
@@ -382,10 +384,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     myNumber = myNumber.multiply(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return MULTIPLY.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ONE;
                     return this;
@@ -395,6 +393,10 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> SMALLEST = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
@@ -417,16 +419,12 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 public void invoke(final ComplexNumber anArg) {
                     if (!ComplexNumber.isSmall(PrimitiveMath.ONE, anArg)) {
-                        myNumber = ComplexFunction.MIN.invoke(myNumber, ABS.invoke(anArg));
+                        myNumber = ComplexMath.MIN.invoke(myNumber, ComplexMath.ABS.invoke(anArg));
                     }
                 }
 
                 public void merge(final ComplexNumber result) {
                     this.invoke(result);
-                }
-
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ComplexFunction.MIN.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -438,6 +436,10 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> SUM = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
@@ -462,10 +464,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
                     this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ADD.invoke(result1, result2);
-                }
-
                 public AggregatorFunction<ComplexNumber> reset() {
                     myNumber = ComplexNumber.ZERO;
                     return this;
@@ -475,6 +473,10 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
         }
     };
 
+    /**
+     * @deprecated v48 Use {@link AggregatorSet#getSet} instead. This will be made private.
+     */
+    @Deprecated
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> SUM2 = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
         @Override
@@ -497,10 +499,6 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
                 public void merge(final ComplexNumber result) {
                     myNumber = myNumber.add(result);
-                }
-
-                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
-                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {

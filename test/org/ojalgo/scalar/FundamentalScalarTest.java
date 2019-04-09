@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
 
@@ -218,9 +218,9 @@ public class FundamentalScalarTest extends ScalarTests {
         final double tmpExp = UNIFORM.doubleValue();
 
         if (tmpbase > tmpExp) {
-            return PrimitiveFunction.POW.invoke(tmpbase, tmpExp);
+            return PrimitiveMath.POW.invoke(tmpbase, tmpExp);
         } else {
-            return -PrimitiveFunction.POW.invoke(tmpbase, tmpExp);
+            return -PrimitiveMath.POW.invoke(tmpbase, tmpExp);
         }
     }
 

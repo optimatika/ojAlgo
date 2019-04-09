@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,10 @@ import org.ojalgo.function.aggregator.Aggregator;
 public interface StructureAnyD extends Structure1D {
 
     public final class IntReference implements Comparable<IntReference> {
+
+        public static IntReference of(final int... aReference) {
+            return new IntReference(aReference);
+        }
 
         public final int[] reference;
 
@@ -101,6 +105,10 @@ public interface StructureAnyD extends Structure1D {
     }
 
     public final class LongReference implements Comparable<LongReference> {
+
+        public static LongReference of(final long... aReference) {
+            return new LongReference(aReference);
+        }
 
         public final long[] reference;
 

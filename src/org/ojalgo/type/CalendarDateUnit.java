@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * <p>
@@ -326,6 +326,10 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
         } else { // QUARTER
             return false;
         }
+    }
+
+    public CalendarDateDuration newDuration(double meassure) {
+        return new CalendarDateDuration(meassure, this);
     }
 
     public long toDurationInMillis() {

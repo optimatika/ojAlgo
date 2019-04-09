@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -33,8 +32,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -80,7 +79,8 @@ public final class IntegerSolver extends GenericSolver {
     final class BranchAndBoundNodeTask extends RecursiveTask<Boolean> {
 
         private final NodeKey myKey;
-        private final PrinterBuffer myPrinter = IntegerSolver.this.isDebug() ? new CharacterRing().asPrinter() : null;
+        private final PrinterBuffer myPrinter = (IntegerSolver.this.options.validate || IntegerSolver.this.isLogProgress()) ? new CharacterRing().asPrinter()
+                : null;
 
         private BranchAndBoundNodeTask(final NodeKey key) {
 
@@ -111,7 +111,7 @@ public final class IntegerSolver extends GenericSolver {
 
                 final double bestIntegerSolutionValue = IntegerSolver.this.getBestResultSoFar().getValue();
 
-                double nudge = MAX.invoke(ABS.invoke(bestIntegerSolutionValue) * options.mip_gap, options.mip_gap);
+                double nudge = PrimitiveMath.MAX.invoke(PrimitiveMath.ABS.invoke(bestIntegerSolutionValue) * options.mip_gap, options.mip_gap);
 
                 if (nodeModel.isMinimisation()) {
                     final BigDecimal upper = TypeUtils.toBigDecimal(bestIntegerSolutionValue - nudge, options.feasibility);
@@ -123,8 +123,6 @@ public final class IntegerSolver extends GenericSolver {
             }
 
             final Boolean retVal = IntegerSolver.this.compute(myKey, nodeModel.prepare(), myPrinter);
-
-            IntegerSolver.this.recycleNodeModel(nodeModel);
 
             return retVal;
         }
@@ -253,7 +251,7 @@ public final class IntegerSolver extends GenericSolver {
 
         super(solverOptions);
 
-        myIntegerModel = model.simplify();
+        myIntegerModel = model.snapshot();
         myFunction = myIntegerModel.objective().toFunction();
 
         myMinimisation = myIntegerModel.isMinimisation();
@@ -321,7 +319,7 @@ public final class IntegerSolver extends GenericSolver {
 
     protected Boolean compute(NodeKey nodeKey, final ExpressionsBasedModel.Intermediate nodeModel, PrinterBuffer nodePrinter) {
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             nodePrinter.println();
             nodePrinter.println("Branch&Bound Node");
             nodePrinter.println(nodeKey.toString());
@@ -329,7 +327,7 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         if (!this.isIterationAllowed()) {
-            if (this.isDebug()) {
+            if (this.isLogDebug()) {
                 nodePrinter.println("Reached iterations or time limit - stop!");
                 IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
             }
@@ -340,18 +338,18 @@ public final class IntegerSolver extends GenericSolver {
             nodeKey.enforceBounds(nodeModel, this.getIntegerIndices());
         }
 
-        final Optimisation.Result bestResultSoFar = this.getBestResultSoFar();
-        final Optimisation.Result nodeResult = nodeModel.solve(bestResultSoFar);
+        final Optimisation.Result bestEstimate = this.getBestEstimate();
+        final Optimisation.Result nodeResult = nodeModel.solve(bestEstimate);
 
         // Increment when/if an iteration was actually performed
         this.incrementIterationsCount();
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             nodePrinter.println("Node Result: {}", nodeResult);
         }
 
         if (nodeResult.getState().isOptimal()) {
-            if (this.isDebug()) {
+            if (this.isLogDebug()) {
                 nodePrinter.println("Node solved to optimality!");
             }
 
@@ -371,7 +369,7 @@ public final class IntegerSolver extends GenericSolver {
             final double tmpSolutionValue = this.evaluateFunction(nodeResult);
 
             if (branchIntegerIndex == -1) {
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     nodePrinter.println("Integer solution! Store it among the others, and stop this branch!");
                 }
 
@@ -379,7 +377,7 @@ public final class IntegerSolver extends GenericSolver {
 
                 this.markInteger(nodeKey, null, tmpIntegerSolutionResult);
 
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     nodePrinter.println(this.getBestResultSoFar().toString());
                     BasicLogger.debug();
                     BasicLogger.debug(this.toString());
@@ -391,7 +389,7 @@ public final class IntegerSolver extends GenericSolver {
                 return true;
 
             } else {
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     nodePrinter.println("Not an Integer Solution: " + tmpSolutionValue);
                 }
 
@@ -399,7 +397,7 @@ public final class IntegerSolver extends GenericSolver {
 
                 if (this.isGoodEnoughToContinueBranching(tmpSolutionValue)) {
 
-                    if (this.isDebug()) {
+                    if (this.isLogDebug()) {
                         nodePrinter.println("Still hope, branching on {} @ {} >>> {}", branchIntegerIndex, variableValue,
                                 nodeModel.getVariable(this.getGlobalIndex(branchIntegerIndex)));
                         IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
@@ -443,7 +441,7 @@ public final class IntegerSolver extends GenericSolver {
                     }
 
                 } else {
-                    if (this.isDebug()) {
+                    if (this.isLogDebug()) {
                         nodePrinter.println("Can't find better integer solutions - stop this branch!");
                         IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
                     }
@@ -454,7 +452,7 @@ public final class IntegerSolver extends GenericSolver {
             }
 
         } else {
-            if (this.isDebug()) {
+            if (this.isLogDebug()) {
                 nodePrinter.println("Failed to solve node problem - stop this branch!");
                 IntegerSolver.flush(nodePrinter, this.getIntegerModel().options.logger_appender);
             }
@@ -501,6 +499,10 @@ public final class IntegerSolver extends GenericSolver {
         }
     }
 
+    protected Optimisation.Result getBestEstimate() {
+        return new Optimisation.Result(Optimisation.State.APPROXIMATE, this.getBestResultSoFar());
+    }
+
     protected MatrixStore<Double> getGradient(final Access1D<Double> solution) {
         return myFunction.getGradient(solution);
     }
@@ -529,8 +531,8 @@ public final class IntegerSolver extends GenericSolver {
 
             final double bestIntegerValue = bestResultSoFar.getValue();
 
-            final double absoluteGap = PrimitiveFunction.ABS.invoke(bestIntegerValue - relaxedNodeValue);
-            final double relativeGap = PrimitiveFunction.ABS.invoke(absoluteGap / bestIntegerValue);
+            final double absoluteGap = PrimitiveMath.ABS.invoke(bestIntegerValue - relaxedNodeValue);
+            final double relativeGap = PrimitiveMath.ABS.invoke(absoluteGap / bestIntegerValue);
 
             if (myMinimisation) {
                 return (relaxedNodeValue < bestIntegerValue) && (relativeGap > options.mip_gap) && (absoluteGap > options.mip_gap);
@@ -558,7 +560,7 @@ public final class IntegerSolver extends GenericSolver {
 
     protected synchronized void markInteger(final NodeKey key, final ExpressionsBasedModel model, final Optimisation.Result result) {
 
-        if (this.isProgress()) {
+        if (this.isLogProgress()) {
             this.log("New integer solution {}", result);
             this.log("\t@ node {}", key);
         }
@@ -580,7 +582,7 @@ public final class IntegerSolver extends GenericSolver {
 
         } else {
 
-            if (this.isDebug()) {
+            if (this.isLogDebug()) {
                 this.log("Previously best {}", myBestResultSoFar);
             }
         }
@@ -596,10 +598,6 @@ public final class IntegerSolver extends GenericSolver {
         }
 
         myIntegerSolutionsCount.incrementAndGet();
-    }
-
-    protected void recycleNodeModel(ExpressionsBasedModel model) {
-        //  myModelPool.giveBack(model);
     }
 
     /**
@@ -635,7 +633,7 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     void addIntegerSignificance(final int index, final double significance) {
-        myIntegerSignificances[index] = HYPOT.invoke(myIntegerSignificances[index], significance);
+        myIntegerSignificances[index] = PrimitiveMath.HYPOT.invoke(myIntegerSignificances[index], significance);
     }
 
     int countExploredNodes() {

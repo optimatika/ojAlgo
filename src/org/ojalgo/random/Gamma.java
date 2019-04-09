@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,9 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 
 /**
@@ -72,7 +72,7 @@ public class Gamma extends RandomNumber {
 
         double tmpIntegralPart = ZERO;
         for (int i = 0; i < tmpInteger; i++) {
-            tmpIntegralPart -= LOG.invoke(this.random().nextDouble());
+            tmpIntegralPart -= PrimitiveMath.LOG.invoke(this.random().nextDouble());
         }
 
         double tmpFractionalPart = ZERO;
@@ -86,11 +86,11 @@ public class Gamma extends RandomNumber {
 
             do {
 
-                tmpFractionalPart = -TWO * LOG.invoke(ONE - POW.invoke(this.random().nextDouble(), ONE / tmpFraction));
+                tmpFractionalPart = -TWO * PrimitiveMath.LOG.invoke(ONE - PrimitiveMath.POW.invoke(this.random().nextDouble(), ONE / tmpFraction));
                 tmpNegHalfFraction = -tmpFractionalPart / TWO;
 
-                tmpNumer = POW.invoke(tmpFractionalPart, tmpFractionMinusOne) * EXP.invoke(tmpNegHalfFraction);
-                tmpDenom = POW.invoke(TWO, tmpFractionMinusOne) * POW.invoke(-EXPM1.invoke(tmpNegHalfFraction), tmpFractionMinusOne);
+                tmpNumer = PrimitiveMath.POW.invoke(tmpFractionalPart, tmpFractionMinusOne) * PrimitiveMath.EXP.invoke(tmpNegHalfFraction);
+                tmpDenom = PrimitiveMath.POW.invoke(TWO, tmpFractionMinusOne) * PrimitiveMath.POW.invoke(-PrimitiveMath.EXPM1.invoke(tmpNegHalfFraction), tmpFractionMinusOne);
 
             } while (this.random().nextDouble() > (tmpNumer / tmpDenom));
         }

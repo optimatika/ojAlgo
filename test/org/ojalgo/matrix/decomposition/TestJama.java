@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ public class TestJama {
 
     private static Cholesky<Double> CHOLESKY = new RawCholesky();
     private static Eigenvalue<Double> EIGENVALUE = new RawEigenvalue.Dynamic();
-    private static NumberContext EVAL_CNTXT = NumberContext.getGeneral(8).newPrecision(15);
+    private static NumberContext EVAL_CNTXT = NumberContext.getGeneral(8).withPrecision(15);
     private static LU<Double> LU = new RawLU();
     private static QR<Double> QR = new RawQR();
     private static SingularValue<Double> SINGULAR_VALUE = new RawSingularValue();

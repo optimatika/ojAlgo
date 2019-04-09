@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,8 @@ package org.ojalgo.scalar;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.QuaternionFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.constant.QuaternionMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -45,11 +45,11 @@ public class QuaternionTest extends ScalarTests {
 
                         final Quaternion tmpOriginal = Quaternion.of(s, i, j, k);
 
-                        final Quaternion tmpOp = QuaternionFunction.COS.invoke(tmpOriginal);
-                        final Quaternion tmpInv = QuaternionFunction.ACOS.invoke(tmpOriginal);
+                        final Quaternion tmpOp = QuaternionMath.COS.invoke(tmpOriginal);
+                        final Quaternion tmpInv = QuaternionMath.ACOS.invoke(tmpOriginal);
 
-                        final Quaternion tmpInvOp = QuaternionFunction.ACOS.invoke(tmpOp);
-                        final Quaternion tmpOpInv = QuaternionFunction.COS.invoke(tmpInv);
+                        final Quaternion tmpInvOp = QuaternionMath.ACOS.invoke(tmpOp);
+                        final Quaternion tmpOpInv = QuaternionMath.COS.invoke(tmpInv);
 
                         TestUtils.assertEquals(tmpOriginal, tmpInvOp);
                         TestUtils.assertEquals(tmpOriginal, tmpOpInv);
@@ -72,11 +72,11 @@ public class QuaternionTest extends ScalarTests {
 
                         final Quaternion tmpOriginal = Quaternion.of(s, i, j, k);
 
-                        final Quaternion tmpOp = QuaternionFunction.COSH.invoke(tmpOriginal);
-                        final Quaternion tmpInv = QuaternionFunction.ACOSH.invoke(tmpOriginal);
+                        final Quaternion tmpOp = QuaternionMath.COSH.invoke(tmpOriginal);
+                        final Quaternion tmpInv = QuaternionMath.ACOSH.invoke(tmpOriginal);
 
-                        final Quaternion tmpInvOp = QuaternionFunction.ACOSH.invoke(tmpOp);
-                        final Quaternion tmpOpInv = QuaternionFunction.COSH.invoke(tmpInv);
+                        final Quaternion tmpInvOp = QuaternionMath.ACOSH.invoke(tmpOp);
+                        final Quaternion tmpOpInv = QuaternionMath.COSH.invoke(tmpInv);
 
                         TestUtils.assertEquals(tmpOriginal, tmpInvOp);
                         TestUtils.assertEquals(tmpOriginal, tmpOpInv);
@@ -99,11 +99,11 @@ public class QuaternionTest extends ScalarTests {
 
                         final Quaternion tmpOriginal = Quaternion.of(s, i, j, k);
 
-                        final Quaternion tmpOp = QuaternionFunction.SIN.invoke(tmpOriginal);
-                        final Quaternion tmpInv = QuaternionFunction.ASIN.invoke(tmpOriginal);
+                        final Quaternion tmpOp = QuaternionMath.SIN.invoke(tmpOriginal);
+                        final Quaternion tmpInv = QuaternionMath.ASIN.invoke(tmpOriginal);
 
-                        final Quaternion tmpInvOp = QuaternionFunction.ASIN.invoke(tmpOp);
-                        final Quaternion tmpOpInv = QuaternionFunction.SIN.invoke(tmpInv);
+                        final Quaternion tmpInvOp = QuaternionMath.ASIN.invoke(tmpOp);
+                        final Quaternion tmpOpInv = QuaternionMath.SIN.invoke(tmpInv);
 
                         TestUtils.assertEquals(tmpOriginal, tmpInvOp);
                         TestUtils.assertEquals(tmpOriginal, tmpOpInv);
@@ -126,11 +126,11 @@ public class QuaternionTest extends ScalarTests {
 
                         final Quaternion tmpOriginal = Quaternion.of(s, i, j, k);
 
-                        final Quaternion tmpOp = QuaternionFunction.SINH.invoke(tmpOriginal);
-                        final Quaternion tmpInv = QuaternionFunction.ASINH.invoke(tmpOriginal);
+                        final Quaternion tmpOp = QuaternionMath.SINH.invoke(tmpOriginal);
+                        final Quaternion tmpInv = QuaternionMath.ASINH.invoke(tmpOriginal);
 
-                        final Quaternion tmpInvOp = QuaternionFunction.ASINH.invoke(tmpOp);
-                        final Quaternion tmpOpInv = QuaternionFunction.SINH.invoke(tmpInv);
+                        final Quaternion tmpInvOp = QuaternionMath.ASINH.invoke(tmpOp);
+                        final Quaternion tmpOpInv = QuaternionMath.SINH.invoke(tmpInv);
 
                         TestUtils.assertEquals(tmpOriginal, tmpInvOp);
                         TestUtils.assertEquals(tmpOriginal, tmpOpInv);
@@ -153,11 +153,11 @@ public class QuaternionTest extends ScalarTests {
 
                         final Quaternion tmpOriginal = Quaternion.of(s, i, j, k);
 
-                        final Quaternion tmpOp = QuaternionFunction.TAN.invoke(tmpOriginal);
-                        final Quaternion tmpInv = QuaternionFunction.ATAN.invoke(tmpOriginal);
+                        final Quaternion tmpOp = QuaternionMath.TAN.invoke(tmpOriginal);
+                        final Quaternion tmpInv = QuaternionMath.ATAN.invoke(tmpOriginal);
 
-                        final Quaternion tmpInvOp = QuaternionFunction.ATAN.invoke(tmpOp);
-                        final Quaternion tmpOpInv = QuaternionFunction.TAN.invoke(tmpInv);
+                        final Quaternion tmpInvOp = QuaternionMath.ATAN.invoke(tmpOp);
+                        final Quaternion tmpOpInv = QuaternionMath.TAN.invoke(tmpInv);
 
                         TestUtils.assertEquals(tmpOriginal, tmpInvOp);
                         TestUtils.assertEquals(tmpOriginal, tmpOpInv);
@@ -180,11 +180,11 @@ public class QuaternionTest extends ScalarTests {
 
                         final Quaternion tmpOriginal = Quaternion.of(s, i, j, k);
 
-                        final Quaternion tmpOp = QuaternionFunction.TANH.invoke(tmpOriginal);
-                        final Quaternion tmpInv = QuaternionFunction.ATANH.invoke(tmpOriginal);
+                        final Quaternion tmpOp = QuaternionMath.TANH.invoke(tmpOriginal);
+                        final Quaternion tmpInv = QuaternionMath.ATANH.invoke(tmpOriginal);
 
-                        final Quaternion tmpInvOp = QuaternionFunction.ATANH.invoke(tmpOp);
-                        final Quaternion tmpOpInv = QuaternionFunction.TANH.invoke(tmpInv);
+                        final Quaternion tmpInvOp = QuaternionMath.ATANH.invoke(tmpOp);
+                        final Quaternion tmpOpInv = QuaternionMath.TANH.invoke(tmpInv);
 
                         TestUtils.assertEquals(tmpOriginal, tmpInvOp);
                         TestUtils.assertEquals(tmpOriginal, tmpOpInv);
@@ -206,11 +206,11 @@ public class QuaternionTest extends ScalarTests {
 
                         final Quaternion tmpQuaternion = Quaternion.of(s, i, j, k);
 
-                        final Quaternion tmpLog = QuaternionFunction.LOG.invoke(tmpQuaternion);
-                        final Quaternion tmpExp = QuaternionFunction.EXP.invoke(tmpQuaternion);
+                        final Quaternion tmpLog = QuaternionMath.LOG.invoke(tmpQuaternion);
+                        final Quaternion tmpExp = QuaternionMath.EXP.invoke(tmpQuaternion);
 
-                        final Quaternion tmpExpLog = QuaternionFunction.EXP.invoke(tmpLog);
-                        final Quaternion tmpLogExp = QuaternionFunction.LOG.invoke(tmpExp);
+                        final Quaternion tmpExpLog = QuaternionMath.EXP.invoke(tmpLog);
+                        final Quaternion tmpLogExp = QuaternionMath.LOG.invoke(tmpExp);
 
                         TestUtils.assertEquals(tmpQuaternion, tmpExpLog);
                         TestUtils.assertEquals(tmpQuaternion, tmpLogExp);
@@ -275,7 +275,7 @@ public class QuaternionTest extends ScalarTests {
         TestUtils.assertEquals(vctrResult, quatResult.vector());
 
         final PhysicalStore<Double> vector = randomPureQuat.vector();
-        vector.transform(normalizedRandomRotation);
+        normalizedRandomRotation.transform(vector);
 
         TestUtils.assertEquals(vctrResult, vector);
     }

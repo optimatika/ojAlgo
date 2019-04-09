@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -97,7 +97,7 @@ public final class CompoundFunction<N extends Number> extends AbstractMultiary<N
 
     @Override
     public MatrixStore<N> getGradient(final Access1D<N> point) {
-        return myQuadratic.getGradient(point).logical().superimpose(0, 0, myLinear.getGradient(point)).get();
+        return myQuadratic.getGradient(point).logical().superimpose(myLinear.getGradient(point)).get();
     }
 
     @Override

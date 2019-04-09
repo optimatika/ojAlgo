@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
 package org.ojalgo.random;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access2D;
 
 abstract class RandomNumber1D {
@@ -53,7 +53,7 @@ abstract class RandomNumber1D {
         final Array1D<Double> retVal = Array1D.PRIMITIVE64.makeZero(tmpLength);
 
         for (int i = 0; i < tmpLength; i++) {
-            retVal.set(i, PrimitiveFunction.SQRT.invoke(tmpVar.doubleValue(i)));
+            retVal.set(i, PrimitiveMath.SQRT.invoke(tmpVar.doubleValue(i)));
         }
 
         return retVal;

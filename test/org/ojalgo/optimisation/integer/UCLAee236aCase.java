@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
@@ -36,8 +36,9 @@ import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * http://www.ee.ucla.edu/ee236a/lectures/intlp.pdf
+ * http://www.ee.ucla.edu/ee236a/lectures/intlp.pdf (UCLAee236aCase.pdf)
  *
+ * @see #testRelaxedNodeP09()
  * @author apete
  */
 public class UCLAee236aCase extends OptimisationIntegerTests {
@@ -296,15 +297,23 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP09() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
-        tmpModel.getVariable(0).lower(THREE);
-        tmpModel.getVariable(1).upper(ONE);
-        tmpModel.getVariable(0).lower(FOUR);
-        tmpModel.getVariable(1).upper(ZERO);
+        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(false);
+        /*
+         * Some time after v47 the relaxing and presolver functionality of ExpressionsBasedModel was changed
+         * so that the model/presolver maintains info about which variables are integer. The model just knows
+         * that it is relaxed and wont call the integer solver. This resulted in this node actually finding
+         * the optimal integer solution (and set state DISTINCT rather than OPTIMAL). To get the "old" relaxed
+         * LP solution back it was necessary to explicitly set integer==false on the varibales.
+         */
+        tmpModel.getVariable(0).lower(THREE).integer(false);
+        tmpModel.getVariable(1).upper(ONE).integer(false);
+        tmpModel.getVariable(0).lower(FOUR).integer(false);
+        tmpModel.getVariable(1).upper(ZERO).integer(false);
 
         final Optimisation.Result tmpResult = tmpModel.minimise();
 
-        TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        //TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        TestUtils.assertStateNotLessThanOptimal(tmpResult);
 
         final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.50 }, { 0.00 } });
 

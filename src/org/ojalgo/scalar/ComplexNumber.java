@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,14 +25,13 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
+import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -43,8 +42,8 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * @author apete
  * @see org.ojalgo.function.ComplexFunction
  */
-public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>,
-        TransformationMatrix<Double, PhysicalStore<Double>>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, Transformation2D<Double>,
+        Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public static final class Normalised extends ComplexNumber {
 
@@ -63,7 +62,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
 
         @Override
-        public void transform(final PhysicalStore<Double> matrix) {
+        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
 
             final double s = this.doubleValue();
 
@@ -73,34 +72,34 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
             final double r00 = (ii + ss);
             final double r11 = (ss - ii);
 
-            if (matrix.count() == 2L) {
+            if (transformable.count() == 2L) {
 
-                final double x = matrix.doubleValue(0);
-                final double y = matrix.doubleValue(1);
+                final double x = transformable.doubleValue(0);
+                final double y = transformable.doubleValue(1);
 
-                matrix.set(0, r00 * x);
-                matrix.set(1, r11 * y);
+                transformable.set(0, r00 * x);
+                transformable.set(1, r11 * y);
 
-            } else if (matrix.countRows() == 2L) {
+            } else if (transformable.countRows() == 2L) {
 
-                for (long c = 0L, limit = matrix.countColumns(); c < limit; c++) {
+                for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
 
-                    final double x = matrix.doubleValue(0, c);
-                    final double y = matrix.doubleValue(1, c);
+                    final double x = transformable.doubleValue(0, c);
+                    final double y = transformable.doubleValue(1, c);
 
-                    matrix.set(0, c, r00 * x);
-                    matrix.set(1, c, r11 * y);
+                    transformable.set(0, c, r00 * x);
+                    transformable.set(1, c, r11 * y);
                 }
 
-            } else if (matrix.countColumns() == 2L) {
+            } else if (transformable.countColumns() == 2L) {
 
-                for (long r = 0L, limit = matrix.countRows(); r < limit; r++) {
+                for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
 
-                    final double x = matrix.doubleValue(r, 0);
-                    final double y = matrix.doubleValue(r, 1);
+                    final double x = transformable.doubleValue(r, 0);
+                    final double y = transformable.doubleValue(r, 1);
 
-                    matrix.set(r, 0, r00 * x);
-                    matrix.set(r, 1, r11 * y);
+                    transformable.set(r, 0, r00 * x);
+                    transformable.set(r, 1, r11 * y);
                 }
 
             } else {
@@ -139,12 +138,33 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     };
 
+    /**
+     * Complex number {@code i}, satisfies i<sup>2</sup> = -1;
+     */
     public static final ComplexNumber I = new ComplexNumber(PrimitiveMath.ZERO, PrimitiveMath.ONE);
+    /**
+     * Complex number Z = (+∞ + 0.0i)
+     */
     public static final ComplexNumber INFINITY = ComplexNumber.makePolar(Double.POSITIVE_INFINITY, PrimitiveMath.ZERO);
+    /**
+     * Complex number Z = (NaN + NaNi)
+     */
     public static final ComplexNumber NaN = ComplexNumber.of(PrimitiveMath.NaN, PrimitiveMath.NaN);
+    /**
+     * Complex number Z = (-1.0 + 0.0i)
+     */
     public static final ComplexNumber NEG = ComplexNumber.valueOf(PrimitiveMath.NEG);
+    /**
+     * Complex number Z = (1.0 + 0.0i)
+     */
     public static final ComplexNumber ONE = ComplexNumber.valueOf(PrimitiveMath.ONE);
+    /**
+     * Complex number Z = (2.0 + 0.0i)
+     */
     public static final ComplexNumber TWO = ComplexNumber.valueOf(PrimitiveMath.TWO);
+    /**
+     * Complex number Z = (0.0 + 0.0i)
+     */
     public static final ComplexNumber ZERO = ComplexNumber.valueOf(PrimitiveMath.ZERO);
 
     private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * PrimitiveScalar.CONTEXT.epsilon();
@@ -158,14 +178,33 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return value.isAbsolute();
     }
 
+    /**
+     * Test if {@code value} is infinite. A complex number is infinite if its real part and/or its imaginary
+     * part is infinite.
+     *
+     * @param value the complex number to test
+     * @return true if the specified value is infinite (real and/or imaginary part) otherwise false
+     */
     public static boolean isInfinite(final ComplexNumber value) {
         return Double.isInfinite(value.doubleValue()) || Double.isInfinite(value.i);
     }
 
+    /**
+     * Test if {@code value} is NaN. A complex number is NaN if its real and/or its imaginary part is NaN.
+     *
+     * @param value the complex number to test
+     * @return true if the specified value is NaN (real and/or imaginary part) otherwise false
+     */
     public static boolean isNaN(final ComplexNumber value) {
         return Double.isNaN(value.doubleValue()) || Double.isNaN(value.i);
     }
 
+    /**
+     * Test if {@code value} is real. A complex number Z is real if and only if {@literal Im(Z) = 0.0}.
+     *
+     * @param value the complex number to test
+     * @return true if the imaginary part of the specified value is null otherwise false
+     */
     public static boolean isReal(final ComplexNumber value) {
         return value.isReal();
     }
@@ -174,6 +213,13 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return value.isSmall(comparedTo);
     }
 
+    /**
+     * Static factory method returning a complex number from polar coordinates
+     *
+     * @param norm the complex number's norm
+     * @param phase the complex number's phase
+     * @return a complex number
+     */
     public static ComplexNumber makePolar(final double norm, final double phase) {
 
         double tmpStdPhase = phase % PrimitiveMath.TWO_PI;
@@ -185,7 +231,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
             return new ComplexNumber(norm);
 
-        } else if (PrimitiveFunction.ABS.invoke(tmpStdPhase - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
+        } else if (PrimitiveMath.ABS.invoke(tmpStdPhase - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
 
             return new ComplexNumber(-norm);
 
@@ -193,7 +239,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
             double tmpRe = PrimitiveMath.ZERO;
             if (norm != PrimitiveMath.ZERO) {
-                final double tmpCos = PrimitiveFunction.COS.invoke(tmpStdPhase);
+                final double tmpCos = PrimitiveMath.COS.invoke(tmpStdPhase);
                 if (tmpCos != PrimitiveMath.ZERO) {
                     tmpRe = norm * tmpCos;
                 }
@@ -201,7 +247,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
             double tmpIm = PrimitiveMath.ZERO;
             if (norm != PrimitiveMath.ZERO) {
-                final double tmpSin = PrimitiveFunction.SIN.invoke(tmpStdPhase);
+                final double tmpSin = PrimitiveMath.SIN.invoke(tmpStdPhase);
                 if (tmpSin != PrimitiveMath.ZERO) {
                     tmpIm = norm * tmpSin;
                 }
@@ -212,9 +258,16 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     }
 
     public static Normalised makeRotation(final double angle) {
-        return new Normalised(PrimitiveFunction.COS.invoke(angle), PrimitiveFunction.SIN.invoke(angle));
+        return new Normalised(PrimitiveMath.COS.invoke(angle), PrimitiveMath.SIN.invoke(angle));
     }
 
+    /**
+     * Static factory method returning a complex number from cartesian coordinates.
+     *
+     * @param real the complex number's real part
+     * @param imaginary the complex number's imaginary part
+     * @return a complex number
+     */
     public static ComplexNumber of(final double real, final double imaginary) {
         if (PrimitiveScalar.CONTEXT.isSmall(real, imaginary)) {
             return new ComplexNumber(real);
@@ -223,10 +276,25 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
     }
 
+    /**
+     * Static factory method returning a complex number from a real value
+     *
+     * @param value the complex number's real part
+     * @return a complex number Z = ({@code value} + 0.0i)
+     */
     public static ComplexNumber valueOf(final double value) {
         return new ComplexNumber(value);
     }
 
+    /**
+     * Static factory method returning a complex number from arbitrary number
+     *
+     * @param number a numeric value
+     * @return {@link ComplexNumber#ZERO} if {@code number} is null otherwise the double value of
+     *         {@code number}
+     * @see Number
+     * @see Number#doubleValue()
+     */
     public static ComplexNumber valueOf(final Number number) {
 
         if (number != null) {
@@ -251,6 +319,9 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     private final boolean myRealForSure;
     private final double myRealValue;
 
+    /**
+     * Complex number constructor, returns {@link ComplexNumber#ZERO}
+     */
     public ComplexNumber() {
         this(PrimitiveMath.ZERO);
     }
@@ -277,14 +348,35 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         i = imaginary;
     }
 
+    /**
+     * Performs the binary operation '+' with a complex number.
+     *
+     * @param arg the complex number to add
+     * @return a complex number {@literal Z = ((Re(this) + Re(arg)) + (Im(this) + Im(arg))i)}
+     */
     public ComplexNumber add(final ComplexNumber arg) {
         return new ComplexNumber(myRealValue + arg.doubleValue(), i + arg.i);
     }
 
+    /**
+     * Performs the binary operation '+' with a real number
+     *
+     * @param arg the real number to add
+     * @return a complex number {@literal Z = ((Re(this) + arg) + Im(this)i)}
+     */
     public ComplexNumber add(final double arg) {
         return new ComplexNumber(myRealValue + arg, i);
     }
 
+    /**
+     * Compares the specified {@code reference} and this. The numerical comparison uses following order :
+     * {@literal |Z| -> Re(Z) -> Im(Z)}.
+     *
+     * @param reference the complex number to compare with
+     * @return a negative value if {@code reference} is numerically greater than this, {@code 0} if this and
+     *         {@code reference} are numerically equal or a positive value if {@code reference} is numerically
+     *         lesser than this.
+     */
     public int compareTo(final ComplexNumber reference) {
 
         int retVal = 0;
@@ -298,6 +390,12 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return retVal;
     }
 
+    /**
+     * Returns the conjugate of this complex number. A complex number conjugate is its reflexion about the
+     * real axis.
+     *
+     * @return a complex number Z = (Re(this) - Im(this)i)
+     */
     public ComplexNumber conjugate() {
         return new ComplexNumber(myRealValue, -i);
     }
@@ -314,12 +412,18 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return 2L;
     }
 
+    /**
+     * Performs the binary operation '/' with a complex number.
+     *
+     * @param arg the complex number to divide by
+     * @return a complex number {@literal Z = this / arg}
+     */
     public ComplexNumber divide(final ComplexNumber arg) {
 
         final double tmpRe = arg.doubleValue();
         final double tmpIm = arg.i;
 
-        if (PrimitiveFunction.ABS.invoke(tmpRe) > PrimitiveFunction.ABS.invoke(tmpIm)) {
+        if (PrimitiveMath.ABS.invoke(tmpRe) > PrimitiveMath.ABS.invoke(tmpIm)) {
 
             final double r = tmpIm / tmpRe;
             final double d = tmpRe + (r * tmpIm);
@@ -335,6 +439,12 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
     }
 
+    /**
+     * Performs the binary operation '/' with a real number.
+     *
+     * @param arg the real number to divide by
+     * @return a complex number {@literal Z = ((Re(this) / arg) + (Im(this) / arg)i)}
+     */
     public ComplexNumber divide(final double arg) {
         return new ComplexNumber(myRealValue / arg, i / arg);
     }
@@ -462,6 +572,11 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return (int) this.doubleValue();
     }
 
+    /**
+     * Performs the unary operation '1/x'
+     *
+     * @return the complex number Z inverse of this, satisfies {@literal Z * this = 1}
+     */
     @Override
     public ComplexNumber invert() {
         return ComplexNumber.makePolar(PrimitiveMath.ONE / this.norm(), -this.phase());
@@ -491,6 +606,12 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return (long) this.doubleValue();
     }
 
+    /**
+     * Performs the binary operation '*' with a complex number.
+     *
+     * @param arg the complex number to multiply by
+     * @return a complex number {@literal Z = this * arg}
+     */
     @Override
     public ComplexNumber multiply(final ComplexNumber arg) {
 
@@ -500,20 +621,43 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return new ComplexNumber((myRealValue * tmpRe) - (i * tmpIm), (myRealValue * tmpIm) + (i * tmpRe));
     }
 
+    /**
+     * Performs the binary operation '*' with a real number.
+     *
+     * @param arg the real number to multiply by
+     * @return a complex number Z = ((Re(this) * arg) + Im(this) * arg))
+     */
     @Override
     public ComplexNumber multiply(final double arg) {
         return new ComplexNumber(myRealValue * arg, i * arg);
     }
 
+    /**
+     * Performs the unary operation '-'.
+     *
+     * @return a complex number Z = -this
+     */
     @Override
     public ComplexNumber negate() {
         return new ComplexNumber(-myRealValue, -i);
     }
 
+    /**
+     * Returns the norm of this complex number. The norm of a complex number is defined by |Z| =
+     * (ZZ<sup>*</sup>)<sup>1/2</sup>.
+     *
+     * @return the norm of this complex number.
+     */
     public double norm() {
-        return PrimitiveFunction.HYPOT.invoke(myRealValue, i);
+        return PrimitiveMath.HYPOT.invoke(myRealValue, i);
     }
 
+    /**
+     * Returns the phase of this complex number. The phase of a complex number Z is the angle between the
+     * positive real axis and the straight line defined by origin and Z in complex plane.
+     *
+     * @return the phase of this complex number
+     */
     public double phase() {
         return Math.atan2(i, myRealValue);
     }
@@ -526,10 +670,22 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
     }
 
+    /**
+     * Performs the binary operation '-' with a complex number.
+     *
+     * @param arg the complex number to subtract
+     * @return a complex number Z = this - {@code arg}
+     */
     public ComplexNumber subtract(final ComplexNumber arg) {
         return new ComplexNumber(myRealValue - arg.doubleValue(), i - arg.i);
     }
 
+    /**
+     * Performs the binary operation '-' with a real number.
+     *
+     * @param arg the real number to subtract
+     * @return a complex number Z = ((Re(this) - arg) + Im(this)i)
+     */
     @Override
     public ComplexNumber subtract(final double arg) {
         return new ComplexNumber(myRealValue - arg, i);
@@ -600,7 +756,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         } else {
             retVal.append(PLUS);
         }
-        retVal.append(Double.toString(PrimitiveFunction.ABS.invoke(tmpIm)));
+        retVal.append(Double.toString(PrimitiveMath.ABS.invoke(tmpIm)));
 
         return retVal.append(RIGHT).toString();
     }
@@ -624,7 +780,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return retVal.append(RIGHT).toString();
     }
 
-    public void transform(final PhysicalStore<Double> matrix) {
+    public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
 
         final double s = myRealValue;
 
@@ -636,34 +792,34 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         final double r00 = (ii + ss) * invs;
         final double r11 = (ss - ii) * invs;
 
-        if (matrix.count() == 2L) {
+        if (transformable.count() == 2L) {
 
-            final double x = matrix.doubleValue(0);
-            final double y = matrix.doubleValue(1);
+            final double x = transformable.doubleValue(0);
+            final double y = transformable.doubleValue(1);
 
-            matrix.set(0, r00 * x);
-            matrix.set(1, r11 * y);
+            transformable.set(0, r00 * x);
+            transformable.set(1, r11 * y);
 
-        } else if (matrix.countRows() == 2L) {
+        } else if (transformable.countRows() == 2L) {
 
-            for (long c = 0L, limit = matrix.countColumns(); c < limit; c++) {
+            for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
 
-                final double x = matrix.doubleValue(0, c);
-                final double y = matrix.doubleValue(1, c);
+                final double x = transformable.doubleValue(0, c);
+                final double y = transformable.doubleValue(1, c);
 
-                matrix.set(0, c, r00 * x);
-                matrix.set(1, c, r11 * y);
+                transformable.set(0, c, r00 * x);
+                transformable.set(1, c, r11 * y);
             }
 
-        } else if (matrix.countColumns() == 2L) {
+        } else if (transformable.countColumns() == 2L) {
 
-            for (long r = 0L, limit = matrix.countRows(); r < limit; r++) {
+            for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
 
-                final double x = matrix.doubleValue(r, 0);
-                final double y = matrix.doubleValue(r, 1);
+                final double x = transformable.doubleValue(r, 0);
+                final double y = transformable.doubleValue(r, 1);
 
-                matrix.set(r, 0, r00 * x);
-                matrix.set(r, 1, r11 * y);
+                transformable.set(r, 0, r00 * x);
+                transformable.set(r, 1, r11 * y);
             }
 
         } else {

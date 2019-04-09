@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,8 +42,8 @@ public interface PolynomialFunction<N extends Number>
 
     void set(Access1D<?> coefficients);
 
-    void set(final int aPower, final double aCoefficient);
+    void set(final int power, final double coefficient);
 
-    void set(final int aPower, final N aCoefficient);
+    void set(final int power, final N coefficient);
 
 }

@@ -1,18 +1,26 @@
 /*
- * Copyright 1997-2018 Optimatika Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute,
- * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions: The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
- * AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * Copyright 1997-2019 Optimatika
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.ojalgo.optimisation.integer;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,12 +29,12 @@ import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.MathProgSysModel;
+import org.ojalgo.optimisation.ModelFileMPS;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
@@ -39,7 +47,7 @@ import org.ojalgo.type.context.NumberContext;
  * http://miplib.zib.de/miplib2010/markshare_5_0.php Objective Value min < MIP < max: 0.00000000e+00 <
  * 1.00000000e+00 < ?
  */
-public final class MarketShareCase extends OptimisationIntegerTests {
+public final class MarketShareCase extends OptimisationIntegerTests implements ModelFileMPS {
 
     private static final BigDecimal OBJECTIVE_MIP = new BigDecimal(1);
     private static final Map<String, BigDecimal> SOLUTION;
@@ -99,11 +107,13 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
     private static ExpressionsBasedModel makeModel() {
 
-        final File tmpFile = new File(MipLibCase.PATH + "markshare_5_0.mps");
+        //        final File tmpFile = new File(ModelFileMPS.INT_PATH + "markshare_5_0.mps");
+        //
+        //        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        //
+        //        return tmpMPS.getExpressionsBasedModel();
 
-        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
-
-        return tmpMPS.getExpressionsBasedModel();
+        return ModelFileMPS.makeModel("miplib", "markshare_5_0.mps", false);
     }
 
     @Test
@@ -175,7 +185,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), tmpModel.options.feasibility);
 
-        final NumberContext tmpContext = tmpModel.options.solution.newScale(13);
+        final NumberContext tmpContext = tmpModel.options.solution.withScale(13);
         for (final Variable tmpVariable : tmpModel.getVariables()) {
             final String tmpName = tmpVariable.getName();
             final double tmpExpected = SOLUTION.get(tmpName).doubleValue();

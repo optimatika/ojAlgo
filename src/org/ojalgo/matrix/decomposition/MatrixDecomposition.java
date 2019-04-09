@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -84,14 +83,6 @@ public interface MatrixDecomposition<N extends Number> {
          * @return True if it will generate a full sized decomposition.
          */
         boolean isFullSize();
-
-        /**
-         * @deprecated v45.1.1 Property now set in constructor (final)
-         */
-        @Deprecated
-        default void setFullSize(boolean fullSize) {
-            ProgrammingError.throwForIllegalInvocation();
-        }
 
     }
 
@@ -270,8 +261,7 @@ public interface MatrixDecomposition<N extends Number> {
     }
 
     /**
-     * Eigenvalue and Singular Value decompositions can calculate the "values" only, and the resulting
-     * matrices and arrays can have their elements sorted (descending) or not.
+     * Eigenvalue and Singular Value decompositions can calculate the "values" only.
      *
      * @author apete
      */

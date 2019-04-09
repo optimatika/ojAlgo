@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 abstract class AbstractContinuous extends RandomNumber implements ContinuousDistribution {
 
@@ -35,6 +35,11 @@ abstract class AbstractContinuous extends RandomNumber implements ContinuousDist
 
     public final double getUpperConfidenceQuantile(final double confidence) {
         return this.getQuantile(ONE - ((ONE - confidence) / TWO));
+    }
+
+    @Override
+    protected double generate() {
+        return this.getQuantile(this.random().nextDouble());
     }
 
 }

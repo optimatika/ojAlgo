@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public class DecompositionProblems extends MatrixDecompositionTests {
 
+    private static final NumberContext TOP_ACCURACY = new NumberContext(14, 14);
     private static final double ZERO = 1e-9; // tolerance for zero checks
 
     /**
@@ -203,7 +204,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     }
 
     @Test
-    public void testP20100512a() {
+    public void testP20100512() {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
@@ -211,19 +212,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         final Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
         tmpPrimitive.decompose(tmpA);
 
-        TestUtils.assertEquals(tmpA, tmpPrimitive, new NumberContext(7, 6));
-    }
-
-    @Test
-    public void testP20100512b() {
-
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
-                .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
-
-        final Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
-        tmpPrimitive.decompose(tmpA);
-
-        TestUtils.assertEquals(tmpA, tmpPrimitive, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpA, tmpPrimitive, TOP_ACCURACY);
     }
 
     @Test

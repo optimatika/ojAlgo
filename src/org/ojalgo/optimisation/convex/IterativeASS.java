@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,13 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.MathContext;
+import java.util.Arrays;
 
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -69,7 +70,7 @@ final class IterativeASS extends ActiveSetSolver {
             //this.getDelegate().setRelaxationFactor(1.5);
 
             // ConjugateGradient
-            this.setAccuracyContext(NumberContext.getMath(MathContext.DECIMAL64).newPrecision(9));
+            this.setAccuracyContext(NumberContext.getMath(MathContext.DECIMAL64).withPrecision(9));
 
             myIterationRows = new Equation[(int) myFullDim];
 
@@ -190,7 +191,7 @@ final class IterativeASS extends ActiveSetSolver {
     @Override
     protected void performIteration() {
 
-        if (this.isDebug()) {
+        if (this.isLogProgress()) {
             this.log("\nPerformIteration {}", 1 + this.countIterations());
             this.log(this.toActivatorString());
         }
@@ -224,14 +225,14 @@ final class IterativeASS extends ActiveSetSolver {
             } else {
                 // Actual/normal optimisation problem
 
-                final double tmpRelativeError = myS.resolve(this.getSolutionL());
+                final double relativeError = myS.resolve(this.getSolutionL());
 
-                if (this.isDebug()) {
-                    this.log("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(incl));
+                if (this.isLogDebug()) {
+                    this.log("Relative error {} in solution for L={}", relativeError, Arrays.toString(this.getIterationL(incl).toRawCopy1D()));
                 }
 
                 final ElementsSupplier<Double> tmpRHS = this.getIterationL(incl).premultiply(this.getIterationA().transpose())
-                        .operateOnMatching(this.getIterationC(), SUBTRACT);
+                        .operateOnMatching(this.getIterationC(), PrimitiveMath.SUBTRACT);
                 this.getSolutionQ(tmpRHS, iterX);
             }
         }
@@ -260,9 +261,9 @@ final class IterativeASS extends ActiveSetSolver {
     }
 
     @Override
-    void resetActivator() {
+    void resetActivator(boolean useLagrange) {
 
-        super.resetActivator();
+        super.resetActivator(useLagrange);
 
         final int numbEqus = this.countEqualityConstraints();
         final int numbVars = this.countVariables();
@@ -276,7 +277,7 @@ final class IterativeASS extends ActiveSetSolver {
             final MatrixStore<Double> iterB = this.getIterationB();
 
             final MatrixStore<Double> tmpCols = this.getSolutionQ(iterA.transpose());
-            final MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB).get();
+            final MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(iterA).operateOnMatching(PrimitiveMath.SUBTRACT, iterB).get();
 
             for (int j = 0; j < numbEqus; j++) {
                 myS.add(j, tmpCols.sliceColumn(j), tmpRHS.doubleValue(j), numbVars);

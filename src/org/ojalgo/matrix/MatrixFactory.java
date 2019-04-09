@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.structure.Transformation2D;
 
 /**
  * MatrixFactory creates instances of classes that implement the {@linkplain org.ojalgo.matrix.BasicMatrix}
@@ -744,6 +745,14 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
         public void supplyTo(PhysicalStore<N> receiver) {
             myDelegate.supplyTo(receiver);
         }
+
+        public void transform(Transformation2D<N> transformation) {
+            if (mySafe) {
+                transformation.transform(myDelegate);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
     }
 
     abstract class SparseReceiver extends Physical<SparseStore<N>> {
@@ -784,8 +793,8 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 
-    @SuppressWarnings("unchecked")
-    public M columns(final List<? extends Number>... source) {
+    @SafeVarargs
+    public final M columns(final List<? extends Number>... source) {
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 

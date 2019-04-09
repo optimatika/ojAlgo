@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -111,6 +111,11 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterable<Matri
 
     public final void remove() {
         ProgrammingError.throwForUnsupportedOptionalOperation();
+    }
+
+    @Override
+    public final String toString() {
+        return Access2D.toString(this);
     }
 
     protected void setIndex(final long matrix) {

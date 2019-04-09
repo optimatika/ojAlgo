@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,11 +30,10 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.format.NumberStyle;
 
 /**
@@ -204,13 +203,12 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
     }
 
     private static boolean isZero(final double value, final double tolerance) {
-        return (PrimitiveFunction.ABS.invoke(value) <= tolerance);
+        return (PrimitiveMath.ABS.invoke(value) <= tolerance);
     }
 
     private final double myEpsilon;
     private final MathContext myMathContext;
     private final double myRoundingFactor;
-
     private final int myScale;
     private final double myZeroError;
 
@@ -237,7 +235,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         myMathContext = new MathContext(precision, mode);
 
         if (precision > 0) {
-            myEpsilon = PrimitiveFunction.MAX.invoke(PrimitiveMath.MACHINE_EPSILON, PrimitiveFunction.POW.invoke(PrimitiveMath.TEN, 1 - precision));
+            myEpsilon = PrimitiveMath.MAX.invoke(PrimitiveMath.MACHINE_EPSILON, PrimitiveMath.POW.invoke(PrimitiveMath.TEN, 1 - precision));
         } else {
             myEpsilon = PrimitiveMath.MACHINE_EPSILON;
         }
@@ -245,9 +243,9 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         myScale = scale;
 
         if (scale > Integer.MIN_VALUE) {
-            myZeroError = PrimitiveFunction.MAX.invoke(PrimitiveMath.MACHINE_SMALLEST,
-                    PrimitiveMath.HALF * PrimitiveFunction.POW.invoke(PrimitiveMath.TEN, -scale));
-            myRoundingFactor = PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, scale);
+            myZeroError = PrimitiveMath.MAX.invoke(PrimitiveMath.MACHINE_SMALLEST,
+                    PrimitiveMath.HALF * PrimitiveMath.POW.invoke(PrimitiveMath.TEN, -scale));
+            myRoundingFactor = PrimitiveMath.POWER.invoke(PrimitiveMath.TEN, scale);
         } else {
             myZeroError = PrimitiveMath.MACHINE_SMALLEST;
             myRoundingFactor = PrimitiveMath.ONE;
@@ -285,7 +283,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
      * {@linkplain StrictMath#rint(double)}.
      */
     public double enforce(final double number) {
-        return PrimitiveFunction.RINT.invoke(myRoundingFactor * number) / myRoundingFactor;
+        return PrimitiveMath.RINT.invoke(myRoundingFactor * number) / myRoundingFactor;
     }
 
     @Override
@@ -398,7 +396,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
     }
 
     public boolean isSmall(final double comparedTo, final double value) {
-        final double tmpComparedTo = PrimitiveFunction.ABS.invoke(comparedTo);
+        final double tmpComparedTo = PrimitiveMath.ABS.invoke(comparedTo);
         if (NumberContext.isZero(tmpComparedTo, myZeroError)) {
             return NumberContext.isZero(value, myZeroError);
         } else {
@@ -410,24 +408,44 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         return NumberContext.isZero(value, myZeroError);
     }
 
+    /**
+     * @deprecated v48 Use {@link #withFormat(NumberStyle,Locale)} instead
+     */
+    @Deprecated
     public NumberContext newFormat(final NumberStyle style, final Locale locale) {
-        return new NumberContext(style.getFormat(locale));
+        return this.withFormat(style, locale);
     }
 
+    /**
+     * @deprecated v48 Use {@link #withMathContext(MathContext)} instead
+     */
+    @Deprecated
     public NumberContext newMathContext(final MathContext context) {
-        return new NumberContext(this.format(), context.getPrecision(), this.getScale(), context.getRoundingMode());
+        return this.withMathContext(context);
     }
 
+    /**
+     * @deprecated v48 Use {@link #withPrecision(int)} instead
+     */
+    @Deprecated
     public NumberContext newPrecision(final int precision) {
-        return new NumberContext(this.format(), precision, this.getScale(), this.getRoundingMode());
+        return this.withPrecision(precision);
     }
 
+    /**
+     * @deprecated v48 Use {@link #withRoundingMode(RoundingMode)} instead
+     */
+    @Deprecated
     public NumberContext newRoundingMode(final RoundingMode mode) {
-        return new NumberContext(this.format(), this.getPrecision(), this.getScale(), mode);
+        return this.withRoundingMode(mode);
     }
 
+    /**
+     * @deprecated v48 Use {@link #withScale(int)} instead
+     */
+    @Deprecated
     public NumberContext newScale(final int scale) {
-        return new NumberContext(this.format(), this.getPrecision(), scale, this.getRoundingMode());
+        return this.withScale(scale);
     }
 
     /**
@@ -435,9 +453,9 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
      */
     public BigDecimal toBigDecimal(final double number) {
 
-        final BigDecimal tmpDecimal = myMathContext.getPrecision() > 0 ? new BigDecimal(number, myMathContext) : new BigDecimal(number);
+        final BigDecimal decimal = myMathContext.getPrecision() > 0 ? new BigDecimal(number, myMathContext) : new BigDecimal(number);
 
-        return this.scale(tmpDecimal);
+        return this.scale(decimal);
     }
 
     /**
@@ -479,19 +497,44 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         return this.getClass().getSimpleName() + " " + myMathContext.getPrecision() + ":" + myScale + " " + myMathContext.getRoundingMode().toString();
     }
 
+    public NumberContext withFormat(final NumberStyle style, final Locale locale) {
+        return new NumberContext(style.getFormat(locale));
+    }
+
+    public NumberContext withMathContext(final MathContext context) {
+        return new NumberContext(this.format(), context.getPrecision(), this.getScale(), context.getRoundingMode());
+    }
+
+    public NumberContext withoutPrecision() {
+        return new NumberContext(this.format(), 0, this.getScale(), this.getRoundingMode());
+    }
+
+    public NumberContext withoutScale() {
+        return new NumberContext(this.format(), this.getPrecision(), DEFAULT_SCALE, this.getRoundingMode());
+    }
+
+    public NumberContext withPrecision(final int precision) {
+        return new NumberContext(this.format(), precision, this.getScale(), this.getRoundingMode());
+    }
+
+    public NumberContext withRoundingMode(final RoundingMode mode) {
+        return new NumberContext(this.format(), this.getPrecision(), this.getScale(), mode);
+    }
+
+    public NumberContext withScale(final int scale) {
+        return new NumberContext(this.format(), this.getPrecision(), scale, this.getRoundingMode());
+    }
+
     private BigDecimal scale(final BigDecimal number) {
 
         BigDecimal retVal = number;
 
-        if (myScale > Integer.MIN_VALUE) {
+        if (myScale > DEFAULT_SCALE) {
             retVal = retVal.setScale(myScale, myMathContext.getRoundingMode());
+            retVal = retVal.stripTrailingZeros();
         }
 
-        if (retVal.signum() == 0) {
-            return BigMath.ZERO;
-        } else {
-            return retVal.stripTrailingZeros();
-        }
+        return retVal;
     }
 
     @Override
@@ -501,7 +544,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
 
             final DecimalFormat tmpDF = (DecimalFormat) format;
 
-            final int tmpModScale = myScale - (int) PrimitiveFunction.LOG10.invoke(tmpDF.getMultiplier());
+            final int tmpModScale = myScale - (int) PrimitiveMath.LOG10.invoke(tmpDF.getMultiplier());
 
             tmpDF.setMaximumFractionDigits(tmpModScale);
             tmpDF.setMinimumFractionDigits(Math.min(2, tmpModScale));

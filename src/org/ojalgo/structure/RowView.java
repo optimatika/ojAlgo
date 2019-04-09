@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,10 @@ public class RowView<N extends Number> implements Access1D<N>, Iterable<RowView<
 
     protected RowView(final Access2D<N> access) {
         this(access, -1L, access.countRows() - 1L);
+    }
+
+    RowView(final Access2D<N> access, final long row) {
+        this(access, row, access.countRows() - 1L);
     }
 
     public int characteristics() {
@@ -112,6 +116,11 @@ public class RowView<N extends Number> implements Access1D<N>, Iterable<RowView<
 
     public Stream<RowView<N>> stream(final boolean parallel) {
         return StreamSupport.stream(this, parallel);
+    }
+
+    @Override
+    public final String toString() {
+        return Access1D.toString(this);
     }
 
     public boolean tryAdvance(Consumer<? super RowView<N>> action) {

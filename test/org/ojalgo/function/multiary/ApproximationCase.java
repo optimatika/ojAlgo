@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,7 @@ package org.ojalgo.function.multiary;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
@@ -64,7 +63,7 @@ public class ApproximationCase {
 
         final PhysicalStore<Double> tmpX = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-10, 20));
 
-        TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), PrimitiveFunction.SQRT.invoke(1E-14 / PrimitiveMath.THREE));
+        TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), PrimitiveMath.SQRT.invoke(1E-14 / PrimitiveMath.THREE));
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,11 +29,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.ComplexFunction;
-import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.QuaternionFunction;
-import org.ojalgo.function.RationalFunction;
+import org.ojalgo.function.constant.ComplexMath;
+import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.constant.QuaternionMath;
+import org.ojalgo.function.constant.RationalMath;
 import org.ojalgo.matrix.BasicMatrix.PhysicalReceiver;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
@@ -211,21 +210,21 @@ public abstract class BasicMatrixTest extends MatrixTests {
     public void testDivideElementsBasicMatrix() {
 
         PhysicalReceiver<RationalNumber, RationalMatrix> copyRational = rationalAA.copy();
-        copyRational.modifyMatching(RationalFunction.DIVIDE, rationalSafe);
+        copyRational.modifyMatching(RationalMath.DIVIDE, rationalSafe);
         expMtrx = copyRational.get();
 
         PhysicalReceiver<Double, PrimitiveMatrix> copyPrimitive = primitiveAA.copy();
-        copyPrimitive.modifyMatching(PrimitiveFunction.DIVIDE, primitiveSafe);
+        copyPrimitive.modifyMatching(PrimitiveMath.DIVIDE, primitiveSafe);
         actMtrx = copyPrimitive.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         PhysicalReceiver<ComplexNumber, ComplexMatrix> copyComplex = complexAA.copy();
-        copyComplex.modifyMatching(ComplexFunction.DIVIDE, complexSafe);
+        copyComplex.modifyMatching(ComplexMath.DIVIDE, complexSafe);
         actMtrx = copyComplex.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         PhysicalReceiver<Quaternion, QuaternionMatrix> copyQuaternion = quaternionAA.copy();
-        copyQuaternion.modifyMatching(QuaternionFunction.DIVIDE, quaternionSafe);
+        copyQuaternion.modifyMatching(QuaternionMath.DIVIDE, quaternionSafe);
         actMtrx = copyQuaternion.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
@@ -326,12 +325,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
             // Difficult to test numerically
             // Will only check that they are the same order of magnitude
 
-            final int tmpExpCondMag = (int) Math.round(PrimitiveFunction.LOG10.invoke(rationalAA.getCondition().doubleValue()));
+            final int tmpExpCondMag = (int) Math.round(PrimitiveMath.LOG10.invoke(rationalAA.getCondition().doubleValue()));
 
-            int tmpActCondMag = (int) Math.round(PrimitiveFunction.LOG10.invoke(primitiveAA.getCondition().doubleValue()));
+            int tmpActCondMag = (int) Math.round(PrimitiveMath.LOG10.invoke(primitiveAA.getCondition().doubleValue()));
             TestUtils.assertEquals(tmpExpCondMag, tmpActCondMag);
 
-            tmpActCondMag = (int) Math.round(PrimitiveFunction.LOG10.invoke(complexAA.getCondition().doubleValue()));
+            tmpActCondMag = (int) Math.round(PrimitiveMath.LOG10.invoke(complexAA.getCondition().doubleValue()));
             TestUtils.assertEquals(tmpExpCondMag, tmpActCondMag);
         }
     }
@@ -688,21 +687,21 @@ public abstract class BasicMatrixTest extends MatrixTests {
     public void testMultiplyElementsBasicMatrix() {
 
         PhysicalReceiver<RationalNumber, RationalMatrix> copyRational = rationalAA.copy();
-        copyRational.modifyMatching(RationalFunction.MULTIPLY, rationalSafe);
+        copyRational.modifyMatching(RationalMath.MULTIPLY, rationalSafe);
         expMtrx = copyRational.get();
 
         PhysicalReceiver<Double, PrimitiveMatrix> copyPrimitive = primitiveAA.copy();
-        copyPrimitive.modifyMatching(PrimitiveFunction.MULTIPLY, primitiveSafe);
+        copyPrimitive.modifyMatching(PrimitiveMath.MULTIPLY, primitiveSafe);
         actMtrx = copyPrimitive.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         PhysicalReceiver<ComplexNumber, ComplexMatrix> copyComplex = complexAA.copy();
-        copyComplex.modifyMatching(ComplexFunction.MULTIPLY, complexSafe);
+        copyComplex.modifyMatching(ComplexMath.MULTIPLY, complexSafe);
         actMtrx = copyComplex.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
         PhysicalReceiver<Quaternion, QuaternionMatrix> copyQuaternion = quaternionAA.copy();
-        copyQuaternion.modifyMatching(QuaternionFunction.MULTIPLY, quaternionSafe);
+        copyQuaternion.modifyMatching(QuaternionMath.MULTIPLY, quaternionSafe);
         actMtrx = copyQuaternion.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
     }
@@ -787,10 +786,10 @@ public abstract class BasicMatrixTest extends MatrixTests {
         expInt = (int) rationalAA.count();
 
         actInt = (int) complexAA.count();
-        TestUtils.assertEquals(expBoolean, actBoolean);
+        TestUtils.assertEquals(expInt, actInt);
 
         actInt = (int) primitiveAA.count();
-        TestUtils.assertEquals(expBoolean, actBoolean);
+        TestUtils.assertEquals(expInt, actInt);
 
     }
 

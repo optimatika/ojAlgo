@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,14 +41,15 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.structure.Transformation2D;
 
 /**
  * Array2D
  *
  * @author apete
  */
-public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Access2D.Sliceable<N>, Access2D.Visitable<N>,
-        Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Exchangeable, Mutate2D.Mixable<N> {
+public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements,
+        Access2D.IndexOf, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.Transformable<N>, Mutate2D.Exchangeable, Mutate2D.Mixable<N> {
 
     public static final class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
@@ -59,7 +60,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
-        public final Array2D<N> columns(final Access1D<?>... source) {
+        public Array2D<N> columns(final Access1D<?>... source) {
 
             final int tmpColumns = source.length;
             final long tmpRows = source[0].count();
@@ -87,7 +88,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
-        public final Array2D<N> columns(final double[]... source) {
+        public Array2D<N> columns(final double[]... source) {
 
             final int tmpColumns = source.length;
             final int tmpRows = source[0].length;
@@ -105,8 +106,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
-        @SafeVarargs
-        public final Array2D<N> columns(final List<? extends Number>... source) {
+        public Array2D<N> columns(final List<? extends Number>... source) {
 
             final int tmpColumns = source.length;
             final int tmpRows = source[0].size();
@@ -124,7 +124,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
-        public final Array2D<N> columns(final Number[]... source) {
+        public Array2D<N> columns(final Number[]... source) {
 
             final int tmpColumns = source.length;
             final int tmpRows = source[0].length;
@@ -142,16 +142,16 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
-        public final Array2D<N> copy(final Access2D<?> source) {
+        public Array2D<N> copy(final Access2D<?> source) {
             return myDelegate.copy(source).wrapInArray2D(source.countRows());
         }
 
         @Override
-        public final FunctionSet<N> function() {
+        public FunctionSet<N> function() {
             return myDelegate.function();
         }
 
-        public final Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
+        public Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(rows, columns);
 
@@ -165,15 +165,15 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return tmpDelegate.wrapInArray2D(rows);
         }
 
-        public final Array2D<N> makeSparse(final long rows, final long columns) {
+        public Array2D<N> makeSparse(final long rows, final long columns) {
             return myDelegate.makeStructuredZero(rows, columns).wrapInArray2D(rows);
         }
 
-        public final Array2D<N> makeZero(final long rows, final long columns) {
+        public Array2D<N> makeZero(final long rows, final long columns) {
             return myDelegate.makeToBeFilled(rows, columns).wrapInArray2D(rows);
         }
 
-        public final Array2D<N> rows(final Access1D<?>... source) {
+        public Array2D<N> rows(final Access1D<?>... source) {
 
             final int tmpRows = source.length;
             final long tmpColumns = source[0].count();
@@ -199,7 +199,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
-        public final Array2D<N> rows(final double[]... source) {
+        public Array2D<N> rows(final double[]... source) {
 
             final int tmpRows = source.length;
             final int tmpColumns = source[0].length;
@@ -217,7 +217,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         }
 
         @SuppressWarnings("unchecked")
-        public final Array2D<N> rows(final List<? extends Number>... source) {
+        public Array2D<N> rows(final List<? extends Number>... source) {
 
             final int tmpRows = source.length;
             final int tmpColumns = source[0].size();
@@ -234,7 +234,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
-        public final Array2D<N> rows(final Number[]... source) {
+        public Array2D<N> rows(final Number[]... source) {
 
             final int tmpRows = source.length;
             final int tmpColumns = source[0].length;
@@ -252,7 +252,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         }
 
         @Override
-        public final Scalar.Factory<N> scalar() {
+        public Scalar.Factory<N> scalar() {
             return myDelegate.scalar();
         }
 
@@ -668,7 +668,11 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     @Override
     public String toString() {
-        return myDelegate.toString();
+        return Access2D.toString(this);
+    }
+
+    public void transform(Transformation2D<N> transformation) {
+        transformation.transform(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

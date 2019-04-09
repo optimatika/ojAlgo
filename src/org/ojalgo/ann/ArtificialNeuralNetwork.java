@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 package org.ojalgo.ann;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +30,7 @@ import java.util.List;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.structure.Access1D;
@@ -55,7 +56,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         /**
          * [0,1]
          */
-        SIGMOID(args -> (PrimitiveFunction.LOGISTIC), arg -> arg * (ONE - arg), true),
+        SIGMOID(args -> (PrimitiveMath.LOGISTIC), arg -> arg * (ONE - arg), true),
         /**
          * [0,1] <br>
          * Currently this can only be used in the final layer in combination with
@@ -64,14 +65,14 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
          */
         SOFTMAX(args -> {
             PrimitiveDenseStore parts = args.copy();
-            parts.modifyAll(PrimitiveFunction.EXP);
+            parts.modifyAll(PrimitiveMath.EXP);
             final double total = parts.aggregateAll(Aggregator.SUM);
-            return arg -> PrimitiveFunction.EXP.invoke(arg) / total;
+            return arg -> PrimitiveMath.EXP.invoke(arg) / total;
         }, arg -> ONE, false),
         /**
          * [-1,1]
          */
-        TANH(args -> (PrimitiveFunction.TANH), arg -> ONE - (arg * arg), true);
+        TANH(args -> (PrimitiveMath.TANH), arg -> ONE - (arg * arg), true);
 
         private final PrimitiveFunction.Unary myDerivativeInTermsOfOutput;
         private final ActivatorFunctionFactory myFunction;

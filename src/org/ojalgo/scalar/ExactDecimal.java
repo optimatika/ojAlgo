@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ package org.ojalgo.scalar;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -181,7 +181,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
     }
 
     public final double norm() {
-        return PrimitiveFunction.ABS.invoke(this.doubleValue());
+        return PrimitiveMath.ABS.invoke(this.doubleValue());
     }
 
     public final S signum() {

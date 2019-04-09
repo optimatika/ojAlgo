@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ package org.ojalgo.optimisation.convex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -119,7 +119,7 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
         if ((myAI != null) && (myBI != null)) {
 
             final PhysicalStore<Double> tmpSlack = myBI.copy();
-            tmpSlack.modifyMatching(PrimitiveFunction.SUBTRACT, myAI.multiply(myXI));
+            tmpSlack.modifyMatching(PrimitiveMath.SUBTRACT, myAI.multiply(myXI));
 
             for (int i = 0; i < tmpSlack.countRows(); i++) {
                 TestUtils.assertTrue(tmpSlack.doubleValue(i, 0) > -myEvaluationContext.epsilon());

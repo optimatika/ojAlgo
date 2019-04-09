@@ -1,6 +1,6 @@
 package org.ojalgo.matrix.transformation;
 
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.ColumnView;
@@ -64,23 +64,6 @@ final class HouseholderColumn<N extends Number> extends ColumnView<N> implements
     public void point(final long row, final long col) {
         this.setColumn(col);
         myFirst = (int) row;
-    }
-
-    @Override
-    public String toString() {
-
-        final StringBuilder retVal = new StringBuilder("{ ");
-
-        final int tmpLastIndex = (int) this.count() - 1;
-        for (int i = 0; i < tmpLastIndex; i++) {
-            retVal.append(this.get(i));
-            retVal.append(", ");
-        }
-        retVal.append(this.get(tmpLastIndex));
-
-        retVal.append(" }");
-
-        return retVal.toString();
     }
 
 }

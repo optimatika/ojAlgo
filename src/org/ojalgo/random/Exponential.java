@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,9 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.constant.PrimitiveMath;
 
 /**
  * Distribution of length of life when no aging. Describes the time between events in a Poisson process, i.e.
@@ -49,11 +49,19 @@ public class Exponential extends AbstractContinuous {
         myRate = aRate;
     }
 
+    public double getDensity(final double value) {
+        if (value < ZERO) {
+            return ZERO;
+        } else {
+            return myRate * PrimitiveMath.EXP.invoke(-myRate * value);
+        }
+    }
+
     public double getDistribution(final double value) {
         if (value < ZERO) {
             return ZERO;
         } else {
-            return ONE - PrimitiveFunction.EXP.invoke(-myRate * value);
+            return ONE - PrimitiveMath.EXP.invoke(-myRate * value);
         }
     }
 
@@ -61,19 +69,11 @@ public class Exponential extends AbstractContinuous {
         return ONE / myRate;
     }
 
-    public double getProbability(final double value) {
-        if (value < ZERO) {
-            return ZERO;
-        } else {
-            return myRate * PrimitiveFunction.EXP.invoke(-myRate * value);
-        }
-    }
+    public double getQuantile(final double probability) {
 
-    public double getQuantile(final double probality) {
+        this.checkProbabilty(probability);
 
-        this.checkProbabilty(probality);
-
-        return PrimitiveFunction.LOG.invoke(ONE - probality) / -myRate;
+        return PrimitiveMath.LOG.invoke(ONE - probability) / -myRate;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class Exponential extends AbstractContinuous {
 
     @Override
     protected double generate() {
-        return -PrimitiveFunction.LOG.invoke(this.random().nextDouble()) / myRate;
+        return -PrimitiveMath.LOG.invoke(this.random().nextDouble()) / myRate;
     }
 
 }

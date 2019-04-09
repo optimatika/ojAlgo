@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ package org.ojalgo.function.polynomial;
 import java.math.BigDecimal;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.constant.BigMath;
+import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -39,12 +39,12 @@ import org.ojalgo.type.TypeUtils;
  */
 public class BigPolynomial extends AbstractPolynomial<BigDecimal> {
 
-    public BigPolynomial(final int aDegree) {
-        super(Array1D.BIG.makeZero(aDegree + 1));
+    public BigPolynomial(final int degree) {
+        super(Array1D.BIG.makeZero(degree + 1));
     }
 
-    BigPolynomial(final Array1D<BigDecimal> someCoefficients) {
-        super(someCoefficients);
+    BigPolynomial(final Array1D<BigDecimal> coefficients) {
+        super(coefficients);
     }
 
     public void estimate(final Access1D<?> x, final Access1D<?> y) {
@@ -96,31 +96,31 @@ public class BigPolynomial extends AbstractPolynomial<BigDecimal> {
         return retVal;
     }
 
-    public void set(final Access1D<?> someCoefficient) {
-        final int tmpLimit = (int) Math.min(this.count(), someCoefficient.count());
+    public void set(final Access1D<?> coefficients) {
+        final int tmpLimit = (int) Math.min(this.count(), coefficients.count());
         for (int p = 0; p < tmpLimit; p++) {
-            this.set(p, TypeUtils.toBigDecimal(someCoefficient.get(p)));
+            this.set(p, TypeUtils.toBigDecimal(coefficients.get(p)));
         }
     }
 
     @Override
-    protected BigDecimal getDerivativeFactor(final int aPower) {
-        final int tmpNextIndex = aPower + 1;
+    protected BigDecimal getDerivativeFactor(final int power) {
+        final int tmpNextIndex = power + 1;
         return this.get(tmpNextIndex).multiply(new BigDecimal(tmpNextIndex));
     }
 
     @Override
-    protected BigDecimal getPrimitiveFactor(final int aPower) {
-        if (aPower <= 0) {
+    protected BigDecimal getPrimitiveFactor(final int power) {
+        if (power <= 0) {
             return BigMath.ZERO;
         } else {
-            return this.get(aPower - 1).divide(new BigDecimal(aPower));
+            return this.get(power - 1).divide(new BigDecimal(power));
         }
     }
 
     @Override
-    protected AbstractPolynomial<BigDecimal> makeInstance(final int aSize) {
-        return new BigPolynomial(Array1D.BIG.makeZero(aSize));
+    protected AbstractPolynomial<BigDecimal> makeInstance(final int size) {
+        return new BigPolynomial(Array1D.BIG.makeZero(size));
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,20 +21,21 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.BigFunction;
+import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.type.context.NumberContext;
 
 public class FinancePortfolioProblem extends OptimisationConvexTests {
 
@@ -89,7 +90,7 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
                 tmpVar.set(i, j, covariances.doubleValue(i, j));
             }
         }
-        tmpVar.weight(BigFunction.DIVIDE.invoke(riskAversion, TWO));
+        tmpVar.weight(BigMath.DIVIDE.invoke(riskAversion, TWO));
 
         return retVal;
     }
@@ -123,7 +124,7 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
 
         TestUtils.assertStateNotLessThanOptimal(result);
         TestUtils.assertTrue(model.validate());
-        TestUtils.assertTrue(model.validate(result));
+        TestUtils.assertTrue(model.validate(result, new NumberContext(8, 8), BasicLogger.ERROR));
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(model);
     }

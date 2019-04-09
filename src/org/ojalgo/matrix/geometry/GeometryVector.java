@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,9 @@ package org.ojalgo.matrix.geometry;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.ElementsConsumer;
-import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.structure.Access1D;
 
-abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> implements Access1D<Double>, TransformationMatrix.Transformable<Double> {
+abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> implements Access1D<Double> {
 
     GeometryVector(final FillByMultiplying<Double> multiplier, final long rows, final long columns) {
         super(multiplier, rows, columns);
@@ -87,6 +86,11 @@ abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> im
 
     public final void set(final long row, final long col, final Number value) {
         this.set((int) row, value.doubleValue());
+    }
+
+    @Override
+    public final String toString() {
+        return Access1D.toString(this);
     }
 
 }

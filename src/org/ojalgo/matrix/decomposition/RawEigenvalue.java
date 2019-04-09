@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -35,6 +34,7 @@ import org.ojalgo.array.blas.COPY;
 import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -85,7 +85,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         @Override
         protected boolean doDecompose(final double[][] data, final boolean valuesOnly) {
 
-            if (this.checkSymmetry()) {
+            if (this.isHermitian()) {
                 this.doSymmetric(data, valuesOnly);
             } else {
                 this.doGeneral(data, valuesOnly);
@@ -274,7 +274,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             for (int i = 0; i < dim; i++) {
                 final double val = d[i];
-                max = MAX.invoke(max, ABS.invoke(val));
+                max = PrimitiveMath.MAX.invoke(max, PrimitiveMath.ABS.invoke(val));
                 if (PrimitiveScalar.isSmall(max, val)) {
                     for (int j = 0; j < dim; j++) {
                         tmpMtrx.set(i, j, ZERO);
@@ -439,7 +439,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             // Calculate the norm of the row/col to zero out - to avoid under/overflow.
             scale = ZERO;
             for (int k = 0; k < m; k++) {
-                scale = MAX.invoke(scale, ABS.invoke(d[k]));
+                scale = PrimitiveMath.MAX.invoke(scale, PrimitiveMath.ABS.invoke(d[k]));
             }
 
             h = ZERO;
@@ -462,7 +462,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     h += val * val; // d[k] * d[k]
                 }
                 f = d[m - 1];
-                g = SQRT.invoke(h);
+                g = PrimitiveMath.SQRT.invoke(h);
                 if (f > 0) {
                     g = -g;
                 }

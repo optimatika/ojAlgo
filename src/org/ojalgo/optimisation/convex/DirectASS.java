@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2018 Optimatika
+ * Copyright 1997-2019 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,9 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
-
 import java.util.Arrays;
 
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -39,7 +37,7 @@ import org.ojalgo.optimisation.Optimisation;
  * when [AE][X] == [BE]<br>
  * and [AI][X] &lt;= [BI]
  * </p>
- * Where [AE] and [BE] are optinal.
+ * Where [AE] and [BE] are optional.
  *
  * @author apete
  */
@@ -49,11 +47,10 @@ final class DirectASS extends ActiveSetSolver {
         super(matrices, solverOptions);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void performIteration() {
 
-        if (this.isDebug()) {
+        if (this.isLogDebug()) {
             this.log("\nPerformIteration {}", 1 + this.countIterations());
             this.log(this.toActivatorString());
         }
@@ -95,19 +92,19 @@ final class DirectASS extends ActiveSetSolver {
                 final ElementsSupplier<Double> tmpS = tmpInvQAT.premultiply(iterA);
                 // TODO Symmetric, only need to calculate half the Schur complement, and only 1 row/column changes per iteration
 
-                if (this.isDebug()) {
+                if (this.isLogDebug()) {
                     BasicLogger.debug("Negated Schur complement: " + Arrays.toString(incl), tmpS.get());
                 }
 
                 if (solved = this.computeGeneral(tmpS)) {
 
-                    this.getSolutionGeneral(this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB), iterL);
+                    this.getSolutionGeneral(this.getInvQC().premultiply(iterA).operateOnMatching(PrimitiveMath.SUBTRACT, iterB), iterL);
 
-                    if (this.isDebug()) {
-                        this.log("Relative error {} in solution for L={}", PrimitiveMath.NaN, iterL);
+                    if (this.isLogDebug()) {
+                        this.log("Relative error {} in solution for L={}", PrimitiveMath.NaN, iterL.toRawCopy1D());
                     }
 
-                    final ElementsSupplier<Double> tmpRHS = iterL.premultiply(iterA.transpose()).operateOnMatching(iterC, SUBTRACT);
+                    final ElementsSupplier<Double> tmpRHS = iterL.premultiply(iterA.transpose()).operateOnMatching(iterC, PrimitiveMath.SUBTRACT);
                     this.getSolutionQ(tmpRHS, iterX);
                 }
             }
