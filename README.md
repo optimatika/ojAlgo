@@ -1,4 +1,4 @@
-# oj! Algorithms [![Build Status](https://travis-ci.org/optimatika/ojAlgo.svg?branch=master)](https://travis-ci.org/optimatika/ojAlgo) [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/optimatika/ojAlgo.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/optimatika/ojAlgo/context:java)
+# oj! Algorithms [![Build Status](https://travis-ci.org/optimatika/ojAlgo.svg?branch=master)](https://travis-ci.org/optimatika/ojAlgo) [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/optimatika/ojAlgo.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/optimatika/ojAlgo/context:java) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.ojalgo/ojalgo/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.ojalgo/ojalgo/)
 
 oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.
 
