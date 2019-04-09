@@ -102,17 +102,17 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
         }
     }
 
+    @Override
+    public String toString() {
+        return Access2D.toString(this);
+    }
+
     SparseArray<N> addColumn(final SparseArray<N> columnToAdd) {
         if (myColumns.add(columnToAdd)) {
             return columnToAdd;
         } else {
             return null;
         }
-    }
-
-    @Override
-    public String toString() {
-        return Access2D.toString(this);
     }
 
 }

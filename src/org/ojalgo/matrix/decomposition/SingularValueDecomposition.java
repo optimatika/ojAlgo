@@ -27,7 +27,6 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
@@ -104,7 +103,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         for (int j = p - 2; j > k; j--) {
 
-            tmp = PrimitiveMath.HYPOT.invoke(s[j], f);
+            tmp = HYPOT.invoke(s[j], f);
             cos = s[j] / tmp;
             sin = f / tmp;
             s[j] = tmp;
@@ -116,7 +115,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             e[j - 1] = cos * tmp;
         }
 
-        tmp = PrimitiveMath.HYPOT.invoke(s[k], f);
+        tmp = HYPOT.invoke(s[k], f);
         cos = s[k] / tmp;
         sin = f / tmp;
         s[k] = tmp;
@@ -133,7 +132,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         for (int j = k; j < p; j++) {
 
-            tmp = PrimitiveMath.HYPOT.invoke(s[j], f);
+            tmp = HYPOT.invoke(s[j], f);
             cos = s[j] / tmp;
             sin = f / tmp;
             s[j] = tmp;
@@ -149,8 +148,8 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     private static void doCase3(final double[] s, final double[] e, final int p, final int k, final RotateRight q1RotR, final RotateRight q2RotR) {
 
         // Calculate the shift.
-        final double scale = PrimitiveMath.MAX.invoke(PrimitiveMath.MAX.invoke(PrimitiveMath.MAX.invoke(PrimitiveMath.MAX.invoke(PrimitiveMath.ABS.invoke(s[p - 1]), PrimitiveMath.ABS.invoke(s[p - 2])), PrimitiveMath.ABS.invoke(e[p - 2])), PrimitiveMath.ABS.invoke(s[k])),
-                PrimitiveMath.ABS.invoke(e[k]));
+        final double scale = MAX.invoke(MAX.invoke(MAX.invoke(MAX.invoke(ABS.invoke(s[p - 1]), ABS.invoke(s[p - 2])), ABS.invoke(e[p - 2])), ABS.invoke(s[k])),
+                ABS.invoke(e[k]));
 
         final double s_p1 = s[p - 1] / scale;
         final double s_p2 = s[p - 2] / scale;
@@ -164,7 +163,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         double shift = ZERO;
         if ((NumberContext.compare(b, ZERO) != 0) || (NumberContext.compare(c, ZERO) != 0)) {
-            shift = PrimitiveMath.SQRT.invoke((b * b) + c);
+            shift = SQRT.invoke((b * b) + c);
             if (b < ZERO) {
                 shift = -shift;
             }
@@ -179,7 +178,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         // Chase zeros.
         for (int j = k; j < (p - 1); j++) {
 
-            tmp = PrimitiveMath.HYPOT.invoke(f, g);
+            tmp = HYPOT.invoke(f, g);
             cos = f / tmp;
             sin = g / tmp;
 
@@ -194,7 +193,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
             q2RotR.rotateRight(j + 1, j, cos, sin);
 
-            tmp = PrimitiveMath.HYPOT.invoke(f, g);
+            tmp = HYPOT.invoke(f, g);
             cos = f / tmp;
             sin = g / tmp;
             s[j] = tmp;
@@ -253,7 +252,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
                 if (k == -1) {
                     break;
                 }
-                if (PrimitiveMath.ABS.invoke(e[k]) <= (TINY + (MACHINE_EPSILON * (PrimitiveMath.ABS.invoke(s[k]) + PrimitiveMath.ABS.invoke(s[k + 1]))))) {
+                if (ABS.invoke(e[k]) <= (TINY + (MACHINE_EPSILON * (ABS.invoke(s[k]) + ABS.invoke(s[k + 1]))))) {
                     e[k] = ZERO;
                     break;
                 }
@@ -266,8 +265,8 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
                     if (ks == k) {
                         break;
                     }
-                    final double t = (ks != p ? PrimitiveMath.ABS.invoke(e[ks]) : ZERO) + (ks != (k + 1) ? PrimitiveMath.ABS.invoke(e[ks - 1]) : ZERO);
-                    if (PrimitiveMath.ABS.invoke(s[ks]) <= (TINY + (MACHINE_EPSILON * t))) {
+                    final double t = (ks != p ? ABS.invoke(e[ks]) : ZERO) + (ks != (k + 1) ? ABS.invoke(e[ks - 1]) : ZERO);
+                    if (ABS.invoke(s[ks]) <= (TINY + (MACHINE_EPSILON * t))) {
                         s[ks] = ZERO;
                         break;
                     }
@@ -381,7 +380,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     public double getFrobeniusNorm() {
 
-        double retVal = PrimitiveMath.ZERO;
+        double retVal = ZERO;
 
         final Array1D<Double> tmpSingularValues = this.getSingularValues();
         double tmpVal;
@@ -391,7 +390,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             retVal += tmpVal * tmpVal;
         }
 
-        return PrimitiveMath.SQRT.invoke(retVal);
+        return SQRT.invoke(retVal);
     }
 
     public MatrixStore<N> getInverse() {
@@ -428,7 +427,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         final Array1D<Double> tmpSingularValues = this.getSingularValues();
 
-        double retVal = PrimitiveMath.ZERO;
+        double retVal = ZERO;
 
         for (int i = Math.min(tmpSingularValues.size(), k) - 1; i >= 0; i--) {
             retVal += tmpSingularValues.doubleValue(i);
@@ -694,7 +693,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     @Override
     protected double getDimensionalEpsilon() {
-        return myBidiagonal.getMaxDim() * PrimitiveMath.MACHINE_EPSILON;
+        return myBidiagonal.getMaxDim() * MACHINE_EPSILON;
     }
 
     protected boolean isTransposed() {

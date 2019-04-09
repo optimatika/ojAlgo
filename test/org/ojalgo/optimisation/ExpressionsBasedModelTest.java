@@ -25,14 +25,12 @@ import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation.Result;
-import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 public class ExpressionsBasedModelTest {
@@ -137,9 +135,7 @@ public class ExpressionsBasedModelTest {
     public void testPresolverCase2() {
 
         NumberContext precision = NumberContext.getGeneral(14, 12);
-        Set<IntIndex> fixedVariables = Collections.emptySet();
-        BigDecimal fixedValue = ZERO;
-
+        Collections.emptySet();
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
         Variable varX = model.addVariable("X").lower(ONE);

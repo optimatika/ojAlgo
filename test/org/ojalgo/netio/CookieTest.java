@@ -1,4 +1,5 @@
 package org.ojalgo.netio;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

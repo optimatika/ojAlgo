@@ -23,7 +23,6 @@ package org.ojalgo.random;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 
 /**
@@ -72,7 +71,7 @@ public class Gamma extends RandomNumber {
 
         double tmpIntegralPart = ZERO;
         for (int i = 0; i < tmpInteger; i++) {
-            tmpIntegralPart -= PrimitiveMath.LOG.invoke(this.random().nextDouble());
+            tmpIntegralPart -= LOG.invoke(this.random().nextDouble());
         }
 
         double tmpFractionalPart = ZERO;
@@ -86,11 +85,11 @@ public class Gamma extends RandomNumber {
 
             do {
 
-                tmpFractionalPart = -TWO * PrimitiveMath.LOG.invoke(ONE - PrimitiveMath.POW.invoke(this.random().nextDouble(), ONE / tmpFraction));
+                tmpFractionalPart = -TWO * LOG.invoke(ONE - POW.invoke(this.random().nextDouble(), ONE / tmpFraction));
                 tmpNegHalfFraction = -tmpFractionalPart / TWO;
 
-                tmpNumer = PrimitiveMath.POW.invoke(tmpFractionalPart, tmpFractionMinusOne) * PrimitiveMath.EXP.invoke(tmpNegHalfFraction);
-                tmpDenom = PrimitiveMath.POW.invoke(TWO, tmpFractionMinusOne) * PrimitiveMath.POW.invoke(-PrimitiveMath.EXPM1.invoke(tmpNegHalfFraction), tmpFractionMinusOne);
+                tmpNumer = POW.invoke(tmpFractionalPart, tmpFractionMinusOne) * EXP.invoke(tmpNegHalfFraction);
+                tmpDenom = POW.invoke(TWO, tmpFractionMinusOne) * POW.invoke(-EXPM1.invoke(tmpNegHalfFraction), tmpFractionMinusOne);
 
             } while (this.random().nextDouble() > (tmpNumer / tmpDenom));
         }

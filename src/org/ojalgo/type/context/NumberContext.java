@@ -243,8 +243,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         myScale = scale;
 
         if (scale > Integer.MIN_VALUE) {
-            myZeroError = PrimitiveMath.MAX.invoke(PrimitiveMath.MACHINE_SMALLEST,
-                    PrimitiveMath.HALF * PrimitiveMath.POW.invoke(PrimitiveMath.TEN, -scale));
+            myZeroError = PrimitiveMath.MAX.invoke(PrimitiveMath.MACHINE_SMALLEST, PrimitiveMath.HALF * PrimitiveMath.POW.invoke(PrimitiveMath.TEN, -scale));
             myRoundingFactor = PrimitiveMath.POWER.invoke(PrimitiveMath.TEN, scale);
         } else {
             myZeroError = PrimitiveMath.MACHINE_SMALLEST;

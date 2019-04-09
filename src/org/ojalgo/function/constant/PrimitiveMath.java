@@ -128,30 +128,6 @@ public abstract class PrimitiveMath {
         }
     }
 
-    public static final int getPrimeNumber(final int index) {
-        return PRIME[index];
-    }
-
-    public static final boolean isPowerOf2(final long value) {
-        return Arrays.binarySearch(POWERS_OF_2, value) >= 0;
-    }
-
-    /**
-     * @return The smallest integer exponent so that 2^exp &gt;= value.
-     */
-    public static final int powerOf2Larger(final long value) {
-        final int index = Arrays.binarySearch(POWERS_OF_2, value);
-        return index >= 0 ? index : Math.min(-(index + 1), 62);
-    }
-
-    /**
-     * @return The largest integer exponent so that 2^exp &lt;= value.
-     */
-    public static final int powerOf2Smaller(final long value) {
-        final int index = Arrays.binarySearch(POWERS_OF_2, value);
-        return index >= 0 ? index : Math.max(-(index + 2), 0);
-    }
-
     /*
      * The lambdas below should not (cannot) reference each other. Implementations must be written in terms of
      * java.lang.Math and/or org.ojalgo.function.special.MissingMath.
@@ -201,5 +177,29 @@ public abstract class PrimitiveMath {
     public static final PrimitiveFunction.Unary TAN = arg -> Math.tan(arg);
     public static final PrimitiveFunction.Unary TANH = arg -> Math.tanh(arg);
     public static final PrimitiveFunction.Unary VALUE = arg -> arg;
+
+    public static final int getPrimeNumber(final int index) {
+        return PRIME[index];
+    }
+
+    public static final boolean isPowerOf2(final long value) {
+        return Arrays.binarySearch(POWERS_OF_2, value) >= 0;
+    }
+
+    /**
+     * @return The smallest integer exponent so that 2^exp &gt;= value.
+     */
+    public static final int powerOf2Larger(final long value) {
+        final int index = Arrays.binarySearch(POWERS_OF_2, value);
+        return index >= 0 ? index : Math.min(-(index + 1), 62);
+    }
+
+    /**
+     * @return The largest integer exponent so that 2^exp &lt;= value.
+     */
+    public static final int powerOf2Smaller(final long value) {
+        final int index = Arrays.binarySearch(POWERS_OF_2, value);
+        return index >= 0 ? index : Math.max(-(index + 2), 0);
+    }
 
 }

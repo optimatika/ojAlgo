@@ -414,6 +414,11 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     @Override
+    public int size() {
+        return data.length;
+    }
+
+    @Override
     public final void sortAscending() {
         Arrays.parallelSort(data);
     }
@@ -566,11 +571,6 @@ public class Primitive64Array extends PrimitiveArray {
     @Override
     protected final void set(final int index, final Number value) {
         data[index] = value.doubleValue();
-    }
-
-    @Override
-    public int size() {
-        return data.length;
     }
 
     @Override
