@@ -43,7 +43,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
-    private boolean myInitWithLP = false;
     private MatrixStore<Double> myInvQC;
     private final PrimitiveDenseStore myIterationX;
     private boolean myShrinkSwitch = true;
