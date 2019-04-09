@@ -112,6 +112,12 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     }
 
+    interface Transformable<N extends Number> extends ModifiableReceiver<N> {
+
+        void transform(TransformationAnyD<N> transformation);
+
+    }
+
     default void add(final long index, final double addend) {
         this.add(StructureAnyD.reference(index, this.shape()), addend);
     }

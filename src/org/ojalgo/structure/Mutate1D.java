@@ -160,6 +160,12 @@ public interface Mutate1D extends Structure1D {
 
     }
 
+    interface Transformable<N extends Number> extends ModifiableReceiver<N> {
+
+        void transform(Transformation1D<N> transformation);
+
+    }
+
     /**
      * Copies the argument of the ComplexNumber elements to the destination.
      */

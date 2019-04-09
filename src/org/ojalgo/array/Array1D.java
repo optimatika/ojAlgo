@@ -44,14 +44,15 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.structure.Transformation1D;
 
 /**
  * Array1D
  *
  * @author apete
  */
-public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Sliceable<N>,
-        Access1D.Visitable<N>, Access1D.Aggregatable<N>, Mutate1D.ModifiableReceiver<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
+public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Visitable<N>, Access1D.Aggregatable<N>,
+        Access1D.Sliceable<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D.Transformable<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
 
     public static final class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
@@ -62,45 +63,45 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
             myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
-        public final Array1D<N> copy(final Access1D<?> source) {
+        public Array1D<N> copy(final Access1D<?> source) {
             return myDelegate.copy(source).wrapInArray1D();
         }
 
-        public final Array1D<N> copy(final double... source) {
+        public Array1D<N> copy(final double... source) {
             return myDelegate.copy(source).wrapInArray1D();
         }
 
-        public final Array1D<N> copy(final List<? extends Number> source) {
+        public Array1D<N> copy(final List<? extends Number> source) {
             return myDelegate.copy(source).wrapInArray1D();
         }
 
-        public final Array1D<N> copy(final Number... source) {
+        public Array1D<N> copy(final Number... source) {
             return myDelegate.copy(source).wrapInArray1D();
         }
 
         @Override
-        public final FunctionSet<N> function() {
+        public FunctionSet<N> function() {
             return myDelegate.function();
         }
 
-        public final Array1D<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
+        public Array1D<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
             return myDelegate.makeFilled(count, supplier).wrapInArray1D();
         }
 
-        public final Array1D<N> makeSparse(final long count) {
+        public Array1D<N> makeSparse(final long count) {
             return myDelegate.makeStructuredZero(count).wrapInArray1D();
         }
 
-        public final Array1D<N> makeZero(final long count) {
+        public Array1D<N> makeZero(final long count) {
             return myDelegate.makeToBeFilled(count).wrapInArray1D();
         }
 
         @Override
-        public final Scalar.Factory<N> scalar() {
+        public Scalar.Factory<N> scalar() {
             return myDelegate.scalar();
         }
 
-        public final Array1D<N> wrap(final BasicArray<N> array) {
+        public Array1D<N> wrap(final BasicArray<N> array) {
             return array.wrapInArray1D();
         }
 
@@ -608,6 +609,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     @Override
     public String toString() {
         return Access1D.toString(this);
+    }
+
+    public void transform(Transformation1D<N> transformation) {
+        transformation.transform(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

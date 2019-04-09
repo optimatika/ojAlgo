@@ -27,7 +27,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
-public interface Householder<N extends Number> extends TransformationMatrix<N, PhysicalStore<N>>, Access1D<N> {
+public interface Householder<N extends Number> extends Access1D<N> {
 
     public static final class Generic<N extends Number & Scalar<N>> extends Object implements Householder<N> {
 
@@ -55,7 +55,7 @@ public interface Householder<N extends Number> extends TransformationMatrix<N, P
             myFactory = factory;
         }
 
-        public final Householder.Generic<N> copy(final Householder<N> source) {
+        public Householder.Generic<N> copy(final Householder<N> source) {
 
             first = source.first();
 
@@ -75,7 +75,7 @@ public interface Householder<N extends Number> extends TransformationMatrix<N, P
             return this;
         }
 
-        public final Householder.Generic<N> copy(final Householder<N> source, final N precalculatedBeta) {
+        public Householder.Generic<N> copy(final Householder<N> source, final N precalculatedBeta) {
 
             first = source.first();
 
@@ -153,7 +153,7 @@ public interface Householder<N extends Number> extends TransformationMatrix<N, P
             first = 0;
         }
 
-        public final Householder.Primitive copy(final Householder<Double> source) {
+        public Householder.Primitive copy(final Householder<Double> source) {
 
             first = source.first();
 
@@ -171,7 +171,7 @@ public interface Householder<N extends Number> extends TransformationMatrix<N, P
             return this;
         }
 
-        public final Householder.Primitive copy(final Householder<Double> source, final double precalculatedBeta) {
+        public Householder.Primitive copy(final Householder<Double> source, final double precalculatedBeta) {
 
             first = source.first();
 

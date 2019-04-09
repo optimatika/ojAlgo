@@ -70,7 +70,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         Access2D.Elements, Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
     @SuppressWarnings("unchecked")
-    static interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
+    interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
             extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         LogicalBuilder<N, M> above(int numberOfRows);
@@ -125,8 +125,8 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     }
 
-    static interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
-            extends Mutate2D.ModifiableReceiver<N>, Mutate2D.Exchangeable, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
+    interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
+            extends Mutate2D.Transformable<N>, Mutate2D.Exchangeable, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         default M build() {
             return this.get();

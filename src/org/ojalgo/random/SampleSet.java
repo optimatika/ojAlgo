@@ -323,12 +323,11 @@ public final class SampleSet implements Access1D<Double> {
 
         double retVal = ZERO;
 
-        final double tmpMean = this.getMean();
-        double tmpVal;
-        final long tmpLimit = mySamples.count();
-        for (long i = 0L; i < tmpLimit; i++) {
-            tmpVal = mySamples.doubleValue(i) - tmpMean;
-            retVal += (tmpVal * tmpVal);
+        final double mean = this.getMean();
+        double deviation;
+        for (long i = 0L, limit = mySamples.count(); i < limit; i++) {
+            deviation = mySamples.doubleValue(i) - mean;
+            retVal += (deviation * deviation);
         }
 
         return retVal;

@@ -27,11 +27,11 @@ import java.math.MathContext;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.transformation.TransformationMatrix;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
+import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -42,8 +42,8 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * @author apete
  * @see org.ojalgo.function.ComplexFunction
  */
-public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>,
-        TransformationMatrix<Double, PhysicalStore<Double>>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, Transformation2D<Double>,
+        Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public static final class Normalised extends ComplexNumber {
 
@@ -62,7 +62,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
 
         @Override
-        public void transform(final PhysicalStore<Double> matrix) {
+        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
 
             final double s = this.doubleValue();
 
@@ -72,34 +72,34 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
             final double r00 = (ii + ss);
             final double r11 = (ss - ii);
 
-            if (matrix.count() == 2L) {
+            if (transformable.count() == 2L) {
 
-                final double x = matrix.doubleValue(0);
-                final double y = matrix.doubleValue(1);
+                final double x = transformable.doubleValue(0);
+                final double y = transformable.doubleValue(1);
 
-                matrix.set(0, r00 * x);
-                matrix.set(1, r11 * y);
+                transformable.set(0, r00 * x);
+                transformable.set(1, r11 * y);
 
-            } else if (matrix.countRows() == 2L) {
+            } else if (transformable.countRows() == 2L) {
 
-                for (long c = 0L, limit = matrix.countColumns(); c < limit; c++) {
+                for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
 
-                    final double x = matrix.doubleValue(0, c);
-                    final double y = matrix.doubleValue(1, c);
+                    final double x = transformable.doubleValue(0, c);
+                    final double y = transformable.doubleValue(1, c);
 
-                    matrix.set(0, c, r00 * x);
-                    matrix.set(1, c, r11 * y);
+                    transformable.set(0, c, r00 * x);
+                    transformable.set(1, c, r11 * y);
                 }
 
-            } else if (matrix.countColumns() == 2L) {
+            } else if (transformable.countColumns() == 2L) {
 
-                for (long r = 0L, limit = matrix.countRows(); r < limit; r++) {
+                for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
 
-                    final double x = matrix.doubleValue(r, 0);
-                    final double y = matrix.doubleValue(r, 1);
+                    final double x = transformable.doubleValue(r, 0);
+                    final double y = transformable.doubleValue(r, 1);
 
-                    matrix.set(r, 0, r00 * x);
-                    matrix.set(r, 1, r11 * y);
+                    transformable.set(r, 0, r00 * x);
+                    transformable.set(r, 1, r11 * y);
                 }
 
             } else {
@@ -181,7 +181,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     /**
      * Test if {@code value} is infinite. A complex number is infinite if its real part and/or its imaginary
      * part is infinite.
-     * 
+     *
      * @param value the complex number to test
      * @return true if the specified value is infinite (real and/or imaginary part) otherwise false
      */
@@ -191,7 +191,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Test if {@code value} is NaN. A complex number is NaN if its real and/or its imaginary part is NaN.
-     * 
+     *
      * @param value the complex number to test
      * @return true if the specified value is NaN (real and/or imaginary part) otherwise false
      */
@@ -201,7 +201,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Test if {@code value} is real. A complex number Z is real if and only if {@literal Im(Z) = 0.0}.
-     * 
+     *
      * @param value the complex number to test
      * @return true if the imaginary part of the specified value is null otherwise false
      */
@@ -215,7 +215,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Static factory method returning a complex number from polar coordinates
-     * 
+     *
      * @param norm the complex number's norm
      * @param phase the complex number's phase
      * @return a complex number
@@ -263,7 +263,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Static factory method returning a complex number from cartesian coordinates.
-     * 
+     *
      * @param real the complex number's real part
      * @param imaginary the complex number's imaginary part
      * @return a complex number
@@ -278,7 +278,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Static factory method returning a complex number from a real value
-     * 
+     *
      * @param value the complex number's real part
      * @return a complex number Z = ({@code value} + 0.0i)
      */
@@ -288,7 +288,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Static factory method returning a complex number from arbitrary number
-     * 
+     *
      * @param number a numeric value
      * @return {@link ComplexNumber#ZERO} if {@code number} is null otherwise the double value of
      *         {@code number}
@@ -350,7 +350,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '+' with a complex number.
-     * 
+     *
      * @param arg the complex number to add
      * @return a complex number {@literal Z = ((Re(this) + Re(arg)) + (Im(this) + Im(arg))i)}
      */
@@ -360,7 +360,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '+' with a real number
-     * 
+     *
      * @param arg the real number to add
      * @return a complex number {@literal Z = ((Re(this) + arg) + Im(this)i)}
      */
@@ -371,7 +371,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     /**
      * Compares the specified {@code reference} and this. The numerical comparison uses following order :
      * {@literal |Z| -> Re(Z) -> Im(Z)}.
-     * 
+     *
      * @param reference the complex number to compare with
      * @return a negative value if {@code reference} is numerically greater than this, {@code 0} if this and
      *         {@code reference} are numerically equal or a positive value if {@code reference} is numerically
@@ -393,7 +393,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     /**
      * Returns the conjugate of this complex number. A complex number conjugate is its reflexion about the
      * real axis.
-     * 
+     *
      * @return a complex number Z = (Re(this) - Im(this)i)
      */
     public ComplexNumber conjugate() {
@@ -414,7 +414,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '/' with a complex number.
-     * 
+     *
      * @param arg the complex number to divide by
      * @return a complex number {@literal Z = this / arg}
      */
@@ -441,7 +441,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '/' with a real number.
-     * 
+     *
      * @param arg the real number to divide by
      * @return a complex number {@literal Z = ((Re(this) / arg) + (Im(this) / arg)i)}
      */
@@ -574,7 +574,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the unary operation '1/x'
-     * 
+     *
      * @return the complex number Z inverse of this, satisfies {@literal Z * this = 1}
      */
     @Override
@@ -608,7 +608,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '*' with a complex number.
-     * 
+     *
      * @param arg the complex number to multiply by
      * @return a complex number {@literal Z = this * arg}
      */
@@ -623,7 +623,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '*' with a real number.
-     * 
+     *
      * @param arg the real number to multiply by
      * @return a complex number Z = ((Re(this) * arg) + Im(this) * arg))
      */
@@ -634,7 +634,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the unary operation '-'.
-     * 
+     *
      * @return a complex number Z = -this
      */
     @Override
@@ -645,7 +645,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     /**
      * Returns the norm of this complex number. The norm of a complex number is defined by |Z| =
      * (ZZ<sup>*</sup>)<sup>1/2</sup>.
-     * 
+     *
      * @return the norm of this complex number.
      */
     public double norm() {
@@ -655,7 +655,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     /**
      * Returns the phase of this complex number. The phase of a complex number Z is the angle between the
      * positive real axis and the straight line defined by origin and Z in complex plane.
-     * 
+     *
      * @return the phase of this complex number
      */
     public double phase() {
@@ -672,7 +672,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '-' with a complex number.
-     * 
+     *
      * @param arg the complex number to subtract
      * @return a complex number Z = this - {@code arg}
      */
@@ -682,7 +682,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     /**
      * Performs the binary operation '-' with a real number.
-     * 
+     *
      * @param arg the real number to subtract
      * @return a complex number Z = ((Re(this) - arg) + Im(this)i)
      */
@@ -780,7 +780,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return retVal.append(RIGHT).toString();
     }
 
-    public void transform(final PhysicalStore<Double> matrix) {
+    public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
 
         final double s = myRealValue;
 
@@ -792,34 +792,34 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         final double r00 = (ii + ss) * invs;
         final double r11 = (ss - ii) * invs;
 
-        if (matrix.count() == 2L) {
+        if (transformable.count() == 2L) {
 
-            final double x = matrix.doubleValue(0);
-            final double y = matrix.doubleValue(1);
+            final double x = transformable.doubleValue(0);
+            final double y = transformable.doubleValue(1);
 
-            matrix.set(0, r00 * x);
-            matrix.set(1, r11 * y);
+            transformable.set(0, r00 * x);
+            transformable.set(1, r11 * y);
 
-        } else if (matrix.countRows() == 2L) {
+        } else if (transformable.countRows() == 2L) {
 
-            for (long c = 0L, limit = matrix.countColumns(); c < limit; c++) {
+            for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
 
-                final double x = matrix.doubleValue(0, c);
-                final double y = matrix.doubleValue(1, c);
+                final double x = transformable.doubleValue(0, c);
+                final double y = transformable.doubleValue(1, c);
 
-                matrix.set(0, c, r00 * x);
-                matrix.set(1, c, r11 * y);
+                transformable.set(0, c, r00 * x);
+                transformable.set(1, c, r11 * y);
             }
 
-        } else if (matrix.countColumns() == 2L) {
+        } else if (transformable.countColumns() == 2L) {
 
-            for (long r = 0L, limit = matrix.countRows(); r < limit; r++) {
+            for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
 
-                final double x = matrix.doubleValue(r, 0);
-                final double y = matrix.doubleValue(r, 1);
+                final double x = transformable.doubleValue(r, 0);
+                final double y = transformable.doubleValue(r, 1);
 
-                matrix.set(r, 0, r00 * x);
-                matrix.set(r, 1, r11 * y);
+                transformable.set(r, 0, r00 * x);
+                transformable.set(r, 1, r11 * y);
             }
 
         } else {

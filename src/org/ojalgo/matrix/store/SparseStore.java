@@ -46,7 +46,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public final class SparseStore<N extends Number> extends FactoryStore<N> implements ElementsConsumer<N> {
 
-    public static interface Factory<N extends Number> {
+    public interface Factory<N extends Number> {
 
         SparseStore<N> make(long rowsCount, long columnsCount);
 
