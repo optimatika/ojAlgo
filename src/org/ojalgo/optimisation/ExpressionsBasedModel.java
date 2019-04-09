@@ -682,10 +682,6 @@ public final class ExpressionsBasedModel extends AbstractModel {
         return new ExpressionsBasedModel(this, false, true);
     }
 
-    public ExpressionsBasedModel snapshot() {
-        return new ExpressionsBasedModel(this, true, false);
-    }
-
     public int countExpressions() {
         return myExpressions.size();
     }
@@ -1156,6 +1152,10 @@ public final class ExpressionsBasedModel extends AbstractModel {
         final ExpressionsBasedModel retVal = new ExpressionsBasedModel(this, true, false);
 
         return retVal;
+    }
+
+    public ExpressionsBasedModel snapshot() {
+        return new ExpressionsBasedModel(this, true, false);
     }
 
     @Override

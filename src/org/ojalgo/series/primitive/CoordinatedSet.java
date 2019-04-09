@@ -57,7 +57,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
     }
 
     public static <K extends Comparable<? super K>> CoordinatedSet.Builder<K> builder() {
-        return new CoordinatedSet.Builder<K>();
+        return new CoordinatedSet.Builder<>();
     }
 
     @SuppressWarnings("unchecked")

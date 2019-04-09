@@ -374,6 +374,11 @@ public abstract class BufferArray extends PlainArray<Double> {
     }
 
     @Override
+    public int size() {
+        return myBuffer.capacity();
+    }
+
+    @Override
     protected void add(final int index, final double addend) {
         this.set(index, this.doubleValue(index) + addend);
     }
@@ -519,11 +524,6 @@ public abstract class BufferArray extends PlainArray<Double> {
     @Override
     protected void set(final int index, final Number value) {
         this.set(index, value.doubleValue());
-    }
-
-    @Override
-    public int size() {
-        return myBuffer.capacity();
     }
 
     @Override

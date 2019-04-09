@@ -170,6 +170,11 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
         Arrays.fill(data, this.valueOf(PrimitiveMath.ZERO));
     }
 
+    @Override
+    public final int size() {
+        return data.length;
+    }
+
     public final Spliterator<N> spliterator() {
         return Spliterators.spliterator(data, 0, data.length, PlainArray.CHARACTERISTICS);
     }
@@ -282,11 +287,6 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
     @Override
     protected final void set(final int index, final Number value) {
         data[index] = this.valueOf(value);
-    }
-
-    @Override
-    public final int size() {
-        return data.length;
     }
 
     @Override

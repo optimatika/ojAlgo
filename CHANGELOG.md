@@ -4,6 +4,8 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
+# v47.1.0: 2019-04-09
+
 ## org.ojalgo.constant
 
 * Everything in this package has been moved to org.ojalgo.function.constant

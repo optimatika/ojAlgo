@@ -42,6 +42,50 @@ public abstract class MissingMath {
         return numerator.divide(denominator, MathContext.DECIMAL128);
     }
 
+    /**
+     * Greatest Common Denominator
+     */
+    public static int gcd(int value1, int value2) {
+
+        int retVal = 1;
+
+        value1 = Math.abs(value1);
+        value2 = Math.abs(value2);
+
+        int tmpMax = Math.max(value1, value2);
+        int tmpMin = Math.min(value1, value2);
+
+        while (tmpMin != 0) {
+            retVal = tmpMin;
+            tmpMin = tmpMax % tmpMin;
+            tmpMax = retVal;
+        }
+
+        return retVal;
+    }
+
+    /**
+     * Greatest Common Denominator
+     */
+    public static long gcd(long value1, long value2) {
+
+        long retVal = 1L;
+
+        value1 = Math.abs(value1);
+        value2 = Math.abs(value2);
+
+        long tmpMax = Math.max(value1, value2);
+        long tmpMin = Math.min(value1, value2);
+
+        while (tmpMin != 0L) {
+            retVal = tmpMin;
+            tmpMin = tmpMax % tmpMin;
+            tmpMax = retVal;
+        }
+
+        return retVal;
+    }
+
     public static BigDecimal hypot(final BigDecimal arg1, final BigDecimal arg2) {
         BigDecimal prod1 = arg1.multiply(arg1);
         BigDecimal prod2 = arg2.multiply(arg2);
@@ -204,50 +248,6 @@ public abstract class MissingMath {
 
     public static double sqrt1px2(double arg) {
         return Math.sqrt(1.0 + (arg * arg));
-    }
-
-    /**
-     * Greatest Common Denominator
-     */
-    public static int gcd(int value1, int value2) {
-
-        int retVal = 1;
-
-        value1 = Math.abs(value1);
-        value2 = Math.abs(value2);
-
-        int tmpMax = Math.max(value1, value2);
-        int tmpMin = Math.min(value1, value2);
-
-        while (tmpMin != 0) {
-            retVal = tmpMin;
-            tmpMin = tmpMax % tmpMin;
-            tmpMax = retVal;
-        }
-
-        return retVal;
-    }
-
-    /**
-     * Greatest Common Denominator
-     */
-    public static long gcd(long value1, long value2) {
-
-        long retVal = 1L;
-
-        value1 = Math.abs(value1);
-        value2 = Math.abs(value2);
-
-        long tmpMax = Math.max(value1, value2);
-        long tmpMin = Math.min(value1, value2);
-
-        while (tmpMin != 0L) {
-            retVal = tmpMin;
-            tmpMin = tmpMax % tmpMin;
-            tmpMax = retVal;
-        }
-
-        return retVal;
     }
 
 }

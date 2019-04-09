@@ -28,18 +28,9 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.ParameterFunction;
-import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.RationalFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.constant.ComplexMath;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.constant.QuaternionMath;
-import org.ojalgo.function.constant.RationalMath;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -99,8 +90,7 @@ public class CompareImplementations {
     @Test
     public void testASIN() {
 
-        this.assertUnary(BigMath.ASIN, ComplexMath.ASIN, PrimitiveMath.ASIN, QuaternionMath.ASIN, RationalMath.ASIN,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.ASIN, ComplexMath.ASIN, PrimitiveMath.ASIN, QuaternionMath.ASIN, RationalMath.ASIN, AROUND_ZERO.doubleValue());
 
         this.assertUnary(BigMath.ASIN, ComplexMath.ASIN, PrimitiveMath.ASIN, QuaternionMath.ASIN, RationalMath.ASIN, ONE);
         this.assertUnary(BigMath.ASIN, ComplexMath.ASIN, PrimitiveMath.ASIN, QuaternionMath.ASIN, RationalMath.ASIN, ZERO);
@@ -110,8 +100,7 @@ public class CompareImplementations {
     @Test
     public void testASINH() {
 
-        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, AROUND_ZERO.doubleValue());
 
         this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, PI);
         this.assertUnary(BigMath.ASINH, ComplexMath.ASINH, PrimitiveMath.ASINH, QuaternionMath.ASINH, RationalMath.ASINH, E);
@@ -131,8 +120,7 @@ public class CompareImplementations {
     @Test
     public void testATAN() {
 
-        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, AROUND_ZERO.doubleValue());
 
         //        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, RationalFunction.ATAN, MAX_VALUE);
         this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, PI);
@@ -141,8 +129,7 @@ public class CompareImplementations {
         this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, HALF_PI);
         this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, ONE);
 
-        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, AROUND_ZERO.doubleValue());
 
         this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, NEG);
         this.assertUnary(BigMath.ATAN, ComplexMath.ATAN, PrimitiveMath.ATAN, QuaternionMath.ATAN, RationalMath.ATAN, -HALF_PI);
@@ -167,8 +154,7 @@ public class CompareImplementations {
     @Test
     public void testATANH() {
 
-        this.assertUnary(BigMath.ATANH, ComplexMath.ATANH, PrimitiveMath.ATANH, QuaternionMath.ATANH, RationalMath.ATANH,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.ATANH, ComplexMath.ATANH, PrimitiveMath.ATANH, QuaternionMath.ATANH, RationalMath.ATANH, AROUND_ZERO.doubleValue());
 
         //    this.assertUnary(BigFunction.ATANH, ComplexFunction.ATANH, PrimitiveFunction.ATANH, RationalFunction.ATANH, ONE);
         this.assertUnary(BigMath.ATANH, ComplexMath.ATANH, PrimitiveMath.ATANH, QuaternionMath.ATANH, RationalMath.ATANH, ZERO);
@@ -177,16 +163,15 @@ public class CompareImplementations {
 
     @Test
     public void testCARDINALITY() {
-        this.assertUnary(BigMath.CARDINALITY, ComplexMath.CARDINALITY, PrimitiveMath.CARDINALITY, QuaternionMath.CARDINALITY,
-                RationalMath.CARDINALITY, AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.CARDINALITY, ComplexMath.CARDINALITY, PrimitiveMath.CARDINALITY, QuaternionMath.CARDINALITY, RationalMath.CARDINALITY,
+                AROUND_ZERO.doubleValue());
     }
 
     @Test
     @Tag("unstable")
     public void testCBRT() {
 
-        this.assertUnary(BigMath.CBRT, ComplexMath.CBRT, PrimitiveMath.CBRT, QuaternionMath.CBRT, RationalMath.CBRT,
-                POSITIVE.doubleValue());
+        this.assertUnary(BigMath.CBRT, ComplexMath.CBRT, PrimitiveMath.CBRT, QuaternionMath.CBRT, RationalMath.CBRT, POSITIVE.doubleValue());
 
         this.assertUnary(BigMath.CBRT, ComplexMath.CBRT, PrimitiveMath.CBRT, QuaternionMath.CBRT, RationalMath.CBRT, PI);
         this.assertUnary(BigMath.CBRT, ComplexMath.CBRT, PrimitiveMath.CBRT, QuaternionMath.CBRT, RationalMath.CBRT, E);
@@ -199,16 +184,15 @@ public class CompareImplementations {
 
     @Test
     public void testCEIL() {
-        this.assertUnary(BigMath.CEIL, ComplexMath.CEIL, PrimitiveMath.CEIL, QuaternionMath.CEIL, RationalMath.CEIL,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.CEIL, ComplexMath.CEIL, PrimitiveMath.CEIL, QuaternionMath.CEIL, RationalMath.CEIL, AROUND_ZERO.doubleValue());
         this.assertUnary(BigMath.CEIL, ComplexMath.CEIL, PrimitiveMath.CEIL, QuaternionMath.CEIL, RationalMath.CEIL, HALF);
         this.assertUnary(BigMath.CEIL, ComplexMath.CEIL, PrimitiveMath.CEIL, QuaternionMath.CEIL, RationalMath.CEIL, -HALF);
     }
 
     @Test
     public void testCONJUGATE() {
-        this.assertUnary(BigMath.CONJUGATE, ComplexMath.CONJUGATE, PrimitiveMath.CONJUGATE, QuaternionMath.CONJUGATE,
-                RationalMath.CONJUGATE, AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.CONJUGATE, ComplexMath.CONJUGATE, PrimitiveMath.CONJUGATE, QuaternionMath.CONJUGATE, RationalMath.CONJUGATE,
+                AROUND_ZERO.doubleValue());
     }
 
     @Test
@@ -234,8 +218,7 @@ public class CompareImplementations {
     @Test
     public void testCOSH() {
 
-        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, AROUND_ZERO.doubleValue());
 
         this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, PI);
         this.assertUnary(BigMath.COSH, ComplexMath.COSH, PrimitiveMath.COSH, QuaternionMath.COSH, RationalMath.COSH, E);
@@ -254,8 +237,8 @@ public class CompareImplementations {
 
     @Test
     public void testDIVIDE() {
-        this.assertBinary(BigMath.DIVIDE, ComplexMath.DIVIDE, PrimitiveMath.DIVIDE, QuaternionMath.DIVIDE, RationalMath.DIVIDE,
-                POSITIVE.doubleValue(), POSITIVE.doubleValue());
+        this.assertBinary(BigMath.DIVIDE, ComplexMath.DIVIDE, PrimitiveMath.DIVIDE, QuaternionMath.DIVIDE, RationalMath.DIVIDE, POSITIVE.doubleValue(),
+                POSITIVE.doubleValue());
     }
 
     @Test
@@ -287,28 +270,25 @@ public class CompareImplementations {
 
     @Test
     public void testEXPM1() {
-        this.assertUnary(BigMath.EXPM1, ComplexMath.EXPM1, PrimitiveMath.EXPM1, QuaternionMath.EXPM1, RationalMath.EXPM1,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.EXPM1, ComplexMath.EXPM1, PrimitiveMath.EXPM1, QuaternionMath.EXPM1, RationalMath.EXPM1, AROUND_ZERO.doubleValue());
     }
 
     @Test
     public void testFLOOR() {
-        this.assertUnary(BigMath.FLOOR, ComplexMath.FLOOR, PrimitiveMath.FLOOR, QuaternionMath.FLOOR, RationalMath.FLOOR,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.FLOOR, ComplexMath.FLOOR, PrimitiveMath.FLOOR, QuaternionMath.FLOOR, RationalMath.FLOOR, AROUND_ZERO.doubleValue());
         this.assertUnary(BigMath.FLOOR, ComplexMath.FLOOR, PrimitiveMath.FLOOR, QuaternionMath.FLOOR, RationalMath.FLOOR, HALF);
         this.assertUnary(BigMath.FLOOR, ComplexMath.FLOOR, PrimitiveMath.FLOOR, QuaternionMath.FLOOR, RationalMath.FLOOR, -HALF);
     }
 
     @Test
     public void testHYPOT() {
-        this.assertBinary(BigMath.HYPOT, ComplexMath.HYPOT, PrimitiveMath.HYPOT, QuaternionMath.HYPOT, RationalMath.HYPOT,
-                POSITIVE.doubleValue(), POSITIVE.doubleValue());
+        this.assertBinary(BigMath.HYPOT, ComplexMath.HYPOT, PrimitiveMath.HYPOT, QuaternionMath.HYPOT, RationalMath.HYPOT, POSITIVE.doubleValue(),
+                POSITIVE.doubleValue());
     }
 
     @Test
     public void testINVERT() {
-        this.assertUnary(BigMath.INVERT, ComplexMath.INVERT, PrimitiveMath.INVERT, QuaternionMath.INVERT, RationalMath.INVERT,
-                POSITIVE.doubleValue());
+        this.assertUnary(BigMath.INVERT, ComplexMath.INVERT, PrimitiveMath.INVERT, QuaternionMath.INVERT, RationalMath.INVERT, POSITIVE.doubleValue());
     }
 
     @Test
@@ -326,14 +306,12 @@ public class CompareImplementations {
 
     @Test
     public void testLOG10() {
-        this.assertUnary(BigMath.LOG10, ComplexMath.LOG10, PrimitiveMath.LOG10, QuaternionMath.LOG10, RationalMath.LOG10,
-                POSITIVE.doubleValue());
+        this.assertUnary(BigMath.LOG10, ComplexMath.LOG10, PrimitiveMath.LOG10, QuaternionMath.LOG10, RationalMath.LOG10, POSITIVE.doubleValue());
     }
 
     @Test
     public void testLOG1P() {
-        this.assertUnary(BigMath.LOG1P, ComplexMath.LOG1P, PrimitiveMath.LOG1P, QuaternionMath.LOG1P, RationalMath.LOG1P,
-                POSITIVE.doubleValue());
+        this.assertUnary(BigMath.LOG1P, ComplexMath.LOG1P, PrimitiveMath.LOG1P, QuaternionMath.LOG1P, RationalMath.LOG1P, POSITIVE.doubleValue());
     }
 
     @Test
@@ -358,8 +336,7 @@ public class CompareImplementations {
 
     @Test
     public void testNEGATE() {
-        this.assertUnary(BigMath.NEGATE, ComplexMath.NEGATE, PrimitiveMath.NEGATE, QuaternionMath.NEGATE, RationalMath.NEGATE,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.NEGATE, ComplexMath.NEGATE, PrimitiveMath.NEGATE, QuaternionMath.NEGATE, RationalMath.NEGATE, AROUND_ZERO.doubleValue());
     }
 
     @Test
@@ -407,8 +384,7 @@ public class CompareImplementations {
     @Test
     public void testRINT() {
 
-        this.assertUnary(BigMath.RINT, ComplexMath.RINT, PrimitiveMath.RINT, QuaternionMath.RINT, RationalMath.RINT,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.RINT, ComplexMath.RINT, PrimitiveMath.RINT, QuaternionMath.RINT, RationalMath.RINT, AROUND_ZERO.doubleValue());
 
         this.assertUnary(BigMath.RINT, ComplexMath.RINT, PrimitiveMath.RINT, QuaternionMath.RINT, RationalMath.RINT, HALF);
 
@@ -423,20 +399,19 @@ public class CompareImplementations {
     @Test
     @Tag("unstable")
     public void testROOT() {
-        this.assertParameter(BigMath.ROOT, ComplexMath.ROOT, PrimitiveMath.ROOT, QuaternionMath.ROOT, RationalMath.ROOT,
-                POSITIVE.doubleValue(), Uniform.randomInteger(1, 10));
+        this.assertParameter(BigMath.ROOT, ComplexMath.ROOT, PrimitiveMath.ROOT, QuaternionMath.ROOT, RationalMath.ROOT, POSITIVE.doubleValue(),
+                Uniform.randomInteger(1, 10));
     }
 
     @Test
     public void testSCALE() {
-        this.assertParameter(BigMath.SCALE, ComplexMath.SCALE, PrimitiveMath.SCALE, QuaternionMath.SCALE, RationalMath.SCALE,
-                AROUND_ZERO.doubleValue(), Uniform.randomInteger(1, 10));
+        this.assertParameter(BigMath.SCALE, ComplexMath.SCALE, PrimitiveMath.SCALE, QuaternionMath.SCALE, RationalMath.SCALE, AROUND_ZERO.doubleValue(),
+                Uniform.randomInteger(1, 10));
     }
 
     @Test
     public void testSIGNUM() {
-        this.assertUnary(BigMath.SIGNUM, ComplexMath.SIGNUM, PrimitiveMath.SIGNUM, QuaternionMath.SIGNUM, RationalMath.SIGNUM,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.SIGNUM, ComplexMath.SIGNUM, PrimitiveMath.SIGNUM, QuaternionMath.SIGNUM, RationalMath.SIGNUM, AROUND_ZERO.doubleValue());
     }
 
     @Test
@@ -462,8 +437,7 @@ public class CompareImplementations {
     @Test
     public void testSINH() {
 
-        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, AROUND_ZERO.doubleValue());
 
         this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, PI);
         this.assertUnary(BigMath.SINH, ComplexMath.SINH, PrimitiveMath.SINH, QuaternionMath.SINH, RationalMath.SINH, E);
@@ -483,8 +457,7 @@ public class CompareImplementations {
     @Test
     public void testSQRT() {
 
-        this.assertUnary(BigMath.SQRT, ComplexMath.SQRT, PrimitiveMath.SQRT, QuaternionMath.SQRT, RationalMath.SQRT,
-                POSITIVE.doubleValue());
+        this.assertUnary(BigMath.SQRT, ComplexMath.SQRT, PrimitiveMath.SQRT, QuaternionMath.SQRT, RationalMath.SQRT, POSITIVE.doubleValue());
 
         this.assertUnary(BigMath.SQRT, ComplexMath.SQRT, PrimitiveMath.SQRT, QuaternionMath.SQRT, RationalMath.SQRT, PI);
         this.assertUnary(BigMath.SQRT, ComplexMath.SQRT, PrimitiveMath.SQRT, QuaternionMath.SQRT, RationalMath.SQRT, E);
@@ -530,8 +503,7 @@ public class CompareImplementations {
     @Test
     public void testTANH() {
 
-        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, AROUND_ZERO.doubleValue());
 
         this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, PI);
         this.assertUnary(BigMath.TANH, ComplexMath.TANH, PrimitiveMath.TANH, QuaternionMath.TANH, RationalMath.TANH, E);
@@ -550,8 +522,7 @@ public class CompareImplementations {
 
     @Test
     public void testVALUE() {
-        this.assertUnary(BigMath.VALUE, ComplexMath.VALUE, PrimitiveMath.VALUE, QuaternionMath.VALUE, RationalMath.VALUE,
-                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigMath.VALUE, ComplexMath.VALUE, PrimitiveMath.VALUE, QuaternionMath.VALUE, RationalMath.VALUE, AROUND_ZERO.doubleValue());
     }
 
     private void assertBinary(final BinaryFunction<BigDecimal> big, final BinaryFunction<ComplexNumber> complex, final BinaryFunction<Double> primitive,

@@ -51,12 +51,12 @@ public class Cauchy extends AbstractContinuous {
         return HALF + (Math.atan((value - myLocation) / myScale) / PI);
     }
 
-    public double getQuantile(double probability) {
-        return myLocation + (myScale * Math.tan(PI * (probability - HALF)));
-    }
-
     public double getExpected() {
         return NaN;
+    }
+
+    public double getQuantile(double probability) {
+        return myLocation + (myScale * Math.tan(PI * (probability - HALF)));
     }
 
     @Override

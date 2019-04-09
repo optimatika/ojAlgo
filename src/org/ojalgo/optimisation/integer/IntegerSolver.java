@@ -481,6 +481,10 @@ public final class IntegerSolver extends GenericSolver {
         return PrimitiveDenseStore.FACTORY.columns(this.getBestResultSoFar());
     }
 
+    protected Optimisation.Result getBestEstimate() {
+        return new Optimisation.Result(Optimisation.State.APPROXIMATE, this.getBestResultSoFar());
+    }
+
     protected Optimisation.Result getBestResultSoFar() {
 
         final Result currentlyTheBest = myBestResultSoFar;
@@ -497,10 +501,6 @@ public final class IntegerSolver extends GenericSolver {
 
             return new Optimisation.Result(tmpSate, tmpValue, tmpSolution);
         }
-    }
-
-    protected Optimisation.Result getBestEstimate() {
-        return new Optimisation.Result(Optimisation.State.APPROXIMATE, this.getBestResultSoFar());
     }
 
     protected MatrixStore<Double> getGradient(final Access1D<Double> solution) {

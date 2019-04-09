@@ -94,8 +94,7 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
     public static GeometricBrownianMotion make(final double initialValue, final double expectedFutureValue, final double aVariance, final double aHorizon) {
 
         final double tmpDrift = PrimitiveMath.LOG.invoke(expectedFutureValue / initialValue) / aHorizon;
-        final double tmpDiff = PrimitiveMath.SQRT
-                .invoke(PrimitiveMath.LOG1P.invoke(aVariance / (expectedFutureValue * expectedFutureValue)) / aHorizon);
+        final double tmpDiff = PrimitiveMath.SQRT.invoke(PrimitiveMath.LOG1P.invoke(aVariance / (expectedFutureValue * expectedFutureValue)) / aHorizon);
 
         final GeometricBrownianMotion retVal = new GeometricBrownianMotion(tmpDrift, tmpDiff);
 

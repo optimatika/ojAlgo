@@ -120,11 +120,11 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
 
         V put(long index, V value);
 
-        K step(K key);
-
         default int size() {
             return Access1D.super.size();
         }
+
+        K step(K key);
 
     }
 

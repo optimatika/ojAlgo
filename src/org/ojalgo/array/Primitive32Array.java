@@ -410,6 +410,11 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
+    public int size() {
+        return data.length;
+    }
+
+    @Override
     public final void sortAscending() {
         Arrays.parallelSort(data);
     }
@@ -554,11 +559,6 @@ public class Primitive32Array extends PrimitiveArray {
     @Override
     protected final void set(final int index, final Number value) {
         data[index] = value.floatValue();
-    }
-
-    @Override
-    public int size() {
-        return data.length;
     }
 
     @Override
