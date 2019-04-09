@@ -21,6 +21,8 @@
  */
 package org.ojalgo.data;
 
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ColumnView;
@@ -28,9 +30,47 @@ import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
 import org.ojalgo.structure.RowView;
 import org.ojalgo.structure.Transformation2D;
 
+/**
+ * Various data preprocessors that could be useful when doing data science or similar.
+ *
+ * @author apete
+ */
 public class DataPreprocessors {
 
-    public static final Transformation2D<Double> COLUMNS_NORMALISER = new Transformation2D<Double>() {
+    /**
+     * Columns will be transformed to [-1.0,1.0]
+     */
+    public static final Transformation2D<Double> SCALE_COLUMNS = new Transformation2D<Double>() {
+
+        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
+            SampleSet sampleSet = SampleSet.make();
+            for (ColumnView<Double> view : transformable.columns()) {
+                sampleSet.swap(view);
+                double largest = sampleSet.getLargest();
+                transformable.modifyColumn(view.column(), DIVIDE.by(largest));
+            }
+        }
+    };
+
+    /**
+     * Rows will be transformed to [-1.0,1.0]
+     */
+    public static final Transformation2D<Double> SCALE_ROWS = new Transformation2D<Double>() {
+
+        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
+            SampleSet sampleSet = SampleSet.make();
+            for (RowView<Double> view : transformable.rows()) {
+                sampleSet.swap(view);
+                double largest = sampleSet.getLargest();
+                transformable.modifyRow(view.row(), DIVIDE.by(largest));
+            }
+        }
+    };
+
+    /**
+     * Will normalise each column - replace each value with its standard score (within that column).
+     */
+    public static final Transformation2D<Double> STANDARD_SCORE_COLUMNS = new Transformation2D<Double>() {
 
         public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
             SampleSet sampleSet = SampleSet.make();
@@ -43,7 +83,10 @@ public class DataPreprocessors {
         }
     };
 
-    public static final Transformation2D<Double> ROWS_NORMALISER = new Transformation2D<Double>() {
+    /**
+     * Will normalise each row - replace each value with its standard score (within that row).
+     */
+    public static final Transformation2D<Double> STANDARD_SCORE_ROWS = new Transformation2D<Double>() {
 
         public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
             SampleSet sampleSet = SampleSet.make();
@@ -54,7 +97,6 @@ public class DataPreprocessors {
                 }
             }
         }
-
     };
 
 }
