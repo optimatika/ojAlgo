@@ -220,6 +220,8 @@ public interface Mutate2D extends Structure2D, Mutate1D {
      */
     interface ModifiableReceiver<N extends Number> extends Modifiable<N>, Receiver<N> {
 
+        void modifyAny(Transformation2D<N> modifier);
+
     }
 
     interface Receiver<N extends Number> extends Mutate2D, Fillable<N>, Consumer<Access2D<?>> {
@@ -235,12 +237,6 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         default boolean isAcceptable(final Structure2D supplier) {
             return (this.countRows() >= supplier.countRows()) && (this.countColumns() >= supplier.countColumns());
         }
-
-    }
-
-    interface Transformable<N extends Number> extends ModifiableReceiver<N> {
-
-        void transform(Transformation2D<N> transformation);
 
     }
 

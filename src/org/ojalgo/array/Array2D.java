@@ -49,7 +49,7 @@ import org.ojalgo.structure.Transformation2D;
  * @author apete
  */
 public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements,
-        Access2D.IndexOf, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.Transformable<N>, Mutate2D.Exchangeable, Mutate2D.Mixable<N> {
+        Access2D.IndexOf, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Exchangeable, Mutate2D.Mixable<N> {
 
     public static final class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
@@ -671,8 +671,8 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         return Access2D.toString(this);
     }
 
-    public void transform(Transformation2D<N> transformation) {
-        transformation.transform(this);
+    public void modifyAny(Transformation2D<N> modifier) {
+        modifier.transform(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

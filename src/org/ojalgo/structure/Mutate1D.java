@@ -129,6 +129,8 @@ public interface Mutate1D extends Structure1D {
      */
     interface ModifiableReceiver<N extends Number> extends Modifiable<N>, Receiver<N> {
 
+        void modifyAny(Transformation1D<N> modifier);
+
     }
 
     /**
@@ -157,12 +159,6 @@ public interface Mutate1D extends Structure1D {
         void sortAscending();
 
         void sortDescending();
-
-    }
-
-    interface Transformable<N extends Number> extends ModifiableReceiver<N> {
-
-        void transform(Transformation1D<N> transformation);
 
     }
 

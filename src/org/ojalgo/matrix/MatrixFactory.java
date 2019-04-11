@@ -746,9 +746,9 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             myDelegate.supplyTo(receiver);
         }
 
-        public void transform(Transformation2D<N> transformation) {
+        public void modifyAny(Transformation2D<N> modifier) {
             if (mySafe) {
-                transformation.transform(myDelegate);
+                modifier.transform(myDelegate);
             } else {
                 throw new IllegalStateException();
             }

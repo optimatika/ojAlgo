@@ -85,6 +85,8 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
      */
     interface ModifiableReceiver<N extends Number> extends Modifiable<N>, Receiver<N> {
 
+        void modifyAny(TransformationAnyD<N> modifier);
+
     }
 
     interface Receiver<N extends Number> extends MutateAnyD, Fillable<N>, Consumer<AccessAnyD<?>> {
@@ -109,12 +111,6 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
             return retVal;
         }
-
-    }
-
-    interface Transformable<N extends Number> extends ModifiableReceiver<N> {
-
-        void transform(TransformationAnyD<N> transformation);
 
     }
 

@@ -29,15 +29,22 @@ import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
+import org.ojalgo.structure.Transformation2D;
 
-public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableReceiver<N> {
+public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableReceiver<N>, Access2D<N> {
 
     class ColumnsRegion<N extends Number> extends ConsumerRegion<N> {
 
         private final ElementsConsumer<N> myBase;
         private final int[] myColumns;
 
+        /**
+         * @param base
+         * @param multiplier
+         * @param columns
+         */
         protected ColumnsRegion(final ElementsConsumer<N> base, final ElementsConsumer.FillByMultiplying<N> multiplier, final int... columns) {
             super(multiplier, base.countRows(), columns.length);
             myBase = base;
@@ -58,6 +65,10 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
 
         public long countRows() {
             return myBase.countRows();
+        }
+
+        public double doubleValue(long row, long col) {
+            return myBase.doubleValue(row, myColumns[(int) col]);
         }
 
         public void fillColumn(final long row, final long col, final Access1D<N> values) {
@@ -82,6 +93,10 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
 
         public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
             myBase.fillOne(row, myColumns[(int) col], supplier);
+        }
+
+        public N get(long row, long col) {
+            return myBase.get(row, myColumns[(int) col]);
         }
 
         public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -206,6 +221,10 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
             return myRowLimit;
         }
 
+        public double doubleValue(long row, long col) {
+            return myBase.doubleValue(row, col);
+        }
+
         public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
             myBase.fillOne(row, col, values, valueIndex);
         }
@@ -216,6 +235,10 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
 
         public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
             myBase.fillOne(row, col, supplier);
+        }
+
+        public N get(long row, long col) {
+            return myBase.get(row, col);
         }
 
         public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -258,6 +281,10 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
 
         public long countRows() {
             return myBase.countRows() - myRowOffset;
+        }
+
+        public double doubleValue(long row, long col) {
+            return myBase.doubleValue(myRowOffset + row, myColumnOffset + col);
         }
 
         @Override
@@ -310,6 +337,10 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
 
         public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
             myBase.fillRow(myRowOffset + row, myColumnOffset + col, supplier);
+        }
+
+        public N get(long row, long col) {
+            return myBase.get(myRowOffset + row, myColumnOffset + col);
         }
 
         public void modifyAll(final UnaryFunction<N> modifier) {
@@ -371,6 +402,10 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
             return myRows.length;
         }
 
+        public double doubleValue(long row, long col) {
+            return myBase.doubleValue(myRows[(int) row], col);
+        }
+
         public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
             myBase.fillOne(myRows[(int) row], col, values, valueIndex);
         }
@@ -393,6 +428,10 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
 
         public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
             myBase.fillRow(myRows[(int) row], col, supplier);
+        }
+
+        public N get(long row, long col) {
+            return myBase.get(myRows[(int) row], col);
         }
 
         public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -438,6 +477,10 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
             return myBase.countColumns();
         }
 
+        public double doubleValue(long row, long col) {
+            return myBase.doubleValue(col, row);
+        }
+
         public void fillColumn(final long row, final long col, final N value) {
             myBase.fillRow(col, row, value);
         }
@@ -472,6 +515,10 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
 
         public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
             myBase.fillDiagonal(col, row, supplier);
+        }
+
+        public N get(long row, long col) {
+            return myBase.get(col, row);
         }
 
         public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -531,5 +578,9 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
      * @return A transposed consumer region
      */
     ElementsConsumer<N> regionByTransposing();
+
+    default void modifyAny(Transformation2D<N> modifier) {
+        modifier.transform(this);
+    }
 
 }

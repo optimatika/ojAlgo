@@ -27,6 +27,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Stream2D;
+import org.ojalgo.structure.Transformation2D;
 
 /**
  * An elements supplier is not (yet) a matrix, but there are several matrix related things you can do with
@@ -45,6 +46,10 @@ public interface ElementsSupplier<N extends Number> extends Stream2D<N, MatrixSt
 
     default MatrixStore<N> get() {
         return this.collect(this.physical());
+    }
+
+    default ElementsSupplier<N> operateOnAny(final Transformation2D<N> operator) {
+        return new MatrixPipeline.Transformer<>(this, operator);
     }
 
     default ElementsSupplier<N> operateOnAll(final UnaryFunction<N> operator) {

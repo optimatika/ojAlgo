@@ -143,8 +143,8 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 
-    default void transform(Transformation2D<N> transformation) {
-        transformation.transform(this);
+    default void modifyAny(Transformation2D<N> modifier) {
+        modifier.transform(this);
     }
 
     void transformLeft(Householder<N> transformation, int firstColumn);

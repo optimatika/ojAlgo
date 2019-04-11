@@ -56,6 +56,10 @@ abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> im
         return this.doubleValue((int) index);
     }
 
+    public double doubleValue(long row, long col) {
+        return this.doubleValue((int) row);
+    }
+
     public final void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
         this.set((int) row, values.doubleValue(valueIndex));
     }
@@ -70,6 +74,10 @@ abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> im
 
     public final Double get(final long index) {
         return this.doubleValue((int) index);
+    }
+
+    public Double get(long row, long col) {
+        return this.get((int) row);
     }
 
     public abstract void modifyOne(int row, UnaryFunction<Double> modifier);
