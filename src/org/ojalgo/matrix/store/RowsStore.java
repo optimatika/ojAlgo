@@ -61,7 +61,7 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
         return this.getBase().limitOfRow(myRows[row]);
     }
 
-    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+    public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
 
         if (this.isPrimitive()) {
 
@@ -96,7 +96,7 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
 
     }
 
-    public void supplyTo(final ElementsConsumer<N> consumer) {
+    public void supplyTo(final TransformableRegion<N> consumer) {
         final MatrixStore<N> tmpBase = this.getBase();
         for (int r = 0; r < myRows.length; r++) {
             consumer.fillRow(r, 0, tmpBase.sliceRow(myRows[r], 0));

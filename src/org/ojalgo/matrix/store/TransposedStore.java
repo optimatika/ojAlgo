@@ -52,7 +52,7 @@ final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
     }
 
     @Override
-    public void supplyTo(final ElementsConsumer<N> receiver) {
+    public void supplyTo(final TransformableRegion<N> receiver) {
         this.getBase().supplyTo(receiver.regionByTransposing());
     }
 

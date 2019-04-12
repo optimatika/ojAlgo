@@ -70,7 +70,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class PrimitiveDenseStore extends Primitive64Array implements PhysicalStore<Double>, DecompositionStore<Double> {
 
-    public interface PrimitiveMultiplyBoth extends ElementsConsumer.FillByMultiplying<Double> {
+    public interface PrimitiveMultiplyBoth extends TransformableRegion.FillByMultiplying<Double> {
 
     }
 
@@ -1035,24 +1035,24 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return FACTORY;
     }
 
-    public ElementsConsumer<Double> regionByColumns(final int... columns) {
-        return new ElementsConsumer.ColumnsRegion<>(this, multiplyBoth, columns);
+    public TransformableRegion<Double> regionByColumns(final int... columns) {
+        return new TransformableRegion.ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
-    public ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new ElementsConsumer.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
+    public TransformableRegion<Double> regionByLimits(final int rowLimit, final int columnLimit) {
+        return new TransformableRegion.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
-    public ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new ElementsConsumer.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
+    public TransformableRegion<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
+        return new TransformableRegion.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
-    public ElementsConsumer<Double> regionByRows(final int... rows) {
-        return new ElementsConsumer.RowsRegion<>(this, multiplyBoth, rows);
+    public TransformableRegion<Double> regionByRows(final int... rows) {
+        return new TransformableRegion.RowsRegion<>(this, multiplyBoth, rows);
     }
 
-    public ElementsConsumer<Double> regionByTransposing() {
-        return new ElementsConsumer.TransposedRegion<>(this, multiplyBoth);
+    public TransformableRegion<Double> regionByTransposing() {
+        return new TransformableRegion.TransposedRegion<>(this, multiplyBoth);
     }
 
     public void rotateRight(final int low, final int high, final double cos, final double sin) {
@@ -1136,7 +1136,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         }
     }
 
-    public void supplyTo(final ElementsConsumer<Double> receiver) {
+    public void supplyTo(final TransformableRegion<Double> receiver) {
         receiver.fillMatching(this);
     }
 

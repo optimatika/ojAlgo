@@ -1175,24 +1175,24 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         return FACTORY;
     }
 
-    public final ElementsConsumer<Double> regionByColumns(final int... columns) {
-        return new ElementsConsumer.ColumnsRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), columns);
+    public final TransformableRegion<Double> regionByColumns(final int... columns) {
+        return new TransformableRegion.ColumnsRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), columns);
     }
 
-    public final ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new ElementsConsumer.LimitRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowLimit, columnLimit);
+    public final TransformableRegion<Double> regionByLimits(final int rowLimit, final int columnLimit) {
+        return new TransformableRegion.LimitRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowLimit, columnLimit);
     }
 
-    public final ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new ElementsConsumer.OffsetRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowOffset, columnOffset);
+    public final TransformableRegion<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
+        return new TransformableRegion.OffsetRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowOffset, columnOffset);
     }
 
-    public final ElementsConsumer<Double> regionByRows(final int... rows) {
-        return new ElementsConsumer.RowsRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rows);
+    public final TransformableRegion<Double> regionByRows(final int... rows) {
+        return new TransformableRegion.RowsRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rows);
     }
 
-    public final ElementsConsumer<Double> regionByTransposing() {
-        return new ElementsConsumer.TransposedRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns));
+    public final TransformableRegion<Double> regionByTransposing() {
+        return new TransformableRegion.TransposedRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns));
     }
 
     public void set(final long row, final long col, final double value) {
@@ -1213,7 +1213,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     }
 
-    public void supplyTo(final ElementsConsumer<Double> receiver) {
+    public void supplyTo(final TransformableRegion<Double> receiver) {
         receiver.fillMatching(this);
     }
 

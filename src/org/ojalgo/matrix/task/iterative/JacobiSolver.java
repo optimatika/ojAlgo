@@ -26,7 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.ElementsConsumer;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -58,7 +58,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
         }
 
         final PhysicalStore<Double> tmpIncrement = this.preallocate(body, rhs);
-        ElementsConsumer<Double> incremetReceiver = body.isFat() ? tmpIncrement.regionByLimits((int) body.countRows(), 1) : tmpIncrement;
+        TransformableRegion<Double> incremetReceiver = body.isFat() ? tmpIncrement.regionByLimits((int) body.countRows(), 1) : tmpIncrement;
 
         double tmpNormErr = POSITIVE_INFINITY;
         final double tmpNormRHS = tmpRHS.aggregateAll(Aggregator.NORM2);

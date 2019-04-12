@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
@@ -33,11 +31,16 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Transformation2D;
 
-public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableReceiver<N>, Access2D<N> {
+/**
+ * Primarily this represents something that can be fille and/or modified
+ *
+ * @author apete
+ */
+public interface TransformableRegion<N extends Number> extends Mutate2D.ModifiableReceiver<N>, Access2D<N> {
 
-    class ColumnsRegion<N extends Number> extends ConsumerRegion<N> {
+    class ColumnsRegion<N extends Number> extends ReceiverRegion<N> {
 
-        private final ElementsConsumer<N> myBase;
+        private final TransformableRegion<N> myBase;
         private final int[] myColumns;
 
         /**
@@ -45,7 +48,7 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
          * @param multiplier
          * @param columns
          */
-        protected ColumnsRegion(final ElementsConsumer<N> base, final ElementsConsumer.FillByMultiplying<N> multiplier, final int... columns) {
+        protected ColumnsRegion(final TransformableRegion<N> base, final TransformableRegion.FillByMultiplying<N> multiplier, final int... columns) {
             super(multiplier, base.countRows(), columns.length);
             myBase = base;
             myColumns = columns;
@@ -117,88 +120,18 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
 
     }
 
-    abstract class ConsumerRegion<N extends Number> implements ElementsConsumer<N> {
-
-        private final ElementsConsumer.FillByMultiplying<N> myMultiplier;
-
-        @SuppressWarnings("unused")
-        private ConsumerRegion() {
-            this(null, 0L, 0L);
-        }
-
-        @SuppressWarnings("unchecked")
-        protected ConsumerRegion(final ElementsConsumer.FillByMultiplying<N> multiplier, final long rows, final long columns) {
-
-            super();
-
-            if (multiplier instanceof PrimitiveMultiplyBoth) {
-                myMultiplier = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getPrimitive(rows, columns);
-            } else if (multiplier instanceof GenericMultiplyBoth) {
-                myMultiplier = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getGeneric(rows, columns);
-            } else {
-                myMultiplier = multiplier;
-            }
-        }
-
-        public final void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
-            myMultiplier.invoke(this, left, (int) (left.count() / this.countRows()), right);
-        }
-
-        public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
-            // TODO very inefficient implemention - must invent something better
-            final long tmpLimit = FunctionUtils.min(left.count(), this.count());
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.modifyOne(i, function.first(left.get(i)));
-            }
-        }
-
-        public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
-            // TODO very inefficient implemention - must invent something better
-            final long tmpLimit = FunctionUtils.min(this.count(), right.count());
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.modifyOne(i, function.second(right.get(i)));
-            }
-        }
-
-        public final ElementsConsumer<N> regionByColumns(final int... columns) {
-            return new ColumnsRegion<>(this, myMultiplier, columns);
-        }
-
-        public final ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
-            return new ElementsConsumer.LimitRegion<>(this, myMultiplier, rowLimit, columnLimit);
-        }
-
-        public final ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
-            return new ElementsConsumer.OffsetRegion<>(this, myMultiplier, rowOffset, columnOffset);
-        }
-
-        public final ElementsConsumer<N> regionByRows(final int... rows) {
-            return new ElementsConsumer.RowsRegion<>(this, myMultiplier, rows);
-        }
-
-        public ElementsConsumer<N> regionByTransposing() {
-            return new ElementsConsumer.TransposedRegion<>(this, myMultiplier);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " " + this.countRows() + " x " + this.countColumns();
-        }
-
-    }
-
     interface FillByMultiplying<N extends Number> {
 
-        void invoke(ElementsConsumer<N> product, Access1D<N> left, int complexity, Access1D<N> right);
+        void invoke(TransformableRegion<N> product, Access1D<N> left, int complexity, Access1D<N> right);
 
     }
 
-    class LimitRegion<N extends Number> extends ConsumerRegion<N> {
+    class LimitRegion<N extends Number> extends ReceiverRegion<N> {
 
-        private final ElementsConsumer<N> myBase;
+        private final TransformableRegion<N> myBase;
         private final int myRowLimit, myColumnLimit; // limits
 
-        protected LimitRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int rowLimit, final int columnLimit) {
+        protected LimitRegion(final TransformableRegion<N> base, final FillByMultiplying<N> multiplier, final int rowLimit, final int columnLimit) {
             super(multiplier, rowLimit, columnLimit);
             myBase = base;
             myRowLimit = rowLimit;
@@ -255,12 +188,12 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
 
     }
 
-    class OffsetRegion<N extends Number> extends ConsumerRegion<N> {
+    class OffsetRegion<N extends Number> extends ReceiverRegion<N> {
 
-        private final ElementsConsumer<N> myBase;
+        private final TransformableRegion<N> myBase;
         private final int myRowOffset, myColumnOffset; // origin/offset
 
-        protected OffsetRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int rowOffset, final int columnOffset) {
+        protected OffsetRegion(final TransformableRegion<N> base, final FillByMultiplying<N> multiplier, final int rowOffset, final int columnOffset) {
             super(multiplier, base.countRows() - rowOffset, base.countColumns() - columnOffset);
             myBase = base;
             myRowOffset = rowOffset;
@@ -375,12 +308,66 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
 
     }
 
-    class RowsRegion<N extends Number> extends ConsumerRegion<N> {
+    abstract class ReceiverRegion<N extends Number> implements TransformableRegion<N> {
 
-        private final ElementsConsumer<N> myBase;
+        private final TransformableRegion.FillByMultiplying<N> myMultiplier;
+
+        @SuppressWarnings("unused")
+        private ReceiverRegion() {
+            this(null, 0L, 0L);
+        }
+
+        @SuppressWarnings("unchecked")
+        protected ReceiverRegion(final TransformableRegion.FillByMultiplying<N> multiplier, final long rows, final long columns) {
+
+            super();
+
+            if (multiplier instanceof PrimitiveMultiplyBoth) {
+                myMultiplier = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.getPrimitive(rows, columns);
+            } else if (multiplier instanceof GenericMultiplyBoth) {
+                myMultiplier = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.getGeneric(rows, columns);
+            } else {
+                myMultiplier = multiplier;
+            }
+        }
+
+        public final void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
+            myMultiplier.invoke(this, left, (int) (left.count() / this.countRows()), right);
+        }
+
+        public final TransformableRegion<N> regionByColumns(final int... columns) {
+            return new ColumnsRegion<>(this, myMultiplier, columns);
+        }
+
+        public final TransformableRegion<N> regionByLimits(final int rowLimit, final int columnLimit) {
+            return new TransformableRegion.LimitRegion<>(this, myMultiplier, rowLimit, columnLimit);
+        }
+
+        public final TransformableRegion<N> regionByOffsets(final int rowOffset, final int columnOffset) {
+            return new TransformableRegion.OffsetRegion<>(this, myMultiplier, rowOffset, columnOffset);
+        }
+
+        public final TransformableRegion<N> regionByRows(final int... rows) {
+            return new TransformableRegion.RowsRegion<>(this, myMultiplier, rows);
+        }
+
+        public TransformableRegion<N> regionByTransposing() {
+            return new TransformableRegion.TransposedRegion<>(this, myMultiplier);
+        }
+
+        @Override
+        public String toString() {
+            return Access1D.toString(this);
+        }
+
+    }
+
+    class RowsRegion<N extends Number> extends ReceiverRegion<N> {
+
+        private final TransformableRegion<N> myBase;
         private final int[] myRows;
 
-        protected RowsRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int... rows) {
+        protected RowsRegion(final TransformableRegion<N> base, final FillByMultiplying<N> multiplier, final int... rows) {
             super(multiplier, rows.length, base.countColumns());
             myBase = base;
             myRows = rows;
@@ -452,11 +439,11 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
 
     }
 
-    class TransposedRegion<N extends Number> extends ConsumerRegion<N> {
+    class TransposedRegion<N extends Number> extends ReceiverRegion<N> {
 
-        private final ElementsConsumer<N> myBase;
+        private final TransformableRegion<N> myBase;
 
-        protected TransposedRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier) {
+        protected TransposedRegion(final TransformableRegion<N> base, final FillByMultiplying<N> multiplier) {
             super(multiplier, base.countColumns(), base.countRows());
             myBase = base;
         }
@@ -538,7 +525,7 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
         }
 
         @Override
-        public ElementsConsumer<N> regionByTransposing() {
+        public TransformableRegion<N> regionByTransposing() {
             return myBase;
         }
 
@@ -552,35 +539,55 @@ public interface ElementsConsumer<N extends Number> extends Mutate2D.ModifiableR
 
     }
 
+    default void exchangeColumns(long colA, long colB) {
+        N valA, valB;
+        for (long i = 0L, limit = this.countRows(); i < limit; i++) {
+            valA = this.get(i, colA);
+            valB = this.get(i, colB);
+            this.set(i, colB, valA);
+            this.set(i, colA, valB);
+        }
+    }
+
+    default void exchangeRows(long rowA, long rowB) {
+        N valA, valB;
+        for (long j = 0L, limit = this.countColumns(); j < limit; j++) {
+            valA = this.get(rowA, j);
+            valB = this.get(rowB, j);
+            this.set(rowB, j, valA);
+            this.set(rowA, j, valB);
+        }
+    }
+
     void fillByMultiplying(final Access1D<N> left, final Access1D<N> right);
-
-    /**
-     * @return A consumer (sub)region
-     */
-    ElementsConsumer<N> regionByColumns(int... columns);
-
-    /**
-     * @return A consumer (sub)region
-     */
-    ElementsConsumer<N> regionByLimits(int rowLimit, int columnLimit);
-
-    /**
-     * @return A consumer (sub)region
-     */
-    ElementsConsumer<N> regionByOffsets(int rowOffset, int columnOffset);
-
-    /**
-     * @return A consumer (sub)region
-     */
-    ElementsConsumer<N> regionByRows(int... rows);
-
-    /**
-     * @return A transposed consumer region
-     */
-    ElementsConsumer<N> regionByTransposing();
 
     default void modifyAny(Transformation2D<N> modifier) {
         modifier.transform(this);
     }
+
+    /**
+     * @return A consumer (sub)region
+     */
+    TransformableRegion<N> regionByColumns(int... columns);
+
+    /**
+     * @return A consumer (sub)region
+     */
+    TransformableRegion<N> regionByLimits(int rowLimit, int columnLimit);
+
+    /**
+     * @return A consumer (sub)region
+     */
+    TransformableRegion<N> regionByOffsets(int rowOffset, int columnOffset);
+
+    /**
+     * @return A consumer (sub)region
+     */
+    TransformableRegion<N> regionByRows(int... rows);
+
+    /**
+     * @return A transposed consumer region
+     */
+    TransformableRegion<N> regionByTransposing();
 
 }

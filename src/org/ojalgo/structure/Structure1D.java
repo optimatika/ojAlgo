@@ -229,6 +229,10 @@ public interface Structure1D {
 
     }
 
+    static int index(final long index) {
+        return Math.toIntExact(index);
+    }
+
     static void loopMatching(final Structure1D structureA, final Structure1D structureB, final IndexCallback callback) {
         final long limit = Math.min(structureA.count(), structureB.count());
         Structure1D.loopRange(0L, limit, callback);

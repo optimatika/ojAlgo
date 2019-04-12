@@ -84,7 +84,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
         return 0;
     }
 
-    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+    public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
         target.reset();
     }
 
@@ -110,7 +110,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
         return new ZeroStore<>(this.physical(), (int) (left.count() / this.getRowDim()), this.getColDim());
     }
 
-    public void supplyTo(final ElementsConsumer<N> receiver) {
+    public void supplyTo(final TransformableRegion<N> receiver) {
         receiver.reset();
     }
 

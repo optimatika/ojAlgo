@@ -42,7 +42,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             this.getContext().supplyTo(receiver);
             receiver.modifyMatching(myLeft, myOperator);
         }
@@ -60,7 +60,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             this.getContext().supplyTo(receiver);
             receiver.modifyMatching(myOperator, myRight);
         }
@@ -83,7 +83,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(ElementsConsumer<N> receiver) {
+        public void supplyTo(TransformableRegion<N> receiver) {
             myBase.reduceColumns(myAggregator, receiver);
         }
 
@@ -113,7 +113,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             receiver.fillByMultiplying(myLeft, myRight);
         }
 
@@ -136,7 +136,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(ElementsConsumer<N> receiver) {
+        public void supplyTo(TransformableRegion<N> receiver) {
             myBase.reduceRows(myAggregator, receiver);
         }
 
@@ -152,7 +152,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             this.getContext().supplyTo(receiver);
             myTransformer.transform(receiver);
         }
@@ -196,7 +196,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             this.getContext().supplyTo(receiver.regionByTransposing());
         }
 
@@ -215,7 +215,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             this.getContext().supplyTo(receiver);
             receiver.modifyAll(myOperator);
         }

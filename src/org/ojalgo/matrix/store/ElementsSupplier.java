@@ -35,25 +35,25 @@ import org.ojalgo.structure.Transformation2D;
  * <ol>
  * <li>You can query the size/shape of the (future) matrix.</li>
  * <li>You can supply the elements to an already existing matrix (or more precisely to an
- * {@linkplain ElementsConsumer}) or collect them using a {@linkplain Factory2D}.</li>
+ * {@linkplain TransformableRegion}) or collect them using a {@linkplain Factory2D}.</li>
  * <li>You can define a stream of additional operations to be executed when the elements are extracted.</li>
  * <li>You can get that matrix</li>
  * </ol>
  *
  * @author apete
  */
-public interface ElementsSupplier<N extends Number> extends Stream2D<N, MatrixStore<N>, ElementsConsumer<N>, ElementsSupplier<N>>, Supplier<MatrixStore<N>> {
+public interface ElementsSupplier<N extends Number> extends Stream2D<N, MatrixStore<N>, TransformableRegion<N>, ElementsSupplier<N>>, Supplier<MatrixStore<N>> {
 
     default MatrixStore<N> get() {
         return this.collect(this.physical());
     }
 
-    default ElementsSupplier<N> operateOnAny(final Transformation2D<N> operator) {
-        return new MatrixPipeline.Transformer<>(this, operator);
-    }
-
     default ElementsSupplier<N> operateOnAll(final UnaryFunction<N> operator) {
         return new MatrixPipeline.UnaryOperator<>(this, operator);
+    }
+
+    default ElementsSupplier<N> operateOnAny(final Transformation2D<N> operator) {
+        return new MatrixPipeline.Transformer<>(this, operator);
     }
 
     default ElementsSupplier<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
