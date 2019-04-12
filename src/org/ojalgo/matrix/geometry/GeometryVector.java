@@ -23,10 +23,12 @@ package org.ojalgo.matrix.geometry;
 
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.store.ElementsConsumer;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Structure1D;
+import org.ojalgo.structure.Structure2D;
 
-abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> implements Access1D<Double> {
+abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double> {
 
     GeometryVector(final FillByMultiplying<Double> multiplier, final long rows, final long columns) {
         super(multiplier, rows, columns);
@@ -34,12 +36,24 @@ abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> im
 
     public abstract void add(int row, double addend);
 
+    public final void add(long index, double addend) {
+        this.add(Structure1D.index(index), addend);
+    }
+
     public final void add(final long row, final long col, final double addend) {
-        this.add((int) row, addend);
+        this.add(Structure2D.index(this.structure(), row, col), addend);
     }
 
     public final void add(final long row, final long col, final Number addend) {
-        this.add((int) row, addend.doubleValue());
+        this.add(Structure2D.index(this.structure(), row, col), addend.doubleValue());
+    }
+
+    public final void add(long index, Number addend) {
+        this.add(Structure1D.index(index), addend.doubleValue());
+    }
+
+    public final long count() {
+        return this.structure();
     }
 
     public final long countColumns() {
@@ -53,44 +67,82 @@ abstract class GeometryVector extends ElementsConsumer.ConsumerRegion<Double> im
     public abstract double doubleValue(int index);
 
     public final double doubleValue(final long index) {
-        return this.doubleValue((int) index);
+        return this.doubleValue(Structure1D.index(index));
+    }
+
+    public final double doubleValue(long row, long col) {
+        return this.doubleValue(Structure2D.index(this.structure(), row, col));
+    }
+
+    public final void fillOne(long index, Access1D<?> values, long valueIndex) {
+        this.set(Structure1D.index(index), values.doubleValue(valueIndex));
+    }
+
+    public final void fillOne(long index, Double value) {
+        this.set(Structure1D.index(index), value.doubleValue());
     }
 
     public final void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        this.set((int) row, values.doubleValue(valueIndex));
+        this.set(Structure2D.index(this.structure(), row, col), values.doubleValue(valueIndex));
     }
 
     public final void fillOne(final long row, final long col, final Double value) {
-        this.set((int) row, value.doubleValue());
+        this.set(Structure2D.index(this.structure(), row, col), value.doubleValue());
     }
 
     public final void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
-        this.set((int) row, supplier.doubleValue());
+        this.set(Structure2D.index(this.structure(), row, col), supplier.doubleValue());
+    }
+
+    public final void fillOne(long index, NullaryFunction<Double> supplier) {
+        this.set(Structure1D.index(index), supplier.doubleValue());
     }
 
     public final Double get(final long index) {
-        return this.doubleValue((int) index);
+        return this.doubleValue(Structure1D.index(index));
+    }
+
+    public final Double get(long row, long col) {
+        return this.get(Structure2D.index(this.structure(), row, col));
     }
 
     public abstract void modifyOne(int row, UnaryFunction<Double> modifier);
 
     public final void modifyOne(final long row, final long col, final UnaryFunction<Double> modifier) {
-        this.modifyOne((int) row, modifier);
+        this.modifyOne(Structure2D.index(this.structure(), row, col), modifier);
+    }
+
+    public final void modifyOne(long index, UnaryFunction<Double> modifier) {
+        this.modifyOne(Structure1D.index(index), modifier);
     }
 
     public abstract void set(int row, double value);
 
+    public final void set(long index, double addend) {
+        this.set(Structure1D.index(index), addend);
+    }
+
     public final void set(final long row, final long col, final double value) {
-        this.set((int) row, value);
+        this.set(Structure2D.index(this.structure(), row, col), value);
     }
 
     public final void set(final long row, final long col, final Number value) {
-        this.set((int) row, value.doubleValue());
+        this.set(Structure2D.index(this.structure(), row, col), value.doubleValue());
+    }
+
+    public final void set(long index, Number addend) {
+        this.set(Structure1D.index(index), addend.doubleValue());
+    }
+
+    public final int size() {
+        return this.structure();
     }
 
     @Override
     public final String toString() {
         return Access1D.toString(this);
     }
+
+    abstract int structure();
 
 }

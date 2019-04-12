@@ -69,7 +69,7 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
         return retVal;
     }
 
-    public void supplyTo(final ElementsConsumer<N> receiver) {
+    public void supplyTo(final TransformableRegion<N> receiver) {
 
         receiver.reset();
 

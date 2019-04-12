@@ -32,7 +32,6 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Factory2D;
-import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.Transformation2D;
 
@@ -47,7 +46,7 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2D.Elements, Access2D.IndexOf, ElementsConsumer<N>, Mutate2D.Exchangeable {
+public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2D.Elements, Access2D.IndexOf, TransformableRegion<N> {
 
     public interface Factory<N extends Number, I extends PhysicalStore<N>> extends Factory2D<I> {
 
@@ -143,8 +142,8 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 
-    default void transform(Transformation2D<N> transformation) {
-        transformation.transform(this);
+    default void modifyAny(Transformation2D<N> modifier) {
+        modifier.transform(this);
     }
 
     void transformLeft(Householder<N> transformation, int firstColumn);

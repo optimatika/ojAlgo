@@ -26,6 +26,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Transformation2D;
 
 abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
 
@@ -41,7 +42,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             this.getContext().supplyTo(receiver);
             receiver.modifyMatching(myLeft, myOperator);
         }
@@ -59,7 +60,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             this.getContext().supplyTo(receiver);
             receiver.modifyMatching(myOperator, myRight);
         }
@@ -82,7 +83,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(ElementsConsumer<N> receiver) {
+        public void supplyTo(TransformableRegion<N> receiver) {
             myBase.reduceColumns(myAggregator, receiver);
         }
 
@@ -112,7 +113,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             receiver.fillByMultiplying(myLeft, myRight);
         }
 
@@ -135,10 +136,26 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(ElementsConsumer<N> receiver) {
+        public void supplyTo(TransformableRegion<N> receiver) {
             myBase.reduceRows(myAggregator, receiver);
         }
 
+    }
+
+    static final class Transformer<N extends Number> extends MatrixPipeline<N> {
+
+        private final Transformation2D<N> myTransformer;
+
+        Transformer(final ElementsSupplier<N> context, final Transformation2D<N> operator) {
+            super(context);
+            myTransformer = operator;
+        }
+
+        @Override
+        public void supplyTo(final TransformableRegion<N> receiver) {
+            this.getContext().supplyTo(receiver);
+            myTransformer.transform(receiver);
+        }
     }
 
     static final class Transpose<N extends Number> extends MatrixPipeline<N> {
@@ -179,7 +196,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             this.getContext().supplyTo(receiver.regionByTransposing());
         }
 
@@ -198,7 +215,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             this.getContext().supplyTo(receiver);
             receiver.modifyAll(myOperator);
         }

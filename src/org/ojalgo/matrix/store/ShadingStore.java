@@ -33,7 +33,7 @@ abstract class ShadingStore<N extends Number> extends LogicalStore<N> {
         super(base, rowsCount, columnsCount);
     }
 
-    public void supplyTo(final ElementsConsumer<N> consumer) {
+    public void supplyTo(final TransformableRegion<N> consumer) {
 
         consumer.reset();
 

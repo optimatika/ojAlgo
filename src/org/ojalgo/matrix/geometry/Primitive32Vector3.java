@@ -38,10 +38,6 @@ public class Primitive32Vector3 extends GeometryVector {
         }
     }
 
-    public final long count() {
-        return 3L;
-    }
-
     @Override
     public final double doubleValue(final int index) {
         switch (index) {
@@ -123,4 +119,10 @@ public class Primitive32Vector3 extends GeometryVector {
             throw new IllegalArgumentException();
         }
     }
+
+    @Override
+    int structure() {
+        return 3;
+    }
+
 }

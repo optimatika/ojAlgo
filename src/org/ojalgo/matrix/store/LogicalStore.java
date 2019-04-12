@@ -59,7 +59,7 @@ abstract class LogicalStore<N extends Number> extends AbstractStore<N> {
         return myBase.physical();
     }
 
-    protected final Future<?> executeMultiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+    protected final Future<?> executeMultiply(final Access1D<N> right, final TransformableRegion<N> target) {
         return DaemonPoolExecutor.invoke(() -> myBase.multiply(right, target));
     }
 

@@ -51,7 +51,7 @@ import org.ojalgo.structure.TransformationAnyD;
  */
 public final class ArrayAnyD<N extends Number>
         implements AccessAnyD<N>, AccessAnyD.Visitable<N>, AccessAnyD.Aggregatable<N>, AccessAnyD.Sliceable<N>, AccessAnyD.Elements, AccessAnyD.IndexOf,
-        StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, MutateAnyD.Transformable<N>, MutateAnyD.Mixable<N> {
+        StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, MutateAnyD.ModifiableReceiver<N>, MutateAnyD.Mixable<N> {
 
     public static final class Factory<N extends Number> implements FactoryAnyD<ArrayAnyD<N>> {
 
@@ -449,8 +449,8 @@ public final class ArrayAnyD<N extends Number>
         return retVal.toString();
     }
 
-    public void transform(TransformationAnyD<N> transformation) {
-        transformation.transform(this);
+    public void modifyAny(TransformationAnyD<N> modifier) {
+        modifier.transform(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

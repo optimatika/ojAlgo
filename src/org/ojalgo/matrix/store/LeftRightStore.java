@@ -82,7 +82,7 @@ final class LeftRightStore<N extends Number> extends ComposingStore<N> {
         return rightLimit == 0 ? this.getBase().limitOfRow(row) : mySplit + rightLimit;
     }
 
-    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+    public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
         // TODO Auto-generated method stub
         super.multiply(right, target);
     }
@@ -141,7 +141,7 @@ final class LeftRightStore<N extends Number> extends ComposingStore<N> {
     }
 
     @Override
-    public void supplyTo(final ElementsConsumer<N> receiver) {
+    public void supplyTo(final TransformableRegion<N> receiver) {
         this.getBase().supplyTo(receiver.regionByLimits(this.getRowDim(), mySplit));
         myRight.supplyTo(receiver.regionByOffsets(0, mySplit));
     }

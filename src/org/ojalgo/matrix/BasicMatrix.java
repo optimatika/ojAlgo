@@ -126,7 +126,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
     }
 
     interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
-            extends Mutate2D.Transformable<N>, Mutate2D.Exchangeable, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
+            extends Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         default M build() {
             return this.get();

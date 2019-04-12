@@ -351,11 +351,6 @@ public interface Structure2D extends Structure1D {
 
     }
 
-    public static <R, C> RowColumnMapper<R, C> mapperOf(final Structure2D structure, final Structure1D.IndexMapper<R> rowMappwer,
-            final Structure1D.IndexMapper<C> columnMappwer) {
-        return new RowColumnMapper<>(structure, rowMappwer, columnMappwer);
-    }
-
     static int column(final int index, final int structure) {
         return index / structure;
     }
@@ -396,6 +391,11 @@ public interface Structure2D extends Structure1D {
                 callback.call(i, j);
             }
         }
+    }
+
+    static <R, C> RowColumnMapper<R, C> mapperOf(final Structure2D structure, final Structure1D.IndexMapper<R> rowMappwer,
+            final Structure1D.IndexMapper<C> columnMappwer) {
+        return new RowColumnMapper<>(structure, rowMappwer, columnMappwer);
     }
 
     static int row(final int index, final int structure) {

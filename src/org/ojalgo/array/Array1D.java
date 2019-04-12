@@ -52,7 +52,7 @@ import org.ojalgo.structure.Transformation1D;
  * @author apete
  */
 public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Visitable<N>, Access1D.Aggregatable<N>,
-        Access1D.Sliceable<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D.Transformable<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
+        Access1D.Sliceable<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D.ModifiableReceiver<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
 
     public static final class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
@@ -611,8 +611,8 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return Access1D.toString(this);
     }
 
-    public void transform(Transformation1D<N> transformation) {
-        transformation.transform(this);
+    public void modifyAny(Transformation1D<N> modifier) {
+        modifier.transform(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

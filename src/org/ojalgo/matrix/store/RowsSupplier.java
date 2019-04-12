@@ -68,7 +68,7 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
         return retVal;
     }
 
-    public void supplyTo(final ElementsConsumer<N> receiver) {
+    public void supplyTo(final TransformableRegion<N> receiver) {
 
         receiver.reset();
 

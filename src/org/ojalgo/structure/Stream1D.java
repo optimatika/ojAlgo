@@ -29,6 +29,8 @@ public interface Stream1D<N extends Number, A extends Access1D<N>, R extends Mut
 
     P operateOnAll(final UnaryFunction<N> operator);
 
+    P operateOnAny(final Transformation1D<N> operator);
+
     P operateOnMatching(final A left, final BinaryFunction<N> operator);
 
     P operateOnMatching(final BinaryFunction<N> operator, final A right);

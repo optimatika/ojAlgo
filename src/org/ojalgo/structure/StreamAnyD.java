@@ -29,6 +29,8 @@ public interface StreamAnyD<N extends Number, A extends AccessAnyD<N>, R extends
 
     P operateOnAll(final UnaryFunction<N> operator);
 
+    P operateOnAny(final TransformationAnyD<N> operator);
+
     P operateOnMatching(final A left, final BinaryFunction<N> operator);
 
     P operateOnMatching(final BinaryFunction<N> operator, final A right);

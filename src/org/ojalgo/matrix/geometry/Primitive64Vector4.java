@@ -42,10 +42,6 @@ public class Primitive64Vector4 extends GeometryVector {
         }
     }
 
-    public final long count() {
-        return 4L;
-    }
-
     @Override
     public final double doubleValue(final int index) {
         switch (index) {
@@ -143,6 +139,11 @@ public class Primitive64Vector4 extends GeometryVector {
         default:
             throw new IllegalArgumentException();
         }
+    }
+
+    @Override
+    int structure() {
+        return 4;
     }
 
 }

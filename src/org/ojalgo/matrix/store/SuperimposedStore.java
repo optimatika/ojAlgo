@@ -82,7 +82,7 @@ final class SuperimposedStore<N extends Number> extends ComposingStore<N> {
         return retVal;
     }
 
-    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+    public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
         // TODO Auto-generated method stub
         super.multiply(right, target);
     }
@@ -113,7 +113,7 @@ final class SuperimposedStore<N extends Number> extends ComposingStore<N> {
         return super.premultiply(left);
     }
 
-    public void supplyTo(final ElementsConsumer<N> consumer) {
+    public void supplyTo(final TransformableRegion<N> consumer) {
         consumer.fillMatching(this.getBase());
         consumer.regionByLimits(myRowLimit, myColLimit).regionByOffsets(myRowFirst, myColFirst).modifyMatching(this.physical().function().add(), myDiff);
     }
