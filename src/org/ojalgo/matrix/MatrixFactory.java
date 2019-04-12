@@ -305,16 +305,16 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
         }
 
         public void exchangeColumns(long colA, long colB) {
-            if (mySafe && (myDelegate instanceof Exchangeable)) {
-                ((Exchangeable) myDelegate).exchangeColumns(colA, colB);
+            if (mySafe) {
+                myDelegate.exchangeColumns(colA, colB);
             } else {
                 throw new IllegalStateException();
             }
         }
 
         public void exchangeRows(long rowA, long rowB) {
-            if (mySafe && (myDelegate instanceof Exchangeable)) {
-                ((Exchangeable) myDelegate).exchangeRows(rowA, rowB);
+            if (mySafe) {
+                myDelegate.exchangeRows(rowA, rowB);
             } else {
                 throw new IllegalStateException();
             }
@@ -582,6 +582,14 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
+        public void modifyAny(Transformation2D<N> modifier) {
+            if (mySafe) {
+                modifier.transform(myDelegate);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
         public void modifyColumn(long row, long col, UnaryFunction<N> modifier) {
             if (mySafe) {
                 myDelegate.modifyColumn(row, col, modifier);
@@ -744,14 +752,6 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
 
         public void supplyTo(PhysicalStore<N> receiver) {
             myDelegate.supplyTo(receiver);
-        }
-
-        public void modifyAny(Transformation2D<N> modifier) {
-            if (mySafe) {
-                modifier.transform(myDelegate);
-            } else {
-                throw new IllegalStateException();
-            }
         }
     }
 
