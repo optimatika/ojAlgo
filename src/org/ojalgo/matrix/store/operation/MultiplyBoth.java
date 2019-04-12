@@ -27,7 +27,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.ElementsConsumer;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
@@ -632,7 +632,7 @@ public final class MultiplyBoth extends MatrixOperation {
         }
     }
 
-    static <N extends Number & Scalar<N>> void invokeGeneric(final ElementsConsumer<N> product, final int firstRow, final int rowLimit, final Access1D<N> left,
+    static <N extends Number & Scalar<N>> void invokeGeneric(final TransformableRegion<N> product, final int firstRow, final int rowLimit, final Access1D<N> left,
             final int complexity, final Access1D<N> right) {
 
         @SuppressWarnings("unchecked")
@@ -679,7 +679,7 @@ public final class MultiplyBoth extends MatrixOperation {
         }
     }
 
-    static void invokePrimitive(final ElementsConsumer<Double> product, final int firstRow, final int rowLimit, final Access1D<Double> left,
+    static void invokePrimitive(final TransformableRegion<Double> product, final int firstRow, final int rowLimit, final Access1D<Double> left,
             final int complexity, final Access1D<Double> right) {
 
         final int tmpRowDim = (int) product.countRows();

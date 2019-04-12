@@ -358,7 +358,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
-        public void supplyTo(final ElementsConsumer<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             if (receiver.isAcceptable(this)) {
                 receiver.accept(this.get());
             } else {
@@ -709,7 +709,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return new MatrixStore.LogicalBuilder<>(this);
     }
 
-    default void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+    default void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
         target.fillByMultiplying(this, right);
     }
 
@@ -897,7 +897,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return this.operateOnMatching(this.physical().function().subtract(), subtrahend).get();
     }
 
-    default void supplyTo(final ElementsConsumer<N> receiver) {
+    default void supplyTo(final TransformableRegion<N> receiver) {
         receiver.fillMatching(this);
     }
 

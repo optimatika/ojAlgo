@@ -82,7 +82,7 @@ final class AboveBelowStore<N extends Number> extends ComposingStore<N> {
         return (row < mySplit) ? this.getBase().limitOfRow(row) : myBelow.limitOfRow(row - mySplit);
     }
 
-    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+    public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
 
         final Future<?> futureAbove = this.executeMultiply(right, target.regionByLimits(mySplit, this.getColDim()));
 
@@ -150,7 +150,7 @@ final class AboveBelowStore<N extends Number> extends ComposingStore<N> {
     }
 
     @Override
-    public void supplyTo(final ElementsConsumer<N> receiver) {
+    public void supplyTo(final TransformableRegion<N> receiver) {
         this.getBase().supplyTo(receiver.regionByLimits(mySplit, this.getColDim()));
         myBelow.supplyTo(receiver.regionByOffsets(mySplit, 0));
     }

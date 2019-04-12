@@ -53,7 +53,7 @@ final class WrapperStore<N extends Number> extends FactoryStore<N> {
         return this.physical().scalar().cast(myAccess.get(aRow, aCol));
     }
 
-    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+    public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
         // TODO Auto-generated method stub
         super.multiply(right, target);
     }

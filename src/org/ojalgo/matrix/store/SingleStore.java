@@ -63,7 +63,7 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
         return myNumber;
     }
 
-    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+    public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
         // TODO Auto-generated method stub
         super.multiply(right, target);
     }
@@ -101,7 +101,7 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
         return super.premultiply(left);
     }
 
-    public void supplyTo(final ElementsConsumer<N> receiver) {
+    public void supplyTo(final TransformableRegion<N> receiver) {
         receiver.fillOne(0L, 0L, myNumber);
     }
 

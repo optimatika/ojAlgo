@@ -4,6 +4,28 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
+* ...
+
+# v47.1.1: 2019-04-12
+
+## org.ojalgo.constant
+
+* The stuff that was deprecated with v47.1.0 are now removed. (Keeping it around may cause problems with some IDE:s) Just update your import statements to org.ojalgo.function.constant rather than org.ojalgo.constant.
+
+## org.ojalgo.data
+
+* Additions and improvements to DataPreprocessors, but they're now column oriented only.
+
+## org.ojalgo.matrix
+
+* The ElementsConsumer interface has been renamed TransformableRegion. This is an intermediate definitions interface - subinterfaces and concrete implementations are not affected other than with their implements and extends declarations.
+
+## org.ojalgo.structure
+
+* The interfaces Mutate1D.Transformable, Mutate2D.Transformable and MutateAnyD.Transformable introduced with v47.1.0 are removed again – bad idea.
+* The Stream1D, Stream2D and StreamAnyD each got a new method named operateOnAny that takes a Transformation?D as input.
+* The Mutate1D.ModifiableReceiver, Mutate2D.ModifiableReceiver and MutateAnyD.ModifiableReceiver each got a new method named modifyAny that takes a Transformation?D as input.
+
 # v47.1.0: 2019-04-09
 
 ## org.ojalgo.constant

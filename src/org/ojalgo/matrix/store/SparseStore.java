@@ -44,7 +44,7 @@ import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-public final class SparseStore<N extends Number> extends FactoryStore<N> implements ElementsConsumer<N> {
+public final class SparseStore<N extends Number> extends FactoryStore<N> implements TransformableRegion<N> {
 
     public interface Factory<N extends Number> {
 
@@ -90,7 +90,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         return SparseStore.makeSparse(physical, shape.countRows(), shape.countColumns());
     }
 
-    static <N extends Number> void multiply(final SparseStore<N> left, final SparseStore<N> right, final ElementsConsumer<N> target) {
+    static <N extends Number> void multiply(final SparseStore<N> left, final SparseStore<N> right, final TransformableRegion<N> target) {
 
         if (left.isPrimitive()) {
 
@@ -109,7 +109,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     private final SparseArray<N> myElements;
     private final int[] myFirsts;
     private final int[] myLimits;
-    private final ElementsConsumer.FillByMultiplying<N> myMultiplyer;
+    private final TransformableRegion.FillByMultiplying<N> myMultiplyer;
 
     SparseStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
 
@@ -123,9 +123,9 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
         final Class<? extends Number> tmpType = factory.scalar().zero().get().getClass();
         if (tmpType.equals(Double.class)) {
-            myMultiplyer = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getPrimitive(rowsCount, columnsCount);
+            myMultiplyer = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.getPrimitive(rowsCount, columnsCount);
         } else if (tmpType.equals(ComplexNumber.class)) {
-            myMultiplyer = (ElementsConsumer.FillByMultiplying<N>) MultiplyBoth.getGeneric(rowsCount, columnsCount);
+            myMultiplyer = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.getGeneric(rowsCount, columnsCount);
         } else {
             myMultiplyer = null;
         }
@@ -286,7 +286,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         }
     }
 
-    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+    public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
 
         if (right instanceof SparseStore<?>) {
 
@@ -468,24 +468,24 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         }
     }
 
-    public ElementsConsumer<N> regionByColumns(final int... columns) {
-        return new ElementsConsumer.ColumnsRegion<>(this, myMultiplyer, columns);
+    public TransformableRegion<N> regionByColumns(final int... columns) {
+        return new TransformableRegion.ColumnsRegion<>(this, myMultiplyer, columns);
     }
 
-    public ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new ElementsConsumer.LimitRegion<>(this, myMultiplyer, rowLimit, columnLimit);
+    public TransformableRegion<N> regionByLimits(final int rowLimit, final int columnLimit) {
+        return new TransformableRegion.LimitRegion<>(this, myMultiplyer, rowLimit, columnLimit);
     }
 
-    public ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new ElementsConsumer.OffsetRegion<>(this, myMultiplyer, rowOffset, columnOffset);
+    public TransformableRegion<N> regionByOffsets(final int rowOffset, final int columnOffset) {
+        return new TransformableRegion.OffsetRegion<>(this, myMultiplyer, rowOffset, columnOffset);
     }
 
-    public ElementsConsumer<N> regionByRows(final int... rows) {
-        return new ElementsConsumer.RowsRegion<>(this, myMultiplyer, rows);
+    public TransformableRegion<N> regionByRows(final int... rows) {
+        return new TransformableRegion.RowsRegion<>(this, myMultiplyer, rows);
     }
 
-    public ElementsConsumer<N> regionByTransposing() {
-        return new ElementsConsumer.TransposedRegion<>(this, myMultiplyer);
+    public TransformableRegion<N> regionByTransposing() {
+        return new TransformableRegion.TransposedRegion<>(this, myMultiplyer);
     }
 
     public void reset() {
@@ -504,7 +504,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         this.updateNonZeros(row, col);
     }
 
-    public void supplyTo(final ElementsConsumer<N> receiver) {
+    public void supplyTo(final TransformableRegion<N> receiver) {
 
         receiver.reset();
 
@@ -546,7 +546,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         this.updateNonZeros((int) row, (int) col);
     }
 
-    void doColumnAXPY(long colX, long colY, double a, ElementsConsumer<N> y) {
+    void doColumnAXPY(long colX, long colY, double a, TransformableRegion<N> y) {
 
         long structure = y.countRows();
 
