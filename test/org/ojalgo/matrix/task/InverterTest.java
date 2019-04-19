@@ -26,10 +26,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public final class InverterTest extends MatrixTaskTests {
 
@@ -82,27 +82,23 @@ public final class InverterTest extends MatrixTaskTests {
 
         try {
 
-            final MatrixStore<Double> tmpMatrix = this.makeSPD(dimension);
+            final MatrixStore<Double> matrix = PrimitiveDenseStore.FACTORY.makeSPD(dimension);
 
-            final MatrixStore<Double> tmpExpInv = fixed.invert(tmpMatrix);
+            final MatrixStore<Double> expInv = fixed.invert(matrix);
 
-            final List<MatrixDecomposition<Double>> tmpList = MatrixDecompositionTests.getAllPrimitive();
-            for (final MatrixDecomposition<Double> tmpDecomp : tmpList) {
-                if (tmpDecomp instanceof InverterTask) {
+            final List<MatrixDecomposition<Double>> decompList = MatrixDecompositionTests.getPrimitiveAll();
+            for (final MatrixDecomposition<Double> decomp : decompList) {
+                if (decomp instanceof InverterTask) {
                     @SuppressWarnings("unchecked")
-                    final InverterTask<Double> tmpTask = (InverterTask<Double>) tmpDecomp;
-                    final MatrixStore<Double> tmpActInv = tmpTask.invert(tmpMatrix);
-                    TestUtils.assertEquals(tmpDecomp.getClass().getName(), tmpExpInv, tmpActInv);
+                    final InverterTask<Double> task = (InverterTask<Double>) decomp;
+                    final MatrixStore<Double> actInv = task.invert(matrix);
+                    TestUtils.assertEquals(decomp.getClass().getName(), expInv, actInv);
                 }
             }
 
         } catch (final RecoverableCondition exception) {
             TestUtils.fail(exception.getMessage());
         }
-    }
-
-    private MatrixStore<Double> makeSPD(final int dim) {
-        return MatrixUtils.makeSPD(dim);
     }
 
 }

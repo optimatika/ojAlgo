@@ -94,7 +94,6 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         final DecompositionStore<N> tmpInPlace = this.setInPlace(matrix);
 
         final int tmpRowDim = this.getRowDim();
-        this.getColDim();
         final int tmpMinDim = this.getMinDim();
 
         myPivot = new Pivot(tmpRowDim);
@@ -210,6 +209,10 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return retVal;
     }
 
+    public int[] getPivotOrder() {
+        return myPivot.getOrder();
+    }
+
     public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
         return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
@@ -307,12 +310,13 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
         boolean retVal = this.getRowDim() == this.getColDim();
 
-        final int tmpFirst = 0;
-        final int tmpLast = this.getColDim() - 1;
+        final int first = 0;
+        final int last = this.getColDim() - 1;
 
-        retVal = retVal && PrimitiveScalar.isSmall(this.getInPlace().doubleValue(tmpFirst, tmpFirst), this.getInPlace().doubleValue(tmpLast, tmpLast));
+        double largest = this.getInPlace().doubleValue(first, first);
+        double smallest = this.getInPlace().doubleValue(last, last);
 
-        return retVal;
+        return retVal && !PrimitiveScalar.isSmall(largest, smallest);
     }
 
 }

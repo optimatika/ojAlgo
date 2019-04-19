@@ -720,30 +720,30 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public void exchangeHermitian(final int indexA, final int indexB) {
 
-        final int tmpMin = Math.min(indexA, indexB);
-        final int tmpMax = Math.max(indexA, indexB);
+        final int indexMin = Math.min(indexA, indexB);
+        final int indexMax = Math.max(indexA, indexB);
 
         double tmpVal;
-        for (int j = 0; j < tmpMin; j++) {
-            tmpVal = this.doubleValue(tmpMin, j);
-            this.set(tmpMin, j, this.doubleValue(tmpMax, j));
-            this.set(tmpMax, j, tmpVal);
+        for (int j = 0; j < indexMin; j++) {
+            tmpVal = this.doubleValue(indexMin, j);
+            this.set(indexMin, j, this.doubleValue(indexMax, j));
+            this.set(indexMax, j, tmpVal);
         }
 
-        tmpVal = this.doubleValue(tmpMin, tmpMin);
-        this.set(tmpMin, tmpMin, this.doubleValue(tmpMax, tmpMax));
-        this.set(tmpMax, tmpMax, tmpVal);
+        tmpVal = this.doubleValue(indexMin, indexMin);
+        this.set(indexMin, indexMin, this.doubleValue(indexMax, indexMax));
+        this.set(indexMax, indexMax, tmpVal);
 
-        for (int ij = tmpMin + 1; ij < tmpMax; ij++) {
-            tmpVal = this.doubleValue(ij, tmpMin);
-            this.set(ij, tmpMin, this.doubleValue(tmpMax, ij));
-            this.set(tmpMax, ij, tmpVal);
+        for (int ij = indexMin + 1; ij < indexMax; ij++) {
+            tmpVal = this.doubleValue(ij, indexMin);
+            this.set(ij, indexMin, this.doubleValue(indexMax, ij));
+            this.set(indexMax, ij, tmpVal);
         }
 
-        for (int i = tmpMax + 1; i < myRowDim; i++) {
-            tmpVal = this.doubleValue(i, tmpMin);
-            this.set(i, tmpMin, this.doubleValue(i, tmpMax));
-            this.set(i, tmpMax, tmpVal);
+        for (int i = indexMax + 1; i < myRowDim; i++) {
+            tmpVal = this.doubleValue(i, indexMin);
+            this.set(i, indexMin, this.doubleValue(i, indexMax));
+            this.set(i, indexMax, tmpVal);
         }
     }
 

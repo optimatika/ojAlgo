@@ -55,9 +55,9 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new LDLDecomposition.Complex();
+    Factory<ComplexNumber> COMPLEX = typical -> new LDLDecomposition.Complex();
 
-    public static final Factory<Double> PRIMITIVE = typical -> {
+    Factory<Double> PRIMITIVE = typical -> {
         if ((256L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
             return new LDLDecomposition.Primitive();
         } else {
@@ -65,12 +65,12 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         }
     };
 
-    public static final Factory<Quaternion> QUATERNION = typical -> new LDLDecomposition.Quat();
+    Factory<Quaternion> QUATERNION = typical -> new LDLDecomposition.Quat();
 
-    public static final Factory<RationalNumber> RATIONAL = typical -> new LDLDecomposition.Rational();
+    Factory<RationalNumber> RATIONAL = typical -> new LDLDecomposition.Rational();
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> LDL<N> make(final Access2D<N> typical) {
+    static <N extends Number> LDL<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -92,10 +92,14 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
     }
 
     static <N extends Number> MatrixStore<N> reconstruct(final LDL<N> decomposition) {
+
         final MatrixStore<N> tmpL = decomposition.getL();
         final MatrixStore<N> tmpD = decomposition.getD();
         final MatrixStore<N> tmpR = decomposition.getR();
-        return tmpL.multiply(tmpD).multiply(tmpR);
+
+        int[] pivotOrder = decomposition.getPivotOrder();
+
+        return tmpL.multiply(tmpD).multiply(tmpR).logical().row(pivotOrder).column(pivotOrder).get();
     }
 
     default boolean equals(final MatrixStore<N> other, final NumberContext context) {
@@ -103,6 +107,11 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
     }
 
     MatrixStore<N> getD();
+
+    /**
+     * This can be used to create a [P] matrix..
+     */
+    int[] getPivotOrder();
 
     /**
      * Must implement either {@link #getL()} or {@link #getR()}.

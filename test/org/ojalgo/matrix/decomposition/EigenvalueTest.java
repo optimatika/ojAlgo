@@ -68,7 +68,7 @@ public class EigenvalueTest {
 
         TestUtils.assertTrue(MatrixUtils.isHermitian(tmpOriginalMatrix));
 
-        final Eigenvalue<Double>[] tmpDecomps = MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric();
+        final Eigenvalue<Double>[] tmpDecomps = MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric();
         for (final Eigenvalue<Double> tmpDecomp : tmpDecomps) {
             tmpDecomp.decompose(tmpOriginalMatrix);
         }
@@ -250,7 +250,7 @@ public class EigenvalueTest {
 
         final PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
 
-        for (final Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getEigenvaluePrimitiveGeneral()) {
+        for (final Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getPrimitiveEigenvalueGeneral()) {
 
             tmpEigenvalue.decompose(matrix);
 
@@ -274,7 +274,7 @@ public class EigenvalueTest {
 
             final PrimitiveDenseStore matrix = MatrixUtils.makeSPD(dim);
 
-            for (final Eigenvalue<Double> decomp : MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric()) {
+            for (final Eigenvalue<Double> decomp : MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric()) {
 
                 decomp.decompose(matrix);
                 TestUtils.assertEquals(matrix, decomp, evaluationContext);

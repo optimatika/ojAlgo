@@ -170,7 +170,7 @@ public interface Eigenvalue<N extends Number>
                 }
             } else {
                 if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
-                    return new OldGeneralEvD.Primitive();
+                    return new GeneralEvD.Primitive();
                 } else {
                     return new RawEigenvalue.General();
                 }

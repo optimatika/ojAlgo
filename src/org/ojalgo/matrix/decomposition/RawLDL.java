@@ -25,17 +25,20 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.blas.DOT;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 
 final class RawLDL extends RawDecomposition implements LDL<Double> {
 
+    private Pivot myPivot;
     private boolean mySPD = false;
 
     RawLDL() {
@@ -91,6 +94,10 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         final LogicalBuilder<Double> tmpBuilder = tmpRawInPlaceStore.logical();
         final LogicalBuilder<Double> tmpTriangular = tmpBuilder.triangular(false, true);
         return tmpTriangular.get();
+    }
+
+    public int[] getPivotOrder() {
+        return myPivot.getOrder();
     }
 
     public int getRank() {
@@ -162,6 +169,8 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         final int tmpDiagDim = this.getRowDim();
         mySPD = (this.getColDim() == tmpDiagDim);
 
+        myPivot = new Pivot(tmpDiagDim);
+
         final double[] tmpRowIJ = new double[tmpDiagDim];
         double[] tmpRowI;
 
@@ -198,7 +207,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
             preallocated.modifyRow(i, 0, PrimitiveMath.DIVIDE.second(tmpBody.doubleValue(i, i)));
         }
 
-        preallocated.substituteBackwards(tmpBody, true, true, true);
+        preallocated.substituteBackwards(tmpBody, true, true, false);
 
         return preallocated;
     }
@@ -222,6 +231,13 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        return this.isComputed() && this.isSolvable();
+
+        boolean retVal = this.getRowDim() == this.getColDim();
+
+        double largest = this.getRawInPlaceStore().aggregateDiagonal(Aggregator.LARGEST);
+        double smallest = this.getRawInPlaceStore().aggregateDiagonal(Aggregator.SMALLEST);
+
+        return retVal && !PrimitiveScalar.isSmall(largest, smallest);
     }
+
 }

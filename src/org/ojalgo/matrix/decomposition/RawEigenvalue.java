@@ -294,7 +294,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
-        return null;
+        preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
+        return preallocated;
     }
 
     public ComplexNumber getTrace() {
