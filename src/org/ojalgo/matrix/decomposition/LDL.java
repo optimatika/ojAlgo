@@ -38,18 +38,18 @@ import org.ojalgo.type.context.NumberContext;
  * </p>
  * <p>
  * If [A] is symmetric (but not necessarily positive definite) then it can be decomposed into [L][D][L]
- * <sup>T</sup> (or [U]<sup>T</sup>[D][U]).
+ * <sup>T</sup> (or [R]<sup>H</sup>[D][R]).
  * </p>
  * <ul>
  * <li>[L] is a unit lower (left) triangular matrix. It has the same dimensions as [this], and ones on the
  * diagonal.</li>
  * <li>[D] is a diagonal matrix. It has the same dimensions as [this].</li>
- * <li>[this] = [L][D][L]<sup>T</sup></li>
+ * <li>[this] = [L][D][L]<sup>H</sup></li>
  * </ul>
  *
  * @author apete
  */
-public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermitian<N> {
+public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Pivoting<N> {
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<LDL<N>> {
 
@@ -102,16 +102,7 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         return tmpL.multiply(tmpD).multiply(tmpR).logical().row(pivotOrder).column(pivotOrder).get();
     }
 
-    default boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        return LDL.equals(other, this, context);
-    }
-
     MatrixStore<N> getD();
-
-    /**
-     * This can be used to create a [P] matrix..
-     */
-    int[] getPivotOrder();
 
     /**
      * Must implement either {@link #getL()} or {@link #getR()}.
@@ -125,10 +116,6 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
      */
     default MatrixStore<N> getR() {
         return this.getL().conjugate();
-    }
-
-    default boolean isFullSize() {
-        return true;
     }
 
     default MatrixStore<N> reconstruct() {

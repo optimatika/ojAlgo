@@ -86,6 +86,11 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.getDeterminant();
     }
 
+    public boolean computeWithoutPivoting(Collectable<N, ? super PhysicalStore<N>> matrix) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
     public boolean computeWithoutPivoting(final ElementsSupplier<N> matrix) {
         return this.compute(matrix, true);
     }
@@ -218,6 +223,10 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     public boolean isFullRank() {
         return this.isSolvable();
+    }
+
+    public boolean isPivoted() {
+        return myPivot.isModified();
     }
 
     public PhysicalStore<N> preallocate(final Structure2D template) {

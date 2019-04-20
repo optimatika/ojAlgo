@@ -26,12 +26,12 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.decomposition.MatrixDecomposition;
+import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
-public final class InverterTest extends MatrixTaskTests {
+public class InverterTest extends MatrixTaskTests {
 
     @Test
     public void testFull2X2() {
@@ -78,25 +78,21 @@ public final class InverterTest extends MatrixTaskTests {
         this.doCompare(AbstractInverter.SYMMETRIC_5X5, 5);
     }
 
-    private void doCompare(final InverterTask<Double> fixed, final int dimension) {
+    private void doCompare(InverterTask<Double> fixed, int dimension) {
 
         try {
 
-            final MatrixStore<Double> matrix = PrimitiveDenseStore.FACTORY.makeSPD(dimension);
+            MatrixStore<Double> matrix = PrimitiveDenseStore.FACTORY.makeSPD(dimension);
 
-            final MatrixStore<Double> expInv = fixed.invert(matrix);
+            MatrixStore<Double> expInv = fixed.invert(matrix);
 
-            final List<MatrixDecomposition<Double>> decompList = MatrixDecompositionTests.getPrimitiveAll();
-            for (final MatrixDecomposition<Double> decomp : decompList) {
-                if (decomp instanceof InverterTask) {
-                    @SuppressWarnings("unchecked")
-                    final InverterTask<Double> task = (InverterTask<Double>) decomp;
-                    final MatrixStore<Double> actInv = task.invert(matrix);
-                    TestUtils.assertEquals(decomp.getClass().getName(), expInv, actInv);
-                }
+            List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();
+            for (Solver<Double> decomp : all) {
+                MatrixStore<Double> actInv = decomp.invert(matrix);
+                TestUtils.assertEquals(decomp.getClass().getName(), expInv, actInv);
             }
 
-        } catch (final RecoverableCondition exception) {
+        } catch (RecoverableCondition exception) {
             TestUtils.fail(exception.getMessage());
         }
     }

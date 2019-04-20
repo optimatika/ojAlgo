@@ -27,8 +27,6 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Raw2D;
 import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -51,31 +49,31 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     public Double calculateDeterminant(final Access2D<?> matrix) {
 
-        final double[][] tmpData = this.reset(matrix, false);
+        final double[][] data = this.reset(matrix, false);
 
         this.getRawInPlaceStore().fillMatching(matrix);
 
-        this.doDecompose(tmpData);
+        this.doDecompose(data, true);
 
         return this.getDeterminant();
     }
 
-    public boolean computeWithoutPivoting(final ElementsSupplier<Double> matrix) {
+    public boolean computeWithoutPivoting(Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
-        final double[][] tmpData = this.reset(matrix, false);
+        final double[][] data = this.reset(matrix, false);
 
         matrix.supplyTo(this.getRawInPlaceStore());
 
-        return this.doDecompose(tmpData);
+        return this.doDecompose(data, false);
     }
 
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
-        final double[][] tmpData = this.reset(matrix, false);
+        final double[][] data = this.reset(matrix, false);
 
         matrix.supplyTo(this.getRawInPlaceStore());
 
-        return this.doDecompose(tmpData);
+        return this.doDecompose(data, true);
     }
 
     public Double getDeterminant() {
@@ -150,7 +148,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         this.getRawInPlaceStore().fillMatching(original);
 
-        this.doDecompose(tmpData);
+        this.doDecompose(tmpData, true);
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
@@ -179,6 +177,10 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return true;
     }
 
+    public boolean isPivoted() {
+        return myPivot.isModified();
+    }
+
     public PhysicalStore<Double> preallocate(final Structure2D template) {
         return this.allocate(template.countRows(), template.countRows());
     }
@@ -202,7 +204,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         this.getRawInPlaceStore().fillMatching(body);
 
-        this.doDecompose(tmpData);
+        this.doDecompose(tmpData, true);
 
         if (this.isSolvable()) {
 
@@ -217,47 +219,53 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     /**
      * Use a "left-looking", dot-product, Crout/Doolittle algorithm, essentially copied from JAMA.
+     *
+     * @param pivot TODO
      */
-    private boolean doDecompose(final double[][] data) {
+    private boolean doDecompose(final double[][] data, boolean pivot) {
 
-        final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = this.getColDim();
+        final int numbRows = this.getRowDim();
+        final int numbCols = this.getColDim();
 
-        myPivot = new Pivot(tmpRowDim);
+        myPivot = new Pivot(numbRows);
 
-        final double[] tmpColJ = new double[tmpRowDim];
+        final double[] colJ = new double[numbRows];
 
         // Outer loop.
-        for (int j = 0; j < tmpColDim; j++) {
+        for (int j = 0; j < numbCols; j++) {
 
             // Make a copy of the j-th column to localize references.
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpColJ[i] = data[i][j];
+            for (int i = 0; i < numbRows; i++) {
+                colJ[i] = data[i][j];
             }
 
             // Apply previous transformations.
-            for (int i = 0; i < tmpRowDim; i++) {
+            for (int i = 0; i < numbRows; i++) {
                 // Most of the time is spent in the following dot product.
-                data[i][j] = tmpColJ[i] -= DOT.invoke(data[i], 0, tmpColJ, 0, 0, Math.min(i, j));
+                data[i][j] = colJ[i] -= DOT.invoke(data[i], 0, colJ, 0, 0, Math.min(i, j));
             }
 
-            // Find pivot and exchange if necessary.
-            int p = j;
-            for (int i = j + 1; i < tmpRowDim; i++) {
-                if (PrimitiveMath.ABS.invoke(tmpColJ[i]) > PrimitiveMath.ABS.invoke(tmpColJ[p])) {
-                    p = i;
+            if (pivot) {
+                // Find pivot and exchange if necessary.
+                int p = j;
+                double valP = ABS.invoke(colJ[p]);
+                for (int i = j + 1; i < numbRows; i++) {
+                    if (ABS.invoke(colJ[i]) > valP) {
+                        p = i;
+                        valP = ABS.invoke(colJ[i]);
+                    }
                 }
-            }
-            if (p != j) {
-                Raw2D.exchangeRows(data, j, p);
-                myPivot.change(j, p);
+                if (p != j) {
+                    Raw2D.exchangeRows(data, j, p);
+                    myPivot.change(j, p);
+                }
             }
 
             // Compute multipliers.
-            if (j < tmpRowDim) {
+            if (j < numbRows) {
                 final double tmpVal = data[j][j];
                 if (tmpVal != ZERO) {
-                    for (int i = j + 1; i < tmpRowDim; i++) {
+                    for (int i = j + 1; i < numbRows; i++) {
                         data[i][j] /= tmpVal;
                     }
                 }

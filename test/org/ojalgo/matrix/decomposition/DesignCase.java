@@ -293,6 +293,7 @@ public class DesignCase {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("Original", matrix);
+            BasicLogger.debug("Solver: {}", solver.getClass());
         }
 
         solver.decompose(matrix);

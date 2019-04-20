@@ -27,7 +27,7 @@ import java.util.Random;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.decomposition.MatrixDecomposition;
+import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -153,19 +153,15 @@ public class SolverTest extends MatrixTaskTests {
 
         try {
 
-            MatrixStore<Double> tmpBody = PrimitiveDenseStore.FACTORY.makeSPD(dimension);
-            MatrixStore<Double> tmpRHS = PrimitiveDenseStore.FACTORY.makeFilled(dimension, 1L, new Uniform());
+            MatrixStore<Double> body = PrimitiveDenseStore.FACTORY.makeSPD(dimension);
+            MatrixStore<Double> rhs = PrimitiveDenseStore.FACTORY.makeFilled(dimension, 1L, new Uniform());
 
-            MatrixStore<Double> tmpExpSol = fixed.solve(tmpBody, tmpRHS);
+            MatrixStore<Double> expSol = fixed.solve(body, rhs);
 
-            List<MatrixDecomposition<Double>> decompList = MatrixDecompositionTests.getPrimitiveAll();
-            for (MatrixDecomposition<Double> decomp : decompList) {
-                if (decomp instanceof SolverTask) {
-                    @SuppressWarnings("unchecked")
-                    SolverTask<Double> tmpTask = (SolverTask<Double>) decomp;
-                    MatrixStore<Double> tmpActSol = tmpTask.solve(tmpBody, tmpRHS);
-                    TestUtils.assertEquals(decomp.getClass().getName(), tmpExpSol, tmpActSol);
-                }
+            List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();
+            for (Solver<Double> decomp : all) {
+                MatrixStore<Double> actSol = decomp.solve(body, rhs);
+                TestUtils.assertEquals(decomp.getClass().getName(), expSol, actSol);
             }
 
         } catch (RecoverableCondition exception) {

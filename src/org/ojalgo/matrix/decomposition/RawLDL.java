@@ -133,6 +133,10 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return this.getRank() == this.getMinDim();
     }
 
+    public boolean isPivoted() {
+        return myPivot.isModified();
+    }
+
     public boolean isSPD() {
         return mySPD;
     }
@@ -238,6 +242,11 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         double smallest = this.getRawInPlaceStore().aggregateDiagonal(Aggregator.SMALLEST);
 
         return retVal && !PrimitiveScalar.isSmall(largest, smallest);
+    }
+
+    public boolean computeWithoutPivoting(Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

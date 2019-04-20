@@ -21,7 +21,10 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Arrays;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -59,6 +62,19 @@ public class LDLTest {
     }
 
     @Test
+    @Disabled
+    public void testQuadOptKTHPivot() {
+
+        RawStore mtrxA = new RawStore(new double[][] { { 2, 4, 6, 8 }, { 4, 9, 17, 22 }, { 6, 17, 44, 61 }, { 8, 22, 61, 118 } });
+        RawStore mtrxL = new RawStore(new double[][] { { 1, 0, 0, 0 }, { 2, 1, 0, 0 }, { 3, 5, 1, 0 }, { 4, 6, 7, 1 } });
+        RawStore mtrxD = new RawStore(new double[][] { { 2, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } });
+
+        MatrixStore<Double> permA = mtrxA.logical().row(3, 2, 1, 0).column(3, 2, 1, 0).get();
+
+        this.doTest(permA, mtrxL, mtrxD);
+    }
+
+    @Test
     public void testWikipediaCasePrePivoted() {
 
         RawStore mtrxA = new RawStore(new double[][] { { 98, -43, -16 }, { -43, 37, 12 }, { -16, 12, 4 } });
@@ -69,7 +85,7 @@ public class LDLTest {
         this.doTest(mtrxA, mtrxL, mtrxD);
     }
 
-    private void doTest(RawStore mtrxA, RawStore mtrxL, RawStore mtrxD) {
+    private void doTest(MatrixStore<Double> mtrxA, RawStore mtrxL, RawStore mtrxD) {
 
         MatrixStore<Double> mtrxIdentity = MatrixStore.PRIMITIVE.makeIdentity((int) mtrxA.countRows()).get();
 
@@ -80,27 +96,31 @@ public class LDLTest {
         rawLDL.decompose(mtrxA);
 
         LDL<Double> primLDL = new LDLDecomposition.Primitive();
-        primLDL.decompose(mtrxA);
+        primLDL.decompose(mtrxA.logical().triangular(false, false).get());
 
         if (MatrixDecompositionTests.DEBUG) {
 
             BasicLogger.debug("Expected L", mtrxL);
             BasicLogger.debug("Expected D", mtrxD);
 
-            BasicLogger.debug("RAW P", rawLDL.getPivotOrder());
+            BasicLogger.debug("RAW P: {}", Arrays.toString(rawLDL.getPivotOrder()));
             BasicLogger.debug("RAW L", rawLDL.getL());
             BasicLogger.debug("RAW D", rawLDL.getD());
 
-            BasicLogger.debug("PRIM P", primLDL.getPivotOrder());
+            BasicLogger.debug("PRIM P: {}", Arrays.toString(primLDL.getPivotOrder()));
             BasicLogger.debug("PRIM L", primLDL.getL());
             BasicLogger.debug("PRIM D", primLDL.getD());
         }
 
-        TestUtils.assertEquals(mtrxL, rawLDL.getL());
-        TestUtils.assertEquals(mtrxD, rawLDL.getD());
+        if (!rawLDL.isPivoted()) {
+            TestUtils.assertEquals(mtrxL, rawLDL.getL());
+            TestUtils.assertEquals(mtrxD, rawLDL.getD());
+        }
 
-        //        TestUtils.assertEquals(mtrxL, primLDL.getL());
-        //        TestUtils.assertEquals(mtrxD, primLDL.getD());
+        if (!primLDL.isPivoted()) {
+            TestUtils.assertEquals(mtrxL, primLDL.getL());
+            TestUtils.assertEquals(mtrxD, primLDL.getD());
+        }
 
         TestUtils.assertEquals(mtrxA, rawLDL.reconstruct());
         TestUtils.assertEquals(mtrxA, primLDL.reconstruct());

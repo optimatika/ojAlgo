@@ -150,6 +150,22 @@ public interface MatrixDecomposition<N extends Number> {
 
     }
 
+    interface Pivoting<N extends Number> extends MatrixDecomposition<N> {
+
+        boolean isPivoted();
+
+        int[] getPivotOrder();
+
+        /**
+         * The normal {@link #decompose(Access2D.Collectable)} method must handle cases where pivoting is
+         * required. If you know that pivoting is not needed you may call this method instead - it may be
+         * faster. Note that the algorithm implementation may still pivot. Pivoting is optional not forbidden
+         * (or required).
+         */
+        boolean computeWithoutPivoting(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);
+
+    }
+
     /**
      * A rank-revealing matrix decomposition of a matrix [A] is a decomposition that is, or can be transformed
      * to be, on the form [A]=[X][D][Y]<sup>T</sup> where:
@@ -276,7 +292,7 @@ public interface MatrixDecomposition<N extends Number> {
 
     }
 
-    static final Structure2D TYPICAL = new Structure2D() {
+    Structure2D TYPICAL = new Structure2D() {
 
         public long countColumns() {
             return 50L;

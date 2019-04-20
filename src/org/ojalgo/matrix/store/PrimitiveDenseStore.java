@@ -582,24 +582,23 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public void applyLDL(final int iterationPoint, final BasicArray<Double> multipliers) {
 
-        final double[] tmpData = data;
-        final double[] tmpColumn = ((Primitive64Array) multipliers).data;
+        final double[] column = ((Primitive64Array) multipliers).data;
 
         if ((myColDim - iterationPoint - 1) > ApplyLDL.THRESHOLD) {
 
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+            final DivideAndConquer conquerer = new DivideAndConquer() {
 
                 @Override
                 protected void conquer(final int first, final int limit) {
-                    ApplyLDL.invoke(tmpData, myRowDim, first, limit, tmpColumn, iterationPoint);
+                    ApplyLDL.invoke(data, myRowDim, first, limit, column, iterationPoint);
                 }
             };
 
-            tmpConquerer.invoke(iterationPoint + 1, myColDim, ApplyLDL.THRESHOLD);
+            conquerer.invoke(iterationPoint + 1, myColDim, ApplyLDL.THRESHOLD);
 
         } else {
 
-            ApplyLDL.invoke(tmpData, myRowDim, iterationPoint + 1, myColDim, tmpColumn, iterationPoint);
+            ApplyLDL.invoke(data, myRowDim, iterationPoint + 1, myColDim, column, iterationPoint);
         }
     }
 
@@ -724,6 +723,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         final int indexMax = Math.max(indexA, indexB);
 
         double tmpVal;
+
         for (int j = 0; j < indexMin; j++) {
             tmpVal = this.doubleValue(indexMin, j);
             this.set(indexMin, j, this.doubleValue(indexMax, j));
@@ -745,6 +745,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             this.set(i, indexMin, this.doubleValue(i, indexMax));
             this.set(i, indexMax, tmpVal);
         }
+
     }
 
     public void exchangeRows(final long rowA, final long rowB) {

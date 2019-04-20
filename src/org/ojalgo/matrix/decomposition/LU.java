@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -52,15 +51,15 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface LU<N extends Number> extends LDU<N> {
+public interface LU<N extends Number> extends LDU<N>, MatrixDecomposition.Pivoting<N> {
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<LU<N>> {
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new LUDecomposition.Complex();
+    Factory<ComplexNumber> COMPLEX = typical -> new LUDecomposition.Complex();
 
-    public static final Factory<Double> PRIMITIVE = typical -> {
+    Factory<Double> PRIMITIVE = typical -> {
         if ((16L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
             return new LUDecomposition.Primitive();
         } else {
@@ -68,12 +67,12 @@ public interface LU<N extends Number> extends LDU<N> {
         }
     };
 
-    public static final Factory<Quaternion> QUATERNION = typical -> new LUDecomposition.Quat();
+    Factory<Quaternion> QUATERNION = typical -> new LUDecomposition.Quat();
 
-    public static final Factory<RationalNumber> RATIONAL = typical -> new LUDecomposition.Rational();
+    Factory<RationalNumber> RATIONAL = typical -> new LUDecomposition.Rational();
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> LU<N> make(final Access2D<N> typical) {
+    static <N extends Number> LU<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -103,22 +102,7 @@ public interface LU<N extends Number> extends LDU<N> {
         return decomposition.getL().multiply(decomposition.getU()).logical().row(decomposition.getPivotOrder()).get();
     }
 
-    /**
-     * The normal {@link #decompose(Access2D.Collectable)} method must handle cases where pivoting is
-     * required. If you know that pivoting is not needed you may call this method instead - it may be faster.
-     * Note that the algorithm implementation may still pivot. Pivoting is optional not forbidden (or
-     * required).
-     */
-    boolean computeWithoutPivoting(ElementsSupplier<N> matrix);
-
     MatrixStore<N> getL();
-
-    /**
-     * This can be used to create a [P] matrix..
-     */
-    int[] getPivotOrder();
-
-    int getRank();
 
     /**
      * http://en.wikipedia.org/wiki/Row_echelon_form <br>
