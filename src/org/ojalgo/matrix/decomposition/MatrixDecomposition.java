@@ -150,17 +150,45 @@ public interface MatrixDecomposition<N extends Number> {
 
     }
 
+    /**
+     * <p>
+     * The pivot or pivot element is the element of a matrix, or an array, which is selected first by an
+     * algorithm (e.g. Gaussian elimination, simplex algorithm, etc.), to do certain calculations. In the case
+     * of matrix algorithms, a pivot entry is usually required to be at least distinct from zero, and often
+     * distant from it; in this case finding this element is called pivoting. Pivoting may be followed by an
+     * interchange of rows or columns to bring the pivot to a fixed position and allow the algorithm to
+     * proceed successfully, and possibly to reduce round-off error. It is often used for verifying row
+     * echelon form.
+     * </p>
+     * <p>
+     * Pivoting might be thought of as swapping or sorting rows or columns in a matrix, and thus it can be
+     * represented as multiplication by permutation matrices. However, algorithms rarely move the matrix
+     * elements because this would cost too much time; instead, they just keep track of the permutations.
+     * </p>
+     * <p>
+     * Overall, pivoting adds more operations to the computational cost of an algorithm. These additional
+     * operations are sometimes necessary for the algorithm to work at all. Other times these additional
+     * operations are worthwhile because they add numerical stability to the final result.
+     * </p>
+     *
+     * @author apete
+     */
     interface Pivoting<N extends Number> extends MatrixDecomposition<N> {
 
+        /**
+         * @return true if any pivoting was actually done
+         */
         boolean isPivoted();
 
+        /**
+         * @return The pivot (row,columnn or diagonal) order
+         */
         int[] getPivotOrder();
 
         /**
          * The normal {@link #decompose(Access2D.Collectable)} method must handle cases where pivoting is
          * required. If you know that pivoting is not needed you may call this method instead - it may be
-         * faster. Note that the algorithm implementation may still pivot. Pivoting is optional not forbidden
-         * (or required).
+         * faster.
          */
         boolean computeWithoutPivoting(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);
 
