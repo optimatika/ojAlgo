@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -71,6 +72,15 @@ public interface LU<N extends Number> extends LDU<N>, MatrixDecomposition.Pivoti
 
     Factory<RationalNumber> RATIONAL = typical -> new LUDecomposition.Rational();
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
+
+        final MatrixStore<N> tmpL = decomposition.getL();
+        final MatrixStore<N> tmpU = decomposition.getU();
+        final int[] tmpPivotOrder = decomposition.getPivotOrder();
+
+        return Access2D.equals(matrix.logical().row(tmpPivotOrder).get(), tmpL.multiply(tmpU), context);
+    }
+
     @SuppressWarnings("unchecked")
     static <N extends Number> LU<N> make(final Access2D<N> typical) {
 
@@ -89,17 +99,16 @@ public interface LU<N extends Number> extends LDU<N>, MatrixDecomposition.Pivoti
         }
     }
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpL = decomposition.getL();
-        final MatrixStore<N> tmpU = decomposition.getU();
-        final int[] tmpPivotOrder = decomposition.getPivotOrder();
-
-        return Access2D.equals(matrix.logical().row(tmpPivotOrder).get(), tmpL.multiply(tmpU), context);
-    }
-
     static <N extends Number> MatrixStore<N> reconstruct(final LU<N> decomposition) {
         return decomposition.getL().multiply(decomposition.getU()).logical().row(decomposition.getPivotOrder()).get();
+    }
+
+    /**
+     * @deprecated v48 Use {@link #decomposeWithoutPivoting(Access2D.Collectable)} instead.
+     */
+    @Deprecated
+    default boolean computeWithoutPivoting(final ElementsSupplier<N> matrix) {
+        return this.decomposeWithoutPivoting(matrix) && this.isSolvable();
     }
 
     MatrixStore<N> getL();

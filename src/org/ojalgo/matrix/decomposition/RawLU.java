@@ -58,15 +58,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.getDeterminant();
     }
 
-    public boolean computeWithoutPivoting(Collectable<Double, ? super PhysicalStore<Double>> matrix) {
-
-        final double[][] data = this.reset(matrix, false);
-
-        matrix.supplyTo(this.getRawInPlaceStore());
-
-        return this.doDecompose(data, false);
-    }
-
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
         final double[][] data = this.reset(matrix, false);
@@ -74,6 +65,15 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         matrix.supplyTo(this.getRawInPlaceStore());
 
         return this.doDecompose(data, true);
+    }
+
+    public boolean decomposeWithoutPivoting(Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+
+        final double[][] data = this.reset(matrix, false);
+
+        matrix.supplyTo(this.getRawInPlaceStore());
+
+        return this.doDecompose(data, false);
     }
 
     public Double getDeterminant() {
@@ -219,10 +219,8 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     /**
      * Use a "left-looking", dot-product, Crout/Doolittle algorithm, essentially copied from JAMA.
-     *
-     * @param pivot TODO
      */
-    private boolean doDecompose(final double[][] data, boolean pivot) {
+    private boolean doDecompose(final double[][] data, boolean pivoting) {
 
         final int numbRows = this.getRowDim();
         final int numbCols = this.getColDim();
@@ -245,7 +243,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
                 data[i][j] = colJ[i] -= DOT.invoke(data[i], 0, colJ, 0, 0, Math.min(i, j));
             }
 
-            if (pivot) {
+            if (pivoting) {
                 // Find pivot and exchange if necessary.
                 int p = j;
                 double valP = ABS.invoke(colJ[p]);

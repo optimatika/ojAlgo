@@ -26,7 +26,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -47,22 +46,21 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
 
     public Double calculateDeterminant(final Access2D<?> matrix) {
 
-        final double[][] retVal = this.reset(matrix, false);
+        final double[][] data = this.reset(matrix, false);
 
-        this.doDecompose(retVal, matrix);
+        this.doDecompose(data, matrix, false);
 
         return this.getDeterminant();
     }
 
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
-        final double[][] retVal = this.reset(matrix, false);
+        final double[][] data = this.reset(matrix, false);
 
-        final RawStore tmpRawInPlaceStore = this.getRawInPlaceStore();
+        final RawStore store = this.getRawInPlaceStore();
+        matrix.supplyTo(store);
 
-        matrix.supplyTo(tmpRawInPlaceStore);
-
-        return this.doDecompose(retVal, tmpRawInPlaceStore);
+        return this.doDecompose(data, store, false);
     }
 
     public MatrixStore<Double> getD() {
@@ -118,9 +116,9 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     @Override
     public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
-        final double[][] retVal = this.reset(original, false);
+        final double[][] data = this.reset(original, false);
 
-        this.doDecompose(retVal, original);
+        this.doDecompose(data, original, false);
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
@@ -156,42 +154,62 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
-        final double[][] retVal = this.reset(body, false);
+        final double[][] data = this.reset(body, false);
 
-        this.doDecompose(retVal, body);
+        this.doDecompose(data, body, false);
 
         if (this.isSolvable()) {
-
             return this.doSolve(MatrixStore.PRIMITIVE.makeWrapper(rhs), preallocated);
         } else {
             throw RecoverableCondition.newEquationSystemNotSolvable();
         }
     }
 
-    private boolean doDecompose(final double[][] data, final Access2D<?> input) {
+    /**
+     * Copy while decomposing, but the source and destination could already be the same storage.
+     */
+    private boolean doDecompose(final double[][] destination, final Access2D<?> source, boolean pivoting) {
 
-        final int tmpDiagDim = this.getRowDim();
-        mySPD = (this.getColDim() == tmpDiagDim);
+        int dim = this.getRowDim();
+        mySPD = (this.getColDim() == dim);
 
-        myPivot = new Pivot(tmpDiagDim);
+        myPivot = new Pivot(dim);
 
-        final double[] tmpRowIJ = new double[tmpDiagDim];
-        double[] tmpRowI;
+        final double[] rowIJ = new double[dim];
+        double[] rowI;
 
         // Main loop.
-        for (int ij = 0; ij < tmpDiagDim; ij++) { // For each row/column, along the diagonal
-            tmpRowI = data[ij];
+        for (int ij = 0; ij < dim; ij++) { // For each row/column, along the diagonal
+            rowI = destination[ij];
 
             for (int j = 0; j < ij; j++) {
-                tmpRowIJ[j] = tmpRowI[j] * data[j][j];
+                rowIJ[j] = rowI[j] * destination[j][j];
             }
-            final double tmpD = tmpRowI[ij] = input.doubleValue(ij, ij) - DOT.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij);
+
+            if (pivoting) {
+                int pivotRow = ij;
+                // Find next pivot row
+                for (int p = ij; p < dim; p++) {
+                    if (!PrimitiveScalar.isSmall(ONE, source.doubleValue(p, p))) {
+                        pivotRow = p;
+                        break;
+                    }
+                }
+
+                // Pivot?
+                if (pivotRow != ij) {
+                    this.exchangeHermitian(this.getRawInPlaceStore(), pivotRow, ij);
+                    myPivot.change(pivotRow, ij);
+                }
+            }
+
+            final double tmpD = rowI[ij] = source.doubleValue(ij, ij) - DOT.invoke(rowI, 0, rowIJ, 0, 0, ij);
             mySPD &= (tmpD > ZERO);
 
-            for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
-                tmpRowI = data[i];
+            for (int i = ij + 1; i < dim; i++) { // Update column below current row
+                rowI = destination[i];
 
-                tmpRowI[ij] = (input.doubleValue(i, ij) - DOT.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij)) / tmpD;
+                rowI[ij] = (source.doubleValue(i, ij) - DOT.invoke(rowI, 0, rowIJ, 0, 0, ij)) / tmpD;
             }
         }
 
@@ -208,7 +226,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         preallocated.substituteForwards(tmpBody, true, false, true);
 
         for (int i = 0; i < preallocated.countRows(); i++) {
-            preallocated.modifyRow(i, 0, PrimitiveMath.DIVIDE.second(tmpBody.doubleValue(i, i)));
+            preallocated.modifyRow(i, 0, DIVIDE.second(tmpBody.doubleValue(i, i)));
         }
 
         preallocated.substituteBackwards(tmpBody, true, true, false);
@@ -225,7 +243,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         preallocated.substituteForwards(tmpBody, true, false, false);
 
         for (int i = 0; i < preallocated.countRows(); i++) {
-            preallocated.modifyRow(i, 0, PrimitiveMath.DIVIDE.second(tmpBody.doubleValue(i, i)));
+            preallocated.modifyRow(i, 0, DIVIDE.second(tmpBody.doubleValue(i, i)));
         }
 
         preallocated.substituteBackwards(tmpBody, true, true, false);
@@ -244,9 +262,40 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return retVal && !PrimitiveScalar.isSmall(largest, smallest);
     }
 
-    public boolean computeWithoutPivoting(Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    public boolean decomposeWithoutPivoting(Collectable<Double, ? super PhysicalStore<Double>> matrix) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    public void exchangeHermitian(RawStore matrix, final int indexA, final int indexB) {
+
+        final int indexMin = Math.min(indexA, indexB);
+        final int indexMax = Math.max(indexA, indexB);
+
+        double tmpVal;
+
+        for (int j = 0; j < indexMin; j++) {
+            tmpVal = matrix.doubleValue(indexMin, j);
+            matrix.set(indexMin, j, matrix.doubleValue(indexMax, j));
+            matrix.set(indexMax, j, tmpVal);
+        }
+
+        tmpVal = matrix.doubleValue(indexMin, indexMin);
+        matrix.set(indexMin, indexMin, matrix.doubleValue(indexMax, indexMax));
+        matrix.set(indexMax, indexMax, tmpVal);
+
+        for (int ij = indexMin + 1; ij < indexMax; ij++) {
+            tmpVal = matrix.doubleValue(ij, indexMin);
+            matrix.set(ij, indexMin, matrix.doubleValue(indexMax, ij));
+            matrix.set(indexMax, ij, tmpVal);
+        }
+
+        for (int i = indexMax + 1; i < matrix.countRows(); i++) {
+            tmpVal = matrix.doubleValue(i, indexMin);
+            matrix.set(i, indexMin, matrix.doubleValue(i, indexMax));
+            matrix.set(i, indexMax, tmpVal);
+        }
+
     }
 
 }

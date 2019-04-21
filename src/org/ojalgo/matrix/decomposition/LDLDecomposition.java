@@ -87,7 +87,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return this.getDeterminant();
     }
 
-    public boolean computeWithoutPivoting(Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decomposeWithoutPivoting(Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, false);
     }
 

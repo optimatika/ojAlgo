@@ -29,7 +29,6 @@ import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -312,7 +311,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             nrm = ZERO;
             for (int i = k; i < m; i++) {
                 final double a = nrm;
-                nrm = PrimitiveMath.HYPOT.invoke(a, tmpColK[i]);
+                nrm = HYPOT.invoke(a, tmpColK[i]);
             }
 
             if (nrm != ZERO) {

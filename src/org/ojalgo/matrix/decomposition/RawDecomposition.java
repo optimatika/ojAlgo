@@ -21,7 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.function.constant.PrimitiveMath;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -80,7 +81,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
     @Override
     protected double getDimensionalEpsilon() {
-        return this.getMaxDim() * PrimitiveMath.MACHINE_EPSILON;
+        return this.getMaxDim() * MACHINE_EPSILON;
     }
 
     protected int getMaxDim() {

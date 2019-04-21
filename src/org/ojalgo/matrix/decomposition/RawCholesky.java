@@ -25,8 +25,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.blas.DOT;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -59,7 +57,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     public boolean checkAndCompute(final MatrixStore<Double> matrix) {
 
-        mySPD = MatrixUtils.isHermitian(matrix);
+        mySPD = matrix.isHermitian();
 
         if (mySPD) {
 
@@ -115,7 +113,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     public int getRank() {
 
-        final double tolerance = PrimitiveMath.SQRT.invoke(this.getAlgorithmEpsilon());
+        final double tolerance = SQRT.invoke(this.getAlgorithmEpsilon());
         int rank = 0;
 
         final RawStore inPlaceStore = this.getRawInPlaceStore();
@@ -204,10 +202,10 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         for (int ij = 0; mySPD && (ij < tmpDiagDim); ij++) { // For each row/column, along the diagonal
             tmpRowIJ = data[ij];
 
-            tmpVal = PrimitiveMath.MAX.invoke(input.doubleValue(ij, ij) - DOT.invoke(tmpRowIJ, 0, tmpRowIJ, 0, 0, ij), ZERO);
-            myMaxDiag = PrimitiveMath.MAX.invoke(myMaxDiag, tmpVal);
-            myMinDiag = PrimitiveMath.MIN.invoke(myMinDiag, tmpVal);
-            tmpVal = tmpRowIJ[ij] = PrimitiveMath.SQRT.invoke(tmpVal);
+            tmpVal = MAX.invoke(input.doubleValue(ij, ij) - DOT.invoke(tmpRowIJ, 0, tmpRowIJ, 0, 0, ij), ZERO);
+            myMaxDiag = MAX.invoke(myMaxDiag, tmpVal);
+            myMinDiag = MIN.invoke(myMinDiag, tmpVal);
+            tmpVal = tmpRowIJ[ij] = SQRT.invoke(tmpVal);
             mySPD = mySPD && (tmpVal > ZERO);
 
             for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
