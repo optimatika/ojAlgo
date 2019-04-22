@@ -254,9 +254,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         final double[][] input = this.reset(matrix, !myTransposed);
 
         if (myTransposed) {
-            matrix.supplyTo(this.getRawInPlaceStore());
+            matrix.supplyTo(this.getInternalStore());
         } else {
-            this.collect(matrix).transpose().supplyTo(this.getRawInPlaceStore());
+            this.collect(matrix).transpose().supplyTo(this.getInternalStore());
         }
 
         m = this.getMaxDim();

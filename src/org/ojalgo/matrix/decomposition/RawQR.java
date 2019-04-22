@@ -69,7 +69,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         final double[][] retVal = this.reset(matrix, true);
 
-        MatrixStore.PRIMITIVE.makeWrapper(matrix).transpose().supplyTo(this.getRawInPlaceStore());
+        MatrixStore.PRIMITIVE.makeWrapper(matrix).transpose().supplyTo(this.getInternalStore());
 
         this.doDecompose(retVal);
 
@@ -88,7 +88,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         final double[][] retVal = this.reset(matrix, true);
 
         // TODO Handle case with non Stream2D
-        ((Stream2D) matrix).transpose().supplyTo(this.getRawInPlaceStore());
+        ((Stream2D) matrix).transpose().supplyTo(this.getInternalStore());
 
         return this.doDecompose(retVal);
     }
@@ -125,7 +125,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         final int m = this.getRowDim();
         final int n = this.getColDim();
 
-        final double[][] tmpData = this.getRawInPlaceData();
+        final double[][] tmpData = this.getInternalData();
 
         final RawStore retVal = new RawStore(m, n);
         final double[][] retData = retVal.data;
@@ -160,7 +160,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         final int tmpColDim = this.getColDim();
 
-        final double[][] tmpData = this.getRawInPlaceData();
+        final double[][] tmpData = this.getInternalData();
 
         final RawStore retVal = new RawStore(tmpColDim, tmpColDim);
         final double[][] retData = retVal.data;
@@ -215,7 +215,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         final double[][] tmpData = this.reset(MatrixStore.PRIMITIVE.makeWrapper(original), true);
 
-        MatrixStore.PRIMITIVE.makeWrapper(original).transpose().supplyTo(this.getRawInPlaceStore());
+        MatrixStore.PRIMITIVE.makeWrapper(original).transpose().supplyTo(this.getInternalStore());
 
         this.doDecompose(tmpData);
 
@@ -276,7 +276,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         final double[][] tmpData = this.reset(body, true);
 
-        MatrixStore.PRIMITIVE.makeWrapper(body).transpose().supplyTo(this.getRawInPlaceStore());
+        MatrixStore.PRIMITIVE.makeWrapper(body).transpose().supplyTo(this.getInternalStore());
 
         this.doDecompose(tmpData);
 
@@ -363,7 +363,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             throw new RuntimeException("RawStore is rank deficient.");
         }
 
-        final double[][] tmpData = this.getRawInPlaceData();
+        final double[][] tmpData = this.getInternalData();
 
         double[] tmpColK;
 

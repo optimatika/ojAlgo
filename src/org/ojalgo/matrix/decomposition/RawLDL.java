@@ -46,30 +46,68 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
 
     public Double calculateDeterminant(final Access2D<?> matrix) {
 
-        final double[][] data = this.reset(matrix, false);
+        double[][] data = this.reset(matrix, false);
+        this.wrap(matrix).supplyTo(this.getInternalStore());
 
-        this.doDecompose(data, matrix, false);
+        this.doDecompose(data, this.getInternalStore(), true);
 
         return this.getDeterminant();
     }
 
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
-        final double[][] data = this.reset(matrix, false);
+        double[][] data = this.reset(matrix, false);
+        matrix.supplyTo(this.getInternalStore());
 
-        final RawStore store = this.getRawInPlaceStore();
-        matrix.supplyTo(store);
+        return this.doDecompose(data, this.getInternalStore(), true);
+    }
 
-        return this.doDecompose(data, store, false);
+    public boolean decomposeWithoutPivoting(Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+
+        double[][] data = this.reset(matrix, false);
+        matrix.supplyTo(this.getInternalStore());
+
+        return this.doDecompose(data, this.getInternalStore(), false);
+    }
+
+    public void exchangeHermitian(RawStore matrix, final int indexA, final int indexB) {
+
+        final int indexMin = Math.min(indexA, indexB);
+        final int indexMax = Math.max(indexA, indexB);
+
+        double tmpVal;
+
+        for (int j = 0; j < indexMin; j++) {
+            tmpVal = matrix.doubleValue(indexMin, j);
+            matrix.set(indexMin, j, matrix.doubleValue(indexMax, j));
+            matrix.set(indexMax, j, tmpVal);
+        }
+
+        tmpVal = matrix.doubleValue(indexMin, indexMin);
+        matrix.set(indexMin, indexMin, matrix.doubleValue(indexMax, indexMax));
+        matrix.set(indexMax, indexMax, tmpVal);
+
+        for (int ij = indexMin + 1; ij < indexMax; ij++) {
+            tmpVal = matrix.doubleValue(ij, indexMin);
+            matrix.set(ij, indexMin, matrix.doubleValue(indexMax, ij));
+            matrix.set(indexMax, ij, tmpVal);
+        }
+
+        for (int i = indexMax + 1; i < matrix.countRows(); i++) {
+            tmpVal = matrix.doubleValue(i, indexMin);
+            matrix.set(i, indexMin, matrix.doubleValue(i, indexMax));
+            matrix.set(i, indexMax, tmpVal);
+        }
+
     }
 
     public MatrixStore<Double> getD() {
-        return this.getRawInPlaceStore().logical().diagonal(false).get();
+        return this.getInternalStore().logical().diagonal(false).get();
     }
 
     public Double getDeterminant() {
 
-        final double[][] tmpData = this.getRawInPlaceData();
+        final double[][] tmpData = this.getInternalData();
 
         double retVal = ONE;
         for (int ij = 0; ij < tmpData.length; ij++) {
@@ -88,7 +126,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     }
 
     public MatrixStore<Double> getL() {
-        final RawStore tmpRawInPlaceStore = this.getRawInPlaceStore();
+        final RawStore tmpRawInPlaceStore = this.getInternalStore();
         final LogicalBuilder<Double> tmpBuilder = tmpRawInPlaceStore.logical();
         final LogicalBuilder<Double> tmpTriangular = tmpBuilder.triangular(false, true);
         return tmpTriangular.get();
@@ -117,8 +155,9 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
         final double[][] data = this.reset(original, false);
+        this.wrap(original).supplyTo(this.getInternalStore());
 
-        this.doDecompose(data, original, false);
+        this.doDecompose(data, this.getInternalStore(), true);
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
@@ -155,8 +194,9 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
         final double[][] data = this.reset(body, false);
+        this.wrap(body).supplyTo(this.getInternalStore());
 
-        this.doDecompose(data, body, false);
+        this.doDecompose(data, this.getInternalStore(), true);
 
         if (this.isSolvable()) {
             return this.doSolve(MatrixStore.PRIMITIVE.makeWrapper(rhs), preallocated);
@@ -198,7 +238,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
 
                 // Pivot?
                 if (pivotRow != ij) {
-                    this.exchangeHermitian(this.getRawInPlaceStore(), pivotRow, ij);
+                    this.exchangeHermitian(this.getInternalStore(), pivotRow, ij);
                     myPivot.change(pivotRow, ij);
                 }
             }
@@ -221,7 +261,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         preallocated.fillAll(ZERO);
         preallocated.fillDiagonal(0L, 0L, ONE);
 
-        final RawStore tmpBody = this.getRawInPlaceStore();
+        final RawStore tmpBody = this.getInternalStore();
 
         preallocated.substituteForwards(tmpBody, true, false, true);
 
@@ -238,7 +278,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
 
         rhs.supplyTo(preallocated);
 
-        final RawStore tmpBody = this.getRawInPlaceStore();
+        final RawStore tmpBody = this.getInternalStore();
 
         preallocated.substituteForwards(tmpBody, true, false, false);
 
@@ -256,46 +296,10 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
 
         boolean retVal = this.getRowDim() == this.getColDim();
 
-        double largest = this.getRawInPlaceStore().aggregateDiagonal(Aggregator.LARGEST);
-        double smallest = this.getRawInPlaceStore().aggregateDiagonal(Aggregator.SMALLEST);
+        double largest = this.getInternalStore().aggregateDiagonal(Aggregator.LARGEST);
+        double smallest = this.getInternalStore().aggregateDiagonal(Aggregator.SMALLEST);
 
         return retVal && !PrimitiveScalar.isSmall(largest, smallest);
-    }
-
-    public boolean decomposeWithoutPivoting(Collectable<Double, ? super PhysicalStore<Double>> matrix) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public void exchangeHermitian(RawStore matrix, final int indexA, final int indexB) {
-
-        final int indexMin = Math.min(indexA, indexB);
-        final int indexMax = Math.max(indexA, indexB);
-
-        double tmpVal;
-
-        for (int j = 0; j < indexMin; j++) {
-            tmpVal = matrix.doubleValue(indexMin, j);
-            matrix.set(indexMin, j, matrix.doubleValue(indexMax, j));
-            matrix.set(indexMax, j, tmpVal);
-        }
-
-        tmpVal = matrix.doubleValue(indexMin, indexMin);
-        matrix.set(indexMin, indexMin, matrix.doubleValue(indexMax, indexMax));
-        matrix.set(indexMax, indexMax, tmpVal);
-
-        for (int ij = indexMin + 1; ij < indexMax; ij++) {
-            tmpVal = matrix.doubleValue(ij, indexMin);
-            matrix.set(ij, indexMin, matrix.doubleValue(indexMax, ij));
-            matrix.set(indexMax, ij, tmpVal);
-        }
-
-        for (int i = indexMax + 1; i < matrix.countRows(); i++) {
-            tmpVal = matrix.doubleValue(i, indexMin);
-            matrix.set(i, indexMin, matrix.doubleValue(i, indexMax));
-            matrix.set(i, indexMax, tmpVal);
-        }
-
     }
 
 }

@@ -51,7 +51,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         final double[][] data = this.reset(matrix, false);
 
-        this.getRawInPlaceStore().fillMatching(matrix);
+        this.getInternalStore().fillMatching(matrix);
 
         this.doDecompose(data, true);
 
@@ -62,7 +62,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         final double[][] data = this.reset(matrix, false);
 
-        matrix.supplyTo(this.getRawInPlaceStore());
+        matrix.supplyTo(this.getInternalStore());
 
         return this.doDecompose(data, true);
     }
@@ -71,7 +71,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         final double[][] data = this.reset(matrix, false);
 
-        matrix.supplyTo(this.getRawInPlaceStore());
+        matrix.supplyTo(this.getInternalStore());
 
         return this.doDecompose(data, false);
     }
@@ -82,7 +82,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         if (m != n) {
             throw new IllegalArgumentException("RawStore must be square.");
         }
-        final double[][] LU = this.getRawInPlaceData();
+        final double[][] LU = this.getInternalData();
         double d = myPivot.signum();
         for (int j = 0; j < n; j++) {
             d *= LU[j][j];
@@ -100,7 +100,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public MatrixStore<Double> getL() {
-        return this.getRawInPlaceStore().logical().triangular(false, true).get();
+        return this.getInternalStore().logical().triangular(false, true).get();
     }
 
     public int[] getPivotOrder() {
@@ -111,7 +111,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         int retVal = 0;
 
-        final RawStore internalStore = this.getRawInPlaceStore();
+        final RawStore internalStore = this.getInternalStore();
 
         double largestValue = internalStore.aggregateDiagonal(Aggregator.LARGEST);
 
@@ -138,7 +138,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public MatrixStore<Double> getU() {
-        return this.getRawInPlaceStore().logical().triangular(true, false).get();
+        return this.getInternalStore().logical().triangular(true, false).get();
     }
 
     @Override
@@ -146,7 +146,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         final double[][] tmpData = this.reset(original, false);
 
-        this.getRawInPlaceStore().fillMatching(original);
+        this.getInternalStore().fillMatching(original);
 
         this.doDecompose(tmpData, true);
 
@@ -164,7 +164,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
      */
     public boolean isFullRank() {
 
-        final RawStore raw = this.getRawInPlaceStore();
+        final RawStore raw = this.getInternalStore();
 
         double largestValue = Math.sqrt(raw.aggregateDiagonal(Aggregator.LARGEST));
 
@@ -202,7 +202,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         final double[][] tmpData = this.reset(body, false);
 
-        this.getRawInPlaceStore().fillMatching(body);
+        this.getInternalStore().fillMatching(body);
 
         this.doDecompose(tmpData, true);
 
@@ -282,7 +282,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
             preallocated.set(i, tmpPivotOrder[i], ONE);
         }
 
-        final RawStore tmpBody = this.getRawInPlaceStore();
+        final RawStore tmpBody = this.getInternalStore();
 
         preallocated.substituteForwards(tmpBody, true, false, !myPivot.isModified());
 
@@ -293,7 +293,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
-        final MatrixStore<Double> tmpBody = this.getRawInPlaceStore();
+        final MatrixStore<Double> tmpBody = this.getInternalStore();
 
         preallocated.substituteForwards(tmpBody, true, false, false);
 

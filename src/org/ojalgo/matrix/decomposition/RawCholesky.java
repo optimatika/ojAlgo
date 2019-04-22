@@ -75,7 +75,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
         final double[][] retVal = this.reset(matrix, false);
 
-        final RawStore tmpRawInPlaceStore = this.getRawInPlaceStore();
+        final RawStore tmpRawInPlaceStore = this.getInternalStore();
 
         matrix.supplyTo(tmpRawInPlaceStore);
 
@@ -84,7 +84,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     public Double getDeterminant() {
 
-        final double[][] tmpData = this.getRawInPlaceData();
+        final double[][] tmpData = this.getInternalData();
 
         final int tmpMinDim = this.getMinDim();
 
@@ -108,7 +108,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     public MatrixStore<Double> getL() {
-        return this.getRawInPlaceStore().logical().triangular(false, false).get();
+        return this.getInternalStore().logical().triangular(false, false).get();
     }
 
     public int getRank() {
@@ -116,7 +116,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         final double tolerance = SQRT.invoke(this.getAlgorithmEpsilon());
         int rank = 0;
 
-        final RawStore inPlaceStore = this.getRawInPlaceStore();
+        final RawStore inPlaceStore = this.getInternalStore();
         final int limit = this.getMinDim();
         for (int ij = 0; ij < limit; ij++) {
             if (inPlaceStore.doubleValue(ij, ij) > tolerance) {
@@ -220,7 +220,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {
 
-        final RawStore tmpBody = this.getRawInPlaceStore();
+        final RawStore tmpBody = this.getInternalStore();
 
         preallocated.substituteForwards(tmpBody, false, false, true);
         preallocated.substituteBackwards(tmpBody, false, true, true);
@@ -230,7 +230,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
-        final RawStore tmpBody = this.getRawInPlaceStore();
+        final RawStore tmpBody = this.getInternalStore();
 
         preallocated.substituteForwards(tmpBody, false, false, false);
         preallocated.substituteBackwards(tmpBody, false, true, false);

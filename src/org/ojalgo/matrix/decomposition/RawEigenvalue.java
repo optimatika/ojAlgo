@@ -186,7 +186,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         final double[][] tmpData = this.reset(matrix, false);
 
-        this.getRawInPlaceStore().fillMatching(matrix);
+        this.getInternalStore().fillMatching(matrix);
 
         this.doDecompose(tmpData, true);
 
@@ -197,7 +197,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         final double[][] tmpData = this.reset(matrix, false);
 
-        matrix.supplyTo(this.getRawInPlaceStore());
+        matrix.supplyTo(this.getInternalStore());
 
         return this.doDecompose(tmpData, true);
     }
@@ -206,7 +206,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         final double[][] tmpData = this.reset(matrix, false);
 
-        matrix.supplyTo(this.getRawInPlaceStore());
+        matrix.supplyTo(this.getInternalStore());
 
         return this.doDecompose(tmpData, false);
     }
@@ -320,7 +320,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         final double[][] tmpData = this.reset(original, false);
 
-        this.getRawInPlaceStore().fillMatching(original);
+        this.getInternalStore().fillMatching(original);
 
         this.doDecompose(tmpData, false);
 
@@ -344,7 +344,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         final double[][] tmpData = this.reset(body, false);
 
-        this.getRawInPlaceStore().fillMatching(body);
+        this.getInternalStore().fillMatching(body);
 
         this.doDecompose(tmpData, false);
 
