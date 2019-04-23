@@ -215,10 +215,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.allocate(templateBody.countColumns(), templateBody.countRows());
     }
 
-    public MatrixStore<Double> reconstruct() {
-        return SingularValue.reconstruct(this);
-    }
-
     @Override
     public void reset() {
 

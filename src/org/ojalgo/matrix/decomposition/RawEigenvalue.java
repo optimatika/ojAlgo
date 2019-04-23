@@ -331,10 +331,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    public MatrixStore<Double> reconstruct() {
-        return Eigenvalue.reconstruct(this);
-    }
-
     @Override
     public void reset() {
         myInverse = null;

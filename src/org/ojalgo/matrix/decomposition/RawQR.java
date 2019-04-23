@@ -255,10 +255,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return this.allocate(templateBody.countRows(), templateRHS.countColumns());
     }
 
-    public MatrixStore<Double> reconstruct() {
-        return QR.reconstruct(this);
-    }
-
     @Override
     public void reset() {
 
