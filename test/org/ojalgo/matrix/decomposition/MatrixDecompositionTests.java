@@ -97,8 +97,7 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static LDL<?>[] getAnyLDL() {
-        return new LDL<?>[] { new LDLDecomposition.Complex(), new LDLDecomposition.Primitive(), new LDLDecomposition.Quat(), new LDLDecomposition.Rational(),
-                new RawLDL() };
+        return new LDL<?>[] { new LDLDecomposition.Complex(), new LDLDecomposition.Primitive(), new LDLDecomposition.Quat(), new LDLDecomposition.Rational() };
     }
 
     public static LU<?>[] getAnyLU() {
@@ -199,7 +198,7 @@ public abstract class MatrixDecompositionTests {
 
     @SuppressWarnings("unchecked")
     public static LDL<Double>[] getPrimitiveLDL() {
-        return (LDL<Double>[]) new LDL<?>[] { new LDLDecomposition.Primitive(), new RawLDL() };
+        return (LDL<Double>[]) new LDL<?>[] { new LDLDecomposition.Primitive() };
     }
 
     @SuppressWarnings("unchecked")

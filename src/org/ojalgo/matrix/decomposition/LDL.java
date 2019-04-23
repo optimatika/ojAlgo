@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -57,17 +56,15 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
 
     Factory<ComplexNumber> COMPLEX = typical -> new LDLDecomposition.Complex();
 
-    Factory<Double> PRIMITIVE = typical -> {
-        if ((256L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
-            return new LDLDecomposition.Primitive();
-        } else {
-            return new RawLDL();
-        }
-    };
+    Factory<Double> PRIMITIVE = typical -> new LDLDecomposition.Primitive();
 
     Factory<Quaternion> QUATERNION = typical -> new LDLDecomposition.Quat();
 
     Factory<RationalNumber> RATIONAL = typical -> new LDLDecomposition.Rational();
+
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
+        return Access2D.equals(matrix, decomposition.reconstruct(), context);
+    }
 
     @SuppressWarnings("unchecked")
     static <N extends Number> LDL<N> make(final Access2D<N> typical) {
@@ -85,10 +82,6 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         } else {
             throw new IllegalArgumentException();
         }
-    }
-
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
-        return Access2D.equals(matrix, decomposition.reconstruct(), context);
     }
 
     static <N extends Number> MatrixStore<N> reconstruct(final LDL<N> decomposition) {

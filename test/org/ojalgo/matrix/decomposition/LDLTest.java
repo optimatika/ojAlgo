@@ -92,7 +92,8 @@ public class LDLTest {
         RawStore reconstructed = mtrxL.multiply(mtrxD.multiply(mtrxL.transpose()));
         TestUtils.assertEquals(mtrxA, reconstructed);
 
-        RawLDL rawLDL = new RawLDL();
+        // TODO Change to new RawLDL() when it's done
+        LDL<Double> rawLDL = new LDLDecomposition.Primitive();
         rawLDL.decompose(mtrxA);
 
         LDL<Double> primLDL = new LDLDecomposition.Primitive();
