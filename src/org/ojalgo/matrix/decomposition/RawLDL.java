@@ -49,7 +49,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         double[][] data = this.reset(matrix, false);
         this.wrap(matrix).supplyTo(this.getInternalStore());
 
-        this.doDecompose(data, this.getInternalStore(), true);
+        this.doDecompose(data, true);
 
         return this.getDeterminant();
     }
@@ -59,7 +59,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         double[][] data = this.reset(matrix, false);
         matrix.supplyTo(this.getInternalStore());
 
-        return this.doDecompose(data, this.getInternalStore(), true);
+        return this.doDecompose(data, true);
     }
 
     public boolean decomposeWithoutPivoting(Collectable<Double, ? super PhysicalStore<Double>> matrix) {
@@ -67,7 +67,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         double[][] data = this.reset(matrix, false);
         matrix.supplyTo(this.getInternalStore());
 
-        return this.doDecompose(data, this.getInternalStore(), false);
+        return this.doDecompose(data, false);
     }
 
     public void exchangeHermitian(RawStore matrix, final int indexA, final int indexB) {
@@ -157,7 +157,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         final double[][] data = this.reset(original, false);
         this.wrap(original).supplyTo(this.getInternalStore());
 
-        this.doDecompose(data, this.getInternalStore(), true);
+        this.doDecompose(data, true);
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
@@ -196,7 +196,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         final double[][] data = this.reset(body, false);
         this.wrap(body).supplyTo(this.getInternalStore());
 
-        this.doDecompose(data, this.getInternalStore(), true);
+        this.doDecompose(data, true);
 
         if (this.isSolvable()) {
             return this.doSolve(MatrixStore.PRIMITIVE.makeWrapper(rhs), preallocated);
@@ -208,48 +208,49 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     /**
      * Copy while decomposing, but the source and destination could already be the same storage.
      */
-    private boolean doDecompose(final double[][] destination, final Access2D<?> source, boolean pivoting) {
+    private boolean doDecompose(final double[][] data, boolean pivoting) {
 
         int dim = this.getRowDim();
         mySPD = (this.getColDim() == dim);
 
         myPivot = new Pivot(dim);
 
-        final double[] rowIJ = new double[dim];
-        double[] rowI;
+        final double[] colJ = new double[dim];
+        double[] rowJ;
 
         // Main loop.
-        for (int ij = 0; ij < dim; ij++) { // For each row/column, along the diagonal
-            rowI = destination[ij];
+        for (int j = 0; j < dim; j++) { // For each row/column, along the diagonal
+            rowJ = data[j];
 
-            for (int j = 0; j < ij; j++) {
-                rowIJ[j] = rowI[j] * destination[j][j];
+            // Recreate col j from lower/left part
+            for (int i = 0; i < j; i++) {
+                colJ[i] = rowJ[i] * data[i][i];
             }
 
             if (pivoting) {
-                int pivotRow = ij;
+                int pivotRow = j;
                 // Find next pivot row
-                for (int p = ij; p < dim; p++) {
-                    if (!PrimitiveScalar.isSmall(ONE, source.doubleValue(p, p))) {
+                for (int p = j; p < dim; p++) {
+                    if (!PrimitiveScalar.isSmall(ONE, data[p][p])) {
                         pivotRow = p;
                         break;
                     }
                 }
 
                 // Pivot?
-                if (pivotRow != ij) {
-                    this.exchangeHermitian(this.getInternalStore(), pivotRow, ij);
-                    myPivot.change(pivotRow, ij);
+                if (pivotRow != j) {
+                    this.exchangeHermitian(this.getInternalStore(), pivotRow, j);
+                    myPivot.change(pivotRow, j);
                 }
             }
 
-            final double tmpD = rowI[ij] = source.doubleValue(ij, ij) - DOT.invoke(rowI, 0, rowIJ, 0, 0, ij);
+            final double tmpD = rowJ[j] = data[j][j] - DOT.invoke(rowJ, 0, colJ, 0, 0, j);
             mySPD &= (tmpD > ZERO);
 
-            for (int i = ij + 1; i < dim; i++) { // Update column below current row
-                rowI = destination[i];
+            for (int i = j + 1; i < dim; i++) { // Update column below current row
+                rowJ = data[i];
 
-                rowI[ij] = (source.doubleValue(i, ij) - DOT.invoke(rowI, 0, rowIJ, 0, 0, ij)) / tmpD;
+                rowJ[j] = (data[i][j] - DOT.invoke(rowJ, 0, colJ, 0, 0, j)) / tmpD;
             }
         }
 

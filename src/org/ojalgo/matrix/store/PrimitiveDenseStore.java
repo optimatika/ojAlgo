@@ -604,8 +604,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public void applyLU(final int iterationPoint, final BasicArray<Double> multipliers) {
 
-        final double[] tmpData = data;
-        final double[] tmpColumn = ((Primitive64Array) multipliers).data;
+        final double[] column = ((Primitive64Array) multipliers).data;
 
         if ((myColDim - iterationPoint - 1) > ApplyLU.THRESHOLD) {
 
@@ -613,7 +612,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
                 @Override
                 protected void conquer(final int first, final int limit) {
-                    ApplyLU.invoke(tmpData, myRowDim, first, limit, tmpColumn, iterationPoint);
+                    ApplyLU.invoke(data, myRowDim, first, limit, column, iterationPoint);
                 }
             };
 
@@ -621,7 +620,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         } else {
 
-            ApplyLU.invoke(tmpData, myRowDim, iterationPoint + 1, myColDim, tmpColumn, iterationPoint);
+            ApplyLU.invoke(data, myRowDim, iterationPoint + 1, myColDim, column, iterationPoint);
         }
     }
 

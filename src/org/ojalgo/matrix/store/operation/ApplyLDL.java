@@ -32,17 +32,17 @@ public final class ApplyLDL extends MatrixOperation {
 
     public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers,
             final int iterationPoint) {
-        final double tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
+        final double diagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, -(tmpDiagVal * multipliers[j]), multipliers, 0, j, structure);
+            AXPY.invoke(data, j * structure, -(diagVal * multipliers[j]), multipliers, 0, j, structure);
         }
     }
 
     public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit,
             final N[] multipliers, final int iterationPoint) {
-        final Scalar<N> tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
+        final Scalar<N> diagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
-            AXPY.invoke(data, j * structure, tmpDiagVal.multiply(multipliers[j].conjugate()).negate().get(), multipliers, 0, j, structure);
+            AXPY.invoke(data, j * structure, diagVal.multiply(multipliers[j].conjugate()).negate().get(), multipliers, 0, j, structure);
         }
     }
 
