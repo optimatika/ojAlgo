@@ -6,6 +6,13 @@
 
 * ...
 
+# v47.1.2: 2019-04-23
+
+## org.ojalgo.matrix
+
+* Fixed bug related to LDL – stackoverflow if you called isSolvable() on some LDL instances.
+* Various tweaks and cleanup with MatrixDecompostion:s
+
 # v47.1.1: 2019-04-12
 
 ## org.ojalgo.constant

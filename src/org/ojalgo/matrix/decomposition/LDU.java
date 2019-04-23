@@ -23,7 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 /**
  * <p>
- * LDU: [A] = [L][D][U] ( [P1][L][D][U][P2] )
+ * LDU: [A] = [L][D][U] ( [P<sub>L</sub>][L][D][U][P<sub>U</sub>] )
  * </p>
  * <ul>
  * <li>[A] can be any matrix.</li>
@@ -32,8 +32,8 @@ package org.ojalgo.matrix.decomposition;
  * <li>[D] is a square diagonal matrix.</li>
  * <li>[U] is a unit upper (right) triangular matrix. It has the same number of columns as [A], and ones on
  * the diagonal.</li>
- * <li>[P1] is a permutation matrix (row pivot order).</li>
- * <li>[P2] is a permutation matrix (column pivot order).</li>
+ * <li>[P<sub>L</sub>] is a permutation matrix (row pivot order).</li>
+ * <li>[P<sub>U</sub>] is a permutation matrix (column pivot order).</li>
  * </ul>
  * <p>
  * Row and/or column permutations may not be necessary and are therefore optional. Numerical stability usually

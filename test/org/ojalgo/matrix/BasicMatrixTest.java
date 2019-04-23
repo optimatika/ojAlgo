@@ -467,7 +467,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         TestUtils.assertEquals(GenericDenseStore.QUATERNION.copy(quaternionAA), quaternionSVD, evaluation);
         TestUtils.assertEquals(expected, quaternionSVD.getSingularValues(), evaluation);
 
-        for (SingularValue<Double> primitiveSVD : MatrixDecompositionTests.getSingularValuePrimitive()) {
+        for (SingularValue<Double> primitiveSVD : MatrixDecompositionTests.getPrimitiveSingularValue()) {
             primitiveSVD.compute(primitiveAA);
             TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(primitiveAA), primitiveSVD, evaluation);
             TestUtils.assertEquals(expected, primitiveSVD.getSingularValues(), evaluation);

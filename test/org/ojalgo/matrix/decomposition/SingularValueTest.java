@@ -363,7 +363,7 @@ public class SingularValueTest {
 
     private void testRecreation(final PhysicalStore<Double> aMtrx) {
 
-        final SingularValue<Double>[] tmpImpls = MatrixDecompositionTests.getSingularValuePrimitive();
+        final SingularValue<Double>[] tmpImpls = MatrixDecompositionTests.getPrimitiveSingularValue();
 
         for (final SingularValue<Double> tmpImpl : tmpImpls) {
 

@@ -52,15 +52,15 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface LU<N extends Number> extends LDU<N> {
+public interface LU<N extends Number> extends LDU<N>, MatrixDecomposition.Pivoting<N> {
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<LU<N>> {
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new LUDecomposition.Complex();
+    Factory<ComplexNumber> COMPLEX = typical -> new LUDecomposition.Complex();
 
-    public static final Factory<Double> PRIMITIVE = typical -> {
+    Factory<Double> PRIMITIVE = typical -> {
         if ((16L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
             return new LUDecomposition.Primitive();
         } else {
@@ -68,12 +68,21 @@ public interface LU<N extends Number> extends LDU<N> {
         }
     };
 
-    public static final Factory<Quaternion> QUATERNION = typical -> new LUDecomposition.Quat();
+    Factory<Quaternion> QUATERNION = typical -> new LUDecomposition.Quat();
 
-    public static final Factory<RationalNumber> RATIONAL = typical -> new LUDecomposition.Rational();
+    Factory<RationalNumber> RATIONAL = typical -> new LUDecomposition.Rational();
+
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
+
+        final MatrixStore<N> tmpL = decomposition.getL();
+        final MatrixStore<N> tmpU = decomposition.getU();
+        final int[] tmpPivotOrder = decomposition.getPivotOrder();
+
+        return Access2D.equals(matrix.logical().row(tmpPivotOrder).get(), tmpL.multiply(tmpU), context);
+    }
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> LU<N> make(final Access2D<N> typical) {
+    static <N extends Number> LU<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -90,35 +99,23 @@ public interface LU<N extends Number> extends LDU<N> {
         }
     }
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpL = decomposition.getL();
-        final MatrixStore<N> tmpU = decomposition.getU();
-        final int[] tmpPivotOrder = decomposition.getPivotOrder();
-
-        return Access2D.equals(matrix.logical().row(tmpPivotOrder).get(), tmpL.multiply(tmpU), context);
-    }
-
+    /**
+     * @deprecated v48 Use {@link #reconstruct()} instead
+     */
+    @Deprecated
     static <N extends Number> MatrixStore<N> reconstruct(final LU<N> decomposition) {
-        return decomposition.getL().multiply(decomposition.getU()).logical().row(decomposition.getPivotOrder()).get();
+        return decomposition.reconstruct();
     }
 
     /**
-     * The normal {@link #decompose(Access2D.Collectable)} method must handle cases where pivoting is
-     * required. If you know that pivoting is not needed you may call this method instead - it may be faster.
-     * Note that the algorithm implementation may still pivot. Pivoting is optional not forbidden (or
-     * required).
+     * @deprecated v48 Use {@link #decomposeWithoutPivoting(Access2D.Collectable)} instead.
      */
-    boolean computeWithoutPivoting(ElementsSupplier<N> matrix);
+    @Deprecated
+    default boolean computeWithoutPivoting(final ElementsSupplier<N> matrix) {
+        return this.decomposeWithoutPivoting(matrix) && this.isSolvable();
+    }
 
     MatrixStore<N> getL();
-
-    /**
-     * This can be used to create a [P] matrix..
-     */
-    int[] getPivotOrder();
-
-    int getRank();
 
     /**
      * http://en.wikipedia.org/wiki/Row_echelon_form <br>
@@ -132,7 +129,10 @@ public interface LU<N extends Number> extends LDU<N> {
     MatrixStore<N> getU();
 
     default MatrixStore<N> reconstruct() {
-        return LU.reconstruct(this);
+        MatrixStore<N> mtrxL = this.getL();
+        MatrixStore<N> mtrxU = this.getU();
+        int[] pivotOrder = this.getPivotOrder();
+        return mtrxL.multiply(mtrxU).logical().row(pivotOrder).get();
     }
 
 }

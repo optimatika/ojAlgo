@@ -472,7 +472,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.730967787376657, 0.24053641567148587, 0.6374174253501083 },
                 { 0.24053641567148587, 0.5975452777972018, 0.3332183994766498 }, { 0.6374174253501083, 0.3332183994766498, 0.8791825178724801 } });
 
-        for (Eigenvalue<Double> evd : MatrixDecompositionTests.getEigenvaluePrimitiveAny()) {
+        for (Eigenvalue<Double> evd : MatrixDecompositionTests.getPrimitiveEigenvalue()) {
 
             String className = evd.getClass().getName();
 

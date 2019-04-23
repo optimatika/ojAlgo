@@ -43,31 +43,13 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new DeferredTridiagonal.Complex();
+    Factory<ComplexNumber> COMPLEX = typical -> new DeferredTridiagonal.Complex();
 
-    public static final Factory<Double> PRIMITIVE = typical -> new DeferredTridiagonal.Primitive();
+    Factory<Double> PRIMITIVE = typical -> new DeferredTridiagonal.Primitive();
 
-    public static final Factory<Quaternion> QUATERNION = typical -> new DeferredTridiagonal.Quat();
+    Factory<Quaternion> QUATERNION = typical -> new DeferredTridiagonal.Quat();
 
-    public static final Factory<RationalNumber> RATIONAL = typical -> new DeferredTridiagonal.Rational();
-
-    @SuppressWarnings("unchecked")
-    public static <N extends Number> Tridiagonal<N> make(final Access2D<N> typical) {
-
-        final N tmpNumber = typical.get(0, 0);
-
-        if (tmpNumber instanceof RationalNumber) {
-            return (Tridiagonal<N>) RATIONAL.make(typical);
-        } else if (tmpNumber instanceof Quaternion) {
-            return (Tridiagonal<N>) QUATERNION.make(typical);
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (Tridiagonal<N>) COMPLEX.make(typical);
-        } else if (tmpNumber instanceof Double) {
-            return (Tridiagonal<N>) PRIMITIVE.make(typical);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
+    Factory<RationalNumber> RATIONAL = typical -> new DeferredTridiagonal.Rational();
 
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Tridiagonal<N> decomposition, final NumberContext context) {
 
@@ -90,9 +72,26 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
         return retVal;
     }
 
+    @SuppressWarnings("unchecked")
+    static <N extends Number> Tridiagonal<N> make(final Access2D<N> typical) {
+
+        final N tmpNumber = typical.get(0, 0);
+
+        if (tmpNumber instanceof RationalNumber) {
+            return (Tridiagonal<N>) RATIONAL.make(typical);
+        } else if (tmpNumber instanceof Quaternion) {
+            return (Tridiagonal<N>) QUATERNION.make(typical);
+        } else if (tmpNumber instanceof ComplexNumber) {
+            return (Tridiagonal<N>) COMPLEX.make(typical);
+        } else if (tmpNumber instanceof Double) {
+            return (Tridiagonal<N>) PRIMITIVE.make(typical);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
     static <N extends Number> MatrixStore<N> reconstruct(final Tridiagonal<N> decomposition) {
-        final MatrixStore<N> tmpQ = decomposition.getQ();
-        return tmpQ.multiply(decomposition.getD()).multiply(tmpQ.conjugate());
+        return decomposition.reconstruct();
     }
 
     MatrixStore<N> getD();
@@ -100,7 +99,9 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
     MatrixStore<N> getQ();
 
     default MatrixStore<N> reconstruct() {
-        return Tridiagonal.reconstruct(this);
+        MatrixStore<N> mtrxQ = this.getQ();
+        MatrixStore<N> mtrxD = this.getD();
+        return mtrxQ.multiply(mtrxD).multiply(mtrxQ.conjugate());
     }
 
 }

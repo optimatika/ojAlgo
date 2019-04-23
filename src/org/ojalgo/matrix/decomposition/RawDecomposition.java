@@ -21,11 +21,14 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.function.constant.PrimitiveMath;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -38,8 +41,8 @@ import org.ojalgo.type.context.NumberContext;
 abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
     private int myColDim;
-    private double[][] myRawInPlaceData;
-    private RawStore myRawInPlaceStore;
+    private double[][] myInternalData;
+    private RawStore myInternalStore;
     private int myRowDim;
 
     protected RawDecomposition() {
@@ -56,14 +59,14 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         boolean retVal = myRowDim == myColDim;
         for (int i = 0; retVal && (i < myRowDim); i++) {
             for (int j = 0; retVal && (j < i); j++) {
-                retVal &= (NumberContext.compare(myRawInPlaceData[i][j], myRawInPlaceData[j][i]) == 0);
+                retVal &= (NumberContext.compare(myInternalData[i][j], myInternalData[j][i]) == 0);
             }
         }
         return retVal;
     }
 
     @SuppressWarnings("unchecked")
-    protected final MatrixStore<Double> collect(final Access2D.Collectable<Double, ? super DecompositionStore<Double>> source) {
+    protected MatrixStore<Double> collect(final Access2D.Collectable<Double, ? super DecompositionStore<Double>> source) {
         // TODO Should use RawStore.FACTORY rather than PrimitiveDenseStore.FACTORY
         if (source instanceof MatrixStore) {
             return (MatrixStore<Double>) source;
@@ -80,7 +83,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
     @Override
     protected double getDimensionalEpsilon() {
-        return this.getMaxDim() * PrimitiveMath.MACHINE_EPSILON;
+        return this.getMaxDim() * MACHINE_EPSILON;
     }
 
     protected int getMaxDim() {
@@ -91,40 +94,44 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return Math.min(myRowDim, myColDim);
     }
 
-    protected double[][] getRawInPlaceData() {
-        return myRawInPlaceData;
+    protected double[][] getInternalData() {
+        return myInternalData;
     }
 
-    protected RawStore getRawInPlaceStore() {
-        return myRawInPlaceStore;
+    protected Collectable<Double, ? super PhysicalStore<Double>> wrap(Access2D<?> matrix) {
+        return MatrixStore.PRIMITIVE.makeWrapper(matrix);
+    }
+
+    protected RawStore getInternalStore() {
+        return myInternalStore;
     }
 
     protected int getRowDim() {
         return myRowDim;
     }
 
-    double[][] reset(final Structure2D matrix, final boolean transpose) {
+    double[][] reset(final Structure2D template, final boolean transpose) {
 
         this.reset();
 
-        final int tmpInputRowDim = (int) matrix.countRows();
-        final int tmpInputColDim = (int) matrix.countColumns();
+        final int templateRows = (int) template.countRows();
+        final int templateCols = (int) template.countColumns();
 
-        final int tmpInPlaceRowDim = transpose ? tmpInputColDim : tmpInputRowDim;
-        final int tmpInPlaceColDim = transpose ? tmpInputRowDim : tmpInputColDim;
+        final int internalRows = transpose ? templateCols : templateRows;
+        final int internalCols = transpose ? templateRows : templateCols;
 
-        if ((myRawInPlaceData == null) || (myRowDim != tmpInputRowDim) || (myColDim != tmpInputColDim)) {
+        if ((myInternalData == null) || (myRowDim != templateRows) || (myColDim != templateCols)) {
 
-            myRawInPlaceStore = RawStore.FACTORY.makeZero(tmpInPlaceRowDim, tmpInPlaceColDim);
-            myRawInPlaceData = myRawInPlaceStore.data;
+            myInternalStore = RawStore.FACTORY.makeZero(internalRows, internalCols);
+            myInternalData = myInternalStore.data;
 
-            myRowDim = tmpInputRowDim;
-            myColDim = tmpInputColDim;
+            myRowDim = templateRows;
+            myColDim = templateCols;
         }
 
-        this.aspectRatioNormal(tmpInputRowDim >= tmpInputColDim);
+        this.aspectRatioNormal(templateRows >= templateCols);
 
-        return myRawInPlaceData;
+        return myInternalData;
     }
 
 }

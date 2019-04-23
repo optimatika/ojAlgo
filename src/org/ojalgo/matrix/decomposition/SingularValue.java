@@ -67,9 +67,9 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new SingularValueDecomposition.Complex(fullSize);
+    Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new SingularValueDecomposition.Complex(fullSize);
 
-    public static final Factory<Double> PRIMITIVE = (typical, fullSize) -> {
+    Factory<Double> PRIMITIVE = (typical, fullSize) -> {
         if (fullSize || ((1024L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE))) {
             return new SingularValueDecomposition.Primitive(fullSize);
         } else {
@@ -77,12 +77,12 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         }
     };
 
-    public static final Factory<Quaternion> QUATERNION = (typical, fullSize) -> new SingularValueDecomposition.Quat(fullSize);
+    Factory<Quaternion> QUATERNION = (typical, fullSize) -> new SingularValueDecomposition.Quat(fullSize);
 
-    public static final Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new SingularValueDecomposition.Rational(fullSize);
+    Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new SingularValueDecomposition.Rational(fullSize);
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> SingularValue<N> make(final Access2D<N> typical) {
+    static <N extends Number> SingularValue<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -163,8 +163,12 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         return retVal;
     }
 
+    /**
+     * @deprecated v48 Use {@link #reconstruct()} instead
+     */
+    @Deprecated
     static <N extends Number> MatrixStore<N> reconstruct(final SingularValue<N> decomposition) {
-        return decomposition.getQ1().multiply(decomposition.getD()).multiply(decomposition.getQ2().conjugate());
+        return decomposition.reconstruct();
     }
 
     /**
@@ -248,7 +252,10 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
     double getTraceNorm();
 
     default MatrixStore<N> reconstruct() {
-        return SingularValue.reconstruct(this);
+        MatrixStore<N> mtrxQ1 = this.getQ1();
+        MatrixStore<N> mtrxD = this.getD();
+        MatrixStore<N> mtrxQ2 = this.getQ2();
+        return mtrxQ1.multiply(mtrxD).multiply(mtrxQ2.conjugate());
     }
 
 }

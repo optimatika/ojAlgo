@@ -110,7 +110,7 @@ public class ExtremeElementsCase {
 
                     ExtremeElementsCase.performInvertTest(tmpOriginal, InverterTask.PRIMITIVE.make(tmpOriginal), tmpContext);
 
-                    final List<MatrixDecomposition<Double>> tmpAllDecomps = MatrixDecompositionTests.getAllPrimitive();
+                    final List<MatrixDecomposition<Double>> tmpAllDecomps = MatrixDecompositionTests.getPrimitiveAll();
                     for (final MatrixDecomposition<Double> tmpDecomp : tmpAllDecomps) {
 
                         if (DEBUG) {
@@ -149,7 +149,7 @@ public class ExtremeElementsCase {
 
                     ExtremeElementsCase.performSolveTest(tmpBody, tmpRHS, SolverTask.PRIMITIVE.make(tmpBody, tmpRHS), tmpContext);
 
-                    final List<MatrixDecomposition<Double>> tmpAllDecomps = MatrixDecompositionTests.getAllPrimitive();
+                    final List<MatrixDecomposition<Double>> tmpAllDecomps = MatrixDecompositionTests.getPrimitiveAll();
                     for (final MatrixDecomposition<Double> tmpDecomp : tmpAllDecomps) {
 
                         if (DEBUG) {

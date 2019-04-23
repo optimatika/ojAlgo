@@ -34,7 +34,6 @@ import org.ojalgo.array.blas.COPY;
 import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -187,7 +186,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         final double[][] tmpData = this.reset(matrix, false);
 
-        this.getRawInPlaceStore().fillMatching(matrix);
+        this.getInternalStore().fillMatching(matrix);
 
         this.doDecompose(tmpData, true);
 
@@ -198,7 +197,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         final double[][] tmpData = this.reset(matrix, false);
 
-        matrix.supplyTo(this.getRawInPlaceStore());
+        matrix.supplyTo(this.getInternalStore());
 
         return this.doDecompose(tmpData, true);
     }
@@ -207,7 +206,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         final double[][] tmpData = this.reset(matrix, false);
 
-        matrix.supplyTo(this.getRawInPlaceStore());
+        matrix.supplyTo(this.getInternalStore());
 
         return this.doDecompose(tmpData, false);
     }
@@ -274,7 +273,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             for (int i = 0; i < dim; i++) {
                 final double val = d[i];
-                max = PrimitiveMath.MAX.invoke(max, PrimitiveMath.ABS.invoke(val));
+                max = MAX.invoke(max, ABS.invoke(val));
                 if (PrimitiveScalar.isSmall(max, val)) {
                     for (int j = 0; j < dim; j++) {
                         tmpMtrx.set(i, j, ZERO);
@@ -294,7 +293,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
-        return null;
+        preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
+        return preallocated;
     }
 
     public ComplexNumber getTrace() {
@@ -320,7 +320,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         final double[][] tmpData = this.reset(original, false);
 
-        this.getRawInPlaceStore().fillMatching(original);
+        this.getInternalStore().fillMatching(original);
 
         this.doDecompose(tmpData, false);
 
@@ -329,10 +329,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         } else {
             throw RecoverableCondition.newMatrixNotInvertible();
         }
-    }
-
-    public MatrixStore<Double> reconstruct() {
-        return Eigenvalue.reconstruct(this);
     }
 
     @Override
@@ -344,7 +340,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         final double[][] tmpData = this.reset(body, false);
 
-        this.getRawInPlaceStore().fillMatching(body);
+        this.getInternalStore().fillMatching(body);
 
         this.doDecompose(tmpData, false);
 
@@ -439,7 +435,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             // Calculate the norm of the row/col to zero out - to avoid under/overflow.
             scale = ZERO;
             for (int k = 0; k < m; k++) {
-                scale = PrimitiveMath.MAX.invoke(scale, PrimitiveMath.ABS.invoke(d[k]));
+                scale = MAX.invoke(scale, ABS.invoke(d[k]));
             }
 
             h = ZERO;
@@ -462,7 +458,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     h += val * val; // d[k] * d[k]
                 }
                 f = d[m - 1];
-                g = PrimitiveMath.SQRT.invoke(h);
+                g = SQRT.invoke(h);
                 if (f > 0) {
                     g = -g;
                 }

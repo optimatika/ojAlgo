@@ -25,8 +25,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.blas.DOT;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -59,7 +57,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     public boolean checkAndCompute(final MatrixStore<Double> matrix) {
 
-        mySPD = MatrixUtils.isHermitian(matrix);
+        mySPD = matrix.isHermitian();
 
         if (mySPD) {
 
@@ -77,7 +75,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
         final double[][] retVal = this.reset(matrix, false);
 
-        final RawStore tmpRawInPlaceStore = this.getRawInPlaceStore();
+        final RawStore tmpRawInPlaceStore = this.getInternalStore();
 
         matrix.supplyTo(tmpRawInPlaceStore);
 
@@ -86,7 +84,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     public Double getDeterminant() {
 
-        final double[][] tmpData = this.getRawInPlaceData();
+        final double[][] tmpData = this.getInternalData();
 
         final int tmpMinDim = this.getMinDim();
 
@@ -110,15 +108,15 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     public MatrixStore<Double> getL() {
-        return this.getRawInPlaceStore().logical().triangular(false, false).get();
+        return this.getInternalStore().logical().triangular(false, false).get();
     }
 
     public int getRank() {
 
-        final double tolerance = PrimitiveMath.SQRT.invoke(this.getAlgorithmEpsilon());
+        final double tolerance = SQRT.invoke(this.getAlgorithmEpsilon());
         int rank = 0;
 
-        final RawStore inPlaceStore = this.getRawInPlaceStore();
+        final RawStore inPlaceStore = this.getInternalStore();
         final int limit = this.getMinDim();
         for (int ij = 0; ij < limit; ij++) {
             if (inPlaceStore.doubleValue(ij, ij) > tolerance) {
@@ -204,10 +202,10 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         for (int ij = 0; mySPD && (ij < tmpDiagDim); ij++) { // For each row/column, along the diagonal
             tmpRowIJ = data[ij];
 
-            tmpVal = PrimitiveMath.MAX.invoke(input.doubleValue(ij, ij) - DOT.invoke(tmpRowIJ, 0, tmpRowIJ, 0, 0, ij), ZERO);
-            myMaxDiag = PrimitiveMath.MAX.invoke(myMaxDiag, tmpVal);
-            myMinDiag = PrimitiveMath.MIN.invoke(myMinDiag, tmpVal);
-            tmpVal = tmpRowIJ[ij] = PrimitiveMath.SQRT.invoke(tmpVal);
+            tmpVal = MAX.invoke(input.doubleValue(ij, ij) - DOT.invoke(tmpRowIJ, 0, tmpRowIJ, 0, 0, ij), ZERO);
+            myMaxDiag = MAX.invoke(myMaxDiag, tmpVal);
+            myMinDiag = MIN.invoke(myMinDiag, tmpVal);
+            tmpVal = tmpRowIJ[ij] = SQRT.invoke(tmpVal);
             mySPD = mySPD && (tmpVal > ZERO);
 
             for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
@@ -222,7 +220,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {
 
-        final RawStore tmpBody = this.getRawInPlaceStore();
+        final RawStore tmpBody = this.getInternalStore();
 
         preallocated.substituteForwards(tmpBody, false, false, true);
         preallocated.substituteBackwards(tmpBody, false, true, true);
@@ -232,7 +230,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
-        final RawStore tmpBody = this.getRawInPlaceStore();
+        final RawStore tmpBody = this.getInternalStore();
 
         preallocated.substituteForwards(tmpBody, false, false, false);
         preallocated.substituteBackwards(tmpBody, false, true, false);

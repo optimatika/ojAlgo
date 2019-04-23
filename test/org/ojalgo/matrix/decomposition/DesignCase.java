@@ -30,10 +30,10 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.EconomySize;
+import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.Uniform;
@@ -54,9 +54,9 @@ public class DesignCase {
     @Test
     public void testCholeskySolveInverse() {
 
-        final PhysicalStore<ComplexNumber> tmpRandomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
-        final PhysicalStore<Double> tmpVctr = PrimitiveDenseStore.FACTORY.copy(tmpRandomComplexStore);
-        final MatrixStore<Double> tmpMtrx = tmpVctr.multiply(tmpVctr.transpose());
+        PhysicalStore<ComplexNumber> tmpRandomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
+        PhysicalStore<Double> tmpVctr = PrimitiveDenseStore.FACTORY.copy(tmpRandomComplexStore);
+        MatrixStore<Double> tmpMtrx = tmpVctr.multiply(tmpVctr.transpose());
 
         this.doTestSolveInverse(Cholesky.PRIMITIVE.make(), tmpMtrx);
     }
@@ -64,15 +64,17 @@ public class DesignCase {
     @Test
     public void testFullSize() {
 
-        final NumberContext precision = new NumberContext(12, 8);
+        NumberContext precision = new NumberContext(12, 8);
 
         MatrixStore<Double> tall = PrimitiveDenseStore.FACTORY.makeFilled(7, 5, new Uniform());
         MatrixStore<Double> fat = PrimitiveDenseStore.FACTORY.makeFilled(5, 7, new Uniform());
 
-        MatrixDecomposition.EconomySize<Double>[] all = MatrixDecompositionTests.getFullSizePrimitive();
+        @SuppressWarnings("unchecked")
+        EconomySize<Double>[] all = (EconomySize<Double>[]) new EconomySize<?>[] { new BidiagonalDecomposition.Primitive(true),
+                new QRDecomposition.Primitive(true), new SingularValueDecomposition.Primitive(true) };
         for (EconomySize<Double> decomp : all) {
 
-            final String className = decomp.getClass().getName();
+            String className = decomp.getClass().getName();
 
             if (decomp instanceof Bidiagonal<?>) {
                 Bidiagonal<Double> bidiagonal = (Bidiagonal<Double>) decomp;
@@ -149,25 +151,28 @@ public class DesignCase {
     }
 
     @Test
-    public void testLuSolveInverse() {
+    public void testSolveInverse() {
 
-        final PhysicalStore<ComplexNumber> tmpRandomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
-        final PhysicalStore<Double> tmpVctr = PrimitiveDenseStore.FACTORY.copy(tmpRandomComplexStore);
-        final MatrixStore<Double> tmpMtrx = tmpVctr.multiply(tmpVctr.transpose());
+        PhysicalStore<ComplexNumber> randomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
+        PhysicalStore<Double> vectors = PrimitiveDenseStore.FACTORY.copy(randomComplexStore);
+        MatrixStore<Double> matrix = vectors.multiply(vectors.transpose());
 
-        this.doTestSolveInverse(LU.PRIMITIVE.make(), tmpMtrx);
+        List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();
+        for (Solver<Double> solver : all) {
+            this.doTestSolveInverse(solver, matrix);
+        }
     }
 
     @Test
     public void testRandomUnderdetermined() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.makeFilled(3, 9, new Normal());
-        final PhysicalStore<Double> tmpB = PrimitiveDenseStore.FACTORY.makeFilled(3, 1, new Normal());
+        PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.makeFilled(3, 9, new Normal());
+        PhysicalStore<Double> tmpB = PrimitiveDenseStore.FACTORY.makeFilled(3, 1, new Normal());
 
-        final QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
+        QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.decompose(tmpA);
 
-        final PhysicalStore<Double> tmpX = tmpQR.getSolution(tmpB).copy();
+        PhysicalStore<Double> tmpX = tmpQR.getSolution(tmpB).copy();
 
         // BasicLogger.debug("Straigt X: " + tmpX.toString());
         tmpB.modifyMatching(PrimitiveMath.SUBTRACT, tmpA.multiply(tmpX));
@@ -176,20 +181,31 @@ public class DesignCase {
     }
 
     @Test
+    public void testSolvable() {
+
+        PhysicalStore<Double> matrix = PrimitiveDenseStore.FACTORY.makeSPD(9);
+
+        List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();
+        for (MatrixDecomposition.Solver<Double> decomposition : all) {
+            decomposition.decompose(matrix);
+            String message = decomposition.getClass().toString();
+            TestUtils.assertTrue(message, decomposition.isComputed());
+            TestUtils.assertTrue(message, decomposition.isSolvable());
+        }
+    }
+
+    @Test
     public void testSolveIdentity() {
 
-        final Access2D<?> tmpIdentity = MatrixStore.PRIMITIVE.makeIdentity(9).get();
-        final Access2D<?> tmpRandom = PrimitiveDenseStore.FACTORY.makeFilled(9, 1, new Uniform());
+        Access2D<?> identity = MatrixStore.PRIMITIVE.makeIdentity(9).get();
+        Access2D<?> random = PrimitiveDenseStore.FACTORY.makeFilled(9, 1, new Uniform());
 
-        final List<MatrixDecomposition<Double>> tmpAllDecomps = MatrixDecompositionTests.getAllPrimitive();
-        for (final MatrixDecomposition<Double> tmpDecomp : tmpAllDecomps) {
-            if (tmpDecomp instanceof SolverTask) {
-                final SolverTask<Double> tmpSolverTask = (SolverTask<Double>) tmpDecomp;
-                try {
-                    TestUtils.assertEquals(tmpDecomp.getClass().toString(), tmpRandom, tmpSolverTask.solve(tmpIdentity, tmpRandom));
-                } catch (final RecoverableCondition xcptn) {
-                    TestUtils.fail(tmpDecomp.getClass().toString() + " " + xcptn.getMessage());
-                }
+        List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();
+        for (Solver<Double> solver : all) {
+            try {
+                TestUtils.assertEquals(solver.getClass().toString(), random, solver.solve(identity, random));
+            } catch (RecoverableCondition xcptn) {
+                TestUtils.fail(solver.getClass().toString() + " " + xcptn.getMessage());
             }
         }
     }
@@ -197,10 +213,10 @@ public class DesignCase {
     @Test
     public void testTridiagonal() {
 
-        final Tridiagonal<Double> tmpDecomposition = Tridiagonal.PRIMITIVE.make();
-        //final Tridiagonal<Double> tmpDecomposition = new TridiagonalAltDecomp();
+        Tridiagonal<Double> tmpDecomposition = Tridiagonal.PRIMITIVE.make();
+        //  Tridiagonal<Double> tmpDecomposition = new TridiagonalAltDecomp();
 
-        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
+        PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 4, 2, 2, 1 }, { 2, -3, 1, 1 }, { 2, 1, 3, 1 }, { 1, 1, 1, 2 } });
 
         tmpDecomposition.decompose(tmpOriginalMatrix);
@@ -214,33 +230,33 @@ public class DesignCase {
     @Test
     public void testWikipediaNullspace() {
 
-        final PhysicalStore<Double> mtrxA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2, 3, 5 }, { -4, 2, 3 } });
-        final MatrixStore<Double> mtrxAt = mtrxA.transpose();
+        PhysicalStore<Double> mtrxA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2, 3, 5 }, { -4, 2, 3 } });
+        MatrixStore<Double> mtrxAt = mtrxA.transpose();
 
-        final NumberContext precision = new NumberContext(14, 8);
+        NumberContext precision = new NumberContext(14, 8);
 
-        final QR<Double> decompPriQR = QR.PRIMITIVE.make(true);
+        QR<Double> decompPriQR = QR.PRIMITIVE.make(true);
         decompPriQR.decompose(mtrxAt);
         TestUtils.assertEquals(mtrxAt, decompPriQR, precision);
         TestUtils.assertEquals(3, decompPriQR.getQ().countRows());
         TestUtils.assertEquals(3, decompPriQR.getQ().countColumns());
 
-        final SingularValue<Double> decompPriSVD = SingularValue.PRIMITIVE.make(true);
+        SingularValue<Double> decompPriSVD = SingularValue.PRIMITIVE.make(true);
         decompPriSVD.decompose(mtrxA);
         TestUtils.assertEquals(mtrxA, decompPriSVD, precision);
         TestUtils.assertEquals(3, decompPriSVD.getQ2().countRows());
         TestUtils.assertEquals(3, decompPriSVD.getQ2().countColumns());
 
-        final PhysicalStore<Double> nullspacePriQR = decompPriQR.getQ().logical().offsets(0, decompPriQR.getRank()).get().copy();
-        final PhysicalStore<Double> nullspacePriSVD = decompPriSVD.getQ2().logical().offsets(0, decompPriSVD.getRank()).get().copy();
+        PhysicalStore<Double> nullspacePriQR = decompPriQR.getQ().logical().offsets(0, decompPriQR.getRank()).get().copy();
+        PhysicalStore<Double> nullspacePriSVD = decompPriSVD.getQ2().logical().offsets(0, decompPriSVD.getRank()).get().copy();
 
-        final double scalePriQR = PrimitiveMath.ABS.invoke(nullspacePriQR.doubleValue(0));
+        double scalePriQR = PrimitiveMath.ABS.invoke(nullspacePriQR.doubleValue(0));
         nullspacePriQR.modifyAll(PrimitiveMath.DIVIDE.second(scalePriQR));
 
-        final double scalePriSVD = PrimitiveMath.ABS.invoke(nullspacePriSVD.doubleValue(0));
+        double scalePriSVD = PrimitiveMath.ABS.invoke(nullspacePriSVD.doubleValue(0));
         nullspacePriSVD.modifyAll(PrimitiveMath.DIVIDE.second(scalePriSVD));
 
-        final PrimitiveDenseStore nullspace = PrimitiveDenseStore.FACTORY.columns(new double[] { -1, -26, 16 });
+        PrimitiveDenseStore nullspace = PrimitiveDenseStore.FACTORY.columns(new double[] { -1, -26, 16 });
 
         TestUtils.assertEquals(nullspace, nullspacePriQR, precision);
         TestUtils.assertEquals(nullspace, nullspacePriSVD, precision);
@@ -252,17 +268,17 @@ public class DesignCase {
     @Test
     public void testWikipediaSVD() {
 
-        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
+        PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
         Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
-        final SingularValue<Double> tmpOldDecomp = new SingularValueDecomposition.Primitive();
+        SingularValue<Double> tmpOldDecomp = new SingularValueDecomposition.Primitive();
         tmpOldDecomp.decompose(tmpOriginalMatrix);
         tmpOldDecomp.getD();
         tmpOldDecomp.getQ1();
         tmpOldDecomp.getQ2();
 
-        final SingularValue<Double> tmpNewDecomp = new RawSingularValue();
+        SingularValue<Double> tmpNewDecomp = new RawSingularValue();
         tmpNewDecomp.decompose(tmpOriginalMatrix);
         tmpNewDecomp.getD();
         tmpNewDecomp.getQ1();
@@ -271,23 +287,24 @@ public class DesignCase {
         TestUtils.assertEquals(tmpOriginalMatrix, tmpNewDecomp, new NumberContext(7, 6));
     }
 
-    private void doTestSolveInverse(final MatrixDecomposition.Solver<Double> aDecomp, final MatrixStore<Double> aMtrx) {
+    private void doTestSolveInverse(MatrixDecomposition.Solver<Double> solver, MatrixStore<Double> matrix) {
 
-        TestUtils.assertEquals("Matrix not square!", aMtrx.countRows(), aMtrx.countColumns());
+        TestUtils.assertEquals("Matrix not square!", matrix.countRows(), matrix.countColumns());
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Original", aMtrx);
+            BasicLogger.debug("Original", matrix);
+            BasicLogger.debug("Solver: {}", solver.getClass());
         }
 
-        aDecomp.decompose(aMtrx);
+        solver.decompose(matrix);
 
-        TestUtils.assertTrue("Decomposition not solveable", aDecomp.isSolvable());
+        TestUtils.assertTrue("Decomposition not solvable", solver.isSolvable());
 
-        final int tmpMinDim = (int) Math.min(aMtrx.countRows(), aMtrx.countColumns());
-        final PhysicalStore<Double> tmpEye = PrimitiveDenseStore.FACTORY.makeEye(tmpMinDim, tmpMinDim);
+        int dim = (int) Math.min(matrix.countRows(), matrix.countColumns());
+        PhysicalStore<Double> tmpEye = PrimitiveDenseStore.FACTORY.makeEye(dim, dim);
 
-        final MatrixStore<Double> tmpDirInv = aDecomp.getInverse();
-        final MatrixStore<Double> tmpSolInv = aDecomp.getSolution(tmpEye);
+        MatrixStore<Double> tmpDirInv = solver.getInverse();
+        MatrixStore<Double> tmpSolInv = solver.getSolution(tmpEye);
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("Direct Inverse", tmpDirInv);
@@ -295,8 +312,7 @@ public class DesignCase {
         }
 
         TestUtils.assertEquals("Not inverted/solved correctly!", tmpDirInv, tmpSolInv);
-        TestUtils.assertEquals("Not inverted correctly!", aMtrx, aMtrx.multiply(tmpDirInv).multiply(aMtrx));
-        TestUtils.assertEquals("Not solved correctly!", aMtrx, aMtrx.multiply(tmpSolInv).multiply(aMtrx));
-
+        TestUtils.assertEquals("Not inverted correctly!", matrix, matrix.multiply(tmpDirInv).multiply(matrix));
+        TestUtils.assertEquals("Not solved correctly!", matrix, matrix.multiply(tmpSolInv).multiply(matrix));
     }
 }

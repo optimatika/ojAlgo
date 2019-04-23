@@ -40,11 +40,11 @@ public abstract class MatrixTaskTests {
 
         final ArrayList<DeterminantTask<Double>> retVal = new ArrayList<>();
 
-        Collections.addAll(retVal, MatrixDecompositionTests.getLUPrimitive());
+        Collections.addAll(retVal, MatrixDecompositionTests.getPrimitiveLU());
 
-        Collections.addAll(retVal, MatrixDecompositionTests.getEigenvaluePrimitiveGeneral());
+        Collections.addAll(retVal, MatrixDecompositionTests.getPrimitiveEigenvalueGeneral());
 
-        Collections.addAll(retVal, MatrixDecompositionTests.getQRPrimitive());
+        Collections.addAll(retVal, MatrixDecompositionTests.getPrimitiveQR());
 
         return retVal;
     }
@@ -53,15 +53,15 @@ public abstract class MatrixTaskTests {
 
         final ArrayList<DeterminantTask<Double>> retVal = new ArrayList<>();
 
-        Collections.addAll(retVal, MatrixDecompositionTests.getCholeskyPrimitive());
+        Collections.addAll(retVal, MatrixDecompositionTests.getPrimitiveCholesky());
 
-        Collections.addAll(retVal, MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric());
+        Collections.addAll(retVal, MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric());
 
-        Collections.addAll(retVal, MatrixDecompositionTests.getLUPrimitive());
+        Collections.addAll(retVal, MatrixDecompositionTests.getPrimitiveLU());
 
-        Collections.addAll(retVal, MatrixDecompositionTests.getEigenvaluePrimitiveGeneral());
+        Collections.addAll(retVal, MatrixDecompositionTests.getPrimitiveEigenvalueGeneral());
 
-        Collections.addAll(retVal, MatrixDecompositionTests.getQRPrimitive());
+        Collections.addAll(retVal, MatrixDecompositionTests.getPrimitiveQR());
 
         return retVal;
     }

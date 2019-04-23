@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -38,39 +37,37 @@ import org.ojalgo.type.context.NumberContext;
  * </p>
  * <p>
  * If [A] is symmetric (but not necessarily positive definite) then it can be decomposed into [L][D][L]
- * <sup>T</sup> (or [U]<sup>T</sup>[D][U]).
+ * <sup>T</sup> (or [R]<sup>H</sup>[D][R]).
  * </p>
  * <ul>
  * <li>[L] is a unit lower (left) triangular matrix. It has the same dimensions as [this], and ones on the
  * diagonal.</li>
  * <li>[D] is a diagonal matrix. It has the same dimensions as [this].</li>
- * <li>[this] = [L][D][L]<sup>T</sup></li>
+ * <li>[this] = [L][D][L]<sup>H</sup></li>
  * </ul>
  *
  * @author apete
  */
-public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermitian<N> {
+public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Pivoting<N> {
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<LDL<N>> {
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new LDLDecomposition.Complex();
+    Factory<ComplexNumber> COMPLEX = typical -> new LDLDecomposition.Complex();
 
-    public static final Factory<Double> PRIMITIVE = typical -> {
-        if ((256L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
-            return new LDLDecomposition.Primitive();
-        } else {
-            return new RawLDL();
-        }
-    };
+    Factory<Double> PRIMITIVE = typical -> new LDLDecomposition.Primitive();
 
-    public static final Factory<Quaternion> QUATERNION = typical -> new LDLDecomposition.Quat();
+    Factory<Quaternion> QUATERNION = typical -> new LDLDecomposition.Quat();
 
-    public static final Factory<RationalNumber> RATIONAL = typical -> new LDLDecomposition.Rational();
+    Factory<RationalNumber> RATIONAL = typical -> new LDLDecomposition.Rational();
+
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
+        return Access2D.equals(matrix, decomposition.reconstruct(), context);
+    }
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> LDL<N> make(final Access2D<N> typical) {
+    static <N extends Number> LDL<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -87,19 +84,12 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         }
     }
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
-        return Access2D.equals(matrix, decomposition.reconstruct(), context);
-    }
-
+    /**
+     * @deprecated v48 Use {@link #reconstruct()} instead
+     */
+    @Deprecated
     static <N extends Number> MatrixStore<N> reconstruct(final LDL<N> decomposition) {
-        final MatrixStore<N> tmpL = decomposition.getL();
-        final MatrixStore<N> tmpD = decomposition.getD();
-        final MatrixStore<N> tmpR = decomposition.getR();
-        return tmpL.multiply(tmpD).multiply(tmpR);
-    }
-
-    default boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        return LDL.equals(other, this, context);
+        return decomposition.reconstruct();
     }
 
     MatrixStore<N> getD();
@@ -118,11 +108,14 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         return this.getL().conjugate();
     }
 
-    default boolean isFullSize() {
-        return true;
-    }
-
     default MatrixStore<N> reconstruct() {
-        return LDL.reconstruct(this);
+
+        MatrixStore<N> mtrxL = this.getL();
+        MatrixStore<N> mtrxD = this.getD();
+        MatrixStore<N> mtrxR = this.getR();
+
+        int[] pivotOrder = this.getPivotOrder();
+
+        return mtrxL.multiply(mtrxD).multiply(mtrxR).logical().row(pivotOrder).column(pivotOrder).get();
     }
 }

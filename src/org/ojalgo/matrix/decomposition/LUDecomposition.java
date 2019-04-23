@@ -28,7 +28,6 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -86,12 +85,12 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.getDeterminant();
     }
 
-    public boolean computeWithoutPivoting(final ElementsSupplier<N> matrix) {
-        return this.compute(matrix, true);
+    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+        return this.doDecompose(matrix, true);
     }
 
-    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> aStore) {
-        return this.compute(aStore, false);
+    public boolean decomposeWithoutPivoting(Collectable<N, ? super PhysicalStore<N>> matrix) {
+        return this.doDecompose(matrix, false);
     }
 
     public N getDeterminant() {
@@ -220,6 +219,10 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.isSolvable();
     }
 
+    public boolean isPivoted() {
+        return myPivot.isModified();
+    }
+
     public PhysicalStore<N> preallocate(final Structure2D template) {
         final long tmpCountRows = template.countRows();
         return this.allocate(tmpCountRows, tmpCountRows);
@@ -259,11 +262,11 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
     }
 
-    private final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> aStore, final boolean assumeNoPivotingRequired) {
+    private final boolean doDecompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean pivoting) {
 
         this.reset();
 
-        final DecompositionStore<N> tmpInPlace = this.setInPlace(aStore);
+        final DecompositionStore<N> tmpInPlace = this.setInPlace(matrix);
 
         final int tmpRowDim = this.getRowDim();
         this.getColDim();
@@ -276,7 +279,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         // Main loop - along the diagonal
         for (int ij = 0; ij < tmpMinDim; ij++) {
 
-            if (!assumeNoPivotingRequired) {
+            if (pivoting) {
                 // Find next pivot row
                 final int tmpPivotRow = (int) tmpInPlace.indexOfLargestInColumn(ij, ij);
 
