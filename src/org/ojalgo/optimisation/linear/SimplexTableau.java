@@ -168,16 +168,14 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             double currentRHS = currentRow.doubleValue(myStructure - 1);
 
             final Primitive64Array auxiliaryRow = Primitive64Array.make(myStructure);
-            double auxiliaryRHS = ZERO;
-
             if (currentRHS > value) {
                 currentRow.axpy(NEG, auxiliaryRow);
                 auxiliaryRow.set(index, ZERO);
-                auxiliaryRow.set(myStructure - 1, auxiliaryRHS = value - currentRHS);
+                auxiliaryRow.set(myStructure - 1, value - currentRHS);
             } else if (currentRHS < value) {
                 currentRow.axpy(ONE, auxiliaryRow);
                 auxiliaryRow.set(index, ZERO);
-                auxiliaryRow.set(myStructure - 1, auxiliaryRHS = currentRHS - value);
+                auxiliaryRow.set(myStructure - 1, currentRHS - value);
             } else {
                 return true;
             }
@@ -196,7 +194,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             // Diff begin
 
-            auxiliaryRHS = this.scale(auxiliaryRow, pivotCol);
+            this.scale(auxiliaryRow, pivotCol);
 
             this.doPivot(-1, pivotCol, auxiliaryRow.data, 0, myStructure);
 
@@ -352,7 +350,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     this.add(index, addend.doubleValue());
                 }
 
-                public final long count() {
+                public long count() {
                     return DenseTableau.this.countConstraints();
                 }
 
@@ -813,7 +811,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     this.add(index, addend.doubleValue());
                 }
 
-                public final long count() {
+                public long count() {
                     return SparseTableau.this.countConstraints();
                 }
 

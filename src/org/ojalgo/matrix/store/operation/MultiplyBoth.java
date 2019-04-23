@@ -27,10 +27,10 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
+import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
@@ -632,8 +632,8 @@ public final class MultiplyBoth extends MatrixOperation {
         }
     }
 
-    static <N extends Number & Scalar<N>> void invokeGeneric(final TransformableRegion<N> product, final int firstRow, final int rowLimit, final Access1D<N> left,
-            final int complexity, final Access1D<N> right) {
+    static <N extends Number & Scalar<N>> void invokeGeneric(final TransformableRegion<N> product, final int firstRow, final int rowLimit,
+            final Access1D<N> left, final int complexity, final Access1D<N> right) {
 
         @SuppressWarnings("unchecked")
         final Class<N> componenetType = (Class<N>) left.get(0L).getClass();

@@ -40,7 +40,7 @@ import org.ojalgo.type.context.NumberContext;
 public final class BigFunction extends FunctionSet<BigDecimal> {
 
     @FunctionalInterface
-    public static interface Binary extends BinaryFunction<BigDecimal> {
+    public interface Binary extends BinaryFunction<BigDecimal> {
 
         default double invoke(final double arg1, final double arg2) {
             return this.invoke(BigDecimal.valueOf(arg1), BigDecimal.valueOf(arg2)).doubleValue();
@@ -49,7 +49,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     }
 
     @FunctionalInterface
-    public static interface Consumer extends VoidFunction<BigDecimal> {
+    public interface Consumer extends VoidFunction<BigDecimal> {
 
         default void invoke(final double arg) {
             this.invoke(BigDecimal.valueOf(arg));
@@ -58,7 +58,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     }
 
     @FunctionalInterface
-    public static interface Parameter extends ParameterFunction<BigDecimal> {
+    public interface Parameter extends ParameterFunction<BigDecimal> {
 
         default double invoke(final double arg, final int param) {
             return this.invoke(BigDecimal.valueOf(arg), param).doubleValue();
@@ -67,7 +67,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     }
 
     @FunctionalInterface
-    public static interface Predicate extends PredicateFunction<BigDecimal> {
+    public interface Predicate extends PredicateFunction<BigDecimal> {
 
         default boolean invoke(final double arg) {
             return this.invoke(BigDecimal.valueOf(arg));
@@ -76,7 +76,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     }
 
     @FunctionalInterface
-    public static interface Unary extends UnaryFunction<BigDecimal> {
+    public interface Unary extends UnaryFunction<BigDecimal> {
 
         default double invoke(final double arg) {
             return this.invoke(BigDecimal.valueOf(arg)).doubleValue();

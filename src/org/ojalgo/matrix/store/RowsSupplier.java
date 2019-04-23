@@ -102,7 +102,7 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return Access2D.toString(this);
     }
 

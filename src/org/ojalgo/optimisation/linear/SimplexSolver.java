@@ -526,11 +526,11 @@ public final class SimplexSolver extends LinearSolver {
         return myPoint.isPhase1() ? myTableau.countConstraints() + 1 : myTableau.countConstraints();
     }
 
-    private final boolean isTableauPrintable() {
+    private boolean isTableauPrintable() {
         return myTableau.count() <= 512L;
     }
 
-    private final void logDebugTableau(final String message) {
+    private void logDebugTableau(final String message) {
         this.log(message + "; Basics: " + Arrays.toString(myTableau.getBasis()), myTableau);
         // this.debug("New/alt " + message + "; Basics: " + Arrays.toString(myBasis), myTableau);
     }

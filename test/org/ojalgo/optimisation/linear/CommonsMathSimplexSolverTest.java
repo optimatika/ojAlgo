@@ -739,7 +739,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     /**
      * Copied/stolen from Commons Math to simplify "copying" the test cases
      */
-    static enum Relationship {
+    enum Relationship {
 
         /**
          * Equality relationship.

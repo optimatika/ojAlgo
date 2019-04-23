@@ -35,7 +35,7 @@ import org.ojalgo.type.context.NumberContext;
 public final class RationalFunction extends FunctionSet<RationalNumber> {
 
     @FunctionalInterface
-    public static interface Binary extends BinaryFunction<RationalNumber> {
+    public interface Binary extends BinaryFunction<RationalNumber> {
 
         default double invoke(final double arg1, final double arg2) {
             return this.invoke(RationalNumber.valueOf(arg1), RationalNumber.valueOf(arg2)).doubleValue();
@@ -44,7 +44,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     }
 
     @FunctionalInterface
-    public static interface Consumer extends VoidFunction<RationalNumber> {
+    public interface Consumer extends VoidFunction<RationalNumber> {
 
         default void invoke(final double arg) {
             this.invoke(RationalNumber.valueOf(arg));
@@ -53,7 +53,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     }
 
     @FunctionalInterface
-    public static interface Parameter extends ParameterFunction<RationalNumber> {
+    public interface Parameter extends ParameterFunction<RationalNumber> {
 
         default double invoke(final double arg, final int param) {
             return this.invoke(RationalNumber.valueOf(arg), param).doubleValue();
@@ -62,7 +62,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     }
 
     @FunctionalInterface
-    public static interface Predicate extends PredicateFunction<RationalNumber> {
+    public interface Predicate extends PredicateFunction<RationalNumber> {
 
         default boolean invoke(final double arg) {
             return this.invoke(RationalNumber.valueOf(arg));
@@ -71,7 +71,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     }
 
     @FunctionalInterface
-    public static interface Unary extends UnaryFunction<RationalNumber> {
+    public interface Unary extends UnaryFunction<RationalNumber> {
 
         default double invoke(final double arg) {
             return this.invoke(RationalNumber.valueOf(arg)).doubleValue();

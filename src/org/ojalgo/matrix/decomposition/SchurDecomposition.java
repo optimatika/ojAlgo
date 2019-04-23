@@ -62,11 +62,11 @@ abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition
             this(null, null);
         }
 
-        public final Array1D<ComplexNumber> getDiagonal() {
+        public Array1D<ComplexNumber> getDiagonal() {
             return myDiagonal;
         }
 
-        public final MatrixStore<N> getQ() {
+        public MatrixStore<N> getQ() {
             return myQ;
         }
 

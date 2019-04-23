@@ -315,6 +315,10 @@ public final class ArrayAnyD<N extends Number>
         myDelegate.modify(0L, this.count(), 1L, modifier);
     }
 
+    public void modifyAny(TransformationAnyD<N> modifier) {
+        modifier.transform(this);
+    }
+
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
         myDelegate.modify(0L, this.count(), 1L, left, function);
     }
@@ -447,10 +451,6 @@ public final class ArrayAnyD<N extends Number>
         }
 
         return retVal.toString();
-    }
-
-    public void modifyAny(TransformationAnyD<N> modifier) {
-        modifier.transform(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

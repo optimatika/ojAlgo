@@ -50,27 +50,27 @@ public interface ParameterFunction<N extends Number> extends BasicFunction, BiFu
             myParameter = param;
         }
 
-        public final ParameterFunction<N> getFunction() {
+        public ParameterFunction<N> getFunction() {
             return myFunction;
         }
 
-        public final int getParameter() {
+        public int getParameter() {
             return myParameter;
         }
 
-        public final double invoke(final double arg) {
+        public double invoke(final double arg) {
             return myFunction.invoke(arg, myParameter);
         }
 
-        public final N invoke(final N arg) {
+        public N invoke(final N arg) {
             return myFunction.invoke(arg, myParameter);
         }
 
     }
 
-    public abstract double invoke(double arg, int param);
+    double invoke(double arg, int param);
 
-    public abstract N invoke(N arg, int param);
+    N invoke(N arg, int param);
 
     default ParameterFunction<N> andThen(final UnaryFunction<N> after) {
         ProgrammingError.throwIfNull(after);

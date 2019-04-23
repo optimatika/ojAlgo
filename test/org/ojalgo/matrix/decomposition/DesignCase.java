@@ -151,19 +151,6 @@ public class DesignCase {
     }
 
     @Test
-    public void testSolveInverse() {
-
-        PhysicalStore<ComplexNumber> randomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
-        PhysicalStore<Double> vectors = PrimitiveDenseStore.FACTORY.copy(randomComplexStore);
-        MatrixStore<Double> matrix = vectors.multiply(vectors.transpose());
-
-        List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();
-        for (Solver<Double> solver : all) {
-            this.doTestSolveInverse(solver, matrix);
-        }
-    }
-
-    @Test
     public void testRandomUnderdetermined() {
 
         PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.makeFilled(3, 9, new Normal());
@@ -207,6 +194,19 @@ public class DesignCase {
             } catch (RecoverableCondition xcptn) {
                 TestUtils.fail(solver.getClass().toString() + " " + xcptn.getMessage());
             }
+        }
+    }
+
+    @Test
+    public void testSolveInverse() {
+
+        PhysicalStore<ComplexNumber> randomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
+        PhysicalStore<Double> vectors = PrimitiveDenseStore.FACTORY.copy(randomComplexStore);
+        MatrixStore<Double> matrix = vectors.multiply(vectors.transpose());
+
+        List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();
+        for (Solver<Double> solver : all) {
+            this.doTestSolveInverse(solver, matrix);
         }
     }
 

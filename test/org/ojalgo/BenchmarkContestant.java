@@ -33,10 +33,6 @@ import org.ojalgo.structure.Structure2D;
 
 public abstract class BenchmarkContestant<T> {
 
-    public static MatrixDecomposition.Solver<Double> newSolver(Structure2D template) {
-        return LU.PRIMITIVE.make(template);
-    }
-
     public abstract class EigenDecomposer implements UnaryOperator<T> {
 
         public abstract T apply(final T matrix);
@@ -128,6 +124,10 @@ public abstract class BenchmarkContestant<T> {
     public static final Map<String, BenchmarkContestant<?>> CONTESTANTS = new HashMap<>();
 
     static {
+    }
+
+    public static MatrixDecomposition.Solver<Double> newSolver(Structure2D template) {
+        return LU.PRIMITIVE.make(template);
     }
 
     public BenchmarkContestant() {

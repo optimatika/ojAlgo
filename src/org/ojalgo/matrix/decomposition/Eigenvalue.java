@@ -183,6 +183,18 @@ public interface Eigenvalue<N extends Number>
 
     Factory<RationalNumber> RATIONAL = (typical, hermitian) -> hermitian ? new HermitianEvD.Rational() : null;
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
+
+        final MatrixStore<N> tmpD = decomposition.getD();
+        final MatrixStore<N> tmpV = decomposition.getV();
+
+        // Check that [A][V] == [V][D] ([A] == [V][D][V]<sup>T</sup> is not always true)
+        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpV);
+        final MatrixStore<N> tmpStore2 = tmpV.multiply(tmpD);
+
+        return Access2D.equals(tmpStore1, tmpStore2, context);
+    }
+
     static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical) {
         return Eigenvalue.make(typical, MatrixUtils.isHermitian(typical));
     }
@@ -203,18 +215,6 @@ public interface Eigenvalue<N extends Number>
         } else {
             throw new IllegalArgumentException();
         }
-    }
-
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpD = decomposition.getD();
-        final MatrixStore<N> tmpV = decomposition.getV();
-
-        // Check that [A][V] == [V][D] ([A] == [V][D][V]<sup>T</sup> is not always true)
-        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpV);
-        final MatrixStore<N> tmpStore2 = tmpV.multiply(tmpD);
-
-        return Access2D.equals(tmpStore1, tmpStore2, context);
     }
 
     /**

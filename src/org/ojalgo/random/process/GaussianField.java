@@ -54,7 +54,7 @@ import org.ojalgo.type.keyvalue.ComparableToDouble;
  */
 public final class GaussianField<K extends Comparable<? super K>> {
 
-    public static interface Covariance<K extends Comparable<? super K>> {
+    public interface Covariance<K extends Comparable<? super K>> {
 
         void calibrate(Collection<ComparableToDouble<K>> observations, Mean<K> mean);
 
@@ -62,7 +62,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
     }
 
-    public static interface Mean<K extends Comparable<? super K>> {
+    public interface Mean<K extends Comparable<? super K>> {
 
         void calibrate(Collection<ComparableToDouble<K>> observations);
 
@@ -81,7 +81,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
             public double invoke(final K anArg) {
                 return ZERO;
-            };
+            }
         };
     }
 

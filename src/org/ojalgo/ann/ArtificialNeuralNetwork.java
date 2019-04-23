@@ -43,7 +43,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
      *
      * @author apete
      */
-    public static enum Activator {
+    public enum Activator {
 
         /**
          * (-,+)
@@ -97,7 +97,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
     }
 
-    public static enum Error implements PrimitiveFunction.Binary {
+    public enum Error implements PrimitiveFunction.Binary {
 
         /**
          * Currently this can only be used in in combination with {@link Activator#SOFTMAX} in the final
@@ -136,7 +136,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
 
     }
 
-    static interface ActivatorFunctionFactory {
+    interface ActivatorFunctionFactory {
 
         PrimitiveFunction.Unary make(PrimitiveDenseStore arguments);
 

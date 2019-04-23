@@ -62,7 +62,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
      *
      * @author apete
      */
-    public static interface Resolution extends TemporalAdjuster {
+    public interface Resolution extends TemporalAdjuster {
 
         /**
          * Will increment the input epochMilli by the size/duration of this timeline resolution.

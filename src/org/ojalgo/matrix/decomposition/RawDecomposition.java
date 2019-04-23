@@ -86,6 +86,14 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return this.getMaxDim() * MACHINE_EPSILON;
     }
 
+    protected double[][] getInternalData() {
+        return myInternalData;
+    }
+
+    protected RawStore getInternalStore() {
+        return myInternalStore;
+    }
+
     protected int getMaxDim() {
         return Math.max(myRowDim, myColDim);
     }
@@ -94,20 +102,12 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return Math.min(myRowDim, myColDim);
     }
 
-    protected double[][] getInternalData() {
-        return myInternalData;
+    protected int getRowDim() {
+        return myRowDim;
     }
 
     protected Collectable<Double, ? super PhysicalStore<Double>> wrap(Access2D<?> matrix) {
         return MatrixStore.PRIMITIVE.makeWrapper(matrix);
-    }
-
-    protected RawStore getInternalStore() {
-        return myInternalStore;
-    }
-
-    protected int getRowDim() {
-        return myRowDim;
     }
 
     double[][] reset(final Structure2D template, final boolean transpose) {

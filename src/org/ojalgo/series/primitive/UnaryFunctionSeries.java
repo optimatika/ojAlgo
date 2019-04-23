@@ -37,12 +37,12 @@ final class UnaryFunctionSeries extends PrimitiveSeries {
     }
 
     @Override
-    public final int size() {
+    public int size() {
         return mySeries.size();
     }
 
     @Override
-    public final double value(final int index) {
+    public double value(final int index) {
         return myFunction.invoke(mySeries.value(index));
     }
 

@@ -52,33 +52,33 @@ public final class DataSeries extends PrimitiveSeries {
         myValues = values;
     }
 
-    public final void modify(final BinaryFunction<Double> func, final double right) {
+    public void modify(final BinaryFunction<Double> func, final double right) {
         myValues.modifyAll(func.second(right));
     }
 
-    public final void modify(final double left, final BinaryFunction<Double> func) {
+    public void modify(final double left, final BinaryFunction<Double> func) {
         myValues.modifyAll(func.first(left));
     }
 
-    public final void modify(final ParameterFunction<Double> func, final int param) {
+    public void modify(final ParameterFunction<Double> func, final int param) {
         myValues.modifyAll(func.parameter(param));
     }
 
-    public final void modify(final UnaryFunction<Double> func) {
+    public void modify(final UnaryFunction<Double> func) {
         myValues.modifyAll(func);
     }
 
     @Override
-    public final int size() {
+    public int size() {
         return myValues.size();
     }
 
     @Override
-    public final double value(final int index) {
+    public double value(final int index) {
         return myValues.doubleValue(index);
     }
 
-    public final void visit(final AggregatorFunction<Double> visitor) {
+    public void visit(final AggregatorFunction<Double> visitor) {
         myValues.visitAll(visitor);
     }
 

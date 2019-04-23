@@ -43,12 +43,12 @@ final class QuotientsSeries extends PrimitiveSeries {
     }
 
     @Override
-    public final int size() {
+    public int size() {
         return myBase.size() - myPeriod;
     }
 
     @Override
-    public final double value(final int index) {
+    public double value(final int index) {
         return myBase.value(index + myPeriod) / myBase.value(index);
     }
 

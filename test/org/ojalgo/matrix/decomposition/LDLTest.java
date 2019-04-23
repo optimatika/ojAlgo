@@ -42,16 +42,6 @@ public class LDLTest {
     }
 
     @Test
-    public void testWikipediaCase() {
-
-        RawStore mtrxA = new RawStore(new double[][] { { 4, 12, -16 }, { 12, 37, -43 }, { -16, -43, 98 } });
-        RawStore mtrxL = new RawStore(new double[][] { { 1, 0, 0 }, { 3, 1, 0 }, { -4, 5, 1 } });
-        RawStore mtrxD = new RawStore(new double[][] { { 4, 0, 0 }, { 0, 1, 0 }, { 0, 0, 9 } });
-
-        this.doTest(mtrxA, mtrxL, mtrxD);
-    }
-
-    @Test
     public void testQuadOptKTH() {
 
         RawStore mtrxA = new RawStore(new double[][] { { 2, 4, 6, 8 }, { 4, 9, 17, 22 }, { 6, 17, 44, 61 }, { 8, 22, 61, 118 } });
@@ -72,6 +62,16 @@ public class LDLTest {
         MatrixStore<Double> permA = mtrxA.logical().row(3, 2, 1, 0).column(3, 2, 1, 0).get();
 
         this.doTest(permA, mtrxL, mtrxD);
+    }
+
+    @Test
+    public void testWikipediaCase() {
+
+        RawStore mtrxA = new RawStore(new double[][] { { 4, 12, -16 }, { 12, 37, -43 }, { -16, -43, 98 } });
+        RawStore mtrxL = new RawStore(new double[][] { { 1, 0, 0 }, { 3, 1, 0 }, { -4, 5, 1 } });
+        RawStore mtrxD = new RawStore(new double[][] { { 4, 0, 0 }, { 0, 1, 0 }, { 0, 0, 9 } });
+
+        this.doTest(mtrxA, mtrxL, mtrxD);
     }
 
     @Test

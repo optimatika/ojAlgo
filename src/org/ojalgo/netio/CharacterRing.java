@@ -161,7 +161,7 @@ public final class CharacterRing implements CharSequence, Appendable, BasicLogge
 
         @Override
         public void close() throws IOException {
-            ;
+
         }
 
         @Override
@@ -188,7 +188,7 @@ public final class CharacterRing implements CharSequence, Appendable, BasicLogge
 
         @Override
         public void flush() throws IOException {
-            ;
+
         }
 
         public void flush(final Printer printer) {

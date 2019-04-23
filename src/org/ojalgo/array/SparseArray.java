@@ -273,15 +273,15 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public final long count() {
+    public long count() {
         return myCount;
     }
 
-    public final long countNonzeros() {
+    public long countNonzeros() {
         return myActualLength;
     }
 
-    public final long countZeros() {
+    public long countZeros() {
         return myCount - myActualLength;
     }
 
@@ -823,7 +823,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return myValues.count();
     }
 
-    final DenseArray<N> densify() {
+    DenseArray<N> densify() {
 
         final DenseArray<N> retVal = myStrategy.make((int) this.count());
 
@@ -891,11 +891,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         };
     }
 
-    final int index(final long index) {
+    int index(final long index) {
         return Arrays.binarySearch(myIndices, 0, myActualLength, index);
     }
 
-    final LongStream indices() {
+    LongStream indices() {
         return Arrays.stream(myIndices, 0, myActualLength);
     }
 

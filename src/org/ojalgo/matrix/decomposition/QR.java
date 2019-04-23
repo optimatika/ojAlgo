@@ -82,6 +82,16 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
 
     Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new QRDecomposition.Rational(fullSize);
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
+
+        final MatrixStore<N> tmpQ = decomposition.getQ();
+        final MatrixStore<N> tmpR = decomposition.getR();
+
+        final MatrixStore<N> tmpStore = tmpQ.multiply(tmpR);
+
+        return Access2D.equals(tmpStore, matrix, context);
+    }
+
     @SuppressWarnings("unchecked")
     static <N extends Number> QR<N> make(final Access2D<N> typical) {
 
@@ -98,16 +108,6 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
         } else {
             throw new IllegalArgumentException();
         }
-    }
-
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpQ = decomposition.getQ();
-        final MatrixStore<N> tmpR = decomposition.getR();
-
-        final MatrixStore<N> tmpStore = tmpQ.multiply(tmpR);
-
-        return Access2D.equals(tmpStore, matrix, context);
     }
 
     /**

@@ -87,12 +87,12 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return this.getDeterminant();
     }
 
-    public boolean decomposeWithoutPivoting(Collectable<N, ? super PhysicalStore<N>> matrix) {
-        return this.doDecompose(matrix, false);
-    }
-
     public boolean decompose(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, true);
+    }
+
+    public boolean decomposeWithoutPivoting(Collectable<N, ? super PhysicalStore<N>> matrix) {
+        return this.doDecompose(matrix, false);
     }
 
     public MatrixStore<N> getD() {

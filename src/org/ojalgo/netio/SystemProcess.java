@@ -93,7 +93,7 @@ public abstract class SystemProcess {
             }
 
         } catch (final IOException anException) {
-            ;
+
         } finally {
 
             myOutStream = null;

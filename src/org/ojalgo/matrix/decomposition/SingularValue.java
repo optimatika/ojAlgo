@@ -81,24 +81,6 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
 
     Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new SingularValueDecomposition.Rational(fullSize);
 
-    @SuppressWarnings("unchecked")
-    static <N extends Number> SingularValue<N> make(final Access2D<N> typical) {
-
-        final N tmpNumber = typical.get(0, 0);
-
-        if (tmpNumber instanceof RationalNumber) {
-            return (SingularValue<N>) RATIONAL.make(typical);
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (SingularValue<N>) COMPLEX.make(typical);
-        } else if (tmpNumber instanceof Double) {
-            return (SingularValue<N>) PRIMITIVE.make(typical);
-        } else if (tmpNumber instanceof Quaternion) {
-            return (SingularValue<N>) QUATERNION.make(typical);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final SingularValue<N> decomposition, final NumberContext context) {
 
         final int tmpRowDim = (int) matrix.countRows();
@@ -161,6 +143,24 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         }
 
         return retVal;
+    }
+
+    @SuppressWarnings("unchecked")
+    static <N extends Number> SingularValue<N> make(final Access2D<N> typical) {
+
+        final N tmpNumber = typical.get(0, 0);
+
+        if (tmpNumber instanceof RationalNumber) {
+            return (SingularValue<N>) RATIONAL.make(typical);
+        } else if (tmpNumber instanceof ComplexNumber) {
+            return (SingularValue<N>) COMPLEX.make(typical);
+        } else if (tmpNumber instanceof Double) {
+            return (SingularValue<N>) PRIMITIVE.make(typical);
+        } else if (tmpNumber instanceof Quaternion) {
+            return (SingularValue<N>) QUATERNION.make(typical);
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     /**

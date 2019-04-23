@@ -39,12 +39,12 @@ final class BinaryFunctionSeries extends PrimitiveSeries {
     }
 
     @Override
-    public final int size() {
+    public int size() {
         return Math.min(myLeftSeries.size(), myRightSeries.size());
     }
 
     @Override
-    public final double value(final int index) {
+    public double value(final int index) {
         return myFunction.invoke(myLeftSeries.value(index), myRightSeries.value(index));
     }
 

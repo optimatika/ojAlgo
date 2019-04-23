@@ -30,7 +30,7 @@ import org.ojalgo.structure.Access1D;
 
 public interface MultiaryFunction<N extends Number> extends BasicFunction.PlainUnary<Access1D<N>, N> {
 
-    public static interface Constant<N extends Number, F extends Constant<N, ?>> extends MultiaryFunction<N> {
+    public interface Constant<N extends Number, F extends Constant<N, ?>> extends MultiaryFunction<N> {
 
         F constant(Number constant);
 
@@ -40,17 +40,17 @@ public interface MultiaryFunction<N extends Number> extends BasicFunction.PlainU
 
     }
 
-    public static interface Convex<N extends Number> extends MultiaryFunction<N> {
+    public interface Convex<N extends Number> extends MultiaryFunction<N> {
 
     }
 
-    public static interface Linear<N extends Number> extends MultiaryFunction<N> {
+    public interface Linear<N extends Number> extends MultiaryFunction<N> {
 
         PhysicalStore<N> linear();
 
     }
 
-    public static interface Quadratic<N extends Number> extends MultiaryFunction<N> {
+    public interface Quadratic<N extends Number> extends MultiaryFunction<N> {
 
         PhysicalStore<N> quadratic();
 
@@ -61,7 +61,7 @@ public interface MultiaryFunction<N extends Number> extends BasicFunction.PlainU
      *
      * @author apete
      */
-    public static interface TwiceDifferentiable<N extends Number> extends MultiaryFunction<N> {
+    public interface TwiceDifferentiable<N extends Number> extends MultiaryFunction<N> {
 
         /**
          * <p>

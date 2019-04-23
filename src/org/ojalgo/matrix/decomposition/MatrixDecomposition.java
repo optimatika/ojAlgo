@@ -176,16 +176,6 @@ public interface MatrixDecomposition<N extends Number> {
     interface Pivoting<N extends Number> extends MatrixDecomposition<N> {
 
         /**
-         * @return true if any pivoting was actually done
-         */
-        boolean isPivoted();
-
-        /**
-         * @return The pivot (row and/or columnn) order
-         */
-        int[] getPivotOrder();
-
-        /**
          * The normal {@link #decompose(Access2D.Collectable)} method must handle cases where pivoting is
          * necessary. If you know that pivoting is not needed you may call this method instead - it may be
          * faster. Implementing this method, to actually decompose without pivoting, is optional. The default
@@ -194,6 +184,16 @@ public interface MatrixDecomposition<N extends Number> {
         default boolean decomposeWithoutPivoting(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
             return this.decompose(matrix);
         }
+
+        /**
+         * @return The pivot (row and/or columnn) order
+         */
+        int[] getPivotOrder();
+
+        /**
+         * @return true if any pivoting was actually done
+         */
+        boolean isPivoted();
 
     }
 

@@ -67,6 +67,17 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
 
     Factory<RationalNumber> RATIONAL = typical -> new CholeskyDecomposition.Rational();
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Cholesky<N> decomposition, final NumberContext context) {
+
+        boolean retVal = false;
+
+        final MatrixStore<N> tmpL = decomposition.getL();
+
+        retVal = Access2D.equals(tmpL.multiply(tmpL.logical().conjugate().get()), matrix, context);
+
+        return retVal;
+    }
+
     @SuppressWarnings("unchecked")
     static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {
 
@@ -85,17 +96,6 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
         }
     }
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Cholesky<N> decomposition, final NumberContext context) {
-
-        boolean retVal = false;
-
-        final MatrixStore<N> tmpL = decomposition.getL();
-
-        retVal = Access2D.equals(tmpL.multiply(tmpL.logical().conjugate().get()), matrix, context);
-
-        return retVal;
-    }
-
     /**
      * @deprecated v48 Use {@link #reconstruct()} instead
      */
@@ -103,16 +103,6 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
     static <N extends Number> MatrixStore<N> reconstruct(final Cholesky<N> decomposition) {
         return decomposition.reconstruct();
     }
-
-    /**
-     * To use the Cholesky decomposition rather than the LU decomposition the matrix must be symmetric and
-     * positive definite. It is recommended that the decomposition algorithm checks for this during
-     * calculation. Possibly the matrix could be assumed to be symmetric (to improve performance) but tests
-     * should be made to assure the matrix is positive definite.
-     *
-     * @return true if the tests did not fail.
-     */
-    boolean isSPD();
 
     /**
      * Must implement either {@link #getL()} or {@link #getR()}.
@@ -127,6 +117,16 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
     default MatrixStore<N> getR() {
         return this.getL().conjugate();
     }
+
+    /**
+     * To use the Cholesky decomposition rather than the LU decomposition the matrix must be symmetric and
+     * positive definite. It is recommended that the decomposition algorithm checks for this during
+     * calculation. Possibly the matrix could be assumed to be symmetric (to improve performance) but tests
+     * should be made to assure the matrix is positive definite.
+     *
+     * @return true if the tests did not fail.
+     */
+    boolean isSPD();
 
     default MatrixStore<N> reconstruct() {
         final MatrixStore<N> mtrxL = this.getL();

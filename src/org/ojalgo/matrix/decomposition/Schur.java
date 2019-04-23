@@ -44,7 +44,7 @@ import org.ojalgo.type.context.NumberContext;
 public interface Schur<N extends Number> extends MatrixDecomposition<N> {
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> Schur<N> make(final Access2D<N> typical) {
+    static <N extends Number> Schur<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -55,7 +55,7 @@ public interface Schur<N extends Number> extends MatrixDecomposition<N> {
         }
     }
 
-    public static Schur<Double> makePrimitive() {
+    static Schur<Double> makePrimitive() {
         return new SchurDecomposition.Primitive();
     }
 

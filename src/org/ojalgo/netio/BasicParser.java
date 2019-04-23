@@ -41,7 +41,7 @@ public interface BasicParser<T> {
      * @param line The text line to parse
      * @return An object containing (referencing) the parsed data
      */
-    public abstract T parse(String line) throws RecoverableCondition;
+    T parse(String line) throws RecoverableCondition;
 
     /**
      * Will parse this file, line by line, passing the reulting objects (1 per line) to the supplied consumer.

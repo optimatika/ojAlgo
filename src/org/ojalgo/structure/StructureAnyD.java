@@ -257,7 +257,7 @@ public interface StructureAnyD extends Structure1D {
 
     }
 
-    public static StructureAnyD.ReferenceMapper mapperOf(final StructureAnyD structure, final Structure1D.IndexMapper<Object>[] mappers) {
+    static StructureAnyD.ReferenceMapper mapperOf(final StructureAnyD structure, final Structure1D.IndexMapper<Object>[] mappers) {
         return new StructureAnyD.ReferenceMapper(structure, mappers);
     }
 

@@ -129,7 +129,7 @@ final class SuperimposedStore<N extends Number> extends ComposingStore<N> {
         return retVal;
     }
 
-    private final boolean isCovered(final int row, final int column) {
+    private boolean isCovered(final int row, final int column) {
         return (myRowFirst <= row) && (myColFirst <= column) && (row < myRowLimit) && (column < myColLimit);
     }
 

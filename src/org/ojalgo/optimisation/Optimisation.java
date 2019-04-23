@@ -42,7 +42,7 @@ public interface Optimisation {
      *
      * @author apete
      */
-    public static interface Constraint extends Optimisation {
+    public interface Constraint extends Optimisation {
 
         /**
          * The lower limit/bound - may return null.
@@ -77,7 +77,7 @@ public interface Optimisation {
 
     }
 
-    public static interface Integration<M extends Optimisation.Model, S extends Optimisation.Solver> extends Optimisation {
+    public interface Integration<M extends Optimisation.Model, S extends Optimisation.Solver> extends Optimisation {
 
         /**
          * An integration must be able to instantiate a solver that can handle (any) model instance.
@@ -110,13 +110,13 @@ public interface Optimisation {
 
     }
 
-    public static interface Model extends Optimisation {
+    public interface Model extends Optimisation {
 
         /**
          * Cleanup when a model instance is no longer needed. The default implementation does nothing,
          */
         default void dispose() {
-            ;
+
         }
 
         Optimisation.Result maximise();
@@ -136,7 +136,7 @@ public interface Optimisation {
      *
      * @author apete
      */
-    public static interface Objective extends Optimisation {
+    public interface Objective extends Optimisation {
 
         /**
          * The weight/factor by which this model entity's value contributes to the objective function - may
@@ -446,13 +446,13 @@ public interface Optimisation {
      *
      * @author apete
      */
-    public static interface Solver extends Optimisation {
+    public interface Solver extends Optimisation {
 
         /**
          * Cleanup when a solver instance is no longer needed. The default implementation does nothing,
          */
         default void dispose() {
-            ;
+
         }
 
         default Optimisation.Result solve() {
@@ -463,7 +463,7 @@ public interface Optimisation {
 
     }
 
-    public static enum State implements Optimisation {
+    public enum State implements Optimisation {
 
         /**
          * Approximate and/or Intermediate solution - Iteration point Probably infeasible, but still "good"
@@ -517,7 +517,7 @@ public interface Optimisation {
          */
         VALID(4);
 
-        private final int myValue;
+        private int myValue;
 
         State(final int aValue) {
             myValue = aValue;

@@ -112,6 +112,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      */
     List<N> asList();
 
+    default void modifyAny(Transformation2D<N> modifier) {
+        modifier.transform(this);
+    }
+
     /**
      * Will solve the equation system [A][X]=[B] where:
      * <ul>
@@ -141,10 +145,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * @param conjugated TODO
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
-
-    default void modifyAny(Transformation2D<N> modifier) {
-        modifier.transform(this);
-    }
 
     void transformLeft(Householder<N> transformation, int firstColumn);
 

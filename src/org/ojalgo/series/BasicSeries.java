@@ -178,30 +178,30 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
 
     }
 
-    public static final BasicSeries.TimeSeriesBuilder<Calendar> CALENDAR = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.CALENDAR);
-    public static final BasicSeries.TimeSeriesBuilder<CalendarDate> CALENDAR_DATE = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.CALENDAR_DATE);
-    public static final BasicSeries.TimeSeriesBuilder<Date> DATE = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.DATE);
-    public static final BasicSeries.TimeSeriesBuilder<Instant> INSTANT = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.INSTANT);
-    public static final BasicSeries.TimeSeriesBuilder<LocalDate> LOCAL_DATE = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LOCAL_DATE);
-    public static final BasicSeries.TimeSeriesBuilder<LocalDateTime> LOCAL_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LOCAL_DATE_TIME);
-    public static final BasicSeries.TimeSeriesBuilder<LocalTime> LOCAL_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LOCAL_TIME);
-    public static final BasicSeries.TimeSeriesBuilder<OffsetDateTime> OFFSET_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.OFFSET_DATE_TIME);
-    public static final BasicSeries.TimeSeriesBuilder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.ZONED_DATE_TIME);
+    BasicSeries.TimeSeriesBuilder<Calendar> CALENDAR = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.CALENDAR);
+    BasicSeries.TimeSeriesBuilder<CalendarDate> CALENDAR_DATE = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.CALENDAR_DATE);
+    BasicSeries.TimeSeriesBuilder<Date> DATE = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.DATE);
+    BasicSeries.TimeSeriesBuilder<Instant> INSTANT = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.INSTANT);
+    BasicSeries.TimeSeriesBuilder<LocalDate> LOCAL_DATE = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LOCAL_DATE);
+    BasicSeries.TimeSeriesBuilder<LocalDateTime> LOCAL_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LOCAL_DATE_TIME);
+    BasicSeries.TimeSeriesBuilder<LocalTime> LOCAL_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LOCAL_TIME);
+    BasicSeries.TimeSeriesBuilder<OffsetDateTime> OFFSET_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.OFFSET_DATE_TIME);
+    BasicSeries.TimeSeriesBuilder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.ZONED_DATE_TIME);
 
-    public static BasicSeries<Double, Double> make(final DenseArray.Factory<Double> arrayFactory) {
+    static BasicSeries<Double, Double> make(final DenseArray.Factory<Double> arrayFactory) {
         return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, null);
     }
 
-    public static BasicSeries<Double, Double> make(final DenseArray.Factory<Double> arrayFactory, final BinaryFunction<Double> accumulator) {
+    static BasicSeries<Double, Double> make(final DenseArray.Factory<Double> arrayFactory, final BinaryFunction<Double> accumulator) {
         return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, accumulator);
     }
 
-    public static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
+    static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
             final Structure1D.IndexMapper<N> indexMapper) {
         return new MappedIndexSeries<>(arrayFactory, indexMapper, null);
     }
 
-    public static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
+    static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
             final Structure1D.IndexMapper<N> indexMapper, final BinaryFunction<N> accumulator) {
         return new MappedIndexSeries<>(arrayFactory, indexMapper, accumulator);
     }

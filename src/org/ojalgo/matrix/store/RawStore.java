@@ -372,7 +372,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         // Ignore initial empty lines
         while (tokenizer.nextToken() == StreamTokenizer.TT_EOL) {
-            ;
+
         }
         if (tokenizer.ttype == StreamTokenizer.TT_EOF) {
             throw new java.io.IOException("Unexpected EOF on matrix read.");
@@ -888,7 +888,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         Raw2D.fillRow(data, (int) row, (int) col, supplier);
     }
 
-    public final MatrixStore<Double> get() {
+    public MatrixStore<Double> get() {
         return this;
     }
 
@@ -1175,23 +1175,23 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         return FACTORY;
     }
 
-    public final TransformableRegion<Double> regionByColumns(final int... columns) {
+    public TransformableRegion<Double> regionByColumns(final int... columns) {
         return new TransformableRegion.ColumnsRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), columns);
     }
 
-    public final TransformableRegion<Double> regionByLimits(final int rowLimit, final int columnLimit) {
+    public TransformableRegion<Double> regionByLimits(final int rowLimit, final int columnLimit) {
         return new TransformableRegion.LimitRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowLimit, columnLimit);
     }
 
-    public final TransformableRegion<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
+    public TransformableRegion<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
         return new TransformableRegion.OffsetRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowOffset, columnOffset);
     }
 
-    public final TransformableRegion<Double> regionByRows(final int... rows) {
+    public TransformableRegion<Double> regionByRows(final int... rows) {
         return new TransformableRegion.RowsRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rows);
     }
 
-    public final TransformableRegion<Double> regionByTransposing() {
+    public TransformableRegion<Double> regionByTransposing() {
         return new TransformableRegion.TransposedRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns));
     }
 
