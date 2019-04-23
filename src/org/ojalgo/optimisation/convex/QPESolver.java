@@ -168,12 +168,12 @@ final class QPESolver extends ConstrainedSolver {
     }
 
     @Override
-    final MatrixStore<Double> getIterationA() {
+    MatrixStore<Double> getIterationA() {
         return this.getMatrixAE();
     }
 
     @Override
-    final MatrixStore<Double> getIterationB() {
+    MatrixStore<Double> getIterationB() {
         if (myFeasible) {
             return MatrixStore.PRIMITIVE.makeZero(this.countEqualityConstraints(), 1).get();
         } else {
@@ -182,7 +182,7 @@ final class QPESolver extends ConstrainedSolver {
     }
 
     @Override
-    final MatrixStore<Double> getIterationC() {
+    MatrixStore<Double> getIterationC() {
         if (myFeasible) {
             final MatrixStore<Double> mtrxQ = this.getMatrixQ();
             final MatrixStore<Double> mtrxC = this.getMatrixC();

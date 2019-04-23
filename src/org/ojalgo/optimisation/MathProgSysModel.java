@@ -66,7 +66,7 @@ public final class MathProgSysModel {
      *
      * @author apete
      */
-    static enum BoundType {
+    enum BoundType {
 
         BV(), FR(), FX(), LI(), LO(), MI(), PL(), SC(), UI(), UP();
 
@@ -206,13 +206,13 @@ public final class MathProgSysModel {
     /**
      * @author apete
      */
-    static enum ColumnMarker {
+    enum ColumnMarker {
 
         INTEND(), INTORG();
 
     }
 
-    static enum FileSection {
+    enum FileSection {
 
         BOUNDS(), COLUMNS(), ENDATA(), NAME(), OBJNAME(), OBJSENSE(), RANGES(), RHS(), ROWS(), SOS();
 
@@ -363,7 +363,7 @@ public final class MathProgSysModel {
      *
      * @author apete
      */
-    static enum RowType {
+    enum RowType {
 
         E(), G(), L(), N();
 

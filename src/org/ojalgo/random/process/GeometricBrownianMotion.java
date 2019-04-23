@@ -143,11 +143,11 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
         return new LogNormal(tmpLocation, tmpScale);
     }
 
-    private final double getDistributionLocation(final double stepSize, final double variance) {
+    private double getDistributionLocation(final double stepSize, final double variance) {
         return (PrimitiveMath.LOG.invoke(this.getValue()) + (myLocalDrift * stepSize)) - (HALF * variance);
     }
 
-    private final double getDistributionVariance(final double stepSize) {
+    private double getDistributionVariance(final double stepSize) {
         return myDiffusionFunction * myDiffusionFunction * stepSize;
     }
 

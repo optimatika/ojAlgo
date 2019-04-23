@@ -551,7 +551,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
         return retVal.toString();
     }
 
-    public final VirtualMachine virtualise() {
+    public VirtualMachine virtualise() {
         return new VirtualMachine(this, Runtime.getRuntime());
     }
 

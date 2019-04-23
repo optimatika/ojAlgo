@@ -1444,7 +1444,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         return new Optimisation.Result(retState, retValue, retSolution);
     }
 
-    final void presolve() {
+    void presolve() {
 
         //  myExpressions.values().forEach(expr -> expr.reset());
 

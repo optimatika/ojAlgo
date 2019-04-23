@@ -149,9 +149,9 @@ public interface Eigenvalue<N extends Number>
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = (typical, hermitian) -> hermitian ? new HermitianEvD.Complex() : null;
+    Factory<ComplexNumber> COMPLEX = (typical, hermitian) -> hermitian ? new HermitianEvD.Complex() : null;
 
-    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+    Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         public Eigenvalue<Double> make(final Structure2D typical) {
             if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
@@ -170,7 +170,7 @@ public interface Eigenvalue<N extends Number>
                 }
             } else {
                 if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
-                    return new OldGeneralEvD.Primitive();
+                    return new GeneralEvD.Primitive();
                 } else {
                     return new RawEigenvalue.General();
                 }
@@ -179,16 +179,28 @@ public interface Eigenvalue<N extends Number>
 
     };
 
-    public static final Factory<Quaternion> QUATERNION = (typical, hermitian) -> hermitian ? new HermitianEvD.Quat() : null;
+    Factory<Quaternion> QUATERNION = (typical, hermitian) -> hermitian ? new HermitianEvD.Quat() : null;
 
-    public static final Factory<RationalNumber> RATIONAL = (typical, hermitian) -> hermitian ? new HermitianEvD.Rational() : null;
+    Factory<RationalNumber> RATIONAL = (typical, hermitian) -> hermitian ? new HermitianEvD.Rational() : null;
 
-    public static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical) {
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
+
+        final MatrixStore<N> tmpD = decomposition.getD();
+        final MatrixStore<N> tmpV = decomposition.getV();
+
+        // Check that [A][V] == [V][D] ([A] == [V][D][V]<sup>T</sup> is not always true)
+        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpV);
+        final MatrixStore<N> tmpStore2 = tmpV.multiply(tmpD);
+
+        return Access2D.equals(tmpStore1, tmpStore2, context);
+    }
+
+    static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical) {
         return Eigenvalue.make(typical, MatrixUtils.isHermitian(typical));
     }
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical, final boolean hermitian) {
+    static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical, final boolean hermitian) {
 
         final N tmpNumber = typical.get(0L, 0L);
 
@@ -205,21 +217,12 @@ public interface Eigenvalue<N extends Number>
         }
     }
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpD = decomposition.getD();
-        final MatrixStore<N> tmpV = decomposition.getV();
-
-        // Check that [A][V] == [V][D] ([A] == [V][D][V]<sup>T</sup> is not always true)
-        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpV);
-        final MatrixStore<N> tmpStore2 = tmpV.multiply(tmpD);
-
-        return Access2D.equals(tmpStore1, tmpStore2, context);
-    }
-
+    /**
+     * @deprecated v48 Use {@link #reconstruct()} instead
+     */
+    @Deprecated
     static <N extends Number> MatrixStore<N> reconstruct(final Eigenvalue<N> decomposition) {
-        final MatrixStore<N> tmpV = decomposition.getV();
-        return tmpV.multiply(decomposition.getD()).multiply(tmpV.conjugate());
+        return decomposition.reconstruct();
     }
 
     /**
@@ -414,7 +417,9 @@ public interface Eigenvalue<N extends Number>
     boolean isOrdered();
 
     default MatrixStore<N> reconstruct() {
-        return Eigenvalue.reconstruct(this);
+        final MatrixStore<N> mtrxV = this.getV();
+        MatrixStore<N> mtrxD = this.getD();
+        return mtrxV.multiply(mtrxD).multiply(mtrxV.conjugate());
     }
 
 }

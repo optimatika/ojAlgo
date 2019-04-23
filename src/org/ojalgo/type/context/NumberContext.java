@@ -54,13 +54,13 @@ import org.ojalgo.type.format.NumberStyle;
  */
 public final class NumberContext extends FormatContext<Number, NumberFormat> {
 
-    public static interface Enforceable<T> {
+    public interface Enforceable<T> {
 
         T enforce(NumberContext context);
 
     }
 
-    public static interface FormatPattern {
+    public interface FormatPattern {
 
         String toLocalizedPattern();
 

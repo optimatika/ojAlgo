@@ -37,7 +37,7 @@ import org.ojalgo.type.context.NumberContext;
 public final class PrimitiveFunction extends FunctionSet<Double> {
 
     @FunctionalInterface
-    public static interface Binary extends BinaryFunction<Double> {
+    public interface Binary extends BinaryFunction<Double> {
 
         default Double invoke(final Double arg1, final Double arg2) {
             return this.invoke(arg1.doubleValue(), arg2.doubleValue());
@@ -46,7 +46,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     }
 
     @FunctionalInterface
-    public static interface Consumer extends VoidFunction<Double> {
+    public interface Consumer extends VoidFunction<Double> {
 
         default void invoke(final Double arg) {
             this.invoke(arg.doubleValue());
@@ -55,7 +55,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     }
 
     @FunctionalInterface
-    public static interface Parameter extends ParameterFunction<Double> {
+    public interface Parameter extends ParameterFunction<Double> {
 
         default Double invoke(final Double arg, final int param) {
             return this.invoke(arg.doubleValue(), param);
@@ -64,7 +64,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     }
 
     @FunctionalInterface
-    public static interface Predicate extends PredicateFunction<Double> {
+    public interface Predicate extends PredicateFunction<Double> {
 
         default boolean invoke(final Double arg) {
             return this.invoke(arg.doubleValue());
@@ -73,7 +73,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     }
 
     @FunctionalInterface
-    public static interface Unary extends UnaryFunction<Double> {
+    public interface Unary extends UnaryFunction<Double> {
 
         default Double invoke(final Double arg) {
             return this.invoke(arg.doubleValue());

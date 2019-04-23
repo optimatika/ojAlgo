@@ -109,7 +109,7 @@ public class ProcessInputStream extends DataInputStream {
             try {
                 this.wait(myWaitTime);
             } catch (final InterruptedException anException) {
-                ;
+
             }
 
             myWaitTime *= 2;

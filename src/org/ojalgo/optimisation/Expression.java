@@ -154,7 +154,7 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
-    public final int compareTo(final Expression obj) {
+    public int compareTo(final Expression obj) {
         return this.getName().compareTo(obj.getName());
     }
 
@@ -571,7 +571,7 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    private final BigDecimal convert(final BigDecimal value, final boolean adjusted) {
+    private BigDecimal convert(final BigDecimal value, final boolean adjusted) {
 
         if (value != null) {
 
@@ -881,9 +881,9 @@ public final class Expression extends ModelEntity<Expression> {
                 final Variable setVar = myModel.getVariable(index);
                 int signum = myLinear.get(index).signum();
                 if ((signum < 0) && setVar.isLowerLimitSet() && (setVar.getLowerLimit().signum() >= 0)) {
-                    ;
+
                 } else if ((signum > 0) && setVar.isUpperLimitSet() && (setVar.getUpperLimit().signum() <= 0)) {
-                    ;
+
                 } else {
                     return false;
                 }
@@ -905,9 +905,9 @@ public final class Expression extends ModelEntity<Expression> {
                 final Variable setVar = myModel.getVariable(index);
                 int signum = myLinear.get(index).signum();
                 if ((signum > 0) && setVar.isLowerLimitSet() && (setVar.getLowerLimit().signum() >= 0)) {
-                    ;
+
                 } else if ((signum < 0) && setVar.isUpperLimitSet() && (setVar.getUpperLimit().signum() <= 0)) {
-                    ;
+
                 } else {
                     return false;
                 }

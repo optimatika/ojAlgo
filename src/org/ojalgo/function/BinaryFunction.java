@@ -60,23 +60,23 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
             myValue = arg1.doubleValue();
         }
 
-        public final double doubleValue() {
+        public double doubleValue() {
             return myValue;
         }
 
-        public final BinaryFunction<N> getFunction() {
+        public BinaryFunction<N> getFunction() {
             return myFunction;
         }
 
-        public final N getNumber() {
+        public N getNumber() {
             return myNumber;
         }
 
-        public final double invoke(final double arg2) {
+        public double invoke(final double arg2) {
             return myFunction.invoke(myValue, arg2);
         }
 
-        public final N invoke(final N arg2) {
+        public N invoke(final N arg2) {
             return myFunction.invoke(myNumber, arg2);
         }
 
@@ -114,31 +114,31 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
             myValue = arg2.doubleValue();
         }
 
-        public final double doubleValue() {
+        public double doubleValue() {
             return myValue;
         }
 
-        public final BinaryFunction<N> getFunction() {
+        public BinaryFunction<N> getFunction() {
             return myFunction;
         }
 
-        public final N getNumber() {
+        public N getNumber() {
             return myNumber;
         }
 
-        public final double invoke(final double arg1) {
+        public double invoke(final double arg1) {
             return myFunction.invoke(arg1, myValue);
         }
 
-        public final N invoke(final N arg1) {
+        public N invoke(final N arg1) {
             return myFunction.invoke(arg1, myNumber);
         }
 
     }
 
-    public abstract double invoke(double arg1, double arg2);
+    double invoke(double arg1, double arg2);
 
-    public abstract N invoke(N arg1, N arg2);
+    N invoke(N arg1, N arg2);
 
     default BinaryFunction<N> andThen(final UnaryFunction<N> after) {
         ProgrammingError.throwIfNull(after);

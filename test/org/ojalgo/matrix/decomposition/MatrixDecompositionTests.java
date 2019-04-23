@@ -28,149 +28,209 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.decomposition.MatrixDecomposition.EconomySize;
 
 /**
- * MatrixDecompositionPackageTests
- *
  * @author apete
  */
 public abstract class MatrixDecompositionTests {
 
-    static final boolean DEBUG = false;
+    static boolean DEBUG = false;
 
-    public static List<MatrixDecomposition<Double>> getAllPrimitive() {
+    public static List<MatrixDecomposition<?>> getAnyAll() {
 
-        final List<MatrixDecomposition<Double>> retVal = new ArrayList<>();
+        List<MatrixDecomposition<?>> retVal = new ArrayList<>();
 
-        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getCholeskyPrimitive()));
-        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getLUPrimitive()));
-        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getQRPrimitive()));
-        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getSingularValuePrimitive()));
-        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyCholesky()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyLDL()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyLU()));
+
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyQR()));
+
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyBidiagonal()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyTridiagonal()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyHessenberg()));
+
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnySingularValue()));
+
+        retVal.addAll(MatrixDecompositionTests.getAnyEigenvalue());
 
         return Collections.unmodifiableList(retVal);
     }
 
-    public static final Bidiagonal<?>[] getBidiagonalAll() {
-        return new Bidiagonal<?>[] { new BidiagonalDecomposition.Rational(), Bidiagonal.COMPLEX.make(), Bidiagonal.PRIMITIVE.make() };
+    public static Bidiagonal<?>[] getAnyBidiagonal() {
+        return new Bidiagonal<?>[] { new BidiagonalDecomposition.Complex(), new BidiagonalDecomposition.Primitive(), new BidiagonalDecomposition.Quat(),
+                new BidiagonalDecomposition.Rational() };
     }
 
-    @SuppressWarnings("unchecked")
-    public static final Bidiagonal<Double>[] getBidiagonalPrimitive() {
-        return (Bidiagonal<Double>[]) new Bidiagonal<?>[] { new BidiagonalDecomposition.Primitive() };
+    public static Cholesky<?>[] getAnyCholesky() {
+        return new Cholesky<?>[] { new CholeskyDecomposition.Complex(), new CholeskyDecomposition.Primitive(), new CholeskyDecomposition.Quat(),
+                new CholeskyDecomposition.Rational(), new RawCholesky() };
     }
 
-    public static final Cholesky<?>[] getCholeskyAll() {
-        return new Cholesky<?>[] { Cholesky.RATIONAL.make(), Cholesky.COMPLEX.make(), Cholesky.PRIMITIVE.make(), new RawCholesky() };
+    public static List<Eigenvalue<?>> getAnyEigenvalue() {
+
+        List<Eigenvalue<?>> retVal = new ArrayList<>();
+
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyEigenvalueHermitian()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyEigenvalueGeneral()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getAnyEigenvalueDynamic()));
+
+        return Collections.unmodifiableList(retVal);
     }
 
-    @SuppressWarnings("unchecked")
-    public static final Cholesky<Double>[] getCholeskyPrimitive() {
-        return (Cholesky<Double>[]) new Cholesky<?>[] { new CholeskyDecomposition.Primitive(), new RawCholesky() };
-    }
-
-    public static final Eigenvalue<?>[] getEigenvalueAllDynamic() {
+    public static Eigenvalue<?>[] getAnyEigenvalueDynamic() {
         return new Eigenvalue<?>[] { new DynamicEvD.Primitive(), new RawEigenvalue.Dynamic() };
     }
 
-    public static final Eigenvalue<?>[] getEigenvalueAllGeneral() {
-        return new Eigenvalue<?>[] { /* new NewGeneralEvD.Primitive(), */ new RawEigenvalue.Dynamic(), new OldGeneralEvD.Primitive() };
+    public static Eigenvalue<?>[] getAnyEigenvalueGeneral() {
+        return new Eigenvalue<?>[] { new GeneralEvD.Primitive(), new RawEigenvalue.General() };
     }
 
-    public static final Eigenvalue<?>[] getEigenvalueAllHermitian() {
+    public static Eigenvalue<?>[] getAnyEigenvalueHermitian() {
         return new Eigenvalue<?>[] { new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(), new RawEigenvalue.Symmetric(),
-                new HermitianEvD.Rational(), new HermitianEvD.Complex() };
+                new HermitianEvD.Rational(), new HermitianEvD.Complex(), new HermitianEvD.Quat() };
     }
 
-    public static List<Eigenvalue<Double>> getEigenvaluePrimitiveAny() {
+    public static Hessenberg<?>[] getAnyHessenberg() {
+        return new Hessenberg<?>[] { new HessenbergDecomposition.Complex(), new HessenbergDecomposition.Primitive(), new HessenbergDecomposition.Quat(),
+                new HessenbergDecomposition.Rational() };
+    }
 
-        final List<Eigenvalue<Double>> retVal = new ArrayList<>();
+    public static LDL<?>[] getAnyLDL() {
+        return new LDL<?>[] { new LDLDecomposition.Complex(), new LDLDecomposition.Primitive(), new LDLDecomposition.Quat(), new LDLDecomposition.Rational() };
+    }
 
-        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric()));
-        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getEigenvaluePrimitiveGeneral()));
-        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getEigenvaluePrimitiveDynamic()));
+    public static LU<?>[] getAnyLU() {
+        return new LU<?>[] { new LUDecomposition.Complex(), new LUDecomposition.Primitive(), new LUDecomposition.Quat(), new LUDecomposition.Rational(),
+                new RawLU() };
+    }
+
+    public static List<MatrixDecomposition.Solver<?>> getAnyMatrixDecompositionSolver() {
+
+        List<MatrixDecomposition.Solver<?>> retVal = new ArrayList<>();
+
+        for (MatrixDecomposition<?> decomp : MatrixDecompositionTests.getPrimitiveAll()) {
+            if (decomp instanceof MatrixDecomposition.Solver) {
+                retVal.add((MatrixDecomposition.Solver<?>) decomp);
+            }
+        }
+
+        return Collections.unmodifiableList(retVal);
+    }
+
+    public static QR<?>[] getAnyQR() {
+        return new QR<?>[] { new QRDecomposition.Complex(), new QRDecomposition.Primitive(), new QRDecomposition.Quat(), new QRDecomposition.Rational(),
+                new RawQR() };
+    }
+
+    public static SingularValue<?>[] getAnySingularValue() {
+        return new SingularValue<?>[] { new SingularValueDecomposition.Complex(), new SingularValueDecomposition.Primitive(),
+                new SingularValueDecomposition.Quat(), new SingularValueDecomposition.Rational(), new RawSingularValue() };
+    }
+
+    public static Tridiagonal<?>[] getAnyTridiagonal() {
+        return new Tridiagonal<?>[] { new DeferredTridiagonal.Complex(), new DeferredTridiagonal.Primitive(), new DeferredTridiagonal.Quat(),
+                new DeferredTridiagonal.Rational(), new SimultaneousTridiagonal() };
+    }
+
+    public static List<MatrixDecomposition<Double>> getPrimitiveAll() {
+
+        List<MatrixDecomposition<Double>> retVal = new ArrayList<>();
+
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveCholesky()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveLDL()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveLU()));
+
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveQR()));
+
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveBidiagonal()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveTridiagonal()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveHessenberg()));
+
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveSingularValue()));
+
+        retVal.addAll(MatrixDecompositionTests.getPrimitiveEigenvalue());
 
         return Collections.unmodifiableList(retVal);
     }
 
     @SuppressWarnings("unchecked")
-    public static final Eigenvalue<Double>[] getEigenvaluePrimitiveDynamic() {
+    public static Bidiagonal<Double>[] getPrimitiveBidiagonal() {
+        return (Bidiagonal<Double>[]) new Bidiagonal<?>[] { new BidiagonalDecomposition.Primitive() };
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Cholesky<Double>[] getPrimitiveCholesky() {
+        return (Cholesky<Double>[]) new Cholesky<?>[] { new CholeskyDecomposition.Primitive(), new RawCholesky() };
+    }
+
+    public static List<Eigenvalue<Double>> getPrimitiveEigenvalue() {
+
+        List<Eigenvalue<Double>> retVal = new ArrayList<>();
+
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveEigenvalueGeneral()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getPrimitiveEigenvalueDynamic()));
+
+        return Collections.unmodifiableList(retVal);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Eigenvalue<Double>[] getPrimitiveEigenvalueDynamic() {
         return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new DynamicEvD.Primitive(), new RawEigenvalue.Dynamic() };
     }
 
     @SuppressWarnings("unchecked")
-    public static Eigenvalue<Double>[] getEigenvaluePrimitiveGeneral() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { /* new NewGeneralEvD.Primitive(), */ new RawEigenvalue.Dynamic(), new OldGeneralEvD.Primitive() };
+    public static Eigenvalue<Double>[] getPrimitiveEigenvalueGeneral() {
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new RawEigenvalue.Dynamic(), new GeneralEvD.Primitive() };
     }
 
     @SuppressWarnings("unchecked")
-    public static Eigenvalue<Double>[] getEigenvaluePrimitiveSymmetric() {
+    public static Eigenvalue<Double>[] getPrimitiveEigenvalueSymmetric() {
         return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(),
                 new RawEigenvalue.Symmetric() };
     }
 
     @SuppressWarnings("unchecked")
-    public static EconomySize<Double>[] getFullSizePrimitive() {
-        return (EconomySize<Double>[]) new EconomySize<?>[] { new BidiagonalDecomposition.Primitive(true), new QRDecomposition.Primitive(true),
-                new SingularValueDecomposition.Primitive(true) };
-    }
-
-    public static final Hessenberg<?>[] getHessenbergAll() {
-        return new Hessenberg<?>[] { Hessenberg.RATIONAL.make(), Hessenberg.COMPLEX.make(), Hessenberg.PRIMITIVE.make() };
-    }
-
-    @SuppressWarnings("unchecked")
-    public static final Hessenberg<Double>[] getHessenbergPrimitive() {
+    public static Hessenberg<Double>[] getPrimitiveHessenberg() {
         return (Hessenberg<Double>[]) new Hessenberg<?>[] { new HessenbergDecomposition.Primitive() };
     }
 
-    public static final LU<?>[] getLUAll() {
-        return new LU<?>[] { LU.RATIONAL.make(), LU.COMPLEX.make(), LU.PRIMITIVE.make(), new RawLU() };
+    @SuppressWarnings("unchecked")
+    public static LDL<Double>[] getPrimitiveLDL() {
+        return (LDL<Double>[]) new LDL<?>[] { new LDLDecomposition.Primitive() };
     }
 
     @SuppressWarnings("unchecked")
-    public static final LU<Double>[] getLUPrimitive() {
+    public static LU<Double>[] getPrimitiveLU() {
         return (LU<Double>[]) new LU<?>[] { new LUDecomposition.Primitive(), new RawLU() };
     }
 
-    public static final QR<?>[] getQRAll() {
-        return new QR<?>[] { QR.RATIONAL.make(), QR.COMPLEX.make(), QR.PRIMITIVE.make(), new RawQR() };
+    public static List<MatrixDecomposition.Solver<Double>> getPrimitiveMatrixDecompositionSolver() {
+
+        List<MatrixDecomposition.Solver<Double>> retVal = new ArrayList<>();
+
+        for (MatrixDecomposition<Double> decomp : MatrixDecompositionTests.getPrimitiveAll()) {
+            if (decomp instanceof MatrixDecomposition.Solver) {
+                retVal.add((MatrixDecomposition.Solver<Double>) decomp);
+            }
+        }
+
+        return Collections.unmodifiableList(retVal);
     }
 
     @SuppressWarnings("unchecked")
-    public static final QR<Double>[] getQRPrimitive() {
+    public static QR<Double>[] getPrimitiveQR() {
         return (QR<Double>[]) new QR<?>[] { new QRDecomposition.Primitive(), new RawQR() };
     }
 
-    public static final Schur<?>[] getSchurAll() {
-        return new Schur<?>[] { Schur.makePrimitive() };
+    @SuppressWarnings("unchecked")
+    public static SingularValue<Double>[] getPrimitiveSingularValue() {
+        return (SingularValue<Double>[]) new SingularValue<?>[] { new SingularValueDecomposition.Primitive(), new RawSingularValue() };
     }
 
     @SuppressWarnings("unchecked")
-    public static final Schur<Double>[] getSchurPrimitive() {
-        return (Schur<Double>[]) new Schur<?>[] { new SchurDecomposition.Primitive() };
-    }
-
-    public static final SingularValue<?>[] getSingularValueAll() {
-        return new SingularValue<?>[] { new SingularValueDecomposition.Rational(), new SingularValueDecomposition.Complex(),
-                new SingularValueDecomposition.Primitive(), new RawSingularValue() };
-    }
-
-    @SuppressWarnings("unchecked")
-    public static final SingularValue<Double>[] getSingularValuePrimitive() {
-        return (SingularValue<Double>[]) new SingularValue<?>[] { /*
-                                                                   * new SVDold30.Primitive (),
-                                                                   */new SingularValueDecomposition.Primitive(), new RawSingularValue() };
-    }
-
-    public static final Tridiagonal<?>[] getTridiagonalAll() {
-        return new Tridiagonal<?>[] { Tridiagonal.RATIONAL.make(), Tridiagonal.COMPLEX.make(), new DeferredTridiagonal.Primitive(),
-                new SimultaneousTridiagonal() };
-    }
-
-    @SuppressWarnings("unchecked")
-    public static final Tridiagonal<Double>[] getTridiagonalPrimitive() {
+    public static Tridiagonal<Double>[] getPrimitiveTridiagonal() {
         return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new DeferredTridiagonal.Primitive(), new SimultaneousTridiagonal() };
     }
 

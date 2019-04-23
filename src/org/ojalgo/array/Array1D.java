@@ -504,6 +504,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         myDelegate.modify(myFirst, myLimit, myStep, modifier);
     }
 
+    public void modifyAny(Transformation1D<N> modifier) {
+        modifier.transform(this);
+    }
+
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
         final long tmpLength = Math.min(length, left.count());
         if (myDelegate.isPrimitive()) {
@@ -609,10 +613,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     @Override
     public String toString() {
         return Access1D.toString(this);
-    }
-
-    public void modifyAny(Transformation1D<N> modifier) {
-        modifier.transform(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

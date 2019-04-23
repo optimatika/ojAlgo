@@ -579,6 +579,10 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         myDelegate.modify(0L, this.count(), 1L, modifier);
     }
 
+    public void modifyAny(Transformation2D<N> modifier) {
+        modifier.transform(this);
+    }
+
     public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
         myDelegate.modify(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L, modifier);
     }
@@ -669,10 +673,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
     @Override
     public String toString() {
         return Access2D.toString(this);
-    }
-
-    public void modifyAny(Transformation2D<N> modifier) {
-        modifier.transform(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

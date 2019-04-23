@@ -30,7 +30,7 @@ import org.ojalgo.type.context.NumberContext;
 public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     @FunctionalInterface
-    public static interface Binary extends BinaryFunction<ComplexNumber> {
+    public interface Binary extends BinaryFunction<ComplexNumber> {
 
         default double invoke(final double arg1, final double arg2) {
             return this.invoke(ComplexNumber.valueOf(arg1), ComplexNumber.valueOf(arg2)).doubleValue();
@@ -39,7 +39,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     }
 
     @FunctionalInterface
-    public static interface Consumer extends VoidFunction<ComplexNumber> {
+    public interface Consumer extends VoidFunction<ComplexNumber> {
 
         default void invoke(final double arg) {
             this.invoke(ComplexNumber.valueOf(arg));
@@ -48,7 +48,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     }
 
     @FunctionalInterface
-    public static interface Parameter extends ParameterFunction<ComplexNumber> {
+    public interface Parameter extends ParameterFunction<ComplexNumber> {
 
         default double invoke(final double arg, final int param) {
             return this.invoke(ComplexNumber.valueOf(arg), param).doubleValue();
@@ -57,7 +57,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     }
 
     @FunctionalInterface
-    public static interface Predicate extends PredicateFunction<ComplexNumber> {
+    public interface Predicate extends PredicateFunction<ComplexNumber> {
 
         default boolean invoke(final double arg) {
             return this.invoke(ComplexNumber.valueOf(arg));
@@ -66,7 +66,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     }
 
     @FunctionalInterface
-    public static interface Unary extends UnaryFunction<ComplexNumber> {
+    public interface Unary extends UnaryFunction<ComplexNumber> {
 
         default double invoke(final double arg) {
             return this.invoke(ComplexNumber.valueOf(arg)).doubleValue();

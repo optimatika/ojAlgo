@@ -59,7 +59,7 @@ public final class DaemonPoolExecutor extends ThreadPoolExecutor {
         return INSTANCE.getActiveCount() < OjAlgoUtils.ENVIRONMENT.threads;
     }
 
-    static final DaemonPoolExecutor makeSingle() {
+    static DaemonPoolExecutor makeSingle() {
         return new DaemonPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), DaemonFactory.INSTANCE);
     }
 

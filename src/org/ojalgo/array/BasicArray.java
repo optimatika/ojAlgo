@@ -62,27 +62,27 @@ public abstract class BasicArray<N extends Number>
         }
 
         @Override
-        public final AggregatorSet<N> aggregator() {
+        public AggregatorSet<N> aggregator() {
             return myDenseFactory.aggregator();
         }
 
         @Override
-        public final FunctionSet<N> function() {
+        public FunctionSet<N> function() {
             return myDenseFactory.function();
         }
 
         @Override
-        public final Scalar.Factory<N> scalar() {
+        public Scalar.Factory<N> scalar() {
             return myDenseFactory.scalar();
         }
 
         @Override
-        final long getCapacityLimit() {
+        long getCapacityLimit() {
             return Long.MAX_VALUE;
         }
 
         @Override
-        final BasicArray<N> makeStructuredZero(final long... structure) {
+        BasicArray<N> makeStructuredZero(final long... structure) {
 
             final long total = StructureAnyD.count(structure);
 
@@ -103,7 +103,7 @@ public abstract class BasicArray<N extends Number>
         }
 
         @Override
-        final BasicArray<N> makeToBeFilled(final long... structure) {
+        BasicArray<N> makeToBeFilled(final long... structure) {
 
             final long total = StructureAnyD.count(structure);
 

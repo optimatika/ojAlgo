@@ -139,7 +139,7 @@ public abstract class BasicLogger {
      *
      * @author apete
      */
-    public static interface Buffer {
+    public interface Buffer {
 
         void clear();
 
@@ -159,7 +159,7 @@ public abstract class BasicLogger {
 
     }
 
-    public static interface Printable {
+    public interface Printable {
 
         default void print(Appendable receiver) {
             this.print(new BasicLogger.AppendablePrinter(receiver));
@@ -177,43 +177,43 @@ public abstract class BasicLogger {
 
     }
 
-    public static interface Printer {
+    public interface Printer {
 
         /**
          * @see java.io.PrintWriter#print(char)
          * @see java.io.PrintStream#print(char)
          */
-        public abstract void print(char c);
+        void print(char c);
 
         /**
          * @see java.io.PrintWriter#print(char[])
          * @see java.io.PrintStream#print(char[])
          */
-        public abstract void print(char[] ca);
+        void print(char[] ca);
 
         /**
          * @see java.io.PrintWriter#print(java.lang.String)
          * @see java.io.PrintStream#print(java.lang.String)
          */
-        public abstract void print(String str);
+        void print(String str);
 
         /**
          * @see java.io.PrintWriter#printf(java.util.Locale, java.lang.String, java.lang.Object[])
          * @see java.io.PrintStream#printf(java.util.Locale, java.lang.String, java.lang.Object[])
          */
-        public abstract Printer printf(Locale locale, String format, Object... args);
+        Printer printf(Locale locale, String format, Object... args);
 
         /**
          * @see java.io.PrintWriter#printf(java.lang.String, java.lang.Object[])
          * @see java.io.PrintStream#printf(java.lang.String, java.lang.Object[])
          */
-        public abstract Printer printf(String format, Object... args);
+        Printer printf(String format, Object... args);
 
         /**
          * @see java.io.PrintWriter#println()
          * @see java.io.PrintStream#println()
          */
-        public abstract void println();
+        void println();
 
         /**
          * @see java.io.PrintWriter#print(boolean)

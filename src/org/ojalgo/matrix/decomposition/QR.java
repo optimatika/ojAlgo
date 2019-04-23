@@ -68,9 +68,9 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new QRDecomposition.Complex(fullSize);
+    Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new QRDecomposition.Complex(fullSize);
 
-    public static final Factory<Double> PRIMITIVE = (typical, fullSize) -> {
+    Factory<Double> PRIMITIVE = (typical, fullSize) -> {
         if (fullSize || (typical.isFat() || ((256L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)))) {
             return new QRDecomposition.Primitive(fullSize);
         } else {
@@ -78,12 +78,22 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
         }
     };
 
-    public static final Factory<Quaternion> QUATERNION = (typical, fullSize) -> new QRDecomposition.Quat(fullSize);
+    Factory<Quaternion> QUATERNION = (typical, fullSize) -> new QRDecomposition.Quat(fullSize);
 
-    public static final Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new QRDecomposition.Rational(fullSize);
+    Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new QRDecomposition.Rational(fullSize);
+
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
+
+        final MatrixStore<N> tmpQ = decomposition.getQ();
+        final MatrixStore<N> tmpR = decomposition.getR();
+
+        final MatrixStore<N> tmpStore = tmpQ.multiply(tmpR);
+
+        return Access2D.equals(tmpStore, matrix, context);
+    }
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> QR<N> make(final Access2D<N> typical) {
+    static <N extends Number> QR<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -100,18 +110,12 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
         }
     }
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpQ = decomposition.getQ();
-        final MatrixStore<N> tmpR = decomposition.getR();
-
-        final MatrixStore<N> tmpStore = tmpQ.multiply(tmpR);
-
-        return Access2D.equals(tmpStore, matrix, context);
-    }
-
+    /**
+     * @deprecated v48 Use {@link #reconstruct()} instead
+     */
+    @Deprecated
     static <N extends Number> MatrixStore<N> reconstruct(final QR<N> decomposition) {
-        return decomposition.getQ().multiply(decomposition.getR());
+        return decomposition.reconstruct();
     }
 
     MatrixStore<N> getQ();
@@ -123,7 +127,9 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
     }
 
     default MatrixStore<N> reconstruct() {
-        return QR.reconstruct(this);
+        MatrixStore<N> mtrxQ = this.getQ();
+        MatrixStore<N> mtrxR = this.getR();
+        return mtrxQ.multiply(mtrxR);
     }
 
 }

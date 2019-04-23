@@ -53,9 +53,9 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new CholeskyDecomposition.Complex();
+    Factory<ComplexNumber> COMPLEX = typical -> new CholeskyDecomposition.Complex();
 
-    public static final Factory<Double> PRIMITIVE = typical -> {
+    Factory<Double> PRIMITIVE = typical -> {
         if ((32L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
             return new CholeskyDecomposition.Primitive();
         } else {
@@ -63,12 +63,23 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
         }
     };
 
-    public static final Factory<Quaternion> QUATERNION = typical -> new CholeskyDecomposition.Quat();
+    Factory<Quaternion> QUATERNION = typical -> new CholeskyDecomposition.Quat();
 
-    public static final Factory<RationalNumber> RATIONAL = typical -> new CholeskyDecomposition.Rational();
+    Factory<RationalNumber> RATIONAL = typical -> new CholeskyDecomposition.Rational();
+
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Cholesky<N> decomposition, final NumberContext context) {
+
+        boolean retVal = false;
+
+        final MatrixStore<N> tmpL = decomposition.getL();
+
+        retVal = Access2D.equals(tmpL.multiply(tmpL.logical().conjugate().get()), matrix, context);
+
+        return retVal;
+    }
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {
+    static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -85,31 +96,13 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
         }
     }
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Cholesky<N> decomposition, final NumberContext context) {
-
-        boolean retVal = false;
-
-        final MatrixStore<N> tmpL = decomposition.getL();
-
-        retVal = Access2D.equals(tmpL.multiply(tmpL.logical().conjugate().get()), matrix, context);
-
-        return retVal;
-    }
-
-    static <N extends Number> MatrixStore<N> reconstruct(final Cholesky<N> decomposition) {
-        final MatrixStore<N> tmpL = decomposition.getL();
-        return tmpL.multiply(tmpL.conjugate());
-    }
-
     /**
-     * To use the Cholesky decomposition rather than the LU decomposition the matrix must be symmetric and
-     * positive definite. It is recommended that the decomposition algorithm checks for this during
-     * calculation. Possibly the matrix could be assumed to be symmetric (to improve performance) but tests
-     * should be made to assure the matrix is positive definite.
-     *
-     * @return true if the tests did not fail.
+     * @deprecated v48 Use {@link #reconstruct()} instead
      */
-    public boolean isSPD();
+    @Deprecated
+    static <N extends Number> MatrixStore<N> reconstruct(final Cholesky<N> decomposition) {
+        return decomposition.reconstruct();
+    }
 
     /**
      * Must implement either {@link #getL()} or {@link #getR()}.
@@ -125,8 +118,19 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
         return this.getL().conjugate();
     }
 
+    /**
+     * To use the Cholesky decomposition rather than the LU decomposition the matrix must be symmetric and
+     * positive definite. It is recommended that the decomposition algorithm checks for this during
+     * calculation. Possibly the matrix could be assumed to be symmetric (to improve performance) but tests
+     * should be made to assure the matrix is positive definite.
+     *
+     * @return true if the tests did not fail.
+     */
+    boolean isSPD();
+
     default MatrixStore<N> reconstruct() {
-        return Cholesky.reconstruct(this);
+        final MatrixStore<N> mtrxL = this.getL();
+        return mtrxL.multiply(mtrxL.conjugate());
     }
 
 }

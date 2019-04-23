@@ -55,7 +55,7 @@ final class HouseholderColumn<N extends Number> extends ColumnView<N> implements
             myWorker = factory.makeHouseholder((int) this.count());
         }
         return (P) myWorker;
-    };
+    }
 
     public boolean isZero() {
         return myStore.isColumnSmall(myFirst + 1L, this.column(), PrimitiveMath.ONE);

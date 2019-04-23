@@ -26,12 +26,12 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.MatrixDecomposition;
+import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
-public final class InverterTest extends MatrixTaskTests {
+public class InverterTest extends MatrixTaskTests {
 
     @Test
     public void testFull2X2() {
@@ -78,31 +78,23 @@ public final class InverterTest extends MatrixTaskTests {
         this.doCompare(AbstractInverter.SYMMETRIC_5X5, 5);
     }
 
-    private void doCompare(final InverterTask<Double> fixed, final int dimension) {
+    private void doCompare(InverterTask<Double> fixed, int dimension) {
 
         try {
 
-            final MatrixStore<Double> tmpMatrix = this.makeSPD(dimension);
+            MatrixStore<Double> matrix = PrimitiveDenseStore.FACTORY.makeSPD(dimension);
 
-            final MatrixStore<Double> tmpExpInv = fixed.invert(tmpMatrix);
+            MatrixStore<Double> expInv = fixed.invert(matrix);
 
-            final List<MatrixDecomposition<Double>> tmpList = MatrixDecompositionTests.getAllPrimitive();
-            for (final MatrixDecomposition<Double> tmpDecomp : tmpList) {
-                if (tmpDecomp instanceof InverterTask) {
-                    @SuppressWarnings("unchecked")
-                    final InverterTask<Double> tmpTask = (InverterTask<Double>) tmpDecomp;
-                    final MatrixStore<Double> tmpActInv = tmpTask.invert(tmpMatrix);
-                    TestUtils.assertEquals(tmpDecomp.getClass().getName(), tmpExpInv, tmpActInv);
-                }
+            List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();
+            for (Solver<Double> decomp : all) {
+                MatrixStore<Double> actInv = decomp.invert(matrix);
+                TestUtils.assertEquals(decomp.getClass().getName(), expInv, actInv);
             }
 
-        } catch (final RecoverableCondition exception) {
+        } catch (RecoverableCondition exception) {
             TestUtils.fail(exception.getMessage());
         }
-    }
-
-    private MatrixStore<Double> makeSPD(final int dim) {
-        return MatrixUtils.makeSPD(dim);
     }
 
 }

@@ -37,7 +37,7 @@ final class Pivot {
         mySign = 1;
     }
 
-    public void change(final int row1, final int row2) {
+    void change(final int row1, final int row2) {
 
         if (row1 != row2) {
 
@@ -54,15 +54,23 @@ final class Pivot {
         }
     }
 
-    public int[] getOrder() {
+    int[] getInverseOrder() {
+        int[] inverse = new int[myOrder.length];
+        for (int i = 0; i < myOrder.length; i++) {
+            inverse[myOrder[i]] = i;
+        }
+        return inverse;
+    }
+
+    int[] getOrder() {
         return myOrder;
     }
 
-    public boolean isModified() {
+    boolean isModified() {
         return myModified;
     }
 
-    public int signum() {
+    int signum() {
         return mySign;
     }
 

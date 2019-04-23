@@ -63,7 +63,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+    Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
         public InverterTask<ComplexNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
@@ -80,7 +80,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     };
 
-    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+    Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
         public InverterTask<Double> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
@@ -124,7 +124,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     };
 
-    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+    Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
         public InverterTask<Quaternion> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
@@ -143,7 +143,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     };
 
-    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+    Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
         public InverterTask<RationalNumber> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {

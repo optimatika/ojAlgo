@@ -140,7 +140,7 @@ public class CoordinationSet<N extends Number> extends HashMap<String, CalendarD
 
     public CalendarDate getLatestLastKey() {
         return BasicSeries.findLatestLastKey(this.values());
-    };
+    }
 
     public CalendarDateUnit getResolution() {
 
@@ -167,7 +167,7 @@ public class CoordinationSet<N extends Number> extends HashMap<String, CalendarD
 
     public N getValue(final String series, final CalendarDate date) {
         return this.get(series).get(date);
-    };
+    }
 
     /**
      * @return A new CoordinationSet where all series have the same first and last keys.

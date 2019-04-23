@@ -75,7 +75,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+    Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
         public SolverTask<ComplexNumber> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
@@ -95,7 +95,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
     };
 
-    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+    Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
         public SolverTask<Double> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric, final boolean positiveDefinite) {
@@ -159,7 +159,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
     };
 
-    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+    Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
         public SolverTask<Quaternion> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
@@ -179,7 +179,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
     };
 
-    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+    Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
         public SolverTask<RationalNumber> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,

@@ -43,12 +43,12 @@ final class DifferencesSeries extends PrimitiveSeries {
     }
 
     @Override
-    public final int size() {
+    public int size() {
         return mySeries.size() - myPeriod;
     }
 
     @Override
-    public final double value(final int index) {
+    public double value(final int index) {
         return mySeries.value(index + myPeriod) - mySeries.value(index);
     }
 

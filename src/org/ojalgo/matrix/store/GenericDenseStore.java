@@ -57,23 +57,23 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class GenericDenseStore<N extends Number & Scalar<N>> extends ScalarArray<N> implements PhysicalStore<N>, DecompositionStore<N> {
 
-    public static interface GenericMultiplyBoth<N extends Number & Scalar<N>> extends TransformableRegion.FillByMultiplying<N> {
+    public interface GenericMultiplyBoth<N extends Number & Scalar<N>> extends TransformableRegion.FillByMultiplying<N> {
 
     }
 
-    public static interface GenericMultiplyLeft<N extends Number & Scalar<N>> {
+    public interface GenericMultiplyLeft<N extends Number & Scalar<N>> {
 
         void invoke(N[] product, Access1D<N> left, int complexity, N[] right, Scalar.Factory<N> scalar);
 
     }
 
-    public static interface GenericMultiplyNeither<N extends Number & Scalar<N>> {
+    public interface GenericMultiplyNeither<N extends Number & Scalar<N>> {
 
         void invoke(N[] product, N[] left, int complexity, N[] right, Scalar.Factory<N> scalar);
 
     }
 
-    public static interface GenericMultiplyRight<N extends Number & Scalar<N>> {
+    public interface GenericMultiplyRight<N extends Number & Scalar<N>> {
 
         void invoke(N[] product, N[] left, int complexity, Access1D<N> right, Scalar.Factory<N> scalar);
 
@@ -406,7 +406,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     public static final PhysicalStore.Factory<RationalNumber, GenericDenseStore<RationalNumber>> RATIONAL = new GenericDenseStore.Factory<>(
             RationalArray.FACTORY);
 
-    private final GenericMultiplyBoth<N> multiplyBoth;;
+    private final GenericMultiplyBoth<N> multiplyBoth;
     private final GenericMultiplyLeft<N> multiplyLeft;
     private final GenericMultiplyNeither<N> multiplyNeither;
     private final GenericMultiplyRight<N> multiplyRight;
@@ -842,7 +842,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Generic<N>) destination, myFactory.scalar());
     }
 
-    public final MatrixStore<N> get() {
+    public MatrixStore<N> get() {
         return this;
     }
 
@@ -980,23 +980,23 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         return myFactory;
     }
 
-    public final TransformableRegion<N> regionByColumns(final int... columns) {
+    public TransformableRegion<N> regionByColumns(final int... columns) {
         return new TransformableRegion.ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
-    public final TransformableRegion<N> regionByLimits(final int rowLimit, final int columnLimit) {
+    public TransformableRegion<N> regionByLimits(final int rowLimit, final int columnLimit) {
         return new TransformableRegion.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
-    public final TransformableRegion<N> regionByOffsets(final int rowOffset, final int columnOffset) {
+    public TransformableRegion<N> regionByOffsets(final int rowOffset, final int columnOffset) {
         return new TransformableRegion.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
-    public final TransformableRegion<N> regionByRows(final int... rows) {
+    public TransformableRegion<N> regionByRows(final int... rows) {
         return new TransformableRegion.RowsRegion<>(this, multiplyBoth, rows);
     }
 
-    public final TransformableRegion<N> regionByTransposing() {
+    public TransformableRegion<N> regionByTransposing() {
         return new TransformableRegion.TransposedRegion<>(this, multiplyBoth);
     }
 
@@ -1092,7 +1092,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return Access2D.toString(this);
     }
 

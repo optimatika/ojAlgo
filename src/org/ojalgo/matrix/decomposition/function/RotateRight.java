@@ -23,7 +23,7 @@ package org.ojalgo.matrix.decomposition.function;
 
 public interface RotateRight {
 
-    static final RotateRight NULL = new RotateRight() {
+    RotateRight NULL = new RotateRight() {
 
         public void rotateRight(final int low, final int high, final double cos, final double sin) {
 

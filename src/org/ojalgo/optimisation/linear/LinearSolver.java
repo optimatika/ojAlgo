@@ -48,7 +48,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             super();
 
             myDelegate = new ConvexSolver.Builder();
-            ;
+
         }
 
         public Builder(final MatrixStore<Double> C) {

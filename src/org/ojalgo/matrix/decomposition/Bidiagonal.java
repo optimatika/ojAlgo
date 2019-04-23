@@ -58,31 +58,13 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new BidiagonalDecomposition.Complex(fullSize);
+    Factory<ComplexNumber> COMPLEX = (typical, fullSize) -> new BidiagonalDecomposition.Complex(fullSize);
 
-    public static final Factory<Double> PRIMITIVE = (typical, fullSize) -> new BidiagonalDecomposition.Primitive(fullSize);
+    Factory<Double> PRIMITIVE = (typical, fullSize) -> new BidiagonalDecomposition.Primitive(fullSize);
 
-    public static final Factory<Quaternion> QUATERNION = (typical, fullSize) -> new BidiagonalDecomposition.Quat(fullSize);
+    Factory<Quaternion> QUATERNION = (typical, fullSize) -> new BidiagonalDecomposition.Quat(fullSize);
 
-    public static final Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new BidiagonalDecomposition.Rational(fullSize);
-
-    @SuppressWarnings("unchecked")
-    public static <N extends Number> Bidiagonal<N> make(final Access2D<N> typical) {
-
-        final N tmpNumber = typical.get(0, 0);
-
-        if (tmpNumber instanceof RationalNumber) {
-            return (Bidiagonal<N>) RATIONAL.make(typical);
-        } else if (tmpNumber instanceof Quaternion) {
-            return (Bidiagonal<N>) QUATERNION.make(typical);
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (Bidiagonal<N>) COMPLEX.make(typical);
-        } else if (tmpNumber instanceof Double) {
-            return (Bidiagonal<N>) PRIMITIVE.make(typical);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
+    Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new BidiagonalDecomposition.Rational(fullSize);
 
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Bidiagonal<N> decomposition, final NumberContext context) {
 
@@ -131,8 +113,30 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
         return retVal;
     }
 
+    @SuppressWarnings("unchecked")
+    static <N extends Number> Bidiagonal<N> make(final Access2D<N> typical) {
+
+        final N tmpNumber = typical.get(0, 0);
+
+        if (tmpNumber instanceof RationalNumber) {
+            return (Bidiagonal<N>) RATIONAL.make(typical);
+        } else if (tmpNumber instanceof Quaternion) {
+            return (Bidiagonal<N>) QUATERNION.make(typical);
+        } else if (tmpNumber instanceof ComplexNumber) {
+            return (Bidiagonal<N>) COMPLEX.make(typical);
+        } else if (tmpNumber instanceof Double) {
+            return (Bidiagonal<N>) PRIMITIVE.make(typical);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    /**
+     * @deprecated v48 Use {@link #reconstruct()} instead
+     */
+    @Deprecated
     static <N extends Number> MatrixStore<N> reconstruct(final Bidiagonal<N> decomposition) {
-        return decomposition.getQ1().multiply(decomposition.getD()).multiply(decomposition.getQ2().conjugate());
+        return decomposition.reconstruct();
     }
 
     MatrixStore<N> getD();
@@ -144,7 +148,10 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
     boolean isUpper();
 
     default MatrixStore<N> reconstruct() {
-        return Bidiagonal.reconstruct(this);
+        MatrixStore<N> mtrxQ1 = this.getQ1();
+        MatrixStore<N> mtrxD = this.getD();
+        MatrixStore<N> mtrxQ2 = this.getQ2();
+        return mtrxQ1.multiply(mtrxD).multiply(mtrxQ2.conjugate());
     }
 
 }

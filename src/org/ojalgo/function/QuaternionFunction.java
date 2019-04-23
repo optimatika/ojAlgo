@@ -30,7 +30,7 @@ import org.ojalgo.type.context.NumberContext;
 public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     @FunctionalInterface
-    public static interface Binary extends BinaryFunction<Quaternion> {
+    public interface Binary extends BinaryFunction<Quaternion> {
 
         default double invoke(final double arg1, final double arg2) {
             return this.invoke(Quaternion.valueOf(arg1), Quaternion.valueOf(arg2)).doubleValue();
@@ -39,7 +39,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     }
 
     @FunctionalInterface
-    public static interface Consumer extends VoidFunction<Quaternion> {
+    public interface Consumer extends VoidFunction<Quaternion> {
 
         default void invoke(final double arg) {
             this.invoke(Quaternion.valueOf(arg));
@@ -48,7 +48,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     }
 
     @FunctionalInterface
-    public static interface Parameter extends ParameterFunction<Quaternion> {
+    public interface Parameter extends ParameterFunction<Quaternion> {
 
         default double invoke(final double arg, final int param) {
             return this.invoke(Quaternion.valueOf(arg), param).doubleValue();
@@ -57,7 +57,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     }
 
     @FunctionalInterface
-    public static interface Predicate extends PredicateFunction<Quaternion> {
+    public interface Predicate extends PredicateFunction<Quaternion> {
 
         default boolean invoke(final double arg) {
             return this.invoke(Quaternion.valueOf(arg));
@@ -66,7 +66,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     }
 
     @FunctionalInterface
-    public static interface Unary extends UnaryFunction<Quaternion> {
+    public interface Unary extends UnaryFunction<Quaternion> {
 
         default double invoke(final double arg) {
             return this.invoke(Quaternion.valueOf(arg)).doubleValue();

@@ -27,6 +27,10 @@ import java.util.function.BinaryOperator;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.decomposition.MatrixDecomposition;
+import org.ojalgo.structure.Structure2D;
+
 public abstract class BenchmarkContestant<T> {
 
     public abstract class EigenDecomposer implements UnaryOperator<T> {
@@ -120,6 +124,10 @@ public abstract class BenchmarkContestant<T> {
     public static final Map<String, BenchmarkContestant<?>> CONTESTANTS = new HashMap<>();
 
     static {
+    }
+
+    public static MatrixDecomposition.Solver<Double> newSolver(Structure2D template) {
+        return LU.PRIMITIVE.make(template);
     }
 
     public BenchmarkContestant() {

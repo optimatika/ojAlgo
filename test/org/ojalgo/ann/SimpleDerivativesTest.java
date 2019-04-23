@@ -56,7 +56,7 @@ public class SimpleDerivativesTest extends BackPropagationExample {
     @Override
     public void testFeedForward() {
         // Not possible to test for this case
-        ;
+
     }
 
     private void doTestDerivatives(ArtificialNeuralNetwork.Activator activator, ArtificialNeuralNetwork.Error error) {

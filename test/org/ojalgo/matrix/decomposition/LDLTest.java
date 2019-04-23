@@ -21,11 +21,15 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.Arrays;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RawStore;
+import org.ojalgo.netio.BasicLogger;
 
 /**
  * @author apete
@@ -38,42 +42,102 @@ public class LDLTest {
     }
 
     @Test
+    public void testQuadOptKTH() {
+
+        RawStore mtrxA = new RawStore(new double[][] { { 2, 4, 6, 8 }, { 4, 9, 17, 22 }, { 6, 17, 44, 61 }, { 8, 22, 61, 118 } });
+        RawStore mtrxL = new RawStore(new double[][] { { 1, 0, 0, 0 }, { 2, 1, 0, 0 }, { 3, 5, 1, 0 }, { 4, 6, 7, 1 } });
+        RawStore mtrxD = new RawStore(new double[][] { { 2, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } });
+
+        this.doTest(mtrxA, mtrxL, mtrxD);
+    }
+
+    @Test
+    @Disabled
+    public void testQuadOptKTHPivot() {
+
+        RawStore mtrxA = new RawStore(new double[][] { { 2, 4, 6, 8 }, { 4, 9, 17, 22 }, { 6, 17, 44, 61 }, { 8, 22, 61, 118 } });
+        RawStore mtrxL = new RawStore(new double[][] { { 1, 0, 0, 0 }, { 2, 1, 0, 0 }, { 3, 5, 1, 0 }, { 4, 6, 7, 1 } });
+        RawStore mtrxD = new RawStore(new double[][] { { 2, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } });
+
+        MatrixStore<Double> permA = mtrxA.logical().row(3, 2, 1, 0).column(3, 2, 1, 0).get();
+
+        this.doTest(permA, mtrxL, mtrxD);
+    }
+
+    @Test
     public void testWikipediaCase() {
 
-        final RawStore tmpA = new RawStore(new double[][] { { 4, 12, -16 }, { 12, 37, -43 }, { -16, -43, 98 } });
-        final RawStore tmpL = new RawStore(new double[][] { { 1, 0, 0 }, { 3, 1, 0 }, { -4, 5, 1 } });
-        final RawStore tmpD = new RawStore(new double[][] { { 4, 0, 0 }, { 0, 1, 0 }, { 0, 0, 9 } });
+        RawStore mtrxA = new RawStore(new double[][] { { 4, 12, -16 }, { 12, 37, -43 }, { -16, -43, 98 } });
+        RawStore mtrxL = new RawStore(new double[][] { { 1, 0, 0 }, { 3, 1, 0 }, { -4, 5, 1 } });
+        RawStore mtrxD = new RawStore(new double[][] { { 4, 0, 0 }, { 0, 1, 0 }, { 0, 0, 9 } });
 
-        final RawStore tmpReconstructed = tmpL.multiply(tmpD.multiply(tmpL.transpose()));
-        TestUtils.assertEquals(tmpA, tmpReconstructed);
+        this.doTest(mtrxA, mtrxL, mtrxD);
+    }
 
-        final RawLDL tmpRawLDL = new RawLDL();
-        tmpRawLDL.decompose(tmpA);
+    @Test
+    public void testWikipediaCasePrePivoted() {
 
-        final LDL<Double> tmpPrimLDL = new LDLDecomposition.Primitive();
-        tmpPrimLDL.decompose(tmpA);
+        RawStore mtrxA = new RawStore(new double[][] { { 98, -43, -16 }, { -43, 37, 12 }, { -16, 12, 4 } });
+        RawStore mtrxL = new RawStore(
+                new double[][] { { 1.0, 0.0, 0.0 }, { -0.4387755102040816, 1.0, 0.0 }, { -0.16326530612244897, 0.2746201463140124, 1.0 } });
+        RawStore mtrxD = new RawStore(new double[][] { { 98.0, 0.0, 0.0 }, { 0.0, 18.13265306122449, 0.0 }, { 0.0, 0.0, 0.020258863252673898 } });
 
-        //        BasicLogger.debug(tmpL);
-        //        BasicLogger.debug(tmpD);
+        this.doTest(mtrxA, mtrxL, mtrxD);
+    }
 
-        //        BasicLogger.debug("RAW L", tmpRawLDL.getL());
-        //        BasicLogger.debug("RAW D", tmpRawLDL.getD());
-        //
-        //        BasicLogger.debug("PRIM L", tmpPrimLDL.getL());
-        //        BasicLogger.debug("PRIM D", tmpPrimLDL.getD());
+    private void doTest(MatrixStore<Double> mtrxA, RawStore mtrxL, RawStore mtrxD) {
 
-        TestUtils.assertEquals(tmpL, tmpRawLDL.getL());
-        TestUtils.assertEquals(tmpD, tmpRawLDL.getD());
+        MatrixStore<Double> mtrxIdentity = MatrixStore.PRIMITIVE.makeIdentity((int) mtrxA.countRows()).get();
 
-        final MatrixStore<Double> tmpRawInv = tmpRawLDL.getSolution(MatrixStore.PRIMITIVE.makeIdentity(3).get());
-        final MatrixStore<Double> tmpPrimInv = tmpPrimLDL.getSolution(MatrixStore.PRIMITIVE.makeIdentity(3).get());
+        RawStore reconstructed = mtrxL.multiply(mtrxD.multiply(mtrxL.transpose()));
+        TestUtils.assertEquals(mtrxA, reconstructed);
 
-        tmpRawInv.multiply(tmpA);
-        tmpPrimInv.multiply(tmpA);
+        // TODO Change to new RawLDL() when it's done
+        LDL<Double> rawLDL = new LDLDecomposition.Primitive();
+        rawLDL.decompose(mtrxA);
 
-        tmpRawLDL.decompose(tmpRawInv);
-        final MatrixStore<Double> tmpInverse2 = tmpRawLDL.getSolution(MatrixStore.PRIMITIVE.makeIdentity(3).get());
+        LDL<Double> primLDL = new LDLDecomposition.Primitive();
+        primLDL.decompose(mtrxA.logical().triangular(false, false).get());
 
-        TestUtils.assertEquals(tmpA, tmpInverse2);
+        if (MatrixDecompositionTests.DEBUG) {
+
+            BasicLogger.debug("Expected L", mtrxL);
+            BasicLogger.debug("Expected D", mtrxD);
+
+            BasicLogger.debug("RAW P: {}", Arrays.toString(rawLDL.getPivotOrder()));
+            BasicLogger.debug("RAW L", rawLDL.getL());
+            BasicLogger.debug("RAW D", rawLDL.getD());
+
+            BasicLogger.debug("PRIM P: {}", Arrays.toString(primLDL.getPivotOrder()));
+            BasicLogger.debug("PRIM L", primLDL.getL());
+            BasicLogger.debug("PRIM D", primLDL.getD());
+        }
+
+        if (!rawLDL.isPivoted()) {
+            TestUtils.assertEquals(mtrxL, rawLDL.getL());
+            TestUtils.assertEquals(mtrxD, rawLDL.getD());
+        }
+
+        if (!primLDL.isPivoted()) {
+            TestUtils.assertEquals(mtrxL, primLDL.getL());
+            TestUtils.assertEquals(mtrxD, primLDL.getD());
+        }
+
+        TestUtils.assertEquals(mtrxA, rawLDL.reconstruct());
+        TestUtils.assertEquals(mtrxA, primLDL.reconstruct());
+
+        MatrixStore<Double> rawInv = rawLDL.getInverse();
+        MatrixStore<Double> primInv = primLDL.getInverse();
+
+        TestUtils.assertEquals(primInv, rawInv);
+        TestUtils.assertEquals(mtrxIdentity, primInv.multiply(mtrxA));
+        TestUtils.assertEquals(mtrxIdentity, rawInv.multiply(mtrxA));
+
+        MatrixStore<Double> rawSol = rawLDL.getSolution(mtrxIdentity);
+        MatrixStore<Double> primSol = primLDL.getSolution(mtrxIdentity);
+
+        TestUtils.assertEquals(primSol, rawSol);
+        TestUtils.assertEquals(mtrxIdentity, primSol.multiply(mtrxA));
+        TestUtils.assertEquals(mtrxIdentity, rawSol.multiply(mtrxA));
     }
 }

@@ -47,37 +47,37 @@ import org.ojalgo.scalar.RationalNumber;
 public interface BLAS1 {
 
     @FunctionalInterface
-    public static interface GenericToInt<T> {
+    public interface GenericToInt<T> {
 
         int invoke(final T[] data, final int first, final int limit, final int step);
 
     }
 
     @FunctionalInterface
-    public static interface PrimitiveToDouble {
+    public interface PrimitiveToDouble {
 
         double invoke(final double[] data, final int first, final int limit, final int step);
 
     }
 
     @FunctionalInterface
-    public static interface PrimitiveToInt {
+    public interface PrimitiveToInt {
 
         int invoke(final double[] data, final int first, final int limit, final int step);
 
     }
 
-    public static final GenericToInt<BigDecimal> BAMAX = AMAX::invoke;
+    GenericToInt<BigDecimal> BAMAX = AMAX::invoke;
 
-    public static final GenericToInt<ComplexNumber> CAMAX = AMAX::invoke;
+    GenericToInt<ComplexNumber> CAMAX = AMAX::invoke;
 
-    public static final PrimitiveToInt DAMAX = AMAX::invoke;
-    public static final PrimitiveToInt DAMIN = AMIN::invoke;
-    public static final PrimitiveToDouble DASUM = ASUM::invoke;
+    PrimitiveToInt DAMAX = AMAX::invoke;
+    PrimitiveToInt DAMIN = AMIN::invoke;
+    PrimitiveToDouble DASUM = ASUM::invoke;
 
-    public static final GenericToInt<Quaternion> QAMAX = AMAX::invoke;
+    GenericToInt<Quaternion> QAMAX = AMAX::invoke;
 
-    public static final GenericToInt<RationalNumber> RAMAX = AMAX::invoke;
+    GenericToInt<RationalNumber> RAMAX = AMAX::invoke;
 
     static double fma(final double m1, final double m2, final double a) {
         return (m1 * m2) + a;

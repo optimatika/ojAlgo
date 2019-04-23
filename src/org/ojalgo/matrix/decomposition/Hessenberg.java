@@ -45,16 +45,27 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new HessenbergDecomposition.Complex();
+    Factory<ComplexNumber> COMPLEX = typical -> new HessenbergDecomposition.Complex();
 
-    public static final Factory<Double> PRIMITIVE = typical -> new HessenbergDecomposition.Primitive();
+    Factory<Double> PRIMITIVE = typical -> new HessenbergDecomposition.Primitive();
 
-    public static final Factory<Quaternion> QUATERNION = typical -> new HessenbergDecomposition.Quat();
+    Factory<Quaternion> QUATERNION = typical -> new HessenbergDecomposition.Quat();
 
-    public static final Factory<RationalNumber> RATIONAL = typical -> new HessenbergDecomposition.Rational();
+    Factory<RationalNumber> RATIONAL = typical -> new HessenbergDecomposition.Rational();
+
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Hessenberg<N> decomposition, final NumberContext context) {
+
+        final MatrixStore<N> tmpH = decomposition.getH();
+        final MatrixStore<N> tmpQ = decomposition.getQ();
+
+        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
+        final MatrixStore<N> tmpStore2 = tmpQ.multiply(tmpH);
+
+        return Access2D.equals(tmpStore1, tmpStore2, context);
+    }
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> Hessenberg<N> make(final Access2D<N> typical) {
+    static <N extends Number> Hessenberg<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -71,21 +82,12 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
         }
     }
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Hessenberg<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpH = decomposition.getH();
-        final MatrixStore<N> tmpQ = decomposition.getQ();
-
-        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
-        final MatrixStore<N> tmpStore2 = tmpQ.multiply(tmpH);
-
-        return Access2D.equals(tmpStore1, tmpStore2, context);
-    }
-
+    /**
+     * @deprecated v48 Use {@link #reconstruct()} instead
+     */
+    @Deprecated
     static <N extends Number> MatrixStore<N> reconstruct(final Hessenberg<N> decomposition) {
-        final MatrixStore<N> tmpQ = decomposition.getQ();
-        final MatrixStore<N> tmpH = decomposition.getH();
-        return tmpQ.multiply(tmpH).multiply(tmpQ.transpose());
+        return decomposition.reconstruct();
     }
 
     boolean compute(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, boolean upper);
@@ -97,6 +99,8 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
     boolean isUpper();
 
     default MatrixStore<N> reconstruct() {
-        return Hessenberg.reconstruct(this);
+        MatrixStore<N> mtrxQ = this.getQ();
+        MatrixStore<N> mtrxH = this.getH();
+        return mtrxQ.multiply(mtrxH).multiply(mtrxQ.transpose());
     }
 }

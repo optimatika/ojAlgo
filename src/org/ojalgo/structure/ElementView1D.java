@@ -33,8 +33,8 @@ import org.ojalgo.ProgrammingError;
 public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>>
         extends AccessScalar<N>, Iterable<V>, Iterator<V>, Spliterator<V>, Comparable<V> {
 
-    static final int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED
-            | Spliterator.SIZED | Spliterator.SORTED | Spliterator.SUBSIZED;
+    int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.SIZED
+            | Spliterator.SORTED | Spliterator.SUBSIZED;
 
     default int characteristics() {
         return CHARACTERISTICS;

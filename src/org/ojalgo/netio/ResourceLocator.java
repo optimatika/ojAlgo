@@ -190,7 +190,7 @@ public final class ResourceLocator {
 
     }
 
-    public static enum Method {
+    public enum Method {
         DELETE, GET, HEAD, OPTIONS, POST, PUT, TRACE;
     }
 

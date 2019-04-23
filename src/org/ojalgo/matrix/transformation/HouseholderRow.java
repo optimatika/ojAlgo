@@ -55,7 +55,7 @@ final class HouseholderRow<N extends Number> extends RowView<N> implements House
             myWorker = factory.makeHouseholder((int) this.count());
         }
         return (P) myWorker;
-    };
+    }
 
     public boolean isZero() {
         return myStore.isRowSmall(this.row(), myFirst + 1L, PrimitiveMath.ONE);

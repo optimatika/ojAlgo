@@ -35,12 +35,12 @@ final class AccessSeries extends PrimitiveSeries {
     }
 
     @Override
-    public final int size() {
+    public int size() {
         return (int) myValues.count();
     }
 
     @Override
-    public final double value(final int index) {
+    public double value(final int index) {
         return myValues.doubleValue(index);
     }
 

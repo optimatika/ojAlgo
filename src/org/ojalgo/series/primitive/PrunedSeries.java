@@ -43,12 +43,12 @@ final class PrunedSeries extends PrimitiveSeries {
     }
 
     @Override
-    public final int size() {
+    public int size() {
         return myBase.size() - Math.abs(myShift);
     }
 
     @Override
-    public final double value(final int index) {
+    public double value(final int index) {
         return myBase.value(index - Math.min(myShift, 0));
     }
 
