@@ -53,9 +53,9 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
 
     }
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new CholeskyDecomposition.Complex();
+    Factory<ComplexNumber> COMPLEX = typical -> new CholeskyDecomposition.Complex();
 
-    public static final Factory<Double> PRIMITIVE = typical -> {
+    Factory<Double> PRIMITIVE = typical -> {
         if ((32L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
             return new CholeskyDecomposition.Primitive();
         } else {
@@ -63,12 +63,12 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
         }
     };
 
-    public static final Factory<Quaternion> QUATERNION = typical -> new CholeskyDecomposition.Quat();
+    Factory<Quaternion> QUATERNION = typical -> new CholeskyDecomposition.Quat();
 
-    public static final Factory<RationalNumber> RATIONAL = typical -> new CholeskyDecomposition.Rational();
+    Factory<RationalNumber> RATIONAL = typical -> new CholeskyDecomposition.Rational();
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {
+    static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -96,9 +96,12 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
         return retVal;
     }
 
+    /**
+     * @deprecated v48 Use {@link #reconstruct()} instead
+     */
+    @Deprecated
     static <N extends Number> MatrixStore<N> reconstruct(final Cholesky<N> decomposition) {
-        final MatrixStore<N> tmpL = decomposition.getL();
-        return tmpL.multiply(tmpL.conjugate());
+        return decomposition.reconstruct();
     }
 
     /**
@@ -109,7 +112,7 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
      *
      * @return true if the tests did not fail.
      */
-    public boolean isSPD();
+    boolean isSPD();
 
     /**
      * Must implement either {@link #getL()} or {@link #getR()}.
@@ -126,7 +129,8 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
     }
 
     default MatrixStore<N> reconstruct() {
-        return Cholesky.reconstruct(this);
+        final MatrixStore<N> mtrxL = this.getL();
+        return mtrxL.multiply(mtrxL.conjugate());
     }
 
 }

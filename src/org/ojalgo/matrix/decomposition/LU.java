@@ -99,8 +99,12 @@ public interface LU<N extends Number> extends LDU<N>, MatrixDecomposition.Pivoti
         }
     }
 
+    /**
+     * @deprecated v48 Use {@link #reconstruct()} instead
+     */
+    @Deprecated
     static <N extends Number> MatrixStore<N> reconstruct(final LU<N> decomposition) {
-        return decomposition.getL().multiply(decomposition.getU()).logical().row(decomposition.getPivotOrder()).get();
+        return decomposition.reconstruct();
     }
 
     /**
@@ -125,7 +129,10 @@ public interface LU<N extends Number> extends LDU<N>, MatrixDecomposition.Pivoti
     MatrixStore<N> getU();
 
     default MatrixStore<N> reconstruct() {
-        return LU.reconstruct(this);
+        MatrixStore<N> mtrxL = this.getL();
+        MatrixStore<N> mtrxU = this.getU();
+        int[] pivotOrder = this.getPivotOrder();
+        return mtrxL.multiply(mtrxU).logical().row(pivotOrder).get();
     }
 
 }

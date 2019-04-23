@@ -84,15 +84,12 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         }
     }
 
+    /**
+     * @deprecated v48 Use {@link #reconstruct()} instead
+     */
+    @Deprecated
     static <N extends Number> MatrixStore<N> reconstruct(final LDL<N> decomposition) {
-
-        final MatrixStore<N> tmpL = decomposition.getL();
-        final MatrixStore<N> tmpD = decomposition.getD();
-        final MatrixStore<N> tmpR = decomposition.getR();
-
-        int[] pivotOrder = decomposition.getPivotOrder();
-
-        return tmpL.multiply(tmpD).multiply(tmpR).logical().row(pivotOrder).column(pivotOrder).get();
+        return decomposition.reconstruct();
     }
 
     MatrixStore<N> getD();
@@ -112,6 +109,13 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
     }
 
     default MatrixStore<N> reconstruct() {
-        return LDL.reconstruct(this);
+
+        MatrixStore<N> mtrxL = this.getL();
+        MatrixStore<N> mtrxD = this.getD();
+        MatrixStore<N> mtrxR = this.getR();
+
+        int[] pivotOrder = this.getPivotOrder();
+
+        return mtrxL.multiply(mtrxD).multiply(mtrxR).logical().row(pivotOrder).column(pivotOrder).get();
     }
 }
