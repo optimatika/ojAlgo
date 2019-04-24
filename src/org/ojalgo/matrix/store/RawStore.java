@@ -743,10 +743,16 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         Raw2D.fillAll(data, supplier);
     }
 
-    public void fillByMultiplying(final Access1D<Double> leftMatrix, final Access1D<Double> rightMatrix) {
-        final double[][] tmpLeft = RawStore.extract(leftMatrix, data.length);
-        final double[][] tmpRight = RawStore.extract(rightMatrix, (int) (leftMatrix.count() / data.length));
-        RawStore.multiply(data, tmpLeft, tmpRight);
+    public void fillByMultiplying(final Access1D<Double> left, final Access1D<Double> right) {
+
+        final int complexity = Math.toIntExact(left.count() / this.countRows());
+        if (complexity != Math.toIntExact(right.count() / this.countColumns())) {
+            ProgrammingError.throwForMultiplicationNotPossible();
+        }
+
+        final double[][] rawLeft = RawStore.extract(left, data.length);
+        final double[][] rawRight = RawStore.extract(right, complexity);
+        RawStore.multiply(data, rawLeft, rawRight);
     }
 
     public void fillColumn(final long row, final long col, final Double value) {

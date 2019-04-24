@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.BinaryFunction;
@@ -146,6 +147,12 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
+
+        final int complexity = Math.toIntExact(left.count() / this.countRows());
+        if (complexity != Math.toIntExact(right.count() / this.countColumns())) {
+            ProgrammingError.throwForMultiplicationNotPossible();
+        }
+
         myMultiplyer.invoke(this, left, (int) (left.count() / this.countRows()), right);
     }
 

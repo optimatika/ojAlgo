@@ -674,7 +674,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
 
-        final int complexity = ((int) left.count()) / myRowDim;
+        final int complexity = Math.toIntExact(left.count() / this.countRows());
+        if (complexity != Math.toIntExact(right.count() / this.countColumns())) {
+            ProgrammingError.throwForMultiplicationNotPossible();
+        }
 
         if (left instanceof GenericDenseStore) {
             if (right instanceof GenericDenseStore) {

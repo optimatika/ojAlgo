@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
@@ -332,6 +333,12 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
         }
 
         public final void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
+
+            final int complexity = Math.toIntExact(left.count() / this.countRows());
+            if (complexity != Math.toIntExact(right.count() / this.countColumns())) {
+                ProgrammingError.throwForMultiplicationNotPossible();
+            }
+
             myMultiplier.invoke(this, left, (int) (left.count() / this.countRows()), right);
         }
 

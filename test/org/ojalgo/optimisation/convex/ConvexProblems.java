@@ -186,8 +186,10 @@ public class ConvexProblems extends OptimisationConvexTests {
         tmpBalance.setLinearFactorsSimple(model.getVariables());
         tmpBalance.level(BigMath.ONE);
 
-        model.options.debug(ConvexSolver.class);
-        model.options.validate = false;
+        if (DEBUG) {
+            model.options.debug(ConvexSolver.class);
+            model.options.validate = false;
+        }
         final Result actual = model.minimise();
 
         final NumberContext accuracy = StandardType.PERCENT.withPrecision(5);

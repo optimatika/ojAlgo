@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.Arrays;
 import java.util.List;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
@@ -753,7 +754,10 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public void fillByMultiplying(final Access1D<Double> left, final Access1D<Double> right) {
 
-        final int complexity = ((int) left.count()) / myRowDim;
+        final int complexity = Math.toIntExact(left.count() / this.countRows());
+        if (complexity != Math.toIntExact(right.count() / this.countColumns())) {
+            ProgrammingError.throwForMultiplicationNotPossible();
+        }
 
         if (left instanceof PrimitiveDenseStore) {
             if (right instanceof PrimitiveDenseStore) {
