@@ -77,7 +77,6 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Optimisation.Result expectedResult = new Optimisation.Result(Optimisation.State.OPTIMAL, expectedValue, expectedSolution);
 
         final ExpressionsBasedModel initialisedModel = ConvexProblems.buildModel(matrices, expectedSolution);
-
         if (DEBUG) {
             initialisedModel.options.debug(ConvexSolver.class);
             initialisedModel.options.validate = false;
@@ -99,6 +98,10 @@ public class ConvexProblems extends OptimisationConvexTests {
         final ExpressionsBasedModel uninitialisedModel = ConvexProblems.buildModel(matrices, expectedSolution);
         // Clear initial variable values
         uninitialisedModel.getVariables().forEach(variable -> variable.setValue(null));
+        if (DEBUG) {
+            uninitialisedModel.options.debug(ConvexSolver.class);
+            uninitialisedModel.options.validate = false;
+        }
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(uninitialisedModel, modelValidationContext);
 

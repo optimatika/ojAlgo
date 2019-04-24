@@ -141,8 +141,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.log("Step: {} - {}", normStepX, iterX.asList());
         }
 
-        if (!options.solution.isSmall(normCurrentX, normStepX)
-                && (GenericSolver.ACCURACY.isSmall(ONE, normCurrentX) || !GenericSolver.ACCURACY.isSmall(normStepX, normCurrentX))) {
+        if (!options.solution.isSmall(normCurrentX, normStepX) && !GenericSolver.ACCURACY.isSmall(normStepX, Math.max(normCurrentX, ONE))) {
             // Non-zero && non-freak solution
 
             double stepLength = ONE;
@@ -173,8 +172,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                     final double currentSlack = slack.doubleValue(i);
                     final double slackChange = excludedInequalityRow.dot(iterX);
-                    final double fraction = (Math.signum(currentSlack) == Math.signum(Math.signum(currentSlack)))
-                            && GenericSolver.ACCURACY.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
+                    final double fraction = (Math.signum(currentSlack) == Math.signum(slackChange)) && GenericSolver.ACCURACY.isSmall(slackChange, currentSlack)
+                            ? ZERO
+                            : Math.abs(currentSlack) / slackChange;
+                    // If the current slack is negative something has already gone wrong.
+                    // Taking the abs value is to handle small negative values due to rounding errors
 
                     if ((slackChange <= ZERO) || GenericSolver.ACCURACY.isSmall(normStepX, slackChange)) {
                         // This constraint not affected
@@ -211,7 +213,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             // Zero solution
 
             if (this.isLogDebug()) {
-                this.log("Step too small!");
+                this.log("Step too small (or freaky large)!");
             }
 
             this.setState(State.FEASIBLE);
