@@ -504,4 +504,53 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
     }
 
+    @Test
+    public void testP20190423() {
+
+        PrimitiveDenseStore mtrxK = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 2.6072E8, 0.0, 0.0, -2.6E8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, 2.6072E8, 0.0, 0.0, -720000.0, 0.0, 0.0, 0.0, -3599999.9999999995, 0.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 1440000.0, 0.0, 0.0, -720000.0, 0.0, 3599999.9999999995, 0.0, 0.0, 0.0, 0.0 },
+                        { -2.6E8, 0.0, 0.0, 2.6072E8, 0.0, 0.0, 0.0, 0.0, -3599999.9999999995, -720000.0, 0.0, 0.0 },
+                        { 0.0, -720000.0, 0.0, 0.0, 2.6072E8, 0.0, 0.0, 0.0, 3599999.9999999995, 0.0, -2.6E8, 0.0 },
+                        { 0.0, 0.0, -720000.0, 0.0, 0.0, 1440000.0, 3599999.9999999995, -3599999.9999999995, 0.0, 0.0, 0.0, -720000.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, 3599999.9999999995, 1.7999999999999996E7, 0.0, 0.0, 0.0, 0.0, -3599999.9999999995 },
+                        { 0.0, 0.0, 3599999.9999999995, 0.0, 0.0, -3599999.9999999995, 0.0, 1.7999999999999996E7, 0.0, 0.0, 0.0, 0.0 },
+                        { 0.0, -3599999.9999999995, 0.0, -3599999.9999999995, 3599999.9999999995, 0.0, 0.0, 0.0, 3.599999999999999E7, 3599999.9999999995, 0.0,
+                                0.0 },
+                        { 0.0, 0.0, 0.0, -720000.0, 0.0, 0.0, 0.0, 0.0, 3599999.9999999995, 720000.0, 0.0, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, -2.6E8, 0.0, 0.0, 0.0, 0.0, 0.0, 2.6E8, 0.0 },
+                        { 0.0, 0.0, 0.0, 0.0, 0.0, -720000.0, -3599999.9999999995, 0.0, 0.0, 0.0, 0.0, 720000.0 } });
+
+        PrimitiveDenseStore mtrxF = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 138750.0 }, { -150000.0 }, { 0.0 }, { 0.0 }, { -150000.0 }, { 0.0 },
+                { 0.0 }, { 0.0 }, { -187500.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
+
+        QR<Double> qr = QR.PRIMITIVE.make(mtrxK);
+        qr.decompose(mtrxK);
+        MatrixStore<Double> qrX = qr.getSolution(mtrxF);
+        BasicLogger.debug("QR rank: {} solvable: {}", qr.getRank(), qr.isSolvable());
+        BasicLogger.debug("QR", qrX);
+        BasicLogger.debug("QR ZERO", mtrxF.subtract(mtrxK.multiply(qrX)));
+
+        SingularValue<Double> svd = SingularValue.PRIMITIVE.make(mtrxK);
+        svd.decompose(mtrxK);
+        MatrixStore<Double> svdX = svd.getSolution(mtrxF);
+        BasicLogger.debug("SVD rank: {} solvable: {}", svd.getRank(), svd.isSolvable());
+        BasicLogger.debug("SVD", svdX);
+        BasicLogger.debug("SVD ZERO", mtrxF.subtract(mtrxK.multiply(svdX)));
+
+        LDL<Double> ldl = LDL.PRIMITIVE.make(mtrxK);
+        ldl.decompose(mtrxK);
+        MatrixStore<Double> ldlX = ldl.getSolution(mtrxF);
+        BasicLogger.debug("LDL rank: {} solvable: {}", ldl.getRank(), ldl.isSolvable());
+        // BasicLogger.debug("LDL", ldlX);
+
+        LU<Double> lu = LU.PRIMITIVE.make(mtrxK);
+        lu.decompose(mtrxK);
+        MatrixStore<Double> luX = lu.getSolution(mtrxF);
+        BasicLogger.debug("LU rank: {} solvable: {}", lu.getRank(), lu.isSolvable());
+        // BasicLogger.debug("LU", luX);
+
+    }
+
 }
