@@ -30,6 +30,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
 public abstract class TypeUtils {
@@ -49,37 +50,41 @@ public abstract class TypeUtils {
             return null;
         }
 
-        final int tmpPatternSize = messagePattern.length();
-        final int tmpArgsCount = args.length;
+        final int patternLength = messagePattern.length();
+        final int argsCount = args.length;
 
-        int tmpFirst = 0;
-        int tmpLimit = tmpPatternSize;
+        int first = 0;
+        int limit = patternLength;
 
-        final StringBuilder retVal = new StringBuilder(tmpPatternSize + (tmpArgsCount * 20));
+        final StringBuilder retVal = new StringBuilder(patternLength + (argsCount * 20));
 
-        for (int a = 0; a < tmpArgsCount; a++) {
+        for (int a = 0; a < argsCount; a++) {
 
-            tmpLimit = messagePattern.indexOf(TypeUtils.START, tmpFirst);
+            limit = messagePattern.indexOf(TypeUtils.START, first);
 
-            if (tmpLimit == -1) {
+            if (limit == -1) {
                 retVal.append(ASCII.SP);
-                if (double[].class.isInstance(args[a])) {
+                if (Access1D.class.isInstance(args[a])) {
+                    retVal.append(Access1D.toString((Access1D<?>) args[a]));
+                } else if (double[].class.isInstance(args[a])) {
                     retVal.append(Arrays.toString((double[]) args[a]));
                 } else {
                     retVal.append(args[a]);
                 }
             } else {
-                retVal.append(messagePattern.substring(tmpFirst, tmpLimit));
-                if (double[].class.isInstance(args[a])) {
+                retVal.append(messagePattern.substring(first, limit));
+                if (Access1D.class.isInstance(args[a])) {
+                    retVal.append(Access1D.toString((Access1D<?>) args[a]));
+                } else if (double[].class.isInstance(args[a])) {
                     retVal.append(Arrays.toString((double[]) args[a]));
                 } else {
                     retVal.append(args[a]);
                 }
-                tmpFirst = tmpLimit + 2;
+                first = limit + 2;
             }
         }
 
-        retVal.append(messagePattern.substring(tmpFirst, tmpPatternSize));
+        retVal.append(messagePattern.substring(first, patternLength));
 
         return retVal.toString();
     }
