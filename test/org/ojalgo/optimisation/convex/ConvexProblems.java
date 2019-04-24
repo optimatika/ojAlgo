@@ -30,6 +30,8 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.BigArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.constant.BigMath;
@@ -169,42 +171,35 @@ public class ConvexProblems extends OptimisationConvexTests {
         return retVal;
     }
 
-    static void doEarly2008(final Variable[] variables, final Access2D<?> covariances, final Access1D<?> expected) {
+    static void doEarly2008(final Variable[] variables, final Access2D<?> covariances, final Access1D<BigDecimal> expected) {
 
-        final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(variables);
+        final ExpressionsBasedModel model = new ExpressionsBasedModel(variables);
 
-        final Expression tmpVariance = tmpModel.addExpression("Variance");
-        tmpVariance.setQuadraticFactors(tmpModel.getVariables(), covariances);
+        final Expression tmpVariance = model.addExpression("Variance");
+        tmpVariance.setQuadraticFactors(model.getVariables(), covariances);
         tmpVariance.weight(BigMath.PI.multiply(BigMath.E).multiply(BigMath.HALF));
 
-        final Expression tmpBalance = tmpModel.addExpression("Balance");
-        tmpBalance.setLinearFactorsSimple(tmpModel.getVariables());
+        final Expression tmpBalance = model.addExpression("Balance");
+        tmpBalance.setLinearFactorsSimple(model.getVariables());
         tmpBalance.level(BigMath.ONE);
 
-        //        tmpModel.options.debug(ConvexSolver.class);
-        //        tmpModel.options.validate = false;
-        final Result tmpActualResult = tmpModel.minimise();
+        model.options.debug(ConvexSolver.class);
+        model.options.validate = false;
+        final Result actual = model.minimise();
 
-        final NumberContext tmpAccuracy = StandardType.PERCENT.withPrecision(5);
+        final NumberContext accuracy = StandardType.PERCENT.withPrecision(5);
 
-        TestUtils.assertTrue(tmpModel.validate(Array1D.BIG.copy(expected), tmpAccuracy));
-        TestUtils.assertTrue(tmpModel.validate(tmpActualResult, tmpAccuracy));
+        TestUtils.assertTrue(model.validate(expected, accuracy));
+        TestUtils.assertTrue(model.validate(actual, accuracy));
 
-        final TwiceDifferentiable<Double> tmpObjective = tmpModel.objective().toFunction();
-        final double tmpExpObjFuncVal = tmpObjective.invoke(Access1D.asPrimitive1D(expected));
-        final double tmpActObjFuncVal = tmpObjective.invoke(Access1D.asPrimitive1D(tmpActualResult));
-        TestUtils.assertEquals(tmpExpObjFuncVal, tmpActObjFuncVal, tmpAccuracy);
+        final TwiceDifferentiable<Double> objective = model.objective().toFunction();
+        final double expObjFuncVal = objective.invoke(Access1D.asPrimitive1D(expected));
+        final double actObjFuncVal = objective.invoke(Access1D.asPrimitive1D(actual));
+        TestUtils.assertEquals(expObjFuncVal, actObjFuncVal, accuracy);
 
-        TestUtils.assertEquals(expected, tmpActualResult, tmpAccuracy);
+        TestUtils.assertEquals(expected, actual, accuracy);
 
-        // Test that the LinearSolver can determine feasibility
-
-        final ExpressionsBasedModel relaxedModel = tmpModel.relax(false);
-
-        final Optimisation.Result tmpLinearResult = relaxedModel.minimise();
-        TestUtils.assertStateNotLessThanFeasible(tmpLinearResult);
-
-        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel, tmpAccuracy);
+        OptimisationConvexTests.assertDirectAndIterativeEquals(model, accuracy);
     }
 
     /**
@@ -325,8 +320,8 @@ public class ConvexProblems extends OptimisationConvexTests {
             tmpVariables[i].upper(new BigDecimal("0.80"));
         }
 
-        final RationalMatrix tmpExpected = RationalMatrix.FACTORY
-                .rows(new double[][] { { 0.02 }, { 0.02 }, { 0.02 }, { 0.02 }, { 0.80 }, { 0.06 }, { 0.02 }, { 0.02 }, { 0.02 } });
+        DenseArray<BigDecimal> tmpExpected = BigArray.FACTORY
+                .copy(RationalMatrix.FACTORY.rows(new double[][] { { 0.02 }, { 0.02 }, { 0.02 }, { 0.02 }, { 0.80 }, { 0.06 }, { 0.02 }, { 0.02 }, { 0.02 } }));
 
         ConvexProblems.doEarly2008(tmpVariables, tmpCovariances, tmpExpected);
     }
@@ -378,8 +373,8 @@ public class ConvexProblems extends OptimisationConvexTests {
             tmpVariables[i].upper(new BigDecimal("0.35"));
         }
 
-        final RationalMatrix tmpExpected = RationalMatrix.FACTORY
-                .rows(new double[][] { { 0.35 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.25 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 } });
+        DenseArray<BigDecimal> tmpExpected = BigArray.FACTORY.copy(RationalMatrix.FACTORY
+                .rows(new double[][] { { 0.35 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.25 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 } }));
 
         ConvexProblems.doEarly2008(tmpVariables, covarianceMatrix, tmpExpected);
     }
@@ -451,10 +446,10 @@ public class ConvexProblems extends OptimisationConvexTests {
             // tmpVariables[i].setUpperLimit(new BigDecimal("1.00"));
         }
 
-        final RationalMatrix tmpExpected = RationalMatrix.FACTORY
-                .rows(new double[][] { { 0.3166116715239731 }, { 0.050000000001624065 }, { 0.04999999999827016 }, { 0.05000000000034928 },
+        DenseArray<BigDecimal> tmpExpected = BigArray.FACTORY.copy(
+                RationalMatrix.FACTORY.rows(new double[][] { { 0.3166116715239731 }, { 0.050000000001624065 }, { 0.04999999999827016 }, { 0.05000000000034928 },
                         { 0.049999999999891145 }, { 0.049999999997416125 }, { 0.08338832846287945 }, { 0.05000000000178943 }, { 0.05000000000085164 },
-                        { 0.04999999999937388 }, { 0.050000000012470555 }, { 0.04999999999966884 }, { 0.050000000000484546 }, { 0.049999999995857476 } });
+                        { 0.04999999999937388 }, { 0.050000000012470555 }, { 0.04999999999966884 }, { 0.050000000000484546 }, { 0.049999999995857476 } }));
 
         ConvexProblems.doEarly2008(tmpVariables, covarianceMatrix, tmpExpected);
     }
@@ -504,10 +499,9 @@ public class ConvexProblems extends OptimisationConvexTests {
             tmpVariables[i].upper(new BigDecimal("0.12"));
         }
 
-        // exception here...
-        final RationalMatrix tmpExpected = RationalMatrix.FACTORY.rows(
+        DenseArray<BigDecimal> tmpExpected = BigArray.FACTORY.copy(RationalMatrix.FACTORY.rows(
                 new double[][] { { 0.08000000000000602 }, { 0.12000000000002384 }, { 0.08000000000000054 }, { 0.10643232489190736 }, { 0.12000000000002252 },
-                        { 0.11999999999979595 }, { 0.09356767510776097 }, { 0.11999999999998154 }, { 0.07999999999999653 }, { 0.08000000000000498 } });
+                        { 0.11999999999979595 }, { 0.09356767510776097 }, { 0.11999999999998154 }, { 0.07999999999999653 }, { 0.08000000000000498 } }));
 
         ConvexProblems.doEarly2008(tmpVariables, tmpCovariances, tmpExpected);
     }
@@ -558,10 +552,9 @@ public class ConvexProblems extends OptimisationConvexTests {
             tmpVariables[i].upper(new BigDecimal("0.12"));
         }
 
-        // exception here...
-        final RationalMatrix tmpExpected = RationalMatrix.FACTORY.rows(
+        DenseArray<BigDecimal> tmpExpected = BigArray.FACTORY.copy(RationalMatrix.FACTORY.rows(
                 new double[][] { { 0.07999999999998897 }, { 0.1199999999999636 }, { 0.07999999999999526 }, { 0.08000000000004488 }, { 0.11999999999999084 },
-                        { 0.12000000000018606 }, { 0.11999999999996151 }, { 0.12000000000000167 }, { 0.08000000000001738 }, { 0.08000000000005617 } });
+                        { 0.12000000000018606 }, { 0.11999999999996151 }, { 0.12000000000000167 }, { 0.08000000000001738 }, { 0.08000000000005617 } }));
 
         ConvexProblems.doEarly2008(tmpVariables, tmpCovariances, tmpExpected);
 

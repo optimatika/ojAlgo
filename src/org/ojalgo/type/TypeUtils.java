@@ -22,6 +22,7 @@
 package org.ojalgo.type;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -62,10 +63,18 @@ public abstract class TypeUtils {
 
             if (tmpLimit == -1) {
                 retVal.append(ASCII.SP);
-                retVal.append(args[a]);
+                if (double[].class.isInstance(args[a])) {
+                    retVal.append(Arrays.toString((double[]) args[a]));
+                } else {
+                    retVal.append(args[a]);
+                }
             } else {
                 retVal.append(messagePattern.substring(tmpFirst, tmpLimit));
-                retVal.append(args[a]);
+                if (double[].class.isInstance(args[a])) {
+                    retVal.append(Arrays.toString((double[]) args[a]));
+                } else {
+                    retVal.append(args[a]);
+                }
                 tmpFirst = tmpLimit + 2;
             }
         }

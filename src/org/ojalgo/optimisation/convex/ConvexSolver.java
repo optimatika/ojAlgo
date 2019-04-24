@@ -32,11 +32,11 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -498,7 +498,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
             mtrxQ = PrimitiveDenseStore.FACTORY.makeZero(numbVars, numbVars);
 
-            final BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? PrimitiveMath.SUBTRACT : PrimitiveMath.ADD;
+            final BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? SUBTRACT : ADD;
             UnaryFunction<Double> tmpModifier;
             for (final IntRowColumn tmpKey : tmpObjExpr.getQuadraticKeySet()) {
                 final int tmpRow = sourceModel.indexOfFreeVariable(tmpKey.row);
@@ -614,7 +614,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     private final ConvexSolver.Builder myMatrices;
     private final PrimitiveDenseStore mySolutionX;
-    private final LU<Double> mySolverGeneral;
+    private final MatrixDecomposition.Solver<Double> mySolverGeneral;
     private final Cholesky<Double> mySolverQ;
 
     @SuppressWarnings("unused")
@@ -630,8 +630,8 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         mySolutionX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
 
-        mySolverQ = Cholesky.make(this.getMatrixQ());
-        mySolverGeneral = LU.make(this.getMatrixQ());
+        mySolverQ = Cholesky.PRIMITIVE.make(this.getMatrixQ());
+        mySolverGeneral = LU.PRIMITIVE.make(this.getMatrixQ());
     }
 
     public void dispose() {
@@ -752,11 +752,17 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     }
 
     protected int getRankGeneral() {
-        return mySolverGeneral.getRank();
+        if (mySolverGeneral instanceof MatrixDecomposition.RankRevealing) {
+            return ((MatrixDecomposition.RankRevealing) mySolverGeneral).getRank();
+        } else if (mySolverGeneral.isSolvable()) {
+            return (int) mySolverGeneral.reconstruct().countColumns();
+        } else {
+            return 0;
+        }
     }
 
     protected MatrixStore<Double> getSE() {
-        return this.getSolutionX().premultiply(this.getMatrixAE()).operateOnMatching(this.getMatrixBE(), PrimitiveMath.SUBTRACT).get();
+        return this.getSolutionX().premultiply(this.getMatrixAE()).operateOnMatching(this.getMatrixBE(), SUBTRACT).get();
     }
 
     protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
@@ -884,7 +890,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return true;
     }
 
-    void supplySlackI(final PhysicalStore<Double> slack) {
+    void supplySlackI(PhysicalStore<Double> slack) {
 
         final RowsSupplier<Double> mtrxAI = myMatrices.getAI();
         final MatrixStore<Double> mtrxBI = this.getMatrixBI();

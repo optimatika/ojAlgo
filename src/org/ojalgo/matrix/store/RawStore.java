@@ -203,7 +203,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         }
 
         public RawStore makeZero(final long rows, final long columns) {
-            return new RawStore(new double[(int) rows][(int) columns]);
+            return new RawStore(Math.toIntExact(rows), Math.toIntExact(columns));
         }
 
         public RawStore rows(final Access1D<?>... source) {
@@ -511,7 +511,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         data = tmpConverted.data;
 
-        myNumberOfColumns = (int) template.countColumns();
+        myNumberOfColumns = Math.toIntExact(template.countColumns());
     }
 
     /**
