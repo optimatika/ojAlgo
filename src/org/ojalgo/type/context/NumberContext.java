@@ -382,7 +382,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         if (expected == actual) {
             return false;
         } else {
-            return !this.isSmall(expected, actual - expected);
+            return !this.isSmall(Math.max(Math.abs(expected), Math.abs(actual)), actual - expected);
         }
     }
 

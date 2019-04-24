@@ -684,10 +684,10 @@ public class ConvexProblems extends OptimisationConvexTests {
         final PrimitiveDenseStore tmpMatlabSolution = tmpFactory.columns(new double[] { 0.00000000000000, -0.01750000000000, -0.01750000000000,
                 0.88830035195990, 4.56989525276369, 5.00000000000000, 0.90562154243124, -1.91718419629399, 0.06390614020590 });
 
-        // Compare to MatLab using 3 digits and 6 decimal places
-        final NumberContext tmpAccuracy = NumberContext.getGeneral(3, 6);
+        // Compare to MatLab using 2 digits and 6 decimal places
+        final NumberContext accuracy = NumberContext.getGeneral(2, 6);
 
-        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, tmpAccuracy, false);
+        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, accuracy, false);
     }
 
     /**
@@ -700,10 +700,6 @@ public class ConvexProblems extends OptimisationConvexTests {
      * matrixes to be solved changes all the time (not the dimensions but the values of the matrixes). I still
      * get errors in certain situations. I will present a system that triggers an
      * ArrayIndexOutOfBoundsException in ActiveSetSolver. Again, Matlabs quadprog produces a correct result.
-     * </p>
-     * <p>
-     * 2015-02-28: Var tvungen att ändra från new NumberContext(7, 6) till new NumberContext(5, 6) för
-     * lösningen.
      * </p>
      */
     @Test
@@ -741,7 +737,10 @@ public class ConvexProblems extends OptimisationConvexTests {
         final PrimitiveDenseStore tmpMatlabSolution = tmpFactory.columns(new double[] { -0.00000000000000, -0.01750000000000, 0.01750000000000,
                 0.13427356981778, 0.50000000000000, -0.14913060410765, 0.06986475572103, -0.08535020176844, 0.00284500680371 });
 
-        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, NumberContext.getGeneral(4, 14), true);
+        // Compare to MatLab using 2 digits and 6 decimal places
+        NumberContext accuracy = NumberContext.getGeneral(2, 6);
+
+        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, accuracy, true);
     }
 
     /**
