@@ -31,7 +31,7 @@
     <licenses>
         <license>
             <name>MIT</name>
-            <url>http://ojalgo.org/license.txt</url>
+            <url>https://github.com/optimatika/ojAlgo/blob/master/LICENSE</url>
         </license>
     </licenses>
     <distributionManagement>
