@@ -25,7 +25,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -69,15 +68,15 @@ public final class JacobiSolver extends StationaryIterativeSolver {
         final double tmpRelaxation = this.getRelaxationFactor();
         do {
 
-            current.premultiply(tmpBody).operateOnMatching(tmpRHS, PrimitiveMath.SUBTRACT).supplyTo(incremetReceiver);
+            current.premultiply(tmpBody).operateOnMatching(tmpRHS, SUBTRACT).supplyTo(incremetReceiver);
             tmpNormErr = tmpIncrement.aggregateAll(Aggregator.NORM2);
-            tmpIncrement.modifyMatching(PrimitiveMath.DIVIDE, tmpBodyDiagonal);
+            tmpIncrement.modifyMatching(DIVIDE, tmpBodyDiagonal);
 
             if (this.getAccuracyContext().isDifferent(ONE, tmpRelaxation)) {
                 tmpIncrement.multiply(tmpRelaxation);
             }
 
-            current.modifyMatching(PrimitiveMath.ADD, tmpIncrement);
+            current.modifyMatching(ADD, tmpIncrement);
 
             tmpIterations++;
 
