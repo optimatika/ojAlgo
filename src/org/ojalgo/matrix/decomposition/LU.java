@@ -62,12 +62,10 @@ public interface LU<N extends Number> extends LDU<N>, MatrixDecomposition.Pivoti
 
     Factory<Double> PRIMITIVE = typical -> {
 
-        if ((16L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
+        if ((512L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
             return new LUDecomposition.Primitive();
-            //return new RawNewLU();
         } else {
             return new RawLU();
-            //return new RawNewLU();
         }
     };
 
