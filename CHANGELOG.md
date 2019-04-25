@@ -4,7 +4,18 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
-* ...
+## org.ojalgo.matrix
+
+* New LU decomposition implementation that is faster ffor smaller matrices.
+* Fixed a bug related to solving equation systems and inverting matrices using SingularValue at certain matrix sizes.
+
+## org.ojalgo.netio
+
+* New funcion to generate random strings of ASCII characters, of specified length.
+
+## org.ojalgo.optimisation
+
+* Minor improvements to ConvexSolver
 
 # v47.1.2: 2019-04-23
 
