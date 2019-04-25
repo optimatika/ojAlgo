@@ -36,7 +36,7 @@ import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-public final class RawLU extends RawDecomposition implements LU<Double> {
+final class RawLU extends RawDecomposition implements LU<Double> {
 
     private final Pivot myPivot = new Pivot();
 
@@ -44,7 +44,7 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
      * Not recommended to use this constructor directly. Consider using the static factory method
      * {@linkplain org.ojalgo.matrix.decomposition.LU#make(Access2D)} instead.
      */
-    public RawLU() {
+    RawLU() {
         super();
     }
 
