@@ -8,6 +8,7 @@
 
 * New LU decomposition implementation that is faster for smaller matrices.
 * Fixed a bug related to solving equation systems and inverting matrices using SingularValue at certain matrix sizes.
+* Renamed checkAndCompute to checkAndDecompose in the MatrixDecomposition.Hermitian interface
 
 ## org.ojalgo.netio
 

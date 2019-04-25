@@ -55,7 +55,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.getDeterminant();
     }
 
-    public boolean checkAndCompute(final MatrixStore<Double> matrix) {
+    public boolean checkAndDecompose(final MatrixStore<Double> matrix) {
 
         mySPD = matrix.isHermitian();
 

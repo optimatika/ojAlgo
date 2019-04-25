@@ -87,7 +87,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return this.getDeterminant();
     }
 
-    public boolean checkAndCompute(final MatrixStore<N> matrix) {
+    public boolean checkAndDecompose(final MatrixStore<N> matrix) {
         return this.compute(matrix, true);
     }
 
