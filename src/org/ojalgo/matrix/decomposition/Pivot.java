@@ -25,25 +25,21 @@ import org.ojalgo.array.BasicArray;
 
 final class Pivot {
 
-    private boolean myModified = false;
-    private final int[] myOrder;
+    private boolean myModified;
+    private int[] myOrder;
     private int mySign;
 
-    Pivot(final int numberOfRows) {
-
+    Pivot() {
         super();
-
-        myOrder = BasicArray.makeIncreasingRange(0, numberOfRows);
-        mySign = 1;
     }
 
-    void change(final int row1, final int row2) {
+    void change(final int ind1, final int ind2) {
 
-        if (row1 != row2) {
+        if (ind1 != ind2) {
 
-            final int tmpRow = myOrder[row1];
-            myOrder[row1] = myOrder[row2];
-            myOrder[row2] = tmpRow;
+            final int tmpRow = myOrder[ind1];
+            myOrder[ind1] = myOrder[ind2];
+            myOrder[ind2] = tmpRow;
 
             mySign = -mySign;
 
@@ -68,6 +64,20 @@ final class Pivot {
 
     boolean isModified() {
         return myModified;
+    }
+
+    void reset(final int numberOf) {
+
+        if ((myOrder == null) || (myOrder.length != numberOf)) {
+            myOrder = BasicArray.makeIncreasingRange(0, numberOf);
+        } else {
+            for (int i = 0; i < myOrder.length; i++) {
+                myOrder[i] = i;
+            }
+        }
+
+        myModified = false;
+        mySign = 1;
     }
 
     int signum() {

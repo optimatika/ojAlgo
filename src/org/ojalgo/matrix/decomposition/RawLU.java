@@ -37,7 +37,7 @@ import org.ojalgo.structure.Structure2D;
 
 final class RawLU extends RawDecomposition implements LU<Double> {
 
-    private Pivot myPivot;
+    private final Pivot myPivot = new Pivot();
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
@@ -190,14 +190,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     @Override
-    public void reset() {
-
-        super.reset();
-
-        myPivot = null;
-    }
-
-    @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
         final double[][] tmpData = this.reset(body, false);
@@ -225,7 +217,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         final int numbRows = this.getRowDim();
         final int numbCols = this.getColDim();
 
-        myPivot = new Pivot(numbRows);
+        myPivot.reset(numbRows);
 
         final double[] colJ = new double[numbRows];
 

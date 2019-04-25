@@ -6,7 +6,7 @@
 
 ## org.ojalgo.matrix
 
-* New LU decomposition implementation that is faster ffor smaller matrices.
+* New LU decomposition implementation that is faster for smaller matrices.
 * Fixed a bug related to solving equation systems and inverting matrices using SingularValue at certain matrix sizes.
 
 ## org.ojalgo.netio

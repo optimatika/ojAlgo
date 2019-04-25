@@ -38,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public final class RawNewLU extends RawDecomposition implements LU<Double> {
 
-    private Pivot myPivot;
+    private final Pivot myPivot = new Pivot();
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
@@ -191,14 +191,6 @@ public final class RawNewLU extends RawDecomposition implements LU<Double> {
     }
 
     @Override
-    public void reset() {
-
-        super.reset();
-
-        myPivot = null;
-    }
-
-    @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
         final double[][] tmpData = this.reset(body, false);
@@ -223,7 +215,7 @@ public final class RawNewLU extends RawDecomposition implements LU<Double> {
         final int m = this.getRowDim();
         final int n = this.getColDim();
 
-        myPivot = new Pivot(m);
+        myPivot.reset(m);
 
         double[] rowP;
         double[] rowI;
@@ -235,7 +227,6 @@ public final class RawNewLU extends RawDecomposition implements LU<Double> {
         for (int ij = 0, limit = Math.min(m, n); ij < limit; ij++) {
 
             if (pivoting) {
-                // Find pivot and exchange if necessary.
                 int p = ij;
                 valP = ABS.invoke(data[p][ij]);
                 for (int i = ij + 1; i < m; i++) {

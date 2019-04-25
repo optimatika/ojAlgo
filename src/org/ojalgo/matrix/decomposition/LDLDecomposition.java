@@ -76,7 +76,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
     }
 
-    private Pivot myPivot;
+    private final Pivot myPivot = new Pivot();
 
     protected LDLDecomposition(PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory) {
         super(factory);
@@ -273,7 +273,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
         int dim = this.getMinDim();
 
-        myPivot = new Pivot(dim);
+        myPivot.reset(dim);
 
         BasicArray<N> multipliers = this.makeArray(dim);
 
