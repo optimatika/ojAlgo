@@ -24,52 +24,62 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
-/**
- * A Hessenberg matrix is one that is "almost" triangular. A lower Hessenberg matrix has zero entries above
- * the first superdiagonal.
- *
- * @author apete
- */
-final class LowerHessenbergStore<N extends Number> extends ShadingStore<N> {
+final class DiagonalStore<N extends Number> extends ShadingStore<N> {
 
-    LowerHessenbergStore(final MatrixStore<N> base) {
-        super(base, base.countRows(), Math.min(base.countRows(), base.countColumns()));
+    DiagonalStore(final MatrixStore<N> base) {
+        super(base, Math.min(base.countRows(), base.countColumns()), Math.min(base.countRows(), base.countColumns()));
+    }
+
+    DiagonalStore(final MatrixStore<N> base, final boolean maintain) {
+        super(base, maintain ? base.countRows() : Math.min(base.countRows(), base.countColumns()),
+                maintain ? base.countColumns() : Math.min(base.countRows(), base.countColumns()));
     }
 
     public double doubleValue(final long row, final long col) {
-        if ((row + 1) < col) {
-            return PrimitiveMath.ZERO;
-        } else {
+        if (row == col) {
             return this.getBase().doubleValue(row, col);
+        } else {
+            return PrimitiveMath.ZERO;
         }
     }
 
     public int firstInColumn(final int col) {
-        if (col == 0) {
-            return 0;
-        } else {
-            return col - 1;
-        }
+        return col;
+    }
+
+    public int firstInRow(final int row) {
+        return row;
     }
 
     public N get(final long row, final long col) {
-        if ((row + 1) < col) {
-            return this.physical().scalar().zero().get();
-        } else {
+        if (row == col) {
             return this.getBase().get(row, col);
+        } else {
+            return this.physical().scalar().zero().get();
         }
     }
 
     @Override
+    public int limitOfColumn(final int col) {
+        return col + 1;
+    }
+
+    @Override
     public int limitOfRow(final int row) {
-        return Math.min(row + 2, this.getColDim());
+        return row + 1;
+    }
+
+    @Override
+    public void supplyTo(final TransformableRegion<N> consumer) {
+        consumer.reset();
+        consumer.fillDiagonal(this.getBase().sliceDiagonal());
     }
 
     public Scalar<N> toScalar(final long row, final long col) {
-        if ((row + 1) < col) {
-            return this.physical().scalar().zero();
-        } else {
+        if (row == col) {
             return this.getBase().toScalar(row, col);
+        } else {
+            return this.physical().scalar().zero();
         }
     }
 

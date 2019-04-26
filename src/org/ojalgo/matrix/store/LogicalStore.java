@@ -55,6 +55,10 @@ abstract class LogicalStore<N extends Number> extends AbstractStore<N> {
         }
     }
 
+    protected LogicalStore(final MatrixStore<N> base, final long rowsCount, final long columnsCount) {
+        this(base, Math.toIntExact(rowsCount), Math.toIntExact(columnsCount));
+    }
+
     public final PhysicalStore.Factory<N, ?> physical() {
         return myBase.physical();
     }

@@ -96,7 +96,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     }
 
     public MatrixStore<N> getD() {
-        return this.getInPlace().logical().diagonal(false).get();
+        return this.getInPlace().logical().diagonal().get();
     }
 
     public N getDeterminant() {

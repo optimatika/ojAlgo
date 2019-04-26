@@ -236,13 +236,20 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return myStore.countRows();
         }
 
+        /**
+         * @return A square diagonal matrix (main diagonal only)
+         */
         public LogicalBuilder<N> diagonal() {
-            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, false), false);
+            myStore = new DiagonalStore<>(myStore);
             return this;
         }
 
-        public LogicalBuilder<N> diagonal(final boolean assumeOne) {
-            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, assumeOne), assumeOne);
+        /**
+         * @param maintain Maintain the original matrix dimensions (resulting matrix not necessarily square).
+         * @return A diagonal matrix (main diagonal only)
+         */
+        public LogicalBuilder<N> diagonal(final boolean maintain) {
+            myStore = new DiagonalStore<>(myStore);
             return this;
         }
 

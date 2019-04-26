@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
@@ -29,17 +28,9 @@ final class UpperTriangularStore<N extends Number> extends ShadingStore<N> {
 
     private final boolean myUnitDiagonal;
 
-    @SuppressWarnings("unused")
-    private UpperTriangularStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
-
-        this(base, true);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
     UpperTriangularStore(final MatrixStore<N> base, final boolean unitDiagonal) {
 
-        super(base, (int) Math.min(base.countRows(), base.countColumns()), (int) base.countColumns());
+        super(base, Math.min(base.countRows(), base.countColumns()), base.countColumns());
 
         myUnitDiagonal = unitDiagonal;
     }

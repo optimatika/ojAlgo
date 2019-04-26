@@ -21,21 +21,12 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.scalar.Scalar;
 
 final class UpperHermitianStore<N extends Number> extends ShadingStore<N> {
 
-    @SuppressWarnings("unused")
-    private UpperHermitianStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
-
-        this(base);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
     UpperHermitianStore(final MatrixStore<N> base) {
-        super(base, (int) Math.min(base.countRows(), base.countColumns()), (int) base.countColumns());
+        super(base, Math.min(base.countRows(), base.countColumns()), base.countColumns());
     }
 
     public double doubleValue(final long row, final long col) {

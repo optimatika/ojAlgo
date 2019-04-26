@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
@@ -33,16 +32,8 @@ import org.ojalgo.scalar.Scalar;
  */
 final class UpperHessenbergStore<N extends Number> extends ShadingStore<N> {
 
-    @SuppressWarnings("unused")
-    private UpperHessenbergStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
-
-        this(base);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
     UpperHessenbergStore(final MatrixStore<N> base) {
-        super(base, (int) Math.min(base.countRows(), base.countColumns()), (int) base.countColumns());
+        super(base, Math.min(base.countRows(), base.countColumns()), base.countColumns());
     }
 
     public double doubleValue(final long row, final long col) {

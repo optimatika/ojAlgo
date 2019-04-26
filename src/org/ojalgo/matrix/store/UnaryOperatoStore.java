@@ -29,7 +29,7 @@ final class UnaryOperatoStore<N extends Number> extends LogicalStore<N> {
 
     UnaryOperatoStore(final MatrixStore<N> base, final UnaryFunction<N> operator) {
 
-        super(base, (int) base.countRows(), (int) base.countColumns());
+        super(base, base.countRows(), base.countColumns());
 
         myOperator = operator;
     }

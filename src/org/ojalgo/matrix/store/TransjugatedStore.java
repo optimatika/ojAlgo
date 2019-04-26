@@ -33,7 +33,7 @@ abstract class TransjugatedStore<N extends Number> extends LogicalStore<N> {
     }
 
     protected TransjugatedStore(final MatrixStore<N> base) {
-        super(base, (int) base.countColumns(), (int) base.countRows());
+        super(base, base.countColumns(), base.countRows());
     }
 
     public final double doubleValue(final long aRow, final long aCol) {
