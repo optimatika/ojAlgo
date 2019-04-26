@@ -22,10 +22,13 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.scalar.Scalar;
 
 abstract class FactoryStore<N extends Number> extends AbstractStore<N> {
 
     private final PhysicalStore.Factory<N, ?> myFactory;
+    private final Scalar<N> myOne;
+    private final Scalar<N> myZero;
 
     @SuppressWarnings("unused")
     private FactoryStore(final int rowsCount, final int columnsCount) {
@@ -40,10 +43,21 @@ abstract class FactoryStore<N extends Number> extends AbstractStore<N> {
         super(rowsCount, columnsCount);
 
         myFactory = factory;
+
+        myZero = factory.scalar().zero();
+        myOne = factory.scalar().one();
     }
 
     public final PhysicalStore.Factory<N, ?> physical() {
         return myFactory;
+    }
+
+    final Scalar<N> one() {
+        return myOne;
+    }
+
+    final Scalar<N> zero() {
+        return myZero;
     }
 
 }

@@ -40,7 +40,7 @@ final class UpperHessenbergStore<N extends Number> extends ShadingStore<N> {
         if (row > (col + 1)) {
             return PrimitiveMath.ZERO;
         } else {
-            return this.getBase().doubleValue(row, col);
+            return this.base().doubleValue(row, col);
         }
     }
 
@@ -54,9 +54,9 @@ final class UpperHessenbergStore<N extends Number> extends ShadingStore<N> {
 
     public N get(final long row, final long col) {
         if (row > (col + 1)) {
-            return this.physical().scalar().zero().get();
+            return this.zero().get();
         } else {
-            return this.getBase().get(row, col);
+            return this.base().get(row, col);
         }
     }
 
@@ -67,9 +67,9 @@ final class UpperHessenbergStore<N extends Number> extends ShadingStore<N> {
 
     public Scalar<N> toScalar(final long row, final long col) {
         if (row > (col + 1)) {
-            return this.physical().scalar().zero();
+            return this.zero();
         } else {
-            return this.getBase().toScalar(row, col);
+            return this.base().toScalar(row, col);
         }
     }
 

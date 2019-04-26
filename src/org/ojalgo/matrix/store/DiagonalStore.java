@@ -37,7 +37,7 @@ final class DiagonalStore<N extends Number> extends ShadingStore<N> {
 
     public double doubleValue(final long row, final long col) {
         if (row == col) {
-            return this.getBase().doubleValue(row, col);
+            return this.base().doubleValue(row, col);
         } else {
             return PrimitiveMath.ZERO;
         }
@@ -53,9 +53,9 @@ final class DiagonalStore<N extends Number> extends ShadingStore<N> {
 
     public N get(final long row, final long col) {
         if (row == col) {
-            return this.getBase().get(row, col);
+            return this.base().get(row, col);
         } else {
-            return this.physical().scalar().zero().get();
+            return this.zero().get();
         }
     }
 
@@ -72,14 +72,14 @@ final class DiagonalStore<N extends Number> extends ShadingStore<N> {
     @Override
     public void supplyTo(final TransformableRegion<N> consumer) {
         consumer.reset();
-        consumer.fillDiagonal(this.getBase().sliceDiagonal());
+        consumer.fillDiagonal(this.base().sliceDiagonal());
     }
 
     public Scalar<N> toScalar(final long row, final long col) {
         if (row == col) {
-            return this.getBase().toScalar(row, col);
+            return this.base().toScalar(row, col);
         } else {
-            return this.physical().scalar().zero();
+            return this.zero();
         }
     }
 

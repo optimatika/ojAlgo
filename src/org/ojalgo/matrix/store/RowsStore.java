@@ -32,14 +32,12 @@ import org.ojalgo.scalar.Scalar;
 final class RowsStore<N extends Number> extends SelectingStore<N> {
 
     private final int[] myRows;
-    private final Scalar<N> myZero;
 
     RowsStore(final MatrixStore<N> base, final int... rows) {
 
         super(base, rows.length, (int) base.countColumns());
 
         myRows = rows;
-        myZero = base.physical().scalar().zero();
     }
 
     /**
@@ -48,7 +46,7 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
     public double doubleValue(final long row, final long col) {
         int rowIndex = this.toBaseIndex(row);
         if (rowIndex >= 0) {
-            return this.getBase().doubleValue(rowIndex, col);
+            return this.base().doubleValue(rowIndex, col);
         } else {
             return PrimitiveMath.ZERO;
         }
@@ -57,7 +55,7 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
     public int firstInRow(final int row) {
         int rowIndex = this.toBaseIndex(row);
         if (rowIndex >= 0) {
-            return this.getBase().firstInRow(rowIndex);
+            return this.base().firstInRow(rowIndex);
         } else {
             return this.getColDim();
         }
@@ -66,9 +64,9 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
     public N get(final long row, final long col) {
         int rowIndex = this.toBaseIndex(row);
         if (rowIndex >= 0) {
-            return this.getBase().get(rowIndex, col);
+            return this.base().get(rowIndex, col);
         } else {
-            return myZero.get();
+            return this.zero().get();
         }
     }
 
@@ -76,20 +74,20 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
     public int limitOfRow(final int row) {
         int rowIndex = this.toBaseIndex(row);
         if (rowIndex >= 0) {
-            return this.getBase().limitOfRow(rowIndex);
+            return this.base().limitOfRow(rowIndex);
         } else {
             return 0;
         }
     }
 
     public void supplyTo(final TransformableRegion<N> consumer) {
-        final MatrixStore<N> base = this.getBase();
+        final MatrixStore<N> base = this.base();
         for (int i = 0; i < myRows.length; i++) {
             int rowIndex = this.toBaseIndex(i);
             if (rowIndex >= 0) {
                 consumer.fillRow(i, base.sliceRow(rowIndex));
             } else {
-                consumer.fillColumn(i, myZero.get());
+                consumer.fillColumn(i, this.zero().get());
             }
         }
     }
@@ -97,9 +95,9 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
     public Scalar<N> toScalar(final long row, final long col) {
         int rowIndex = this.toBaseIndex(row);
         if (rowIndex >= 0) {
-            return this.getBase().toScalar(rowIndex, col);
+            return this.base().toScalar(rowIndex, col);
         } else {
-            return myZero;
+            return this.zero();
         }
     }
 

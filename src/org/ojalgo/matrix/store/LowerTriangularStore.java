@@ -41,7 +41,7 @@ final class LowerTriangularStore<N extends Number> extends ShadingStore<N> {
         } else if (myUnitDiagonal && (row == col)) {
             return PrimitiveMath.ONE;
         } else {
-            return this.getBase().doubleValue(row, col);
+            return this.base().doubleValue(row, col);
         }
     }
 
@@ -51,11 +51,11 @@ final class LowerTriangularStore<N extends Number> extends ShadingStore<N> {
 
     public N get(final long row, final long col) {
         if (row < col) {
-            return this.physical().scalar().zero().get();
+            return this.zero().get();
         } else if (myUnitDiagonal && (row == col)) {
-            return this.physical().scalar().one().get();
+            return this.one().get();
         } else {
-            return this.getBase().get(row, col);
+            return this.base().get(row, col);
         }
     }
 
@@ -66,11 +66,11 @@ final class LowerTriangularStore<N extends Number> extends ShadingStore<N> {
 
     public Scalar<N> toScalar(final long row, final long col) {
         if (row < col) {
-            return this.physical().scalar().zero();
+            return this.zero();
         } else if (myUnitDiagonal && (row == col)) {
-            return this.physical().scalar().one();
+            return this.one();
         } else {
-            return this.getBase().toScalar(row, col);
+            return this.base().toScalar(row, col);
         }
     }
 

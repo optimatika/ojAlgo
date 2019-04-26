@@ -32,20 +32,18 @@ import org.ojalgo.scalar.Scalar;
 final class ColumnsStore<N extends Number> extends SelectingStore<N> {
 
     private final int[] myColumns;
-    private final Scalar<N> myZero;
 
     ColumnsStore(final MatrixStore<N> base, final int[] columns) {
 
         super(base, (int) base.countRows(), columns.length);
 
         myColumns = columns;
-        myZero = base.physical().scalar().zero();
     }
 
     public double doubleValue(final long row, final long col) {
         int colIndex = this.toBaseIndex(col);
         if (colIndex >= 0) {
-            return this.getBase().doubleValue(row, colIndex);
+            return this.base().doubleValue(row, colIndex);
         } else {
             return PrimitiveMath.ZERO;
         }
@@ -54,7 +52,7 @@ final class ColumnsStore<N extends Number> extends SelectingStore<N> {
     public int firstInColumn(final int col) {
         int colIndex = this.toBaseIndex(col);
         if (colIndex >= 0) {
-            return this.getBase().firstInColumn(colIndex);
+            return this.base().firstInColumn(colIndex);
         } else {
             return this.getRowDim();
         }
@@ -63,9 +61,9 @@ final class ColumnsStore<N extends Number> extends SelectingStore<N> {
     public N get(final long row, final long col) {
         int colIndex = this.toBaseIndex(col);
         if (colIndex >= 0) {
-            return this.getBase().get(row, colIndex);
+            return this.base().get(row, colIndex);
         } else {
-            return myZero.get();
+            return this.zero().get();
         }
     }
 
@@ -73,20 +71,20 @@ final class ColumnsStore<N extends Number> extends SelectingStore<N> {
     public int limitOfColumn(final int col) {
         int colIndex = this.toBaseIndex(col);
         if (colIndex >= 0) {
-            return this.getBase().limitOfColumn(colIndex);
+            return this.base().limitOfColumn(colIndex);
         } else {
             return 0;
         }
     }
 
     public void supplyTo(final TransformableRegion<N> consumer) {
-        final MatrixStore<N> base = this.getBase();
+        final MatrixStore<N> base = this.base();
         for (int j = 0; j < myColumns.length; j++) {
             int colIndex = this.toBaseIndex(j);
             if (colIndex >= 0) {
                 consumer.fillColumn(j, base.sliceColumn(colIndex));
             } else {
-                consumer.fillColumn(j, myZero.get());
+                consumer.fillColumn(j, this.zero().get());
             }
         }
     }
@@ -94,9 +92,9 @@ final class ColumnsStore<N extends Number> extends SelectingStore<N> {
     public Scalar<N> toScalar(final long row, final long col) {
         int colIndex = this.toBaseIndex(col);
         if (colIndex >= 0) {
-            return this.getBase().toScalar(row, colIndex);
+            return this.base().toScalar(row, colIndex);
         } else {
-            return myZero;
+            return this.zero();
         }
     }
 

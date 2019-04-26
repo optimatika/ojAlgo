@@ -31,9 +31,9 @@ final class UpperHermitianStore<N extends Number> extends ShadingStore<N> {
 
     public double doubleValue(final long row, final long col) {
         if (row > col) {
-            return this.getBase().doubleValue(col, row);
+            return this.base().doubleValue(col, row);
         } else {
-            return this.getBase().doubleValue(row, col);
+            return this.base().doubleValue(row, col);
         }
     }
 
@@ -43,9 +43,9 @@ final class UpperHermitianStore<N extends Number> extends ShadingStore<N> {
 
     public Scalar<N> toScalar(final long row, final long col) {
         if (row > col) {
-            return this.getBase().toScalar(col, row).conjugate();
+            return this.base().toScalar(col, row).conjugate();
         } else {
-            return this.getBase().toScalar(row, col);
+            return this.base().toScalar(row, col);
         }
     }
 }

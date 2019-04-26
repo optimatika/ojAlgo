@@ -62,7 +62,7 @@ final class SuperimposedStore<N extends Number> extends ComposingStore<N> {
      */
     public double doubleValue(final long row, final long col) {
 
-        double retVal = this.getBase().doubleValue(row, col);
+        double retVal = this.base().doubleValue(row, col);
 
         if (this.isCovered((int) row, (int) col)) {
             retVal += myDiff.doubleValue(row - myRowFirst, col - myColFirst);
@@ -73,7 +73,7 @@ final class SuperimposedStore<N extends Number> extends ComposingStore<N> {
 
     public N get(final long row, final long col) {
 
-        N retVal = this.getBase().get(row, col);
+        N retVal = this.base().get(row, col);
 
         if (this.isCovered((int) row, (int) col)) {
             retVal = myDiff.toScalar((int) row - myRowFirst, (int) col - myColFirst).add(retVal).get();
@@ -114,13 +114,13 @@ final class SuperimposedStore<N extends Number> extends ComposingStore<N> {
     }
 
     public void supplyTo(final TransformableRegion<N> consumer) {
-        consumer.fillMatching(this.getBase());
+        consumer.fillMatching(this.base());
         consumer.regionByLimits(myRowLimit, myColLimit).regionByOffsets(myRowFirst, myColFirst).modifyMatching(this.physical().function().add(), myDiff);
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
 
-        Scalar<N> retVal = this.getBase().toScalar(row, column);
+        Scalar<N> retVal = this.base().toScalar(row, column);
 
         if (this.isCovered((int) row, (int) column)) {
             retVal = retVal.add(myDiff.get(row - myRowFirst, column - myColFirst));

@@ -35,11 +35,11 @@ final class UnaryOperatoStore<N extends Number> extends LogicalStore<N> {
     }
 
     public double doubleValue(final long row, final long col) {
-        return myOperator.invoke(this.getBase().doubleValue(row, col));
+        return myOperator.invoke(this.base().doubleValue(row, col));
     }
 
     public N get(final long row, final long col) {
-        return myOperator.invoke(this.getBase().get(row, col));
+        return myOperator.invoke(this.base().get(row, col));
     }
 
 }
