@@ -6,7 +6,7 @@
 
 ## org.ojalgo.matrix
 
-* New LU decomposition implementation that is faster for smaller matrices.
+* New LU decomposition implementation that is faster for small matrices.
 * Fixed a bug related to solving equation systems and inverting matrices using SingularValue at certain matrix sizes.
 * Renamed checkAndCompute to checkAndDecompose in the MatrixDecomposition.Hermitian interface
 * Extended the MatrixStore.LogicalBuilder rows() and columns() methods to allow for negative indexes that refer to all zero rows/columns.
