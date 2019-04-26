@@ -27,7 +27,7 @@ import org.ojalgo.random.Uniform;
 
 public class StructureTest {
 
-    static void backAndForth(long index, long[] structure, long[] reference) {
+    static void backAndForth(final long index, final long[] structure, final long[] reference) {
         TestUtils.assertEquals(index, StructureAnyD.index(structure, reference));
         TestUtils.assertEquals(StructureAnyD.reference(index, structure), reference);
     }

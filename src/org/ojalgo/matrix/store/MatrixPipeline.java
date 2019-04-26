@@ -71,7 +71,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         private final Aggregator myAggregator;
         private final MatrixStore<N> myBase;
 
-        ColumnsReducer(MatrixStore<N> base, Aggregator aggregator) {
+        ColumnsReducer(final MatrixStore<N> base, final Aggregator aggregator) {
             super(base);
             myBase = base;
             myAggregator = aggregator;
@@ -83,7 +83,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(TransformableRegion<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             myBase.reduceColumns(myAggregator, receiver);
         }
 
@@ -124,7 +124,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         private final Aggregator myAggregator;
         private final MatrixStore<N> myBase;
 
-        RowsReducer(MatrixStore<N> base, Aggregator aggregator) {
+        RowsReducer(final MatrixStore<N> base, final Aggregator aggregator) {
             super(base);
             myBase = base;
             myAggregator = aggregator;
@@ -136,7 +136,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(TransformableRegion<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             myBase.reduceRows(myAggregator, receiver);
         }
 

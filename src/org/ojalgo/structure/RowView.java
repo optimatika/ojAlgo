@@ -38,7 +38,7 @@ public class RowView<N extends Number> implements Access1D<N>, Iterable<RowView<
     private final long myLastRow;
     private long myRow = -1L;
 
-    private RowView(final Access2D<N> access, final long row, long lastRow) {
+    private RowView(final Access2D<N> access, final long row, final long lastRow) {
 
         super();
 
@@ -60,7 +60,7 @@ public class RowView<N extends Number> implements Access1D<N>, Iterable<RowView<
         return CHARACTERISTICS;
     }
 
-    public int compareTo(RowView<N> other) {
+    public int compareTo(final RowView<N> other) {
         return Long.compare(myRow, other.row());
     }
 
@@ -76,7 +76,7 @@ public class RowView<N extends Number> implements Access1D<N>, Iterable<RowView<
         return myLastRow - myRow;
     }
 
-    public void forEachRemaining(Consumer<? super RowView<N>> action) {
+    public void forEachRemaining(final Consumer<? super RowView<N>> action) {
         Iterator.super.forEachRemaining(action);
     }
 
@@ -123,7 +123,7 @@ public class RowView<N extends Number> implements Access1D<N>, Iterable<RowView<
         return Access1D.toString(this);
     }
 
-    public boolean tryAdvance(Consumer<? super RowView<N>> action) {
+    public boolean tryAdvance(final Consumer<? super RowView<N>> action) {
         if (this.hasNext()) {
             action.accept(this.next());
             return true;

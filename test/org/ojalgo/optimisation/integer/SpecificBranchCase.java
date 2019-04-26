@@ -146,7 +146,7 @@ public final class SpecificBranchCase extends OptimisationIntegerTests implement
         }
     }
 
-    private void doNodeTest(int[] lower, int[] upper) {
+    private void doNodeTest(final int[] lower, final int[] upper) {
 
         final File file = new File(SpecificBranchCase.INT_PATH + "noswot.mps");
         final MathProgSysModel mps = MathProgSysModel.make(file);

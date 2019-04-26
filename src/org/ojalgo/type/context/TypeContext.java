@@ -37,15 +37,15 @@ import java.text.Format;
  */
 public interface TypeContext<T> {
 
-    String format(Object object);
-
-    T parse(CharSequence text);
-
     /**
      * Will force the object to conform to the context's specification.
      */
     default T enforce(final T object) {
         return this.parse(this.format(object));
     }
+
+    String format(Object object);
+
+    T parse(CharSequence text);
 
 }

@@ -89,7 +89,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.doDecompose(matrix, true);
     }
 
-    public boolean decomposeWithoutPivoting(Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decomposeWithoutPivoting(final Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, false);
     }
 

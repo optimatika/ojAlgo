@@ -245,7 +245,7 @@ public abstract class ASCII {
      * @param predicate Need to pass this test
      * @return A String of the specified length containing ASCII characters that pass the predicate test.
      */
-    public static String generateRandom(int length, IntPredicate predicate) {
+    public static String generateRandom(final int length, final IntPredicate predicate) {
         StringBuilder builder = new StringBuilder();
         int soFar = 0;
         while (soFar < length) {

@@ -68,7 +68,7 @@ public class DataPreprocessors {
     public static final Transformation2D<Double> STANDARD_SCORE = DataPreprocessors
             .newTransformation2D(ss -> SUBTRACT.by(ss.getMean()).andThen(DIVIDE.by(ss.getStandardDeviation())));
 
-    public static <D extends Access2D<?> & Access2D.Sliceable<?>, M extends Mutate2D> M covariances(Factory2D<M> factory, D data) {
+    public static <D extends Access2D<?> & Access2D.Sliceable<?>, M extends Mutate2D> M covariances(final Factory2D<M> factory, final D data) {
 
         long numberOfVariables = data.countColumns();
         M retVal = factory.makeZero(numberOfVariables, numberOfVariables);
@@ -93,10 +93,10 @@ public class DataPreprocessors {
         return retVal;
     }
 
-    public static Transformation2D<Double> newTransformation2D(Function<SampleSet, UnaryFunction<Double>> definition) {
+    public static Transformation2D<Double> newTransformation2D(final Function<SampleSet, UnaryFunction<Double>> definition) {
         return new Transformation2D<Double>() {
 
-            public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
+            public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
                 SampleSet sampleSet = SampleSet.make();
                 for (ColumnView<Double> view : transformable.columns()) {
                     sampleSet.swap(view);

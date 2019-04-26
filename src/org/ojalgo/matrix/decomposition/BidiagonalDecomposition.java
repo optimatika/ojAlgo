@@ -43,7 +43,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
             this(false);
         }
 
-        Complex(boolean fullSize) {
+        Complex(final boolean fullSize) {
             super(GenericDenseStore.COMPLEX, fullSize);
         }
 
@@ -131,7 +131,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
             this(false);
         }
 
-        Primitive(boolean fullSize) {
+        Primitive(final boolean fullSize) {
             super(PrimitiveDenseStore.FACTORY, fullSize);
         }
 
@@ -148,7 +148,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
             this(false);
         }
 
-        Quat(boolean fullSize) {
+        Quat(final boolean fullSize) {
             super(GenericDenseStore.QUATERNION, fullSize);
         }
 
@@ -166,7 +166,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
             this(false);
         }
 
-        Rational(boolean fullSize) {
+        Rational(final boolean fullSize) {
             super(GenericDenseStore.RATIONAL, fullSize);
         }
 
@@ -184,7 +184,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
     private transient DecompositionStore<N> myQ1;
     private transient DecompositionStore<N> myQ2;
 
-    protected BidiagonalDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, boolean fullSize) {
+    protected BidiagonalDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final boolean fullSize) {
         super(factory);
         myFullSize = fullSize;
     }

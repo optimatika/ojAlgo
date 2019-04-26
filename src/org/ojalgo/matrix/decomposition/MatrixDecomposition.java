@@ -192,7 +192,7 @@ public interface MatrixDecomposition<N extends Number> {
          * faster. Implementing this method, to actually decompose without pivoting, is optional. The default
          * implementation simply calls {@link #decompose(Access2D.Collectable)}.
          */
-        default boolean decomposeWithoutPivoting(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+        default boolean decomposeWithoutPivoting(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
             return this.decompose(matrix);
         }
 

@@ -45,11 +45,11 @@ public interface Mutate1D extends Structure1D {
      */
     interface Fillable<N extends Number> extends Structure1D {
 
-        default void fillAll(N value) {
+        default void fillAll(final N value) {
             this.fillRange(0L, this.count(), value);
         }
 
-        default void fillAll(NullaryFunction<N> supplier) {
+        default void fillAll(final NullaryFunction<N> supplier) {
             this.fillRange(0L, this.count(), supplier);
         }
 
@@ -60,15 +60,15 @@ public interface Mutate1D extends Structure1D {
          * </p>
          * <code>this(i) = values(i)</code>
          */
-        default void fillMatching(Access1D<?> values) {
+        default void fillMatching(final Access1D<?> values) {
             Structure1D.loopMatching(this, values, i -> this.fillOne(i, values, i));
         }
 
-        default void fillMatching(Access1D<N> left, BinaryFunction<N> function, Access1D<N> right) {
+        default void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
             Structure1D.loopMatching(left, right, i -> this.fillOne(i, function.invoke(left.get(i), right.get(i))));
         }
 
-        default void fillMatching(UnaryFunction<N> function, Access1D<N> arguments) {
+        default void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
             Structure1D.loopMatching(this, arguments, i -> this.fillOne(i, function.invoke(arguments.get(i))));
         }
 
@@ -78,11 +78,11 @@ public interface Mutate1D extends Structure1D {
 
         void fillOne(long index, NullaryFunction<N> supplier);
 
-        default void fillRange(long first, long limit, N value) {
+        default void fillRange(final long first, final long limit, final N value) {
             Structure1D.loopRange(first, limit, i -> this.fillOne(i, value));
         }
 
-        default void fillRange(long first, long limit, NullaryFunction<N> supplier) {
+        default void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
             Structure1D.loopRange(first, limit, i -> this.fillOne(i, supplier));
         }
     }
@@ -107,17 +107,17 @@ public interface Mutate1D extends Structure1D {
 
     interface Modifiable<N extends Number> extends Structure1D {
 
-        default void modifyAll(UnaryFunction<N> modifier) {
+        default void modifyAll(final UnaryFunction<N> modifier) {
             this.modifyRange(0L, this.count(), modifier);
         }
 
-        default void modifyMatching(Access1D<N> left, BinaryFunction<N> function) {
+        default void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
             for (long i = 0L, limit = FunctionUtils.min(left.count(), this.count()); i < limit; i++) {
                 this.modifyOne(i, function.first(left.get(i)));
             }
         }
 
-        default void modifyMatching(BinaryFunction<N> function, Access1D<N> right) {
+        default void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
             for (long i = 0L, limit = FunctionUtils.min(this.count(), right.count()); i < limit; i++) {
                 this.modifyOne(i, function.second(right.get(i)));
             }
@@ -125,7 +125,7 @@ public interface Mutate1D extends Structure1D {
 
         void modifyOne(long index, UnaryFunction<N> modifier);
 
-        default void modifyRange(long first, long limit, UnaryFunction<N> modifier) {
+        default void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
             Structure1D.loopRange(first, limit, i -> this.modifyOne(i, modifier));
         }
 
@@ -149,7 +149,7 @@ public interface Mutate1D extends Structure1D {
      */
     interface Receiver<N extends Number> extends Mutate1D, Mutate1D.Fillable<N>, Consumer<Access1D<?>> {
 
-        default void accept(Access1D<?> supplied) {
+        default void accept(final Access1D<?> supplied) {
             if (this.isAcceptable(supplied)) {
                 supplied.loopAll(i -> this.set(i, supplied.get(i)));
             } else {
@@ -157,7 +157,7 @@ public interface Mutate1D extends Structure1D {
             }
         }
 
-        default boolean isAcceptable(Structure1D supplier) {
+        default boolean isAcceptable(final Structure1D supplier) {
             return this.count() >= supplier.count();
         }
 
@@ -174,28 +174,28 @@ public interface Mutate1D extends Structure1D {
     /**
      * Copies the argument of the ComplexNumber elements to the destination.
      */
-    static void copyComplexArgument(Access1D<ComplexNumber> source, Mutate1D destination) {
+    static void copyComplexArgument(final Access1D<ComplexNumber> source, final Mutate1D destination) {
         source.loopAll(i -> destination.set(i, source.get(i).getArgument()));
     }
 
     /**
      * Copies the imaginary part of the ComplexNumber elements to the destination.
      */
-    static void copyComplexImaginary(Access1D<ComplexNumber> source, Mutate1D destination) {
+    static void copyComplexImaginary(final Access1D<ComplexNumber> source, final Mutate1D destination) {
         source.loopAll(i -> destination.set(i, source.get(i).getImaginary()));
     }
 
     /**
      * Copies the modulus of the ComplexNumber elements to the destination.
      */
-    static void copyComplexModulus(Access1D<ComplexNumber> source, Mutate1D destination) {
+    static void copyComplexModulus(final Access1D<ComplexNumber> source, final Mutate1D destination) {
         source.loopAll(i -> destination.set(i, source.get(i).getModulus()));
     }
 
     /**
      * Simultaneously copies the modulus and argument of the ComplexNumber elements to the destinations.
      */
-    static void copyComplexModulusAndArgument(Access1D<ComplexNumber> source, Mutate1D modDest, Mutate1D argDest) {
+    static void copyComplexModulusAndArgument(final Access1D<ComplexNumber> source, final Mutate1D modDest, final Mutate1D argDest) {
         source.loopAll(i -> {
             ComplexNumber cmplx = source.get(i);
             modDest.set(i, cmplx.getModulus());
@@ -206,14 +206,14 @@ public interface Mutate1D extends Structure1D {
     /**
      * Copies the real part of the ComplexNumber elements to the destination.
      */
-    static void copyComplexReal(Access1D<ComplexNumber> source, Mutate1D destination) {
+    static void copyComplexReal(final Access1D<ComplexNumber> source, final Mutate1D destination) {
         source.loopAll(i -> destination.set(i, source.get(i).getReal()));
     }
 
     /**
      * Simultaneously copies the real and imaginary parts of the ComplexNumber elements to the destinations.
      */
-    static void copyComplexRealAndImaginary(Access1D<ComplexNumber> source, Mutate1D realDest, Mutate1D imagDest) {
+    static void copyComplexRealAndImaginary(final Access1D<ComplexNumber> source, final Mutate1D realDest, final Mutate1D imagDest) {
         source.loopAll(i -> {
             ComplexNumber cmplx = source.get(i);
             realDest.set(i, cmplx.getReal());

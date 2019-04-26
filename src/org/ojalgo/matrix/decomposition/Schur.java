@@ -43,6 +43,18 @@ import org.ojalgo.type.context.NumberContext;
 @Deprecated
 public interface Schur<N extends Number> extends MatrixDecomposition<N> {
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Schur<N> decomposition, final NumberContext context) {
+
+        final MatrixStore<N> tmpU = decomposition.getU();
+        final MatrixStore<N> tmpQ = decomposition.getQ();
+
+        // Check that [A][Q] == [Q][U] ([A] == [Q][U][Q]<sup>T</sup> is not always true)
+        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
+        final MatrixStore<N> tmpStore2 = tmpQ.multiply(tmpU);
+
+        return Access2D.equals(tmpStore1, tmpStore2, context);
+    }
+
     @SuppressWarnings("unchecked")
     static <N extends Number> Schur<N> make(final Access2D<N> typical) {
 
@@ -57,18 +69,6 @@ public interface Schur<N extends Number> extends MatrixDecomposition<N> {
 
     static Schur<Double> makePrimitive() {
         return new SchurDecomposition.Primitive();
-    }
-
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Schur<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpU = decomposition.getU();
-        final MatrixStore<N> tmpQ = decomposition.getQ();
-
-        // Check that [A][Q] == [Q][U] ([A] == [Q][U][Q]<sup>T</sup> is not always true)
-        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
-        final MatrixStore<N> tmpStore2 = tmpQ.multiply(tmpU);
-
-        return Access2D.equals(tmpStore1, tmpStore2, context);
     }
 
     static <N extends Number> MatrixStore<N> reconstruct(final Schur<N> decomposition) {

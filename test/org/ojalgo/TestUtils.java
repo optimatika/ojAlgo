@@ -351,20 +351,20 @@ public abstract class TestUtils {
         Assertions.assertFalse(condition, message);
     }
 
-    public static void assertFasterThan(double limitMeassure, CalendarDateUnit limitUnit, Stopwatch actualTimer) {
+    public static void assertFasterThan(final double limitMeassure, final CalendarDateUnit limitUnit, final Stopwatch actualTimer) {
         CalendarDateDuration duration = actualTimer.stop(limitUnit);
         if (duration.measure > limitMeassure) {
             TestUtils.fail(duration.toString() + " > " + new CalendarDateDuration(limitMeassure, limitUnit));
         }
     }
 
-    public static void assertInRange(int first, int limit, int actual) {
+    public static void assertInRange(final int first, final int limit, final int actual) {
         if ((first > actual) || (actual >= limit)) {
             TestUtils.fail("Not in range!");
         }
     }
 
-    public static void assertNotNullOrEmpty(String actual) {
+    public static void assertNotNullOrEmpty(final String actual) {
         if (actual == null) {
             TestUtils.fail("Is null!");
         }
@@ -423,7 +423,7 @@ public abstract class TestUtils {
         Assertions.fail(message);
     }
 
-    public static void fail(Throwable problem) {
+    public static void fail(final Throwable problem) {
         Assertions.fail(problem.getMessage(), problem);
     }
 

@@ -301,25 +301,25 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         myDelegate.add(index, addend);
     }
 
-    public N aggregateColumn(long row, long col, Aggregator aggregator) {
+    public N aggregateColumn(final long row, final long col, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitColumn(row, col, visitor);
         return visitor.get();
     }
 
-    public N aggregateDiagonal(long row, long col, Aggregator aggregator) {
+    public N aggregateDiagonal(final long row, final long col, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitDiagonal(row, col, visitor);
         return visitor.get();
     }
 
-    public N aggregateRange(long first, long limit, Aggregator aggregator) {
+    public N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitRange(first, limit, visitor);
         return visitor.get();
     }
 
-    public N aggregateRow(long row, long col, Aggregator aggregator) {
+    public N aggregateRow(final long row, final long col, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitRow(row, col, visitor);
         return visitor.get();
@@ -579,7 +579,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         myDelegate.modify(0L, this.count(), 1L, modifier);
     }
 
-    public void modifyAny(Transformation2D<N> modifier) {
+    public void modifyAny(final Transformation2D<N> modifier) {
         modifier.transform(this);
     }
 
@@ -616,13 +616,13 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         myDelegate.modify(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, modifier);
     }
 
-    public Array1D<N> reduceColumns(Aggregator aggregator) {
+    public Array1D<N> reduceColumns(final Aggregator aggregator) {
         Array1D<N> retVal = myDelegate.factory().makeZero(myColumnsCount).wrapInArray1D();
         this.reduceColumns(aggregator, retVal);
         return retVal;
     }
 
-    public Array1D<N> reduceRows(Aggregator aggregator) {
+    public Array1D<N> reduceRows(final Aggregator aggregator) {
         Array1D<N> retVal = myDelegate.factory().makeZero(myRowsCount).wrapInArray1D();
         this.reduceRows(aggregator, retVal);
         return retVal;

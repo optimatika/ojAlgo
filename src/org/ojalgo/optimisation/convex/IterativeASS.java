@@ -260,7 +260,7 @@ final class IterativeASS extends ActiveSetSolver {
     }
 
     @Override
-    void resetActivator(boolean useLagrange) {
+    void resetActivator(final boolean useLagrange) {
 
         super.resetActivator(useLagrange);
 

@@ -33,11 +33,11 @@ public interface PredicateFunction<N extends Number> extends BasicFunction, Pred
     default PredicateFunction<N> negate() {
         return new PredicateFunction<N>() {
 
-            public boolean invoke(double arg) {
+            public boolean invoke(final double arg) {
                 return !PredicateFunction.this.invoke(arg);
             }
 
-            public boolean invoke(N arg) {
+            public boolean invoke(final N arg) {
                 return !PredicateFunction.this.invoke(arg);
             }
 

@@ -599,7 +599,7 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    private BigDecimal toPositiveFraction(BigDecimal noninteger) {
+    private BigDecimal toPositiveFraction(final BigDecimal noninteger) {
         BigDecimal intPart = noninteger.setScale(0, RoundingMode.FLOOR);
         return noninteger.subtract(intPart);
     }
@@ -921,7 +921,7 @@ public final class Expression extends ModelEntity<Expression> {
         return myRedundant;
     }
 
-    Variable resolve(Structure1D.IntIndex index) {
+    Variable resolve(final Structure1D.IntIndex index) {
         return myModel.getVariable(index);
     }
 

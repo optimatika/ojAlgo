@@ -44,7 +44,7 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
 
     static final int CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
 
-    PlainArray(DenseArray.Factory<N> factory, final int size) {
+    PlainArray(final DenseArray.Factory<N> factory, final int size) {
 
         super(factory);
 

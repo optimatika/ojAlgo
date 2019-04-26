@@ -348,7 +348,7 @@ public abstract class BufferArray extends PlainArray<Double> {
     private final Buffer myBuffer;
     private final RandomAccessFile myFile;
 
-    BufferArray(DenseArray.Factory<Double> factory, final Buffer buffer, final RandomAccessFile file) {
+    BufferArray(final DenseArray.Factory<Double> factory, final Buffer buffer, final RandomAccessFile file) {
 
         super(factory, buffer.capacity());
 

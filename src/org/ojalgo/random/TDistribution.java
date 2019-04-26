@@ -36,17 +36,17 @@ public class TDistribution extends AbstractContinuous {
         }
 
         @Override
-        public double getDensity(double value) {
+        public double getDensity(final double value) {
             return myCauchy.getDensity(value);
         }
 
         @Override
-        public double getDistribution(double value) {
+        public double getDistribution(final double value) {
             return myCauchy.getDistribution(value);
         }
 
         @Override
-        public double getQuantile(double probability) {
+        public double getQuantile(final double probability) {
             return myCauchy.getQuantile(probability);
         }
 
@@ -64,17 +64,17 @@ public class TDistribution extends AbstractContinuous {
         }
 
         @Override
-        public double getDensity(double value) {
+        public double getDensity(final double value) {
             return ONE / Math.pow(TWO + (value * value), THREE / TWO);
         }
 
         @Override
-        public double getDistribution(double value) {
+        public double getDistribution(final double value) {
             return HALF + (value / (TWO * Math.sqrt(TWO + (value * value))));
         }
 
         @Override
-        public double getQuantile(double probability) {
+        public double getQuantile(final double probability) {
             double alpha = FOUR * probability * (ONE - probability);
             return TWO * (probability - HALF) * Math.sqrt(TWO / alpha);
         }
@@ -88,7 +88,7 @@ public class TDistribution extends AbstractContinuous {
         }
 
         @Override
-        public double getDensity(double value) {
+        public double getDensity(final double value) {
             return (SIX * Math.sqrt(THREE)) / (PI * Math.pow(THREE + (value * value), TWO));
         }
 
@@ -101,7 +101,7 @@ public class TDistribution extends AbstractContinuous {
         }
 
         @Override
-        public double getQuantile(double probability) {
+        public double getQuantile(final double probability) {
             double alpha = FOUR * probability * (ONE - probability);
             double sqrt = Math.sqrt(alpha);
             double q = Math.cos(THIRD * Math.acos(sqrt)) / sqrt;
@@ -119,17 +119,17 @@ public class TDistribution extends AbstractContinuous {
         }
 
         @Override
-        public double getDensity(double value) {
+        public double getDensity(final double value) {
             return myNormal.getDensity(value);
         }
 
         @Override
-        public double getDistribution(double value) {
+        public double getDistribution(final double value) {
             return myNormal.getDistribution(value);
         }
 
         @Override
-        public double getQuantile(double probability) {
+        public double getQuantile(final double probability) {
             return myNormal.getQuantile(probability);
         }
 
@@ -140,7 +140,7 @@ public class TDistribution extends AbstractContinuous {
 
     }
 
-    public static TDistribution make(int degreesOfFreedom) {
+    public static TDistribution make(final int degreesOfFreedom) {
         switch (degreesOfFreedom) {
         case 1:
             return new Degree1();
@@ -163,17 +163,17 @@ public class TDistribution extends AbstractContinuous {
     private final double myConstant;
     private final double myDegreesOfFreedom;
 
-    public TDistribution(double degreesOfFreedom) {
+    public TDistribution(final double degreesOfFreedom) {
         super();
         myDegreesOfFreedom = degreesOfFreedom;
         myConstant = GammaFunction.gamma((degreesOfFreedom + ONE) / TWO) / (Math.sqrt(degreesOfFreedom * PI) * GammaFunction.gamma(degreesOfFreedom / TWO));
     }
 
-    public double getDensity(double value) {
+    public double getDensity(final double value) {
         return myConstant * Math.pow(ONE + ((value * value) / myDegreesOfFreedom), (NEG - myDegreesOfFreedom) / TWO);
     }
 
-    public double getDistribution(double value) {
+    public double getDistribution(final double value) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -186,7 +186,7 @@ public class TDistribution extends AbstractContinuous {
         }
     }
 
-    public double getQuantile(double probability) {
+    public double getQuantile(final double probability) {
         // TODO Auto-generated method stub
         return 0;
     }

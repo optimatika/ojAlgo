@@ -55,11 +55,11 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<SingularValue<N>> {
 
-        default SingularValue<N> make(boolean fullSize) {
+        default SingularValue<N> make(final boolean fullSize) {
             return this.make(TYPICAL, fullSize);
         }
 
-        default SingularValue<N> make(Structure2D typical) {
+        default SingularValue<N> make(final Structure2D typical) {
             return this.make(typical, false);
         }
 

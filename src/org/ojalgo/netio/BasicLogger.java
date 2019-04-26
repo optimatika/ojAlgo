@@ -161,23 +161,31 @@ public abstract class BasicLogger {
 
     public interface Printable {
 
-        default void print(Appendable receiver) {
+        default void print(final Appendable receiver) {
             this.print(new BasicLogger.AppendablePrinter(receiver));
         }
 
         void print(BasicLogger.Printer receiver);
 
-        default void print(PrintStream receiver) {
+        default void print(final PrintStream receiver) {
             this.print(new BasicLogger.PrintStreamPrinter(receiver));
         }
 
-        default void print(PrintWriter receiver) {
+        default void print(final PrintWriter receiver) {
             this.print(new BasicLogger.PrintWriterPrinter(receiver));
         }
 
     }
 
     public interface Printer {
+
+        /**
+         * @see java.io.PrintWriter#print(boolean)
+         * @see java.io.PrintStream#print(boolean)
+         */
+        default void print(final boolean b) {
+            this.print(String.valueOf(b));
+        }
 
         /**
          * @see java.io.PrintWriter#print(char)
@@ -190,38 +198,6 @@ public abstract class BasicLogger {
          * @see java.io.PrintStream#print(char[])
          */
         void print(char[] ca);
-
-        /**
-         * @see java.io.PrintWriter#print(java.lang.String)
-         * @see java.io.PrintStream#print(java.lang.String)
-         */
-        void print(String str);
-
-        /**
-         * @see java.io.PrintWriter#printf(java.util.Locale, java.lang.String, java.lang.Object[])
-         * @see java.io.PrintStream#printf(java.util.Locale, java.lang.String, java.lang.Object[])
-         */
-        Printer printf(Locale locale, String format, Object... args);
-
-        /**
-         * @see java.io.PrintWriter#printf(java.lang.String, java.lang.Object[])
-         * @see java.io.PrintStream#printf(java.lang.String, java.lang.Object[])
-         */
-        Printer printf(String format, Object... args);
-
-        /**
-         * @see java.io.PrintWriter#println()
-         * @see java.io.PrintStream#println()
-         */
-        void println();
-
-        /**
-         * @see java.io.PrintWriter#print(boolean)
-         * @see java.io.PrintStream#print(boolean)
-         */
-        default void print(final boolean b) {
-            this.print(String.valueOf(b));
-        }
 
         /**
          * @see java.io.PrintWriter#print(double)
@@ -263,9 +239,33 @@ public abstract class BasicLogger {
             this.print(String.valueOf(obj));
         }
 
+        /**
+         * @see java.io.PrintWriter#print(java.lang.String)
+         * @see java.io.PrintStream#print(java.lang.String)
+         */
+        void print(String str);
+
         default void print(final String message, final Object... args) {
             this.print(TypeUtils.format(message, args));
         }
+
+        /**
+         * @see java.io.PrintWriter#printf(java.util.Locale, java.lang.String, java.lang.Object[])
+         * @see java.io.PrintStream#printf(java.util.Locale, java.lang.String, java.lang.Object[])
+         */
+        Printer printf(Locale locale, String format, Object... args);
+
+        /**
+         * @see java.io.PrintWriter#printf(java.lang.String, java.lang.Object[])
+         * @see java.io.PrintStream#printf(java.lang.String, java.lang.Object[])
+         */
+        Printer printf(String format, Object... args);
+
+        /**
+         * @see java.io.PrintWriter#println()
+         * @see java.io.PrintStream#println()
+         */
+        void println();
 
         /**
          * @see java.io.PrintWriter#println(boolean)
@@ -854,7 +854,7 @@ public abstract class BasicLogger {
 
     }
 
-    private static String toString(Number number, NumberContext context, boolean plain) {
+    private static String toString(final Number number, final NumberContext context, final boolean plain) {
         if (plain) {
             if (number instanceof Scalar<?>) {
                 return ((Scalar<?>) number).toPlainString(context);

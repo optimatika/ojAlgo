@@ -194,7 +194,19 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
+        /**
+         * @see #columns(int[])
+         */
         public LogicalBuilder<N> column(final int... columns) {
+            return this.columns(columns);
+        }
+
+        /**
+         * A selection (re-ordering) of columns. Note that it's ok to reference the same base column more than
+         * once, and any negative column reference/index will translate to a column of zeros. The number of
+         * columns in the resulting matrix is the same as the number of elements in the columns index array.
+         */
+        public LogicalBuilder<N> columns(final int[] columns) {
             myStore = new ColumnsStore<>(myStore, columns);
             return this;
         }
@@ -338,7 +350,19 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
+        /**
+         * @see #rows(int[])
+         */
         public LogicalBuilder<N> row(final int... rows) {
+            return this.rows(rows);
+        }
+
+        /**
+         * A selection (re-ordering) of rows. Note that it's ok to reference the same base row more than once,
+         * and any negative row reference/index will translate to a row of zeros. The number of rows in the
+         * resulting matrix is the same as the number of elements in the rows index array.
+         */
+        public LogicalBuilder<N> rows(final int[] rows) {
             myStore = new RowsStore<>(myStore, rows);
             return this;
         }
@@ -406,7 +430,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.COMPLEX, element));
         }
 
-        public SparseStore<ComplexNumber> makeSparse(int rowsCount, int columnsCount) {
+        public SparseStore<ComplexNumber> makeSparse(final int rowsCount, final int columnsCount) {
             return SparseStore.COMPLEX.make(rowsCount, columnsCount);
         }
 
@@ -430,7 +454,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return new LogicalBuilder<>(new SingleStore<>(PrimitiveDenseStore.FACTORY, element));
         }
 
-        public SparseStore<Double> makeSparse(int rowsCount, int columnsCount) {
+        public SparseStore<Double> makeSparse(final int rowsCount, final int columnsCount) {
             return SparseStore.PRIMITIVE.make(rowsCount, columnsCount);
         }
 
@@ -454,7 +478,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.QUATERNION, element));
         }
 
-        public SparseStore<Quaternion> makeSparse(int rowsCount, int columnsCount) {
+        public SparseStore<Quaternion> makeSparse(final int rowsCount, final int columnsCount) {
             return SparseStore.QUATERNION.make(rowsCount, columnsCount);
         }
 
@@ -478,7 +502,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.RATIONAL, element));
         }
 
-        public SparseStore<RationalNumber> makeSparse(int rowsCount, int columnsCount) {
+        public SparseStore<RationalNumber> makeSparse(final int rowsCount, final int columnsCount) {
             return SparseStore.RATIONAL.make(rowsCount, columnsCount);
         }
 

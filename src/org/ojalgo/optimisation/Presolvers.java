@@ -47,7 +47,8 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver BINARY_VALUE = new ExpressionsBasedModel.Presolver(100) {
 
         @Override
-        public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
+                final NumberContext precision) {
             return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
         }
 
@@ -56,7 +57,8 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver INTEGER_EXPRESSION_ROUNDING = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
-        public boolean simplify(Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, NumberContext precision) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
+                final NumberContext precision) {
             if (expression.isLinearAndAllInteger()) {
                 expression.doIntegerRounding();
             }
@@ -71,7 +73,7 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.VariableAnalyser INTEGER_VARIABLE_ROUNDING = new ExpressionsBasedModel.VariableAnalyser(4) {
 
         @Override
-        public boolean simplify(Variable variable, ExpressionsBasedModel model) {
+        public boolean simplify(final Variable variable, final ExpressionsBasedModel model) {
             if (variable.isInteger()) {
                 variable.doIntegerRounding();
             }
@@ -87,7 +89,8 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver LINEAR_OBJECTIVE = new ExpressionsBasedModel.Presolver(10) {
 
         @Override
-        public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
+                final NumberContext precision) {
 
             if (expression.isFunctionLinear()) {
 
@@ -123,7 +126,8 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver REDUNDANT_CONSTRAINT = new ExpressionsBasedModel.Presolver(Integer.MAX_VALUE) {
 
         @Override
-        public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
+                final NumberContext precision) {
 
             if (expression.isFunctionLinear()) {
 
@@ -211,7 +215,8 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver OPPOSITE_SIGN = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
-        public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
+                final NumberContext precision) {
             return Presolvers.doCaseN(expression, remaining, lower, upper, precision);
         }
 
@@ -280,7 +285,8 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver ZERO_ONE_TWO = new ExpressionsBasedModel.Presolver(10) {
 
         @Override
-        public boolean simplify(final Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
+                final NumberContext precision) {
 
             switch (remaining.size()) {
             case 0:
@@ -303,7 +309,8 @@ public abstract class Presolvers {
     /**
      * This constraint expression has 0 remaining free variable. It is entirely redundant.
      */
-    static boolean doCase0(final Expression expression, final Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
+    static boolean doCase0(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
+            final NumberContext precision) {
 
         expression.setRedundant();
 
@@ -321,7 +328,8 @@ public abstract class Presolvers {
      * This constraint expression has 1 remaining free variable. The lower/upper limits can be transferred to
      * that variable, and the expression marked as redundant.
      */
-    static boolean doCase1(final Expression expression, final Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
+    static boolean doCase1(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
+            final NumberContext precision) {
 
         expression.setRedundant();
 
@@ -412,7 +420,8 @@ public abstract class Presolvers {
      * Checks if bounds on either of the variables (together with the expressions's bounds) implies tighter
      * bounds on the other variable.
      */
-    static boolean doCase2(final Expression expression, final Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
+    static boolean doCase2(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
+            final NumberContext precision) {
 
         final Iterator<IntIndex> tmpIterator = remaining.iterator();
 
@@ -545,7 +554,8 @@ public abstract class Presolvers {
      * Checks the sign of the limits and the sign of the expression parameters to deduce variables that in
      * fact can only be zero.
      */
-    static boolean doCaseN(final Expression expression, final Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, final NumberContext precision) {
+    static boolean doCaseN(final Expression expression, final Set<IntIndex> remaining, final BigDecimal lower, final BigDecimal upper,
+            final NumberContext precision) {
 
         boolean didFixVariable = false;
 

@@ -170,7 +170,7 @@ public class RationalNumberTest extends ScalarTests {
             //                9223372036854775807.0,
             //                -9223372036854775808.0
     })
-    public void testValueOf(double d) {
+    public void testValueOf(final double d) {
 
         final RationalNumber direct = RationalNumber.valueOf(d);
         final RationalNumber approximation = RationalNumber.valueOf(d);
@@ -192,7 +192,7 @@ public class RationalNumberTest extends ScalarTests {
             0b0_1111110100_1111111111111111111111111111111111111111111111111111L, // * 2^{-63}
             0b0_1111110011_1111111111111111111111111111111111111111111111111111L, // * 2^{-64}
     })
-    public void testValueOf(long l) {
+    public void testValueOf(final long l) {
         this.testValueOf(Double.longBitsToDouble(l));
     }
 

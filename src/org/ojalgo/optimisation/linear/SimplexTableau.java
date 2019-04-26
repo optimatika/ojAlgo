@@ -126,7 +126,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             return myTransposed.get(col, row);
         }
 
-        private void doPivot(final int row, final int col, final double[] dataX, final int baseX, int structure) {
+        private void doPivot(final int row, final int col, final double[] dataX, final int baseX, final int structure) {
             for (int i = 0, limit = (int) myTransposed.countColumns(); i < limit; i++) {
                 if (i != row) {
                     final double colVal = myTransposed.doubleValue(col, i);
@@ -137,7 +137,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             }
         }
 
-        private double scale(DenseArray<Double> pivotBody, int pivotCol) {
+        private double scale(final DenseArray<Double> pivotBody, final int pivotCol) {
 
             double pivotElement = pivotBody.doubleValue(pivotCol);
 
@@ -153,7 +153,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         }
 
         @Override
-        protected boolean fixVariable(int index, double value) {
+        protected boolean fixVariable(final int index, final double value) {
 
             int row = this.getBasisRowIndex(index);
 
@@ -470,7 +470,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             myPhase1Weights = DENSE_FACTORY.makeZero(totNumbVars);
         }
 
-        SparseTableau(LinearSolver.Builder matrices) {
+        SparseTableau(final LinearSolver.Builder matrices) {
 
             this(matrices.countConstraints(), matrices.countVariables(), 0);
 
@@ -570,7 +570,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             }
         }
 
-        private double scale(SparseArray<Double> pivotBody, int pivotCol, double pivotRHS) {
+        private double scale(final SparseArray<Double> pivotBody, final int pivotCol, final double pivotRHS) {
 
             double pivotElement = pivotBody.doubleValue(pivotCol);
 
@@ -588,7 +588,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         }
 
         @Override
-        protected boolean fixVariable(int index, double value) {
+        protected boolean fixVariable(final int index, final double value) {
 
             int row = this.getBasisRowIndex(index);
 
@@ -879,7 +879,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     static final DenseArray.Factory<Double> DENSE_FACTORY = Primitive64Array.FACTORY;
 
     protected static SimplexTableau make(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables,
-            Optimisation.Options options) {
+            final Optimisation.Options options) {
 
         final int numbRows = numberOfConstraints + 2;
         final int numbCols = numberOfProblemVariables + numberOfSlackVariables + numberOfConstraints + 1;
@@ -986,7 +986,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         return myNumberOfProblemVariables + myNumberOfSlackVariables + myNumberOfConstraints;
     }
 
-    protected boolean fixVariable(int index, double value) {
+    protected boolean fixVariable(final int index, final double value) {
 
         int row = this.getBasisRowIndex(index);
 
@@ -1063,7 +1063,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         myBasis[pivotRow] = pivotCol;
     }
 
-    int findNextPivotColumn(Access1D<Double> auxiliaryRow, Access1D<Double> objectiveRow) {
+    int findNextPivotColumn(final Access1D<Double> auxiliaryRow, final Access1D<Double> objectiveRow) {
 
         int retVal = -1;
         double minQuotient = MACHINE_LARGEST;

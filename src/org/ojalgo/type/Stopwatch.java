@@ -64,27 +64,27 @@ public class Stopwatch {
         return System.nanoTime() - myStart;
     }
 
-    public boolean isLessThan(CalendarDateDuration duration) {
+    public boolean isLessThan(final CalendarDateDuration duration) {
         return this.isLessThanNanos(duration.toDurationInNanos());
     }
 
-    public boolean isLessThanMillis(long millis) {
+    public boolean isLessThanMillis(final long millis) {
         return this.isLessThanNanos(millis * CalendarDate.NANOS_PER_MILLIS);
     }
 
-    public boolean isLessThanNanos(long nanos) {
+    public boolean isLessThanNanos(final long nanos) {
         return this.countNanos() < nanos;
     }
 
-    public boolean isMoreThan(CalendarDateDuration duration) {
+    public boolean isMoreThan(final CalendarDateDuration duration) {
         return this.isMoreThanNanos(duration.toDurationInNanos());
     }
 
-    public boolean isMoreThanMillis(long millis) {
+    public boolean isMoreThanMillis(final long millis) {
         return this.isMoreThanNanos(millis * CalendarDate.NANOS_PER_MILLIS);
     }
 
-    public boolean isMoreThanNanos(long nanos) {
+    public boolean isMoreThanNanos(final long nanos) {
         return this.countNanos() > nanos;
     }
 

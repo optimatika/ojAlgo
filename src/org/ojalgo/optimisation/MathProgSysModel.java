@@ -538,7 +538,7 @@ public final class MathProgSysModel {
         return myDelegate.validate(solution, context);
     }
 
-    private String[] extractFields(String line, Map<String, ?> verifier) {
+    private String[] extractFields(final String line, final Map<String, ?> verifier) {
 
         myFields[0] = line.substring(FIELD_FIRSTS[0], FIELD_LIMITS[0]).trim();
         myFields[1] = line.substring(FIELD_FIRSTS[1], FIELD_LIMITS[1]).trim();

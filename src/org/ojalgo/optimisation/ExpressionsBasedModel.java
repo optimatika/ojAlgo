@@ -1343,7 +1343,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         }
     }
 
-    void addReference(IntIndex index) {
+    void addReference(final IntIndex index) {
         myReferences.add(index);
     }
 
@@ -1413,7 +1413,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         return false;
     }
 
-    boolean isReferenced(Variable variable) {
+    boolean isReferenced(final Variable variable) {
         return myReferences.contains(variable.getIndex());
     }
 

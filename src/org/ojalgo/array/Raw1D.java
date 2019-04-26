@@ -62,7 +62,7 @@ public abstract class Raw1D {
         return retVal;
     }
 
-    public static int indexOf(final int[] array, int value) {
+    public static int indexOf(final int[] array, final int value) {
         for (int i = 0, limit = array.length; i < limit; i++) {
             if (array[i] == value) {
                 return i;
@@ -71,7 +71,7 @@ public abstract class Raw1D {
         return -1;
     }
 
-    public static int indexOf(final long[] array, long value) {
+    public static int indexOf(final long[] array, final long value) {
         for (int i = 0, limit = array.length; i < limit; i++) {
             if (array[i] == value) {
                 return i;

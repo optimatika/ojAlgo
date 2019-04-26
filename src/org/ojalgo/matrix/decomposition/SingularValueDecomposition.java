@@ -52,7 +52,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             this(false);
         }
 
-        Complex(boolean fullSize) {
+        Complex(final boolean fullSize) {
             super(GenericDenseStore.COMPLEX, new BidiagonalDecomposition.Complex(fullSize), fullSize);
         }
 
@@ -64,7 +64,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             this(false);
         }
 
-        Primitive(boolean fullSize) {
+        Primitive(final boolean fullSize) {
             super(PrimitiveDenseStore.FACTORY, new BidiagonalDecomposition.Primitive(fullSize), fullSize);
         }
 
@@ -76,7 +76,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             this(false);
         }
 
-        Quat(boolean fullSize) {
+        Quat(final boolean fullSize) {
             super(GenericDenseStore.QUATERNION, new BidiagonalDecomposition.Quat(fullSize), fullSize);
         }
 
@@ -88,7 +88,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             this(false);
         }
 
-        Rational(boolean fullSize) {
+        Rational(final boolean fullSize) {
             super(GenericDenseStore.RATIONAL, new BidiagonalDecomposition.Rational(fullSize), fullSize);
         }
 
@@ -346,7 +346,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     protected SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory,
-            final BidiagonalDecomposition<N> bidiagonal, boolean fullSize) {
+            final BidiagonalDecomposition<N> bidiagonal, final boolean fullSize) {
 
         super(factory);
 

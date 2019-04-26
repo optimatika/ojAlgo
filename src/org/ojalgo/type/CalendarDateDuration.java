@@ -44,7 +44,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
  */
 public final class CalendarDateDuration extends Number implements TemporalAmount, CalendarDate.Resolution, Comparable<CalendarDateDuration> {
 
-    static CalendarDateDuration of(long nanos) {
+    static CalendarDateDuration of(final long nanos) {
         return new CalendarDateDuration(nanos, CalendarDateUnit.NANOS);
     }
 
@@ -63,7 +63,7 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
         this(PrimitiveMath.ZERO, CalendarDateUnit.MILLIS);
     }
 
-    public long addTo(long epochMilli) {
+    public long addTo(final long epochMilli) {
         return epochMilli + this.toDurationInMillis();
     }
 

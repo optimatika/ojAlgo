@@ -649,7 +649,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return mySlackI;
     }
 
-    MatrixStore<Double> getSlackI(int[] rows) {
+    MatrixStore<Double> getSlackI(final int[] rows) {
         return this.getSlackI().logical().row(rows).get();
     }
 
@@ -672,7 +672,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
     }
 
-    void resetActivator(boolean useLagrange) {
+    void resetActivator(final boolean useLagrange) {
 
         myActivator.excludeAll();
 

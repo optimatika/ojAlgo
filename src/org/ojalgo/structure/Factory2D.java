@@ -27,7 +27,7 @@ import org.ojalgo.function.NullaryFunction;
 
 public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
-    default I column(double... elements) {
+    default I column(final double... elements) {
         return this.columns(elements);
     }
 
@@ -54,7 +54,7 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
         return this.makeZero(shape.countRows(), shape.countColumns());
     }
 
-    default I row(double... elements) {
+    default I row(final double... elements) {
         return this.rows(elements);
     }
 

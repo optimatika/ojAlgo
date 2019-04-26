@@ -36,7 +36,7 @@ abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double>
 
     public abstract void add(int row, double addend);
 
-    public final void add(long index, double addend) {
+    public final void add(final long index, final double addend) {
         this.add(Structure1D.index(index), addend);
     }
 
@@ -48,7 +48,7 @@ abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double>
         this.add(Structure2D.index(this.structure(), row, col), addend.doubleValue());
     }
 
-    public final void add(long index, Number addend) {
+    public final void add(final long index, final Number addend) {
         this.add(Structure1D.index(index), addend.doubleValue());
     }
 
@@ -70,15 +70,15 @@ abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double>
         return this.doubleValue(Structure1D.index(index));
     }
 
-    public final double doubleValue(long row, long col) {
+    public final double doubleValue(final long row, final long col) {
         return this.doubleValue(Structure2D.index(this.structure(), row, col));
     }
 
-    public final void fillOne(long index, Access1D<?> values, long valueIndex) {
+    public final void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
         this.set(Structure1D.index(index), values.doubleValue(valueIndex));
     }
 
-    public final void fillOne(long index, Double value) {
+    public final void fillOne(final long index, final Double value) {
         this.set(Structure1D.index(index), value.doubleValue());
     }
 
@@ -94,7 +94,7 @@ abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double>
         this.set(Structure2D.index(this.structure(), row, col), supplier.doubleValue());
     }
 
-    public final void fillOne(long index, NullaryFunction<Double> supplier) {
+    public final void fillOne(final long index, final NullaryFunction<Double> supplier) {
         this.set(Structure1D.index(index), supplier.doubleValue());
     }
 
@@ -102,7 +102,7 @@ abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double>
         return this.doubleValue(Structure1D.index(index));
     }
 
-    public final Double get(long row, long col) {
+    public final Double get(final long row, final long col) {
         return this.get(Structure2D.index(this.structure(), row, col));
     }
 
@@ -112,13 +112,13 @@ abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double>
         this.modifyOne(Structure2D.index(this.structure(), row, col), modifier);
     }
 
-    public final void modifyOne(long index, UnaryFunction<Double> modifier) {
+    public final void modifyOne(final long index, final UnaryFunction<Double> modifier) {
         this.modifyOne(Structure1D.index(index), modifier);
     }
 
     public abstract void set(int row, double value);
 
-    public final void set(long index, double addend) {
+    public final void set(final long index, final double addend) {
         this.set(Structure1D.index(index), addend);
     }
 
@@ -130,7 +130,7 @@ abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double>
         this.set(Structure2D.index(this.structure(), row, col), value.doubleValue());
     }
 
-    public final void set(long index, Number addend) {
+    public final void set(final long index, final Number addend) {
         this.set(Structure1D.index(index), addend.doubleValue());
     }
 

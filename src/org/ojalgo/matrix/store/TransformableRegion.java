@@ -71,7 +71,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             return myBase.countRows();
         }
 
-        public double doubleValue(long row, long col) {
+        public double doubleValue(final long row, final long col) {
             return myBase.doubleValue(row, myColumns[(int) col]);
         }
 
@@ -99,7 +99,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillOne(row, myColumns[(int) col], supplier);
         }
 
-        public N get(long row, long col) {
+        public N get(final long row, final long col) {
             return myBase.get(row, myColumns[(int) col]);
         }
 
@@ -155,7 +155,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             return myRowLimit;
         }
 
-        public double doubleValue(long row, long col) {
+        public double doubleValue(final long row, final long col) {
             return myBase.doubleValue(row, col);
         }
 
@@ -171,7 +171,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillOne(row, col, supplier);
         }
 
-        public N get(long row, long col) {
+        public N get(final long row, final long col) {
             return myBase.get(row, col);
         }
 
@@ -217,7 +217,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             return myBase.countRows() - myRowOffset;
         }
 
-        public double doubleValue(long row, long col) {
+        public double doubleValue(final long row, final long col) {
             return myBase.doubleValue(myRowOffset + row, myColumnOffset + col);
         }
 
@@ -273,7 +273,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillRow(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
-        public N get(long row, long col) {
+        public N get(final long row, final long col) {
             return myBase.get(myRowOffset + row, myColumnOffset + col);
         }
 
@@ -396,7 +396,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             return myRows.length;
         }
 
-        public double doubleValue(long row, long col) {
+        public double doubleValue(final long row, final long col) {
             return myBase.doubleValue(myRows[(int) row], col);
         }
 
@@ -424,7 +424,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillRow(myRows[(int) row], col, supplier);
         }
 
-        public N get(long row, long col) {
+        public N get(final long row, final long col) {
             return myBase.get(myRows[(int) row], col);
         }
 
@@ -471,7 +471,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             return myBase.countColumns();
         }
 
-        public double doubleValue(long row, long col) {
+        public double doubleValue(final long row, final long col) {
             return myBase.doubleValue(col, row);
         }
 
@@ -511,7 +511,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillDiagonal(col, row, supplier);
         }
 
-        public N get(long row, long col) {
+        public N get(final long row, final long col) {
             return myBase.get(col, row);
         }
 
@@ -546,7 +546,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
 
     }
 
-    default void exchangeColumns(long colA, long colB) {
+    default void exchangeColumns(final long colA, final long colB) {
         N valA, valB;
         for (long i = 0L, limit = this.countRows(); i < limit; i++) {
             valA = this.get(i, colA);
@@ -556,7 +556,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
         }
     }
 
-    default void exchangeRows(long rowA, long rowB) {
+    default void exchangeRows(final long rowA, final long rowB) {
         N valA, valB;
         for (long j = 0L, limit = this.countColumns(); j < limit; j++) {
             valA = this.get(rowA, j);
@@ -568,7 +568,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
 
     void fillByMultiplying(final Access1D<N> left, final Access1D<N> right);
 
-    default void modifyAny(Transformation2D<N> modifier) {
+    default void modifyAny(final Transformation2D<N> modifier) {
         modifier.transform(this);
     }
 

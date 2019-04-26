@@ -78,20 +78,20 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
     private final Pivot myPivot = new Pivot();
 
-    protected LDLDecomposition(PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory) {
+    protected LDLDecomposition(final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory) {
         super(factory);
     }
 
-    public N calculateDeterminant(Access2D<?> matrix) {
+    public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
     }
 
-    public boolean decompose(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, true);
     }
 
-    public boolean decomposeWithoutPivoting(Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decomposeWithoutPivoting(final Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, false);
     }
 
@@ -113,7 +113,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     }
 
     @Override
-    public MatrixStore<N> getInverse(PhysicalStore<N> preallocated) {
+    public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
         int tmpRowDim = this.getRowDim();
         int[] tmpOrder = myPivot.getOrder();
@@ -172,12 +172,12 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return retVal;
     }
 
-    public MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs) {
+    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
         return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
     @Override
-    public MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs, PhysicalStore<N> preallocated) {
+    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
         int tmpRowDim = this.getRowDim();
         int[] tmpOrder = myPivot.getOrder();
@@ -200,7 +200,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return preallocated.logical().row(tmpInvertedOrder).get();
     }
 
-    public MatrixStore<N> invert(Access2D<?> original) throws RecoverableCondition {
+    public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
@@ -211,7 +211,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         }
     }
 
-    public MatrixStore<N> invert(Access2D<?> original, PhysicalStore<N> preallocated) throws RecoverableCondition {
+    public MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
@@ -234,16 +234,16 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return myPivot.isModified();
     }
 
-    public PhysicalStore<N> preallocate(Structure2D template) {
+    public PhysicalStore<N> preallocate(final Structure2D template) {
         long tmpCountRows = template.countRows();
         return this.allocate(tmpCountRows, tmpCountRows);
     }
 
-    public PhysicalStore<N> preallocate(Structure2D templateBody, Structure2D templateRHS) {
+    public PhysicalStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
         return this.allocate(templateRHS.countRows(), templateRHS.countColumns());
     }
 
-    public MatrixStore<N> solve(Access2D<?> body, Access2D<?> rhs) throws RecoverableCondition {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
 
         this.decompose(this.wrap(body));
 
@@ -254,7 +254,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         }
     }
 
-    public MatrixStore<N> solve(Access2D<?> body, Access2D<?> rhs, PhysicalStore<N> preallocated) throws RecoverableCondition {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(body));
 
@@ -265,7 +265,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         }
     }
 
-    private boolean doDecompose(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, boolean pivoting) {
+    private boolean doDecompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean pivoting) {
 
         this.reset();
 

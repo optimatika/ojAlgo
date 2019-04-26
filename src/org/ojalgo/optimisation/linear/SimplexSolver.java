@@ -89,7 +89,7 @@ public final class SimplexSolver extends LinearSolver {
     private static final NumberContext PHASE1 = ACCURACY.withScale(8);
     private static final NumberContext RATIO = ACCURACY.withScale(8);
 
-    static SimplexTableau build(final ConvexSolver.Builder convex, Optimisation.Options options) {
+    static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options) {
 
         final int numbVars = convex.countVariables();
         final int numbEqus = convex.countEqualityConstraints();

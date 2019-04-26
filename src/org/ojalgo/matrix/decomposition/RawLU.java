@@ -68,7 +68,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.doDecompose(data, true);
     }
 
-    public boolean decomposeWithoutPivoting(Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    public boolean decomposeWithoutPivoting(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
         final double[][] data = this.reset(matrix, false);
 
@@ -210,7 +210,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         }
     }
 
-    private boolean doDecompose(final double[][] data, boolean pivoting) {
+    private boolean doDecompose(final double[][] data, final boolean pivoting) {
 
         final int m = this.getRowDim();
         final int n = this.getColDim();

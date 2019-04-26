@@ -107,7 +107,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                     return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.Factory.this, element));
                 }
 
-                public SparseStore<N> makeSparse(int rowsCount, int columnsCount) {
+                public SparseStore<N> makeSparse(final int rowsCount, final int columnsCount) {
                     return new SparseStore<>(GenericDenseStore.Factory.this, rowsCount, columnsCount);
                 }
 

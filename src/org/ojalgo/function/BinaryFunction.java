@@ -136,10 +136,6 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
 
     }
 
-    double invoke(double arg1, double arg2);
-
-    N invoke(N arg1, N arg2);
-
     default BinaryFunction<N> andThen(final UnaryFunction<N> after) {
         ProgrammingError.throwIfNull(after);
         return new BinaryFunction<N>() {
@@ -195,6 +191,10 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
     default UnaryFunction<N> first(final N arg1) {
         return new FixedFirst<>(arg1, this);
     }
+
+    double invoke(double arg1, double arg2);
+
+    N invoke(N arg1, N arg2);
 
     /**
      * @see #second(Number)

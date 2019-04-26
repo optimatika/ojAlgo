@@ -171,7 +171,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         return elements.size() > 0;
     }
 
-    public N aggregateRange(long first, long limit, Aggregator aggregator) {
+    public N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myStorage.factory().aggregator());
         this.visitRange(first, limit, visitor);
         return visitor.get();

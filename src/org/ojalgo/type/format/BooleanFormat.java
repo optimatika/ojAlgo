@@ -43,11 +43,11 @@ public final class BooleanFormat extends Format {
         this(Boolean.TRUE.toString(), Boolean.FALSE.toString());
     }
 
-    public BooleanFormat(String trueValue, String falseValue) {
+    public BooleanFormat(final String trueValue, final String falseValue) {
         this(trueValue, falseValue, "?");
     }
 
-    public BooleanFormat(String trueValue, String falseValue, String nullValue) {
+    public BooleanFormat(final String trueValue, final String falseValue, final String nullValue) {
         super();
         myTrueValue = trueValue;
         myFalseValue = falseValue;

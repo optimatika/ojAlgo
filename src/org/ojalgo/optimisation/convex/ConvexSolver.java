@@ -890,7 +890,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return true;
     }
 
-    void supplySlackI(PhysicalStore<Double> slack) {
+    void supplySlackI(final PhysicalStore<Double> slack) {
 
         final RowsSupplier<Double> mtrxAI = myMatrices.getAI();
         final MatrixStore<Double> mtrxBI = this.getMatrixBI();

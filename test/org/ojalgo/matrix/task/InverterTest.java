@@ -78,7 +78,7 @@ public class InverterTest extends MatrixTaskTests {
         this.doCompare(AbstractInverter.SYMMETRIC_5X5, 5);
     }
 
-    private void doCompare(InverterTask<Double> fixed, int dimension) {
+    private void doCompare(final InverterTask<Double> fixed, final int dimension) {
 
         try {
 

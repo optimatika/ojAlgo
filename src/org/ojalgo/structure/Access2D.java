@@ -570,12 +570,12 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         };
     }
 
-    default byte byteValue(long index) {
+    default byte byteValue(final long index) {
         final long structure = this.countRows();
         return this.byteValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
     }
 
-    default byte byteValue(long row, long col) {
+    default byte byteValue(final long row, final long col) {
         return (byte) this.shortValue(row, col);
     }
 
@@ -601,12 +601,12 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         return new Access2D.ElementView<>(Access1D.super.elements(), this.countRows());
     }
 
-    default float floatValue(long index) {
+    default float floatValue(final long index) {
         final long structure = this.countRows();
         return this.floatValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
     }
 
-    default float floatValue(long row, long col) {
+    default float floatValue(final long row, final long col) {
         return (float) this.doubleValue(row, col);
     }
 
@@ -617,21 +617,21 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     N get(long row, long col);
 
-    default int intValue(long index) {
+    default int intValue(final long index) {
         final long structure = this.countRows();
         return this.intValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
     }
 
-    default int intValue(long row, long col) {
+    default int intValue(final long row, final long col) {
         return (int) this.longValue(row, col);
     }
 
-    default long longValue(long index) {
+    default long longValue(final long index) {
         final long structure = this.countRows();
         return this.longValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
     }
 
-    default long longValue(long row, long col) {
+    default long longValue(final long row, final long col) {
         return Math.round(this.doubleValue(row, col));
     }
 
@@ -639,12 +639,12 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         return new RowView<>(this);
     }
 
-    default short shortValue(long index) {
+    default short shortValue(final long index) {
         final long structure = this.countRows();
         return this.shortValue(Structure2D.row(index, structure), Structure2D.column(index, structure));
     }
 
-    default short shortValue(long row, long col) {
+    default short shortValue(final long row, final long col) {
         return (short) this.intValue(row, col);
     }
 

@@ -27,18 +27,18 @@ final class UnaryOperatoStore<N extends Number> extends LogicalStore<N> {
 
     private final UnaryFunction<N> myOperator;
 
-    UnaryOperatoStore(MatrixStore<N> base, UnaryFunction<N> operator) {
+    UnaryOperatoStore(final MatrixStore<N> base, final UnaryFunction<N> operator) {
 
         super(base, (int) base.countRows(), (int) base.countColumns());
 
         myOperator = operator;
     }
 
-    public double doubleValue(long row, long col) {
+    public double doubleValue(final long row, final long col) {
         return myOperator.invoke(this.getBase().doubleValue(row, col));
     }
 
-    public N get(long row, long col) {
+    public N get(final long row, final long col) {
         return myOperator.invoke(this.getBase().get(row, col));
     }
 
