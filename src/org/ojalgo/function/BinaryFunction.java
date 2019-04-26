@@ -175,6 +175,15 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
     }
 
     /**
+     * To allow syntax like <code>array.modifyAll(DIVIDE.by(3.0));</code>
+     *
+     * @see #second(double)
+     */
+    default UnaryFunction<N> by(final N arg2) {
+        return this.second(arg2);
+    }
+
+    /**
      * @see #first(Number)
      */
     default UnaryFunction<N> first(final double arg1) {
