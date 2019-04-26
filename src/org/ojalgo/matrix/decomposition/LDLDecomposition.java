@@ -115,27 +115,26 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     @Override
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
-        int tmpRowDim = this.getRowDim();
-        int[] tmpOrder = myPivot.getOrder();
-        boolean tmpModified = myPivot.isModified();
+        int[] order = myPivot.getOrder();
+        boolean modified = myPivot.isModified();
 
-        if (tmpModified) {
+        if (modified) {
             preallocated.fillAll(this.scalar().zero().get());
-            for (int i = 0; i < tmpRowDim; i++) {
-                preallocated.set(i, tmpOrder[i], PrimitiveMath.ONE);
+            for (int i = 0; i < order.length; i++) {
+                preallocated.set(i, order[i], PrimitiveMath.ONE);
             }
         }
 
-        DecompositionStore<N> tmpBody = this.getInPlace();
+        DecompositionStore<N> body = this.getInPlace();
 
-        preallocated.substituteForwards(tmpBody, true, false, !tmpModified);
+        preallocated.substituteForwards(body, true, false, !modified);
 
-        BinaryFunction<N> tmpDivide = this.function().divide();
-        for (int i = 0; i < tmpRowDim; i++) {
-            preallocated.modifyRow(i, 0, tmpDivide.second(tmpBody.doubleValue(i, i)));
+        BinaryFunction<N> divide = this.function().divide();
+        for (int i = 0; i < order.length; i++) {
+            preallocated.modifyRow(i, 0, divide.by(body.doubleValue(i, i)));
         }
 
-        preallocated.substituteBackwards(tmpBody, true, true, false);
+        preallocated.substituteBackwards(body, true, true, false);
 
         return preallocated.logical().row(myPivot.getInverseOrder()).get();
     }
@@ -179,25 +178,22 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     @Override
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
-        int tmpRowDim = this.getRowDim();
-        int[] tmpOrder = myPivot.getOrder();
-        int[] tmpInvertedOrder = myPivot.getInverseOrder();
+        int[] order = myPivot.getOrder();
 
-        //        preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), tmpOrder));
-        preallocated.fillMatching(this.collect(rhs).logical().row(tmpOrder).get());
+        preallocated.fillMatching(this.collect(rhs).logical().row(order).get());
 
-        DecompositionStore<N> tmpBody = this.getInPlace();
+        DecompositionStore<N> body = this.getInPlace();
 
-        preallocated.substituteForwards(tmpBody, true, false, false);
+        preallocated.substituteForwards(body, true, false, false);
 
-        BinaryFunction<N> tmpDivide = this.function().divide();
-        for (int i = 0; i < tmpRowDim; i++) {
-            preallocated.modifyRow(i, 0, tmpDivide.second(tmpBody.doubleValue(i, i)));
+        BinaryFunction<N> divide = this.function().divide();
+        for (int i = 0; i < order.length; i++) {
+            preallocated.modifyRow(i, divide.by(body.get(i, i)));
         }
 
-        preallocated.substituteBackwards(tmpBody, true, true, false);
+        preallocated.substituteBackwards(body, true, true, false);
 
-        return preallocated.logical().row(tmpInvertedOrder).get();
+        return preallocated.logical().row(myPivot.getInverseOrder()).get();
     }
 
     public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
