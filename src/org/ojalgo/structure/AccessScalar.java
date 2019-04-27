@@ -47,14 +47,6 @@ public interface AccessScalar<N extends Number> {
     N get();
 
     /**
-     * @deprecated v45 Use {@link #get()} instead
-     */
-    @Deprecated
-    default N getNumber() {
-        return this.get();
-    }
-
-    /**
      * @see Number#intValue()
      */
     default int intValue() {
