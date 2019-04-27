@@ -23,7 +23,6 @@ package org.ojalgo.matrix.store;
 
 import java.util.concurrent.Future;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.concurrent.DaemonPoolExecutor;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -39,23 +38,11 @@ abstract class LogicalStore<N extends Number> extends AbstractStore<N> {
     private final Scalar<N> myOne;
     private final Scalar<N> myZero;
 
-    @SuppressWarnings("unused")
-    private LogicalStore(final int rowsCount, final int columnsCount) {
-
-        this(null, rowsCount, columnsCount);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
     protected LogicalStore(final MatrixStore<N> base, final int rowsCount, final int columnsCount) {
 
         super(rowsCount, columnsCount);
 
         myBase = base;
-
-        if (myBase == null) {
-            throw new IllegalArgumentException(this.getClass().getName() + " cannot have a null 'base'!");
-        }
 
         myZero = base.physical().scalar().zero();
         myOne = base.physical().scalar().one();

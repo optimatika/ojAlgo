@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.scalar.Scalar;
 
 abstract class FactoryStore<N extends Number> extends AbstractStore<N> {
@@ -29,14 +28,6 @@ abstract class FactoryStore<N extends Number> extends AbstractStore<N> {
     private final PhysicalStore.Factory<N, ?> myFactory;
     private final Scalar<N> myOne;
     private final Scalar<N> myZero;
-
-    @SuppressWarnings("unused")
-    private FactoryStore(final int rowsCount, final int columnsCount) {
-
-        this(null, rowsCount, columnsCount);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
 
     protected FactoryStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
 
