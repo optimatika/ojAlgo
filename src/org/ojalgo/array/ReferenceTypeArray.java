@@ -115,7 +115,7 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
 
     public final N[] data;
 
-    ReferenceTypeArray(DenseArray.Factory<N> factory, final int length) {
+    ReferenceTypeArray(final DenseArray.Factory<N> factory, final int length) {
 
         super(factory, length);
 
@@ -124,7 +124,7 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
         this.fill(0, length, 1, this.factory().scalar().zero().get());
     }
 
-    ReferenceTypeArray(DenseArray.Factory<N> factory, final N[] data) {
+    ReferenceTypeArray(final DenseArray.Factory<N> factory, final N[] data) {
 
         super(factory, data.length);
 

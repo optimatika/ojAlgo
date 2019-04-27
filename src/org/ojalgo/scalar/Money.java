@@ -119,7 +119,7 @@ public final class Money extends ExactDecimal<Money> {
     }
 
     @Override
-    protected Money wrap(long numerator) {
+    protected Money wrap(final long numerator) {
         return new Money(numerator);
     }
 

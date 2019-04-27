@@ -36,11 +36,11 @@ import org.ojalgo.structure.Mutate1D;
  */
 public abstract class ScalarArray<N extends Number & Scalar<N>> extends ReferenceTypeArray<N> {
 
-    protected ScalarArray(DenseArray.Factory<N> factory, final int length) {
+    protected ScalarArray(final DenseArray.Factory<N> factory, final int length) {
         super(factory, length);
     }
 
-    protected ScalarArray(DenseArray.Factory<N> factory, final N[] data) {
+    protected ScalarArray(final DenseArray.Factory<N> factory, final N[] data) {
         super(factory, data);
     }
 

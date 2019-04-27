@@ -169,13 +169,13 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
-        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countRows());
-        return this.getSolution(rhs, tmpPreallocated);
+        return this.getSolution(rhs, this.allocate(this.getMinDim(), rhs.countColumns()));
     }
 
     @Override
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
-        return this.doGetInverse((PrimitiveDenseStore) preallocated).multiply(this.collect(rhs));
+        preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
+        return preallocated;
     }
 
     public double getTraceNorm() {
@@ -212,7 +212,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public PhysicalStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.allocate(templateBody.countColumns(), templateBody.countRows());
+        return this.allocate(templateBody.countColumns(), templateRHS.countColumns());
     }
 
     @Override
@@ -229,10 +229,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         this.doDecompose(body.asCollectable2D(), true);
 
         if (this.isSolvable()) {
-
-            final MatrixStore<Double> tmpRHS = MatrixStore.PRIMITIVE.makeWrapper(rhs).get();
-            return this.doGetInverse((PrimitiveDenseStore) preallocated).multiply(tmpRHS);
-
+            return this.getSolution(rhs.asCollectable2D(), preallocated);
         } else {
             throw RecoverableCondition.newEquationSystemNotSolvable();
         }
@@ -538,7 +535,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 }
             }
 
-            preallocated.fillByMultiplying(this.getQ2(), tmpMtrx);
+            MatrixStore<Double> mtrxQ2 = this.getQ2();
+            preallocated.fillByMultiplying(mtrxQ2, tmpMtrx);
             myPseudoinverse = preallocated;
         }
 

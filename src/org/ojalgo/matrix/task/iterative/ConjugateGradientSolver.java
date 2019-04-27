@@ -26,7 +26,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -72,7 +71,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         for (int r = 0; r < tmpCountRows; r++) {
             final Equation tmpRow = equations.get(r);
             double tmpVal = tmpRow.getRHS();
-            tmpNormRHS = PrimitiveMath.HYPOT.invoke(tmpNormRHS, tmpVal);
+            tmpNormRHS = HYPOT.invoke(tmpNormRHS, tmpVal);
             tmpVal -= tmpRow.dot(solution);
             tmpResidual.set(tmpRow.index, tmpVal);
             tmpPreconditioned.set(tmpRow.index, tmpVal / tmpRow.getPivot()); // precondition
@@ -116,15 +115,15 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             for (int r = 0; r < tmpCountRows; r++) {
                 final Equation tmpRow = equations.get(r);
                 final double tmpValue = tmpResidual.doubleValue(tmpRow.index);
-                tmpNormErr = PrimitiveMath.HYPOT.invoke(tmpNormErr, tmpValue);
+                tmpNormErr = HYPOT.invoke(tmpNormErr, tmpValue);
                 tmpPreconditioned.set(tmpRow.index, tmpValue / tmpRow.getPivot());
             }
 
             zr1 = tmpPreconditioned.dot(tmpResidual);
             tmpGradientCorrectionFactor = zr1 / zr0;
 
-            tmpDirection.modifyAll(PrimitiveMath.MULTIPLY.second(tmpGradientCorrectionFactor));
-            tmpDirection.modifyMatching(PrimitiveMath.ADD, tmpPreconditioned);
+            tmpDirection.modifyAll(MULTIPLY.second(tmpGradientCorrectionFactor));
+            tmpDirection.modifyMatching(ADD, tmpPreconditioned);
 
             tmpIterations++;
 

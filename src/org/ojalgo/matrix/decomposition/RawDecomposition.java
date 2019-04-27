@@ -106,7 +106,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return myRowDim;
     }
 
-    protected Collectable<Double, ? super PhysicalStore<Double>> wrap(Access2D<?> matrix) {
+    protected Collectable<Double, ? super PhysicalStore<Double>> wrap(final Access2D<?> matrix) {
         return MatrixStore.PRIMITIVE.makeWrapper(matrix);
     }
 

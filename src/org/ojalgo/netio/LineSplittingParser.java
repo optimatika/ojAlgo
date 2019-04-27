@@ -32,18 +32,18 @@ public final class LineSplittingParser implements BasicParser<String[]> {
         this("\\s+", true);
     }
 
-    public LineSplittingParser(String regex) {
+    public LineSplittingParser(final String regex) {
         this(regex, false);
     }
 
-    public LineSplittingParser(String regex, boolean trim) {
+    public LineSplittingParser(final String regex, final boolean trim) {
         super();
         myRegExp = regex;
         myTrim = trim;
     }
 
     @Override
-    public String[] parse(String line) throws RecoverableCondition {
+    public String[] parse(final String line) throws RecoverableCondition {
         return (myTrim ? line.trim() : line).split(myRegExp);
     }
 

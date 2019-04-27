@@ -36,21 +36,13 @@ import org.ojalgo.RecoverableCondition;
 public interface BasicParser<T> {
 
     /**
-     * Parse one line into some custom object.
-     *
-     * @param line The text line to parse
-     * @return An object containing (referencing) the parsed data
-     */
-    T parse(String line) throws RecoverableCondition;
-
-    /**
      * Will parse this file, line by line, passing the reulting objects (1 per line) to the supplied consumer.
      *
      * @param file The CSV file to parse
      * @param skipHeader Should skip (1) header row/line
      * @param consumer The results consumer
      */
-    default void parse(final File file, boolean skipHeader, final Consumer<T> consumer) {
+    default void parse(final File file, final boolean skipHeader, final Consumer<T> consumer) {
 
         if (file.exists() && file.isFile() && file.canRead()) {
 
@@ -91,7 +83,7 @@ public interface BasicParser<T> {
      * @param skipHeader Should skip (1) header row/line
      * @param consumer The results consumer
      */
-    default void parse(final Reader reader, boolean skipHeader, final Consumer<T> consumer) {
+    default void parse(final Reader reader, final boolean skipHeader, final Consumer<T> consumer) {
 
         String tmpLine = null;
         T tmpItem = null;
@@ -121,7 +113,15 @@ public interface BasicParser<T> {
         this.parse(reader, false, consumer);
     }
 
-    default void parse(final String filePath, boolean skipHeader, final Consumer<T> consumer) {
+    /**
+     * Parse one line into some custom object.
+     *
+     * @param line The text line to parse
+     * @return An object containing (referencing) the parsed data
+     */
+    T parse(String line) throws RecoverableCondition;
+
+    default void parse(final String filePath, final boolean skipHeader, final Consumer<T> consumer) {
         this.parse(new File(filePath), skipHeader, consumer);
     }
 

@@ -421,7 +421,6 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 public void invoke(final double anArg) {
                     final double tmpArg = PrimitiveMath.ABS.invoke(anArg);
-                    // if (tmpArg != ZERO) {
                     if (NumberContext.compare(tmpArg, ZERO) != 0) {
                         myValue = PrimitiveMath.MIN.invoke(myValue, tmpArg);
                     }

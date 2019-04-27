@@ -52,7 +52,7 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterable<Matri
         myLastOffset = myDelegateAnyD.count() - myCount;
     }
 
-    public int compareTo(MatrixView<N> other) {
+    public int compareTo(final MatrixView<N> other) {
         return Long.compare(myOffset, other.getOffset());
     }
 
@@ -68,7 +68,7 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterable<Matri
         return myRowsCount;
     }
 
-    public double doubleValue(long row, long col) {
+    public double doubleValue(final long row, final long col) {
         return myDelegateAnyD.doubleValue(myOffset + Structure2D.index(myRowsCount, row, col));
     }
 
@@ -76,7 +76,7 @@ public class MatrixView<N extends Number> implements Access2D<N>, Iterable<Matri
         return (myLastOffset - myOffset) / myCount;
     }
 
-    public N get(long row, long col) {
+    public N get(final long row, final long col) {
         return myDelegateAnyD.get(myOffset + Structure2D.index(myRowsCount, row, col));
     }
 

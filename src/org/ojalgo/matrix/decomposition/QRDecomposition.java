@@ -44,7 +44,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
             this(false);
         }
 
-        Complex(boolean fullSize) {
+        Complex(final boolean fullSize) {
             super(GenericDenseStore.COMPLEX, fullSize);
         }
 
@@ -56,7 +56,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
             this(false);
         }
 
-        Primitive(boolean fullSize) {
+        Primitive(final boolean fullSize) {
             super(PrimitiveDenseStore.FACTORY, fullSize);
         }
 
@@ -68,7 +68,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
             this(false);
         }
 
-        Quat(boolean fullSize) {
+        Quat(final boolean fullSize) {
             super(GenericDenseStore.QUATERNION, fullSize);
         }
 
@@ -80,7 +80,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
             this(false);
         }
 
-        Rational(boolean fullSize) {
+        Rational(final boolean fullSize) {
             super(GenericDenseStore.RATIONAL, fullSize);
         }
 
@@ -89,7 +89,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     private final boolean myFullSize;
     private int myNumberOfHouseholderTransformations = 0;
 
-    protected QRDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, boolean fullSize) {
+    protected QRDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final boolean fullSize) {
         super(factory);
         myFullSize = fullSize;
     }

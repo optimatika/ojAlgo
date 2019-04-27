@@ -4,7 +4,21 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
-* ...
+## org.ojalgo.matrix
+
+* New LU decomposition implementation that is faster for small matrices.
+* Fixed a bug related to solving equation systems and inverting matrices using SingularValue at certain matrix sizes.
+* Renamed checkAndCompute to checkAndDecompose in the MatrixDecomposition.Hermitian interface
+* Extended the MatrixStore.LogicalBuilder rows() and columns() methods to allow for negative indexes that refer to all zero rows/columns.
+* New more efficient implementation of MatrixStore.LogicalBuilder.diagonal() data structure.
+
+## org.ojalgo.netio
+
+* New funcion to generate random strings of ASCII characters, of specified length.
+
+## org.ojalgo.optimisation
+
+* Minor improvements to ConvexSolver
 
 # v47.1.2: 2019-04-23
 

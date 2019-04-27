@@ -164,7 +164,7 @@ public abstract class BasicArray<N extends Number>
         this(null);
     }
 
-    protected BasicArray(ArrayFactory<N, ?> factory) {
+    protected BasicArray(final ArrayFactory<N, ?> factory) {
         super();
         myFactory = factory;
     }
@@ -181,12 +181,12 @@ public abstract class BasicArray<N extends Number>
         this.modify(0L, this.count(), 1L, modifier);
     }
 
-    public void modifyMatching(Access1D<N> left, BinaryFunction<N> function) {
+    public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
         long limit = Math.min(left.count(), this.count());
         this.modify(0L, limit, 1L, left, function);
     }
 
-    public void modifyMatching(BinaryFunction<N> function, Access1D<N> right) {
+    public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
         long limit = Math.min(this.count(), right.count());
         this.modify(0L, limit, 1L, function, right);
     }

@@ -431,19 +431,19 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         this.appendRightPart(builder);
     }
 
-    final BigDecimal getCompensatedLowerLimit(BigDecimal compensation) {
+    final BigDecimal getCompensatedLowerLimit(final BigDecimal compensation) {
         return myLowerLimit != null ? myLowerLimit.subtract(compensation) : null;
     }
 
-    final BigDecimal getCompensatedLowerLimit(BigDecimal compensation, NumberContext precision) {
+    final BigDecimal getCompensatedLowerLimit(final BigDecimal compensation, final NumberContext precision) {
         return myLowerLimit != null ? precision.enforce(myLowerLimit.subtract(compensation)) : null;
     }
 
-    final BigDecimal getCompensatedUpperLimit(BigDecimal compensation) {
+    final BigDecimal getCompensatedUpperLimit(final BigDecimal compensation) {
         return myUpperLimit != null ? myUpperLimit.subtract(compensation) : null;
     }
 
-    final BigDecimal getCompensatedUpperLimit(BigDecimal compensation, NumberContext precision) {
+    final BigDecimal getCompensatedUpperLimit(final BigDecimal compensation, final NumberContext precision) {
         return myUpperLimit != null ? precision.enforce(myUpperLimit.subtract(compensation)) : null;
     }
 
@@ -451,7 +451,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      * @return true if both the lower and upper limits are defined, and the range is defined by lower and
      *         upper.
      */
-    boolean isClosedRange(BigDecimal lower, BigDecimal upper) {
+    boolean isClosedRange(final BigDecimal lower, final BigDecimal upper) {
         return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(lower) == 0) && (myUpperLimit.compareTo(upper) == 0);
     }
 

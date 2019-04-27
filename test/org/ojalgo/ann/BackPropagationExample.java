@@ -44,22 +44,22 @@ abstract class BackPropagationExample extends ANNTest {
             this(1.0);
         }
 
-        Data(double rate) {
+        Data(final double rate) {
             super();
             this.rate = rate;
         }
 
-        Data expected(double... row) {
+        Data expected(final double... row) {
             expected = PrimitiveDenseStore.FACTORY.rows(row);
             return this;
         }
 
-        Data input(double... row) {
+        Data input(final double... row) {
             input = PrimitiveDenseStore.FACTORY.rows(row);
             return this;
         }
 
-        Data target(double... row) {
+        Data target(final double... row) {
             target = PrimitiveDenseStore.FACTORY.rows(row);
             return this;
         }
@@ -108,7 +108,7 @@ abstract class BackPropagationExample extends ANNTest {
         }
     }
 
-    protected void deriveTheHardWay(NetworkBuilder builder, Data triplet, NumberContext precision) {
+    protected void deriveTheHardWay(final NetworkBuilder builder, final Data triplet, final NumberContext precision) {
 
         if (DEBUG) {
             BasicLogger.debug("Weights before training");

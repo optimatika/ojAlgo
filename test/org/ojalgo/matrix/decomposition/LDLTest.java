@@ -85,7 +85,7 @@ public class LDLTest {
         this.doTest(mtrxA, mtrxL, mtrxD);
     }
 
-    private void doTest(MatrixStore<Double> mtrxA, RawStore mtrxL, RawStore mtrxD) {
+    private void doTest(final MatrixStore<Double> mtrxA, final RawStore mtrxL, final RawStore mtrxD) {
 
         MatrixStore<Double> mtrxIdentity = MatrixStore.PRIMITIVE.makeIdentity((int) mtrxA.countRows()).get();
 

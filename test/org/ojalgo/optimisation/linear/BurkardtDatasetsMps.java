@@ -44,7 +44,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
 
     static NumberContext PRECISION = new NumberContext(11, 9);
 
-    static ExpressionsBasedModel doTest(String modelName, String expMinValString, String expMaxValString) {
+    static ExpressionsBasedModel doTest(final String modelName, final String expMinValString, final String expMaxValString) {
         return ModelFileMPS.makeAndAssert("burkardt", modelName, expMinValString, expMaxValString, false, BurkardtDatasetsMps.PRECISION, null);
     }
 

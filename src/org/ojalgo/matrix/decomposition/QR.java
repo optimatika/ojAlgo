@@ -56,11 +56,11 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<QR<N>> {
 
-        default QR<N> make(boolean fullSize) {
+        default QR<N> make(final boolean fullSize) {
             return this.make(TYPICAL, fullSize);
         }
 
-        default QR<N> make(Structure2D typical) {
+        default QR<N> make(final Structure2D typical) {
             return this.make(typical, false);
         }
 

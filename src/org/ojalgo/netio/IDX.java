@@ -39,11 +39,11 @@ import org.ojalgo.structure.Access2D;
  */
 public abstract class IDX {
 
-    public static ArrayAnyD<Double> parse(String filePath) {
+    public static ArrayAnyD<Double> parse(final String filePath) {
         return IDX.parse(filePath, Primitive32Array.FACTORY);
     }
 
-    public static ArrayAnyD<Double> parse(String filePath, DenseArray.Factory<Double> arrayFactory) {
+    public static ArrayAnyD<Double> parse(final String filePath, final DenseArray.Factory<Double> arrayFactory) {
 
         try (DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(filePath))))) {
 
@@ -92,11 +92,11 @@ public abstract class IDX {
         }
     }
 
-    public static void print(Access2D<?> image, BasicLogger.Printer printer) {
+    public static void print(final Access2D<?> image, final BasicLogger.Printer printer) {
         IDX.print(image, printer, true);
     }
 
-    public static void print(Access2D<?> image, BasicLogger.Printer printer, boolean transpose) {
+    public static void print(final Access2D<?> image, final BasicLogger.Printer printer, final boolean transpose) {
 
         double maxValue = 0D;
         for (int i = 0; i < image.count(); i++) {
@@ -106,7 +106,7 @@ public abstract class IDX {
         IDX.print(image, printer, transpose, maxValue);
     }
 
-    public static void print(Access2D<?> image, BasicLogger.Printer printer, boolean transpose, double maxExpectedValue) {
+    public static void print(final Access2D<?> image, final BasicLogger.Printer printer, final boolean transpose, final double maxExpectedValue) {
 
         double oneThird = maxExpectedValue / 3D;
         double twoThirds = (2D * maxExpectedValue) / 3D;
@@ -131,7 +131,7 @@ public abstract class IDX {
         }
     }
 
-    private static void printPixel(double gray, BasicLogger.Printer printer, double oneThird, double twoThirds) {
+    private static void printPixel(final double gray, final BasicLogger.Printer printer, final double oneThird, final double twoThirds) {
         if (gray < oneThird) {
             printer.print(" ");
         } else if (gray < twoThirds) {

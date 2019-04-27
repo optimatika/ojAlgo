@@ -126,7 +126,7 @@ public abstract class BenchmarkContestant<T> {
     static {
     }
 
-    public static MatrixDecomposition.Solver<Double> newSolver(Structure2D template) {
+    public static MatrixDecomposition.Solver<Double> newSolver(final Structure2D template) {
         return LU.PRIMITIVE.make(template);
     }
 

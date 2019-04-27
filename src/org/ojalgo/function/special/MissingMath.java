@@ -38,7 +38,7 @@ public abstract class MissingMath {
         return Math.log((1.0 + arg) / (1.0 - arg)) / 2.0;
     }
 
-    public static BigDecimal divide(BigDecimal numerator, BigDecimal denominator) {
+    public static BigDecimal divide(final BigDecimal numerator, final BigDecimal denominator) {
         return numerator.divide(denominator, MathContext.DECIMAL128);
     }
 
@@ -92,7 +92,7 @@ public abstract class MissingMath {
         return MissingMath.root(prod1.add(prod2), 2);
     }
 
-    public static double hypot(double arg1, double arg2) {
+    public static double hypot(final double arg1, final double arg2) {
 
         if (Double.isNaN(arg1) || Double.isNaN(arg2)) {
             return Double.NaN;
@@ -120,7 +120,7 @@ public abstract class MissingMath {
         return Math.log(1.0 / (1.0 - arg));
     }
 
-    public static BigDecimal pow(BigDecimal arg1, BigDecimal arg2) {
+    public static BigDecimal pow(final BigDecimal arg1, final BigDecimal arg2) {
         if (arg2.signum() == 0) {
             return BigDecimal.ONE;
         } else if (arg1.signum() == 0) {
@@ -150,7 +150,7 @@ public abstract class MissingMath {
         }
     }
 
-    public static double power(double arg, int param) {
+    public static double power(final double arg, int param) {
 
         if (param < 0) {
 
@@ -199,7 +199,7 @@ public abstract class MissingMath {
         }
     }
 
-    public static double root(double arg, int param) {
+    public static double root(final double arg, final int param) {
         if (param != 0) {
             return Math.pow(arg, 1.0 / param);
         } else {
@@ -207,7 +207,7 @@ public abstract class MissingMath {
         }
     }
 
-    public static double scale(double arg, int param) {
+    public static double scale(final double arg, int param) {
 
         if (param == 0) {
 
@@ -235,7 +235,7 @@ public abstract class MissingMath {
         }
     }
 
-    public static BigDecimal signum(BigDecimal arg) {
+    public static BigDecimal signum(final BigDecimal arg) {
         switch (arg.signum()) {
         case 1:
             return BigDecimal.ONE;
@@ -246,7 +246,7 @@ public abstract class MissingMath {
         }
     }
 
-    public static double sqrt1px2(double arg) {
+    public static double sqrt1px2(final double arg) {
         return Math.sqrt(1.0 + (arg * arg));
     }
 

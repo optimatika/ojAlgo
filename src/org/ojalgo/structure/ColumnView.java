@@ -39,7 +39,7 @@ public class ColumnView<N extends Number>
     private final Access2D<N> myDelegate2D;
     private final long myLastColumn;
 
-    private ColumnView(final Access2D<N> access, final long column, long lastColumn) {
+    private ColumnView(final Access2D<N> access, final long column, final long lastColumn) {
 
         super();
 
@@ -65,7 +65,7 @@ public class ColumnView<N extends Number>
         return myColumn;
     }
 
-    public int compareTo(ColumnView<N> other) {
+    public int compareTo(final ColumnView<N> other) {
         return Long.compare(myColumn, other.column());
     }
 
@@ -81,7 +81,7 @@ public class ColumnView<N extends Number>
         return myLastColumn - myColumn;
     }
 
-    public void forEachRemaining(Consumer<? super ColumnView<N>> action) {
+    public void forEachRemaining(final Consumer<? super ColumnView<N>> action) {
         Iterator.super.forEachRemaining(action);
     }
 
@@ -124,7 +124,7 @@ public class ColumnView<N extends Number>
         return Access1D.toString(this);
     }
 
-    public boolean tryAdvance(Consumer<? super ColumnView<N>> action) {
+    public boolean tryAdvance(final Consumer<? super ColumnView<N>> action) {
         if (this.hasNext()) {
             action.accept(this.next());
             return true;

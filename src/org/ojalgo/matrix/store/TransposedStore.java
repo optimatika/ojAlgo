@@ -30,7 +30,7 @@ final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
     }
 
     public N get(final long aRow, final long aCol) {
-        return this.getBase().get(aCol, aRow);
+        return this.base().get(aCol, aRow);
     }
 
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
@@ -39,7 +39,7 @@ final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
 
         if (right instanceof TransposedStore<?>) {
 
-            retVal = ((TransposedStore<N>) right).getOriginal().multiply(this.getBase());
+            retVal = ((TransposedStore<N>) right).getOriginal().multiply(this.base());
 
             retVal = new TransposedStore<>(retVal);
 
@@ -53,16 +53,16 @@ final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
 
     @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
-        this.getBase().supplyTo(receiver.regionByTransposing());
+        this.base().supplyTo(receiver.regionByTransposing());
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
-        return this.getBase().toScalar(column, row);
+        return this.base().toScalar(column, row);
     }
 
     @Override
     public MatrixStore<N> transpose() {
-        return this.getBase();
+        return this.base();
     }
 
 }

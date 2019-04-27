@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
@@ -122,15 +121,27 @@ public interface MatrixDecomposition<N extends Number> {
          * paths can be chosen - compute or not / choose different algorithms...
          *
          * @param matrix A matrix to check and then (maybe) decompose
-         * @return true if the hermitian check passed and computation suceeded; false if not
+         * @return true if the hermitian check passed and decomposition suceeded; false if not
+         * @deprecated v48 Use {@link #checkAndDecompose(MatrixStore<N>)} instead
          */
-        @SuppressWarnings("unchecked")
+        @Deprecated
         default boolean checkAndCompute(final MatrixStore<N> matrix) {
+            return this.checkAndDecompose(matrix);
+        }
+
+        /**
+         * Absolutely must check if the matrix is hermitian or not. Then, depending on the result differents
+         * paths can be chosen - compute or not / choose different algorithms...
+         *
+         * @param matrix A matrix to check and then (maybe) decompose
+         * @return true if the hermitian check passed and decomposition suceeded; false if not
+         */
+        default boolean checkAndDecompose(final MatrixStore<N> matrix) {
 
             this.reset();
 
-            if (MatrixUtils.isHermitian(matrix)) {
-                return this instanceof Solver<?> ? ((Solver<N>) this).compute(matrix) : this.decompose(matrix);
+            if (matrix.isHermitian()) {
+                return this.decompose(matrix);
             } else {
                 return false;
             }
@@ -181,7 +192,7 @@ public interface MatrixDecomposition<N extends Number> {
          * faster. Implementing this method, to actually decompose without pivoting, is optional. The default
          * implementation simply calls {@link #decompose(Access2D.Collectable)}.
          */
-        default boolean decomposeWithoutPivoting(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+        default boolean decomposeWithoutPivoting(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
             return this.decompose(matrix);
         }
 

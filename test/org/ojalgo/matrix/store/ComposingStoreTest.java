@@ -45,15 +45,15 @@ public class ComposingStoreTest {
         }
     }
 
-    private MatrixStore<Double> blockMatrix(MatrixStore<Double> upperLeft, MatrixStore<Double> lowerRight) {
+    private MatrixStore<Double> blockMatrix(final MatrixStore<Double> upperLeft, final MatrixStore<Double> lowerRight) {
         return upperLeft.logical().right((int) lowerRight.countColumns()).below(lowerRight.logical().left((int) upperLeft.countColumns()).get()).get();
     }
 
-    private MatrixStore<Double> filledMatrix(int rowCount, int colCount) {
+    private MatrixStore<Double> filledMatrix(final int rowCount, final int colCount) {
         return this.filledMatrix(rowCount, colCount, 1d);
     }
 
-    private MatrixStore<Double> filledMatrix(int rowCount, int colCount, double value) {
+    private MatrixStore<Double> filledMatrix(final int rowCount, final int colCount, final double value) {
         PhysicalStore.Factory<Double, PrimitiveDenseStore> storeFactory = PrimitiveDenseStore.FACTORY;
         return storeFactory.makeFilled(rowCount, colCount, new NullaryFunction<Double>() {
 
@@ -68,11 +68,11 @@ public class ComposingStoreTest {
         });
     }
 
-    private MatrixStore<Double> sparseMatrix(int rowCount, int colCount) {
+    private MatrixStore<Double> sparseMatrix(final int rowCount, final int colCount) {
         return this.sparseMatrix(rowCount, colCount, (int) Math.floor(Math.random() * rowCount * colCount * .075d));
     }
 
-    private MatrixStore<Double> sparseMatrix(int rowCount, int colCount, int nonzeroCount) {
+    private MatrixStore<Double> sparseMatrix(final int rowCount, final int colCount, final int nonzeroCount) {
         SparseStore<Double> matrix = SparseStore.makePrimitive(rowCount, colCount);
         for (int i = 0; i < nonzeroCount; i++) {
             int row = (int) Math.floor(Math.random() * rowCount);

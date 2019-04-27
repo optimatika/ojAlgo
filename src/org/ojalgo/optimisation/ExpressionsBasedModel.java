@@ -958,8 +958,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         boolean retVal = false;
 
-        for (final Expression value : myExpressions.values()) {
-            retVal |= (value.isAnyQuadraticFactorNonZero() && value.isConstraint() && !value.isRedundant());
+        for (Expression expr : myExpressions.values()) {
+            retVal |= (!expr.isRedundant() && expr.isConstraint() && expr.isAnyQuadraticFactorNonZero());
         }
 
         return retVal;
@@ -975,8 +975,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         boolean retVal = false;
 
-        for (final Expression value : myExpressions.values()) {
-            retVal |= value.isAnyQuadraticFactorNonZero() && (value.isConstraint() || value.isObjective());
+        for (Expression expr : myExpressions.values()) {
+            retVal |= (!expr.isRedundant() && expr.isAnyQuadraticFactorNonZero());
         }
 
         return retVal;
@@ -986,8 +986,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         boolean retVal = false;
 
-        for (final Expression value : myExpressions.values()) {
-            retVal |= (value.isAnyQuadraticFactorNonZero() && value.isObjective());
+        for (Expression expr : myExpressions.values()) {
+            retVal |= (!expr.isRedundant() && expr.isObjective() && expr.isAnyQuadraticFactorNonZero());
         }
 
         return retVal;
@@ -1343,7 +1343,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         }
     }
 
-    void addReference(IntIndex index) {
+    void addReference(final IntIndex index) {
         myReferences.add(index);
     }
 
@@ -1413,7 +1413,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         return false;
     }
 
-    boolean isReferenced(Variable variable) {
+    boolean isReferenced(final Variable variable) {
         return myReferences.contains(variable.getIndex());
     }
 

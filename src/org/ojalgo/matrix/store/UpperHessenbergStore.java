@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
@@ -33,23 +32,15 @@ import org.ojalgo.scalar.Scalar;
  */
 final class UpperHessenbergStore<N extends Number> extends ShadingStore<N> {
 
-    @SuppressWarnings("unused")
-    private UpperHessenbergStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
-
-        this(base);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
     UpperHessenbergStore(final MatrixStore<N> base) {
-        super(base, (int) Math.min(base.countRows(), base.countColumns()), (int) base.countColumns());
+        super(base, Math.min(base.countRows(), base.countColumns()), base.countColumns());
     }
 
     public double doubleValue(final long row, final long col) {
         if (row > (col + 1)) {
             return PrimitiveMath.ZERO;
         } else {
-            return this.getBase().doubleValue(row, col);
+            return this.base().doubleValue(row, col);
         }
     }
 
@@ -63,9 +54,9 @@ final class UpperHessenbergStore<N extends Number> extends ShadingStore<N> {
 
     public N get(final long row, final long col) {
         if (row > (col + 1)) {
-            return this.physical().scalar().zero().get();
+            return this.zero().get();
         } else {
-            return this.getBase().get(row, col);
+            return this.base().get(row, col);
         }
     }
 
@@ -76,9 +67,9 @@ final class UpperHessenbergStore<N extends Number> extends ShadingStore<N> {
 
     public Scalar<N> toScalar(final long row, final long col) {
         if (row > (col + 1)) {
-            return this.physical().scalar().zero();
+            return this.zero();
         } else {
-            return this.getBase().toScalar(row, col);
+            return this.base().toScalar(row, col);
         }
     }
 

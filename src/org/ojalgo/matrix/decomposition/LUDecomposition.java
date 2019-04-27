@@ -74,7 +74,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     }
 
-    private Pivot myPivot;
+    private final Pivot myPivot = new Pivot();
 
     protected LUDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
@@ -89,7 +89,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.doDecompose(matrix, true);
     }
 
-    public boolean decomposeWithoutPivoting(Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decomposeWithoutPivoting(final Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, false);
     }
 
@@ -232,14 +232,6 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.allocate(templateRHS.countRows(), templateRHS.countColumns());
     }
 
-    @Override
-    public void reset() {
-
-        super.reset();
-
-        myPivot = null;
-    }
-
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
 
         this.decompose(this.wrap(body));
@@ -272,7 +264,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         this.getColDim();
         final int tmpMinDim = this.getMinDim();
 
-        myPivot = new Pivot(tmpRowDim);
+        myPivot.reset(tmpRowDim);
 
         final BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
 

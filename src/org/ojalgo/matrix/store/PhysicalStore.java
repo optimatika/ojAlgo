@@ -112,7 +112,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      */
     List<N> asList();
 
-    default void modifyAny(Transformation2D<N> modifier) {
+    default void modifyAny(final Transformation2D<N> modifier) {
         modifier.transform(this);
     }
 
