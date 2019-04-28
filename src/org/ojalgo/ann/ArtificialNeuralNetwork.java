@@ -31,6 +31,7 @@ import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.structure.Access1D;
@@ -118,7 +119,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
 
         public double invoke(final Access1D<?> target, final Access1D<?> current) {
-            int limit = (int) Math.min(target.count(), current.count());
+            int limit = MissingMath.toMinIntExact(target.count(), current.count());
             double retVal = ZERO;
             for (int i = 0; i < limit; i++) {
                 retVal += myFunction.invoke(target.doubleValue(i), current.doubleValue(i));

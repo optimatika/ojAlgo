@@ -250,4 +250,8 @@ public abstract class MissingMath {
         return Math.sqrt(1.0 + (arg * arg));
     }
 
+    public static int toMinIntExact(final long a, final long b) {
+        return Math.toIntExact(Math.min(a, b));
+    }
+
 }
