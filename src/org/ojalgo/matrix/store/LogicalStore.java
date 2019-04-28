@@ -34,7 +34,7 @@ import org.ojalgo.structure.Access1D;
  */
 abstract class LogicalStore<N extends Number> extends AbstractStore<N> {
 
-    private MatrixStore<N> myBase;
+    private final MatrixStore<N> myBase;
     private final Scalar<N> myOne;
     private final Scalar<N> myZero;
 
