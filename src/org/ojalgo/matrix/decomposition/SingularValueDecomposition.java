@@ -358,6 +358,16 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return this.compute(matrix, true, false);
     }
 
+    public int countSignificant(final double threshold) {
+        int significant = 0;
+        for (int i = 0; i < s.length; i++) {
+            if (s[i] >= threshold) {
+                significant++;
+            }
+        }
+        return significant;
+    }
+
     public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.compute(matrix, false, this.isFullSize());
     }
@@ -467,15 +477,8 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return myQ2;
     }
 
-    public int getRank() {
-        final double tolerance = s[0] * this.getDimensionalEpsilon();
-        int rank = 0;
-        for (int i = 0; i < s.length; i++) {
-            if (s[i] > tolerance) {
-                rank++;
-            }
-        }
-        return rank;
+    public double getRankThreshold() {
+        return Math.max(MACHINE_SMALLEST, s[0]) * this.getDimensionalEpsilon();
     }
 
     public Array1D<Double> getSingularValues() {
@@ -523,7 +526,8 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     public boolean isFullRank() {
-        return this.getRank() == myBidiagonal.getMinDim();
+        double tolerance = s[0] * this.getDimensionalEpsilon();
+        return s[s.length - 1] > tolerance;
     }
 
     public boolean isFullSize() {
@@ -612,7 +616,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     @Override
     protected boolean checkSolvability() {
-        return this.isComputed();
+        return true;
     }
 
     protected boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
@@ -692,8 +696,13 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     @Override
-    protected double getDimensionalEpsilon() {
-        return myBidiagonal.getMaxDim() * MACHINE_EPSILON;
+    protected int getColDim() {
+        return myTransposed ? myBidiagonal.getRowDim() : myBidiagonal.getColDim();
+    }
+
+    @Override
+    protected int getRowDim() {
+        return myTransposed ? myBidiagonal.getColDim() : myBidiagonal.getRowDim();
     }
 
     protected boolean isTransposed() {

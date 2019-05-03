@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.function.special.MissingMath;
+
 /**
  * <p>
  * LDU: [A] = [L][D][U] ( [P<sub>L</sub>][L][D][U][P<sub>U</sub>] )
@@ -65,6 +67,10 @@ package org.ojalgo.matrix.decomposition;
  */
 public interface LDU<N extends Number>
         extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.RankRevealing<N> {
+
+    default boolean isFullRank() {
+        return this.getRank() == MissingMath.toMinIntExact(this.countRows(), this.countColumns());
+    }
 
     default boolean isOrdered() {
         return false;

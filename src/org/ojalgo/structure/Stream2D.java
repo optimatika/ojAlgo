@@ -27,13 +27,17 @@ public interface Stream2D<N extends Number, A extends Access2D<N>, R extends Mut
         return this.operateOnAll(operator.parameter(parameter));
     }
 
-    P operateOnAll(final UnaryFunction<N> operator);
+    P operateOnAll(UnaryFunction<N> operator);
 
-    P operateOnAny(final Transformation2D<N> operator);
+    P operateOnAny(Transformation2D<N> operator);
 
-    P operateOnMatching(final A left, final BinaryFunction<N> operator);
+    P operateOnColumns(BinaryFunction<N> operator, Access1D<N> right);
 
-    P operateOnMatching(final BinaryFunction<N> operator, final A right);
+    P operateOnMatching(A left, BinaryFunction<N> operator);
+
+    P operateOnMatching(BinaryFunction<N> operator, A right);
+
+    P operateOnRows(BinaryFunction<N> operator, Access1D<N> right);
 
     P transpose();
 

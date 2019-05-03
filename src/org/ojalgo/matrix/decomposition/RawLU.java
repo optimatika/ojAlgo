@@ -59,6 +59,20 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.getDeterminant();
     }
 
+    public int countSignificant(final double threshold) {
+
+        RawStore internal = this.getInternalStore();
+
+        int significant = 0;
+        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+            if (Math.abs(internal.doubleValue(ij, ij)) >= threshold) {
+                significant++;
+            }
+        }
+
+        return significant;
+    }
+
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
         final double[][] data = this.reset(matrix, false);
@@ -108,21 +122,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return myPivot.getOrder();
     }
 
-    public int getRank() {
+    public double getRankThreshold() {
 
-        int retVal = 0;
+        double largest = this.getInternalStore().aggregateDiagonal(Aggregator.LARGEST);
+        double epsilon = this.getDimensionalEpsilon();
 
-        final RawStore internalStore = this.getInternalStore();
-
-        double largestValue = internalStore.aggregateDiagonal(Aggregator.LARGEST);
-
-        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (!internalStore.isSmall(ij, ij, largestValue)) {
-                retVal++;
-            }
-        }
-
-        return retVal;
+        return epsilon * Math.max(MACHINE_SMALLEST, largest);
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
@@ -292,7 +297,8 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        return (this.getRowDim() == this.getColDim()) && this.isFullRank();
+        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
+        return (this.getRowDim() == this.getColDim()) && (this.getColDim() == this.countSignificant(threshold));
     }
 
 }

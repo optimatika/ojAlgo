@@ -76,6 +76,18 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return this.getDeterminant();
     }
 
+    public int countSignificant(final double threshold) {
+
+        int significant = 0;
+        for (int ij = 0, limit = myDiagonalR.length; ij < limit; ij++) {
+            if (Math.abs(myDiagonalR[ij]) >= threshold) {
+                significant++;
+            }
+        }
+
+        return significant;
+    }
+
     /**
      * QR Decomposition, computed by Householder reflections. Structure to access R and the Householder
      * vectors and compute Q.
@@ -177,24 +189,16 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return retVal;
     }
 
-    public int getRank() {
+    public double getRankThreshold() {
 
-        int retVal = 0;
-
-        final MatrixStore<Double> tmpR = this.getR();
-        final int tmpMinDim = (int) Math.min(tmpR.countRows(), tmpR.countColumns());
-
-        final AggregatorFunction<Double> tmpLargest = PrimitiveAggregator.LARGEST.get();
-        tmpR.visitDiagonal(0L, 0L, tmpLargest);
-        final double tmpLargestValue = tmpLargest.doubleValue();
-
-        for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpR.isSmall(ij, ij, tmpLargestValue)) {
-                retVal++;
-            }
+        double largest = MACHINE_SMALLEST;
+        for (int ij = 0, limit = myDiagonalR.length; ij < limit; ij++) {
+            largest = Math.max(largest, Math.abs(myDiagonalR[ij]));
         }
 
-        return retVal;
+        double epsilon = this.getDimensionalEpsilon();
+
+        return largest * epsilon;
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
@@ -224,23 +228,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         } else {
             throw RecoverableCondition.newMatrixNotInvertible();
         }
-    }
-
-    /**
-     * Is the matrix full rank?
-     *
-     * @return true if R, and hence A, has full rank.
-     */
-    public boolean isFullRank() {
-
-        final int n = this.getColDim();
-
-        for (int j = 0; j < n; j++) {
-            if (myDiagonalR[j] == 0) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public boolean isFullSize() {
@@ -390,7 +377,8 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        return this.isFullRank();
+        double threshold = Math.min(this.getRankThreshold(), this.getDimensionalEpsilon());
+        return this.getColDim() == this.countSignificant(threshold);
     }
 
 }

@@ -112,6 +112,17 @@ public abstract class MissingMath {
         return retVal;
     }
 
+    /**
+     * For very small arguments (regardless of sign) the replacement is returned instead
+     */
+    public static double log10(final double arg, final double replacement) {
+        if (Math.abs(arg) < Double.MIN_NORMAL) {
+            return replacement;
+        } else {
+            return Math.log10(arg);
+        }
+    }
+
     public static double logistic(final double arg) {
         return 1.0 / (1.0 + Math.exp(-arg));
     }
@@ -205,6 +216,10 @@ public abstract class MissingMath {
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    public static int roundToInt(final double value) {
+        return Math.toIntExact(Math.round(value));
     }
 
     public static double scale(final double arg, int param) {

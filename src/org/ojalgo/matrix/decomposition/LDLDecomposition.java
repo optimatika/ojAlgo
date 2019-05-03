@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.GenericDenseStore;
@@ -34,7 +35,6 @@ import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -85,6 +85,20 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
+    }
+
+    public int countSignificant(final double threshold) {
+
+        DecompositionStore<N> internal = this.getInPlace();
+
+        int significant = 0;
+        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+            if (Math.abs(internal.doubleValue(ij, ij)) >= threshold) {
+                significant++;
+            }
+        }
+
+        return significant;
     }
 
     public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
@@ -150,25 +164,12 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return myPivot.getOrder();
     }
 
-    public int getRank() {
+    public double getRankThreshold() {
 
-        int retVal = 0;
+        N largest = this.getInPlace().aggregateDiagonal(Aggregator.LARGEST);
+        double epsilon = this.getDimensionalEpsilon();
 
-        DecompositionStore<N> tmpInPlace = this.getInPlace();
-
-        AggregatorFunction<N> tmpLargest = this.aggregator().largest();
-        tmpInPlace.visitDiagonal(0L, 0L, tmpLargest);
-        double tmpLargestValue = tmpLargest.doubleValue();
-
-        int tmpMinDim = this.getMinDim();
-
-        for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpInPlace.isSmall(ij, ij, tmpLargestValue)) {
-                retVal++;
-            }
-        }
-
-        return retVal;
+        return epsilon * Math.max(MACHINE_SMALLEST, largest.doubleValue());
     }
 
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
@@ -216,14 +217,6 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         } else {
             throw RecoverableCondition.newMatrixNotInvertible();
         }
-    }
-
-    public boolean isFullRank() {
-
-        int tmpFirst = 0;
-        int tmpLast = this.getColDim() - 1;
-
-        return PrimitiveScalar.isSmall(this.getInPlace().doubleValue(tmpFirst, tmpFirst), this.getInPlace().doubleValue(tmpLast, tmpLast));
     }
 
     public boolean isPivoted() {
@@ -308,16 +301,8 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
     @Override
     protected boolean checkSolvability() {
-
-        boolean retVal = this.getRowDim() == this.getColDim();
-
-        int first = 0;
-        int last = this.getColDim() - 1;
-
-        double largest = this.getInPlace().doubleValue(first, first);
-        double smallest = this.getInPlace().doubleValue(last, last);
-
-        return retVal && !PrimitiveScalar.isSmall(largest, smallest);
+        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
+        return (this.getRowDim() == this.getColDim()) && (this.getColDim() == this.countSignificant(threshold));
     }
 
 }

@@ -86,6 +86,16 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.doDecompose(matrix, false);
     }
 
+    public int countSignificant(final double threshold) {
+        int significant = 0;
+        for (int i = 0; i < s.length; i++) {
+            if (s[i] >= threshold) {
+                significant++;
+            }
+        }
+        return significant;
+    }
+
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
         return this.doDecompose(matrix, true);
     }
@@ -149,15 +159,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return myTransposed ? new RawStore(myUt, n, m).logical().transpose().get() : new RawStore(myVt, n, n).logical().transpose().get();
     }
 
-    public int getRank() {
-        final double tolerance = s[0] * this.getDimensionalEpsilon();
-        int rank = 0;
-        for (int i = 0; i < s.length; i++) {
-            if (s[i] > tolerance) {
-                rank++;
-            }
-        }
-        return rank;
+    public double getRankThreshold() {
+        return Math.max(MACHINE_SMALLEST, s[0]) * this.getDimensionalEpsilon();
     }
 
     public Array1D<Double> getSingularValues() {
@@ -195,7 +198,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public boolean isFullRank() {
-        final double tolerance = s[0] * this.getDimensionalEpsilon();
+        double tolerance = s[0] * this.getDimensionalEpsilon();
         return s[s.length - 1] > tolerance;
     }
 

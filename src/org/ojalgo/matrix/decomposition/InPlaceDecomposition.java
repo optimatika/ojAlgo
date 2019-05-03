@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access2D;
@@ -37,7 +36,7 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
         super(factory);
     }
 
-    public final MatrixStore<N> getInverse() {
+    public MatrixStore<N> getInverse() {
         return this.getInverse(this.allocate(this.getRowDim(), this.getRowDim()));
     }
 
@@ -46,35 +45,24 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
         return null;
     }
 
-    protected final int getColDim() {
+    @Override
+    protected int getColDim() {
         return myColDim;
     }
 
-    @Override
-    protected double getDimensionalEpsilon() {
-        return this.getMaxDim() * PrimitiveMath.MACHINE_EPSILON;
-    }
-
-    protected final DecompositionStore<N> getInPlace() {
+    protected DecompositionStore<N> getInPlace() {
         return myInPlace;
     }
 
-    protected final int getMaxDim() {
-        return Math.max(myRowDim, myColDim);
-    }
-
-    protected final int getMinDim() {
-        return Math.min(myRowDim, myColDim);
-    }
-
-    protected final int getRowDim() {
+    @Override
+    protected int getRowDim() {
         return myRowDim;
     }
 
-    final DecompositionStore<N> setInPlace(final Access2D.Collectable<N, ? super DecompositionStore<N>> matrix) {
+    DecompositionStore<N> setInPlace(final Access2D.Collectable<N, ? super DecompositionStore<N>> matrix) {
 
-        final int tmpRowDim = (int) matrix.countRows();
-        final int tmpColDim = (int) matrix.countColumns();
+        int tmpRowDim = (int) matrix.countRows();
+        int tmpColDim = (int) matrix.countColumns();
 
         if ((myInPlace != null) && (myRowDim == tmpRowDim) && (myColDim == tmpColDim)) {
 
@@ -88,7 +76,6 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
 
         matrix.supplyTo(myInPlace);
 
-        this.aspectRatioNormal(tmpRowDim >= tmpColDim);
         this.computed(false);
 
         return myInPlace;

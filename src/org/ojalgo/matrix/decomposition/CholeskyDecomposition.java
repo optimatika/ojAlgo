@@ -91,6 +91,22 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return this.compute(matrix, true);
     }
 
+    public int countSignificant(final double threshold) {
+
+        double minimum = Math.sqrt(threshold);
+
+        DecompositionStore<N> internal = this.getInPlace();
+
+        int significant = 0;
+        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+            if (internal.doubleValue(ij, ij) >= minimum) {
+                significant++;
+            }
+        }
+
+        return significant;
+    }
+
     public final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> aStore) {
         return this.compute(aStore, false);
     }
@@ -120,19 +136,8 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return this.getInPlace().logical().triangular(false, false).get();
     }
 
-    public int getRank() {
-
-        final double tolerance = PrimitiveMath.SQRT.invoke(this.getAlgorithmEpsilon());
-        int rank = 0;
-
-        final DecompositionStore<N> inPlaceStore = this.getInPlace();
-        final int limit = this.getMinDim();
-        for (int ij = 0; ij < limit; ij++) {
-            if (inPlaceStore.doubleValue(ij, ij) > tolerance) {
-                rank++;
-            }
-        }
-        return rank;
+    public double getRankThreshold() {
+        return myMaxDiag * this.getDimensionalEpsilon();
     }
 
     public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
@@ -245,7 +250,8 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
     @Override
     protected boolean checkSolvability() {
-        return mySPD && (myMinDiag > this.getAlgorithmEpsilon());
+        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
+        return mySPD && (myMinDiag >= threshold);
     }
 
     final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean checkHermitian) {
@@ -260,8 +266,8 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
         // true if (Hermitian) Positive Definite
         boolean tmpPositiveDefinite = tmpRowDim == tmpColDim;
-        myMaxDiag = ZERO;
-        myMinDiag = POSITIVE_INFINITY;
+        myMaxDiag = MACHINE_SMALLEST;
+        myMinDiag = MACHINE_LARGEST;
 
         final BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
 
@@ -297,10 +303,6 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         }
 
         return this.computed(mySPD = tmpPositiveDefinite);
-    }
-
-    double getAlgorithmEpsilon() {
-        return myMaxDiag * TEN * this.getDimensionalEpsilon();
     }
 
 }

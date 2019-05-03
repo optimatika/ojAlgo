@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Stream2D;
 import org.ojalgo.structure.Transformation2D;
@@ -56,12 +57,20 @@ public interface ElementsSupplier<N extends Number> extends Stream2D<N, MatrixSt
         return new MatrixPipeline.Transformer<>(this, operator);
     }
 
+    default ElementsSupplier<N> operateOnColumns(final BinaryFunction<N> operator, final Access1D<N> right) {
+        return new MatrixPipeline.ColumnsModifier<>(this, operator, right);
+    }
+
     default ElementsSupplier<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
         return new MatrixPipeline.BinaryOperatorRight<>(this, operator, right);
     }
 
     default ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
         return new MatrixPipeline.BinaryOperatorLeft<>(left, operator, this);
+    }
+
+    default ElementsSupplier<N> operateOnRows(final BinaryFunction<N> operator, final Access1D<N> right) {
+        return new MatrixPipeline.RowsModifier<>(this, operator, right);
     }
 
     PhysicalStore.Factory<N, ?> physical();
