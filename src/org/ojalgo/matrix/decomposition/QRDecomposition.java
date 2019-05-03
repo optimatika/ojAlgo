@@ -21,7 +21,10 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 import org.ojalgo.RecoverableCondition;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -44,7 +47,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
             this(false);
         }
 
-        Complex(boolean fullSize) {
+        Complex(final boolean fullSize) {
             super(GenericDenseStore.COMPLEX, fullSize);
         }
 
@@ -56,7 +59,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
             this(false);
         }
 
-        Primitive(boolean fullSize) {
+        Primitive(final boolean fullSize) {
             super(PrimitiveDenseStore.FACTORY, fullSize);
         }
 
@@ -68,7 +71,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
             this(false);
         }
 
-        Quat(boolean fullSize) {
+        Quat(final boolean fullSize) {
             super(GenericDenseStore.QUATERNION, fullSize);
         }
 
@@ -80,7 +83,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
             this(false);
         }
 
-        Rational(boolean fullSize) {
+        Rational(final boolean fullSize) {
             super(GenericDenseStore.RATIONAL, fullSize);
         }
 
@@ -89,7 +92,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     private final boolean myFullSize;
     private int myNumberOfHouseholderTransformations = 0;
 
-    protected QRDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, boolean fullSize) {
+    protected QRDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final boolean fullSize) {
         super(factory);
         myFullSize = fullSize;
     }
@@ -97,6 +100,20 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     public N calculateDeterminant(final Access2D<?> matrix) {
         this.decompose(this.wrap(matrix));
         return this.getDeterminant();
+    }
+
+    public int countSignificant(final double threshold) {
+
+        DecompositionStore<N> internal = this.getInPlace();
+
+        int significant = 0;
+        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+            if (Math.abs(internal.doubleValue(ij, ij)) > threshold) {
+                significant++;
+            }
+        }
+
+        return significant;
     }
 
     public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
@@ -170,25 +187,12 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return retVal;
     }
 
-    public int getRank() {
+    public double getRankThreshold() {
 
-        int retVal = 0;
+        N largest = this.getInPlace().aggregateDiagonal(Aggregator.LARGEST);
+        double epsilon = this.getDimensionalEpsilon();
 
-        final DecompositionStore<N> tmpInPlace = this.getInPlace();
-
-        final AggregatorFunction<N> tmpLargest = this.aggregator().largest();
-        tmpInPlace.visitDiagonal(0L, 0L, tmpLargest);
-        final double tmpLargestValue = tmpLargest.doubleValue();
-
-        final int tmpMinDim = this.getMinDim();
-
-        for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpInPlace.isSmall(ij, ij, tmpLargestValue)) {
-                retVal++;
-            }
-        }
-
-        return retVal;
+        return epsilon * Math.max(MACHINE_SMALLEST, largest.doubleValue());
     }
 
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
@@ -257,10 +261,6 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
     }
 
-    public boolean isFullRank() {
-        return this.getRank() == this.getMinDim();
-    }
-
     public boolean isFullSize() {
         return myFullSize;
     }
@@ -306,7 +306,8 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     @Override
     protected boolean checkSolvability() {
-        return this.isComputed() && this.isFullRank();
+        double threshold = Math.min(this.getRankThreshold(), this.getDimensionalEpsilon());
+        return this.getColDim() == this.countSignificant(threshold);
     }
 
     /**

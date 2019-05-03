@@ -227,7 +227,7 @@ public interface Eigenvalue<N extends Number>
 
     /**
      * @deprecated With Java 9 this will be made private. Use {@link #getEigenvectors()} or
-     *             {@link #getEigenvector(int)} instead.
+     *             {@link #getEigenpair(int)} instead.
      */
     @Deprecated
     default void copyEigenvector(final int index, final Array1D<ComplexNumber> destination) {
@@ -287,9 +287,8 @@ public interface Eigenvalue<N extends Number>
      * they need to be expressed as complex numbers when [A] is not symmetric.
      * </p>
      * <p>
-     * Prior to v41 this array should always be ordered in descending order - largest (modulus) first. As of
-     * v41 the values should be in the same order as the matrices "V" and "D", and if that is ordered or not
-     * is indicated by the {@link #isOrdered()} method.
+     * The values should be in the same order as the matrices "V" and "D", and if they is ordered or not is
+     * indicated by the {@link #isOrdered()} method.
      * </p>
      *
      * @return The eigenvalues.
@@ -321,24 +320,6 @@ public interface Eigenvalue<N extends Number>
                 realParts[i] = values.doubleValue(i);
             }
         }
-    }
-
-    /**
-     * @param index Index corresponding to an entry in {@link #getEigenvalues()} and/or a column in
-     *        {@link #getEigenvectors()}.
-     * @return One eigenvector
-     * @deprecated v43 Use {@link #getEigenpair(int)} instead.
-     */
-    @Deprecated
-    default MatrixStore<ComplexNumber> getEigenvector(final int index) {
-
-        final long tmpDimension = this.getV().countColumns();
-
-        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(tmpDimension, 1L);
-
-        this.copyEigenvector(index, retVal.sliceColumn(0, index));
-
-        return retVal;
     }
 
     /**

@@ -171,7 +171,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    public Variable lower(Number lower) {
+    public Variable lower(final Number lower) {
         Variable retVal = super.lower(lower);
         this.assertFixedValue();
         return retVal;
@@ -212,7 +212,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    public Variable upper(Number upper) {
+    public Variable upper(final Number upper) {
         Variable retVal = super.upper(upper);
         this.assertFixedValue();
         return retVal;
@@ -295,7 +295,7 @@ public final class Variable extends ModelEntity<Variable> {
         myUnbounded = uncorrelated;
     }
 
-    boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender, boolean relaxed) {
+    boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender, final boolean relaxed) {
 
         boolean retVal = super.validate(value, context, appender);
 

@@ -38,7 +38,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
     private final PrimitiveDenseStore myOutput;
     private final PrimitiveDenseStore myWeights;
 
-    CalculationLayer(int numberOfInputs, int numberOfOutputs, ArtificialNeuralNetwork.Activator activator) {
+    CalculationLayer(final int numberOfInputs, final int numberOfOutputs, final ArtificialNeuralNetwork.Activator activator) {
 
         super();
 
@@ -52,7 +52,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -93,7 +93,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return result;
     }
 
-    public PrimitiveDenseStore invoke(Access1D<Double> input) {
+    public PrimitiveDenseStore invoke(final Access1D<Double> input) {
         myWeights.premultiply(input).operateOnMatching(PrimitiveMath.ADD, myBias).supplyTo(myOutput);
         myOutput.modifyAll(myActivator.getFunction(myOutput));
         return myOutput;
@@ -112,7 +112,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return tmpBuilder.toString();
     }
 
-    private void randomise(double numberOfInputs) {
+    private void randomise(final double numberOfInputs) {
 
         double magnitude = ONE / Math.sqrt(numberOfInputs);
 
@@ -123,7 +123,8 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         myBias.fillAll(randomiser);
     }
 
-    void adjust(final Access1D<Double> layerInput, PrimitiveDenseStore downstreamGradient, double learningRate, PrimitiveDenseStore upstreamGradient) {
+    void adjust(final Access1D<Double> layerInput, final PrimitiveDenseStore downstreamGradient, final double learningRate,
+            final PrimitiveDenseStore upstreamGradient) {
 
         downstreamGradient.modifyMatching(PrimitiveMath.MULTIPLY, myOutput.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
 
@@ -142,7 +143,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         }
     }
 
-    double getBias(int output) {
+    double getBias(final int output) {
         return myBias.doubleValue(output);
     }
 
@@ -158,19 +159,19 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return myWeights;
     }
 
-    double getWeight(int input, int output) {
+    double getWeight(final int input, final int output) {
         return myWeights.doubleValue(input, output);
     }
 
-    void setActivator(ArtificialNeuralNetwork.Activator activator) {
+    void setActivator(final ArtificialNeuralNetwork.Activator activator) {
         myActivator = activator;
     }
 
-    void setBias(int output, double bias) {
+    void setBias(final int output, final double bias) {
         myBias.set(output, bias);
     }
 
-    void setWeight(int input, int output, double weight) {
+    void setWeight(final int input, final int output, final double weight) {
         myWeights.set(input, output, weight);
     }
 

@@ -32,6 +32,7 @@ import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -44,7 +45,6 @@ import org.ojalgo.type.context.NumberContext;
  */
 abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.Constraint, Optimisation.Objective, Comparable<ME> {
 
-    private static final double _32_0 = PrimitiveMath.EIGHT + PrimitiveMath.EIGHT + PrimitiveMath.EIGHT + PrimitiveMath.EIGHT;
     private static final BigDecimal LARGEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_LARGEST), new MathContext(8, RoundingMode.DOWN));
     private static final BigDecimal SMALLEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_SMALLEST), new MathContext(8, RoundingMode.UP));
 
@@ -52,18 +52,19 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
     static int getAdjustmentExponent(final double largest, final double smallest) {
 
-        final double tmpLargestExp = largest > PrimitiveMath.ZERO ? PrimitiveMath.LOG10.invoke(largest) : PrimitiveMath.ZERO;
-        final double tmpSmallestExp = smallest > PrimitiveMath.ZERO ? PrimitiveMath.LOG10.invoke(smallest) : -PrimitiveMath.EIGHT;
+        double expL = MissingMath.log10(largest, PrimitiveMath.ZERO);
 
-        if ((tmpLargestExp - tmpSmallestExp) > ModelEntity._32_0) {
+        if (expL > 32) {
 
             return 0;
 
         } else {
 
-            final double tmpNegatedAverage = (tmpLargestExp + tmpSmallestExp) / (-PrimitiveMath.TWO);
+            double expS = Math.max(MissingMath.log10(smallest, -16), expL - 8);
 
-            return (int) Math.round(tmpNegatedAverage);
+            double negatedAverage = (expL + expS) / (-PrimitiveMath.TWO);
+
+            return MissingMath.roundToInt(negatedAverage);
         }
     }
 
@@ -431,19 +432,19 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         this.appendRightPart(builder);
     }
 
-    final BigDecimal getCompensatedLowerLimit(BigDecimal compensation) {
+    final BigDecimal getCompensatedLowerLimit(final BigDecimal compensation) {
         return myLowerLimit != null ? myLowerLimit.subtract(compensation) : null;
     }
 
-    final BigDecimal getCompensatedLowerLimit(BigDecimal compensation, NumberContext precision) {
+    final BigDecimal getCompensatedLowerLimit(final BigDecimal compensation, final NumberContext precision) {
         return myLowerLimit != null ? precision.enforce(myLowerLimit.subtract(compensation)) : null;
     }
 
-    final BigDecimal getCompensatedUpperLimit(BigDecimal compensation) {
+    final BigDecimal getCompensatedUpperLimit(final BigDecimal compensation) {
         return myUpperLimit != null ? myUpperLimit.subtract(compensation) : null;
     }
 
-    final BigDecimal getCompensatedUpperLimit(BigDecimal compensation, NumberContext precision) {
+    final BigDecimal getCompensatedUpperLimit(final BigDecimal compensation, final NumberContext precision) {
         return myUpperLimit != null ? precision.enforce(myUpperLimit.subtract(compensation)) : null;
     }
 
@@ -451,7 +452,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      * @return true if both the lower and upper limits are defined, and the range is defined by lower and
      *         upper.
      */
-    boolean isClosedRange(BigDecimal lower, BigDecimal upper) {
+    boolean isClosedRange(final BigDecimal lower, final BigDecimal upper) {
         return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(lower) == 0) && (myUpperLimit.compareTo(upper) == 0);
     }
 

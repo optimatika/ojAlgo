@@ -74,7 +74,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     }
 
-    private Pivot myPivot;
+    private final Pivot myPivot = new Pivot();
 
     protected LUDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
@@ -85,11 +85,25 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.getDeterminant();
     }
 
+    public int countSignificant(final double threshold) {
+
+        DecompositionStore<N> internal = this.getInPlace();
+
+        int significant = 0;
+        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+            if (Math.abs(internal.doubleValue(ij, ij)) > threshold) {
+                significant++;
+            }
+        }
+
+        return significant;
+    }
+
     public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, true);
     }
 
-    public boolean decomposeWithoutPivoting(Collectable<N, ? super PhysicalStore<N>> matrix) {
+    public boolean decomposeWithoutPivoting(final Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.doDecompose(matrix, false);
     }
 
@@ -136,21 +150,12 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return myPivot.getOrder();
     }
 
-    public int getRank() {
+    public double getRankThreshold() {
 
-        int retVal = 0;
+        N largest = this.getInPlace().aggregateDiagonal(Aggregator.LARGEST);
+        double epsilon = this.getDimensionalEpsilon();
 
-        final DecompositionStore<N> internalStore = this.getInPlace();
-
-        final double largestValue = internalStore.aggregateAll(Aggregator.LARGEST).doubleValue();
-
-        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (!internalStore.isSmall(ij, ij, largestValue)) {
-                retVal++;
-            }
-        }
-
-        return retVal;
+        return epsilon * Math.max(MACHINE_SMALLEST, largest.doubleValue());
     }
 
     public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
@@ -215,10 +220,6 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
     }
 
-    public boolean isFullRank() {
-        return this.isSolvable();
-    }
-
     public boolean isPivoted() {
         return myPivot.isModified();
     }
@@ -230,14 +231,6 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     public PhysicalStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
         return this.allocate(templateRHS.countRows(), templateRHS.countColumns());
-    }
-
-    @Override
-    public void reset() {
-
-        super.reset();
-
-        myPivot = null;
     }
 
     public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
@@ -272,7 +265,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         this.getColDim();
         final int tmpMinDim = this.getMinDim();
 
-        myPivot = new Pivot(tmpRowDim);
+        myPivot.reset(tmpRowDim);
 
         final BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
 
@@ -314,7 +307,8 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     @Override
     protected boolean checkSolvability() {
-        return (this.getRowDim() == this.getColDim()) && (this.getRank() == this.getColDim());
+        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
+        return (this.getRowDim() == this.getColDim()) && (this.getColDim() == this.countSignificant(threshold));
     }
 
     int[] getReducedPivots() {

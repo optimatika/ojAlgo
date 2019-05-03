@@ -128,7 +128,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         }
 
         @Override
-        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
+        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
 
             final double s = this.doubleValue();
 
@@ -1029,7 +1029,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         return retVal.toString();
     }
 
-    public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
+    public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
 
         final double s = myScalar;
 

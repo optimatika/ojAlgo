@@ -39,7 +39,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         private final NumberContext myContext;
         private final long myDenominator;
 
-        public Descriptor(int scale) {
+        public Descriptor(final int scale) {
 
             super();
 
@@ -47,7 +47,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
             myDenominator = Math.round(Math.pow(10.0, scale));
         }
 
-        public long add(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
+        public long add(final ExactDecimal<?> arg1, final ExactDecimal<?> arg2) {
             final BigDecimal deci1 = arg1.toBigDecimal();
             final BigDecimal deci2 = arg2.toBigDecimal();
             final BigDecimal resul = deci1.add(deci2);
@@ -62,21 +62,21 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
             return myDenominator;
         }
 
-        public long divide(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
+        public long divide(final ExactDecimal<?> arg1, final ExactDecimal<?> arg2) {
             final BigDecimal deci1 = arg1.toBigDecimal();
             final BigDecimal deci2 = arg2.toBigDecimal();
             final BigDecimal resul = deci1.divide(deci2, myContext.getMathContext());
             return ExactDecimal.extractUnscaledValue(resul, myContext);
         }
 
-        public long multiply(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
+        public long multiply(final ExactDecimal<?> arg1, final ExactDecimal<?> arg2) {
             final BigDecimal deci1 = arg1.toBigDecimal();
             final BigDecimal deci2 = arg2.toBigDecimal();
             final BigDecimal resul = deci1.multiply(deci2);
             return ExactDecimal.extractUnscaledValue(resul, myContext);
         }
 
-        public long subtract(ExactDecimal<?> arg1, ExactDecimal<?> arg2) {
+        public long subtract(final ExactDecimal<?> arg1, final ExactDecimal<?> arg2) {
             final BigDecimal deci1 = arg1.toBigDecimal();
             final BigDecimal deci2 = arg2.toBigDecimal();
             final BigDecimal resul = deci1.subtract(deci2);
@@ -99,11 +99,11 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         myNumerator = numerator;
     }
 
-    public final S add(double scalarAddend) {
+    public final S add(final double scalarAddend) {
         return this.wrap(myNumerator + Math.round(scalarAddend * this.descriptor().denominator()));
     }
 
-    public final S add(S scalarAddend) {
+    public final S add(final S scalarAddend) {
         return this.wrap(myNumerator + scalarAddend.numerator());
     }
 
@@ -116,11 +116,11 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         return (S) this;
     }
 
-    public final S divide(double scalarDivisor) {
+    public final S divide(final double scalarDivisor) {
         return this.wrap(Math.round(myNumerator / scalarDivisor));
     }
 
-    public final S divide(S scalarDivisor) {
+    public final S divide(final S scalarDivisor) {
         return this.wrap((myNumerator * this.descriptor().denominator()) / scalarDivisor.numerator());
     }
 
@@ -129,7 +129,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         return myNumerator / this.descriptor().denominator();
     }
 
-    public final S enforce(NumberContext context) {
+    public final S enforce(final NumberContext context) {
         BigDecimal decimal = this.toBigDecimal(context);
         final NumberContext type = this.descriptor().context();
         decimal = decimal.setScale(type.getScale(), type.getRoundingMode());
@@ -168,11 +168,11 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         return this.toBigDecimal().longValue();
     }
 
-    public final S multiply(double scalarMultiplicand) {
+    public final S multiply(final double scalarMultiplicand) {
         return this.wrap(Math.round(myNumerator * scalarMultiplicand));
     }
 
-    public final S multiply(S scalarMultiplicand) {
+    public final S multiply(final S scalarMultiplicand) {
         return this.wrap((myNumerator * scalarMultiplicand.numerator()) / this.descriptor().denominator());
     }
 
@@ -194,11 +194,11 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         }
     }
 
-    public final S subtract(double scalarSubtrahend) {
+    public final S subtract(final double scalarSubtrahend) {
         return this.wrap(myNumerator - Math.round(scalarSubtrahend * this.descriptor().denominator()));
     }
 
-    public final S subtract(S scalarSubtrahend) {
+    public final S subtract(final S scalarSubtrahend) {
         return this.wrap(myNumerator - scalarSubtrahend.numerator());
     }
 
@@ -214,11 +214,11 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         return this.toBigDecimal().toPlainString();
     }
 
-    public final String toString(NumberContext context) {
+    public final String toString(final NumberContext context) {
         return this.toBigDecimal(context).toPlainString();
     }
 
-    private final BigDecimal toBigDecimal(NumberContext context) {
+    private final BigDecimal toBigDecimal(final NumberContext context) {
         return new BigDecimal(myNumerator).divide(new BigDecimal(this.descriptor().denominator()), context.getMathContext());
     }
 

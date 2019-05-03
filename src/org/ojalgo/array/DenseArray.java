@@ -86,7 +86,7 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
      */
     public static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
-    protected DenseArray(DenseArray.Factory<N> factory) {
+    protected DenseArray(final DenseArray.Factory<N> factory) {
         super(factory);
     }
 

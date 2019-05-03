@@ -24,89 +24,63 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
-/**
- * A selection (re-ordering) of rows.
- *
- * @author apete
- */
-final class RowsStore<N extends Number> extends SelectingStore<N> {
+final class DiagonalStore<N extends Number> extends ShadingStore<N> {
 
-    private final int[] myRows;
-
-    RowsStore(final MatrixStore<N> base, final int... rows) {
-
-        super(base, rows.length, (int) base.countColumns());
-
-        myRows = rows;
+    DiagonalStore(final MatrixStore<N> base) {
+        super(base, Math.min(base.countRows(), base.countColumns()), Math.min(base.countRows(), base.countColumns()));
     }
 
-    /**
-     * @see org.ojalgo.matrix.store.MatrixStore#doubleValue(long, long)
-     */
+    DiagonalStore(final MatrixStore<N> base, final boolean maintain) {
+        super(base, maintain ? base.countRows() : Math.min(base.countRows(), base.countColumns()),
+                maintain ? base.countColumns() : Math.min(base.countRows(), base.countColumns()));
+    }
+
     public double doubleValue(final long row, final long col) {
-        int rowIndex = this.toBaseIndex(row);
-        if (rowIndex >= 0) {
-            return this.base().doubleValue(rowIndex, col);
+        if (row == col) {
+            return this.base().doubleValue(row, col);
         } else {
             return PrimitiveMath.ZERO;
         }
     }
 
+    public int firstInColumn(final int col) {
+        return col;
+    }
+
     public int firstInRow(final int row) {
-        int rowIndex = this.toBaseIndex(row);
-        if (rowIndex >= 0) {
-            return this.base().firstInRow(rowIndex);
-        } else {
-            return this.getColDim();
-        }
+        return row;
     }
 
     public N get(final long row, final long col) {
-        int rowIndex = this.toBaseIndex(row);
-        if (rowIndex >= 0) {
-            return this.base().get(rowIndex, col);
+        if (row == col) {
+            return this.base().get(row, col);
         } else {
             return this.zero().get();
         }
     }
 
     @Override
-    public int limitOfRow(final int row) {
-        int rowIndex = this.toBaseIndex(row);
-        if (rowIndex >= 0) {
-            return this.base().limitOfRow(rowIndex);
-        } else {
-            return 0;
-        }
+    public int limitOfColumn(final int col) {
+        return col + 1;
     }
 
+    @Override
+    public int limitOfRow(final int row) {
+        return row + 1;
+    }
+
+    @Override
     public void supplyTo(final TransformableRegion<N> consumer) {
-        final MatrixStore<N> base = this.base();
-        for (int i = 0; i < myRows.length; i++) {
-            int rowIndex = this.toBaseIndex(i);
-            if (rowIndex >= 0) {
-                consumer.fillRow(i, base.sliceRow(rowIndex));
-            } else {
-                consumer.fillColumn(i, this.zero().get());
-            }
-        }
+        consumer.reset();
+        consumer.fillDiagonal(this.base().sliceDiagonal());
     }
 
     public Scalar<N> toScalar(final long row, final long col) {
-        int rowIndex = this.toBaseIndex(row);
-        if (rowIndex >= 0) {
-            return this.base().toScalar(rowIndex, col);
+        if (row == col) {
+            return this.base().toScalar(row, col);
         } else {
             return this.zero();
         }
-    }
-
-    private int toBaseIndex(final int row) {
-        return myRows[row];
-    }
-
-    private int toBaseIndex(final long row) {
-        return myRows[Math.toIntExact(row)];
     }
 
 }

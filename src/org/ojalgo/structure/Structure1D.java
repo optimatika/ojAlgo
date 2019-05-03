@@ -101,7 +101,7 @@ public interface Structure1D {
 
     public final class IntIndex implements Comparable<IntIndex> {
 
-        public static IntIndex of(int index) {
+        public static IntIndex of(final int index) {
             return new IntIndex(index);
         }
 
@@ -163,7 +163,7 @@ public interface Structure1D {
 
     public final class LongIndex implements Comparable<LongIndex> {
 
-        public static LongIndex of(long index) {
+        public static LongIndex of(final long index) {
             return new LongIndex(index);
         }
 

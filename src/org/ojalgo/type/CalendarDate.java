@@ -67,14 +67,14 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         /**
          * Will increment the input epochMilli by the size/duration of this timeline resolution.
          */
-        default long addTo(long epochMilli) {
+        default long addTo(final long epochMilli) {
             return epochMilli + this.toDurationInMillis();
         }
 
         /**
          * Maps a range of instances in time to a single instance.
          */
-        default long adjustInto(long epochMilli) {
+        default long adjustInto(final long epochMilli) {
             long duration = this.toDurationInMillis();
             long half = duration / 2L;
             return ((epochMilli / duration) * duration) + half;
@@ -201,11 +201,11 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         return new CalendarDate(instant.toEpochMilli());
     }
 
-    public static CalendarDate valueOf(OffsetDateTime offsetDateTime) {
+    public static CalendarDate valueOf(final OffsetDateTime offsetDateTime) {
         return new CalendarDate(offsetDateTime.toEpochSecond() * MILLIS_PER_SECOND);
     }
 
-    public static CalendarDate valueOf(ZonedDateTime zonedDateTime) {
+    public static CalendarDate valueOf(final ZonedDateTime zonedDateTime) {
         return new CalendarDate(zonedDateTime.toEpochSecond() * MILLIS_PER_SECOND);
     }
 
@@ -507,7 +507,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         }
     }
 
-    public CalendarDate with(TemporalAdjuster adjuster) {
+    public CalendarDate with(final TemporalAdjuster adjuster) {
         return (CalendarDate) Temporal.super.with(adjuster);
     }
 

@@ -43,7 +43,7 @@ public abstract class BasicArrayTest {
         Arrays.sort(INDICES);
     }
 
-    static void setMultiple(BasicArray<Double> array, long[] indices) {
+    static void setMultiple(final BasicArray<Double> array, final long[] indices) {
         for (long i : indices) {
             array.set(i, 1.0);
         }

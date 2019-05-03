@@ -54,11 +54,11 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     interface Mixable<N extends Number> extends StructureAnyD, Mutate1D.Mixable<N> {
 
-        default double mix(long index, BinaryFunction<N> mixer, double addend) {
+        default double mix(final long index, final BinaryFunction<N> mixer, final double addend) {
             return this.mix(StructureAnyD.reference(index, this.shape()), mixer, addend);
         }
 
-        default N mix(long index, BinaryFunction<N> mixer, N addend) {
+        default N mix(final long index, final BinaryFunction<N> mixer, final N addend) {
             return this.mix(StructureAnyD.reference(index, this.shape()), mixer, addend);
         }
 
@@ -91,15 +91,15 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     interface Receiver<N extends Number> extends MutateAnyD, Fillable<N>, Consumer<AccessAnyD<?>> {
 
-        default void accept(AccessAnyD<?> supplied) {
+        default void accept(final AccessAnyD<?> supplied) {
             if (this.isAcceptable(supplied)) {
-                supplied.loopAll((long[] ref) -> this.set(ref, supplied.get(ref)));
+                supplied.loopAll((final long[] ref) -> this.set(ref, supplied.get(ref)));
             } else {
                 throw new ProgrammingError("Not acceptable!");
             }
         }
 
-        default boolean isAcceptable(StructureAnyD supplier) {
+        default boolean isAcceptable(final StructureAnyD supplier) {
 
             boolean retVal = true;
 
@@ -114,11 +114,11 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     }
 
-    default void add(long index, double addend) {
+    default void add(final long index, final double addend) {
         this.add(StructureAnyD.reference(index, this.shape()), addend);
     }
 
-    default void add(long index, Number addend) {
+    default void add(final long index, final Number addend) {
         this.add(StructureAnyD.reference(index, this.shape()), addend);
     }
 
@@ -126,11 +126,11 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     void add(long[] reference, Number addend);
 
-    default void set(long index, double value) {
+    default void set(final long index, final double value) {
         this.set(StructureAnyD.reference(index, this.shape()), value);
     }
 
-    default void set(long index, Number value) {
+    default void set(final long index, final Number value) {
         this.set(StructureAnyD.reference(index, this.shape()), value);
     }
 

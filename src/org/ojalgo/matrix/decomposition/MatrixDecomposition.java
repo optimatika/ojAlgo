@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
@@ -54,7 +54,7 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public interface MatrixDecomposition<N extends Number> {
+public interface MatrixDecomposition<N extends Number> extends Structure2D {
 
     interface Determinant<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
 
@@ -122,15 +122,27 @@ public interface MatrixDecomposition<N extends Number> {
          * paths can be chosen - compute or not / choose different algorithms...
          *
          * @param matrix A matrix to check and then (maybe) decompose
-         * @return true if the hermitian check passed and computation suceeded; false if not
+         * @return true if the hermitian check passed and decomposition suceeded; false if not
+         * @deprecated v48 Use {@link #checkAndDecompose(MatrixStore<N>)} instead
          */
-        @SuppressWarnings("unchecked")
+        @Deprecated
         default boolean checkAndCompute(final MatrixStore<N> matrix) {
+            return this.checkAndDecompose(matrix);
+        }
+
+        /**
+         * Absolutely must check if the matrix is hermitian or not. Then, depending on the result differents
+         * paths can be chosen - compute or not / choose different algorithms...
+         *
+         * @param matrix A matrix to check and then (maybe) decompose
+         * @return true if the hermitian check passed and decomposition suceeded; false if not
+         */
+        default boolean checkAndDecompose(final MatrixStore<N> matrix) {
 
             this.reset();
 
-            if (MatrixUtils.isHermitian(matrix)) {
-                return this instanceof Solver<?> ? ((Solver<N>) this).compute(matrix) : this.decompose(matrix);
+            if (matrix.isHermitian()) {
+                return this.decompose(matrix);
             } else {
                 return false;
             }
@@ -181,7 +193,7 @@ public interface MatrixDecomposition<N extends Number> {
          * faster. Implementing this method, to actually decompose without pivoting, is optional. The default
          * implementation simply calls {@link #decompose(Access2D.Collectable)}.
          */
-        default boolean decomposeWithoutPivoting(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
+        default boolean decomposeWithoutPivoting(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
             return this.decompose(matrix);
         }
 
@@ -219,17 +231,29 @@ public interface MatrixDecomposition<N extends Number> {
     interface RankRevealing<N extends Number> extends Ordered<N> {
 
         /**
+         * @param threshold Significance limit
+         * @return The number of elements in the diagonal matrix that are greater than the threshold
+         */
+        int countSignificant(double threshold);
+
+        /**
          * The best (and most expensive) way to get the effective numerical rank is by calculating a
          * {@link SingularValue} decomposition and then find the number of nonnegligible singular values.
          *
          * @return The effective numerical rank (best estimate)
          */
-        int getRank();
+        default int getRank() {
+            return this.countSignificant(this.getRankThreshold());
+        }
+
+        double getRankThreshold();
 
         /**
          * @return true if the rank is equal to the minimum of the row and column dimensions; false if not
          */
-        boolean isFullRank();
+        default boolean isFullRank() {
+            return this.getRank() == MissingMath.toMinIntExact(this.countRows(), this.countColumns());
+        }
 
     }
 

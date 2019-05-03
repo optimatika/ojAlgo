@@ -42,6 +42,10 @@ public class ProgrammingError extends RuntimeException implements EffectiveThrow
         throw new ProgrammingError("Don't use this method/constructor!");
     }
 
+    public static void throwForMultiplicationNotPossible() {
+        throw new ProgrammingError("The column dimension of the left matrix does not match the row dimension of the right matrix!");
+    }
+
     public static void throwForTryingToModifyAnImmutableObject() {
         throw new ProgrammingError("This class is immutable!");
     }
@@ -52,7 +56,7 @@ public class ProgrammingError extends RuntimeException implements EffectiveThrow
 
     public static void throwIfMultiplicationNotPossible(final Access2D<?> left, final Access2D<?> right) {
         if (left.countColumns() != right.countRows()) {
-            throw new ProgrammingError("The column dimension of the left matrix does not match the row dimension of the right matrix!");
+            ProgrammingError.throwForMultiplicationNotPossible();
         }
     }
 

@@ -73,6 +73,7 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.copy(source);
     }
 
+    @Override
     protected final FunctionSet<N> function() {
         return myFactory.function();
     }
@@ -105,6 +106,7 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.makeZero(numberOfRows, numberOfColumns);
     }
 
+    @Override
     protected final Scalar.Factory<N> scalar() {
         return myFactory.scalar();
     }

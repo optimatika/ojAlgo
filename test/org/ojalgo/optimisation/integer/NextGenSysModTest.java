@@ -1126,7 +1126,8 @@ public class NextGenSysModTest {
         private final double myOptimalValue;
         private final double[] myOptimisationSolution;
 
-        CaseData(double[][] covarianceMtrx, double[][] dataSetMtrx, double[] optimisationSolution, double estimatedValue, double optimalValue) {
+        CaseData(final double[][] covarianceMtrx, final double[][] dataSetMtrx, final double[] optimisationSolution, final double estimatedValue,
+                final double optimalValue) {
             super();
             myCovarianceMtrx = covarianceMtrx;
             myDataSetMtrx = dataSetMtrx;
@@ -1135,7 +1136,7 @@ public class NextGenSysModTest {
             myOptimalValue = optimalValue;
         }
 
-        public double getBeta(int asset) {
+        public double getBeta(final int asset) {
             return myDataSetMtrx[2][asset];
         }
 
@@ -1143,7 +1144,7 @@ public class NextGenSysModTest {
             return myDataSetMtrx[2];
         }
 
-        public double getCovariance(int assetR, int assetC) {
+        public double getCovariance(final int assetR, final int assetC) {
             return myCovarianceMtrx[assetR][assetC];
         }
 
@@ -1162,7 +1163,7 @@ public class NextGenSysModTest {
             return myEstimatedValue;
         }
 
-        public double getMargin(int asset) {
+        public double getMargin(final int asset) {
             return myDataSetMtrx[1][asset];
         }
 
@@ -1184,11 +1185,11 @@ public class NextGenSysModTest {
             return myOptimisationSolution;
         }
 
-        public double getOptimisationSolution(int asset) {
+        public double getOptimisationSolution(final int asset) {
             return myOptimisationSolution[asset];
         }
 
-        public double getReturn(int asset) {
+        public double getReturn(final int asset) {
             return myDataSetMtrx[0][asset];
         }
 
@@ -1211,7 +1212,8 @@ public class NextGenSysModTest {
     private static final NumberContext SOLUTION_ACCURACY = new NumberContext(7, 6, RoundingMode.HALF_DOWN);
     private static final NumberContext VALIDATION_ACCURACY = SOLUTION_ACCURACY.withPrecision(5);
 
-    public static void assertSolution(ExpressionsBasedModel model, double[] expected, Optimisation.Result actual, NumberContext accuracy) {
+    public static void assertSolution(final ExpressionsBasedModel model, final double[] expected, final Optimisation.Result actual,
+            final NumberContext accuracy) {
 
         // Check that the solver (thinks) it found the optimal solution
         TestUtils.assertStateNotLessThanOptimal(actual);
@@ -1223,7 +1225,7 @@ public class NextGenSysModTest {
         TestUtils.assertEquals(Access1D.wrap(expected), actual, accuracy);
     }
 
-    public static ExpressionsBasedModel buildModel(CaseData data) {
+    public static ExpressionsBasedModel buildModel(final CaseData data) {
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
@@ -1275,7 +1277,7 @@ public class NextGenSysModTest {
         return retVal;
     }
 
-    public static Optimisation.Result solveSequentially(CaseData data) {
+    public static Optimisation.Result solveSequentially(final CaseData data) {
 
         int numberOfAssets = data.numberOfAssets();
 
@@ -1400,7 +1402,7 @@ public class NextGenSysModTest {
         this.doTestSequential(CASE_050B);
     }
 
-    protected void doTestAllInOne(CaseData testCase) {
+    protected void doTestAllInOne(final CaseData testCase) {
 
         ExpressionsBasedModel model = NextGenSysModTest.buildModel(testCase);
 
@@ -1413,7 +1415,7 @@ public class NextGenSysModTest {
         NextGenSysModTest.assertSolution(model, testCase.getOptimisationSolution(), result, VALIDATION_ACCURACY);
     }
 
-    protected void doTestSequential(CaseData testCase) {
+    protected void doTestSequential(final CaseData testCase) {
 
         Result estimate = NextGenSysModTest.solveSequentially(testCase);
 

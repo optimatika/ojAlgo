@@ -107,7 +107,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
                     return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.Factory.this, element));
                 }
 
-                public SparseStore<N> makeSparse(int rowsCount, int columnsCount) {
+                public SparseStore<N> makeSparse(final int rowsCount, final int columnsCount) {
                     return new SparseStore<>(GenericDenseStore.Factory.this, rowsCount, columnsCount);
                 }
 
@@ -674,7 +674,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
 
-        final int complexity = ((int) left.count()) / myRowDim;
+        final int complexity = Math.toIntExact(left.count() / this.countRows());
+        if (complexity != Math.toIntExact(right.count() / this.countColumns())) {
+            ProgrammingError.throwForMultiplicationNotPossible();
+        }
 
         if (left instanceof GenericDenseStore) {
             if (right instanceof GenericDenseStore) {

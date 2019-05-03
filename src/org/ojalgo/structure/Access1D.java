@@ -287,7 +287,7 @@ public interface Access1D<N extends Number> extends Structure1D {
         return retVal;
     }
 
-    static String toString(Access1D<?> access) {
+    static String toString(final Access1D<?> access) {
         int size = access.size();
         switch (size) {
         case 0:
@@ -405,7 +405,7 @@ public interface Access1D<N extends Number> extends Structure1D {
         Structure1D.loopMatching(this, y, i -> y.add(i, a * this.doubleValue(i)));
     }
 
-    default byte byteValue(long index) {
+    default byte byteValue(final long index) {
         return (byte) this.shortValue(index);
     }
 
@@ -431,17 +431,17 @@ public interface Access1D<N extends Number> extends Structure1D {
         return new Access1D.ElementView<>(this);
     }
 
-    default float floatValue(long index) {
+    default float floatValue(final long index) {
         return (float) this.doubleValue(index);
     }
 
     N get(long index);
 
-    default int intValue(long index) {
+    default int intValue(final long index) {
         return (int) this.longValue(index);
     }
 
-    default long longValue(long index) {
+    default long longValue(final long index) {
         return Math.round(this.doubleValue(index));
     }
 
@@ -449,7 +449,7 @@ public interface Access1D<N extends Number> extends Structure1D {
         return this.elements();
     }
 
-    default short shortValue(long index) {
+    default short shortValue(final long index) {
         return (short) this.intValue(index);
     }
 

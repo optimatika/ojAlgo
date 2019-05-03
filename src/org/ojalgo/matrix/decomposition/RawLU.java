@@ -25,19 +25,19 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Raw2D;
-import org.ojalgo.array.blas.DOT;
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.context.NumberContext;
 
 final class RawLU extends RawDecomposition implements LU<Double> {
 
-    private Pivot myPivot;
+    private final Pivot myPivot = new Pivot();
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
@@ -58,6 +58,20 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.getDeterminant();
     }
 
+    public int countSignificant(final double threshold) {
+
+        RawStore internal = this.getInternalStore();
+
+        int significant = 0;
+        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+            if (Math.abs(internal.doubleValue(ij, ij)) > threshold) {
+                significant++;
+            }
+        }
+
+        return significant;
+    }
+
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
         final double[][] data = this.reset(matrix, false);
@@ -67,7 +81,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.doDecompose(data, true);
     }
 
-    public boolean decomposeWithoutPivoting(Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    public boolean decomposeWithoutPivoting(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
         final double[][] data = this.reset(matrix, false);
 
@@ -107,21 +121,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return myPivot.getOrder();
     }
 
-    public int getRank() {
+    public double getRankThreshold() {
 
-        int retVal = 0;
+        double largest = this.getInternalStore().aggregateDiagonal(Aggregator.LARGEST);
+        double epsilon = this.getDimensionalEpsilon();
 
-        final RawStore internalStore = this.getInternalStore();
-
-        double largestValue = internalStore.aggregateDiagonal(Aggregator.LARGEST);
-
-        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (!internalStore.isSmall(ij, ij, largestValue)) {
-                retVal++;
-            }
-        }
-
-        return retVal;
+        return epsilon * Math.max(MACHINE_SMALLEST, largest);
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
@@ -157,26 +162,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         }
     }
 
-    /**
-     * Is the matrix nonsingular?
-     *
-     * @return true if U, and hence A, is nonsingular.
-     */
-    public boolean isFullRank() {
-
-        final RawStore raw = this.getInternalStore();
-
-        double largestValue = Math.sqrt(raw.aggregateDiagonal(Aggregator.LARGEST));
-
-        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (PrimitiveScalar.isSmall(largestValue, raw.doubleValue(ij, ij))) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     public boolean isPivoted() {
         return myPivot.isModified();
     }
@@ -187,14 +172,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     public PhysicalStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
         return this.allocate(templateBody.countRows(), templateRHS.countColumns());
-    }
-
-    @Override
-    public void reset() {
-
-        super.reset();
-
-        myPivot = null;
     }
 
     @Override
@@ -217,58 +194,53 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         }
     }
 
-    /**
-     * Use a "left-looking", dot-product, Crout/Doolittle algorithm, essentially copied from JAMA.
-     */
-    private boolean doDecompose(final double[][] data, boolean pivoting) {
+    private boolean doDecompose(final double[][] data, final boolean pivoting) {
 
-        final int numbRows = this.getRowDim();
-        final int numbCols = this.getColDim();
+        final int m = this.getRowDim();
+        final int n = this.getColDim();
 
-        myPivot = new Pivot(numbRows);
+        myPivot.reset(m);
 
-        final double[] colJ = new double[numbRows];
+        double[] rowP;
+        double[] rowI;
 
-        // Outer loop.
-        for (int j = 0; j < numbCols; j++) {
+        double valP;
+        double valI;
 
-            // Make a copy of the j-th column to localize references.
-            for (int i = 0; i < numbRows; i++) {
-                colJ[i] = data[i][j];
-            }
-
-            // Apply previous transformations.
-            for (int i = 0; i < numbRows; i++) {
-                // Most of the time is spent in the following dot product.
-                data[i][j] = colJ[i] -= DOT.invoke(data[i], 0, colJ, 0, 0, Math.min(i, j));
-            }
+        // Main loop along the diagonal
+        for (int ij = 0, limit = Math.min(m, n); ij < limit; ij++) {
 
             if (pivoting) {
-                // Find pivot and exchange if necessary.
-                int p = j;
-                double valP = ABS.invoke(colJ[p]);
-                for (int i = j + 1; i < numbRows; i++) {
-                    if (ABS.invoke(colJ[i]) > valP) {
+                int p = ij;
+                valP = ABS.invoke(data[p][ij]);
+                for (int i = ij + 1; i < m; i++) {
+                    valI = ABS.invoke(data[i][ij]);
+                    if (valI > valP) {
                         p = i;
-                        valP = ABS.invoke(colJ[i]);
+                        valP = valI;
                     }
                 }
-                if (p != j) {
-                    Raw2D.exchangeRows(data, j, p);
-                    myPivot.change(j, p);
+                if (p != ij) {
+                    Raw2D.exchangeRows(data, ij, p);
+                    myPivot.change(ij, p);
                 }
             }
 
-            // Compute multipliers.
-            if (j < numbRows) {
-                final double tmpVal = data[j][j];
-                if (tmpVal != ZERO) {
-                    for (int i = j + 1; i < numbRows; i++) {
-                        data[i][j] /= tmpVal;
+            rowP = data[ij];
+            valP = rowP[ij];
+
+            if (NumberContext.compare(valP, ZERO) != 0) {
+                for (int i = ij + 1; i < m; i++) {
+
+                    rowI = data[i];
+                    valI = rowI[ij] / valP;
+
+                    if (NumberContext.compare(valI, ZERO) != 0) {
+                        rowI[ij] = valI;
+                        AXPY.invoke(rowI, 0, -valI, rowP, 0, ij + 1, n);
                     }
                 }
             }
-
         }
 
         return this.computed(true);
@@ -304,7 +276,8 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        return (this.getRowDim() == this.getColDim()) && this.isFullRank();
+        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
+        return (this.getRowDim() == this.getColDim()) && (this.getColDim() == this.countSignificant(threshold));
     }
 
 }

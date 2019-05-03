@@ -39,7 +39,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
 
         private final List<Supplier<BasicSeries<K, ?>>> mySuppliers = new ArrayList<>();
 
-        public CoordinatedSet.Builder<K> add(Supplier<BasicSeries<K, ?>> supplier) {
+        public CoordinatedSet.Builder<K> add(final Supplier<BasicSeries<K, ?>> supplier) {
             mySuppliers.add(supplier);
             return this;
         }
@@ -61,11 +61,11 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <K extends Comparable<? super K>> CoordinatedSet<K> from(BasicSeries<K, ?>... uncoordinated) {
+    public static <K extends Comparable<? super K>> CoordinatedSet<K> from(final BasicSeries<K, ?>... uncoordinated) {
         return CoordinatedSet.from(Arrays.asList(uncoordinated));
     }
 
-    public static <K extends Comparable<? super K>> CoordinatedSet<K> from(List<? extends BasicSeries<K, ?>> uncoordinated) {
+    public static <K extends Comparable<? super K>> CoordinatedSet<K> from(final List<? extends BasicSeries<K, ?>> uncoordinated) {
 
         K first = BasicSeries.findLatestFirstKey(uncoordinated);
         K last = BasicSeries.findEarliestLastKey(uncoordinated);
@@ -108,7 +108,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
     private final K myFirstKey;
     private final K myLastKey;
 
-    private CoordinatedSet(PrimitiveSeries[] coordinated, K first, K last) {
+    private CoordinatedSet(final PrimitiveSeries[] coordinated, final K first, final K last) {
 
         super();
 
@@ -129,7 +129,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
         return PrimitiveDenseStore.FACTORY.columns(myCoordinated);
     }
 
-    public MatrixStore<Double> getSamples(UnaryOperator<PrimitiveSeries> operator) {
+    public MatrixStore<Double> getSamples(final UnaryOperator<PrimitiveSeries> operator) {
         PrimitiveSeries[] operated = new PrimitiveSeries[myCoordinated.length];
         for (int i = 0; i < operated.length; i++) {
             operated[i] = operator.apply(myCoordinated[i]);
@@ -137,7 +137,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
         return PrimitiveDenseStore.FACTORY.columns(operated);
     }
 
-    public PrimitiveSeries getSeries(int index) {
+    public PrimitiveSeries getSeries(final int index) {
         return myCoordinated[index];
     }
 

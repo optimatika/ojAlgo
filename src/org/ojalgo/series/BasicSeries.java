@@ -188,24 +188,6 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
     BasicSeries.TimeSeriesBuilder<OffsetDateTime> OFFSET_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.OFFSET_DATE_TIME);
     BasicSeries.TimeSeriesBuilder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.ZONED_DATE_TIME);
 
-    static BasicSeries<Double, Double> make(final DenseArray.Factory<Double> arrayFactory) {
-        return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, null);
-    }
-
-    static BasicSeries<Double, Double> make(final DenseArray.Factory<Double> arrayFactory, final BinaryFunction<Double> accumulator) {
-        return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, accumulator);
-    }
-
-    static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
-            final Structure1D.IndexMapper<N> indexMapper) {
-        return new MappedIndexSeries<>(arrayFactory, indexMapper, null);
-    }
-
-    static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
-            final Structure1D.IndexMapper<N> indexMapper, final BinaryFunction<N> accumulator) {
-        return new MappedIndexSeries<>(arrayFactory, indexMapper, accumulator);
-    }
-
     static <K extends Comparable<? super K>> CoordinatedSet<K> coordinate(final List<? extends BasicSeries<K, ?>> uncoordinated) {
         return CoordinatedSet.from(uncoordinated);
     }
@@ -272,6 +254,24 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         }
 
         return retVal;
+    }
+
+    static BasicSeries<Double, Double> make(final DenseArray.Factory<Double> arrayFactory) {
+        return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, null);
+    }
+
+    static BasicSeries<Double, Double> make(final DenseArray.Factory<Double> arrayFactory, final BinaryFunction<Double> accumulator) {
+        return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, accumulator);
+    }
+
+    static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
+            final Structure1D.IndexMapper<N> indexMapper) {
+        return new MappedIndexSeries<>(arrayFactory, indexMapper, null);
+    }
+
+    static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
+            final Structure1D.IndexMapper<N> indexMapper, final BinaryFunction<N> accumulator) {
+        return new MappedIndexSeries<>(arrayFactory, indexMapper, accumulator);
     }
 
     PrimitiveSeries asPrimitive();

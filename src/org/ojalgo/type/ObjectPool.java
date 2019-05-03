@@ -37,7 +37,7 @@ public abstract class ObjectPool<T> {
         myLimited = false;
     }
 
-    public ObjectPool(int capacity) {
+    public ObjectPool(final int capacity) {
         super();
         myObjects = new LinkedBlockingQueue<>(capacity);
         myLimited = true;
@@ -62,7 +62,7 @@ public abstract class ObjectPool<T> {
         return retVal;
     }
 
-    public final void giveBack(T object) {
+    public final void giveBack(final T object) {
         ProgrammingError.throwIfNull(object);
         this.reset(object);
         if (myLimited) {

@@ -257,10 +257,6 @@ public interface StructureAnyD extends Structure1D {
 
     }
 
-    static StructureAnyD.ReferenceMapper mapperOf(final StructureAnyD structure, final Structure1D.IndexMapper<Object>[] mappers) {
-        return new StructureAnyD.ReferenceMapper(structure, mappers);
-    }
-
     /**
      * @param structure An access structure
      * @return The size of an access with that structure
@@ -358,6 +354,10 @@ public interface StructureAnyD extends Structure1D {
             throw new ProgrammingError("The 2 structures must have the same shape!");
         }
         Structure1D.loopMatching(structureA, structureB, callback);
+    }
+
+    static StructureAnyD.ReferenceMapper mapperOf(final StructureAnyD structure, final Structure1D.IndexMapper<Object>[] mappers) {
+        return new StructureAnyD.ReferenceMapper(structure, mappers);
     }
 
     static long[] reference(final long index, final long[] structure) {
@@ -481,7 +481,7 @@ public interface StructureAnyD extends Structure1D {
      * @param dimensionalIndex The index value that dimension is fixed to. (Which row, column or matrix/area)
      * @param callback A callback with parameters that define a sub-loop
      */
-    default void loop(int dimension, long dimensionalIndex, final LoopCallback callback) {
+    default void loop(final int dimension, final long dimensionalIndex, final LoopCallback callback) {
 
         final long[] structure = this.shape();
 
@@ -510,7 +510,7 @@ public interface StructureAnyD extends Structure1D {
 
     }
 
-    default void loop(long[] initial, int dimension, LoopCallback callback) {
+    default void loop(final long[] initial, final int dimension, final LoopCallback callback) {
 
         long[] structure = this.shape();
 
@@ -523,7 +523,7 @@ public interface StructureAnyD extends Structure1D {
         callback.call(first, limit, step);
     }
 
-    default void loop(final Predicate<long[]> filter, IndexCallback callback) {
+    default void loop(final Predicate<long[]> filter, final IndexCallback callback) {
         final long[] structure = this.shape();
         for (long i = 0L, limit = this.count(); i < limit; i++) {
             final long[] reference = StructureAnyD.reference(i, structure);

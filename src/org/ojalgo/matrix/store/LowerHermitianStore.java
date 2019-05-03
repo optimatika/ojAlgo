@@ -21,28 +21,19 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.scalar.Scalar;
 
 final class LowerHermitianStore<N extends Number> extends ShadingStore<N> {
 
-    @SuppressWarnings("unused")
-    private LowerHermitianStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
-
-        this(base);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
     LowerHermitianStore(final MatrixStore<N> base) {
-        super(base, (int) base.countRows(), (int) Math.min(base.countRows(), base.countColumns()));
+        super(base, base.countRows(), Math.min(base.countRows(), base.countColumns()));
     }
 
     public double doubleValue(final long row, final long col) {
         if (row < col) {
-            return this.getBase().doubleValue(col, row);
+            return this.base().doubleValue(col, row);
         } else {
-            return this.getBase().doubleValue(row, col);
+            return this.base().doubleValue(row, col);
         }
     }
 
@@ -52,9 +43,9 @@ final class LowerHermitianStore<N extends Number> extends ShadingStore<N> {
 
     public Scalar<N> toScalar(final long row, final long col) {
         if (row < col) {
-            return this.getBase().toScalar(col, row).conjugate();
+            return this.base().toScalar(col, row).conjugate();
         } else {
-            return this.getBase().toScalar(row, col);
+            return this.base().toScalar(row, col);
         }
     }
 

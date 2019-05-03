@@ -38,7 +38,7 @@ public abstract class PrimitiveArray extends PlainArray<Double> implements Mutat
         return Primitive32Array.wrap(data);
     }
 
-    PrimitiveArray(DenseArray.Factory<Double> factory, final int size) {
+    PrimitiveArray(final DenseArray.Factory<Double> factory, final int size) {
         super(factory, size);
     }
 

@@ -40,7 +40,7 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
         Number aggregateSet(long[] initial, int dimension, Aggregator aggregator);
 
-        default void reduce(int dimension, Aggregator aggregator, Mutate1D receiver) {
+        default void reduce(final int dimension, final Aggregator aggregator, final Mutate1D receiver) {
             final long count1 = this.count(dimension);
             final long count2 = receiver.count();
             for (long i = 0L, limit = Math.min(count1, count2); i < limit; i++) {
@@ -178,11 +178,11 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         };
     }
 
-    default byte byteValue(long index) {
+    default byte byteValue(final long index) {
         return this.byteValue(StructureAnyD.reference(index, this.shape()));
     }
 
-    default byte byteValue(long[] ref) {
+    default byte byteValue(final long[] ref) {
         return (byte) this.shortValue(ref);
     }
 
@@ -196,11 +196,11 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     double doubleValue(long[] ref);
 
-    default float floatValue(long index) {
+    default float floatValue(final long index) {
         return this.floatValue(StructureAnyD.reference(index, this.shape()));
     }
 
-    default float floatValue(long[] ref) {
+    default float floatValue(final long[] ref) {
         return (float) this.doubleValue(ref);
     }
 
@@ -210,19 +210,19 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     N get(long[] ref);
 
-    default int intValue(long index) {
+    default int intValue(final long index) {
         return this.intValue(StructureAnyD.reference(index, this.shape()));
     }
 
-    default int intValue(long[] ref) {
+    default int intValue(final long[] ref) {
         return (int) this.longValue(ref);
     }
 
-    default long longValue(long index) {
+    default long longValue(final long index) {
         return this.longValue(StructureAnyD.reference(index, this.shape()));
     }
 
-    default long longValue(long[] ref) {
+    default long longValue(final long[] ref) {
         return Math.round(this.doubleValue(ref));
     }
 
@@ -230,11 +230,11 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         return new MatrixView<>(this);
     }
 
-    default short shortValue(long index) {
+    default short shortValue(final long index) {
         return this.shortValue(StructureAnyD.reference(index, this.shape()));
     }
 
-    default short shortValue(long[] ref) {
+    default short shortValue(final long[] ref) {
         return (short) this.intValue(ref);
     }
 

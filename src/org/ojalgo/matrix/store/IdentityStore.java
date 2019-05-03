@@ -66,9 +66,9 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
 
     public N get(final long aRow, final long aCol) {
         if (aRow == aCol) {
-            return this.physical().scalar().one().get();
+            return this.one().get();
         } else {
-            return this.physical().scalar().zero().get();
+            return this.zero().get();
         }
     }
 
@@ -129,14 +129,14 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
 
         receiver.reset();
 
-        receiver.fillDiagonal(this.physical().scalar().one().get());
+        receiver.fillDiagonal(this.one().get());
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
         if (row == column) {
-            return this.physical().scalar().one();
+            return this.one();
         } else {
-            return this.physical().scalar().zero();
+            return this.zero();
         }
     }
 

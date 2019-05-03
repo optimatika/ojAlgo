@@ -127,19 +127,19 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             return new NonzeroView<>(myIndices, myValues, -1, myLastCursor);
         }
 
-        public void modify(BinaryFunction<N> function, double right) {
+        public void modify(final BinaryFunction<N> function, final double right) {
             myValues.set(myCursor, function.invoke(myValues.doubleValue(myCursor), right));
         }
 
-        public void modify(BinaryFunction<N> function, N right) {
+        public void modify(final BinaryFunction<N> function, final N right) {
             myValues.set(myCursor, function.invoke(myValues.get(myCursor), right));
         }
 
-        public void modify(double left, BinaryFunction<N> function) {
+        public void modify(final double left, final BinaryFunction<N> function) {
             myValues.set(myCursor, function.invoke(left, myValues.doubleValue(myCursor)));
         }
 
-        public void modify(N left, BinaryFunction<N> function) {
+        public void modify(final N left, final BinaryFunction<N> function) {
             myValues.set(myCursor, function.invoke(left, myValues.get(myCursor)));
         }
 
@@ -205,7 +205,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             return new SparseArray<>(this.getStrategy().limit(), this.getStrategy());
         }
 
-        public SparseArray<N> make(long count) {
+        public SparseArray<N> make(final long count) {
             return new SparseArray<>(count, this.getStrategy().limit(count));
         }
 
@@ -489,7 +489,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public void visitPrimitiveNonzerosInRange(long first, long limit, NonzeroPrimitiveCallback visitor) {
+    public void visitPrimitiveNonzerosInRange(final long first, final long limit, final NonzeroPrimitiveCallback visitor) {
 
         int localFirst = this.index(first);
         if (localFirst < 0) {
@@ -506,7 +506,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    public void visitRange(long first, long limit, VoidFunction<N> visitor) {
+    public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
 
         int localFirst = this.index(first);
         if (localFirst < 0) {
@@ -526,7 +526,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public void visitReferenceTypeNonzerosInRange(long first, long limit, NonzeroReferenceTypeCallback<N> visitor) {
+    public void visitReferenceTypeNonzerosInRange(final long first, final long limit, final NonzeroReferenceTypeCallback<N> visitor) {
 
         int localFirst = this.index(first);
         if (localFirst < 0) {

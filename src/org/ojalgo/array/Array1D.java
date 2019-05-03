@@ -276,7 +276,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         myDelegate.add(tmpIndex, addend);
     }
 
-    public N aggregateRange(long first, long limit, Aggregator aggregator) {
+    public N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitRange(first, limit, visitor);
         return visitor.get();
@@ -504,7 +504,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         myDelegate.modify(myFirst, myLimit, myStep, modifier);
     }
 
-    public void modifyAny(Transformation1D<N> modifier) {
+    public void modifyAny(final Transformation1D<N> modifier) {
         modifier.transform(this);
     }
 

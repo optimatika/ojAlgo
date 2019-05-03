@@ -50,7 +50,7 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     public static final class DenseReceiver extends
             MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver>.DenseReceiver {
 
-        DenseReceiver(Factory enclosing, PhysicalStore<Quaternion> delegate) {
+        DenseReceiver(final Factory enclosing, final PhysicalStore<Quaternion> delegate) {
             enclosing.super(delegate);
         }
 
@@ -64,17 +64,17 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
         }
 
         @Override
-        QuaternionMatrix.LogicalBuilder logical(MatrixStore<Quaternion> delegate) {
+        QuaternionMatrix.LogicalBuilder logical(final MatrixStore<Quaternion> delegate) {
             return new QuaternionMatrix.LogicalBuilder(this, delegate);
         }
 
         @Override
-        QuaternionMatrix.DenseReceiver physical(PhysicalStore<Quaternion> delegate) {
+        QuaternionMatrix.DenseReceiver physical(final PhysicalStore<Quaternion> delegate) {
             return new QuaternionMatrix.DenseReceiver(this, delegate);
         }
 
         @Override
-        QuaternionMatrix.SparseReceiver physical(SparseStore<Quaternion> delegate) {
+        QuaternionMatrix.SparseReceiver physical(final SparseStore<Quaternion> delegate) {
             return new QuaternionMatrix.SparseReceiver(this, delegate);
         }
 
@@ -83,11 +83,11 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     public static final class LogicalBuilder extends
             MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver>.Logical {
 
-        LogicalBuilder(Factory enclosing, MatrixStore.LogicalBuilder<Quaternion> delegate) {
+        LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<Quaternion> delegate) {
             enclosing.super(delegate);
         }
 
-        LogicalBuilder(Factory enclosing, MatrixStore<Quaternion> store) {
+        LogicalBuilder(final Factory enclosing, final MatrixStore<Quaternion> store) {
             enclosing.super(store);
         }
 
@@ -101,7 +101,7 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     public static final class SparseReceiver extends
             MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver>.SparseReceiver {
 
-        SparseReceiver(Factory enclosing, SparseStore<Quaternion> delegate) {
+        SparseReceiver(final Factory enclosing, final SparseStore<Quaternion> delegate) {
             enclosing.super(delegate);
         }
 
@@ -150,32 +150,32 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     }
 
     @Override
-    Cholesky<Quaternion> getDecompositionCholesky(Structure2D typical) {
+    Cholesky<Quaternion> getDecompositionCholesky(final Structure2D typical) {
         return Cholesky.QUATERNION.make(typical);
     }
 
     @Override
-    Eigenvalue<Quaternion> getDecompositionEigenvalue(Structure2D typical) {
+    Eigenvalue<Quaternion> getDecompositionEigenvalue(final Structure2D typical) {
         return Eigenvalue.QUATERNION.make(typical, this.isHermitian());
     }
 
     @Override
-    LDL<Quaternion> getDecompositionLDL(Structure2D typical) {
+    LDL<Quaternion> getDecompositionLDL(final Structure2D typical) {
         return LDL.QUATERNION.make(typical);
     }
 
     @Override
-    LU<Quaternion> getDecompositionLU(Structure2D typical) {
+    LU<Quaternion> getDecompositionLU(final Structure2D typical) {
         return LU.QUATERNION.make(typical);
     }
 
     @Override
-    QR<Quaternion> getDecompositionQR(Structure2D typical) {
+    QR<Quaternion> getDecompositionQR(final Structure2D typical) {
         return QR.QUATERNION.make(typical);
     }
 
     @Override
-    SingularValue<Quaternion> getDecompositionSingularValue(Structure2D typical) {
+    SingularValue<Quaternion> getDecompositionSingularValue(final Structure2D typical) {
         return SingularValue.QUATERNION.make(typical);
     }
 

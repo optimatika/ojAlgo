@@ -88,7 +88,7 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
         return Math.round(this.generate());
     }
 
-    public SampleSet newSampleSet(int numberOfSamples) {
+    public SampleSet newSampleSet(final int numberOfSamples) {
         return SampleSet.make(this, numberOfSamples);
     }
 

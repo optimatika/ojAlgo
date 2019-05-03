@@ -31,6 +31,7 @@ import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.structure.Access1D;
@@ -78,7 +79,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         private final ActivatorFunctionFactory myFunction;
         private final boolean mySingleFolded;
 
-        Activator(ActivatorFunctionFactory function, PrimitiveFunction.Unary derivativeInTermsOfOutput, boolean singleFolded) {
+        Activator(final ActivatorFunctionFactory function, final PrimitiveFunction.Unary derivativeInTermsOfOutput, final boolean singleFolded) {
             myFunction = function;
             myDerivativeInTermsOfOutput = derivativeInTermsOfOutput;
             mySingleFolded = singleFolded;
@@ -88,7 +89,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
             return myDerivativeInTermsOfOutput;
         }
 
-        PrimitiveFunction.Unary getFunction(PrimitiveDenseStore arguments) {
+        PrimitiveFunction.Unary getFunction(final PrimitiveDenseStore arguments) {
             return myFunction.make(arguments);
         }
 
@@ -112,13 +113,13 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         private final PrimitiveFunction.Binary myDerivative;
         private final PrimitiveFunction.Binary myFunction;
 
-        Error(PrimitiveFunction.Binary function, PrimitiveFunction.Binary derivative) {
+        Error(final PrimitiveFunction.Binary function, final PrimitiveFunction.Binary derivative) {
             myFunction = function;
             myDerivative = derivative;
         }
 
-        public double invoke(Access1D<?> target, Access1D<?> current) {
-            int limit = (int) Math.min(target.count(), current.count());
+        public double invoke(final Access1D<?> target, final Access1D<?> current) {
+            int limit = MissingMath.toMinIntExact(target.count(), current.count());
             double retVal = ZERO;
             for (int i = 0; i < limit; i++) {
                 retVal += myFunction.invoke(target.doubleValue(i), current.doubleValue(i));
@@ -126,7 +127,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
             return retVal;
         }
 
-        public double invoke(double target, double current) {
+        public double invoke(final double target, final double current) {
             return myFunction.invoke(target, current);
         }
 
@@ -142,13 +143,13 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
 
     }
 
-    public static NetworkBuilder builder(int numberOfInputNodes, int... nodesPerCalculationLayer) {
+    public static NetworkBuilder builder(final int numberOfInputNodes, final int... nodesPerCalculationLayer) {
         return new NetworkBuilder(numberOfInputNodes, nodesPerCalculationLayer);
     }
 
     private final CalculationLayer[] myLayers;
 
-    ArtificialNeuralNetwork(int inputs, int[] layers) {
+    ArtificialNeuralNetwork(final int inputs, final int[] layers) {
         super();
         myLayers = new CalculationLayer[layers.length];
         int tmpIn = inputs;
@@ -161,7 +162,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -208,19 +209,19 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return myLayers.length;
     }
 
-    double getBias(int layer, int output) {
+    double getBias(final int layer, final int output) {
         return myLayers[layer].getBias(output);
     }
 
-    CalculationLayer getLayer(int index) {
+    CalculationLayer getLayer(final int index) {
         return myLayers[index];
     }
 
-    PrimitiveDenseStore getOutput(int layer) {
+    PrimitiveDenseStore getOutput(final int layer) {
         return myLayers[layer].getOutput();
     }
 
-    double getWeight(int layer, int input, int output) {
+    double getWeight(final int layer, final int input, final int output) {
         return myLayers[layer].getWeight(input, output);
     }
 

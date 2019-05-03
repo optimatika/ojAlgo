@@ -62,7 +62,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
 
         @Override
-        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
+        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
 
             final double s = this.doubleValue();
 
@@ -780,7 +780,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return retVal.append(RIGHT).toString();
     }
 
-    public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(T transformable) {
+    public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
 
         final double s = myRealValue;
 

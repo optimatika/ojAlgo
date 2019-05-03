@@ -105,7 +105,7 @@ public abstract class OjAlgoUtils {
         return tmpManifestValue != null ? tmpManifestValue : "X.X";
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         BasicLogger.debug();
         BasicLogger.debug("####################################################################");
         BasicLogger.debug("#################### Welcome to oj! Algorithms! ####################");

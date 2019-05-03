@@ -34,11 +34,11 @@ final class OffsetStore<N extends Number> extends SelectingStore<N> {
     }
 
     public double doubleValue(final long row, final long col) {
-        return this.getBase().doubleValue(myRowOffset + row, myColumnOffset + col);
+        return this.base().doubleValue(myRowOffset + row, myColumnOffset + col);
     }
 
     public N get(final long row, final long col) {
-        return this.getBase().get(myRowOffset + row, myColumnOffset + col);
+        return this.base().get(myRowOffset + row, myColumnOffset + col);
     }
 
 }

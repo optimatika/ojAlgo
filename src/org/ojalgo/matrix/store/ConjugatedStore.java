@@ -36,11 +36,11 @@ final class ConjugatedStore<N extends Number> extends TransjugatedStore<N> {
 
     @Override
     public MatrixStore<N> conjugate() {
-        return this.getBase();
+        return this.base();
     }
 
     public N get(final long aRow, final long aCol) {
-        return this.getBase().toScalar((int) aCol, (int) aRow).conjugate().get();
+        return this.base().toScalar((int) aCol, (int) aRow).conjugate().get();
     }
 
     @Override
@@ -50,7 +50,7 @@ final class ConjugatedStore<N extends Number> extends TransjugatedStore<N> {
 
         if (right instanceof ConjugatedStore<?>) {
 
-            retVal = ((ConjugatedStore<N>) right).getOriginal().multiply(this.getBase());
+            retVal = ((ConjugatedStore<N>) right).getOriginal().multiply(this.base());
 
             retVal = new ConjugatedStore<>(retVal);
 
@@ -63,7 +63,7 @@ final class ConjugatedStore<N extends Number> extends TransjugatedStore<N> {
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
-        return this.getBase().toScalar(column, row).conjugate();
+        return this.base().toScalar(column, row).conjugate();
     }
 
 }

@@ -409,11 +409,6 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     }
 
     @Override
-    protected double getDimensionalEpsilon() {
-        return d.length * PrimitiveMath.MACHINE_EPSILON;
-    }
-
-    @Override
     protected MatrixStore<N> makeD() {
         final DiagonalBasicArray<Double> diagonal = new DiagonalBasicArray<>(Primitive64Array.wrap(d), null, null, ZERO);
         return this.wrap(diagonal).diagonal().get();

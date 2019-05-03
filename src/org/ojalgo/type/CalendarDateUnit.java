@@ -141,7 +141,7 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
         }
     }
 
-    public long adjustInto(long epochMilli) {
+    public long adjustInto(final long epochMilli) {
         return ((epochMilli / myDurationInMillis) * myDurationInMillis) + myHalf;
     }
 
@@ -328,7 +328,7 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
         }
     }
 
-    public CalendarDateDuration newDuration(double meassure) {
+    public CalendarDateDuration newDuration(final double meassure) {
         return new CalendarDateDuration(meassure, this);
     }
 
