@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -122,15 +121,6 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
     MatrixStore<N> getQ();
 
     MatrixStore<N> getR();
-
-    /**
-     * Is the matrix full rank?
-     *
-     * @return true if R, and hence A, has full rank.
-     */
-    default boolean isFullRank() {
-        return this.getRank() == MissingMath.toMinIntExact(this.countRows(), this.countColumns());
-    }
 
     default boolean isOrdered() {
         return false;

@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
@@ -231,8 +232,7 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
 
         /**
          * @param threshold Significance limit
-         * @return The number of elements in the diagonal matrix that are greater than or equal to the
-         *         threshold
+         * @return The number of elements in the diagonal matrix that are greater than the threshold
          */
         int countSignificant(double threshold);
 
@@ -251,7 +251,9 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
         /**
          * @return true if the rank is equal to the minimum of the row and column dimensions; false if not
          */
-        boolean isFullRank();
+        default boolean isFullRank() {
+            return this.getRank() == MissingMath.toMinIntExact(this.countRows(), this.countColumns());
+        }
 
     }
 

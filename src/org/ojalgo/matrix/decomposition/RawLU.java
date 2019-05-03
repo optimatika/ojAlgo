@@ -30,7 +30,6 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
@@ -65,7 +64,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         int significant = 0;
         for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (Math.abs(internal.doubleValue(ij, ij)) >= threshold) {
+            if (Math.abs(internal.doubleValue(ij, ij)) > threshold) {
                 significant++;
             }
         }
@@ -161,26 +160,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         } else {
             throw RecoverableCondition.newMatrixNotInvertible();
         }
-    }
-
-    /**
-     * Is the matrix nonsingular?
-     *
-     * @return true if U, and hence A, is nonsingular.
-     */
-    public boolean isFullRank() {
-
-        final RawStore raw = this.getInternalStore();
-
-        double largestValue = Math.sqrt(raw.aggregateDiagonal(Aggregator.LARGEST));
-
-        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (PrimitiveScalar.isSmall(largestValue, raw.doubleValue(ij, ij))) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public boolean isPivoted() {

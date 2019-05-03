@@ -99,7 +99,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
         int significant = 0;
         for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (internal.doubleValue(ij, ij) >= minimum) {
+            if (internal.doubleValue(ij, ij) > minimum) {
                 significant++;
             }
         }
@@ -195,10 +195,6 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         } else {
             throw RecoverableCondition.newMatrixNotInvertible();
         }
-    }
-
-    public boolean isFullRank() {
-        return this.isSolvable();
     }
 
     public final boolean isFullSize() {

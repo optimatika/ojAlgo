@@ -105,11 +105,24 @@ public abstract class MatrixDecompositionTests {
                 new RawLU() };
     }
 
+    public static List<MatrixDecomposition.RankRevealing<?>> getAnyMatrixDecompositionRankRevealing() {
+
+        List<MatrixDecomposition.RankRevealing<?>> retVal = new ArrayList<>();
+
+        for (MatrixDecomposition<?> decomp : MatrixDecompositionTests.getAnyAll()) {
+            if (decomp instanceof MatrixDecomposition.RankRevealing) {
+                retVal.add((MatrixDecomposition.RankRevealing<?>) decomp);
+            }
+        }
+
+        return Collections.unmodifiableList(retVal);
+    }
+
     public static List<MatrixDecomposition.Solver<?>> getAnyMatrixDecompositionSolver() {
 
         List<MatrixDecomposition.Solver<?>> retVal = new ArrayList<>();
 
-        for (MatrixDecomposition<?> decomp : MatrixDecompositionTests.getPrimitiveAll()) {
+        for (MatrixDecomposition<?> decomp : MatrixDecompositionTests.getAnyAll()) {
             if (decomp instanceof MatrixDecomposition.Solver) {
                 retVal.add((MatrixDecomposition.Solver<?>) decomp);
             }
@@ -204,6 +217,19 @@ public abstract class MatrixDecompositionTests {
     @SuppressWarnings("unchecked")
     public static LU<Double>[] getPrimitiveLU() {
         return (LU<Double>[]) new LU<?>[] { new LUDecomposition.Primitive(), new RawLU() };
+    }
+
+    public static List<MatrixDecomposition.RankRevealing<Double>> getPrimitiveMatrixDecompositionRankRevealing() {
+
+        List<MatrixDecomposition.RankRevealing<Double>> retVal = new ArrayList<>();
+
+        for (MatrixDecomposition<Double> decomp : MatrixDecompositionTests.getPrimitiveAll()) {
+            if (decomp instanceof MatrixDecomposition.RankRevealing) {
+                retVal.add((MatrixDecomposition.RankRevealing<Double>) decomp);
+            }
+        }
+
+        return Collections.unmodifiableList(retVal);
     }
 
     public static List<MatrixDecomposition.Solver<Double>> getPrimitiveMatrixDecompositionSolver() {

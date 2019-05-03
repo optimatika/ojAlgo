@@ -108,7 +108,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         int significant = 0;
         for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (Math.abs(internal.doubleValue(ij, ij)) >= threshold) {
+            if (Math.abs(internal.doubleValue(ij, ij)) > threshold) {
                 significant++;
             }
         }

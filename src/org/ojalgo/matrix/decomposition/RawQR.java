@@ -80,7 +80,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         int significant = 0;
         for (int ij = 0, limit = myDiagonalR.length; ij < limit; ij++) {
-            if (Math.abs(myDiagonalR[ij]) >= threshold) {
+            if (Math.abs(myDiagonalR[ij]) > threshold) {
                 significant++;
             }
         }

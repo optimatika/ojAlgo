@@ -361,7 +361,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     public int countSignificant(final double threshold) {
         int significant = 0;
         for (int i = 0; i < s.length; i++) {
-            if (s[i] >= threshold) {
+            if (s[i] > threshold) {
                 significant++;
             }
         }
@@ -526,8 +526,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     public boolean isFullRank() {
-        double tolerance = s[0] * this.getDimensionalEpsilon();
-        return s[s.length - 1] > tolerance;
+        return s[s.length - 1] > this.getRankThreshold();
     }
 
     public boolean isFullSize() {

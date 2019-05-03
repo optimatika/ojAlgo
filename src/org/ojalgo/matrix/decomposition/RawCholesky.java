@@ -79,7 +79,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
         int significant = 0;
         for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (internal.doubleValue(ij, ij) >= minimum) {
+            if (internal.doubleValue(ij, ij) > minimum) {
                 significant++;
             }
         }
@@ -156,10 +156,6 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         } else {
             throw RecoverableCondition.newMatrixNotInvertible();
         }
-    }
-
-    public boolean isFullRank() {
-        return this.isSolvable();
     }
 
     public boolean isSPD() {
