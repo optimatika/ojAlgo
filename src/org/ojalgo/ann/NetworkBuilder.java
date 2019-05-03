@@ -44,7 +44,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
     private final PrimitiveDenseStore[] myLayerValues;
     private double myLearningRate = 1.0;
 
-    NetworkBuilder(int numberOfInputNodes, int... outputNodesPerCalculationLayer) {
+    NetworkBuilder(final int numberOfInputNodes, final int... outputNodesPerCalculationLayer) {
 
         super();
 
@@ -65,32 +65,32 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
      * @param layer 0-based index among the calculation layers (excluding the input layer)
      * @param activator The activator function to use
      */
-    public NetworkBuilder activator(int layer, ArtificialNeuralNetwork.Activator activator) {
+    public NetworkBuilder activator(final int layer, final ArtificialNeuralNetwork.Activator activator) {
         myANN.getLayer(layer).setActivator(activator);
         return this;
     }
 
-    public NetworkBuilder activators(ArtificialNeuralNetwork.Activator activator) {
+    public NetworkBuilder activators(final ArtificialNeuralNetwork.Activator activator) {
         for (int i = 0, limit = myANN.countCalculationLayers(); i < limit; i++) {
             myANN.getLayer(i).setActivator(activator);
         }
         return this;
     }
 
-    public NetworkBuilder activators(ArtificialNeuralNetwork.Activator... activators) {
+    public NetworkBuilder activators(final ArtificialNeuralNetwork.Activator... activators) {
         for (int i = 0, limit = activators.length; i < limit; i++) {
             myANN.getLayer(i).setActivator(activators[i]);
         }
         return this;
     }
 
-    public NetworkBuilder bias(int layer, int output, double bias) {
+    public NetworkBuilder bias(final int layer, final int output, final double bias) {
         myANN.getLayer(layer).setBias(output, bias);
         return this;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -117,7 +117,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return true;
     }
 
-    public NetworkBuilder error(ArtificialNeuralNetwork.Error error) {
+    public NetworkBuilder error(final ArtificialNeuralNetwork.Error error) {
         myError = error;
         return this;
     }
@@ -139,7 +139,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return result;
     }
 
-    public NetworkBuilder rate(double rate) {
+    public NetworkBuilder rate(final double rate) {
         myLearningRate = rate;
         return this;
     }
@@ -155,7 +155,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return tmpBuilder.toString();
     }
 
-    public void train(Access1D<Double> givenInput, Access1D<Double> targetOutput) {
+    public void train(final Access1D<Double> givenInput, final Access1D<Double> targetOutput) {
 
         Access1D<Double> current = myANN.invoke(givenInput);
 
@@ -171,7 +171,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
      * Note that the required {@link Iterable}:s can be obtained from calling {@link Access2D#rows()} or
      * {@link Access2D#columns()} on anything "2D".
      */
-    public void train(Iterable<? extends Access1D<Double>> givenInputs, Iterable<? extends Access1D<Double>> targetOutputs) {
+    public void train(final Iterable<? extends Access1D<Double>> givenInputs, final Iterable<? extends Access1D<Double>> targetOutputs) {
 
         Iterator<? extends Access1D<Double>> iterI = givenInputs.iterator();
         Iterator<? extends Access1D<Double>> iterO = targetOutputs.iterator();
@@ -181,20 +181,20 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         }
     }
 
-    public NetworkBuilder weight(int layer, int input, int output, double weight) {
+    public NetworkBuilder weight(final int layer, final int input, final int output, final double weight) {
         myANN.getLayer(layer).setWeight(input, output, weight);
         return this;
     }
 
-    double error(Access1D<?> target, Access1D<?> current) {
+    double error(final Access1D<?> target, final Access1D<?> current) {
         return myError.invoke(target, current);
     }
 
-    double getBias(int layer, int output) {
+    double getBias(final int layer, final int output) {
         return myANN.getBias(layer, output);
     }
 
-    double getWeight(int layer, int input, int output) {
+    double getWeight(final int layer, final int input, final int output) {
         return myANN.getWeight(layer, input, output);
     }
 

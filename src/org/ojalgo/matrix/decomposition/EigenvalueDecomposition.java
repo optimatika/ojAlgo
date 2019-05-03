@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -61,6 +61,7 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
 
     private MatrixStore<N> myD = null;
     private Array1D<ComplexNumber> myEigenvalues = null;
+    private int mySquareDim = 0;
     private MatrixStore<N> myV = null;
     private boolean myValuesOnly = false;
 
@@ -73,8 +74,8 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         return this.getDeterminant();
     }
 
-    public final boolean checkAndCompute(final MatrixStore<N> matrix) {
-        return this.compute(matrix, MatrixUtils.isHermitian(matrix), false);
+    public final boolean checkAndDecompose(final MatrixStore<N> matrix) {
+        return this.compute(matrix, matrix.isHermitian(), false);
     }
 
     public boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
@@ -122,6 +123,8 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         myV = null;
 
         myValuesOnly = false;
+
+        mySquareDim = 0;
     }
 
     private final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean hermitian, final boolean valuesOnly) {
@@ -131,6 +134,12 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         myValuesOnly = valuesOnly;
 
         boolean retVal = false;
+
+        long countRows = matrix.countRows();
+        if (matrix.countColumns() != countRows) {
+            ProgrammingError.throwIfNotSquare(matrix);
+        }
+        mySquareDim = Math.toIntExact(countRows);
 
         try {
 
@@ -155,6 +164,26 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
     protected abstract boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
 
     protected abstract boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
+
+    @Override
+    protected int getColDim() {
+        return mySquareDim;
+    }
+
+    @Override
+    protected int getMaxDim() {
+        return mySquareDim;
+    }
+
+    @Override
+    protected int getMinDim() {
+        return mySquareDim;
+    }
+
+    @Override
+    protected int getRowDim() {
+        return mySquareDim;
+    }
 
     protected abstract MatrixStore<N> makeD();
 

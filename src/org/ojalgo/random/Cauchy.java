@@ -37,17 +37,17 @@ public class Cauchy extends AbstractContinuous {
         this(ZERO, ONE);
     }
 
-    public Cauchy(double location, double scale) {
+    public Cauchy(final double location, final double scale) {
         super();
         myLocation = location;
         myScale = scale;
     }
 
-    public double getDensity(double value) {
+    public double getDensity(final double value) {
         return ONE / (PI * myScale * (ONE + Math.pow((value - myLocation) / myScale, TWO)));
     }
 
-    public double getDistribution(double value) {
+    public double getDistribution(final double value) {
         return HALF + (Math.atan((value - myLocation) / myScale) / PI);
     }
 
@@ -55,7 +55,7 @@ public class Cauchy extends AbstractContinuous {
         return NaN;
     }
 
-    public double getQuantile(double probability) {
+    public double getQuantile(final double probability) {
         return myLocation + (myScale * Math.tan(PI * (probability - HALF)));
     }
 

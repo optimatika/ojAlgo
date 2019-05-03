@@ -62,7 +62,7 @@ public interface ContinuousDistribution extends Distribution {
      * @deprecated v48 Use {@link #getDensity(double)} instead
      */
     @Deprecated
-    default double getProbability(double value) {
+    default double getProbability(final double value) {
         return this.getDensity(value);
     }
 

@@ -41,8 +41,8 @@ public interface ModelFileMPS {
     String OPTIMISATION_RSRC = "./rsrc/optimisation/";
     String SOLUTION_NOT_VALID = "Solution not valid!";
 
-    static void assertValues(final ExpressionsBasedModel model, BigDecimal expMinVal, BigDecimal expMaxVal, final Map<String, BigDecimal> solution,
-            NumberContext precision) {
+    static void assertValues(final ExpressionsBasedModel model, final BigDecimal expMinVal, final BigDecimal expMaxVal, final Map<String, BigDecimal> solution,
+            final NumberContext precision) {
 
         TestUtils.assertTrue(model.validate());
 
@@ -83,8 +83,8 @@ public interface ModelFileMPS {
         }
     }
 
-    static ExpressionsBasedModel makeAndAssert(String dataset, final String modelName, final String expMinValString, final String expMaxValString,
-            final boolean relax, NumberContext precision, final Map<String, BigDecimal> solution) {
+    static ExpressionsBasedModel makeAndAssert(final String dataset, final String modelName, final String expMinValString, final String expMaxValString,
+            final boolean relax, final NumberContext precision, final Map<String, BigDecimal> solution) {
 
         final ExpressionsBasedModel model = ModelFileMPS.makeModel(dataset, modelName, relax);
 
@@ -96,7 +96,7 @@ public interface ModelFileMPS {
         return model;
     }
 
-    static ExpressionsBasedModel makeModel(String dataset, final String name, final boolean relax) {
+    static ExpressionsBasedModel makeModel(final String dataset, final String name, final boolean relax) {
 
         final File file = new File(OPTIMISATION_RSRC + dataset + "/" + name);
         final ExpressionsBasedModel model = MathProgSysModel.make(file).getExpressionsBasedModel();

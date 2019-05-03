@@ -287,7 +287,7 @@ public class DesignCase {
         TestUtils.assertEquals(tmpOriginalMatrix, tmpNewDecomp, new NumberContext(7, 6));
     }
 
-    private void doTestSolveInverse(MatrixDecomposition.Solver<Double> solver, MatrixStore<Double> matrix) {
+    private void doTestSolveInverse(final MatrixDecomposition.Solver<Double> solver, final MatrixStore<Double> matrix) {
 
         TestUtils.assertEquals("Matrix not square!", matrix.countRows(), matrix.countColumns());
 

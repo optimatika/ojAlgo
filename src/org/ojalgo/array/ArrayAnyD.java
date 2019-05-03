@@ -135,20 +135,20 @@ public final class ArrayAnyD<N extends Number>
         myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
 
-    public N aggregateRange(long first, long limit, Aggregator aggregator) {
+    public N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitRange(first, limit, visitor);
         return visitor.get();
     }
 
-    public Number aggregateSet(int dimension, long dimensionalIndex, Aggregator aggregator) {
+    public Number aggregateSet(final int dimension, final long dimensionalIndex, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitSet(dimension, dimensionalIndex, visitor);
         return visitor.get();
     }
 
     @Override
-    public Number aggregateSet(long[] initial, int dimension, Aggregator aggregator) {
+    public Number aggregateSet(final long[] initial, final int dimension, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitSet(initial, dimension, visitor);
         return visitor.get();
@@ -233,12 +233,12 @@ public final class ArrayAnyD<N extends Number>
     }
 
     @Override
-    public void fillSet(int dimension, long dimensionalIndex, N value) {
+    public void fillSet(final int dimension, final long dimensionalIndex, final N value) {
         this.loop(dimension, dimensionalIndex, (f, l, s) -> myDelegate.fill(f, l, s, value));
     }
 
     @Override
-    public void fillSet(int dimension, long dimensionalIndex, NullaryFunction<N> supplier) {
+    public void fillSet(final int dimension, final long dimensionalIndex, final NullaryFunction<N> supplier) {
         this.loop(dimension, dimensionalIndex, (f, l, s) -> myDelegate.fill(f, l, s, supplier));
     }
 
@@ -247,7 +247,7 @@ public final class ArrayAnyD<N extends Number>
     }
 
     @Override
-    public void fillSet(long[] initial, int dimension, NullaryFunction<N> supplier) {
+    public void fillSet(final long[] initial, final int dimension, final NullaryFunction<N> supplier) {
         this.loop(initial, dimension, (f, l, s) -> myDelegate.fill(f, l, s, supplier));
     }
 
@@ -315,7 +315,7 @@ public final class ArrayAnyD<N extends Number>
         myDelegate.modify(0L, this.count(), 1L, modifier);
     }
 
-    public void modifyAny(TransformationAnyD<N> modifier) {
+    public void modifyAny(final TransformationAnyD<N> modifier) {
         modifier.transform(this);
     }
 
@@ -340,7 +340,7 @@ public final class ArrayAnyD<N extends Number>
     }
 
     @Override
-    public void modifySet(int dimension, long dimensionalIndex, UnaryFunction<N> modifier) {
+    public void modifySet(final int dimension, final long dimensionalIndex, final UnaryFunction<N> modifier) {
         this.loop(dimension, dimensionalIndex, (f, l, s) -> myDelegate.modify(f, l, s, modifier));
     }
 
@@ -352,7 +352,7 @@ public final class ArrayAnyD<N extends Number>
         return myStructure.length;
     }
 
-    public Array1D<N> reduce(int dimension, Aggregator aggregator) {
+    public Array1D<N> reduce(final int dimension, final Aggregator aggregator) {
         final long reduceToCount = StructureAnyD.count(myStructure, dimension);
         Array1D<N> retVal = myDelegate.factory().makeZero(reduceToCount).wrapInArray1D();
         this.reduce(dimension, aggregator, retVal);
@@ -360,7 +360,7 @@ public final class ArrayAnyD<N extends Number>
     }
 
     @Override
-    public Array2D<N> reduce(int rowDimension, int columnDimension, Aggregator aggregator) {
+    public Array2D<N> reduce(final int rowDimension, final int columnDimension, final Aggregator aggregator) {
 
         long[] structure = this.shape();
 
@@ -469,7 +469,7 @@ public final class ArrayAnyD<N extends Number>
         myDelegate.visit(first, limit, 1L, visitor);
     }
 
-    public void visitSet(int dimension, long dimensionalIndex, VoidFunction<N> visitor) {
+    public void visitSet(final int dimension, final long dimensionalIndex, final VoidFunction<N> visitor) {
         this.loop(dimension, dimensionalIndex, (f, l, s) -> myDelegate.visit(f, l, s, visitor));
     }
 

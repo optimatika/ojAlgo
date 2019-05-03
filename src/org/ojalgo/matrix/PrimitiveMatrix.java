@@ -49,7 +49,7 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
     public static final class DenseReceiver extends
             MatrixFactory<Double, PrimitiveMatrix, PrimitiveMatrix.LogicalBuilder, PrimitiveMatrix.DenseReceiver, PrimitiveMatrix.SparseReceiver>.DenseReceiver {
 
-        DenseReceiver(Factory enclosing, PhysicalStore<Double> delegate) {
+        DenseReceiver(final Factory enclosing, final PhysicalStore<Double> delegate) {
             enclosing.super(delegate);
         }
 
@@ -63,17 +63,17 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
         }
 
         @Override
-        PrimitiveMatrix.LogicalBuilder logical(MatrixStore<Double> delegate) {
+        PrimitiveMatrix.LogicalBuilder logical(final MatrixStore<Double> delegate) {
             return new PrimitiveMatrix.LogicalBuilder(this, delegate);
         }
 
         @Override
-        PrimitiveMatrix.DenseReceiver physical(PhysicalStore<Double> delegate) {
+        PrimitiveMatrix.DenseReceiver physical(final PhysicalStore<Double> delegate) {
             return new PrimitiveMatrix.DenseReceiver(this, delegate);
         }
 
         @Override
-        PrimitiveMatrix.SparseReceiver physical(SparseStore<Double> delegate) {
+        PrimitiveMatrix.SparseReceiver physical(final SparseStore<Double> delegate) {
             return new PrimitiveMatrix.SparseReceiver(this, delegate);
         }
 
@@ -82,11 +82,11 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
     public static final class LogicalBuilder extends
             MatrixFactory<Double, PrimitiveMatrix, PrimitiveMatrix.LogicalBuilder, PrimitiveMatrix.DenseReceiver, PrimitiveMatrix.SparseReceiver>.Logical {
 
-        LogicalBuilder(Factory enclosing, MatrixStore.LogicalBuilder<Double> delegate) {
+        LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<Double> delegate) {
             enclosing.super(delegate);
         }
 
-        LogicalBuilder(Factory enclosing, MatrixStore<Double> store) {
+        LogicalBuilder(final Factory enclosing, final MatrixStore<Double> store) {
             enclosing.super(store);
         }
 
@@ -100,7 +100,7 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
     public static final class SparseReceiver extends
             MatrixFactory<Double, PrimitiveMatrix, PrimitiveMatrix.LogicalBuilder, PrimitiveMatrix.DenseReceiver, PrimitiveMatrix.SparseReceiver>.SparseReceiver {
 
-        SparseReceiver(Factory enclosing, SparseStore<Double> delegate) {
+        SparseReceiver(final Factory enclosing, final SparseStore<Double> delegate) {
             enclosing.super(delegate);
         }
 
@@ -153,32 +153,32 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
     }
 
     @Override
-    Cholesky<Double> getDecompositionCholesky(Structure2D typical) {
+    Cholesky<Double> getDecompositionCholesky(final Structure2D typical) {
         return Cholesky.PRIMITIVE.make(typical);
     }
 
     @Override
-    Eigenvalue<Double> getDecompositionEigenvalue(Structure2D typical) {
+    Eigenvalue<Double> getDecompositionEigenvalue(final Structure2D typical) {
         return Eigenvalue.PRIMITIVE.make(typical, this.isHermitian());
     }
 
     @Override
-    LDL<Double> getDecompositionLDL(Structure2D typical) {
+    LDL<Double> getDecompositionLDL(final Structure2D typical) {
         return LDL.PRIMITIVE.make(typical);
     }
 
     @Override
-    LU<Double> getDecompositionLU(Structure2D typical) {
+    LU<Double> getDecompositionLU(final Structure2D typical) {
         return LU.PRIMITIVE.make(typical);
     }
 
     @Override
-    QR<Double> getDecompositionQR(Structure2D typical) {
+    QR<Double> getDecompositionQR(final Structure2D typical) {
         return QR.PRIMITIVE.make(typical);
     }
 
     @Override
-    SingularValue<Double> getDecompositionSingularValue(Structure2D typical) {
+    SingularValue<Double> getDecompositionSingularValue(final Structure2D typical) {
         return SingularValue.PRIMITIVE.make(typical);
     }
 

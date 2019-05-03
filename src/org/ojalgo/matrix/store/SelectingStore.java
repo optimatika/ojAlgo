@@ -32,4 +32,8 @@ abstract class SelectingStore<N extends Number> extends LogicalStore<N> {
         super(base, rowsCount, columnsCount);
     }
 
+    protected SelectingStore(final MatrixStore<N> base, final long rowsCount, final long columnsCount) {
+        super(base, rowsCount, columnsCount);
+    }
+
 }

@@ -4,7 +4,40 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
+# v47.2.0: 2019-05-03
+
 * ...
+
+## org.ojalgo.data
+
+* Renamed DataPreprocessors to DataProcessors, and added methods to create a covariance matrix from an SVD.
+
+## org.ojalgo.function
+
+* Added a couple more utilities to MissingMath
+
+## org.ojalgo.matrix
+
+* New LU decomposition implementation that is faster for small matrices.
+* Fixed a bug related to solving equation systems and inverting matrices using SingularValue at certain matrix sizes.
+* Renamed checkAndCompute to checkAndDecompose in the MatrixDecomposition.Hermitian interface
+* Extended the MatrixStore.LogicalBuilder rows() and columns() methods to allow for negative indexes that refer to all zero rows/columns.
+* New more efficient implementation of MatrixStore.LogicalBuilder.diagonal() data structure.
+* The MatrixDecomposition interface now extends Structure2D so that you can get the size/shape of the original matrix.
+* Additions to the MatrixDecomposition.RankRevealing interface. It is now possible to estimate the rank using a custom threshold. Also reworked all code related to estimating rank (in all implementations of that interface).
+
+## org.ojalgo.netio
+
+* New funcion to generate random strings of ASCII characters, of specified length.
+
+## org.ojalgo.optimisation
+
+* The optimisation model parameter scaling functionality has been tweaked to be more in line with the improved "rank revealing" of matrices.
+* Minor improvements to ConvexSolver
+
+## org.ojalgo.structure
+
+* The Stream2D interface now has methods operateOnColumns(...) and operateOnRows(...)
 
 # v47.1.2: 2019-04-23
 

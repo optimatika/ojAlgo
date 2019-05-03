@@ -264,7 +264,7 @@ public interface Optimisation {
             super();
         }
 
-        public Options abort(CalendarDateDuration duration) {
+        public Options abort(final CalendarDateDuration duration) {
             ProgrammingError.throwIfNull(duration);
             time_abort = duration.toDurationInMillis();
             return this;
@@ -305,7 +305,7 @@ public interface Optimisation {
             myConfigurator = configurator;
         }
 
-        public Options suffice(CalendarDateDuration duration) {
+        public Options suffice(final CalendarDateDuration duration) {
             ProgrammingError.throwIfNull(duration);
             time_suffice = duration.toDurationInMillis();
             return this;
@@ -386,7 +386,7 @@ public interface Optimisation {
         /**
          * Will round the solution to the given precision
          */
-        public Optimisation.Result getSolution(NumberContext precision) {
+        public Optimisation.Result getSolution(final NumberContext precision) {
             final Optimisation.State state = this.getState();
             final double value = this.getValue();
             final BigArray solution = BigArray.make((int) this.count());
@@ -517,7 +517,7 @@ public interface Optimisation {
          */
         VALID(4);
 
-        private int myValue;
+        private final int myValue;
 
         State(final int aValue) {
             myValue = aValue;

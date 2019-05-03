@@ -228,7 +228,7 @@ public final class IntegerSolver extends GenericSolver {
         return new IntegerSolver(model, model.options);
     }
 
-    static void flush(PrinterBuffer buffer, BasicLogger.Printer receiver) {
+    static void flush(final PrinterBuffer buffer, final BasicLogger.Printer receiver) {
         if ((buffer != null) && (receiver != null)) {
             buffer.flush(receiver);
         }
@@ -317,7 +317,7 @@ public final class IntegerSolver extends GenericSolver {
         return TypeUtils.format("Solutions={} Nodes/Iterations={} {}", this.countIntegerSolutions(), this.countExploredNodes(), this.getBestResultSoFar());
     }
 
-    protected Boolean compute(NodeKey nodeKey, final ExpressionsBasedModel.Intermediate nodeModel, PrinterBuffer nodePrinter) {
+    protected Boolean compute(final NodeKey nodeKey, final ExpressionsBasedModel.Intermediate nodeModel, final PrinterBuffer nodePrinter) {
 
         if (this.isLogDebug()) {
             nodePrinter.println();

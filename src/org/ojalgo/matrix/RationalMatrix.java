@@ -50,7 +50,7 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     public static final class DenseReceiver extends
             MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.DenseReceiver {
 
-        DenseReceiver(Factory enclosing, PhysicalStore<RationalNumber> delegate) {
+        DenseReceiver(final Factory enclosing, final PhysicalStore<RationalNumber> delegate) {
             enclosing.super(delegate);
         }
 
@@ -64,17 +64,17 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
         }
 
         @Override
-        RationalMatrix.LogicalBuilder logical(MatrixStore<RationalNumber> delegate) {
+        RationalMatrix.LogicalBuilder logical(final MatrixStore<RationalNumber> delegate) {
             return new RationalMatrix.LogicalBuilder(this, delegate);
         }
 
         @Override
-        RationalMatrix.DenseReceiver physical(PhysicalStore<RationalNumber> delegate) {
+        RationalMatrix.DenseReceiver physical(final PhysicalStore<RationalNumber> delegate) {
             return new RationalMatrix.DenseReceiver(this, delegate);
         }
 
         @Override
-        RationalMatrix.SparseReceiver physical(SparseStore<RationalNumber> delegate) {
+        RationalMatrix.SparseReceiver physical(final SparseStore<RationalNumber> delegate) {
             return new RationalMatrix.SparseReceiver(this, delegate);
         }
 
@@ -83,11 +83,11 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     public static final class LogicalBuilder extends
             MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.Logical {
 
-        LogicalBuilder(Factory enclosing, MatrixStore.LogicalBuilder<RationalNumber> delegate) {
+        LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<RationalNumber> delegate) {
             enclosing.super(delegate);
         }
 
-        LogicalBuilder(Factory enclosing, MatrixStore<RationalNumber> store) {
+        LogicalBuilder(final Factory enclosing, final MatrixStore<RationalNumber> store) {
             enclosing.super(store);
         }
 
@@ -101,7 +101,7 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     public static final class SparseReceiver extends
             MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver>.SparseReceiver {
 
-        SparseReceiver(Factory enclosing, SparseStore<RationalNumber> delegate) {
+        SparseReceiver(final Factory enclosing, final SparseStore<RationalNumber> delegate) {
             enclosing.super(delegate);
         }
 
@@ -150,32 +150,32 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
     }
 
     @Override
-    Cholesky<RationalNumber> getDecompositionCholesky(Structure2D typical) {
+    Cholesky<RationalNumber> getDecompositionCholesky(final Structure2D typical) {
         return Cholesky.RATIONAL.make(typical);
     }
 
     @Override
-    Eigenvalue<RationalNumber> getDecompositionEigenvalue(Structure2D typical) {
+    Eigenvalue<RationalNumber> getDecompositionEigenvalue(final Structure2D typical) {
         return Eigenvalue.RATIONAL.make(typical, this.isHermitian());
     }
 
     @Override
-    LDL<RationalNumber> getDecompositionLDL(Structure2D typical) {
+    LDL<RationalNumber> getDecompositionLDL(final Structure2D typical) {
         return LDL.RATIONAL.make(typical);
     }
 
     @Override
-    LU<RationalNumber> getDecompositionLU(Structure2D typical) {
+    LU<RationalNumber> getDecompositionLU(final Structure2D typical) {
         return LU.RATIONAL.make(typical);
     }
 
     @Override
-    QR<RationalNumber> getDecompositionQR(Structure2D typical) {
+    QR<RationalNumber> getDecompositionQR(final Structure2D typical) {
         return QR.RATIONAL.make(typical);
     }
 
     @Override
-    SingularValue<RationalNumber> getDecompositionSingularValue(Structure2D typical) {
+    SingularValue<RationalNumber> getDecompositionSingularValue(final Structure2D typical) {
         return SingularValue.RATIONAL.make(typical);
     }
 

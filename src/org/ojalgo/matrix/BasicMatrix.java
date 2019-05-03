@@ -593,11 +593,11 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         return myStore.norm();
     }
 
-    public M reduceColumns(Aggregator aggregator) {
+    public M reduceColumns(final Aggregator aggregator) {
         return this.getFactory().instantiate(myStore.reduceColumns(aggregator).get());
     }
 
-    public M reduceRows(Aggregator aggregator) {
+    public M reduceRows(final Aggregator aggregator) {
         return this.getFactory().instantiate(myStore.reduceRows(aggregator).get());
     }
 
@@ -692,7 +692,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         return this.getFactory().instantiate(retVal);
     }
 
-    public void supplyTo(PhysicalStore<N> receiver) {
+    public void supplyTo(final PhysicalStore<N> receiver) {
         myStore.supplyTo(receiver);
     }
 
@@ -779,7 +779,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     abstract LDL<N> getDecompositionLDL(Structure2D typical);
 
-    LDU<N> getDecompositionLDU(Structure2D typical) {
+    LDU<N> getDecompositionLDU(final Structure2D typical) {
 
         if ((myDecomposition != null) && (myDecomposition instanceof LDU)) {
             return (LDU<N>) myDecomposition;

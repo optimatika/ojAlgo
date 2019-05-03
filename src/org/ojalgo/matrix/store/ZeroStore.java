@@ -32,15 +32,8 @@ import org.ojalgo.structure.Access1D;
  */
 final class ZeroStore<N extends Number> extends FactoryStore<N> {
 
-    private final N myNumberZero;
-    private final Scalar<N> myScalarZero;
-
     ZeroStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
-
         super(factory, rowsCount, columnsCount);
-
-        myScalarZero = factory.scalar().zero();
-        myNumberZero = myScalarZero.get();
     }
 
     @Override
@@ -71,7 +64,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
     }
 
     public N get(final long aRow, final long aCol) {
-        return myNumberZero;
+        return this.zero().get();
     }
 
     @Override
@@ -103,7 +96,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
 
     @Override
     public N multiplyBoth(final Access1D<N> leftAndRight) {
-        return this.physical().scalar().zero().get();
+        return this.zero().get();
     }
 
     public ZeroStore<N> premultiply(final Access1D<N> left) {
@@ -115,7 +108,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
-        return myScalarZero;
+        return this.zero();
     }
 
     @Override

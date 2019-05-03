@@ -39,7 +39,7 @@ public final class BooleanContext extends FormatContext<Boolean, Format> {
         super(DEFAULT_FORMAT);
     }
 
-    public BooleanContext(String trueValue, String falseValue) {
+    public BooleanContext(final String trueValue, final String falseValue) {
         super(new BooleanFormat(trueValue, falseValue));
     }
 

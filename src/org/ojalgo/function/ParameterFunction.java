@@ -68,10 +68,6 @@ public interface ParameterFunction<N extends Number> extends BasicFunction, BiFu
 
     }
 
-    double invoke(double arg, int param);
-
-    N invoke(N arg, int param);
-
     default ParameterFunction<N> andThen(final UnaryFunction<N> after) {
         ProgrammingError.throwIfNull(after);
         return new ParameterFunction<N>() {
@@ -105,6 +101,10 @@ public interface ParameterFunction<N extends Number> extends BasicFunction, BiFu
 
         };
     }
+
+    double invoke(double arg, int param);
+
+    N invoke(N arg, int param);
 
     /**
      * Turns this parameter function into a unary function with the parameter fixed/locked to the specified

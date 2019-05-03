@@ -33,33 +33,33 @@ abstract class TransjugatedStore<N extends Number> extends LogicalStore<N> {
     }
 
     protected TransjugatedStore(final MatrixStore<N> base) {
-        super(base, (int) base.countColumns(), (int) base.countRows());
+        super(base, base.countColumns(), base.countRows());
     }
 
     public final double doubleValue(final long aRow, final long aCol) {
-        return this.getBase().doubleValue(aCol, aRow);
+        return this.base().doubleValue(aCol, aRow);
     }
 
     public final int firstInColumn(final int col) {
-        return this.getBase().firstInRow(col);
+        return this.base().firstInRow(col);
     }
 
     public final int firstInRow(final int row) {
-        return this.getBase().firstInColumn(row);
+        return this.base().firstInColumn(row);
     }
 
     public final MatrixStore<N> getOriginal() {
-        return this.getBase();
+        return this.base();
     }
 
     @Override
     public final int limitOfColumn(final int col) {
-        return this.getBase().limitOfRow(col);
+        return this.base().limitOfRow(col);
     }
 
     @Override
     public final int limitOfRow(final int row) {
-        return this.getBase().limitOfColumn(row);
+        return this.base().limitOfColumn(row);
     }
 
 }

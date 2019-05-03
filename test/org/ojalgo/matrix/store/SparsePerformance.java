@@ -36,7 +36,7 @@ import org.ojalgo.type.Stopwatch;
 
 public class SparsePerformance extends MatrixStoreTests {
 
-    static void fill(Mutate2D mtrx) {
+    static void fill(final Mutate2D mtrx) {
         int limit = Math.toIntExact(Math.min(mtrx.countRows(), mtrx.countColumns()));
         for (int ij = 0; ij < limit; ij++) {
             mtrx.set(ij, Uniform.randomInteger(limit), Math.random());
@@ -44,7 +44,7 @@ public class SparsePerformance extends MatrixStoreTests {
         }
     }
 
-    static void touchNonzeros(MatrixStore<Double> store) {
+    static void touchNonzeros(final MatrixStore<Double> store) {
         ElementView1D<Double, ?> nz = store.nonzeros();
         while (nz.hasNext()) {
             nz.next();

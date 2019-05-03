@@ -66,12 +66,40 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
     }
 
+    static final class ColumnsModifier<N extends Number> extends MatrixPipeline<N> {
+
+        private final BinaryFunction<N> myFunction;
+        private final Access1D<N> myRightArgumnts;
+
+        ColumnsModifier(final ElementsSupplier<N> base, final BinaryFunction<N> modifier, final Access1D<N> right) {
+            super(base);
+            myFunction = modifier;
+            myRightArgumnts = right;
+        }
+
+        @Override
+        public void supplyTo(final TransformableRegion<N> receiver) {
+
+            this.getContext().supplyTo(receiver);
+
+            UnaryFunction<N> modifier;
+
+            final long limit = Math.min(receiver.countColumns(), myRightArgumnts.count());
+            for (long j = 0; j < limit; j++) {
+                modifier = myFunction.second(myRightArgumnts.get(j));
+                receiver.modifyColumn(j, modifier);
+            }
+
+        }
+
+    }
+
     static final class ColumnsReducer<N extends Number> extends MatrixPipeline<N> {
 
         private final Aggregator myAggregator;
         private final MatrixStore<N> myBase;
 
-        ColumnsReducer(MatrixStore<N> base, Aggregator aggregator) {
+        ColumnsReducer(final MatrixStore<N> base, final Aggregator aggregator) {
             super(base);
             myBase = base;
             myAggregator = aggregator;
@@ -83,7 +111,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(TransformableRegion<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             myBase.reduceColumns(myAggregator, receiver);
         }
 
@@ -119,12 +147,40 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
 
     }
 
+    static final class RowsModifier<N extends Number> extends MatrixPipeline<N> {
+
+        private final BinaryFunction<N> myFunction;
+        private final Access1D<N> myRightArgumnts;
+
+        RowsModifier(final ElementsSupplier<N> base, final BinaryFunction<N> modifier, final Access1D<N> right) {
+            super(base);
+            myFunction = modifier;
+            myRightArgumnts = right;
+        }
+
+        @Override
+        public void supplyTo(final TransformableRegion<N> receiver) {
+
+            this.getContext().supplyTo(receiver);
+
+            UnaryFunction<N> modifier;
+
+            final long limit = Math.min(receiver.countRows(), myRightArgumnts.count());
+            for (long i = 0; i < limit; i++) {
+                modifier = myFunction.second(myRightArgumnts.get(i));
+                receiver.modifyRow(i, modifier);
+            }
+
+        }
+
+    }
+
     static final class RowsReducer<N extends Number> extends MatrixPipeline<N> {
 
         private final Aggregator myAggregator;
         private final MatrixStore<N> myBase;
 
-        RowsReducer(MatrixStore<N> base, Aggregator aggregator) {
+        RowsReducer(final MatrixStore<N> base, final Aggregator aggregator) {
             super(base);
             myBase = base;
             myAggregator = aggregator;
@@ -136,7 +192,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
 
         @Override
-        public void supplyTo(TransformableRegion<N> receiver) {
+        public void supplyTo(final TransformableRegion<N> receiver) {
             myBase.reduceRows(myAggregator, receiver);
         }
 

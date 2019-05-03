@@ -15,7 +15,7 @@ abstract class AbstractParser<T> implements BasicParser<T> {
         super();
     }
 
-    public final void parse(final Reader reader, boolean skipHeader, final Consumer<T> consumer) {
+    public final void parse(final Reader reader, final boolean skipHeader, final Consumer<T> consumer) {
         // A reimplementation of the default method from the BasicParser interface.
         // The only difference is that it keeps a reference to the BufferedReader to enable passing it to other methods.
         String tmpLine = null;

@@ -55,31 +55,31 @@ final class LeftRightStore<N extends Number> extends ComposingStore<N> {
      * @see org.ojalgo.matrix.store.MatrixStore#doubleValue(long, long)
      */
     public double doubleValue(final long row, final long col) {
-        return (col >= mySplit) ? myRight.doubleValue(row, col - mySplit) : this.getBase().doubleValue(row, col);
+        return (col >= mySplit) ? myRight.doubleValue(row, col - mySplit) : this.base().doubleValue(row, col);
     }
 
     public int firstInColumn(final int col) {
-        return (col < mySplit) ? this.getBase().firstInColumn(col) : myRight.firstInColumn(col - mySplit);
+        return (col < mySplit) ? this.base().firstInColumn(col) : myRight.firstInColumn(col - mySplit);
     }
 
     public int firstInRow(final int row) {
-        final int baseFirst = this.getBase().firstInRow(row);
+        final int baseFirst = this.base().firstInRow(row);
         return (baseFirst < mySplit) ? baseFirst : mySplit + myRight.firstInRow(row);
     }
 
     public N get(final long row, final long col) {
-        return (col >= mySplit) ? myRight.get(row, col - mySplit) : this.getBase().get(row, col);
+        return (col >= mySplit) ? myRight.get(row, col - mySplit) : this.base().get(row, col);
     }
 
     @Override
     public int limitOfColumn(final int col) {
-        return (col < mySplit) ? this.getBase().limitOfColumn(col) : myRight.limitOfColumn(col - mySplit);
+        return (col < mySplit) ? this.base().limitOfColumn(col) : myRight.limitOfColumn(col - mySplit);
     }
 
     @Override
     public int limitOfRow(final int row) {
         final int rightLimit = myRight.limitOfRow(row);
-        return rightLimit == 0 ? this.getBase().limitOfRow(row) : mySplit + rightLimit;
+        return rightLimit == 0 ? this.base().limitOfRow(row) : mySplit + rightLimit;
     }
 
     public void multiply(final Access1D<N> right, final TransformableRegion<N> target) {
@@ -142,12 +142,12 @@ final class LeftRightStore<N extends Number> extends ComposingStore<N> {
 
     @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
-        this.getBase().supplyTo(receiver.regionByLimits(this.getRowDim(), mySplit));
+        this.base().supplyTo(receiver.regionByLimits(this.getRowDim(), mySplit));
         myRight.supplyTo(receiver.regionByOffsets(0, mySplit));
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
-        return (column >= mySplit) ? myRight.toScalar(row, column - mySplit) : this.getBase().toScalar(row, column);
+        return (column >= mySplit) ? myRight.toScalar(row, column - mySplit) : this.base().toScalar(row, column);
     }
 
 }

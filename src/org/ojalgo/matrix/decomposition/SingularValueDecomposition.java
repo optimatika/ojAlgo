@@ -52,7 +52,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             this(false);
         }
 
-        Complex(boolean fullSize) {
+        Complex(final boolean fullSize) {
             super(GenericDenseStore.COMPLEX, new BidiagonalDecomposition.Complex(fullSize), fullSize);
         }
 
@@ -64,7 +64,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             this(false);
         }
 
-        Primitive(boolean fullSize) {
+        Primitive(final boolean fullSize) {
             super(PrimitiveDenseStore.FACTORY, new BidiagonalDecomposition.Primitive(fullSize), fullSize);
         }
 
@@ -76,7 +76,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             this(false);
         }
 
-        Quat(boolean fullSize) {
+        Quat(final boolean fullSize) {
             super(GenericDenseStore.QUATERNION, new BidiagonalDecomposition.Quat(fullSize), fullSize);
         }
 
@@ -88,7 +88,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             this(false);
         }
 
-        Rational(boolean fullSize) {
+        Rational(final boolean fullSize) {
             super(GenericDenseStore.RATIONAL, new BidiagonalDecomposition.Rational(fullSize), fullSize);
         }
 
@@ -346,7 +346,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     protected SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory,
-            final BidiagonalDecomposition<N> bidiagonal, boolean fullSize) {
+            final BidiagonalDecomposition<N> bidiagonal, final boolean fullSize) {
 
         super(factory);
 
@@ -356,6 +356,16 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     public boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.compute(matrix, true, false);
+    }
+
+    public int countSignificant(final double threshold) {
+        int significant = 0;
+        for (int i = 0; i < s.length; i++) {
+            if (s[i] > threshold) {
+                significant++;
+            }
+        }
+        return significant;
     }
 
     public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
@@ -467,15 +477,8 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return myQ2;
     }
 
-    public int getRank() {
-        final double tolerance = s[0] * this.getDimensionalEpsilon();
-        int rank = 0;
-        for (int i = 0; i < s.length; i++) {
-            if (s[i] > tolerance) {
-                rank++;
-            }
-        }
-        return rank;
+    public double getRankThreshold() {
+        return Math.max(MACHINE_SMALLEST, s[0]) * this.getDimensionalEpsilon();
     }
 
     public Array1D<Double> getSingularValues() {
@@ -523,7 +526,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     public boolean isFullRank() {
-        return this.getRank() == myBidiagonal.getMinDim();
+        return s[s.length - 1] > this.getRankThreshold();
     }
 
     public boolean isFullSize() {
@@ -612,7 +615,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     @Override
     protected boolean checkSolvability() {
-        return this.isComputed();
+        return true;
     }
 
     protected boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
@@ -692,8 +695,13 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     @Override
-    protected double getDimensionalEpsilon() {
-        return myBidiagonal.getMaxDim() * MACHINE_EPSILON;
+    protected int getColDim() {
+        return myTransposed ? myBidiagonal.getRowDim() : myBidiagonal.getColDim();
+    }
+
+    @Override
+    protected int getRowDim() {
+        return myTransposed ? myBidiagonal.getColDim() : myBidiagonal.getRowDim();
     }
 
     protected boolean isTransposed() {

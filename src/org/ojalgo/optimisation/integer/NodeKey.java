@@ -70,7 +70,7 @@ final class NodeKey implements Comparable<NodeKey> {
     final long sequence = GENERATOR.getAndIncrement();
 
     private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int integerIndexBranchedOn,
-            final double branchVariableDisplacement, final double parentObjectiveFunctionValue, boolean signChanged) {
+            final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean signChanged) {
 
         super();
 
@@ -147,7 +147,7 @@ final class NodeKey implements Comparable<NodeKey> {
         }
     }
 
-    public boolean equals(int[] lowerBounds, int[] upperBounds) {
+    public boolean equals(final int[] lowerBounds, final int[] upperBounds) {
         if (!Arrays.equals(myLowerBounds, lowerBounds)) {
             return false;
         }
@@ -221,7 +221,7 @@ final class NodeKey implements Comparable<NodeKey> {
         builder.append(myUpperBounds[index]);
     }
 
-    private double feasible(final int index, final double value, boolean validate) {
+    private double feasible(final int index, final double value, final boolean validate) {
 
         double feasibilityAdjusted = PrimitiveMath.MIN.invoke(PrimitiveMath.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
 

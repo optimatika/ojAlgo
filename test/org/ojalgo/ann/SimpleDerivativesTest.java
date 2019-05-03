@@ -59,7 +59,7 @@ public class SimpleDerivativesTest extends BackPropagationExample {
 
     }
 
-    private void doTestDerivatives(ArtificialNeuralNetwork.Activator activator, ArtificialNeuralNetwork.Error error) {
+    private void doTestDerivatives(final ArtificialNeuralNetwork.Activator activator, final ArtificialNeuralNetwork.Error error) {
 
         for (Data triplet : this.getTestCases()) {
 

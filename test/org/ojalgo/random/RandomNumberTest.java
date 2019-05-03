@@ -89,7 +89,7 @@ public class RandomNumberTest extends RandomTests {
         }
     }
 
-    public static void compareDensity(ContinuousDistribution expected, ContinuousDistribution actual) {
+    public static void compareDensity(final ContinuousDistribution expected, final ContinuousDistribution actual) {
         for (int d = -20; d < 21; d++) { // -2 .. 2
             double value = d / 10.0;
             double e = expected.getDensity(value);
@@ -98,7 +98,7 @@ public class RandomNumberTest extends RandomTests {
         }
     }
 
-    public static void compareDistribution(ContinuousDistribution expected, ContinuousDistribution actual) {
+    public static void compareDistribution(final ContinuousDistribution expected, final ContinuousDistribution actual) {
         for (int d = -20; d < 21; d++) { // -2 .. 2
             double value = d / 10.0;
             double e = expected.getDistribution(-value);
@@ -107,7 +107,7 @@ public class RandomNumberTest extends RandomTests {
         }
     }
 
-    public static void compareQuantile(ContinuousDistribution expected, ContinuousDistribution actual) {
+    public static void compareQuantile(final ContinuousDistribution expected, final ContinuousDistribution actual) {
         for (int t = 1; t < 10; t++) { // 0.1 .. 0.9
             double probability = t / 10.0;
             double e = expected.getQuantile(probability);

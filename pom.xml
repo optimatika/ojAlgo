@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>47.1.2</version>
+    <version>47.2.0</version>
     <packaging>jar</packaging>
     <name>ojAlgo</name>
     <url>http://ojalgo.org</url>
@@ -31,7 +31,7 @@
     <licenses>
         <license>
             <name>MIT</name>
-            <url>http://ojalgo.org/license.txt</url>
+            <url>https://github.com/optimatika/ojAlgo/blob/master/LICENSE</url>
         </license>
     </licenses>
     <distributionManagement>

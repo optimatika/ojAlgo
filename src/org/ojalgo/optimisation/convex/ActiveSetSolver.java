@@ -30,7 +30,6 @@ import org.ojalgo.function.PrimitiveFunction.Unary;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -98,9 +97,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
                 final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
-                final double largest = PrimitiveMath.MAX.invoke(largestInQ, largestInC);
+                final double largest = MAX.invoke(largestInQ, largestInC);
 
-                this.getIterationQ().modifyDiagonal(PrimitiveMath.ADD.second(largest * RELATIVELY_SMALL));
+                this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
                 this.computeQ(this.getIterationQ());
 
                 this.getSolutionL().modifyAll((Unary) arg -> {
@@ -132,7 +131,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         final PhysicalStore<Double> soluX = this.getSolutionX();
 
-        iterX.modifyMatching(PrimitiveMath.SUBTRACT, soluX);
+        iterX.modifyMatching(SUBTRACT, soluX);
 
         final double normCurrentX = soluX.aggregateAll(Aggregator.LARGEST);
         final double normStepX = iterX.aggregateAll(Aggregator.LARGEST);
@@ -142,36 +141,42 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.log("Step: {} - {}", normStepX, iterX.asList());
         }
 
-        if (!options.solution.isSmall(normCurrentX, normStepX)
-                && (GenericSolver.ACCURACY.isSmall(ONE, normCurrentX) || !GenericSolver.ACCURACY.isSmall(normStepX, normCurrentX))) {
+        if (!options.solution.isSmall(normCurrentX, normStepX) && !GenericSolver.ACCURACY.isSmall(normStepX, Math.max(normCurrentX, ONE))) {
             // Non-zero && non-freak solution
 
             double stepLength = ONE;
 
             if (excluded.length > 0) {
 
-                final PhysicalStore<Double> slack = this.getSlackI();
+                final MatrixStore<Double> slack = this.getSlackI(excluded);
 
                 if (this.isLogDebug()) {
 
                     final MatrixStore<Double> change = this.getMatrixAI(excluded).get().multiply(iterX);
 
-                    final PhysicalStore<Double> steps = slack.copy();
-                    steps.modifyMatching(PrimitiveMath.DIVIDE, change);
+                    if (slack.count() != change.count()) {
+                        throw new IllegalStateException();
+                    }
 
-                    this.log("Numer/slack: {}", slack.asList());
-                    this.log("Denom/chang: {}", change.copy().asList());
-                    this.log("Looking for the largest possible step length (smallest positive scalar) among these: {}).", steps.asList());
+                    final PhysicalStore<Double> steps = slack.copy();
+                    steps.modifyMatching(DIVIDE, change);
+
+                    this.log("Numer/slack: {}", slack.toRawCopy1D());
+                    this.log("Denom/chang: {}", change.toRawCopy1D());
+                    this.log("Looking for the largest possible step length (smallest positive scalar) among these: {}).", steps.toRawCopy1D());
                 }
 
                 for (int i = 0; i < excluded.length; i++) {
 
                     final SparseArray<Double> excludedInequalityRow = this.getMatrixAI(excluded[i]);
 
-                    final double currentSlack = slack.doubleValue(excluded[i]);
+                    final double currentSlack = slack.doubleValue(i);
                     final double slackChange = excludedInequalityRow.dot(iterX);
-                    final double fraction = (Math.signum(currentSlack) == Math.signum(Math.signum(currentSlack)))
-                            && GenericSolver.ACCURACY.isSmall(slackChange, currentSlack) ? ZERO : currentSlack / slackChange;
+                    final double fraction = (Math.signum(currentSlack) == Math.signum(slackChange)) && GenericSolver.ACCURACY.isSmall(slackChange, currentSlack)
+                            ? ZERO
+                            : Math.abs(currentSlack) / slackChange;
+                    // If the current slack is negative something has already gone wrong.
+                    // Taking the abs value is to handle small negative values due to rounding errors
 
                     if ((slackChange <= ZERO) || GenericSolver.ACCURACY.isSmall(normStepX, slackChange)) {
                         // This constraint not affected
@@ -208,7 +213,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             // Zero solution
 
             if (this.isLogDebug()) {
-                this.log("Step too small!");
+                this.log("Step too small (or freaky large)!");
             }
 
             this.setState(State.FEASIBLE);
@@ -259,7 +264,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         for (int i = 0; i < incl.length; i++) {
             final double value = soluL.doubleValue(numbEqus + incl[i]);
-            final double weight = PrimitiveMath.ABS.invoke(value) * PrimitiveMath.MAX.invoke(-value, ONE);
+            final double weight = ABS.invoke(value) * MAX.invoke(-value, ONE);
             if (weight > maxWeight) {
                 maxWeight = weight;
                 toExclude = incl[i];
@@ -644,6 +649,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return mySlackI;
     }
 
+    MatrixStore<Double> getSlackI(final int[] rows) {
+        return this.getSlackI().logical().row(rows).get();
+    }
+
     PrimitiveDenseStore getSolutionL() {
         return mySolutionL;
     }
@@ -663,7 +672,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
     }
 
-    void resetActivator(boolean useLagrange) {
+    void resetActivator(final boolean useLagrange) {
 
         myActivator.excludeAll();
 

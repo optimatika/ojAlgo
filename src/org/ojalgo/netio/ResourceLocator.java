@@ -62,7 +62,7 @@ public final class ResourceLocator {
             myValues = new Properties();
         }
 
-        KeyedValues(Properties defaults) {
+        KeyedValues(final Properties defaults) {
             super();
             myValues = new Properties(defaults);
         }
@@ -72,11 +72,11 @@ public final class ResourceLocator {
             myValues.clear();
         }
 
-        public boolean containsKey(Object key) {
+        public boolean containsKey(final Object key) {
             return myValues.containsKey(key);
         }
 
-        public boolean containsValue(Object value) {
+        public boolean containsValue(final Object value) {
             return myValues.containsValue(value);
         }
 
@@ -91,7 +91,7 @@ public final class ResourceLocator {
                     return e.getValue().toString();
                 }
 
-                public String setValue(String value) {
+                public String setValue(final String value) {
                     String prev = e.getValue().toString();
                     e.setValue(value);
                     return prev;
@@ -100,7 +100,7 @@ public final class ResourceLocator {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -114,7 +114,7 @@ public final class ResourceLocator {
             return Objects.equals(myOrderedKeys, other.myOrderedKeys) && Objects.equals(myValues, other.myValues);
         }
 
-        public String get(Object key) {
+        public String get(final Object key) {
             return myValues.getProperty(key.toString());
         }
 
@@ -136,7 +136,7 @@ public final class ResourceLocator {
          *
          * @param keysAndValues A query (or form) string
          */
-        public void parse(String keysAndValues) {
+        public void parse(final String keysAndValues) {
             if (keysAndValues != null) {
                 String[] pairs = keysAndValues.split("&");
                 for (int i = 0; i < pairs.length; i++) {
@@ -149,16 +149,16 @@ public final class ResourceLocator {
             }
         }
 
-        public String put(String key, String value) {
+        public String put(final String key, final String value) {
             myOrderedKeys.add(key);
             return String.valueOf(myValues.setProperty(key, value));
         }
 
-        public void putAll(Map<? extends String, ? extends String> m) {
+        public void putAll(final Map<? extends String, ? extends String> m) {
             myValues.putAll(m);
         }
 
-        public String remove(Object key) {
+        public String remove(final Object key) {
             myOrderedKeys.remove(key);
             Object removed = myValues.remove(key);
             return removed != null ? removed.toString() : null;
@@ -207,12 +207,12 @@ public final class ResourceLocator {
 
         private final ResourceLocator.Session mySession;
 
-        Request(ResourceLocator.Session session) {
+        Request(final ResourceLocator.Session session) {
             super();
             mySession = session;
         }
 
-        Request(ResourceLocator.Session session, URL url) {
+        Request(final ResourceLocator.Session session, final URL url) {
             super();
             mySession = session;
 
@@ -224,7 +224,7 @@ public final class ResourceLocator {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -240,7 +240,7 @@ public final class ResourceLocator {
                     && Objects.equals(myQuery, other.myQuery) && Objects.equals(myScheme, other.myScheme) && Objects.equals(mySession, other.mySession);
         }
 
-        public ResourceLocator.Request form(String form) {
+        public ResourceLocator.Request form(final String form) {
             myQuery.parse(form);
             return this;
         }
@@ -260,11 +260,11 @@ public final class ResourceLocator {
             return this;
         }
 
-        public String getFormValue(String key) {
+        public String getFormValue(final String key) {
             return myForm.get(key);
         }
 
-        public String getQueryValue(String key) {
+        public String getQueryValue(final String key) {
             return myQuery.get(key);
         }
 
@@ -297,7 +297,7 @@ public final class ResourceLocator {
             return this;
         }
 
-        public void print(Printer receiver) {
+        public void print(final Printer receiver) {
             mySession.print(receiver);
             receiver.println("Request URL: {}", this.toURL());
             if (myForm.size() > 0) {
@@ -305,7 +305,7 @@ public final class ResourceLocator {
             }
         }
 
-        public ResourceLocator.Request query(String query) {
+        public ResourceLocator.Request query(final String query) {
             myQuery.parse(query);
             return this;
         }
@@ -354,7 +354,7 @@ public final class ResourceLocator {
             }
         }
 
-        void configure(HttpURLConnection connection) {
+        void configure(final HttpURLConnection connection) {
             try {
                 connection.setRequestMethod(myMethod.name());
             } catch (ProtocolException exception) {
@@ -395,7 +395,7 @@ public final class ResourceLocator {
 
         private transient String myString;
 
-        Response(ResourceLocator.Request request) {
+        Response(final ResourceLocator.Request request) {
 
             super();
 
@@ -463,7 +463,7 @@ public final class ResourceLocator {
             }
         }
 
-        public void print(Printer receiver) {
+        public void print(final Printer receiver) {
             receiver.println("Response body: {}", this.toString());
             receiver.println("Response headers: {}", myConnection.getHeaderFields());
             receiver.println("<Recreated>");
@@ -517,11 +517,11 @@ public final class ResourceLocator {
             CookieHandler.setDefault(myCookieManager);
         }
 
-        public String getParameterValue(String key) {
+        public String getParameterValue(final String key) {
             return myParameters.get(key);
         }
 
-        public ResourceLocator.Session parameter(String key, String value) {
+        public ResourceLocator.Session parameter(final String key, final String value) {
             if (value != null) {
                 myParameters.put(key, value);
             } else {
@@ -530,7 +530,7 @@ public final class ResourceLocator {
             return this;
         }
 
-        public void print(BasicLogger.Printer receiver) {
+        public void print(final BasicLogger.Printer receiver) {
             receiver.println("Session parameters: {}", myParameters);
             receiver.println("Session cookies: {}", myCookieManager.getCookieStore().getCookies());
         }
@@ -539,7 +539,7 @@ public final class ResourceLocator {
             return new Request(this);
         }
 
-        public Request request(String url) {
+        public Request request(final String url) {
             try {
                 return new Request(this, new URL(url));
             } catch (MalformedURLException exception) {
@@ -569,7 +569,7 @@ public final class ResourceLocator {
         return new Session();
     }
 
-    static String urldecode(String encoded) {
+    static String urldecode(final String encoded) {
         try {
             return URLDecoder.decode(encoded, UTF_8);
         } catch (UnsupportedEncodingException exception) {
@@ -577,7 +577,7 @@ public final class ResourceLocator {
         }
     }
 
-    static String urlencode(String unencoded) {
+    static String urlencode(final String unencoded) {
         try {
             return URLEncoder.encode(unencoded, UTF_8);
         } catch (UnsupportedEncodingException exception) {

@@ -46,11 +46,11 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<Bidiagonal<N>> {
 
-        default Bidiagonal<N> make(boolean fullSize) {
+        default Bidiagonal<N> make(final boolean fullSize) {
             return this.make(TYPICAL, fullSize);
         }
 
-        default Bidiagonal<N> make(Structure2D typical) {
+        default Bidiagonal<N> make(final Structure2D typical) {
             return this.make(typical, false);
         }
 

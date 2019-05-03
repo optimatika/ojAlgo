@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.BinaryFunction;
@@ -50,7 +51,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
         SparseStore<N> make(long rowsCount, long columnsCount);
 
-        default SparseStore<N> make(Structure2D shape) {
+        default SparseStore<N> make(final Structure2D shape) {
             return this.make(shape.countRows(), shape.countColumns());
         }
 
@@ -82,11 +83,11 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         return SparseStore.makeSparse(GenericDenseStore.RATIONAL, rowsCount, columnsCount);
     }
 
-    static <N extends Number> SparseStore<N> makeSparse(PhysicalStore.Factory<N, ?> physical, long numberOfRows, long numberOfColumns) {
+    static <N extends Number> SparseStore<N> makeSparse(final PhysicalStore.Factory<N, ?> physical, final long numberOfRows, final long numberOfColumns) {
         return new SparseStore<>(physical, Math.toIntExact(numberOfRows), Math.toIntExact(numberOfColumns));
     }
 
-    static <N extends Number> SparseStore<N> makeSparse(PhysicalStore.Factory<N, ?> physical, Structure2D shape) {
+    static <N extends Number> SparseStore<N> makeSparse(final PhysicalStore.Factory<N, ?> physical, final Structure2D shape) {
         return SparseStore.makeSparse(physical, shape.countRows(), shape.countColumns());
     }
 
@@ -146,6 +147,12 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
+
+        final int complexity = Math.toIntExact(left.count() / this.countRows());
+        if (complexity != Math.toIntExact(right.count() / this.countColumns())) {
+            ProgrammingError.throwForMultiplicationNotPossible();
+        }
+
         myMultiplyer.invoke(this, left, (int) (left.count() / this.countRows()), right);
     }
 
@@ -444,7 +451,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         }
     }
 
-    public void reduceColumns(Aggregator aggregator, Mutate1D receiver) {
+    public void reduceColumns(final Aggregator aggregator, final Mutate1D receiver) {
         if (aggregator == Aggregator.SUM) {
             if (this.isPrimitive()) {
                 this.nonzeros().forEach(element -> receiver.add(element.column(), element.doubleValue()));
@@ -456,7 +463,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         }
     }
 
-    public void reduceRows(Aggregator aggregator, Mutate1D receiver) {
+    public void reduceRows(final Aggregator aggregator, final Mutate1D receiver) {
         if (aggregator == Aggregator.SUM) {
             if (this.isPrimitive()) {
                 this.nonzeros().forEach(element -> receiver.add(element.row(), element.doubleValue()));
@@ -511,7 +518,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         myElements.supplyNonZerosTo(receiver);
     }
 
-    public void visitColumn(long row, long col, VoidFunction<N> visitor) {
+    public void visitColumn(final long row, final long col, final VoidFunction<N> visitor) {
 
         long structure = this.countRows();
         long first = Structure2D.index(structure, row, col);
@@ -520,7 +527,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         myElements.visitRange(first, limit, visitor);
     }
 
-    public void visitRow(long row, long col, VoidFunction<N> visitor) {
+    public void visitRow(final long row, final long col, final VoidFunction<N> visitor) {
         int counter = 0;
         if (this.isPrimitive()) {
             for (ElementView2D<N, ?> nzv : this.nonzeros()) {
@@ -546,7 +553,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         this.updateNonZeros((int) row, (int) col);
     }
 
-    void doColumnAXPY(long colX, long colY, double a, TransformableRegion<N> y) {
+    void doColumnAXPY(final long colX, final long colY, final double a, final TransformableRegion<N> y) {
 
         long structure = y.countRows();
 

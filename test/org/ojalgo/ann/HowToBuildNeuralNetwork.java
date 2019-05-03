@@ -42,28 +42,28 @@ public class HowToBuildNeuralNetwork extends BackPropagationExample {
         super();
     }
 
-    private Data makeCase00(double learningRate) {
+    private Data makeCase00(final double learningRate) {
         Data _00 = new Data(learningRate);
         _00.input(0.0, 0.0);
         _00.target(0.0);
         return _00;
     }
 
-    private Data makeCase01(double learningRate) {
+    private Data makeCase01(final double learningRate) {
         Data _01 = new Data(learningRate);
         _01.input(0.0, 1.0);
         _01.target(1.0);
         return _01;
     }
 
-    private Data makeCase10(double learningRate) {
+    private Data makeCase10(final double learningRate) {
         Data _10 = new Data(learningRate);
         _10.input(1.0, 0.0);
         _10.target(1.0);
         return _10;
     }
 
-    private Data makeCase11(double learningRate) {
+    private Data makeCase11(final double learningRate) {
         Data _11 = new Data(learningRate);
         _11.input(1.0, 1.0);
         _11.target(0.0);

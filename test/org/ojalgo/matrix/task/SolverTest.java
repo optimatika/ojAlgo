@@ -149,7 +149,7 @@ public class SolverTest extends MatrixTaskTests {
         TestUtils.assertEquals(expected, tmpConjugateGradientSolver.solve(body, rhs).get());
     }
 
-    private void doCompare(SolverTask<Double> fixed, int dimension) {
+    private void doCompare(final SolverTask<Double> fixed, final int dimension) {
 
         try {
 

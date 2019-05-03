@@ -21,12 +21,14 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
-
+import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
+import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
@@ -77,13 +79,14 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         }
     }
 
-    protected int getColDim() {
-        return myColDim;
+    @Override
+    protected final FunctionSet<Double> function() {
+        return PrimitiveFunction.getSet();
     }
 
     @Override
-    protected double getDimensionalEpsilon() {
-        return this.getMaxDim() * MACHINE_EPSILON;
+    protected int getColDim() {
+        return myColDim;
     }
 
     protected double[][] getInternalData() {
@@ -94,19 +97,17 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return myInternalStore;
     }
 
-    protected int getMaxDim() {
-        return Math.max(myRowDim, myColDim);
-    }
-
-    protected int getMinDim() {
-        return Math.min(myRowDim, myColDim);
-    }
-
+    @Override
     protected int getRowDim() {
         return myRowDim;
     }
 
-    protected Collectable<Double, ? super PhysicalStore<Double>> wrap(Access2D<?> matrix) {
+    @Override
+    protected final Scalar.Factory<Double> scalar() {
+        return PrimitiveScalar.FACTORY;
+    }
+
+    protected Collectable<Double, ? super PhysicalStore<Double>> wrap(final Access2D<?> matrix) {
         return MatrixStore.PRIMITIVE.makeWrapper(matrix);
     }
 
@@ -128,8 +129,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
             myRowDim = templateRows;
             myColDim = templateCols;
         }
-
-        this.aspectRatioNormal(templateRows >= templateCols);
 
         return myInternalData;
     }

@@ -21,17 +21,29 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
+import org.ojalgo.function.FunctionSet;
+import org.ojalgo.scalar.Scalar;
+
 /**
  * @author apete
  */
 abstract class AbstractDecomposition<N extends Number> implements MatrixDecomposition<N> {
 
-    private boolean myAspectRatioNormal = true;
     private boolean myComputed = false;
     private Boolean mySolvable = null;
 
     AbstractDecomposition() {
         super();
+    }
+
+    public final long countColumns() {
+        return this.getColDim();
+    }
+
+    public final long countRows() {
+        return this.getRowDim();
     }
 
     public final boolean isComputed() {
@@ -50,16 +62,11 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
     }
 
     public void reset() {
-        myAspectRatioNormal = true;
         myComputed = false;
         mySolvable = null;
     }
 
     protected abstract DecompositionStore<N> allocate(long numberOfRows, long numberOfColumns);
-
-    protected final boolean aspectRatioNormal(final boolean aspectRatioNormal) {
-        return (myAspectRatioNormal = aspectRatioNormal);
-    }
 
     protected boolean checkSolvability() {
         return false;
@@ -69,10 +76,28 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
         return (myComputed = computed);
     }
 
-    protected abstract double getDimensionalEpsilon();
+    protected abstract FunctionSet<N> function();
+
+    protected abstract int getColDim();
+
+    protected final double getDimensionalEpsilon() {
+        return this.getMaxDim() * MACHINE_EPSILON;
+    }
+
+    protected int getMaxDim() {
+        return Math.max(this.getRowDim(), this.getColDim());
+    }
+
+    protected int getMinDim() {
+        return Math.min(this.getRowDim(), this.getColDim());
+    }
+
+    protected abstract int getRowDim();
 
     protected final boolean isAspectRatioNormal() {
-        return myAspectRatioNormal;
+        return this.getRowDim() >= this.getColDim();
     }
+
+    protected abstract Scalar.Factory<N> scalar();
 
 }

@@ -51,7 +51,7 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     public static final class DenseReceiver extends
             MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.DenseReceiver {
 
-        DenseReceiver(Factory enclosing, PhysicalStore<ComplexNumber> delegate) {
+        DenseReceiver(final Factory enclosing, final PhysicalStore<ComplexNumber> delegate) {
             enclosing.super(delegate);
         }
 
@@ -65,17 +65,17 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
         }
 
         @Override
-        ComplexMatrix.LogicalBuilder logical(MatrixStore<ComplexNumber> delegate) {
+        ComplexMatrix.LogicalBuilder logical(final MatrixStore<ComplexNumber> delegate) {
             return new ComplexMatrix.LogicalBuilder(this, delegate);
         }
 
         @Override
-        ComplexMatrix.DenseReceiver physical(PhysicalStore<ComplexNumber> delegate) {
+        ComplexMatrix.DenseReceiver physical(final PhysicalStore<ComplexNumber> delegate) {
             return new ComplexMatrix.DenseReceiver(this, delegate);
         }
 
         @Override
-        ComplexMatrix.SparseReceiver physical(SparseStore<ComplexNumber> delegate) {
+        ComplexMatrix.SparseReceiver physical(final SparseStore<ComplexNumber> delegate) {
             return new ComplexMatrix.SparseReceiver(this, delegate);
         }
 
@@ -84,11 +84,11 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     public static final class LogicalBuilder extends
             MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.Logical {
 
-        LogicalBuilder(Factory enclosing, MatrixStore.LogicalBuilder<ComplexNumber> delegate) {
+        LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<ComplexNumber> delegate) {
             enclosing.super(delegate);
         }
 
-        LogicalBuilder(Factory enclosing, MatrixStore<ComplexNumber> store) {
+        LogicalBuilder(final Factory enclosing, final MatrixStore<ComplexNumber> store) {
             enclosing.super(store);
         }
 
@@ -102,7 +102,7 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     public static final class SparseReceiver extends
             MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver>.SparseReceiver {
 
-        SparseReceiver(Factory enclosing, SparseStore<ComplexNumber> delegate) {
+        SparseReceiver(final Factory enclosing, final SparseStore<ComplexNumber> delegate) {
             enclosing.super(delegate);
         }
 
@@ -179,32 +179,32 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     }
 
     @Override
-    Cholesky<ComplexNumber> getDecompositionCholesky(Structure2D typical) {
+    Cholesky<ComplexNumber> getDecompositionCholesky(final Structure2D typical) {
         return Cholesky.COMPLEX.make(typical);
     }
 
     @Override
-    Eigenvalue<ComplexNumber> getDecompositionEigenvalue(Structure2D typical) {
+    Eigenvalue<ComplexNumber> getDecompositionEigenvalue(final Structure2D typical) {
         return Eigenvalue.COMPLEX.make(typical, this.isHermitian());
     }
 
     @Override
-    LDL<ComplexNumber> getDecompositionLDL(Structure2D typical) {
+    LDL<ComplexNumber> getDecompositionLDL(final Structure2D typical) {
         return LDL.COMPLEX.make(typical);
     }
 
     @Override
-    LU<ComplexNumber> getDecompositionLU(Structure2D typical) {
+    LU<ComplexNumber> getDecompositionLU(final Structure2D typical) {
         return LU.COMPLEX.make(typical);
     }
 
     @Override
-    QR<ComplexNumber> getDecompositionQR(Structure2D typical) {
+    QR<ComplexNumber> getDecompositionQR(final Structure2D typical) {
         return QR.COMPLEX.make(typical);
     }
 
     @Override
-    SingularValue<ComplexNumber> getDecompositionSingularValue(Structure2D typical) {
+    SingularValue<ComplexNumber> getDecompositionSingularValue(final Structure2D typical) {
         return SingularValue.COMPLEX.make(typical);
     }
 
