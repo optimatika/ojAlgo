@@ -4,6 +4,10 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
+# v47.2.0: 2019-05-03
+
+* ...
+
 ## org.ojalgo.data
 
 * Renamed DataPreprocessors to DataProcessors, and added methods to create a covariance matrix from an SVD.
@@ -20,7 +24,7 @@
 * Extended the MatrixStore.LogicalBuilder rows() and columns() methods to allow for negative indexes that refer to all zero rows/columns.
 * New more efficient implementation of MatrixStore.LogicalBuilder.diagonal() data structure.
 * The MatrixDecomposition interface now extends Structure2D so that you can get the size/shape of the original matrix.
-* Additions to the MatrixDecomposition.RankRevealing interface. It is now possible estimate the rank using a custom threshold. Also reworked all code related estimating rank (in all implementations of that interface).
+* Additions to the MatrixDecomposition.RankRevealing interface. It is now possible to estimate the rank using a custom threshold. Also reworked all code related to estimating rank (in all implementations of that interface).
 
 ## org.ojalgo.netio
 

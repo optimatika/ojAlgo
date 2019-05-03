@@ -41,9 +41,9 @@ import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
 import org.ojalgo.structure.Transformation2D;
 
 /**
- * Various data preprocessors that could be useful when doing data science or similar. With ojAlgo it is
- * highly advantageous to store data in columns (rather than rows). All the {@link Transformation2D} instances
- * in this class assume columns represent variables, and rows samples.
+ * Various data processors that could be useful when doing data science or similar. With ojAlgo it is highly
+ * advantageous to store data in columns (rather than rows). All the {@link Transformation2D} instances in
+ * this class assume columns represent variables, and rows samples.
  *
  * @author apete
  */
@@ -74,6 +74,9 @@ public class DataProcessors {
     public static final Transformation2D<Double> STANDARD_SCORE = DataProcessors
             .newTransformation2D(ss -> SUBTRACT.by(ss.getMean()).andThen(DIVIDE.by(ss.getStandardDeviation())));
 
+    /**
+     * Variables in columns and samples in rows
+     */
     public static <D extends Access2D<?> & Access2D.Sliceable<?>, M extends Mutate2D> M covariances(final Factory2D<M> factory, final D data) {
 
         long numberOfVariables = data.countColumns();
@@ -99,17 +102,23 @@ public class DataProcessors {
         return retVal;
     }
 
+    /**
+     * @see #covariances(Factory2D, SingularValue, int)
+     */
     public static <M extends PhysicalStore<Double>> M covariances(final Factory2D<M> factory, final SingularValue<Double> svd) {
         return DataProcessors.covariances(factory, svd, Math.toIntExact(svd.countColumns()));
     }
 
+    /**
+     * @see #covariances(Factory2D, SingularValue, int)
+     */
     public static <M extends PhysicalStore<Double>> M covariances(final Factory2D<M> factory, final SingularValue<Double> svd, final double threshold) {
         return DataProcessors.covariances(factory, svd, svd.countSignificant(threshold));
     }
 
     /**
      * @param factory A factory that will produce the returned covariance matrix
-     * @param svd A pre-decomposed SVD instance. The original matrix assumed to have centered data in its
+     * @param svd A pre-decomposed SVD instance. The original matrix is assumed to have centered data in its
      *        columns
      * @param complexity The maximum number of singular values that should be considered
      */
