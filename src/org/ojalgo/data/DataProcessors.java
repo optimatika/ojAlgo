@@ -126,7 +126,7 @@ public class DataProcessors {
         long numberOfSamples = svd.countRows();
         long numberOfVariables = svd.countColumns();
 
-        if (numberOfSamples > 1) {
+        if (numberOfSamples <= 1) {
             throw new ProgrammingError("There must be more than 1 sample!");
         }
 
