@@ -107,15 +107,6 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     @Override
-    protected double getDimensionalEpsilon() {
-        if (myHermitian) {
-            return myHermitianDelegate.getDimensionalEpsilon();
-        } else {
-            return myGeneralDelegate.getDimensionalEpsilon();
-        }
-    }
-
-    @Override
     protected MatrixStore<N> makeD() {
         if (myHermitian) {
             return myHermitianDelegate.getD();

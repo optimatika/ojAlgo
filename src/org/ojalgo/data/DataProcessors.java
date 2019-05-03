@@ -25,7 +25,13 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.function.Function;
 
+import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.Array1D;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.matrix.decomposition.SingularValue;
+import org.ojalgo.matrix.store.ElementsSupplier;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ColumnView;
@@ -41,18 +47,18 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-public class DataPreprocessors {
+public class DataProcessors {
 
     /**
      * Variables centered so that their average will be 0.0
      */
-    public static final Transformation2D<Double> CENTER = DataPreprocessors.newTransformation2D(ss -> SUBTRACT.by(ss.getMean()));
+    public static final Transformation2D<Double> CENTER = DataProcessors.newTransformation2D(ss -> SUBTRACT.by(ss.getMean()));
 
     /**
      * Variables will be centered around 0.0 AND scaled to be [-1.0,1.0]. The minimum value will be
      * transformed to -1.0 and the maximum to +1.0.
      */
-    public static final Transformation2D<Double> CENTER_AND_SCALE = DataPreprocessors
+    public static final Transformation2D<Double> CENTER_AND_SCALE = DataProcessors
             .newTransformation2D(ss -> SUBTRACT.by(ss.getMean()).andThen(DIVIDE.by((ss.getMaximum() - ss.getMinimum()) / TWO)));
 
     /**
@@ -60,12 +66,12 @@ public class DataPreprocessors {
      * values are positive the range will within [0.0,1.0]. If all are negative the range will be within
      * [-1.0,0.0]
      */
-    public static final Transformation2D<Double> SCALE = DataPreprocessors.newTransformation2D(ss -> DIVIDE.by(ss.getLargest()));
+    public static final Transformation2D<Double> SCALE = DataProcessors.newTransformation2D(ss -> DIVIDE.by(ss.getLargest()));
 
     /**
      * Will normalise each variable - replace each value with its standard score.
      */
-    public static final Transformation2D<Double> STANDARD_SCORE = DataPreprocessors
+    public static final Transformation2D<Double> STANDARD_SCORE = DataProcessors
             .newTransformation2D(ss -> SUBTRACT.by(ss.getMean()).andThen(DIVIDE.by(ss.getStandardDeviation())));
 
     public static <D extends Access2D<?> & Access2D.Sliceable<?>, M extends Mutate2D> M covariances(final Factory2D<M> factory, final D data) {
@@ -88,6 +94,60 @@ public class DataPreprocessors {
                 retVal.set(i, j, covariance);
                 retVal.set(j, i, covariance);
             }
+        }
+
+        return retVal;
+    }
+
+    public static <M extends PhysicalStore<Double>> M covariances(final Factory2D<M> factory, final SingularValue<Double> svd) {
+        return DataProcessors.covariances(factory, svd, Math.toIntExact(svd.countColumns()));
+    }
+
+    public static <M extends PhysicalStore<Double>> M covariances(final Factory2D<M> factory, final SingularValue<Double> svd, final double threshold) {
+        return DataProcessors.covariances(factory, svd, svd.countSignificant(threshold));
+    }
+
+    /**
+     * @param factory A factory that will produce the returned covariance matrix
+     * @param svd A pre-decomposed SVD instance. The original matrix assumed to have centered data in its
+     *        columns
+     * @param complexity The maximum number of singular values that should be considered
+     */
+    public static <M extends PhysicalStore<Double>> M covariances(final Factory2D<M> factory, final SingularValue<Double> svd, final int complexity) {
+
+        if (!svd.isComputed()) {
+            throw new ProgrammingError("The decomposition must be computed!");
+        }
+
+        if (!svd.isOrdered()) {
+            throw new ProgrammingError("The singular values must be ordered!");
+        }
+
+        long numberOfSamples = svd.countRows();
+        long numberOfVariables = svd.countColumns();
+
+        if (numberOfSamples <= 1) {
+            throw new ProgrammingError("There must be more than 1 sample!");
+        }
+
+        M retVal = factory.makeZero(numberOfVariables, numberOfVariables);
+
+        int limit = Math.min(complexity, svd.getRank());
+        if (limit > 0) {
+
+            Array1D<Double> values = svd.getSingularValues();
+            ElementsSupplier<Double> vectors = svd.getQ2();
+
+            if (limit < numberOfVariables) {
+                values = values.sliceRange(0L, limit);
+                vectors = vectors.get().logical().limits(-1, limit);
+            }
+
+            MatrixStore<Double> scaledV = vectors.operateOnColumns(MULTIPLY, values).get();
+
+            retVal.fillByMultiplying(scaledV, scaledV.transpose());
+
+            retVal.modifyAll(DIVIDE.by(numberOfSamples - 1));
         }
 
         return retVal;

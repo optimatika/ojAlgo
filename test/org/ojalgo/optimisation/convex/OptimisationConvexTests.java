@@ -36,8 +36,8 @@ public abstract class OptimisationConvexTests {
     protected static void assertDirectAndIterativeEquals(final ConvexSolver.Builder builder, final NumberContext accuracy) {
 
         final Optimisation.Options options = new Optimisation.Options();
-        // options.debug(DirectASS.class);
-        // options.validate = false;
+        //        options.debug(DirectASS.class);
+        //        options.validate = false;
 
         if (builder.hasInequalityConstraints()) {
             // ActiveSetSolver (ASS)

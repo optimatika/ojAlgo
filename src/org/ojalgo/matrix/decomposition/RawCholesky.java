@@ -71,6 +71,22 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         }
     }
 
+    public int countSignificant(final double threshold) {
+
+        double minimum = Math.sqrt(threshold);
+
+        RawStore internal = this.getInternalStore();
+
+        int significant = 0;
+        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+            if (internal.doubleValue(ij, ij) > minimum) {
+                significant++;
+            }
+        }
+
+        return significant;
+    }
+
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
         final double[][] retVal = this.reset(matrix, false);
@@ -111,19 +127,8 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.getInternalStore().logical().triangular(false, false).get();
     }
 
-    public int getRank() {
-
-        final double tolerance = SQRT.invoke(this.getAlgorithmEpsilon());
-        int rank = 0;
-
-        final RawStore inPlaceStore = this.getInternalStore();
-        final int limit = this.getMinDim();
-        for (int ij = 0; ij < limit; ij++) {
-            if (inPlaceStore.doubleValue(ij, ij) > tolerance) {
-                rank++;
-            }
-        }
-        return rank;
+    public double getRankThreshold() {
+        return myMaxDiag * this.getDimensionalEpsilon();
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
@@ -151,10 +156,6 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         } else {
             throw RecoverableCondition.newMatrixNotInvertible();
         }
-    }
-
-    public boolean isFullRank() {
-        return this.isSolvable();
     }
 
     public boolean isSPD() {
@@ -191,8 +192,8 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
         final int tmpDiagDim = this.getRowDim();
         mySPD = (this.getColDim() == tmpDiagDim);
-        myMaxDiag = ZERO;
-        myMinDiag = POSITIVE_INFINITY;
+        myMaxDiag = MACHINE_SMALLEST;
+        myMinDiag = MACHINE_LARGEST;
 
         double[] tmpRowIJ;
         double[] tmpRowI;
@@ -240,11 +241,8 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        return mySPD && (myMinDiag > this.getAlgorithmEpsilon());
-    }
-
-    double getAlgorithmEpsilon() {
-        return myMaxDiag * TEN * this.getDimensionalEpsilon();
+        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
+        return mySPD && (myMinDiag >= threshold);
     }
 
 }

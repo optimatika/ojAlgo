@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
@@ -53,7 +54,7 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public interface MatrixDecomposition<N extends Number> {
+public interface MatrixDecomposition<N extends Number> extends Structure2D {
 
     interface Determinant<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
 
@@ -230,17 +231,29 @@ public interface MatrixDecomposition<N extends Number> {
     interface RankRevealing<N extends Number> extends Ordered<N> {
 
         /**
+         * @param threshold Significance limit
+         * @return The number of elements in the diagonal matrix that are greater than the threshold
+         */
+        int countSignificant(double threshold);
+
+        /**
          * The best (and most expensive) way to get the effective numerical rank is by calculating a
          * {@link SingularValue} decomposition and then find the number of nonnegligible singular values.
          *
          * @return The effective numerical rank (best estimate)
          */
-        int getRank();
+        default int getRank() {
+            return this.countSignificant(this.getRankThreshold());
+        }
+
+        double getRankThreshold();
 
         /**
          * @return true if the rank is equal to the minimum of the row and column dimensions; false if not
          */
-        boolean isFullRank();
+        default boolean isFullRank() {
+            return this.getRank() == MissingMath.toMinIntExact(this.countRows(), this.countColumns());
+        }
 
     }
 

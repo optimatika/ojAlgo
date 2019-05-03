@@ -30,7 +30,6 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
@@ -57,6 +56,20 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         this.doDecompose(data, true);
 
         return this.getDeterminant();
+    }
+
+    public int countSignificant(final double threshold) {
+
+        RawStore internal = this.getInternalStore();
+
+        int significant = 0;
+        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
+            if (Math.abs(internal.doubleValue(ij, ij)) > threshold) {
+                significant++;
+            }
+        }
+
+        return significant;
     }
 
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
@@ -108,21 +121,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return myPivot.getOrder();
     }
 
-    public int getRank() {
+    public double getRankThreshold() {
 
-        int retVal = 0;
+        double largest = this.getInternalStore().aggregateDiagonal(Aggregator.LARGEST);
+        double epsilon = this.getDimensionalEpsilon();
 
-        final RawStore internalStore = this.getInternalStore();
-
-        double largestValue = internalStore.aggregateDiagonal(Aggregator.LARGEST);
-
-        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (!internalStore.isSmall(ij, ij, largestValue)) {
-                retVal++;
-            }
-        }
-
-        return retVal;
+        return epsilon * Math.max(MACHINE_SMALLEST, largest);
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
@@ -156,26 +160,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         } else {
             throw RecoverableCondition.newMatrixNotInvertible();
         }
-    }
-
-    /**
-     * Is the matrix nonsingular?
-     *
-     * @return true if U, and hence A, is nonsingular.
-     */
-    public boolean isFullRank() {
-
-        final RawStore raw = this.getInternalStore();
-
-        double largestValue = Math.sqrt(raw.aggregateDiagonal(Aggregator.LARGEST));
-
-        for (int ij = 0, limit = this.getMinDim(); ij < limit; ij++) {
-            if (PrimitiveScalar.isSmall(largestValue, raw.doubleValue(ij, ij))) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public boolean isPivoted() {
@@ -292,7 +276,8 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        return (this.getRowDim() == this.getColDim()) && this.isFullRank();
+        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
+        return (this.getRowDim() == this.getColDim()) && (this.getColDim() == this.countSignificant(threshold));
     }
 
 }
