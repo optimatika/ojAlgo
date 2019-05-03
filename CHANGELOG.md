@@ -4,9 +4,9 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
-# v47.2.0: 2019-05-03
-
 * ...
+
+# v47.2.0: 2019-05-03
 
 ## org.ojalgo.data
 
