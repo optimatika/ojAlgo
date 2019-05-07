@@ -1429,17 +1429,18 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         Intermediate prepared = this.prepare();
 
-        final Optimisation.Result retSolution = prepared.solve(null);
+        Optimisation.Result result = prepared.solve(null);
 
         for (int i = 0, limit = myVariables.size(); i < limit; i++) {
             final Variable tmpVariable = myVariables.get(i);
             if (!tmpVariable.isFixed()) {
-                tmpVariable.setValue(options.solution.toBigDecimal(retSolution.doubleValue(i)));
+                tmpVariable.setValue(options.solution.toBigDecimal(result.doubleValue(i)));
             }
         }
 
-        final Optimisation.State retState = retSolution.getState();
-        final double retValue = this.objective().evaluate(retSolution).doubleValue();
+        Result retSolution = this.getVariableValues();
+        double retValue = this.objective().evaluate(retSolution).doubleValue();
+        Optimisation.State retState = result.getState();
 
         return new Optimisation.Result(retState, retValue, retSolution);
     }

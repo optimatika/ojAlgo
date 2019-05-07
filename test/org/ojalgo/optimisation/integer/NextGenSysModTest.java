@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -1423,7 +1422,7 @@ public class NextGenSysModTest {
             BasicLogger.debug("Estimate: {}", estimate);
         }
 
-        TestUtils.assertTrue(estimate.getValue() >= (testCase.getEstimatedValue() - (10 * PrimitiveMath.MACHINE_EPSILON)));
+        TestUtils.assertEquals(testCase.getEstimatedValue(), estimate.getValue(), 0.000001);
     }
 
 }

@@ -4,7 +4,9 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
-* ...
+## org.ojalgo.optimisation
+
+* Minor rounding/precision related change to how ExpressionsBasedModel receives the solution from the solver and then returns it. The `options.solution` property is now enforced.
 
 # v47.2.0: 2019-05-03
 
