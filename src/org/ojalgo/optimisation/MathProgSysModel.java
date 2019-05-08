@@ -25,7 +25,6 @@ import static org.ojalgo.function.constant.BigMath.*;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -387,36 +386,29 @@ public final class MathProgSysModel {
 
         final MathProgSysModel retVal = new MathProgSysModel();
 
-        String tmpLine;
-        FileSection tmpSection = null;
+        String line;
+        FileSection section = null;
 
-        try {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 
-            final BufferedReader tmpBufferedFileReader = new BufferedReader(new FileReader(file));
+            // Returns the content of a line MINUS the newline.
+            // Returns null only for the END of the stream.
+            // Returns an empty String if two newlines appear in a row.
+            while ((line = reader.readLine()) != null) {
 
-            //readLine is a bit quirky :
-            //it returns the content of a line MINUS the newline.
-            //it returns null only for the END of the stream.
-            //it returns an empty String if two newlines appear in a row.
-            while ((tmpLine = tmpBufferedFileReader.readLine()) != null) {
+                // BasicLogger.debug("Line: {}", line);
 
-                // BasicLogger.debug("Line: {}", tmpLine);
-
-                if ((tmpLine.length() == 0) || tmpLine.startsWith(COMMENT) || tmpLine.startsWith(COMMENT_REF)) {
+                if ((line.length() == 0) || line.startsWith(COMMENT) || line.startsWith(COMMENT_REF)) {
                     // Skip this line
-                } else if (tmpLine.startsWith(SPACE)) {
-                    retVal.parseSectionLine(tmpSection, tmpLine);
+                } else if (line.startsWith(SPACE)) {
+                    retVal.parseSectionLine(section, line);
                 } else {
-                    tmpSection = retVal.identifySection(tmpLine);
+                    section = retVal.identifySection(line);
                 }
             }
 
-            tmpBufferedFileReader.close();
-
-        } catch (final FileNotFoundException anException) {
-            anException.printStackTrace();
-        } catch (final IOException anException) {
-            anException.printStackTrace();
+        } catch (IOException xcptn) {
+            xcptn.printStackTrace();
         }
 
         return retVal;

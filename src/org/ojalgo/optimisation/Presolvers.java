@@ -296,8 +296,8 @@ public abstract class Presolvers {
             case 2:
                 /*
                  * doCaseN(...) does something that doCase2(...) does not, and it's necessary. Possibly
-                 * doCase2(...) can be removed completely - complicated code that doesn't seem to do
-                 * accomplish very much.
+                 * doCase2(...) can be removed completely - complicated code that doesn't seem to accomplish
+                 * very much.
                  */
                 return Presolvers.doCaseN(expression, remaining, lower, upper, precision) || Presolvers.doCase2(expression, remaining, lower, upper, precision);
             default: // 3 or more
