@@ -261,16 +261,16 @@ public final class Expression extends ModelEntity<Expression> {
 
         BigDecimal retVal = BigMath.ZERO;
 
-        BigDecimal tmpFactor;
+        BigDecimal factor;
 
-        for (final IntRowColumn tmpKey : this.getQuadraticKeySet()) {
-            tmpFactor = this.get(tmpKey);
-            retVal = retVal.add(tmpFactor.multiply(point.get(tmpKey.row)).multiply(point.get(tmpKey.column)));
+        for (IntRowColumn quadKey : this.getQuadraticKeySet()) {
+            factor = this.get(quadKey);
+            retVal = retVal.add(factor.multiply(point.get(quadKey.row)).multiply(point.get(quadKey.column)));
         }
 
-        for (final IntIndex tmpKey : this.getLinearKeySet()) {
-            tmpFactor = this.get(tmpKey);
-            retVal = retVal.add(tmpFactor.multiply(point.get(tmpKey.index)));
+        for (IntIndex linKey : this.getLinearKeySet()) {
+            factor = this.get(linKey);
+            retVal = retVal.add(factor.multiply(point.get(linKey.index)));
         }
 
         return retVal;
