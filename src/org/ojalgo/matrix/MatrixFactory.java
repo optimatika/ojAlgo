@@ -82,6 +82,16 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
+        public B above(final M matrix) {
+            myDelegate.above(this.cast(matrix));
+            return this.self();
+        }
+
+        public B above(final M above1, final M above2) {
+            myDelegate.above(this.cast(above1, above2));
+            return this.self();
+        }
+
         public B above(final N... elements) {
             myDelegate.above(elements);
             return this.self();
@@ -94,6 +104,16 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
 
         public B below(final M... below) {
             myDelegate.below(this.cast(below));
+            return this.self();
+        }
+
+        public B below(final M matrix) {
+            myDelegate.below(this.cast(matrix));
+            return this.self();
+        }
+
+        public B below(final M below1, final M below2) {
+            myDelegate.below(this.cast(below1, below2));
             return this.self();
         }
 
@@ -159,6 +179,16 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
+        public B left(final M matrix) {
+            myDelegate.left(this.cast(matrix));
+            return this.self();
+        }
+
+        public B left(final M left1, final M left2) {
+            myDelegate.left(this.cast(left1, left2));
+            return this.self();
+        }
+
         public B left(final N... elements) {
             myDelegate.left(elements);
             return this.self();
@@ -181,6 +211,16 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
 
         public B right(final M... right) {
             myDelegate.right(this.cast(right));
+            return this.self();
+        }
+
+        public B right(final M matrix) {
+            myDelegate.right(this.cast(matrix));
+            return this.self();
+        }
+
+        public B right(final M right1, final M right2) {
+            myDelegate.right(this.cast(right1, right2));
             return this.self();
         }
 
@@ -226,6 +266,17 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
         public B tridiagonal() {
             myDelegate.tridiagonal();
             return this.self();
+        }
+
+        MatrixStore<N> cast(final M matrix) {
+            return matrix.getStore();
+        }
+
+        MatrixStore<N>[] cast(final M matrix1, final M matrix2) {
+            MatrixStore<N>[] retVal = (MatrixStore<N>[]) new MatrixStore<?>[2];
+            retVal[0] = matrix1.getStore();
+            retVal[1] = matrix2.getStore();
+            return retVal;
         }
 
         MatrixStore<N>[] cast(final M[] matrices) {

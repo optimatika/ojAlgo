@@ -49,6 +49,10 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N> {
         myColDim = numberOfColumns;
     }
 
+    protected AbstractStore(final long numberOfRows, final long numberOfColumns) {
+        this(Math.toIntExact(numberOfRows), Math.toIntExact(numberOfColumns));
+    }
+
     public long countColumns() {
         return myColDim;
     }

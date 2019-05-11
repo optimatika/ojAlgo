@@ -39,6 +39,10 @@ abstract class FactoryStore<N extends Number> extends AbstractStore<N> {
         myOne = factory.scalar().one();
     }
 
+    protected FactoryStore(final PhysicalStore.Factory<N, ?> factory, final long rowsCount, final long columnsCount) {
+        this(factory, Math.toIntExact(rowsCount), Math.toIntExact(columnsCount));
+    }
+
     public final PhysicalStore.Factory<N, ?> physical() {
         return myFactory;
     }
