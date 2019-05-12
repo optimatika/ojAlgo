@@ -275,6 +275,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
+        /**
+         * @deprecated v48 Use {@link MatrixStore#conjugate()} instead
+         */
+        @Deprecated
         public LogicalBuilder<N> conjugate() {
             if (myStore instanceof ConjugatedStore) {
                 myStore = ((ConjugatedStore<N>) myStore).getOriginal();
@@ -313,7 +317,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
          * @return A diagonal matrix (main diagonal only)
          */
         public LogicalBuilder<N> diagonal(final boolean maintain) {
-            myStore = new DiagonalStore<>(myStore);
+            myStore = new DiagonalStore<>(myStore, maintain);
             return this;
         }
 
@@ -501,6 +505,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return myStore.toString();
         }
 
+        /**
+         * @deprecated v48 Use {@link MatrixStore#transpose()} instead
+         */
+        @Deprecated
         public LogicalBuilder<N> transpose() {
             if (myStore instanceof TransposedStore) {
                 myStore = ((TransposedStore<N>) myStore).getOriginal();

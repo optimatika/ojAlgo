@@ -73,7 +73,7 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
 
         final MatrixStore<N> tmpL = decomposition.getL();
 
-        retVal = Access2D.equals(tmpL.multiply(tmpL.logical().conjugate().get()), matrix, context);
+        retVal = Access2D.equals(tmpL.multiply(tmpL.conjugate()), matrix, context);
 
         return retVal;
     }

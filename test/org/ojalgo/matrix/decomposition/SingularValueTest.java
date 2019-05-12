@@ -306,10 +306,10 @@ public class SingularValueTest {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q1 unitary", IMPL_BIG.getQ1().logical().conjugate().get().multiply(IMPL_BIG.getQ1()));
-            BasicLogger.debug("Cmplx Q1 unitary", IMPL_COMPLEX.getQ1().logical().conjugate().get().multiply(IMPL_COMPLEX.getQ1()));
-            BasicLogger.debug("Jama  Q1 unitary", IMPL_RAW.getQ1().logical().conjugate().get().multiply(IMPL_RAW.getQ1()));
-            BasicLogger.debug("Direc Q1 unitary", IMPL_PRIMITIVE.getQ1().logical().conjugate().get().multiply(IMPL_PRIMITIVE.getQ1()));
+            BasicLogger.debug("Big   Q1 unitary", IMPL_BIG.getQ1().conjugate().multiply(IMPL_BIG.getQ1()));
+            BasicLogger.debug("Cmplx Q1 unitary", IMPL_COMPLEX.getQ1().conjugate().multiply(IMPL_COMPLEX.getQ1()));
+            BasicLogger.debug("Jama  Q1 unitary", IMPL_RAW.getQ1().conjugate().multiply(IMPL_RAW.getQ1()));
+            BasicLogger.debug("Direc Q1 unitary", IMPL_PRIMITIVE.getQ1().conjugate().multiply(IMPL_PRIMITIVE.getQ1()));
         }
 
         if (MatrixDecompositionTests.DEBUG) {
@@ -322,10 +322,10 @@ public class SingularValueTest {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q2 unitary", IMPL_BIG.getQ2().multiply(IMPL_BIG.getQ2().logical().conjugate().get()));
-            BasicLogger.debug("Cmplx Q2 unitary", IMPL_COMPLEX.getQ2().multiply(IMPL_COMPLEX.getQ2().logical().conjugate().get()));
-            BasicLogger.debug("Jama  Q2 unitary", IMPL_RAW.getQ2().multiply(IMPL_RAW.getQ2().logical().conjugate().get()));
-            BasicLogger.debug("Direc Q2 unitary", IMPL_PRIMITIVE.getQ2().multiply(IMPL_PRIMITIVE.getQ2().logical().conjugate().get()));
+            BasicLogger.debug("Big   Q2 unitary", IMPL_BIG.getQ2().multiply(IMPL_BIG.getQ2().conjugate()));
+            BasicLogger.debug("Cmplx Q2 unitary", IMPL_COMPLEX.getQ2().multiply(IMPL_COMPLEX.getQ2().conjugate()));
+            BasicLogger.debug("Jama  Q2 unitary", IMPL_RAW.getQ2().multiply(IMPL_RAW.getQ2().conjugate()));
+            BasicLogger.debug("Direc Q2 unitary", IMPL_PRIMITIVE.getQ2().multiply(IMPL_PRIMITIVE.getQ2().conjugate()));
         }
 
         tmpPrimitiveRoundFunction = CNTXT_CPLX_VALUES.getFunction(PrimitiveFunction.getSet());

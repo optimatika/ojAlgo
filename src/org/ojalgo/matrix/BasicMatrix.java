@@ -94,6 +94,10 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
         LogicalBuilder<N, M> column(final int... columns);
 
+        /**
+         * @deprecated v48 Use {@link BasicMatrix#conjugate()} instead
+         */
+        @Deprecated
         LogicalBuilder<N, M> conjugate();
 
         LogicalBuilder<N, M> diagonal();
@@ -128,6 +132,10 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
         LogicalBuilder<N, M> superimpose(M matrix);
 
+        /**
+         * @deprecated v48 Use {@link BasicMatrix#transpose()} instead
+         */
+        @Deprecated
         LogicalBuilder<N, M> transpose();
 
         LogicalBuilder<N, M> triangular(boolean upper, boolean assumeOne);

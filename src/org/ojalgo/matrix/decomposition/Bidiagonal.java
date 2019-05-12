@@ -75,8 +75,8 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
         decomposition.getD();
         final MatrixStore<N> tmpQ2 = decomposition.getQ2();
 
-        final MatrixStore<N> tmpConjugatedQ1 = tmpQ1.logical().conjugate().get();
-        final MatrixStore<N> tmpConjugatedQ2 = tmpQ2.logical().conjugate().get();
+        final MatrixStore<N> tmpConjugatedQ1 = tmpQ1.conjugate();
+        final MatrixStore<N> tmpConjugatedQ2 = tmpQ2.conjugate();
 
         MatrixStore<N> tmpThis;
         MatrixStore<N> tmpThat;

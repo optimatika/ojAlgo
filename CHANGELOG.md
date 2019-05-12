@@ -4,9 +4,17 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## org.ojalgo.matrix
+
+* Various deprecations in MatrixStore.LogicalBuilder and the corresponding LogicalBuilder:s of PrimitiveMatrix, ComplexMatrix & RationalMatrix.
+
 ## org.ojalgo.optimisation
 
 * Minor rounding/precision related change to how ExpressionsBasedModel receives the solution from the solver and then returns it. The `options.solution` property is now enforced.
+
+## org.ojalgo.structure
+
+* Additions to Structure2D.Logical (Moved definitions from MatrixStore.LogicalBuilder to here).
 
 # v47.2.0: 2019-05-03
 
