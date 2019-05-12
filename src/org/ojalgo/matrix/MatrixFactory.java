@@ -72,7 +72,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             this(store.logical());
         }
 
-        public B above(final int numberOfRows) {
+        public B above(final long numberOfRows) {
             myDelegate.above(numberOfRows);
             return this.self();
         }
@@ -97,7 +97,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
-        public B below(final int numberOfRows) {
+        public B below(final long numberOfRows) {
             myDelegate.below(numberOfRows);
             return this.self();
         }
@@ -122,6 +122,15 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
+        public B bidiagonal(final boolean upper) {
+            myDelegate.bidiagonal(upper);
+            return this.self();
+        }
+
+        /**
+         * @deprecated v48 Use {@link #bidiagonal(boolean)} instead
+         */
+        @Deprecated
         public B bidiagonal(final boolean upper, final boolean assumeOne) {
             myDelegate.bidiagonal(upper, assumeOne);
             return this.self();
@@ -169,7 +178,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
-        public B left(final int numberOfColumns) {
+        public B left(final long numberOfColumns) {
             myDelegate.left(numberOfColumns);
             return this.self();
         }
@@ -204,7 +213,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
-        public B right(final int numberOfColumns) {
+        public B right(final long numberOfColumns) {
             myDelegate.right(numberOfColumns);
             return this.self();
         }

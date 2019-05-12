@@ -127,11 +127,15 @@ public interface Structure2D extends Structure1D {
     @SuppressWarnings("unchecked")
     interface Logical<S extends Structure2D, B extends Logical<S, B>> extends Structure2D {
 
+        B above(long numberOfRows);
+
         B above(S... above);
 
         B above(S above);
 
         B above(S above1, S above2);
+
+        B below(long numberOfRows);
 
         B below(S... below);
 
@@ -143,17 +147,23 @@ public interface Structure2D extends Structure1D {
 
         S get();
 
+        B left(long numberOfColumns);
+
         B left(S... left);
 
         B left(S left);
 
         B left(S left1, S left2);
 
+        B right(long numberOfColumns);
+
         B right(S... right);
 
         B right(S right);
 
         B right(S right1, S right2);
+
+        B bidiagonal(boolean upper);
 
     }
 
