@@ -100,7 +100,7 @@ public interface StructureAnyD extends Structure1D {
 
     }
 
-    interface Logical<S extends StructureAnyD, B extends Logical<S, ?>> extends StructureAnyD {
+    interface Logical<S extends StructureAnyD, B extends Logical<S, B>> extends StructureAnyD {
 
     }
 

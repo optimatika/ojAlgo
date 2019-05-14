@@ -153,7 +153,7 @@ public interface Structure1D {
 
     }
 
-    interface Logical<S extends Structure1D, B extends Logical<S, ?>> extends Structure1D {
+    interface Logical<S extends Structure1D, B extends Logical<S, B>> extends Structure1D {
 
         B after(S after);
 
@@ -227,6 +227,14 @@ public interface Structure1D {
          */
         void call(long first, long limit, long step);
 
+    }
+
+    static int[] toIntIndexes(final long[] indexes) {
+        int[] retVal = new int[indexes.length];
+        for (int i = 0; i < indexes.length; i++) {
+            retVal[i] = Math.toIntExact(indexes[i]);
+        }
+        return retVal;
     }
 
     static int index(final long index) {

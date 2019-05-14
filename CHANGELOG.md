@@ -6,12 +6,17 @@
 
 ## org.ojalgo.matrix
 
+* Various deprecations in MatrixStore.LogicalBuilder and the corresponding LogicalBuilder:s of PrimitiveMatrix, ComplexMatrix & RationalMatrix. Everything in the LogicalBuilder:s are now either defined in org.ojalgo.structure.Structure2D.Logical or deprecated.
 * Tweaked the isSolvable() method implementations of the Cholesky decompositions to return `true` slightly less often.
 * The debug logging of the iterative solvers now output the relative error at each iteration.
 
 ## org.ojalgo.optimisation
 
 * Minor rounding/precision related change to how ExpressionsBasedModel receives the solution from the solver and then returns it. The `options.solution` property is now enforced.
+
+## org.ojalgo.structure
+
+* Additions to Structure2D.Logical (Moved definitions from MatrixStore.LogicalBuilder to here).
 
 # v47.2.0: 2019-05-03
 

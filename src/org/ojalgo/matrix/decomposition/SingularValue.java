@@ -108,7 +108,7 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         if (retVal && (tmpQ1.countRows() == tmpQ1.countColumns())) {
 
             tmpThis = tmpQ1.physical().makeEye(tmpRowDim, tmpRowDim);
-            tmpThat = tmpQ1.logical().conjugate().get().multiply(tmpQ1);
+            tmpThat = tmpQ1.conjugate().multiply(tmpQ1);
 
             retVal &= tmpThis.equals(tmpThat, context);
         }
@@ -117,7 +117,7 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         if (retVal && (tmpQ2.countRows() == tmpQ2.countColumns())) {
 
             tmpThis = tmpQ2.physical().makeEye(tmpColDim, tmpColDim);
-            tmpThat = tmpQ2.multiply(tmpQ2.logical().conjugate().get());
+            tmpThat = tmpQ2.multiply(tmpQ2.conjugate());
 
             retVal &= tmpThis.equals(tmpThat, context);
         }
