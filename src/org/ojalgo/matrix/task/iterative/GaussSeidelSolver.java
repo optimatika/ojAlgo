@@ -63,7 +63,7 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
             tmpIterations++;
 
             if (this.isDebugPrinterSet()) {
-                this.debug(tmpIterations, solution);
+                this.debug(tmpIterations, tmpNormErr / tmpNormRHS, solution);
             }
 
         } while ((tmpIterations < tmpLimit) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));

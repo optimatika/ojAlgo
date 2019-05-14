@@ -141,7 +141,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.log("Step: {} - {}", normStepX, iterX.asList());
         }
 
-        if (!options.solution.isSmall(normCurrentX, normStepX) && !GenericSolver.ACCURACY.isSmall(normStepX, Math.max(normCurrentX, ONE))) {
+        if (!options.solution.isSmall(normCurrentX, normStepX) && !ACCURACY.isSmall(normStepX, Math.max(normCurrentX, ONE))) {
             // Non-zero && non-freak solution
 
             double stepLength = ONE;
