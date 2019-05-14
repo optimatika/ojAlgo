@@ -259,13 +259,6 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         }
 
         /**
-         * @see #columns(int[])
-         */
-        public LogicalBuilder<N> column(final int... columns) {
-            return this.columns(columns);
-        }
-
-        /**
          * A selection (re-ordering) of columns. Note that it's ok to reference the same base column more than
          * once, and any negative column reference/index will translate to a column of zeros. The number of
          * columns in the resulting matrix is the same as the number of elements in the columns index array.
@@ -288,6 +281,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public PhysicalStore<N> copy() {
             return myStore.copy();
         }
@@ -353,6 +350,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return myStore;
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public LogicalBuilder<N> hermitian(final boolean upper) {
             if (upper) {
                 myStore = new UpperHermitianStore<>(myStore);
@@ -410,13 +411,13 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
          * Setting either limit to &lt; 0 is interpreted as "no limit" (useful when you only want to limit
          * either the rows or columns, and don't know the size of the other)
          */
-        public LogicalBuilder<N> limits(final int rowLimit, final int columnLimit) {
+        public LogicalBuilder<N> limits(final long rowLimit, final long columnLimit) {
             myStore = new LimitStore<>(rowLimit < 0 ? (int) myStore.countRows() : rowLimit, columnLimit < 0 ? (int) myStore.countColumns() : columnLimit,
                     myStore);
             return this;
         }
 
-        public LogicalBuilder<N> offsets(final int rowOffset, final int columnOffset) {
+        public LogicalBuilder<N> offsets(final long rowOffset, final long columnOffset) {
             myStore = new OffsetStore<>(myStore, rowOffset < 0 ? 0 : rowOffset, columnOffset < 0 ? 0 : columnOffset);
             return this;
         }
@@ -461,13 +462,6 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         }
 
         /**
-         * @see #rows(int[])
-         */
-        public LogicalBuilder<N> row(final int... rows) {
-            return this.rows(rows);
-        }
-
-        /**
          * A selection (re-ordering) of rows. Note that it's ok to reference the same base row more than once,
          * and any negative row reference/index will translate to a row of zeros. The number of rows in the
          * resulting matrix is the same as the number of elements in the rows index array.
@@ -477,16 +471,28 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public LogicalBuilder<N> superimpose(final int row, final int col, final MatrixStore<N> matrix) {
             myStore = new SuperimposedStore<>(myStore, row, col, matrix);
             return this;
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public LogicalBuilder<N> superimpose(final int row, final int col, final Number matrix) {
             myStore = new SuperimposedStore<>(myStore, row, col, new SingleStore<>(myStore.physical(), matrix));
             return this;
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public LogicalBuilder<N> superimpose(final MatrixStore<N> matrix) {
             myStore = new SuperimposedStore<>(myStore, 0, 0, matrix);
             return this;

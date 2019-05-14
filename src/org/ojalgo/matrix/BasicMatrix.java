@@ -72,75 +72,9 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
     interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
             extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>> {
 
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        LogicalBuilder<N, M> above(N... elements);
-
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        LogicalBuilder<N, M> below(N... elements);
-
-        LogicalBuilder<N, M> bidiagonal(boolean upper, boolean assumeOne);
-
         default M build() {
             return this.get();
         }
-
-        LogicalBuilder<N, M> column(final int... columns);
-
-        /**
-         * @deprecated v48 Use {@link BasicMatrix#conjugate()} instead
-         */
-        @Deprecated
-        LogicalBuilder<N, M> conjugate();
-
-        LogicalBuilder<N, M> diagonal();
-
-        LogicalBuilder<N, M> hermitian(boolean upper);
-
-        LogicalBuilder<N, M> hessenberg(boolean upper);
-
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        LogicalBuilder<N, M> left(N... elements);
-
-        LogicalBuilder<N, M> limits(int rowLimit, int columnLimit);
-
-        LogicalBuilder<N, M> offsets(int rowOffset, int columnOffset);
-
-        /**
-         * @deprecated v48
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        LogicalBuilder<N, M> right(N... elements);
-
-        LogicalBuilder<N, M> row(final int... rows);
-
-        LogicalBuilder<N, M> superimpose(int row, int col, M matrix);
-
-        LogicalBuilder<N, M> superimpose(int row, int col, Number matrix);
-
-        LogicalBuilder<N, M> superimpose(M matrix);
-
-        /**
-         * @deprecated v48 Use {@link BasicMatrix#transpose()} instead
-         */
-        @Deprecated
-        LogicalBuilder<N, M> transpose();
-
-        LogicalBuilder<N, M> triangular(boolean upper, boolean assumeOne);
-
-        LogicalBuilder<N, M> tridiagonal();
 
     }
 

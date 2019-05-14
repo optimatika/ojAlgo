@@ -143,9 +143,52 @@ public interface Structure2D extends Structure1D {
 
         B below(S below1, S below2);
 
+        B bidiagonal(boolean upper);
+
+        /**
+         * @see #columns(int[])
+         */
+        default B column(final int... columns) {
+            return this.columns(columns);
+        }
+
+        /**
+         * @see #columns(int[])
+         */
+        default B column(final long... columns) {
+            return this.columns(Structure1D.toIntIndexes(columns));
+        }
+
+        /**
+         * A selection (re-ordering) of columns. Note that it's ok to reference the same base column more than
+         * once, and any negative column reference/index will translate to a column of zeros. The number of
+         * columns in the resulting matrix is the same as the number of elements in the columns index array.
+         */
+        B columns(int[] columns);
+
+        /**
+         * @see #columns(int[])
+         */
+        default B columns(final long[] columns) {
+            return this.columns(Structure1D.toIntIndexes(columns));
+        }
+
+        /**
+         * @return A square diagonal matrix (main diagonal only)
+         */
+        B diagonal();
+
+        /**
+         * @param maintain Maintain the original matrix dimensions (resulting matrix not necessarily square).
+         * @return A diagonal matrix (main diagonal only)
+         */
+        B diagonal(boolean maintain);
+
         B diagonally(S... diagonally);
 
         S get();
+
+        B hessenberg(boolean upper);
 
         B left(long numberOfColumns);
 
@@ -155,6 +198,14 @@ public interface Structure2D extends Structure1D {
 
         B left(S left1, S left2);
 
+        /**
+         * Setting either limit to &lt; 0 is interpreted as "no limit" (useful when you only want to limit
+         * either the rows or columns, and don't know the size of the other)
+         */
+        B limits(long rowLimit, long columnLimit);
+
+        B offsets(long rowOffset, long columnOffset);
+
         B right(long numberOfColumns);
 
         B right(S... right);
@@ -163,7 +214,37 @@ public interface Structure2D extends Structure1D {
 
         B right(S right1, S right2);
 
-        B bidiagonal(boolean upper);
+        /**
+         * @see #rows(int[])
+         */
+        default B row(final int... rows) {
+            return this.rows(rows);
+        }
+
+        /**
+         * @see #rows(int[])
+         */
+        default B row(final long... rows) {
+            return this.rows(Structure1D.toIntIndexes(rows));
+        }
+
+        /**
+         * A selection (re-ordering) of rows. Note that it's ok to reference the same base row more than once,
+         * and any negative row reference/index will translate to a row of zeros. The number of rows in the
+         * resulting matrix is the same as the number of elements in the rows index array.
+         */
+        B rows(final int[] rows);
+
+        /**
+         * @see #rows(int[])
+         */
+        default B rows(final long[] rows) {
+            return this.rows(Structure1D.toIntIndexes(rows));
+        }
+
+        B triangular(boolean upper, boolean assumeOne);
+
+        B tridiagonal();
 
     }
 

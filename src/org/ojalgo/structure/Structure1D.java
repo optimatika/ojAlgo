@@ -229,6 +229,14 @@ public interface Structure1D {
 
     }
 
+    static int[] toIntIndexes(final long[] indexes) {
+        int[] retVal = new int[indexes.length];
+        for (int i = 0; i < indexes.length; i++) {
+            retVal[i] = Math.toIntExact(indexes[i]);
+        }
+        return retVal;
+    }
+
     static int index(final long index) {
         return Math.toIntExact(index);
     }

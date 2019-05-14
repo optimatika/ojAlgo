@@ -92,6 +92,10 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public B above(final N... elements) {
             myDelegate.above(elements);
             return this.self();
@@ -117,6 +121,10 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public B below(final N... elements) {
             myDelegate.below(elements);
             return this.self();
@@ -136,11 +144,15 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
-        public B column(final int... columns) {
+        public B columns(final int[] columns) {
             myDelegate.column(columns);
             return this.self();
         }
 
+        /**
+         * @deprecated v48 Use {@link BasicMatrix#conjugate()} instead
+         */
+        @Deprecated
         public B conjugate() {
             myDelegate.conjugate();
             return this.self();
@@ -159,6 +171,11 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
+        public B diagonal(final boolean maintain) {
+            myDelegate.diagonal(maintain);
+            return this.self();
+        }
+
         public B diagonally(final M... diagonally) {
             myDelegate.diagonally(this.cast(diagonally));
             return this.self();
@@ -168,6 +185,10 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return MatrixFactory.this.instantiate(myDelegate.get());
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public B hermitian(final boolean upper) {
             myDelegate.hermitian(upper);
             return this.self();
@@ -198,17 +219,21 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public B left(final N... elements) {
             myDelegate.left(elements);
             return this.self();
         }
 
-        public B limits(final int rowLimit, final int columnLimit) {
+        public B limits(final long rowLimit, final long columnLimit) {
             myDelegate.limits(rowLimit, columnLimit);
             return this.self();
         }
 
-        public B offsets(final int rowOffset, final int columnOffset) {
+        public B offsets(final long rowOffset, final long columnOffset) {
             myDelegate.offsets(rowOffset, columnOffset);
             return this.self();
         }
@@ -233,26 +258,42 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public B right(final N... elements) {
             myDelegate.right(elements);
             return this.self();
         }
 
-        public B row(final int... rows) {
+        public B rows(final int[] rows) {
             myDelegate.row(rows);
             return this.self();
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public B superimpose(final int row, final int col, final M matrix) {
             myDelegate.superimpose(row, col, matrix.getStore());
             return this.self();
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public B superimpose(final int row, final int col, final Number matrix) {
             myDelegate.superimpose(row, col, matrix);
             return this.self();
         }
 
+        /**
+         * @deprecated v48
+         */
+        @Deprecated
         public B superimpose(final M matrix) {
             myDelegate.superimpose(matrix.getStore());
             return this.self();
@@ -262,6 +303,10 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             myDelegate.supplyTo(receiver);
         }
 
+        /**
+         * @deprecated v48 Use {@link BasicMatrix#transpose()} instead
+         */
+        @Deprecated
         public B transpose() {
             myDelegate.transpose();
             return this.self();
