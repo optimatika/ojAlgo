@@ -241,7 +241,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
+        double threshold = TEN * Math.min(this.getRankThreshold(), MACHINE_EPSILON);
         return mySPD && (myMinDiag >= threshold);
     }
 

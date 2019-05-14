@@ -70,7 +70,7 @@ final class DirectASS extends ActiveSetSolver {
         final PrimitiveDenseStore iterL = PrimitiveDenseStore.FACTORY.makeZero(numbConstr, 1L);
         final PrimitiveDenseStore soluL = this.getSolutionL();
 
-        if ((numbConstr < numbVars) && (solved = this.isSolvableQ())) {
+        if ((numbConstr <= numbVars) && (solved = this.isSolvableQ())) {
             // Q is SPD
 
             if (numbConstr == 0L) {

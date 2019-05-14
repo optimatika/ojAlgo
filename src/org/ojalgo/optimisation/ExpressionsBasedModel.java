@@ -959,7 +959,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         boolean retVal = false;
 
         for (Expression expr : myExpressions.values()) {
-            retVal |= (!expr.isRedundant() && expr.isConstraint() && expr.isAnyQuadraticFactorNonZero());
+            retVal |= (expr.isConstraint() && !expr.isRedundant() && expr.isAnyQuadraticFactorNonZero());
         }
 
         return retVal;
@@ -976,7 +976,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         boolean retVal = false;
 
         for (Expression expr : myExpressions.values()) {
-            retVal |= (!expr.isRedundant() && expr.isAnyQuadraticFactorNonZero());
+            retVal |= (expr.isAnyQuadraticFactorNonZero() && (expr.isObjective() || (expr.isConstraint() && !expr.isRedundant())));
         }
 
         return retVal;
@@ -987,7 +987,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
         boolean retVal = false;
 
         for (Expression expr : myExpressions.values()) {
-            retVal |= (!expr.isRedundant() && expr.isObjective() && expr.isAnyQuadraticFactorNonZero());
+            retVal |= (expr.isObjective() && expr.isAnyQuadraticFactorNonZero());
         }
 
         return retVal;

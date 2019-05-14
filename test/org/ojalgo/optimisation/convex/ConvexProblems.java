@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.TestUtils;
@@ -757,6 +758,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * </p>
      */
     @Test
+    @Disabled
     public void testP20081119() {
 
         final PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
