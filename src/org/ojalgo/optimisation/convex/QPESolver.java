@@ -68,19 +68,25 @@ final class QPESolver extends ConstrainedSolver {
     @Override
     protected boolean initialise(final Result kickStarter) {
 
-        super.initialise(kickStarter);
+        boolean ok = super.initialise(kickStarter);
 
         if ((kickStarter != null) && kickStarter.getState().isFeasible()) {
+
             this.getSolutionX().fillMatching(kickStarter);
+
             if (!(myFeasible = this.isFeasible())) {
                 this.getSolutionX().fillAll(ZERO);
+            } else {
+                this.setState(State.FEASIBLE);
             }
+
         } else {
+
             this.getSolutionX().fillAll(ZERO);
             myFeasible = false; // Could still be feasible, but doesn't matter...
         }
 
-        return true;
+        return ok;
     }
 
     @Override

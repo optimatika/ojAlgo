@@ -391,10 +391,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     @Override
     protected final boolean initialise(final Result kickStarter) {
 
-        super.initialise(kickStarter);
+        boolean ok = super.initialise(kickStarter);
 
         boolean feasible = false;
-        final boolean usableKickStarter = (kickStarter != null) && kickStarter.getState().isApproximate();
+        boolean usableKickStarter = (kickStarter != null) && kickStarter.getState().isApproximate();
 
         if (usableKickStarter) {
             this.getSolutionX().fillMatching(kickStarter);
@@ -453,7 +453,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         }
 
-        return this.getState().isFeasible();
+        return ok && this.getState().isFeasible();
     }
 
     @Override

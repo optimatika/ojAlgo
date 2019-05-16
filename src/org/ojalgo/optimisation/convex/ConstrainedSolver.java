@@ -46,26 +46,32 @@ abstract class ConstrainedSolver extends ConvexSolver {
     }
 
     @Override
-    protected boolean validate() {
+    protected boolean initialise(final Result kickStarter) {
 
-        super.validate();
+        boolean spdQ = super.initialise(kickStarter);
 
-        final MatrixStore<Double> iterA = this.getIterationA();
-        final MatrixStore<Double> iterB = this.getIterationB();
+        boolean fullRankA = true;
+        if (options.validate) {
 
-        if (((iterA != null) && (iterB == null)) || ((iterA == null) && (iterB != null))) {
-            throw new IllegalArgumentException("Either A or B is null, and the other one is not!");
-        }
+            MatrixStore<Double> iterationA = this.getIterationA();
 
-        if (iterA != null) {
-            this.computeGeneral(iterA.countRows() < iterA.countColumns() ? iterA.transpose() : iterA);
-            if (this.getRankGeneral() != iterA.countRows()) {
-                throw new IllegalArgumentException("A must have full (row) rank!");
+            if (iterationA != null) {
+                this.computeGeneral(iterationA.countRows() < iterationA.countColumns() ? iterationA.transpose() : iterationA);
+                if (this.getRankGeneral() != iterationA.countRows()) {
+
+                    fullRankA = false;
+                    this.setState(State.INVALID);
+
+                    if (this.isLogDebug()) {
+                        this.log("A not full (row) rank!");
+                    } else {
+                        throw new IllegalArgumentException("A not full (row) rank!");
+                    }
+                }
             }
         }
 
-        this.setState(State.VALID);
-        return true;
+        return spdQ && fullRankA;
     }
 
     /**
