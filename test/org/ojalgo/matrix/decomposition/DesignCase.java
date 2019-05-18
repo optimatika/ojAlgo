@@ -29,6 +29,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.EconomySize;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -54,11 +55,13 @@ public class DesignCase {
     @Test
     public void testCholeskySolveInverse() {
 
-        PhysicalStore<ComplexNumber> tmpRandomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
-        PhysicalStore<Double> tmpVctr = PrimitiveDenseStore.FACTORY.copy(tmpRandomComplexStore);
-        MatrixStore<Double> tmpMtrx = tmpVctr.multiply(tmpVctr.transpose());
+        PhysicalStore<ComplexNumber> randomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
+        PhysicalStore<Double> vctrs = PrimitiveDenseStore.FACTORY.copy(randomComplexStore);
+        MatrixStore<Double> mtrx = vctrs.multiply(vctrs.transpose());
 
-        this.doTestSolveInverse(Cholesky.PRIMITIVE.make(), tmpMtrx);
+        for (Cholesky<Double> decomp : MatrixDecompositionTests.getPrimitiveCholesky()) {
+            this.doTestSolveInverse(decomp, mtrx);
+        }
     }
 
     @Test
@@ -300,7 +303,7 @@ public class DesignCase {
 
         TestUtils.assertTrue("Decomposition not solvable", solver.isSolvable());
 
-        int dim = (int) Math.min(matrix.countRows(), matrix.countColumns());
+        int dim = MissingMath.toMinIntExact(matrix.countRows(), matrix.countColumns());
         PhysicalStore<Double> tmpEye = PrimitiveDenseStore.FACTORY.makeEye(dim, dim);
 
         MatrixStore<Double> tmpDirInv = solver.getInverse();

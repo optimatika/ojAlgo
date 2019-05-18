@@ -24,7 +24,7 @@ package org.ojalgo.optimisation.integer;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
@@ -38,6 +38,7 @@ import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
+@Disabled
 public class NextGenSysModTest {
 
     public static final class Case010A extends CaseData {
@@ -1271,6 +1272,7 @@ public class NextGenSysModTest {
             retVal.addExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
         }
 
+        // retVal.options.debug(ConvexSolver.class);
         retVal.options.solution = SOLUTION_ACCURACY;
 
         return retVal;
@@ -1281,6 +1283,7 @@ public class NextGenSysModTest {
         int numberOfAssets = data.numberOfAssets();
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
+        // model.options.debug(ConvexSolver.class);
         model.options.solution = SOLUTION_ACCURACY;
 
         double[] returnVctr = data.getReturnVctr();
@@ -1359,19 +1362,16 @@ public class NextGenSysModTest {
     }
 
     @Test
-    @Tag("unstable")
     public void testAllInOneCase030B() {
         this.doTestAllInOne(CASE_030B);
     }
 
     @Test
-    @Tag("unstable")
     public void testAllInOneCase040B() {
         this.doTestAllInOne(CASE_040B);
     }
 
     @Test
-    @Tag("unstable")
     public void testAllInOneCase050B() {
         this.doTestAllInOne(CASE_050B);
     }

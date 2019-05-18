@@ -216,7 +216,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
             }
         }
 
-        return this.computed(true);
+        return this.computed(mySPD);
     }
 
     private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {

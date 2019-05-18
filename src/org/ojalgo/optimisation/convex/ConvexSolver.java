@@ -90,9 +90,6 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class ConvexSolver extends GenericSolver implements UpdatableSolver {
 
-    private static final String Q_NOT_POSITIVE_SEMIDEFINITE = "Q not positive semidefinite!";
-    private static final String Q_NOT_SYMMETRIC = "Q not symmetric!";
-
     public static final class Builder extends GenericSolver.Builder<ConvexSolver.Builder, ConvexSolver> {
 
         private static final NumberContext NC = NumberContext.getGeneral(12);
@@ -435,7 +432,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
     }
-
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<ConvexSolver> {
 
         public ConvexSolver build(final ExpressionsBasedModel model) {
@@ -457,6 +453,9 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
     }
+
+    private static final String Q_NOT_POSITIVE_SEMIDEFINITE = "Q not positive semidefinite!";
+    private static final String Q_NOT_SYMMETRIC = "Q not symmetric!";
 
     public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
 
@@ -670,10 +669,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return mySolverGeneral.compute(matrix);
     }
 
-    protected boolean computeQ(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
-        return mySolverQ.compute(matrix);
-    }
-
     protected int countEqualityConstraints() {
         return myMatrices.countEqualityConstraints();
     }
@@ -818,10 +813,9 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             }
         }
 
-        if (!this.computeQ(matrixQ)) {
-            double largest = matrixQ.aggregateAll(Aggregator.LARGEST);
-            matrixQ.modifyDiagonal(ADD.by(largest * RELATIVELY_SMALL));
-            this.computeQ(matrixQ);
+        if (!mySolverQ.compute(matrixQ)) {
+            matrixQ.modifyDiagonal(ADD.by(RELATIVELY_SMALL * matrixQ.aggregateAll(Aggregator.LARGEST)));
+            mySolverQ.compute(matrixQ);
         }
 
         boolean semidefinite = true;
@@ -857,6 +851,10 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     }
 
     protected boolean isSolvableQ() {
+        //        double max = Math.max(RELATIVELY_SMALL, mySolverQ.getRankThreshold());
+        //        int countVariables = this.countVariables();
+        //        int countSignificant = mySolverQ.countSignificant(max);
+        //        return countVariables == countSignificant;
         return mySolverQ.isSolvable();
     }
 

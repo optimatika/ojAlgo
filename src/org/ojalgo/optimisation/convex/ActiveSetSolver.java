@@ -26,7 +26,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.Optional;
 
 import org.ojalgo.array.SparseArray;
-import org.ojalgo.function.PrimitiveFunction.Unary;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
@@ -35,7 +34,6 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.type.IndexSelector;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
@@ -62,68 +60,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         myIterationX = PrimitiveDenseStore.FACTORY.makeZero(tmpCountVariables, 1L);
 
         mySlackI = PrimitiveDenseStore.FACTORY.makeZero(tmpCountInequalityConstraints, 1L);
-    }
-
-    private void handleIterationFailure(final int[] included) {
-
-        if (this.isIterationAllowed()) {
-
-            if (this.isSolvableQ()) {
-                // There must be a problem with the constraints
-
-                if (this.isLogProgress()) {
-                    this.log("Constraints problem!");
-                }
-
-                if (included.length >= 1) {
-                    // At least 1 active inequality
-
-                    this.shrink();
-                    this.performIteration();
-
-                } else {
-                    // Should not be possible to end up here, infeasibility among
-                    // the equality constraints should have been detected earlier.
-
-                    this.setState(State.FAILED);
-                }
-
-            } else {
-                // Patch Q
-
-                if (this.isLogProgress()) {
-                    this.log("Q problem!");
-                }
-
-                final double largestInQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
-                final double largestInC = this.getMatrixC().aggregateAll(Aggregator.LARGEST);
-                final double largest = MAX.invoke(largestInQ, largestInC);
-
-                this.getIterationQ().modifyDiagonal(ADD.second(largest * RELATIVELY_SMALL));
-                this.computeQ(this.getIterationQ());
-
-                this.getSolutionL().modifyAll((Unary) arg -> {
-                    if (Double.isFinite(arg)) {
-                        return arg;
-                    } else {
-                        return ZERO;
-                    }
-                });
-
-                this.resetActivator(true);
-                this.performIteration();
-            }
-
-        } else if (this.checkFeasibility(false)) {
-            // Feasible current solution
-
-            this.setState(State.FEASIBLE);
-
-        } else {
-            // Current solution somehow NOT feasible
-
-            this.setState(State.FAILED);
-        }
     }
 
     private void handleIterationSolution(final PrimitiveDenseStore iterX, final int[] excluded) {
@@ -344,13 +280,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return retVal;
     }
 
-    @Override
-    protected boolean computeQ(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
-        final boolean retVal = super.computeQ(matrix);
-        myInvQC = this.getSolutionQ(this.getIterationC());
-        return retVal;
-    }
-
     protected int countExcluded() {
         return myActivator.countExcluded();
     }
@@ -392,6 +321,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     protected final boolean initialise(final Result kickStarter) {
 
         boolean ok = super.initialise(kickStarter);
+
+        myInvQC = this.getSolutionQ(this.getIterationC());
 
         boolean feasible = false;
         boolean usableKickStarter = (kickStarter != null) && kickStarter.getState().isApproximate();
@@ -662,9 +593,42 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         this.incrementIterationsCount();
 
         if (solved) {
+
             this.handleIterationSolution(iterX, excluded);
+
         } else {
-            this.handleIterationFailure(included);
+
+            if (this.isIterationAllowed()) {
+                // Assume Q solvable
+                // There must be a problem with the constraints
+
+                if (this.isLogProgress()) {
+                    this.log("Constraints problem!");
+                }
+
+                if (included.length >= 1) {
+                    // At least 1 active inequality
+
+                    this.shrink();
+                    this.performIteration();
+
+                } else {
+                    // Should not be possible to end up here, infeasibility among
+                    // the equality constraints should have been detected earlier.
+
+                    this.setState(State.FAILED);
+                }
+
+            } else if (this.checkFeasibility(false)) {
+                // Feasible current solution
+
+                this.setState(State.FEASIBLE);
+
+            } else {
+                // Current solution somehow NOT feasible
+
+                this.setState(State.FAILED);
+            }
         }
 
         if (options.validate && !this.checkFeasibility(false)) {
@@ -691,8 +655,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             PrimitiveDenseStore lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
                 double slack = inqSlack.doubleValue(excl[i]);
-                if (GenericSolver.ACCURACY.isZero(slack) && (this.countIncluded() < maxToInclude)) {
-                    if (!useLagrange || !GenericSolver.ACCURACY.isZero(lagrange.doubleValue(numbEqus + excl[i]))) {
+                if (ACCURACY.isZero(slack) && (this.countIncluded() < maxToInclude)) {
+                    if (!useLagrange || !ACCURACY.isZero(lagrange.doubleValue(numbEqus + excl[i]))) {
                         if (this.isLogDebug()) {
                             this.log("Will inlcude ineq {} with slack={} L={}", i, slack, lagrange.doubleValue(numbEqus + excl[i]));
                         }

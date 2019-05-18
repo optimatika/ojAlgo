@@ -99,9 +99,11 @@ final class DirectASS extends ActiveSetSolver {
 
                 if (solved = this.computeGeneral(tmpS)) {
 
-                    this.getSolutionGeneral(this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB), iterL);
+                    ElementsSupplier<Double> rhs = this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB);
+                    this.getSolutionGeneral(rhs, iterL);
 
                     if (this.isLogDebug()) {
+                        this.log("RHS={}", rhs.get().toRawCopy1D());
                         this.log("Relative error {} in solution for L={}", NaN, iterL.toRawCopy1D());
                     }
 
