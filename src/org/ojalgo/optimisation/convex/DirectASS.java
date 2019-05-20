@@ -23,12 +23,9 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import java.util.Arrays;
-
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
@@ -94,7 +91,7 @@ final class DirectASS extends ActiveSetSolver {
                 // TODO Symmetric, only need to calculate half the Schur complement, and only 1 row/column changes per iteration
 
                 if (this.isLogDebug()) {
-                    BasicLogger.debug("Negated Schur complement: " + Arrays.toString(incl), tmpS.get());
+                    // BasicLogger.debug("Negated Schur complement: " + Arrays.toString(incl), tmpS.get());
                 }
 
                 if (solved = this.computeGeneral(tmpS)) {
