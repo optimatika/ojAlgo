@@ -307,8 +307,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     @Override
     protected boolean checkSolvability() {
-        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
-        return (this.getRowDim() == this.getColDim()) && (this.getColDim() == this.countSignificant(threshold));
+        return this.isSquare() && this.isFullRank();
     }
 
     int[] getReducedPivots() {

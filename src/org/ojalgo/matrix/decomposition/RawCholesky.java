@@ -128,7 +128,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     public double getRankThreshold() {
-        return myMaxDiag * this.getDimensionalEpsilon();
+        return TEN * myMaxDiag * this.getDimensionalEpsilon();
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
@@ -241,8 +241,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        double threshold = TEN * Math.min(this.getRankThreshold(), MACHINE_EPSILON);
-        return mySPD && (myMinDiag >= threshold);
+        return mySPD && this.isFullRank();
     }
 
 }
