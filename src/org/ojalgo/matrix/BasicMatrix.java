@@ -69,7 +69,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         Operation.Multiplication<M>, ScalarOperation.Addition<M, N>, ScalarOperation.Division<M, N>, ScalarOperation.Subtraction<M, N>, Access2D<N>,
         Access2D.Elements, Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
-    interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
+    public interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
             extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         default M build() {
@@ -78,7 +78,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     }
 
-    interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
+    public interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
             extends Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         default M build() {
