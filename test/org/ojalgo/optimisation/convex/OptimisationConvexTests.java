@@ -52,7 +52,9 @@ public abstract class OptimisationConvexTests {
             IterativeASS iterativeASS = new IterativeASS(builder, options);
             Optimisation.Result iterative = iterativeASS.solve();
 
-            if (accuracy != null) {
+            if (!direct.getState().isFeasible()) {
+                TestUtils.assertFalse(iterative.getState().isFeasible());
+            } else if (accuracy != null) {
                 TestUtils.assertStateAndSolution(direct, iterative, accuracy);
             } else {
                 TestUtils.assertStateAndSolution(direct, iterative);
