@@ -241,7 +241,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        return mySPD && this.isFullRank();
+        return mySPD && (myMinDiag > this.getRankThreshold());
     }
 
 }

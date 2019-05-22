@@ -1252,71 +1252,75 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20150720() {
 
-        final ExpressionsBasedModel tmpModel1 = P20150720.buildModel1();
-        final ExpressionsBasedModel tmpModel2 = P20150720.buildModel2();
-        final ExpressionsBasedModel tmpModel3 = P20150720.buildModel3();
+        final ExpressionsBasedModel model1 = P20150720.buildModel1();
+        final ExpressionsBasedModel model2 = P20150720.buildModel2();
+        final ExpressionsBasedModel model3 = P20150720.buildModel3();
 
-        // tmpModel3.options.debug(ConvexSolver.class);
+        model3.options.debug(ConvexSolver.class);
 
         // The problem is with the ConvexSolver, and it is present without integer constraints
-        tmpModel1.relax(true);
-        tmpModel2.relax(true);
-        tmpModel3.relax(true);
+        model1.relax(true);
+        model2.relax(true);
+        model3.relax(true);
 
-        final Result tmpBaseResult1 = tmpModel1.maximise();
-        final Result tmpBaseResult2 = tmpModel2.maximise();
-        final Result tmpBaseResult3 = tmpModel3.maximise();
+        final Result baseResult1 = model1.maximise();
+        final Result baseResult2 = model2.maximise();
+        final Result baseResult3 = model3.maximise();
 
-        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel1, null);
-        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel2, null);
-        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel3, null);
+        TestUtils.assertSolutionFeasible(model1, baseResult1);
+        TestUtils.assertSolutionFeasible(model2, baseResult2);
+        TestUtils.assertSolutionFeasible(model3, baseResult3);
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(model1, null);
+        OptimisationConvexTests.assertDirectAndIterativeEquals(model2, null);
+        OptimisationConvexTests.assertDirectAndIterativeEquals(model3, null);
 
         for (int l = 0; l < 10; l++) {
 
-            final Result tmpResult1 = tmpModel1.maximise();
+            final Result tmpResult1 = model1.maximise();
 
             if (OptimisationConvexTests.DEBUG) {
                 BasicLogger.debug();
                 BasicLogger.debug("Model 1");
                 BasicLogger.debug(tmpResult1);
-                BasicLogger.debug(tmpModel1);
+                BasicLogger.debug(model1);
             }
 
             TestUtils.assertStateNotLessThanFeasible(tmpResult1);
 
-            TestUtils.assertEquals("Model 1 State @" + l, tmpBaseResult1.getState(), tmpResult1.getState());
-            TestUtils.assertEquals("Model 1 Value @" + l, tmpBaseResult1.getValue(), tmpResult1.getValue());
-            TestUtils.assertEquals("Model 1 Solution @" + l, tmpBaseResult1, tmpResult1);
+            TestUtils.assertEquals("Model 1 State @" + l, baseResult1.getState(), tmpResult1.getState());
+            TestUtils.assertEquals("Model 1 Value @" + l, baseResult1.getValue(), tmpResult1.getValue());
+            TestUtils.assertEquals("Model 1 Solution @" + l, baseResult1, tmpResult1);
 
-            final Result tmpResult2 = tmpModel2.maximise();
+            final Result tmpResult2 = model2.maximise();
 
             if (OptimisationConvexTests.DEBUG) {
                 BasicLogger.debug();
                 BasicLogger.debug("Model 2");
                 BasicLogger.debug(tmpResult2);
-                BasicLogger.debug(tmpModel2);
+                BasicLogger.debug(model2);
             }
 
             TestUtils.assertStateNotLessThanFeasible(tmpResult2);
 
-            TestUtils.assertEquals("Model 2 State @" + l, tmpBaseResult2.getState(), tmpResult2.getState());
-            TestUtils.assertEquals("Model 2 Value @" + l, tmpBaseResult2.getValue(), tmpResult2.getValue());
-            TestUtils.assertEquals("Model 2 Solution @" + l, tmpBaseResult2, tmpResult2);
+            TestUtils.assertEquals("Model 2 State @" + l, baseResult2.getState(), tmpResult2.getState());
+            TestUtils.assertEquals("Model 2 Value @" + l, baseResult2.getValue(), tmpResult2.getValue());
+            TestUtils.assertEquals("Model 2 Solution @" + l, baseResult2, tmpResult2);
 
-            final Result tmpResult3 = tmpModel3.maximise();
+            final Result tmpResult3 = model3.maximise();
 
             if (OptimisationConvexTests.DEBUG) {
                 BasicLogger.debug();
                 BasicLogger.debug("Model 3");
                 BasicLogger.debug(tmpResult3);
-                BasicLogger.debug(tmpModel3);
+                BasicLogger.debug(model3);
             }
 
             TestUtils.assertStateNotLessThanFeasible(tmpResult3);
 
-            TestUtils.assertEquals("Model 3 State @" + l, tmpBaseResult3.getState(), tmpResult3.getState());
-            TestUtils.assertEquals("Model 3 Value @" + l, tmpBaseResult3.getValue(), tmpResult3.getValue());
-            TestUtils.assertEquals("Model 3 Solution @" + l, tmpBaseResult3, tmpResult3);
+            TestUtils.assertEquals("Model 3 State @" + l, baseResult3.getState(), tmpResult3.getState());
+            TestUtils.assertEquals("Model 3 Value @" + l, baseResult3.getValue(), tmpResult3.getValue());
+            TestUtils.assertEquals("Model 3 Solution @" + l, baseResult3, tmpResult3);
         }
 
     }

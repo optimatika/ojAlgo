@@ -246,7 +246,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
     @Override
     protected boolean checkSolvability() {
-        return mySPD && this.isFullRank();
+        return mySPD && (myMinDiag > this.getRankThreshold());
     }
 
     final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean checkHermitian) {
