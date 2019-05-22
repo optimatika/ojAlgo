@@ -21,14 +21,24 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.structure.Access2D.Collectable;
 
 abstract class ConstrainedSolver extends ConvexSolver {
 
+    private final PrimitiveDenseStore mySlackE;
+
     protected ConstrainedSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
+
         super(matrices, solverOptions);
+
+        int numberOfEqualityConstraints = this.countEqualityConstraints();
+
+        mySlackE = PrimitiveDenseStore.FACTORY.makeZero(numberOfEqualityConstraints, 1L);
     }
 
     @Override
@@ -88,6 +98,19 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
     final PhysicalStore<Double> getIterationQ() {
         return this.getMatrixQ();
+    }
+
+    PhysicalStore<Double> getSlackE() {
+
+        MatrixStore<Double> mtrxAE = this.getMatrixAE();
+        MatrixStore<Double> mtrxBE = this.getMatrixBE();
+        PhysicalStore<Double> mtrxX = this.getSolutionX();
+
+        if ((mtrxAE != null) && (mtrxAE.count() != 0L)) {
+            mtrxX.premultiply(mtrxAE).operateOnMatching(mtrxBE, SUBTRACT).supplyTo(mySlackE);
+        }
+
+        return mySlackE;
     }
 
 }

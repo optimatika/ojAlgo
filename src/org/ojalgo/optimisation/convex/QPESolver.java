@@ -55,7 +55,7 @@ final class QPESolver extends ConstrainedSolver {
 
         boolean retVal = true;
 
-        final MatrixStore<Double> tmpSE = this.getSE();
+        final MatrixStore<Double> tmpSE = this.getSlackE();
         for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
             if (!GenericSolver.ACCURACY.isZero(tmpSE.doubleValue(i))) {
                 retVal = false;

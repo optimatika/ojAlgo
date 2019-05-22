@@ -750,10 +750,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
     }
 
-    protected MatrixStore<Double> getSE() {
-        return this.getSolutionX().premultiply(this.getMatrixAE()).operateOnMatching(this.getMatrixBE(), SUBTRACT).get();
-    }
-
     protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
         return mySolverGeneral.getSolution(rhs);
     }
@@ -878,19 +874,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     protected Optimisation.Result solveLP() {
         return LinearSolver.solve(myMatrices, options);
-    }
-
-    void supplySlackI(final PhysicalStore<Double> slack) {
-
-        final RowsSupplier<Double> mtrxAI = myMatrices.getAI();
-        final MatrixStore<Double> mtrxBI = this.getMatrixBI();
-        final PhysicalStore<Double> mtrxX = this.getSolutionX();
-
-        slack.fillMatching(mtrxBI);
-
-        for (int i = 0; i < mtrxAI.countRows(); i++) {
-            slack.add(i, -mtrxAI.getRow(i).dot(mtrxX));
-        }
     }
 
 }

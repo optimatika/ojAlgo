@@ -1256,7 +1256,9 @@ public class ConvexProblems extends OptimisationConvexTests {
         final ExpressionsBasedModel model2 = P20150720.buildModel2();
         final ExpressionsBasedModel model3 = P20150720.buildModel3();
 
-        model3.options.debug(ConvexSolver.class);
+        //        model1.options.debug(ConvexSolver.class);
+        //        model2.options.debug(ConvexSolver.class);
+        //        model3.options.debug(ConvexSolver.class);
 
         // The problem is with the ConvexSolver, and it is present without integer constraints
         model1.relax(true);

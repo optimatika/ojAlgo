@@ -32,6 +32,7 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.IndexSelector;
@@ -50,16 +51,16 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         super(matrices, solverOptions);
 
-        final int tmpCountVariables = this.countVariables();
-        final int tmpCountEqualityConstraints = this.countEqualityConstraints();
-        final int tmpCountInequalityConstraints = this.countInequalityConstraints();
+        int numberOfVariables = this.countVariables();
+        int numberOfEqualityConstraints = this.countEqualityConstraints();
+        int numberOfInequalityConstraints = this.countInequalityConstraints();
 
-        myActivator = new IndexSelector(tmpCountInequalityConstraints);
+        myActivator = new IndexSelector(numberOfInequalityConstraints);
 
-        mySolutionL = PrimitiveDenseStore.FACTORY.makeZero(tmpCountEqualityConstraints + tmpCountInequalityConstraints, 1L);
-        myIterationX = PrimitiveDenseStore.FACTORY.makeZero(tmpCountVariables, 1L);
+        mySolutionL = PrimitiveDenseStore.FACTORY.makeZero(numberOfEqualityConstraints + numberOfInequalityConstraints, 1L);
+        myIterationX = PrimitiveDenseStore.FACTORY.makeZero(numberOfVariables, 1L);
 
-        mySlackI = PrimitiveDenseStore.FACTORY.makeZero(tmpCountInequalityConstraints, 1L);
+        mySlackI = PrimitiveDenseStore.FACTORY.makeZero(numberOfInequalityConstraints, 1L);
     }
 
     private void handleIterationSolution(final PrimitiveDenseStore iterX, final int[] excluded) {
@@ -75,6 +76,20 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         if (this.isLogDebug()) {
             this.log("Current: {} - {}", normCurrentX, soluX.asList());
             this.log("Step: {} - {}", normStepX, iterX.asList());
+        }
+
+        if (this.isLogDebug()) {
+
+            final PhysicalStore<Double> change0 = this.getMatrixAI(this.getIncluded()).get().multiply(iterX).copy();
+
+            if (change0.count() > 0) {
+                this.log("Included-change: {}", change0.asList());
+                double minI = change0.aggregateAll(Aggregator.MINIMUM);
+                if (!options.feasibility.isZero(minI)) {
+                    this.log("Nonzero Included-change! {}", minI);
+                }
+            }
+
         }
 
         if (!options.solution.isSmall(normCurrentX, normStepX) && !ACCURACY.isSmall(normStepX, Math.max(normCurrentX, ONE))) {
@@ -156,15 +171,28 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
 
         if (this.isLogDebug()) {
+
+            PhysicalStore<Double> slackE = this.getSlackE();
+            PhysicalStore<Double> slackI = this.getSlackI();
+
             this.log("Post iteration");
             this.log("\tSolution: {}", soluX.asList());
             this.log("\tL: {}", this.getSolutionL().asList());
-            if ((this.getMatrixAE() != null) && (this.getMatrixAE().count() > 0)) {
-                this.log("\tE-slack: {}", this.getSE().copy().asList());
+
+            if (slackE.count() > 0) {
+                this.log("\tE-slack: {}", slackE.asList());
+                double minE = slackE.aggregateAll(Aggregator.MINIMUM);
+                if (!options.feasibility.isZero(minE)) {
+                    this.log("Negative E-slack! {}", minE);
+                }
             }
-            this.log("\tI-slack: {}", this.getSlackI().asList());
-            if (this.getSlackI().aggregateAll(Aggregator.MINIMUM) < -0.000001) {
-                this.log("Negative slack!");
+
+            if (slackI.count() > 0) {
+                this.log("\tI-slack: {}", slackI.asList());
+                double minI = slackI.aggregateAll(Aggregator.MINIMUM);
+                if ((minI < ZERO) && !options.feasibility.isZero(minI)) {
+                    this.log("Negative I-slack! {}", minI);
+                }
             }
         }
     }
@@ -245,7 +273,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         if (!onlyExcluded) {
 
             if (this.hasEqualityConstraints()) {
-                final MatrixStore<Double> tmpSE = this.getSE();
+                final MatrixStore<Double> tmpSE = this.getSlackE();
                 for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
                     if (!GenericSolver.ACCURACY.isZero(tmpSE.doubleValue(i))) {
                         retVal = false;
@@ -373,7 +401,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             this.log("Initial solution: {}", this.getSolutionX().copy().asList());
             if (this.getMatrixAE() != null) {
-                this.log("Initial E-slack: {}", this.getSE().copy().asList());
+                this.log("Initial E-slack: {}", this.getSlackE().copy().asList());
             }
             if (this.getMatrixAI() != null) {
                 this.log("Initial I-slack: {}", this.getSlackI().copy().asList());
@@ -576,7 +604,17 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     }
 
     PhysicalStore<Double> getSlackI() {
-        this.supplySlackI(mySlackI);
+
+        RowsSupplier<Double> mtrxAI = this.getMatrixAI();
+        MatrixStore<Double> mtrxBI = this.getMatrixBI();
+        PhysicalStore<Double> mtrxX = this.getSolutionX();
+
+        mySlackI.fillMatching(mtrxBI);
+
+        for (int i = 0; i < mtrxAI.countRows(); i++) {
+            mySlackI.add(i, -mtrxAI.getRow(i).dot(mtrxX));
+        }
+
         return mySlackI;
     }
 
