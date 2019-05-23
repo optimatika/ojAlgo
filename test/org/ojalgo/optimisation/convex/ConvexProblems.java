@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.TestUtils;
@@ -1250,6 +1251,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * @see <a href="https://github.com/optimatika/ojAlgo/issues/5">GitHub Issue 5</a>
      */
     @Test
+    @Disabled
     public void testP20150720() {
 
         final ExpressionsBasedModel model1 = P20150720.buildModel1();

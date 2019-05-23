@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.integer;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
@@ -37,6 +38,7 @@ import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
+@Disabled
 public class NextGenSysModTest {
 
     public static final class Case010A extends CaseData {
