@@ -26,7 +26,6 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.TestUtils;
@@ -1247,11 +1246,15 @@ public class ConvexProblems extends OptimisationConvexTests {
      * sequential executions. This test is designed to (only) ensure consistency between exections. (I don't
      * know what the correct solution is.)
      * </p>
+     * <p>
+     * 2019-05-23: The solvers don't always return a feasible solution and the direct and iterative solvers
+     * sometimes give different soltions – things go wrong and they go wrong to varying degrees. This test
+     * should only verify consistency between exections.
+     * </p>
      *
      * @see <a href="https://github.com/optimatika/ojAlgo/issues/5">GitHub Issue 5</a>
      */
     @Test
-    @Disabled
     public void testP20150720() {
 
         final ExpressionsBasedModel model1 = P20150720.buildModel1();
@@ -1270,14 +1273,6 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Result baseResult1 = model1.maximise();
         final Result baseResult2 = model2.maximise();
         final Result baseResult3 = model3.maximise();
-
-        TestUtils.assertSolutionFeasible(model1, baseResult1);
-        TestUtils.assertSolutionFeasible(model2, baseResult2);
-        TestUtils.assertSolutionFeasible(model3, baseResult3);
-
-        OptimisationConvexTests.assertDirectAndIterativeEquals(model1, null);
-        OptimisationConvexTests.assertDirectAndIterativeEquals(model2, null);
-        OptimisationConvexTests.assertDirectAndIterativeEquals(model3, null);
 
         for (int l = 0; l < 10; l++) {
 

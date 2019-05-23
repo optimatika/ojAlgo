@@ -36,8 +36,12 @@ import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.IndexSelector;
+import org.ojalgo.type.TypeUtils;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
+
+    private static final String NEGATIVE_I_SLACK = "Negative I-slack! {}";
+    private static final String NONZERO_E_SLACK = "Nonzero E-slack! {}";
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
@@ -78,13 +82,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.log("Step: {} - {}", normStepX, iterX.asList());
         }
 
-        if (this.isLogDebug()) {
+        if (this.isLogDebug() || options.validate) {
 
-            final PhysicalStore<Double> change0 = this.getMatrixAI(this.getIncluded()).get().multiply(iterX).copy();
+            final PhysicalStore<Double> includedChange = this.getMatrixAI(this.getIncluded()).get().multiply(iterX).copy();
 
-            if (change0.count() > 0) {
-                this.log("Included-change: {}", change0.asList());
-                double minI = change0.aggregateAll(Aggregator.MINIMUM);
+            if (includedChange.count() > 0) {
+                this.log("Included-change: {}", includedChange.asList());
+                double minI = includedChange.aggregateAll(Aggregator.MINIMUM);
                 if (!options.feasibility.isZero(minI)) {
                     this.log("Nonzero Included-change! {}", minI);
                 }
@@ -171,29 +175,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
 
         if (this.isLogDebug()) {
-
-            PhysicalStore<Double> slackE = this.getSlackE();
-            PhysicalStore<Double> slackI = this.getSlackI();
-
             this.log("Post iteration");
             this.log("\tSolution: {}", soluX.asList());
             this.log("\tL: {}", this.getSolutionL().asList());
-
-            if (slackE.count() > 0) {
-                this.log("\tE-slack: {}", slackE.asList());
-                double minE = slackE.aggregateAll(Aggregator.MINIMUM);
-                if (!options.feasibility.isZero(minE)) {
-                    this.log("Negative E-slack! {}", minE);
-                }
-            }
-
-            if (slackI.count() > 0) {
-                this.log("\tI-slack: {}", slackI.asList());
-                double minI = slackI.aggregateAll(Aggregator.MINIMUM);
-                if ((minI < ZERO) && !options.feasibility.isZero(minI)) {
-                    this.log("Negative I-slack! {}", minI);
-                }
-            }
+        }
+        if (this.isLogDebug() || options.validate) {
+            this.checkFeasibility();
         }
     }
 
@@ -266,48 +253,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return toExclude;
     }
 
-    protected boolean checkFeasibility(final boolean onlyExcluded) {
-
-        boolean retVal = true;
-
-        if (!onlyExcluded) {
-
-            if (this.hasEqualityConstraints()) {
-                final MatrixStore<Double> tmpSE = this.getSlackE();
-                for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
-                    if (!GenericSolver.ACCURACY.isZero(tmpSE.doubleValue(i))) {
-                        retVal = false;
-                    }
-                }
-            }
-
-            if (this.hasInequalityConstraints() && (myActivator.countIncluded() > 0)) {
-                final int[] tmpIncluded = myActivator.getIncluded();
-                final MatrixStore<Double> tmpSI = this.getSlackI();
-                for (int i = 0; retVal && (i < tmpIncluded.length); i++) {
-                    final double tmpSlack = tmpSI.doubleValue(tmpIncluded[i]);
-                    if ((tmpSlack < ZERO) && !GenericSolver.ACCURACY.isZero(tmpSlack)) {
-                        retVal = false;
-                    }
-                }
-            }
-
-        }
-
-        if (this.hasInequalityConstraints() && (myActivator.countExcluded() > 0)) {
-            final int[] tmpExcluded = myActivator.getExcluded();
-            final MatrixStore<Double> tmpSI = this.getSlackI();
-            for (int e = 0; retVal && (e < tmpExcluded.length); e++) {
-                final double tmpSlack = tmpSI.doubleValue(tmpExcluded[e]);
-                if ((tmpSlack < ZERO) && !GenericSolver.ACCURACY.isZero(tmpSlack)) {
-                    retVal = false;
-                }
-            }
-        }
-
-        return retVal;
-    }
-
     protected int countExcluded() {
         return myActivator.countExcluded();
     }
@@ -360,7 +305,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (kickStarter.getState().isFeasible()) {
                 feasible = true;
             } else {
-                feasible = this.checkFeasibility(false);
+                feasible = this.checkFeasibility();
             }
         }
 
@@ -400,16 +345,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         if (this.isLogDebug()) {
 
             this.log("Initial solution: {}", this.getSolutionX().copy().asList());
-            if (this.getMatrixAE() != null) {
-                this.log("Initial E-slack: {}", this.getSlackE().copy().asList());
-            }
-            if (this.getMatrixAI() != null) {
-                this.log("Initial I-slack: {}", this.getSlackI().copy().asList());
-            }
-            if (this.getSlackI().aggregateAll(Aggregator.MINIMUM) < -0.000001) {
-                this.log("Negative slack!");
-            }
 
+            this.checkFeasibility();
         }
 
         return ok && this.getState().isFeasible();
@@ -525,6 +462,46 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     protected String toActivatorString() {
         return myActivator.toString();
+    }
+
+    boolean checkFeasibility() {
+
+        boolean retVal = true;
+
+        PhysicalStore<Double> slackE = this.getSlackE();
+        PhysicalStore<Double> slackI = this.getSlackI();
+
+        if (retVal && (slackE.count() > 0)) {
+            if (this.isLogDebug()) {
+                this.log("E-slack: {}", slackE.asList());
+            }
+            double largestE = slackE.aggregateAll(Aggregator.LARGEST);
+            if (!options.feasibility.isZero(largestE)) {
+                retVal = false;
+                if (this.isLogDebug()) {
+                    this.log(NONZERO_E_SLACK, largestE);
+                } else if (options.validate) {
+                    throw new IllegalStateException(TypeUtils.format(NONZERO_E_SLACK, largestE));
+                }
+            }
+        }
+
+        if (retVal && (slackI.count() > 0)) {
+            if (this.isLogDebug()) {
+                this.log("I-slack: {}", slackI.asList());
+            }
+            double minimumI = slackI.aggregateAll(Aggregator.MINIMUM);
+            if ((minimumI < ZERO) && !options.feasibility.isZero(minimumI)) {
+                retVal = false;
+                if (this.isLogDebug()) {
+                    this.log(NEGATIVE_I_SLACK, minimumI);
+                } else if (options.validate) {
+                    throw new IllegalStateException(TypeUtils.format(NEGATIVE_I_SLACK, minimumI));
+                }
+            }
+        }
+
+        return retVal;
     }
 
     @Override
@@ -657,7 +634,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     this.setState(State.FAILED);
                 }
 
-            } else if (this.checkFeasibility(false)) {
+            } else if (this.checkFeasibility()) {
                 // Feasible current solution
 
                 this.setState(State.FEASIBLE);
@@ -669,9 +646,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
         }
 
-        if (options.validate && !this.checkFeasibility(false)) {
-            this.log("Problem!");
-        }
     }
 
     void resetActivator(final boolean useLagrange) {
