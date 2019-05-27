@@ -68,13 +68,25 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
         MatrixStore.LogicalBuilder<N> makeIdentity(int dimension);
 
+        default MatrixStore.LogicalBuilder<N> makeIdentity(final long dimension) {
+            return this.makeIdentity(Math.toIntExact(dimension));
+        }
+
         MatrixStore.LogicalBuilder<N> makeSingle(N element);
 
         SparseStore<N> makeSparse(int rowsCount, int columnsCount);
 
+        default SparseStore<N> makeSparse(final long rowsCount, final long columnsCount) {
+            return this.makeSparse(Math.toIntExact(rowsCount), Math.toIntExact(columnsCount));
+        }
+
         MatrixStore.LogicalBuilder<N> makeWrapper(Access2D<?> access);
 
         MatrixStore.LogicalBuilder<N> makeZero(int rowsCount, int columnsCount);
+
+        default MatrixStore.LogicalBuilder<N> makeZero(final long rowsCount, final long columnsCount) {
+            return this.makeZero(Math.toIntExact(rowsCount), Math.toIntExact(columnsCount));
+        }
 
     }
 
@@ -236,6 +248,15 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return this;
         }
 
+        public LogicalBuilder<N> bidiagonal(final boolean upper) {
+            if (upper) {
+                myStore = new UpperTriangularStore<>(new LowerHessenbergStore<>(myStore), false);
+            } else {
+                myStore = new LowerTriangularStore<>(new UpperHessenbergStore<>(myStore), false);
+            }
+            return this;
+        }
+
         /**
          * @deprecated v48 Use {@link #bidiagonal(boolean)} instead
          */
@@ -245,15 +266,6 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
                 myStore = new UpperTriangularStore<>(new LowerHessenbergStore<>(myStore), assumeOne);
             } else {
                 myStore = new LowerTriangularStore<>(new UpperHessenbergStore<>(myStore), assumeOne);
-            }
-            return this;
-        }
-
-        public LogicalBuilder<N> bidiagonal(final boolean upper) {
-            if (upper) {
-                myStore = new UpperTriangularStore<>(new LowerHessenbergStore<>(myStore), false);
-            } else {
-                myStore = new LowerTriangularStore<>(new UpperHessenbergStore<>(myStore), false);
             }
             return this;
         }
@@ -916,6 +928,51 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     default MatrixStore<N> operateOnAll(final UnaryFunction<N> operator) {
         return new UnaryOperatoStore<>(this, operator);
+    }
+
+    /**
+     * Multiply this matrix by itself {@code power} times.
+     */
+    default MatrixStore<N> power(final int power) {
+
+        if (power < 0) {
+            throw new ProgrammingError("Negative powers not supported!");
+        }
+
+        if (!this.isSquare()) {
+            throw new ProgrammingError("Matrix must be square!");
+        }
+
+        PhysicalStore.Factory<N, ?> factory = this.physical();
+
+        if (power == 0) {
+
+            return factory.builder().makeIdentity(this.countRows()).get();
+
+        } else if (power == 1) {
+
+            return this;
+
+        } else if (power == 2) {
+
+            return this.multiply(this);
+
+        } else {
+
+            PhysicalStore<N> right = factory.makeZero(this);
+            PhysicalStore<N> product = factory.makeZero(this);
+            PhysicalStore<N> temp;
+
+            this.multiply(this, product);
+            for (int i = 2; i < power; i++) {
+                temp = right;
+                right = product;
+                product = temp;
+                this.multiply(right, product);
+            }
+
+            return product;
+        }
     }
 
     /**

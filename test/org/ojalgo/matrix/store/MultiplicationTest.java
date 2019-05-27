@@ -24,13 +24,30 @@ package org.ojalgo.matrix.store;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.Uniform;
 
-public class MultiplicationTest {
+public class MultiplicationTest extends MatrixStoreTests {
 
     public MultiplicationTest() {
         super();
+    }
+
+    @Test
+    public void testPower() {
+
+        Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
+
+        int dim = 9;
+        PrimitiveDenseStore random = factory.makeSPD(dim);
+        MatrixStore<Double> expected = factory.makeEye(dim, dim);
+
+        for (int p = 0; p < 7; p++) {
+            MatrixStore<Double> actual = random.power(p);
+            TestUtils.assertEquals(expected, actual);
+            expected = expected.multiply(random);
+        }
     }
 
     @Test
