@@ -957,7 +957,18 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
             return this.multiply(this);
 
+        } else if ((power % 2) == 0) {
+            // 4,6,8,10...
+
+            return this.power(2).power(power / 2);
+
+        } else if (power > 8) {
+            // 9,11,13,15...
+
+            return this.power(power - 1).multiply(this);
+
         } else {
+            // 3,5,7
 
             PhysicalStore<N> right = factory.makeZero(this);
             PhysicalStore<N> product = factory.makeZero(this);

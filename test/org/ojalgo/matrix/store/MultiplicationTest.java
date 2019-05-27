@@ -43,7 +43,7 @@ public class MultiplicationTest extends MatrixStoreTests {
         PrimitiveDenseStore random = factory.makeSPD(dim);
         MatrixStore<Double> expected = factory.makeEye(dim, dim);
 
-        for (int p = 0; p < 7; p++) {
+        for (int p = 0; p < 20; p++) {
             MatrixStore<Double> actual = random.power(p);
             TestUtils.assertEquals(expected, actual);
             expected = expected.multiply(random);
