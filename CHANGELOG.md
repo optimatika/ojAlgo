@@ -9,6 +9,7 @@
 * Various deprecations in MatrixStore.LogicalBuilder and the corresponding LogicalBuilder:s of PrimitiveMatrix, ComplexMatrix & RationalMatrix. Everything in the LogicalBuilder:s are now either defined in org.ojalgo.structure.Structure2D.Logical or deprecated.
 * Tweaked the isSolvable() method implementations of the Cholesky decompositions to return `true` slightly less often.
 * The debug logging of the iterative solvers now output the relative error at each iteration.
+* Added a method power(int) to MatrixStore
 
 ## org.ojalgo.optimisation
 
