@@ -235,6 +235,17 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
         return PrimitiveMath.ABS.invoke(myValue);
     }
 
+    public PrimitiveScalar power(final int power) {
+
+        double retVal = PrimitiveMath.ONE;
+
+        for (int p = 0; p < power; p++) {
+            retVal *= myValue;
+        }
+
+        return new PrimitiveScalar(retVal);
+    }
+
     public PrimitiveScalar signum() {
         return new PrimitiveScalar(PrimitiveMath.SIGNUM.invoke(myValue));
     }
