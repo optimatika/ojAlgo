@@ -30,6 +30,7 @@ import java.util.Optional;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;

@@ -26,12 +26,12 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
-import org.ojalgo.matrix.task.iterative.Equation;
 import org.ojalgo.matrix.task.iterative.MutableSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.scalar.PrimitiveScalar;
