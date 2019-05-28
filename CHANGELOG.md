@@ -14,6 +14,7 @@
 * Tweaked the isSolvable() method implementations of the Cholesky decompositions to return `true` slightly less often.
 * The debug logging of the iterative solvers now output the relative error at each iteration.
 * Implemented the power(int) method defined in Operation.Multiplication.
+* New method getCovariance in the SingularValue interface
 
 ## org.ojalgo.optimisation
 
