@@ -42,6 +42,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.random.Normal;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
@@ -106,6 +107,26 @@ public class SingularValueTest {
     @Test
     public void testBasicMatrixP20071019TallCase() {
         this.doTestTypes(P20071019Case.getTallProblematic());
+    }
+
+    @Test
+    public void testGetCovariance() {
+
+        PrimitiveDenseStore original = PrimitiveDenseStore.FACTORY.makeFilled(9, 3, new Normal());
+
+        for (SingularValue<Double> decomp : MatrixDecompositionTests.getPrimitiveSingularValue()) {
+
+            decomp.decompose(original);
+
+            MatrixStore<Double> covariance = decomp.getCovariance();
+
+            decomp.decompose(original.premultiply(original.transpose()));
+
+            MatrixStore<Double> inverse = decomp.getInverse();
+
+            TestUtils.assertEquals(inverse, covariance);
+        }
+
     }
 
     /**

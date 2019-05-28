@@ -39,6 +39,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
@@ -377,6 +378,21 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         final Array1D<Double> tmpSingularValues = this.getSingularValues();
 
         return tmpSingularValues.doubleValue(0) / tmpSingularValues.doubleValue(tmpSingularValues.length - 1);
+    }
+
+    public MatrixStore<N> getCovariance() {
+
+        MatrixStore<N> v = this.getQ2();
+        MatrixStore<N> d = this.getD();
+        Access1D<N> values = d.sliceDiagonal();
+
+        int rank = this.getRank();
+
+        BinaryFunction<N> divide = this.function().divide();
+
+        MatrixStore<N> tmp = v.logical().limits(-1, rank).operateOnColumns(divide, values).get();
+
+        return tmp.multiply(tmp.transpose());
     }
 
     public MatrixStore<N> getD() {

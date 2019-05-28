@@ -179,6 +179,11 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
     double getCondition();
 
     /**
+     * @return [[A]<sup>T</sup>[A]]<sup>-1</sup> Where [A] is the original matrix.
+     */
+    MatrixStore<N> getCovariance();
+
+    /**
      * @return The diagonal matrix of singular values.
      */
     MatrixStore<N> getD();

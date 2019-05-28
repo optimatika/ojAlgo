@@ -34,6 +34,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
@@ -102,6 +103,18 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     public double getCondition() {
         return s[0] / s[n - 1];
+    }
+
+    public MatrixStore<Double> getCovariance() {
+
+        MatrixStore<Double> v = this.getQ2();
+        Access1D<Double> values = this.getSingularValues();
+
+        int rank = this.getRank();
+
+        MatrixStore<Double> tmp = v.logical().limits(-1, rank).operateOnColumns(DIVIDE, values).get();
+
+        return tmp.multiply(tmp.transpose());
     }
 
     public MatrixStore<Double> getD() {
