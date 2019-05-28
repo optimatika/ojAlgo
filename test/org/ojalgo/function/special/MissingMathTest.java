@@ -19,36 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.scalar;
-
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+package org.ojalgo.function.special;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 
-public class ComplexNumberTest extends ScalarTests {
-
-    @Test
-    public void testModulus() {
-
-        TestUtils.assertEquals(ONE, ComplexNumber.valueOf(NEG).getModulus());
-        TestUtils.assertEquals(NaN, ComplexNumber.NaN.getModulus());
-        TestUtils.assertEquals(FIVE, ComplexNumber.of(FOUR, THREE).getModulus());
-
-    }
+public class MissingMathTest {
 
     @Test
     public void testPower() {
 
-        ComplexNumber base = ComplexNumber.TWO;
-
-        TestUtils.assertEquals(1L, base.power(0));
-        TestUtils.assertEquals(2L, base.power(1));
-        TestUtils.assertEquals(4L, base.power(2));
-        TestUtils.assertEquals(8L, base.power(3));
-        TestUtils.assertEquals(16L, base.power(4));
-        TestUtils.assertEquals(32L, base.power(5));
-        TestUtils.assertEquals(64L, base.power(6));
+        TestUtils.assertEquals(1L, MissingMath.power(2L, 0));
+        TestUtils.assertEquals(2L, MissingMath.power(2L, 1));
+        TestUtils.assertEquals(4L, MissingMath.power(2L, 2));
+        TestUtils.assertEquals(8L, MissingMath.power(2L, 3));
+        TestUtils.assertEquals(16L, MissingMath.power(2L, 4));
+        TestUtils.assertEquals(32L, MissingMath.power(2L, 5));
+        TestUtils.assertEquals(64L, MissingMath.power(2L, 6));
     }
 
 }

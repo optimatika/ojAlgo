@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.NullaryFunction;
 
-public class ComposingStoreTest {
+public class ComposingStoreTest extends MatrixStoreTests {
 
     private final static int BLOCK_COUNT = 128;
     private final static int SPARSE_SIZE = 128;

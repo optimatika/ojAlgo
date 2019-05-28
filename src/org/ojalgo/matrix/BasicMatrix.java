@@ -546,6 +546,10 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         return myStore.norm();
     }
 
+    public M power(final int power) {
+        return this.getFactory().instantiate(myStore.power(power));
+    }
+
     public M reduceColumns(final Aggregator aggregator) {
         return this.getFactory().instantiate(myStore.reduceColumns(aggregator).get());
     }

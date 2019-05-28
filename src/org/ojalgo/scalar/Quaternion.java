@@ -826,6 +826,17 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         return PrimitiveMath.SQRT.invoke(this.calculateSumOfSquaresAll());
     }
 
+    public Quaternion power(final int power) {
+
+        Quaternion retVal = ONE;
+
+        for (int p = 0; p < power; p++) {
+            retVal = retVal.multiply(this);
+        }
+
+        return retVal;
+    }
+
     public double scalar() {
         return myScalar;
     }
