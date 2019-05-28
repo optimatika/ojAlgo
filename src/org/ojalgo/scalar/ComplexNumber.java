@@ -662,6 +662,14 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return Math.atan2(i, myRealValue);
     }
 
+    public ComplexNumber power(final int power) {
+
+        double norm = Math.pow(this.norm(), power);
+        double phase = this.phase() * power;
+
+        return ComplexNumber.makePolar(norm, phase);
+    }
+
     public ComplexNumber.Normalised signum() {
         if (ComplexNumber.isSmall(PrimitiveMath.ONE, this)) {
             return ComplexNumber.makeRotation(PrimitiveMath.ZERO);

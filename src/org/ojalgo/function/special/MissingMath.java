@@ -180,6 +180,25 @@ public abstract class MissingMath {
         }
     }
 
+    public static long power(final long arg, final int param) {
+
+        if (param == 0) {
+            return 1L;
+        } else if (param == 1) {
+            return arg;
+        } else if (param == 2) {
+            return arg * arg;
+        } else if (param < 0) {
+            return Math.round(Math.pow(arg, param));
+        } else {
+            long retVal = arg;
+            for (int p = 1; p < param; p++) {
+                retVal *= arg;
+            }
+            return retVal;
+        }
+    }
+
     public static BigDecimal root(final BigDecimal arg, final int param) {
 
         if (param <= 0) {

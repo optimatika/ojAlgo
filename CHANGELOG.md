@@ -4,15 +4,24 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## org.ojalgo.algebra
+
+* Added a power(int) method to the Operation.Multiplication interface.
+
 ## org.ojalgo.matrix
 
 * Various deprecations in MatrixStore.LogicalBuilder and the corresponding LogicalBuilder:s of PrimitiveMatrix, ComplexMatrix & RationalMatrix. Everything in the LogicalBuilder:s are now either defined in org.ojalgo.structure.Structure2D.Logical or deprecated.
 * Tweaked the isSolvable() method implementations of the Cholesky decompositions to return `true` slightly less often.
 * The debug logging of the iterative solvers now output the relative error at each iteration.
+* Implemented the power(int) method defined in Operation.Multiplication.
 
 ## org.ojalgo.optimisation
 
 * Minor rounding/precision related change to how ExpressionsBasedModel receives the solution from the solver and then returns it. The `options.solution` property is now enforced.
+
+## org.ojalgo.scalar
+
+* Implemented the power(int) method defined in Operation.Multiplication.
 
 ## org.ojalgo.structure
 
