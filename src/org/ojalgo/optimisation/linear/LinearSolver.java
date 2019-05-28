@@ -96,7 +96,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             final SimplexTableau tableau = new DenseTableau(this);
 
-            return new SimplexSolver(tableau, options);
+            return new PrimalSimplex(tableau, options);
         }
 
     }
@@ -107,14 +107,14 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             final SimplexTableau tableau = SimplexSolver.build(convexBuilder, options);
 
-            return new SimplexSolver(tableau, options);
+            return new PrimalSimplex(tableau, options);
         }
 
         public LinearSolver build(final ExpressionsBasedModel model) {
 
             final SimplexTableau tableau = SimplexSolver.build(model);
 
-            return new SimplexSolver(tableau, model.options);
+            return new PrimalSimplex(tableau, model.options);
         }
 
         public boolean isCapable(final ExpressionsBasedModel model) {
@@ -211,7 +211,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         final SimplexTableau tableau = SimplexSolver.build(convex, options);
 
-        final LinearSolver solver = new SimplexSolver(tableau, options);
+        final LinearSolver solver = new PrimalSimplex(tableau, options);
 
         final Result result = solver.solve();
 

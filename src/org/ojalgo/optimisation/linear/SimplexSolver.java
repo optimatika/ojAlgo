@@ -80,7 +80,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class SimplexSolver extends LinearSolver {
+public abstract class SimplexSolver extends LinearSolver {
 
     interface AlgorithmStore {
 
