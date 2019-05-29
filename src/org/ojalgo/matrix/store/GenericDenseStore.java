@@ -38,6 +38,7 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
+import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
@@ -117,6 +118,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
                 public LogicalBuilder<N> makeZero(final int rowsCount, final int columnsCount) {
                     return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.Factory.this, rowsCount, columnsCount));
+                }
+
+                public <D extends Access1D<?>> Builder<N, D> makeDiagonal(final D mainDiagonal) {
+                    return DiagonalStore.builder(GenericDenseStore.Factory.this, mainDiagonal);
                 }
 
             };

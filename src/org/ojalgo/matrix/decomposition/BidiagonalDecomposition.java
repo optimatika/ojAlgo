@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -50,7 +51,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         @Override
         Array1D<ComplexNumber>[] makeReal() {
 
-            final DiagonalArray1D<ComplexNumber> tmpDiagonalAccessD = this.doGetDiagonal();
+            final DiagonalStore<ComplexNumber, Array1D<ComplexNumber>> tmpDiagonalAccessD = this.doGetDiagonal();
 
             final Array1D<ComplexNumber> tmpInitDiagQ1 = Array1D.COMPLEX.makeZero(tmpDiagonalAccessD.getDimension());
             tmpInitDiagQ1.fillAll(ComplexNumber.ONE);
@@ -62,8 +63,8 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
             if (tmpUpper) {
 
-                final Array1D<ComplexNumber> tmpMainDiagonal = tmpDiagonalAccessD.mainDiagonal;
-                final Array1D<ComplexNumber> tmpSuperdiagonal = tmpDiagonalAccessD.superdiagonal;
+                final Array1D<ComplexNumber> tmpMainDiagonal = tmpDiagonalAccessD.getMainDiagonal().get();
+                final Array1D<ComplexNumber> tmpSuperdiagonal = tmpDiagonalAccessD.getSuperdiagonal().get();
 
                 final int tmpLimit = (int) tmpSuperdiagonal.count();
                 for (int i = 0; i < tmpLimit; i++) {
@@ -91,8 +92,8 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
             } else {
 
-                final Array1D<ComplexNumber> tmpMainDiagonal = tmpDiagonalAccessD.mainDiagonal;
-                final Array1D<ComplexNumber> tmpSubdiagonal = tmpDiagonalAccessD.subdiagonal;
+                final Array1D<ComplexNumber> tmpMainDiagonal = tmpDiagonalAccessD.getMainDiagonal().get();
+                final Array1D<ComplexNumber> tmpSubdiagonal = tmpDiagonalAccessD.getSubdiagonal().get();
 
                 final int tmpLimit = (int) tmpSubdiagonal.count();
                 for (int i = 0; i < tmpLimit; i++) {
@@ -177,7 +178,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
     }
 
-    private transient DiagonalArray1D<N> myDiagonal;
+    private transient DiagonalStore<N, Array1D<N>> myDiagonal;
     private final boolean myFullSize;
     private Array1D<N> myInitDiagLQ = null;
     private Array1D<N> myInitDiagRQ = null;
@@ -287,7 +288,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         myInitDiagRQ = null;
     }
 
-    private DiagonalArray1D<N> makeDiagonal() {
+    private DiagonalStore<N, Array1D<N>> makeDiagonal() {
 
         final DecompositionStore<N> storage = this.getInPlace();
 
@@ -303,7 +304,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
             diagSub = storage.sliceDiagonal(1, 0);
         }
 
-        return new DiagonalArray1D<>(diagMain, diagSuper, diagSub, this.scalar().zero().get());
+        return this.makeDiagonal(diagMain).superdiagonal(diagSuper).subdiagonal(diagSub).get();
     }
 
     private DecompositionStore<N> makeLQ() {
@@ -370,7 +371,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
      * Will solve the equation system [aMtrxV][aMtrxD][X]=[aMtrxSimilar]<sup>T</sup> and overwrite the
      * solution [X] to [aV].
      */
-    private void solve(final PhysicalStore<N> aMtrxV, final MatrixStore<N> aMtrxD, final DiagonalBasicArray<N> aMtrxSimilar) {
+    private void solve(final PhysicalStore<N> aMtrxV, final MatrixStore<N> aMtrxD, final DiagonalStore<N, ?> aMtrxSimilar) {
 
         final int tmpDim = (int) aMtrxV.countRows();
         final int tmpLim = tmpDim - 1;
@@ -394,7 +395,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         }
     }
 
-    private DecompositionStore<N> solve2(final PhysicalStore<N> aMtrxV, final MatrixStore<N> aMtrxD, final DiagonalBasicArray<N> aMtrxSimilar) {
+    private DecompositionStore<N> solve2(final PhysicalStore<N> aMtrxV, final MatrixStore<N> aMtrxD, final DiagonalStore<N, ?> aMtrxSimilar) {
 
         final int tmpDim = (int) aMtrxV.countRows();
         final int tmpLim = tmpDim - 1;
@@ -422,7 +423,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         return retVal;
     }
 
-    DiagonalArray1D<N> doGetDiagonal() {
+    DiagonalStore<N, Array1D<N>> doGetDiagonal() {
         if (myDiagonal == null) {
             myDiagonal = this.makeDiagonal();
         }

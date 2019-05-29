@@ -30,6 +30,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
+import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -672,7 +673,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         this.computeBidiagonal(matrix, fullSize);
 
-        final DiagonalArray1D<N> tmpBidiagonal = myBidiagonal.doGetDiagonal();
+        final DiagonalStore<N, Array1D<N>> tmpBidiagonal = myBidiagonal.doGetDiagonal();
 
         final DecompositionStore<N> tmpQ1 = valuesOnly ? null : myBidiagonal.doGetLQ();
         final DecompositionStore<N> tmpQ2 = valuesOnly ? null : myBidiagonal.doGetRQ();
@@ -684,8 +685,8 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             e = new double[size];
         }
 
-        tmpBidiagonal.mainDiagonal.supplyTo(s);
-        tmpBidiagonal.superdiagonal.supplyTo(e);
+        tmpBidiagonal.supplyMainDiagonalTo(s);
+        tmpBidiagonal.supplySuperdiagonalTo(e);
 
         final RotateRight q1RotR = tmpQ1 != null ? tmpQ1 : RotateRight.NULL;
         final RotateRight q2RotR = tmpQ2 != null ? tmpQ2 : RotateRight.NULL;
@@ -713,7 +714,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     protected MatrixStore<N> makeD() {
-        MatrixStore<N> retVal = this.wrap(new DiagonalArray1D<>(this.getSingularValues(), null, null, ZERO)).get();
+        MatrixStore<N> retVal = this.makeDiagonal(this.getSingularValues()).get();
         if (myFullSize) {
             if (myInputStructure.countRows() > retVal.countRows()) {
                 retVal = retVal.logical().below((int) (myInputStructure.countRows() - retVal.countRows())).get();
