@@ -158,8 +158,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         @Override
         protected MatrixStore<Double> makeD(final double[] d, final double[] e) {
-            final DiagonalBasicArray<Double> diagonal = new DiagonalBasicArray<>(Primitive64Array.wrap(d), null, null, ZERO);
-            return MatrixStore.PRIMITIVE.makeWrapper(diagonal).diagonal().get();
+            return this.makeDiagonal(Primitive64Array.wrap(d)).get();
         }
 
     }

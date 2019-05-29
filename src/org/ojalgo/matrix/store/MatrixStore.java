@@ -29,6 +29,7 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
@@ -65,6 +66,8 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         Access2D.Elements, Structure2D.ReducibleTo1D<ElementsSupplier<N>>, NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>> {
 
     public interface Factory<N extends Number> {
+
+        <D extends Access1D<?>> DiagonalStore.Builder<N, D> makeDiagonal(D mainDiagonal);
 
         MatrixStore.LogicalBuilder<N> makeIdentity(int dimension);
 
@@ -249,11 +252,18 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         }
 
         public LogicalBuilder<N> bidiagonal(final boolean upper) {
+            PhysicalStore.Factory<N, ?> factory = myStore.physical();
+            Access1D<N> mainDiagonal = myStore.sliceDiagonal();
+            Access1D<N> superdiagonal = null;
+            Access1D<N> subdiagonal = null;
             if (upper) {
-                myStore = new UpperTriangularStore<>(new LowerHessenbergStore<>(myStore), false);
+                superdiagonal = myStore.sliceDiagonal(0, 1);
             } else {
-                myStore = new LowerTriangularStore<>(new UpperHessenbergStore<>(myStore), false);
+                subdiagonal = myStore.sliceDiagonal(1, 0);
             }
+            long numbRows = myStore.countRows();
+            long numbCols = myStore.countColumns();
+            myStore = new DiagonalStore<>(factory, numbRows, numbCols, mainDiagonal, superdiagonal, subdiagonal);
             return this;
         }
 
@@ -313,20 +323,12 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return myStore.countRows();
         }
 
-        /**
-         * @return A square diagonal matrix (main diagonal only)
-         */
         public LogicalBuilder<N> diagonal() {
-            myStore = new DiagonalStore<>(myStore);
-            return this;
-        }
-
-        /**
-         * @param maintain Maintain the original matrix dimensions (resulting matrix not necessarily square).
-         * @return A diagonal matrix (main diagonal only)
-         */
-        public LogicalBuilder<N> diagonal(final boolean maintain) {
-            myStore = new DiagonalStore<>(myStore, maintain);
+            PhysicalStore.Factory<N, ?> factory = myStore.physical();
+            Access1D<N> mainDiagonal = myStore.sliceDiagonal();
+            long numbRows = myStore.countRows();
+            long numbCols = myStore.countColumns();
+            myStore = new DiagonalStore<>(factory, numbRows, numbCols, mainDiagonal, null, null);
             return this;
         }
 
@@ -546,13 +548,23 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         }
 
         public LogicalBuilder<N> tridiagonal() {
-            myStore = new UpperHessenbergStore<>(new LowerHessenbergStore<>(myStore));
+            PhysicalStore.Factory<N, ?> factory = myStore.physical();
+            Access1D<N> mainDiagonal = myStore.sliceDiagonal();
+            Access1D<N> superdiagonal = myStore.sliceDiagonal(0, 1);
+            Access1D<N> subdiagonal = myStore.sliceDiagonal(1, 0);
+            long numbRows = myStore.countRows();
+            long numbCols = myStore.countColumns();
+            myStore = new DiagonalStore<>(factory, numbRows, numbCols, mainDiagonal, superdiagonal, subdiagonal);
             return this;
         }
 
     }
 
     Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+
+        public <D extends Access1D<?>> DiagonalStore.Builder<ComplexNumber, D> makeDiagonal(final D mainDiagonal) {
+            return DiagonalStore.builder(GenericDenseStore.COMPLEX, mainDiagonal);
+        }
 
         public LogicalBuilder<ComplexNumber> makeIdentity(final int dimension) {
             return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.COMPLEX, dimension));
@@ -578,6 +590,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     Factory<Double> PRIMITIVE = new Factory<Double>() {
 
+        public <D extends Access1D<?>> Builder<Double, D> makeDiagonal(final D mainDiagonal) {
+            return DiagonalStore.builder(PrimitiveDenseStore.FACTORY, mainDiagonal);
+        }
+
         public LogicalBuilder<Double> makeIdentity(final int dimension) {
             return new LogicalBuilder<>(new IdentityStore<>(PrimitiveDenseStore.FACTORY, dimension));
         }
@@ -602,6 +618,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
+        public <D extends Access1D<?>> Builder<Quaternion, D> makeDiagonal(final D mainDiagonal) {
+            return DiagonalStore.builder(GenericDenseStore.QUATERNION, mainDiagonal);
+        }
+
         public LogicalBuilder<Quaternion> makeIdentity(final int dimension) {
             return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.QUATERNION, dimension));
         }
@@ -625,6 +645,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
     };
 
     Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+
+        public <D extends Access1D<?>> Builder<RationalNumber, D> makeDiagonal(final D mainDiagonal) {
+            return DiagonalStore.builder(GenericDenseStore.RATIONAL, mainDiagonal);
+        }
 
         public LogicalBuilder<RationalNumber> makeIdentity(final int dimension) {
             return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.RATIONAL, dimension));

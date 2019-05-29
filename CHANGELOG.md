@@ -14,6 +14,11 @@
 * Tweaked the isSolvable() method implementations of the Cholesky decompositions to return `true` slightly less often.
 * The debug logging of the iterative solvers now output the relative error at each iteration.
 * Implemented the power(int) method defined in Operation.Multiplication.
+* New method getCovariance in the SingularValue interface
+* Q1 and Q2 in the SingularValue decomposition have been renamed U and V to match denominations commonly used elsewhere. In Bidiagonal Q1 and Q2 have been renamed LQ and RQ.
+* New MatrixStore implementation DiagonalStore to be used for diagonal, bidiagonal and tridiagonal matrices. Replaces two different previous (package private) implementations.
+* MatrixStore.Factory has a new method makeDiagonal(...)
+* MatrixStore.LogicalBuilder has new implementations for the diagonal(), bidiagonal(boolean) and tridiagonal() methods.
 
 ## org.ojalgo.optimisation
 

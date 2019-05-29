@@ -54,9 +54,9 @@ public class BidiagonalTest {
 
         final MatrixStore<ComplexNumber> tmpReconstructed = tmpDecomposition.reconstruct();
 
-        final MatrixStore<ComplexNumber> tmpQ1 = tmpDecomposition.getQ1();
+        final MatrixStore<ComplexNumber> tmpQ1 = tmpDecomposition.getLQ();
         final MatrixStore<ComplexNumber> tmpD = tmpDecomposition.getD();
-        final MatrixStore<ComplexNumber> tmpQ2 = tmpDecomposition.getQ2();
+        final MatrixStore<ComplexNumber> tmpQ2 = tmpDecomposition.getRQ();
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
@@ -137,9 +137,9 @@ public class BidiagonalTest {
         BasicLogger.debug();
         BasicLogger.debug();
         BasicLogger.debug("Original: ", aMatrix);
-        BasicLogger.debug("Q1 get: ", aDecomposition.getQ1());
+        BasicLogger.debug("Q1 get: ", aDecomposition.getLQ());
         BasicLogger.debug("D: ", aDecomposition.getD());
-        BasicLogger.debug("Q2 get: ", aDecomposition.getQ2());
+        BasicLogger.debug("Q2 get: ", aDecomposition.getRQ());
         BasicLogger.debug("Reconstructed: ", Bidiagonal.reconstruct(aDecomposition));
     }
 
