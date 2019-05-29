@@ -30,13 +30,13 @@ import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * A general matrix [A] can be factorized by similarity transformations into the form [A]=[Q1][D][Q2]
+ * A general matrix [A] can be factorized by similarity transformations into the form [A]=[LQ][D][RQ]
  * <sup>-1</sup> where:
  * <ul>
  * <li>[A] (m-by-n) is any, real or complex, matrix</li>
  * <li>[D] (r-by-r) or (m-by-n) is, upper or lower, bidiagonal</li>
- * <li>[Q1] (m-by-r) or (m-by-m) is orthogonal</li>
- * <li>[Q2] (n-by-r) or (n-by-n) is orthogonal</li>
+ * <li>[LQ] (m-by-r) or (m-by-m) is orthogonal</li>
+ * <li>[RQ] (n-by-r) or (n-by-n) is orthogonal</li>
  * <li>r = min(m,n)</li>
  * </ul>
  *
@@ -71,9 +71,9 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
         final int tmpRowDim = (int) matrix.countRows();
         final int tmpColDim = (int) matrix.countColumns();
 
-        final MatrixStore<N> tmpQ1 = decomposition.getQ1();
+        final MatrixStore<N> tmpQ1 = decomposition.getLQ();
         decomposition.getD();
-        final MatrixStore<N> tmpQ2 = decomposition.getQ2();
+        final MatrixStore<N> tmpQ2 = decomposition.getRQ();
 
         final MatrixStore<N> tmpConjugatedQ1 = tmpQ1.conjugate();
         final MatrixStore<N> tmpConjugatedQ2 = tmpQ2.conjugate();
@@ -141,16 +141,32 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
 
     MatrixStore<N> getD();
 
-    MatrixStore<N> getQ1();
+    MatrixStore<N> getLQ();
 
-    MatrixStore<N> getQ2();
+    /**
+     * @deprecated v48 Use {@link #getLQ()} instead
+     */
+    @Deprecated
+    default MatrixStore<N> getQ1() {
+        return this.getLQ();
+    }
+
+    /**
+     * @deprecated v48 Use {@link #getRQ()} instead
+     */
+    @Deprecated
+    default MatrixStore<N> getQ2() {
+        return this.getRQ();
+    }
+
+    MatrixStore<N> getRQ();
 
     boolean isUpper();
 
     default MatrixStore<N> reconstruct() {
-        MatrixStore<N> mtrxQ1 = this.getQ1();
+        MatrixStore<N> mtrxQ1 = this.getLQ();
         MatrixStore<N> mtrxD = this.getD();
-        MatrixStore<N> mtrxQ2 = this.getQ2();
+        MatrixStore<N> mtrxQ2 = this.getRQ();
         return mtrxQ1.multiply(mtrxD).multiply(mtrxQ2.conjugate());
     }
 
