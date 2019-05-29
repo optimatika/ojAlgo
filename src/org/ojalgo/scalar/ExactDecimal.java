@@ -86,6 +86,12 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
 
     }
 
+    public interface Factory<S extends ExactDecimal<S>> extends Scalar.Factory<S> {
+
+        Descriptor descriptor();
+
+    }
+
     protected static long extractUnscaledValue(final BigDecimal decimal, final NumberContext cntxt) {
         return decimal.setScale(cntxt.getScale(), cntxt.getRoundingMode()).unscaledValue().longValueExact();
     }

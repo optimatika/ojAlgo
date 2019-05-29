@@ -50,7 +50,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         @Override
         Array1D<ComplexNumber>[] makeReal() {
 
-            final DiagonalArray1D<ComplexNumber> tmpDiagonalAccessD = this.getDiagonal();
+            final DiagonalArray1D<ComplexNumber> tmpDiagonalAccessD = this.doGetDiagonal();
 
             final Array1D<ComplexNumber> tmpInitDiagQ1 = Array1D.COMPLEX.makeZero(tmpDiagonalAccessD.getDimension());
             tmpInitDiagQ1.fillAll(ComplexNumber.ONE);
@@ -154,7 +154,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
         @Override
         Array1D<Quaternion>[] makeReal() {
-            // TODO Implement something similr to what's in "Complex"
+            // TODO Implement something similar to what's in "Complex"
             return null;
         }
 
@@ -179,10 +179,10 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
     private transient DiagonalArray1D<N> myDiagonal;
     private final boolean myFullSize;
-    private Array1D<N> myInitDiagQ1 = null;
-    private Array1D<N> myInitDiagQ2 = null;
-    private transient DecompositionStore<N> myQL;
-    private transient DecompositionStore<N> myQR;
+    private Array1D<N> myInitDiagLQ = null;
+    private Array1D<N> myInitDiagRQ = null;
+    private transient DecompositionStore<N> myLQ;
+    private transient DecompositionStore<N> myRQ;
 
     protected BidiagonalDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final boolean fullSize) {
         super(factory);
@@ -193,7 +193,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
         this.reset();
 
-        final DecompositionStore<N> tmpStore = this.setInPlace(matrix);
+        final DecompositionStore<N> storage = this.setInPlace(matrix);
 
         final int tmpRowDim = this.getRowDim();
         final int tmpColDim = this.getColDim();
@@ -207,38 +207,38 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
             for (int ij = 0; ij < tmpLimit; ij++) {
 
-                if (((ij + 1) < tmpRowDim) && tmpStore.generateApplyAndCopyHouseholderColumn(ij, ij, tmpHouseholderCol)) {
-                    tmpStore.transformLeft(tmpHouseholderCol, ij + 1);
+                if (((ij + 1) < tmpRowDim) && storage.generateApplyAndCopyHouseholderColumn(ij, ij, tmpHouseholderCol)) {
+                    storage.transformLeft(tmpHouseholderCol, ij + 1);
                 }
 
-                if (((ij + 2) < tmpColDim) && tmpStore.generateApplyAndCopyHouseholderRow(ij, ij + 1, tmpHouseholderRow)) {
-                    tmpStore.transformRight(tmpHouseholderRow, ij + 1);
+                if (((ij + 2) < tmpColDim) && storage.generateApplyAndCopyHouseholderRow(ij, ij + 1, tmpHouseholderRow)) {
+                    storage.transformRight(tmpHouseholderRow, ij + 1);
                 }
             }
 
             final Array1D<N>[] tmpInitDiags = this.makeReal();
             if (tmpInitDiags != null) {
-                myInitDiagQ1 = tmpInitDiags[0];
-                myInitDiagQ2 = tmpInitDiags[1];
+                myInitDiagLQ = tmpInitDiags[0];
+                myInitDiagRQ = tmpInitDiags[1];
             }
 
         } else {
 
             for (int ij = 0; ij < tmpLimit; ij++) {
 
-                if (((ij + 1) < tmpColDim) && tmpStore.generateApplyAndCopyHouseholderRow(ij, ij, tmpHouseholderRow)) {
-                    tmpStore.transformRight(tmpHouseholderRow, ij + 1);
+                if (((ij + 1) < tmpColDim) && storage.generateApplyAndCopyHouseholderRow(ij, ij, tmpHouseholderRow)) {
+                    storage.transformRight(tmpHouseholderRow, ij + 1);
                 }
 
-                if (((ij + 2) < tmpRowDim) && tmpStore.generateApplyAndCopyHouseholderColumn(ij + 1, ij, tmpHouseholderCol)) {
-                    tmpStore.transformLeft(tmpHouseholderCol, ij + 1);
+                if (((ij + 2) < tmpRowDim) && storage.generateApplyAndCopyHouseholderColumn(ij + 1, ij, tmpHouseholderCol)) {
+                    storage.transformLeft(tmpHouseholderCol, ij + 1);
                 }
             }
 
             final Array1D<N>[] tmpInitDiags = this.makeReal();
             if (tmpInitDiags != null) {
-                myInitDiagQ1 = tmpInitDiags[0];
-                myInitDiagQ2 = tmpInitDiags[1];
+                myInitDiagLQ = tmpInitDiags[0];
+                myInitDiagRQ = tmpInitDiags[1];
             }
 
         }
@@ -279,31 +279,31 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
         super.reset();
 
-        myQL = null;
-        myQR = null;
+        myLQ = null;
+        myRQ = null;
         myDiagonal = null;
 
-        myInitDiagQ1 = null;
-        myInitDiagQ2 = null;
+        myInitDiagLQ = null;
+        myInitDiagRQ = null;
     }
 
     private DiagonalArray1D<N> makeDiagonal() {
 
-        final DecompositionStore<N> tmpArray2D = this.getInPlace();
+        final DecompositionStore<N> storage = this.getInPlace();
 
-        final Array1D<N> tmpMain = tmpArray2D.sliceDiagonal(0, 0);
-        Array1D<N> tmpSuper;
-        Array1D<N> tmpSub;
+        final Array1D<N> diagMain = storage.sliceDiagonal(0, 0);
+        Array1D<N> diagSuper;
+        Array1D<N> diagSub;
 
         if (this.isAspectRatioNormal()) {
-            tmpSuper = tmpArray2D.sliceDiagonal(0, 1);
-            tmpSub = null;
+            diagSuper = storage.sliceDiagonal(0, 1);
+            diagSub = null;
         } else {
-            tmpSuper = null;
-            tmpSub = tmpArray2D.sliceDiagonal(1, 0);
+            diagSuper = null;
+            diagSub = storage.sliceDiagonal(1, 0);
         }
 
-        return new DiagonalArray1D<>(tmpMain, tmpSuper, tmpSub, this.scalar().zero().get());
+        return new DiagonalArray1D<>(diagMain, diagSuper, diagSub, this.scalar().zero().get());
     }
 
     private DecompositionStore<N> makeLQ() {
@@ -314,10 +314,10 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         final int tmpMinDim = this.getMinDim();
 
         DecompositionStore<N> retVal = null;
-        if (myInitDiagQ1 != null) {
+        if (myInitDiagLQ != null) {
             retVal = this.makeZero(tmpRowDim, myFullSize ? tmpRowDim : tmpMinDim);
             for (int ij = 0; ij < tmpMinDim; ij++) {
-                retVal.set(ij, ij, myInitDiagQ1.get(ij));
+                retVal.set(ij, ij, myInitDiagLQ.get(ij));
             }
         } else {
             retVal = this.makeEye(tmpRowDim, myFullSize ? tmpRowDim : tmpMinDim);
@@ -344,10 +344,10 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         final int tmpMinDim = this.getMinDim();
 
         DecompositionStore<N> retVal = null;
-        if (myInitDiagQ2 != null) {
+        if (myInitDiagRQ != null) {
             retVal = this.makeZero(tmpColDim, myFullSize ? tmpColDim : tmpMinDim);
             for (int ij = 0; ij < tmpMinDim; ij++) {
-                retVal.set(ij, ij, myInitDiagQ2.get(ij));
+                retVal.set(ij, ij, myInitDiagRQ.get(ij));
             }
         } else {
             retVal = this.makeEye(tmpColDim, myFullSize ? tmpColDim : tmpMinDim);
@@ -422,25 +422,25 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         return retVal;
     }
 
-    DecompositionStore<N> doGetLQ() {
-        if (myQL == null) {
-            myQL = this.makeLQ();
-        }
-        return myQL;
-    }
-
-    DecompositionStore<N> doGetRQ() {
-        if (myQR == null) {
-            myQR = this.makeRQ();
-        }
-        return myQR;
-    }
-
-    DiagonalArray1D<N> getDiagonal() {
+    DiagonalArray1D<N> doGetDiagonal() {
         if (myDiagonal == null) {
             myDiagonal = this.makeDiagonal();
         }
         return myDiagonal;
+    }
+
+    DecompositionStore<N> doGetLQ() {
+        if (myLQ == null) {
+            myLQ = this.makeLQ();
+        }
+        return myLQ;
+    }
+
+    DecompositionStore<N> doGetRQ() {
+        if (myRQ == null) {
+            myRQ = this.makeRQ();
+        }
+        return myRQ;
     }
 
     abstract Array1D<N>[] makeReal();

@@ -672,7 +672,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         this.computeBidiagonal(matrix, fullSize);
 
-        final DiagonalArray1D<N> tmpBidiagonal = myBidiagonal.getDiagonal();
+        final DiagonalArray1D<N> tmpBidiagonal = myBidiagonal.doGetDiagonal();
 
         final DecompositionStore<N> tmpQ1 = valuesOnly ? null : myBidiagonal.doGetLQ();
         final DecompositionStore<N> tmpQ2 = valuesOnly ? null : myBidiagonal.doGetRQ();
