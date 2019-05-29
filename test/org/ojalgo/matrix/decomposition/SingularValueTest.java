@@ -158,9 +158,9 @@ public class SingularValueTest {
                 BasicLogger.debug();
                 BasicLogger.debug("Scale = {}", tmpScale);
                 BasicLogger.debug("A", tmpOriginalMtrx);
-                BasicLogger.debug("Q1", tmpBidiagonal.getQ1());
+                BasicLogger.debug("Q1", tmpBidiagonal.getLQ());
                 BasicLogger.debug("D", tmpBidiagonal.getD());
-                BasicLogger.debug("Q2", tmpBidiagonal.getQ2());
+                BasicLogger.debug("Q2", tmpBidiagonal.getRQ());
                 BasicLogger.debug("Reconstructed", tmpReconstructed);
             }
             TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, new NumberContext(7, 6));
@@ -217,9 +217,9 @@ public class SingularValueTest {
             BasicLogger.debug();
             BasicLogger.debug(tmpDecomposition.toString());
             BasicLogger.debug("Original", tmpOriginal);
-            BasicLogger.debug("Q1", tmpDecomposition.getQ1());
+            BasicLogger.debug("Q1", tmpDecomposition.getU());
             BasicLogger.debug("D", tmpDecomposition.getD());
-            BasicLogger.debug("Q2", tmpDecomposition.getQ2());
+            BasicLogger.debug("Q2", tmpDecomposition.getV());
             BasicLogger.debug("Reconstructed", tmpReconstructed);
             final PhysicalStore<ComplexNumber> tmpCopy = tmpOriginal.copy();
             // tmpCopy.maxpy(ComplexNumber.NEG, tmpReconstructed);
@@ -319,34 +319,34 @@ public class SingularValueTest {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q1", IMPL_BIG.getQ1());
-            BasicLogger.debug("Cmplx Q1", IMPL_COMPLEX.getQ1());
-            BasicLogger.debug("Jama  Q1", IMPL_RAW.getQ1());
-            BasicLogger.debug("Direc Q1", IMPL_PRIMITIVE.getQ1());
+            BasicLogger.debug("Big   Q1", IMPL_BIG.getU());
+            BasicLogger.debug("Cmplx Q1", IMPL_COMPLEX.getU());
+            BasicLogger.debug("Jama  Q1", IMPL_RAW.getU());
+            BasicLogger.debug("Direc Q1", IMPL_PRIMITIVE.getU());
         }
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q1 unitary", IMPL_BIG.getQ1().conjugate().multiply(IMPL_BIG.getQ1()));
-            BasicLogger.debug("Cmplx Q1 unitary", IMPL_COMPLEX.getQ1().conjugate().multiply(IMPL_COMPLEX.getQ1()));
-            BasicLogger.debug("Jama  Q1 unitary", IMPL_RAW.getQ1().conjugate().multiply(IMPL_RAW.getQ1()));
-            BasicLogger.debug("Direc Q1 unitary", IMPL_PRIMITIVE.getQ1().conjugate().multiply(IMPL_PRIMITIVE.getQ1()));
+            BasicLogger.debug("Big   Q1 unitary", IMPL_BIG.getU().conjugate().multiply(IMPL_BIG.getU()));
+            BasicLogger.debug("Cmplx Q1 unitary", IMPL_COMPLEX.getU().conjugate().multiply(IMPL_COMPLEX.getU()));
+            BasicLogger.debug("Jama  Q1 unitary", IMPL_RAW.getU().conjugate().multiply(IMPL_RAW.getU()));
+            BasicLogger.debug("Direc Q1 unitary", IMPL_PRIMITIVE.getU().conjugate().multiply(IMPL_PRIMITIVE.getU()));
         }
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q2", IMPL_BIG.getQ2());
-            BasicLogger.debug("Cmplx Q2", IMPL_COMPLEX.getQ2());
-            BasicLogger.debug("Jama  Q2", IMPL_RAW.getQ2());
-            BasicLogger.debug("Direc Q2", IMPL_PRIMITIVE.getQ2());
+            BasicLogger.debug("Big   Q2", IMPL_BIG.getV());
+            BasicLogger.debug("Cmplx Q2", IMPL_COMPLEX.getV());
+            BasicLogger.debug("Jama  Q2", IMPL_RAW.getV());
+            BasicLogger.debug("Direc Q2", IMPL_PRIMITIVE.getV());
         }
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q2 unitary", IMPL_BIG.getQ2().multiply(IMPL_BIG.getQ2().conjugate()));
-            BasicLogger.debug("Cmplx Q2 unitary", IMPL_COMPLEX.getQ2().multiply(IMPL_COMPLEX.getQ2().conjugate()));
-            BasicLogger.debug("Jama  Q2 unitary", IMPL_RAW.getQ2().multiply(IMPL_RAW.getQ2().conjugate()));
-            BasicLogger.debug("Direc Q2 unitary", IMPL_PRIMITIVE.getQ2().multiply(IMPL_PRIMITIVE.getQ2().conjugate()));
+            BasicLogger.debug("Big   Q2 unitary", IMPL_BIG.getV().multiply(IMPL_BIG.getV().conjugate()));
+            BasicLogger.debug("Cmplx Q2 unitary", IMPL_COMPLEX.getV().multiply(IMPL_COMPLEX.getV().conjugate()));
+            BasicLogger.debug("Jama  Q2 unitary", IMPL_RAW.getV().multiply(IMPL_RAW.getV().conjugate()));
+            BasicLogger.debug("Direc Q2 unitary", IMPL_PRIMITIVE.getV().multiply(IMPL_PRIMITIVE.getV().conjugate()));
         }
 
         tmpPrimitiveRoundFunction = CNTXT_CPLX_VALUES.getFunction(PrimitiveFunction.getSet());
@@ -400,9 +400,9 @@ public class SingularValueTest {
                 BasicLogger.debug();
                 BasicLogger.debug(tmpImpl.toString());
                 BasicLogger.debug("Original", aMtrx);
-                BasicLogger.debug("Q1", tmpImpl.getQ1());
+                BasicLogger.debug("Q1", tmpImpl.getU());
                 BasicLogger.debug("D", tmpImpl.getD());
-                BasicLogger.debug("Q2", tmpImpl.getQ2());
+                BasicLogger.debug("Q2", tmpImpl.getV());
                 BasicLogger.debug("Reconstructed", tmpReconstructed);
                 final PhysicalStore<Double> tmpCopy = aMtrx.copy();
                 // tmpCopy.maxpy(-1.0, tmpReconstructed);

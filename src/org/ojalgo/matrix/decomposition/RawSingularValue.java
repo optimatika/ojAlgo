@@ -107,7 +107,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     public MatrixStore<Double> getCovariance() {
 
-        MatrixStore<Double> v = this.getQ2();
+        MatrixStore<Double> v = this.getV();
         Access1D<Double> values = this.getSingularValues();
 
         int rank = this.getRank();
@@ -164,11 +164,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return s[0];
     }
 
-    public MatrixStore<Double> getQ1() {
+    public MatrixStore<Double> getU() {
         return myTransposed ? new RawStore(myVt, n, n).logical().transpose().get() : new RawStore(myUt, n, m).logical().transpose().get();
     }
 
-    public MatrixStore<Double> getQ2() {
+    public MatrixStore<Double> getV() {
         return myTransposed ? new RawStore(myUt, n, m).logical().transpose().get() : new RawStore(myVt, n, n).logical().transpose().get();
     }
 
@@ -550,7 +550,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 }
             }
 
-            MatrixStore<Double> mtrxQ2 = this.getQ2();
+            MatrixStore<Double> mtrxQ2 = this.getV();
             preallocated.fillByMultiplying(mtrxQ2, tmpMtrx);
             myPseudoinverse = preallocated;
         }

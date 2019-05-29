@@ -334,10 +334,10 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         }
     };
     private transient MatrixStore<N> myInverse = null;
-    private transient MatrixStore<N> myQ1 = null;
-    private transient MatrixStore<N> myQ2 = null;
     private transient Array1D<Double> mySingularValues = null;
     private boolean myTransposed = false;
+    private transient MatrixStore<N> myU = null;
+    private transient MatrixStore<N> myV = null;
     private boolean myValuesOnly = false;
     private double[] s = null;
 
@@ -382,7 +382,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     public MatrixStore<N> getCovariance() {
 
-        MatrixStore<N> v = this.getQ2();
+        MatrixStore<N> v = this.getV();
         MatrixStore<N> d = this.getD();
         Access1D<N> values = d.sliceDiagonal();
 
@@ -427,9 +427,9 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         if (myInverse == null) {
 
-            final MatrixStore<N> tmpQ1 = this.getQ1();
+            final MatrixStore<N> tmpQ1 = this.getU();
             final Array1D<Double> tmpSingulars = this.getSingularValues();
-            final MatrixStore<N> tmpQ2 = this.getQ2();
+            final MatrixStore<N> tmpQ2 = this.getV();
 
             final int rank = this.getRank();
 
@@ -466,33 +466,6 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return this.getSingularValues().doubleValue(0);
     }
 
-    public MatrixStore<N> getQ1() {
-
-        if (!myValuesOnly && this.isComputed() && (myQ1 == null)) {
-
-            if (myTransposed) {
-                myQ1 = this.makeQ2();
-            } else {
-                myQ1 = this.makeQ1();
-            }
-        }
-
-        return myQ1;
-    }
-
-    public MatrixStore<N> getQ2() {
-
-        if (!myValuesOnly && this.isComputed() && (myQ2 == null)) {
-            if (myTransposed) {
-                myQ2 = this.makeQ1();
-            } else {
-                myQ2 = this.makeQ2();
-            }
-        }
-
-        return myQ2;
-    }
-
     public double getRankThreshold() {
         return Math.max(MACHINE_SMALLEST, s[0]) * this.getDimensionalEpsilon();
     }
@@ -517,6 +490,33 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     public double getTraceNorm() {
         return this.getKyFanNorm(this.getSingularValues().size());
+    }
+
+    public MatrixStore<N> getU() {
+
+        if (!myValuesOnly && this.isComputed() && (myU == null)) {
+
+            if (myTransposed) {
+                myU = myBidiagonal.doGetRQ();
+            } else {
+                myU = myBidiagonal.doGetLQ();
+            }
+        }
+
+        return myU;
+    }
+
+    public MatrixStore<N> getV() {
+
+        if (!myValuesOnly && this.isComputed() && (myV == null)) {
+            if (myTransposed) {
+                myV = myBidiagonal.doGetLQ();
+            } else {
+                myV = myBidiagonal.doGetRQ();
+            }
+        }
+
+        return myV;
     }
 
     public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
@@ -569,8 +569,8 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         myBidiagonal.reset();
 
         myD = null;
-        myQ1 = null;
-        myQ2 = null;
+        myU = null;
+        myV = null;
         mySingularValues = null;
 
         myInverse = null;
@@ -605,9 +605,9 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         if (myInverse == null) {
 
-            final MatrixStore<N> tmpQ1 = this.getQ1();
+            final MatrixStore<N> tmpQ1 = this.getU();
             final Array1D<Double> tmpSingulars = this.getSingularValues();
-            final MatrixStore<N> tmpQ2 = this.getQ2();
+            final MatrixStore<N> tmpQ2 = this.getV();
 
             final int tmpRowDim = (int) tmpSingulars.count();
             final int tmpColDim = (int) tmpQ1.countRows();
@@ -672,10 +672,10 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         this.computeBidiagonal(matrix, fullSize);
 
-        final DiagonalArray1D<N> tmpBidiagonal = this.getBidiagonal();
+        final DiagonalArray1D<N> tmpBidiagonal = myBidiagonal.getDiagonal();
 
-        final DecompositionStore<N> tmpQ1 = valuesOnly ? null : this.getBidiagonalQ1();
-        final DecompositionStore<N> tmpQ2 = valuesOnly ? null : this.getBidiagonalQ2();
+        final DecompositionStore<N> tmpQ1 = valuesOnly ? null : myBidiagonal.doGetLQ();
+        final DecompositionStore<N> tmpQ2 = valuesOnly ? null : myBidiagonal.doGetRQ();
 
         final int size = tmpBidiagonal.getDimension();
 
@@ -696,18 +696,6 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         SingularValueDecomposition.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
 
         return this.computed(true);
-    }
-
-    protected DiagonalArray1D<N> getBidiagonal() {
-        return myBidiagonal.getDiagonal();
-    }
-
-    protected DecompositionStore<N> getBidiagonalQ1() {
-        return (DecompositionStore<N>) myBidiagonal.getQ1();
-    }
-
-    protected DecompositionStore<N> getBidiagonalQ2() {
-        return (DecompositionStore<N>) myBidiagonal.getQ2();
     }
 
     @Override
@@ -734,14 +722,6 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             }
         }
         return retVal;
-    }
-
-    protected MatrixStore<N> makeQ1() {
-        return this.getBidiagonalQ1();
-    }
-
-    protected MatrixStore<N> makeQ2() {
-        return this.getBidiagonalQ2();
     }
 
     protected Array1D<Double> makeSingularValues() {

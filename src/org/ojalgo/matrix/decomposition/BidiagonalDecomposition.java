@@ -181,8 +181,8 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
     private final boolean myFullSize;
     private Array1D<N> myInitDiagQ1 = null;
     private Array1D<N> myInitDiagQ2 = null;
-    private transient DecompositionStore<N> myQ1;
-    private transient DecompositionStore<N> myQ2;
+    private transient DecompositionStore<N> myQL;
+    private transient DecompositionStore<N> myQR;
 
     protected BidiagonalDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final boolean fullSize) {
         super(factory);
@@ -258,18 +258,12 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         return retVal;
     }
 
-    public MatrixStore<N> getQ1() {
-        if (myQ1 == null) {
-            myQ1 = this.makeQ1();
-        }
-        return myQ1;
+    public MatrixStore<N> getLQ() {
+        return this.doGetLQ();
     }
 
-    public MatrixStore<N> getQ2() {
-        if (myQ2 == null) {
-            myQ2 = this.makeQ2();
-        }
-        return myQ2;
+    public MatrixStore<N> getRQ() {
+        return this.doGetRQ();
     }
 
     public boolean isFullSize() {
@@ -285,8 +279,8 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
         super.reset();
 
-        myQ1 = null;
-        myQ2 = null;
+        myQL = null;
+        myQR = null;
         myDiagonal = null;
 
         myInitDiagQ1 = null;
@@ -310,6 +304,66 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         }
 
         return new DiagonalArray1D<>(tmpMain, tmpSuper, tmpSub, this.scalar().zero().get());
+    }
+
+    private DecompositionStore<N> makeLQ() {
+
+        final HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(this.getInPlace());
+
+        final int tmpRowDim = this.getRowDim();
+        final int tmpMinDim = this.getMinDim();
+
+        DecompositionStore<N> retVal = null;
+        if (myInitDiagQ1 != null) {
+            retVal = this.makeZero(tmpRowDim, myFullSize ? tmpRowDim : tmpMinDim);
+            for (int ij = 0; ij < tmpMinDim; ij++) {
+                retVal.set(ij, ij, myInitDiagQ1.get(ij));
+            }
+        } else {
+            retVal = this.makeEye(tmpRowDim, myFullSize ? tmpRowDim : tmpMinDim);
+        }
+
+        final boolean tmpUpper = this.isUpper();
+        for (int ij = (tmpUpper && (tmpRowDim != tmpMinDim)) ? tmpMinDim - 1 : tmpMinDim - 2; ij >= 0; ij--) {
+
+            tmpReference.point(tmpUpper ? ij : ij + 1, ij);
+
+            if (!tmpReference.isZero()) {
+                retVal.transformLeft(tmpReference, ij);
+            }
+        }
+
+        return retVal;
+    }
+
+    private DecompositionStore<N> makeRQ() {
+
+        final HouseholderReference<N> tmpReference = HouseholderReference.makeRow(this.getInPlace());
+
+        final int tmpColDim = this.getColDim();
+        final int tmpMinDim = this.getMinDim();
+
+        DecompositionStore<N> retVal = null;
+        if (myInitDiagQ2 != null) {
+            retVal = this.makeZero(tmpColDim, myFullSize ? tmpColDim : tmpMinDim);
+            for (int ij = 0; ij < tmpMinDim; ij++) {
+                retVal.set(ij, ij, myInitDiagQ2.get(ij));
+            }
+        } else {
+            retVal = this.makeEye(tmpColDim, myFullSize ? tmpColDim : tmpMinDim);
+        }
+
+        final boolean tmpUpper = this.isUpper();
+        for (int ij = tmpUpper ? tmpMinDim - 2 : tmpMinDim - 1; ij >= 0; ij--) {
+
+            tmpReference.point(ij, tmpUpper ? ij + 1 : ij);
+
+            if (!tmpReference.isZero()) {
+                retVal.transformLeft(tmpReference, ij);
+            }
+        }
+
+        return retVal;
     }
 
     /**
@@ -368,64 +422,18 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         return retVal;
     }
 
-    protected DecompositionStore<N> makeQ1() {
-
-        final HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(this.getInPlace());
-
-        final int tmpRowDim = this.getRowDim();
-        final int tmpMinDim = this.getMinDim();
-
-        DecompositionStore<N> retVal = null;
-        if (myInitDiagQ1 != null) {
-            retVal = this.makeZero(tmpRowDim, myFullSize ? tmpRowDim : tmpMinDim);
-            for (int ij = 0; ij < tmpMinDim; ij++) {
-                retVal.set(ij, ij, myInitDiagQ1.get(ij));
-            }
-        } else {
-            retVal = this.makeEye(tmpRowDim, myFullSize ? tmpRowDim : tmpMinDim);
+    DecompositionStore<N> doGetLQ() {
+        if (myQL == null) {
+            myQL = this.makeLQ();
         }
-
-        final boolean tmpUpper = this.isUpper();
-        for (int ij = (tmpUpper && (tmpRowDim != tmpMinDim)) ? tmpMinDim - 1 : tmpMinDim - 2; ij >= 0; ij--) {
-
-            tmpReference.point(tmpUpper ? ij : ij + 1, ij);
-
-            if (!tmpReference.isZero()) {
-                retVal.transformLeft(tmpReference, ij);
-            }
-        }
-
-        return retVal;
+        return myQL;
     }
 
-    protected DecompositionStore<N> makeQ2() {
-
-        final HouseholderReference<N> tmpReference = HouseholderReference.makeRow(this.getInPlace());
-
-        final int tmpColDim = this.getColDim();
-        final int tmpMinDim = this.getMinDim();
-
-        DecompositionStore<N> retVal = null;
-        if (myInitDiagQ2 != null) {
-            retVal = this.makeZero(tmpColDim, myFullSize ? tmpColDim : tmpMinDim);
-            for (int ij = 0; ij < tmpMinDim; ij++) {
-                retVal.set(ij, ij, myInitDiagQ2.get(ij));
-            }
-        } else {
-            retVal = this.makeEye(tmpColDim, myFullSize ? tmpColDim : tmpMinDim);
+    DecompositionStore<N> doGetRQ() {
+        if (myQR == null) {
+            myQR = this.makeRQ();
         }
-
-        final boolean tmpUpper = this.isUpper();
-        for (int ij = tmpUpper ? tmpMinDim - 2 : tmpMinDim - 1; ij >= 0; ij--) {
-
-            tmpReference.point(ij, tmpUpper ? ij + 1 : ij);
-
-            if (!tmpReference.isZero()) {
-                retVal.transformLeft(tmpReference, ij);
-            }
-        }
-
-        return retVal;
+        return myQR;
     }
 
     DiagonalArray1D<N> getDiagonal() {
