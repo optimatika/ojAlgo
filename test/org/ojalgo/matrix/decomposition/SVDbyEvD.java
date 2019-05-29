@@ -131,8 +131,8 @@ public class SVDbyEvD {
             BasicLogger.debug();
             BasicLogger.debug("Experimental  S: {}.", tmpExperimental.getSingularValues());
             BasicLogger.debug("D", tmpExperimental.getD(), CONTEXT);
-            BasicLogger.debug("Q1", tmpExperimental.getQ1(), CONTEXT);
-            BasicLogger.debug("Q2", tmpExperimental.getQ2(), CONTEXT);
+            BasicLogger.debug("Q1", tmpExperimental.getU(), CONTEXT);
+            BasicLogger.debug("Q2", tmpExperimental.getV(), CONTEXT);
         }
 
         TestUtils.assertEquals(matrixA, tmpExperimental, CONTEXT);

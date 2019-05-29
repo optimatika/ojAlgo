@@ -84,21 +84,21 @@ public class DesignCase {
 
                 bidiagonal.decompose(tall);
 
-                TestUtils.assertEquals(className, 7, bidiagonal.getQ1().countRows());
-                TestUtils.assertEquals(className, 7, bidiagonal.getQ1().countColumns());
+                TestUtils.assertEquals(className, 7, bidiagonal.getLQ().countRows());
+                TestUtils.assertEquals(className, 7, bidiagonal.getLQ().countColumns());
 
-                TestUtils.assertEquals(className, 5, bidiagonal.getQ2().countRows());
-                TestUtils.assertEquals(className, 5, bidiagonal.getQ2().countColumns());
+                TestUtils.assertEquals(className, 5, bidiagonal.getRQ().countRows());
+                TestUtils.assertEquals(className, 5, bidiagonal.getRQ().countColumns());
 
                 TestUtils.assertEquals(tall, bidiagonal, precision);
 
                 bidiagonal.decompose(fat);
 
-                TestUtils.assertEquals(className, 5, bidiagonal.getQ1().countRows());
-                TestUtils.assertEquals(className, 5, bidiagonal.getQ1().countColumns());
+                TestUtils.assertEquals(className, 5, bidiagonal.getLQ().countRows());
+                TestUtils.assertEquals(className, 5, bidiagonal.getLQ().countColumns());
 
-                TestUtils.assertEquals(className, 7, bidiagonal.getQ2().countRows());
-                TestUtils.assertEquals(className, 7, bidiagonal.getQ2().countColumns());
+                TestUtils.assertEquals(className, 7, bidiagonal.getRQ().countRows());
+                TestUtils.assertEquals(className, 7, bidiagonal.getRQ().countColumns());
 
                 TestUtils.assertEquals(fat, bidiagonal, precision);
 
@@ -130,21 +130,21 @@ public class DesignCase {
 
                 svd.decompose(tall);
 
-                TestUtils.assertEquals(className, 7, svd.getQ1().countRows());
-                TestUtils.assertEquals(className, 7, svd.getQ1().countColumns());
+                TestUtils.assertEquals(className, 7, svd.getU().countRows());
+                TestUtils.assertEquals(className, 7, svd.getU().countColumns());
 
-                TestUtils.assertEquals(className, 5, svd.getQ2().countRows());
-                TestUtils.assertEquals(className, 5, svd.getQ2().countColumns());
+                TestUtils.assertEquals(className, 5, svd.getV().countRows());
+                TestUtils.assertEquals(className, 5, svd.getV().countColumns());
 
                 TestUtils.assertEquals(tall, svd, precision);
 
                 svd.decompose(fat);
 
-                TestUtils.assertEquals(className, 5, svd.getQ1().countRows());
-                TestUtils.assertEquals(className, 5, svd.getQ1().countColumns());
+                TestUtils.assertEquals(className, 5, svd.getU().countRows());
+                TestUtils.assertEquals(className, 5, svd.getU().countColumns());
 
-                TestUtils.assertEquals(className, 7, svd.getQ2().countRows());
-                TestUtils.assertEquals(className, 7, svd.getQ2().countColumns());
+                TestUtils.assertEquals(className, 7, svd.getV().countRows());
+                TestUtils.assertEquals(className, 7, svd.getV().countColumns());
 
                 TestUtils.assertEquals(fat, svd, precision);
             }
@@ -247,11 +247,11 @@ public class DesignCase {
         SingularValue<Double> decompPriSVD = SingularValue.PRIMITIVE.make(true);
         decompPriSVD.decompose(mtrxA);
         TestUtils.assertEquals(mtrxA, decompPriSVD, precision);
-        TestUtils.assertEquals(3, decompPriSVD.getQ2().countRows());
-        TestUtils.assertEquals(3, decompPriSVD.getQ2().countColumns());
+        TestUtils.assertEquals(3, decompPriSVD.getV().countRows());
+        TestUtils.assertEquals(3, decompPriSVD.getV().countColumns());
 
         PhysicalStore<Double> nullspacePriQR = decompPriQR.getQ().logical().offsets(0, decompPriQR.getRank()).get().copy();
-        PhysicalStore<Double> nullspacePriSVD = decompPriSVD.getQ2().logical().offsets(0, decompPriSVD.getRank()).get().copy();
+        PhysicalStore<Double> nullspacePriSVD = decompPriSVD.getV().logical().offsets(0, decompPriSVD.getRank()).get().copy();
 
         double scalePriQR = PrimitiveMath.ABS.invoke(nullspacePriQR.doubleValue(0));
         nullspacePriQR.modifyAll(PrimitiveMath.DIVIDE.second(scalePriQR));
@@ -278,14 +278,14 @@ public class DesignCase {
         SingularValue<Double> tmpOldDecomp = new SingularValueDecomposition.Primitive();
         tmpOldDecomp.decompose(tmpOriginalMatrix);
         tmpOldDecomp.getD();
-        tmpOldDecomp.getQ1();
-        tmpOldDecomp.getQ2();
+        tmpOldDecomp.getU();
+        tmpOldDecomp.getV();
 
         SingularValue<Double> tmpNewDecomp = new RawSingularValue();
         tmpNewDecomp.decompose(tmpOriginalMatrix);
         tmpNewDecomp.getD();
-        tmpNewDecomp.getQ1();
-        tmpNewDecomp.getQ2();
+        tmpNewDecomp.getU();
+        tmpNewDecomp.getV();
 
         TestUtils.assertEquals(tmpOriginalMatrix, tmpNewDecomp, new NumberContext(7, 6));
     }

@@ -34,6 +34,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20050125Case;
 import org.ojalgo.matrix.P20061119Case;
+import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -50,7 +51,7 @@ public class EigenvalueTest {
 
     static final class EvD {
 
-        DiagonalBasicArray<?> D;
+        DiagonalStore<?, ?> D;
 
         PhysicalStore<Double> V;
 

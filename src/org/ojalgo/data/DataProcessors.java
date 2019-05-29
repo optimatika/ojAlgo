@@ -145,7 +145,7 @@ public class DataProcessors {
         if (limit > 0) {
 
             Array1D<Double> values = svd.getSingularValues();
-            ElementsSupplier<Double> vectors = svd.getQ2();
+            ElementsSupplier<Double> vectors = svd.getV();
 
             if (limit < numberOfVariables) {
                 values = values.sliceRange(0L, limit);
