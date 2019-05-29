@@ -174,15 +174,9 @@ public interface Structure2D extends Structure1D {
         }
 
         /**
-         * @return A square diagonal matrix (main diagonal only)
-         */
-        B diagonal();
-
-        /**
-         * @param maintain Maintain the original matrix dimensions (resulting matrix not necessarily square).
          * @return A diagonal matrix (main diagonal only)
          */
-        B diagonal(boolean maintain);
+        B diagonal();
 
         B diagonally(S... diagonally);
 

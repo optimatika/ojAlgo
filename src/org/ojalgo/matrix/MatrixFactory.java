@@ -171,11 +171,6 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             return this.self();
         }
 
-        public B diagonal(final boolean maintain) {
-            myDelegate.diagonal(maintain);
-            return this.self();
-        }
-
         public B diagonally(final M... diagonally) {
             myDelegate.diagonally(this.cast(diagonally));
             return this.self();
