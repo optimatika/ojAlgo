@@ -428,15 +428,9 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         if (myInverse == null) {
 
-
-            final MatrixStore<N> tmpQ1 = this.getU();
-            final Array1D<Double> tmpSingulars = this.getSingularValues();
-            final MatrixStore<N> tmpQ2 = this.getV();
-
             final int rank = this.getRank();
 
-
-            PhysicalStore<N> tmpMtrx = this.getQ2().logical().limits(-1, rank).copy();
+            PhysicalStore<N> tmpMtrx = this.getV().logical().limits(-1, rank).copy();
 
             Scalar.Factory<N> scalar = this.scalar();
             BinaryFunction<N> divide = this.function().divide();
@@ -446,7 +440,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
                 tmpMtrx.modifyColumn(0L, j, divide.by(scalar.cast(singularValues.doubleValue(j))));
             }
 
-            preallocated.fillByMultiplying(tmpMtrx, this.getQ1().logical().limits(-1, rank).conjugate().get());
+            preallocated.fillByMultiplying(tmpMtrx, this.getU().logical().limits(-1, rank).conjugate().get());
             myInverse = preallocated;
         }
 
