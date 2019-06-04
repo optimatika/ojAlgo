@@ -24,34 +24,19 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.machine.JavaType;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.RowsSupplier;
-import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.IterationPoint;
 import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.structure.Mutate2D;
-import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -88,367 +73,6 @@ public abstract class SimplexSolver extends LinearSolver {
 
     private static final NumberContext PHASE1 = ACCURACY.withScale(8);
     private static final NumberContext RATIO = ACCURACY.withScale(8);
-
-    static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options) {
-
-        final int numbVars = convex.countVariables();
-        final int numbEqus = convex.countEqualityConstraints();
-        final int numbInes = convex.countInequalityConstraints();
-
-        final SimplexTableau retVal = SimplexTableau.make(numbEqus + numbInes, numbVars + numbVars, numbInes, options);
-
-        final Mutate1D obj = retVal.objective();
-
-        final MatrixStore<Double> convexC = convex.getC();
-
-        for (int v = 0; v < numbVars; v++) {
-            final double val = convexC.doubleValue(v);
-            obj.set(v, -val);
-            obj.set(numbVars + v, val);
-        }
-
-        final Mutate2D constrBody = retVal.constraintsBody();
-        final Mutate1D constrRHS = retVal.constraintsRHS();
-
-        final MatrixStore<Double> convexAE = convex.getAE();
-        final MatrixStore<Double> convexBE = convex.getBE();
-
-        for (int i = 0; i < numbEqus; i++) {
-            final double rhs = convexBE.doubleValue(i);
-            final boolean neg = NumberContext.compare(rhs, ZERO) < 0;
-            for (int j = 0; j < numbVars; j++) {
-                final double val = convexAE.doubleValue(i, j);
-                constrBody.set(i, j, neg ? -val : val);
-                constrBody.set(i, numbVars + j, neg ? val : -val);
-            }
-            constrRHS.set(i, neg ? -rhs : rhs);
-        }
-
-        final RowsSupplier<Double> convexAI = convex.getAI();
-        final MatrixStore<Double> convexBI = convex.getBI();
-
-        for (int i = 0; i < numbInes; i++) {
-            final int r = i;
-            final SparseArray<Double> row = convexAI.getRow(r);
-            final double rhs = convexBI.doubleValue(r);
-            final boolean neg = NumberContext.compare(rhs, ZERO) < 0;
-            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
-            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
-            constrBody.set(numbEqus + r, numbVars + numbVars + r, neg ? NEG : ONE);
-            constrRHS.set(numbEqus + i, neg ? -rhs : rhs);
-        }
-
-        return retVal;
-    }
-
-    static SimplexTableau build(final ExpressionsBasedModel model) {
-
-        final List<Variable> tmpPosVariables = model.getPositiveVariables();
-        final List<Variable> tmpNegVariables = model.getNegativeVariables();
-        final Set<IntIndex> tmpFixVariables = model.getFixedVariables();
-
-        final Expression tmpObjFunc = model.objective().compensate(tmpFixVariables);
-
-        final List<Expression> tmpExprsEq = model.constraints().filter(c -> c.isEqualityConstraint() && !c.isAnyQuadraticFactorNonZero())
-                .collect(Collectors.toList());
-        final List<Expression> tmpExprsLo = model.constraints().filter(c -> c.isLowerConstraint() && !c.isAnyQuadraticFactorNonZero())
-                .collect(Collectors.toList());
-        final List<Expression> tmpExprsUp = model.constraints().filter(c -> c.isUpperConstraint() && !c.isAnyQuadraticFactorNonZero())
-                .collect(Collectors.toList());
-
-        final List<Variable> tmpVarsPosLo = model.bounds().filter(v -> v.isPositive() && v.isLowerConstraint() && (v.getLowerLimit().signum() > 0))
-                .collect(Collectors.toList());
-        final List<Variable> tmpVarsPosUp = model.bounds().filter(v -> v.isPositive() && v.isUpperConstraint() && (v.getUpperLimit().signum() > 0))
-                .collect(Collectors.toList());
-
-        final List<Variable> tmpVarsNegLo = model.bounds().filter(v -> v.isNegative() && v.isLowerConstraint() && (v.getLowerLimit().signum() < 0))
-                .collect(Collectors.toList());
-        final List<Variable> tmpVarsNegUp = model.bounds().filter(v -> v.isNegative() && v.isUpperConstraint() && (v.getUpperLimit().signum() < 0))
-                .collect(Collectors.toList());
-
-        final int tmpConstraiCount = tmpExprsEq.size() + tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size() + tmpVarsNegLo.size()
-                + tmpVarsNegUp.size();
-        final int tmpProblVarCount = tmpPosVariables.size() + tmpNegVariables.size();
-        final int tmpSlackVarCount = tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size() + tmpVarsNegLo.size()
-                + tmpVarsNegUp.size();
-        final SimplexTableau retVal = SimplexTableau.make(tmpConstraiCount, tmpProblVarCount, tmpSlackVarCount, model.options);
-
-        final int tmpPosVarsBaseIndex = 0;
-        final int tmpNegVarsBaseIndex = tmpPosVarsBaseIndex + tmpPosVariables.size();
-        final int tmpSlaVarsBaseIndex = tmpNegVarsBaseIndex + tmpNegVariables.size();
-
-        for (final IntIndex tmpKey : tmpObjFunc.getLinearKeySet()) {
-
-            final double tmpFactor = model.isMaximisation() ? -tmpObjFunc.getAdjustedLinearFactor(tmpKey) : tmpObjFunc.getAdjustedLinearFactor(tmpKey);
-
-            final int tmpPosInd = model.indexOfPositiveVariable(tmpKey.index);
-            if (tmpPosInd >= 0) {
-                retVal.objective().set(tmpPosInd, tmpFactor);
-            }
-
-            final int tmpNegInd = model.indexOfNegativeVariable(tmpKey.index);
-            if (tmpNegInd >= 0) {
-                retVal.objective().set(tmpNegVarsBaseIndex + tmpNegInd, -tmpFactor);
-            }
-        }
-
-        int tmpConstrBaseIndex = 0;
-        int tmpCurrentSlackVarIndex = tmpSlaVarsBaseIndex;
-
-        final int tmpExprsEqLength = tmpExprsEq.size();
-        for (int c = 0; c < tmpExprsEqLength; c++) {
-
-            final Expression tmpExpr = tmpExprsEq.get(c).compensate(tmpFixVariables);
-            final double tmpRHS = tmpExpr.getAdjustedLowerLimit();
-
-            if (tmpRHS < ZERO) {
-
-                retVal.constraintsRHS().set(tmpConstrBaseIndex + c, -tmpRHS);
-
-                for (final IntIndex tmpKey : tmpExpr.getLinearKeySet()) {
-
-                    final double tmpFactor = tmpExpr.getAdjustedLinearFactor(tmpKey);
-
-                    final int tmpPosInd = model.indexOfPositiveVariable(tmpKey.index);
-                    if (tmpPosInd >= 0) {
-                        retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpPosVarsBaseIndex + tmpPosInd, -tmpFactor);
-                    }
-
-                    final int tmpNegInd = model.indexOfNegativeVariable(tmpKey.index);
-                    if (tmpNegInd >= 0) {
-                        retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpNegVarsBaseIndex + tmpNegInd, tmpFactor);
-                    }
-                }
-
-            } else {
-
-                retVal.constraintsRHS().set(tmpConstrBaseIndex + c, tmpRHS);
-
-                for (final IntIndex tmpKey : tmpExpr.getLinearKeySet()) {
-
-                    final double tmpFactor = tmpExpr.getAdjustedLinearFactor(tmpKey);
-
-                    final int tmpPosInd = model.indexOfPositiveVariable(tmpKey.index);
-                    if (tmpPosInd >= 0) {
-                        retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpPosVarsBaseIndex + tmpPosInd, tmpFactor);
-                    }
-
-                    final int tmpNegInd = model.indexOfNegativeVariable(tmpKey.index);
-                    if (tmpNegInd >= 0) {
-                        retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpNegVarsBaseIndex + tmpNegInd, -tmpFactor);
-                    }
-                }
-            }
-        }
-        tmpConstrBaseIndex += tmpExprsEqLength;
-
-        final int tmpExprsLoLength = tmpExprsLo.size();
-        for (int c = 0; c < tmpExprsLoLength; c++) {
-
-            final Expression tmpExpr = tmpExprsLo.get(c).compensate(tmpFixVariables);
-            final double tmpRHS = tmpExpr.getAdjustedLowerLimit();
-
-            if (tmpRHS < ZERO) {
-
-                retVal.constraintsRHS().set(tmpConstrBaseIndex + c, -tmpRHS);
-
-                for (final IntIndex tmpKey : tmpExpr.getLinearKeySet()) {
-
-                    final double tmpFactor = tmpExpr.getAdjustedLinearFactor(tmpKey);
-
-                    final int tmpPosInd = model.indexOfPositiveVariable(tmpKey.index);
-                    if (tmpPosInd >= 0) {
-                        retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpPosVarsBaseIndex + tmpPosInd, -tmpFactor);
-                    }
-
-                    final int tmpNegInd = model.indexOfNegativeVariable(tmpKey.index);
-                    if (tmpNegInd >= 0) {
-                        retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpNegVarsBaseIndex + tmpNegInd, tmpFactor);
-                    }
-                }
-
-                retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpCurrentSlackVarIndex++, ONE);
-
-            } else {
-
-                retVal.constraintsRHS().set(tmpConstrBaseIndex + c, tmpRHS);
-
-                for (final IntIndex tmpKey : tmpExpr.getLinearKeySet()) {
-
-                    final double tmpFactor = tmpExpr.getAdjustedLinearFactor(tmpKey);
-
-                    final int tmpPosInd = model.indexOfPositiveVariable(tmpKey.index);
-                    if (tmpPosInd >= 0) {
-                        retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpPosVarsBaseIndex + tmpPosInd, tmpFactor);
-                    }
-
-                    final int tmpNegInd = model.indexOfNegativeVariable(tmpKey.index);
-                    if (tmpNegInd >= 0) {
-                        retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpNegVarsBaseIndex + tmpNegInd, -tmpFactor);
-                    }
-                }
-
-                retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpCurrentSlackVarIndex++, NEG);
-            }
-        }
-        tmpConstrBaseIndex += tmpExprsLoLength;
-
-        final int tmpExprsUpLength = tmpExprsUp.size();
-        for (int c = 0; c < tmpExprsUpLength; c++) {
-
-            final Expression tmpExpr = tmpExprsUp.get(c).compensate(tmpFixVariables);
-            final double tmpRHS = tmpExpr.getAdjustedUpperLimit();
-
-            if (tmpRHS < ZERO) {
-
-                retVal.constraintsRHS().set(tmpConstrBaseIndex + c, -tmpRHS);
-
-                for (final IntIndex tmpKey : tmpExpr.getLinearKeySet()) {
-
-                    final double tmpFactor = tmpExpr.getAdjustedLinearFactor(tmpKey);
-
-                    final int tmpPosInd = model.indexOfPositiveVariable(tmpKey.index);
-                    if (tmpPosInd >= 0) {
-                        retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpPosVarsBaseIndex + tmpPosInd, -tmpFactor);
-                    }
-
-                    final int tmpNegInd = model.indexOfNegativeVariable(tmpKey.index);
-                    if (tmpNegInd >= 0) {
-                        retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpNegVarsBaseIndex + tmpNegInd, tmpFactor);
-                    }
-                }
-
-                retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpCurrentSlackVarIndex++, NEG);
-
-            } else {
-
-                retVal.constraintsRHS().set(tmpConstrBaseIndex + c, tmpRHS);
-
-                for (final IntIndex tmpKey : tmpExpr.getLinearKeySet()) {
-
-                    final double tmpFactor = tmpExpr.getAdjustedLinearFactor(tmpKey);
-
-                    final int tmpPosInd = model.indexOfPositiveVariable(tmpKey.index);
-                    if (tmpPosInd >= 0) {
-                        retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpPosVarsBaseIndex + tmpPosInd, tmpFactor);
-                    }
-
-                    final int tmpNegInd = model.indexOfNegativeVariable(tmpKey.index);
-                    if (tmpNegInd >= 0) {
-                        retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpNegVarsBaseIndex + tmpNegInd, -tmpFactor);
-                    }
-                }
-
-                retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpCurrentSlackVarIndex++, ONE);
-            }
-        }
-        tmpConstrBaseIndex += tmpExprsUpLength;
-
-        final int tmpVarsPosLoLength = tmpVarsPosLo.size();
-        for (int c = 0; c < tmpVarsPosLoLength; c++) {
-            final Variable tmpVar = tmpVarsPosLo.get(c);
-
-            retVal.constraintsRHS().set(tmpConstrBaseIndex + c, tmpVar.getAdjustedLowerLimit());
-
-            final int tmpKey = model.indexOf(tmpVar);
-
-            final double tmpFactor = tmpVar.getAdjustmentFactor();
-
-            final int tmpPosInd = model.indexOfPositiveVariable(tmpKey);
-            if (tmpPosInd >= 0) {
-                retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpPosVarsBaseIndex + tmpPosInd, tmpFactor);
-            }
-
-            final int tmpNegInd = model.indexOfNegativeVariable(tmpKey);
-            if (tmpNegInd >= 0) {
-                retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpNegVarsBaseIndex + tmpNegInd, -tmpFactor);
-            }
-
-            retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpCurrentSlackVarIndex++, NEG);
-        }
-        tmpConstrBaseIndex += tmpVarsPosLoLength;
-
-        final int tmpVarsPosUpLength = tmpVarsPosUp.size();
-        for (int c = 0; c < tmpVarsPosUpLength; c++) {
-            final Variable tmpVar = tmpVarsPosUp.get(c);
-
-            retVal.constraintsRHS().set(tmpConstrBaseIndex + c, tmpVar.getAdjustedUpperLimit());
-
-            final int tmpKey = model.indexOf(tmpVar);
-
-            final double tmpFactor = tmpVar.getAdjustmentFactor();
-
-            final int tmpPosInd = model.indexOfPositiveVariable(tmpKey);
-            if (tmpPosInd >= 0) {
-                retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpPosVarsBaseIndex + tmpPosInd, tmpFactor);
-            }
-
-            final int tmpNegInd = model.indexOfNegativeVariable(tmpKey);
-            if (tmpNegInd >= 0) {
-                retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpNegVarsBaseIndex + tmpNegInd, -tmpFactor);
-            }
-
-            retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpCurrentSlackVarIndex++, ONE);
-        }
-        tmpConstrBaseIndex += tmpVarsPosUpLength;
-
-        final int tmpVarsNegLoLength = tmpVarsNegLo.size();
-        for (int c = 0; c < tmpVarsNegLoLength; c++) {
-            final Variable tmpVar = tmpVarsNegLo.get(c);
-
-            retVal.constraintsRHS().set(tmpConstrBaseIndex + c, -tmpVar.getAdjustedLowerLimit());
-
-            final int tmpKey = model.indexOf(tmpVar);
-
-            final double tmpFactor = tmpVar.getAdjustmentFactor();
-
-            final int tmpPosInd = model.indexOfPositiveVariable(tmpKey);
-            if (tmpPosInd >= 0) {
-                retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpPosVarsBaseIndex + tmpPosInd, -tmpFactor);
-            }
-
-            final int tmpNegInd = model.indexOfNegativeVariable(tmpKey);
-            if (tmpNegInd >= 0) {
-                retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpNegVarsBaseIndex + tmpNegInd, tmpFactor);
-            }
-
-            retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpCurrentSlackVarIndex++, ONE);
-        }
-        tmpConstrBaseIndex += tmpVarsNegLoLength;
-
-        final int tmpVarsNegUpLength = tmpVarsNegUp.size();
-        for (int c = 0; c < tmpVarsNegUpLength; c++) {
-            final Variable tmpVar = tmpVarsNegUp.get(c);
-
-            retVal.constraintsRHS().set(tmpConstrBaseIndex + c, -tmpVar.getAdjustedUpperLimit());
-
-            final int tmpKey = model.indexOf(tmpVar);
-
-            final double tmpFactor = tmpVar.getAdjustmentFactor();
-
-            final int tmpPosInd = model.indexOfPositiveVariable(tmpKey);
-            if (tmpPosInd >= 0) {
-                retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpPosVarsBaseIndex + tmpPosInd, -tmpFactor);
-            }
-
-            final int tmpNegInd = model.indexOfNegativeVariable(tmpKey);
-            if (tmpNegInd >= 0) {
-                retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpNegVarsBaseIndex + tmpNegInd, tmpFactor);
-            }
-
-            retVal.constraintsBody().set(tmpConstrBaseIndex + c, tmpCurrentSlackVarIndex++, NEG);
-        }
-        tmpConstrBaseIndex += tmpVarsNegUpLength;
-
-        //        BasicLogger.DEBUG.printmtrx("Sparse", retVal);
-        //        BasicLogger.DEBUG.printmtrx("Dense", retVal.toDense());
-
-        if ((model.options.sparse == null) && (retVal.getOvercapacity() <= OjAlgoUtils.ENVIRONMENT.getCacheElements(JavaType.DOUBLE.memory()))) {
-            return retVal.toDense();
-        } else {
-            return retVal;
-        }
-    }
 
     private LongToNumberMap<Double> myFixedVariables = null;
     private final IterationPoint myPoint;
@@ -544,7 +168,7 @@ public abstract class SimplexSolver extends LinearSolver {
 
     @Override
     protected Result buildResult() {
-        return super.buildResult().multipliers(myTableau.sliceDualVariables());
+        return super.buildResult().multipliers(this.extractMultipliers());
     }
 
     @Override
@@ -552,19 +176,23 @@ public abstract class SimplexSolver extends LinearSolver {
         return this.objective();
     }
 
+    protected Access1D<?> extractMultipliers() {
+        return myTableau.sliceDualVariables();
+    }
+
     /**
      * Extract solution MatrixStore from the tableau
      */
     @Override
-    protected PhysicalStore<Double> extractSolution() {
+    protected Access1D<?> extractSolution() {
 
-        final int colRHS = myTableau.countConstraints() + myTableau.countVariables();
+        int colRHS = myTableau.countConstraints() + myTableau.countVariables();
 
-        final PrimitiveDenseStore solution = PrimitiveDenseStore.FACTORY.makeZero(myTableau.countVariables(), 1);
+        PrimitiveDenseStore solution = PrimitiveDenseStore.FACTORY.makeZero(myTableau.countVariables(), 1);
 
-        final int numberOfConstraints = myTableau.countConstraints();
+        int numberOfConstraints = myTableau.countConstraints();
         for (int row = 0; row < numberOfConstraints; row++) {
-            final int variableIndex = myTableau.getBasisColumnIndex(row);
+            int variableIndex = myTableau.getBasisColumnIndex(row);
             if (variableIndex >= 0) {
                 solution.set(variableIndex, myTableau.doubleValue(row, colRHS));
             }
@@ -596,7 +224,7 @@ public abstract class SimplexSolver extends LinearSolver {
 
         if (myPoint.isPhase1()) {
 
-            final double phaseOneValue = myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
+            double phaseOneValue = myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
 
             if (!myTableau.isBasicArtificials() || PHASE1.isZero(phaseOneValue)) {
 
@@ -660,7 +288,7 @@ public abstract class SimplexSolver extends LinearSolver {
 
     protected boolean validate() {
 
-        final boolean retVal = true;
+        boolean retVal = true;
         this.setState(State.VALID);
 
         return retVal;
@@ -668,7 +296,7 @@ public abstract class SimplexSolver extends LinearSolver {
 
     int findNextPivotCol() {
 
-        final int[] tmpExcluded = myTableau.getExcluded();
+        int[] tmpExcluded = myTableau.getExcluded();
 
         if (this.isLogDebug()) {
             if (options.validate) {
@@ -705,14 +333,14 @@ public abstract class SimplexSolver extends LinearSolver {
 
     int findNextPivotRow() {
 
-        final int tmpNumerCol = myTableau.countConstraints() + myTableau.countVariables();
-        final int tmpDenomCol = myPoint.col;
+        int tmpNumerCol = myTableau.countConstraints() + myTableau.countVariables();
+        int tmpDenomCol = myPoint.col;
 
         if (this.isLogDebug()) {
             if (options.validate) {
-                final Access1D<Double> tmpNumerators = myTableau.sliceTableauColumn(tmpNumerCol);
-                final Access1D<Double> tmpDenominators = myTableau.sliceTableauColumn(tmpDenomCol);
-                final Array1D<Double> tmpRatios = Array1D.PRIMITIVE64.copy(tmpNumerators);
+                Access1D<Double> tmpNumerators = myTableau.sliceTableauColumn(tmpNumerCol);
+                Access1D<Double> tmpDenominators = myTableau.sliceTableauColumn(tmpDenomCol);
+                Array1D<Double> tmpRatios = Array1D.PRIMITIVE64.copy(tmpNumerators);
                 tmpRatios.modifyMatching(DIVIDE, tmpDenominators);
                 this.log("\nfindNextPivotRow (smallest positive ratio) among these:\nNumerators={}\nDenominators={}\nRatios={}", tmpNumerators, tmpDenominators,
                         tmpRatios);
@@ -724,14 +352,14 @@ public abstract class SimplexSolver extends LinearSolver {
         int retVal = -1;
         double numer = NaN, denom = NaN, ratio = NaN, minRatio = MACHINE_LARGEST;
 
-        final int tmpConstraintsCount = myTableau.countConstraints();
+        int tmpConstraintsCount = myTableau.countConstraints();
 
-        final boolean tmpPhase2 = myPoint.isPhase2();
+        boolean tmpPhase2 = myPoint.isPhase2();
 
         for (int i = 0; i < tmpConstraintsCount; i++) {
 
             // Phase 2 with artificials still in the basis
-            final boolean specialCase = tmpPhase2 && (myTableau.getBasisColumnIndex(i) < 0);
+            boolean specialCase = tmpPhase2 && (myTableau.getBasisColumnIndex(i) < 0);
 
             denom = myTableau.doubleValue(i, tmpDenomCol);
 
@@ -771,9 +399,9 @@ public abstract class SimplexSolver extends LinearSolver {
 
     void performIteration(final IterationPoint pivot) {
 
-        final double tmpPivotElement = myTableau.doubleValue(pivot.row, pivot.col);
-        final int tmpColRHS = myTableau.countConstraints() + myTableau.countVariables();
-        final double tmpPivotRHS = myTableau.doubleValue(pivot.row, tmpColRHS);
+        double tmpPivotElement = myTableau.doubleValue(pivot.row, pivot.col);
+        int tmpColRHS = myTableau.countConstraints() + myTableau.countVariables();
+        double tmpPivotRHS = myTableau.doubleValue(pivot.row, tmpColRHS);
 
         myTableau.pivot(pivot);
 
@@ -785,11 +413,11 @@ public abstract class SimplexSolver extends LinearSolver {
         if (options.validate) {
 
             // Right-most column of the tableau
-            final Array1D<Double> tmpRHS = myTableau.sliceConstraintsRHS();
+            Array1D<Double> tmpRHS = myTableau.sliceConstraintsRHS();
 
-            final AggregatorFunction<Double> tmpMinAggr = PrimitiveAggregator.getSet().minimum();
+            AggregatorFunction<Double> tmpMinAggr = PrimitiveAggregator.getSet().minimum();
             tmpRHS.visitAll(tmpMinAggr);
-            final double tmpMinVal = tmpMinAggr.doubleValue();
+            double tmpMinVal = tmpMinAggr.doubleValue();
 
             if ((tmpMinVal < ZERO) && !GenericSolver.ACCURACY.isZero(tmpMinVal)) {
                 this.log("\nNegative RHS! {}", tmpMinVal);

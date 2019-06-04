@@ -26,7 +26,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -85,9 +84,9 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     protected Optimisation.Result buildResult() {
 
-        final MatrixStore<Double> solution = this.extractSolution();
-        final double value = this.evaluateFunction(solution);
-        final Optimisation.State state = this.getState();
+        Access1D<?> solution = this.extractSolution();
+        double value = this.evaluateFunction(solution);
+        Optimisation.State state = this.getState();
 
         return new Optimisation.Result(state, value, solution);
     }
@@ -109,7 +108,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
     /**
      * Should be able to feed this to {@link #evaluateFunction(Access1D)}.
      */
-    protected abstract MatrixStore<Double> extractSolution();
+    protected abstract Access1D<?> extractSolution();
 
     protected final State getState() {
         return myState;

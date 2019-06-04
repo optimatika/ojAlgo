@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -105,14 +106,14 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         public LinearSolver build(final ConvexSolver.Builder convexBuilder, final Optimisation.Options options) {
 
-            final SimplexTableau tableau = SimplexSolver.build(convexBuilder, options);
+            final SimplexTableau tableau = PrimalSimplex.build(convexBuilder, options);
 
             return new PrimalSimplex(tableau, options);
         }
 
         public LinearSolver build(final ExpressionsBasedModel model) {
 
-            final SimplexTableau tableau = SimplexSolver.build(model);
+            final SimplexTableau tableau = PrimalSimplex.build(model);
 
             return new PrimalSimplex(tableau, model.options);
         }
@@ -207,13 +208,18 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options) {
 
-        final int numbVars = convex.countVariables();
+        int numbVars = convex.countVariables();
+        int numbEqus = convex.countEqualityConstraints();
+        int numbInes = convex.countInequalityConstraints();
 
-        final SimplexTableau tableau = SimplexSolver.build(convex, options);
+        final SimplexTableau tableau = PrimalSimplex.build(convex, options);
+        final SimplexTableau tableau2 = DualSimplex.build(convex, options);
 
         final LinearSolver solver = new PrimalSimplex(tableau, options);
+        final DualSimplex solver2 = new DualSimplex(tableau2, options);
 
         final Result result = solver.solve();
+        final Result result2 = solver2.solve();
 
         final Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), new Access1D<Double>() {
 
@@ -235,8 +241,42 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             }
 
         });
-
         retVal.multipliers(result.getMultipliers().get());
+
+        Access1D<?> multipliers2 = result2.getMultipliers().get();
+        final Optimisation.Result retVal2 = new Optimisation.Result(result2.getState(), result2.getValue(), result2);
+
+        retVal2.multipliers(new Access1D<Double>() {
+
+            public long count() {
+                return numbEqus + numbInes;
+            }
+
+            public double doubleValue(final long index) {
+                if (index < numbEqus) {
+                    return multipliers2.doubleValue(numbEqus + index) - multipliers2.doubleValue(index);
+                } else {
+                    return multipliers2.doubleValue(numbEqus + index);
+                }
+            }
+
+            public Double get(final long index) {
+                return this.doubleValue(index);
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
+            }
+
+        });
+
+        BasicLogger.debug();
+        BasicLogger.debug("Prim sol: {}", retVal);
+        BasicLogger.debug("Dual sol: {}", retVal2);
+
+        BasicLogger.debug("Prim mul: {}", retVal.getMultipliers().get());
+        BasicLogger.debug("Dual mul: {}", retVal2.getMultipliers().get());
 
         return retVal;
     }
