@@ -37,12 +37,26 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.context.NumberContext;
 
 final class PrimalSimplex extends SimplexSolver {
+
+    public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options) {
+
+        SimplexTableau tableau = PrimalSimplex.build(convex, options);
+
+        LinearSolver solver = new PrimalSimplex(tableau, options);
+
+        Result result = solver.solve();
+
+        Optimisation.Result retVal = PrimalSimplex.toConvexState(result, convex);
+
+        return retVal;
+    }
 
     static SimplexTableau build(final ConvexSolver.Builder convex, final Optimisation.Options options) {
 
@@ -57,9 +71,9 @@ final class PrimalSimplex extends SimplexSolver {
         MatrixStore<Double> convexC = convex.getC();
 
         for (int v = 0; v < numbVars; v++) {
-            double val = convexC.doubleValue(v);
-            obj.set(v, -val);
-            obj.set(numbVars + v, val);
+            double valC = convexC.doubleValue(v);
+            obj.set(v, -valC);
+            obj.set(numbVars + v, valC);
         }
 
         Mutate2D constrBody = retVal.constraintsBody();
@@ -72,9 +86,9 @@ final class PrimalSimplex extends SimplexSolver {
             double rhs = convexBE.doubleValue(i);
             boolean neg = NumberContext.compare(rhs, ZERO) < 0;
             for (int j = 0; j < numbVars; j++) {
-                double val = convexAE.doubleValue(i, j);
-                constrBody.set(i, j, neg ? -val : val);
-                constrBody.set(i, numbVars + j, neg ? val : -val);
+                double valA = convexAE.doubleValue(i, j);
+                constrBody.set(i, j, neg ? -valA : valA);
+                constrBody.set(i, numbVars + j, neg ? valA : -valA);
             }
             constrRHS.set(i, neg ? -rhs : rhs);
         }
@@ -92,6 +106,8 @@ final class PrimalSimplex extends SimplexSolver {
             constrBody.set(numbEqus + r, numbVars + numbVars + r, neg ? NEG : ONE);
             constrRHS.set(numbEqus + i, neg ? -rhs : rhs);
         }
+
+        // BasicLogger.debug("Primal", retVal);
 
         return retVal;
     }
@@ -400,6 +416,36 @@ final class PrimalSimplex extends SimplexSolver {
         } else {
             return retVal;
         }
+    }
+
+    static Optimisation.Result toConvexState(final Result result, final ConvexSolver.Builder convex) {
+
+        int numbVars = convex.countVariables();
+
+        Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), new Access1D<Double>() {
+
+            public long count() {
+                return numbVars;
+            }
+
+            public double doubleValue(final long index) {
+                return result.doubleValue(index) - result.doubleValue(numbVars + index);
+            }
+
+            public Double get(final long index) {
+                return this.doubleValue(index);
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
+            }
+
+        });
+
+        retVal.multipliers(result.getMultipliers().get());
+
+        return retVal;
     }
 
     PrimalSimplex(final SimplexTableau tableau, final Options solverOptions) {

@@ -35,7 +35,7 @@ import org.ojalgo.optimisation.linear.SimplexTableau.SparseTableau;
  *
  * @author apete
  */
-public class SpecialSituations {
+public class SpecialSituations extends OptimisationLinearTests {
 
     public SpecialSituations() {
         super();

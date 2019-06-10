@@ -311,9 +311,11 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         public Builder objective(final MatrixStore<Double> mtrxQ, final MatrixStore<Double> mtrxC) {
 
-            ProgrammingError.throwIfNull(mtrxQ);
+            // ProgrammingError.throwIfNull(mtrxQ);
 
-            if (mtrxQ instanceof PhysicalStore) {
+            if (mtrxQ == null) {
+                myQ = PrimitiveDenseStore.FACTORY.makeZero(mtrxC.count(), mtrxC.count());
+            } else if (mtrxQ instanceof PhysicalStore) {
                 myQ = (PhysicalStore<Double>) mtrxQ;
             } else {
                 myQ = mtrxQ.copy();
