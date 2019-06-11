@@ -306,8 +306,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     @Override
     protected boolean checkSolvability() {
-        double threshold = Math.min(this.getRankThreshold(), this.getDimensionalEpsilon());
-        return this.getColDim() == this.countSignificant(threshold);
+        return this.isAspectRatioNormal() && this.isFullRank();
     }
 
     /**

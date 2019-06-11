@@ -377,8 +377,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        double threshold = Math.min(this.getRankThreshold(), this.getDimensionalEpsilon());
-        return this.getColDim() == this.countSignificant(threshold);
+        return this.isAspectRatioNormal() && this.isFullRank();
     }
 
 }

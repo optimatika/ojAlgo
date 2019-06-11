@@ -32,6 +32,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -431,7 +432,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
     }
-
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<ConvexSolver> {
 
         public ConvexSolver build(final ExpressionsBasedModel model) {
@@ -453,6 +453,9 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
 
     }
+
+    private static final String Q_NOT_POSITIVE_SEMIDEFINITE = "Q not positive semidefinite!";
+    private static final String Q_NOT_SYMMETRIC = "Q not symmetric!";
 
     public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
 
@@ -643,17 +646,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     public final Optimisation.Result solve(final Optimisation.Result kickStarter) {
 
-        boolean ok = true;
-
-        if (options.validate) {
-            ok = this.validate();
-        }
-
-        if (ok) {
-            ok = this.initialise(kickStarter);
-        }
-
-        if (ok) {
+        if (this.initialise(kickStarter)) {
 
             this.resetIterationsCount();
 
@@ -674,10 +667,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     protected boolean computeGeneral(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
         return mySolverGeneral.compute(matrix);
-    }
-
-    protected boolean computeQ(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
-        return mySolverQ.compute(matrix);
     }
 
     protected int countEqualityConstraints() {
@@ -761,10 +750,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         }
     }
 
-    protected MatrixStore<Double> getSE() {
-        return this.getSolutionX().premultiply(this.getMatrixAE()).operateOnMatching(this.getMatrixBE(), SUBTRACT).get();
-    }
-
     protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
         return mySolverGeneral.getSolution(rhs);
     }
@@ -800,11 +785,61 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return myMatrices.hasObjective();
     }
 
+    /**
+     * @return true/false if the main algorithm may start or not
+     */
     protected boolean initialise(final Result kickStarter) {
 
-        this.computeQ(this.getMatrixQ());
+        PhysicalStore<Double> matrixQ = this.getMatrixQ();
+        this.setState(State.VALID);
 
-        return true;
+        boolean symmetric = true;
+        if (options.validate) {
+
+            if (!matrixQ.isHermitian()) {
+
+                symmetric = false;
+                this.setState(State.INVALID);
+
+                if (this.isLogDebug()) {
+                    this.log(Q_NOT_SYMMETRIC, matrixQ);
+                } else {
+                    throw new IllegalArgumentException(Q_NOT_SYMMETRIC);
+                }
+            }
+        }
+
+        if (!mySolverQ.compute(matrixQ)) {
+            matrixQ.modifyDiagonal(ADD.by(RELATIVELY_SMALL * matrixQ.aggregateAll(Aggregator.LARGEST)));
+            mySolverQ.compute(matrixQ);
+        }
+
+        boolean semidefinite = true;
+        if (options.validate && !mySolverQ.isSPD()) {
+            // Not symmetric positive definite. Check if at least positive semidefinite.
+
+            Eigenvalue<Double> decompEvD = Eigenvalue.PRIMITIVE.make(matrixQ, true);
+            decompEvD.computeValuesOnly(matrixQ);
+            final Array1D<ComplexNumber> eigenvalues = decompEvD.getEigenvalues();
+            decompEvD.reset();
+
+            for (final ComplexNumber eigval : eigenvalues) {
+                if (((eigval.doubleValue() < ZERO) && !eigval.isSmall(TEN)) || !eigval.isReal()) {
+
+                    semidefinite = false;
+                    this.setState(State.INVALID);
+
+                    if (this.isLogDebug()) {
+                        this.log(Q_NOT_POSITIVE_SEMIDEFINITE);
+                        this.log("The eigenvalues are: {}", eigenvalues);
+                    } else {
+                        throw new IllegalArgumentException(Q_NOT_POSITIVE_SEMIDEFINITE);
+                    }
+                }
+            }
+        }
+
+        return symmetric && semidefinite;
     }
 
     protected boolean isSolvableGeneral() {
@@ -812,6 +847,10 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     }
 
     protected boolean isSolvableQ() {
+        //        double max = Math.max(RELATIVELY_SMALL, mySolverQ.getRankThreshold());
+        //        int countVariables = this.countVariables();
+        //        int countSignificant = mySolverQ.countSignificant(max);
+        //        return countVariables == countSignificant;
         return mySolverQ.isSolvable();
     }
 
@@ -835,72 +874,6 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     protected Optimisation.Result solveLP() {
         return LinearSolver.solve(myMatrices, options);
-    }
-
-    /**
-     * Should validate the solver data/input/structue. Even "expensive" validation can be performed as the
-     * method should only be called if {@linkplain org.ojalgo.optimisation.Optimisation.Options#validate} is
-     * set to true. In addition to returning true or false the implementation should set the state to either
-     * {@linkplain org.ojalgo.optimisation.Optimisation.State#VALID} or
-     * {@linkplain org.ojalgo.optimisation.Optimisation.State#INVALID} (or possibly
-     * {@linkplain org.ojalgo.optimisation.Optimisation.State#FAILED}). Typically the method should be called
-     * at the very beginning of the solve-method.
-     *
-     * @return Is the solver instance valid?
-     */
-    protected boolean validate() {
-
-        final MatrixStore<Double> mtrxQ = this.getMatrixQ();
-        final MatrixStore<Double> mtrxC = this.getMatrixC();
-
-        if ((mtrxQ == null) || (mtrxC == null)) {
-            throw new IllegalArgumentException("Neither Q nor C may be null!");
-        }
-
-        if (!mtrxQ.isHermitian()) {
-            if (this.isLogDebug()) {
-                this.log("Q not symmetric!", mtrxQ);
-            }
-            throw new IllegalArgumentException("Q must be symmetric!");
-        }
-
-        if (!mySolverQ.isSPD()) {
-            // Not symmetric positive definite. Check if at least positive semidefinite.
-
-            final Eigenvalue<Double> decompEvD = Eigenvalue.PRIMITIVE.make(mtrxQ, true);
-
-            decompEvD.computeValuesOnly(mtrxQ);
-
-            final Array1D<ComplexNumber> eigenvalues = decompEvD.getEigenvalues();
-
-            decompEvD.reset();
-
-            for (final ComplexNumber eigval : eigenvalues) {
-                if (((eigval.doubleValue() < ZERO) && !eigval.isSmall(TEN)) || !eigval.isReal()) {
-                    if (this.isLogDebug()) {
-                        this.log("Q not positive semidefinite!");
-                        this.log("The eigenvalues are: {}", eigenvalues);
-                    }
-                    throw new IllegalArgumentException("Q must be positive semidefinite!");
-                }
-            }
-        }
-
-        this.setState(State.VALID);
-        return true;
-    }
-
-    void supplySlackI(final PhysicalStore<Double> slack) {
-
-        final RowsSupplier<Double> mtrxAI = myMatrices.getAI();
-        final MatrixStore<Double> mtrxBI = this.getMatrixBI();
-        final PhysicalStore<Double> mtrxX = this.getSolutionX();
-
-        slack.fillMatching(mtrxBI);
-
-        for (int i = 0; i < mtrxAI.countRows(); i++) {
-            slack.add(i, -mtrxAI.getRow(i).dot(mtrxX));
-        }
     }
 
 }

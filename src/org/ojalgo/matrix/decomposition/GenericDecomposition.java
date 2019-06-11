@@ -75,10 +75,6 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.copy(source);
     }
 
-    protected final <D extends Access1D<?>> DiagonalStore.Builder<N, D> makeDiagonal(final D mainDiag) {
-        return DiagonalStore.builder(myFactory, mainDiag);
-    }
-
     @Override
     protected final FunctionSet<N> function() {
         return myFactory.function();
@@ -86,6 +82,10 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
 
     protected final BasicArray<N> makeArray(final int length) {
         return myFactory.array().makeZero(length);
+    }
+
+    protected final <D extends Access1D<?>> DiagonalStore.Builder<N, D> makeDiagonal(final D mainDiag) {
+        return DiagonalStore.builder(myFactory, mainDiag);
     }
 
     protected final DecompositionStore<N> makeEye(final int numberOfRows, final int numberOfColumns) {

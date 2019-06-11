@@ -163,14 +163,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return s[0];
     }
 
-    public MatrixStore<Double> getU() {
-        return myTransposed ? new RawStore(myVt, n, n).logical().transpose().get() : new RawStore(myUt, n, m).logical().transpose().get();
-    }
-
-    public MatrixStore<Double> getV() {
-        return myTransposed ? new RawStore(myUt, n, m).logical().transpose().get() : new RawStore(myVt, n, n).logical().transpose().get();
-    }
-
     public double getRankThreshold() {
         return Math.max(MACHINE_SMALLEST, s[0]) * this.getDimensionalEpsilon();
     }
@@ -195,6 +187,14 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     public double getTraceNorm() {
         return this.getKyFanNorm(s.length);
+    }
+
+    public MatrixStore<Double> getU() {
+        return myTransposed ? new RawStore(myVt, n, n).logical().transpose().get() : new RawStore(myUt, n, m).logical().transpose().get();
+    }
+
+    public MatrixStore<Double> getV() {
+        return myTransposed ? new RawStore(myUt, n, m).logical().transpose().get() : new RawStore(myVt, n, n).logical().transpose().get();
     }
 
     @Override
@@ -537,11 +537,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1t[0].length);
             final double[][] tmpMtrxData = tmpMtrx.data;
 
-            final double tmpEps = (tmpSingular[0] * MACHINE_EPSILON) * tmpSingular.length;
+            final double small = this.getRankThreshold();
 
             for (int i = 0; i < tmpSingular.length; i++) {
                 final double tmpVal = tmpSingular[i];
-                if (tmpVal > tmpEps) {
+                if (tmpVal > small) {
                     final double[] tmpRow = tmpMtrxData[i];
                     for (int j = 0; j < tmpRow.length; j++) {
                         tmpRow[j] = tmpQ1t[i][j] / tmpVal;

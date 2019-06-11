@@ -100,6 +100,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         public MatrixStore.Factory<N> builder() {
             return new MatrixStore.Factory<N>() {
 
+                public <D extends Access1D<?>> Builder<N, D> makeDiagonal(final D mainDiagonal) {
+                    return DiagonalStore.builder(GenericDenseStore.Factory.this, mainDiagonal);
+                }
+
                 public LogicalBuilder<N> makeIdentity(final int dimension) {
                     return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.Factory.this, dimension));
                 }
@@ -118,10 +122,6 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
                 public LogicalBuilder<N> makeZero(final int rowsCount, final int columnsCount) {
                     return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.Factory.this, rowsCount, columnsCount));
-                }
-
-                public <D extends Access1D<?>> Builder<N, D> makeDiagonal(final D mainDiagonal) {
-                    return DiagonalStore.builder(GenericDenseStore.Factory.this, mainDiagonal);
                 }
 
             };

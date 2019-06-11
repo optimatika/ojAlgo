@@ -137,7 +137,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
     }
 
     public double getRankThreshold() {
-        return myMaxDiag * this.getDimensionalEpsilon();
+        return TEN * myMaxDiag * this.getDimensionalEpsilon();
     }
 
     public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
@@ -246,8 +246,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
     @Override
     protected boolean checkSolvability() {
-        double threshold = TEN * Math.min(this.getRankThreshold(), MACHINE_EPSILON);
-        return mySPD && (myMinDiag >= threshold);
+        return mySPD && (myMinDiag > this.getRankThreshold());
     }
 
     final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean checkHermitian) {
