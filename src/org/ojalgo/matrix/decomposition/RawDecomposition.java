@@ -81,10 +81,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         }
     }
 
-    protected final <D extends Access1D<?>> DiagonalStore.Builder<Double, D> makeDiagonal(final D mainDiag) {
-        return DiagonalStore.builder(RawStore.FACTORY, mainDiag);
-    }
-
     @Override
     protected final FunctionSet<Double> function() {
         return PrimitiveFunction.getSet();
@@ -106,6 +102,10 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     @Override
     protected int getRowDim() {
         return myRowDim;
+    }
+
+    protected final <D extends Access1D<?>> DiagonalStore.Builder<Double, D> makeDiagonal(final D mainDiag) {
+        return DiagonalStore.builder(RawStore.FACTORY, mainDiag);
     }
 
     @Override
