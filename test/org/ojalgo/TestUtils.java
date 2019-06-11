@@ -40,6 +40,8 @@ import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.operation.MatrixOperation;
+import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.random.Uniform;
@@ -376,6 +378,15 @@ public abstract class TestUtils {
         if (actual.length() <= 0) {
             TestUtils.fail("Is empty!");
         }
+    }
+
+    public static void assertSolutionFeasible(final ExpressionsBasedModel model, final Optimisation.Result solution) {
+        TestUtils.assertSolutionFeasible(model, solution, EQUALS);
+    }
+
+    public static void assertSolutionFeasible(final ExpressionsBasedModel model, final Optimisation.Result solution, final NumberContext accuracy) {
+        TestUtils.assertStateNotLessThanFeasible(solution);
+        TestUtils.assertTrue(model.validate(solution, accuracy, BasicLogger.DEBUG));
     }
 
     public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual) {

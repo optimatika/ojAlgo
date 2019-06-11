@@ -123,6 +123,20 @@ public class RationalNumberTest extends ScalarTests {
     }
 
     @Test
+    public void testPower() {
+
+        RationalNumber base = RationalNumber.TWO;
+
+        TestUtils.assertEquals(1L, base.power(0));
+        TestUtils.assertEquals(2L, base.power(1));
+        TestUtils.assertEquals(4L, base.power(2));
+        TestUtils.assertEquals(8L, base.power(3));
+        TestUtils.assertEquals(16L, base.power(4));
+        TestUtils.assertEquals(32L, base.power(5));
+        TestUtils.assertEquals(64L, base.power(6));
+    }
+
+    @Test
     public void testRational() {
         TestUtils.assertEquals(RationalNumber.of(1, 10), RationalNumber.rational(0.1));
     }
@@ -139,20 +153,6 @@ public class RationalNumberTest extends ScalarTests {
             tmpRat1.subtract(tmpRat2);
             tmpRat1.divide(tmpRat2);
         }
-    }
-
-    @Test
-    public void testPower() {
-
-        RationalNumber base = RationalNumber.TWO;
-
-        TestUtils.assertEquals(1L, base.power(0));
-        TestUtils.assertEquals(2L, base.power(1));
-        TestUtils.assertEquals(4L, base.power(2));
-        TestUtils.assertEquals(8L, base.power(3));
-        TestUtils.assertEquals(16L, base.power(4));
-        TestUtils.assertEquals(32L, base.power(5));
-        TestUtils.assertEquals(64L, base.power(6));
     }
 
     @Test

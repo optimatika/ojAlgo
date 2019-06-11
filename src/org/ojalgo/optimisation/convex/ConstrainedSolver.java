@@ -21,14 +21,24 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.structure.Access2D.Collectable;
 
 abstract class ConstrainedSolver extends ConvexSolver {
 
+    private final PrimitiveDenseStore mySlackE;
+
     protected ConstrainedSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
+
         super(matrices, solverOptions);
+
+        int numberOfEqualityConstraints = this.countEqualityConstraints();
+
+        mySlackE = PrimitiveDenseStore.FACTORY.makeZero(numberOfEqualityConstraints, 1L);
     }
 
     @Override
@@ -46,26 +56,32 @@ abstract class ConstrainedSolver extends ConvexSolver {
     }
 
     @Override
-    protected boolean validate() {
+    protected boolean initialise(final Result kickStarter) {
 
-        super.validate();
+        boolean spdQ = super.initialise(kickStarter);
 
-        final MatrixStore<Double> iterA = this.getIterationA();
-        final MatrixStore<Double> iterB = this.getIterationB();
+        boolean fullRankA = true;
+        if (options.validate) {
 
-        if (((iterA != null) && (iterB == null)) || ((iterA == null) && (iterB != null))) {
-            throw new IllegalArgumentException("Either A or B is null, and the other one is not!");
-        }
+            MatrixStore<Double> iterationA = this.getIterationA();
 
-        if (iterA != null) {
-            this.computeGeneral(iterA.countRows() < iterA.countColumns() ? iterA.transpose() : iterA);
-            if (this.getRankGeneral() != iterA.countRows()) {
-                throw new IllegalArgumentException("A must have full (row) rank!");
+            if (iterationA != null) {
+                this.computeGeneral(iterationA.countRows() < iterationA.countColumns() ? iterationA.transpose() : iterationA);
+                if (this.getRankGeneral() != iterationA.countRows()) {
+
+                    fullRankA = false;
+                    this.setState(State.INVALID);
+
+                    if (this.isLogDebug()) {
+                        this.log("A not full (row) rank!");
+                    } else {
+                        throw new IllegalArgumentException("A not full (row) rank!");
+                    }
+                }
             }
         }
 
-        this.setState(State.VALID);
-        return true;
+        return spdQ && fullRankA;
     }
 
     /**
@@ -82,6 +98,19 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
     final PhysicalStore<Double> getIterationQ() {
         return this.getMatrixQ();
+    }
+
+    PhysicalStore<Double> getSlackE() {
+
+        MatrixStore<Double> mtrxAE = this.getMatrixAE();
+        MatrixStore<Double> mtrxBE = this.getMatrixBE();
+        PhysicalStore<Double> mtrxX = this.getSolutionX();
+
+        if ((mtrxAE != null) && (mtrxAE.count() != 0L)) {
+            mtrxX.premultiply(mtrxAE).operateOnMatching(mtrxBE, SUBTRACT).supplyTo(mySlackE);
+        }
+
+        return mySlackE;
     }
 
 }

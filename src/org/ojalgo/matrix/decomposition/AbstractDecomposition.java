@@ -58,7 +58,7 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
                 mySolvable = Boolean.FALSE;
             }
         }
-        return myComputed && mySolvable.booleanValue();
+        return myComputed && (mySolvable != null) && mySolvable.booleanValue();
     }
 
     public void reset() {

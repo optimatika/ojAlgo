@@ -230,6 +230,7 @@ final class IterativeASS extends ActiveSetSolver {
                 final double relativeError = myS.resolve(this.getSolutionL());
 
                 if (this.isLogDebug()) {
+                    this.log("RHS={}", myS.getRHS());
                     this.log("Relative error {} in solution for L={}", relativeError, Arrays.toString(this.getIterationL(incl).toRawCopy1D()));
                 }
 
