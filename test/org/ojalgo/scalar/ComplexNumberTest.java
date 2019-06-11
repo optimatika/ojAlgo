@@ -37,4 +37,18 @@ public class ComplexNumberTest extends ScalarTests {
 
     }
 
+    @Test
+    public void testPower() {
+
+        ComplexNumber base = ComplexNumber.TWO;
+
+        TestUtils.assertEquals(1L, base.power(0));
+        TestUtils.assertEquals(2L, base.power(1));
+        TestUtils.assertEquals(4L, base.power(2));
+        TestUtils.assertEquals(8L, base.power(3));
+        TestUtils.assertEquals(16L, base.power(4));
+        TestUtils.assertEquals(32L, base.power(5));
+        TestUtils.assertEquals(64L, base.power(6));
+    }
+
 }

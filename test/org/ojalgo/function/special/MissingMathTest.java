@@ -19,14 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.decomposition;
+package org.ojalgo.function.special;
 
-import org.ojalgo.array.Array1D;
+import org.junit.jupiter.api.Test;
+import org.ojalgo.TestUtils;
 
-final class DiagonalArray1D<N extends Number> extends DiagonalAccess<N, Array1D<N>> {
+public class MissingMathTest {
 
-    DiagonalArray1D(final Array1D<N> mainDiag, final Array1D<N> superdiag, final Array1D<N> subdiag, final N zero) {
-        super(mainDiag, superdiag, subdiag, zero);
+    @Test
+    public void testPower() {
+
+        TestUtils.assertEquals(1L, MissingMath.power(2L, 0));
+        TestUtils.assertEquals(2L, MissingMath.power(2L, 1));
+        TestUtils.assertEquals(4L, MissingMath.power(2L, 2));
+        TestUtils.assertEquals(8L, MissingMath.power(2L, 3));
+        TestUtils.assertEquals(16L, MissingMath.power(2L, 4));
+        TestUtils.assertEquals(32L, MissingMath.power(2L, 5));
+        TestUtils.assertEquals(64L, MissingMath.power(2L, 6));
     }
 
 }

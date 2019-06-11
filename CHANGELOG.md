@@ -4,9 +4,36 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
-# v47.2.0: 2019-05-03
+## org.ojalgo.algebra
 
-* ...
+* Added a power(int) method to the Operation.Multiplication interface.
+
+## org.ojalgo.matrix
+
+* Various deprecations in MatrixStore.LogicalBuilder and the corresponding LogicalBuilder:s of PrimitiveMatrix, ComplexMatrix & RationalMatrix. Everything in the LogicalBuilder:s are now either defined in org.ojalgo.structure.Structure2D.Logical or deprecated.
+* Tweaked the isSolvable() method implementations of the Cholesky decompositions to return `true` slightly less often.
+* The debug logging of the iterative solvers now output the relative error at each iteration.
+* Implemented the power(int) method defined in Operation.Multiplication.
+* New method getCovariance in the SingularValue interface
+* Q1 and Q2 in the SingularValue decomposition have been renamed U and V to match denominations commonly used elsewhere. In Bidiagonal Q1 and Q2 have been renamed LQ and RQ.
+* New MatrixStore implementation DiagonalStore to be used for diagonal, bidiagonal and tridiagonal matrices. Replaces two different previous (package private) implementations.
+* MatrixStore.Factory has a new method makeDiagonal(...)
+* MatrixStore.LogicalBuilder has new implementations for the diagonal(), bidiagonal(boolean) and tridiagonal() methods.
+
+## org.ojalgo.optimisation
+
+* Minor rounding/precision related change to how ExpressionsBasedModel receives the solution from the solver and then returns it. The `options.solution` property is now enforced.
+* Internal refactoring of ConvexSolver and its subclasses. This includes changes in behaviour (handling of not-so-convex or otherwise difficult problems).
+
+## org.ojalgo.scalar
+
+* Implemented the power(int) method defined in Operation.Multiplication.
+
+## org.ojalgo.structure
+
+* Additions to Structure2D.Logical (Moved definitions from MatrixStore.LogicalBuilder to here).
+
+# v47.2.0: 2019-05-03
 
 ## org.ojalgo.data
 

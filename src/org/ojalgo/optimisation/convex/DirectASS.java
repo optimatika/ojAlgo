@@ -23,12 +23,9 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import java.util.Arrays;
-
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
@@ -70,7 +67,7 @@ final class DirectASS extends ActiveSetSolver {
         final PrimitiveDenseStore iterL = PrimitiveDenseStore.FACTORY.makeZero(numbConstr, 1L);
         final PrimitiveDenseStore soluL = this.getSolutionL();
 
-        if ((numbConstr < numbVars) && (solved = this.isSolvableQ())) {
+        if ((numbConstr <= numbVars) && (solved = this.isSolvableQ())) {
             // Q is SPD
 
             if (numbConstr == 0L) {
@@ -94,14 +91,16 @@ final class DirectASS extends ActiveSetSolver {
                 // TODO Symmetric, only need to calculate half the Schur complement, and only 1 row/column changes per iteration
 
                 if (this.isLogDebug()) {
-                    BasicLogger.debug("Negated Schur complement: " + Arrays.toString(incl), tmpS.get());
+                    // BasicLogger.debug("Negated Schur complement: " + Arrays.toString(incl), tmpS.get());
                 }
 
                 if (solved = this.computeGeneral(tmpS)) {
 
-                    this.getSolutionGeneral(this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB), iterL);
+                    ElementsSupplier<Double> rhs = this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB);
+                    this.getSolutionGeneral(rhs, iterL);
 
                     if (this.isLogDebug()) {
+                        this.log("RHS={}", rhs.get().toRawCopy1D());
                         this.log("Relative error {} in solution for L={}", NaN, iterL.toRawCopy1D());
                     }
 

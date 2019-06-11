@@ -33,18 +33,18 @@ import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Singular Value: [A] = [Q1][D][Q2]<sup>T</sup> Decomposes [this] into [Q1], [D] and [Q2] where:
+ * Singular Value: [A] = [U][D][V]<sup>T</sup> Decomposes [this] into [U], [D] and [V] where:
  * <ul>
- * <li>[Q1] is an orthogonal matrix. The columns are the left, orthonormal, singular vectors of [this]. Its
+ * <li>[U] is an orthogonal matrix. The columns are the left, orthonormal, singular vectors of [this]. Its
  * columns are the eigenvectors of [A][A]<sup>T</sup>, and therefore has the same number of rows as [this].
  * </li>
  * <li>[D] is a diagonal matrix. The elements on the diagonal are the singular values of [this]. It is either
  * square or has the same dimensions as [this]. The singular values of [this] are the square roots of the
  * nonzero eigenvalues of [A][A]<sup>T</sup> and [A]<sup>T</sup>[A] (they are the same)</li>
- * <li>[Q2] is an orthogonal matrix. The columns are the right, orthonormal, singular vectors of [this]. Its
+ * <li>[V] is an orthogonal matrix. The columns are the right, orthonormal, singular vectors of [this]. Its
  * columns are the eigenvectors of [A][A]<sup>T</sup>, and therefore has the same number of rows as [this] has
  * columns.</li>
- * <li>[this] = [Q1][D][Q2]<sup>T</sup></li>
+ * <li>[this] = [U][D][V]<sup>T</sup></li>
  * </ul>
  * A singular values decomposition always exists.
  *
@@ -86,16 +86,16 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         final int tmpRowDim = (int) matrix.countRows();
         final int tmpColDim = (int) matrix.countColumns();
 
-        final MatrixStore<N> tmpQ1 = decomposition.getQ1();
+        final MatrixStore<N> tmpQ1 = decomposition.getU();
         final MatrixStore<N> tmpD = decomposition.getD();
-        final MatrixStore<N> tmpQ2 = decomposition.getQ2();
+        final MatrixStore<N> tmpQ2 = decomposition.getV();
 
         MatrixStore<N> tmpThis;
         MatrixStore<N> tmpThat;
 
         boolean retVal = (tmpRowDim == tmpQ1.countRows()) && (tmpQ2.countRows() == tmpColDim);
 
-        // Check that [A][Q2] == [Q1][D]
+        // Check that [A][V] == [U][D]
         if (retVal) {
 
             tmpThis = matrix.multiply(tmpQ2);
@@ -108,7 +108,7 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         if (retVal && (tmpQ1.countRows() == tmpQ1.countColumns())) {
 
             tmpThis = tmpQ1.physical().makeEye(tmpRowDim, tmpRowDim);
-            tmpThat = tmpQ1.logical().conjugate().get().multiply(tmpQ1);
+            tmpThat = tmpQ1.conjugate().multiply(tmpQ1);
 
             retVal &= tmpThis.equals(tmpThat, context);
         }
@@ -117,7 +117,7 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         if (retVal && (tmpQ2.countRows() == tmpQ2.countColumns())) {
 
             tmpThis = tmpQ2.physical().makeEye(tmpColDim, tmpColDim);
-            tmpThat = tmpQ2.multiply(tmpQ2.logical().conjugate().get());
+            tmpThat = tmpQ2.multiply(tmpQ2.conjugate());
 
             retVal &= tmpThis.equals(tmpThat, context);
         }
@@ -179,6 +179,11 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
     double getCondition();
 
     /**
+     * @return [[A]<sup>T</sup>[A]]<sup>-1</sup> Where [A] is the original matrix.
+     */
+    MatrixStore<N> getCovariance();
+
+    /**
      * @return The diagonal matrix of singular values.
      */
     MatrixStore<N> getD();
@@ -210,24 +215,20 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
     double getOperatorNorm();
 
     /**
-     * If [A] is m-by-n and its rank is r, then:
-     * <ul>
-     * <li>The first r columns of [Q1] span the column space, range or image of [A].</li>
-     * <li>The last m-r columns of [Q1] span the left nullspace or cokernel of [A].</li>
-     * </ul>
-     * Calculating the QR decomposition of [A] is a faster alternative.
+     * @deprecated v48 Use {@link #getU()} instead
      */
-    MatrixStore<N> getQ1();
+    @Deprecated
+    default MatrixStore<N> getQ1() {
+        return this.getU();
+    }
 
     /**
-     * If [A] is m-by-n and its rank is r, then:
-     * <ul>
-     * <li>The first r columns of [Q2] span the row space or coimage of [A].</li>
-     * <li>The last n-r columns of [Q2] span the nullspace or kernel of [A].</li>
-     * </ul>
-     * Calculating the QR decomposition of [A]<sup>T</sup> is a faster alternative.
+     * @deprecated v48 Use {@link #getV()} instead
      */
-    MatrixStore<N> getQ2();
+    @Deprecated
+    default MatrixStore<N> getQ2() {
+        return this.getV();
+    }
 
     /**
      * @return The singular values ordered in descending order.
@@ -251,10 +252,30 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
 
     double getTraceNorm();
 
+    /**
+     * If [A] is m-by-n and its rank is r, then:
+     * <ul>
+     * <li>The first r columns of [U] span the column space, range or image of [A].</li>
+     * <li>The last m-r columns of [U] span the left nullspace or cokernel of [A].</li>
+     * </ul>
+     * Calculating the QR decomposition of [A] is a faster alternative.
+     */
+    MatrixStore<N> getU();
+
+    /**
+     * If [A] is m-by-n and its rank is r, then:
+     * <ul>
+     * <li>The first r columns of [V] span the row space or coimage of [A].</li>
+     * <li>The last n-r columns of [V] span the nullspace or kernel of [A].</li>
+     * </ul>
+     * Calculating the QR decomposition of [A]<sup>T</sup> is a faster alternative.
+     */
+    MatrixStore<N> getV();
+
     default MatrixStore<N> reconstruct() {
-        MatrixStore<N> mtrxQ1 = this.getQ1();
+        MatrixStore<N> mtrxQ1 = this.getU();
         MatrixStore<N> mtrxD = this.getD();
-        MatrixStore<N> mtrxQ2 = this.getQ2();
+        MatrixStore<N> mtrxQ2 = this.getV();
         return mtrxQ1.multiply(mtrxD).multiply(mtrxQ2.conjugate());
     }
 

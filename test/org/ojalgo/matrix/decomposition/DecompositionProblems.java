@@ -119,7 +119,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         }
 
         // Recover the Q2 matrix.
-        MatrixStore<Double> q2 = svd.getQ2();
+        MatrixStore<Double> q2 = svd.getV();
         if (DEBUG) {
             System.out.println("Q2 matrix:\n" + q2);
         }
@@ -165,8 +165,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("D", tmpSVD.getD(), new NumberContext(7, 6));
-            BasicLogger.debug("Q1", tmpSVD.getQ1(), new NumberContext(7, 6));
-            BasicLogger.debug("Q2", tmpSVD.getQ2(), new NumberContext(7, 6));
+            BasicLogger.debug("Q1", tmpSVD.getU(), new NumberContext(7, 6));
+            BasicLogger.debug("Q2", tmpSVD.getV(), new NumberContext(7, 6));
         }
 
         TestUtils.assertEquals(tmpA, tmpSVD, new NumberContext(7, 6));

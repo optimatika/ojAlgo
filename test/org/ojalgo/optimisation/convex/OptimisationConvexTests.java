@@ -31,55 +31,44 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class OptimisationConvexTests {
 
-    static final boolean DEBUG = false;
+    static boolean DEBUG = false;
 
-    protected static void assertDirectAndIterativeEquals(final ConvexSolver.Builder builder, final NumberContext accuracy) {
+    protected static void assertDirectAndIterativeEquals(final ConvexSolver.Builder builder, final NumberContext accuracy, Optimisation.Options options) {
 
-        final Optimisation.Options options = new Optimisation.Options();
-        //        options.debug(DirectASS.class);
-        //        options.validate = false;
+        if (options == null) {
+            options = new Optimisation.Options();
+        }
+
+        if (accuracy != null) {
+            options.solution = accuracy;
+        }
 
         if (builder.hasInequalityConstraints()) {
             // ActiveSetSolver (ASS)
 
-            if (builder.hasEqualityConstraints()) {
-                // Mixed ASS
+            DirectASS directASS = new DirectASS(builder, options);
+            Optimisation.Result direct = directASS.solve();
 
-                final Optimisation.Result direct = new DirectASS(builder, options).solve();
-                final Optimisation.Result iterative = new IterativeASS(builder, options).solve();
+            IterativeASS iterativeASS = new IterativeASS(builder, options);
+            Optimisation.Result iterative = iterativeASS.solve();
 
-                if (accuracy != null) {
-                    TestUtils.assertStateAndSolution(direct, iterative, accuracy);
-                } else {
-                    TestUtils.assertStateAndSolution(direct, iterative);
-                }
-
+            if (!direct.getState().isFeasible()) {
+                TestUtils.assertFalse(iterative.getState().isFeasible());
+            } else if (accuracy != null) {
+                TestUtils.assertStateAndSolution(direct, iterative, accuracy);
             } else {
-                // Pure ASS
-
-                final Optimisation.Result direct = new DirectASS(builder, options).solve();
-                final Optimisation.Result iterative = new IterativeASS(builder, options).solve();
-
-                if (accuracy != null) {
-                    TestUtils.assertStateAndSolution(direct, iterative, accuracy);
-                } else {
-                    TestUtils.assertStateAndSolution(direct, iterative);
-                }
+                TestUtils.assertStateAndSolution(direct, iterative);
             }
         }
     }
 
-    protected static void assertDirectAndIterativeEquals(final ExpressionsBasedModel model) {
-        OptimisationConvexTests.assertDirectAndIterativeEquals(model, null);
-    }
-
     protected static void assertDirectAndIterativeEquals(final ExpressionsBasedModel model, final NumberContext accuracy) {
 
-        final ConvexSolver.Builder builder = new ConvexSolver.Builder();
+        ConvexSolver.Builder builder = new ConvexSolver.Builder();
 
         ConvexSolver.copy(model, builder);
 
-        OptimisationConvexTests.assertDirectAndIterativeEquals(builder, accuracy);
+        OptimisationConvexTests.assertDirectAndIterativeEquals(builder, accuracy, model.options);
     }
 
 }

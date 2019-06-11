@@ -64,6 +64,11 @@ public interface Operation {
          */
         T multiply(T multiplicand);
 
+        /**
+         * Multiply by itself {@code power} times.
+         */
+        T power(int power);
+
     }
 
     /**

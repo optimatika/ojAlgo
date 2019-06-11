@@ -27,10 +27,18 @@ final class OffsetStore<N extends Number> extends SelectingStore<N> {
 
     OffsetStore(final MatrixStore<N> base, final int rowOffset, final int columnOffset) {
 
-        super(base, (int) base.countRows() - rowOffset, (int) base.countColumns() - columnOffset);
+        super(base, base.countRows() - rowOffset, base.countColumns() - columnOffset);
 
         myRowOffset = rowOffset;
         myColumnOffset = columnOffset;
+    }
+
+    OffsetStore(final MatrixStore<N> base, final long rowOffset, final long columnOffset) {
+
+        super(base, base.countRows() - rowOffset, base.countColumns() - columnOffset);
+
+        myRowOffset = Math.toIntExact(rowOffset);
+        myColumnOffset = Math.toIntExact(columnOffset);
     }
 
     public double doubleValue(final long row, final long col) {

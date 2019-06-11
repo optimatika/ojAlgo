@@ -81,7 +81,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
             tmpIterations++;
 
             if (this.isDebugPrinterSet()) {
-                this.debug(tmpIterations, current);
+                this.debug(tmpIterations, tmpNormErr / tmpNormRHS, current);
             }
 
         } while ((tmpIterations < tmpLimit) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));

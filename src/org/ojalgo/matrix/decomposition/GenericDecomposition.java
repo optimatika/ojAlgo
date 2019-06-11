@@ -24,11 +24,13 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 
 /**
@@ -38,8 +40,8 @@ import org.ojalgo.structure.Access2D;
  */
 abstract class GenericDecomposition<N extends Number> extends AbstractDecomposition<N> {
 
-    private final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> myFactory;
     private final MatrixStore.Factory<N> myBuilder;
+    private final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> myFactory;
 
     protected GenericDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
 
@@ -80,6 +82,10 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
 
     protected final BasicArray<N> makeArray(final int length) {
         return myFactory.array().makeZero(length);
+    }
+
+    protected final <D extends Access1D<?>> DiagonalStore.Builder<N, D> makeDiagonal(final D mainDiag) {
+        return DiagonalStore.builder(myFactory, mainDiag);
     }
 
     protected final DecompositionStore<N> makeEye(final int numberOfRows, final int numberOfColumns) {

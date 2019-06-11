@@ -232,6 +232,17 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return PrimitiveMath.ABS.invoke(myNumber.doubleValue());
     }
 
+    public BigScalar power(final int power) {
+
+        BigScalar retVal = ONE;
+
+        for (int p = 0; p < power; p++) {
+            retVal = retVal.multiply(myNumber);
+        }
+
+        return retVal;
+    }
+
     public BigScalar signum() {
         return new BigScalar(BigMath.SIGNUM.invoke(myNumber));
     }

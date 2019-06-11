@@ -27,6 +27,10 @@ final class LimitStore<N extends Number> extends SelectingStore<N> {
         super(base, rowsCount, columnsCount);
     }
 
+    LimitStore(final long rowsCount, final long columnsCount, final MatrixStore<N> base) {
+        super(base, rowsCount, columnsCount);
+    }
+
     public double doubleValue(final long row, final long col) {
         return this.base().doubleValue(row, col);
     }

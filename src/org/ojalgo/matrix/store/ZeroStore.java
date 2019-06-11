@@ -36,6 +36,10 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
         super(factory, rowsCount, columnsCount);
     }
 
+    ZeroStore(final PhysicalStore.Factory<N, ?> factory, final long rowsCount, final long columnsCount) {
+        super(factory, rowsCount, columnsCount);
+    }
+
     @Override
     public MatrixStore<N> add(final MatrixStore<N> addend) {
         return addend;

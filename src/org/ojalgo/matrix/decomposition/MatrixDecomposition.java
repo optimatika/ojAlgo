@@ -34,7 +34,7 @@ import org.ojalgo.structure.Structure2D;
 /**
  * Notation used to describe the various matrix decompositions:
  * <ul>
- * <li>[A] could be any matrix. (The matrix to decompose.)</li>
+ * <li>[A] could be any matrix. (The original matrix to decompose.)</li>
  * <li>[A]<sup>-1</sup> is the inverse of [A].</li>
  * <li>[A]<sup>T</sup> is the transpose of [A].</li>
  * <li>[A]<sup>H</sup> is the conjugate transpose of [A]. [A]<sup>H</sup> is equilvalent to [A]<sup>T</sup> if
@@ -48,8 +48,10 @@ import org.ojalgo.structure.Structure2D;
  * <li>[Q] is an orthogonal/unitary matrix. [Q]<sup>-1</sup> = [Q]<sup>H</sup>, and with real matrices = [Q]
  * <sup>T</sup>.</li>
  * <li>[R] is a right (upper) tringular matrix. It is equivalent to [U].</li>
- * <li>[U] is an upper (right) triangular matrix. It is equivalent to [R].</li>
- * <li>[V] is an eigenvector matrix. The columns are the eigenvectors</li>
+ * <li>[U] is an upper (right) triangular matrix. It is equivalent to [R]. Alternatively [U] is also used to
+ * denominate the left, orthonormal, singular vectors.</li>
+ * <li>[V] is an eigenvector matrix and/or an orthogonal matrix – the columns are the eigenvectors or the
+ * right, orthonormal, singular vectors.</li>
  * </ul>
  *
  * @author apete
@@ -361,12 +363,12 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
 
     /**
      * @param matrix A matrix to decompose
-     * @return true if the computation suceeded; false if not
+     * @return true if decomposition suceeded; false if not
      */
     boolean decompose(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);
 
     /**
-     * @return true if computation has been attemped; false if not.
+     * @return true if decomposition has been attemped and was successful; false if not.
      * @see #decompose(Access2D.Collectable)
      */
     boolean isComputed();

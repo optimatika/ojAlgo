@@ -44,7 +44,7 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
     private PrimitiveDenseStore myBE;
     private PrimitiveDenseStore myBI;
     private PrimitiveDenseStore myC;
-    private final NumberContext myEvaluationContext = new NumberContext(8, 8);
+    private final NumberContext myEvaluationContext = new NumberContext(7, 8);
     private PrimitiveDenseStore myQ;
     private PrimitiveDenseStore myXE;
     private PrimitiveDenseStore myXI;

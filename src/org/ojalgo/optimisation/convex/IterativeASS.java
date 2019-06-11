@@ -23,7 +23,6 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import java.math.MathContext;
 import java.util.Arrays;
 
 import org.ojalgo.array.SparseArray;
@@ -69,7 +68,9 @@ final class IterativeASS extends ActiveSetSolver {
             //this.getDelegate().setRelaxationFactor(1.5);
 
             // ConjugateGradient
-            this.setAccuracyContext(NumberContext.getMath(MathContext.DECIMAL64).withPrecision(9));
+            this.setAccuracyContext(ITERATIVE_ACCURACY);
+
+            // this.setDebugPrinter(BasicLogger.DEBUG);
 
             myIterationRows = new Equation[(int) myFullDim];
 
@@ -161,6 +162,8 @@ final class IterativeASS extends ActiveSetSolver {
 
     }
 
+    static final NumberContext ITERATIVE_ACCURACY = ACCURACY.withPrecision(10);
+
     private final PhysicalStore<Double> myColumnS;
     private final MyIterativeSolver myS;
 
@@ -213,7 +216,7 @@ final class IterativeASS extends ActiveSetSolver {
 
         final PrimitiveDenseStore iterX = this.getIterationX();
 
-        if ((this.countIterationConstraints() < this.countVariables()) && (solved = this.isSolvableQ())) {
+        if ((this.countIterationConstraints() <= this.countVariables()) && (solved = this.isSolvableQ())) {
             // Q is SPD
 
             if (this.countIterationConstraints() == 0L) {
@@ -227,6 +230,7 @@ final class IterativeASS extends ActiveSetSolver {
                 final double relativeError = myS.resolve(this.getSolutionL());
 
                 if (this.isLogDebug()) {
+                    this.log("RHS={}", myS.getRHS());
                     this.log("Relative error {} in solution for L={}", relativeError, Arrays.toString(this.getIterationL(incl).toRawCopy1D()));
                 }
 

@@ -128,7 +128,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             tmpIterations++;
 
             if (this.isDebugPrinterSet()) {
-                this.debug(tmpIterations, solution);
+                this.debug(tmpIterations, tmpNormErr / tmpNormRHS, solution);
             }
 
         } while ((tmpIterations < tmpLimit) && !Double.isNaN(tmpNormErr) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
