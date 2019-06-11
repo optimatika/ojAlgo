@@ -29,7 +29,6 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -40,63 +39,85 @@ import org.ojalgo.optimisation.Variable;
  */
 public class ComPictetPamBamTest extends OptimisationConvexTests {
 
+    static void assertStateValidationConsistency(final ExpressionsBasedModel model) {
+
+        Optimisation.Result result = model.minimise();
+
+        boolean resultFeasible = result.getState().isFeasible();
+        boolean validated = model.validate(result);
+        String message = "State: " + result.getState() + ", validated: " + validated;
+
+        if (resultFeasible) {
+            TestUtils.assertTrue(message, validated);
+        } else {
+            TestUtils.assertFalse(message, validated);
+        }
+
+        //        model.options.debug(ConvexSolver.class);
+        //        model.options.validate = false;
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(model, null);
+    }
+
     private ExpressionsBasedModel model;
     private BigDecimal[] point;
     private Variable[] vars;
 
     @Test
     public void test1() {
-        this.setupModel(6);
-        this.solve();
+        this.build(6);
+        ComPictetPamBamTest.assertStateValidationConsistency(model);
     }
 
     @Test
     public void test2() {
-        this.setupModel(6);
+        this.build(6);
         vars[3].level(new BigDecimal(40.0));
         vars[4].level(new BigDecimal(18.0));
-        this.solve();
+        ComPictetPamBamTest.assertStateValidationConsistency(model);
     }
 
     @Test
     public void test3() {
-        this.setupModel(6);
+        this.build(6);
         vars[3].level(new BigDecimal(48.0));
         vars[4].level(new BigDecimal(18.0));
         vars[5].level(new BigDecimal(5.0));
-        this.solve();
+        ComPictetPamBamTest.assertStateValidationConsistency(model);
     }
 
     @Test
     public void test4() {
-        this.setupModel(42);
-        this.solve();
+        this.build(42);
+        ComPictetPamBamTest.assertStateValidationConsistency(model);
     }
 
     @Test
     public void test5() {
-        this.setupModel(42);
+        this.build(42);
         vars[3].level(new BigDecimal(40.0));
         vars[4].level(new BigDecimal(18.0));
-        this.solve();
+        ComPictetPamBamTest.assertStateValidationConsistency(model);
     }
 
     @Test
     public void test6() {
-        this.setupModel(42);
+        this.build(42);
         vars[3].level(new BigDecimal(40.0));
         vars[4].level(new BigDecimal(18.0));
         vars[5].level(new BigDecimal(5.0));
-        this.solve();
+        ComPictetPamBamTest.assertStateValidationConsistency(model);
     }
 
     /**
      * @param numberOfVars greater than 6
      */
-    void setupModel(final int numberOfVars) {
+    void build(final int numberOfVars) {
+
         if (numberOfVars < 6) {
             throw new IllegalArgumentException("numberOfVars must be >= 6 !!!");
         }
+
         //
         // variables
         //
@@ -131,40 +152,40 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         // objective function
         //
         {
-            final int tmpLength = model.countVariables();
+            int tmpLength = model.countVariables();
 
-            final Expression retVal = model.addExpression("objective");
+            Expression retVal = model.addExpression("objective");
 
             for (int ij = 0; ij < tmpLength; ij++) {
                 retVal.set(ij, ij, ONE);
             }
 
-            final BigDecimal tmpLinearWeight = TWO.negate();
+            BigDecimal tmpLinearWeight = TWO.negate();
             for (int i = 0; i < tmpLength; i++) {
                 retVal.set(i, Arrays.asList(point).get(i).multiply(tmpLinearWeight));
             }
-            final Expression e = retVal;
+            Expression e = retVal;
             e.weight(BigMath.HALF);
         }
         //
         // sum(xi) = 100.0
         //
         {
-            final int tmpLength = model.countVariables();
+            int tmpLength = model.countVariables();
 
-            final Expression retVal = model.addExpression("sum(xi) = 100.0");
+            Expression retVal = model.addExpression("sum(xi) = 100.0");
 
             for (int i = 0; i < tmpLength; i++) {
                 retVal.set(i, ONE);
             }
-            final Expression e = retVal;
+            Expression e = retVal;
             e.level(BigMath.HUNDRED);
         }
         //
         // x1 + x2 <= 45
         //
         {
-            final Expression e = model.addExpression("x1 + x2 <= 45.0");
+            Expression e = model.addExpression("x1 + x2 <= 45.0");
             e.set(1, BigMath.ONE);
             e.set(2, BigMath.ONE);
             e.lower(BigMath.ZERO).upper(new BigDecimal(45.0));
@@ -173,34 +194,12 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         // x4 - 2*x5 = 0
         //
         {
-            final Expression e = model.addExpression("x4 - 2*x5 = 0");
+            Expression e = model.addExpression("x4 - 2*x5 = 0");
             e.set(4, BigMath.ONE);
             e.set(5, BigMath.TWO.negate());
             e.level(BigMath.ZERO);
         }
 
         // model.options.debug(ConvexSolver.class);
-    }
-
-    void solve() {
-
-        //  final ConvexSolver solver = new ConvexSolver.Builder(model).build();
-
-        final Optimisation.Result result = model.minimise();
-
-        if (RationalMatrix.FACTORY.columns(result) != null) {
-            final boolean validated = model.validate(result, model.options.feasibility);
-            if (result.getState().isFeasible()) {
-                final String message = "State: " + result.getState() + ", validated: " + validated;
-                TestUtils.assertTrue(message, validated);
-            } else {
-                final String message = "State: " + result.getState() + ", validated: " + validated;
-                TestUtils.assertFalse(message, validated);
-            }
-        } else {
-            TestUtils.assertFalse("No solution but state FEASIBLE", result.getState().isFeasible());
-        }
-
-        OptimisationConvexTests.assertDirectAndIterativeEquals(model);
     }
 }

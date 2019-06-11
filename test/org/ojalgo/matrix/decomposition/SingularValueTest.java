@@ -109,26 +109,6 @@ public class SingularValueTest {
         this.doTestTypes(P20071019Case.getTallProblematic());
     }
 
-    @Test
-    public void testGetCovariance() {
-
-        PrimitiveDenseStore original = PrimitiveDenseStore.FACTORY.makeFilled(9, 3, new Normal());
-
-        for (SingularValue<Double> decomp : MatrixDecompositionTests.getPrimitiveSingularValue()) {
-
-            decomp.decompose(original);
-
-            MatrixStore<Double> covariance = decomp.getCovariance();
-
-            decomp.decompose(original.premultiply(original.transpose()));
-
-            MatrixStore<Double> inverse = decomp.getInverse();
-
-            TestUtils.assertEquals(inverse, covariance);
-        }
-
-    }
-
     /**
      * http://en.wikipedia.org/wiki/Singular_value_decomposition
      */
@@ -192,6 +172,26 @@ public class SingularValueTest {
                 BasicLogger.debug("Reconstructed", tmpReconstructed);
             }
             TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, new NumberContext(7, 6));
+        }
+
+    }
+
+    @Test
+    public void testGetCovariance() {
+
+        PrimitiveDenseStore original = PrimitiveDenseStore.FACTORY.makeFilled(9, 3, new Normal());
+
+        for (SingularValue<Double> decomp : MatrixDecompositionTests.getPrimitiveSingularValue()) {
+
+            decomp.decompose(original);
+
+            MatrixStore<Double> covariance = decomp.getCovariance();
+
+            decomp.decompose(original.premultiply(original.transpose()));
+
+            MatrixStore<Double> inverse = decomp.getInverse();
+
+            TestUtils.assertEquals(inverse, covariance);
         }
 
     }

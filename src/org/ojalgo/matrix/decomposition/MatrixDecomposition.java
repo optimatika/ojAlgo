@@ -363,12 +363,12 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
 
     /**
      * @param matrix A matrix to decompose
-     * @return true if the computation suceeded; false if not
+     * @return true if decomposition suceeded; false if not
      */
     boolean decompose(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);
 
     /**
-     * @return true if computation has been attemped; false if not.
+     * @return true if decomposition has been attemped and was successful; false if not.
      * @see #decompose(Access2D.Collectable)
      */
     boolean isComputed();

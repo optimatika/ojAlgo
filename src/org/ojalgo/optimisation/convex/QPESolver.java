@@ -55,7 +55,7 @@ final class QPESolver extends ConstrainedSolver {
 
         boolean retVal = true;
 
-        final MatrixStore<Double> tmpSE = this.getSE();
+        final MatrixStore<Double> tmpSE = this.getSlackE();
         for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
             if (!GenericSolver.ACCURACY.isZero(tmpSE.doubleValue(i))) {
                 retVal = false;
@@ -68,19 +68,25 @@ final class QPESolver extends ConstrainedSolver {
     @Override
     protected boolean initialise(final Result kickStarter) {
 
-        super.initialise(kickStarter);
+        boolean ok = super.initialise(kickStarter);
 
         if ((kickStarter != null) && kickStarter.getState().isFeasible()) {
+
             this.getSolutionX().fillMatching(kickStarter);
+
             if (!(myFeasible = this.isFeasible())) {
                 this.getSolutionX().fillAll(ZERO);
+            } else {
+                this.setState(State.FEASIBLE);
             }
+
         } else {
+
             this.getSolutionX().fillAll(ZERO);
             myFeasible = false; // Could still be feasible, but doesn't matter...
         }
 
-        return true;
+        return ok;
     }
 
     @Override
@@ -91,7 +97,6 @@ final class QPESolver extends ConstrainedSolver {
     @Override
     protected void performIteration() {
 
-        this.getIterationQ();
         final MatrixStore<Double> tmpIterC = this.getIterationC();
         final MatrixStore<Double> tmpIterA = this.getIterationA();
         final MatrixStore<Double> tmpIterB = this.getIterationB();
