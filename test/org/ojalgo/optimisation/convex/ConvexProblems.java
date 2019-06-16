@@ -1236,7 +1236,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         tmpMatrices[5] = tmpBI;
 
         // The original AMPL/LOQO solution was given with 6 digits precision and never more than 9 decimals
-        NumberContext accuracy = NumberContext.getGeneral(3, 3); // ojAlgo can only get roughly the same solution
+        NumberContext accuracy = NumberContext.getGeneral(6, 9); // ojAlgo can only get roughly the same solution
 
         ConvexProblems.builAndTestModel(tmpMatrices, tmpExpected, accuracy, true);
     }
@@ -1386,9 +1386,10 @@ public class ConvexProblems extends OptimisationConvexTests {
         //        model2.options.debug(ConvexSolver.class);
         //        model3.options.debug(ConvexSolver.class);
 
-        Result tmpBaseResult1 = model1.maximise();
-        Result tmpBaseResult2 = model2.maximise();
-        Result tmpBaseResult3 = model3.maximise();
+        // The problem is with the ConvexSolver, and it is present without integer constraints
+        model1.relax(true);
+        model2.relax(true);
+        model3.relax(true);
 
         final Result baseResult1 = model1.maximise();
         final Result baseResult2 = model2.maximise();
