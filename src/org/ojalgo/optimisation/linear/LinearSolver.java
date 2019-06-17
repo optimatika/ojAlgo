@@ -36,7 +36,6 @@ import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
@@ -213,7 +212,8 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         Optimisation.Result retVal = PrimalSimplex.solve(convex, options);
         Optimisation.Result retVal2 = DualSimplex.solve(convex, options);
 
-        if (!Access1D.equals(retVal, retVal2, ACCURACY.withScale(6))) {
+        // if (!Access1D.equals(retVal, retVal2, ACCURACY.withScale(6))) {
+        if (false) {
 
             BasicLogger.debug();
             BasicLogger.debug("Prim sol: {}", retVal);

@@ -67,12 +67,9 @@ final class DualSimplex extends SimplexSolver {
         RowsSupplier<Double> convexAI = convex.getAI();
         MatrixStore<Double> convexBI = convex.getBI();
 
-        boolean[] negs = new boolean[numbVars];
-
         for (int i = 0; i < numbVars; i++) {
             double rhs = convexC.doubleValue(i);
-            boolean neg = NumberContext.compare(rhs, ZERO) < 0;
-            negs[i] = neg;
+            boolean neg = retVal.negative[i] = NumberContext.compare(rhs, ZERO) < 0;
             for (int j = 0; j < numbEqus; j++) {
                 double valE = convexAE.doubleValue(j, i);
                 constrBody.set(i, j, neg ? -valE : valE);
@@ -88,7 +85,7 @@ final class DualSimplex extends SimplexSolver {
                 int tabI = Math.toIntExact(elemV.index());
 
                 double tabVal = elemV.doubleValue();
-                constrBody.set(tabI, numbEqus + numbEqus + tabJ, negs[tabI] ? -tabVal : tabVal);
+                constrBody.set(tabI, numbEqus + numbEqus + tabJ, retVal.negative[tabI] ? -tabVal : tabVal);
             }
         }
 
@@ -100,7 +97,8 @@ final class DualSimplex extends SimplexSolver {
             obj.set(numbEqus + numbEqus + j, convexBI.doubleValue(j));
         }
 
-        // BasicLogger.debug("Dual", retVal);
+        //        BasicLogger.debug("Dual", retVal);
+        //        BasicLogger.debug("Negs (dual): {}", Arrays.toString(retVal.negative));
 
         return retVal;
     }

@@ -58,9 +58,17 @@ public class PrimalDualTest extends OptimisationLinearTests {
         PrimalSimplex solver2 = new PrimalSimplex(primTab2, model.options);
         DualSimplex solver3 = new DualSimplex(primTab3, model.options);
 
-        Result result1 = LINEAR_INTEGRATION.toModelState(solver1.solve(), model);
-        Result result2 = PrimalSimplex.toConvexState(solver2.solve(), convex);
-        Result result3 = DualSimplex.toConvexState(solver3.solve(), convex);
+        Result solve1 = solver1.solve();
+        Result solve2 = solver2.solve();
+        Result solve3 = solver3.solve();
+
+        BasicLogger.debug(solve1);
+        BasicLogger.debug(solve2);
+        BasicLogger.debug(solve3);
+
+        Result result1 = LINEAR_INTEGRATION.toModelState(solve1, model);
+        Result result2 = PrimalSimplex.toConvexState(solve2, convex);
+        Result result3 = DualSimplex.toConvexState(solve3, convex);
 
         BasicLogger.debug(result1);
         BasicLogger.debug(result2);
@@ -129,6 +137,11 @@ public class PrimalDualTest extends OptimisationLinearTests {
     private void doCompare(final ExpressionsBasedModel primModel, final ExpressionsBasedModel dualModel, final double optimalValue,
             final DenseArray<Double> optimalX, final DenseArray<Double> optimalY) {
 
+        if (DEBUG) {
+            primModel.options.debug(LinearSolver.class);
+            dualModel.options.debug(LinearSolver.class);
+        }
+
         Result primResult = primModel.maximise();
         Result dualResult = dualModel.minimise();
 
@@ -145,25 +158,35 @@ public class PrimalDualTest extends OptimisationLinearTests {
         ConvexSolver.copy(dualModel, dualConvex);
 
         Result primModelPrimSolver = PrimalSimplex.solve(primConvex, primModel.options);
-        Result primModelDualSolver = DualSimplex.solve(primConvex, primModel.options);
+        Result primModelDualSolver = DualSimplex.solve(primConvex, dualModel.options);
         Result dualModelPrimSolver = PrimalSimplex.solve(dualConvex, dualModel.options);
-        Result dualModelDualSolver = DualSimplex.solve(dualConvex, dualModel.options);
+        Result dualModelDualSolver = DualSimplex.solve(dualConvex, primModel.options);
 
         if (DEBUG) {
 
             BasicLogger.debug();
             BasicLogger.debug("Result/Solution");
-            BasicLogger.debug(primModelPrimSolver);
-            BasicLogger.debug(primModelDualSolver);
-            BasicLogger.debug(dualModelPrimSolver);
-            BasicLogger.debug(dualModelDualSolver);
+            BasicLogger.debug("\tMultipliers");
 
             BasicLogger.debug();
-            BasicLogger.debug("Multipliers");
-            BasicLogger.debug(primModelPrimSolver.getMultipliers().get());
-            BasicLogger.debug(primModelDualSolver.getMultipliers().get());
-            BasicLogger.debug(dualModelPrimSolver.getMultipliers().get());
-            BasicLogger.debug(dualModelDualSolver.getMultipliers().get());
+            BasicLogger.debug("primModelPrimSolver");
+            BasicLogger.debug(primModelPrimSolver);
+            BasicLogger.debug("\t" + primModelPrimSolver.getMultipliers().get());
+
+            BasicLogger.debug();
+            BasicLogger.debug("primModelDualSolver");
+            BasicLogger.debug(primModelDualSolver);
+            BasicLogger.debug("\t" + primModelDualSolver.getMultipliers().get());
+
+            BasicLogger.debug();
+            BasicLogger.debug("dualModelPrimSolver");
+            BasicLogger.debug(dualModelPrimSolver);
+            BasicLogger.debug("\t" + dualModelPrimSolver.getMultipliers().get());
+
+            BasicLogger.debug();
+            BasicLogger.debug("dualModelDualSolver");
+            BasicLogger.debug(dualModelDualSolver);
+            BasicLogger.debug("\t" + dualModelDualSolver.getMultipliers().get());
         }
 
         TestUtils.assertStateAndSolution(primResult, primModelPrimSolver);
@@ -171,10 +194,8 @@ public class PrimalDualTest extends OptimisationLinearTests {
         TestUtils.assertStateAndSolution(dualResult, dualModelPrimSolver);
         TestUtils.assertStateAndSolution(dualResult, dualModelDualSolver);
 
-        TestUtils.assertEquals(dualResult, primModelDualSolver.getMultipliers().get());
-        TestUtils.assertEquals(dualResult, primModelPrimSolver.getMultipliers().get());
-        TestUtils.assertEquals(primResult, dualModelPrimSolver.getMultipliers().get());
-        TestUtils.assertEquals(primResult, dualModelDualSolver.getMultipliers().get());
+        TestUtils.assertEquals(primModelPrimSolver.getMultipliers().get(), primModelDualSolver.getMultipliers().get());
+        TestUtils.assertEquals(dualModelPrimSolver.getMultipliers().get(), dualModelDualSolver.getMultipliers().get());
     }
 
 }

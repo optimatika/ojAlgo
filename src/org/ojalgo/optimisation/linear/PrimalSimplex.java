@@ -84,7 +84,9 @@ final class PrimalSimplex extends SimplexSolver {
 
         for (int i = 0; i < numbEqus; i++) {
             double rhs = convexBE.doubleValue(i);
-            boolean neg = NumberContext.compare(rhs, ZERO) < 0;
+
+            boolean neg = retVal.negative[i] = NumberContext.compare(rhs, ZERO) < 0;
+
             for (int j = 0; j < numbVars; j++) {
                 double valA = convexAE.doubleValue(i, j);
                 constrBody.set(i, j, neg ? -valA : valA);
@@ -100,7 +102,9 @@ final class PrimalSimplex extends SimplexSolver {
             int r = i;
             SparseArray<Double> row = convexAI.getRow(r);
             double rhs = convexBI.doubleValue(r);
-            boolean neg = NumberContext.compare(rhs, ZERO) < 0;
+
+            boolean neg = retVal.negative[numbEqus + r] = NumberContext.compare(rhs, ZERO) < 0;
+
             row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
             row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
             constrBody.set(numbEqus + r, numbVars + numbVars + r, neg ? NEG : ONE);
@@ -108,6 +112,7 @@ final class PrimalSimplex extends SimplexSolver {
         }
 
         // BasicLogger.debug("Primal", retVal);
+        // BasicLogger.debug("Negs (primal): {}", negs);
 
         return retVal;
     }

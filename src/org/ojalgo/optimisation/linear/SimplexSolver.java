@@ -177,7 +177,30 @@ public abstract class SimplexSolver extends LinearSolver {
     }
 
     protected Access1D<?> extractMultipliers() {
-        return myTableau.sliceDualVariables();
+
+        Access1D<Double> duals = myTableau.sliceDualVariables();
+        boolean[] negative = myTableau.negative;
+
+        return new Access1D<Double>() {
+
+            public long count() {
+                return negative.length;
+            }
+
+            public double doubleValue(final long index) {
+                int i = Math.toIntExact(index);
+                return negative[i] ? -duals.doubleValue(index) : duals.doubleValue(index);
+            }
+
+            public Double get(final long index) {
+                return this.doubleValue(index);
+            }
+
+            @Override
+            public String toString() {
+                return Access1D.toString(this);
+            }
+        };
     }
 
     /**
