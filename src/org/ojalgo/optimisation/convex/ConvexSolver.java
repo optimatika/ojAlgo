@@ -312,7 +312,9 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         public Builder objective(final MatrixStore<Double> mtrxQ, final MatrixStore<Double> mtrxC) {
 
-            // ProgrammingError.throwIfNull(mtrxQ);
+            if ((mtrxQ == null) && (mtrxC == null)) {
+                ProgrammingError.throwWithMessage("Both parameters can't be null!");
+            }
 
             if (mtrxQ == null) {
                 myQ = PrimitiveDenseStore.FACTORY.makeZero(mtrxC.count(), mtrxC.count());
@@ -322,7 +324,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
                 myQ = mtrxQ.copy();
             }
 
-            myC = mtrxC != null ? mtrxC : MatrixStore.PRIMITIVE.makeZero((int) mtrxQ.countRows(), 1).get();
+            myC = mtrxC != null ? mtrxC : MatrixStore.PRIMITIVE.makeZero(mtrxQ.countRows(), 1).get();
 
             return this;
         }

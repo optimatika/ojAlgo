@@ -62,20 +62,26 @@ public class PrimalDualTest extends OptimisationLinearTests {
         Result solve2 = solver2.solve();
         Result solve3 = solver3.solve();
 
-        BasicLogger.debug(solve1);
-        BasicLogger.debug(solve2);
-        BasicLogger.debug(solve3);
+        if (DEBUG) {
+            BasicLogger.debug(solve1);
+            BasicLogger.debug(solve2);
+            BasicLogger.debug(solve3);
+
+        }
 
         Result result1 = LINEAR_INTEGRATION.toModelState(solve1, model);
         Result result2 = PrimalSimplex.toConvexState(solve2, convex);
         Result result3 = DualSimplex.toConvexState(solve3, convex);
 
-        BasicLogger.debug(result1);
-        BasicLogger.debug(result2);
-        BasicLogger.debug(result3);
+        if (DEBUG) {
 
-        BasicLogger.debug(result2.getMultipliers().get());
-        BasicLogger.debug(result3.getMultipliers().get());
+            BasicLogger.debug(result1);
+            BasicLogger.debug(result2);
+            BasicLogger.debug(result3);
+
+            BasicLogger.debug(result2.getMultipliers().get());
+            BasicLogger.debug(result3.getMultipliers().get());
+        }
 
         TestUtils.assertStateAndSolution(result1, result2);
         TestUtils.assertStateAndSolution(result1, result3);
