@@ -1558,6 +1558,7 @@ public class NextGenSysModTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testSequentialCase020A() {
         this.doTestSequential(CASE_020A);
     }

@@ -144,8 +144,8 @@ public class PrimalDualTest extends OptimisationLinearTests {
             final DenseArray<Double> optimalX, final DenseArray<Double> optimalY) {
 
         if (DEBUG) {
-            primModel.options.debug(LinearSolver.class);
-            dualModel.options.debug(LinearSolver.class);
+            //            primModel.options.debug(LinearSolver.class);
+            //            dualModel.options.debug(LinearSolver.class);
         }
 
         Result primResult = primModel.maximise();
