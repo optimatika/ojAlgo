@@ -46,12 +46,11 @@ public class PrimalDualTest extends OptimisationLinearTests {
 
         ExpressionsBasedModel model = ConvexProblems.buildP20080117();
 
-        boolean minimise = true;
-
-        this.doEvaluate(model, minimise);
+        this.doEvaluate(model, true);
     }
 
     private void doEvaluate(final ExpressionsBasedModel model, final boolean minimise) {
+
         Result modResult = minimise ? model.minimise() : model.maximise();
 
         ConvexSolver.Builder convex = ConvexSolver.getBuilder();
@@ -80,7 +79,7 @@ public class PrimalDualTest extends OptimisationLinearTests {
      * http://courses.mai.liu.se/GU/TAOP88/Fo/h-TAOP88_04_LPdual.pdf
      */
     @Test
-    public void testTAOP88() {
+    public void testCaseLIU() {
 
         ExpressionsBasedModel primModel = new ExpressionsBasedModel();
         Variable x1 = primModel.addVariable("X1").lower(0).weight(4);
@@ -99,6 +98,60 @@ public class PrimalDualTest extends OptimisationLinearTests {
         double optimalValue = 36.0;
         DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 3.0, 8.0 });
         DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 0.2, 0.0, 0.6 });
+
+        this.doCompare(primModel, dualModel, optimalValue, optimalX, optimalY);
+    }
+
+    /**
+     * https://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15859-f11/www/notes/lecture05.pdf
+     */
+    @Test
+    public void testCaseCMU() {
+
+        ExpressionsBasedModel primModel = new ExpressionsBasedModel();
+        Variable x1 = primModel.addVariable("X1").lower(0).weight(2);
+        Variable x2 = primModel.addVariable("X2").lower(0).weight(3);
+        primModel.addExpression().set(x1, 4).set(x2, 8).upper(12);
+        primModel.addExpression().set(x1, 2).set(x2, 1).upper(3);
+        primModel.addExpression().set(x1, 3).set(x2, 2).upper(4);
+
+        ExpressionsBasedModel dualModel = new ExpressionsBasedModel();
+        Variable y1 = dualModel.addVariable("Y1").lower(0).weight(12);
+        Variable y2 = dualModel.addVariable("Y2").lower(0).weight(3);
+        Variable y3 = dualModel.addVariable("Y3").lower(0).weight(4);
+        dualModel.addExpression().set(y1, 4).set(y2, 2).set(y3, 3).lower(2);
+        dualModel.addExpression().set(y1, 8).set(y2, 1).set(y3, 2).lower(3);
+
+        double optimalValue = 4.75;
+        DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 0.5, 1.25 });
+        DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 5.0 / 16.0, 0.0, 0.25 });
+
+        this.doCompare(primModel, dualModel, optimalValue, optimalX, optimalY);
+    }
+
+    /**
+     * http://web.mit.edu/15.053/www/AMP-Chapter-04.pdf
+     */
+    @Test
+    public void testCaseMIT() {
+
+        ExpressionsBasedModel primModel = new ExpressionsBasedModel();
+        Variable x1 = primModel.addVariable("X1").lower(0).weight(6);
+        Variable x2 = primModel.addVariable("X2").lower(0).weight(14);
+        Variable x3 = primModel.addVariable("X3").lower(0).weight(13);
+        primModel.addExpression().set(x1, 0.5).set(x2, 2.0).set(x3, 1.0).upper(24);
+        primModel.addExpression().set(x1, 1.0).set(x2, 2.0).set(x3, 4.0).upper(60);
+
+        ExpressionsBasedModel dualModel = new ExpressionsBasedModel();
+        Variable y1 = dualModel.addVariable("Y1").lower(0).weight(24);
+        Variable y2 = dualModel.addVariable("Y2").lower(0).weight(60);
+        dualModel.addExpression().set(y1, 0.5).set(y2, 1).lower(6);
+        dualModel.addExpression().set(y1, 2).set(y2, 2).lower(14);
+        dualModel.addExpression().set(y1, 1).set(y2, 4).lower(13);
+
+        double optimalValue = 294.0;
+        DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 36.0, 0.0, 6.0 });
+        DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 11, 0.5 });
 
         this.doCompare(primModel, dualModel, optimalValue, optimalX, optimalY);
     }
