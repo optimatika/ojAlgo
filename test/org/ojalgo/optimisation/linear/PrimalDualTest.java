@@ -46,47 +46,34 @@ public class PrimalDualTest extends OptimisationLinearTests {
 
         ExpressionsBasedModel model = ConvexProblems.buildP20080117();
 
+        boolean minimise = true;
+
+        this.doEvaluate(model, minimise);
+    }
+
+    private void doEvaluate(final ExpressionsBasedModel model, final boolean minimise) {
+        Result modResult = minimise ? model.minimise() : model.maximise();
+
         ConvexSolver.Builder convex = ConvexSolver.getBuilder();
         ConvexSolver.copy(model, convex);
 
-        SimplexTableau primTab1 = PrimalSimplex.build(model);
-        SimplexTableau primTab2 = PrimalSimplex.build(convex, model.options);
-        SimplexTableau primTab3 = DualSimplex.build(convex, model.options);
-
-        PrimalSimplex solver1 = new PrimalSimplex(primTab1, model.options);
-
-        PrimalSimplex solver2 = new PrimalSimplex(primTab2, model.options);
-        DualSimplex solver3 = new DualSimplex(primTab3, model.options);
-
-        Result solve1 = solver1.solve();
-        Result solve2 = solver2.solve();
-        Result solve3 = solver3.solve();
-
-        if (DEBUG) {
-            BasicLogger.debug(solve1);
-            BasicLogger.debug(solve2);
-            BasicLogger.debug(solve3);
-
-        }
-
-        Result result1 = LINEAR_INTEGRATION.toModelState(solve1, model);
-        Result result2 = PrimalSimplex.toConvexState(solve2, convex);
-        Result result3 = DualSimplex.toConvexState(solve3, convex);
+        Result primResult = PrimalSimplex.solve(convex, model.options);
+        Result dualResult = DualSimplex.solve(convex, model.options);
 
         if (DEBUG) {
 
-            BasicLogger.debug(result1);
-            BasicLogger.debug(result2);
-            BasicLogger.debug(result3);
+            BasicLogger.debug(modResult);
+            BasicLogger.debug(primResult);
+            BasicLogger.debug(dualResult);
 
-            BasicLogger.debug(result2.getMultipliers().get());
-            BasicLogger.debug(result3.getMultipliers().get());
+            BasicLogger.debug(primResult.getMultipliers().get());
+            BasicLogger.debug(dualResult.getMultipliers().get());
         }
 
-        TestUtils.assertStateAndSolution(result1, result2);
-        TestUtils.assertStateAndSolution(result1, result3);
+        TestUtils.assertStateAndSolution(modResult, primResult);
+        TestUtils.assertStateAndSolution(modResult, dualResult);
 
-        TestUtils.assertEquals(result2.getMultipliers().get(), result3.getMultipliers().get());
+        TestUtils.assertEquals(primResult.getMultipliers().get(), dualResult.getMultipliers().get());
     }
 
     /**
