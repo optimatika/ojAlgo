@@ -24,12 +24,15 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.math.MathContext;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20050125Case;
@@ -39,6 +42,7 @@ import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
@@ -49,7 +53,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class EigenvalueTest {
 
-    static final class EvD {
+    static class EvD {
 
         DiagonalStore<?, ?> D;
 
@@ -65,34 +69,34 @@ public class EigenvalueTest {
     @Test
     public void testP20050125Case() {
 
-        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.copy(P20050125Case.getProblematic());
+        PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.copy(P20050125Case.getProblematic());
 
         TestUtils.assertTrue(MatrixUtils.isHermitian(tmpOriginalMatrix));
 
-        final Eigenvalue<Double>[] tmpDecomps = MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric();
-        for (final Eigenvalue<Double> tmpDecomp : tmpDecomps) {
+        Eigenvalue<Double>[] tmpDecomps = MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric();
+        for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
             tmpDecomp.decompose(tmpOriginalMatrix);
         }
 
         if (MatrixDecompositionTests.DEBUG) {
 
             BasicLogger.debug("Eigenvalues");
-            for (final Eigenvalue<Double> tmpDecomp : tmpDecomps) {
+            for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
                 BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + tmpDecomp.getEigenvalues().toString());
             }
 
             BasicLogger.debug("D");
-            for (final Eigenvalue<Double> tmpDecomp : tmpDecomps) {
+            for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
                 BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + PrimitiveDenseStore.FACTORY.copy(tmpDecomp.getD()));
             }
 
             BasicLogger.debug("V");
-            for (final Eigenvalue<Double> tmpDecomp : tmpDecomps) {
+            for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
                 BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + PrimitiveDenseStore.FACTORY.copy(tmpDecomp.getV()));
             }
         }
 
-        for (final Eigenvalue<Double> tmpDecomp : tmpDecomps) {
+        for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
             TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp, new NumberContext(7, 6));
         }
     }
@@ -100,25 +104,25 @@ public class EigenvalueTest {
     @Test
     public void testP20061119Case() {
 
-        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.copy(P20061119Case.getProblematic());
+        PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.copy(P20061119Case.getProblematic());
 
-        final ComplexNumber tmp00 = ComplexNumber.valueOf(26.14421883828456);
-        final ComplexNumber tmp11 = ComplexNumber.of(2.727890580857718, 3.6223578444417908);
-        final ComplexNumber tmp22 = tmp11.conjugate();
-        final ComplexNumber tmp33 = ComplexNumber.ZERO;
-        final ComplexNumber tmp44 = tmp33;
+        ComplexNumber tmp00 = ComplexNumber.valueOf(26.14421883828456);
+        ComplexNumber tmp11 = ComplexNumber.of(2.727890580857718, 3.6223578444417908);
+        ComplexNumber tmp22 = tmp11.conjugate();
+        ComplexNumber tmp33 = ComplexNumber.ZERO;
+        ComplexNumber tmp44 = tmp33;
 
-        final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33, tmp44 });
-        final NumberContext accuracyContext = new NumberContext(7, 6);
+        Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33, tmp44 });
+        NumberContext accuracyContext = new NumberContext(7, 6);
 
         MatrixStore<Double> tmpRecreatedMatrix;
 
-        final Eigenvalue<Double> tmpDecomposition = Eigenvalue.PRIMITIVE.make(tmpOriginalMatrix);
+        Eigenvalue<Double> tmpDecomposition = Eigenvalue.PRIMITIVE.make(tmpOriginalMatrix);
         tmpDecomposition.decompose(tmpOriginalMatrix);
 
-        final Array1D<ComplexNumber> tmpEigenvalues = tmpDecomposition.getEigenvalues();
-        final MatrixStore<Double> tmpD = tmpDecomposition.getD();
-        final MatrixStore<Double> tmpV = tmpDecomposition.getV();
+        Array1D<ComplexNumber> tmpEigenvalues = tmpDecomposition.getEigenvalues();
+        MatrixStore<Double> tmpD = tmpDecomposition.getD();
+        MatrixStore<Double> tmpV = tmpDecomposition.getV();
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("Eigenvalues = {}", tmpEigenvalues);
@@ -138,65 +142,65 @@ public class EigenvalueTest {
         TestUtils.assertEquals(tmpExpectedDiagonal, tmpEigenvalues, accuracyContext);
 
         tmpDecomposition.computeValuesOnly(tmpOriginalMatrix);
-        final Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpDecomposition.getEigenvalues();
+        Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpDecomposition.getEigenvalues();
         TestUtils.assertEquals(tmpExpectedDiagonal, tmpEigenvaluesOnly, accuracyContext);
     }
 
     @Test
     public void testPaulsMathNote() {
 
-        final double[][] tmpData = new double[][] { { 3, -9 }, { 4, -3 } };
-        final PrimitiveDenseStore tmpA = PrimitiveDenseStore.FACTORY.rows(tmpData);
-        final int tmpLength = tmpData.length;
+        double[][] tmpData = new double[][] { { 3, -9 }, { 4, -3 } };
+        PrimitiveDenseStore tmpA = PrimitiveDenseStore.FACTORY.rows(tmpData);
+        int tmpLength = tmpData.length;
 
-        final Array1D<ComplexNumber> tmpExpVals = Array1D.COMPLEX.makeZero(2);
+        Array1D<ComplexNumber> tmpExpVals = Array1D.COMPLEX.makeZero(2);
         tmpExpVals.set(0, ComplexNumber.of(0.0, THREE * PrimitiveMath.SQRT.invoke(THREE)));
         tmpExpVals.set(1, tmpExpVals.get(0).conjugate());
 
-        final Array2D<ComplexNumber> tmpExpVecs = Array2D.COMPLEX.makeZero(2, 2);
+        Array2D<ComplexNumber> tmpExpVecs = Array2D.COMPLEX.makeZero(2, 2);
         tmpExpVecs.set(0, 0, ComplexNumber.of(THREE, ZERO));
         tmpExpVecs.set(1, 0, ComplexNumber.of(ONE, -PrimitiveMath.SQRT.invoke(THREE)));
         tmpExpVecs.set(0, 1, ComplexNumber.of(THREE, ZERO));
         tmpExpVecs.set(1, 1, ComplexNumber.of(ONE, PrimitiveMath.SQRT.invoke(THREE)));
 
-        final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(tmpA, false);
+        Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(tmpA, false);
         tmpEvD.decompose(tmpA);
 
-        final MatrixStore<Double> tmpD = tmpEvD.getD();
-        final MatrixStore<Double> tmpV = tmpEvD.getV();
+        MatrixStore<Double> tmpD = tmpEvD.getD();
+        MatrixStore<Double> tmpV = tmpEvD.getV();
 
-        final Array1D<ComplexNumber> tmpValues = tmpEvD.getEigenvalues();
-        final MatrixStore<ComplexNumber> tmpVectors = tmpEvD.getEigenvectors();
+        Array1D<ComplexNumber> tmpValues = tmpEvD.getEigenvalues();
+        MatrixStore<ComplexNumber> tmpVectors = tmpEvD.getEigenvectors();
 
         TestUtils.assertEquals(tmpExpVals, tmpValues);
         for (int j = 0; j < tmpLength; j++) {
-            final Array1D<ComplexNumber> tmpSliceColumn = tmpExpVecs.sliceColumn(0, j);
-            final Access1D<ComplexNumber> tmpActual = tmpVectors.sliceColumn(0, j);
+            Array1D<ComplexNumber> tmpSliceColumn = tmpExpVecs.sliceColumn(0, j);
+            Access1D<ComplexNumber> tmpActual = tmpVectors.sliceColumn(0, j);
 
-            final ComplexNumber tmpFactor = tmpActual.get(0).divide(tmpSliceColumn.get(0));
+            ComplexNumber tmpFactor = tmpActual.get(0).divide(tmpSliceColumn.get(0));
 
             TestUtils.assertEquals(tmpSliceColumn.get(1).multiply(tmpFactor), tmpActual.get(1));
         }
 
-        final GenericDenseStore<ComplexNumber> tmpCmplA = GenericDenseStore.COMPLEX.copy(tmpA);
-        final GenericDenseStore<ComplexNumber> tmpCmplD = GenericDenseStore.COMPLEX.copy(tmpD);
-        final GenericDenseStore<ComplexNumber> tmpCmplV = GenericDenseStore.COMPLEX.copy(tmpV);
+        GenericDenseStore<ComplexNumber> tmpCmplA = GenericDenseStore.COMPLEX.copy(tmpA);
+        GenericDenseStore<ComplexNumber> tmpCmplD = GenericDenseStore.COMPLEX.copy(tmpD);
+        GenericDenseStore<ComplexNumber> tmpCmplV = GenericDenseStore.COMPLEX.copy(tmpV);
 
-        final MatrixStore<ComplexNumber> tmpExp1 = tmpCmplA.multiply(tmpCmplV);
-        final MatrixStore<ComplexNumber> tmpAct1 = tmpCmplV.multiply(tmpCmplD);
+        MatrixStore<ComplexNumber> tmpExp1 = tmpCmplA.multiply(tmpCmplV);
+        MatrixStore<ComplexNumber> tmpAct1 = tmpCmplV.multiply(tmpCmplD);
         TestUtils.assertEquals(tmpExp1, tmpAct1);
 
-        final GenericDenseStore<ComplexNumber> tmpComplexD = GenericDenseStore.COMPLEX.makeZero(tmpLength, tmpLength);
+        GenericDenseStore<ComplexNumber> tmpComplexD = GenericDenseStore.COMPLEX.makeZero(tmpLength, tmpLength);
         for (int j = 0; j < tmpLength; j++) {
             tmpComplexD.set(j, j, tmpValues.get(j));
         }
 
-        final MatrixStore<ComplexNumber> tmpExp2 = tmpCmplA.multiply(tmpVectors);
-        final MatrixStore<ComplexNumber> tmpAct2 = tmpVectors.multiply(tmpComplexD);
+        MatrixStore<ComplexNumber> tmpExp2 = tmpCmplA.multiply(tmpVectors);
+        MatrixStore<ComplexNumber> tmpAct2 = tmpVectors.multiply(tmpComplexD);
         TestUtils.assertEquals(tmpExp2, tmpAct2);
 
         tmpEvD.computeValuesOnly(tmpA);
-        final Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpEvD.getEigenvalues();
+        Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpEvD.getEigenvalues();
         TestUtils.assertEquals(tmpValues, tmpEigenvaluesOnly);
 
     }
@@ -204,42 +208,42 @@ public class EigenvalueTest {
     @Test
     public void testPrimitiveAsComplex() {
 
-        final double[][] tmpData = new double[][] { { 1, 0, 3 }, { 0, 4, 1 }, { -5, 1, 0 } };
-        final PrimitiveDenseStore tmpA = PrimitiveDenseStore.FACTORY.rows(tmpData);
+        double[][] tmpData = new double[][] { { 1, 0, 3 }, { 0, 4, 1 }, { -5, 1, 0 } };
+        PrimitiveDenseStore tmpA = PrimitiveDenseStore.FACTORY.rows(tmpData);
 
-        final int tmpLength = tmpData.length;
+        int tmpLength = tmpData.length;
 
-        final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(tmpA, false);
+        Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(tmpA, false);
 
         tmpEvD.decompose(tmpA);
 
-        final MatrixStore<Double> tmpD = tmpEvD.getD();
-        final MatrixStore<Double> tmpV = tmpEvD.getV();
+        MatrixStore<Double> tmpD = tmpEvD.getD();
+        MatrixStore<Double> tmpV = tmpEvD.getV();
 
-        final Array1D<ComplexNumber> tmpValues = tmpEvD.getEigenvalues();
-        final MatrixStore<ComplexNumber> tmpVectors = tmpEvD.getEigenvectors();
+        Array1D<ComplexNumber> tmpValues = tmpEvD.getEigenvalues();
+        MatrixStore<ComplexNumber> tmpVectors = tmpEvD.getEigenvectors();
 
-        final GenericDenseStore<ComplexNumber> tmpCmplA = GenericDenseStore.COMPLEX.copy(tmpA);
-        final GenericDenseStore<ComplexNumber> tmpCmplD = GenericDenseStore.COMPLEX.copy(tmpD);
-        final GenericDenseStore<ComplexNumber> tmpCmplV = GenericDenseStore.COMPLEX.copy(tmpV);
+        GenericDenseStore<ComplexNumber> tmpCmplA = GenericDenseStore.COMPLEX.copy(tmpA);
+        GenericDenseStore<ComplexNumber> tmpCmplD = GenericDenseStore.COMPLEX.copy(tmpD);
+        GenericDenseStore<ComplexNumber> tmpCmplV = GenericDenseStore.COMPLEX.copy(tmpV);
 
-        final MatrixStore<ComplexNumber> tmpExp1 = tmpCmplA.multiply(tmpCmplV);
-        final MatrixStore<ComplexNumber> tmpAct1 = tmpCmplV.multiply(tmpCmplD);
+        MatrixStore<ComplexNumber> tmpExp1 = tmpCmplA.multiply(tmpCmplV);
+        MatrixStore<ComplexNumber> tmpAct1 = tmpCmplV.multiply(tmpCmplD);
         TestUtils.assertEquals(tmpExp1, tmpAct1);
 
-        final GenericDenseStore<ComplexNumber> tmpAltD = GenericDenseStore.COMPLEX.makeZero(tmpLength, tmpLength);
-        final MatrixStore<ComplexNumber> tmpAltV = tmpVectors;
+        GenericDenseStore<ComplexNumber> tmpAltD = GenericDenseStore.COMPLEX.makeZero(tmpLength, tmpLength);
+        MatrixStore<ComplexNumber> tmpAltV = tmpVectors;
 
         for (int j = 0; j < tmpLength; j++) {
             tmpAltD.set(j, j, tmpValues.get(j));
         }
 
-        final MatrixStore<ComplexNumber> tmpExp2 = tmpCmplA.multiply(tmpAltV);
-        final MatrixStore<ComplexNumber> tmpAct2 = tmpAltV.multiply(tmpAltD);
+        MatrixStore<ComplexNumber> tmpExp2 = tmpCmplA.multiply(tmpAltV);
+        MatrixStore<ComplexNumber> tmpAct2 = tmpAltV.multiply(tmpAltD);
         TestUtils.assertEquals(tmpExp2, tmpAct2);
 
         tmpEvD.computeValuesOnly(tmpA);
-        final Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpEvD.getEigenvalues();
+        Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpEvD.getEigenvalues();
         TestUtils.assertEquals(tmpValues, tmpEigenvaluesOnly);
     }
 
@@ -249,40 +253,80 @@ public class EigenvalueTest {
     @Test
     public void testProblemFoundInTheWild() {
 
-        final PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
+        PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
 
-        for (final Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getPrimitiveEigenvalueGeneral()) {
+        for (Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getPrimitiveEigenvalueGeneral()) {
 
             tmpEigenvalue.decompose(matrix);
 
             TestUtils.assertEquals(matrix, tmpEigenvalue, NumberContext.getGeneral(MathContext.DECIMAL64));
 
-            final Array1D<ComplexNumber> tmpValues = tmpEigenvalue.getEigenvalues();
+            Array1D<ComplexNumber> tmpValues = tmpEigenvalue.getEigenvalues();
 
             tmpEigenvalue.computeValuesOnly(matrix);
-            final Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpEigenvalue.getEigenvalues();
+            Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpEigenvalue.getEigenvalues();
             TestUtils.assertEquals(tmpValues, tmpEigenvaluesOnly);
 
         }
     }
 
     @Test
+    public void testRandomGeneralisedSymmetric() throws RecoverableCondition {
+
+        NumberContext accuracy = NumberContext.getGeneral(MathContext.DECIMAL32);
+
+        for (int dim = 2; dim < 10; dim++) {
+
+            PrimitiveDenseStore mtrxA = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+            PrimitiveDenseStore mtrxB = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+
+            Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(mtrxB);
+            cholesky.decompose(mtrxB);
+
+            MatrixStore<Double> compL = cholesky.getL();
+            MatrixStore<Double> compU = cholesky.getR();
+
+            MatrixStore<Double> mtrxC = SolverTask.PRIMITIVE.solve(compL, SolverTask.PRIMITIVE.solve(compL, mtrxA).transpose());
+
+            Eigenvalue<Double> eigenvalue = Eigenvalue.PRIMITIVE.make(mtrxC, true);
+            eigenvalue.decompose(mtrxC);
+            TestUtils.assertEquals(mtrxC, eigenvalue, accuracy);
+
+            double[] values = new double[dim];
+            eigenvalue.getEigenvalues(values, Optional.empty());
+
+            MatrixStore<Double> vectorsY = eigenvalue.getV();
+
+            MatrixStore<Double> leftY = mtrxC.multiply(vectorsY);
+            MatrixStore<Double> scales = leftY.operateOnMatching(DIVIDE, vectorsY).get();
+            MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).get();
+            TestUtils.assertEquals(values, averages, accuracy);
+
+            MatrixStore<Double> vectorsZ = SolverTask.PRIMITIVE.solve(compU, vectorsY);
+
+            MatrixStore<Double> leftZ = mtrxA.multiply(vectorsZ);
+            MatrixStore<Double> rightZ = mtrxB.multiply(vectorsZ);
+            TestUtils.assertEquals(scales, leftZ.operateOnMatching(DIVIDE, rightZ).get(), accuracy);
+        }
+    }
+
+    @Test
     public void testRandomSymmetricValuesOnly() {
 
-        final NumberContext evaluationContext = NumberContext.getGeneral(MathContext.DECIMAL32);
+        NumberContext evaluationContext = NumberContext.getGeneral(MathContext.DECIMAL32);
 
         for (int dim = 1; dim < 10; dim++) {
 
-            final PrimitiveDenseStore matrix = MatrixUtils.makeSPD(dim);
+            PrimitiveDenseStore matrix = MatrixUtils.makeSPD(dim);
 
-            for (final Eigenvalue<Double> decomp : MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric()) {
+            for (Eigenvalue<Double> decomp : MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric()) {
 
                 decomp.decompose(matrix);
                 TestUtils.assertEquals(matrix, decomp, evaluationContext);
 
-                final Array1D<ComplexNumber> expected = decomp.getEigenvalues();
+                Array1D<ComplexNumber> expected = decomp.getEigenvalues();
                 decomp.computeValuesOnly(matrix);
-                final Array1D<ComplexNumber> actual = decomp.getEigenvalues();
+                Array1D<ComplexNumber> actual = decomp.getEigenvalues();
                 TestUtils.assertEquals(expected, actual, evaluationContext);
             }
         }
