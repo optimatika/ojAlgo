@@ -32,6 +32,7 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ColumnView;
@@ -100,6 +101,13 @@ public class DataProcessors {
         }
 
         return retVal;
+    }
+
+    /**
+     * @param data Each of the arrays represent a variable - it contains the samples for that variable
+     */
+    public static <M extends Mutate2D> M covariances(final Factory2D<M> factory, final double[]... data) {
+        return DataProcessors.covariances(factory, new RawStore(data).transpose());
     }
 
     /**

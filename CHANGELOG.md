@@ -8,6 +8,10 @@
 
 * Added a power(int) method to the Operation.Multiplication interface.
 
+## org.ojalgo.data
+
+* Added a variant of the covariances method in DataProcessors that take `double[]...` as input.
+
 ## org.ojalgo.matrix
 
 * Various deprecations in MatrixStore.LogicalBuilder and the corresponding LogicalBuilder:s of PrimitiveMatrix, ComplexMatrix & RationalMatrix. Everything in the LogicalBuilder:s are now either defined in org.ojalgo.structure.Structure2D.Logical or deprecated.
@@ -19,11 +23,16 @@
 * New MatrixStore implementation DiagonalStore to be used for diagonal, bidiagonal and tridiagonal matrices. Replaces two different previous (package private) implementations.
 * MatrixStore.Factory has a new method makeDiagonal(...)
 * MatrixStore.LogicalBuilder has new implementations for the diagonal(), bidiagonal(boolean) and tridiagonal() methods.
+* Some improvements to TransposedStore – more efficient use of the underlying store. Particular in the case when it is a RawStore.
 
 ## org.ojalgo.optimisation
 
 * Minor rounding/precision related change to how ExpressionsBasedModel receives the solution from the solver and then returns it. The `options.solution` property is now enforced.
 * Internal refactoring of ConvexSolver and its subclasses. This includes changes in behaviour (handling of not-so-convex or otherwise difficult problems).
+
+## org.ojalgo.random
+
+* SampleSet can now swap in a `double[]`
 
 ## org.ojalgo.scalar
 

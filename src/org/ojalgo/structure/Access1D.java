@@ -315,11 +315,11 @@ public interface Access1D<N extends Number> extends Structure1D {
             }
 
             public double doubleValue(final long index) {
-                return target[(int) index];
+                return target[Math.toIntExact(index)];
             }
 
             public Double get(final long index) {
-                return target[(int) index];
+                return this.doubleValue(index);
             }
 
             @Override
