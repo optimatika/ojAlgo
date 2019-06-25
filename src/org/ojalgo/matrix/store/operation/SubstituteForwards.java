@@ -22,83 +22,136 @@
 package org.ojalgo.matrix.store.operation;
 
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 
-public final class SubstituteForwards extends MatrixOperation {
+public class SubstituteForwards extends MatrixOperation {
 
-    public static final SubstituteForwards SETUP = new SubstituteForwards();
+    public static SubstituteForwards SETUP = new SubstituteForwards();
 
     public static int THRESHOLD = 64;
 
-    public static void invoke(final double[] data, final int structure, final int first, final int limit, final Access2D<Double> body,
-            final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
+    /**
+     * @param data RHS data that will be overwritten with the solution
+     * @param structure The structure (number of rows) in data
+     * @param first The first (incl) column/solution to handle
+     * @param limit The last (excl) column/solution to handle
+     * @param body The equation system body
+     * @param unitDiagonal Assume the body has a unit diagonal
+     * @param conjugated Assume the body is a conjugsated store where the upper/right part is actually stored
+     *        in the lower/left part.
+     * @param identity Assume the RHS is an identity matrix (disregard the actual elements)
+     */
+    public static void invoke(final double[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,
+            final boolean conjugated, final boolean identity) {
 
-        final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
-        final double[] tmpBodyRow = new double[tmpDiagDim];
+        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
+        double[] bodyRow = new double[diagDim];
         double tmpVal;
-        int tmpColBaseIndex;
+        int colBaseIndex;
 
-        for (int i = 0; i < tmpDiagDim; i++) {
+        for (int i = 0; i < diagDim; i++) {
 
             for (int j = 0; j <= i; j++) {
-                tmpBodyRow[j] = conjugated ? body.doubleValue(j, i) : body.doubleValue(i, j);
+                bodyRow[j] = conjugated ? body.doubleValue(j, i) : body.doubleValue(i, j);
             }
 
             for (int s = first; s < limit; s++) {
-                tmpColBaseIndex = s * structure;
+                colBaseIndex = s * structure;
 
                 tmpVal = PrimitiveMath.ZERO;
                 for (int j = identity ? s : 0; j < i; j++) {
-                    tmpVal += tmpBodyRow[j] * data[j + tmpColBaseIndex];
+                    tmpVal += bodyRow[j] * data[j + colBaseIndex];
                 }
                 if (identity) {
                     tmpVal = i == s ? PrimitiveMath.ONE - tmpVal : -tmpVal;
                 } else {
-                    tmpVal = data[i + tmpColBaseIndex] - tmpVal;
+                    tmpVal = data[i + colBaseIndex] - tmpVal;
                 }
 
                 if (!unitDiagonal) {
-                    tmpVal /= tmpBodyRow[i];
+                    tmpVal /= bodyRow[i];
                 }
 
-                data[i + tmpColBaseIndex] = tmpVal;
+                data[i + colBaseIndex] = tmpVal;
             }
         }
     }
 
+    /**
+     * @see #invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
+     */
+    public static void invoke(final double[][] data, final Access2D<?> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
+
+        int limit = data[0].length;
+
+        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
+        double[] bodyRow = new double[diagDim];
+        double tmpVal;
+
+        for (int i = 0; i < diagDim; i++) {
+
+            for (int j = 0; j <= i; j++) {
+                bodyRow[j] = conjugated ? body.doubleValue(j, i) : body.doubleValue(i, j);
+            }
+
+            for (int s = 0; s < limit; s++) {
+
+                tmpVal = PrimitiveMath.ZERO;
+                for (int j = identity ? s : 0; j < i; j++) {
+                    tmpVal += bodyRow[j] * data[j][s];
+                }
+                if (identity) {
+                    tmpVal = i == s ? PrimitiveMath.ONE - tmpVal : -tmpVal;
+                } else {
+                    tmpVal = data[i][s] - tmpVal;
+                }
+
+                if (!unitDiagonal) {
+                    tmpVal /= bodyRow[i];
+                }
+
+                data[i][s] = tmpVal;
+            }
+        }
+    }
+
+    /**
+     * @see #invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
+     */
     public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Access2D<N> body,
             final boolean unitDiagonal, final boolean conjugated, final boolean identity, final Scalar.Factory<N> scalar) {
 
-        final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
-        final N[] tmpBodyRow = scalar.newArrayInstance(tmpDiagDim);
+        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
+        N[] bodyRow = scalar.newArrayInstance(diagDim);
         Scalar<N> tmpVal;
-        int tmpColBaseIndex;
+        int colBaseIndex;
 
-        for (int i = 0; i < tmpDiagDim; i++) {
+        for (int i = 0; i < diagDim; i++) {
 
             for (int j = 0; j <= i; j++) {
-                tmpBodyRow[j] = conjugated ? body.get(j, i).conjugate().get() : body.get(i, j);
+                bodyRow[j] = conjugated ? body.get(j, i).conjugate().get() : body.get(i, j);
             }
 
             for (int s = first; s < limit; s++) {
-                tmpColBaseIndex = s * structure;
+                colBaseIndex = s * structure;
 
                 tmpVal = scalar.zero();
                 for (int j = identity ? s : 0; j < i; j++) {
-                    tmpVal = tmpVal.add(tmpBodyRow[j].multiply(data[j + tmpColBaseIndex]));
+                    tmpVal = tmpVal.add(bodyRow[j].multiply(data[j + colBaseIndex]));
                 }
                 if (identity) {
                     tmpVal = i == s ? scalar.one().subtract(tmpVal) : tmpVal.negate();
                 } else {
-                    tmpVal = data[i + tmpColBaseIndex].subtract(tmpVal);
+                    tmpVal = data[i + colBaseIndex].subtract(tmpVal);
                 }
 
                 if (!unitDiagonal) {
-                    tmpVal = tmpVal.divide(tmpBodyRow[i]);
+                    tmpVal = tmpVal.divide(bodyRow[i]);
                 }
 
-                data[i + tmpColBaseIndex] = tmpVal.get();
+                data[i + colBaseIndex] = tmpVal.get();
             }
         }
     }

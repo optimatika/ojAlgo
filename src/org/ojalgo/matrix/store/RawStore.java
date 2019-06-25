@@ -62,7 +62,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class RawStore extends Object implements PhysicalStore<Double> {
 
-    public static PhysicalStore.Factory<Double, RawStore> FACTORY = new PhysicalStore.Factory<Double, RawStore>() {
+    public static final PhysicalStore.Factory<Double, RawStore> FACTORY = new PhysicalStore.Factory<Double, RawStore>() {
 
         public AggregatorSet<Double> aggregator() {
             return PrimitiveAggregator.getSet();
@@ -78,10 +78,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         public RawStore columns(final Access1D<?>... source) {
 
-            final int tmpRowDim = (int) source[0].count();
-            final int tmpColDim = source.length;
+            int tmpRowDim = (int) source[0].count();
+            int tmpColDim = source.length;
 
-            final double[][] retVal = new double[tmpRowDim][tmpColDim];
+            double[][] retVal = new double[tmpRowDim][tmpColDim];
 
             Access1D<?> tmpColumn;
             for (int j = 0; j < tmpColDim; j++) {
@@ -96,10 +96,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         public RawStore columns(final double[]... source) {
 
-            final int tmpRowDim = source[0].length;
-            final int tmpColDim = source.length;
+            int tmpRowDim = source[0].length;
+            int tmpColDim = source.length;
 
-            final double[][] retVal = new double[tmpRowDim][tmpColDim];
+            double[][] retVal = new double[tmpRowDim][tmpColDim];
 
             double[] tmpColumn;
             for (int j = 0; j < tmpColDim; j++) {
@@ -114,10 +114,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         public RawStore columns(final List<? extends Number>... source) {
 
-            final int tmpRowDim = source[0].size();
-            final int tmpColDim = source.length;
+            int tmpRowDim = source[0].size();
+            int tmpColDim = source.length;
 
-            final double[][] retVal = new double[tmpRowDim][tmpColDim];
+            double[][] retVal = new double[tmpRowDim][tmpColDim];
 
             List<? extends Number> tmpColumn;
             for (int j = 0; j < tmpColDim; j++) {
@@ -132,10 +132,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         public RawStore columns(final Number[]... source) {
 
-            final int tmpRowDim = source[0].length;
-            final int tmpColDim = source.length;
+            int tmpRowDim = source[0].length;
+            int tmpColDim = source.length;
 
-            final double[][] retVal = new double[tmpRowDim][tmpColDim];
+            double[][] retVal = new double[tmpRowDim][tmpColDim];
 
             Number[] tmpColumn;
             for (int j = 0; j < tmpColDim; j++) {
@@ -154,10 +154,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         public RawStore copy(final Access2D<?> source) {
 
-            final int tmpRowDim = (int) source.countRows();
-            final int tmpColDim = (int) source.countColumns();
+            int tmpRowDim = (int) source.countRows();
+            int tmpColDim = (int) source.countColumns();
 
-            final double[][] retVal = new double[tmpRowDim][tmpColDim];
+            double[][] retVal = new double[tmpRowDim][tmpColDim];
 
             MatrixUtils.copy(source, tmpRowDim, tmpColDim, retVal);
 
@@ -170,7 +170,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         public RawStore makeEye(final long rows, final long columns) {
 
-            final RawStore retVal = this.makeZero(rows, columns);
+            RawStore retVal = this.makeZero(rows, columns);
 
             retVal.fillDiagonal(0, 0, this.scalar().one().get());
 
@@ -179,7 +179,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         public RawStore makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
-            final double[][] retVal = new double[(int) rows][(int) columns];
+            double[][] retVal = new double[(int) rows][(int) columns];
 
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
@@ -208,10 +208,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         public RawStore rows(final Access1D<?>... source) {
 
-            final int tmpRowDim = source.length;
-            final int tmpColDim = (int) source[0].count();
+            int tmpRowDim = source.length;
+            int tmpColDim = (int) source[0].count();
 
-            final double[][] retVal = new double[tmpRowDim][tmpColDim];
+            double[][] retVal = new double[tmpRowDim][tmpColDim];
 
             Access1D<?> tmpSource;
             double[] tmpDestination;
@@ -228,10 +228,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         public RawStore rows(final double[]... source) {
 
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].length;
+            int tmpRowDim = source.length;
+            int tmpColDim = source[0].length;
 
-            final double[][] retVal = new double[tmpRowDim][tmpColDim];
+            double[][] retVal = new double[tmpRowDim][tmpColDim];
 
             double[] tmpSource;
             double[] tmpDestination;
@@ -248,10 +248,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         public RawStore rows(final List<? extends Number>... source) {
 
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].size();
+            int tmpRowDim = source.length;
+            int tmpColDim = source[0].size();
 
-            final double[][] retVal = new double[tmpRowDim][tmpColDim];
+            double[][] retVal = new double[tmpRowDim][tmpColDim];
 
             List<? extends Number> tmpSource;
             double[] tmpDestination;
@@ -268,10 +268,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         public RawStore rows(final Number[]... source) {
 
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].length;
+            int tmpRowDim = source.length;
+            int tmpColDim = source[0].length;
 
-            final double[][] retVal = new double[tmpRowDim][tmpColDim];
+            double[][] retVal = new double[tmpRowDim][tmpColDim];
 
             Number[] tmpSource;
             double[] tmpDestination;
@@ -292,10 +292,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         public RawStore transpose(final Access2D<?> source) {
 
-            final int tmpRowDim = (int) source.countColumns();
-            final int tmpColDim = (int) source.countRows();
+            int tmpRowDim = (int) source.countColumns();
+            int tmpColDim = (int) source.countRows();
 
-            final double[][] retVal = new double[tmpRowDim][tmpColDim];
+            double[][] retVal = new double[tmpRowDim][tmpColDim];
 
             for (int i = 0; i < tmpRowDim; i++) {
                 for (int j = 0; j < tmpColDim; j++) {
@@ -315,10 +315,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      * @exception IllegalArgumentException All rows must have the same length
      */
     public static RawStore constructWithCopy(final double[][] A) {
-        final int m = A.length;
-        final int n = A[0].length;
-        final RawStore X = new RawStore(m, n);
-        final double[][] C = X.data;
+        int m = A.length;
+        int n = A[0].length;
+        RawStore X = new RawStore(m, n);
+        double[][] C = X.data;
         for (int i = 0; i < m; i++) {
             if (A[i].length != n) {
                 throw new IllegalArgumentException("All rows must have the same length.");
@@ -338,8 +338,8 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      * @return An m-by-n matrix with uniformly distributed random elements.
      */
     public static RawStore random(final int m, final int n) {
-        final RawStore A = new RawStore(m, n);
-        final double[][] X = A.data;
+        RawStore A = new RawStore(m, n);
+        double[][] X = A.data;
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 X[i][j] = Math.random();
@@ -356,7 +356,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      * @param input the input stream.
      */
     public static RawStore read(final BufferedReader input) throws java.io.IOException {
-        final StreamTokenizer tokenizer = new StreamTokenizer(input);
+        StreamTokenizer tokenizer = new StreamTokenizer(input);
 
         // Although StreamTokenizer will parse numbers, it doesn't recognize
         // scientific notation (E or D); however, Double.valueOf does.
@@ -368,7 +368,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         tokenizer.wordChars(0, 255);
         tokenizer.whitespaceChars(0, ' ');
         tokenizer.eolIsSignificant(true);
-        final java.util.Vector<Double> vD = new java.util.Vector<>();
+        java.util.Vector<Double> vD = new java.util.Vector<>();
 
         // Ignore initial empty lines
         while (tokenizer.nextToken() == StreamTokenizer.TT_EOL) {
@@ -381,12 +381,12 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             vD.addElement(Double.valueOf(tokenizer.sval)); // Read & store 1st row.
         } while (tokenizer.nextToken() == StreamTokenizer.TT_WORD);
 
-        final int n = vD.size(); // Now we've got the number of columns!
+        int n = vD.size(); // Now we've got the number of columns!
         double row[] = new double[n];
         for (int j = 0; j < n; j++) {
             row[j] = vD.elementAt(j).doubleValue();
         }
-        final java.util.Vector<double[]> v = new java.util.Vector<>();
+        java.util.Vector<double[]> v = new java.util.Vector<>();
         v.addElement(row); // Start storing rows instead of columns.
         while (tokenizer.nextToken() == StreamTokenizer.TT_WORD) {
             // While non-empty lines
@@ -402,8 +402,8 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
                 throw new java.io.IOException("Row " + v.size() + " is too short.");
             }
         }
-        final int m = v.size(); // Now we've got the number of rows.
-        final double[][] A = new double[m][];
+        int m = v.size(); // Now we've got the number of rows.
+        double[][] A = new double[m][];
         v.copyInto(A); // copy the rows out of the vector
         return new RawStore(A);
     }
@@ -448,7 +448,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         } else {
 
-            final int tmpNumberOfColumns = (int) (structure != 0 ? (elements.count() / structure) : 0);
+            int tmpNumberOfColumns = (int) (structure != 0 ? (elements.count() / structure) : 0);
 
             if ((structure * tmpNumberOfColumns) != elements.count()) {
                 throw new IllegalArgumentException("Array length must be a multiple of structure.");
@@ -470,12 +470,12 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     private static void multiply(final double[][] product, final double[][] left, final double[][] right) {
 
-        final int tmpRowsCount = product.length;
-        final int tmpComplexity = right.length;
-        final int tmpColsCount = right[0].length;
+        int tmpRowsCount = product.length;
+        int tmpComplexity = right.length;
+        int tmpColsCount = right[0].length;
 
         double[] tmpRow;
-        final double[] tmpColumn = new double[tmpComplexity];
+        double[] tmpColumn = new double[tmpComplexity];
         for (int j = 0; j < tmpColsCount; j++) {
             for (int k = 0; k < tmpComplexity; k++) {
                 tmpColumn[k] = right[k][j];
@@ -507,7 +507,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         super();
 
-        final RawStore tmpConverted = RawStore.convert(template);
+        RawStore tmpConverted = RawStore.convert(template);
 
         data = tmpConverted.data;
 
@@ -643,7 +643,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public Double aggregateAll(final Aggregator aggregator) {
 
-        final AggregatorFunction<Double> tmpVisitor = aggregator.getFunction(PrimitiveAggregator.getSet());
+        AggregatorFunction<Double> tmpVisitor = aggregator.getFunction(PrimitiveAggregator.getSet());
 
         this.visitAll(tmpVisitor);
 
@@ -652,7 +652,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public List<Double> asList() {
 
-        final int tmpStructure = data.length;
+        int tmpStructure = data.length;
 
         return new AbstractList<Double>() {
 
@@ -663,9 +663,9 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
             @Override
             public Double set(final int index, final Double value) {
-                final int tmpRow = Structure2D.row(index, tmpStructure);
-                final int tmpColumn = Structure2D.column(index, tmpStructure);
-                final Double retVal = RawStore.this.get(tmpRow, tmpColumn);
+                int tmpRow = Structure2D.row(index, tmpStructure);
+                int tmpColumn = Structure2D.column(index, tmpStructure);
+                Double retVal = RawStore.this.get(tmpRow, tmpColumn);
                 RawStore.this.set(tmpRow, tmpColumn, value);
                 return retVal;
             }
@@ -677,7 +677,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         };
     }
 
-    public RawStore conjugate() {
+    public MatrixStore<Double> conjugate() {
         return this.transpose();
     }
 
@@ -694,8 +694,8 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      * @return Two-dimensional array copy of matrix elements.
      */
     public double[][] copyOfData() {
-        final int tmpLength = data.length;
-        final double[][] retVal = new double[tmpLength][];
+        int tmpLength = data.length;
+        double[][] retVal = new double[tmpLength][];
         for (int i = 0; i < tmpLength; i++) {
             retVal[i] = Raw1D.copyOf(data[i]);
         }
@@ -745,13 +745,13 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public void fillByMultiplying(final Access1D<Double> left, final Access1D<Double> right) {
 
-        final int complexity = Math.toIntExact(left.count() / this.countRows());
+        int complexity = Math.toIntExact(left.count() / this.countRows());
         if (complexity != Math.toIntExact(right.count() / this.countColumns())) {
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
-        final double[][] rawLeft = RawStore.extract(left, data.length);
-        final double[][] rawRight = RawStore.extract(right, complexity);
+        double[][] rawLeft = RawStore.extract(left, data.length);
+        double[][] rawRight = RawStore.extract(right, complexity);
         RawStore.multiply(data, rawLeft, rawRight);
     }
 
@@ -775,7 +775,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         double[] tmpRowI;
 
-        final int tmpRowDim = data.length;
+        int tmpRowDim = data.length;
         for (int i = 0; i < tmpRowDim; i++) {
 
             tmpRowI = data[i];
@@ -788,7 +788,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
         if (left == this) {
-            final double[][] tmpRight = RawStore.convert(right, data.length).data;
+            double[][] tmpRight = RawStore.convert(right, data.length).data;
             if (function == PrimitiveMath.ADD) {
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
@@ -817,7 +817,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
                 Raw2D.fillMatching(data, data, function, tmpRight);
             }
         } else if (right == this) {
-            final double[][] tmpLeft = RawStore.convert(left, data.length).data;
+            double[][] tmpLeft = RawStore.convert(left, data.length).data;
             if (function == PrimitiveMath.ADD) {
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
@@ -906,24 +906,24 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      * Get a submatrix.
      *
      * @param i0 Initial row index
-     * @param i1 Final row index
+     * @param i1 row index
      * @param j0 Initial column index
-     * @param j1 Final column index
+     * @param j1 column index
      * @return A(i0:i1,j0:j1)
      * @exception ArrayIndexOutOfBoundsException Submatrix indices
      * @deprecated v39
      */
     @Deprecated
     public RawStore getMatrix(final int i0, final int i1, final int j0, final int j1) {
-        final RawStore X = new RawStore((i1 - i0) + 1, (j1 - j0) + 1);
-        final double[][] B = X.data;
+        RawStore X = new RawStore((i1 - i0) + 1, (j1 - j0) + 1);
+        double[][] B = X.data;
         try {
             for (int i = i0; i <= i1; i++) {
                 for (int j = j0; j <= j1; j++) {
                     B[i - i0][j - j0] = data[i][j];
                 }
             }
-        } catch (final ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             throw new ArrayIndexOutOfBoundsException("Submatrix indices");
         }
         return X;
@@ -934,22 +934,22 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      *
      * @param r Array of row indices.
      * @param j0 Initial column index
-     * @param j1 Final column index
+     * @param j1 column index
      * @return A(r(:),j0:j1)
      * @exception ArrayIndexOutOfBoundsException Submatrix indices
      * @deprecated v39
      */
     @Deprecated
     public RawStore getMatrix(final int[] r, final int j0, final int j1) {
-        final RawStore X = new RawStore(r.length, (j1 - j0) + 1);
-        final double[][] B = X.data;
+        RawStore X = new RawStore(r.length, (j1 - j0) + 1);
+        double[][] B = X.data;
         try {
             for (int i = 0; i < r.length; i++) {
                 for (int j = j0; j <= j1; j++) {
                     B[i][j - j0] = data[r[i]][j];
                 }
             }
-        } catch (final ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             throw new ArrayIndexOutOfBoundsException("Submatrix indices");
         }
         return X;
@@ -962,7 +962,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public long indexOfLargest() {
 
-        final int tmpRowDim = data.length;
+        int tmpRowDim = data.length;
 
         int retVal = 0;
         double tmpLargest = ZERO;
@@ -986,7 +986,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public long indexOfLargestInColumn(final long row, final long col) {
 
-        final int tmpRowDim = data.length;
+        int tmpRowDim = data.length;
 
         int retVal = (int) row;
         double tmpLargest = ZERO;
@@ -1006,15 +1006,15 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public long indexOfLargestInRange(final long first, final long limit) {
 
-        final int tmpRowDim = data.length;
+        int tmpRowDim = data.length;
 
         int retVal = 0;
         double tmpLargest = ZERO;
         double tmpValue;
 
         for (int index = 0; index < this.count(); index++) {
-            final int i = Structure2D.row(index, tmpRowDim);
-            final int j = Structure2D.column(index, tmpRowDim);
+            int i = Structure2D.row(index, tmpRowDim);
+            int j = Structure2D.column(index, tmpRowDim);
             tmpValue = PrimitiveMath.ABS.invoke(data[i][j]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
@@ -1030,7 +1030,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         int retVal = (int) col;
         double tmpLargest = ZERO;
         double tmpValue;
-        final double[] tmpRow = data[(int) row];
+        double[] tmpRow = data[(int) row];
 
         for (int j = (int) col; j < myNumberOfColumns; j++) {
             tmpValue = PrimitiveMath.ABS.invoke(tmpRow[j]);
@@ -1045,7 +1045,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public long indexOfLargestOnDiagonal(final long first) {
 
-        final int tmpRowDim = data.length;
+        int tmpRowDim = data.length;
 
         int retVal = (int) (first);
         double tmpLargest = ZERO;
@@ -1063,7 +1063,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
     }
 
     public boolean isAbsolute(final long index) {
-        final int tmpRowDim = data.length;
+        int tmpRowDim = data.length;
         return PrimitiveScalar.isAbsolute(this.get(Structure2D.row(index, tmpRowDim), Structure2D.column(index, tmpRowDim)));
     }
 
@@ -1072,7 +1072,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
     }
 
     public boolean isSmall(final long index, final double comparedTo) {
-        final int tmpRowDim = data.length;
+        int tmpRowDim = data.length;
         return PrimitiveScalar.isSmall(comparedTo, this.get(Structure2D.row(index, tmpRowDim), Structure2D.column(index, tmpRowDim)));
     }
 
@@ -1090,11 +1090,11 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public void modifyDiagonal(final long row, final long col, final UnaryFunction<Double> modifier) {
 
-        final long tmpCount = Math.min(data.length - row, myNumberOfColumns - col);
+        long tmpCount = Math.min(data.length - row, myNumberOfColumns - col);
 
-        final int tmpFirst = (int) (row + (col * data.length));
-        final int tmpLimit = (int) (row + tmpCount + ((col + tmpCount) * data.length));
-        final int tmpStep = 1 + data.length;
+        int tmpFirst = (int) (row + (col * data.length));
+        int tmpLimit = (int) (row + tmpCount + ((col + tmpCount) * data.length));
+        int tmpStep = 1 + data.length;
 
         for (int ij = tmpFirst; ij < tmpLimit; ij += tmpStep) {
             this.set(ij, modifier.invoke(this.doubleValue(ij)));
@@ -1106,7 +1106,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         double[] tmpRowI;
 
-        final int tmpRowDim = data.length;
+        int tmpRowDim = data.length;
         for (int i = 0; i < tmpRowDim; i++) {
 
             tmpRowI = data[i];
@@ -1121,7 +1121,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
         double[] tmpRowI;
 
-        final int tmpRowDim = data.length;
+        int tmpRowDim = data.length;
         for (int i = 0; i < tmpRowDim; i++) {
 
             tmpRowI = data[i];
@@ -1153,13 +1153,13 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public RawStore multiply(final MatrixStore<Double> right) {
 
-        final int tmpRowDim = data.length;
-        final int tmpComplexity = myNumberOfColumns;
-        final int tmpColDim = (int) (right.count() / tmpComplexity);
+        int tmpRowDim = data.length;
+        int tmpComplexity = myNumberOfColumns;
+        int tmpColDim = (int) (right.count() / tmpComplexity);
 
-        final RawStore retVal = new RawStore(tmpRowDim, tmpColDim);
+        RawStore retVal = new RawStore(tmpRowDim, tmpColDim);
 
-        final double[][] tmpRight = RawStore.extract(right, tmpComplexity);
+        double[][] tmpRight = RawStore.extract(right, tmpComplexity);
 
         RawStore.multiply(retVal.data, data, tmpRight);
 
@@ -1168,8 +1168,8 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public Double multiplyBoth(final Access1D<Double> leftAndRight) {
 
-        final PhysicalStore<Double> tmpStep1 = FACTORY.makeZero(1L, leftAndRight.count());
-        final PhysicalStore<Double> tmpStep2 = FACTORY.makeZero(1L, 1L);
+        PhysicalStore<Double> tmpStep1 = FACTORY.makeZero(1L, leftAndRight.count());
+        PhysicalStore<Double> tmpStep2 = FACTORY.makeZero(1L, 1L);
 
         tmpStep1.fillByMultiplying(leftAndRight, this);
         tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
@@ -1209,6 +1209,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         data[(int) row][(int) col] = value.doubleValue();
     }
 
+    public Access1D<Double> sliceRow(final long row) {
+        return Access1D.wrap(data[Math.toIntExact(row)]);
+    }
+
     public void substituteBackwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
         // TODO Auto-generated method stub
 
@@ -1234,13 +1238,13 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public void transformLeft(final Householder<Double> transformation, final int firstColumn) {
 
-        final double[][] tmpArray = data;
-        final int tmpRowDim = data.length;
-        final int tmpColDim = myNumberOfColumns;
+        double[][] tmpArray = data;
+        int tmpRowDim = data.length;
+        int tmpColDim = myNumberOfColumns;
 
-        final int tmpFirst = transformation.first();
+        int tmpFirst = transformation.first();
 
-        final double[] tmpWorkCopy = new double[(int) transformation.count()];
+        double[] tmpWorkCopy = new double[(int) transformation.count()];
 
         double tmpScale;
         for (int j = firstColumn; j < tmpColDim; j++) {
@@ -1249,7 +1253,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
                 tmpScale += tmpWorkCopy[i] * tmpArray[i][j];
             }
             double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
-            final int tmpSize = (int) transformation.count();
+            int tmpSize = (int) transformation.count();
             for (int i1 = transformation.first(); i1 < tmpSize; i1++) {
                 tmpVal = transformation.doubleValue(i1);
                 tmpVal2 += tmpVal * tmpVal;
@@ -1264,15 +1268,15 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public void transformLeft(final Rotation<Double> transformation) {
 
-        final Rotation.Primitive tmpTransf = RawStore.cast(transformation);
+        Rotation.Primitive tmpTransf = RawStore.cast(transformation);
 
-        final int tmpLow = tmpTransf.low;
-        final int tmpHigh = tmpTransf.high;
+        int tmpLow = tmpTransf.low;
+        int tmpHigh = tmpTransf.high;
 
         if (tmpLow != tmpHigh) {
             if (!Double.isNaN(tmpTransf.cos) && !Double.isNaN(tmpTransf.sin)) {
 
-                final double[][] tmpArray = data;
+                double[][] tmpArray = data;
                 double tmpOldLow;
                 double tmpOldHigh;
 
@@ -1300,13 +1304,13 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public void transformRight(final Householder<Double> transformation, final int firstRow) {
 
-        final double[][] tmpArray = data;
-        final int tmpRowDim = data.length;
-        final int tmpColDim = myNumberOfColumns;
+        double[][] tmpArray = data;
+        int tmpRowDim = data.length;
+        int tmpColDim = myNumberOfColumns;
 
-        final int tmpFirst = transformation.first();
+        int tmpFirst = transformation.first();
 
-        final double[] tmpWorkCopy = new double[(int) transformation.count()];
+        double[] tmpWorkCopy = new double[(int) transformation.count()];
 
         double tmpScale;
         for (int i = firstRow; i < tmpRowDim; i++) {
@@ -1315,7 +1319,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
                 tmpScale += tmpWorkCopy[j] * tmpArray[i][j];
             }
             double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
-            final int tmpSize = (int) transformation.count();
+            int tmpSize = (int) transformation.count();
             for (int i1 = transformation.first(); i1 < tmpSize; i1++) {
                 tmpVal = transformation.doubleValue(i1);
                 tmpVal2 += tmpVal * tmpVal;
@@ -1330,15 +1334,15 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     public void transformRight(final Rotation<Double> transformation) {
 
-        final Rotation.Primitive tmpTransf = RawStore.cast(transformation);
+        Rotation.Primitive tmpTransf = RawStore.cast(transformation);
 
-        final int tmpLow = tmpTransf.low;
-        final int tmpHigh = tmpTransf.high;
+        int tmpLow = tmpTransf.low;
+        int tmpHigh = tmpTransf.high;
 
         if (tmpLow != tmpHigh) {
             if (!Double.isNaN(tmpTransf.cos) && !Double.isNaN(tmpTransf.sin)) {
 
-                final double[][] tmpArray = data;
+                double[][] tmpArray = data;
                 double tmpOldLow;
                 double tmpOldHigh;
 
@@ -1364,19 +1368,8 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         }
     }
 
-    /**
-     * RawStore transpose.
-     *
-     * @return A'
-     */
-    public RawStore transpose() {
-        final RawStore retVal = new RawStore(myNumberOfColumns, data.length);
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < myNumberOfColumns; j++) {
-                retVal.data[j][i] = data[i][j];
-            }
-        }
-        return retVal;
+    public MatrixStore<Double> transpose() {
+        return new TransposedStore<>(this);
     }
 
     public void visitAll(final VoidFunction<Double> visitor) {

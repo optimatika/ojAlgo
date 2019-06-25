@@ -124,8 +124,9 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * <li>[A] is upper/right triangular</li>
      * </ul>
      *
-     * @param body The equation system body parameters [A]
+     * @param body The equation system body [A]
      * @param unitDiagonal TODO
+     * @param unitDiagonal true if the body has ones on the diagonal
      * @param conjugated true if the upper/right part of body is actually stored in the lower/left part of the
      *        matrix, and the elements conjugated.
      * @param hermitian TODO
@@ -140,9 +141,11 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * <li>[A] is lower/left triangular</li>
      * </ul>
      *
-     * @param body The equation system body parameters [A]
-     * @param unitDiagonal true if body has ones on the diagonal
-     * @param conjugated TODO
+     * @param body The equation system body [A]
+     * @param unitDiagonal true if the body has ones on the diagonal
+     * @param conjugated true if the upper/right part of body is actually stored in the lower/left part of the
+     *        matrix, and the elements conjugated.
+     * @param identity TODO
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 
