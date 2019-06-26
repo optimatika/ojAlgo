@@ -29,6 +29,7 @@ import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -117,13 +118,13 @@ public interface Eigenvalue<N extends Number>
 
     }
 
-    interface Factory<N extends Number> extends MatrixDecomposition.Factory<Eigenvalue<N>> {
+    abstract class Factory<N extends Number> implements MatrixDecomposition.Factory<Eigenvalue<N>> {
 
-        default Eigenvalue<N> make(final boolean hermitian) {
+        public final Eigenvalue<N> make(final boolean hermitian) {
             return this.make(TYPICAL, hermitian);
         }
 
-        default Eigenvalue<N> make(final int dimension, final boolean hermitian) {
+        public final Eigenvalue<N> make(final int dimension, final boolean hermitian) {
             return this.make(new Structure2D() {
 
                 public long countColumns() {
@@ -137,22 +138,56 @@ public interface Eigenvalue<N extends Number>
             }, hermitian);
         }
 
-        default Eigenvalue<N> make(final Structure2D typical) {
-            if (typical instanceof Access2D) {
-                return this.make(typical, MatrixUtils.isHermitian((Access2D<?>) typical));
+        public Eigenvalue<N> make(final Structure2D typical) {
+            if (typical instanceof MatrixStore) {
+                return this.make(typical, ((MatrixStore<?>) typical).isHermitian());
             } else {
                 return this.make(typical, false);
             }
         }
 
-        Eigenvalue<N> make(Structure2D typical, boolean hermitian);
+        public abstract Eigenvalue<N> make(Structure2D typical, boolean hermitian);
+
+        /**
+         * [A][V] = [B][V][D]
+         * <ul>
+         * <li>http://www.cmth.ph.ic.ac.uk/people/a.mackinnon/Lectures/compphys/node72.html</li>
+         * <li>https://www.netlib.org/lapack/lug/node54.html</li>
+         * </ul>
+         *
+         * @param matrixB [B]
+         * @param typicalA [A]
+         * @return
+         */
+        public final Eigenvalue<N> makeGeneralised(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB, final Structure2D typicalA) {
+
+            Cholesky<N> cholesky = this.makeCholesky(matrixB);
+            cholesky.decompose(matrixB);
+
+            return new GeneralisedEigenvalue<>(cholesky, this.make(typicalA, true));
+        }
+
+        abstract Cholesky<N> makeCholesky(Structure2D typical);
 
     }
 
-    Factory<ComplexNumber> COMPLEX = (typical, hermitian) -> hermitian ? new HermitianEvD.Complex() : null;
+    Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+
+        @Override
+        public Eigenvalue<ComplexNumber> make(final Structure2D typical, final boolean hermitian) {
+            return hermitian ? new HermitianEvD.Complex() : null;
+        }
+
+        @Override
+        Cholesky<ComplexNumber> makeCholesky(final Structure2D typical) {
+            return Cholesky.COMPLEX.make(typical);
+        }
+
+    };
 
     Factory<Double> PRIMITIVE = new Factory<Double>() {
 
+        @Override
         public Eigenvalue<Double> make(final Structure2D typical) {
             if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
                 return new DynamicEvD.Primitive();
@@ -161,6 +196,7 @@ public interface Eigenvalue<N extends Number>
             }
         }
 
+        @Override
         public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
             if (hermitian) {
                 if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
@@ -177,11 +213,40 @@ public interface Eigenvalue<N extends Number>
             }
         }
 
+        @Override
+        Cholesky<Double> makeCholesky(final Structure2D typical) {
+            return Cholesky.PRIMITIVE.make(typical);
+        }
+
     };
 
-    Factory<Quaternion> QUATERNION = (typical, hermitian) -> hermitian ? new HermitianEvD.Quat() : null;
+    Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
-    Factory<RationalNumber> RATIONAL = (typical, hermitian) -> hermitian ? new HermitianEvD.Rational() : null;
+        @Override
+        public Eigenvalue<Quaternion> make(final Structure2D typical, final boolean hermitian) {
+            return hermitian ? new HermitianEvD.Quat() : null;
+        }
+
+        @Override
+        Cholesky<Quaternion> makeCholesky(final Structure2D typical) {
+            return Cholesky.QUATERNION.make(typical);
+        }
+
+    };
+
+    Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+
+        @Override
+        public Eigenvalue<RationalNumber> make(final Structure2D typical, final boolean hermitian) {
+            return hermitian ? new HermitianEvD.Rational() : null;
+        }
+
+        @Override
+        Cholesky<RationalNumber> makeCholesky(final Structure2D typical) {
+            return Cholesky.RATIONAL.make(typical);
+        }
+
+    };
 
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
 
