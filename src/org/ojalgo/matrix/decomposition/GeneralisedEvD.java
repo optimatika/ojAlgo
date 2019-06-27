@@ -82,8 +82,19 @@ final class GeneralisedEvD<N extends Number> extends EigenvalueDecomposition<N> 
     }
 
     @Override
+    public void reset() {
+        super.reset();
+        // myCholesky.reset();
+        myEigenvalue.reset();
+    }
+
+    @Override
     protected boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
-        myC = this.reduce(matrix);
+        if (myCholesky.isComputed()) {
+            myC = this.reduce(matrix);
+        } else {
+            myC = matrix.collect(myFactory);
+        }
         if (valuesOnly) {
             return myEigenvalue.computeValuesOnly(myC);
         } else {
@@ -103,22 +114,37 @@ final class GeneralisedEvD<N extends Number> extends EigenvalueDecomposition<N> 
 
     @Override
     protected MatrixStore<N> makeV() {
-        return this.recover(myEigenvalue.getV());
+        MatrixStore<N> subV = myEigenvalue.getV();
+        if (myCholesky.isComputed()) {
+            return this.recover(subV);
+        } else {
+            return subV;
+        }
     }
 
     MatrixStore<N> recover(final MatrixStore<N> reduced) {
+
+        MatrixStore<N> mtrxR = myCholesky.getR();
+
+        PhysicalStore<N> retVal = reduced.collect(myFactory);
+
         try {
-            MatrixStore<N> mtrxR = myCholesky.getR();
-            MatrixStore<Double> retVal = SolverTask.PRIMITIVE.solve(mtrxR, reduced);
-            return (MatrixStore<N>) retVal;
+
+            retVal.substituteBackwards(mtrxR, false, false, false);
+
+            MatrixStore<Double> old = SolverTask.PRIMITIVE.solve(mtrxR, reduced);
+            return (MatrixStore<N>) old;
         } catch (RecoverableCondition exception) {
             return null;
         }
     }
 
     MatrixStore<N> reduce(final Access2D.Collectable<N, ? super PhysicalStore<N>> original) {
+
+        PhysicalStore<N> collected = original.collect(myFactory);
+
         try {
-            DecompositionStore<N> collected = original.collect(myFactory);
+
             MatrixStore<N> mtrxL = myCholesky.getL();
             MatrixStore<Double> step1 = SolverTask.PRIMITIVE.solve(mtrxL, collected);
             MatrixStore<Double> step2 = step1.transpose();

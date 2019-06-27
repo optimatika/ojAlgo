@@ -312,7 +312,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     public MatrixStore<Double> getV() {
         final int n = this.getRowDim();
-        return new RawStore(myTransposedV, n, n).logical().transpose().get();
+        return new RawStore(myTransposedV, n, n).transpose();
     }
 
     public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
