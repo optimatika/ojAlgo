@@ -30,6 +30,7 @@ import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -118,13 +119,13 @@ public interface Eigenvalue<N extends Number>
 
     }
 
-    abstract class Factory<N extends Number> implements MatrixDecomposition.Factory<Eigenvalue<N>> {
+    interface Factory<N extends Number> extends MatrixDecomposition.Factory<Eigenvalue<N>> {
 
-        public final Eigenvalue<N> make(final boolean hermitian) {
+        default Eigenvalue<N> make(final boolean hermitian) {
             return this.make(TYPICAL, hermitian);
         }
 
-        public final Eigenvalue<N> make(final int dimension, final boolean hermitian) {
+        default Eigenvalue<N> make(final int dimension, final boolean hermitian) {
             return this.make(new Structure2D() {
 
                 public long countColumns() {
@@ -138,7 +139,7 @@ public interface Eigenvalue<N extends Number>
             }, hermitian);
         }
 
-        public Eigenvalue<N> make(final Structure2D typical) {
+        default Eigenvalue<N> make(final Structure2D typical) {
             if (typical instanceof MatrixStore) {
                 return this.make(typical, ((MatrixStore<?>) typical).isHermitian());
             } else {
@@ -146,7 +147,7 @@ public interface Eigenvalue<N extends Number>
             }
         }
 
-        public abstract Eigenvalue<N> make(Structure2D typical, boolean hermitian);
+        Eigenvalue<N> make(Structure2D typical, boolean hermitian);
 
         /**
          * [A][V] = [B][V][D]
@@ -154,20 +155,18 @@ public interface Eigenvalue<N extends Number>
          * <li>http://www.cmth.ph.ic.ac.uk/people/a.mackinnon/Lectures/compphys/node72.html</li>
          * <li>https://www.netlib.org/lapack/lug/node54.html</li>
          * </ul>
-         *
-         * @param matrixB [B]
-         * @param typicalA [A]
-         * @return
          */
-        public final Eigenvalue<N> makeGeneralised(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB, final Structure2D typicalA) {
+        Eigenvalue.Generalised<N> makeGeneralised(Structure2D typical);
 
-            Cholesky<N> cholesky = this.makeCholesky(matrixB);
-            cholesky.decompose(matrixB);
+    }
 
-            return new GeneralisedEigenvalue<>(cholesky, this.make(typicalA, true));
-        }
+    interface Generalised<N extends Number> extends Eigenvalue<N> {
 
-        abstract Cholesky<N> makeCholesky(Structure2D typical);
+        boolean computeValuesOnly(Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA, Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB);
+
+        boolean decompose(Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA, Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB);
+
+        boolean prepare(Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB);
 
     }
 
@@ -179,8 +178,9 @@ public interface Eigenvalue<N extends Number>
         }
 
         @Override
-        Cholesky<ComplexNumber> makeCholesky(final Structure2D typical) {
-            return Cholesky.COMPLEX.make(typical);
+        public Eigenvalue.Generalised<ComplexNumber> makeGeneralised(final Structure2D typical) {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     };
@@ -200,7 +200,7 @@ public interface Eigenvalue<N extends Number>
         public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
             if (hermitian) {
                 if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
-                    return new HermitianEvD.SimultaneousPrimitive();
+                    return new HermitianEvD.Primitive();
                 } else {
                     return new RawEigenvalue.Symmetric();
                 }
@@ -214,8 +214,13 @@ public interface Eigenvalue<N extends Number>
         }
 
         @Override
-        Cholesky<Double> makeCholesky(final Structure2D typical) {
-            return Cholesky.PRIMITIVE.make(typical);
+        public Eigenvalue.Generalised<Double> makeGeneralised(final Structure2D typical) {
+
+            PhysicalStore.Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
+            Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(typical);
+            Eigenvalue<Double> eigenvalue = this.make(typical, true);
+
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue);
         }
 
     };
@@ -228,8 +233,9 @@ public interface Eigenvalue<N extends Number>
         }
 
         @Override
-        Cholesky<Quaternion> makeCholesky(final Structure2D typical) {
-            return Cholesky.QUATERNION.make(typical);
+        public Eigenvalue.Generalised<Quaternion> makeGeneralised(final Structure2D typical) {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     };
@@ -242,8 +248,9 @@ public interface Eigenvalue<N extends Number>
         }
 
         @Override
-        Cholesky<RationalNumber> makeCholesky(final Structure2D typical) {
-            return Cholesky.RATIONAL.make(typical);
+        public Eigenvalue.Generalised<RationalNumber> makeGeneralised(final Structure2D typical) {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     };

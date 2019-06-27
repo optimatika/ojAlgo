@@ -69,14 +69,6 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
     }
 
-    static final class DeferredPrimitive extends HermitianEvD<Double> {
-
-        DeferredPrimitive() {
-            super(PrimitiveDenseStore.FACTORY, new DeferredTridiagonal.Primitive());
-        }
-
-    }
-
     static final class Quat extends HermitianEvD<Quaternion> {
 
         Quat() {
@@ -93,9 +85,9 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
     }
 
-    static final class SimultaneousPrimitive extends HermitianEvD<Double> {
+    static final class Primitive extends HermitianEvD<Double> {
 
-        SimultaneousPrimitive() {
+        Primitive() {
             super(PrimitiveDenseStore.FACTORY, new SimultaneousTridiagonal());
         }
 
@@ -194,15 +186,24 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     private final TridiagonalDecomposition<N> myTridiagonal;
 
     @SuppressWarnings("unused")
-    private HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
-        this(aFactory, null);
+    private HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
+        this(factory, null);
     }
 
-    protected HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory, final TridiagonalDecomposition<N> tridiagonal) {
+    protected HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final TridiagonalDecomposition<N> tridiagonal) {
 
-        super(aFactory);
+        super(factory);
 
         myTridiagonal = tridiagonal;
+    }
+
+    public boolean checkAndDecompose(final MatrixStore<N> matrix) {
+        if (matrix.isHermitian()) {
+            return this.decompose(matrix);
+        } else {
+            ProgrammingError.throwForUnsupportedOptionalOperation();
+            return false;
+        }
     }
 
     public final N getDeterminant() {
@@ -374,13 +375,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     }
 
     @Override
-    protected final boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
-        return false;
-    }
-
-    @Override
-    protected final boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
+    protected boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
 
         final int size = (int) matrix.countRows();
 
@@ -431,5 +426,4 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     protected MatrixStore<N> makeV() {
         return myTridiagonal.getQ();
     }
-
 }

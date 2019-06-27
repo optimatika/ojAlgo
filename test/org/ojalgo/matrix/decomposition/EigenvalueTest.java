@@ -307,6 +307,13 @@ public class EigenvalueTest {
             MatrixStore<Double> leftZ = mtrxA.multiply(vectorsZ);
             MatrixStore<Double> rightZ = mtrxB.multiply(vectorsZ);
             TestUtils.assertEquals(scales, leftZ.operateOnMatching(DIVIDE, rightZ).get(), accuracy);
+
+            Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA);
+            generalised.decompose(mtrxA, mtrxB);
+
+            TestUtils.assertEquals(mtrxC, generalised.reconstruct(), accuracy);
+            TestUtils.assertEquals(vectorsZ, generalised.getV(), accuracy);
+            TestUtils.assertEquals(eigenvalue.getD(), generalised.getD(), accuracy);
         }
     }
 

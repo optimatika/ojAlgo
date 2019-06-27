@@ -87,8 +87,8 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static Eigenvalue<?>[] getAnyEigenvalueHermitian() {
-        return new Eigenvalue<?>[] { new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(), new RawEigenvalue.Symmetric(),
-                new HermitianEvD.Rational(), new HermitianEvD.Complex(), new HermitianEvD.Quat() };
+        return new Eigenvalue<?>[] { new HermitianEvD.Primitive(), new RawEigenvalue.Symmetric(), new HermitianEvD.Rational(),
+                new HermitianEvD.Complex(), new HermitianEvD.Quat() };
     }
 
     public static Hessenberg<?>[] getAnyHessenberg() {
@@ -200,8 +200,7 @@ public abstract class MatrixDecompositionTests {
 
     @SuppressWarnings("unchecked")
     public static Eigenvalue<Double>[] getPrimitiveEigenvalueSymmetric() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(),
-                new RawEigenvalue.Symmetric() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new HermitianEvD.Primitive(), new RawEigenvalue.Symmetric() };
     }
 
     @SuppressWarnings("unchecked")
