@@ -48,14 +48,6 @@ final class GeneralisedEvD<N extends Number> extends EigenvalueDecomposition<N> 
         myEigenvalue = eigenvalue;
     }
 
-    public boolean computeValuesOnly(final Collectable<N, ? super PhysicalStore<N>> matrixA, final Collectable<N, ? super PhysicalStore<N>> matrixB) {
-        return myCholesky.decompose(matrixB) && this.computeValuesOnly(matrixA);
-    }
-
-    public boolean decompose(final Collectable<N, ? super PhysicalStore<N>> matrixA, final Collectable<N, ? super PhysicalStore<N>> matrixB) {
-        return myCholesky.decompose(matrixB) && this.decompose(matrixA);
-    }
-
     public N getDeterminant() {
         return myEigenvalue.getDeterminant();
     }

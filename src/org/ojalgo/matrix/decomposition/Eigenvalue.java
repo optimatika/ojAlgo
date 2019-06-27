@@ -162,9 +162,15 @@ public interface Eigenvalue<N extends Number>
 
     interface Generalised<N extends Number> extends Eigenvalue<N> {
 
-        boolean computeValuesOnly(Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA, Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB);
+        default boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA,
+                final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB) {
+            return this.prepare(matrixB) && this.computeValuesOnly(matrixA);
+        }
 
-        boolean decompose(Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA, Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB);
+        default boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA,
+                final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB) {
+            return this.prepare(matrixB) && this.decompose(matrixA);
+        }
 
         boolean prepare(Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB);
 
