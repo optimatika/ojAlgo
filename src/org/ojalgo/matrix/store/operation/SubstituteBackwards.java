@@ -37,12 +37,11 @@ public class SubstituteBackwards extends MatrixOperation {
      * @param structure The structure (number of rows) in data
      * @param first The first (incl) column/solution to handle
      * @param limit The last (excl) column/solution to handle
-     * @param body The equation system body
+     * @param body The equation system body (assumed to be upper/right triangular)
      * @param unitDiagonal Assume the body has a unit diagonal
-     * @param conjugated Assume the body is a conjugsated store where the upper/right part is actually stored
-     *        in the lower/left part.
-     * @param identity Assume the RHS is an identity matrix (disregard the actual elements)
-     * @param hermitian
+     * @param conjugated Assume the body is conjugated/transposed so that the upper/right part is actually
+     *        stored in the lower/left part.
+     * @param hermitian Assume the solution is hermitian/symmetric
      */
     public static void invoke(final double[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,
             final boolean conjugated, final boolean hermitian) {

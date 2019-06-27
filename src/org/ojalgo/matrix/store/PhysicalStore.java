@@ -26,6 +26,8 @@ import java.util.List;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.matrix.store.operation.SubstituteBackwards;
+import org.ojalgo.matrix.store.operation.SubstituteForwards;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
@@ -124,12 +126,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * <li>[A] is upper/right triangular</li>
      * </ul>
      *
-     * @param body The equation system body [A]
-     * @param unitDiagonal TODO
-     * @param unitDiagonal true if the body has ones on the diagonal
-     * @param conjugated true if the upper/right part of body is actually stored in the lower/left part of the
-     *        matrix, and the elements conjugated.
-     * @param hermitian TODO
+     * @see SubstituteBackwards#invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
      */
     void substituteBackwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean hermitian);
 
@@ -141,11 +138,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * <li>[A] is lower/left triangular</li>
      * </ul>
      *
-     * @param body The equation system body [A]
-     * @param unitDiagonal true if the body has ones on the diagonal
-     * @param conjugated true if the upper/right part of body is actually stored in the lower/left part of the
-     *        matrix, and the elements conjugated.
-     * @param identity TODO
+     * @see SubstituteForwards#invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 
