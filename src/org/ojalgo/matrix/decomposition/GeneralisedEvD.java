@@ -21,21 +21,23 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
 final class GeneralisedEvD<N extends Number> extends EigenvalueDecomposition<N> implements Eigenvalue.Generalised<N> {
 
-    private transient MatrixStore<N> myC = null;
     private final Cholesky<N> myCholesky;
     private final Eigenvalue<N> myEigenvalue;
     private final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> myFactory;
+    private transient PhysicalStore<N> myRecovered = null;
+    /**
+     * C
+     */
+    private transient PhysicalStore<N> myReduced = null;
 
     GeneralisedEvD(final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory, final Cholesky<N> cholesky, final Eigenvalue<N> eigenvalue) {
 
@@ -75,10 +77,10 @@ final class GeneralisedEvD<N extends Number> extends EigenvalueDecomposition<N> 
     }
 
     public MatrixStore<N> reconstruct() {
-        if (myC == null) {
-            myC = myEigenvalue.reconstruct();
+        if (myReduced == null) {
+            myReduced = myEigenvalue.reconstruct().copy();
         }
-        return myC;
+        return myReduced;
     }
 
     @Override
@@ -86,19 +88,21 @@ final class GeneralisedEvD<N extends Number> extends EigenvalueDecomposition<N> 
         super.reset();
         // myCholesky.reset();
         myEigenvalue.reset();
+        myReduced = null;
+        myRecovered = null;
     }
 
     @Override
     protected boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
         if (myCholesky.isComputed()) {
-            myC = this.reduce(matrix);
+            myReduced = this.reduce(matrix);
         } else {
-            myC = matrix.collect(myFactory);
+            myReduced = matrix.collect(myFactory);
         }
         if (valuesOnly) {
-            return myEigenvalue.computeValuesOnly(myC);
+            return myEigenvalue.computeValuesOnly(myReduced);
         } else {
-            return myEigenvalue.decompose(myC);
+            return myEigenvalue.decompose(myReduced);
         }
     }
 
@@ -124,35 +128,38 @@ final class GeneralisedEvD<N extends Number> extends EigenvalueDecomposition<N> 
 
     MatrixStore<N> recover(final MatrixStore<N> reduced) {
 
-        MatrixStore<N> mtrxR = myCholesky.getR();
-
-        PhysicalStore<N> retVal = reduced.collect(myFactory);
-
-        try {
-
-            retVal.substituteBackwards(mtrxR, false, false, false);
-
-            MatrixStore<Double> old = SolverTask.PRIMITIVE.solve(mtrxR, reduced);
-            return (MatrixStore<N>) old;
-        } catch (RecoverableCondition exception) {
-            return null;
+        if (reduced instanceof PhysicalStore<?>) {
+            myRecovered = (PhysicalStore<N>) reduced;
+        } else {
+            if (myRecovered != null) {
+                reduced.supplyTo(myRecovered);
+            } else {
+                myRecovered = reduced.collect(myFactory);
+            }
         }
+
+        MatrixStore<N> mtrxL = myCholesky.getL();
+
+        myRecovered.substituteBackwards(mtrxL, false, true, false);
+
+        return myRecovered;
     }
 
-    MatrixStore<N> reduce(final Access2D.Collectable<N, ? super PhysicalStore<N>> original) {
+    PhysicalStore<N> reduce(final Access2D.Collectable<N, ? super PhysicalStore<N>> original) {
 
-        PhysicalStore<N> collected = original.collect(myFactory);
-
-        try {
-
-            MatrixStore<N> mtrxL = myCholesky.getL();
-            MatrixStore<Double> step1 = SolverTask.PRIMITIVE.solve(mtrxL, collected);
-            MatrixStore<Double> step2 = step1.transpose();
-            MatrixStore<Double> step3 = SolverTask.PRIMITIVE.solve(mtrxL, step2);
-            return (MatrixStore<N>) step3;
-        } catch (RecoverableCondition exception) {
-            return null;
+        if (myRecovered != null) {
+            original.supplyTo(myRecovered);
+        } else {
+            myRecovered = original.collect(myFactory);
         }
+
+        MatrixStore<N> mtrxL = myCholesky.getL();
+
+        myRecovered.substituteForwards(mtrxL, false, false, false);
+        myReduced = myRecovered.transpose().copy();
+        myReduced.substituteForwards(mtrxL, false, false, false);
+
+        return myReduced;
     }
 
 }

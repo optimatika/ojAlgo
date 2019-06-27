@@ -179,8 +179,12 @@ public interface Eigenvalue<N extends Number>
 
         @Override
         public Eigenvalue.Generalised<ComplexNumber> makeGeneralised(final Structure2D typical) {
-            // TODO Auto-generated method stub
-            return null;
+
+            PhysicalStore.Factory<ComplexNumber, GenericDenseStore<ComplexNumber>> factory = GenericDenseStore.COMPLEX;
+            Cholesky<ComplexNumber> cholesky = Cholesky.COMPLEX.make(typical);
+            Eigenvalue<ComplexNumber> eigenvalue = this.make(typical, true);
+
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue);
         }
 
     };
@@ -234,8 +238,12 @@ public interface Eigenvalue<N extends Number>
 
         @Override
         public Eigenvalue.Generalised<Quaternion> makeGeneralised(final Structure2D typical) {
-            // TODO Auto-generated method stub
-            return null;
+
+            PhysicalStore.Factory<Quaternion, GenericDenseStore<Quaternion>> factory = GenericDenseStore.QUATERNION;
+            Cholesky<Quaternion> cholesky = Cholesky.QUATERNION.make(typical);
+            Eigenvalue<Quaternion> eigenvalue = this.make(typical, true);
+
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue);
         }
 
     };
@@ -249,8 +257,12 @@ public interface Eigenvalue<N extends Number>
 
         @Override
         public Eigenvalue.Generalised<RationalNumber> makeGeneralised(final Structure2D typical) {
-            // TODO Auto-generated method stub
-            return null;
+
+            PhysicalStore.Factory<RationalNumber, GenericDenseStore<RationalNumber>> factory = GenericDenseStore.RATIONAL;
+            Cholesky<RationalNumber> cholesky = Cholesky.RATIONAL.make(typical);
+            Eigenvalue<RationalNumber> eigenvalue = this.make(typical, true);
+
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue);
         }
 
     };

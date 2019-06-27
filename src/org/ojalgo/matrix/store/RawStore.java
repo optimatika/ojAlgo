@@ -46,6 +46,8 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
+import org.ojalgo.matrix.store.operation.SubstituteBackwards;
+import org.ojalgo.matrix.store.operation.SubstituteForwards;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -1214,13 +1216,11 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
     }
 
     public void substituteBackwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
-        // TODO Auto-generated method stub
-
+        SubstituteBackwards.invoke(data, body, unitDiagonal, conjugated, hermitian);
     }
 
     public void substituteForwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
-        // TODO Auto-generated method stub
-
+        SubstituteForwards.invoke(data, body, unitDiagonal, conjugated, identity);
     }
 
     public void supplyTo(final TransformableRegion<Double> receiver) {
