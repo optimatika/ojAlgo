@@ -426,6 +426,14 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return retVal;
     }
 
+    public static PrimitiveDenseStore wrap(final double... data) {
+        return new PrimitiveDenseStore(data);
+    }
+
+    public static PrimitiveDenseStore wrap(final double[] data, final int structure) {
+        return new PrimitiveDenseStore(structure, data.length / structure, data);
+    }
+
     static PrimitiveDenseStore cast(final Access1D<Double> matrix) {
         if (matrix instanceof PrimitiveDenseStore) {
             return (PrimitiveDenseStore) matrix;

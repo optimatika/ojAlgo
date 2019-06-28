@@ -315,7 +315,9 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      *
      * @param A Two-dimensional array of doubles.
      * @exception IllegalArgumentException All rows must have the same length
+     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
      */
+    @Deprecated
     public static RawStore constructWithCopy(final double[][] A) {
         int m = A.length;
         int n = A[0].length;
@@ -338,7 +340,9 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      * @param m Number of rows.
      * @param n Number of colums.
      * @return An m-by-n matrix with uniformly distributed random elements.
+     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
      */
+    @Deprecated
     public static RawStore random(final int m, final int n) {
         RawStore A = new RawStore(m, n);
         double[][] X = A.data;
@@ -356,7 +360,9 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      * elements for each row appear on a single line, the last row is followed by a blank line.
      *
      * @param input the input stream.
+     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
      */
+    @Deprecated
     public static RawStore read(final BufferedReader input) throws java.io.IOException {
         StreamTokenizer tokenizer = new StreamTokenizer(input);
 
@@ -408,6 +414,18 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         double[][] A = new double[m][];
         v.copyInto(A); // copy the rows out of the vector
         return new RawStore(A);
+    }
+
+    /**
+     * Will create a single row matrix with the supplied array as the inner array. You access it using
+     * <code>data[0]</code>.
+     */
+    public static RawStore wrap(final double... data) {
+        return new RawStore(new double[][] { data }, data.length);
+    }
+
+    public static RawStore wrap(final double[][] data) {
+        return new RawStore(data, data[0].length);
     }
 
     private static RawStore convert(final Access1D<?> elements, final int structure) {
@@ -505,6 +523,10 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
 
     private final int myNumberOfColumns;
 
+    /**
+     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
+     */
+    @Deprecated
     public RawStore(final Access2D<?> template) {
 
         super();
@@ -522,7 +544,9 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      * @param elements One-dimensional array of doubles, packed by columns (ala Fortran).
      * @param structure Number of rows.
      * @exception IllegalArgumentException Array length must be a multiple of m.
+     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
      */
+    @Deprecated
     public RawStore(final double elements[], final int structure) {
 
         myNumberOfColumns = (structure != 0 ? elements.length / structure : 0);
@@ -547,7 +571,9 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      * @param A Two-dimensional array of doubles.
      * @exception IllegalArgumentException All rows must have the same length
      * @see #constructWithCopy
+     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
      */
+    @Deprecated
     public RawStore(final double[][] A) {
 
         myNumberOfColumns = A[0].length;
@@ -566,7 +592,9 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      * @param A Two-dimensional array of doubles.
      * @param m Number of rows.
      * @param n Number of colums.
+     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
      */
+    @Deprecated
     public RawStore(final double[][] A, final int m, final int n) {
 
         data = A;
@@ -579,7 +607,9 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      *
      * @param m Number of rows.
      * @param n Number of colums.
+     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
      */
+    @Deprecated
     public RawStore(final int m, final int n) {
 
         myNumberOfColumns = n;
@@ -593,7 +623,9 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
      * @param m Number of rows.
      * @param n Number of colums.
      * @param s Fill the matrix with this scalar value.
+     * @deprecated v48 Use {@link #FACTORY} or {@link #wrap(double[][])}
      */
+    @Deprecated
     public RawStore(final int m, final int n, final double s) {
 
         myNumberOfColumns = n;
