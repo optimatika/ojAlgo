@@ -37,6 +37,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20050125Case;
 import org.ojalgo.matrix.P20061119Case;
+import org.ojalgo.matrix.decomposition.Eigenvalue.Generalisation;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -271,7 +272,7 @@ public class EigenvalueTest {
     }
 
     @Test
-    public void testRandomGeneralisedSymmetric() throws RecoverableCondition {
+    public void testRandomGeneralisedA_B() throws RecoverableCondition {
 
         NumberContext accuracy = NumberContext.getGeneral(MathContext.DECIMAL32);
 
@@ -309,6 +310,100 @@ public class EigenvalueTest {
             TestUtils.assertEquals(scales, leftZ.operateOnMatching(DIVIDE, rightZ).get(), accuracy);
 
             Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA);
+            generalised.decompose(mtrxA, mtrxB);
+
+            TestUtils.assertEquals(mtrxC, generalised.reconstruct(), accuracy);
+            TestUtils.assertEquals(vectorsZ, generalised.getV(), accuracy);
+            TestUtils.assertEquals(eigenvalue.getD(), generalised.getD(), accuracy);
+        }
+    }
+
+    @Test
+    public void testRandomGeneralisedAB() throws RecoverableCondition {
+
+        NumberContext accuracy = NumberContext.getGeneral(MathContext.DECIMAL32);
+
+        for (int dim = 2; dim < 10; dim++) {
+
+            PrimitiveDenseStore mtrxA = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+            PrimitiveDenseStore mtrxB = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+
+            Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(mtrxB);
+            cholesky.decompose(mtrxB);
+
+            MatrixStore<Double> compL = cholesky.getL();
+            MatrixStore<Double> compU = cholesky.getR();
+
+            MatrixStore<Double> mtrxC = compL.transpose().multiply(mtrxA).multiply(compL);
+
+            Eigenvalue<Double> eigenvalue = Eigenvalue.PRIMITIVE.make(mtrxC, true);
+            eigenvalue.decompose(mtrxC);
+            TestUtils.assertEquals(mtrxC, eigenvalue, accuracy);
+
+            double[] values = new double[dim];
+            eigenvalue.getEigenvalues(values, Optional.empty());
+
+            MatrixStore<Double> vectorsY = eigenvalue.getV();
+
+            MatrixStore<Double> leftY = mtrxC.multiply(vectorsY);
+            MatrixStore<Double> scales = leftY.operateOnMatching(DIVIDE, vectorsY).get();
+            MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).get();
+            TestUtils.assertEquals(values, averages, accuracy);
+
+            MatrixStore<Double> vectorsZ = SolverTask.PRIMITIVE.solve(compU, vectorsY);
+
+            MatrixStore<Double> leftZ = mtrxA.multiply(mtrxB).multiply(vectorsZ);
+            MatrixStore<Double> rightZ = vectorsZ;
+            TestUtils.assertEquals(scales, leftZ.operateOnMatching(DIVIDE, rightZ).get(), accuracy);
+
+            Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA, Generalisation.AB);
+            generalised.decompose(mtrxA, mtrxB);
+
+            TestUtils.assertEquals(mtrxC, generalised.reconstruct(), accuracy);
+            TestUtils.assertEquals(vectorsZ, generalised.getV(), accuracy);
+            TestUtils.assertEquals(eigenvalue.getD(), generalised.getD(), accuracy);
+        }
+    }
+
+    @Test
+    public void testRandomGeneralisedBA() throws RecoverableCondition {
+
+        NumberContext accuracy = NumberContext.getGeneral(MathContext.DECIMAL32);
+
+        for (int dim = 2; dim < 10; dim++) {
+
+            PrimitiveDenseStore mtrxA = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+            PrimitiveDenseStore mtrxB = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+
+            Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(mtrxB);
+            cholesky.decompose(mtrxB);
+
+            MatrixStore<Double> compL = cholesky.getL();
+            MatrixStore<Double> compU = cholesky.getR();
+
+            MatrixStore<Double> mtrxC = compL.transpose().multiply(mtrxA).multiply(compL);
+
+            Eigenvalue<Double> eigenvalue = Eigenvalue.PRIMITIVE.make(mtrxC, true);
+            eigenvalue.decompose(mtrxC);
+            TestUtils.assertEquals(mtrxC, eigenvalue, accuracy);
+
+            double[] values = new double[dim];
+            eigenvalue.getEigenvalues(values, Optional.empty());
+
+            MatrixStore<Double> vectorsY = eigenvalue.getV();
+
+            MatrixStore<Double> leftY = mtrxC.multiply(vectorsY);
+            MatrixStore<Double> scales = leftY.operateOnMatching(DIVIDE, vectorsY).get();
+            MatrixStore<Double> averages = scales.reduceColumns(Aggregator.AVERAGE).get();
+            TestUtils.assertEquals(values, averages, accuracy);
+
+            MatrixStore<Double> vectorsZ = compL.multiply(vectorsY);
+
+            MatrixStore<Double> leftZ = mtrxB.multiply(mtrxA).multiply(vectorsZ);
+            MatrixStore<Double> rightZ = vectorsZ;
+            TestUtils.assertEquals(scales, leftZ.operateOnMatching(DIVIDE, rightZ).get(), accuracy);
+
+            Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA, Generalisation.BA);
             generalised.decompose(mtrxA, mtrxB);
 
             TestUtils.assertEquals(mtrxC, generalised.reconstruct(), accuracy);

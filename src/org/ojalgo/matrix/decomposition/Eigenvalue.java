@@ -151,12 +151,43 @@ public interface Eigenvalue<N extends Number>
 
         /**
          * [A][V] = [B][V][D]
+         */
+        default Eigenvalue.Generalised<N> makeGeneralised(final Structure2D typical) {
+            return this.makeGeneralised(typical, Eigenvalue.Generalisation.A_B);
+        }
+
+        /**
          * <ul>
          * <li>http://www.cmth.ph.ic.ac.uk/people/a.mackinnon/Lectures/compphys/node72.html</li>
          * <li>https://www.netlib.org/lapack/lug/node54.html</li>
          * </ul>
          */
-        Eigenvalue.Generalised<N> makeGeneralised(Structure2D typical);
+        Eigenvalue.Generalised<N> makeGeneralised(Structure2D typical, Eigenvalue.Generalisation type);
+
+    }
+
+    /**
+     * <a href="https://www.netlib.org/lapack/lug/node54.html">Generalized Symmetric Definite
+     * Eigenproblems</a>
+     *
+     * @author apete
+     */
+    enum Generalisation {
+
+        /**
+         * [A][V]=[B][V][D]
+         */
+        A_B,
+
+        /**
+         * [A][B][V]=[V][D]
+         */
+        AB,
+
+        /**
+         * [B][A][V]=[V][D]
+         */
+        BA;
 
     }
 
@@ -184,13 +215,13 @@ public interface Eigenvalue<N extends Number>
         }
 
         @Override
-        public Eigenvalue.Generalised<ComplexNumber> makeGeneralised(final Structure2D typical) {
+        public Eigenvalue.Generalised<ComplexNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
             PhysicalStore.Factory<ComplexNumber, GenericDenseStore<ComplexNumber>> factory = GenericDenseStore.COMPLEX;
             Cholesky<ComplexNumber> cholesky = Cholesky.COMPLEX.make(typical);
             Eigenvalue<ComplexNumber> eigenvalue = this.make(typical, true);
 
-            return new GeneralisedEvD<>(factory, cholesky, eigenvalue);
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
         }
 
     };
@@ -224,13 +255,13 @@ public interface Eigenvalue<N extends Number>
         }
 
         @Override
-        public Eigenvalue.Generalised<Double> makeGeneralised(final Structure2D typical) {
+        public Eigenvalue.Generalised<Double> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
             PhysicalStore.Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
             Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(typical);
             Eigenvalue<Double> eigenvalue = this.make(typical, true);
 
-            return new GeneralisedEvD<>(factory, cholesky, eigenvalue);
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
         }
 
     };
@@ -243,13 +274,13 @@ public interface Eigenvalue<N extends Number>
         }
 
         @Override
-        public Eigenvalue.Generalised<Quaternion> makeGeneralised(final Structure2D typical) {
+        public Eigenvalue.Generalised<Quaternion> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
             PhysicalStore.Factory<Quaternion, GenericDenseStore<Quaternion>> factory = GenericDenseStore.QUATERNION;
             Cholesky<Quaternion> cholesky = Cholesky.QUATERNION.make(typical);
             Eigenvalue<Quaternion> eigenvalue = this.make(typical, true);
 
-            return new GeneralisedEvD<>(factory, cholesky, eigenvalue);
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
         }
 
     };
@@ -262,13 +293,13 @@ public interface Eigenvalue<N extends Number>
         }
 
         @Override
-        public Eigenvalue.Generalised<RationalNumber> makeGeneralised(final Structure2D typical) {
+        public Eigenvalue.Generalised<RationalNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
             PhysicalStore.Factory<RationalNumber, GenericDenseStore<RationalNumber>> factory = GenericDenseStore.RATIONAL;
             Cholesky<RationalNumber> cholesky = Cholesky.RATIONAL.make(typical);
             Eigenvalue<RationalNumber> eigenvalue = this.make(typical, true);
 
-            return new GeneralisedEvD<>(factory, cholesky, eigenvalue);
+            return new GeneralisedEvD<>(factory, cholesky, eigenvalue, type);
         }
 
     };

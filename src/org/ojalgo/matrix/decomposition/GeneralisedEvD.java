@@ -33,19 +33,22 @@ final class GeneralisedEvD<N extends Number> extends EigenvalueDecomposition<N> 
     private final Cholesky<N> myCholesky;
     private final Eigenvalue<N> myEigenvalue;
     private final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> myFactory;
+    private final Eigenvalue.Generalisation myType;
     private transient PhysicalStore<N> myRecovered = null;
     /**
      * C
      */
     private transient PhysicalStore<N> myReduced = null;
 
-    GeneralisedEvD(final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory, final Cholesky<N> cholesky, final Eigenvalue<N> eigenvalue) {
+    GeneralisedEvD(final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory, final Cholesky<N> cholesky, final Eigenvalue<N> eigenvalue,
+            final Eigenvalue.Generalisation type) {
 
         super(factory);
 
         myFactory = factory;
         myCholesky = cholesky;
         myEigenvalue = eigenvalue;
+        myType = type;
     }
 
     public N getDeterminant() {
@@ -120,38 +123,75 @@ final class GeneralisedEvD<N extends Number> extends EigenvalueDecomposition<N> 
 
     MatrixStore<N> recover(final MatrixStore<N> reduced) {
 
-        if (reduced instanceof PhysicalStore<?>) {
-            myRecovered = (PhysicalStore<N>) reduced;
-        } else {
-            if (myRecovered != null) {
-                reduced.supplyTo(myRecovered);
-            } else {
-                myRecovered = reduced.collect(myFactory);
-            }
-        }
-
         MatrixStore<N> mtrxL = myCholesky.getL();
 
-        myRecovered.substituteBackwards(mtrxL, false, true, false);
+        switch (myType) {
 
-        return myRecovered;
+        case BA:
+
+            if (myRecovered == null) {
+                myRecovered = this.makeZero(reduced);
+            }
+
+            myRecovered.fillByMultiplying(mtrxL, reduced);
+
+            return myRecovered;
+
+        default:
+
+            if (reduced instanceof PhysicalStore<?>) {
+                myRecovered = (PhysicalStore<N>) reduced;
+            } else {
+                if (myRecovered != null) {
+                    reduced.supplyTo(myRecovered);
+                } else {
+                    myRecovered = reduced.collect(myFactory);
+                }
+            }
+
+            myRecovered.substituteBackwards(mtrxL, false, true, false);
+
+            return myRecovered;
+        }
     }
 
     PhysicalStore<N> reduce(final Access2D.Collectable<N, ? super PhysicalStore<N>> original) {
 
-        if (myRecovered != null) {
-            original.supplyTo(myRecovered);
-        } else {
-            myRecovered = original.collect(myFactory);
-        }
-
         MatrixStore<N> mtrxL = myCholesky.getL();
 
-        myRecovered.substituteForwards(mtrxL, false, false, false);
-        myReduced = myRecovered.transpose().copy();
-        myReduced.substituteForwards(mtrxL, false, false, false);
+        switch (myType) {
 
-        return myReduced;
+        case A_B:
+
+            if (myRecovered != null) {
+                original.supplyTo(myRecovered);
+            } else {
+                myRecovered = original.collect(myFactory);
+            }
+
+            myRecovered.substituteForwards(mtrxL, false, false, false);
+            myReduced = myRecovered.transpose().copy();
+            myReduced.substituteForwards(mtrxL, false, false, false);
+
+            return myReduced;
+
+        default:
+
+            if (myReduced != null) {
+                original.supplyTo(myReduced);
+            } else {
+                myReduced = original.collect(myFactory);
+            }
+
+            if (myRecovered == null) {
+                myRecovered = this.makeZero(original);
+            }
+
+            myRecovered.fillByMultiplying(myReduced, mtrxL);
+            myReduced.fillByMultiplying(mtrxL.transpose(), myRecovered);
+
+            return myReduced;
+        }
     }
 
 }

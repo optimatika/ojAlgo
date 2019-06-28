@@ -32,6 +32,7 @@ import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.Structure2D;
 
 /**
  * AbstractDecomposition
@@ -110,6 +111,10 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
 
     protected final DecompositionStore<N> makeZero(final int numberOfRows, final int numberOfColumns) {
         return myFactory.makeZero(numberOfRows, numberOfColumns);
+    }
+
+    protected final DecompositionStore<N> makeZero(final Structure2D shape) {
+        return myFactory.makeZero(shape);
     }
 
     @Override
