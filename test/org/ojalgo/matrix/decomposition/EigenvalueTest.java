@@ -413,6 +413,29 @@ public class EigenvalueTest {
     }
 
     @Test
+    public void testRandomGeneralisedUnprepared() throws RecoverableCondition {
+
+        NumberContext accuracy = NumberContext.getGeneral(MathContext.DECIMAL32);
+
+        for (int dim = 2; dim < 10; dim++) {
+
+            PrimitiveDenseStore mtrxA = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+
+            Eigenvalue<Double> eigenvalue = Eigenvalue.PRIMITIVE.make(mtrxA, true);
+            eigenvalue.decompose(mtrxA);
+            TestUtils.assertEquals(mtrxA, eigenvalue, accuracy);
+
+            Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA);
+            generalised.decompose(mtrxA);
+            TestUtils.assertEquals(mtrxA, generalised, accuracy);
+
+            TestUtils.assertEquals(eigenvalue.reconstruct(), generalised.reconstruct(), accuracy);
+            TestUtils.assertEquals(eigenvalue.getV(), generalised.getV(), accuracy);
+            TestUtils.assertEquals(eigenvalue.getD(), generalised.getD(), accuracy);
+        }
+    }
+
+    @Test
     public void testRandomSymmetricValuesOnly() {
 
         NumberContext evaluationContext = NumberContext.getGeneral(MathContext.DECIMAL32);
