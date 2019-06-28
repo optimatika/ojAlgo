@@ -115,25 +115,25 @@ public class SingularValueTest {
     @Test
     public void testComplexNumberVersionOfWikipediaCase() {
 
-        final PhysicalStore<Double> tmpBaseMtrx = PrimitiveDenseStore.FACTORY
+        PhysicalStore<Double> tmpBaseMtrx = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        final Array1D<Double> tmpExpectedSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
+        Array1D<Double> tmpExpectedSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
-        final ComplexNumber[] tmpScales = new ComplexNumber[] { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
+        ComplexNumber[] tmpScales = new ComplexNumber[] { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
                 ComplexNumber.makePolar(1.0, -Math.PI / 2.0), ComplexNumber.makePolar(1.0, Math.PI / 4.0),
                 ComplexNumber.makePolar(1.0, (4.0 * Math.PI) / 3.0) };
 
-        final Bidiagonal<ComplexNumber> tmpBidiagonal = Bidiagonal.COMPLEX.make();
-        final SingularValue<ComplexNumber> tmpSVD = SingularValue.COMPLEX.make();
+        Bidiagonal<ComplexNumber> tmpBidiagonal = Bidiagonal.COMPLEX.make();
+        SingularValue<ComplexNumber> tmpSVD = SingularValue.COMPLEX.make();
 
-        for (final ComplexNumber tmpScale : tmpScales) {
+        for (ComplexNumber tmpScale : tmpScales) {
 
-            final PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericDenseStore.COMPLEX.transpose(tmpBaseMtrx);
+            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericDenseStore.COMPLEX.transpose(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexMath.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx);
-            final MatrixStore<ComplexNumber> tmpReconstructed = tmpBidiagonal.reconstruct();
+            MatrixStore<ComplexNumber> tmpReconstructed = tmpBidiagonal.reconstruct();
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug();
                 BasicLogger.debug("Scale = {}", tmpScale);
@@ -146,27 +146,27 @@ public class SingularValueTest {
             TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, new NumberContext(7, 6));
         }
 
-        for (final ComplexNumber tmpScale : tmpScales) {
+        for (ComplexNumber tmpScale : tmpScales) {
 
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug();
                 BasicLogger.debug("Scale = {}", tmpScale);
             }
 
-            final PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericDenseStore.COMPLEX.copy(tmpBaseMtrx);
+            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericDenseStore.COMPLEX.copy(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexMath.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx.conjugate());
             tmpSVD.decompose(tmpOriginalMtrx);
 
-            final Array1D<Double> tmpActualSingularValues = tmpSVD.getSingularValues();
+            Array1D<Double> tmpActualSingularValues = tmpSVD.getSingularValues();
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug("Expected = {}", tmpExpectedSingularValues);
                 BasicLogger.debug("Actual = {}", tmpActualSingularValues);
             }
             TestUtils.assertEquals(tmpExpectedSingularValues, tmpActualSingularValues, new NumberContext(7, 6));
 
-            final MatrixStore<ComplexNumber> tmpReconstructed = tmpSVD.reconstruct();
+            MatrixStore<ComplexNumber> tmpReconstructed = tmpSVD.reconstruct();
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug("Original", tmpOriginalMtrx);
                 BasicLogger.debug("Reconstructed", tmpReconstructed);
@@ -196,16 +196,82 @@ public class SingularValueTest {
 
     }
 
+    /**
+     * https://stackoverflow.com/questions/56752647/huge-difference-between-svd-solution-output-of-commons-math3-and-ojalgo-librarie
+     */
+    @Test
+    public void testPseudoinverseSolve() {
+
+        double[][] olsColumns = { { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
+                { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
+                { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
+                { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
+                { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
+                { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
+                { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
+                { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
+                { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
+                { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 } };
+        PrimitiveDenseStore body = PrimitiveDenseStore.FACTORY.rows(olsColumns);
+
+        double[] observationVector = { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+        PrimitiveDenseStore rhs = PrimitiveDenseStore.FACTORY.column(observationVector);
+
+        double expected = 0.0161290322580645;
+        MatrixStore<Double> actual;
+        MatrixStore<Double> inverse;
+
+        for (SingularValue<Double> decomp : MatrixDecompositionTests.getPrimitiveSingularValue()) {
+
+            decomp.reset();
+            decomp.decompose(body);
+
+            actual = decomp.getSolution(rhs);
+            TestUtils.assertEquals(2, actual.count());
+            TestUtils.assertEquals(expected, actual.doubleValue(0));
+            TestUtils.assertEquals(expected, actual.doubleValue(1));
+
+            decomp.reset();
+            decomp.decompose(body);
+
+            actual = decomp.getSolution(rhs, decomp.preallocate(body, rhs));
+            TestUtils.assertEquals(2, actual.count());
+            TestUtils.assertEquals(expected, actual.doubleValue(0));
+            TestUtils.assertEquals(expected, actual.doubleValue(1));
+
+            decomp.reset();
+            decomp.decompose(body);
+
+            inverse = decomp.getInverse();
+            actual = inverse.multiply(rhs);
+            TestUtils.assertEquals(2, actual.count());
+            TestUtils.assertEquals(expected, actual.doubleValue(0));
+            TestUtils.assertEquals(expected, actual.doubleValue(1));
+
+            decomp.reset();
+            decomp.decompose(body);
+
+            inverse = decomp.getInverse(decomp.preallocate(body));
+            actual = inverse.multiply(rhs);
+            TestUtils.assertEquals(2, actual.count());
+            TestUtils.assertEquals(expected, actual.doubleValue(0));
+            TestUtils.assertEquals(expected, actual.doubleValue(1));
+        }
+    }
+
     @Test
     public void testRandomActuallyComplexCase() {
 
-        final PhysicalStore<ComplexNumber> tmpOriginal = TestUtils.makeRandomComplexStore(4, 4);
+        PhysicalStore<ComplexNumber> tmpOriginal = TestUtils.makeRandomComplexStore(4, 4);
 
-        final SingularValue<ComplexNumber> tmpDecomposition = SingularValue.COMPLEX.make();
+        SingularValue<ComplexNumber> tmpDecomposition = SingularValue.COMPLEX.make();
 
         tmpDecomposition.decompose(tmpOriginal);
 
-        final MatrixStore<ComplexNumber> tmpReconstructed = tmpDecomposition.reconstruct();
+        MatrixStore<ComplexNumber> tmpReconstructed = tmpDecomposition.reconstruct();
 
         if (!Access2D.equals(tmpOriginal, tmpReconstructed, new NumberContext(7, 6))) {
             BasicLogger.error("Recreation failed for: {}", tmpDecomposition.getClass().getName());
@@ -221,7 +287,7 @@ public class SingularValueTest {
             BasicLogger.debug("D", tmpDecomposition.getD());
             BasicLogger.debug("Q2", tmpDecomposition.getV());
             BasicLogger.debug("Reconstructed", tmpReconstructed);
-            final PhysicalStore<ComplexNumber> tmpCopy = tmpOriginal.copy();
+            PhysicalStore<ComplexNumber> tmpCopy = tmpOriginal.copy();
             // tmpCopy.maxpy(ComplexNumber.NEG, tmpReconstructed);
             tmpReconstructed.axpy(-1, tmpCopy);
             BasicLogger.debug("Diff", tmpCopy);
@@ -250,7 +316,7 @@ public class SingularValueTest {
     @Test
     public void testRecreationFat() {
 
-        final PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_FAT);
+        PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_FAT);
 
         this.testRecreation(tmpOriginal);
     }
@@ -258,7 +324,7 @@ public class SingularValueTest {
     @Test
     public void testRecreationSquare() {
 
-        final PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_SQUARE);
+        PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_SQUARE);
 
         this.testRecreation(tmpOriginal);
     }
@@ -266,26 +332,26 @@ public class SingularValueTest {
     @Test
     public void testRecreationTall() {
 
-        final PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_TALL);
+        PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_TALL);
 
         this.testRecreation(tmpOriginal);
     }
 
     private void doTestTypes(final RationalMatrix original) {
 
-        final PhysicalStore<RationalNumber> tmpBigStore = GenericDenseStore.RATIONAL.copy(original);
-        final PhysicalStore<ComplexNumber> tmpComplexStore = GenericDenseStore.COMPLEX.copy(original);
-        final PhysicalStore<Double> tmpPrimitiveStore = PrimitiveDenseStore.FACTORY.copy(original);
+        PhysicalStore<RationalNumber> tmpBigStore = GenericDenseStore.RATIONAL.copy(original);
+        PhysicalStore<ComplexNumber> tmpComplexStore = GenericDenseStore.COMPLEX.copy(original);
+        PhysicalStore<Double> tmpPrimitiveStore = PrimitiveDenseStore.FACTORY.copy(original);
 
         IMPL_BIG.decompose(GenericDenseStore.RATIONAL.copy(original));
         IMPL_COMPLEX.decompose(GenericDenseStore.COMPLEX.copy(original));
         IMPL_RAW.decompose(PrimitiveDenseStore.FACTORY.copy(original));
         IMPL_PRIMITIVE.decompose(PrimitiveDenseStore.FACTORY.copy(original));
 
-        final Array1D<Double> tmpBigSingularValues = IMPL_BIG.getSingularValues();
-        final Array1D<Double> tmpComplexSingularValues = IMPL_COMPLEX.getSingularValues();
-        final Array1D<Double> tmpJamaSingularValues = IMPL_RAW.getSingularValues();
-        final Array1D<Double> tmpDirectSingularValues = IMPL_PRIMITIVE.getSingularValues();
+        Array1D<Double> tmpBigSingularValues = IMPL_BIG.getSingularValues();
+        Array1D<Double> tmpComplexSingularValues = IMPL_COMPLEX.getSingularValues();
+        Array1D<Double> tmpJamaSingularValues = IMPL_RAW.getSingularValues();
+        Array1D<Double> tmpDirectSingularValues = IMPL_PRIMITIVE.getSingularValues();
 
         UnaryFunction<Double> tmpPrimitiveRoundFunction = CNTXT_REAL_VALUES.getFunction(PrimitiveFunction.getSet());
         //        tmpBigSingularValues.modifyAll(tmpPrimitiveRoundFunction);
@@ -384,12 +450,12 @@ public class SingularValueTest {
 
     private void testRecreation(final PhysicalStore<Double> aMtrx) {
 
-        final SingularValue<Double>[] tmpImpls = MatrixDecompositionTests.getPrimitiveSingularValue();
+        SingularValue<Double>[] tmpImpls = MatrixDecompositionTests.getPrimitiveSingularValue();
 
-        for (final SingularValue<Double> tmpImpl : tmpImpls) {
+        for (SingularValue<Double> tmpImpl : tmpImpls) {
 
             tmpImpl.decompose(aMtrx);
-            final MatrixStore<Double> tmpReconstructed = SingularValue.reconstruct(tmpImpl);
+            MatrixStore<Double> tmpReconstructed = SingularValue.reconstruct(tmpImpl);
             if (!Access2D.equals(aMtrx, tmpReconstructed, new NumberContext(7, 6))) {
                 BasicLogger.error("Recreation failed for: {}", tmpImpl.getClass().getName());
             }
@@ -404,7 +470,7 @@ public class SingularValueTest {
                 BasicLogger.debug("D", tmpImpl.getD());
                 BasicLogger.debug("Q2", tmpImpl.getV());
                 BasicLogger.debug("Reconstructed", tmpReconstructed);
-                final PhysicalStore<Double> tmpCopy = aMtrx.copy();
+                PhysicalStore<Double> tmpCopy = aMtrx.copy();
                 // tmpCopy.maxpy(-1.0, tmpReconstructed);
                 tmpReconstructed.axpy(-1, tmpCopy);
                 BasicLogger.debug("Diff", tmpCopy);
