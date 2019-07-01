@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
-import static org.ojalgo.matrix.decomposition.MatrixDecompositionTests.*;
 
 import java.util.List;
 
@@ -47,7 +46,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class ExtremeElementsCase {
+public class ExtremeElementsCase extends MatrixDecompositionTests {
 
     /**
      * 146 = (308/2) - (16/2)
@@ -217,6 +216,7 @@ public class ExtremeElementsCase {
         return tmpRndm.transpose().multiply(tmpRndm).multiply(1E-150);
     }
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();

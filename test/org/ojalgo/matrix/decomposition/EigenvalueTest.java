@@ -52,7 +52,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class EigenvalueTest {
+public class EigenvalueTest extends MatrixDecompositionTests {
 
     static class EvD {
 
@@ -62,6 +62,7 @@ public class EigenvalueTest {
 
     }
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
@@ -358,6 +359,10 @@ public class EigenvalueTest {
 
             Eigenvalue.Generalised<Double> generalised = Eigenvalue.PRIMITIVE.makeGeneralised(mtrxA, Generalisation.AB);
             generalised.decompose(mtrxA, mtrxB);
+
+            if (DEBUG) {
+
+            }
 
             TestUtils.assertEquals(mtrxC, generalised.reconstruct(), accuracy);
             TestUtils.assertEquals(vectorsZ, generalised.getV(), accuracy);

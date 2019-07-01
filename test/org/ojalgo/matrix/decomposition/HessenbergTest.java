@@ -34,8 +34,9 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class HessenbergTest {
+public class HessenbergTest extends MatrixDecompositionTests {
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();

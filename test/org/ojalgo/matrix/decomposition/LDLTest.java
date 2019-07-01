@@ -34,8 +34,9 @@ import org.ojalgo.netio.BasicLogger;
 /**
  * @author apete
  */
-public class LDLTest {
+public class LDLTest extends MatrixDecompositionTests {
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();

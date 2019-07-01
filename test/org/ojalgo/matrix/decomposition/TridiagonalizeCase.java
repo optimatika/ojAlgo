@@ -39,8 +39,9 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class TridiagonalizeCase {
+public class TridiagonalizeCase extends MatrixDecompositionTests {
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();

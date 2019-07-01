@@ -87,8 +87,8 @@ public abstract class MatrixDecompositionTests {
     }
 
     public static Eigenvalue<?>[] getAnyEigenvalueHermitian() {
-        return new Eigenvalue<?>[] { new HermitianEvD.Primitive(), new RawEigenvalue.Symmetric(), new HermitianEvD.Rational(),
-                new HermitianEvD.Complex(), new HermitianEvD.Quat() };
+        return new Eigenvalue<?>[] { new HermitianEvD.Primitive(), new RawEigenvalue.Symmetric(), new HermitianEvD.Rational(), new HermitianEvD.Complex(),
+                new HermitianEvD.Quat() };
     }
 
     public static Hessenberg<?>[] getAnyHessenberg() {

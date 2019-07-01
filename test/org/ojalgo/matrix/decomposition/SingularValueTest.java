@@ -48,7 +48,7 @@ import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
-public class SingularValueTest {
+public class SingularValueTest extends MatrixDecompositionTests {
 
     private static final SingularValue<RationalNumber> IMPL_BIG = SingularValue.RATIONAL.make();
     private static final SingularValue<ComplexNumber> IMPL_COMPLEX = SingularValue.COMPLEX.make();
@@ -64,6 +64,7 @@ public class SingularValueTest {
     static final NumberContext CNTXT_REAL_DECOMP = new NumberContext(3, 2);
     static final NumberContext CNTXT_REAL_VALUES = new NumberContext(7, 10);
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
