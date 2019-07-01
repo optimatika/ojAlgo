@@ -73,14 +73,14 @@ public class EigenvalueTest extends MatrixDecompositionTests {
 
         PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.copy(P20050125Case.getProblematic());
 
-        TestUtils.assertTrue(MatrixUtils.isHermitian(tmpOriginalMatrix));
+        TestUtils.assertTrue(tmpOriginalMatrix.isHermitian());
 
         Eigenvalue<Double>[] tmpDecomps = MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric();
         for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
             tmpDecomp.decompose(tmpOriginalMatrix);
         }
 
-        if (MatrixDecompositionTests.DEBUG) {
+        if (DEBUG) {
 
             BasicLogger.debug("Eigenvalues");
             for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
