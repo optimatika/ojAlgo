@@ -66,7 +66,7 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         }
 
         @Override
-        PlainArray<BigDecimal> make(final long size) {
+        PlainArray<BigDecimal> makeDenseArray(final long size) {
             return BigArray.make((int) size);
         }
 

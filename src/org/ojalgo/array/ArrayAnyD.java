@@ -79,7 +79,7 @@ public final class ArrayAnyD<N extends Number>
             return myDelegate.makeStructuredZero(structure).wrapInArrayAnyD(structure);
         }
 
-        public ArrayAnyD<N> makeZero(final long... structure) {
+        public ArrayAnyD<N> make(final long... structure) {
             return myDelegate.makeToBeFilled(structure).wrapInArrayAnyD(structure);
         }
 

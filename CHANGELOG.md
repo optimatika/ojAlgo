@@ -41,6 +41,7 @@
 ## org.ojalgo.structure
 
 * Additions to Structure2D.Logical (Moved definitions from MatrixStore.LogicalBuilder to here).
+* Refactoring to Factory1D, Factory2D and FactoryAnyD – makeZero(...) is renamed make(...) and everything is moved to a nestyed subinterface Dense.
 
 # v47.2.0: 2019-05-03
 

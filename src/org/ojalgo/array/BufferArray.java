@@ -137,7 +137,7 @@ public abstract class BufferArray extends PlainArray<Double> {
         }
 
         @Override
-        DenseArray<Double> make(final long size) {
+        DenseArray<Double> makeDenseArray(final long size) {
             final int tmpSize = (int) size;
             final ByteBuffer tmpAllocateDirect = ByteBuffer.allocateDirect(tmpSize * 4);
             return new FloatBufferArray(tmpAllocateDirect.asFloatBuffer(), null);
@@ -173,7 +173,7 @@ public abstract class BufferArray extends PlainArray<Double> {
         }
 
         @Override
-        DenseArray<Double> make(final long size) {
+        DenseArray<Double> makeDenseArray(final long size) {
             final int tmpSize = (int) size;
             final ByteBuffer tmpAllocateDirect = ByteBuffer.allocateDirect(tmpSize * 8);
             return new DoubleBufferArray(tmpAllocateDirect.asDoubleBuffer(), null);
@@ -249,7 +249,7 @@ public abstract class BufferArray extends PlainArray<Double> {
                     }
 
                     @Override
-                    PlainArray<Double> make(final long size) {
+                    PlainArray<Double> makeDenseArray(final long size) {
 
                         final long tmpSize2 = size * DOUBLE_ELEMENT_SIZE;
                         try {

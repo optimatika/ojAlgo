@@ -771,7 +771,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
      */
     default PhysicalStore<N> copy() {
 
-        PhysicalStore<N> retVal = this.physical().makeZero(this);
+        PhysicalStore<N> retVal = this.physical().make(this);
 
         this.supplyTo(retVal);
 
@@ -994,8 +994,8 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         } else {
             // 3,5,7
 
-            PhysicalStore<N> right = factory.makeZero(this);
-            PhysicalStore<N> product = factory.makeZero(this);
+            PhysicalStore<N> right = factory.make(this);
+            PhysicalStore<N> product = factory.make(this);
             PhysicalStore<N> temp;
 
             this.multiply(this, product);

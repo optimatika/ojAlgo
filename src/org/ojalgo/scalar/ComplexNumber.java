@@ -711,14 +711,14 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     }
 
     public MatrixStore<Double> toMultiplicationMatrix() {
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(this);
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(this);
         this.supplyTo(retVal);
         return retVal;
     }
 
     public MatrixStore<Double> toMultiplicationVector() {
 
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(2L, 1L);
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(2L, 1L);
 
         retVal.set(0L, myRealValue);
         retVal.set(1L, i);
@@ -728,7 +728,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     public MatrixStore<Double> toRotationMatrix() {
 
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(2L, 2L);
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(2L, 2L);
 
         final double s = myRealValue;
 

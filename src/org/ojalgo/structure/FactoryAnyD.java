@@ -25,18 +25,38 @@ import org.ojalgo.function.NullaryFunction;
 
 public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement {
 
-    I copy(AccessAnyD<?> source);
+    interface Dense<I extends StructureAnyD> extends FactoryAnyD<I> {
 
-    I makeFilled(long[] structure, NullaryFunction<?> supplier);
+        I copy(AccessAnyD<?> source);
 
-    default I makeFilled(final StructureAnyD shape, final NullaryFunction<?> supplier) {
-        return this.makeFilled(shape.shape(), supplier);
+        I makeFilled(long[] structure, NullaryFunction<?> supplier);
+
+        default I makeFilled(final StructureAnyD shape, final NullaryFunction<?> supplier) {
+            return this.makeFilled(shape.shape(), supplier);
+        }
+
     }
 
-    I makeZero(long... structure);
+    I make(long... structure);
 
+    default I make(final StructureAnyD shape) {
+        return this.make(shape.shape());
+    }
+
+    /**
+     * @deprecated v48 Use {@link #make(long...)} instead
+     */
+    @Deprecated
+    default I makeZero(final long... structure) {
+        return this.make(structure);
+    }
+
+    /**
+     * @deprecated v48 Use {@link #make(StructureAnyD)} instead
+     */
+    @Deprecated
     default I makeZero(final StructureAnyD shape) {
-        return this.makeZero(shape.shape());
+        return this.make(shape);
     }
 
 }

@@ -252,7 +252,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             return this.makeRotation(low, high, cos != null ? cos.doubleValue() : Double.NaN, sin != null ? sin.doubleValue() : Double.NaN);
         }
 
-        public PrimitiveDenseStore makeZero(final long rows, final long columns) {
+        public PrimitiveDenseStore make(final long rows, final long columns) {
             return new PrimitiveDenseStore((int) rows, (int) columns);
         }
 

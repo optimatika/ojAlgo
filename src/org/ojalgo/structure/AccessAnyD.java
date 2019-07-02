@@ -54,7 +54,7 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
         default <I extends R> I collect(final FactoryAnyD<I> factory) {
 
-            final I retVal = factory.makeZero(this.shape());
+            final I retVal = factory.make(this.shape());
 
             this.supplyTo(retVal);
 

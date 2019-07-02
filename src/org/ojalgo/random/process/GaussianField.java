@@ -248,7 +248,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
         final int tmpLength = args.length;
 
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(tmpLength, 1);
+        final PrimitiveDenseStore retVal = FACTORY.make(tmpLength, 1);
 
         for (int i = 0; i < tmpLength; i++) {
             retVal.set(i, 0, myMeanFunction.invoke(args[i]));
@@ -263,7 +263,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
         final int tmpSize = tmpObservations.size();
 
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(tmpSize, 1);
+        final PrimitiveDenseStore retVal = FACTORY.make(tmpSize, 1);
 
         for (int i = 0; i < tmpSize; i++) {
             retVal.set(i, 0, myMeanFunction.invoke(tmpObservations.get(i).key));
@@ -278,7 +278,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
         final int tmpSize = tmpObservations.size();
 
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(tmpSize, 1);
+        final PrimitiveDenseStore retVal = FACTORY.make(tmpSize, 1);
 
         ComparableToDouble<K> tmpObservation;
         double tmpDiff;

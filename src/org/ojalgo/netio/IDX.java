@@ -57,7 +57,7 @@ public abstract class IDX {
                 structure[rank - 1 - i] = input.readInt();
             }
 
-            ArrayAnyD<Double> data = ArrayAnyD.factory(arrayFactory).makeZero(structure);
+            ArrayAnyD<Double> data = ArrayAnyD.factory(arrayFactory).make(structure);
 
             for (long i = 0, limit = data.count(); i < limit; i++) {
                 switch (type) {

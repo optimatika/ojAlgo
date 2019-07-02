@@ -296,7 +296,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             return new Rotation.Generic<>(low, high, cos, sin);
         }
 
-        public GenericDenseStore<N> makeZero(final long rows, final long columns) {
+        public GenericDenseStore<N> make(final long rows, final long columns) {
             return new GenericDenseStore<>(this, (int) rows, (int) columns);
         }
 
