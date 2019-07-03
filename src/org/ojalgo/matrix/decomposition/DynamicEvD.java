@@ -34,7 +34,7 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
     static final class Primitive extends DynamicEvD<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY, new HermitianEvD.SimultaneousPrimitive(), new GeneralEvD.Primitive());
+            super(PrimitiveDenseStore.FACTORY, new HermitianEvD.Primitive(), new GeneralEvD.Primitive());
         }
 
     }
@@ -58,6 +58,10 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
         myHermitianDelegate = hermitianDelegate;
         myGeneralDelegate = generalDelegate;
+    }
+
+    public boolean checkAndDecompose(final MatrixStore<N> matrix) {
+        return this.decompose(matrix);
     }
 
     @Override
@@ -92,18 +96,22 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
         myGeneralDelegate.reset();
         myHermitianDelegate.reset();
-
-        myHermitian = false;
     }
 
     @Override
-    protected boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
-        return myGeneralDelegate.doGeneral(matrix, eigenvaluesOnly);
-    }
+    protected boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
 
-    @Override
-    protected boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
-        return myHermitianDelegate.doHermitian(matrix, eigenvaluesOnly);
+        if (matrix instanceof MatrixStore) {
+            myHermitian = ((MatrixStore<?>) matrix).isHermitian();
+        } else {
+            myHermitian = false;
+        }
+
+        if (myHermitian) {
+            return myHermitianDelegate.doDecompose(matrix, valuesOnly);
+        } else {
+            return myGeneralDelegate.doDecompose(matrix, valuesOnly);
+        }
     }
 
     @Override

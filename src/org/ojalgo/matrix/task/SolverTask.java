@@ -39,10 +39,10 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
     public static abstract class Factory<N extends Number> {
 
-        public final SolverTask<N> make(final int numberOfEquations, final int numberOfVariables, final int numberOfSolutions, final boolean symmetric,
+        public SolverTask<N> make(final int numberOfEquations, final int numberOfVariables, final int numberOfSolutions, final boolean symmetric,
                 final boolean positiveDefinite) {
 
-            final Structure2D templateBody = new Structure2D() {
+            Structure2D templateBody = new Structure2D() {
 
                 public long countColumns() {
                     return numberOfVariables;
@@ -53,7 +53,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
                 }
             };
 
-            final Structure2D templateRHS = new Structure2D() {
+            Structure2D templateRHS = new Structure2D() {
 
                 public long countColumns() {
                     return numberOfSolutions;
@@ -67,11 +67,18 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
             return this.make(templateBody, templateRHS, symmetric, positiveDefinite);
         }
 
-        public final SolverTask<N> make(final MatrixStore<N> templateBody, final MatrixStore<N> templateRHS) {
+        public SolverTask<N> make(final MatrixStore<N> templateBody, final MatrixStore<N> templateRHS) {
             return this.make(templateBody, templateRHS, MatrixUtils.isHermitian(templateBody), false);
         }
 
         public abstract SolverTask<N> make(Structure2D templateBody, Structure2D templateRHS, boolean symmetric, boolean positiveDefinite);
+
+        /**
+         * [A][X]=[B] or [body][return]=[rhs]
+         */
+        public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
+            return this.make(body, rhs, false, false).solve(body, rhs);
+        }
 
     }
 
@@ -100,9 +107,9 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
         @Override
         public SolverTask<Double> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric, final boolean positiveDefinite) {
 
-            final boolean tmpVectorRHS = templateRHS.countColumns() == 1L;
+            boolean tmpVectorRHS = templateRHS.countColumns() == 1L;
 
-            final long tmpColDim = templateBody.countColumns();
+            long tmpColDim = templateBody.countColumns();
 
             if (templateBody.isSquare()) {
 
@@ -201,7 +208,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
     default PhysicalStore<N> preallocate(final int numberOfEquations, final int numberOfVariables, final int numberOfSolutions) {
 
-        final Structure2D templateBody = new Structure2D() {
+        Structure2D templateBody = new Structure2D() {
 
             public long countColumns() {
                 return numberOfVariables;
@@ -212,7 +219,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
             }
         };
 
-        final Structure2D templateRHS = new Structure2D() {
+        Structure2D templateRHS = new Structure2D() {
 
             public long countColumns() {
                 return numberOfSolutions;
@@ -260,7 +267,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      *
      * @param rhs The Right Hand Side, wont be modfied
      * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
-     *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
+     *        assume this is modified, but you cannot assume it will contain the full/ /correct solution.
      * @return The solution
      */
     MatrixStore<N> solve(Access2D<?> body, Access2D<?> rhs, PhysicalStore<N> preallocated) throws RecoverableCondition;

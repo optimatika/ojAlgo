@@ -123,12 +123,11 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
     @Override
     public final MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
-        final DecompositionStore<N> tmpBody = this.getInPlace();
+        final DecompositionStore<N> body = this.getInPlace();
 
-        preallocated.substituteForwards(tmpBody, false, false, true);
-        preallocated.substituteBackwards(tmpBody, false, true, true);
+        preallocated.substituteForwards(body, false, false, true);
+        preallocated.substituteBackwards(body, false, true, true);
 
-        //return new LowerHermitianStore<>(preallocated);
         return preallocated.logical().hermitian(false).get();
     }
 
@@ -167,10 +166,10 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
         rhs.supplyTo(preallocated);
 
-        final DecompositionStore<N> tmpBody = this.getInPlace();
+        final DecompositionStore<N> body = this.getInPlace();
 
-        preallocated.substituteForwards(tmpBody, false, false, false);
-        preallocated.substituteBackwards(tmpBody, false, true, false);
+        preallocated.substituteForwards(body, false, false, false);
+        preallocated.substituteBackwards(body, false, true, false);
 
         return preallocated;
     }

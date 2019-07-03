@@ -24,6 +24,9 @@
 * MatrixStore.Factory has a new method makeDiagonal(...)
 * MatrixStore.LogicalBuilder has new implementations for the diagonal(), bidiagonal(boolean) and tridiagonal() methods.
 * Some improvements to TransposedStore – more efficient use of the underlying store. Particular in the case when it is a RawStore.
+* Some general cleanup/refactoring among the Eigenvalue related code.
+* Added support for generalised eigenvalue problems.
+* Fixed in a bug in RawStore - visitRow/Column were interchanged
 
 ## org.ojalgo.optimisation
 

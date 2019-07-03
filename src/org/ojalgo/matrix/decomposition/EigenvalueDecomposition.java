@@ -26,7 +26,6 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
@@ -74,16 +73,12 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         return this.getDeterminant();
     }
 
-    public final boolean checkAndDecompose(final MatrixStore<N> matrix) {
-        return this.compute(matrix, matrix.isHermitian(), false);
-    }
-
     public boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
-        return this.compute(matrix, this.isHermitian(), true);
+        return this.decompose(matrix, true);
     }
 
     public final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
-        return this.compute(matrix, this.isHermitian(), false);
+        return this.decompose(matrix, false);
     }
 
     public final MatrixStore<N> getD() {
@@ -127,7 +122,7 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         mySquareDim = 0;
     }
 
-    private final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean hermitian, final boolean valuesOnly) {
+    private final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
 
         this.reset();
 
@@ -141,29 +136,12 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         }
         mySquareDim = Math.toIntExact(countRows);
 
-        try {
-
-            if (hermitian) {
-                retVal = this.doHermitian(matrix, valuesOnly);
-            } else {
-                retVal = this.doGeneral(matrix, valuesOnly);
-            }
-
-        } catch (final Exception exc) {
-
-            BasicLogger.error(exc.toString());
-
-            this.reset();
-
-            retVal = false;
-        }
+        retVal = this.doDecompose(matrix, valuesOnly);
 
         return this.computed(retVal);
     }
 
-    protected abstract boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
-
-    protected abstract boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
+    protected abstract boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly);
 
     @Override
     protected int getColDim() {

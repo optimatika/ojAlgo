@@ -44,7 +44,7 @@ import org.ojalgo.optimisation.Variable;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
-public class LinearDesignTestCases {
+public class LinearDesignTestCases extends OptimisationLinearTests {
 
     /**
      * http://math.uww.edu/~mcfarlat/s-prob.htm

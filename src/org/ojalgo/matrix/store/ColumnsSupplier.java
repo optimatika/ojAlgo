@@ -8,9 +8,34 @@ import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.ColumnView;
+import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate1D;
 
 public final class ColumnsSupplier<N extends Number> implements Access2D<N>, ElementsSupplier<N> {
+
+    static final class ItemView<N extends Number> extends ColumnView<N> {
+
+        private final ColumnsSupplier<N> mySupplier;
+
+        ItemView(final ColumnsSupplier<N> access) {
+            super(access);
+            mySupplier = access;
+        }
+
+        public ElementView1D<N, ?> elements() {
+            return this.getCurrent().elements();
+        }
+
+        public ElementView1D<N, ?> nonzeros() {
+            return this.getCurrent().nonzeros();
+        }
+
+        private SparseArray<N> getCurrent() {
+            return mySupplier.getColumn(Math.toIntExact(this.column()));
+        }
+
+    }
 
     private final List<SparseArray<N>> myColumns = new ArrayList<>();
     private final PhysicalStore.Factory<N, ?> myFactory;
@@ -27,10 +52,14 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
     }
 
     public void addColumns(final int numberToAdd) {
-        final SparseFactory<N> factory = SparseArray.factory(myFactory.array(), myRowsCount);
+        SparseFactory<N> factory = SparseArray.factory(myFactory.array(), myRowsCount);
         for (int j = 0; j < numberToAdd; j++) {
             myColumns.add(factory.make());
         }
+    }
+
+    public ColumnView<N> columns() {
+        return new ItemView<>(this);
     }
 
     public long countColumns() {
@@ -62,7 +91,7 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
     }
 
     public ColumnsSupplier<N> selectColumns(final int[] indices) {
-        final ColumnsSupplier<N> retVal = new ColumnsSupplier<>(myFactory, myRowsCount);
+        ColumnsSupplier<N> retVal = new ColumnsSupplier<>(myFactory, myRowsCount);
         for (int i = 0; i < indices.length; i++) {
             retVal.addColumn(this.getColumn(indices[i]));
         }
@@ -74,7 +103,7 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
         receiver.reset();
 
         for (int j = 0, limit = myColumns.size(); j < limit; j++) {
-            final long col = j;
+            long col = j;
 
             myColumns.get(j).supplyNonZerosTo(new Mutate1D() {
 

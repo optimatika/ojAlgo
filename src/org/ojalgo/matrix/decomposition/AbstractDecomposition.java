@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.FunctionSet;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -66,7 +67,7 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
         mySolvable = null;
     }
 
-    protected abstract DecompositionStore<N> allocate(long numberOfRows, long numberOfColumns);
+    protected abstract PhysicalStore<N> allocate(long numberOfRows, long numberOfColumns);
 
     protected boolean checkSolvability() {
         return false;

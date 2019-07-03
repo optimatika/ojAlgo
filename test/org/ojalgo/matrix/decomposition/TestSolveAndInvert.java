@@ -34,13 +34,14 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class TestSolveAndInvert {
+public class TestSolveAndInvert extends MatrixDecompositionTests {
 
     static MatrixDecomposition.Solver<Double>[] getAllSquare() {
         return (MatrixDecomposition.Solver<Double>[]) new MatrixDecomposition.Solver<?>[] { LU.PRIMITIVE.make(), new RawLU(), QR.PRIMITIVE.make(), new RawQR(),
                 SingularValue.PRIMITIVE.make(), new RawSingularValue()/* , new SVDold30.Primitive() */ };
     }
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();

@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.task.iterative;
+package org.ojalgo.equation;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 

@@ -35,10 +35,11 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class SVDbyEvD {
+public class SVDbyEvD extends MatrixDecompositionTests {
 
     private static final NumberContext CONTEXT = new NumberContext(7, 6);
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
