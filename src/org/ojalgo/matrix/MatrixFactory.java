@@ -932,7 +932,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
     }
 
     public DR makeDense(final int rows, final int columns) {
-        return this.physical(myPhysicalFactory.makeZero(rows, columns));
+        return this.physical(myPhysicalFactory.make(rows, columns));
     }
 
     public M makeEye(final int rows, final int columns) {
@@ -978,7 +978,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
         return this.instantiate(myPhysicalFactory.builder().makeWrapper(elements).get());
     }
 
-    public M makeZero(final long rows, final long columns) {
+    public M make(final long rows, final long columns) {
         return this.instantiate(myPhysicalFactory.builder().makeZero((int) rows, (int) columns).get());
     }
 

@@ -46,7 +46,7 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
         abstract long getElementSize();
 
-        abstract DenseArray<N> make(long size);
+        abstract DenseArray<N> makeDenseArray(long size);
 
         @Override
         final DenseArray<N> makeStructuredZero(final long... structure) {
@@ -59,7 +59,7 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
             } else {
 
-                return this.make(total);
+                return this.makeDenseArray(total);
             }
         }
 
@@ -74,7 +74,7 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
             } else {
 
-                return this.make(total);
+                return this.makeDenseArray(total);
             }
         }
 

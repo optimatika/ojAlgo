@@ -27,24 +27,44 @@ import org.ojalgo.function.NullaryFunction;
 
 public interface Factory1D<I extends Structure1D> extends FactorySupplement {
 
-    I copy(Access1D<?> source);
+    interface Dense<I extends Structure1D> extends Factory1D<I> {
 
-    I copy(double... source);
+        I copy(Access1D<?> source);
 
-    I copy(List<? extends Number> source);
+        I copy(double... source);
 
-    I copy(Number... source);
+        I copy(List<? extends Number> source);
 
-    I makeFilled(long count, NullaryFunction<?> supplier);
+        I copy(Number... source);
 
-    default I makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
-        return this.makeFilled(shape.count(), supplier);
+        I makeFilled(long count, NullaryFunction<?> supplier);
+
+        default I makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
+            return this.makeFilled(shape.count(), supplier);
+        }
+
     }
 
-    I makeZero(long count);
+    I make(long count);
 
-    default I makeZero(final Structure1D shape) {
+    default I make(final Structure1D shape) {
         return this.makeZero(shape.count());
+    }
+
+    /**
+     * @deprecated v48 Use {@link #make(long)} instead
+     */
+    @Deprecated
+    default I makeZero(final long count) {
+        return this.make(count);
+    }
+
+    /**
+     * @deprecated v48 Use {@link #make(Structure1D)} instead
+     */
+    @Deprecated
+    default I makeZero(final Structure1D shape) {
+        return this.make(shape);
     }
 
 }

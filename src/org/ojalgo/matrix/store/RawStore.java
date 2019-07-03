@@ -204,7 +204,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             return new Rotation.Primitive(low, high, cos, sin);
         }
 
-        public RawStore makeZero(final long rows, final long columns) {
+        public RawStore make(final long rows, final long columns) {
             return new RawStore(Math.toIntExact(rows), Math.toIntExact(columns));
         }
 

@@ -61,7 +61,7 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
         }
 
         @Override
-        PlainArray<Quaternion> make(final long size) {
+        PlainArray<Quaternion> makeDenseArray(final long size) {
             return QuaternionArray.make((int) size);
         }
 

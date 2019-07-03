@@ -77,7 +77,7 @@ public class Primitive32Array extends PrimitiveArray {
         }
 
         @Override
-        PlainArray<Double> make(final long size) {
+        PlainArray<Double> makeDenseArray(final long size) {
             return Primitive32Array.make((int) size);
         }
 

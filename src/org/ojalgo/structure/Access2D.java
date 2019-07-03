@@ -72,7 +72,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         default <I extends R> I collect(final Factory2D<I> factory) {
 
-            final I retVal = factory.makeZero(this.countRows(), this.countColumns());
+            final I retVal = factory.make(this.countRows(), this.countColumns());
 
             this.supplyTo(retVal);
 

@@ -128,8 +128,8 @@ abstract class BackPropagationExample extends ANNTest {
 
         for (int layer = 0, limit = structure.length; layer < limit; layer++) {
 
-            PrimitiveDenseStore newWeights = weights[layer] = PrimitiveDenseStore.FACTORY.makeZero(structure[layer]);
-            PrimitiveDenseStore newBias = bias[layer] = PrimitiveDenseStore.FACTORY.makeZero(1, structure[layer].countColumns());
+            PrimitiveDenseStore newWeights = weights[layer] = PrimitiveDenseStore.FACTORY.make(structure[layer]);
+            PrimitiveDenseStore newBias = bias[layer] = PrimitiveDenseStore.FACTORY.make(1, structure[layer].countColumns());
 
             for (int output = 0; output < structure[layer].countColumns(); output++) {
                 for (int input = 0; input < structure[layer].countRows(); input++) {

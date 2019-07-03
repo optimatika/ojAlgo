@@ -169,7 +169,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
             return myDelegate.makeStructuredZero(rows, columns).wrapInArray2D(rows);
         }
 
-        public Array2D<N> makeZero(final long rows, final long columns) {
+        public Array2D<N> make(final long rows, final long columns) {
             return myDelegate.makeToBeFilled(rows, columns).wrapInArray2D(rows);
         }
 

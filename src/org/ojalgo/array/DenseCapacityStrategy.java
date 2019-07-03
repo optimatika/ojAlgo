@@ -140,7 +140,7 @@ final class DenseCapacityStrategy<N extends Number> {
     }
 
     DenseArray<N> make(final long size) {
-        return myDenseFactory.make(size);
+        return myDenseFactory.makeDenseArray(size);
     }
 
     DenseArray<N> makeChunk() {

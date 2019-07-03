@@ -61,7 +61,7 @@ public class ReductionTest {
 
         final double total = StructureAnyD.count(structure);
 
-        final ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.makeZero(structure);
+        final ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.make(structure);
         array.fillAll(1.0);
 
         for (int d = 0; d < structure.length; d++) {
@@ -81,7 +81,7 @@ public class ReductionTest {
 
         final double total = StructureAnyD.count(structure);
 
-        final ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.makeZero(structure);
+        final ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.make(structure);
         array.fillAll(1.0);
 
         for (int rd = 0; rd < structure.length; rd++) {
@@ -112,7 +112,7 @@ public class ReductionTest {
             structure[d] = 1 + rnd.nextInt(9);
         }
 
-        final ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.makeZero(structure);
+        final ArrayAnyD<Double> array = ArrayAnyD.PRIMITIVE64.make(structure);
         array.fillAll(new Normal());
 
         for (int rd = 0; rd < structure.length; rd++) {

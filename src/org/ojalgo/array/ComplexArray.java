@@ -61,7 +61,7 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
         }
 
         @Override
-        PlainArray<ComplexNumber> make(final long size) {
+        PlainArray<ComplexNumber> makeDenseArray(final long size) {
             return ComplexArray.make((int) size);
         }
 

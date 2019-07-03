@@ -50,7 +50,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         final NumberContext evaluation = new NumberContext(7, 4);
 
         RationalMatrix square = SimpleEquationCase.getBody();
-        final RationalMatrix degenerate = RationalMatrix.FACTORY.makeZero(square).logical().below(square).below(square).get();
+        final RationalMatrix degenerate = RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get();
 
         final LU<RationalNumber> decomp = LU.RATIONAL.make();
         decomp.decompose(degenerate);
@@ -64,7 +64,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         final NumberContext evaluation = new NumberContext(7, 4);
 
         RationalMatrix square = SimpleEquationCase.getBody();
-        final RationalMatrix degenerate = RationalMatrix.FACTORY.makeZero(square).logical().below(square).below(square).get();
+        final RationalMatrix degenerate = RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get();
 
         final LU<ComplexNumber> decomp = LU.COMPLEX.make();
         decomp.decompose(GenericDenseStore.COMPLEX.copy(degenerate));
@@ -78,7 +78,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         final NumberContext evaluation = new NumberContext(7, 4);
 
         RationalMatrix square = SimpleEquationCase.getBody();
-        final RationalMatrix degenerate = RationalMatrix.FACTORY.makeZero(square).logical().below(square).below(square).get();
+        final RationalMatrix degenerate = RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get();
 
         final LU<Double> decomp = LU.PRIMITIVE.make();
         decomp.decompose(PrimitiveDenseStore.FACTORY.copy(degenerate));
@@ -92,7 +92,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         final NumberContext evaluation = new NumberContext(7, 4);
 
         RationalMatrix square = SimpleEquationCase.getBody();
-        final RationalMatrix degenerate = RationalMatrix.FACTORY.makeZero(square).logical().below(square).below(square).get();
+        final RationalMatrix degenerate = RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get();
 
         final LU<Double> decomp = new RawLU();
         decomp.decompose(RawStore.FACTORY.copy(degenerate));

@@ -27,44 +27,64 @@ import org.ojalgo.function.NullaryFunction;
 
 public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
-    default I column(final double... elements) {
-        return this.columns(elements);
+    interface Dense<I extends Structure2D> extends Factory2D<I> {
+
+        default I column(final double... elements) {
+            return this.columns(elements);
+        }
+
+        I columns(Access1D<?>... source);
+
+        I columns(double[]... source);
+
+        @SuppressWarnings("unchecked")
+        I columns(List<? extends Number>... source);
+
+        I columns(Number[]... source);
+
+        I copy(Access2D<?> source);
+
+        I makeFilled(long rows, long columns, NullaryFunction<?> supplier);
+
+        default I makeFilled(final Structure2D shape, final NullaryFunction<?> supplier) {
+            return this.makeFilled(shape.countRows(), shape.countColumns(), supplier);
+        }
+
+        default I row(final double... elements) {
+            return this.rows(elements);
+        }
+
+        I rows(Access1D<?>... source);
+
+        I rows(double[]... source);
+
+        @SuppressWarnings("unchecked")
+        I rows(List<? extends Number>... source);
+
+        I rows(Number[]... source);
+
     }
 
-    I columns(Access1D<?>... source);
+    I make(long rows, long columns);
 
-    I columns(double[]... source);
-
-    @SuppressWarnings("unchecked")
-    I columns(List<? extends Number>... source);
-
-    I columns(Number[]... source);
-
-    I copy(Access2D<?> source);
-
-    I makeFilled(long rows, long columns, NullaryFunction<?> supplier);
-
-    default I makeFilled(final Structure2D shape, final NullaryFunction<?> supplier) {
-        return this.makeFilled(shape.countRows(), shape.countColumns(), supplier);
+    default I make(final Structure2D shape) {
+        return this.make(shape.countRows(), shape.countColumns());
     }
 
-    I makeZero(long rows, long columns);
+    /**
+     * @deprecated v48 Use {@link #make(long,long)} instead
+     */
+    @Deprecated
+    default I makeZero(final long rows, final long columns) {
+        return this.make(rows, columns);
+    }
 
+    /**
+     * @deprecated v48 Use {@link #make(Structure2D)} instead
+     */
+    @Deprecated
     default I makeZero(final Structure2D shape) {
-        return this.makeZero(shape.countRows(), shape.countColumns());
+        return this.make(shape);
     }
-
-    default I row(final double... elements) {
-        return this.rows(elements);
-    }
-
-    I rows(Access1D<?>... source);
-
-    I rows(double[]... source);
-
-    @SuppressWarnings("unchecked")
-    I rows(List<? extends Number>... source);
-
-    I rows(Number[]... source);
 
 }

@@ -472,7 +472,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             myRHS = ARRAY1D_FACTORY.makeZero(numberOfConstraints);
 
             myObjectiveWeights = ARRAY1D_FACTORY.makeZero(totNumbVars);
-            myPhase1Weights = DENSE_FACTORY.makeZero(totNumbVars);
+            myPhase1Weights = DENSE_FACTORY.make(totNumbVars);
         }
 
         SparseTableau(final LinearSolver.Builder matrices) {
