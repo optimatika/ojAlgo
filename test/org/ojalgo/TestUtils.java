@@ -43,6 +43,7 @@ import org.ojalgo.matrix.store.operation.MatrixOperation;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -351,6 +352,10 @@ public abstract class TestUtils {
         TestUtils.assertEquals(message, (Access1D<?>) expected, (Access1D<?>) actual, context);
     }
 
+    public static void assertEquivalent(final Optimisation.Result expected, final Optimisation.Result actual) {
+        TestUtils.assertOptimisationResult("Optimisation.Result != Optimisation.Result", expected, actual, EQUALS, true, true, true, true);
+    }
+
     public static void assertFalse(final boolean condition) {
         Assertions.assertFalse(condition);
     }
@@ -404,12 +409,7 @@ public abstract class TestUtils {
 
     public static void assertStateAndSolution(final String message, final Optimisation.Result expected, final Optimisation.Result actual,
             final NumberContext context) {
-
-        TestUtils.assertEquals(message + ", different Optimisation.State", expected.getState(), actual.getState());
-
-        if (expected.getState().isFeasible()) {
-            TestUtils.assertEquals(message, expected, actual, context);
-        }
+        TestUtils.assertOptimisationResult(message, expected, actual, context, true, false, true, false);
     }
 
     public static void assertStateLessThanFeasible(final Optimisation.Result actual) {
@@ -461,6 +461,51 @@ public abstract class TestUtils {
 
     public static void minimiseAllBranchLimits() {
         MatrixOperation.setAllOperationThresholds(2);
+    }
+
+    static void assertOptimisationResult(final String message, final Optimisation.Result expected, final Optimisation.Result actual,
+            final NumberContext context, final boolean state, final boolean value, final boolean solution, final boolean multipliers) {
+
+        State expectedState = expected.getState();
+
+        if (state) {
+
+            State actualState = actual.getState();
+
+            boolean failed = false;
+
+            if (expectedState == actualState) {
+
+            } else if (expectedState.isDistinct() && !actualState.isDistinct()) {
+                failed = true;
+            } else if (expectedState.isOptimal() && !actualState.isOptimal()) {
+                failed = true;
+            } else if (expectedState.isFeasible() && !actualState.isFeasible()) {
+                failed = true;
+            } else if (expectedState.isApproximate() && !actualState.isApproximate()) {
+                failed = true;
+            }
+
+            if (failed) {
+                TestUtils.assertEquals(message + " – State", expectedState, actualState);
+            }
+        }
+
+        if (value) {
+            double expectedValue = expected.getValue();
+            double actualValue = actual.getValue();
+            TestUtils.assertEquals(message + " – Value", expectedValue, actualValue, context);
+        }
+
+        if (solution && expectedState.isFeasible()) {
+            TestUtils.assertEquals(message + " – Solution", expected, actual, context);
+        }
+
+        if (multipliers && expected.getMultipliers().isPresent()) {
+            Access1D<?> expectedMultipliers = expected.getMultipliers().get();
+            Access1D<?> actualMultipliers = actual.getMultipliers().get();
+            TestUtils.assertEquals(message + " – Multipliers", expectedMultipliers, actualMultipliers, context);
+        }
     }
 
     private TestUtils() {

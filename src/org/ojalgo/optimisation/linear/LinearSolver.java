@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -96,7 +97,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             final SimplexTableau tableau = new DenseTableau(this);
 
-            return new SimplexSolver(tableau, options);
+            return new PrimalSimplex(tableau, options);
         }
 
     }
@@ -105,16 +106,18 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         public LinearSolver build(final ConvexSolver.Builder convexBuilder, final Optimisation.Options options) {
 
-            final SimplexTableau tableau = SimplexSolver.build(convexBuilder, options);
+            final SimplexTableau tableau = PrimalSimplex.build(convexBuilder, options);
 
-            return new SimplexSolver(tableau, options);
+            return new PrimalSimplex(tableau, options);
         }
 
         public LinearSolver build(final ExpressionsBasedModel model) {
 
-            final SimplexTableau tableau = SimplexSolver.build(model);
+            final SimplexTableau tableau = PrimalSimplex.build(model);
 
-            return new SimplexSolver(tableau, model.options);
+            // BasicLogger.debug("EBM tabeau", tableau);
+
+            return new PrimalSimplex(tableau, model.options);
         }
 
         public boolean isCapable(final ExpressionsBasedModel model) {
@@ -207,36 +210,19 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options) {
 
-        final int numbVars = convex.countVariables();
+        Optimisation.Result retVal = PrimalSimplex.solve(convex, options);
+        Optimisation.Result retVal2 = DualSimplex.solve(convex, options);
 
-        final SimplexTableau tableau = SimplexSolver.build(convex, options);
+        if (false && !Access1D.equals(retVal, retVal2, ACCURACY.withPrecision(8).withScale(6))) {
 
-        final LinearSolver solver = new SimplexSolver(tableau, options);
+            BasicLogger.debug();
+            BasicLogger.debug("Prim sol: {}", retVal);
+            BasicLogger.debug("Dual sol: {}", retVal2);
 
-        final Result result = solver.solve();
-
-        final Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), new Access1D<Double>() {
-
-            public long count() {
-                return numbVars;
-            }
-
-            public double doubleValue(final long index) {
-                return result.doubleValue(index) - result.doubleValue(numbVars + index);
-            }
-
-            public Double get(final long index) {
-                return this.doubleValue(index);
-            }
-
-            @Override
-            public String toString() {
-                return Access1D.toString(this);
-            }
-
-        });
-
-        retVal.multipliers(result.getMultipliers().get());
+            BasicLogger.debug("Prim mul: {}", retVal.getMultipliers().get());
+            BasicLogger.debug("Dual mul: {}", retVal2.getMultipliers().get());
+            BasicLogger.debug();
+        }
 
         return retVal;
     }
