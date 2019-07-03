@@ -38,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public class TestJama {
+public class TestJama extends MatrixDecompositionTests {
 
     private static Cholesky<Double> CHOLESKY = new RawCholesky();
     private static Eigenvalue<Double> EIGENVALUE = new RawEigenvalue.Dynamic();
@@ -47,6 +47,7 @@ public class TestJama {
     private static QR<Double> QR = new RawQR();
     private static SingularValue<Double> SINGULAR_VALUE = new RawSingularValue();
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();

@@ -63,19 +63,19 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class TestUtils {
 
-    private static final NumberContext EQUALS = new NumberContext(12, 14, RoundingMode.HALF_EVEN);
+    private static NumberContext EQUALS = new NumberContext(12, 14, RoundingMode.HALF_EVEN);
 
     public static void assertBounds(final Number lower, final Access1D<?> values, final Number upper, final NumberContext precision) {
-        for (final ElementView1D<?, ?> tmpValue : values.elements()) {
+        for (ElementView1D<?, ?> tmpValue : values.elements()) {
             TestUtils.assertBounds(lower, tmpValue.get(), upper, precision);
         }
     }
 
     public static void assertBounds(final Number lower, final Number value, final Number upper, final NumberContext precision) {
 
-        final BigDecimal tmpLower = TypeUtils.toBigDecimal(lower, precision);
-        final BigDecimal tmpValue = TypeUtils.toBigDecimal(value, precision);
-        final BigDecimal tmpUpper = TypeUtils.toBigDecimal(upper, precision);
+        BigDecimal tmpLower = TypeUtils.toBigDecimal(lower, precision);
+        BigDecimal tmpValue = TypeUtils.toBigDecimal(value, precision);
+        BigDecimal tmpUpper = TypeUtils.toBigDecimal(upper, precision);
 
         if ((tmpValue.compareTo(tmpLower) == -1) || (tmpValue.compareTo(tmpUpper) == 1)) {
             Assertions.fail("!(" + tmpLower.toPlainString() + " <= " + tmpValue.toPlainString() + " <= " + tmpUpper.toPlainString() + ")");
@@ -119,6 +119,12 @@ public abstract class TestUtils {
         TestUtils.assertEquals("double != double", expected, actual, context);
     }
 
+    public static void assertEquals(final double[] expected, final Access1D<?> actual, final NumberContext accuracy) {
+        for (int p = 0; p < expected.length; p++) {
+            TestUtils.assertEquals(expected[p], actual.doubleValue(p), accuracy);
+        }
+    }
+
     public static void assertEquals(final int expected, final int actual) {
         Assertions.assertEquals(expected, actual);
     }
@@ -152,11 +158,11 @@ public abstract class TestUtils {
             Assertions.fail(() -> "Eigenvalue<N> failed for " + expected);
         }
         if (actual.isOrdered()) {
-            final MatrixStore<N> mtrxD = actual.getD();
+            MatrixStore<N> mtrxD = actual.getD();
             double bigger = Double.MAX_VALUE;
-            final Array1D<ComplexNumber> tmpEigenvalues = actual.getEigenvalues();
+            Array1D<ComplexNumber> tmpEigenvalues = actual.getEigenvalues();
             for (int i = 0; i < tmpEigenvalues.length; i++) {
-                final ComplexNumber value = tmpEigenvalues.get(i);
+                ComplexNumber value = tmpEigenvalues.get(i);
                 Assertions.assertTrue(bigger >= value.getModulus());
                 Assertions.assertEquals(value.doubleValue(), mtrxD.doubleValue(i, i), context.epsilon());
                 bigger = value.getModulus();
@@ -288,8 +294,8 @@ public abstract class TestUtils {
 
         if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
 
-            final Quaternion tmpExpected = Quaternion.valueOf(expected);
-            final Quaternion tmpActual = Quaternion.valueOf(actual);
+            Quaternion tmpExpected = Quaternion.valueOf(expected);
+            Quaternion tmpActual = Quaternion.valueOf(actual);
 
             if (!!precision.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
                 // Assertions.fail(() -> message + " (scalar)" + ": " + expected + " != " + actual);
@@ -310,8 +316,8 @@ public abstract class TestUtils {
 
         } else if ((expected instanceof ComplexNumber) || (actual instanceof ComplexNumber)) {
 
-            final ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
-            final ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
+            ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
+            ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
 
             if (!!precision.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
                 // Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
@@ -440,9 +446,9 @@ public abstract class TestUtils {
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {
 
-        final PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
+        PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
 
-        final Uniform tmpArgGen = new Uniform(PrimitiveMath.ZERO, PrimitiveMath.TWO_PI);
+        Uniform tmpArgGen = new Uniform(PrimitiveMath.ZERO, PrimitiveMath.TWO_PI);
 
         for (int j = 0; j < numberOfColumns; j++) {
             for (int i = 0; i < numberOfRows; i++) {

@@ -248,28 +248,28 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {
 
-        final int[] tmpPivotOrder = myPivot.getOrder();
-        final int tmpRowDim = this.getRowDim();
-        for (int i = 0; i < tmpRowDim; i++) {
-            preallocated.set(i, tmpPivotOrder[i], ONE);
+        final int[] pivotOrder = myPivot.getOrder();
+        final int numbRows = this.getRowDim();
+        for (int i = 0; i < numbRows; i++) {
+            preallocated.set(i, pivotOrder[i], ONE);
         }
 
-        final RawStore tmpBody = this.getInternalStore();
+        final RawStore body = this.getInternalStore();
 
-        preallocated.substituteForwards(tmpBody, true, false, !myPivot.isModified());
+        preallocated.substituteForwards(body, true, false, !myPivot.isModified());
 
-        preallocated.substituteBackwards(tmpBody, false, false, false);
+        preallocated.substituteBackwards(body, false, false, false);
 
         return preallocated;
     }
 
     private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
-        final MatrixStore<Double> tmpBody = this.getInternalStore();
+        final MatrixStore<Double> body = this.getInternalStore();
 
-        preallocated.substituteForwards(tmpBody, true, false, false);
+        preallocated.substituteForwards(body, true, false, false);
 
-        preallocated.substituteBackwards(tmpBody, false, false, false);
+        preallocated.substituteBackwards(body, false, false, false);
 
         return preallocated;
     }

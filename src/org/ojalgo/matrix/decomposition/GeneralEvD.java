@@ -56,8 +56,8 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
     }
 
-    protected GeneralEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
-        super(aFactory);
+    protected GeneralEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
+        super(factory);
     }
 
     public final N getDeterminant() {
@@ -67,6 +67,10 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
         this.getEigenvalues().visitAll(tmpVisitor);
 
         return this.scalar().cast(tmpVisitor.get());
+    }
+
+    public boolean checkAndDecompose(final MatrixStore<N> matrix) {
+        return this.decompose(matrix);
     }
 
     public MatrixStore<N> getInverse() {
@@ -102,7 +106,7 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     @Override
-    protected boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
+    protected boolean doDecompose(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
 
         final int tmpDiagDim = (int) matrix.countRows();
 
@@ -142,11 +146,6 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
         // tmpEigenvalues.sortDescending();
 
         return this.computed(true);
-    }
-
-    @Override
-    protected boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
-        return this.doGeneral(matrix, eigenvaluesOnly);
     }
 
     @Override

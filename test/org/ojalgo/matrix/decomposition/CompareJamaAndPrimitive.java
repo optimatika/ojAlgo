@@ -34,7 +34,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.type.context.NumberContext;
 
-public class CompareJamaAndPrimitive {
+public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
     private static NumberContext COMPARE_CONTEXT = NumberContext.getGeneral(8);
     private static Cholesky<Double> JAMA_CHOLESKY = new RawCholesky();
@@ -49,6 +49,7 @@ public class CompareJamaAndPrimitive {
     private static LU<Double> PRIMITIVE_RAW_LU = LU.PRIMITIVE.make();
     private static SingularValue<Double> PRIMITIVE_SVD = SingularValue.PRIMITIVE.make();
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();

@@ -42,7 +42,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class QRTest {
+public class QRTest extends MatrixDecompositionTests {
 
     private static final int DIMENSION = 4;
 
@@ -55,6 +55,7 @@ public class QRTest {
         return tmpBase.multiply(tmpBase.conjugate());
     }
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();

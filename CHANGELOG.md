@@ -19,6 +19,9 @@
 * New MatrixStore implementation DiagonalStore to be used for diagonal, bidiagonal and tridiagonal matrices. Replaces two different previous (package private) implementations.
 * MatrixStore.Factory has a new method makeDiagonal(...)
 * MatrixStore.LogicalBuilder has new implementations for the diagonal(), bidiagonal(boolean) and tridiagonal() methods.
+* Some general cleanup/refactoring among the Eigenvalue related code.
+* Added support for generalised eigenvalue problems.
+* Fixed in a bug in RawStore - visitRow/Column were interchanged
 
 ## org.ojalgo.optimisation
 

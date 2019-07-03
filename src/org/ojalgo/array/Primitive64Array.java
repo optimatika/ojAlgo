@@ -89,11 +89,11 @@ public class Primitive64Array extends PrimitiveArray {
 
     static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
 
-    public static final Primitive64Array make(final int size) {
+    public static Primitive64Array make(final int size) {
         return new Primitive64Array(size);
     }
 
-    public static final Primitive64Array wrap(final double... data) {
+    public static Primitive64Array wrap(final double... data) {
         return new Primitive64Array(data);
     }
 

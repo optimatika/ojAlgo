@@ -411,11 +411,18 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     public static final PhysicalStore.Factory<RationalNumber, GenericDenseStore<RationalNumber>> RATIONAL = new GenericDenseStore.Factory<>(
             RationalArray.FACTORY);
 
+    public static <N extends Number & Scalar<N>> GenericDenseStore<N> wrap(final GenericDenseStore.Factory<N> factory, final N... data) {
+        return new GenericDenseStore<>(factory, data.length, 1, data);
+    }
+
+    public static <N extends Number & Scalar<N>> GenericDenseStore<N> wrap(final GenericDenseStore.Factory<N> factory, final N[] data, final int structure) {
+        return new GenericDenseStore<>(factory, structure, data.length / structure, data);
+    }
+
     private final GenericMultiplyBoth<N> multiplyBoth;
     private final GenericMultiplyLeft<N> multiplyLeft;
     private final GenericMultiplyNeither<N> multiplyNeither;
     private final GenericMultiplyRight<N> multiplyRight;
-
     private final int myColDim;
     private final GenericDenseStore.Factory<N> myFactory;
     private final int myRowDim;
