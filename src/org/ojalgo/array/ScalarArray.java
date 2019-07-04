@@ -24,8 +24,8 @@ package org.ojalgo.array;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.ojalgo.array.blas.AMAX;
-import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.operation.AMAX;
+import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Mutate1D;
 

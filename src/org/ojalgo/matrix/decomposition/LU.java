@@ -82,6 +82,11 @@ public interface LU<N extends Number> extends LDU<N>, MatrixDecomposition.Pivoti
         return Access2D.equals(matrix.logical().row(tmpPivotOrder).get(), tmpL.multiply(tmpU), context);
     }
 
+    /**
+     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
+     *             innstead.
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     static <N extends Number> LU<N> make(final Access2D<N> typical) {
 

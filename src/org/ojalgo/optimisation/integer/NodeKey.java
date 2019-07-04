@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.ojalgo.array.Raw1D;
+import org.ojalgo.array.operation.Raw1D;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;

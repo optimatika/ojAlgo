@@ -1,7 +1,7 @@
 package org.ojalgo.matrix.geometry;
 
+import org.ojalgo.array.operation.MultiplyBoth;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.store.operation.MultiplyBoth;
 
 public class Primitive32Vector2 extends GeometryVector {
 

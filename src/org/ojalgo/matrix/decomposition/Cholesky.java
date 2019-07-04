@@ -78,6 +78,11 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
         return retVal;
     }
 
+    /**
+     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
+     *             innstead.
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {
 

@@ -25,8 +25,8 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.blas.AXPY;
-import org.ojalgo.array.blas.DOT;
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.DOT;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;

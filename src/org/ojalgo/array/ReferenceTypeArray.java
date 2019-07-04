@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Spliterator;
 import java.util.Spliterators;
 
+import org.ojalgo.array.operation.Raw1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;

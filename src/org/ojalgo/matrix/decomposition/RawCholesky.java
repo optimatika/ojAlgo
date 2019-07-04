@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.blas.DOT;
+import org.ojalgo.array.operation.DOT;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;

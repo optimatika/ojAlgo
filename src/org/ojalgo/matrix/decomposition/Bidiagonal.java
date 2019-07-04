@@ -113,6 +113,11 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
         return retVal;
     }
 
+    /**
+     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
+     *             innstead.
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     static <N extends Number> Bidiagonal<N> make(final Access2D<N> typical) {
 

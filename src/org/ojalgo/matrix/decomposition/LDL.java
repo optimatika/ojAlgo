@@ -66,6 +66,11 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         return Access2D.equals(matrix, decomposition.reconstruct(), context);
     }
 
+    /**
+     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
+     *             innstead.
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     static <N extends Number> LDL<N> make(final Access2D<N> typical) {
 

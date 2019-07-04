@@ -145,6 +145,11 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         return retVal;
     }
 
+    /**
+     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
+     *             innstead.
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     static <N extends Number> SingularValue<N> make(final Access2D<N> typical) {
 

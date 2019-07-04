@@ -316,10 +316,21 @@ public interface Eigenvalue<N extends Number>
         return Access2D.equals(tmpStore1, tmpStore2, context);
     }
 
+    /**
+     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
+     *             innstead.
+     */
+    @Deprecated
+    @SuppressWarnings("unchecked")
     static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical) {
         return Eigenvalue.make(typical, MatrixUtils.isHermitian(typical));
     }
 
+    /**
+     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
+     *             innstead.
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical, final boolean hermitian) {
 

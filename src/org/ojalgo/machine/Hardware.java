@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Raw1D;
+import org.ojalgo.array.operation.Raw1D;
 import org.ojalgo.netio.ASCII;
 
 /**

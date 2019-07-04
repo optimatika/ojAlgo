@@ -24,8 +24,8 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.Raw2D;
-import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.Raw2D;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;

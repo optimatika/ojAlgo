@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.*;
+import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
@@ -39,7 +40,6 @@ import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.DiagonalStore.Builder;
-import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;

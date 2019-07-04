@@ -29,8 +29,9 @@ import java.util.Spliterators;
 import java.util.stream.DoubleStream;
 import java.util.stream.StreamSupport;
 
-import org.ojalgo.array.blas.AMAX;
-import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.operation.AMAX;
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.Raw1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;

@@ -8,6 +8,12 @@
 
 * Added a power(int) method to the Operation.Multiplication interface.
 
+## org.ojalgo.array
+
+* The package org.ojalgo.array.blas has been renamed org.ojalgo.array.operation
+* The utility classes Raw1D, Raw2D and RawAnyD have been moved to the new package org.ojalgo.array.operation
+* Everything in org.ojalgo.matrix.store.operation has been moved to org.ojalgo.array.operation
+
 ## org.ojalgo.data
 
 * Added a variant of the covariances method in DataProcessors that take `double[]...` as input.
@@ -27,6 +33,7 @@
 * Some general cleanup/refactoring among the Eigenvalue related code.
 * Added support for generalised eigenvalue problems.
 * Fixed in a bug in RawStore - visitRow/Column were interchanged
+* Everything in org.ojalgo.matrix.store.operation has been moved to org.ojalgo.array.operation
 
 ## org.ojalgo.optimisation
 

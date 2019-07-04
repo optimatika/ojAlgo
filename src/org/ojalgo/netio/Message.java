@@ -23,7 +23,7 @@ package org.ojalgo.netio;
 
 import java.util.List;
 
-import org.ojalgo.array.Raw1D;
+import org.ojalgo.array.operation.Raw1D;
 
 public class Message {
 

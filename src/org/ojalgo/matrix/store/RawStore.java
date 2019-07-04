@@ -31,8 +31,11 @@ import java.util.List;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.array.Raw1D;
-import org.ojalgo.array.Raw2D;
+import org.ojalgo.array.operation.MultiplyBoth;
+import org.ojalgo.array.operation.Raw1D;
+import org.ojalgo.array.operation.Raw2D;
+import org.ojalgo.array.operation.SubstituteBackwards;
+import org.ojalgo.array.operation.SubstituteForwards;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -45,9 +48,6 @@ import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.operation.MultiplyBoth;
-import org.ojalgo.matrix.store.operation.SubstituteBackwards;
-import org.ojalgo.matrix.store.operation.SubstituteForwards;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -413,7 +413,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         int m = v.size(); // Now we've got the number of rows.
         double[][] A = new double[m][];
         v.copyInto(A); // copy the rows out of the vector
-        return new RawStore(A);
+        return RawStore.wrap(A);
     }
 
     /**

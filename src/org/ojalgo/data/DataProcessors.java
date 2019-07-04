@@ -107,7 +107,7 @@ public class DataProcessors {
      * @param data Each of the arrays represent a variable - it contains the samples for that variable
      */
     public static <M extends Mutate2D> M covariances(final Factory2D<M> factory, final double[]... data) {
-        return DataProcessors.covariances(factory, new RawStore(data).transpose());
+        return DataProcessors.covariances(factory, RawStore.wrap(data).transpose());
     }
 
     /**

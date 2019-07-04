@@ -64,6 +64,11 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
         return Access2D.equals(tmpStore1, tmpStore2, context);
     }
 
+    /**
+     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
+     *             innstead.
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     static <N extends Number> Hessenberg<N> make(final Access2D<N> typical) {
 
