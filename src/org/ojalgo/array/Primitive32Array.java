@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.array.operation.AXPY;
-import org.ojalgo.array.operation.Raw1D;
+import org.ojalgo.array.operation.COPY;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
@@ -438,7 +438,7 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     protected final float[] copyOfData() {
-        return Raw1D.copyOf(data);
+        return COPY.copyOf(data);
     }
 
     @Override

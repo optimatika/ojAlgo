@@ -31,7 +31,6 @@ import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.operation.AXPY;
-import org.ojalgo.array.operation.Raw1D;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.machine.JavaType;
@@ -1011,7 +1010,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     }
 
     protected int getBasisRowIndex(final int basisColumnIndex) {
-        return Raw1D.indexOf(myBasis, basisColumnIndex);
+        return org.ojalgo.array.operation.IndexOf.indexOf(myBasis, basisColumnIndex);
     }
 
     protected final int[] getExcluded() {

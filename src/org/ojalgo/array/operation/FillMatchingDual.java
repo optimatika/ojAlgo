@@ -21,6 +21,11 @@
  */
 package org.ojalgo.array.operation;
 
+import java.util.function.DoubleBinaryOperator;
+import java.util.function.DoubleSupplier;
+
+import org.ojalgo.structure.Structure2D;
+
 public final class FillMatchingDual extends ArrayOperation {
 
     public static final FillMatchingDual SETUP = new FillMatchingDual();
@@ -34,6 +39,118 @@ public final class FillMatchingDual extends ArrayOperation {
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static void fillAll(final double[][] target, final double value) {
+        int limit = target.length;
+        for (int i = 0; i < limit; i++) {
+            int tmpInnerLength = target[i].length;
+            for (int j = 0; j < tmpInnerLength; j++) {
+                target[i][j] = value;
+            }
+        }
+    }
+
+    public static void fillAll(final double[][] target, final DoubleSupplier supplier) {
+        int limit = target.length;
+        for (int i = 0; i < limit; i++) {
+            int tmpInnerLength = target[i].length;
+            for (int j = 0; j < tmpInnerLength; j++) {
+                target[i][j] = supplier.getAsDouble();
+            }
+        }
+    }
+
+    public static void fillColumn(final double[][] target, final int row, final int col, final double value) {
+        for (int i = row, limit = target.length; i < limit; i++) {
+            target[i][col] = value;
+        }
+    }
+
+    public static void fillColumn(final double[][] target, final int row, final int col, final DoubleSupplier supplier) {
+        for (int i = row, limit = target.length; i < limit; i++) {
+            target[i][col] = supplier.getAsDouble();
+        }
+    }
+
+    public static void fillDiagonal(final double[][] target, final int row, final int col, final double value) {
+        int limit = target.length;
+        for (int ij = 0; ((row + ij) < limit) && ((col + ij) < target[row + ij].length); ij++) {
+            target[row + ij][col + ij] = value;
+        }
+    }
+
+    public static void fillDiagonal(final double[][] target, final int row, final int col, final DoubleSupplier supplier) {
+        int limit = target.length;
+        for (int ij = 0; ((row + ij) < limit) && ((col + ij) < target[row + ij].length); ij++) {
+            target[row + ij][col + ij] = supplier.getAsDouble();
+        }
+    }
+
+    public static void fillMatching(final double[][] target, final double left, final DoubleBinaryOperator function, final double[][] right) {
+        int limit = target.length;
+        for (int i = 0; i < limit; i++) {
+            int tmpInnerLength = target[i].length;
+            for (int j = 0; j < tmpInnerLength; j++) {
+                target[i][j] = function.applyAsDouble(left, right[i][j]);
+            }
+        }
+    }
+
+    public static void fillMatching(final double[][] target, final double[][] left, final DoubleBinaryOperator function, final double right) {
+        int limit = target.length;
+        for (int i = 0; i < limit; i++) {
+            int tmpInnerLength = target[i].length;
+            for (int j = 0; j < tmpInnerLength; j++) {
+                target[i][j] = function.applyAsDouble(left[i][j], right);
+            }
+        }
+    }
+
+    public static void fillMatching(final double[][] target, final double[][] left, final DoubleBinaryOperator function, final double[][] right) {
+        int limit = target.length;
+        for (int i = 0; i < limit; i++) {
+            int tmpInnerLength = target[i].length;
+            for (int j = 0; j < tmpInnerLength; j++) {
+                target[i][j] = function.applyAsDouble(left[i][j], right[i][j]);
+            }
+        }
+    }
+
+    public static void fillRange(final double[][] target, final int first, final int limit, final double value) {
+    
+        int tmpLength = target.length;
+    
+        for (int index = first; index < limit; index++) {
+            int tmpRow = Structure2D.row(index, tmpLength);
+            int tmpcol = Structure2D.column(index, tmpLength);
+            target[tmpRow][tmpcol] = value;
+        }
+    }
+
+    public static void fillRange(final double[][] target, final int first, final int limit, final DoubleSupplier supplier) {
+    
+        int tmpLength = target.length;
+    
+        for (int index = first; index < limit; index++) {
+            int tmpRow = Structure2D.row(index, tmpLength);
+            int tmpcol = Structure2D.column(index, tmpLength);
+            target[tmpRow][tmpcol] = supplier.getAsDouble();
+        }
+    }
+
+    public static void fillRow(final double[][] target, final int row, final int col, final double value) {
+        double[] targetRow = target[row];
+        for (int j = col, limit = targetRow.length; j < limit; j++) {
+            targetRow[j] = value;
+        }
+    }
+
+    public static void fillRow(final double[][] target, final int row, final int col, final DoubleSupplier supplier) {
+        double[] targetRow = target[row];
+        for (int j = col, limit = targetRow.length; j < limit; j++) {
+            targetRow[j] = supplier.getAsDouble();
+        }
     }
 
 }

@@ -26,7 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.array.operation.DOT;
-import org.ojalgo.array.operation.Raw1D;
+import org.ojalgo.array.operation.VisitAll;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -109,7 +109,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         final AggregatorFunction<Double> aggregator = PrimitiveAggregator.getSet().product();
 
-        Raw1D.visit(myDiagonalR, aggregator);
+        VisitAll.visit(myDiagonalR, aggregator);
 
         if ((myNumberOfHouseholderTransformations % 2) != 0) {
             return -aggregator.get();

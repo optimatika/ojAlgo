@@ -21,28 +21,33 @@
  */
 package org.ojalgo.array.operation;
 
-/**
- * <p>
- * Contents in this package loosely corresponds to BLAS. The exact selection of operations and their API:s are
- * entirely dictated by the requirements of the various {@linkplain org.ojalgo.matrix.store.MatrixStore}
- * implementations.
- * </p>
- * <ul>
- * <li>http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms</li>
- * <li>http://www.netlib.org/blas/</li>
- * <li>http://www.netlib.org/blas/faq.html</li>
- * <li>http://www.netlib.org/lapack/lug/node145.html</li>
- * </ul>
- * Basic Linear Algebra Subprograms (BLAS) Level 2 contains matrix-vector operations.
- * <ul>
- * <li><a href="http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_2">BLAS Level 2 @
- * WikipediA</a></li>
- * <li><a href="http://www.netlib.org/blas/#_level_2">BLAS Level 2 @ Netlib</a></li>
- * <li><a href="https://software.intel.com/en-us/node/520748">BLAS Level 2 @ Intel</a></li>
- * </ul>
- *
- * @author apete
- */
-public interface BLAS2 {
+public final class IndexOf extends ArrayOperation {
+
+    public static final IndexOf SETUP = new IndexOf();
+
+    public static int THRESHOLD = 128;
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
+    }
+
+    public static int indexOf(final int[] array, final int value) {
+        for (int i = 0, limit = array.length; i < limit; i++) {
+            if (array[i] == value) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int indexOf(final long[] array, final long value) {
+        for (int i = 0, limit = array.length; i < limit; i++) {
+            if (array[i] == value) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
 }

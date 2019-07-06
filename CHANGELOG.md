@@ -11,7 +11,7 @@
 ## org.ojalgo.array
 
 * The package org.ojalgo.array.blas has been renamed org.ojalgo.array.operation
-* The utility classes Raw1D, Raw2D and RawAnyD have been moved to the new package org.ojalgo.array.operation
+* The utility classes Raw1D, Raw2D and RawAnyD have been removed and their contents moved to various classes in the new package org.ojalgo.array.operation
 * Everything in org.ojalgo.matrix.store.operation has been moved to org.ojalgo.array.operation
 
 ## org.ojalgo.data
@@ -32,7 +32,7 @@
 * Some improvements to TransposedStore – more efficient use of the underlying store. Particular in the case when it is a RawStore.
 * Some general cleanup/refactoring among the Eigenvalue related code.
 * Added support for generalised eigenvalue problems.
-* Fixed in a bug in RawStore - visitRow/Column were interchanged
+* Fixed a bug in RawStore - visitRow/Column were interchanged
 * Everything in org.ojalgo.matrix.store.operation has been moved to org.ojalgo.array.operation
 
 ## org.ojalgo.optimisation

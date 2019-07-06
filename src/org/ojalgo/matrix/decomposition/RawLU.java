@@ -25,7 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.operation.AXPY;
-import org.ojalgo.array.operation.Raw2D;
+import org.ojalgo.array.operation.SWAP;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -221,7 +221,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
                     }
                 }
                 if (p != ij) {
-                    Raw2D.exchangeRows(data, ij, p);
+                    SWAP.exchangeRows(data, ij, p);
                     myPivot.change(ij, p);
                 }
             }

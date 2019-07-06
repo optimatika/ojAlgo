@@ -21,12 +21,18 @@
  */
 package org.ojalgo.array.operation;
 
+import java.lang.reflect.Array;
+
+import org.ojalgo.structure.Access2D;
+
 /**
  * The ?copy routines perform a vector-vector operation defined as y = x, where x and y are vectors.
  *
  * @author apete
  */
 public final class COPY extends ArrayOperation implements BLAS1 {
+
+    public static int THRESHOLD = 128;
 
     public static void invoke(final double[] source, final int sourceOffset, final double[] destination, final int destinationOffset, final int first,
             final int limit) {
@@ -35,11 +41,57 @@ public final class COPY extends ArrayOperation implements BLAS1 {
         }
     }
 
-    public static int THRESHOLD = 128;
+    public static void row(final Access2D<?> source, final long row, final double[] destination, final int first, final int limit) {
+        for (int j = first; j < limit; j++) {
+            destination[j] = source.doubleValue(row, j);
+        }
+    }
+
+    public static void column(final Access2D<?> source, final long col, final double[] destination, final int first, final int limit) {
+        for (int i = first; i < limit; i++) {
+            destination[i] = source.doubleValue(i, col);
+        }
+    }
 
     @Override
     public int threshold() {
         return THRESHOLD;
+    }
+
+    public static double[] copyOf(final double[] original) {
+        final int tmpLength = original.length;
+        final double[] retVal = new double[tmpLength];
+        System.arraycopy(original, 0, retVal, 0, tmpLength);
+        return retVal;
+    }
+
+    public static float[] copyOf(final float[] original) {
+        final int tmpLength = original.length;
+        final float[] retVal = new float[tmpLength];
+        System.arraycopy(original, 0, retVal, 0, tmpLength);
+        return retVal;
+    }
+
+    public static int[] copyOf(final int[] original) {
+        final int tmpLength = original.length;
+        final int[] retVal = new int[tmpLength];
+        System.arraycopy(original, 0, retVal, 0, tmpLength);
+        return retVal;
+    }
+
+    public static long[] copyOf(final long[] original) {
+        final int tmpLength = original.length;
+        final long[] retVal = new long[tmpLength];
+        System.arraycopy(original, 0, retVal, 0, tmpLength);
+        return retVal;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T[] copyOf(final T[] original) {
+        final int tmpLength = original.length;
+        final T[] retVal = (T[]) Array.newInstance(original.getClass().getComponentType(), tmpLength);
+        System.arraycopy(original, 0, retVal, 0, tmpLength);
+        return retVal;
     }
 
 }

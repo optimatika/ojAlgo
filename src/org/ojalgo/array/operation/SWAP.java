@@ -35,4 +35,20 @@ public final class SWAP extends ArrayOperation implements BLAS1 {
         return THRESHOLD;
     }
 
+    public static void exchangeColumns(final double[][] target, final int colA, final int colB) {
+        double tmpElem;
+        int limit = target.length;
+        for (int i = 0; i < limit; i++) {
+            tmpElem = target[i][colA];
+            target[i][colA] = target[i][colB];
+            target[i][colB] = tmpElem;
+        }
+    }
+
+    public static void exchangeRows(final double[][] target, final int rowA, final int rowB) {
+        double[] tmpRow = target[rowA];
+        target[rowA] = target[rowB];
+        target[rowB] = tmpRow;
+    }
+
 }

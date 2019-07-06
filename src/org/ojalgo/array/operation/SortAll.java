@@ -21,71 +21,23 @@
  */
 package org.ojalgo.array.operation;
 
-import java.lang.reflect.Array;
-import java.util.function.DoubleConsumer;
+public final class SortAll extends ArrayOperation {
 
-public final class Raw1D extends ArrayOperation {
+    public static final SortAll SETUP = new SortAll();
 
-    public static double[] copyOf(final double[] original) {
-        final int tmpLength = original.length;
-        final double[] retVal = new double[tmpLength];
-        System.arraycopy(original, 0, retVal, 0, tmpLength);
-        return retVal;
-    }
+    public static int THRESHOLD = 128;
 
-    public static float[] copyOf(final float[] original) {
-        final int tmpLength = original.length;
-        final float[] retVal = new float[tmpLength];
-        System.arraycopy(original, 0, retVal, 0, tmpLength);
-        return retVal;
-    }
-
-    public static int[] copyOf(final int[] original) {
-        final int tmpLength = original.length;
-        final int[] retVal = new int[tmpLength];
-        System.arraycopy(original, 0, retVal, 0, tmpLength);
-        return retVal;
-    }
-
-    public static long[] copyOf(final long[] original) {
-        final int tmpLength = original.length;
-        final long[] retVal = new long[tmpLength];
-        System.arraycopy(original, 0, retVal, 0, tmpLength);
-        return retVal;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T[] copyOf(final T[] original) {
-        final int tmpLength = original.length;
-        final T[] retVal = (T[]) Array.newInstance(original.getClass().getComponentType(), tmpLength);
-        System.arraycopy(original, 0, retVal, 0, tmpLength);
-        return retVal;
-    }
-
-    public static int indexOf(final int[] array, final int value) {
-        for (int i = 0, limit = array.length; i < limit; i++) {
-            if (array[i] == value) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public static int indexOf(final long[] array, final long value) {
-        for (int i = 0, limit = array.length; i < limit; i++) {
-            if (array[i] == value) {
-                return i;
-            }
-        }
-        return -1;
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
     public static void sort(final long[] primary, final double[] secondary) {
-
+    
         boolean tmpSwapped;
-
+    
         final int tmpLimit = Math.min(primary.length, secondary.length) - 1;
-
+    
         do {
             tmpSwapped = false;
             for (int i = 0; i < tmpLimit; i++) {
@@ -103,11 +55,11 @@ public final class Raw1D extends ArrayOperation {
     }
 
     public static void sort(final long[] primary, final Object[] secondary) {
-
+    
         boolean tmpSwapped;
-
+    
         final int tmpLimit = Math.min(primary.length, secondary.length) - 1;
-
+    
         do {
             tmpSwapped = false;
             for (int i = 0; i < tmpLimit; i++) {
@@ -122,23 +74,6 @@ public final class Raw1D extends ArrayOperation {
                 }
             }
         } while (tmpSwapped);
-    }
-
-    public static void visit(final double[] target, final DoubleConsumer visitor) {
-        Raw1D.visit(target, 0, target.length, visitor);
-    }
-
-    public static void visit(final double[] target, final int first, final int limit, final DoubleConsumer visitor) {
-        for (int i = first, lim = Math.min(limit, target.length); i < lim; i++) {
-            visitor.accept(target[i]);
-        }
-    }
-
-    public static int THRESHOLD = 128;
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
     }
 
 }

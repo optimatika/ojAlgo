@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Spliterator;
 import java.util.Spliterators;
 
-import org.ojalgo.array.operation.Raw1D;
+import org.ojalgo.array.operation.COPY;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
@@ -181,7 +181,7 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
     }
 
     protected final N[] copyOfData() {
-        return Raw1D.copyOf(data);
+        return COPY.copyOf(data);
     }
 
     @Override

@@ -38,12 +38,12 @@ public abstract class OjAlgoUtils {
 
     static {
 
-        final String tmpArchitecture = VirtualMachine.getArchitecture();
-        final long tmpMemory = VirtualMachine.getMemory();
-        final int tmpThreads = VirtualMachine.getThreads();
+        String architecture = VirtualMachine.getArchitecture();
+        long memory = VirtualMachine.getMemory();
+        int threads = VirtualMachine.getThreads();
 
-        for (final Hardware hw : Hardware.PREDEFINED) {
-            if (hw.architecture.equals(tmpArchitecture) && (hw.threads <= tmpThreads) && (hw.memory >= tmpMemory)) {
+        for (Hardware hw : Hardware.PREDEFINED) {
+            if (hw.architecture.equals(architecture) && (hw.threads <= threads) && (hw.memory >= memory)) {
                 ENVIRONMENT = hw.virtualise();
             }
         }
@@ -55,14 +55,12 @@ public abstract class OjAlgoUtils {
                 BasicLogger.debug("A default hardware profile, that is perfectly usable, has been set for you.");
                 BasicLogger.debug("You may want to set org.ojalgo.OjAlgoUtils.ENVIRONMENT to something that");
                 BasicLogger.debug("better matches the hardware/OS/JVM you're running on, than the default.");
-                BasicLogger.debug("Additionally it would be appreciated if you contribute your hardware profile.");
-                BasicLogger.debug("https://lists.sourceforge.net/lists/listinfo/ojalgo-user");
+                BasicLogger.debug("Additionally it would be appreciated if you contribute your hardware profile:");
                 BasicLogger.debug("https://github.com/optimatika/ojAlgo/issues");
-                BasicLogger.debug("Architecture={} Threads={} Memory={}", tmpArchitecture, tmpThreads, tmpMemory);
+                BasicLogger.debug("Architecture={} Threads={} Memory={}", architecture, threads, memory);
             }
-            ENVIRONMENT = Hardware.makeSimple(tmpArchitecture, tmpMemory, tmpThreads).virtualise();
+            ENVIRONMENT = Hardware.makeSimple(architecture, memory, threads).virtualise();
         }
-
     }
 
     /**
@@ -70,9 +68,9 @@ public abstract class OjAlgoUtils {
      */
     public static String getDate() {
 
-        final String tmpManifestValue = OjAlgoUtils.class.getPackage().getSpecificationVersion();
+        String manifestValue = OjAlgoUtils.class.getPackage().getSpecificationVersion();
 
-        return tmpManifestValue != null ? tmpManifestValue : StandardType.SQL_DATE.format(new Date());
+        return manifestValue != null ? manifestValue : StandardType.SQL_DATE.format(new Date());
     }
 
     /**
@@ -80,9 +78,9 @@ public abstract class OjAlgoUtils {
      */
     public static String getTitle() {
 
-        final String tmpManifestValue = OjAlgoUtils.class.getPackage().getImplementationTitle();
+        String manifestValue = OjAlgoUtils.class.getPackage().getImplementationTitle();
 
-        return tmpManifestValue != null ? tmpManifestValue : "ojAlgo";
+        return manifestValue != null ? manifestValue : "ojAlgo";
     }
 
     /**
@@ -90,9 +88,9 @@ public abstract class OjAlgoUtils {
      */
     public static String getVendor() {
 
-        final String tmpManifestValue = OjAlgoUtils.class.getPackage().getImplementationVendor();
+        String manifestValue = OjAlgoUtils.class.getPackage().getImplementationVendor();
 
-        return tmpManifestValue != null ? tmpManifestValue : "Optimatika";
+        return manifestValue != null ? manifestValue : "Optimatika";
     }
 
     /**
@@ -100,9 +98,9 @@ public abstract class OjAlgoUtils {
      */
     public static String getVersion() {
 
-        final String tmpManifestValue = OjAlgoUtils.class.getPackage().getImplementationVersion();
+        String manifestValue = OjAlgoUtils.class.getPackage().getImplementationVersion();
 
-        return tmpManifestValue != null ? tmpManifestValue : "X.X";
+        return manifestValue != null ? manifestValue : "X.X";
     }
 
     public static void main(final String[] args) {

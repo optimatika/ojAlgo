@@ -58,7 +58,7 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
 
     @Override
     protected final DecompositionStore<N> allocate(final long numberOfRows, final long numberOfColumns) {
-        return myFactory.makeZero(numberOfRows, numberOfColumns);
+        return myFactory.make(numberOfRows, numberOfColumns);
     }
 
     @SuppressWarnings("unchecked")
@@ -82,7 +82,7 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
     }
 
     protected final BasicArray<N> makeArray(final int length) {
-        return myFactory.array().makeZero(length);
+        return myFactory.array().make(length);
     }
 
     protected final <D extends Access1D<?>> DiagonalStore.Builder<N, D> makeDiagonal(final D mainDiag) {
@@ -110,11 +110,11 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
     }
 
     protected final DecompositionStore<N> makeZero(final int numberOfRows, final int numberOfColumns) {
-        return myFactory.makeZero(numberOfRows, numberOfColumns);
+        return myFactory.make(numberOfRows, numberOfColumns);
     }
 
     protected final DecompositionStore<N> makeZero(final Structure2D shape) {
-        return myFactory.makeZero(shape);
+        return myFactory.make(shape);
     }
 
     @Override
