@@ -30,9 +30,11 @@ import org.ojalgo.structure.Access1D;
 
 public interface MultiaryFunction<N extends Number> extends BasicFunction.PlainUnary<Access1D<N>, N> {
 
-    public interface Constant<N extends Number, F extends Constant<N, ?>> extends MultiaryFunction<N> {
+    public interface Affine<N extends Number> extends Linear<N>, Constant<N> {
 
-        F constant(Number constant);
+    }
+
+    public interface Constant<N extends Number> extends MultiaryFunction<N> {
 
         N getConstant();
 
@@ -50,9 +52,13 @@ public interface MultiaryFunction<N extends Number> extends BasicFunction.PlainU
 
     }
 
-    public interface Quadratic<N extends Number> extends MultiaryFunction<N> {
+    public interface PureQuadratic<N extends Number> extends Constant<N> {
 
         PhysicalStore<N> quadratic();
+
+    }
+
+    public interface Quadratic<N extends Number> extends PureQuadratic<N>, Linear<N> {
 
     }
 
@@ -98,11 +104,15 @@ public interface MultiaryFunction<N extends Number> extends BasicFunction.PlainU
         /**
          * @return The gradient at 0 (0-vector)
          */
-        Access1D<N> getLinearFactors();
+        MatrixStore<N> getLinearFactors();
 
-        FirstOrderApproximation<N> toFirstOrderApproximation(final Access1D<N> point);
+        default MultiaryFunction<N> toFirstOrderApproximation(final Access1D<N> arg) {
+            return new FirstOrderApproximation<>(this, arg);
+        }
 
-        SecondOrderApproximation<N> toSecondOrderApproximation(final Access1D<N> point);
+        default MultiaryFunction<N> toSecondOrderApproximation(final Access1D<N> arg) {
+            return new SecondOrderApproximation<>(this, arg);
+        }
 
     }
 

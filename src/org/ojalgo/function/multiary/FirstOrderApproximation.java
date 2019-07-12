@@ -22,22 +22,23 @@
 package org.ojalgo.function.multiary;
 
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access1D;
 
 public final class FirstOrderApproximation<N extends Number> extends ApproximateFunction<N> {
 
-    private final LinearFunction<N> myDelegate;
+    private final AffineFunction<N> myDelegate;
 
     public FirstOrderApproximation(final MultiaryFunction.TwiceDifferentiable<N> function, final Access1D<N> point) {
 
         super(function, point);
 
-        final MatrixStore<N> tmpGradient = function.getGradient(point).logical().transpose().get();
+        final MatrixStore<N> linear = function.getGradient(point);
 
-        myDelegate = new LinearFunction<>(tmpGradient);
-        myDelegate.setConstant(function.invoke(point));
+        N constant = function.invoke(point);
+
+        myDelegate = new AffineFunction<>(linear);
+        myDelegate.setConstant(constant);
     }
 
     public int arity() {
@@ -86,17 +87,13 @@ public final class FirstOrderApproximation<N extends Number> extends Approximate
         return myDelegate.invoke(this.shift(arg));
     }
 
-    public PhysicalStore<N> linear() {
-        return myDelegate.linear();
-    }
-
     @Override
     public String toString() {
         return myDelegate.toString();
     }
 
     @Override
-    protected Factory<N, ?> factory() {
+    Factory<N, ?> factory() {
         return myDelegate.factory();
     }
 
