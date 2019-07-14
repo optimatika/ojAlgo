@@ -20,7 +20,7 @@
 
 ## org.ojalgo.function
 
-* Refactoring in the org.ojalgo.function.multiary package including (api-breaking) name changes to some interfaces and classes. The previous QuadraticFunction has been renamed PureQuadraticFunction, and CompoundFunction renamed QuadraticFunction. Further there is now both a LinearFunction and ann AffineFunction.
+* Refactoring in the org.ojalgo.function.multiary package including (api-breaking) name changes to some interfaces and classes. The previous QuadraticFunction has been renamed PureQuadraticFunction, and CompoundFunction renamed QuadraticFunction. Further there is now both a LinearFunction and an AffineFunction.
 
 ## org.ojalgo.matrix
 
