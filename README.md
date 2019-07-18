@@ -34,6 +34,4 @@ The [ojAlgo-user mailing list](https://sourceforge.net/p/ojalgo/mailman/ojalgo-u
 
 ojAlgo is Open Source, and you are strongly encouraged to clone or fork this repository and work directly with the source code. The source code is (part of) the documentation, and you should read it.
 
-### Contributing
-
-There's a whole separate [page on contributing](CONTRIBUTING.md).
+[Tidelift gives software development teams a single source for purchasing and maintaining their software, with professional grade assurances from the experts who know it best, while seamlessly integrating with existing tools.](https://tidelift.com/subscription/pkg/maven-org-ojalgo-ojalgo?utm_source=maven-org-ojalgo-ojalgo&utm_medium=referral&utm_campaign=readme)
