@@ -46,16 +46,9 @@ abstract class AbstractMachine extends BasicMachine {
      */
     public final int units;
 
-    private AbstractMachine(final long memory, final int threads) {
-
-        super(memory, threads);
-
-        throw new IllegalArgumentException();
-    }
-
     protected AbstractMachine(final Hardware hardware, final Runtime runtime) {
 
-        super(runtime.maxMemory(), runtime.availableProcessors());
+        super(Math.min(hardware.memory, runtime.maxMemory()), Math.min(hardware.threads, runtime.availableProcessors()));
 
         architecture = hardware.architecture;
 

@@ -21,7 +21,6 @@
  */
 package org.ojalgo.machine;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicLogger;
@@ -58,16 +57,6 @@ public final class VirtualMachine extends AbstractMachine {
 
     private final Hardware myHardware;
     private final Runtime myRuntime;
-
-    private VirtualMachine(final String architecture, final BasicMachine[] levels) {
-
-        super(architecture, levels);
-
-        myHardware = null;
-        myRuntime = null;
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
 
     VirtualMachine(final Hardware hardware, final Runtime runtime) {
 
