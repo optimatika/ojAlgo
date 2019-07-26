@@ -4,6 +4,10 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## org.ojalgo
+
+* The `OjAlgoUtils.ENVIRONMENT` can now be modified to limit the parallelism of ojAlgo.
+
 ## org.ojalgo.algebra
 
 * Added a power(int) method to the Operation.Multiplication interface.
