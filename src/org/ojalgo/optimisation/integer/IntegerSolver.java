@@ -32,6 +32,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.multiary.MultiaryFunction;
@@ -224,6 +225,8 @@ public final class IntegerSolver extends GenericSolver {
 
     }
 
+    private static final ForkJoinPool EXECUTOR = new ForkJoinPool(OjAlgoUtils.ENVIRONMENT.cores);
+
     public static IntegerSolver make(final ExpressionsBasedModel model) {
         return new IntegerSolver(model, model.options);
     }
@@ -286,11 +289,11 @@ public final class IntegerSolver extends GenericSolver {
 
         final BranchAndBoundNodeTask rootNodeTask = new BranchAndBoundNodeTask();
 
-        boolean normalExit = ForkJoinPool.commonPool().invoke(rootNodeTask).booleanValue();
+        boolean normalExit = EXECUTOR.invoke(rootNodeTask).booleanValue();
         while (normalExit && (myDeferredNodes.size() > 0)) {
             NodeKey nodeKey = myDeferredNodes.poll();
             if (this.isGoodEnoughToContinueBranching(nodeKey.objective)) {
-                normalExit &= ForkJoinPool.commonPool().invoke(new BranchAndBoundNodeTask(nodeKey)).booleanValue();
+                normalExit &= EXECUTOR.invoke(new BranchAndBoundNodeTask(nodeKey)).booleanValue();
             }
         }
         myDeferredNodes.clear();

@@ -42,7 +42,8 @@ abstract class AbstractMachine extends BasicMachine {
      */
     public final int cores;
     /**
-     * The number of top level (L3 or L2) cache units.
+     * The number of top level (L3 or L2) cache units. With L3 cache defined this corresponds to the number of
+     * CPU:s.
      */
     public final int units;
 
@@ -70,17 +71,16 @@ abstract class AbstractMachine extends BasicMachine {
         this.architecture = architecture;
 
         cores = threads / levels[levels.length - 1].threads;
+        cache = levels[1].memory;
+        units = threads / levels[1].threads;
+    }
 
-        if (levels.length > 3) { // L3 specified
-            cache = levels[levels.length - 3].memory;
-            units = threads / levels[levels.length - 3].threads;
-        } else if (levels.length > 2) { // L2 specified
-            cache = levels[levels.length - 2].memory;
-            units = threads / levels[levels.length - 2].threads;
-        } else {
-            cache = levels[levels.length - 1].memory;
-            units = threads / levels[levels.length - 1].threads;
-        }
+    AbstractMachine(final VirtualMachine base, final int modUnits, final int modCores, final int modThreads) {
+        super(base.memory, modThreads);
+        architecture = base.architecture;
+        cache = base.cache;
+        cores = modCores;
+        units = modUnits;
     }
 
     public IntCount countCores() {

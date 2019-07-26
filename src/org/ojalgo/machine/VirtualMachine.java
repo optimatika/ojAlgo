@@ -66,6 +66,12 @@ public final class VirtualMachine extends AbstractMachine {
         myRuntime = runtime;
     }
 
+    VirtualMachine(final VirtualMachine base, final int modUnits, final int modCores, final int modThreads) {
+        super(base, modUnits, modCores, modThreads);
+        myHardware = base.myHardware;
+        myRuntime = base.myRuntime;
+    }
+
     public void collectGarbage() {
 
         myRuntime.runFinalization();
@@ -134,6 +140,33 @@ public final class VirtualMachine extends AbstractMachine {
         int result = super.hashCode();
         result = (prime * result) + ((myHardware == null) ? 0 : myHardware.hashCode());
         return result;
+    }
+
+    public VirtualMachine limitCores(final int maxCores) {
+
+        int newCores = Math.max(1, Math.min(cores, maxCores));
+
+        int newThreads = Math.max(1, (threads * newCores) / cores);
+
+        return this.limitThreads(newThreads);
+    }
+
+    public VirtualMachine limitThreads(final int maxThreads) {
+
+        int newThreads = Math.max(1, Math.min(threads, maxThreads));
+        int newCores = Math.max(1, (cores * newThreads) / threads);
+        int newUnits = Math.max(1, (units * newCores) / cores);
+
+        return new VirtualMachine(this, newUnits, newCores, newThreads);
+    }
+
+    public VirtualMachine limitUnits(final int maxUnits) {
+
+        int newUnits = Math.max(1, Math.min(units, maxUnits));
+
+        int newThreads = Math.max(1, (threads * newUnits) / units);
+
+        return this.limitThreads(newThreads);
     }
 
     @Override

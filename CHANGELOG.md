@@ -39,6 +39,7 @@
 
 * Minor rounding/precision related change to how ExpressionsBasedModel receives the solution from the solver and then returns it. The `options.solution` property is now enforced.
 * Internal refactoring of ConvexSolver and its subclasses. This includes changes in behaviour (handling of not-so-convex or otherwise difficult problems).
+* The IntegerSolver now uses its own ForkJoinPool instance rather than the default `commonPool()`. The parallelism is derived from `OjAlgoUtils.ENVIRONMENT`.
 
 ## org.ojalgo.random
 
