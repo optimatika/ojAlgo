@@ -43,7 +43,7 @@
 
 * Minor rounding/precision related change to how ExpressionsBasedModel receives the solution from the solver and then returns it. The `options.solution` property is now enforced.
 * Internal refactoring of ConvexSolver and its subclasses. This includes changes in behaviour (handling of not-so-convex or otherwise difficult problems).
-* Internalrefactoring related to the LinearSolver.Builder as well as the ConvexSolver.Builder.
+* Internalnrefactoring related to the LinearSolver.Builder as well as the ConvexSolver.Builder.
 
 ## org.ojalgo.random
 
