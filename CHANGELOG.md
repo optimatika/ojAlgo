@@ -22,6 +22,10 @@
 
 * Added a variant of the covariances method in DataProcessors that take `double[]...` as input.
 
+## org.ojalgo.function
+
+* Refactoring in the org.ojalgo.function.multiary package including (api-breaking) name changes to some interfaces and classes. The previous QuadraticFunction has been renamed PureQuadraticFunction, and CompoundFunction renamed QuadraticFunction. Further there is now both a LinearFunction and an AffineFunction.
+
 ## org.ojalgo.matrix
 
 * Various deprecations in MatrixStore.LogicalBuilder and the corresponding LogicalBuilder:s of PrimitiveMatrix, ComplexMatrix & RationalMatrix. Everything in the LogicalBuilder:s are now either defined in org.ojalgo.structure.Structure2D.Logical or deprecated.
@@ -44,6 +48,7 @@
 * Minor rounding/precision related change to how ExpressionsBasedModel receives the solution from the solver and then returns it. The `options.solution` property is now enforced.
 * Internal refactoring of ConvexSolver and its subclasses. This includes changes in behaviour (handling of not-so-convex or otherwise difficult problems).
 * The IntegerSolver now uses its own ForkJoinPool instance rather than the default `commonPool()`. The parallelism is derived from `OjAlgoUtils.ENVIRONMENT`.
+* Internal refactoring related to the LinearSolver.Builder as well as the ConvexSolver.Builder.
 
 ## org.ojalgo.random
 

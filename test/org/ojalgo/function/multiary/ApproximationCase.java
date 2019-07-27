@@ -23,47 +23,72 @@ package org.ojalgo.function.multiary;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
 
-public class ApproximationCase {
+public class ApproximationCase extends MultiaryFunctionTests {
+
+    private static final NumberContext ACCURACY = new NumberContext(7, 14);
 
     @Test
     public void testFirstOrderApproximation() {
 
-        final int tmpArity = 9;
+        for (int arity = 1; arity < 10; arity++) {
 
-        final PhysicalStore<Double> tmpLinear = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-1, 2));
+            PhysicalStore<Double> linear = PrimitiveDenseStore.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
 
-        final PhysicalStore<Double> tmpPoint = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-10, 20));
+            PhysicalStore<Double> zero = PrimitiveDenseStore.FACTORY.make(arity, 1);
+            PhysicalStore<Double> point = PrimitiveDenseStore.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
 
-        final LinearFunction<Double> tmpOrgFunc = LinearFunction.makePrimitive(tmpLinear);
-        final FirstOrderApproximation<Double> tmpApprFunc = tmpOrgFunc.toFirstOrderApproximation(tmpPoint);
+            AffineFunction<Double> orgFunc = AffineFunction.makePrimitive(linear);
 
-        final PhysicalStore<Double> tmpX = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-10, 20));
+            PhysicalStore<Double> arg = PrimitiveDenseStore.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
 
-        TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), new NumberContext(7, 14));
+            Double expected = orgFunc.invoke(arg);
+
+            MultiaryFunction<Double> maclaurinApprox = orgFunc.toFirstOrderApproximation(zero);
+            MultiaryFunction<Double> taylorApprox = orgFunc.toFirstOrderApproximation(point);
+
+            Double orgVal = orgFunc.invoke(arg);
+            Double maclaurinVal = maclaurinApprox.invoke(arg);
+            Double taylorVal = taylorApprox.invoke(arg);
+
+            TestUtils.assertEquals(expected, orgVal, ACCURACY);
+            TestUtils.assertEquals(expected, maclaurinVal, ACCURACY);
+            TestUtils.assertEquals(expected, taylorVal, ACCURACY);
+        }
     }
 
     @Test
     public void testSecondOrderApproximation() {
 
-        final int tmpArity = 9;
+        for (int arity = 1; arity < 10; arity++) {
 
-        final PhysicalStore<Double> tmpQuadratic = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, tmpArity, new Uniform());
-        final PhysicalStore<Double> tmpLinear = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-1, 2));
+            PhysicalStore<Double> quadratic = PrimitiveDenseStore.FACTORY.makeFilled(arity, arity, new Uniform());
+            PhysicalStore<Double> linear = PrimitiveDenseStore.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
 
-        final PhysicalStore<Double> tmpPoint = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-10, 20));
+            PhysicalStore<Double> zero = PrimitiveDenseStore.FACTORY.make(arity, 1);
+            PhysicalStore<Double> point = PrimitiveDenseStore.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
 
-        final CompoundFunction<Double> tmpOrgFunc = CompoundFunction.makePrimitive(tmpQuadratic, tmpLinear);
-        final SecondOrderApproximation<Double> tmpApprFunc = tmpOrgFunc.toSecondOrderApproximation(tmpPoint);
+            QuadraticFunction<Double> orgFunc = QuadraticFunction.makePrimitive(quadratic, linear);
 
-        final PhysicalStore<Double> tmpX = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-10, 20));
+            PhysicalStore<Double> arg = PrimitiveDenseStore.FACTORY.makeFilled(arity, 1, new Uniform(-10, 20));
 
-        TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), PrimitiveMath.SQRT.invoke(1E-14 / PrimitiveMath.THREE));
+            Double expected = orgFunc.invoke(arg);
+
+            MultiaryFunction<Double> maclaurinApprox = orgFunc.toSecondOrderApproximation(zero);
+            MultiaryFunction<Double> taylorApprox = orgFunc.toSecondOrderApproximation(point);
+
+            Double orgVal = orgFunc.invoke(arg);
+            Double maclaurinVal = maclaurinApprox.invoke(arg);
+            Double taylorVal = taylorApprox.invoke(arg);
+
+            TestUtils.assertEquals(expected, orgVal, ACCURACY);
+            TestUtils.assertEquals(expected, maclaurinVal, ACCURACY);
+            TestUtils.assertEquals(expected, taylorVal, ACCURACY);
+        }
     }
 
 }

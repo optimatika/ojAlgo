@@ -19,8 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function.tmp;
+package org.ojalgo.function.multiary;
 
-public class TemporaryFunction {
+public abstract class MultiaryFunctionTests {
+
+    static final boolean DEBUG = false;
 
 }

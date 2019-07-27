@@ -27,7 +27,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BigArray;
@@ -35,7 +34,7 @@ import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.multiary.CompoundFunction;
+import org.ojalgo.function.multiary.QuadraticFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.RationalMatrix;
@@ -1278,7 +1277,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             TestUtils.assertStateLessThanFeasible(tmpResult);
             TestUtils.fail();
 
-        } catch (ProgrammingError exception) {
+        } catch (Exception exception) {
             TestUtils.assertTrue("Yes!", true);
         }
 
@@ -1340,7 +1339,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             assert false;
         }
 
-        CompoundFunction<Double> tmpObj = CompoundFunction.makePrimitive(JamaQ.multiply(0.5), JamaC.multiply(-1.0));
+        QuadraticFunction<Double> tmpObj = QuadraticFunction.makePrimitive(JamaQ.multiply(0.5), JamaC.multiply(-1.0));
 
         TestUtils.assertEquals(State.OPTIMAL, result.getState());
 
