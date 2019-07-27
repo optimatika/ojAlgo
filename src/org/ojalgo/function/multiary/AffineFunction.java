@@ -28,46 +28,48 @@ import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
 /**
- * [l]<sup>T</sup>[x]
+ * [l]<sup>T</sup>[x] + c
  *
  * @author apete
  */
-public final class LinearFunction<N extends Number> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Linear<N> {
+public final class AffineFunction<N extends Number> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Affine<N> {
 
-    public static LinearFunction<ComplexNumber> makeComplex(final Access1D<?> coefficients) {
-        return new LinearFunction<>(GenericDenseStore.COMPLEX.rows(coefficients));
+    public static AffineFunction<ComplexNumber> makeComplex(final Access1D<?> coefficients) {
+        return new AffineFunction<>(GenericDenseStore.COMPLEX.rows(coefficients));
     }
 
-    public static LinearFunction<ComplexNumber> makeComplex(final int arity) {
-        return new LinearFunction<>(GenericDenseStore.COMPLEX.make(1, arity));
+    public static AffineFunction<ComplexNumber> makeComplex(final int arity) {
+        return new AffineFunction<>(GenericDenseStore.COMPLEX.make(1, arity));
     }
 
-    public static LinearFunction<Double> makePrimitive(final Access1D<?> coefficients) {
-        return new LinearFunction<>(PrimitiveDenseStore.FACTORY.rows(coefficients));
+    public static AffineFunction<Double> makePrimitive(final Access1D<?> coefficients) {
+        return new AffineFunction<>(PrimitiveDenseStore.FACTORY.rows(coefficients));
     }
 
-    public static LinearFunction<Double> makePrimitive(final int arity) {
-        return new LinearFunction<>(PrimitiveDenseStore.FACTORY.make(1, arity));
+    public static AffineFunction<Double> makePrimitive(final int arity) {
+        return new AffineFunction<>(PrimitiveDenseStore.FACTORY.make(1, arity));
     }
 
-    public static LinearFunction<RationalNumber> makeRational(final Access1D<?> coefficients) {
-        return new LinearFunction<>(GenericDenseStore.RATIONAL.rows(coefficients));
+    public static AffineFunction<RationalNumber> makeRational(final Access1D<?> coefficients) {
+        return new AffineFunction<>(GenericDenseStore.RATIONAL.rows(coefficients));
     }
 
-    public static LinearFunction<RationalNumber> makeRational(final int arity) {
-        return new LinearFunction<>(GenericDenseStore.RATIONAL.make(1, arity));
+    public static AffineFunction<RationalNumber> makeRational(final int arity) {
+        return new AffineFunction<>(GenericDenseStore.RATIONAL.make(1, arity));
     }
 
-    public static <N extends Number> LinearFunction<N> wrap(final PhysicalStore<N> coefficients) {
-        return new LinearFunction<>(coefficients);
+    public static <N extends Number> AffineFunction<N> wrap(final PhysicalStore<N> coefficients) {
+        return new AffineFunction<>(coefficients);
     }
 
     private final MatrixStore<N> myCoefficients;
+    private final ConstantFunction<N> myConstant;
 
-    LinearFunction(final MatrixStore<N> coefficients) {
+    AffineFunction(final MatrixStore<N> coefficients) {
 
         super();
 
@@ -76,10 +78,15 @@ public final class LinearFunction<N extends Number> implements MultiaryFunction.
         }
 
         myCoefficients = coefficients;
+        myConstant = new ConstantFunction<>(coefficients.count(), coefficients.physical());
     }
 
     public int arity() {
         return Math.toIntExact(myCoefficients.count());
+    }
+
+    public N getConstant() {
+        return myConstant.getConstant();
     }
 
     @Override
@@ -89,7 +96,7 @@ public final class LinearFunction<N extends Number> implements MultiaryFunction.
 
     @Override
     public MatrixStore<N> getHessian(final Access1D<N> point) {
-        return this.factory().builder().makeZero(this.arity(), this.arity()).get();
+        return myCoefficients.physical().builder().makeZero(this.arity(), this.arity()).get();
     }
 
     public MatrixStore<N> getLinearFactors() {
@@ -102,20 +109,32 @@ public final class LinearFunction<N extends Number> implements MultiaryFunction.
 
     @Override
     public N invoke(final Access1D<N> arg) {
-
-        PhysicalStore<N> preallocated = myCoefficients.physical().make(1L, 1L);
-
-        myCoefficients.multiply(arg, preallocated);
-
-        return preallocated.get(0, 0);
+        return this.getScalarValue(arg).get();
     }
 
     public PhysicalStore<N> linear() {
         return (PhysicalStore<N>) myCoefficients;
     }
 
+    public void setConstant(final Number constant) {
+        myConstant.setConstant(constant);
+    }
+
     Factory<N, ?> factory() {
         return myCoefficients.physical();
+    }
+
+    Scalar<N> getScalarValue(final Access1D<N> arg) {
+
+        PhysicalStore<N> preallocated = myCoefficients.physical().make(1L, 1L);
+
+        Scalar<N> retVal = myConstant.getScalarConstant();
+
+        myCoefficients.multiply(arg, preallocated);
+
+        retVal = retVal.add(preallocated.get(0, 0));
+
+        return retVal;
     }
 
 }

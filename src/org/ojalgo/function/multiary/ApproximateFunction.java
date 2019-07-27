@@ -21,10 +21,11 @@
  */
 package org.ojalgo.function.multiary;
 
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access1D;
 
-abstract class ApproximateFunction<N extends Number> implements MultiaryFunction<N>, MultiaryFunction.TwiceDifferentiable<N> {
+abstract class ApproximateFunction<N extends Number> implements MultiaryFunction.TwiceDifferentiable<N> {
 
     private final Access1D<N> myPoint;
 
@@ -57,7 +58,7 @@ abstract class ApproximateFunction<N extends Number> implements MultiaryFunction
         return true;
     }
 
-    public Access1D<N> getLinearFactors() {
+    public MatrixStore<N> getLinearFactors() {
         return this.getGradient(this.factory().builder().makeZero(this.arity(), 1).get());
     }
 
@@ -77,12 +78,12 @@ abstract class ApproximateFunction<N extends Number> implements MultiaryFunction
         return new SecondOrderApproximation<>(this, arg);
     }
 
-    protected abstract PhysicalStore.Factory<N, ?> factory();
-
     protected PhysicalStore<N> shift(final Access1D<?> arg) {
         final PhysicalStore<N> retVal = this.factory().columns(arg);
         retVal.modifyMatching(this.factory().function().subtract(), myPoint);
         return retVal;
     }
+
+    abstract PhysicalStore.Factory<N, ?> factory();
 
 }
