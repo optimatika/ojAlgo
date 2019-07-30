@@ -33,7 +33,6 @@ import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -41,7 +40,6 @@ import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
-import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 
@@ -260,18 +258,19 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
     public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options) {
 
         Optimisation.Result retVal = PrimalSimplex.solve(convex, options);
-        Optimisation.Result retVal2 = DualSimplex.solve(convex, options);
-
-        if (!Access1D.equals(retVal, retVal2, ACCURACY.withPrecision(8).withScale(6))) {
-
-            BasicLogger.debug();
-            BasicLogger.debug("Prim sol: {}", retVal);
-            BasicLogger.debug("Dual sol: {}", retVal2);
-
-            BasicLogger.debug("Prim mul: {}", retVal.getMultipliers().get());
-            BasicLogger.debug("Dual mul: {}", retVal2.getMultipliers().get());
-            BasicLogger.debug();
-        }
+        //        Optimisation.Result retVal2 = DualSimplex.solve(convex, options);
+        //
+        //        if (retVal.getMultipliers().isPresent()
+        //                && !Access1D.equals(retVal.getMultipliers().get(), retVal2.getMultipliers().get(), ACCURACY.withPrecision(8).withScale(6))) {
+        //
+        //            BasicLogger.debug();
+        //            BasicLogger.debug("Prim sol: {}", retVal);
+        //            BasicLogger.debug("Dual sol: {}", retVal2);
+        //
+        //            BasicLogger.debug("Prim mul: {}", retVal.getMultipliers().get());
+        //            BasicLogger.debug("Dual mul: {}", retVal2.getMultipliers().get());
+        //            BasicLogger.debug();
+        //        }
 
         return retVal;
     }
