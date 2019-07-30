@@ -225,7 +225,7 @@ public final class IntegerSolver extends GenericSolver {
 
     }
 
-    private static final ForkJoinPool EXECUTOR = new ForkJoinPool(OjAlgoUtils.ENVIRONMENT.cores);
+    private static final ForkJoinPool EXECUTOR = new ForkJoinPool(OjAlgoUtils.ENVIRONMENT.threads);
 
     public static IntegerSolver make(final ExpressionsBasedModel model) {
         return new IntegerSolver(model, model.options);
