@@ -262,7 +262,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         Optimisation.Result retVal = PrimalSimplex.solve(convex, options);
         Optimisation.Result retVal2 = DualSimplex.solve(convex, options);
 
-        if (false && !Access1D.equals(retVal, retVal2, ACCURACY.withPrecision(8).withScale(6))) {
+        if (!Access1D.equals(retVal, retVal2, ACCURACY.withPrecision(8).withScale(6))) {
 
             BasicLogger.debug();
             BasicLogger.debug("Prim sol: {}", retVal);
