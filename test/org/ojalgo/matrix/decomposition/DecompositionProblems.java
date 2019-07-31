@@ -152,6 +152,29 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     }
 
     /**
+     * https://github.com/optimatika/ojAlgo/issues/214
+     */
+    @Test
+    public void testGitHubIssue214() {
+
+        double[][] olsColumns = { { 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 },
+                { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 }, { 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 },
+                { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 }, { 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 }, { 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 } };
+
+        double[] observationVector = { 26.0, 12.0, 9.0, 18.0, 16.0, 17.0, 24.0, 32.0, 30.0, 21.0, 16.0, 12.0, 21.0, 16.0 };
+
+        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(olsColumns);
+        SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make(tmpOriginal);
+        tmpSVD.decompose(tmpOriginal);
+        PrimitiveDenseStore rhs = PrimitiveDenseStore.FACTORY.column(observationVector);
+        MatrixStore<Double> solution = tmpSVD.getSolution(rhs, tmpSVD.preallocate(tmpOriginal, rhs));
+
+        // Simply test that we can run this program without getting an exception
+    }
+
+    /**
      * http://en.wikipedia.org/wiki/Singular_value_decomposition There is no problem...
      */
     @Test

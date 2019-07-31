@@ -288,7 +288,8 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
          *
          * @param preallocated Preallocated memory for the results, possibly some intermediate results. You
          *        must assume this is modified, but you cannot assume it will contain the full/final/correct
-         *        solution.
+         *        solution. Use {@link #preallocate(int, int)} or {@link #preallocate(Structure2D)} to get a
+         *        suitable instance.
          * @return The inverse, this is where you get the solution
          * @throws UnsupportedOperationException When/if this feature is not implemented
          */
@@ -314,7 +315,8 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
          * @param rhs The Right Hand Side, wont be modfied
          * @param preallocated Preallocated memory for the results, possibly some intermediate results. You
          *        must assume this is modified, but you cannot assume it will contain the full/final/correct
-         *        solution.
+         *        solution. Use {@link #preallocate(int, int, int)} or
+         *        {@link #preallocate(Structure2D, Structure2D)} to get a suitable instance.
          * @return The solution
          * @throws UnsupportedOperationException When/if this feature is not implemented
          */
