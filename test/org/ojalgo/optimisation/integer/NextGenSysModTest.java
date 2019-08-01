@@ -46,7 +46,6 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
-@Disabled
 public class NextGenSysModTest {
 
     public static final class Case010A extends CaseData {
@@ -1554,6 +1553,7 @@ public class NextGenSysModTest {
     }
 
     @Test
+    @Tag("unstable")
     public void testSequentialCase010A() {
         this.doTestSequential(CASE_010A);
     }
