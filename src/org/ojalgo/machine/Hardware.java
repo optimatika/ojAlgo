@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.netio.ASCII;
 
@@ -140,6 +139,9 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
     static final Hardware X86_64__02 = new Hardware("x86_64",
             new BasicMachine[] { new BasicMachine(3L * K * K * K, 2), new BasicMachine(4L * K * K, 2), new BasicMachine(32L * K, 1) });
 
+    static final Hardware X86_64__04 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(16L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
+            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
+
     /**
      * <ul>
      * <li>PA's Q9400
@@ -229,9 +231,6 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </ul>
      */
     static final Hardware X86_64__04_2 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(8L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
-            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
-
-    static final Hardware X86_64__04 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(16L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     /**
@@ -474,15 +473,6 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
         }
 
         myLevels = COPY.copyOf(levels);
-    }
-
-    private Hardware(final Hardware aHardware, final Runtime aRuntime) {
-
-        super(aHardware, aRuntime);
-
-        myLevels = null;
-
-        ProgrammingError.throwForIllegalInvocation();
     }
 
     public int compareTo(final Hardware other) {
