@@ -258,7 +258,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
     public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options) {
 
         Optimisation.Result retVal = PrimalSimplex.solve(convex, options);
-        //        Optimisation.Result retVal2 = DualSimplex.solve(convex, options);
+        Optimisation.Result retVal2 = DualSimplex.solve(convex, options);
         //
         //        if (retVal.getMultipliers().isPresent()
         //                && !Access1D.equals(retVal.getMultipliers().get(), retVal2.getMultipliers().get(), ACCURACY.withPrecision(8).withScale(6))) {
@@ -272,7 +272,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         //            BasicLogger.debug();
         //        }
 
-        return retVal;
+        return retVal2;
     }
 
     protected LinearSolver(final Options solverOptions) {
