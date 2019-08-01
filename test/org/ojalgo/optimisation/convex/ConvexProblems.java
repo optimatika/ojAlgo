@@ -26,7 +26,6 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
@@ -878,7 +877,6 @@ public class ConvexProblems extends OptimisationConvexTests {
      * </p>
      */
     @Test
-    @Tag("primaldual")
     public void testP20081119() {
 
         PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
@@ -1305,7 +1303,6 @@ public class ConvexProblems extends OptimisationConvexTests {
      * @see "http://bugzilla.optimatika.se/show_bug.cgi?id=210"
      */
     @Test
-    @Tag("primaldual")
     public void testP20140522() {
 
         double[][] q = new double[][] { { 49.0, 31.0, 17.0, 6.0 }, { 31.0, 25.0, 13.0, 5.0 }, { 17.0, 13.0, 11.0, 3.5 }, { 6.0, 5.0, 3.5, 4.0 } };

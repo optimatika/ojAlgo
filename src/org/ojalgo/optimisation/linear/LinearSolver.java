@@ -257,22 +257,23 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options) {
 
-        Optimisation.Result retVal = PrimalSimplex.solve(convex, options);
-        Optimisation.Result retVal2 = DualSimplex.solve(convex, options);
+        Optimisation.Result primRes = PrimalSimplex.solve(convex, options);
+
+        //        Optimisation.Result dualRes = DualSimplex.solve(convex, options);
         //
-        //        if (retVal.getMultipliers().isPresent()
-        //                && !Access1D.equals(retVal.getMultipliers().get(), retVal2.getMultipliers().get(), ACCURACY.withPrecision(8).withScale(6))) {
+        //        if (primRes.getMultipliers().isPresent()
+        //                && !Access1D.equals(primRes.getMultipliers().get(), dualRes.getMultipliers().get(), ACCURACY.withPrecision(8).withScale(6))) {
         //
         //            BasicLogger.debug();
-        //            BasicLogger.debug("Prim sol: {}", retVal);
-        //            BasicLogger.debug("Dual sol: {}", retVal2);
+        //            BasicLogger.debug("Prim sol: {}", primRes);
+        //            BasicLogger.debug("Dual sol: {}", dualRes);
         //
-        //            BasicLogger.debug("Prim mul: {}", retVal.getMultipliers().get());
-        //            BasicLogger.debug("Dual mul: {}", retVal2.getMultipliers().get());
+        //            BasicLogger.debug("Prim mul: {}", primRes.getMultipliers().get());
+        //            BasicLogger.debug("Dual mul: {}", dualRes.getMultipliers().get());
         //            BasicLogger.debug();
         //        }
 
-        return retVal2;
+        return primRes;
     }
 
     protected LinearSolver(final Options solverOptions) {
