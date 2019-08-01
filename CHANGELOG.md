@@ -4,6 +4,10 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## org.ojalgo
+
+* The `OjAlgoUtils.ENVIRONMENT` can now be modified to limit the parallelism of ojAlgo.
+
 ## org.ojalgo.algebra
 
 * Added a power(int) method to the Operation.Multiplication interface.
@@ -43,7 +47,8 @@
 
 * Minor rounding/precision related change to how ExpressionsBasedModel receives the solution from the solver and then returns it. The `options.solution` property is now enforced.
 * Internal refactoring of ConvexSolver and its subclasses. This includes changes in behaviour (handling of not-so-convex or otherwise difficult problems).
-* Internalnrefactoring related to the LinearSolver.Builder as well as the ConvexSolver.Builder.
+* The IntegerSolver now uses its own ForkJoinPool instance rather than the default `commonPool()`. The parallelism is derived from `OjAlgoUtils.ENVIRONMENT`.
+* Internal refactoring related to the LinearSolver.Builder as well as the ConvexSolver.Builder.
 
 ## org.ojalgo.random
 
@@ -56,7 +61,7 @@
 ## org.ojalgo.structure
 
 * Additions to Structure2D.Logical (Moved definitions from MatrixStore.LogicalBuilder to here).
-* Refactoring to Factory1D, Factory2D and FactoryAnyD – makeZero(...) is renamed make(...) and everything is moved to a nestyed subinterface Dense.
+* Refactoring to Factory1D, Factory2D and FactoryAnyD – makeZero(...) is renamed make(...) and everything else is moved to a nested subinterface Dense.
 
 # v47.2.0: 2019-05-03
 

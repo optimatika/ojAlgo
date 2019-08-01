@@ -81,7 +81,7 @@ public class DataProcessors {
     public static <D extends Access2D<?> & Access2D.Sliceable<?>, M extends Mutate2D> M covariances(final Factory2D<M> factory, final D data) {
 
         long numberOfVariables = data.countColumns();
-        M retVal = factory.makeZero(numberOfVariables, numberOfVariables);
+        M retVal = factory.make(numberOfVariables, numberOfVariables);
 
         SampleSet rowSet = SampleSet.make();
         SampleSet colSet = SampleSet.make();

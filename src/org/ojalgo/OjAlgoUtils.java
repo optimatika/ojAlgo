@@ -32,7 +32,10 @@ public abstract class OjAlgoUtils {
 
     /**
      * This is set for you, but you may want to set it to something different/better. Create a
-     * {@linkplain Hardware} instance and then call {@linkplain Hardware#virtualise()}.
+     * {@linkplain Hardware} instance and then call {@linkplain Hardware#virtualise()}. The idea is that the
+     * {@linkplain Hardware} instance should match the actual hardware, but the {@linkplain VirtualMachine}
+     * can optionally be limited to only let ojAlgo "see" a subset of the cores/threads. Changing this must be
+     * the very first thing you do with ojAlgo.
      */
     public static VirtualMachine ENVIRONMENT = null;
 
@@ -101,6 +104,33 @@ public abstract class OjAlgoUtils {
         String manifestValue = OjAlgoUtils.class.getPackage().getImplementationVersion();
 
         return manifestValue != null ? manifestValue : "X.X";
+    }
+
+    /**
+     * With several CPU cores present you can limit the number of threads used by ojAlgo by defining how many
+     * of the cores ojAlgo should "see".
+     *
+     * @param maxCores The number of CPU cores avaibale to ojAlgo
+     */
+    public static void limitCoresTo(final int maxCores) {
+        ENVIRONMENT = ENVIRONMENT.limitCores(maxCores);
+    }
+
+    /**
+     * @param maxThreads The number of CPU threads avaibale to ojAlgo
+     */
+    public static void limitThreadsTo(final int maxThreads) {
+        ENVIRONMENT = ENVIRONMENT.limitThreads(maxThreads);
+    }
+
+    /**
+     * With several CPU:s present you can limit the number of threads used by ojAlgo by defining how many of
+     * the CPU:s ojAlgo should "see".
+     *
+     * @param maxUnits The number of CPU:s avaibale to ojAlgo
+     */
+    public static void limitUnitsTo(final int maxUnits) {
+        ENVIRONMENT = ENVIRONMENT.limitUnits(maxUnits);
     }
 
     public static void main(final String[] args) {
