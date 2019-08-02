@@ -154,4 +154,18 @@ final class DualSimplex extends SimplexSolver {
         return super.extractMultipliers();
     }
 
+    @Override
+    protected State getState() {
+
+        State state = super.getState();
+
+        if (state == State.UNBOUNDED) {
+            return State.INFEASIBLE;
+        } else if (!state.isFeasible()) {
+            return State.UNBOUNDED;
+        } else {
+            return state;
+        }
+    }
+
 }

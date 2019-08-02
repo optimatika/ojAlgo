@@ -308,7 +308,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
      */
     protected abstract Access1D<?> extractSolution();
 
-    protected final State getState() {
+    protected State getState() {
         return myState;
     }
 
