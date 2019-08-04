@@ -37,9 +37,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class HouseholderHermitian extends ArrayOperation {
-
-    public static final HouseholderHermitian SETUP = new HouseholderHermitian();
+public final class HouseholderHermitian implements ArrayOperation {
 
     public static void invoke(final double[] data, final Householder.Primitive householder, final double[] worker) {
 

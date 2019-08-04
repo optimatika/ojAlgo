@@ -30,9 +30,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class HermitianRank2Update extends ArrayOperation {
-
-    public static final HermitianRank2Update SETUP = new HermitianRank2Update();
+public final class HermitianRank2Update implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 

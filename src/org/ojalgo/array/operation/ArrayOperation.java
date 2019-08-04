@@ -21,19 +21,17 @@
  */
 package org.ojalgo.array.operation;
 
-import org.ojalgo.OjAlgoUtils;
-
 /**
  * @author apete
  */
-public abstract class ArrayOperation {
+public interface ArrayOperation {
 
     /**
      * Sets all matrix size operation thresholds to precisly this value.
      *
      * @param value The threshold
      */
-    public static void setAllOperationThresholds(final int value) {
+    static void setAllOperationThresholds(final int value) {
         ArrayOperation.setThresholdsMaxValue(value);
         ArrayOperation.setThresholdsMinValue(value);
     }
@@ -44,7 +42,7 @@ public abstract class ArrayOperation {
      *
      * @param maxValue The max allowed value
      */
-    public static void setThresholdsMaxValue(final int maxValue) {
+    static void setThresholdsMaxValue(final int maxValue) {
         AggregateAll.THRESHOLD = Math.min(maxValue, AggregateAll.THRESHOLD);
         ApplyCholesky.THRESHOLD = Math.min(maxValue, ApplyCholesky.THRESHOLD);
         ApplyLU.THRESHOLD = Math.min(maxValue, ApplyLU.THRESHOLD);
@@ -73,7 +71,7 @@ public abstract class ArrayOperation {
      *
      * @param minValue The min allowed value
      */
-    public static void setThresholdsMinValue(final int minValue) {
+    static void setThresholdsMinValue(final int minValue) {
         AggregateAll.THRESHOLD = Math.max(minValue, AggregateAll.THRESHOLD);
         ApplyCholesky.THRESHOLD = Math.max(minValue, ApplyCholesky.THRESHOLD);
         ApplyLU.THRESHOLD = Math.max(minValue, ApplyLU.THRESHOLD);
@@ -96,14 +94,6 @@ public abstract class ArrayOperation {
         SubstituteForwards.THRESHOLD = Math.max(minValue, SubstituteForwards.THRESHOLD);
     }
 
-    protected ArrayOperation() {
-        super();
-    }
-
-    public abstract int threshold();
-
-    public int workers() {
-        return OjAlgoUtils.ENVIRONMENT.threads;
-    }
+    int threshold();
 
 }

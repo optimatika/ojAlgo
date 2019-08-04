@@ -225,10 +225,17 @@ public final class IntegerSolver extends GenericSolver {
 
     }
 
-    private static final ForkJoinPool EXECUTOR = new ForkJoinPool(OjAlgoUtils.ENVIRONMENT.threads);
+    private static volatile ForkJoinPool EXECUTOR;
 
     public static IntegerSolver make(final ExpressionsBasedModel model) {
         return new IntegerSolver(model, model.options);
+    }
+
+    private static ForkJoinPool executor() {
+        if (EXECUTOR == null) {
+            EXECUTOR = new ForkJoinPool(OjAlgoUtils.ENVIRONMENT.threads);
+        }
+        return EXECUTOR;
     }
 
     static void flush(final PrinterBuffer buffer, final BasicLogger.Printer receiver) {
@@ -289,11 +296,11 @@ public final class IntegerSolver extends GenericSolver {
 
         final BranchAndBoundNodeTask rootNodeTask = new BranchAndBoundNodeTask();
 
-        boolean normalExit = EXECUTOR.invoke(rootNodeTask).booleanValue();
+        boolean normalExit = IntegerSolver.executor().invoke(rootNodeTask).booleanValue();
         while (normalExit && (myDeferredNodes.size() > 0)) {
             NodeKey nodeKey = myDeferredNodes.poll();
             if (this.isGoodEnoughToContinueBranching(nodeKey.objective)) {
-                normalExit &= EXECUTOR.invoke(new BranchAndBoundNodeTask(nodeKey)).booleanValue();
+                normalExit &= IntegerSolver.executor().invoke(new BranchAndBoundNodeTask(nodeKey)).booleanValue();
             }
         }
         myDeferredNodes.clear();

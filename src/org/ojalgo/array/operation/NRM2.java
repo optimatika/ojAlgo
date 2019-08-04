@@ -27,7 +27,7 @@ package org.ojalgo.array.operation;
  *
  * @author apete
  */
-public final class NRM2 extends ArrayOperation implements BLAS1 {
+public final class NRM2 implements BLAS1 {
 
     public static int THRESHOLD = 128;
 

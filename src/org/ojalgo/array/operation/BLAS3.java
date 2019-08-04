@@ -43,6 +43,6 @@ package org.ojalgo.array.operation;
  *
  * @author apete
  */
-public interface BLAS3 {
+public interface BLAS3 extends ArrayOperation {
 
 }

@@ -24,9 +24,7 @@ package org.ojalgo.array.operation;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.Scalar;
 
-public final class HouseholderLeft extends ArrayOperation {
-
-    public static final HouseholderLeft SETUP = new HouseholderLeft();
+public final class HouseholderLeft implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

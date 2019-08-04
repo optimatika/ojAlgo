@@ -21,12 +21,47 @@
  */
 package org.ojalgo.type;
 
+import java.util.concurrent.Callable;
+
 /**
  * This stopwatch is always running. It start as soon as you create the instance.
  *
  * @author apete
  */
 public class Stopwatch {
+
+    public static final class TimedResult<T> {
+
+        public final CalendarDateDuration duration;
+        public final T result;
+
+        TimedResult(final T result, final CalendarDateDuration duration) {
+            super();
+            this.result = result;
+            this.duration = duration;
+        }
+
+    }
+
+    public static <T> TimedResult<T> meassure(final Callable<T> task) {
+        return Stopwatch.meassure(task, CalendarDateUnit.MILLIS);
+    }
+
+    public static <T> TimedResult<T> meassure(final Callable<T> task, final CalendarDateUnit unit) {
+
+        final Stopwatch timer = new Stopwatch();
+
+        T result;
+        try {
+            result = task.call();
+        } catch (Exception exception) {
+            result = null;
+        }
+
+        CalendarDateDuration duration = timer.stop(unit);
+
+        return new TimedResult<>(result, duration);
+    }
 
     /**
      * Meassure task duration using this class' stopwatch functionality.

@@ -26,20 +26,13 @@ import java.util.function.DoubleSupplier;
 
 import org.ojalgo.structure.Structure2D;
 
-public final class FillMatchingDual extends ArrayOperation {
-
-    public static final FillMatchingDual SETUP = new FillMatchingDual();
+public final class FillMatchingDual implements ArrayOperation {
 
     /**
      * 2013-10-22: Was set to 128 (based on calibration) but I saw a dip in relative performance (java matrix
      * benchmark) at size 200. So I cahnged it to 256.
      */
     public static int THRESHOLD = 256;
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
 
     public static void fillAll(final double[][] target, final double value) {
         int limit = target.length;
@@ -118,9 +111,9 @@ public final class FillMatchingDual extends ArrayOperation {
     }
 
     public static void fillRange(final double[][] target, final int first, final int limit, final double value) {
-    
+
         int tmpLength = target.length;
-    
+
         for (int index = first; index < limit; index++) {
             int tmpRow = Structure2D.row(index, tmpLength);
             int tmpcol = Structure2D.column(index, tmpLength);
@@ -129,9 +122,9 @@ public final class FillMatchingDual extends ArrayOperation {
     }
 
     public static void fillRange(final double[][] target, final int first, final int limit, final DoubleSupplier supplier) {
-    
+
         int tmpLength = target.length;
-    
+
         for (int index = first; index < limit; index++) {
             int tmpRow = Structure2D.row(index, tmpLength);
             int tmpcol = Structure2D.column(index, tmpLength);
@@ -151,6 +144,11 @@ public final class FillMatchingDual extends ArrayOperation {
         for (int j = col, limit = targetRow.length; j < limit; j++) {
             targetRow[j] = supplier.getAsDouble();
         }
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

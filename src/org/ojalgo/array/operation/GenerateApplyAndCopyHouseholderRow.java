@@ -26,9 +26,7 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
-public final class GenerateApplyAndCopyHouseholderRow extends ArrayOperation {
-
-    public static final GenerateApplyAndCopyHouseholderRow SETUP = new GenerateApplyAndCopyHouseholderRow();
+public final class GenerateApplyAndCopyHouseholderRow implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

@@ -23,9 +23,7 @@ package org.ojalgo.array.operation;
 
 import org.ojalgo.scalar.Scalar;
 
-public final class ApplyCholesky extends ArrayOperation {
-
-    public static final ApplyCholesky SETUP = new ApplyCholesky();
+public final class ApplyCholesky implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

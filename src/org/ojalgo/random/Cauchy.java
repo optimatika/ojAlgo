@@ -30,6 +30,14 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
  */
 public class Cauchy extends AbstractContinuous {
 
+    public static Cauchy of(final double location, final double scale) {
+        return new Cauchy(location, scale);
+    }
+
+    public static Cauchy standard() {
+        return new Cauchy();
+    }
+
     private final double myLocation;
     private final double myScale;
 

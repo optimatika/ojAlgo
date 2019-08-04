@@ -23,6 +23,7 @@ package org.ojalgo;
 
 import java.util.Date;
 
+import org.ojalgo.array.operation.ArrayOperation;
 import org.ojalgo.machine.Hardware;
 import org.ojalgo.machine.VirtualMachine;
 import org.ojalgo.netio.BasicLogger;
@@ -110,14 +111,18 @@ public abstract class OjAlgoUtils {
      * With several CPU cores present you can limit the number of threads used by ojAlgo by defining how many
      * of the cores ojAlgo should "see".
      *
-     * @param maxCores The number of CPU cores avaibale to ojAlgo
+     * @param maxCores The number of CPU cores available to ojAlgo
      */
     public static void limitCoresTo(final int maxCores) {
         ENVIRONMENT = ENVIRONMENT.limitCores(maxCores);
     }
 
+    public static void limitEnvironmentBy(final double fraction) {
+        ENVIRONMENT = ENVIRONMENT.limitBy(fraction);
+    }
+
     /**
-     * @param maxThreads The number of CPU threads avaibale to ojAlgo
+     * @param maxThreads The number of CPU threads available to ojAlgo
      */
     public static void limitThreadsTo(final int maxThreads) {
         ENVIRONMENT = ENVIRONMENT.limitThreads(maxThreads);
@@ -127,7 +132,7 @@ public abstract class OjAlgoUtils {
      * With several CPU:s present you can limit the number of threads used by ojAlgo by defining how many of
      * the CPU:s ojAlgo should "see".
      *
-     * @param maxUnits The number of CPU:s avaibale to ojAlgo
+     * @param maxUnits The number of CPU:s available to ojAlgo
      */
     public static void limitUnitsTo(final int maxUnits) {
         ENVIRONMENT = ENVIRONMENT.limitUnits(maxUnits);
@@ -149,6 +154,10 @@ public abstract class OjAlgoUtils {
         BasicLogger.debug();
         BasicLogger.debug("System properties: {}", System.getProperties());
         BasicLogger.debug();
+    }
+
+    public static void pushUpConcurrencyThresholds(final int minValue) {
+        ArrayOperation.setThresholdsMinValue(minValue);
     }
 
     private OjAlgoUtils() {

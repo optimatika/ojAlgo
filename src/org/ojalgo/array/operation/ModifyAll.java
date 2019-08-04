@@ -23,16 +23,9 @@ package org.ojalgo.array.operation;
 
 import java.util.function.DoubleUnaryOperator;
 
-public final class ModifyAll extends ArrayOperation {
-
-    public static final ModifyAll SETUP = new ModifyAll();
+public final class ModifyAll implements ArrayOperation {
 
     public static int THRESHOLD = 64;
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
 
     public static void modifyAll(final double[][] target, final DoubleUnaryOperator function) {
         int tmpLength = target.length;
@@ -62,6 +55,11 @@ public final class ModifyAll extends ArrayOperation {
         for (int j = col, limit = targetRow.length; j < limit; j++) {
             targetRow[j] = function.applyAsDouble(targetRow[j]);
         }
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

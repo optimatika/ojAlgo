@@ -29,9 +29,7 @@ import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyNeither;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyNeither;
 import org.ojalgo.scalar.Scalar;
 
-public final class MultiplyNeither extends ArrayOperation {
-
-    public static final MultiplyNeither SETUP = new MultiplyNeither();
+public final class MultiplyNeither implements ArrayOperation {
 
     public static int THRESHOLD = 32;
 

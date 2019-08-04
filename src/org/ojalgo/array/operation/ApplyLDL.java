@@ -23,9 +23,7 @@ package org.ojalgo.array.operation;
 
 import org.ojalgo.scalar.Scalar;
 
-public final class ApplyLDL extends ArrayOperation {
-
-    public static final ApplyLDL SETUP = new ApplyLDL();
+public final class ApplyLDL implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 

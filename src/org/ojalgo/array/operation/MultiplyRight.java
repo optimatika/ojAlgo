@@ -32,9 +32,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
-public final class MultiplyRight extends ArrayOperation {
-
-    public static final MultiplyRight SETUP = new MultiplyRight();
+public final class MultiplyRight implements ArrayOperation {
 
     public static int THRESHOLD = 32;
 

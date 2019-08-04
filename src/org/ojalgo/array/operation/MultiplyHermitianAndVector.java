@@ -31,9 +31,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class MultiplyHermitianAndVector extends ArrayOperation {
-
-    public static final MultiplyHermitianAndVector SETUP = new MultiplyHermitianAndVector();
+public final class MultiplyHermitianAndVector implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 

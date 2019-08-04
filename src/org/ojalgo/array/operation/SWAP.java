@@ -26,14 +26,9 @@ package org.ojalgo.array.operation;
  *
  * @author apete
  */
-public final class SWAP extends ArrayOperation implements BLAS1 {
+public final class SWAP implements BLAS1 {
 
     public static int THRESHOLD = 128;
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
 
     public static void exchangeColumns(final double[][] target, final int colA, final int colB) {
         double tmpElem;
@@ -49,6 +44,11 @@ public final class SWAP extends ArrayOperation implements BLAS1 {
         double[] tmpRow = target[rowA];
         target[rowA] = target[rowB];
         target[rowB] = tmpRow;
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

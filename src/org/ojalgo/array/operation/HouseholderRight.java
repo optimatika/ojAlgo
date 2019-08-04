@@ -25,9 +25,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.Scalar;
 
-public final class HouseholderRight extends ArrayOperation {
-
-    public static final HouseholderRight SETUP = new HouseholderRight();
+public final class HouseholderRight implements ArrayOperation {
 
     public static int THRESHOLD = 512;
 

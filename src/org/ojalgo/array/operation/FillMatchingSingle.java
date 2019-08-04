@@ -27,9 +27,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.TypeUtils;
 
-public final class FillMatchingSingle extends ArrayOperation {
-
-    public static final FillMatchingSingle SETUP = new FillMatchingSingle();
+public final class FillMatchingSingle implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 

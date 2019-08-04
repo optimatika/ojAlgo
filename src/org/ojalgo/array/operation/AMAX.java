@@ -36,7 +36,9 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class AMAX extends ArrayOperation implements BLAS1 {
+public final class AMAX implements BLAS1 {
+
+    public static int THRESHOLD = 128;
 
     public static <N extends Number> long invoke(final BasicArray<N> data, final long first, final long limit, final long step) {
 
@@ -117,8 +119,6 @@ public final class AMAX extends ArrayOperation implements BLAS1 {
         }
         return retVal;
     }
-
-    public static int THRESHOLD = 128;
 
     @Override
     public int threshold() {

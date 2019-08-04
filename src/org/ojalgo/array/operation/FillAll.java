@@ -21,9 +21,7 @@
  */
 package org.ojalgo.array.operation;
 
-public final class FillAll extends ArrayOperation {
-
-    public static final FillAll SETUP = new FillAll();
+public final class FillAll implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 

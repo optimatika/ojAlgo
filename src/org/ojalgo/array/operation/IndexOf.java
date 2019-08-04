@@ -21,16 +21,9 @@
  */
 package org.ojalgo.array.operation;
 
-public final class IndexOf extends ArrayOperation {
-
-    public static final IndexOf SETUP = new IndexOf();
+public final class IndexOf implements ArrayOperation {
 
     public static int THRESHOLD = 128;
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
 
     public static int indexOf(final int[] array, final int value) {
         for (int i = 0, limit = array.length; i < limit; i++) {
@@ -48,6 +41,11 @@ public final class IndexOf extends ArrayOperation {
             }
         }
         return -1;
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

@@ -55,7 +55,7 @@ import org.ojalgo.scalar.RationalNumber;
  *
  * @author apete
  */
-public interface BLAS1 {
+public interface BLAS1 extends ArrayOperation {
 
     @FunctionalInterface
     public interface GenericToInt<T> {

@@ -23,9 +23,7 @@ package org.ojalgo.array.operation;
 
 import org.ojalgo.scalar.Scalar;
 
-public final class ApplyLU extends ArrayOperation {
-
-    public static final ApplyLU SETUP = new ApplyLU();
+public final class ApplyLU implements ArrayOperation {
 
     public static int THRESHOLD = 256;
 

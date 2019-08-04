@@ -25,16 +25,9 @@ import java.util.function.DoubleConsumer;
 
 import org.ojalgo.structure.Structure2D;
 
-public final class VisitAll extends ArrayOperation {
-
-    public static final VisitAll SETUP = new VisitAll();
+public final class VisitAll implements ArrayOperation {
 
     public static int THRESHOLD = 128;
-
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
 
     public static void visit(final double[] target, final DoubleConsumer visitor) {
         VisitAll.visit(target, 0, target.length, visitor);
@@ -81,6 +74,11 @@ public final class VisitAll extends ArrayOperation {
         for (int j = col, limit = targetRow.length; j < limit; j++) {
             visitor.accept(targetRow[j]);
         }
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

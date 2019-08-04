@@ -21,9 +21,7 @@
  */
 package org.ojalgo.array.operation;
 
-public final class AggregateAll extends ArrayOperation {
-
-    public static final AggregateAll SETUP = new AggregateAll();
+public final class AggregateAll implements ArrayOperation {
 
     public static int THRESHOLD = 64;
 

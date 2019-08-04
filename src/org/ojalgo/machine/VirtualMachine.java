@@ -22,6 +22,7 @@
 package org.ojalgo.machine;
 
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicLogger;
 
@@ -142,31 +143,40 @@ public final class VirtualMachine extends AbstractMachine {
         return result;
     }
 
-    public VirtualMachine limitCores(final int maxCores) {
+    /**
+     * @param fraction [0.0, 1.0]
+     * @return A limited VirtualMachine
+     */
+    public VirtualMachine limitBy(final double fraction) {
 
-        int newCores = Math.max(1, Math.min(cores, maxCores));
+        double factor = Math.max(0.0, Math.min(Math.abs(fraction), 1.0));
 
-        int newThreads = Math.max(1, (threads * newCores) / cores);
-
-        return this.limitThreads(newThreads);
-    }
-
-    public VirtualMachine limitThreads(final int maxThreads) {
-
-        int newThreads = Math.max(1, Math.min(threads, maxThreads));
-        int newCores = Math.max(1, (cores * newThreads) / threads);
-        int newUnits = Math.max(1, (units * newCores) / cores);
+        int newUnits = Math.max(1, MissingMath.roundToInt(units * factor));
+        int newCores = Math.max(1, MissingMath.roundToInt(cores * factor));
+        int newThreads = Math.max(1, MissingMath.roundToInt(threads * factor));
 
         return new VirtualMachine(this, newUnits, newCores, newThreads);
     }
 
+    public VirtualMachine limitCores(final int maxCores) {
+
+        double newCores = Math.max(1, Math.min(cores, maxCores));
+
+        return this.limitBy(newCores / cores);
+    }
+
+    public VirtualMachine limitThreads(final int maxThreads) {
+
+        double newThreads = Math.max(1, Math.min(threads, maxThreads));
+
+        return this.limitBy(newThreads / threads);
+    }
+
     public VirtualMachine limitUnits(final int maxUnits) {
 
-        int newUnits = Math.max(1, Math.min(units, maxUnits));
+        double newUnits = Math.max(1, Math.min(units, maxUnits));
 
-        int newThreads = Math.max(1, (threads * newUnits) / units);
-
-        return this.limitThreads(newThreads);
+        return this.limitBy(newUnits / units);
     }
 
     @Override

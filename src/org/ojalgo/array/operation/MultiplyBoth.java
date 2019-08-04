@@ -34,9 +34,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
-public final class MultiplyBoth extends ArrayOperation {
-
-    public static final MultiplyBoth SETUP = new MultiplyBoth();
+public final class MultiplyBoth implements ArrayOperation {
 
     public static int THRESHOLD = 16;
 

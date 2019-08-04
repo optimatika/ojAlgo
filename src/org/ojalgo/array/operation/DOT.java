@@ -34,7 +34,9 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class DOT extends ArrayOperation implements BLAS1 {
+public final class DOT implements BLAS1 {
+
+    public static int THRESHOLD = 128;
 
     public static BigDecimal invoke(final BigDecimal[] array1, final int offset1, final BigDecimal[] array2, final int offset2, final int first,
             final int limit) {
@@ -256,8 +258,6 @@ public final class DOT extends ArrayOperation implements BLAS1 {
 
         return retVal;
     }
-
-    public static int THRESHOLD = 128;
 
     @Override
     public int threshold() {

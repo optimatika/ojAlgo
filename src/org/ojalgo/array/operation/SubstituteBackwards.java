@@ -26,9 +26,7 @@ import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 
-public final class SubstituteBackwards extends ArrayOperation {
-
-    public static SubstituteBackwards SETUP = new SubstituteBackwards();
+public final class SubstituteBackwards implements ArrayOperation {
 
     public static int THRESHOLD = 64;
 

@@ -33,7 +33,7 @@ import org.ojalgo.structure.Mutate1D;
  *
  * @author apete
  */
-public final class AXPY extends ArrayOperation implements BLAS1 {
+public final class AXPY implements BLAS1 {
 
     public static int THRESHOLD = 128;
 

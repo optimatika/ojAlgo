@@ -21,23 +21,16 @@
  */
 package org.ojalgo.array.operation;
 
-public final class SortAll extends ArrayOperation {
-
-    public static final SortAll SETUP = new SortAll();
+public final class SortAll implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
-    @Override
-    public int threshold() {
-        return THRESHOLD;
-    }
-
     public static void sort(final long[] primary, final double[] secondary) {
-    
+
         boolean tmpSwapped;
-    
+
         final int tmpLimit = Math.min(primary.length, secondary.length) - 1;
-    
+
         do {
             tmpSwapped = false;
             for (int i = 0; i < tmpLimit; i++) {
@@ -55,11 +48,11 @@ public final class SortAll extends ArrayOperation {
     }
 
     public static void sort(final long[] primary, final Object[] secondary) {
-    
+
         boolean tmpSwapped;
-    
+
         final int tmpLimit = Math.min(primary.length, secondary.length) - 1;
-    
+
         do {
             tmpSwapped = false;
             for (int i = 0; i < tmpLimit; i++) {
@@ -74,6 +67,11 @@ public final class SortAll extends ArrayOperation {
                 }
             }
         } while (tmpSwapped);
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }
