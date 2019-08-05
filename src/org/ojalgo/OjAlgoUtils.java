@@ -114,7 +114,8 @@ public abstract class OjAlgoUtils {
      * @param maxCores The number of CPU cores available to ojAlgo
      */
     public static void limitCoresTo(final int maxCores) {
-        ENVIRONMENT = ENVIRONMENT.limitCores(maxCores);
+        double newCores = Math.max(1, Math.min(ENVIRONMENT.cores, maxCores));
+        ENVIRONMENT = ENVIRONMENT.limitBy(newCores / ENVIRONMENT.cores);
     }
 
     public static void limitEnvironmentBy(final double fraction) {
@@ -125,7 +126,8 @@ public abstract class OjAlgoUtils {
      * @param maxThreads The number of CPU threads available to ojAlgo
      */
     public static void limitThreadsTo(final int maxThreads) {
-        ENVIRONMENT = ENVIRONMENT.limitThreads(maxThreads);
+        double newThreads = Math.max(1, Math.min(ENVIRONMENT.threads, maxThreads));
+        ENVIRONMENT = ENVIRONMENT.limitBy(newThreads / ENVIRONMENT.threads);
     }
 
     /**
@@ -135,7 +137,8 @@ public abstract class OjAlgoUtils {
      * @param maxUnits The number of CPU:s available to ojAlgo
      */
     public static void limitUnitsTo(final int maxUnits) {
-        ENVIRONMENT = ENVIRONMENT.limitUnits(maxUnits);
+        double newUnits = Math.max(1, Math.min(ENVIRONMENT.units, maxUnits));
+        ENVIRONMENT = ENVIRONMENT.limitBy(newUnits / ENVIRONMENT.units);
     }
 
     public static void main(final String[] args) {

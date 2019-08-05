@@ -158,27 +158,6 @@ public final class VirtualMachine extends AbstractMachine {
         return new VirtualMachine(this, newUnits, newCores, newThreads);
     }
 
-    public VirtualMachine limitCores(final int maxCores) {
-
-        double newCores = Math.max(1, Math.min(cores, maxCores));
-
-        return this.limitBy(newCores / cores);
-    }
-
-    public VirtualMachine limitThreads(final int maxThreads) {
-
-        double newThreads = Math.max(1, Math.min(threads, maxThreads));
-
-        return this.limitBy(newThreads / threads);
-    }
-
-    public VirtualMachine limitUnits(final int maxUnits) {
-
-        double newUnits = Math.max(1, Math.min(units, maxUnits));
-
-        return this.limitBy(newUnits / units);
-    }
-
     @Override
     public String toString() {
         return super.toString() + ASCII.SP + myHardware.toString();
