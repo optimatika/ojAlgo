@@ -55,9 +55,9 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         myANN = new ArtificialNeuralNetwork(numberOfInputNodes, outputNodesPerCalculationLayer);
 
         myLayerValues = new PrimitiveDenseStore[1 + outputNodesPerCalculationLayer.length];
-        myLayerValues[0] = PrimitiveDenseStore.FACTORY.makeZero(numberOfInputNodes, 1);
+        myLayerValues[0] = PrimitiveDenseStore.FACTORY.make(numberOfInputNodes, 1);
         for (int l = 0; l < outputNodesPerCalculationLayer.length; l++) {
-            myLayerValues[1 + l] = PrimitiveDenseStore.FACTORY.makeZero(outputNodesPerCalculationLayer[l], 1);
+            myLayerValues[1 + l] = PrimitiveDenseStore.FACTORY.make(outputNodesPerCalculationLayer[l], 1);
         }
     }
 

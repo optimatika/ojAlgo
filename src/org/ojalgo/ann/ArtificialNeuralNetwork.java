@@ -30,7 +30,6 @@ import java.util.List;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -57,7 +56,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         /**
          * [0,1]
          */
-        SIGMOID(args -> (PrimitiveMath.LOGISTIC), arg -> arg * (ONE - arg), true),
+        SIGMOID(args -> (LOGISTIC), arg -> arg * (ONE - arg), true),
         /**
          * [0,1] <br>
          * Currently this can only be used in the final layer in combination with
@@ -66,14 +65,14 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
          */
         SOFTMAX(args -> {
             PrimitiveDenseStore parts = args.copy();
-            parts.modifyAll(PrimitiveMath.EXP);
+            parts.modifyAll(EXP);
             final double total = parts.aggregateAll(Aggregator.SUM);
-            return arg -> PrimitiveMath.EXP.invoke(arg) / total;
+            return arg -> EXP.invoke(arg) / total;
         }, arg -> ONE, false),
         /**
          * [-1,1]
          */
-        TANH(args -> (PrimitiveMath.TANH), arg -> ONE - (arg * arg), true);
+        TANH(args -> (org.ojalgo.function.constant.PrimitiveMath.TANH), arg -> ONE - (arg * arg), true);
 
         private final PrimitiveFunction.Unary myDerivativeInTermsOfOutput;
         private final ActivatorFunctionFactory myFunction;
