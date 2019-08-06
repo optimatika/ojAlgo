@@ -57,6 +57,7 @@ public interface ArrayOperation {
         ModifyAll.THRESHOLD = Math.min(maxValue, ModifyAll.THRESHOLD);
         MultiplyBoth.THRESHOLD = Math.min(maxValue, MultiplyBoth.THRESHOLD);
         MultiplyHermitianAndVector.THRESHOLD = Math.min(maxValue, MultiplyHermitianAndVector.THRESHOLD);
+        MultiplyNeither.THRESHOLD = Math.min(maxValue, MultiplyNeither.THRESHOLD);
         MultiplyLeft.THRESHOLD = Math.min(maxValue, MultiplyLeft.THRESHOLD);
         MultiplyRight.THRESHOLD = Math.min(maxValue, MultiplyRight.THRESHOLD);
         RotateLeft.THRESHOLD = Math.min(maxValue, RotateLeft.THRESHOLD);
@@ -86,6 +87,7 @@ public interface ArrayOperation {
         ModifyAll.THRESHOLD = Math.max(minValue, ModifyAll.THRESHOLD);
         MultiplyBoth.THRESHOLD = Math.max(minValue, MultiplyBoth.THRESHOLD);
         MultiplyHermitianAndVector.THRESHOLD = Math.max(minValue, MultiplyHermitianAndVector.THRESHOLD);
+        MultiplyNeither.THRESHOLD = Math.max(minValue, MultiplyNeither.THRESHOLD);
         MultiplyLeft.THRESHOLD = Math.max(minValue, MultiplyLeft.THRESHOLD);
         MultiplyRight.THRESHOLD = Math.max(minValue, MultiplyRight.THRESHOLD);
         RotateLeft.THRESHOLD = Math.max(minValue, RotateLeft.THRESHOLD);
