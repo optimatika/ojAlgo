@@ -429,12 +429,12 @@ public class Primitive32Array extends PrimitiveArray {
 
     @Override
     protected void add(final int index, final double addend) {
-        data[index] += addend;
+        data[index] += (float) addend;
     }
 
     @Override
     protected void add(final int index, final Number addend) {
-        data[index] += addend.doubleValue();
+        data[index] += addend.floatValue();
     }
 
     protected final float[] copyOfData() {

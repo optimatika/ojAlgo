@@ -216,8 +216,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         }
 
         @Override
-        protected int getOvercapacity() {
-            return 0;
+        protected long getOvercapacity() {
+            return 0L;
         }
 
         @Override
@@ -661,8 +661,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         }
 
         @Override
-        protected int getOvercapacity() {
-            int retVal = 0;
+        protected long getOvercapacity() {
+            long retVal = 0L;
             for (int r = 0; r < myRows.length; r++) {
                 retVal += myRows[r].countZeros();
             }
@@ -1021,7 +1021,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         return mySelector.getIncluded();
     }
 
-    protected abstract int getOvercapacity();
+    protected abstract long getOvercapacity();
 
     protected boolean isBasicArtificials() {
         final int tmpLength = myBasis.length;

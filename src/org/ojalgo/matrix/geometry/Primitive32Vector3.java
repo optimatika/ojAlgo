@@ -25,13 +25,13 @@ public class Primitive32Vector3 extends GeometryVector {
     public final void add(final int row, final double addend) {
         switch (row) {
         case 0:
-            v0 += addend;
+            v0 += (float) addend;
             break;
         case 1:
-            v1 += addend;
+            v1 += (float) addend;
             break;
         case 2:
-            v2 += addend;
+            v2 += (float) addend;
             break;
         default:
             throw new IllegalArgumentException();
