@@ -40,60 +40,60 @@ public interface ArrayOperation {
      * Will make sure no matrix size operation thresholds are larger than the supplied value. Existing smaller
      * values are unchanged.
      *
-     * @param maxValue The max allowed value
+     * @param value The max allowed value
      */
-    static void setThresholdsMaxValue(final int maxValue) {
-        AggregateAll.THRESHOLD = Math.min(maxValue, AggregateAll.THRESHOLD);
-        ApplyCholesky.THRESHOLD = Math.min(maxValue, ApplyCholesky.THRESHOLD);
-        ApplyLU.THRESHOLD = Math.min(maxValue, ApplyLU.THRESHOLD);
-        FillMatchingDual.THRESHOLD = Math.min(maxValue, FillMatchingDual.THRESHOLD);
-        FillMatchingSingle.THRESHOLD = Math.min(maxValue, FillMatchingSingle.THRESHOLD);
-        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.min(maxValue, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
-        GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.min(maxValue, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
-        HermitianRank2Update.THRESHOLD = Math.min(maxValue, HermitianRank2Update.THRESHOLD);
-        HouseholderLeft.THRESHOLD = Math.min(maxValue, HouseholderLeft.THRESHOLD);
-        HouseholderRight.THRESHOLD = Math.min(maxValue, HouseholderRight.THRESHOLD);
-        AXPY.THRESHOLD = Math.min(maxValue, AXPY.THRESHOLD);
-        ModifyAll.THRESHOLD = Math.min(maxValue, ModifyAll.THRESHOLD);
-        MultiplyBoth.THRESHOLD = Math.min(maxValue, MultiplyBoth.THRESHOLD);
-        MultiplyHermitianAndVector.THRESHOLD = Math.min(maxValue, MultiplyHermitianAndVector.THRESHOLD);
-        MultiplyNeither.THRESHOLD = Math.min(maxValue, MultiplyNeither.THRESHOLD);
-        MultiplyLeft.THRESHOLD = Math.min(maxValue, MultiplyLeft.THRESHOLD);
-        MultiplyRight.THRESHOLD = Math.min(maxValue, MultiplyRight.THRESHOLD);
-        RotateLeft.THRESHOLD = Math.min(maxValue, RotateLeft.THRESHOLD);
-        RotateRight.THRESHOLD = Math.min(maxValue, RotateRight.THRESHOLD);
-        SubstituteBackwards.THRESHOLD = Math.min(maxValue, SubstituteBackwards.THRESHOLD);
-        SubstituteForwards.THRESHOLD = Math.min(maxValue, SubstituteForwards.THRESHOLD);
+    static void setThresholdsMaxValue(final int value) {
+        AggregateAll.THRESHOLD = Math.min(value, AggregateAll.THRESHOLD);
+        ApplyCholesky.THRESHOLD = Math.min(value, ApplyCholesky.THRESHOLD);
+        ApplyLU.THRESHOLD = Math.min(value, ApplyLU.THRESHOLD);
+        FillMatchingDual.THRESHOLD = Math.min(value, FillMatchingDual.THRESHOLD);
+        FillMatchingSingle.THRESHOLD = Math.min(value, FillMatchingSingle.THRESHOLD);
+        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.min(value, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
+        GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.min(value, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
+        HermitianRank2Update.THRESHOLD = Math.min(value, HermitianRank2Update.THRESHOLD);
+        HouseholderLeft.THRESHOLD = Math.min(value, HouseholderLeft.THRESHOLD);
+        HouseholderRight.THRESHOLD = Math.min(value, HouseholderRight.THRESHOLD);
+        AXPY.THRESHOLD = Math.min(value, AXPY.THRESHOLD);
+        ModifyAll.THRESHOLD = Math.min(value, ModifyAll.THRESHOLD);
+        MultiplyBoth.THRESHOLD = Math.min(value, MultiplyBoth.THRESHOLD);
+        MultiplyHermitianAndVector.THRESHOLD = Math.min(value, MultiplyHermitianAndVector.THRESHOLD);
+        MultiplyNeither.THRESHOLD = Math.min(value, MultiplyNeither.THRESHOLD);
+        MultiplyLeft.THRESHOLD = Math.min(value, MultiplyLeft.THRESHOLD);
+        MultiplyRight.THRESHOLD = Math.min(value, MultiplyRight.THRESHOLD);
+        RotateLeft.THRESHOLD = Math.min(value, RotateLeft.THRESHOLD);
+        RotateRight.THRESHOLD = Math.min(value, RotateRight.THRESHOLD);
+        SubstituteBackwards.THRESHOLD = Math.min(value, SubstituteBackwards.THRESHOLD);
+        SubstituteForwards.THRESHOLD = Math.min(value, SubstituteForwards.THRESHOLD);
     }
 
     /**
      * Will make sure all matrix size operation thresholds are at least as large as the supplied value.
      * Existing larger values are unchanged.
      *
-     * @param minValue The min allowed value
+     * @param value The min allowed value
      */
-    static void setThresholdsMinValue(final int minValue) {
-        AggregateAll.THRESHOLD = Math.max(minValue, AggregateAll.THRESHOLD);
-        ApplyCholesky.THRESHOLD = Math.max(minValue, ApplyCholesky.THRESHOLD);
-        ApplyLU.THRESHOLD = Math.max(minValue, ApplyLU.THRESHOLD);
-        FillMatchingDual.THRESHOLD = Math.max(minValue, FillMatchingDual.THRESHOLD);
-        FillMatchingSingle.THRESHOLD = Math.max(minValue, FillMatchingSingle.THRESHOLD);
-        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.max(minValue, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
-        GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.max(minValue, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
-        HermitianRank2Update.THRESHOLD = Math.max(minValue, HermitianRank2Update.THRESHOLD);
-        HouseholderLeft.THRESHOLD = Math.max(minValue, HouseholderLeft.THRESHOLD);
-        HouseholderRight.THRESHOLD = Math.max(minValue, HouseholderRight.THRESHOLD);
-        AXPY.THRESHOLD = Math.max(minValue, AXPY.THRESHOLD);
-        ModifyAll.THRESHOLD = Math.max(minValue, ModifyAll.THRESHOLD);
-        MultiplyBoth.THRESHOLD = Math.max(minValue, MultiplyBoth.THRESHOLD);
-        MultiplyHermitianAndVector.THRESHOLD = Math.max(minValue, MultiplyHermitianAndVector.THRESHOLD);
-        MultiplyNeither.THRESHOLD = Math.max(minValue, MultiplyNeither.THRESHOLD);
-        MultiplyLeft.THRESHOLD = Math.max(minValue, MultiplyLeft.THRESHOLD);
-        MultiplyRight.THRESHOLD = Math.max(minValue, MultiplyRight.THRESHOLD);
-        RotateLeft.THRESHOLD = Math.max(minValue, RotateLeft.THRESHOLD);
-        RotateRight.THRESHOLD = Math.max(minValue, RotateRight.THRESHOLD);
-        SubstituteBackwards.THRESHOLD = Math.max(minValue, SubstituteBackwards.THRESHOLD);
-        SubstituteForwards.THRESHOLD = Math.max(minValue, SubstituteForwards.THRESHOLD);
+    static void setThresholdsMinValue(final int value) {
+        AggregateAll.THRESHOLD = Math.max(value, AggregateAll.THRESHOLD);
+        ApplyCholesky.THRESHOLD = Math.max(value, ApplyCholesky.THRESHOLD);
+        ApplyLU.THRESHOLD = Math.max(value, ApplyLU.THRESHOLD);
+        FillMatchingDual.THRESHOLD = Math.max(value, FillMatchingDual.THRESHOLD);
+        FillMatchingSingle.THRESHOLD = Math.max(value, FillMatchingSingle.THRESHOLD);
+        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.max(value, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
+        GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.max(value, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
+        HermitianRank2Update.THRESHOLD = Math.max(value, HermitianRank2Update.THRESHOLD);
+        HouseholderLeft.THRESHOLD = Math.max(value, HouseholderLeft.THRESHOLD);
+        HouseholderRight.THRESHOLD = Math.max(value, HouseholderRight.THRESHOLD);
+        AXPY.THRESHOLD = Math.max(value, AXPY.THRESHOLD);
+        ModifyAll.THRESHOLD = Math.max(value, ModifyAll.THRESHOLD);
+        MultiplyBoth.THRESHOLD = Math.max(value, MultiplyBoth.THRESHOLD);
+        MultiplyHermitianAndVector.THRESHOLD = Math.max(value, MultiplyHermitianAndVector.THRESHOLD);
+        MultiplyNeither.THRESHOLD = Math.max(value, MultiplyNeither.THRESHOLD);
+        MultiplyLeft.THRESHOLD = Math.max(value, MultiplyLeft.THRESHOLD);
+        MultiplyRight.THRESHOLD = Math.max(value, MultiplyRight.THRESHOLD);
+        RotateLeft.THRESHOLD = Math.max(value, RotateLeft.THRESHOLD);
+        RotateRight.THRESHOLD = Math.max(value, RotateRight.THRESHOLD);
+        SubstituteBackwards.THRESHOLD = Math.max(value, SubstituteBackwards.THRESHOLD);
+        SubstituteForwards.THRESHOLD = Math.max(value, SubstituteForwards.THRESHOLD);
     }
 
     int threshold();
