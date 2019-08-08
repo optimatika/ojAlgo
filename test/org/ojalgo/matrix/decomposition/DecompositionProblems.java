@@ -119,7 +119,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         }
 
         // Recover the Q2 matrix.
-        MatrixStore<Double> q2 = svd.getQ2();
+        MatrixStore<Double> q2 = svd.getV();
         if (DEBUG) {
             System.out.println("Q2 matrix:\n" + q2);
         }
@@ -152,21 +152,44 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     }
 
     /**
+     * https://github.com/optimatika/ojAlgo/issues/214
+     */
+    @Test
+    public void testGitHubIssue214() {
+
+        double[][] olsColumns = { { 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 },
+                { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 }, { 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 },
+                { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 }, { 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 }, { 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 } };
+
+        double[] observationVector = { 26.0, 12.0, 9.0, 18.0, 16.0, 17.0, 24.0, 32.0, 30.0, 21.0, 16.0, 12.0, 21.0, 16.0 };
+
+        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(olsColumns);
+        SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make(tmpOriginal);
+        tmpSVD.decompose(tmpOriginal);
+        PrimitiveDenseStore rhs = PrimitiveDenseStore.FACTORY.column(observationVector);
+        MatrixStore<Double> solution = tmpSVD.getSolution(rhs, tmpSVD.preallocate(tmpOriginal, rhs));
+
+        // Simply test that we can run this program without getting an exception
+    }
+
+    /**
      * http://en.wikipedia.org/wiki/Singular_value_decomposition There is no problem...
      */
     @Test
     public void testP20090923() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
+        PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        final SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make();
+        SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make();
         tmpSVD.decompose(tmpA);
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("D", tmpSVD.getD(), new NumberContext(7, 6));
-            BasicLogger.debug("Q1", tmpSVD.getQ1(), new NumberContext(7, 6));
-            BasicLogger.debug("Q2", tmpSVD.getQ2(), new NumberContext(7, 6));
+            BasicLogger.debug("Q1", tmpSVD.getU(), new NumberContext(7, 6));
+            BasicLogger.debug("Q2", tmpSVD.getV(), new NumberContext(7, 6));
         }
 
         TestUtils.assertEquals(tmpA, tmpSVD, new NumberContext(7, 6));
@@ -178,9 +201,9 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20091012() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 9));
+        PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(5, 9));
 
-        final QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
+        QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpQR, new NumberContext(7, 6));
@@ -192,12 +215,12 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20091012fixed() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
+        PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 1.5686711899234411, 5.857030526629094, 2.1798778832593637, 1.4901137152515287, 5.640993583029061 },
                         { 4.890945865607895, 4.2576454398997265, 1.0251822439318778, 0.8623492557631138, 5.7457253685285545 },
                         { 1.6397137349990025, 0.6795594856277076, 4.7101325736711095, 2.0823473021899517, 2.2159317240940233 } });
 
-        final QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
+        QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpQR, new NumberContext(7, 6));
@@ -206,10 +229,10 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20100512() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
+        PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
 
-        final Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
+        Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
         tmpPrimitive.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpPrimitive, TOP_ACCURACY);
@@ -218,21 +241,21 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20110126() {
 
-        final int tmpDim = 5;
+        int tmpDim = 5;
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpI = PrimitiveDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
+        PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        PhysicalStore<Double> tmpI = PrimitiveDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
 
-        final LU<Double> tmpDecomp = LU.PRIMITIVE.make();
+        LU<Double> tmpDecomp = LU.PRIMITIVE.make();
 
         tmpDecomp.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpDecomp, new NumberContext(7, 6));
 
-        final MatrixStore<Double> tmpExpected = tmpDecomp.getSolution(tmpI);
+        MatrixStore<Double> tmpExpected = tmpDecomp.getSolution(tmpI);
 
         tmpDecomp.decompose(tmpA);
-        final MatrixStore<Double> tmpActual = tmpDecomp.getInverse();
+        MatrixStore<Double> tmpActual = tmpDecomp.getInverse();
 
         TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
     }
@@ -245,22 +268,22 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20110223() {
 
-        final NumberContext tmpEqualsNumberContext = new NumberContext(7, 11);
+        NumberContext tmpEqualsNumberContext = new NumberContext(7, 11);
 
-        final int tmpDim = 99;
-        final PhysicalStore<Double> tmpRandom = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpIdentity = PrimitiveDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
+        int tmpDim = 99;
+        PhysicalStore<Double> tmpRandom = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        PhysicalStore<Double> tmpIdentity = PrimitiveDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
 
-        final LU<Double> tmpRefDecomps = new RawLU();
+        LU<Double> tmpRefDecomps = new RawLU();
         tmpRefDecomps.decompose(tmpRandom);
-        final MatrixStore<Double> tmpExpected = tmpRefDecomps.getInverse();
+        MatrixStore<Double> tmpExpected = tmpRefDecomps.getInverse();
 
-        final LU<Double> tmpTestDecomp = LU.PRIMITIVE.make();
+        LU<Double> tmpTestDecomp = LU.PRIMITIVE.make();
         tmpTestDecomp.decompose(tmpRandom);
         MatrixStore<Double> tmpActual = tmpTestDecomp.getInverse();
 
         TestUtils.assertEquals(tmpExpected, tmpActual, tmpEqualsNumberContext);
-        final MatrixStore<Double> left = tmpActual;
+        MatrixStore<Double> left = tmpActual;
         TestUtils.assertEquals(tmpIdentity, left.multiply(tmpRandom), tmpEqualsNumberContext);
         TestUtils.assertEquals(tmpIdentity, tmpRandom.multiply(tmpActual), tmpEqualsNumberContext);
 
@@ -268,7 +291,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         tmpActual = tmpTestDecomp.getInverse();
 
         TestUtils.assertEquals(tmpExpected, tmpActual, tmpEqualsNumberContext);
-        final MatrixStore<Double> left1 = tmpActual;
+        MatrixStore<Double> left1 = tmpActual;
         TestUtils.assertEquals(tmpIdentity, left1.multiply(tmpRandom), tmpEqualsNumberContext);
         TestUtils.assertEquals(tmpIdentity, tmpRandom.multiply(tmpActual), tmpEqualsNumberContext);
     }
@@ -280,15 +303,15 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Tag("unstable")
     public void testP20111213square() {
 
-        final int tmpDim = Uniform.randomInteger(2, 6);
+        int tmpDim = Uniform.randomInteger(2, 6);
 
-        final PhysicalStore<ComplexNumber> tmpSquare = TestUtils.makeRandomComplexStore(tmpDim, tmpDim);
-        final MatrixStore<ComplexNumber> tmpHermitian = tmpSquare.conjugate().multiply(tmpSquare);
-        final PhysicalStore<ComplexNumber> tmpExpected = GenericDenseStore.COMPLEX.makeEye(tmpDim, tmpDim);
+        PhysicalStore<ComplexNumber> tmpSquare = TestUtils.makeRandomComplexStore(tmpDim, tmpDim);
+        MatrixStore<ComplexNumber> tmpHermitian = tmpSquare.conjugate().multiply(tmpSquare);
+        PhysicalStore<ComplexNumber> tmpExpected = GenericDenseStore.COMPLEX.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> tmpActual;
 
         @SuppressWarnings("unchecked")
-        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
+        MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
                 Eigenvalue.COMPLEX.make(MatrixDecomposition.TYPICAL,
                         true)/*
                               * , HessenbergDecomposition. makeComplex()
@@ -298,7 +321,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                                               * , TridiagonalDecomposition . makeComplex ( )
                                               */ };
 
-        for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
+        for (MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
             tmpDecomposition.decompose(tmpHermitian);
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug(tmpDecomposition.toString());
@@ -322,17 +345,17 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20111213tall() {
 
-        final int tmpDim = Uniform.randomInteger(2, 6);
+        int tmpDim = Uniform.randomInteger(2, 6);
 
-        final PhysicalStore<ComplexNumber> original = TestUtils.makeRandomComplexStore(tmpDim + tmpDim, tmpDim);
-        final PhysicalStore<ComplexNumber> identity = GenericDenseStore.COMPLEX.makeEye(tmpDim, tmpDim);
+        PhysicalStore<ComplexNumber> original = TestUtils.makeRandomComplexStore(tmpDim + tmpDim, tmpDim);
+        PhysicalStore<ComplexNumber> identity = GenericDenseStore.COMPLEX.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> solution;
 
         @SuppressWarnings("unchecked")
-        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { QR.COMPLEX.make(), SingularValue.COMPLEX.make(),
+        MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { QR.COMPLEX.make(), SingularValue.COMPLEX.make(),
                 Bidiagonal.COMPLEX.make() };
 
-        for (final MatrixDecomposition<ComplexNumber> decomp : tmpCmplxDecomps) {
+        for (MatrixDecomposition<ComplexNumber> decomp : tmpCmplxDecomps) {
 
             decomp.decompose(original);
 
@@ -361,17 +384,17 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Tag("slow")
     public void testP20160419() {
 
-        final PrimitiveDenseStore tmpOrg = PrimitiveDenseStore.FACTORY.makeFilled(2000, 2000, new Normal());
+        PrimitiveDenseStore tmpOrg = PrimitiveDenseStore.FACTORY.makeFilled(2000, 2000, new Normal());
 
-        final SingularValue<Double> tmpRaw = new RawSingularValue();
+        SingularValue<Double> tmpRaw = new RawSingularValue();
 
         try {
 
-            final MatrixStore<Double> tmpInv = tmpRaw.invert(tmpOrg);
+            MatrixStore<Double> tmpInv = tmpRaw.invert(tmpOrg);
 
             TestUtils.assertEquals(tmpOrg, tmpOrg.multiply(tmpInv).multiply(tmpOrg), NumberContext.getGeneral(6, 6));
 
-        } catch (final RecoverableCondition exception) {
+        } catch (RecoverableCondition exception) {
             exception.printStackTrace();
         }
 
@@ -385,7 +408,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Tag("slow")
     public void testP20160510InvertLargeMatrix() {
 
-        final double[][] data = new double[3000][3000];
+        double[][] data = new double[3000][3000];
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data.length; j++) {
                 data[i][j] = 0.9;
@@ -393,12 +416,12 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         }
         data[0][1] = 1.01;
 
-        final PrimitiveMatrix input = PrimitiveMatrix.FACTORY.rows(data);
+        PrimitiveMatrix input = PrimitiveMatrix.FACTORY.rows(data);
         try {
-            // final SingularValue<Double> svd = SingularValue.make(input);
-            final SingularValue<Double> svd = new SingularValueDecomposition.Primitive();
+            //   SingularValue<Double> svd = SingularValue.make(input);
+            SingularValue<Double> svd = new SingularValueDecomposition.Primitive();
             svd.invert(input);
-        } catch (final RecoverableCondition exception) {
+        } catch (RecoverableCondition exception) {
             // TODO Auto-generated catch block
             exception.printStackTrace();
         }
@@ -452,7 +475,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         DecompositionProblems.fullSVD(matrixA);
 
-        // Finally, we confirm that it works with the padded matrix.
+        //  ly, we confirm that it works with the padded matrix.
         if (DEBUG) {
             System.out.println("\nAttempting singular value decomposition of B ...");
         }
@@ -467,7 +490,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     @Test
     public void testP20180617() {
 
-        final NumberContext precision = new NumberContext(12, 8);
+        NumberContext precision = new NumberContext(12, 8);
 
         PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.730967787376657, 0.24053641567148587, 0.6374174253501083 },
                 { 0.24053641567148587, 0.5975452777972018, 0.3332183994766498 }, { 0.6374174253501083, 0.3332183994766498, 0.8791825178724801 } });

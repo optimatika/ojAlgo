@@ -597,6 +597,17 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return PrimitiveMath.ABS.invoke(this.doubleValue());
     }
 
+    public RationalNumber power(final int power) {
+
+        RationalNumber retVal = ONE;
+
+        for (int p = 0; p < power; p++) {
+            retVal = retVal.multiply(this);
+        }
+
+        return retVal;
+    }
+
     public RationalNumber signum() {
         if (!this.isInfinite() && RationalNumber.isSmall(PrimitiveMath.ONE, this)) {
             return ZERO;

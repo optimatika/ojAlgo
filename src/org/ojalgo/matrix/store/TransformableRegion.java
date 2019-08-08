@@ -22,11 +22,11 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.operation.MultiplyBoth;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
-import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;

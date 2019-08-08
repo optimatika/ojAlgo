@@ -25,8 +25,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Raw1D;
+import org.ojalgo.array.operation.COPY;
 import org.ojalgo.netio.ASCII;
 
 /**
@@ -141,6 +140,12 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
             new BasicMachine[] { new BasicMachine(3L * K * K * K, 2), new BasicMachine(4L * K * K, 2), new BasicMachine(32L * K, 1) });
 
     /**
+     * Combination of {@link #X86_64__04_1_L2}, {@link #X86_64__04_1_L3} and {@link #X86_64__04_2}
+     */
+    static final Hardware X86_64__04 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(32L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
+            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
+
+    /**
      * <ul>
      * <li>PA's Q9400
      * <ul>
@@ -183,9 +188,21 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
+     * <li>Intel Core i5-3570K with 32GB of RAM (from Java Matrix Benchmark)
+     * <ul>
+     * <li>1 processors</li>
+     * <li>4 cores per processor</li>
+     * <li>1 thread per core (4 threads in total)</li>
+     * <li>===</li>
+     * <li>32GB system RAM</li>
+     * <li>6MB L3 cache per processor</li>
+     * <li>256kB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
      * </ul>
      */
-    static final Hardware X86_64__04_1_L3 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(16L * K * K * K, 4), new BasicMachine(6L * K * K, 4),
+    static final Hardware X86_64__04_1_L3 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(32L * K * K * K, 4), new BasicMachine(6L * K * K, 4),
             new BasicMachine(256L * K, 1), new BasicMachine(32L * K, 1) });
 
     /**
@@ -229,9 +246,6 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </ul>
      */
     static final Hardware X86_64__04_2 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(8L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
-            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
-
-    static final Hardware X86_64__04 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(16L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     /**
@@ -473,16 +487,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
             throw new IllegalArgumentException();
         }
 
-        myLevels = Raw1D.copyOf(levels);
-    }
-
-    private Hardware(final Hardware aHardware, final Runtime aRuntime) {
-
-        super(aHardware, aRuntime);
-
-        myLevels = null;
-
-        ProgrammingError.throwForIllegalInvocation();
+        myLevels = COPY.copyOf(levels);
     }
 
     public int compareTo(final Hardware other) {

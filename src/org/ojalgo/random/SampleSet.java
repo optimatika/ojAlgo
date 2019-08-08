@@ -384,6 +384,10 @@ public final class SampleSet implements Access1D<Double> {
         return this;
     }
 
+    public SampleSet swap(final double[] samples) {
+        return this.swap(Access1D.wrap(samples));
+    }
+
     @Override
     public String toString() {
         return "Sample set Size=" + this.count() + ", Mean=" + this.getMean() + ", Var=" + this.getVariance() + ", StdDev=" + this.getStandardDeviation()

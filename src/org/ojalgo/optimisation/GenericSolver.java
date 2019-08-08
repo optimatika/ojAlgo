@@ -26,7 +26,12 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.array.SparseArray;
+import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.RowsSupplier;
+import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -37,6 +42,12 @@ import org.ojalgo.type.context.NumberContext;
 public abstract class GenericSolver implements Optimisation.Solver {
 
     public static abstract class Builder<B extends Builder<?, ?>, S extends GenericSolver> {
+
+        private MatrixStore<Double> myAE = null;
+        private RowsSupplier<Double> myAI = null;
+        private MatrixStore<Double> myBE = null;
+        private MatrixStore<Double> myBI = null;
+        private MultiaryFunction.TwiceDifferentiable<Double> myObjective;
 
         protected Builder() {
             super();
@@ -51,11 +62,197 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return this.doBuild(options);
         }
 
-        public abstract int countConstraints();
+        public int countConstraints() {
+            return this.countEqualityConstraints() + this.countInequalityConstraints();
+        }
 
-        public abstract int countVariables();
+        public int countEqualityConstraints() {
+            return (int) ((this.getAE() != null) ? this.getAE().countRows() : 0);
+        }
+
+        public int countInequalityConstraints() {
+            return (int) ((this.getAI() != null) ? this.getAI().countRows() : 0);
+        }
+
+        public int countVariables() {
+
+            int retVal = -1;
+
+            if (this.getAE() != null) {
+                retVal = (int) this.getAE().countColumns();
+            } else if (this.getAI() != null) {
+                retVal = (int) this.getAI().countColumns();
+            } else if (myObjective != null) {
+                retVal = myObjective.arity();
+            } else {
+                throw new ProgrammingError("Cannot deduce the number of variables!");
+            }
+
+            return retVal;
+        }
+
+        @SuppressWarnings("unchecked")
+        public B equalities(final MatrixStore<Double> mtrxAE, final MatrixStore<Double> mtrxBE) {
+
+            ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
+            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
+
+            myAE = mtrxAE;
+            myBE = mtrxBE;
+
+            return (B) this;
+        }
+
+        /**
+         * [AE][X] == [BE]
+         */
+        public MatrixStore<Double> getAE() {
+            return myAE;
+        }
+
+        /**
+         * [AI][X] &lt;= [BI]
+         */
+        public RowsSupplier<Double> getAI() {
+            return myAI;
+        }
+
+        protected SparseArray<Double> getAI(final int row) {
+            return myAI.getRow(row);
+        }
+
+        /**
+         * [AE][X] == [BE]
+         */
+        public MatrixStore<Double> getBE() {
+            return myBE;
+        }
+
+        /**
+         * [AI][X] &lt;= [BI]
+         */
+        public MatrixStore<Double> getBI() {
+            return myBI;
+        }
+
+        public boolean hasEqualityConstraints() {
+            return (myAE != null) && (myAE.countRows() > 0);
+        }
+
+        public boolean hasInequalityConstraints() {
+            return (myAI != null) && (myAI.countRows() > 0);
+        }
+
+        public boolean hasObjective() {
+            return myObjective != null;
+        }
+
+        @SuppressWarnings("unchecked")
+        public B inequalities(final Access2D<Double> mtrxAI, final MatrixStore<Double> mtrxBI) {
+
+            ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
+            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
+
+            if (mtrxAI instanceof RowsSupplier) {
+
+                myAI = (RowsSupplier<Double>) mtrxAI;
+
+            } else {
+
+                myAI = PrimitiveDenseStore.FACTORY.makeRowsSupplier((int) mtrxAI.countColumns());
+                myAI.addRows((int) mtrxAI.countRows());
+
+                if (mtrxAI instanceof SparseStore) {
+
+                    ((SparseStore<Double>) mtrxAI).nonzeros().forEach(nz -> myAI.getRow((int) nz.row()).set((int) nz.column(), nz.doubleValue()));
+
+                } else {
+
+                    double value;
+                    for (int i = 0; i < mtrxAI.countRows(); i++) {
+                        final SparseArray<Double> tmpRow = myAI.getRow(i);
+                        for (int j = 0; j < mtrxAI.countColumns(); j++) {
+                            value = mtrxAI.doubleValue(i, j);
+                            if (!GenericSolver.ACCURACY.isZero(value)) {
+                                tmpRow.set(j, value);
+                            }
+                        }
+                    }
+                }
+            }
+
+            myBI = mtrxBI;
+
+            return (B) this;
+        }
+
+        public void reset() {
+            myAE = null;
+            myAI = null;
+            myBE = null;
+            myBI = null;
+            myObjective = null;
+        }
+
+        public void validate() {
+
+            if (this.hasEqualityConstraints()) {
+
+                if (this.getAE() == null) {
+                    throw new ProgrammingError("AE cannot be null!");
+                } else if (this.getAE().countColumns() != this.countVariables()) {
+                    throw new ProgrammingError("AE has the wrong number of columns!");
+                } else if (this.getAE().countRows() != this.getBE().countRows()) {
+                    throw new ProgrammingError("AE and BE do not have the same number of rows!");
+                } else if (this.getBE().countColumns() != 1) {
+                    throw new ProgrammingError("BE must have precisely one column!");
+                }
+
+            } else {
+
+                myAE = null;
+                myBE = null;
+            }
+
+            if (this.hasObjective()) {
+
+                if (myObjective.arity() != this.countVariables()) {
+                    throw new ProgrammingError("The objective function has the wrong arity!");
+                }
+
+            } else {
+
+                myObjective = null;
+            }
+
+            if (this.hasInequalityConstraints()) {
+
+                if (this.getAI() == null) {
+                    throw new ProgrammingError("AI cannot be null!");
+                } else if (this.getAI().countColumns() != this.countVariables()) {
+                    throw new ProgrammingError("AI has the wrong number of columns!");
+                } else if (this.getAI().countRows() != this.getBI().countRows()) {
+                    throw new ProgrammingError("AI and BI do not have the same number of rows!");
+                } else if (this.getBI().countColumns() != 1) {
+                    throw new ProgrammingError("BI must have precisely one column!");
+                }
+
+            } else {
+
+                myAI = null;
+                myBI = null;
+            }
+        }
 
         protected abstract S doBuild(Optimisation.Options options);
+
+        protected double evaluate(final Access1D<Double> arg) {
+            return myObjective.invoke(arg);
+        }
+
+        protected void setObjective(final MultiaryFunction.TwiceDifferentiable<Double> objective) {
+            myObjective = objective;
+        }
 
     }
 
@@ -85,9 +282,9 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
     protected Optimisation.Result buildResult() {
 
-        final MatrixStore<Double> solution = this.extractSolution();
-        final double value = this.evaluateFunction(solution);
-        final Optimisation.State state = this.getState();
+        Access1D<?> solution = this.extractSolution();
+        double value = this.evaluateFunction(solution);
+        Optimisation.State state = this.getState();
 
         return new Optimisation.Result(state, value, solution);
     }
@@ -109,9 +306,9 @@ public abstract class GenericSolver implements Optimisation.Solver {
     /**
      * Should be able to feed this to {@link #evaluateFunction(Access1D)}.
      */
-    protected abstract MatrixStore<Double> extractSolution();
+    protected abstract Access1D<?> extractSolution();
 
-    protected final State getState() {
+    protected State getState() {
         return myState;
     }
 

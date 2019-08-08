@@ -7,9 +7,34 @@ import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.structure.RowView;
 
 public final class RowsSupplier<N extends Number> implements Access2D<N>, ElementsSupplier<N> {
+
+    static final class ItemView<N extends Number> extends RowView<N> {
+
+        private final RowsSupplier<N> mySupplier;
+
+        ItemView(final RowsSupplier<N> access) {
+            super(access);
+            mySupplier = access;
+        }
+
+        public ElementView1D<N, ?> elements() {
+            return this.getCurrent().elements();
+        }
+
+        public ElementView1D<N, ?> nonzeros() {
+            return this.getCurrent().nonzeros();
+        }
+
+        private SparseArray<N> getCurrent() {
+            return mySupplier.getRow(Math.toIntExact(this.row()));
+        }
+
+    }
 
     private final int myColumnsCount;
     private final PhysicalStore.Factory<N, ?> myFactory;
@@ -26,7 +51,7 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
     }
 
     public void addRows(final int numberToAdd) {
-        final SparseFactory<N> factory = SparseArray.factory(myFactory.array(), myColumnsCount);
+        SparseFactory<N> factory = SparseArray.factory(myFactory.array(), myColumnsCount);
         for (int i = 0; i < numberToAdd; i++) {
             myRows.add(factory.make());
         }
@@ -60,8 +85,12 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
         return myRows.remove(index);
     }
 
+    public RowView<N> rows() {
+        return new ItemView<>(this);
+    }
+
     public RowsSupplier<N> selectRows(final int[] indices) {
-        final RowsSupplier<N> retVal = new RowsSupplier<>(myFactory, myColumnsCount);
+        RowsSupplier<N> retVal = new RowsSupplier<>(myFactory, myColumnsCount);
         for (int i = 0; i < indices.length; i++) {
             retVal.addRow(this.getRow(indices[i]));
         }
@@ -73,7 +102,7 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
         receiver.reset();
 
         for (int i = 0, limit = myRows.size(); i < limit; i++) {
-            final long row = i;
+            long row = i;
 
             myRows.get(i).supplyNonZerosTo(new Mutate1D() {
 

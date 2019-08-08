@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.blas.DOT;
+import org.ojalgo.array.operation.DOT;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -128,7 +128,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     public double getRankThreshold() {
-        return myMaxDiag * this.getDimensionalEpsilon();
+        return TEN * myMaxDiag * this.getDimensionalEpsilon();
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
@@ -216,33 +216,32 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
             }
         }
 
-        return this.computed(true);
+        return this.computed(mySPD);
     }
 
     private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {
 
-        final RawStore tmpBody = this.getInternalStore();
+        final RawStore body = this.getInternalStore();
 
-        preallocated.substituteForwards(tmpBody, false, false, true);
-        preallocated.substituteBackwards(tmpBody, false, true, true);
+        preallocated.substituteForwards(body, false, false, true);
+        preallocated.substituteBackwards(body, false, true, true);
 
         return preallocated.logical().hermitian(false).get();
     }
 
     private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
-        final RawStore tmpBody = this.getInternalStore();
+        final RawStore body = this.getInternalStore();
 
-        preallocated.substituteForwards(tmpBody, false, false, false);
-        preallocated.substituteBackwards(tmpBody, false, true, false);
+        preallocated.substituteForwards(body, false, false, false);
+        preallocated.substituteBackwards(body, false, true, false);
 
         return preallocated;
     }
 
     @Override
     protected boolean checkSolvability() {
-        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
-        return mySPD && (myMinDiag >= threshold);
+        return mySPD && (myMinDiag > this.getRankThreshold());
     }
 
 }

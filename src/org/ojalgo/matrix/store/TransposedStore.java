@@ -21,7 +21,10 @@
  */
 package org.ojalgo.matrix.store;
 
+import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 
 final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
 
@@ -29,8 +32,24 @@ final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
         super(base);
     }
 
+    public N aggregateColumn(final long col, final Aggregator aggregator) {
+        return this.base().aggregateRow(col, aggregator);
+    }
+
+    public N aggregateRow(final long row, final Aggregator aggregator) {
+        return this.base().aggregateColumn(row, aggregator);
+    }
+
     public N get(final long aRow, final long aCol) {
         return this.base().get(aCol, aRow);
+    }
+
+    public void loopColumn(final long col, final RowColumnCallback callback) {
+        this.base().loopRow(col, callback);
+    }
+
+    public void loopRow(final long row, final RowColumnCallback callback) {
+        this.base().loopColumn(row, callback);
     }
 
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
@@ -51,6 +70,14 @@ final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
         return retVal;
     }
 
+    public Access1D<N> sliceColumn(final long col) {
+        return this.base().sliceRow(col);
+    }
+
+    public Access1D<N> sliceRow(final long row) {
+        return this.base().sliceColumn(row);
+    }
+
     @Override
     public void supplyTo(final TransformableRegion<N> receiver) {
         this.base().supplyTo(receiver.regionByTransposing());
@@ -63,6 +90,14 @@ final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
     @Override
     public MatrixStore<N> transpose() {
         return this.base();
+    }
+
+    public void visitColumn(final long col, final VoidFunction<N> visitor) {
+        this.base().visitRow(col, visitor);
+    }
+
+    public void visitRow(final long row, final VoidFunction<N> visitor) {
+        this.base().visitColumn(row, visitor);
     }
 
 }

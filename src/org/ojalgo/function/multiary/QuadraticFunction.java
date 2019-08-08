@@ -24,6 +24,7 @@ package org.ojalgo.function.multiary;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -32,85 +33,107 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 
 /**
- * [x]<sup>T</sup>[Q][x] + c
+ * [x]<sup>T</sup>[Q][x] + [l]<sup>T</sup>[x] + c
  *
  * @author apete
  */
-public final class QuadraticFunction<N extends Number> extends AbstractMultiary<N, QuadraticFunction<N>> implements MultiaryFunction.Quadratic<N> {
+public final class QuadraticFunction<N extends Number> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Quadratic<N> {
 
-    public static QuadraticFunction<ComplexNumber> makeComplex(final Access2D<? extends Number> factors) {
-        return new QuadraticFunction<>(GenericDenseStore.COMPLEX.copy(factors));
+    public static QuadraticFunction<ComplexNumber> makeComplex(final Access2D<?> quadratic, final Access1D<?> linear) {
+        return new QuadraticFunction<>(GenericDenseStore.COMPLEX.copy(quadratic), GenericDenseStore.COMPLEX.columns(linear));
     }
 
     public static QuadraticFunction<ComplexNumber> makeComplex(final int arity) {
-        return new QuadraticFunction<>(GenericDenseStore.COMPLEX.makeZero(arity, arity));
+        return new QuadraticFunction<>(GenericDenseStore.COMPLEX.make(arity, arity), GenericDenseStore.COMPLEX.make(arity, 1));
     }
 
-    public static QuadraticFunction<Double> makePrimitive(final Access2D<? extends Number> factors) {
-        return new QuadraticFunction<>(PrimitiveDenseStore.FACTORY.copy(factors));
+    public static QuadraticFunction<Double> makePrimitive(final Access2D<?> quadratic, final Access1D<?> linear) {
+        return new QuadraticFunction<>(PrimitiveDenseStore.FACTORY.copy(quadratic), PrimitiveDenseStore.FACTORY.columns(linear));
     }
 
     public static QuadraticFunction<Double> makePrimitive(final int arity) {
-        return new QuadraticFunction<>(PrimitiveDenseStore.FACTORY.makeZero(arity, arity));
+        return new QuadraticFunction<>(PrimitiveDenseStore.FACTORY.make(arity, arity), PrimitiveDenseStore.FACTORY.make(arity, 1));
     }
 
-    public static QuadraticFunction<RationalNumber> makeRational(final Access2D<? extends Number> factors) {
-        return new QuadraticFunction<>(GenericDenseStore.RATIONAL.copy(factors));
+    public static QuadraticFunction<RationalNumber> makeRational(final Access2D<?> quadratic, final Access1D<?> linear) {
+        return new QuadraticFunction<>(GenericDenseStore.RATIONAL.copy(quadratic), GenericDenseStore.RATIONAL.columns(linear));
     }
 
     public static QuadraticFunction<RationalNumber> makeRational(final int arity) {
-        return new QuadraticFunction<>(GenericDenseStore.RATIONAL.makeZero(arity, arity));
+        return new QuadraticFunction<>(GenericDenseStore.RATIONAL.make(arity, arity), GenericDenseStore.RATIONAL.make(arity, 1));
     }
 
-    private final MatrixStore<N> myFactors;
+    public static <N extends Number> QuadraticFunction<N> wrap(final PhysicalStore<N> quadratic, final PhysicalStore<N> linear) {
+        return new QuadraticFunction<>(quadratic, linear);
+    }
 
-    QuadraticFunction(final MatrixStore<N> factors) {
+    private final LinearFunction<N> myLinear;
+    private final PureQuadraticFunction<N> myPureQuadratic;
+
+    QuadraticFunction(final MatrixStore<N> quadratic, final MatrixStore<N> linear) {
 
         super();
 
-        myFactors = factors;
+        myPureQuadratic = new PureQuadraticFunction<>(quadratic);
+        myLinear = new LinearFunction<>(linear);
 
-        if (myFactors.countRows() != myFactors.countColumns()) {
-            throw new IllegalArgumentException("Must be sqaure!");
+        if (myPureQuadratic.arity() != myLinear.arity()) {
+            throw new IllegalArgumentException("Must have the same arity!");
         }
     }
 
     public int arity() {
-        return (int) myFactors.countColumns();
+        return myLinear.arity();
+    }
+
+    public N getConstant() {
+        return myPureQuadratic.getConstant();
     }
 
     @Override
     public MatrixStore<N> getGradient(final Access1D<N> point) {
-
-        final PhysicalStore<N> retVal = myFactors.physical().makeZero(this.arity(), 1L);
-
-        this.getHessian(point).multiply(point, retVal);
-
-        return retVal;
+        MatrixStore<N> pureQuadraticPart = myPureQuadratic.getGradient(point);
+        MatrixStore<N> linearPart = myLinear.getGradient(point);
+        return pureQuadraticPart.add(linearPart);
     }
 
     @Override
     public MatrixStore<N> getHessian(final Access1D<N> point) {
-        return myFactors.logical().superimpose(myFactors.conjugate()).get();
+        return myPureQuadratic.getHessian(point);
+    }
+
+    public MatrixStore<N> getLinearFactors() {
+        return myLinear.getLinearFactors();
     }
 
     @Override
     public N invoke(final Access1D<N> arg) {
+        return this.getScalarValue(arg).get();
+    }
 
-        Scalar<N> retVal = this.getScalarConstant();
-
-        retVal = retVal.add(myFactors.multiplyBoth(arg));
-
-        return retVal.get();
+    public PhysicalStore<N> linear() {
+        return myLinear.linear();
     }
 
     public PhysicalStore<N> quadratic() {
-        return (PhysicalStore<N>) myFactors;
+        return myPureQuadratic.quadratic();
     }
 
-    @Override
-    protected org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> factory() {
-        return myFactors.physical();
+    public void setConstant(final Number constant) {
+        myPureQuadratic.setConstant(constant);
+    }
+
+    Factory<N, ?> factory() {
+        return myLinear.factory();
+    }
+
+    Scalar<N> getScalarValue(final Access1D<N> arg) {
+
+        Scalar<N> retVal = myPureQuadratic.getScalarValue(arg);
+
+        N linearPart = myLinear.invoke(arg);
+
+        return retVal.add(linearPart);
     }
 
 }

@@ -28,60 +28,63 @@ import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
 /**
- * [l]<sup>T</sup>[x] + c
+ * [l]<sup>T</sup>[x]
  *
  * @author apete
  */
-public final class LinearFunction<N extends Number> extends AbstractMultiary<N, LinearFunction<N>> implements MultiaryFunction.Linear<N> {
+public final class LinearFunction<N extends Number> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Linear<N> {
 
-    public static LinearFunction<ComplexNumber> makeComplex(final Access1D<? extends Number> factors) {
-        return new LinearFunction<>(GenericDenseStore.COMPLEX.rows(factors));
+    public static LinearFunction<ComplexNumber> makeComplex(final Access1D<?> coefficients) {
+        return new LinearFunction<>(GenericDenseStore.COMPLEX.rows(coefficients));
     }
 
     public static LinearFunction<ComplexNumber> makeComplex(final int arity) {
-        return new LinearFunction<>(GenericDenseStore.COMPLEX.makeZero(1, arity));
+        return new LinearFunction<>(GenericDenseStore.COMPLEX.make(1, arity));
     }
 
-    public static LinearFunction<Double> makePrimitive(final Access1D<? extends Number> factors) {
-        return new LinearFunction<>(PrimitiveDenseStore.FACTORY.rows(factors));
+    public static LinearFunction<Double> makePrimitive(final Access1D<?> coefficients) {
+        return new LinearFunction<>(PrimitiveDenseStore.FACTORY.rows(coefficients));
     }
 
     public static LinearFunction<Double> makePrimitive(final int arity) {
-        return new LinearFunction<>(PrimitiveDenseStore.FACTORY.makeZero(1, arity));
+        return new LinearFunction<>(PrimitiveDenseStore.FACTORY.make(1, arity));
     }
 
-    public static LinearFunction<RationalNumber> makeRational(final Access1D<? extends Number> factors) {
-        return new LinearFunction<>(GenericDenseStore.RATIONAL.rows(factors));
+    public static LinearFunction<RationalNumber> makeRational(final Access1D<?> coefficients) {
+        return new LinearFunction<>(GenericDenseStore.RATIONAL.rows(coefficients));
     }
 
     public static LinearFunction<RationalNumber> makeRational(final int arity) {
-        return new LinearFunction<>(GenericDenseStore.RATIONAL.makeZero(1, arity));
+        return new LinearFunction<>(GenericDenseStore.RATIONAL.make(1, arity));
     }
 
-    private final MatrixStore<N> myFactors;
+    public static <N extends Number> LinearFunction<N> wrap(final PhysicalStore<N> coefficients) {
+        return new LinearFunction<>(coefficients);
+    }
 
-    LinearFunction(final MatrixStore<N> factors) {
+    private final MatrixStore<N> myCoefficients;
+
+    LinearFunction(final MatrixStore<N> coefficients) {
 
         super();
 
-        myFactors = factors;
-
-        if (myFactors.countRows() != 1L) {
-            throw new IllegalArgumentException("Must be a row vector!");
+        if (!coefficients.isVector()) {
+            throw new IllegalArgumentException("Must be a  vector!");
         }
+
+        myCoefficients = coefficients;
     }
 
     public int arity() {
-        return (int) myFactors.countColumns();
+        return Math.toIntExact(myCoefficients.count());
     }
 
     @Override
     public MatrixStore<N> getGradient(final Access1D<N> point) {
-        return myFactors.transpose();
+        return this.getLinearFactors();
     }
 
     @Override
@@ -89,27 +92,30 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
         return this.factory().builder().makeZero(this.arity(), this.arity()).get();
     }
 
+    public MatrixStore<N> getLinearFactors() {
+        if (myCoefficients.countRows() == 1L) {
+            return myCoefficients.transpose();
+        } else {
+            return myCoefficients;
+        }
+    }
+
     @Override
     public N invoke(final Access1D<N> arg) {
 
-        final PhysicalStore<N> tmpPreallocated = myFactors.physical().makeZero(1L, 1L);
+        PhysicalStore<N> preallocated = myCoefficients.physical().make(1L, 1L);
 
-        Scalar<N> retVal = this.getScalarConstant();
+        myCoefficients.multiply(arg, preallocated);
 
-        myFactors.multiply(arg, tmpPreallocated);
-
-        retVal = retVal.add(tmpPreallocated.get(0, 0));
-
-        return retVal.get();
+        return preallocated.get(0, 0);
     }
 
     public PhysicalStore<N> linear() {
-        return (PhysicalStore<N>) myFactors;
+        return (PhysicalStore<N>) myCoefficients;
     }
 
-    @Override
-    protected Factory<N, ?> factory() {
-        return myFactors.physical();
+    Factory<N, ?> factory() {
+        return myCoefficients.physical();
     }
 
 }

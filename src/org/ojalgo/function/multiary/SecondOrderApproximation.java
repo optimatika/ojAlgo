@@ -28,22 +28,21 @@ import org.ojalgo.structure.Access1D;
 
 public final class SecondOrderApproximation<N extends Number> extends ApproximateFunction<N> {
 
-    private final CompoundFunction<N> myDelegate;
+    private final QuadraticFunction<N> myDelegate;
 
     public SecondOrderApproximation(final MultiaryFunction.TwiceDifferentiable<N> function, final Access1D<N> point) {
 
         super(function, point);
 
-        final PhysicalStore<N> tmpHessian = function.getHessian(point).copy();
-        final MatrixStore<N> tmpGradient = function.getGradient(point).logical().transpose().get();
+        PhysicalStore<N> quadratic = function.getHessian(point).copy();
+        quadratic.modifyAll(quadratic.physical().function().multiply().first(0.5));
 
-        tmpHessian.modifyAll(tmpHessian.physical().function().multiply().first(0.5));
+        MatrixStore<N> linear = function.getGradient(point);
 
-        final QuadraticFunction<N> tmpQuadratic = new QuadraticFunction<>(tmpHessian);
-        final LinearFunction<N> tmpLinear = new LinearFunction<>(tmpGradient);
+        N constant = function.invoke(point);
 
-        myDelegate = new CompoundFunction<>(tmpQuadratic, tmpLinear);
-        myDelegate.setConstant(function.invoke(point));
+        myDelegate = new QuadraticFunction<>(quadratic, linear);
+        myDelegate.setConstant(constant);
     }
 
     public int arity() {
@@ -98,7 +97,7 @@ public final class SecondOrderApproximation<N extends Number> extends Approximat
     }
 
     @Override
-    protected Factory<N, ?> factory() {
+    Factory<N, ?> factory() {
         return myDelegate.factory();
     }
 

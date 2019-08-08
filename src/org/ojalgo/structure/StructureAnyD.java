@@ -100,7 +100,7 @@ public interface StructureAnyD extends Structure1D {
 
     }
 
-    interface Logical<S extends StructureAnyD, B extends Logical<S, ?>> extends StructureAnyD {
+    interface Logical<S extends StructureAnyD, B extends Logical<S, B>> extends StructureAnyD {
 
     }
 
@@ -308,22 +308,6 @@ public interface StructureAnyD extends Structure1D {
      */
     static int index(final int[] structure, final int[] reference) {
         int retVal = reference[0];
-        int tmpFactor = structure[0];
-        final int tmpLength = reference.length;
-        for (int i = 1; i < tmpLength; i++) {
-            retVal += tmpFactor * reference[i];
-            tmpFactor *= structure[i];
-        }
-        return retVal;
-    }
-
-    /**
-     * @param structure An access structure
-     * @param reference An access element reference
-     * @return The index of that element
-     */
-    static int index(final int[] structure, final long[] reference) {
-        int retVal = (int) reference[0];
         int tmpFactor = structure[0];
         final int tmpLength = reference.length;
         for (int i = 1; i < tmpLength; i++) {

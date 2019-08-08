@@ -222,7 +222,7 @@ public interface Optimisation {
          * this as a stopping criteria or similar. The default essentially copies the numbers as is –
          * corresponding to full double precision.
          */
-        public NumberContext solution = new NumberContext(16, 14, RoundingMode.HALF_DOWN);
+        public NumberContext solution = new NumberContext(0, 14, RoundingMode.HALF_DOWN);
 
         /**
          * Controls if sparse/iterative solvers should be favoured over dense/direct alternatives.

@@ -24,6 +24,8 @@ package org.ojalgo.matrix.store;
 import java.util.List;
 
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.operation.SubstituteBackwards;
+import org.ojalgo.array.operation.SubstituteForwards;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.transformation.Householder;
@@ -48,7 +50,7 @@ import org.ojalgo.structure.Transformation2D;
  */
 public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2D.Elements, Access2D.IndexOf, TransformableRegion<N> {
 
-    public interface Factory<N extends Number, I extends PhysicalStore<N>> extends Factory2D<I> {
+    public interface Factory<N extends Number, I extends PhysicalStore<N>> extends Factory2D.Dense<I> {
 
         AggregatorSet<N> aggregator();
 
@@ -124,11 +126,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * <li>[A] is upper/right triangular</li>
      * </ul>
      *
-     * @param body The equation system body parameters [A]
-     * @param unitDiagonal TODO
-     * @param conjugated true if the upper/right part of body is actually stored in the lower/left part of the
-     *        matrix, and the elements conjugated.
-     * @param hermitian TODO
+     * @see SubstituteBackwards#invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
      */
     void substituteBackwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean hermitian);
 
@@ -140,9 +138,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * <li>[A] is lower/left triangular</li>
      * </ul>
      *
-     * @param body The equation system body parameters [A]
-     * @param unitDiagonal true if body has ones on the diagonal
-     * @param conjugated TODO
+     * @see SubstituteForwards#invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 

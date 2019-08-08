@@ -25,8 +25,9 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
-import org.ojalgo.array.blas.AMAX;
-import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.operation.AMAX;
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.COPY;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
@@ -77,7 +78,7 @@ public class Primitive32Array extends PrimitiveArray {
         }
 
         @Override
-        PlainArray<Double> make(final long size) {
+        PlainArray<Double> makeDenseArray(final long size) {
             return Primitive32Array.make((int) size);
         }
 
@@ -85,11 +86,11 @@ public class Primitive32Array extends PrimitiveArray {
 
     static final long ELEMENT_SIZE = JavaType.FLOAT.memory();
 
-    public static final Primitive32Array make(final int size) {
+    public static Primitive32Array make(final int size) {
         return new Primitive32Array(size);
     }
 
-    public static final Primitive32Array wrap(final float... data) {
+    public static Primitive32Array wrap(final float... data) {
         return new Primitive32Array(data);
     }
 
@@ -428,16 +429,16 @@ public class Primitive32Array extends PrimitiveArray {
 
     @Override
     protected void add(final int index, final double addend) {
-        data[index] += addend;
+        data[index] += (float) addend;
     }
 
     @Override
     protected void add(final int index, final Number addend) {
-        data[index] += addend.doubleValue();
+        data[index] += addend.floatValue();
     }
 
     protected final float[] copyOfData() {
-        return Raw1D.copyOf(data);
+        return COPY.copyOf(data);
     }
 
     @Override

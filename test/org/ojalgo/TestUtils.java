@@ -27,6 +27,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Assertions;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.operation.ArrayOperation;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Bidiagonal;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -39,8 +40,10 @@ import org.ojalgo.matrix.decomposition.Tridiagonal;
 import org.ojalgo.matrix.store.GenericDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.operation.MatrixOperation;
+import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -61,19 +64,19 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class TestUtils {
 
-    private static final NumberContext EQUALS = new NumberContext(12, 14, RoundingMode.HALF_EVEN);
+    private static NumberContext EQUALS = new NumberContext(12, 14, RoundingMode.HALF_EVEN);
 
     public static void assertBounds(final Number lower, final Access1D<?> values, final Number upper, final NumberContext precision) {
-        for (final ElementView1D<?, ?> tmpValue : values.elements()) {
+        for (ElementView1D<?, ?> tmpValue : values.elements()) {
             TestUtils.assertBounds(lower, tmpValue.get(), upper, precision);
         }
     }
 
     public static void assertBounds(final Number lower, final Number value, final Number upper, final NumberContext precision) {
 
-        final BigDecimal tmpLower = TypeUtils.toBigDecimal(lower, precision);
-        final BigDecimal tmpValue = TypeUtils.toBigDecimal(value, precision);
-        final BigDecimal tmpUpper = TypeUtils.toBigDecimal(upper, precision);
+        BigDecimal tmpLower = TypeUtils.toBigDecimal(lower, precision);
+        BigDecimal tmpValue = TypeUtils.toBigDecimal(value, precision);
+        BigDecimal tmpUpper = TypeUtils.toBigDecimal(upper, precision);
 
         if ((tmpValue.compareTo(tmpLower) == -1) || (tmpValue.compareTo(tmpUpper) == 1)) {
             Assertions.fail("!(" + tmpLower.toPlainString() + " <= " + tmpValue.toPlainString() + " <= " + tmpUpper.toPlainString() + ")");
@@ -117,6 +120,12 @@ public abstract class TestUtils {
         TestUtils.assertEquals("double != double", expected, actual, context);
     }
 
+    public static void assertEquals(final double[] expected, final Access1D<?> actual, final NumberContext accuracy) {
+        for (int p = 0; p < expected.length; p++) {
+            TestUtils.assertEquals(expected[p], actual.doubleValue(p), accuracy);
+        }
+    }
+
     public static void assertEquals(final int expected, final int actual) {
         Assertions.assertEquals(expected, actual);
     }
@@ -150,11 +159,11 @@ public abstract class TestUtils {
             Assertions.fail(() -> "Eigenvalue<N> failed for " + expected);
         }
         if (actual.isOrdered()) {
-            final MatrixStore<N> mtrxD = actual.getD();
+            MatrixStore<N> mtrxD = actual.getD();
             double bigger = Double.MAX_VALUE;
-            final Array1D<ComplexNumber> tmpEigenvalues = actual.getEigenvalues();
+            Array1D<ComplexNumber> tmpEigenvalues = actual.getEigenvalues();
             for (int i = 0; i < tmpEigenvalues.length; i++) {
-                final ComplexNumber value = tmpEigenvalues.get(i);
+                ComplexNumber value = tmpEigenvalues.get(i);
                 Assertions.assertTrue(bigger >= value.getModulus());
                 Assertions.assertEquals(value.doubleValue(), mtrxD.doubleValue(i, i), context.epsilon());
                 bigger = value.getModulus();
@@ -286,8 +295,8 @@ public abstract class TestUtils {
 
         if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
 
-            final Quaternion tmpExpected = Quaternion.valueOf(expected);
-            final Quaternion tmpActual = Quaternion.valueOf(actual);
+            Quaternion tmpExpected = Quaternion.valueOf(expected);
+            Quaternion tmpActual = Quaternion.valueOf(actual);
 
             if (!!precision.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
                 // Assertions.fail(() -> message + " (scalar)" + ": " + expected + " != " + actual);
@@ -308,8 +317,8 @@ public abstract class TestUtils {
 
         } else if ((expected instanceof ComplexNumber) || (actual instanceof ComplexNumber)) {
 
-            final ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
-            final ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
+            ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
+            ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
 
             if (!!precision.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
                 // Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
@@ -343,6 +352,10 @@ public abstract class TestUtils {
         TestUtils.assertEquals(message, (Access1D<?>) expected, (Access1D<?>) actual, context);
     }
 
+    public static void assertEquivalent(final Optimisation.Result expected, final Optimisation.Result actual) {
+        TestUtils.assertOptimisationResult("Optimisation.Result != Optimisation.Result", expected, actual, EQUALS, true, true, true, true);
+    }
+
     public static void assertFalse(final boolean condition) {
         Assertions.assertFalse(condition);
     }
@@ -373,6 +386,15 @@ public abstract class TestUtils {
         }
     }
 
+    public static void assertSolutionFeasible(final ExpressionsBasedModel model, final Optimisation.Result solution) {
+        TestUtils.assertSolutionFeasible(model, solution, EQUALS);
+    }
+
+    public static void assertSolutionFeasible(final ExpressionsBasedModel model, final Optimisation.Result solution, final NumberContext accuracy) {
+        TestUtils.assertStateNotLessThanFeasible(solution);
+        TestUtils.assertTrue(model.validate(solution, accuracy, BasicLogger.DEBUG));
+    }
+
     public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual) {
         TestUtils.assertStateAndSolution(expected, actual, EQUALS);
     }
@@ -387,12 +409,7 @@ public abstract class TestUtils {
 
     public static void assertStateAndSolution(final String message, final Optimisation.Result expected, final Optimisation.Result actual,
             final NumberContext context) {
-
-        TestUtils.assertEquals(message + ", different Optimisation.State", expected.getState(), actual.getState());
-
-        if (expected.getState().isFeasible()) {
-            TestUtils.assertEquals(message, expected, actual, context);
-        }
+        TestUtils.assertOptimisationResult(message, expected, actual, context, true, false, true, false);
     }
 
     public static void assertStateLessThanFeasible(final Optimisation.Result actual) {
@@ -429,9 +446,9 @@ public abstract class TestUtils {
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {
 
-        final PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
+        PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
 
-        final Uniform tmpArgGen = new Uniform(PrimitiveMath.ZERO, PrimitiveMath.TWO_PI);
+        Uniform tmpArgGen = new Uniform(PrimitiveMath.ZERO, PrimitiveMath.TWO_PI);
 
         for (int j = 0; j < numberOfColumns; j++) {
             for (int i = 0; i < numberOfRows; i++) {
@@ -443,7 +460,52 @@ public abstract class TestUtils {
     }
 
     public static void minimiseAllBranchLimits() {
-        MatrixOperation.setAllOperationThresholds(2);
+        ArrayOperation.setAllOperationThresholds(2);
+    }
+
+    static void assertOptimisationResult(final String message, final Optimisation.Result expected, final Optimisation.Result actual,
+            final NumberContext context, final boolean state, final boolean value, final boolean solution, final boolean multipliers) {
+
+        State expectedState = expected.getState();
+
+        if (state) {
+
+            State actualState = actual.getState();
+
+            boolean failed = false;
+
+            if (expectedState == actualState) {
+
+            } else if (expectedState.isDistinct() && !actualState.isDistinct()) {
+                failed = true;
+            } else if (expectedState.isOptimal() && !actualState.isOptimal()) {
+                failed = true;
+            } else if (expectedState.isFeasible() && !actualState.isFeasible()) {
+                failed = true;
+            } else if (expectedState.isApproximate() && !actualState.isApproximate()) {
+                failed = true;
+            }
+
+            if (failed) {
+                TestUtils.assertEquals(message + " – State", expectedState, actualState);
+            }
+        }
+
+        if (value) {
+            double expectedValue = expected.getValue();
+            double actualValue = actual.getValue();
+            TestUtils.assertEquals(message + " – Value", expectedValue, actualValue, context);
+        }
+
+        if (solution && expectedState.isFeasible()) {
+            TestUtils.assertEquals(message + " – Solution", expected, actual, context);
+        }
+
+        if (multipliers && expected.getMultipliers().isPresent()) {
+            Access1D<?> expectedMultipliers = expected.getMultipliers().get();
+            Access1D<?> actualMultipliers = actual.getMultipliers().get();
+            TestUtils.assertEquals(message + " – Multipliers", expectedMultipliers, actualMultipliers, context);
+        }
     }
 
     private TestUtils() {

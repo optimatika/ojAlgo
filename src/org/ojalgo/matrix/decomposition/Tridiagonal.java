@@ -72,6 +72,11 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
         return retVal;
     }
 
+    /**
+     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
+     *             innstead.
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     static <N extends Number> Tridiagonal<N> make(final Access2D<N> typical) {
 
@@ -90,6 +95,10 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
         }
     }
 
+    /**
+     * @deprecated v48 Use {@link #reconstruct()} instead
+     */
+    @Deprecated
     static <N extends Number> MatrixStore<N> reconstruct(final Tridiagonal<N> decomposition) {
         return decomposition.reconstruct();
     }

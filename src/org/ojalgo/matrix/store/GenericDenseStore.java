@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.*;
+import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
@@ -38,7 +39,7 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
-import org.ojalgo.matrix.store.operation.*;
+import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -98,6 +99,10 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
         public MatrixStore.Factory<N> builder() {
             return new MatrixStore.Factory<N>() {
+
+                public <D extends Access1D<?>> Builder<N, D> makeDiagonal(final D mainDiagonal) {
+                    return DiagonalStore.builder(GenericDenseStore.Factory.this, mainDiagonal);
+                }
 
                 public LogicalBuilder<N> makeIdentity(final int dimension) {
                     return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.Factory.this, dimension));
@@ -291,7 +296,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             return new Rotation.Generic<>(low, high, cos, sin);
         }
 
-        public GenericDenseStore<N> makeZero(final long rows, final long columns) {
+        public GenericDenseStore<N> make(final long rows, final long columns) {
             return new GenericDenseStore<>(this, (int) rows, (int) columns);
         }
 
@@ -406,11 +411,18 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     public static final PhysicalStore.Factory<RationalNumber, GenericDenseStore<RationalNumber>> RATIONAL = new GenericDenseStore.Factory<>(
             RationalArray.FACTORY);
 
+    public static <N extends Number & Scalar<N>> GenericDenseStore<N> wrap(final GenericDenseStore.Factory<N> factory, final N... data) {
+        return new GenericDenseStore<>(factory, data.length, 1, data);
+    }
+
+    public static <N extends Number & Scalar<N>> GenericDenseStore<N> wrap(final GenericDenseStore.Factory<N> factory, final N[] data, final int structure) {
+        return new GenericDenseStore<>(factory, structure, data.length / structure, data);
+    }
+
     private final GenericMultiplyBoth<N> multiplyBoth;
     private final GenericMultiplyLeft<N> multiplyLeft;
     private final GenericMultiplyNeither<N> multiplyNeither;
     private final GenericMultiplyRight<N> multiplyRight;
-
     private final int myColDim;
     private final GenericDenseStore.Factory<N> myFactory;
     private final int myRowDim;

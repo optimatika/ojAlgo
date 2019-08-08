@@ -39,9 +39,13 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     public static abstract class Factory<N extends Number> {
 
-        public final InverterTask<N> make(final int dim, final boolean spd) {
+        public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
+            return this.make(original, false, false).invert(original);
+        }
 
-            final Structure2D template = new Structure2D() {
+        public InverterTask<N> make(final int dim, final boolean spd) {
+
+            Structure2D template = new Structure2D() {
 
                 public long countColumns() {
                     return dim;
@@ -55,12 +59,11 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
             return this.make(template, spd, spd);
         }
 
-        public final InverterTask<N> make(final MatrixStore<N> template) {
+        public InverterTask<N> make(final MatrixStore<N> template) {
             return this.make(template, MatrixUtils.isHermitian(template), false);
         }
 
         public abstract InverterTask<N> make(Structure2D template, boolean symmetric, boolean positiveDefinite);
-
     }
 
     Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
@@ -85,7 +88,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
         @Override
         public InverterTask<Double> make(final Structure2D template, final boolean symmetric, final boolean positiveDefinite) {
 
-            final long tmpDim = template.countRows();
+            long tmpDim = template.countRows();
 
             if (symmetric) {
                 if (tmpDim == 1L) {
@@ -182,7 +185,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
      * </p>
      *
      * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
-     *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
+     *        assume this is modified, but you cannot assume it will contain the full/ /correct solution.
      * @return The inverse
      * @throws RecoverableCondition TODO
      */

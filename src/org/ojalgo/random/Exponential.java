@@ -36,17 +36,21 @@ public class Exponential extends AbstractContinuous {
 
     private static final long serialVersionUID = -720007692511649669L;
 
+    public static Exponential of(final double rate) {
+        return new Exponential(rate);
+    }
+
     private final double myRate; // lamda
 
     public Exponential() {
         this(ONE);
     }
 
-    public Exponential(final double aRate) {
+    public Exponential(final double rate) {
 
         super();
 
-        myRate = aRate;
+        myRate = rate;
     }
 
     public double getDensity(final double value) {

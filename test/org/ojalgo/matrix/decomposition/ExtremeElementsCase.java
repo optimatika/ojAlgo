@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
-import static org.ojalgo.matrix.decomposition.MatrixDecompositionTests.*;
 
 import java.util.List;
 
@@ -32,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.decomposition.HermitianEvD.SimultaneousPrimitive;
+import org.ojalgo.matrix.decomposition.HermitianEvD.Primitive;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.RankRevealing;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -47,7 +46,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class ExtremeElementsCase {
+public class ExtremeElementsCase extends MatrixDecompositionTests {
 
     /**
      * 146 = (308/2) - (16/2)
@@ -217,6 +216,7 @@ public class ExtremeElementsCase {
         return tmpRndm.transpose().multiply(tmpRndm).multiply(1E-150);
     }
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
@@ -307,7 +307,7 @@ public class ExtremeElementsCase {
                 { 0.6439543946598099, 1.134228320145167, 0.8341376835908743 }, { 1.2096354379603502, 0.8341376835908743, 1.6999093634457072 } });
         tmpOriginal.modifyAll(MULTIPLY.second(POWER.invoke(TEN, 155)));
 
-        SimultaneousPrimitive tmpAlgorithm = new HermitianEvD.SimultaneousPrimitive();
+        Primitive tmpAlgorithm = new HermitianEvD.Primitive();
 
         NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
 

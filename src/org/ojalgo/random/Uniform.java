@@ -34,6 +34,10 @@ public class Uniform extends AbstractContinuous {
 
     private static final long serialVersionUID = -8198257914507986404L;
 
+    public static Uniform of(final double lower, final double range) {
+        return new Uniform(lower, range);
+    }
+
     /**
      * @return An integer: 0 &lt;= ? &lt; limit
      */
@@ -53,6 +57,10 @@ public class Uniform extends AbstractContinuous {
      */
     public static long randomInteger(final long limit) {
         return (long) PrimitiveMath.FLOOR.invoke(limit * Math.random());
+    }
+
+    public static Uniform standard() {
+        return new Uniform();
     }
 
     private final double myLower;

@@ -24,6 +24,7 @@ package org.ojalgo.scalar;
 import java.math.BigDecimal;
 
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -82,6 +83,12 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
             final BigDecimal resul = deci1.subtract(deci2);
             return ExactDecimal.extractUnscaledValue(resul, myContext);
         }
+
+    }
+
+    public interface Factory<S extends ExactDecimal<S>> extends Scalar.Factory<S> {
+
+        Descriptor descriptor();
 
     }
 
@@ -182,6 +189,26 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
 
     public final double norm() {
         return PrimitiveMath.ABS.invoke(this.doubleValue());
+    }
+
+    @SuppressWarnings("unchecked")
+    public S power(final int power) {
+
+        if (power == 0) {
+
+            return this.wrap(this.descriptor().denominator());
+
+        } else if (power == 1) {
+
+            return (S) this;
+
+        } else {
+
+            long numer = MissingMath.power(myNumerator, power);
+            long denom = MissingMath.power(this.descriptor().denominator(), (power - 1));
+
+            return this.wrap(numer / denom);
+        }
     }
 
     public final S signum() {

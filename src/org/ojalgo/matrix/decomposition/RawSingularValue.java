@@ -25,8 +25,8 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.blas.AXPY;
-import org.ojalgo.array.blas.DOT;
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.DOT;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
@@ -34,6 +34,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
@@ -104,9 +105,20 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return s[0] / s[n - 1];
     }
 
+    public MatrixStore<Double> getCovariance() {
+
+        MatrixStore<Double> v = this.getV();
+        Access1D<Double> values = this.getSingularValues();
+
+        int rank = this.getRank();
+
+        MatrixStore<Double> tmp = v.logical().limits(-1, rank).operateOnColumns(DIVIDE, values).get();
+
+        return tmp.multiply(tmp.transpose());
+    }
+
     public MatrixStore<Double> getD() {
-        final DiagonalArray1D<Double> tmpDiagonal = new DiagonalArray1D<>(this.getSingularValues(), null, null, ZERO);
-        return MatrixStore.PRIMITIVE.makeWrapper(tmpDiagonal).get();
+        return this.makeDiagonal(this.getSingularValues()).get();
     }
 
     public double getFrobeniusNorm() {
@@ -151,14 +163,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return s[0];
     }
 
-    public MatrixStore<Double> getQ1() {
-        return myTransposed ? new RawStore(myVt, n, n).logical().transpose().get() : new RawStore(myUt, n, m).logical().transpose().get();
-    }
-
-    public MatrixStore<Double> getQ2() {
-        return myTransposed ? new RawStore(myUt, n, m).logical().transpose().get() : new RawStore(myVt, n, n).logical().transpose().get();
-    }
-
     public double getRankThreshold() {
         return Math.max(MACHINE_SMALLEST, s[0]) * this.getDimensionalEpsilon();
     }
@@ -183,6 +187,14 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     public double getTraceNorm() {
         return this.getKyFanNorm(s.length);
+    }
+
+    public MatrixStore<Double> getU() {
+        return myTransposed ? new RawStore(myVt, n, n).logical().transpose().get() : new RawStore(myUt, n, m).logical().transpose().get();
+    }
+
+    public MatrixStore<Double> getV() {
+        return myTransposed ? new RawStore(myUt, n, m).logical().transpose().get() : new RawStore(myVt, n, n).logical().transpose().get();
     }
 
     @Override
@@ -525,11 +537,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1t[0].length);
             final double[][] tmpMtrxData = tmpMtrx.data;
 
-            final double tmpEps = (tmpSingular[0] * MACHINE_EPSILON) * tmpSingular.length;
+            final double small = this.getRankThreshold();
 
             for (int i = 0; i < tmpSingular.length; i++) {
                 final double tmpVal = tmpSingular[i];
-                if (tmpVal > tmpEps) {
+                if (tmpVal > small) {
                     final double[] tmpRow = tmpMtrxData[i];
                     for (int j = 0; j < tmpRow.length; j++) {
                         tmpRow[j] = tmpQ1t[i][j] / tmpVal;
@@ -537,7 +549,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 }
             }
 
-            MatrixStore<Double> mtrxQ2 = this.getQ2();
+            MatrixStore<Double> mtrxQ2 = this.getV();
             preallocated.fillByMultiplying(mtrxQ2, tmpMtrx);
             myPseudoinverse = preallocated;
         }

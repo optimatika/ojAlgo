@@ -125,24 +125,23 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         if (myPivot.isModified()) {
             preallocated.fillAll(this.scalar().zero().get());
-            final int[] tmpPivotOrder = myPivot.getOrder();
-            final int tmpRowDim = this.getRowDim();
-            for (int i = 0; i < tmpRowDim; i++) {
-                preallocated.set(i, tmpPivotOrder[i], PrimitiveMath.ONE);
+            final int[] pivotOrder = myPivot.getOrder();
+            final int numbRows = this.getRowDim();
+            for (int i = 0; i < numbRows; i++) {
+                preallocated.set(i, pivotOrder[i], PrimitiveMath.ONE);
             }
         }
 
-        final DecompositionStore<N> tmpBody = this.getInPlace();
+        final DecompositionStore<N> body = this.getInPlace();
 
-        preallocated.substituteForwards(tmpBody, true, false, !myPivot.isModified());
+        preallocated.substituteForwards(body, true, false, !myPivot.isModified());
 
-        preallocated.substituteBackwards(tmpBody, false, false, false);
+        preallocated.substituteBackwards(body, false, false, false);
 
         return preallocated;
     }
 
     public MatrixStore<N> getL() {
-        //return new LowerTriangularStore<N>(this.getInPlace(), true);
         return this.getInPlace().logical().triangular(false, true).get();
     }
 
@@ -181,20 +180,18 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
     @Override
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
-        //preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), myPivot.getOrder()));
         preallocated.fillMatching(this.collect(rhs).logical().row(myPivot.getOrder()).get());
 
-        final DecompositionStore<N> tmpBody = this.getInPlace();
+        final DecompositionStore<N> body = this.getInPlace();
 
-        preallocated.substituteForwards(tmpBody, true, false, false);
+        preallocated.substituteForwards(body, true, false, false);
 
-        preallocated.substituteBackwards(tmpBody, false, false, false);
+        preallocated.substituteBackwards(body, false, false, false);
 
         return preallocated;
     }
 
     public MatrixStore<N> getU() {
-        //return new UpperTriangularStore<N>(this.getInPlace(), false);
         return this.getInPlace().logical().triangular(true, false).get();
     }
 
@@ -307,8 +304,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     @Override
     protected boolean checkSolvability() {
-        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
-        return (this.getRowDim() == this.getColDim()) && (this.getColDim() == this.countSignificant(threshold));
+        return this.isSquare() && this.isFullRank();
     }
 
     int[] getReducedPivots() {

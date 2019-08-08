@@ -87,7 +87,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
         return retVal;
     }
 
-    public final I makeZero(final long count) {
+    public final I make(final long count) {
         return this.makeStructuredZero(count);
     }
 

@@ -60,7 +60,7 @@ public interface Access1D<N extends Number> extends Structure1D {
 
         default <I extends R> I collect(final Factory1D<I> factory) {
 
-            final I retVal = factory.makeZero(this.count());
+            final I retVal = factory.make(this.count());
 
             this.supplyTo(retVal);
 
@@ -279,10 +279,10 @@ public interface Access1D<N extends Number> extends Structure1D {
     }
 
     static int hashCode(final Access1D<?> access) {
-        final int tmpSize = (int) access.count();
-        int retVal = tmpSize + 31;
-        for (int ij = 0; ij < tmpSize; ij++) {
-            retVal *= access.doubleValue(ij);
+        final int limit = (int) access.count();
+        int retVal = limit + 31;
+        for (int ij = 0; ij < limit; ij++) {
+            retVal *= access.intValue(ij);
         }
         return retVal;
     }
@@ -315,11 +315,11 @@ public interface Access1D<N extends Number> extends Structure1D {
             }
 
             public double doubleValue(final long index) {
-                return target[(int) index];
+                return target[Math.toIntExact(index)];
             }
 
             public Double get(final long index) {
-                return target[(int) index];
+                return this.doubleValue(index);
             }
 
             @Override

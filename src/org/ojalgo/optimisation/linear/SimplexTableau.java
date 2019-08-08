@@ -28,10 +28,9 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.array.Raw1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.array.SparseArray.NonzeroView;
-import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.machine.JavaType;
@@ -217,8 +216,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         }
 
         @Override
-        protected int getOvercapacity() {
-            return 0;
+        protected long getOvercapacity() {
+            return 0L;
         }
 
         @Override
@@ -250,20 +249,25 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
         @Override
         protected Access1D<Double> sliceDualVariables() {
-            final Array1D<Double> tmpSliceRange = myTransposed.sliceColumn(this.countConstraints()).sliceRange(this.countVariables(),
-                    this.countVariables() + this.countConstraints());
+
+            int numbVariables = this.countVariables();
+            int numbConstraints = this.countConstraints();
+
+            Array1D<Double> rowWithDuals = myTransposed.sliceColumn(numbConstraints);
+            final Array1D<Double> dualsOnly = rowWithDuals.sliceRange(numbVariables, numbVariables + numbConstraints);
+
             return new Access1D<Double>() {
 
                 public long count() {
-                    return tmpSliceRange.count();
+                    return dualsOnly.count();
                 }
 
                 public double doubleValue(final long index) {
-                    return -tmpSliceRange.doubleValue(index);
+                    return -dualsOnly.doubleValue(index);
                 }
 
                 public Double get(final long index) {
-                    return -tmpSliceRange.doubleValue(index);
+                    return -dualsOnly.doubleValue(index);
                 }
 
                 @Override
@@ -467,7 +471,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             myRHS = ARRAY1D_FACTORY.makeZero(numberOfConstraints);
 
             myObjectiveWeights = ARRAY1D_FACTORY.makeZero(totNumbVars);
-            myPhase1Weights = DENSE_FACTORY.makeZero(totNumbVars);
+            myPhase1Weights = DENSE_FACTORY.make(totNumbVars);
         }
 
         SparseTableau(final LinearSolver.Builder matrices) {
@@ -657,8 +661,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         }
 
         @Override
-        protected int getOvercapacity() {
-            int retVal = 0;
+        protected long getOvercapacity() {
+            long retVal = 0L;
             for (int r = 0; r < myRows.length; r++) {
                 retVal += myRows[r].countZeros();
             }
@@ -915,6 +919,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     private transient Mutate1D myObjective = null;
     private final IndexSelector mySelector;
 
+    final boolean[] negative;
+
     protected SimplexTableau(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables) {
 
         super();
@@ -925,6 +931,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
         mySelector = new IndexSelector(this.countVariables());
         myBasis = BasicArray.makeIncreasingRange(-numberOfConstraints, numberOfConstraints);
+
+        negative = new boolean[numberOfConstraints];
     }
 
     protected final Mutate2D constraintsBody() {
@@ -1002,7 +1010,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     }
 
     protected int getBasisRowIndex(final int basisColumnIndex) {
-        return Raw1D.indexOf(myBasis, basisColumnIndex);
+        return org.ojalgo.array.operation.IndexOf.indexOf(myBasis, basisColumnIndex);
     }
 
     protected final int[] getExcluded() {
@@ -1013,7 +1021,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         return mySelector.getIncluded();
     }
 
-    protected abstract int getOvercapacity();
+    protected abstract long getOvercapacity();
 
     protected boolean isBasicArtificials() {
         final int tmpLength = myBasis.length;

@@ -38,10 +38,10 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.ConstantFunction;
 import org.ojalgo.function.multiary.LinearFunction;
 import org.ojalgo.function.multiary.MultiaryFunction;
+import org.ojalgo.function.multiary.PureQuadraticFunction;
 import org.ojalgo.function.multiary.QuadraticFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -261,16 +261,16 @@ public final class Expression extends ModelEntity<Expression> {
 
         BigDecimal retVal = BigMath.ZERO;
 
-        BigDecimal tmpFactor;
+        BigDecimal factor;
 
-        for (final IntRowColumn tmpKey : this.getQuadraticKeySet()) {
-            tmpFactor = this.get(tmpKey);
-            retVal = retVal.add(tmpFactor.multiply(point.get(tmpKey.row)).multiply(point.get(tmpKey.column)));
+        for (IntRowColumn quadKey : this.getQuadraticKeySet()) {
+            factor = this.get(quadKey);
+            retVal = retVal.add(factor.multiply(point.get(quadKey.row)).multiply(point.get(quadKey.column)));
         }
 
-        for (final IntIndex tmpKey : this.getLinearKeySet()) {
-            tmpFactor = this.get(tmpKey);
-            retVal = retVal.add(tmpFactor.multiply(point.get(tmpKey.index)));
+        for (IntIndex linKey : this.getLinearKeySet()) {
+            factor = this.get(linKey);
+            retVal = retVal.add(factor.multiply(point.get(linKey.index)));
         }
 
         return retVal;
@@ -381,19 +381,19 @@ public final class Expression extends ModelEntity<Expression> {
         return myQuadratic.size() > 0;
     }
 
-    public boolean isFunctionCompound() {
-        return this.isAnyQuadraticFactorNonZero() && this.isAnyLinearFactorNonZero();
-    }
-
     public boolean isFunctionLinear() {
         return !this.isAnyQuadraticFactorNonZero() && this.isAnyLinearFactorNonZero();
     }
 
-    public boolean isFunctionQuadratic() {
+    public boolean isFunctionPureQuadratic() {
         return this.isAnyQuadraticFactorNonZero() && !this.isAnyLinearFactorNonZero();
     }
 
-    public boolean isFunctionZero() {
+    public boolean isFunctionQuadratic() {
+        return this.isAnyQuadraticFactorNonZero() && this.isAnyLinearFactorNonZero();
+    }
+
+    public boolean isFunctionConstant() {
         return !this.isAnyQuadraticFactorNonZero() && !this.isAnyLinearFactorNonZero();
     }
 
@@ -560,14 +560,14 @@ public final class Expression extends ModelEntity<Expression> {
 
     public MultiaryFunction.TwiceDifferentiable<Double> toFunction() {
 
-        if (this.isFunctionCompound()) {
-            return this.getCompoundFunction();
-        } else if (this.isFunctionQuadratic()) {
-            return this.getQuadraticFunction();
+        if (this.isFunctionQuadratic()) {
+            return this.makeQuadraticFunction();
+        } else if (this.isFunctionPureQuadratic()) {
+            return this.makePureQuadraticFunction();
         } else if (this.isFunctionLinear()) {
-            return this.getLinearFunction();
+            return this.makeLinearFunction();
         } else {
-            return this.getZeroFunction();
+            return this.makeConstantFunction();
         }
     }
 
@@ -597,6 +597,55 @@ public final class Expression extends ModelEntity<Expression> {
 
             return BigMath.ZERO;
         }
+    }
+
+    private ConstantFunction<Double> makeConstantFunction() {
+        return ConstantFunction.makePrimitive(myModel.countVariables());
+    }
+
+    private LinearFunction<Double> makeLinearFunction() {
+
+        final LinearFunction<Double> retVal = LinearFunction.makePrimitive(myModel.countVariables());
+
+        if (this.isAnyLinearFactorNonZero()) {
+            for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
+                retVal.linear().set(entry.getKey().index, entry.getValue().doubleValue());
+            }
+        }
+
+        return retVal;
+    }
+
+    private PureQuadraticFunction<Double> makePureQuadraticFunction() {
+
+        final PureQuadraticFunction<Double> retVal = PureQuadraticFunction.makePrimitive(myModel.countVariables());
+
+        if (this.isAnyQuadraticFactorNonZero()) {
+            for (Entry<IntRowColumn, BigDecimal> entry : myQuadratic.entrySet()) {
+                retVal.quadratic().set(entry.getKey().row, entry.getKey().column, entry.getValue().doubleValue());
+            }
+        }
+
+        return retVal;
+    }
+
+    private QuadraticFunction<Double> makeQuadraticFunction() {
+
+        final QuadraticFunction<Double> retVal = QuadraticFunction.makePrimitive(myModel.countVariables());
+
+        if (this.isAnyQuadraticFactorNonZero()) {
+            for (Entry<IntRowColumn, BigDecimal> entry : myQuadratic.entrySet()) {
+                retVal.quadratic().set(entry.getKey().row, entry.getKey().column, entry.getValue().doubleValue());
+            }
+        }
+
+        if (this.isAnyLinearFactorNonZero()) {
+            for (Entry<IntIndex, BigDecimal> entry : myLinear.entrySet()) {
+                retVal.linear().set(entry.getKey().index, entry.getValue().doubleValue());
+            }
+        }
+
+        return retVal;
     }
 
     private BigDecimal toPositiveFraction(final BigDecimal noninteger) {
@@ -788,44 +837,12 @@ public final class Expression extends ModelEntity<Expression> {
         return retVal;
     }
 
-    CompoundFunction<Double> getCompoundFunction() {
-
-        final CompoundFunction<Double> retVal = CompoundFunction.makePrimitive(myModel.countVariables());
-
-        if (this.isAnyQuadraticFactorNonZero()) {
-            for (final Entry<IntRowColumn, BigDecimal> tmpEntry : myQuadratic.entrySet()) {
-                retVal.quadratic().set(tmpEntry.getKey().row, tmpEntry.getKey().column, tmpEntry.getValue().doubleValue());
-            }
-        }
-
-        if (this.isAnyLinearFactorNonZero()) {
-            for (final Entry<IntIndex, BigDecimal> tmpEntry : myLinear.entrySet()) {
-                retVal.linear().set(tmpEntry.getKey().index, tmpEntry.getValue().doubleValue());
-            }
-        }
-
-        return retVal;
-    }
-
     HashMap<IntIndex, BigDecimal> getLinear() {
         return myLinear;
     }
 
     BigDecimal getLinearFactor(final IntIndex key, final boolean adjusted) {
         return this.convert(myLinear.get(key), adjusted);
-    }
-
-    LinearFunction<Double> getLinearFunction() {
-
-        final LinearFunction<Double> retVal = LinearFunction.makePrimitive(myModel.countVariables());
-
-        if (this.isAnyLinearFactorNonZero()) {
-            for (final Entry<IntIndex, BigDecimal> tmpEntry : myLinear.entrySet()) {
-                retVal.linear().set(tmpEntry.getKey().index, tmpEntry.getValue().doubleValue());
-            }
-        }
-
-        return retVal;
     }
 
     ExpressionsBasedModel getModel() {
@@ -838,23 +855,6 @@ public final class Expression extends ModelEntity<Expression> {
 
     BigDecimal getQuadraticFactor(final IntRowColumn key, final boolean adjusted) {
         return this.convert(myQuadratic.get(key), adjusted);
-    }
-
-    QuadraticFunction<Double> getQuadraticFunction() {
-
-        final QuadraticFunction<Double> retVal = QuadraticFunction.makePrimitive(myModel.countVariables());
-
-        if (this.isAnyQuadraticFactorNonZero()) {
-            for (final Entry<IntRowColumn, BigDecimal> tmpEntry : myQuadratic.entrySet()) {
-                retVal.quadratic().set(tmpEntry.getKey().row, tmpEntry.getKey().column, tmpEntry.getValue().doubleValue());
-            }
-        }
-
-        return retVal;
-    }
-
-    ConstantFunction<Double> getZeroFunction() {
-        return ConstantFunction.makePrimitive(myModel.countVariables());
     }
 
     boolean includes(final Variable variable) {

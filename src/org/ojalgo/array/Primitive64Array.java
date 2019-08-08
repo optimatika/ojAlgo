@@ -29,8 +29,9 @@ import java.util.Spliterators;
 import java.util.stream.DoubleStream;
 import java.util.stream.StreamSupport;
 
-import org.ojalgo.array.blas.AMAX;
-import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.operation.AMAX;
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.COPY;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
@@ -81,7 +82,7 @@ public class Primitive64Array extends PrimitiveArray {
         }
 
         @Override
-        PlainArray<Double> make(final long size) {
+        PlainArray<Double> makeDenseArray(final long size) {
             return Primitive64Array.make((int) size);
         }
 
@@ -89,11 +90,11 @@ public class Primitive64Array extends PrimitiveArray {
 
     static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
 
-    public static final Primitive64Array make(final int size) {
+    public static Primitive64Array make(final int size) {
         return new Primitive64Array(size);
     }
 
-    public static final Primitive64Array wrap(final double... data) {
+    public static Primitive64Array wrap(final double... data) {
         return new Primitive64Array(data);
     }
 
@@ -449,7 +450,7 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     protected final double[] copyOfData() {
-        return Raw1D.copyOf(data);
+        return COPY.copyOf(data);
     }
 
     @Override

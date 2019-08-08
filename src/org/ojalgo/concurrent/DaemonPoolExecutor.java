@@ -27,7 +27,7 @@ import org.ojalgo.OjAlgoUtils;
 
 public final class DaemonPoolExecutor extends ThreadPoolExecutor {
 
-    static final DaemonPoolExecutor INSTANCE = new DaemonPoolExecutor(OjAlgoUtils.ENVIRONMENT.cores, Integer.MAX_VALUE, 2L, TimeUnit.SECONDS,
+    static final DaemonPoolExecutor INSTANCE = new DaemonPoolExecutor(OjAlgoUtils.ENVIRONMENT.units, Integer.MAX_VALUE, 5L, TimeUnit.SECONDS,
             new SynchronousQueue<Runnable>(), DaemonFactory.INSTANCE);
 
     /**

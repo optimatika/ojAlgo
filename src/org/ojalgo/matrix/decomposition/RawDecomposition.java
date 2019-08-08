@@ -23,12 +23,14 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
@@ -100,6 +102,10 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     @Override
     protected int getRowDim() {
         return myRowDim;
+    }
+
+    protected final <D extends Access1D<?>> DiagonalStore.Builder<Double, D> makeDiagonal(final D mainDiag) {
+        return DiagonalStore.builder(RawStore.FACTORY, mainDiag);
     }
 
     @Override

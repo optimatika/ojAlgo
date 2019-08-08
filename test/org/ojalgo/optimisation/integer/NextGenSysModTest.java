@@ -24,11 +24,17 @@ package org.ojalgo.optimisation.integer;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -37,6 +43,7 @@ import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
 public class NextGenSysModTest {
@@ -74,6 +81,7 @@ public class NextGenSysModTest {
         }
 
     }
+
     public static final class Case020A extends CaseData {
 
         public static final double[][] covarianceMtrx = {
@@ -642,7 +650,6 @@ public class NextGenSysModTest {
         }
 
     }
-
     public static final class Case050B extends CaseData {
 
         public static final double[][] covarianceMtrx = {
@@ -1201,14 +1208,28 @@ public class NextGenSysModTest {
             return myCovarianceMtrx.length;
         }
 
+        public PrimitiveMatrix toCleanedCovariances() {
+            return NextGenSysModTest.toCovariances(this.toVolatilities(), this.toCorrelations());
+        }
+
+        public PrimitiveMatrix toCorrelations() {
+            return NextGenSysModTest.toCorrelations(PrimitiveMatrix.FACTORY.rows(myCovarianceMtrx), true);
+        }
+
+        public PrimitiveMatrix toVolatilities() {
+            return NextGenSysModTest.toVolatilities(PrimitiveMatrix.FACTORY.rows(myCovarianceMtrx), true);
+        }
+
     }
 
     public static final Case010A CASE_010A = new Case010A();
+
     public static final Case020A CASE_020A = new Case020A();
+
     public static final Case030B CASE_030B = new Case030B();
+
     public static final Case040B CASE_040B = new Case040B();
     public static final Case050B CASE_050B = new Case050B();
-
     private static final NumberContext SOLUTION_ACCURACY = new NumberContext(7, 6, RoundingMode.HALF_DOWN);
     private static final NumberContext VALIDATION_ACCURACY = SOLUTION_ACCURACY.withPrecision(5);
 
@@ -1226,6 +1247,8 @@ public class NextGenSysModTest {
     }
 
     public static ExpressionsBasedModel buildModel(final CaseData data) {
+
+        PrimitiveMatrix covar = data.toCleanedCovariances();
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
@@ -1256,7 +1279,7 @@ public class NextGenSysModTest {
             totalExpr.set(weightVar, BigMath.ONE);
 
             for (int i = 0; i < numberOfAssets; i++) {
-                varianceExpr.set(i, j, data.getCovariance(i, j));
+                varianceExpr.set(i, j, covar.doubleValue(i, j));
             }
         }
 
@@ -1272,6 +1295,7 @@ public class NextGenSysModTest {
             retVal.addExpression("Active__" + weightVar.getName()).set(weightVar, BigMath.ONE).set(activationVar, BigMath.NEG).upper(BigMath.ZERO);
         }
 
+        // retVal.options.debug(ConvexSolver.class);
         retVal.options.solution = SOLUTION_ACCURACY;
 
         return retVal;
@@ -1279,9 +1303,12 @@ public class NextGenSysModTest {
 
     public static Optimisation.Result solveSequentially(final CaseData data) {
 
+        PrimitiveMatrix covar = data.toCleanedCovariances();
+
         int numberOfAssets = data.numberOfAssets();
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
+        // model.options.debug(ConvexSolver.class);
         model.options.solution = SOLUTION_ACCURACY;
 
         double[] returnVctr = data.getReturnVctr();
@@ -1315,7 +1342,7 @@ public class NextGenSysModTest {
         Expression varianceExpr = model.addExpression("Variance").weight(BigMath.DIVIDE.invoke(BigMath.HUNDRED, BigMath.TWO).negate());
         for (int j = 0; j < numberOfAssets; j++) {
             for (int i = 0; i < numberOfAssets; i++) {
-                varianceExpr.set(i, j, data.getCovariance(i, j));
+                varianceExpr.set(i, j, covar.get(i, j));
             }
         }
 
@@ -1349,45 +1376,196 @@ public class NextGenSysModTest {
         return model.maximise();
     }
 
+    /**
+     * <p>
+     * Will extract the correlation coefficients from the input covariance matrix. If "cleaning" is enabled
+     * small and negative eigenvalues of the covariance matrix will be replaced with a new minimal value.
+     * </p>
+     * <p>
+     * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
+     * </p>
+     */
+    static PrimitiveMatrix toCorrelations(final Access2D<?> covariances, final boolean clean) {
+
+        int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
+
+        MatrixStore<Double> covarianceMtrx = MatrixStore.PRIMITIVE.makeWrapper(covariances).get();
+
+        if (clean) {
+
+            Eigenvalue<Double> evd = Eigenvalue.PRIMITIVE.make(covarianceMtrx, true);
+            evd.decompose(covarianceMtrx);
+
+            MatrixStore<Double> mtrxV = evd.getV();
+            PhysicalStore<Double> mtrxD = evd.getD().copy();
+
+            double largest = evd.getEigenvalues().get(0).norm();
+            double limit = largest * size * PrimitiveMath.RELATIVELY_SMALL;
+
+            for (int ij = 0; ij < size; ij++) {
+                if (mtrxD.doubleValue(ij, ij) < limit) {
+                    mtrxD.set(ij, ij, limit);
+                }
+            }
+
+            covarianceMtrx = mtrxV.multiply(mtrxD).multiply(mtrxV.transpose());
+        }
+
+        PrimitiveMatrix.DenseReceiver retVal = PrimitiveMatrix.FACTORY.makeDense(size, size);
+
+        double[] volatilities = new double[size];
+        for (int ij = 0; ij < size; ij++) {
+            volatilities[ij] = PrimitiveMath.SQRT.invoke(covarianceMtrx.doubleValue(ij, ij));
+        }
+
+        for (int j = 0; j < size; j++) {
+            double colVol = volatilities[j];
+
+            retVal.set(j, j, PrimitiveMath.ONE);
+
+            for (int i = j + 1; i < size; i++) {
+                double rowVol = volatilities[i];
+
+                if ((rowVol <= PrimitiveMath.ZERO) || (colVol <= PrimitiveMath.ZERO)) {
+
+                    retVal.set(i, j, PrimitiveMath.ZERO);
+                    retVal.set(j, i, PrimitiveMath.ZERO);
+
+                } else {
+
+                    double covariance = covarianceMtrx.doubleValue(i, j);
+                    double correlation = covariance / (rowVol * colVol);
+
+                    retVal.set(i, j, correlation);
+                    retVal.set(j, i, correlation);
+                }
+            }
+        }
+
+        return retVal.get();
+    }
+
+    /**
+     * <p>
+     * Vill constract a covariance matrix from the standard deviations (volatilities) and correlation
+     * coefficient,
+     * </p>
+     * <p>
+     * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
+     * </p>
+     */
+    static PrimitiveMatrix toCovariances(final Access1D<?> volatilities, final Access2D<?> correlations) {
+
+        int tmpSize = (int) volatilities.count();
+
+        PrimitiveMatrix.DenseReceiver retVal = PrimitiveMatrix.FACTORY.makeDense(tmpSize, tmpSize);
+
+        for (int j = 0; j < tmpSize; j++) {
+            double tmpColumnVolatility = volatilities.doubleValue(j);
+            retVal.set(j, j, tmpColumnVolatility * tmpColumnVolatility);
+            for (int i = j + 1; i < tmpSize; i++) {
+                double tmpCovariance = volatilities.doubleValue(i) * correlations.doubleValue(i, j) * tmpColumnVolatility;
+                retVal.set(i, j, tmpCovariance);
+                retVal.set(j, i, tmpCovariance);
+            }
+        }
+
+        return retVal.get();
+    }
+
+    /**
+     * <p>
+     * Will extract the standard deviations (volatilities) from the input covariance matrix. If "cleaning" is
+     * enabled small variances will be replaced with a new minimal value.
+     * </p>
+     * <p>
+     * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
+     * </p>
+     */
+    static PrimitiveMatrix toVolatilities(final Access2D<?> covariances, final boolean clean) {
+
+        int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
+
+        PrimitiveMatrix.DenseReceiver retVal = PrimitiveMatrix.FACTORY.makeDense(size);
+
+        if (clean) {
+
+            MatrixStore<Double> covarianceMtrx = MatrixStore.PRIMITIVE.makeWrapper(covariances).get();
+
+            double largest = covarianceMtrx.aggregateDiagonal(Aggregator.LARGEST);
+            double limit = largest * size * PrimitiveMath.RELATIVELY_SMALL;
+            double smallest = PrimitiveMath.SQRT.invoke(limit);
+
+            for (int ij = 0; ij < size; ij++) {
+                double variance = covariances.doubleValue(ij, ij);
+
+                if (variance < limit) {
+                    retVal.set(ij, smallest);
+                } else {
+                    retVal.set(ij, PrimitiveMath.SQRT.invoke(variance));
+                }
+            }
+
+        } else {
+
+            for (int ij = 0; ij < size; ij++) {
+                double variance = covariances.doubleValue(ij, ij);
+
+                if (variance <= PrimitiveMath.ZERO) {
+                    retVal.set(ij, PrimitiveMath.ZERO);
+                } else {
+                    retVal.set(ij, PrimitiveMath.SQRT.invoke(variance));
+                }
+            }
+        }
+
+        return retVal.get();
+    }
+
     @Test
+    @Disabled
     public void testAllInOneCase010A() {
         this.doTestAllInOne(CASE_010A);
     }
 
     @Test
+    @Disabled
     public void testAllInOneCase020A() {
         this.doTestAllInOne(CASE_020A);
     }
 
     @Test
-    @Tag("unstable")
+    @Disabled
     public void testAllInOneCase030B() {
         this.doTestAllInOne(CASE_030B);
     }
 
     @Test
-    @Tag("unstable")
+    @Disabled
     public void testAllInOneCase040B() {
         this.doTestAllInOne(CASE_040B);
     }
 
     @Test
-    @Tag("unstable")
+    @Disabled
     public void testAllInOneCase050B() {
         this.doTestAllInOne(CASE_050B);
     }
 
     @Test
+    @Tag("unstable")
     public void testSequentialCase010A() {
         this.doTestSequential(CASE_010A);
     }
 
     @Test
+    @Tag("unstable")
     public void testSequentialCase020A() {
         this.doTestSequential(CASE_020A);
     }
 
     @Test
+    @Tag("unstable")
     public void testSequentialCase030B() {
         this.doTestSequential(CASE_030B);
     }
@@ -1423,7 +1601,7 @@ public class NextGenSysModTest {
             BasicLogger.debug("Estimate: {}", estimate);
         }
 
-        TestUtils.assertTrue(estimate.getValue() >= (testCase.getEstimatedValue() - (10 * PrimitiveMath.MACHINE_EPSILON)));
+        TestUtils.assertEquals(testCase.getEstimatedValue(), estimate.getValue(), 0.0001);
     }
 
 }

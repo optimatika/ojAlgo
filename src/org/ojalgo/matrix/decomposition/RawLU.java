@@ -24,8 +24,8 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.Raw2D;
-import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.SWAP;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -221,7 +221,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
                     }
                 }
                 if (p != ij) {
-                    Raw2D.exchangeRows(data, ij, p);
+                    SWAP.exchangeRows(data, ij, p);
                     myPivot.change(ij, p);
                 }
             }
@@ -248,36 +248,35 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {
 
-        final int[] tmpPivotOrder = myPivot.getOrder();
-        final int tmpRowDim = this.getRowDim();
-        for (int i = 0; i < tmpRowDim; i++) {
-            preallocated.set(i, tmpPivotOrder[i], ONE);
+        final int[] pivotOrder = myPivot.getOrder();
+        final int numbRows = this.getRowDim();
+        for (int i = 0; i < numbRows; i++) {
+            preallocated.set(i, pivotOrder[i], ONE);
         }
 
-        final RawStore tmpBody = this.getInternalStore();
+        final RawStore body = this.getInternalStore();
 
-        preallocated.substituteForwards(tmpBody, true, false, !myPivot.isModified());
+        preallocated.substituteForwards(body, true, false, !myPivot.isModified());
 
-        preallocated.substituteBackwards(tmpBody, false, false, false);
+        preallocated.substituteBackwards(body, false, false, false);
 
         return preallocated;
     }
 
     private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
-        final MatrixStore<Double> tmpBody = this.getInternalStore();
+        final MatrixStore<Double> body = this.getInternalStore();
 
-        preallocated.substituteForwards(tmpBody, true, false, false);
+        preallocated.substituteForwards(body, true, false, false);
 
-        preallocated.substituteBackwards(tmpBody, false, false, false);
+        preallocated.substituteBackwards(body, false, false, false);
 
         return preallocated;
     }
 
     @Override
     protected boolean checkSolvability() {
-        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
-        return (this.getRowDim() == this.getColDim()) && (this.getColDim() == this.countSignificant(threshold));
+        return this.isSquare() && this.isFullRank();
     }
 
 }

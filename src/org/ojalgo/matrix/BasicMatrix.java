@@ -69,63 +69,16 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         Operation.Multiplication<M>, ScalarOperation.Addition<M, N>, ScalarOperation.Division<M, N>, ScalarOperation.Subtraction<M, N>, Access2D<N>,
         Access2D.Elements, Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
-    @SuppressWarnings("unchecked")
-    interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
+    public interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
             extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>> {
-
-        LogicalBuilder<N, M> above(int numberOfRows);
-
-        LogicalBuilder<N, M> above(N... elements);
-
-        LogicalBuilder<N, M> below(int numberOfRows);
-
-        LogicalBuilder<N, M> below(N... elements);
-
-        LogicalBuilder<N, M> bidiagonal(boolean upper, boolean assumeOne);
 
         default M build() {
             return this.get();
         }
 
-        LogicalBuilder<N, M> column(final int... columns);
-
-        LogicalBuilder<N, M> conjugate();
-
-        LogicalBuilder<N, M> diagonal();
-
-        LogicalBuilder<N, M> hermitian(boolean upper);
-
-        LogicalBuilder<N, M> hessenberg(boolean upper);
-
-        LogicalBuilder<N, M> left(int numberOfColumns);
-
-        LogicalBuilder<N, M> left(N... elements);
-
-        LogicalBuilder<N, M> limits(int rowLimit, int columnLimit);
-
-        LogicalBuilder<N, M> offsets(int rowOffset, int columnOffset);
-
-        LogicalBuilder<N, M> right(int numberOfColumns);
-
-        LogicalBuilder<N, M> right(N... elements);
-
-        LogicalBuilder<N, M> row(final int... rows);
-
-        LogicalBuilder<N, M> superimpose(int row, int col, M matrix);
-
-        LogicalBuilder<N, M> superimpose(int row, int col, Number matrix);
-
-        LogicalBuilder<N, M> superimpose(M matrix);
-
-        LogicalBuilder<N, M> transpose();
-
-        LogicalBuilder<N, M> triangular(boolean upper, boolean assumeOne);
-
-        LogicalBuilder<N, M> tridiagonal();
-
     }
 
-    interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
+    public interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
             extends Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         default M build() {
@@ -591,6 +544,10 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
      */
     public double norm() {
         return myStore.norm();
+    }
+
+    public M power(final int power) {
+        return this.getFactory().instantiate(myStore.power(power));
     }
 
     public M reduceColumns(final Aggregator aggregator) {

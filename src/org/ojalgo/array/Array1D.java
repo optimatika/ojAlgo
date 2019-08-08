@@ -92,7 +92,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
             return myDelegate.makeStructuredZero(count).wrapInArray1D();
         }
 
-        public Array1D<N> makeZero(final long count) {
+        public Array1D<N> make(final long count) {
             return myDelegate.makeToBeFilled(count).wrapInArray1D();
         }
 

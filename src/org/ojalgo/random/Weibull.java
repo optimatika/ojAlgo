@@ -42,12 +42,12 @@ public class Weibull extends RandomNumber {
         this(ONE, ONE);
     }
 
-    public Weibull(final double aLambda, final double aBeta) {
+    public Weibull(final double lambda, final double beta) {
 
         super();
 
-        myRate = aLambda;
-        myShape = aBeta;
+        myRate = lambda;
+        myShape = beta;
     }
 
     public double getExpected() {

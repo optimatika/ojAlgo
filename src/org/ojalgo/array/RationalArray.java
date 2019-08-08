@@ -61,7 +61,7 @@ public class RationalArray extends ScalarArray<RationalNumber> {
         }
 
         @Override
-        PlainArray<RationalNumber> make(final long size) {
+        PlainArray<RationalNumber> makeDenseArray(final long size) {
             return RationalArray.make((int) size);
         }
 

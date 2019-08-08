@@ -29,9 +29,9 @@ import java.util.Optional;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.array.blas.AXPY;
-import org.ojalgo.array.blas.COPY;
-import org.ojalgo.array.blas.DOT;
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.COPY;
+import org.ojalgo.array.operation.DOT;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
@@ -158,8 +158,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         @Override
         protected MatrixStore<Double> makeD(final double[] d, final double[] e) {
-            final DiagonalBasicArray<Double> diagonal = new DiagonalBasicArray<>(Primitive64Array.wrap(d), null, null, ZERO);
-            return MatrixStore.PRIMITIVE.makeWrapper(diagonal).diagonal().get();
+            return this.makeDiagonal(Primitive64Array.wrap(d)).get();
         }
 
     }
@@ -313,7 +312,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     public MatrixStore<Double> getV() {
         final int n = this.getRowDim();
-        return new RawStore(myTransposedV, n, n).logical().transpose().get();
+        return new RawStore(myTransposedV, n, n).transpose();
     }
 
     public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {

@@ -83,7 +83,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         @Override
         public MatrixStore<Double> toRotationMatrix() {
 
-            final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(3L, 3L);
+            final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(3L, 3L);
 
             final double s = this.doubleValue();
 
@@ -826,6 +826,17 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         return PrimitiveMath.SQRT.invoke(this.calculateSumOfSquaresAll());
     }
 
+    public Quaternion power(final int power) {
+
+        Quaternion retVal = ONE;
+
+        for (int p = 0; p < power; p++) {
+            retVal = retVal.multiply(this);
+        }
+
+        return retVal;
+    }
+
     public double scalar() {
         return myScalar;
     }
@@ -878,7 +889,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
     public MatrixStore<ComplexNumber> toComplexMatrix() {
 
-        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(2L, 2L);
+        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.make(2L, 2L);
 
         retVal.set(0L, ComplexNumber.of(myScalar, i));
         retVal.set(1L, ComplexNumber.of(-j, k));
@@ -889,14 +900,14 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
     }
 
     public MatrixStore<Double> toMultiplicationMatrix() {
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(this);
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(this);
         this.supplyTo(retVal);
         return retVal;
     }
 
     public MatrixStore<Double> toMultiplicationVector() {
 
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(4L, 1L);
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(4L, 1L);
 
         retVal.set(0L, myScalar);
         retVal.set(1L, i);
@@ -908,7 +919,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
     public MatrixStore<Double> toRotationMatrix() {
 
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(3L, 3L);
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(3L, 3L);
 
         final double s = myScalar;
 
@@ -1115,7 +1126,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
     public PhysicalStore<Double> vector() {
 
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(3L, 1L);
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(3L, 1L);
 
         retVal.set(0L, i);
         retVal.set(1L, j);

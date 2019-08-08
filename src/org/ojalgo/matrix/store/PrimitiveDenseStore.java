@@ -33,7 +33,7 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ComplexArray;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
@@ -52,7 +52,6 @@ import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.decomposition.EvD1D;
-import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
@@ -252,7 +251,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             return this.makeRotation(low, high, cos != null ? cos.doubleValue() : Double.NaN, sin != null ? sin.doubleValue() : Double.NaN);
         }
 
-        public PrimitiveDenseStore makeZero(final long rows, final long columns) {
+        public PrimitiveDenseStore make(final long rows, final long columns) {
             return new PrimitiveDenseStore((int) rows, (int) columns);
         }
 
@@ -424,6 +423,14 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         Mutate1D.copyComplexReal(arg, retVal);
 
         return retVal;
+    }
+
+    public static PrimitiveDenseStore wrap(final double... data) {
+        return new PrimitiveDenseStore(data);
+    }
+
+    public static PrimitiveDenseStore wrap(final double[] data, final int structure) {
+        return new PrimitiveDenseStore(structure, data.length / structure, data);
     }
 
     static PrimitiveDenseStore cast(final Access1D<Double> matrix) {

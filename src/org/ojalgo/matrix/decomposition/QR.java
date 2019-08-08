@@ -92,6 +92,11 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
         return Access2D.equals(tmpStore, matrix, context);
     }
 
+    /**
+     * @deprecated v48 Use {link #COMPLEX}, {@link #PRIMITIVE}. {@link #QUATERNION} or {@link #RATIONAL}
+     *             innstead.
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     static <N extends Number> QR<N> make(final Access2D<N> typical) {
 

@@ -26,8 +26,13 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.function.multiary.LinearFunction;
+import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -35,59 +40,102 @@ import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
-import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
     public static final class Builder extends GenericSolver.Builder<LinearSolver.Builder, LinearSolver> {
 
-        private final ConvexSolver.Builder myDelegate;
+        private LinearFunction<Double> myObjective = null;
 
         public Builder() {
-
             super();
-
-            myDelegate = new ConvexSolver.Builder();
-
         }
 
         public Builder(final MatrixStore<Double> C) {
 
             super();
 
-            myDelegate = new ConvexSolver.Builder(C);
+            this.objective(C);
         }
 
+        /**
+         * Currently/still the RHS elements need to non-negative. (You have to convert the LP to standard
+         * form.)
+         *
+         * @see org.ojalgo.optimisation.GenericSolver.Builder#equalities(org.ojalgo.matrix.store.MatrixStore,
+         *      org.ojalgo.matrix.store.MatrixStore)
+         */
         @Override
-        public int countConstraints() {
-            return myDelegate.countConstraints();
-        }
-
-        @Override
-        public int countVariables() {
-            return myDelegate.countVariables();
-        }
-
-        public LinearSolver.Builder equalities(final MatrixStore<Double> mtrxAE, final MatrixStore<Double> mtrxBE) {
-            myDelegate.equalities(mtrxAE, mtrxBE);
-            return this;
-        }
-
-        public MatrixStore<Double> getAE() {
-            return myDelegate.getAE();
-        }
-
-        public MatrixStore<Double> getBE() {
-            return myDelegate.getBE();
+        public Builder equalities(final MatrixStore<Double> mtrxAE, final MatrixStore<Double> mtrxBE) {
+            return super.equalities(mtrxAE, mtrxBE);
         }
 
         public MatrixStore<Double> getC() {
-            return myDelegate.getC();
+            return myObjective.linear();
+        }
+
+        /**
+         * Setting inequalities here is not yet supported. (You have to convert the LP to standard form.)
+         *
+         * @see org.ojalgo.optimisation.GenericSolver.Builder#inequalities(org.ojalgo.structure.Access2D,
+         *      org.ojalgo.matrix.store.MatrixStore)
+         */
+        @Override
+        public Builder inequalities(final Access2D<Double> mtrxAI, final MatrixStore<Double> mtrxBI) {
+            ProgrammingError.throwForIllegalInvocation();
+            return super.inequalities(mtrxAI, mtrxBI);
         }
 
         public LinearSolver.Builder objective(final MatrixStore<Double> mtrxC) {
-            myDelegate.objective(mtrxC);
+            this.setObjective(mtrxC);
+            return this;
+        }
+
+        @Override
+        public void reset() {
+            super.reset();
+            myObjective = null;
+        }
+
+        @Override
+        public String toString() {
+
+            final String simpleName = this.getClass().getSimpleName();
+
+            final StringBuilder retVal = new StringBuilder("<" + simpleName + ">");
+
+            retVal.append("\n[AE] = " + (this.getAE() != null ? PrimitiveMatrix.FACTORY.copy(this.getAE()) : "?"));
+
+            retVal.append("\n[BE] = " + (this.getBE() != null ? PrimitiveMatrix.FACTORY.copy(this.getBE()) : "?"));
+
+            retVal.append("\n[C] = " + (myObjective != null ? PrimitiveMatrix.FACTORY.copy(this.getC()) : "?"));
+
+            retVal.append("\n[AI] = " + (this.getAI() != null ? PrimitiveMatrix.FACTORY.copy(this.getAI()) : "?"));
+
+            retVal.append("\n[BI] = " + (this.getBI() != null ? PrimitiveMatrix.FACTORY.copy(this.getBI()) : "?"));
+
+            retVal.append("\n</" + simpleName + ">");
+
+            return retVal.toString();
+        }
+
+        private Builder setObjective(final MatrixStore<Double> mtrxC) {
+
+            PhysicalStore<Double> tmpC = null;
+
+            if (mtrxC == null) {
+                tmpC = PrimitiveDenseStore.FACTORY.make(this.countVariables(), 1);
+            } else if (mtrxC instanceof PhysicalStore) {
+                tmpC = (PhysicalStore<Double>) mtrxC;
+            } else {
+                tmpC = mtrxC.copy();
+            }
+
+            myObjective = LinearFunction.wrap(tmpC);
+            super.setObjective(myObjective);
+
             return this;
         }
 
@@ -96,7 +144,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             final SimplexTableau tableau = new DenseTableau(this);
 
-            return new SimplexSolver(tableau, options);
+            return new PrimalSimplex(tableau, options);
         }
 
     }
@@ -105,16 +153,18 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         public LinearSolver build(final ConvexSolver.Builder convexBuilder, final Optimisation.Options options) {
 
-            final SimplexTableau tableau = SimplexSolver.build(convexBuilder, options);
+            final SimplexTableau tableau = PrimalSimplex.build(convexBuilder, options);
 
-            return new SimplexSolver(tableau, options);
+            return new PrimalSimplex(tableau, options);
         }
 
         public LinearSolver build(final ExpressionsBasedModel model) {
 
-            final SimplexTableau tableau = SimplexSolver.build(model);
+            final SimplexTableau tableau = PrimalSimplex.build(model);
 
-            return new SimplexSolver(tableau, model.options);
+            // BasicLogger.debug("EBM tabeau", tableau);
+
+            return new PrimalSimplex(tableau, model.options);
         }
 
         public boolean isCapable(final ExpressionsBasedModel model) {
@@ -207,38 +257,23 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
     public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options) {
 
-        final int numbVars = convex.countVariables();
+        Optimisation.Result primRes = PrimalSimplex.solve(convex, options);
 
-        final SimplexTableau tableau = SimplexSolver.build(convex, options);
+        //        Optimisation.Result dualRes = DualSimplex.solve(convex, options);
+        //
+        //        if (primRes.getMultipliers().isPresent()
+        //                && !Access1D.equals(primRes.getMultipliers().get(), dualRes.getMultipliers().get(), ACCURACY.withPrecision(8).withScale(6))) {
+        //
+        //            BasicLogger.debug();
+        //            BasicLogger.debug("Prim sol: {}", primRes);
+        //            BasicLogger.debug("Dual sol: {}", dualRes);
+        //
+        //            BasicLogger.debug("Prim mul: {}", primRes.getMultipliers().get());
+        //            BasicLogger.debug("Dual mul: {}", dualRes.getMultipliers().get());
+        //            BasicLogger.debug();
+        //        }
 
-        final LinearSolver solver = new SimplexSolver(tableau, options);
-
-        final Result result = solver.solve();
-
-        final Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), new Access1D<Double>() {
-
-            public long count() {
-                return numbVars;
-            }
-
-            public double doubleValue(final long index) {
-                return result.doubleValue(index) - result.doubleValue(numbVars + index);
-            }
-
-            public Double get(final long index) {
-                return this.doubleValue(index);
-            }
-
-            @Override
-            public String toString() {
-                return Access1D.toString(this);
-            }
-
-        });
-
-        retVal.multipliers(result.getMultipliers().get());
-
-        return retVal;
+        return primRes;
     }
 
     protected LinearSolver(final Options solverOptions) {

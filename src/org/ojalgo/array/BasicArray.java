@@ -21,7 +21,7 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.array.blas.AMAX;
+import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;

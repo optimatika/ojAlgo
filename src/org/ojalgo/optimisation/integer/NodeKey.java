@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.ojalgo.array.Raw1D;
+import org.ojalgo.array.operation.COPY;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -325,7 +325,7 @@ final class NodeKey implements Comparable<NodeKey> {
     }
 
     int[] getLowerBounds() {
-        return Raw1D.copyOf(myLowerBounds);
+        return COPY.copyOf(myLowerBounds);
     }
 
     BigDecimal getUpperBound(final int index) {
@@ -338,7 +338,7 @@ final class NodeKey implements Comparable<NodeKey> {
     }
 
     int[] getUpperBounds() {
-        return Raw1D.copyOf(myUpperBounds);
+        return COPY.copyOf(myUpperBounds);
     }
 
     boolean isSignChanged() {

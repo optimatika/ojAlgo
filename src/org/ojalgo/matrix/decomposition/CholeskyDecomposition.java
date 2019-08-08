@@ -123,12 +123,11 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
     @Override
     public final MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
-        final DecompositionStore<N> tmpBody = this.getInPlace();
+        final DecompositionStore<N> body = this.getInPlace();
 
-        preallocated.substituteForwards(tmpBody, false, false, true);
-        preallocated.substituteBackwards(tmpBody, false, true, true);
+        preallocated.substituteForwards(body, false, false, true);
+        preallocated.substituteBackwards(body, false, true, true);
 
-        //return new LowerHermitianStore<>(preallocated);
         return preallocated.logical().hermitian(false).get();
     }
 
@@ -137,7 +136,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
     }
 
     public double getRankThreshold() {
-        return myMaxDiag * this.getDimensionalEpsilon();
+        return TEN * myMaxDiag * this.getDimensionalEpsilon();
     }
 
     public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
@@ -167,10 +166,10 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
         rhs.supplyTo(preallocated);
 
-        final DecompositionStore<N> tmpBody = this.getInPlace();
+        final DecompositionStore<N> body = this.getInPlace();
 
-        preallocated.substituteForwards(tmpBody, false, false, false);
-        preallocated.substituteBackwards(tmpBody, false, true, false);
+        preallocated.substituteForwards(body, false, false, false);
+        preallocated.substituteBackwards(body, false, true, false);
 
         return preallocated;
     }
@@ -246,8 +245,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
     @Override
     protected boolean checkSolvability() {
-        double threshold = Math.min(this.getRankThreshold(), MACHINE_EPSILON);
-        return mySPD && (myMinDiag >= threshold);
+        return mySPD && (myMinDiag > this.getRankThreshold());
     }
 
     final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean checkHermitian) {

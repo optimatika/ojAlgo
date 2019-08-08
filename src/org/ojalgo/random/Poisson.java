@@ -40,17 +40,21 @@ public class Poisson extends AbstractDiscrete {
 
     private static final long serialVersionUID = -5382163736545207782L;
 
+    public static Poisson of(final double lambda) {
+        return new Poisson(lambda);
+    }
+
     private final double myLambda; // rate or intensity
 
     public Poisson() {
         this(ONE);
     }
 
-    public Poisson(final double aLambda) {
+    public Poisson(final double lambda) {
 
         super();
 
-        myLambda = aLambda;
+        myLambda = lambda;
     }
 
     public double getExpected() {

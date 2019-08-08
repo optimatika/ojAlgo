@@ -35,17 +35,21 @@ public class Geometric extends AbstractDiscrete {
 
     private static final long serialVersionUID = 1324905651790774444L;
 
+    public static Geometric of(final double probability) {
+        return new Geometric(probability);
+    }
+
     private final double myProbability;
 
     public Geometric() {
         this(HALF);
     }
 
-    public Geometric(final double aProbability) {
+    public Geometric(final double probability) {
 
         super();
 
-        myProbability = aProbability;
+        myProbability = probability;
     }
 
     public double getExpected() {

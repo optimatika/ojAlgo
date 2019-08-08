@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
+import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
@@ -67,6 +68,10 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
 
     public void clear() {
         myRows.clear();
+    }
+
+    public double[] getRHS() {
+        return myRows.stream().mapToDouble(e -> e.getRHS()).toArray();
     }
 
     public boolean remove(final Equation row) {

@@ -44,7 +44,7 @@ final class AnyTensor<N extends Number> implements Tensor<N> {
         final long[] shape = new long[rank];
         Arrays.fill(shape, dimensions);
 
-        myArray = ArrayAnyD.factory(arrayFactory).makeZero(shape);
+        myArray = ArrayAnyD.factory(arrayFactory).make(shape);
 
         myArrayFactory = arrayFactory;
     }

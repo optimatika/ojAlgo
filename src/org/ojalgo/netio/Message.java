@@ -23,7 +23,7 @@ package org.ojalgo.netio;
 
 import java.util.List;
 
-import org.ojalgo.array.Raw1D;
+import org.ojalgo.array.operation.COPY;
 
 public class Message {
 
@@ -71,7 +71,7 @@ public class Message {
 
         super();
 
-        myCommand = Raw1D.copyOf(aCommand);
+        myCommand = COPY.copyOf(aCommand);
     }
 
     @SuppressWarnings("unused")

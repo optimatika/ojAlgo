@@ -29,6 +29,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.EconomySize;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -44,8 +45,9 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class DesignCase {
+public class DesignCase extends MatrixDecompositionTests {
 
+    @Override
     @BeforeEach
     public void minimiseAllBranchLimits() {
         TestUtils.minimiseAllBranchLimits();
@@ -54,11 +56,13 @@ public class DesignCase {
     @Test
     public void testCholeskySolveInverse() {
 
-        PhysicalStore<ComplexNumber> tmpRandomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
-        PhysicalStore<Double> tmpVctr = PrimitiveDenseStore.FACTORY.copy(tmpRandomComplexStore);
-        MatrixStore<Double> tmpMtrx = tmpVctr.multiply(tmpVctr.transpose());
+        PhysicalStore<ComplexNumber> randomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
+        PhysicalStore<Double> vctrs = PrimitiveDenseStore.FACTORY.copy(randomComplexStore);
+        MatrixStore<Double> mtrx = vctrs.multiply(vctrs.transpose());
 
-        this.doTestSolveInverse(Cholesky.PRIMITIVE.make(), tmpMtrx);
+        for (Cholesky<Double> decomp : MatrixDecompositionTests.getPrimitiveCholesky()) {
+            this.doTestSolveInverse(decomp, mtrx);
+        }
     }
 
     @Test
@@ -81,21 +85,21 @@ public class DesignCase {
 
                 bidiagonal.decompose(tall);
 
-                TestUtils.assertEquals(className, 7, bidiagonal.getQ1().countRows());
-                TestUtils.assertEquals(className, 7, bidiagonal.getQ1().countColumns());
+                TestUtils.assertEquals(className, 7, bidiagonal.getLQ().countRows());
+                TestUtils.assertEquals(className, 7, bidiagonal.getLQ().countColumns());
 
-                TestUtils.assertEquals(className, 5, bidiagonal.getQ2().countRows());
-                TestUtils.assertEquals(className, 5, bidiagonal.getQ2().countColumns());
+                TestUtils.assertEquals(className, 5, bidiagonal.getRQ().countRows());
+                TestUtils.assertEquals(className, 5, bidiagonal.getRQ().countColumns());
 
                 TestUtils.assertEquals(tall, bidiagonal, precision);
 
                 bidiagonal.decompose(fat);
 
-                TestUtils.assertEquals(className, 5, bidiagonal.getQ1().countRows());
-                TestUtils.assertEquals(className, 5, bidiagonal.getQ1().countColumns());
+                TestUtils.assertEquals(className, 5, bidiagonal.getLQ().countRows());
+                TestUtils.assertEquals(className, 5, bidiagonal.getLQ().countColumns());
 
-                TestUtils.assertEquals(className, 7, bidiagonal.getQ2().countRows());
-                TestUtils.assertEquals(className, 7, bidiagonal.getQ2().countColumns());
+                TestUtils.assertEquals(className, 7, bidiagonal.getRQ().countRows());
+                TestUtils.assertEquals(className, 7, bidiagonal.getRQ().countColumns());
 
                 TestUtils.assertEquals(fat, bidiagonal, precision);
 
@@ -127,21 +131,21 @@ public class DesignCase {
 
                 svd.decompose(tall);
 
-                TestUtils.assertEquals(className, 7, svd.getQ1().countRows());
-                TestUtils.assertEquals(className, 7, svd.getQ1().countColumns());
+                TestUtils.assertEquals(className, 7, svd.getU().countRows());
+                TestUtils.assertEquals(className, 7, svd.getU().countColumns());
 
-                TestUtils.assertEquals(className, 5, svd.getQ2().countRows());
-                TestUtils.assertEquals(className, 5, svd.getQ2().countColumns());
+                TestUtils.assertEquals(className, 5, svd.getV().countRows());
+                TestUtils.assertEquals(className, 5, svd.getV().countColumns());
 
                 TestUtils.assertEquals(tall, svd, precision);
 
                 svd.decompose(fat);
 
-                TestUtils.assertEquals(className, 5, svd.getQ1().countRows());
-                TestUtils.assertEquals(className, 5, svd.getQ1().countColumns());
+                TestUtils.assertEquals(className, 5, svd.getU().countRows());
+                TestUtils.assertEquals(className, 5, svd.getU().countColumns());
 
-                TestUtils.assertEquals(className, 7, svd.getQ2().countRows());
-                TestUtils.assertEquals(className, 7, svd.getQ2().countColumns());
+                TestUtils.assertEquals(className, 7, svd.getV().countRows());
+                TestUtils.assertEquals(className, 7, svd.getV().countColumns());
 
                 TestUtils.assertEquals(fat, svd, precision);
             }
@@ -244,11 +248,11 @@ public class DesignCase {
         SingularValue<Double> decompPriSVD = SingularValue.PRIMITIVE.make(true);
         decompPriSVD.decompose(mtrxA);
         TestUtils.assertEquals(mtrxA, decompPriSVD, precision);
-        TestUtils.assertEquals(3, decompPriSVD.getQ2().countRows());
-        TestUtils.assertEquals(3, decompPriSVD.getQ2().countColumns());
+        TestUtils.assertEquals(3, decompPriSVD.getV().countRows());
+        TestUtils.assertEquals(3, decompPriSVD.getV().countColumns());
 
         PhysicalStore<Double> nullspacePriQR = decompPriQR.getQ().logical().offsets(0, decompPriQR.getRank()).get().copy();
-        PhysicalStore<Double> nullspacePriSVD = decompPriSVD.getQ2().logical().offsets(0, decompPriSVD.getRank()).get().copy();
+        PhysicalStore<Double> nullspacePriSVD = decompPriSVD.getV().logical().offsets(0, decompPriSVD.getRank()).get().copy();
 
         double scalePriQR = PrimitiveMath.ABS.invoke(nullspacePriQR.doubleValue(0));
         nullspacePriQR.modifyAll(PrimitiveMath.DIVIDE.second(scalePriQR));
@@ -275,14 +279,14 @@ public class DesignCase {
         SingularValue<Double> tmpOldDecomp = new SingularValueDecomposition.Primitive();
         tmpOldDecomp.decompose(tmpOriginalMatrix);
         tmpOldDecomp.getD();
-        tmpOldDecomp.getQ1();
-        tmpOldDecomp.getQ2();
+        tmpOldDecomp.getU();
+        tmpOldDecomp.getV();
 
         SingularValue<Double> tmpNewDecomp = new RawSingularValue();
         tmpNewDecomp.decompose(tmpOriginalMatrix);
         tmpNewDecomp.getD();
-        tmpNewDecomp.getQ1();
-        tmpNewDecomp.getQ2();
+        tmpNewDecomp.getU();
+        tmpNewDecomp.getV();
 
         TestUtils.assertEquals(tmpOriginalMatrix, tmpNewDecomp, new NumberContext(7, 6));
     }
@@ -300,7 +304,7 @@ public class DesignCase {
 
         TestUtils.assertTrue("Decomposition not solvable", solver.isSolvable());
 
-        int dim = (int) Math.min(matrix.countRows(), matrix.countColumns());
+        int dim = MissingMath.toMinIntExact(matrix.countRows(), matrix.countColumns());
         PhysicalStore<Double> tmpEye = PrimitiveDenseStore.FACTORY.makeEye(dim, dim);
 
         MatrixStore<Double> tmpDirInv = solver.getInverse();

@@ -21,8 +21,8 @@
  */
 package org.ojalgo.machine;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicLogger;
 
@@ -59,22 +59,18 @@ public final class VirtualMachine extends AbstractMachine {
     private final Hardware myHardware;
     private final Runtime myRuntime;
 
-    private VirtualMachine(final String architecture, final BasicMachine[] levels) {
-
-        super(architecture, levels);
-
-        myHardware = null;
-        myRuntime = null;
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
     VirtualMachine(final Hardware hardware, final Runtime runtime) {
 
         super(hardware, runtime);
 
         myHardware = hardware;
         myRuntime = runtime;
+    }
+
+    VirtualMachine(final VirtualMachine base, final int modUnits, final int modCores, final int modThreads) {
+        super(base, modUnits, modCores, modThreads);
+        myHardware = base.myHardware;
+        myRuntime = base.myRuntime;
     }
 
     public void collectGarbage() {
@@ -145,6 +141,21 @@ public final class VirtualMachine extends AbstractMachine {
         int result = super.hashCode();
         result = (prime * result) + ((myHardware == null) ? 0 : myHardware.hashCode());
         return result;
+    }
+
+    /**
+     * @param fraction [0.0, 1.0]
+     * @return A limited VirtualMachine
+     */
+    public VirtualMachine limitBy(final double fraction) {
+
+        double factor = Math.max(0.0, Math.min(Math.abs(fraction), 1.0));
+
+        int newUnits = Math.max(1, MissingMath.roundToInt(units * factor));
+        int newCores = Math.max(1, MissingMath.roundToInt(cores * factor));
+        int newThreads = Math.max(1, MissingMath.roundToInt(threads * factor));
+
+        return new VirtualMachine(this, newUnits, newCores, newThreads);
     }
 
     @Override

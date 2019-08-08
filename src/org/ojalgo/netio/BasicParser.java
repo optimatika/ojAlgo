@@ -46,25 +46,27 @@ public interface BasicParser<T> {
 
         if (file.exists() && file.isFile() && file.canRead()) {
 
-            try {
-                final String path = file.getPath();
-                if (path.endsWith(".gz")) {
-                    try (InputStreamReader reader = new InputStreamReader(new GZIPInputStream(new FileInputStream(file)))) {
-                        this.parse(reader, skipHeader, consumer);
-                    }
-                } else if (path.endsWith(".zip")) {
-                    try (InputStreamReader reader = new InputStreamReader(new ZipInputStream(new FileInputStream(file)))) {
-                        this.parse(reader, skipHeader, consumer);
-                    }
-                } else {
-                    try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file))) {
-                        this.parse(reader, skipHeader, consumer);
-                    }
+            final String path = file.getPath();
+            if (path.endsWith(".gz")) {
+                try (InputStreamReader reader = new InputStreamReader(new GZIPInputStream(new FileInputStream(file)))) {
+                    this.parse(reader, skipHeader, consumer);
+                } catch (IOException exception) {
+                    exception.printStackTrace();
                 }
-
-            } catch (final IOException exception) {
-                exception.printStackTrace();
+            } else if (path.endsWith(".zip")) {
+                try (InputStreamReader reader = new InputStreamReader(new ZipInputStream(new FileInputStream(file)))) {
+                    this.parse(reader, skipHeader, consumer);
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
+            } else {
+                try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file))) {
+                    this.parse(reader, skipHeader, consumer);
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
             }
+
         }
     }
 

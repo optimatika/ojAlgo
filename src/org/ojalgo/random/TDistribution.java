@@ -140,7 +140,7 @@ public class TDistribution extends AbstractContinuous {
 
     }
 
-    public static TDistribution make(final int degreesOfFreedom) {
+    public static TDistribution of(final int degreesOfFreedom) {
         switch (degreesOfFreedom) {
         case 1:
             return new Degree1();
@@ -155,6 +155,14 @@ public class TDistribution extends AbstractContinuous {
         default:
             return new TDistribution(degreesOfFreedom);
         }
+    }
+
+    /**
+     * @deprecated v48
+     */
+    @Deprecated
+    public static TDistribution make(final int degreesOfFreedom) {
+        return TDistribution.of(degreesOfFreedom);
     }
 
     /**

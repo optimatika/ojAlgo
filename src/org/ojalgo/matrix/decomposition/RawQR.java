@@ -24,9 +24,9 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.Raw1D;
-import org.ojalgo.array.blas.AXPY;
-import org.ojalgo.array.blas.DOT;
+import org.ojalgo.array.operation.AXPY;
+import org.ojalgo.array.operation.DOT;
+import org.ojalgo.array.operation.VisitAll;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -109,7 +109,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         final AggregatorFunction<Double> aggregator = PrimitiveAggregator.getSet().product();
 
-        Raw1D.visit(myDiagonalR, aggregator);
+        VisitAll.visit(myDiagonalR, aggregator);
 
         if ((myNumberOfHouseholderTransformations % 2) != 0) {
             return -aggregator.get();
@@ -377,8 +377,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        double threshold = Math.min(this.getRankThreshold(), this.getDimensionalEpsilon());
-        return this.getColDim() == this.countSignificant(threshold);
+        return this.isAspectRatioNormal() && this.isFullRank();
     }
 
 }

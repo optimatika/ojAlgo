@@ -71,7 +71,7 @@ public class Random1D {
      */
     public Array1D<Double> nextDouble() {
 
-        final PrimitiveDenseStore tmpUncorrelated = PrimitiveDenseStore.FACTORY.makeZero(length, 1);
+        final PrimitiveDenseStore tmpUncorrelated = PrimitiveDenseStore.FACTORY.make(length, 1);
 
         for (int i = 0; i < length; i++) {
             tmpUncorrelated.set(i, 0, this.random().nextDouble());
@@ -89,7 +89,7 @@ public class Random1D {
      */
     public Array1D<Double> nextGaussian() {
 
-        final PrimitiveDenseStore tmpUncorrelated = PrimitiveDenseStore.FACTORY.makeZero(length, 1);
+        final PrimitiveDenseStore tmpUncorrelated = PrimitiveDenseStore.FACTORY.make(length, 1);
 
         for (int i = 0; i < length; i++) {
             tmpUncorrelated.set(i, 0, this.random().nextGaussian());

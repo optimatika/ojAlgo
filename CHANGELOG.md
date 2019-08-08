@@ -4,9 +4,68 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
-# v47.2.0: 2019-05-03
+# v47.3.0: 2019-08-08
 
-* ...
+## org.ojalgo
+
+* The `OjAlgoUtils.ENVIRONMENT` can now be modified to limit the parallelism of ojAlgo.
+
+## org.ojalgo.algebra
+
+* Added a power(int) method to the Operation.Multiplication interface.
+
+## org.ojalgo.array
+
+* The package org.ojalgo.array.blas has been renamed org.ojalgo.array.operation
+* The utility classes Raw1D, Raw2D and RawAnyD have been removed and their contents moved to various classes in the new package org.ojalgo.array.operation
+* Everything in org.ojalgo.matrix.store.operation has been moved to org.ojalgo.array.operation
+
+## org.ojalgo.data
+
+* Added a variant of the covariances method in DataProcessors that take `double[]...` as input.
+
+## org.ojalgo.function
+
+* Refactoring in the org.ojalgo.function.multiary package including (api-breaking) name changes to some interfaces and classes. The previous QuadraticFunction has been renamed PureQuadraticFunction, and CompoundFunction renamed QuadraticFunction. Further there is now both a LinearFunction and an AffineFunction.
+
+## org.ojalgo.matrix
+
+* Various deprecations in MatrixStore.LogicalBuilder and the corresponding LogicalBuilder:s of PrimitiveMatrix, ComplexMatrix & RationalMatrix. Everything in the LogicalBuilder:s are now either defined in org.ojalgo.structure.Structure2D.Logical or deprecated.
+* Tweaked the isSolvable() method implementations of the Cholesky decompositions to return `true` slightly less often.
+* The debug logging of the iterative solvers now output the relative error at each iteration.
+* Implemented the power(int) method defined in Operation.Multiplication.
+* New method getCovariance in the SingularValue interface
+* Q1 and Q2 in the SingularValue decomposition have been renamed U and V to match denominations commonly used elsewhere. In Bidiagonal Q1 and Q2 have been renamed LQ and RQ.
+* New MatrixStore implementation DiagonalStore to be used for diagonal, bidiagonal and tridiagonal matrices. Replaces two different previous (package private) implementations.
+* MatrixStore.Factory has a new method makeDiagonal(...)
+* MatrixStore.LogicalBuilder has new implementations for the diagonal(), bidiagonal(boolean) and tridiagonal() methods.
+* Some improvements to TransposedStore – more efficient use of the underlying store. Particular in the case when it is a RawStore.
+* Some general cleanup/refactoring among the Eigenvalue related code.
+* Added support for generalised eigenvalue problems.
+* Fixed a bug in RawStore - visitRow/Column were interchanged
+* Everything in org.ojalgo.matrix.store.operation has been moved to org.ojalgo.array.operation
+
+## org.ojalgo.optimisation
+
+* Minor rounding/precision related change to how ExpressionsBasedModel receives the solution from the solver and then returns it. The `options.solution` property is now enforced.
+* Internal refactoring of ConvexSolver and its subclasses. This includes changes in behaviour (handling of not-so-convex or otherwise difficult problems).
+* The IntegerSolver now uses its own ForkJoinPool instance rather than the default `commonPool()`. The parallelism is derived from `OjAlgoUtils.ENVIRONMENT`.
+* Internal refactoring related to the LinearSolver.Builder as well as the ConvexSolver.Builder.
+
+## org.ojalgo.random
+
+* SampleSet can now swap in a `double[]`
+
+## org.ojalgo.scalar
+
+* Implemented the power(int) method defined in Operation.Multiplication.
+
+## org.ojalgo.structure
+
+* Additions to Structure2D.Logical (Moved definitions from MatrixStore.LogicalBuilder to here).
+* Refactoring to Factory1D, Factory2D and FactoryAnyD – makeZero(...) is renamed make(...) and everything else is moved to a nested subinterface Dense.
+
+# v47.2.0: 2019-05-03
 
 ## org.ojalgo.data
 
