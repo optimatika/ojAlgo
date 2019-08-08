@@ -4,6 +4,8 @@
 
 > Corresponds to changes in the `develop` branch since the last release
 
+# v47.3.0: 2019-08-08
+
 ## org.ojalgo
 
 * The `OjAlgoUtils.ENVIRONMENT` can now be modified to limit the parallelism of ojAlgo.
