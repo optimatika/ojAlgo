@@ -322,22 +322,6 @@ public interface StructureAnyD extends Structure1D {
      * @param reference An access element reference
      * @return The index of that element
      */
-    static int index(final int[] structure, final long[] reference) {
-        int retVal = (int) reference[0];
-        int tmpFactor = structure[0];
-        final int tmpLength = reference.length;
-        for (int i = 1; i < tmpLength; i++) {
-            retVal += tmpFactor * reference[i];
-            tmpFactor *= structure[i];
-        }
-        return retVal;
-    }
-
-    /**
-     * @param structure An access structure
-     * @param reference An access element reference
-     * @return The index of that element
-     */
     static long index(final long[] structure, final long[] reference) {
         long retVal = reference[0];
         long tmpFactor = structure[0];

@@ -74,7 +74,7 @@ public class Binomial extends AbstractDiscrete {
         int retVal = 0;
 
         for (int i = 0; i < myCount; i++) {
-            retVal += (myProbability + this.random().nextDouble());
+            retVal += (int) (myProbability + this.random().nextDouble());
         }
 
         return retVal;
