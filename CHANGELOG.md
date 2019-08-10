@@ -34,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [47.3.0] – 2019-08-08
 
+### Changed
+
 #### org.ojalgo
 
 * The `OjAlgoUtils.ENVIRONMENT` can now be modified to limit the parallelism of ojAlgo.
@@ -95,6 +97,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [47.2.0] – 2019-05-03
 
+### Changed
+
 #### org.ojalgo.data
 
 * Renamed DataPreprocessors to DataProcessors, and added methods to create a covariance matrix from an SVD.
@@ -128,12 +132,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [47.1.2] – 2019-04-23
 
+### Changed
+
 #### org.ojalgo.matrix
 
 * Fixed bug related to LDL – stackoverflow if you called isSolvable() on some LDL instances.
 * Various tweaks and cleanup with MatrixDecompostion:s
 
 ## [47.1.1] – 2019-04-12
+
+### Changed
 
 #### org.ojalgo.constant
 
@@ -154,6 +162,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The Mutate1D.ModifiableReceiver, Mutate2D.ModifiableReceiver and MutateAnyD.ModifiableReceiver each got a new method named modifyAny that takes a Transformation?D as input.
 
 ## [47.1.0] – 2019-04-09
+
+### Changed
 
 #### org.ojalgo.constant
 
@@ -207,6 +217,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [47.0.0] – 2018-12-16
 
+### Changed
+
 #### org.ojalgo.array
 
 * SparseArray: It is now possible to visit the nonzero elements in an index range with a functional callback interface - you can have a lambda called by each nonzero element in a range.
@@ -242,6 +254,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [46.3.0] – 2018-10-12
 
+### Changed
+
 * Now builds a separate test-jar artefact. It contains a test utilities class that can be used by libraries that extend ojAlgo to help test some ojAlgo specific types.
 * Added a main method in org.ojalgo.OjAlgoUtils that output info about the environment.
 
@@ -250,6 +264,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The BasicMatrix interface has been deprecated!!! The various implementations will remain - all of them - but you should use those implementations directly/explicitly rather than the interface.
 
 ## [46.2.0] – 2018-10-04
+
+### Changed
 
 Nothing in ojAlgo implements Serializable - a few odd classes used to declare that they did, but serialization has never been supported.
 
@@ -267,6 +283,8 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 * Access1D no longer extends Iterable. To iterate over the elements use `elements()`.
 
 ## [46.1.0] – 2018-09-17
+
+### Changed
 
 #### org.ojalgo.ann
 
@@ -290,6 +308,8 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 * AccessAnyD now has a method `matrices()` that return a `Iterable<MatrixView<N>>`. On a multi-dimensional data structure you can iterate over its 2D (sub)matrices. Useful when you have a 3-dimensional (or more) data structure that is actually a collection of 2D matrices.
 
 ## [46.0.0] – 2018-08-19
+
+### Changed
 
 #### org.ojalgo.access
 
@@ -350,6 +370,8 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 
 ## [45.1.0] – 2018-04-13
 
+### Changed
+
 #### org.ojalgo.access
 
 * 3 new interfaces Structure2D.ReducibleTo1D, StructureAnyD.ReducibleTo1D and StructureAnyD.ReducibleTo2D
@@ -380,6 +402,8 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 * New class TableData - used to create a "table" of values that can then be exported to a csv file.
 
 ## [45.0.0] – 2018-03-30
+
+### Changed
 
 >Switced to using JUnit 5!
 
@@ -439,6 +463,8 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 * Bug fixed in a NumberContext factory method - getPercent(int,Locale)
 
 ## [44.0.0] – 2017-09-27
+
+### Changed
 
 #### org.ojalgo.access
 
@@ -502,6 +528,8 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 * NumberContext now has new compare(double,double) and compare(float,float) that are alternatives to the compare(...) methods in Double and Float - the only difference is that these return 0 when the two input args are ==.
 
 ## [43.0.0] – 2017-04-22
+
+### Changed
 
 * It is now possible to turn off warnings related to missing hardware profiles. Set a system property 'shut.up.ojAlgo' to anything, not null, and you won't see those warnings. (It would be must better if you contributed your hardware profile to ojAlgo.)
 
@@ -567,6 +595,8 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 
 ## [42.0.0] – 2017-02-03
 
+### Changed
+
 #### org.ojalgo.access
 
 * Added a method aggregateRange(...) to Access1D.Aggregatable and created new Access2D.Aggregatable and AccessAnyD.Aggregatable interfaces. Their set of methods now match what's available in the Visitable interfaces.
@@ -611,7 +641,9 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 * All previously existing variations of getXXFunction(...) in NumberContext has been deprecated and are replaced by by 1 new variant that takes a FunctionSet as input.
 * New class NativeMemory used as single point to allocate, read or write native memory.
 
-#v41.0.0] – 2016-11-13
+## [41.0.0] – 2016-11-13
+
+### Changed
 
 #### org.ojalgo.access
 
@@ -675,6 +707,8 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 
 ## [40.0.0] – 2016-06-20
 
+### Changed
+
 #### org.ojalgo.access
 
 * The Access1D.Builder, Access2D.Builder and AccessAnyD.Builder interfaces have been removed. The API of the BasicMatrix builder have changed slightly as a consequence of this.
@@ -732,6 +766,8 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 * CalendarDateDuration now implements TemporalAmount
 
 ## [39.0.0] – 2015-11-28
+
+### Changed
 
 >Everything (wasn't much) that made use of code outside the JRE profile "compact1" has been removed from ojAlgo. In terms of library functionality nothing has been removed, but there could be incompatibilities.
 
@@ -815,9 +851,13 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 
 ## [38.0.0]
 
+### Changed
+
 The first version to require Java 8!
 
 ## [37.0.0] / [37.1.0]
+
+### Changed
 
 The last version to not require Java 8! (Targets Java 7) No real new features compared to v36.
 
