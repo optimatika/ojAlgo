@@ -47,7 +47,7 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
             expected = copied.aggregateAll(aggregator);
             actual = anyStore.aggregateAll(aggregator);
 
-            TestUtils.assertEquals(aggregator.name(), expected, actual, CNTXT);
+            TestUtils.assertEquals(aggregator.name() + "@" + anyStore, expected, actual, CNTXT);
 
             if (!((aggregator == Aggregator.AVERAGE) && (anyStore instanceof SparseStore<?>))) {
                 // For a sparse store the AVERAGE aggreghator will get an incorrect result
