@@ -430,6 +430,10 @@ public final class ExpressionsBasedModel extends AbstractModel {
         ExpressionsBasedModel.addPresolver(Presolvers.REDUNDANT_CONSTRAINT);
     }
 
+    /**
+     * Add a solver that will be used for problem types the built-in solvers cannot handle as defined by
+     * {@link Integration#isCapable(org.ojalgo.optimisation.Optimisation.Model)}.
+     */
     public static boolean addFallbackSolver(final Integration<?> integration) {
         return FALLBACK_INTEGRATIONS.add(integration);
     }
@@ -443,6 +447,9 @@ public final class ExpressionsBasedModel extends AbstractModel {
         return ExpressionsBasedModel.addPreferredSolver(integration);
     }
 
+    /**
+     * Add a solver that will be used rather than the built-in solvers
+     */
     public static boolean addPreferredSolver(final Integration<?> integration) {
         return PREFERRED_INTEGRATIONS.add(integration);
     }
