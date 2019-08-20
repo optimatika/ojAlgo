@@ -134,7 +134,7 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
         if (templateRHS.countColumns() != 1L) {
             throw new IllegalArgumentException("The RHS must have precisely 1 column!");
         }
-        return PrimitiveDenseStore.FACTORY.makeZero(templateBody.countColumns(), 1L);
+        return PrimitiveDenseStore.FACTORY.make(templateBody.countColumns(), 1L);
     }
 
     public final Optional<MatrixStore<Double>> solve(final MatrixStore<Double> body, final MatrixStore<Double> rhs) {
