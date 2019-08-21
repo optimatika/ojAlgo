@@ -26,15 +26,19 @@ import org.ojalgo.random.Uniform;
 
 public class ZeroCase extends NonPhysicalTest {
 
+    @Override
     @BeforeEach
     public void setUp() {
 
-        final int tmpRowDim = Uniform.randomInteger(1, 9);
-        final int tmpColDim = Uniform.randomInteger(1, 9);
+        int tmpRowDim = Uniform.randomInteger(1, 9);
+        int tmpColDim = Uniform.randomInteger(1, 9);
 
         rationalStore = new ZeroStore<>(GenericDenseStore.RATIONAL, tmpRowDim, tmpColDim);
         complexStore = new ZeroStore<>(GenericDenseStore.COMPLEX, tmpRowDim, tmpColDim);
         primitiveStore = new ZeroStore<>(PrimitiveDenseStore.FACTORY, tmpRowDim, tmpColDim);
+
+        numberOfRows = tmpRowDim;
+        numberOfColumns = tmpColDim;
     }
 
 }

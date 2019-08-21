@@ -29,10 +29,11 @@ import org.ojalgo.random.Uniform;
 
 public class SparseCase extends NonPhysicalTest {
 
+    @Override
     @BeforeEach
     public void setUp() {
 
-        final int dim = Uniform.randomInteger(1, 9);
+        int dim = Uniform.randomInteger(1, 9);
 
         rationalStore = SparseStore.RATIONAL.make(dim, dim);
         complexStore = SparseStore.COMPLEX.make(dim, dim);
@@ -43,6 +44,9 @@ public class SparseCase extends NonPhysicalTest {
             ((SparseStore<?>) complexStore).set(ij, ij, 1.0);
             ((SparseStore<?>) primitiveStore).set(ij, ij, 1.0);
         }
+
+        numberOfRows = dim;
+        numberOfColumns = dim;
     }
 
     @Test
@@ -78,7 +82,7 @@ public class SparseCase extends NonPhysicalTest {
     @Test
     public void testOneFullColumn() {
 
-        final int ind = Uniform.randomInteger(0, 10);
+        int ind = Uniform.randomInteger(0, 10);
 
         SparseStore<Double> store = SparseStore.PRIMITIVE.make(10, 10);
         store.fillColumn(ind, 1.0);
@@ -106,7 +110,7 @@ public class SparseCase extends NonPhysicalTest {
     @Test
     public void testOneFullRow() {
 
-        final int ind = Uniform.randomInteger(0, 10);
+        int ind = Uniform.randomInteger(0, 10);
 
         SparseStore<Double> store = SparseStore.PRIMITIVE.make(10, 10);
         store.fillRow(ind, 1.0);

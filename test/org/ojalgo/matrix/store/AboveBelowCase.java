@@ -25,20 +25,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 
-public class MergedColumnsCase extends NonPhysicalTest {
+public class AboveBelowCase extends NonPhysicalTest {
 
+    @Override
     @BeforeEach
     public void setUp() {
 
-        final int tmpRowDim = Uniform.randomInteger(1, 9);
-        final int tmpColDim = Uniform.randomInteger(1, 9);
+        int tmpRowDim = Uniform.randomInteger(1, 9);
+        int tmpColDim = Uniform.randomInteger(1, 9);
 
-        final MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
-        final MatrixStore<ComplexNumber> tmpLower = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        MatrixStore<ComplexNumber> above = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        MatrixStore<ComplexNumber> below = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        rationalStore = new AboveBelowStore<>(GenericDenseStore.RATIONAL.copy(tmpBase), GenericDenseStore.RATIONAL.copy(tmpLower));
-        complexStore = new AboveBelowStore<>(GenericDenseStore.COMPLEX.copy(tmpBase), GenericDenseStore.COMPLEX.copy(tmpLower));
-        primitiveStore = new AboveBelowStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), PrimitiveDenseStore.FACTORY.copy(tmpLower));
+        rationalStore = new AboveBelowStore<>(GenericDenseStore.RATIONAL.copy(above), GenericDenseStore.RATIONAL.copy(below));
+        complexStore = new AboveBelowStore<>(GenericDenseStore.COMPLEX.copy(above), GenericDenseStore.COMPLEX.copy(below));
+        primitiveStore = new AboveBelowStore<>(PrimitiveDenseStore.FACTORY.copy(above), PrimitiveDenseStore.FACTORY.copy(below));
+
+        numberOfRows = tmpRowDim + tmpRowDim;
+        numberOfColumns = tmpColDim;
     }
 
 }

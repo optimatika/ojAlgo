@@ -27,17 +27,21 @@ import org.ojalgo.scalar.ComplexNumber;
 
 public class TransposedCase extends NonPhysicalTest {
 
+    @Override
     @BeforeEach
     public void setUp() {
 
-        final int tmpRowDim = Uniform.randomInteger(1, 9);
-        final int tmpColDim = Uniform.randomInteger(1, 9);
+        int tmpRowDim = Uniform.randomInteger(1, 9);
+        int tmpColDim = Uniform.randomInteger(1, 9);
 
-        final MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
         rationalStore = new TransposedStore<>(GenericDenseStore.RATIONAL.copy(tmpBase));
         complexStore = new TransposedStore<>(GenericDenseStore.COMPLEX.copy(tmpBase));
         primitiveStore = new TransposedStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase));
+
+        numberOfRows = tmpColDim;
+        numberOfColumns = tmpRowDim;
     }
 
 }

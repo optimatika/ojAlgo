@@ -27,17 +27,21 @@ import org.ojalgo.scalar.ComplexNumber;
 
 public class ConjugatedCase extends NonPhysicalTest {
 
+    @Override
     @BeforeEach
     public void setUp() {
 
-        final int tmpRowDim = Uniform.randomInteger(1, 9);
-        final int tmpColDim = Uniform.randomInteger(1, 9);
+        int tmpRowDim = Uniform.randomInteger(1, 9);
+        int tmpColDim = Uniform.randomInteger(1, 9);
 
-        final MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        MatrixStore<ComplexNumber> base = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        rationalStore = new ConjugatedStore<>(GenericDenseStore.RATIONAL.copy(tmpBase));
-        complexStore = new ConjugatedStore<>(GenericDenseStore.COMPLEX.copy(tmpBase));
-        primitiveStore = new ConjugatedStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase));
+        rationalStore = new ConjugatedStore<>(GenericDenseStore.RATIONAL.copy(base));
+        complexStore = new ConjugatedStore<>(GenericDenseStore.COMPLEX.copy(base));
+        primitiveStore = new ConjugatedStore<>(PrimitiveDenseStore.FACTORY.copy(base));
+
+        numberOfRows = tmpColDim;
+        numberOfColumns = tmpRowDim;
     }
 
 }

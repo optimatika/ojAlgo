@@ -25,21 +25,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 
-public class SuperimposedMatrixColumnCase extends NonPhysicalTest {
+public class SuperimposedColumnCase extends NonPhysicalTest {
 
+    @Override
     @BeforeEach
     public void setUp() {
 
-        final int tmpRowDim = Uniform.randomInteger(1, 9);
-        final int tmpColDim = Uniform.randomInteger(1, 9);
+        int tmpRowDim = Uniform.randomInteger(1, 9);
+        int tmpColDim = Uniform.randomInteger(1, 9);
 
-        final MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
-        final MatrixStore<ComplexNumber> tmpColumn = NonPhysicalTest.makeRandomMatrix(tmpRowDim, 1);
-        final int tmpIndex = Uniform.randomInteger(tmpColDim);
+        MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        MatrixStore<ComplexNumber> tmpColumn = NonPhysicalTest.makeRandomMatrix(tmpRowDim, 1);
+        int tmpIndex = Uniform.randomInteger(tmpColDim);
 
         rationalStore = new SuperimposedStore<>(GenericDenseStore.RATIONAL.copy(tmpBase), 0, tmpIndex, GenericDenseStore.RATIONAL.copy(tmpColumn));
         complexStore = new SuperimposedStore<>(GenericDenseStore.COMPLEX.copy(tmpBase), 0, tmpIndex, GenericDenseStore.COMPLEX.copy(tmpColumn));
         primitiveStore = new SuperimposedStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), 0, tmpIndex, PrimitiveDenseStore.FACTORY.copy(tmpColumn));
+
+        numberOfRows = tmpRowDim;
+        numberOfColumns = tmpColDim;
     }
 
 }

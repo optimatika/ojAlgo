@@ -25,6 +25,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -33,11 +34,14 @@ import org.ojalgo.type.context.NumberContext;
 
 public abstract class NonPhysicalTest extends MatrixStoreTests {
 
-    private static NumberContext CNTXT = StandardType.DECIMAL_032;
+    private static final NumberContext ACCURACY = StandardType.DECIMAL_032;
 
     private static <N extends Number> void testAggregation(final MatrixStore<N> anyStore) {
 
         final PhysicalStore<N> copied = anyStore.copy();
+
+        BasicLogger.debug("Any", anyStore);
+        BasicLogger.debug("Copy", copied);
 
         Number expected;
         Number actual;
@@ -47,7 +51,7 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
             expected = copied.aggregateAll(aggregator);
             actual = anyStore.aggregateAll(aggregator);
 
-            TestUtils.assertEquals(aggregator.name() + "@" + anyStore, expected, actual, CNTXT);
+            TestUtils.assertEquals(aggregator.name() + "@" + anyStore, expected, actual, ACCURACY);
 
             if (!((aggregator == Aggregator.AVERAGE) && (anyStore instanceof SparseStore<?>))) {
                 // For a sparse store the AVERAGE aggreghator will get an incorrect result
@@ -56,54 +60,60 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
                 for (int i = 0; i < copied.countRows(); i++) {
                     expected = copied.aggregateRow(i, aggregator);
                     actual = anyStore.aggregateRow(i, aggregator);
-                    TestUtils.assertEquals("Row: " + i + " " + aggregator.name(), expected, actual, CNTXT);
+                    TestUtils.assertEquals("Row: " + i + " " + aggregator.name(), expected, actual, ACCURACY);
                 }
 
                 for (int j = 0; j < copied.countColumns(); j++) {
                     expected = copied.aggregateColumn(j, aggregator);
                     actual = anyStore.aggregateColumn(j, aggregator);
-                    TestUtils.assertEquals("Col: " + j + " " + aggregator.name(), expected, actual, CNTXT);
+                    TestUtils.assertEquals("Col: " + j + " " + aggregator.name(), expected, actual, ACCURACY);
                 }
             }
 
         }
     }
 
-    private static <N extends Number> void testElements(final MatrixStore<N> aStore) {
-        TestUtils.assertEquals(aStore, aStore.copy(), CNTXT);
+    private static <N extends Number> void testCopy(final MatrixStore<N> anyStore) {
+        TestUtils.assertEquals(anyStore, anyStore.copy(), ACCURACY);
     }
 
-    private static <N extends Number> void testMultiplication(final MatrixStore<N> matrixStore) {
+    private static <N extends Number> void testDimensions(final MatrixStore<N> anyStore, final int numberOfRows, final int numberOfColumns) {
+        TestUtils.assertEquals(numberOfRows, anyStore.countRows());
+        TestUtils.assertEquals(numberOfColumns, anyStore.countColumns());
+        TestUtils.assertEquals(numberOfRows * numberOfColumns, anyStore.count());
+    }
 
-        final PhysicalStore<N> tmpCopy = matrixStore.copy();
+    private static <N extends Number> void testMultiplication(final MatrixStore<N> anyStore) {
 
-        final int tmpRowDim = (int) matrixStore.countRows();
-        final int tmpColDim = (int) matrixStore.countColumns();
+        final PhysicalStore<N> tmpCopy = anyStore.copy();
+
+        final int tmpRowDim = (int) anyStore.countRows();
+        final int tmpColDim = (int) anyStore.countColumns();
         final int tmpNewDim = Uniform.randomInteger(1, tmpRowDim + tmpColDim);
 
         // multiplyLeft
         final MatrixStore<ComplexNumber> tmpLeftMtrx = NonPhysicalTest.makeRandomMatrix(tmpNewDim, tmpRowDim);
-        final PhysicalStore<N> tmpLeft = matrixStore.physical().copy(tmpLeftMtrx);
+        final PhysicalStore<N> tmpLeft = anyStore.physical().copy(tmpLeftMtrx);
 
         MatrixStore<N> tmpExpected = tmpLeft.multiply(tmpCopy);
-        MatrixStore<N> tmpActual = tmpLeft.multiply(matrixStore);
-        TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
+        MatrixStore<N> tmpActual = tmpLeft.multiply(anyStore);
+        TestUtils.assertEquals(tmpExpected, tmpActual, ACCURACY);
 
         tmpExpected = tmpCopy.premultiply(tmpLeft).get();
-        tmpActual = matrixStore.premultiply(tmpLeft).get();
-        TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
+        tmpActual = anyStore.premultiply(tmpLeft).get();
+        TestUtils.assertEquals(tmpExpected, tmpActual, ACCURACY);
 
         // multiplyRight
         final MatrixStore<ComplexNumber> tmpRightMtrx = NonPhysicalTest.makeRandomMatrix(tmpColDim, tmpNewDim);
-        final PhysicalStore<N> tmpRight = matrixStore.physical().copy(tmpRightMtrx);
+        final PhysicalStore<N> tmpRight = anyStore.physical().copy(tmpRightMtrx);
 
         tmpExpected = tmpCopy.multiply(tmpRight);
-        tmpActual = matrixStore.multiply(tmpRight);
-        TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
+        tmpActual = anyStore.multiply(tmpRight);
+        TestUtils.assertEquals(tmpExpected, tmpActual, ACCURACY);
 
         tmpExpected = tmpRight.premultiply(tmpCopy).get();
-        tmpActual = tmpRight.premultiply(matrixStore).get();
-        TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
+        tmpActual = tmpRight.premultiply(anyStore).get();
+        TestUtils.assertEquals(tmpExpected, tmpActual, ACCURACY);
     }
 
     protected static MatrixStore<ComplexNumber> makeRandomMatrix(final int numberOfRows, final int numberOfColumns) {
@@ -111,8 +121,12 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
     }
 
     MatrixStore<ComplexNumber> complexStore;
+    int numberOfColumns;
+    int numberOfRows;
     MatrixStore<Double> primitiveStore;
     MatrixStore<RationalNumber> rationalStore;
+
+    public abstract void setUp();
 
     @AfterEach
     public void tearDown() {
@@ -129,10 +143,17 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
     }
 
     @Test
-    public void testElements() {
-        NonPhysicalTest.testElements(primitiveStore);
-        NonPhysicalTest.testElements(complexStore);
-        NonPhysicalTest.testElements(rationalStore);
+    public void testCopy() {
+        NonPhysicalTest.testCopy(primitiveStore);
+        NonPhysicalTest.testCopy(complexStore);
+        NonPhysicalTest.testCopy(rationalStore);
+    }
+
+    @Test
+    public void testDimensions() {
+        NonPhysicalTest.testDimensions(primitiveStore, numberOfRows, numberOfColumns);
+        NonPhysicalTest.testDimensions(complexStore, numberOfRows, numberOfColumns);
+        NonPhysicalTest.testDimensions(rationalStore, numberOfRows, numberOfColumns);
     }
 
     @Test
