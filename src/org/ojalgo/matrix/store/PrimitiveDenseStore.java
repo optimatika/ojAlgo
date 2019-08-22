@@ -55,6 +55,7 @@ import org.ojalgo.matrix.decomposition.EvD1D;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -550,7 +551,9 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                     PrimitiveDenseStore.this.visit(tmpRowDim * first, tmpRowDim * limit, 1, tmpPartAggr);
 
                     synchronized (mainAggr) {
-                        mainAggr.merge(tmpPartAggr.get());
+                        Double result = tmpPartAggr.get();
+                        BasicLogger.debug("Merging {} from thread", result, Thread.currentThread());
+                        mainAggr.merge(result);
                     }
                 }
             };
