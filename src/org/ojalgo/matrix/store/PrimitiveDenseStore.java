@@ -552,7 +552,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
                     synchronized (mainAggr) {
                         Double result = tmpPartAggr.get();
-                        BasicLogger.debug("Merging {} from thread", result, Thread.currentThread());
+                        BasicLogger.debug("Merging {} from thread {}", result, Thread.currentThread());
                         mainAggr.merge(result);
                     }
                 }
