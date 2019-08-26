@@ -14,7 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- 
+#### org.ojalgo.function
+
+- The merge functionality of AggregatorFunction is deprecated.
+
+#### org.ojalgo.matrix
+
+- The multithreaded implementations of aggregateAll in PrimkitiveDenseStoree and GenericDenseStore are removed. 
 
 ### Deprecated
 

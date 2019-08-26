@@ -42,8 +42,6 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -55,7 +53,6 @@ import org.ojalgo.matrix.decomposition.EvD1D;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -530,42 +527,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public void add(final long row, final long col, final Number addend) {
         myUtility.add(row, col, addend);
-    }
-
-    public Double aggregateAll(final Aggregator aggregator) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        final AggregatorFunction<Double> mainAggr = aggregator.getFunction(PrimitiveAggregator.getSet());
-
-        if (mainAggr.isMergeable() && (tmpColDim > AggregateAll.THRESHOLD)) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int first, final int limit) {
-
-                    final AggregatorFunction<Double> tmpPartAggr = aggregator.getFunction(PrimitiveAggregator.getSet());
-
-                    PrimitiveDenseStore.this.visit(tmpRowDim * first, tmpRowDim * limit, 1, tmpPartAggr);
-
-                    synchronized (mainAggr) {
-                        Double result = tmpPartAggr.get();
-                        BasicLogger.debug("Merging {} from thread {}", result, Thread.currentThread());
-                        mainAggr.merge(result);
-                    }
-                }
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, AggregateAll.THRESHOLD);
-
-        } else {
-
-            PrimitiveDenseStore.this.visit(0, this.size(), 1, mainAggr);
-        }
-
-        return mainAggr.get();
     }
 
     public void applyCholesky(final int iterationPoint, final BasicArray<Double> multipliers) {
