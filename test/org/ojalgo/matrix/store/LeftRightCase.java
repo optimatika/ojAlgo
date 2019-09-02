@@ -25,20 +25,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 
-public class MergedRowsCase extends NonPhysicalTest {
+public class LeftRightCase extends NonPhysicalTest {
 
+    @Override
     @BeforeEach
     public void setUp() {
 
-        final int tmpRowDim = Uniform.randomInteger(1, 9);
-        final int tmpColDim = Uniform.randomInteger(1, 9);
+        int tmpRowDim = Uniform.randomInteger(1, 9);
+        int tmpColDim = Uniform.randomInteger(1, 9);
 
-        final MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
-        final MatrixStore<ComplexNumber> tmpRight = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        MatrixStore<ComplexNumber> left = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        MatrixStore<ComplexNumber> right = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        rationalStore = new LeftRightStore<>(GenericDenseStore.RATIONAL.copy(tmpBase), GenericDenseStore.RATIONAL.copy(tmpRight));
-        complexStore = new LeftRightStore<>(GenericDenseStore.COMPLEX.copy(tmpBase), GenericDenseStore.COMPLEX.copy(tmpRight));
-        primitiveStore = new LeftRightStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), PrimitiveDenseStore.FACTORY.copy(tmpRight));
+        rationalStore = new LeftRightStore<>(GenericDenseStore.RATIONAL.copy(left), GenericDenseStore.RATIONAL.copy(right));
+        complexStore = new LeftRightStore<>(GenericDenseStore.COMPLEX.copy(left), GenericDenseStore.COMPLEX.copy(right));
+        primitiveStore = new LeftRightStore<>(PrimitiveDenseStore.FACTORY.copy(left), PrimitiveDenseStore.FACTORY.copy(right));
+
+        numberOfRows = tmpRowDim;
+        numberOfColumns = tmpColDim + tmpColDim;
     }
 
 }

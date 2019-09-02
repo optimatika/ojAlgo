@@ -114,8 +114,16 @@ public class RowView<N extends Number> implements Access1D<N>, Iterable<RowView<
         return myRow;
     }
 
+    /**
+     * @deprecated v48 Use {@link #stream()} instead
+     */
+    @Deprecated
     public Stream<RowView<N>> stream(final boolean parallel) {
-        return StreamSupport.stream(this, parallel);
+        return this.stream();
+    }
+
+    public Stream<RowView<N>> stream() {
+        return StreamSupport.stream(this, false);
     }
 
     @Override
