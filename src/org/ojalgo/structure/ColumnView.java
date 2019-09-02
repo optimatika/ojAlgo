@@ -115,8 +115,16 @@ public class ColumnView<N extends Number>
         ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
+    /**
+     * @deprecated v48 Use {@link #stream()} instead
+     */
+    @Deprecated
     public Stream<ColumnView<N>> stream(final boolean parallel) {
-        return StreamSupport.stream(this, parallel);
+        return this.stream();
+    }
+
+    public Stream<ColumnView<N>> stream() {
+        return StreamSupport.stream(this, false);
     }
 
     @Override

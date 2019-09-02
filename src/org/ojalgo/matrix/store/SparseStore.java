@@ -97,7 +97,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
             target.reset();
 
-            right.nonzeros().stream(false).forEach(element -> {
+            right.nonzeros().stream().forEach(element -> {
                 left.doColumnAXPY(element.row(), element.column(), element.doubleValue(), target);
             });
 
@@ -306,7 +306,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
             target.reset();
 
-            this.nonzeros().stream(false).forEach(element -> {
+            this.nonzeros().stream().forEach(element -> {
 
                 final long row = element.row();
                 final long col = element.column();
@@ -426,7 +426,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
             final SparseStore<N> retVal = SparseStore.makeSparse(this.physical(), numberOfRows, numberOfColumns);
 
-            this.nonzeros().stream(false).forEach(element -> {
+            this.nonzeros().stream().forEach(element -> {
 
                 final long row = element.row();
                 final long col = element.column();
