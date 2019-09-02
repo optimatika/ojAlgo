@@ -34,8 +34,6 @@ import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
@@ -487,40 +485,6 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public void add(final long row, final long col, final Number addend) {
         myUtility.add(row, col, addend);
-    }
-
-    public N aggregateAll(final Aggregator aggregator) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        final AggregatorFunction<N> mainAggr = aggregator.getFunction(myFactory.aggregator());
-
-        if (mainAggr.isMergeable() && (tmpColDim > AggregateAll.THRESHOLD)) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int aFirst, final int aLimit) {
-
-                    final AggregatorFunction<N> tmpPartAggr = aggregator.getFunction(myFactory.aggregator());
-
-                    GenericDenseStore.this.visit(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, tmpPartAggr);
-
-                    synchronized (mainAggr) {
-                        mainAggr.merge(tmpPartAggr.get());
-                    }
-                }
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, AggregateAll.THRESHOLD);
-
-        } else {
-
-            GenericDenseStore.this.visit(0, this.size(), 1, mainAggr);
-        }
-
-        return mainAggr.get();
     }
 
     public void applyCholesky(final int iterationPoint, final BasicArray<N> multipliers) {

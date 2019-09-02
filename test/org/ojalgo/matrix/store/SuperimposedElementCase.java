@@ -29,30 +29,34 @@ import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 
-public class SuperimposedMatrixElementCase extends NonPhysicalTest {
+public class SuperimposedElementCase extends NonPhysicalTest {
 
+    @Override
     @BeforeEach
     public void setUp() {
 
-        final int tmpRowDim = Uniform.randomInteger(1, 9);
-        final int tmpColDim = Uniform.randomInteger(1, 9);
+        int tmpRowDim = Uniform.randomInteger(1, 9);
+        int tmpColDim = Uniform.randomInteger(1, 9);
 
-        final MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
-        final int tmpRowIndex = Uniform.randomInteger(tmpRowDim);
-        final int tmpColumnIndex = Uniform.randomInteger(tmpColDim);
-        final BigDecimal tmpElement = BigMath.PI;
-        final MatrixStore<RationalNumber> aBase = GenericDenseStore.RATIONAL.copy(tmpBase);
+        MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
+        int tmpRowIndex = Uniform.randomInteger(tmpRowDim);
+        int tmpColumnIndex = Uniform.randomInteger(tmpColDim);
+        BigDecimal tmpElement = BigMath.PI;
+        MatrixStore<RationalNumber> aBase = GenericDenseStore.RATIONAL.copy(tmpBase);
 
         //        myBigStore = new SuperimposedMatrixStore<BigDecimal>(BigDenseStore.FACTORY.copyMatrix(tmpBase), tmpRowIndex, tmpColumnIndex, tmpElement);
         //        myComplexStore = new SuperimposedMatrixStore<ComplexNumber>(ComplexDenseStore.FACTORY.copyMatrix(tmpBase), tmpRowIndex, tmpColumnIndex, ComplexNumber.makeReal(tmpElement.doubleValue()));
         //        myPrimitiveStore = new SuperimposedMatrixStore<Double>(PrimitiveDenseStore.FACTORY.copyMatrix(tmpBase), tmpRowIndex, tmpColumnIndex, tmpElement.doubleValue());
 
         rationalStore = new SuperimposedStore<>(aBase, tmpRowIndex, tmpColumnIndex, new SingleStore<>(aBase.physical(), tmpElement));
-        final MatrixStore<ComplexNumber> aBase1 = GenericDenseStore.COMPLEX.copy(tmpBase);
+        MatrixStore<ComplexNumber> aBase1 = GenericDenseStore.COMPLEX.copy(tmpBase);
         complexStore = new SuperimposedStore<>(aBase1, tmpRowIndex, tmpColumnIndex,
                 new SingleStore<>(aBase1.physical(), ComplexNumber.valueOf(tmpElement.doubleValue())));
-        final MatrixStore<Double> aBase2 = PrimitiveDenseStore.FACTORY.copy(tmpBase);
+        MatrixStore<Double> aBase2 = PrimitiveDenseStore.FACTORY.copy(tmpBase);
         primitiveStore = new SuperimposedStore<>(aBase2, tmpRowIndex, tmpColumnIndex, new SingleStore<>(aBase2.physical(), tmpElement.doubleValue()));
+
+        numberOfRows = tmpRowDim;
+        numberOfColumns = tmpColDim;
     }
 
 }

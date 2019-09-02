@@ -14,7 +14,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- 
+#### org.ojalgo.function
+
+- The merge functionality of AggregatorFunction is deprecated.
+
+#### org.ojalgo.matrix
+
+- The multithreaded implementations of aggregateAll in PrimkitiveDenseStoree and GenericDenseStore are removed.
+
+#### org.ojalgo.structure
+
+- The stream(boolean) methods of ElementView, RowView and ColumnView are deprecated and replaced with a simple stream() method. You no longer have the option to use parallel streams.
 
 ### Deprecated
 

@@ -26,14 +26,18 @@ import org.ojalgo.random.Uniform;
 
 public class IdentityCase extends NonPhysicalTest {
 
+    @Override
     @BeforeEach
     public void setUp() {
 
-        final int tmpDim = Uniform.randomInteger(1, 9);
+        int dim = Uniform.randomInteger(1, 9);
 
-        rationalStore = new IdentityStore<>(GenericDenseStore.RATIONAL, tmpDim);
-        complexStore = new IdentityStore<>(GenericDenseStore.COMPLEX, tmpDim);
-        primitiveStore = new IdentityStore<>(PrimitiveDenseStore.FACTORY, tmpDim);
+        rationalStore = new IdentityStore<>(GenericDenseStore.RATIONAL, dim);
+        complexStore = new IdentityStore<>(GenericDenseStore.COMPLEX, dim);
+        primitiveStore = new IdentityStore<>(PrimitiveDenseStore.FACTORY, dim);
+
+        numberOfRows = dim;
+        numberOfColumns = dim;
     }
 
 }
