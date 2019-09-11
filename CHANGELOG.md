@@ -41,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- 
+- The compareTo method of CalendarDateDuration didn't work when the unit of either instances was "nanos".
 
 ### Security
 
