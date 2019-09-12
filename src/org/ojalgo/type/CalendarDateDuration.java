@@ -87,8 +87,8 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
     }
 
     public int compareTo(final CalendarDateDuration reference) {
-        final long tmpVal = this.toDurationInMillis();
-        final long refVal = reference.toDurationInMillis();
+        final long tmpVal = this.toDurationInNanos();
+        final long refVal = reference.toDurationInNanos();
         return Long.signum(tmpVal - refVal);
     }
 

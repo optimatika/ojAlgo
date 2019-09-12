@@ -56,7 +56,7 @@ final class IterativeASS extends ActiveSetSolver {
 
         private final PhysicalStore<Double> myColumnE;
         private final int myCountE = IterativeASS.this.countEqualityConstraints();
-        private final long myFullDim = myCountE + IterativeASS.this.countInequalityConstraints();
+        private final int myFullDim = myCountE + IterativeASS.this.countInequalityConstraints();
         private final Equation[] myIterationRows;
 
         MyIterativeSolver() {
@@ -69,12 +69,13 @@ final class IterativeASS extends ActiveSetSolver {
 
             // ConjugateGradient
             this.setAccuracyContext(ITERATIVE_ACCURACY);
+            this.setIterationsLimit(myFullDim + myFullDim);
 
             // this.setDebugPrinter(BasicLogger.DEBUG);
 
-            myIterationRows = new Equation[(int) myFullDim];
+            myIterationRows = new Equation[myFullDim];
 
-            myColumnE = PrimitiveDenseStore.FACTORY.makeZero(myCountE, 1);
+            myColumnE = PrimitiveDenseStore.FACTORY.make(myCountE, 1);
         }
 
         @Override
@@ -172,7 +173,7 @@ final class IterativeASS extends ActiveSetSolver {
         super(matrices, solverOptions);
 
         myS = new MyIterativeSolver();
-        myColumnS = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1);
+        myColumnS = PrimitiveDenseStore.FACTORY.make(this.countVariables(), 1);
     }
 
     private void addConstraint(final int constrIndex, final Access1D<?> constrBody, final double constrRHS) {
@@ -243,7 +244,7 @@ final class IterativeASS extends ActiveSetSolver {
         if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
-            final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
+            final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.make(this.countVariables() + this.countIterationConstraints(), 1L);
 
             if (solved = this.solveFullKKT(tmpXL)) {
 

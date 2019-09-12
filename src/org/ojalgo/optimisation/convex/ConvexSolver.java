@@ -297,7 +297,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         if (numbEqExpr > 0) {
 
             final SparseStore<Double> mtrxAE = SparseStore.PRIMITIVE.make(numbEqExpr, numbVars);
-            final PhysicalStore<Double> mtrxBE = PrimitiveDenseStore.FACTORY.makeZero(numbEqExpr, 1);
+            final PhysicalStore<Double> mtrxBE = PrimitiveDenseStore.FACTORY.make(numbEqExpr, 1);
 
             for (int i = 0; i < numbEqExpr; i++) {
 
@@ -321,7 +321,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         PhysicalStore<Double> mtrxQ = null;
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
-            mtrxQ = PrimitiveDenseStore.FACTORY.makeZero(numbVars, numbVars);
+            mtrxQ = PrimitiveDenseStore.FACTORY.make(numbVars, numbVars);
 
             final BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? SUBTRACT : ADD;
             UnaryFunction<Double> tmpModifier;
@@ -338,7 +338,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         PhysicalStore<Double> mtrxC = null;
         if (tmpObjExpr.isAnyLinearFactorNonZero()) {
-            mtrxC = PrimitiveDenseStore.FACTORY.makeZero(numbVars, 1);
+            mtrxC = PrimitiveDenseStore.FACTORY.make(numbVars, 1);
             if (sourceModel.isMinimisation()) {
                 for (final IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
                     final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
@@ -377,7 +377,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         if ((numbUpExpr + numbUpVar + numbLoExpr + numbLoVar) > 0) {
 
             final RowsSupplier<Double> mtrxAI = PrimitiveDenseStore.FACTORY.makeRowsSupplier(numbVars);
-            final PhysicalStore<Double> mtrxBI = PrimitiveDenseStore.FACTORY.makeZero(numbUpExpr + numbUpVar + numbLoExpr + numbLoVar, 1);
+            final PhysicalStore<Double> mtrxBI = PrimitiveDenseStore.FACTORY.make(numbUpExpr + numbUpVar + numbLoExpr + numbLoVar, 1);
 
             if (numbUpExpr > 0) {
                 for (int i = 0; i < numbUpExpr; i++) {
