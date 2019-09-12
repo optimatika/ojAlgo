@@ -1,4 +1,5 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -22,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The multithreaded implementations of aggregateAll in PrimkitiveDenseStoree and GenericDenseStore are removed.
 
+#### org.ojalgo.optimisation
+
+- The iterative version of the ActiveSetSolver now enforce an iterations limit.
+
 #### org.ojalgo.structure
 
 - The stream(boolean) methods of ElementView, RowView and ColumnView are deprecated and replaced with a simple stream() method. You no longer have the option to use parallel streams.
@@ -36,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- 
+- The compareTo method of CalendarDateDuration didn't work when the unit of either instances was "nanos".
 
 ### Security
 

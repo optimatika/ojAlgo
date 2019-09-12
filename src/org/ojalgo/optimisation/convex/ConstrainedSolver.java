@@ -38,7 +38,7 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
         int numberOfEqualityConstraints = this.countEqualityConstraints();
 
-        mySlackE = PrimitiveDenseStore.FACTORY.makeZero(numberOfEqualityConstraints, 1L);
+        mySlackE = PrimitiveDenseStore.FACTORY.make(numberOfEqualityConstraints, 1L);
     }
 
     @Override

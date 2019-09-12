@@ -61,10 +61,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         myActivator = new IndexSelector(numberOfInequalityConstraints);
 
-        mySolutionL = PrimitiveDenseStore.FACTORY.makeZero(numberOfEqualityConstraints + numberOfInequalityConstraints, 1L);
-        myIterationX = PrimitiveDenseStore.FACTORY.makeZero(numberOfVariables, 1L);
+        mySolutionL = PrimitiveDenseStore.FACTORY.make(numberOfEqualityConstraints + numberOfInequalityConstraints, 1L);
+        myIterationX = PrimitiveDenseStore.FACTORY.make(numberOfVariables, 1L);
 
-        mySlackI = PrimitiveDenseStore.FACTORY.makeZero(numberOfInequalityConstraints, 1L);
+        mySlackI = PrimitiveDenseStore.FACTORY.make(numberOfInequalityConstraints, 1L);
     }
 
     private void handleIterationSolution(final PrimitiveDenseStore iterX, final int[] excluded) {
@@ -230,7 +230,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final int[] incl = myActivator.getIncluded();
         int lastIncluded = myActivator.getLastIncluded();
 
-        AggregatorFunction<Double> aggregator = PrimitiveAggregator.NORM2.get();
+        AggregatorFunction<Double> aggregator = PrimitiveAggregator.getSet().norm2();
         SparseArray<Double> lastRow = this.getMatrixAI(lastIncluded);
         lastRow.visitAll(aggregator);
         double lastNorm = aggregator.doubleValue();
@@ -524,7 +524,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final int numbVars = this.countVariables();
         final int[] incl = myActivator.getIncluded();
 
-        final PhysicalStore<Double> retVal = PrimitiveDenseStore.FACTORY.makeZero(numbEqus + incl.length, numbVars);
+        final PhysicalStore<Double> retVal = PrimitiveDenseStore.FACTORY.make(numbEqus + incl.length, numbVars);
 
         if (numbEqus > 0) {
             this.getMatrixAE().supplyTo(retVal.regionByLimits(numbEqus, numbVars));
@@ -542,7 +542,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final int numbEqus = this.countEqualityConstraints();
         final int[] incl = myActivator.getIncluded();
 
-        final PhysicalStore<Double> retVal = PrimitiveDenseStore.FACTORY.makeZero(numbEqus + incl.length, 1);
+        final PhysicalStore<Double> retVal = PrimitiveDenseStore.FACTORY.make(numbEqus + incl.length, 1);
 
         for (int i = 0; i < numbEqus; i++) {
             retVal.set(i, this.getMatrixBE().doubleValue(i));
