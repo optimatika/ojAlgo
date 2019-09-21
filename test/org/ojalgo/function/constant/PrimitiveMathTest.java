@@ -147,22 +147,6 @@ public class PrimitiveMathTest {
     }
 
     @Test
-    public void testPowersOf2() {
-
-        long previous = POWERS_OF_2[0];
-        TestUtils.assertEquals(1L, previous);
-
-        for (int i = 1; i < POWERS_OF_2.length; i++) {
-            final long current = POWERS_OF_2[i];
-
-            TestUtils.assertTrue(previous < current);
-            TestUtils.assertEquals(2, current / previous);
-
-            previous = current;
-        }
-    }
-
-    @Test
     public void testPrefixes() {
 
         double expected = Double.NaN;

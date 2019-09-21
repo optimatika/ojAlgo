@@ -21,10 +21,9 @@
  */
 package org.ojalgo.function.constant;
 
-import java.util.Arrays;
-
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.scalar.PrimitiveScalar;
 
 public abstract class PrimitiveMath {
@@ -120,14 +119,6 @@ public abstract class PrimitiveMath {
             107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263,
             269, 271 };
 
-    public static final long[] POWERS_OF_2 = new long[63];
-    static {
-        POWERS_OF_2[0] = 1L;
-        for (int p = 1; p < POWERS_OF_2.length; p++) {
-            POWERS_OF_2[p] = POWERS_OF_2[p - 1] * 2L;
-        }
-    }
-
     /*
      * The lambdas below should not (cannot) reference each other. Implementations must be written in terms of
      * java.lang.Math and/or org.ojalgo.function.special.MissingMath.
@@ -182,24 +173,30 @@ public abstract class PrimitiveMath {
         return PRIME[index];
     }
 
+    /**
+     * @deprecated v48 Use {@link PowerOf2#isPowerOf2(long)} instead
+     */
+    @Deprecated
     public static final boolean isPowerOf2(final long value) {
-        return Arrays.binarySearch(POWERS_OF_2, value) >= 0;
+        return PowerOf2.isPowerOf2(value);
     }
 
     /**
      * @return The smallest integer exponent so that 2^exp &gt;= value.
+     * @deprecated v48 Use {@link PowerOf2#powerOf2Larger(long)} instead
      */
+    @Deprecated
     public static final int powerOf2Larger(final long value) {
-        final int index = Arrays.binarySearch(POWERS_OF_2, value);
-        return index >= 0 ? index : Math.min(-(index + 1), 62);
+        return PowerOf2.powerOf2Larger(value);
     }
 
     /**
      * @return The largest integer exponent so that 2^exp &lt;= value.
+     * @deprecated v48 Use {@link PowerOf2#powerOf2Smaller(long)} instead
      */
+    @Deprecated
     public static final int powerOf2Smaller(final long value) {
-        final int index = Arrays.binarySearch(POWERS_OF_2, value);
-        return index >= 0 ? index : Math.max(-(index + 2), 0);
+        return PowerOf2.powerOf2Smaller(value);
     }
 
 }
