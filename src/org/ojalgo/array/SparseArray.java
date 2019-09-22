@@ -212,7 +212,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     }
 
-    private static final long HASH_MASK = 65536L - 1L;
+    private static final long HASH_MASK = 65536L - 1L; // 2^16 - 1
     private static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
     public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
