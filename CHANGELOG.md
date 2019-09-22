@@ -11,13 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- 
+#### org.ojalgo.function
+
+- New special function utility class PowerOf2. It replaces what was in PrimitiveMath, amde some improvements and addition and added support or 'int' (used to be only 'long').
 
 ### Changed
 
-#### org.ojalgo.function
-
-- The merge functionality of AggregatorFunction is deprecated.
+- 
 
 #### org.ojalgo.matrix
 
@@ -33,7 +33,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
-- 
+#### org.ojalgo.function
+
+- The merge functionality of AggregatorFunction is deprecated.
+- Everything related to "power of 2" has been deprecetd in PrimitiveMath. 
 
 ### Removed
 
