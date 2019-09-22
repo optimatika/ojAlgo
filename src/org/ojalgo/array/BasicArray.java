@@ -28,7 +28,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
@@ -52,7 +52,7 @@ public abstract class BasicArray<N extends Number>
 
     public static final class Factory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
 
-        private static final long SPARSE_SEGMENTATION_LIMIT = PrimitiveMath.POWERS_OF_2[46];
+        private static final long SPARSE_SEGMENTATION_LIMIT = PowerOf2.powerOfLong2(46);
 
         private final DenseArray.Factory<N> myDenseFactory;
 

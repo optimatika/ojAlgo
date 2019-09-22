@@ -21,14 +21,11 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
-
-import java.util.Arrays;
-
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.special.PowerOf2;
 import org.ojalgo.structure.Access1D;
 
 /**
@@ -69,7 +66,7 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
             throw new IllegalArgumentException("The last segment cannot be larger than the others!");
         }
 
-        myIndexBits = Arrays.binarySearch(POWERS_OF_2, mySegmentSize);
+        myIndexBits = PowerOf2.find(mySegmentSize);
         if ((myIndexBits < 0) || (mySegmentSize != (1L << myIndexBits))) {
             throw new IllegalArgumentException("The segment size must be a power of 2!");
         }
