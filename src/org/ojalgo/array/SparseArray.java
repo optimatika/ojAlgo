@@ -211,7 +211,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     }
 
-    static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
+    private static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
     public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
         return new SparseFactory<>(denseFactory);
@@ -285,7 +285,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return myCount - myActualLength;
     }
 
-    @Override
     public double dot(final Access1D<?> vector) {
 
         double retVal = PrimitiveMath.ZERO;
@@ -297,8 +296,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return retVal;
     }
 
-    @Override
     public double doubleValue(final long index) {
+
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
             return this.doubleValueInternally(tmpIndex);
@@ -307,7 +306,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    @Override
     public void fillAll(final N value) {
 
         if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, value.doubleValue())) {
@@ -330,7 +328,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    @Override
     public void fillAll(final NullaryFunction<N> supplier) {
 
         // Bad idea...
@@ -362,12 +359,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         this.set(index, supplier.get());
     }
 
-    @Override
     public void fillRange(final long first, final long limit, final N value) {
         this.fill(first, limit, 1L, value);
     }
 
-    @Override
     public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
         this.fill(first, limit, 1L, supplier);
     }
@@ -384,8 +379,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    @Override
     public N get(final long index) {
+
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
             return this.getInternally(tmpIndex);
@@ -447,13 +442,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return new NonzeroView<>(myIndices, myValues, myActualLength);
     }
 
-    @Override
     public void reset() {
         myActualLength = 0;
         myValues.reset();
     }
 
-    @Override
     public void set(final long index, final double value) {
 
         final int internalIndex = this.index(index);
@@ -461,7 +454,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         this.update(index, internalIndex, value, false);
     }
 
-    @Override
     public void set(final long index, final Number value) {
 
         final int internalIndex = this.index(index);
