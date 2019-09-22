@@ -378,11 +378,6 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
 
     private final LineView myLineView;
 
-    @SuppressWarnings("unused")
-    private EnumeratedColumnsParser() {
-        this(0, ',', null);
-    }
-
     EnumeratedColumnsParser(final int columns, final char delimiter, final ParseStrategy strategy) {
 
         super();
