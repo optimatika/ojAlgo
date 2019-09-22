@@ -21,12 +21,36 @@
  */
 package org.ojalgo.array;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.random.Uniform;
 
 public class SparseTest extends ArrayTests {
+
+    @Test
+    @Tag("slow")
+    @Tag("unstable")
+    public void testRandomAccess() {
+
+        long dim = 100_000L;
+
+        SparseArray<Double> array = SparseArray.factory(Primitive64Array.FACTORY).make(dim * dim);
+
+        for (long i = 0L; i < dim; i++) {
+            array.set(Uniform.randomInteger(dim * dim), 1.0);
+        }
+
+        double sumOfAll = 0D;
+        for (long i = 0L, limit = array.count(); i < limit; i++) {
+            sumOfAll += array.doubleValue(i);
+        }
+
+        // There is of course a chanse the same random index was generated more
+        // than once (when setting the values). In that case the test will fail.
+        TestUtils.assertEquals(dim, sumOfAll);
+    }
 
     @Test
     public void testAggregateSumDifferentWays() {

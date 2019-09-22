@@ -212,7 +212,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     }
 
-    private static final long HASH_MASK = 65536L - 1L; // 2^16 - 1
     private static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
     public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
@@ -223,16 +222,13 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return new SparseFactory<>(denseFactory, count);
     }
 
-    private static int hash(final long index) {
-        return (int) (index & HASH_MASK);
-    }
-
     /**
      * The actual number of nonzwero elements
      */
     private int myActualLength = 0;
     private final BitSet myBloomFilter = new BitSet();
     private final long myCount;
+    private final long myHashMask;
     private long[] myIndices;
     private final DenseCapacityStrategy<N> myStrategy;
     private DenseArray<N> myValues;
@@ -254,6 +250,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         myZeroScalar = strategy.scalar().zero();
         myZeroNumber = myZeroScalar.get();
         myZeroValue = myZeroNumber.doubleValue();
+
+        myHashMask = (1L << Math.min(31, Math.max(0, PrimitiveMath.powerOf2Smaller(count) - 1))) - 1L;
     }
 
     public void add(final long index, final double addend) {
@@ -305,7 +303,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     public double doubleValue(final long index) {
 
-        if (!myBloomFilter.get(SparseArray.hash(index))) {
+        if (!myBloomFilter.get(this.hash(index))) {
             return myZeroValue;
         }
 
@@ -392,7 +390,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     public N get(final long index) {
 
-        if (!myBloomFilter.get(SparseArray.hash(index))) {
+        if (!myBloomFilter.get(this.hash(index))) {
             return myZeroNumber;
         }
 
@@ -549,6 +547,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    private int hash(final long index) {
+        return (int) (index & myHashMask);
+    }
+
     /**
      * Will never remove anything - just insert or update
      */
@@ -562,7 +564,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         } else if (shouldStoreZero || (NumberContext.compare(value, PrimitiveMath.ZERO) != 0)) {
             // Not existing value, insert new
             final int tmpInsInd = -(internalIndex + 1);
-            myBloomFilter.set(SparseArray.hash(externalIndex));
+            myBloomFilter.set(this.hash(externalIndex));
 
             if ((myActualLength + 1) <= myIndices.length) {
                 // No need to grow the backing arrays
@@ -617,7 +619,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         } else if (shouldStoreZero || !value.equals(myZeroNumber)) {
             // Not existing value, insert new
             final int tmpInsInd = -(internalIndex + 1);
-            myBloomFilter.set(SparseArray.hash(externalIndex));
+            myBloomFilter.set(this.hash(externalIndex));
 
             if ((myActualLength + 1) <= myIndices.length) {
                 // No need to grow the backing arrays
