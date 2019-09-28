@@ -21,10 +21,53 @@
  */
 package org.ojalgo.function.special;
 
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 
 public class MissingMathTest {
+
+    @Test
+    public void testMax() {
+        TestUtils.assertEquals(9, MissingMath.max(9, 0, -9));
+        TestUtils.assertEquals(9, MissingMath.max(-9, 0, 9));
+    }
+
+    @Test
+    public void testMin() {
+        TestUtils.assertEquals(-9, MissingMath.min(9, 0, -9));
+        TestUtils.assertEquals(-9, MissingMath.min(-9, 0, 9));
+    }
+
+    @Test
+    public void testMinMax() {
+
+        TestUtils.assertEquals(Math.min(2, -78), MissingMath.min(2, -78));
+        TestUtils.assertEquals(MAX.invoke(2, -78), MissingMath.max(2, -78));
+
+        TestUtils.assertEquals(67, MissingMath.max(new int[] { 67 }));
+        TestUtils.assertEquals(67, MissingMath.min(new int[] { 67 }));
+
+        TestUtils.assertEquals(MissingMath.max(67, -76), MissingMath.max(new int[] { 67, -76 }));
+        TestUtils.assertEquals(MissingMath.min(67, -76), MissingMath.min(new int[] { 67, -76 }));
+
+        TestUtils.assertEquals(MissingMath.max(0, 67, -76), MissingMath.max(new int[] { 0, 67, -76 }));
+        TestUtils.assertEquals(MissingMath.min(0, 67, -76), MissingMath.min(new int[] { 0, 67, -76 }));
+
+        TestUtils.assertEquals(MissingMath.max(0, 67, -76, 80), MissingMath.max(new int[] { 0, 67, -76, 80 }));
+        TestUtils.assertEquals(MissingMath.min(0, 67, -76, -80), MissingMath.min(new int[] { 0, 67, -76, -80 }));
+
+        TestUtils.assertEquals(MissingMath.max(80, 0, 67, -76), MissingMath.max(new int[] { 80, 0, 67, -76 }));
+        TestUtils.assertEquals(MissingMath.min(-80, 0, 67, -76), MissingMath.min(new int[] { -80, 0, 67, -76 }));
+
+        TestUtils.assertEquals(80, MissingMath.max(new int[] { 0, 67, -76, 80 }));
+        TestUtils.assertEquals(-80, MissingMath.min(new int[] { 0, 67, -76, -80 }));
+
+        TestUtils.assertEquals(80, MissingMath.max(new int[] { 80, 0, 67, -76 }));
+        TestUtils.assertEquals(-80, MissingMath.min(new int[] { -80, 0, 67, -76 }));
+
+    }
 
     @Test
     public void testPower() {

@@ -24,7 +24,7 @@ package org.ojalgo.matrix.task;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.function.FunctionUtils;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -171,7 +171,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         double tmp01 = source.doubleValue(2L);
         double tmp11 = source.doubleValue(3L);
 
-        final double tmpScale = FunctionUtils.norm(tmp00, tmp01, tmp10, tmp11);
+        final double tmpScale = MissingMath.norm(tmp00, tmp01, tmp10, tmp11);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -202,7 +202,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         double tmp12 = source.doubleValue(7L);
         double tmp22 = source.doubleValue(8L);
 
-        final double tmpScale = FunctionUtils.norm(tmp00, tmp01, tmp02, tmp10, tmp11, tmp12, tmp20, tmp21, tmp22);
+        final double tmpScale = MissingMath.norm(tmp00, tmp01, tmp02, tmp10, tmp11, tmp12, tmp20, tmp21, tmp22);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -265,7 +265,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         double tmp23 = source.doubleValue(14L);
         double tmp33 = source.doubleValue(15L);
 
-        final double tmpScale = FunctionUtils.norm(tmp00, tmp01, tmp02, tmp03, tmp10, tmp11, tmp12, tmp13, tmp20, tmp21, tmp22, tmp23, tmp30, tmp31, tmp32,
+        final double tmpScale = MissingMath.norm(tmp00, tmp01, tmp02, tmp03, tmp10, tmp11, tmp12, tmp13, tmp20, tmp21, tmp22, tmp23, tmp30, tmp31, tmp32,
                 tmp33);
 
         tmp00 /= tmpScale;
@@ -363,7 +363,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         double tmp34 = source.doubleValue(23L);
         double tmp44 = source.doubleValue(24L);
 
-        final double tmpScale = FunctionUtils.norm(tmp00, tmp01, tmp02, tmp03, tmp04, tmp10, tmp11, tmp12, tmp13, tmp14, tmp20, tmp21, tmp22, tmp23, tmp24,
+        final double tmpScale = MissingMath.norm(tmp00, tmp01, tmp02, tmp03, tmp04, tmp10, tmp11, tmp12, tmp13, tmp14, tmp20, tmp21, tmp22, tmp23, tmp24,
                 tmp30, tmp31, tmp32, tmp33, tmp34, tmp40, tmp41, tmp42, tmp43, tmp44);
 
         tmp00 /= tmpScale;
@@ -491,7 +491,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
         double tmp11 = source.doubleValue(3L);
 
-        final double tmpScale = FunctionUtils.norm(tmp00, tmp10, tmp11);
+        final double tmpScale = MissingMath.norm(tmp00, tmp10, tmp11);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -518,7 +518,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
         double tmp22 = source.doubleValue(8L);
 
-        final double tmpScale = FunctionUtils.norm(tmp00, tmp10, tmp11, tmp20, tmp21, tmp22);
+        final double tmpScale = MissingMath.norm(tmp00, tmp10, tmp11, tmp20, tmp21, tmp22);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -569,7 +569,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
         double tmp33 = source.doubleValue(15L);
 
-        final double tmpScale = FunctionUtils.norm(tmp00, tmp10, tmp11, tmp20, tmp21, tmp22, tmp30, tmp31, tmp32, tmp33);
+        final double tmpScale = MissingMath.norm(tmp00, tmp10, tmp11, tmp20, tmp21, tmp22, tmp30, tmp31, tmp32, tmp33);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -644,7 +644,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
         double tmp44 = source.doubleValue(24L);
 
-        final double tmpScale = FunctionUtils.norm(tmp00, tmp10, tmp11, tmp20, tmp21, tmp22, tmp30, tmp31, tmp32, tmp33, tmp40, tmp41, tmp42, tmp43, tmp44);
+        final double tmpScale = MissingMath.norm(tmp00, tmp10, tmp11, tmp20, tmp21, tmp22, tmp30, tmp31, tmp32, tmp33, tmp40, tmp41, tmp42, tmp43, tmp44);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;

@@ -27,12 +27,12 @@ import java.util.Spliterators;
 
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 
@@ -148,15 +148,15 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
     }
 
     public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-        final int tmpLimit = (int) FunctionUtils.min(this.count(), left.count(), right.count());
-        for (int i = 0; i < tmpLimit; i++) {
+        int limit = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
+        for (int i = 0; i < limit; i++) {
             data[i] = function.invoke(left.get(i), right.get(i));
         }
     }
 
     public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
-        final int tmpLimit = (int) FunctionUtils.min(this.count(), arguments.count());
-        for (int i = 0; i < tmpLimit; i++) {
+        int limit = MissingMath.toMinIntExact(this.count(), arguments.count());
+        for (int i = 0; i < limit; i++) {
             data[i] = function.invoke(arguments.get(i));
         }
     }

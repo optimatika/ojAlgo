@@ -25,7 +25,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.constant.PrimitiveMath.Prefix;
 import org.ojalgo.type.context.NumberContext;
 
@@ -94,35 +93,6 @@ public class PrimitiveMathTest {
 
         TestUtils.assertEquals(FIVE, HYPOT.invoke(FOUR, THREE), MACHINE_EPSILON);
         TestUtils.assertEquals(NaN, HYPOT.invoke(NaN, NaN), MACHINE_EPSILON);
-
-    }
-
-    @Test
-    public void testMinMax() {
-
-        TestUtils.assertEquals(Math.min(2, -78), FunctionUtils.min(2, -78));
-        TestUtils.assertEquals(MAX.invoke(2, -78), FunctionUtils.max(2, -78));
-
-        TestUtils.assertEquals(67, FunctionUtils.max(new int[] { 67 }));
-        TestUtils.assertEquals(67, FunctionUtils.min(new int[] { 67 }));
-
-        TestUtils.assertEquals(FunctionUtils.max(67, -76), FunctionUtils.max(new int[] { 67, -76 }));
-        TestUtils.assertEquals(FunctionUtils.min(67, -76), FunctionUtils.min(new int[] { 67, -76 }));
-
-        TestUtils.assertEquals(FunctionUtils.max(0, 67, -76), FunctionUtils.max(new int[] { 0, 67, -76 }));
-        TestUtils.assertEquals(FunctionUtils.min(0, 67, -76), FunctionUtils.min(new int[] { 0, 67, -76 }));
-
-        TestUtils.assertEquals(FunctionUtils.max(0, 67, -76, 80), FunctionUtils.max(new int[] { 0, 67, -76, 80 }));
-        TestUtils.assertEquals(FunctionUtils.min(0, 67, -76, -80), FunctionUtils.min(new int[] { 0, 67, -76, -80 }));
-
-        TestUtils.assertEquals(FunctionUtils.max(80, 0, 67, -76), FunctionUtils.max(new int[] { 80, 0, 67, -76 }));
-        TestUtils.assertEquals(FunctionUtils.min(-80, 0, 67, -76), FunctionUtils.min(new int[] { -80, 0, 67, -76 }));
-
-        TestUtils.assertEquals(80, FunctionUtils.max(new int[] { 0, 67, -76, 80 }));
-        TestUtils.assertEquals(-80, FunctionUtils.min(new int[] { 0, 67, -76, -80 }));
-
-        TestUtils.assertEquals(80, FunctionUtils.max(new int[] { 80, 0, 67, -76 }));
-        TestUtils.assertEquals(-80, FunctionUtils.min(new int[] { -80, 0, 67, -76 }));
 
     }
 

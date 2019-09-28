@@ -131,6 +131,146 @@ public abstract class MissingMath {
         return Math.log(1.0 / (1.0 - arg));
     }
 
+    public static double max(final double... values) {
+        double retVal = values[0];
+        for (int i = values.length; i-- != 1;) {
+            retVal = values[i] > retVal ? values[i] : retVal;
+        }
+        return retVal;
+    }
+
+    public static double max(final double a, final double b) {
+        return Math.max(a, b);
+    }
+
+    public static double max(final double a, final double b, final double c) {
+        return Math.max(Math.max(a, b), c);
+    }
+
+    public static double max(final double a, final double b, final double c, final double d) {
+        return Math.max(Math.max(a, b), Math.max(c, d));
+    }
+
+    public static int max(final int... values) {
+        int retVal = values[0];
+        for (int i = values.length; i-- != 1;) {
+            retVal = values[i] > retVal ? values[i] : retVal;
+        }
+        return retVal;
+    }
+
+    public static int max(final int a, final int b) {
+        return Math.max(a, b);
+    }
+
+    public static int max(final int a, final int b, final int c) {
+        return Math.max(Math.max(a, b), c);
+    }
+
+    public static int max(final int a, final int b, final int c, final int d) {
+        return Math.max(Math.max(a, b), Math.max(c, d));
+    }
+
+    public static long max(final long... values) {
+        long retVal = values[0];
+        for (int i = values.length; i-- != 1;) {
+            retVal = values[i] > retVal ? values[i] : retVal;
+        }
+        return retVal;
+    }
+
+    public static long max(final long a, final long b) {
+        return Math.max(a, b);
+    }
+
+    public static long max(final long a, final long b, final long c) {
+        return Math.max(Math.max(a, b), c);
+    }
+
+    public static long max(final long a, final long b, final long c, final long d) {
+        return Math.max(Math.max(a, b), Math.max(c, d));
+    }
+
+    public static double min(final double... values) {
+        double retVal = values[0];
+        for (int i = values.length; i-- != 1;) {
+            retVal = values[i] < retVal ? values[i] : retVal;
+        }
+        return retVal;
+    }
+
+    public static double min(final double a, final double b) {
+        return Math.min(a, b);
+    }
+
+    public static double min(final double a, final double b, final double c) {
+        return Math.min(Math.min(a, b), c);
+    }
+
+    public static double min(final double a, final double b, final double c, final double d) {
+        return Math.min(Math.min(a, b), Math.min(c, d));
+    }
+
+    public static int min(final int... values) {
+        int retVal = values[0];
+        for (int i = values.length; i-- != 1;) {
+            retVal = values[i] < retVal ? values[i] : retVal;
+        }
+        return retVal;
+    }
+
+    public static int min(final int a, final int b) {
+        return Math.min(a, b);
+    }
+
+    public static int min(final int a, final int b, final int c) {
+        return Math.min(Math.min(a, b), c);
+    }
+
+    public static int min(final int a, final int b, final int c, final int d) {
+        return Math.min(Math.min(a, b), Math.min(c, d));
+    }
+
+    public static long min(final long... values) {
+        long retVal = values[0];
+        for (int i = values.length; i-- != 1;) {
+            retVal = values[i] < retVal ? values[i] : retVal;
+        }
+        return retVal;
+    }
+
+    public static long min(final long a, final long b) {
+        return Math.min(a, b);
+    }
+
+    public static long min(final long a, final long b, final long c) {
+        return Math.min(Math.min(a, b), c);
+    }
+
+    public static long min(final long a, final long b, final long c, final long d) {
+        return Math.min(Math.min(a, b), Math.min(c, d));
+    }
+
+    public static double norm(final double... values) {
+        double retVal = Math.abs(values[0]);
+        for (int i = values.length; i-- != 1;) {
+            retVal = values[i] > retVal ? Math.abs(values[i]) : retVal;
+        }
+        return retVal;
+    }
+
+    public static double norm(final double a, final double b) {
+        return Math.max(Math.abs(a), Math.abs(b));
+    }
+
+    public static double norm(final double a, final double b, final double c) {
+        return Math.max(Math.max(Math.abs(a), Math.abs(b)), Math.abs(c));
+    }
+
+    public static double norm(final double a, final double b, final double c, final double d) {
+        return Math.max(Math.max(Math.abs(a), Math.abs(b)), Math.max(Math.abs(c), Math.abs(d)));
+    }
+
     public static BigDecimal pow(final BigDecimal arg1, final BigDecimal arg2) {
         if (arg2.signum() == 0) {
             return BigDecimal.ONE;
@@ -284,8 +424,20 @@ public abstract class MissingMath {
         return Math.sqrt(1.0 + (arg * arg));
     }
 
+    public static int toMinIntExact(final long... values) {
+        return Math.toIntExact(MissingMath.min(values));
+    }
+
     public static int toMinIntExact(final long a, final long b) {
         return Math.toIntExact(Math.min(a, b));
+    }
+
+    public static int toMinIntExact(final long a, final long b, final long c) {
+        return Math.toIntExact(MissingMath.min(a, b, c));
+    }
+
+    public static int toMinIntExact(final long a, final long b, final long c, final long d) {
+        return Math.toIntExact(MissingMath.min(a, b, c, d));
     }
 
 }

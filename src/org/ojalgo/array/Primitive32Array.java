@@ -32,7 +32,6 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.ParameterFunction.FixedParameter;
@@ -42,6 +41,7 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -396,13 +396,13 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        final int tmpLimit = (int) FunctionUtils.min(this.count(), left.count(), right.count());
-        Primitive32Array.invoke(data, 0, tmpLimit, 1, left, function, right);
+        int limit = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
+        Primitive32Array.invoke(data, 0, limit, 1, left, function, right);
     }
 
     public void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
-        final int tmpLimit = (int) FunctionUtils.min(this.count(), arguments.count());
-        Primitive32Array.invoke(data, 0, tmpLimit, 1, arguments, function);
+        int limit = MissingMath.toMinIntExact(this.count(), arguments.count());
+        Primitive32Array.invoke(data, 0, limit, 1, arguments, function);
     }
 
     @Override

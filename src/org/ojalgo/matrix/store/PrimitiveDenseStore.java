@@ -37,7 +37,6 @@ import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -45,6 +44,7 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.matrix.MatrixUtils;
@@ -798,7 +798,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     @Override
     public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
 
-        final int matchingCount = (int) FunctionUtils.min(this.count(), left.count(), right.count());
+        int matchingCount = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
 
         if (myColDim > FillMatchingDual.THRESHOLD) {
 
@@ -822,7 +822,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     @Override
     public void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
 
-        final int matchingCount = (int) FunctionUtils.min(this.count(), arguments.count());
+        int matchingCount = MissingMath.toMinIntExact(this.count(), arguments.count());
 
         if (myColDim > FillMatchingSingle.THRESHOLD) {
 
@@ -947,22 +947,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public void modifyDiagonal(final long row, final long col, final UnaryFunction<Double> modifier) {
         myUtility.modifyDiagonal(row, col, modifier);
-    }
-
-    @Override
-    public void modifyMatching(final Access1D<Double> left, final BinaryFunction<Double> function) {
-        final long tmpLimit = FunctionUtils.min(left.count(), this.count(), this.count());
-        for (long i = 0L; i < tmpLimit; i++) {
-            this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
-        }
-    }
-
-    @Override
-    public void modifyMatching(final BinaryFunction<Double> function, final Access1D<Double> right) {
-        final long tmpLimit = FunctionUtils.min(this.count(), right.count(), this.count());
-        for (long i = 0L; i < tmpLimit; i++) {
-            this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
-        }
     }
 
     public void modifyOne(final long row, final long col, final UnaryFunction<Double> modifier) {
