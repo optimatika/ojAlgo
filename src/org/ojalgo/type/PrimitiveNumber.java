@@ -19,47 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.structure;
+package org.ojalgo.type;
 
-import org.ojalgo.type.PrimitiveNumber;
+/**
+ * An interface that defines what is in {@link java.lang.Number}. Hopefully Java itself will one day get an
+ * interface that does this.
+ */
+public interface PrimitiveNumber {
 
-public interface AccessScalar<N> extends PrimitiveNumber {
+    byte byteValue();
 
-    /**
-     * @see Number#byteValue()
-     */
-    default byte byteValue() {
-        return (byte) this.shortValue();
-    }
+    double doubleValue();
 
-    /**
-     * @see Number#floatValue()
-     */
-    default float floatValue() {
-        return (float) this.doubleValue();
-    }
+    float floatValue();
 
-    N get();
+    int intValue();
 
-    /**
-     * @see Number#intValue()
-     */
-    default int intValue() {
-        return (int) this.longValue();
-    }
+    long longValue();
 
-    /**
-     * @see Number#longValue()
-     */
-    default long longValue() {
-        return Math.round(this.doubleValue());
-    }
-
-    /**
-     * @see Number#shortValue()
-     */
-    default short shortValue() {
-        return (short) this.intValue();
-    }
+    short shortValue();
 
 }
