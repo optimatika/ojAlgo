@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Added / Changed / Deprecated / Removed / Fixed / Security
+
 ## [Unreleased]
 
 > Corresponds to changes in the `develop` branch since the last release
@@ -25,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### org.ojalgo.optimisation
 
-- The iterative version of the ActiveSetSolver now enforce an iterations limit.
+- The iterative version of the ActiveSetSolver now enforce an iterations limit on its internal subsolver.
 
 #### org.ojalgo.structure
 
@@ -37,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The merge functionality of AggregatorFunction is deprecated.
 - Everything related to "power of 2" has been deprecetd in PrimitiveMath. 
+- FunctionUtils has been deprecated. Everything in it has been moved elsewhere – mostly to MissingMath.
 
 ### Removed
 

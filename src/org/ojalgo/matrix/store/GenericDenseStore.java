@@ -30,11 +30,11 @@ import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.DiagonalStore.Builder;
@@ -744,7 +744,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     @Override
     public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
 
-        final int matchingCount = (int) FunctionUtils.min(this.count(), left.count(), right.count());
+        int matchingCount = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
 
         if (myColDim > FillMatchingDual.THRESHOLD) {
 
@@ -768,7 +768,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     @Override
     public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
 
-        final int matchingCount = (int) FunctionUtils.min(this.count(), arguments.count());
+        int matchingCount = MissingMath.toMinIntExact(this.count(), arguments.count());
 
         if (myColDim > FillMatchingSingle.THRESHOLD) {
 
@@ -893,22 +893,6 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
 
     public void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
         myUtility.modifyDiagonal(row, col, modifier);
-    }
-
-    @Override
-    public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
-        final long tmpLimit = FunctionUtils.min(left.count(), this.count(), this.count());
-        for (long i = 0L; i < tmpLimit; i++) {
-            this.fillOne(i, function.invoke(left.get(i), this.get(i)));
-        }
-    }
-
-    @Override
-    public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
-        final long tmpLimit = FunctionUtils.min(this.count(), right.count(), this.count());
-        for (long i = 0L; i < tmpLimit; i++) {
-            this.fillOne(i, function.invoke(this.get(i), right.get(i)));
-        }
     }
 
     public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {

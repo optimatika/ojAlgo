@@ -25,9 +25,9 @@ import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.special.MissingMath;
 
 /**
  * N-dimensional mutator methods
@@ -103,7 +103,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
             boolean retVal = true;
 
-            int tmpRank = FunctionUtils.max(this.shape().length, this.shape().length);
+            int tmpRank = MissingMath.max(this.shape().length, this.shape().length);
 
             for (int i = 0; i < tmpRank; i++) {
                 retVal &= this.count(i) >= supplier.count(i);

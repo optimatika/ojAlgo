@@ -21,20 +21,15 @@
  */
 package org.ojalgo.structure;
 
-public interface AccessScalar<N extends Number> {
+import org.ojalgo.type.PrimitiveNumber;
+
+public interface AccessScalar<N> extends PrimitiveNumber {
 
     /**
      * @see Number#byteValue()
      */
     default byte byteValue() {
         return (byte) this.shortValue();
-    }
-
-    /**
-     * @see Number#doubleValue()
-     */
-    default double doubleValue() {
-        return this.get().doubleValue();
     }
 
     /**
