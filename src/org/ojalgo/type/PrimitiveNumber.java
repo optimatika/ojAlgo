@@ -19,27 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix;
-
-import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.FunctionUtils;
+package org.ojalgo.type;
 
 /**
- * @author apete
+ * An interface that defines what is in {@link java.lang.Number}. Hopefully Java itself will one day get an
+ * interface that does this. When/if that happens then this interface AND any/all usage of
+ * <code>extends java.lang.Number</code> will be replaced by that new interface.
  */
-public class MatrixUtilsTest extends MatrixTests {
+public interface PrimitiveNumber {
 
-    @Test
-    public void testMax() {
-        TestUtils.assertEquals(9, FunctionUtils.max(9, 0, -9));
-        TestUtils.assertEquals(9, FunctionUtils.max(-9, 0, 9));
-    }
+    byte byteValue();
 
-    @Test
-    public void testMin() {
-        TestUtils.assertEquals(-9, FunctionUtils.min(9, 0, -9));
-        TestUtils.assertEquals(-9, FunctionUtils.min(-9, 0, 9));
-    }
+    double doubleValue();
+
+    float floatValue();
+
+    int intValue();
+
+    long longValue();
+
+    short shortValue();
 
 }

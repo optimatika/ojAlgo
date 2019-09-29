@@ -25,8 +25,14 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.function.UnaryOperator;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.scalar.PrimitiveScalar;
 
 public interface UnaryFunction<N extends Number> extends BasicFunction, UnaryOperator<N>, DoubleUnaryOperator {
+
+    static <N extends Number> boolean isZeroModified(final UnaryFunction<N> function) {
+        return !PrimitiveScalar.isSmall(PrimitiveMath.ONE, function.invoke(PrimitiveMath.ZERO));
+    }
 
     default UnaryFunction<N> andThen(final UnaryFunction<N> after) {
         ProgrammingError.throwIfNull(after);

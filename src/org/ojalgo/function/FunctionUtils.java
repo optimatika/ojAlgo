@@ -21,153 +21,244 @@
  */
 package org.ojalgo.function;
 
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.function.special.MissingMath;
 
+/**
+ * @deprecated v48
+ */
+@Deprecated
 public abstract class FunctionUtils {
 
+    /**
+     * @deprecated v48 Use {@link UnaryFunction#isZeroModified(UnaryFunction<N>)} instead
+     */
+    @Deprecated
     public static <N extends Number> boolean isZeroModified(final UnaryFunction<N> function) {
-        return !PrimitiveScalar.isSmall(PrimitiveMath.ONE, function.invoke(PrimitiveMath.ZERO));
+        return UnaryFunction.isZeroModified(function);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#max(double...)} instead
+     */
+    @Deprecated
     public static double max(final double... values) {
-        double retVal = values[0];
-        for (int i = values.length; i-- != 1;) {
-            retVal = values[i] > retVal ? values[i] : retVal;
-        }
-        return retVal;
+        return MissingMath.max(values);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#max(double,double)} instead
+     */
+    @Deprecated
     public static double max(final double a, final double b) {
-        return Math.max(a, b);
+        return MissingMath.max(a, b);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#max(double,double,double)} instead
+     */
+    @Deprecated
     public static double max(final double a, final double b, final double c) {
-        return Math.max(Math.max(a, b), c);
+        return MissingMath.max(a, b, c);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#max(double,double,double,double)} instead
+     */
+    @Deprecated
     public static double max(final double a, final double b, final double c, final double d) {
-        return Math.max(Math.max(a, b), Math.max(c, d));
+        return MissingMath.max(a, b, c, d);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#max(int...)} instead
+     */
+    @Deprecated
     public static int max(final int... values) {
-        int retVal = values[0];
-        for (int i = values.length; i-- != 1;) {
-            retVal = values[i] > retVal ? values[i] : retVal;
-        }
-        return retVal;
+        return MissingMath.max(values);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#max(int,int)} instead
+     */
+    @Deprecated
     public static int max(final int a, final int b) {
-        return Math.max(a, b);
+        return MissingMath.max(a, b);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#max(int,int,int)} instead
+     */
+    @Deprecated
     public static int max(final int a, final int b, final int c) {
-        return Math.max(Math.max(a, b), c);
+        return MissingMath.max(a, b, c);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#max(int,int,int,int)} instead
+     */
+    @Deprecated
     public static int max(final int a, final int b, final int c, final int d) {
-        return Math.max(Math.max(a, b), Math.max(c, d));
+        return MissingMath.max(a, b, c, d);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#max(long...)} instead
+     */
+    @Deprecated
     public static long max(final long... values) {
-        long retVal = values[0];
-        for (int i = values.length; i-- != 1;) {
-            retVal = values[i] > retVal ? values[i] : retVal;
-        }
-        return retVal;
+        return MissingMath.max(values);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#max(long,long)} instead
+     */
+    @Deprecated
     public static long max(final long a, final long b) {
-        return Math.max(a, b);
+        return MissingMath.max(a, b);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#max(long,long,long)} instead
+     */
+    @Deprecated
     public static long max(final long a, final long b, final long c) {
-        return Math.max(Math.max(a, b), c);
+        return MissingMath.max(a, b, c);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#max(long,long,long,long)} instead
+     */
+    @Deprecated
     public static long max(final long a, final long b, final long c, final long d) {
-        return Math.max(Math.max(a, b), Math.max(c, d));
+        return MissingMath.max(a, b, c, d);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#min(double...)} instead
+     */
+    @Deprecated
     public static double min(final double... values) {
-        double retVal = values[0];
-        for (int i = values.length; i-- != 1;) {
-            retVal = values[i] < retVal ? values[i] : retVal;
-        }
-        return retVal;
+        return MissingMath.min(values);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#min(double,double)} instead
+     */
+    @Deprecated
     public static double min(final double a, final double b) {
-        return Math.min(a, b);
+        return MissingMath.min(a, b);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#min(double,double,double)} instead
+     */
+    @Deprecated
     public static double min(final double a, final double b, final double c) {
-        return Math.min(Math.min(a, b), c);
+        return MissingMath.min(a, b, c);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#min(double,double,double,double)} instead
+     */
+    @Deprecated
     public static double min(final double a, final double b, final double c, final double d) {
-        return Math.min(Math.min(a, b), Math.min(c, d));
+        return MissingMath.min(a, b, c, d);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#min(int...)} instead
+     */
+    @Deprecated
     public static int min(final int... values) {
-        int retVal = values[0];
-        for (int i = values.length; i-- != 1;) {
-            retVal = values[i] < retVal ? values[i] : retVal;
-        }
-        return retVal;
+        return MissingMath.min(values);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#min(int,int)} instead
+     */
+    @Deprecated
     public static int min(final int a, final int b) {
-        return Math.min(a, b);
+        return MissingMath.min(a, b);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#min(int,int,int)} instead
+     */
+    @Deprecated
     public static int min(final int a, final int b, final int c) {
-        return Math.min(Math.min(a, b), c);
+        return MissingMath.min(a, b, c);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#min(int,int,int,int)} instead
+     */
+    @Deprecated
     public static int min(final int a, final int b, final int c, final int d) {
-        return Math.min(Math.min(a, b), Math.min(c, d));
+        return MissingMath.min(a, b, c, d);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#min(long...)} instead
+     */
+    @Deprecated
     public static long min(final long... values) {
-        long retVal = values[0];
-        for (int i = values.length; i-- != 1;) {
-            retVal = values[i] < retVal ? values[i] : retVal;
-        }
-        return retVal;
+        return MissingMath.min(values);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#min(long,long)} instead
+     */
+    @Deprecated
     public static long min(final long a, final long b) {
-        return Math.min(a, b);
+        return MissingMath.min(a, b);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#min(long,long,long)} instead
+     */
+    @Deprecated
     public static long min(final long a, final long b, final long c) {
-        return Math.min(Math.min(a, b), c);
+        return MissingMath.min(a, b, c);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#min(long,long,long,long)} instead
+     */
+    @Deprecated
     public static long min(final long a, final long b, final long c, final long d) {
-        return Math.min(Math.min(a, b), Math.min(c, d));
+        return MissingMath.min(a, b, c, d);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#norm(double...)} instead
+     */
+    @Deprecated
     public static double norm(final double... values) {
-        double retVal = Math.abs(values[0]);
-        for (int i = values.length; i-- != 1;) {
-            retVal = values[i] > retVal ? Math.abs(values[i]) : retVal;
-        }
-        return retVal;
+        return MissingMath.norm(values);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#norm(double,double)} instead
+     */
+    @Deprecated
     public static double norm(final double a, final double b) {
-        return Math.max(Math.abs(a), Math.abs(b));
+        return MissingMath.norm(a, b);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#norm(double,double,double)} instead
+     */
+    @Deprecated
     public static double norm(final double a, final double b, final double c) {
-        return Math.max(Math.max(Math.abs(a), Math.abs(b)), Math.abs(c));
+        return MissingMath.norm(a, b, c);
     }
 
+    /**
+     * @deprecated v48 Use {@link MissingMath#norm(double,double,double,double)} instead
+     */
+    @Deprecated
     public static double norm(final double a, final double b, final double c, final double d) {
-        return Math.max(Math.max(Math.abs(a), Math.abs(b)), Math.max(Math.abs(c), Math.abs(d)));
+        return MissingMath.norm(a, b, c, d);
     }
 
     private FunctionUtils() {

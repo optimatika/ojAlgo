@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.task;
 
 import org.ojalgo.RecoverableCondition;
-import org.ojalgo.function.FunctionUtils;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -137,7 +137,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp0 = rhs.doubleValue(0L);
         double tmp1 = rhs.doubleValue(1L);
 
-        final double tmpScale = FunctionUtils.norm(tmp0, tmp1);
+        final double tmpScale = MissingMath.norm(tmp0, tmp1);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -172,7 +172,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp1 = rhs.doubleValue(1L);
         double tmp2 = rhs.doubleValue(2L);
 
-        final double tmpScale = FunctionUtils.norm(tmp0, tmp1, tmp2);
+        final double tmpScale = MissingMath.norm(tmp0, tmp1, tmp2);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -236,7 +236,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp2 = rhs.doubleValue(2L);
         double tmp3 = rhs.doubleValue(3L);
 
-        final double tmpScale = FunctionUtils.norm(tmp0, tmp1, tmp2, tmp3);
+        final double tmpScale = MissingMath.norm(tmp0, tmp1, tmp2, tmp3);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -329,7 +329,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp3 = rhs.doubleValue(3L);
         double tmp4 = rhs.doubleValue(4L);
 
-        final double tmpScale = FunctionUtils.norm(tmp0, tmp1, tmp2, tmp3, tmp4);
+        final double tmpScale = MissingMath.norm(tmp0, tmp1, tmp2, tmp3, tmp4);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -475,7 +475,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp0 = rhs.doubleValue(0L);
         double tmp1 = rhs.doubleValue(1L);
 
-        final double tmpScale = FunctionUtils.norm(tmp0, tmp1);
+        final double tmpScale = MissingMath.norm(tmp0, tmp1);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -506,7 +506,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp1 = rhs.doubleValue(1L);
         double tmp2 = rhs.doubleValue(2L);
 
-        final double tmpScale = FunctionUtils.norm(tmp0, tmp1, tmp2);
+        final double tmpScale = MissingMath.norm(tmp0, tmp1, tmp2);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -558,7 +558,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp2 = rhs.doubleValue(2L);
         double tmp3 = rhs.doubleValue(3L);
 
-        final double tmpScale = FunctionUtils.norm(tmp0, tmp1, tmp2, tmp3);
+        final double tmpScale = MissingMath.norm(tmp0, tmp1, tmp2, tmp3);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -629,7 +629,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         double tmp3 = rhs.doubleValue(3L);
         double tmp4 = rhs.doubleValue(4L);
 
-        final double tmpScale = FunctionUtils.norm(tmp0, tmp1, tmp2, tmp3, tmp4);
+        final double tmpScale = MissingMath.norm(tmp0, tmp1, tmp2, tmp3, tmp4);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;

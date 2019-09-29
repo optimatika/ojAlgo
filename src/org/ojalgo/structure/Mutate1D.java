@@ -25,7 +25,6 @@ import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -112,15 +111,11 @@ public interface Mutate1D extends Structure1D {
         }
 
         default void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
-            for (long i = 0L, limit = FunctionUtils.min(left.count(), this.count()); i < limit; i++) {
-                this.modifyOne(i, function.first(left.get(i)));
-            }
+            Structure1D.loopMatching(left, this, i -> this.modifyOne(i, function.first(left.get(i))));
         }
 
         default void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
-            for (long i = 0L, limit = FunctionUtils.min(this.count(), right.count()); i < limit; i++) {
-                this.modifyOne(i, function.second(right.get(i)));
-            }
+            Structure1D.loopMatching(this, right, i -> this.modifyOne(i, function.second(right.get(i))));
         }
 
         void modifyOne(long index, UnaryFunction<N> modifier);
