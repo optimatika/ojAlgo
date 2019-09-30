@@ -23,9 +23,65 @@ package org.ojalgo.function.special;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.scalar.ComplexNumber;
 
 public abstract class GammaFunction {
+
+    public static abstract class Incomplete extends GammaFunction {
+
+        public static long lower(final int n, double limit) {
+            return 0L;
+        }
+
+        public static long upper(final int n, double limit) {
+            return 0L;
+        }
+
+        public static double lower(final double x, double limit) {
+            return NaN;
+        }
+
+        public static double upper(final double x, double limit) {
+            return NaN;
+        }
+
+        public static ComplexNumber lower(final ComplexNumber z, double limit) {
+            return null;
+        }
+
+        public static ComplexNumber upper(final ComplexNumber z, double limit) {
+            return null;
+        }
+
+    }
+
+    public static abstract class Regularized extends GammaFunction {
+
+        public static ComplexNumber lower(final ComplexNumber z, double limit) {
+            return GammaFunction.Incomplete.lower(z, limit).divide(GammaFunction.gamma(z));
+        }
+
+        public static ComplexNumber upper(final ComplexNumber z, double limit) {
+            return GammaFunction.Incomplete.upper(z, limit).divide(GammaFunction.gamma(z));
+        }
+
+        public static double lower(final double x, double limit) {
+            return GammaFunction.Incomplete.lower(x, limit) / GammaFunction.gamma(x);
+        }
+
+        public static double upper(final double x, double limit) {
+            return GammaFunction.Incomplete.upper(x, limit) / GammaFunction.gamma(x);
+        }
+
+        public static long lower(final int n, double limit) {
+            return GammaFunction.Incomplete.lower(n, limit) / GammaFunction.gamma(n);
+        }
+
+        public static long upper(final int n, double limit) {
+            return GammaFunction.Incomplete.upper(n, limit) / GammaFunction.gamma(n);
+        }
+
+    }
 
     /**
      * For the Lanczos approximation of the gamma function
@@ -34,40 +90,48 @@ public abstract class GammaFunction {
             771.3234287776530788486528258894, -176.61502916214059906584551354, 12.507343278686904814458936853, -0.13857109526572011689554707,
             9.984369578019570859563e-6, 1.50563273514931155834e-7 };
 
+    public static ComplexNumber gamma(final ComplexNumber z) {
+        // TODO Implemennt it!
+        return null;
+    }
+
     /**
      * Lanczos approximation. The abritray constant is 7, and there are 9 coefficients used. Essentially the
      * algorithm is taken from <a href="http://en.wikipedia.org/wiki/Lanczos_approximation">WikipediA</a> ,
      * but it's modified a bit and I found more exact coefficients somewhere else.
      */
-    public static double gamma(final double arg) {
+    public static double gamma(final double x) {
 
-        if ((arg <= ZERO) && (PrimitiveMath.ABS.invoke(arg % ONE) < MACHINE_EPSILON)) {
+        if ((x <= ZERO) && (ABS.invoke(x % ONE) < MACHINE_EPSILON)) {
 
             return NaN;
 
         } else {
 
-            if (arg < HALF) {
+            if (x < HALF) {
 
-                return PI / (PrimitiveMath.SIN.invoke(PI * arg) * GammaFunction.gamma(ONE - arg));
+                return PI / (SIN.invoke(PI * x) * GammaFunction.gamma(ONE - x));
 
             } else {
 
-                final double z = arg - ONE;
+                final double x1 = x - ONE;
+                final double x7 = x1 + (7 + HALF);
 
-                double x = GammaFunction.L9[0];
-                for (int i = 1; i < GammaFunction.L9.length; i++) {
-                    x += GammaFunction.L9[i] / (z + i);
+                double x9 = L9[0];
+                for (int i = 1; i < L9.length; i++) {
+                    x9 += L9[i] / (x1 + i);
                 }
 
-                final double t = z + (7 + HALF);
-
-                return SQRT_TWO_PI * PrimitiveMath.POW.invoke(t, z + HALF) * PrimitiveMath.EXP.invoke(-t) * x;
+                return SQRT_TWO_PI * POW.invoke(x7, x1 + HALF) * EXP.invoke(-x7) * x9;
             }
         }
     }
 
-    private GammaFunction() {
+    public static long gamma(final int n) {
+        if (n < 1) {
+            throw new IllegalArgumentException();
+        }
+        return Math.round(CombinatorialFunctions.factorial(n - 1));
     }
 
 }
