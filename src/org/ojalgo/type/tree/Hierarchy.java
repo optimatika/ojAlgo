@@ -19,27 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function.special;
+package org.ojalgo.type.tree;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import java.util.List;
+import java.util.Optional;
 
-public class HypergeometricFunction {
+public interface Hierarchy<T> {
 
-    public static double hypergeometric(double a, double b, double c, double x) {
+    interface Element<T> {
 
-        double incr = ONE;
-        double sum = ONE;
+        List<T> getChildren();
 
-        double a1 = a - ONE;
-        double b1 = b - ONE;
-        double c1 = c - ONE;
+        Optional<T> getParent();
 
-        for (int n = 1; n < 100_000; n++) {
-            incr *= ((a1 + n) * (b1 + n) * x) / ((c1 + n) * n);
-            sum += incr;
-        }
+        boolean isLeaf();
 
-        return sum;
+        boolean isRoot();
+
     }
+
+    T getRoot();
 
 }

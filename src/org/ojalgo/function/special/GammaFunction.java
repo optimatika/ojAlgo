@@ -29,28 +29,47 @@ public abstract class GammaFunction {
 
     public static abstract class Incomplete extends GammaFunction {
 
-        public static long lower(final int n, double limit) {
-            return 0L;
-        }
-
-        public static long upper(final int n, double limit) {
-            return 0L;
+        public static ComplexNumber lower(final ComplexNumber z, double limit) {
+            return null;
         }
 
         public static double lower(final double x, double limit) {
             return NaN;
         }
 
-        public static double upper(final double x, double limit) {
-            return NaN;
-        }
-
-        public static ComplexNumber lower(final ComplexNumber z, double limit) {
-            return null;
+        public static long lower(final int n, double limit) {
+            return 0L;
         }
 
         public static ComplexNumber upper(final ComplexNumber z, double limit) {
             return null;
+        }
+
+        public static double upper(final double x, double limit) {
+            return NaN;
+        }
+
+        public static long upper(final int n, double limit) {
+            return 0L;
+        }
+
+    }
+
+    public static abstract class Logarithmic extends GammaFunction {
+
+        public static ComplexNumber gamma(ComplexNumber z) {
+            // TODO Implement it!
+            return null;
+        }
+
+        public static double gamma(double x) {
+            // TODO Implement it!
+            return NaN;
+        }
+
+        public static double gamma(int n) {
+            // TODO Implement it!
+            return NaN;
         }
 
     }
@@ -61,23 +80,23 @@ public abstract class GammaFunction {
             return GammaFunction.Incomplete.lower(z, limit).divide(GammaFunction.gamma(z));
         }
 
-        public static ComplexNumber upper(final ComplexNumber z, double limit) {
-            return GammaFunction.Incomplete.upper(z, limit).divide(GammaFunction.gamma(z));
-        }
-
         public static double lower(final double x, double limit) {
             return GammaFunction.Incomplete.lower(x, limit) / GammaFunction.gamma(x);
+        }
+
+        public static double lower(final int n, double limit) {
+            return GammaFunction.Incomplete.lower(n, limit) / GammaFunction.gamma(n);
+        }
+
+        public static ComplexNumber upper(final ComplexNumber z, double limit) {
+            return GammaFunction.Incomplete.upper(z, limit).divide(GammaFunction.gamma(z));
         }
 
         public static double upper(final double x, double limit) {
             return GammaFunction.Incomplete.upper(x, limit) / GammaFunction.gamma(x);
         }
 
-        public static long lower(final int n, double limit) {
-            return GammaFunction.Incomplete.lower(n, limit) / GammaFunction.gamma(n);
-        }
-
-        public static long upper(final int n, double limit) {
+        public static double upper(final int n, double limit) {
             return GammaFunction.Incomplete.upper(n, limit) / GammaFunction.gamma(n);
         }
 
@@ -91,7 +110,7 @@ public abstract class GammaFunction {
             9.984369578019570859563e-6, 1.50563273514931155834e-7 };
 
     public static ComplexNumber gamma(final ComplexNumber z) {
-        // TODO Implemennt it!
+        // TODO Implement it!
         return null;
     }
 
@@ -115,23 +134,23 @@ public abstract class GammaFunction {
             } else {
 
                 final double x1 = x - ONE;
-                final double x7 = x1 + (7 + HALF);
+                final double xac = x1 + (7 + HALF);
 
                 double x9 = L9[0];
                 for (int i = 1; i < L9.length; i++) {
                     x9 += L9[i] / (x1 + i);
                 }
 
-                return SQRT_TWO_PI * POW.invoke(x7, x1 + HALF) * EXP.invoke(-x7) * x9;
+                return SQRT_TWO_PI * POW.invoke(xac, x1 + HALF) * EXP.invoke(-xac) * x9;
             }
         }
     }
 
-    public static long gamma(final int n) {
+    public static double gamma(final int n) {
         if (n < 1) {
             throw new IllegalArgumentException();
         }
-        return Math.round(CombinatorialFunctions.factorial(n - 1));
+        return MissingMath.factorial(n - 1);
     }
 
 }

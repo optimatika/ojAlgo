@@ -23,41 +23,57 @@ package org.ojalgo.function.special;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import org.ojalgo.scalar.ComplexNumber;
+
 public abstract class BetaFunction {
 
     public static abstract class Incomplete extends BetaFunction {
 
-        public static double beta(double z, double a, double b) {
-
-            double tmp = ONE;
-            double incr = tmp / a;
-            double sum = incr;
-
-            for (int n = 1; (n < 100) && (Math.abs(incr) < MACHINE_EPSILON); n++) {
-                tmp *= ((n - b) * z) / n;
-                incr = tmp / (a + n);
-                sum += incr;
-            }
-
-            return Math.pow(z, a) * sum;
+        public static ComplexNumber beta(double limit, ComplexNumber a, ComplexNumber b) {
+            // TODO Implement it!
+            return null;
         }
 
-        public static double beta(double z, double a, int b) {
-            return 0D;
+        public static double beta(double limit, double a, double b) {
+
+            double tmp = ONE;
+            double sum = tmp / a;
+
+            // This implementation isn't very good numerically,
+            // but icreasing the number of iterations doesn't seem to help much.
+            for (int n = 1; n < 100; n++) {
+                tmp *= ((n - b) / n) * limit;
+                sum += tmp / (a + n);
+            }
+
+            // return Math.pow(limit, a) * sum;
+            return Math.exp((a * Math.log(limit)) + Math.log(sum));
+        }
+
+        public static double beta(double limit, int a, int b) {
+            return Incomplete.beta(limit, (double) a, (double) b);
         }
 
     }
 
     public static abstract class Regularized extends BetaFunction {
 
-        public static double beta(double z, double a, double b) {
-            return BetaFunction.Incomplete.beta(z, a, b) / BetaFunction.beta(a, b);
+        public static ComplexNumber beta(double limit, ComplexNumber a, ComplexNumber b) {
+            return BetaFunction.Incomplete.beta(limit, a, b).divide(BetaFunction.beta(a, b));
         }
 
-        public static double beta(double z, double a, int b) {
-            return BetaFunction.Incomplete.beta(z, a, b) / BetaFunction.beta(a, b);
+        public static double beta(double limit, double a, double b) {
+            return BetaFunction.Incomplete.beta(limit, a, b) / BetaFunction.beta(a, b);
         }
 
+        public static double beta(double limit, int a, int b) {
+            return BetaFunction.Incomplete.beta(limit, a, b) / BetaFunction.beta(a, b);
+        }
+
+    }
+
+    public static ComplexNumber beta(ComplexNumber a, ComplexNumber b) {
+        return GammaFunction.gamma(a).multiply(GammaFunction.gamma(b)).divide(GammaFunction.gamma(a.add(b)));
     }
 
     public static double beta(double a, double b) {
@@ -65,7 +81,7 @@ public abstract class BetaFunction {
     }
 
     public static double beta(int a, int b) {
-        return (CombinatorialFunctions.factorial(a - 1) * CombinatorialFunctions.factorial(b - 1)) / CombinatorialFunctions.factorial((a + b) - 1);
+        return (GammaFunction.gamma(a) * GammaFunction.gamma(b)) / GammaFunction.gamma(a + b);
     }
 
 }

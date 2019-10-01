@@ -29,11 +29,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
  */
 public abstract class PochhammerSymbol {
 
-    public static double pochhammer(double x, double n) {
-        return GammaFunction.gamma(x + n) / GammaFunction.gamma(x);
-    }
-
-    public static double pochhammer(double x, int n) {
+    public static double pochhammer(final double x, final int n) {
         double retVal = ONE;
         for (int i = 0; i < n; i++) {
             retVal *= (x + i);

@@ -21,6 +21,8 @@
  */
 package org.ojalgo.function.special;
 
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 
@@ -40,6 +42,24 @@ public abstract class MissingMath {
 
     public static BigDecimal divide(final BigDecimal numerator, final BigDecimal denominator) {
         return numerator.divide(denominator, MathContext.DECIMAL128);
+    }
+
+    /**
+     * <code>13!</code> does not fit in an <code>int</code>, and <code>21!</code> does not fit in a
+     * <code>long</code> - that's why this method returns a <code>double</code>.
+     */
+    public static double factorial(final int arg) {
+        if (arg < 0) {
+            throw new IllegalArgumentException();
+        } else if (arg < 2) {
+            return ONE;
+        } else if (arg < 13) {
+            return MissingMath.factorialInt(arg);
+        } else if (arg < 21) {
+            return MissingMath.factorialLong(arg);
+        } else {
+            return MissingMath.factorialDouble(arg);
+        }
     }
 
     /**
@@ -438,6 +458,30 @@ public abstract class MissingMath {
 
     public static int toMinIntExact(final long a, final long b, final long c, final long d) {
         return Math.toIntExact(MissingMath.min(a, b, c, d));
+    }
+
+    static double factorialDouble(final int arg) {
+        double retVal = ONE;
+        for (int i = 2; i <= arg; i++) {
+            retVal *= i;
+        }
+        return retVal;
+    }
+
+    static int factorialInt(final int arg) {
+        int retVal = 1;
+        for (int i = 2; i <= arg; i++) {
+            retVal *= i;
+        }
+        return retVal;
+    }
+
+    static long factorialLong(final int arg) {
+        long retVal = 1L;
+        for (int i = 2; i <= arg; i++) {
+            retVal *= i;
+        }
+        return retVal;
     }
 
 }

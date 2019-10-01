@@ -24,6 +24,7 @@ package org.ojalgo.random;
 import org.ojalgo.function.special.CombinatorialFunctions;
 import org.ojalgo.function.special.ErrorFunction;
 import org.ojalgo.function.special.GammaFunction;
+import org.ojalgo.function.special.MissingMath;
 
 /**
  * RandomUtils
@@ -83,11 +84,11 @@ public abstract class RandomUtils {
     }
 
     /**
-     * @deprecated v48 Use {@link CombinatorialFunctions#factorial(int)} instead
+     * @deprecated v48 Use {@link MissingMath#factorial(int)} instead
      */
     @Deprecated
     public static double factorial(final int aVal) {
-        return CombinatorialFunctions.factorial(aVal);
+        return MissingMath.factorial(aVal);
     }
 
     /**
@@ -110,7 +111,7 @@ public abstract class RandomUtils {
      */
     @Deprecated
     public static int partitions(final int n, final int[] k) {
-        return CombinatorialFunctions.partitions(n, k);
+        return Math.toIntExact(CombinatorialFunctions.partitions(n, k));
     }
 
     /**
@@ -120,7 +121,7 @@ public abstract class RandomUtils {
      */
     @Deprecated
     public static int permutations(final int n) {
-        return CombinatorialFunctions.permutations(n);
+        return Math.toIntExact(CombinatorialFunctions.permutations(n));
     }
 
     /**
@@ -131,7 +132,7 @@ public abstract class RandomUtils {
      */
     @Deprecated
     public static int subsets(final int n, final int k) {
-        return CombinatorialFunctions.subsets(n, k);
+        return Math.toIntExact(CombinatorialFunctions.subsets(n, k));
     }
 
     /**
@@ -142,7 +143,7 @@ public abstract class RandomUtils {
      */
     @Deprecated
     public static int variations(final int n, final int k) {
-        return CombinatorialFunctions.variations(n, k);
+        return Math.toIntExact(CombinatorialFunctions.variations(n, k));
     }
 
     private RandomUtils() {

@@ -19,27 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function.special;
+package org.ojalgo.type.tree;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+public interface BinaryTree extends Hierarchy<BinaryNode> {
 
-public class HypergeometricFunction {
-
-    public static double hypergeometric(double a, double b, double c, double x) {
-
-        double incr = ONE;
-        double sum = ONE;
-
-        double a1 = a - ONE;
-        double b1 = b - ONE;
-        double c1 = c - ONE;
-
-        for (int n = 1; n < 100_000; n++) {
-            incr *= ((a1 + n) * (b1 + n) * x) / ((c1 + n) * n);
-            sum += incr;
-        }
-
-        return sum;
+    static BinaryTree make() {
+        return new TreeNode();
     }
 
 }
