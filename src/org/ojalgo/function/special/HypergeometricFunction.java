@@ -25,7 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 public class HypergeometricFunction {
 
-    public static double hypergeometric(double a, double b, double c, double x) {
+    public static double hypergeometric(final double a, final double b, final double c, final double x) {
 
         double incr = ONE;
         double sum = ONE;

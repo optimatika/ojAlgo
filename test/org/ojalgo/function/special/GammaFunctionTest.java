@@ -25,9 +25,26 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 public class GammaFunctionTest {
+
+    @Test
+    public void testCompareImplementations() {
+
+        int lim = 50;
+        for (int a = 1; a < lim; a++) {
+
+            double intResult = GammaFunction.gamma(a);
+            double doubleResult = GammaFunction.gamma((double) a);
+            ComplexNumber complexResult = GammaFunction.gamma(ComplexNumber.valueOf(a));
+
+            TestUtils.assertEquals(intResult, doubleResult);
+            TestUtils.assertEquals(intResult, complexResult);
+
+        }
+    }
 
     @Test
     public void testGammaFunction() {
@@ -80,6 +97,20 @@ public class GammaFunctionTest {
                     GammaFunction.gamma(n + HALF), tmpEval);
         }
 
+    }
+
+    @Test
+    public void testLogarithmic() {
+
+        int lim = 50;
+        for (int a = 1; a < lim; a++) {
+            double x = a / TEN;
+
+            double expected = Math.log(GammaFunction.gamma(x));
+            double actual = GammaFunction.Logarithmic.gamma(x);
+
+            TestUtils.assertEquals(expected, actual);
+        }
     }
 
 }

@@ -24,6 +24,7 @@ package org.ojalgo.random;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.special.GammaFunction;
+import org.ojalgo.function.special.HypergeometricFunction;
 
 public class TDistribution extends AbstractContinuous {
 
@@ -182,8 +183,8 @@ public class TDistribution extends AbstractContinuous {
     }
 
     public double getDistribution(final double value) {
-        // TODO Auto-generated method stub
-        return 0;
+        return HALF + (value * myConstant
+                * HypergeometricFunction.hypergeometric(HALF, (myDegreesOfFreedom - ONE) / TWO, THREE / TWO, -(value * value) / myDegreesOfFreedom));
     }
 
     public double getExpected() {

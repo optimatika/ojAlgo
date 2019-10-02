@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.StandardType;
 
 public class BetaFunctionTest {
@@ -38,10 +39,10 @@ public class BetaFunctionTest {
 
                 double intResult = BetaFunction.beta(a, b);
                 double doubleResult = BetaFunction.beta((double) a, (double) b);
-                // ComplexNumber complexResult = null;
+                ComplexNumber complexResult = BetaFunction.beta(ComplexNumber.valueOf(a), ComplexNumber.valueOf(b));
 
                 TestUtils.assertEquals(intResult, doubleResult);
-                // TestUtils.assertEquals(intResult, complexResult);
+                TestUtils.assertEquals(intResult, complexResult);
             }
         }
     }

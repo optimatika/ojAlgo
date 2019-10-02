@@ -23,6 +23,7 @@ package org.ojalgo.function.special;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import org.ojalgo.function.constant.ComplexMath;
 import org.ojalgo.scalar.ComplexNumber;
 
 public abstract class GammaFunction {
@@ -30,26 +31,26 @@ public abstract class GammaFunction {
     public static abstract class Incomplete extends GammaFunction {
 
         public static ComplexNumber lower(final ComplexNumber z, double limit) {
-            return null;
+            return ComplexNumber.NaN;
         }
 
         public static double lower(final double x, double limit) {
             return NaN;
         }
 
-        public static long lower(final int n, double limit) {
+        public static double lower(final int n, double limit) {
             return 0L;
         }
 
         public static ComplexNumber upper(final ComplexNumber z, double limit) {
-            return null;
+            return ComplexNumber.NaN;
         }
 
         public static double upper(final double x, double limit) {
             return NaN;
         }
 
-        public static long upper(final int n, double limit) {
+        public static double upper(final int n, double limit) {
             return 0L;
         }
 
@@ -58,18 +59,15 @@ public abstract class GammaFunction {
     public static abstract class Logarithmic extends GammaFunction {
 
         public static ComplexNumber gamma(ComplexNumber z) {
-            // TODO Implement it!
-            return null;
+            return GammaFunction.LanczosApproximation.logarithmic(z);
         }
 
         public static double gamma(double x) {
-            // TODO Implement it!
-            return NaN;
+            return GammaFunction.LanczosApproximation.logarithmic(x);
         }
 
         public static double gamma(int n) {
-            // TODO Implement it!
-            return NaN;
+            return Math.log(GammaFunction.gamma(n));
         }
 
     }
@@ -103,47 +101,118 @@ public abstract class GammaFunction {
     }
 
     /**
-     * For the Lanczos approximation of the gamma function
+     * Lanczos approximation. The abritray constant is 7, and there are 9 coefficients used.
+     *
+     * <pre>
+     * http://en.wikipedia.org/wiki/Lanczos_approximation
+     * http://mathworld.wolfram.com/LanczosApproximation.html
+     * https://mrob.com/pub/ries/lanczos-gamma.html
+     * </pre>
      */
-    private static final double[] L9 = { 0.99999999999980993227684700473478, 676.520368121885098567009190444019, -1259.13921672240287047156078755283,
-            771.3234287776530788486528258894, -176.61502916214059906584551354, 12.507343278686904814458936853, -0.13857109526572011689554707,
-            9.984369578019570859563e-6, 1.50563273514931155834e-7 };
+    static abstract class LanczosApproximation {
 
-    public static ComplexNumber gamma(final ComplexNumber z) {
-        // TODO Implement it!
-        return null;
-    }
+        /**
+         * Arbitrary constant
+         */
+        private static final double A = SEVEN;
+        /**
+         * Coefficients
+         */
+        private static final double[] C = { 0.99999999999980993227684700473478, 676.520368121885098567009190444019, -1259.13921672240287047156078755283,
+                771.3234287776530788486528258894, -176.61502916214059906584551354, 12.507343278686904814458936853, -0.13857109526572011689554707,
+                9.984369578019570859563e-6, 1.50563273514931155834e-7 };
+        private static final double LOG_SQRT_TWO_PI = LOG.invoke(SQRT_TWO_PI);
 
-    /**
-     * Lanczos approximation. The abritray constant is 7, and there are 9 coefficients used. Essentially the
-     * algorithm is taken from <a href="http://en.wikipedia.org/wiki/Lanczos_approximation">WikipediA</a> ,
-     * but it's modified a bit and I found more exact coefficients somewhere else.
-     */
-    public static double gamma(final double x) {
+        static ComplexNumber gamma(final ComplexNumber z) {
 
-        if ((x <= ZERO) && (ABS.invoke(x % ONE) < MACHINE_EPSILON)) {
+            double zr = z.getReal();
 
-            return NaN;
+            if ((zr <= ZERO) && (ABS.invoke(zr % ONE) < MACHINE_EPSILON)) {
 
-        } else {
-
-            if (x < HALF) {
-
-                return PI / (SIN.invoke(PI * x) * GammaFunction.gamma(ONE - x));
+                return ComplexNumber.NaN;
 
             } else {
 
-                final double x1 = x - ONE;
-                final double xac = x1 + (7 + HALF);
+                if (zr < HALF) {
 
-                double x9 = L9[0];
-                for (int i = 1; i < L9.length; i++) {
-                    x9 += L9[i] / (x1 + i);
+                    return ComplexMath.SIN.invoke(z.multiply(PI)).multiply(GammaFunction.gamma(ComplexNumber.ONE.subtract(z))).invert().multiply(PI);
+
+                } else {
+
+                    final ComplexNumber z1 = z.subtract(ONE);
+                    final ComplexNumber za = z1.add(A + HALF);
+
+                    ComplexNumber zs = ComplexNumber.valueOf(C[0]);
+                    for (int i = C.length - 1; i > 0; i--) {
+                        zs = zs.add(z1.add(i).invert().multiply(C[i]));
+                    }
+
+                    return ComplexMath.POW.invoke(za, z1.add(HALF)).multiply(SQRT_TWO_PI).multiply(ComplexMath.EXP.invoke(za.negate())).multiply(zs);
                 }
-
-                return SQRT_TWO_PI * POW.invoke(xac, x1 + HALF) * EXP.invoke(-xac) * x9;
             }
         }
+
+        static double gamma(final double x) {
+
+            if ((x <= ZERO) && (ABS.invoke(x % ONE) < MACHINE_EPSILON)) {
+
+                return NaN;
+
+            } else {
+
+                if (x < HALF) {
+
+                    return PI / (SIN.invoke(PI * x) * GammaFunction.gamma(ONE - x));
+
+                } else {
+
+                    final double x1 = x - ONE;
+                    final double xa = x1 + (A + HALF);
+
+                    double xs = C[0];
+                    for (int i = C.length - 1; i > 0; i--) {
+                        xs += C[i] / (x1 + i);
+                    }
+
+                    return POW.invoke(xa, x1 + HALF) * SQRT_TWO_PI * EXP.invoke(-xa) * xs;
+                }
+            }
+        }
+
+        static ComplexNumber logarithmic(ComplexNumber z) {
+
+            final ComplexNumber z1 = z.subtract(ONE);
+            final ComplexNumber za = z1.add(A + HALF);
+
+            ComplexNumber zs = ComplexNumber.valueOf(C[0]);
+            for (int i = C.length - 1; i > 0; i--) {
+                zs = zs.add(z1.add(i).invert().multiply(C[i]));
+            }
+
+            return z1.add(HALF).multiply(ComplexMath.LOG.invoke(za)).add(LOG_SQRT_TWO_PI).subtract(za).add(ComplexMath.LOG.invoke(zs));
+        }
+
+        static double logarithmic(double x) {
+
+            final double x1 = x - ONE;
+            final double xa = x1 + (A + HALF);
+
+            double xs = C[0];
+            for (int i = C.length - 1; i > 0; i--) {
+                xs += C[i] / (x1 + i);
+            }
+
+            return ((((x1 + HALF) * LOG.invoke(xa)) + LOG_SQRT_TWO_PI) - xa) + LOG.invoke(xs);
+        }
+
+    }
+
+    public static ComplexNumber gamma(final ComplexNumber z) {
+        return GammaFunction.LanczosApproximation.gamma(z);
+    }
+
+    public static double gamma(final double x) {
+        return GammaFunction.LanczosApproximation.gamma(x);
     }
 
     public static double gamma(final int n) {
