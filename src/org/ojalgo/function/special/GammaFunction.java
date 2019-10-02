@@ -31,27 +31,33 @@ public abstract class GammaFunction {
     public static abstract class Incomplete extends GammaFunction {
 
         public static ComplexNumber lower(final ComplexNumber z, double limit) {
+            // TODO Implement it!
             return ComplexNumber.NaN;
         }
 
         public static double lower(final double x, double limit) {
+            // TODO Implement it!
             return NaN;
         }
 
         public static double lower(final int n, double limit) {
-            return 0L;
+            // TODO Implement it!
+            return NaN;
         }
 
         public static ComplexNumber upper(final ComplexNumber z, double limit) {
+            // TODO Implement it!
             return ComplexNumber.NaN;
         }
 
         public static double upper(final double x, double limit) {
+            // TODO Implement it!
             return NaN;
         }
 
         public static double upper(final int n, double limit) {
-            return 0L;
+            // TODO Implement it!
+            return NaN;
         }
 
     }

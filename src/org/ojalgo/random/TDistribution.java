@@ -60,7 +60,7 @@ public class TDistribution extends AbstractContinuous {
 
     static final class Degree2 extends TDistribution {
 
-        public Degree2() {
+        Degree2() {
             super(TWO);
         }
 
@@ -84,7 +84,7 @@ public class TDistribution extends AbstractContinuous {
 
     static final class Degree3 extends TDistribution {
 
-        public Degree3() {
+        Degree3() {
             super(THREE);
         }
 
@@ -97,7 +97,7 @@ public class TDistribution extends AbstractContinuous {
 
     static final class Degree4 extends TDistribution {
 
-        public Degree4() {
+        Degree4() {
             super(FOUR);
         }
 
@@ -115,7 +115,7 @@ public class TDistribution extends AbstractContinuous {
 
         private final Normal myNormal = new Normal();
 
-        public DegreeInfinity() {
+        DegreeInfinity() {
             super(POSITIVE_INFINITY);
         }
 
@@ -141,6 +141,14 @@ public class TDistribution extends AbstractContinuous {
 
     }
 
+    /**
+     * @deprecated v48
+     */
+    @Deprecated
+    public static TDistribution make(final int degreesOfFreedom) {
+        return TDistribution.of(degreesOfFreedom);
+    }
+
     public static TDistribution of(final int degreesOfFreedom) {
         switch (degreesOfFreedom) {
         case 1:
@@ -159,23 +167,16 @@ public class TDistribution extends AbstractContinuous {
     }
 
     /**
-     * @deprecated v48
-     */
-    @Deprecated
-    public static TDistribution make(final int degreesOfFreedom) {
-        return TDistribution.of(degreesOfFreedom);
-    }
-
-    /**
      * The density and distribution functions share a common constant factor
      */
     private final double myConstant;
     private final double myDegreesOfFreedom;
 
-    public TDistribution(final double degreesOfFreedom) {
+    TDistribution(final double degreesOfFreedom) {
         super();
-        myDegreesOfFreedom = degreesOfFreedom;
-        myConstant = GammaFunction.gamma((degreesOfFreedom + ONE) / TWO) / (Math.sqrt(degreesOfFreedom * PI) * GammaFunction.gamma(degreesOfFreedom / TWO));
+        myDegreesOfFreedom = Math.min(100, degreesOfFreedom);
+        myConstant = GammaFunction.gamma((myDegreesOfFreedom + ONE) / TWO)
+                / (Math.sqrt(myDegreesOfFreedom * PI) * GammaFunction.gamma(myDegreesOfFreedom / TWO));
     }
 
     public double getDensity(final double value) {
@@ -197,7 +198,7 @@ public class TDistribution extends AbstractContinuous {
 
     public double getQuantile(final double probability) {
         // TODO Auto-generated method stub
-        return 0;
+        return NaN;
     }
 
     @Override

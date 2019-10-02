@@ -31,7 +31,7 @@ public abstract class BetaFunction {
 
         public static ComplexNumber beta(double limit, ComplexNumber a, ComplexNumber b) {
             // TODO Implement it!
-            return null;
+            return ComplexNumber.NaN;
         }
 
         public static double beta(double limit, double a, double b) {
