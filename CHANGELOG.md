@@ -15,7 +15,7 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 #### org.ojalgo.function
 
-- New special functions: beta (complete, incomplete and regularized), gamma (logarithmic), Hypergeometric and Pochhammer symbol. Inluding complex valued variants where applicable.
+- New special functions: beta (complete, incomplete and regularized), gamma (logarithmic), Hypergeometric and Pochhammer symbol. Inluding complex valued variants where applicable. The complete gamma function existed previously, and the upper/lower incomplete gamma functions are only implemented for the integer case.
 
 #### org.ojalgo.random
 

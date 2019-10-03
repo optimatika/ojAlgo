@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.StandardType;
 import org.ojalgo.type.context.NumberContext;
 
 public class GammaFunctionTest {
@@ -42,7 +43,21 @@ public class GammaFunctionTest {
 
             TestUtils.assertEquals(intResult, doubleResult);
             TestUtils.assertEquals(intResult, complexResult);
+        }
+    }
 
+    @Test
+    public void testCompareLogarithmicImplementations() {
+
+        int lim = 50;
+        for (int a = 1; a < lim; a++) {
+
+            double intResult = GammaFunction.Logarithmic.gamma(a);
+            double doubleResult = GammaFunction.Logarithmic.gamma((double) a);
+            ComplexNumber complexResult = GammaFunction.Logarithmic.gamma(ComplexNumber.valueOf(a));
+
+            TestUtils.assertEquals(intResult, doubleResult);
+            TestUtils.assertEquals(intResult, complexResult);
         }
     }
 
@@ -100,6 +115,49 @@ public class GammaFunctionTest {
     }
 
     @Test
+    public void testIntIncompleteParts() {
+
+        int lim = 50;
+        for (int n = 1; n < lim; n++) {
+
+            for (int e = -2; e <= 2; e++) {
+                double x = Math.pow(TEN, e);
+
+                double complete = GammaFunction.gamma(n);
+
+                double lower = GammaFunction.Incomplete.lower(n, x);
+                double upper = GammaFunction.Incomplete.upper(n, x);
+
+                TestUtils.assertEquals(complete, lower + upper);
+            }
+        }
+    }
+
+    @Test
+    public void testIntIncompleteSteps() {
+
+        NumberContext accuracy = StandardType.MATH_032;
+
+        int lim = 5;
+        for (int n = 1; n < lim; n++) {
+
+            for (int e = -1; e <= 1; e++) {
+                double x = Math.pow(TEN, e);
+
+                double lowExp = (n * GammaFunction.Incomplete.lower(n, x)) - (Math.pow(x, n) * Math.exp(-x));
+                double lowAct = GammaFunction.Incomplete.lower(n + 1, x);
+
+                TestUtils.assertEquals(lowExp, lowAct, accuracy);
+
+                double uppExp = (n * GammaFunction.Incomplete.upper(n, x)) + (Math.pow(x, n) * Math.exp(-x));
+                double uppAct = GammaFunction.Incomplete.upper(n + 1, x);
+
+                TestUtils.assertEquals(uppExp, uppAct, accuracy);
+            }
+        }
+    }
+
+    @Test
     public void testLogarithmic() {
 
         int lim = 50;
@@ -110,6 +168,45 @@ public class GammaFunctionTest {
             double actual = GammaFunction.Logarithmic.gamma(x);
 
             TestUtils.assertEquals(expected, actual);
+        }
+    }
+
+    @Test
+    public void testSpecialCeseLimitZero() {
+
+        double x = ZERO;
+
+        int lim = 50;
+        for (int n = 1; n < lim; n++) {
+
+            double complete = GammaFunction.gamma(n);
+
+            double lower = GammaFunction.Incomplete.lower(n, x);
+            double upper = GammaFunction.Incomplete.upper(n, x);
+
+            TestUtils.assertEquals(complete, upper);
+            TestUtils.assertEquals(ZERO, lower);
+            TestUtils.assertEquals(complete, lower + upper);
+        }
+    }
+
+    @Test
+    public void testSpecialCeseValueOne() {
+
+        int n = 1;
+
+        for (int e = -2; e <= 2; e++) {
+            double x = Math.pow(TEN, e);
+
+            double lowExp = ONE - Math.exp(-x);
+            double lowAct = GammaFunction.Incomplete.lower(n, x);
+
+            TestUtils.assertEquals(lowExp, lowAct);
+
+            double uppExp = Math.exp(-x);
+            double uppAct = GammaFunction.Incomplete.upper(n, x);
+
+            TestUtils.assertEquals(uppExp, uppAct);
         }
     }
 

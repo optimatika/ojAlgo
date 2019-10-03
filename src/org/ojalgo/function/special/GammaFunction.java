@@ -41,8 +41,14 @@ public abstract class GammaFunction {
         }
 
         public static double lower(final int n, double limit) {
-            // TODO Implement it!
-            return NaN;
+
+            double incr = ONE, sum = ONE;
+            for (int k = 1; k < n; k++) {
+                incr *= (limit / k);
+                sum += incr;
+            }
+
+            return (ONE - (sum * Math.exp(-limit))) * MissingMath.factorial(n - 1);
         }
 
         public static ComplexNumber upper(final ComplexNumber z, double limit) {
@@ -56,8 +62,14 @@ public abstract class GammaFunction {
         }
 
         public static double upper(final int n, double limit) {
-            // TODO Implement it!
-            return NaN;
+
+            double incr = ONE, sum = ONE;
+            for (int k = 1; k < n; k++) {
+                incr *= (limit / k);
+                sum += incr;
+            }
+
+            return sum * Math.exp(-limit) * MissingMath.factorial(n - 1);
         }
 
     }
