@@ -21,11 +21,32 @@
  */
 package org.ojalgo.concurrent;
 
+import java.util.Queue;
 import java.util.concurrent.*;
 
 import org.ojalgo.OjAlgoUtils;
 
 public final class DaemonPoolExecutor extends ThreadPoolExecutor {
+
+    static abstract class BatchProcessor<T> {
+
+        private final DaemonPoolExecutor myExecutor;
+        private final Queue<T> myQueue = new ConcurrentLinkedQueue<>();
+
+        BatchProcessor(DaemonPoolExecutor executor, int parallelism) {
+            super();
+            myExecutor = executor;
+        }
+
+    }
+
+    public static final class BatchConsumer<T> extends BatchProcessor<T> {
+
+        BatchConsumer(DaemonPoolExecutor executor, int parallelism) {
+            super(executor, parallelism);
+        }
+
+    }
 
     static final DaemonPoolExecutor INSTANCE = new DaemonPoolExecutor(OjAlgoUtils.ENVIRONMENT.units, Integer.MAX_VALUE, 5L, TimeUnit.SECONDS,
             new SynchronousQueue<Runnable>(), DaemonFactory.INSTANCE);

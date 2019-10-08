@@ -44,14 +44,19 @@ public abstract class DivideAndConquer extends Object {
      */
     public final void invoke(final int first, final int limit, final int threshold) {
 
-        final int availableWorkers = OjAlgoUtils.ENVIRONMENT.threads - (DaemonPoolExecutor.INSTANCE.getActiveCount() / 2);
+        final int availableWorkers = OjAlgoUtils.ENVIRONMENT.threads - DaemonPoolExecutor.INSTANCE.getActiveCount();
 
-        this.divide(first, limit, threshold, availableWorkers);
+        try {
+            this.divide(first, limit, threshold, availableWorkers).get();
+        } catch (InterruptedException | ExecutionException exception) {
+            exception.printStackTrace();
+            throw new ProgrammingError(exception);
+        }
     }
 
     protected abstract void conquer(final int first, final int limit);
 
-    final void divide(final int first, final int limit, final int threshold, final int workers) {
+    final Future<?> divide(final int first, final int limit, final int threshold, final int workers) {
 
         final int count = limit - first;
 
@@ -60,20 +65,21 @@ public abstract class DivideAndConquer extends Object {
             final int split = first + (count / 2);
             final int nextWorkers = workers / 2;
 
-            final Future<?> firstPart = DaemonPoolExecutor.INSTANCE.submit(() -> this.divide(first, split, threshold, nextWorkers));
-            final Future<?> secondPart = DaemonPoolExecutor.INSTANCE.submit(() -> this.divide(split, limit, threshold, nextWorkers));
+            final Future<?> firstPart = this.divide(first, split, threshold, nextWorkers);
+            final Future<?> secondPart = this.divide(split, limit, threshold, nextWorkers);
 
             try {
                 firstPart.get();
-                secondPart.get();
             } catch (final InterruptedException | ExecutionException exception) {
                 exception.printStackTrace();
                 throw new ProgrammingError(exception);
             }
 
+            return secondPart;
+
         } else {
 
-            this.conquer(first, limit);
+            return DaemonPoolExecutor.INSTANCE.submit(() -> this.conquer(first, limit));
         }
     }
 
