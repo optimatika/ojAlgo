@@ -11,15 +11,17 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+Added / Changed / Deprecated / Removed / Fixed / Security
+
+## [47.3.1] – 2019-09-29
+
 ### Added
 
 #### org.ojalgo.function
 
-- New special function utility class PowerOf2. It replaces what was in PrimitiveMath, amde some improvements and addition and added support or 'int' (used to be only 'long').
+- New special function utility class PowerOf2. It replaces what was in PrimitiveMath, made some improvements and addition and added support or 'int' (used to be only 'long').
 
 ### Changed
-
-- 
 
 #### org.ojalgo.matrix
 
@@ -41,17 +43,9 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 - Everything related to "power of 2" has been deprecetd in PrimitiveMath. 
 - FunctionUtils has been deprecated. Everything in it has been moved elsewhere – mostly to MissingMath.
 
-### Removed
-
-- 
-
 ### Fixed
 
 - The compareTo method of CalendarDateDuration didn't work when the unit of either instances was "nanos".
-
-### Security
-
-- 
 
 ## [47.3.0] – 2019-08-08
 
