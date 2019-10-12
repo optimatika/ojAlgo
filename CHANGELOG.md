@@ -11,7 +11,15 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
-Added / Changed / Deprecated / Removed / Fixed / Security
+### Added
+
+#### org.ojalgo.function
+
+- New special functions: beta (complete, incomplete and regularized), gamma (logarithmic), Hypergeometric and Pochhammer symbol. Inluding complex valued variants where applicable. The complete gamma function existed previously, and the upper/lower incomplete gamma functions are only implemented for the integer case.
+
+#### org.ojalgo.random
+
+- The `getDistribution()` method in the TDistribution is now implemented for the general case. Previously it was only implemented for a few distinct degrees of freedom.
 
 ## [47.3.1] – 2019-09-29
 
