@@ -35,12 +35,13 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LU<N> {
+abstract class LUDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements LU<N> {
 
     static final class Complex extends LUDecomposition<ComplexNumber> {
 
@@ -154,7 +155,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         N largest = this.getInPlace().aggregateDiagonal(Aggregator.LARGEST);
         double epsilon = this.getDimensionalEpsilon();
 
-        return epsilon * Math.max(MACHINE_SMALLEST, largest.doubleValue());
+        return epsilon * Math.max(MACHINE_SMALLEST, Scalar.doubleValue(largest));
     }
 
     public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {

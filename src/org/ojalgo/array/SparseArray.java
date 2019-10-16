@@ -46,7 +46,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class SparseArray<N extends Number> extends BasicArray<N> {
+public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
     @FunctionalInterface
     public interface NonzeroPrimitiveCallback {
@@ -60,7 +60,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @FunctionalInterface
-    public interface NonzeroReferenceTypeCallback<N extends Number> {
+    public interface NonzeroReferenceTypeCallback<N extends Comparable<N>> {
 
         /**
          * @param index Index
@@ -70,7 +70,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     }
 
-    public static final class NonzeroView<N extends Number> implements ElementView1D<N, NonzeroView<N>> {
+    public static final class NonzeroView<N extends Comparable<N>> implements ElementView1D<N, NonzeroView<N>> {
 
         private int myCursor = -1;
         private final long[] myIndices;
@@ -189,7 +189,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     }
 
-    public static final class SparseFactory<N extends Number> extends StrategyBuilder<N, SparseArray<N>, SparseFactory<N>> {
+    public static final class SparseFactory<N extends Comparable<N>> extends StrategyBuilder<N, SparseArray<N>, SparseFactory<N>> {
 
         SparseFactory(final DenseArray.Factory<N> denseFactory) {
             super(denseFactory);
@@ -213,11 +213,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     private static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
-    public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
+    public static <N extends Comparable<N>> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
         return new SparseFactory<>(denseFactory);
     }
 
-    public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory, final long count) {
+    public static <N extends Comparable<N>> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory, final long count) {
         return new SparseFactory<>(denseFactory, count);
     }
 
@@ -246,7 +246,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         myZeroScalar = strategy.scalar().zero();
         myZeroNumber = myZeroScalar.get();
-        myZeroValue = myZeroNumber.doubleValue();
+        myZeroValue = myZeroScalar.doubleValue();
     }
 
     public void add(final long index, final double addend) {
@@ -258,7 +258,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public void add(final long index, final Number addend) {
+    public void add(final long index, final Comparable<?> addend) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
             myValues.add(tmpIndex, addend);
@@ -308,7 +308,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     public void fillAll(final N value) {
 
-        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, value.doubleValue())) {
+        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, Scalar.doubleValue(value))) {
 
             myValues.fillAll(myZeroNumber);
 
@@ -454,7 +454,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         this.update(index, internalIndex, value, false);
     }
 
-    public void set(final long index, final Number value) {
+    public void set(final long index, final Comparable<?> value) {
 
         final int internalIndex = this.index(index);
 
@@ -591,7 +591,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     /**
      * Will never remove anything - just insert or update
      */
-    private void update(final long externalIndex, final int internalIndex, final Number value, final boolean shouldStoreZero) {
+    private void update(final long externalIndex, final int internalIndex, final Comparable<?> value, final boolean shouldStoreZero) {
 
         if (internalIndex >= 0) {
             // Existing value, just update

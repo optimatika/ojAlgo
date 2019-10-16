@@ -30,9 +30,9 @@ import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
-public final class DiagonalStore<N extends Number, D extends Access1D<?>> extends FactoryStore<N> {
+public final class DiagonalStore<N extends Comparable<N>, D extends Access1D<?>> extends FactoryStore<N> {
 
-    public static class Builder<N extends Number, D extends Access1D<?>> implements Supplier<DiagonalStore<N, D>> {
+    public static class Builder<N extends Comparable<N>, D extends Access1D<?>> implements Supplier<DiagonalStore<N, D>> {
 
         private final PhysicalStore.Factory<N, ?> myFactory;
         private final D myMainDiagonal;
@@ -74,7 +74,7 @@ public final class DiagonalStore<N extends Number, D extends Access1D<?>> extend
 
     }
 
-    public static <N extends Number, D extends Access1D<?>> Builder<N, D> builder(final PhysicalStore.Factory<N, ?> factory, final D mainDiagonal) {
+    public static <N extends Comparable<N>, D extends Access1D<?>> Builder<N, D> builder(final PhysicalStore.Factory<N, ?> factory, final D mainDiagonal) {
         return new Builder<>(factory, mainDiagonal);
     }
 

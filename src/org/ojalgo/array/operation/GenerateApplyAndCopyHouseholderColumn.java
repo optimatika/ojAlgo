@@ -80,7 +80,7 @@ public final class GenerateApplyAndCopyHouseholderColumn implements ArrayOperati
         return retVal;
     }
 
-    public static <N extends Number & Scalar<N>> boolean invoke(final N[] data, final int structure, final int row, final int col,
+    public static <N extends Scalar<N>> boolean invoke(final N[] data, final int structure, final int row, final int col,
             final Householder.Generic<N> destination, final Scalar.Factory<N> scalar) {
 
         final int tmpColBase = col * structure;

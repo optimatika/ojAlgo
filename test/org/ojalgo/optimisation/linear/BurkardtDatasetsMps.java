@@ -150,7 +150,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
         TestUtils.assertEquals(tmpVariables.length, tmpExpMinRes.count());
         TestUtils.assertEquals(tmpVariables.length, tmpActMinRes.count());
 
-        TestUtils.assertEquals(tmpExpMinRes, tmpActMinRes, BurkardtDatasetsMps.PRECISION);
+        TestUtils.assertStateAndSolution(tmpExpMinRes, tmpActMinRes, BurkardtDatasetsMps.PRECISION);
 
         for (int i = 0; i < tmpVariables.length; i++) {
             TestUtils.assertEquals(tmpVariables[i].getName(), tmpExpMinRes.doubleValue(i), tmpActMinRes.doubleValue(i), BurkardtDatasetsMps.PRECISION);

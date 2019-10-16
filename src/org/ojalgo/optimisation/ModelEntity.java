@@ -34,6 +34,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -199,7 +200,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      * @see #getLowerLimit()
      * @see #getUpperLimit()
      */
-    public final ME level(final Number level) {
+    public final ME level(final Comparable<?> level) {
         return this.lower(level).upper(level);
     }
 
@@ -209,12 +210,12 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      * are always used as they are.
      */
     @SuppressWarnings("unchecked")
-    public ME lower(final Number lower) {
+    public ME lower(final Comparable<?> lower) {
         myLowerLimit = null;
         if (lower != null) {
             if (lower instanceof BigDecimal) {
                 myLowerLimit = (BigDecimal) lower;
-            } else if (Double.isFinite(lower.doubleValue())) {
+            } else if (Double.isFinite(Scalar.doubleValue(lower))) {
                 BigDecimal limit = TypeUtils.toBigDecimal(lower);
                 final BigDecimal magnitude = limit.abs();
                 if (magnitude.compareTo(LARGEST) >= 0) {
@@ -244,12 +245,12 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      * are always used as they are.
      */
     @SuppressWarnings("unchecked")
-    public ME upper(final Number upper) {
+    public ME upper(final Comparable<?> upper) {
         myUpperLimit = null;
         if (upper != null) {
             if (upper instanceof BigDecimal) {
                 myUpperLimit = (BigDecimal) upper;
-            } else if (Double.isFinite(upper.doubleValue())) {
+            } else if (Double.isFinite(Scalar.doubleValue(upper))) {
                 BigDecimal limit = TypeUtils.toBigDecimal(upper);
                 final BigDecimal magnitude = limit.abs();
                 if (magnitude.compareTo(LARGEST) >= 0) {
@@ -267,13 +268,13 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      * @see #getContributionWeight()
      */
     @SuppressWarnings("unchecked")
-    public final ME weight(final Number weight) {
+    public final ME weight(final Comparable<?> weight) {
         myContributionWeight = null;
         if (weight != null) {
             BigDecimal tmpWeight = null;
             if (weight instanceof BigDecimal) {
                 tmpWeight = (BigDecimal) weight;
-            } else if (Double.isFinite(weight.doubleValue())) {
+            } else if (Double.isFinite(Scalar.doubleValue(weight))) {
                 tmpWeight = TypeUtils.toBigDecimal(weight);
             }
             if ((tmpWeight != null) && (tmpWeight.signum() != 0)) {

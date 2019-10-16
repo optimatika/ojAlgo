@@ -48,9 +48,9 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2D.Elements, Access2D.IndexOf, TransformableRegion<N> {
+public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, Access2D.Elements, Access2D.IndexOf, TransformableRegion<N> {
 
-    public interface Factory<N extends Number, I extends PhysicalStore<N>> extends Factory2D.Dense<I> {
+    public interface Factory<N extends Comparable<N>, I extends PhysicalStore<N>> extends Factory2D.Dense<I> {
 
         AggregatorSet<N> aggregator();
 

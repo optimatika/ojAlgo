@@ -26,7 +26,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access2D;
 
-abstract class InPlaceDecomposition<N extends Number> extends GenericDecomposition<N> {
+abstract class InPlaceDecomposition<N extends Comparable<N>> extends GenericDecomposition<N> {
 
     private int myColDim;
     private DecompositionStore<N> myInPlace;

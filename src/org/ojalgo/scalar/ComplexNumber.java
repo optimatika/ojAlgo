@@ -42,7 +42,7 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * @author apete
  * @see org.ojalgo.function.ComplexFunction
  */
-public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, Transformation2D<Double>,
+public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, Transformation2D<Double>,
         Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public static final class Normalised extends ComplexNumber {
@@ -116,7 +116,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
             return ComplexNumber.valueOf(value);
         }
 
-        public ComplexNumber cast(final Number number) {
+        public ComplexNumber cast(final Comparable<?> number) {
             return ComplexNumber.valueOf(number);
         }
 
@@ -124,7 +124,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
             return ComplexNumber.valueOf(value);
         }
 
-        public ComplexNumber convert(final Number number) {
+        public ComplexNumber convert(final Comparable<?> number) {
             return ComplexNumber.valueOf(number);
         }
 
@@ -295,22 +295,19 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
      * @see Number
      * @see Number#doubleValue()
      */
-    public static ComplexNumber valueOf(final Number number) {
+    public static ComplexNumber valueOf(final Comparable<?> number) {
 
-        if (number != null) {
+        if (number == null) {
+            return ZERO;
+        }
 
-            if (number instanceof ComplexNumber) {
+        if (number instanceof ComplexNumber) {
 
-                return (ComplexNumber) number;
-
-            } else {
-
-                return new ComplexNumber(number.doubleValue());
-            }
+            return (ComplexNumber) number;
 
         } else {
 
-            return ZERO;
+            return new ComplexNumber(Scalar.doubleValue(number));
         }
     }
 

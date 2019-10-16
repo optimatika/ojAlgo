@@ -553,7 +553,7 @@ public final class MultiplyBoth implements ArrayOperation {
         tmpConquerer.invoke(0, ((int) left.count()) / complexity, THRESHOLD);
     };
 
-    public static <N extends Number & Scalar<N>> GenericMultiplyBoth<N> getGeneric(final long rows, final long columns) {
+    public static <N extends Scalar<N>> GenericMultiplyBoth<N> getGeneric(final long rows, final long columns) {
 
         if (rows > THRESHOLD) {
 
@@ -629,7 +629,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     }
 
-    static <N extends Number & Scalar<N>> void invokeGeneric(final TransformableRegion<N> product, final int firstRow, final int rowLimit,
+    static <N extends Scalar<N>> void invokeGeneric(final TransformableRegion<N> product, final int firstRow, final int rowLimit,
             final Access1D<N> left, final int complexity, final Access1D<N> right) {
 
         @SuppressWarnings("unchecked")

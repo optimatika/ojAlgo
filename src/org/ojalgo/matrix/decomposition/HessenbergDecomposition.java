@@ -32,7 +32,7 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 
-abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Hessenberg<N> {
+abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Hessenberg<N> {
 
     static final class Complex extends HessenbergDecomposition<ComplexNumber> {
 

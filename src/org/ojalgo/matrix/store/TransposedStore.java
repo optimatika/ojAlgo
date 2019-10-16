@@ -26,7 +26,7 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
-final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
+final class TransposedStore<N extends Comparable<N>> extends TransjugatedStore<N> {
 
     TransposedStore(final MatrixStore<N> base) {
         super(base);

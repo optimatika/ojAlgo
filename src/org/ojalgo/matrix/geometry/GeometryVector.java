@@ -24,6 +24,7 @@ package org.ojalgo.matrix.geometry;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.TransformableRegion;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure2D;
@@ -44,12 +45,12 @@ abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double>
         this.add(Structure2D.index(this.structure(), row, col), addend);
     }
 
-    public final void add(final long row, final long col, final Number addend) {
-        this.add(Structure2D.index(this.structure(), row, col), addend.doubleValue());
+    public final void add(final long row, final long col, final Comparable<?> addend) {
+        this.add(Structure2D.index(this.structure(), row, col), Scalar.doubleValue(addend));
     }
 
-    public final void add(final long index, final Number addend) {
-        this.add(Structure1D.index(index), addend.doubleValue());
+    public final void add(final long index, final Comparable<?> addend) {
+        this.add(Structure1D.index(index), Scalar.doubleValue(addend));
     }
 
     public final long count() {
@@ -126,12 +127,12 @@ abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double>
         this.set(Structure2D.index(this.structure(), row, col), value);
     }
 
-    public final void set(final long row, final long col, final Number value) {
-        this.set(Structure2D.index(this.structure(), row, col), value.doubleValue());
+    public final void set(final long row, final long col, final Comparable<?> value) {
+        this.set(Structure2D.index(this.structure(), row, col), Scalar.doubleValue(value));
     }
 
-    public final void set(final long index, final Number addend) {
-        this.set(Structure1D.index(index), addend.doubleValue());
+    public final void set(final long index, final Comparable<?> value) {
+        this.set(Structure1D.index(index), Scalar.doubleValue(value));
     }
 
     public final int size() {

@@ -128,7 +128,7 @@ public final class Expression extends ModelEntity<Expression> {
         ProgrammingError.throwIfNull(myModel, myLinear, myQuadratic);
     }
 
-    public Expression add(final IntIndex key, final Number value) {
+    public Expression add(final IntIndex key, final Comparable<?> value) {
 
         final BigDecimal tmpExisting = myLinear.get(key);
 
@@ -141,7 +141,7 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
-    public Expression add(final IntRowColumn key, final Number value) {
+    public Expression add(final IntRowColumn key, final Comparable<?> value) {
 
         final BigDecimal tmpExisting = myQuadratic.get(key);
 
@@ -425,19 +425,19 @@ public final class Expression extends ModelEntity<Expression> {
         return (myQuadratic.size() == 0) && (myLinear.size() > 0) && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isInteger());
     }
 
-    public Expression set(final int row, final int column, final Number value) {
+    public Expression set(final int row, final int column, final Comparable<?> value) {
         return this.set(new IntRowColumn(row, column), value);
     }
 
-    public Expression set(final int index, final Number value) {
+    public Expression set(final int index, final Comparable<?> value) {
         return this.set(myModel.getVariable(index), value);
     }
 
-    public Expression set(final IntIndex row, final IntIndex column, final Number value) {
+    public Expression set(final IntIndex row, final IntIndex column, final Comparable<?> value) {
         return this.set(new IntRowColumn(row, column), value);
     }
 
-    public Expression set(final IntIndex key, final Number value) {
+    public Expression set(final IntIndex key, final Comparable<?> value) {
 
         if (key != null) {
 
@@ -458,7 +458,7 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
-    public Expression set(final IntRowColumn key, final Number value) {
+    public Expression set(final IntRowColumn key, final Comparable<?> value) {
 
         if (key != null) {
 
@@ -480,11 +480,11 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
-    public Expression set(final Variable variable, final Number value) {
+    public Expression set(final Variable variable, final Comparable<?> value) {
         return this.set(variable.getIndex(), value);
     }
 
-    public Expression set(final Variable variable1, final Variable variable2, final Number value) {
+    public Expression set(final Variable variable1, final Variable variable2, final Comparable<?> value) {
         return this.set(variable1.getIndex().index, variable2.getIndex().index, value);
     }
 

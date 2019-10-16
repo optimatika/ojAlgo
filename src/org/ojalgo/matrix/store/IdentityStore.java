@@ -32,7 +32,7 @@ import org.ojalgo.structure.Access2D;
  *
  * @author apete
  */
-final class IdentityStore<N extends Number> extends FactoryStore<N> {
+final class IdentityStore<N extends Comparable<N>> extends FactoryStore<N> {
 
     private IdentityStore(final org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
         super(factory, rowsCount, columnsCount);

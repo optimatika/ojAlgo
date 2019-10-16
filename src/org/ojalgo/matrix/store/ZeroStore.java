@@ -30,7 +30,7 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-final class ZeroStore<N extends Number> extends FactoryStore<N> {
+final class ZeroStore<N extends Comparable<N>> extends FactoryStore<N> {
 
     ZeroStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
         super(factory, rowsCount, columnsCount);

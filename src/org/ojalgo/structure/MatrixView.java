@@ -25,7 +25,7 @@ import java.util.Iterator;
 
 import org.ojalgo.ProgrammingError;
 
-public class MatrixView<N extends Number> implements Access2D<N>, Iterable<MatrixView<N>>, Iterator<MatrixView<N>>, Comparable<MatrixView<N>> {
+public class MatrixView<N extends Comparable<N>> implements Access2D<N>, Iterable<MatrixView<N>>, Iterator<MatrixView<N>>, Comparable<MatrixView<N>> {
 
     private final long myColumnsCount;
     private final long myCount;

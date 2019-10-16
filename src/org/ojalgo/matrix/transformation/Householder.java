@@ -27,9 +27,9 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
-public interface Householder<N extends Number> extends Access1D<N> {
+public interface Householder<N extends Comparable<N>> extends Access1D<N> {
 
-    public static final class Generic<N extends Number & Scalar<N>> extends Object implements Householder<N> {
+    public static final class Generic<N extends Scalar<N>> extends Object implements Householder<N> {
 
         public N beta;
         public int first;

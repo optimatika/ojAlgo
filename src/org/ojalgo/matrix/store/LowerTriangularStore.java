@@ -24,7 +24,7 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
-final class LowerTriangularStore<N extends Number> extends ShadingStore<N> {
+final class LowerTriangularStore<N extends Comparable<N>> extends ShadingStore<N> {
 
     private final boolean myUnitDiagonal;
 

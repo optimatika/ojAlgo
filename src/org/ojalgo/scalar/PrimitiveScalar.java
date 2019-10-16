@@ -28,7 +28,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class PrimitiveScalar extends Number implements Scalar<Double>, Enforceable<PrimitiveScalar> {
+public final class PrimitiveScalar implements Scalar<Double>, Enforceable<PrimitiveScalar> {
 
     public static final Scalar.Factory<Double> FACTORY = new Scalar.Factory<Double>() {
 
@@ -36,15 +36,15 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
             return value;
         }
 
-        public Double cast(final Number number) {
-            return number.doubleValue();
+        public Double cast(final Comparable<?> number) {
+            return Scalar.doubleValue(number);
         }
 
         public PrimitiveScalar convert(final double value) {
             return PrimitiveScalar.of(value);
         }
 
-        public PrimitiveScalar convert(final Number number) {
+        public PrimitiveScalar convert(final Comparable<?> number) {
             return PrimitiveScalar.valueOf(number);
         }
 
@@ -92,23 +92,8 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
         return PrimitiveScalar.of(value);
     }
 
-    public static PrimitiveScalar valueOf(final Number number) {
-
-        if (number != null) {
-
-            if (number instanceof PrimitiveScalar) {
-
-                return (PrimitiveScalar) number;
-
-            } else {
-
-                return new PrimitiveScalar(number.doubleValue());
-            }
-
-        } else {
-
-            return ZERO;
-        }
+    public static PrimitiveScalar valueOf(final Comparable<?> number) {
+        return PrimitiveScalar.of(Scalar.doubleValue(number));
     }
 
     private final double myValue;

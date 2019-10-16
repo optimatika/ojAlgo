@@ -70,7 +70,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     boolean actBoolean;
     int actInt;
     BasicMatrix<?, ?> actMtrx;
-    Number actNumber;
+    Comparable<?> actNumber;
     Scalar<?> actScalar;
     double actValue;
     BigDecimal bigNumber;
@@ -82,7 +82,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     boolean expBoolean;
     int expInt;
     BasicMatrix<?, ?> expMtrx;
-    Number expNumber;
+    Comparable<?> expNumber;
     Scalar<?> expScalar;
     double expValue;
     PrimitiveMatrix primitiveAA;
@@ -180,12 +180,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testAddNumber() {
 
-        expMtrx = rationalAA.add(bigNumber);
+        expMtrx = rationalAA.add(RationalNumber.valueOf(bigNumber));
 
-        actMtrx = complexAA.add(bigNumber);
+        actMtrx = complexAA.add(ComplexNumber.valueOf(bigNumber));
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        actMtrx = primitiveAA.add(bigNumber);
+        actMtrx = primitiveAA.add(bigNumber.doubleValue());
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
@@ -235,12 +235,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testDivideNumber() {
 
-        expMtrx = rationalAA.divide(bigNumber);
+        expMtrx = rationalAA.divide(RationalNumber.valueOf(bigNumber));
 
-        actMtrx = complexAA.divide(bigNumber);
+        actMtrx = complexAA.divide(ComplexNumber.valueOf(bigNumber));
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        actMtrx = primitiveAA.divide(bigNumber);
+        actMtrx = primitiveAA.divide(bigNumber.doubleValue());
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
@@ -712,12 +712,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testMultiplyNumber() {
 
-        expMtrx = rationalAA.multiply(bigNumber);
+        expMtrx = rationalAA.multiply(RationalNumber.valueOf(bigNumber));
 
-        actMtrx = complexAA.multiply(bigNumber);
+        actMtrx = complexAA.multiply(ComplexNumber.valueOf(bigNumber));
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        actMtrx = primitiveAA.multiply(bigNumber);
+        actMtrx = primitiveAA.multiply(bigNumber.doubleValue());
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }
@@ -834,12 +834,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testSubtractNumber() {
 
-        expMtrx = rationalAA.subtract(bigNumber);
+        expMtrx = rationalAA.subtract(RationalNumber.valueOf(bigNumber));
 
-        actMtrx = complexAA.subtract(bigNumber);
+        actMtrx = complexAA.subtract(ComplexNumber.valueOf(bigNumber));
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        actMtrx = primitiveAA.subtract(bigNumber);
+        actMtrx = primitiveAA.subtract(bigNumber.doubleValue());
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
     }

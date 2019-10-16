@@ -27,7 +27,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class AbstractStore<N extends Number> implements MatrixStore<N> {
+abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> {
 
     private final int myColDim;
     private transient Class<?> myComponentType = null;

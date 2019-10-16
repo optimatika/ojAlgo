@@ -25,7 +25,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access1D;
 
-public final class FirstOrderApproximation<N extends Number> extends ApproximateFunction<N> {
+public final class FirstOrderApproximation<N extends Comparable<N>> extends ApproximateFunction<N> {
 
     private final AffineFunction<N> myDelegate;
 

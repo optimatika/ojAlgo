@@ -37,7 +37,7 @@ import org.ojalgo.structure.Access2D;
  *
  * @author apete
  */
-public final class PureQuadraticFunction<N extends Number> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.PureQuadratic<N> {
+public final class PureQuadraticFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.PureQuadratic<N> {
 
     public static PureQuadraticFunction<ComplexNumber> makeComplex(final Access2D<?> coefficients) {
         return new PureQuadraticFunction<>(GenericDenseStore.COMPLEX.copy(coefficients));
@@ -63,7 +63,7 @@ public final class PureQuadraticFunction<N extends Number> implements MultiaryFu
         return new PureQuadraticFunction<>(GenericDenseStore.RATIONAL.make(arity, arity));
     }
 
-    public static <N extends Number> PureQuadraticFunction<N> wrap(final PhysicalStore<N> coefficients) {
+    public static <N extends Comparable<N>> PureQuadraticFunction<N> wrap(final PhysicalStore<N> coefficients) {
         return new PureQuadraticFunction<>(coefficients);
     }
 
@@ -118,7 +118,7 @@ public final class PureQuadraticFunction<N extends Number> implements MultiaryFu
         return (PhysicalStore<N>) myCoefficients;
     }
 
-    public void setConstant(final Number constant) {
+    public void setConstant(final Comparable<?> constant) {
         myConstant.setConstant(constant);
     }
 

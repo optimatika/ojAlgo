@@ -27,7 +27,7 @@ package org.ojalgo.structure;
  * @author apete
  */
 @FunctionalInterface
-public interface TransformationAnyD<N extends Number> {
+public interface TransformationAnyD<N extends Comparable<N>> {
 
     <T extends MutateAnyD.ModifiableReceiver<N> & AccessAnyD<N>> void transform(T transformable);
 

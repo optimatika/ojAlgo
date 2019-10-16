@@ -1097,8 +1097,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
                         tmpOldVal = retVal.get(tmpKey);
                         tmpDiff = tmpExpression.get(tmpKey);
                         tmpNewVal = tmpOldVal.add(tmpNotOne ? tmpContributionWeight.multiply(tmpDiff) : tmpDiff);
-                        final Number value = tmpNewVal;
-                        retVal.set(tmpKey, value);
+                        retVal.set(tmpKey, tmpNewVal);
                     }
                 }
 
@@ -1107,8 +1106,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
                         tmpOldVal = retVal.get(tmpKey);
                         tmpDiff = tmpExpression.get(tmpKey);
                         tmpNewVal = tmpOldVal.add(tmpNotOne ? tmpContributionWeight.multiply(tmpDiff) : tmpDiff);
-                        final Number value = tmpNewVal;
-                        retVal.set(tmpKey, value);
+                        retVal.set(tmpKey, tmpNewVal);
                     }
                 }
             }

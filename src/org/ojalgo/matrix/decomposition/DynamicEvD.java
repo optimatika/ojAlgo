@@ -29,7 +29,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D.Collectable;
 
-abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
+abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> {
 
     static final class Primitive extends DynamicEvD<Double> {
 

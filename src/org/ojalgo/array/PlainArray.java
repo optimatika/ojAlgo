@@ -40,7 +40,7 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-abstract class PlainArray<N extends Number> extends DenseArray<N> implements RandomAccess {
+abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> implements RandomAccess {
 
     static final int CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
 
@@ -57,7 +57,7 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
         this.add((int) index, addend);
     }
 
-    public void add(final long index, final Number addend) {
+    public void add(final long index, final Comparable<?> addend) {
         this.add((int) index, addend);
     }
 
@@ -123,7 +123,7 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
         this.set((int) index, value);
     }
 
-    public final void set(final long index, final Number number) {
+    public final void set(final long index, final Comparable<?> number) {
         this.set((int) index, number);
     }
 
@@ -144,7 +144,7 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
 
     protected abstract void add(int index, double addend);
 
-    protected abstract void add(int index, Number addend);
+    protected abstract void add(int index, Comparable<?> addend);
 
     protected abstract double doubleValue(final int index);
 
@@ -238,7 +238,7 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
 
     protected abstract void set(final int index, final double value);
 
-    protected abstract void set(final int index, final Number number);
+    protected abstract void set(final int index, final Comparable<?> number);
 
     protected abstract void sortAscending();
 

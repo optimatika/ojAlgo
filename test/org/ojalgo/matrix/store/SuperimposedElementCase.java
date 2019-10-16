@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.random.Uniform;
@@ -41,7 +39,7 @@ public class SuperimposedElementCase extends NonPhysicalTest {
         MatrixStore<ComplexNumber> tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
         int tmpRowIndex = Uniform.randomInteger(tmpRowDim);
         int tmpColumnIndex = Uniform.randomInteger(tmpColDim);
-        BigDecimal tmpElement = BigMath.PI;
+        RationalNumber tmpElement = RationalNumber.valueOf(BigMath.PI);
         MatrixStore<RationalNumber> aBase = GenericDenseStore.RATIONAL.copy(tmpBase);
 
         //        myBigStore = new SuperimposedMatrixStore<BigDecimal>(BigDenseStore.FACTORY.copyMatrix(tmpBase), tmpRowIndex, tmpColumnIndex, tmpElement);

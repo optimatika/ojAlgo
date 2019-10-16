@@ -29,7 +29,7 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-final class SuperimposedStore<N extends Number> extends ComposingStore<N> {
+final class SuperimposedStore<N extends Comparable<N>> extends ComposingStore<N> {
 
     private final int myColFirst;
     private final int myColLimit;

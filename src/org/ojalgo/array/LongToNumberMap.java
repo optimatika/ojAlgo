@@ -24,9 +24,9 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class LongToNumberMap<N extends Number> implements SortedMap<Long, N>, Access1D<N>, Mutate1D.Mixable<N> {
+public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap<Long, N>, Access1D<N>, Mutate1D.Mixable<N> {
 
-    public static final class MapFactory<N extends Number> extends StrategyBuilder<N, LongToNumberMap<N>, MapFactory<N>> {
+    public static final class MapFactory<N extends Comparable<N>> extends StrategyBuilder<N, LongToNumberMap<N>, MapFactory<N>> {
 
         MapFactory(final Factory<N> denseFactory) {
             super(denseFactory);
@@ -39,7 +39,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
 
     }
 
-    public static <N extends Number> MapFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
+    public static <N extends Comparable<N>> MapFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
         return new MapFactory<>(denseFactory);
     }
 

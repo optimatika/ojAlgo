@@ -21,9 +21,9 @@
  */
 package org.ojalgo.structure;
 
-import org.ojalgo.type.PrimitiveNumber;
+import org.ojalgo.type.NumberDefinition;
 
-public interface AccessScalar<N> extends PrimitiveNumber {
+public interface AccessScalar<N> extends NumberDefinition {
 
     /**
      * @see Number#byteValue()

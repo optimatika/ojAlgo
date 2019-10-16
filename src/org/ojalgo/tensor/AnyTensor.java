@@ -28,7 +28,7 @@ import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 
-final class AnyTensor<N extends Number> implements Tensor<N> {
+final class AnyTensor<N extends Comparable<N>> implements Tensor<N> {
 
     private final ArrayAnyD<N> myArray;
     private final DenseArray.Factory<N> myArrayFactory;

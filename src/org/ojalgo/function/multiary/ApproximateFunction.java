@@ -25,7 +25,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access1D;
 
-abstract class ApproximateFunction<N extends Number> implements MultiaryFunction.TwiceDifferentiable<N> {
+abstract class ApproximateFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N> {
 
     private final Access1D<N> myPoint;
 

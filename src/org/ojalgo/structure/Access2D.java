@@ -32,9 +32,9 @@ import org.ojalgo.type.context.NumberContext;
  * @see Access1D
  * @author apete
  */
-public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
+public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D<N> {
 
-    public interface Aggregatable<N extends Number> extends Structure2D, Access1D.Aggregatable<N> {
+    public interface Aggregatable<N extends Comparable<N>> extends Structure2D, Access1D.Aggregatable<N> {
 
         default N aggregateColumn(final long col, final Aggregator aggregator) {
             return this.aggregateColumn(0L, col, aggregator);
@@ -68,7 +68,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
-    public interface Collectable<N extends Number, R extends Mutate2D.Receiver<N>> extends Structure2D {
+    public interface Collectable<N extends Comparable<N>, R extends Mutate2D.Receiver<N>> extends Structure2D {
 
         default <I extends R> I collect(final Factory2D<I> factory) {
 
@@ -169,7 +169,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
-    public static final class ElementView<N extends Number> implements ElementView2D<N, ElementView<N>> {
+    public static final class ElementView<N extends Comparable<N>> implements ElementView2D<N, ElementView<N>> {
 
         private final ElementView1D<N, ?> myDelegate;
         private final long myStructure;
@@ -308,7 +308,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
-    public interface Sliceable<N extends Number> extends Structure2D, Access1D.Sliceable<N> {
+    public interface Sliceable<N extends Comparable<N>> extends Structure2D, Access1D.Sliceable<N> {
 
         default Access1D<N> sliceColumn(final long col) {
             return this.sliceColumn(0L, col);
@@ -331,7 +331,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
-    public interface Visitable<N extends Number> extends Structure2D, Access1D.Visitable<N> {
+    public interface Visitable<N extends Comparable<N>> extends Structure2D, Access1D.Visitable<N> {
 
         default void visitColumn(final long row, final long col, final VoidFunction<N> visitor) {
             this.loopColumn(row, col, (r, c) -> this.visitOne(r, c, visitor));
@@ -517,7 +517,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         };
     }
 
-    static <N extends Number> Access2D<N> wrap(final N[][] target) {
+    static <N extends Comparable<N>> Access2D<N> wrap(final N[][] target) {
         return new Access2D<N>() {
 
             public long count() {
@@ -533,11 +533,11 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             }
 
             public double doubleValue(final long index) {
-                return this.get(index).doubleValue();
+                return Scalar.doubleValue(this.get(index));
             }
 
             public double doubleValue(final long row, final long col) {
-                return this.get(row, col).doubleValue();
+                return Scalar.doubleValue(this.get(row, col));
             }
 
             public N get(final long row, final long col) {
@@ -552,7 +552,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         };
     }
 
-    default <NN extends Number, R extends Mutate2D.Receiver<NN>> Collectable<NN, R> asCollectable2D() {
+    default <NN extends Comparable<NN>, R extends Mutate2D.Receiver<NN>> Collectable<NN, R> asCollectable2D() {
         return new Collectable<NN, R>() {
 
             public long countColumns() {

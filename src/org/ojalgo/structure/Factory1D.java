@@ -33,9 +33,9 @@ public interface Factory1D<I extends Structure1D> extends FactorySupplement {
 
         I copy(double... source);
 
-        I copy(List<? extends Number> source);
+        I copy(List<? extends Comparable<?>> source);
 
-        I copy(Number... source);
+        I copy(Comparable<?>... source);
 
         I makeFilled(long count, NullaryFunction<?> supplier);
 

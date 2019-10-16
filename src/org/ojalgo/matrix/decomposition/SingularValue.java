@@ -50,10 +50,10 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface SingularValue<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
+public interface SingularValue<N extends Comparable<N>> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
         MatrixDecomposition.RankRevealing<N>, MatrixDecomposition.Values<N> {
 
-    interface Factory<N extends Number> extends MatrixDecomposition.Factory<SingularValue<N>> {
+    interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<SingularValue<N>> {
 
         default SingularValue<N> make(final boolean fullSize) {
             return this.make(TYPICAL, fullSize);
@@ -81,7 +81,7 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
 
     Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new SingularValueDecomposition.Rational(fullSize);
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final SingularValue<N> decomposition, final NumberContext context) {
+    static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final SingularValue<N> decomposition, final NumberContext context) {
 
         final int tmpRowDim = (int) matrix.countRows();
         final int tmpColDim = (int) matrix.countColumns();
@@ -151,7 +151,7 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
      */
     @Deprecated
     @SuppressWarnings("unchecked")
-    static <N extends Number> SingularValue<N> make(final Access2D<N> typical) {
+    static <N extends Comparable<N>> SingularValue<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -172,7 +172,7 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
      * @deprecated v48 Use {@link #reconstruct()} instead
      */
     @Deprecated
-    static <N extends Number> MatrixStore<N> reconstruct(final SingularValue<N> decomposition) {
+    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final SingularValue<N> decomposition) {
         return decomposition.reconstruct();
     }
 

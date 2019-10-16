@@ -204,7 +204,7 @@ public abstract class StandardType {
     /**
      * {@linkplain #getQuantity()} * {@linkplain #getPrice()} = {@linkplain #getAmount()}
      */
-    public TypeContext<Number> getAmount() {
+    public TypeContext<Comparable<?>> getAmount() {
         return AMOUNT;
     }
 
@@ -216,27 +216,27 @@ public abstract class StandardType {
         return DATE;
     }
 
-    public TypeContext<Number> getDecimal032() {
+    public TypeContext<Comparable<?>> getDecimal032() {
         return DECIMAL_032;
     }
 
-    public TypeContext<Number> getDecimal064() {
+    public TypeContext<Comparable<?>> getDecimal064() {
         return DECIMAL_064;
     }
 
-    public TypeContext<Number> getDecimal128() {
+    public TypeContext<Comparable<?>> getDecimal128() {
         return DECIMAL_128;
     }
 
-    public TypeContext<Number> getMath032() {
+    public TypeContext<Comparable<?>> getMath032() {
         return MATH_032;
     }
 
-    public TypeContext<Number> getMath064() {
+    public TypeContext<Comparable<?>> getMath064() {
         return MATH_064;
     }
 
-    public TypeContext<Number> getMath128() {
+    public TypeContext<Comparable<?>> getMath128() {
         return MATH_128;
     }
 
@@ -244,29 +244,29 @@ public abstract class StandardType {
         return DATETIME;
     }
 
-    public TypeContext<Number> getMoney() {
+    public TypeContext<Comparable<?>> getMoney() {
         return AMOUNT;
     }
 
-    public TypeContext<Number> getParameter() {
+    public TypeContext<Comparable<?>> getParameter() {
         return DECIMAL_064;
     }
 
-    public TypeContext<Number> getPercent() {
+    public TypeContext<Comparable<?>> getPercent() {
         return PERCENT;
     }
 
     /**
      * {@linkplain #getQuantity()} * {@linkplain #getPrice()} = {@linkplain #getAmount()}
      */
-    public TypeContext<Number> getPrice() {
+    public TypeContext<Comparable<?>> getPrice() {
         return PRICE;
     }
 
     /**
      * {@linkplain #getQuantity()} * {@linkplain #getPrice()} = {@linkplain #getAmount()}
      */
-    public TypeContext<Number> getQuantity() {
+    public TypeContext<Comparable<?>> getQuantity() {
         return QUANTITY;
     }
 

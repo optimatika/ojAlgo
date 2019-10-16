@@ -30,7 +30,7 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class RationalNumber extends Number implements Scalar<RationalNumber>, Enforceable<RationalNumber> {
+public final class RationalNumber implements Scalar<RationalNumber>, Enforceable<RationalNumber> {
 
     public static final Scalar.Factory<RationalNumber> FACTORY = new Scalar.Factory<RationalNumber>() {
 
@@ -38,7 +38,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             return RationalNumber.valueOf(value);
         }
 
-        public RationalNumber cast(final Number number) {
+        public RationalNumber cast(final Comparable<?> number) {
             return RationalNumber.valueOf(number);
         }
 
@@ -46,7 +46,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             return RationalNumber.valueOf(value);
         }
 
-        public RationalNumber convert(final Number number) {
+        public RationalNumber convert(final Comparable<?> number) {
             return RationalNumber.valueOf(number);
         }
 
@@ -173,63 +173,56 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return RationalNumber.fromLong(value);
     }
 
-    public static RationalNumber valueOf(final Number number) {
+    public static RationalNumber valueOf(final Comparable<?> number) {
 
-        if (number != null) {
+        if (number == null) {
+            return ZERO;
+        }
 
-            if (number instanceof RationalNumber) {
+        if (number instanceof RationalNumber) {
 
-                return (RationalNumber) number;
-
-            } else if (number instanceof Double) {
-
-                return RationalNumber.valueOf(number.doubleValue());
-
-            } else {
-
-                final BigDecimal tmpBigDecimal = TypeUtils.toBigDecimal(number);
-
-                BigInteger retNumer;
-                BigInteger retDenom;
-
-                final int scale = tmpBigDecimal.scale();
-
-                if (scale < 0) {
-
-                    retNumer = tmpBigDecimal.unscaledValue().multiply(BigInteger.TEN.pow(-scale));
-                    retDenom = BigInteger.ONE;
-
-                } else {
-
-                    retNumer = tmpBigDecimal.unscaledValue();
-                    retDenom = BigInteger.TEN.pow(scale);
-
-                    final BigInteger gcd = retNumer.gcd(retDenom);
-                    if (gcd.compareTo(BigInteger.ONE) == 1) {
-                        retNumer = retNumer.divide(gcd);
-                        retDenom = retDenom.divide(gcd);
-                    }
-                }
-
-                final int bits = Math.max(retNumer.bitLength(), retDenom.bitLength());
-
-                if (bits > MAX_BITS) {
-                    final int shift = bits - MAX_BITS;
-                    retNumer = retNumer.shiftRight(shift);
-                    retDenom = retDenom.shiftRight(shift);
-                }
-
-                //                final BigDecimal recreated = BigFunction.DIVIDE.invoke(new BigDecimal(retNumer), new BigDecimal(retDenom));
-                //                if (recreated.plus(MathContext.DECIMAL32).compareTo(tmpBigDecimal.plus(MathContext.DECIMAL32)) != 0) {
-                //                    BasicLogger.debug("{} != {}", tmpBigDecimal, recreated);
-                //                }
-
-                return new RationalNumber(retNumer.longValue(), retDenom.longValue());
-            }
+            return (RationalNumber) number;
 
         } else {
 
-            return ZERO;
+            BigDecimal tmpBigD = TypeUtils.toBigDecimal(number);
+
+            BigInteger retNumer;
+            BigInteger retDenom;
+
+            int scale = tmpBigD.scale();
+
+            if (scale < 0) {
+
+                retNumer = tmpBigD.unscaledValue().multiply(BigInteger.TEN.pow(-scale));
+                retDenom = BigInteger.ONE;
+
+            } else {
+
+                retNumer = tmpBigD.unscaledValue();
+                retDenom = BigInteger.TEN.pow(scale);
+
+                BigInteger gcd = retNumer.gcd(retDenom);
+                if (gcd.compareTo(BigInteger.ONE) == 1) {
+                    retNumer = retNumer.divide(gcd);
+                    retDenom = retDenom.divide(gcd);
+                }
+            }
+
+            int bits = Math.max(retNumer.bitLength(), retDenom.bitLength());
+
+            if (bits > MAX_BITS) {
+                int shift = bits - MAX_BITS;
+                retNumer = retNumer.shiftRight(shift);
+                retDenom = retDenom.shiftRight(shift);
+            }
+
+            //                final BigDecimal recreated = BigFunction.DIVIDE.invoke(new BigDecimal(retNumer), new BigDecimal(retDenom));
+            //                if (recreated.plus(MathContext.DECIMAL32).compareTo(tmpBigDecimal.plus(MathContext.DECIMAL32)) != 0) {
+            //                    BasicLogger.debug("{} != {}", tmpBigDecimal, recreated);
+            //                }
+
+            return new RationalNumber(retNumer.longValue(), retDenom.longValue());
         }
     }
 

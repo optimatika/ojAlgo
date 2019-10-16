@@ -547,7 +547,7 @@ public final class MultiplyNeither implements ArrayOperation {
         tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
     };
 
-    public static <N extends Number & Scalar<N>> GenericMultiplyNeither<N> getGeneric(final long rows, final long columns) {
+    public static <N extends Scalar<N>> GenericMultiplyNeither<N> getGeneric(final long rows, final long columns) {
 
         if (rows > THRESHOLD) {
 
@@ -619,7 +619,7 @@ public final class MultiplyNeither implements ArrayOperation {
         }
     }
 
-    static <N extends Number & Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
+    static <N extends Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
             final N[] right, final Scalar.Factory<N> scalar) {
 
         final int structure = left.length / complexity;

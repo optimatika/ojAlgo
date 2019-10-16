@@ -149,7 +149,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         // When/if the correct/optimal solution is used to kickStart ojAlgo should return that solution
         Result initialisedModelResult = initialisedModel.minimise();
         TestUtils.assertStateNotLessThanOptimal(initialisedModelResult);
-        TestUtils.assertEquals(expectedResult, initialisedModelResult, modelValidationContext);
+        TestUtils.assertStateAndSolution(expectedResult, initialisedModelResult, modelValidationContext);
         TestUtils.assertEquals(expectedValue, initialisedModelResult.getValue(), modelValidationContext);
         TestUtils.assertEquals(expectedValue, initialisedModel.objective().evaluate(initialisedModelResult).doubleValue(), modelValidationContext);
         TestUtils.assertEquals(expectedValue, initialisedModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
@@ -166,7 +166,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         Result uninitialisedModelResult = uninitialisedModel.minimise();
         TestUtils.assertStateNotLessThanOptimal(uninitialisedModelResult);
-        TestUtils.assertEquals(expectedResult, uninitialisedModelResult, modelValidationContext);
+        TestUtils.assertEquals((Access1D<?>) expectedResult, (Access1D<?>) uninitialisedModelResult, modelValidationContext);
         TestUtils.assertEquals(expectedValue, uninitialisedModelResult.getValue(), modelValidationContext);
         TestUtils.assertEquals(expectedValue, uninitialisedModel.objective().evaluate(uninitialisedModelResult).doubleValue(), modelValidationContext);
         TestUtils.assertEquals(expectedValue, uninitialisedModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
@@ -180,7 +180,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             Optimisation.Result tmpResult = tmpSolver.solve();
 
             TestUtils.assertStateNotLessThanOptimal(tmpResult);
-            TestUtils.assertEquals(expectedResult, tmpResult, NumberContext.getGeneral(2, 4));
+            TestUtils.assertEquals((Access1D<?>) expectedResult, (Access1D<?>) tmpResult, NumberContext.getGeneral(2, 4));
             TestUtils.assertEquals(expectedValue, uninitialisedModel.objective().evaluate(tmpResult).doubleValue(), NumberContext.getGeneral(4, 8));
         }
     }
@@ -960,7 +960,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         Optimisation.Result tmpResult = tmpSolver.solve();
 
-        TestUtils.assertBounds(BigMath.ZERO, tmpResult, BigMath.ONE, StandardType.PERCENT);
+        TestUtils.assertBounds(BigMath.ZERO, (Access1D<?>) tmpResult, BigMath.ONE, StandardType.PERCENT);
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null, null);
     }
@@ -1409,7 +1409,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
             TestUtils.assertEquals("Model 1 State @" + l, baseResult1.getState(), tmpResult1.getState());
             TestUtils.assertEquals("Model 1 Value @" + l, baseResult1.getValue(), tmpResult1.getValue());
-            TestUtils.assertEquals("Model 1 Solution @" + l, baseResult1, tmpResult1);
+            TestUtils.assertStateAndSolution("Model 1 Solution @" + l, baseResult1, tmpResult1);
 
             Result tmpResult2 = model2.maximise();
 
@@ -1424,7 +1424,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
             TestUtils.assertEquals("Model 2 State @" + l, baseResult2.getState(), tmpResult2.getState());
             TestUtils.assertEquals("Model 2 Value @" + l, baseResult2.getValue(), tmpResult2.getValue());
-            TestUtils.assertEquals("Model 2 Solution @" + l, baseResult2, tmpResult2);
+            TestUtils.assertStateAndSolution("Model 2 Solution @" + l, baseResult2, tmpResult2);
 
             Result tmpResult3 = model3.maximise();
 
@@ -1439,7 +1439,8 @@ public class ConvexProblems extends OptimisationConvexTests {
 
             TestUtils.assertEquals("Model 3 State @" + l, baseResult3.getState(), tmpResult3.getState());
             TestUtils.assertEquals("Model 3 Value @" + l, baseResult3.getValue(), tmpResult3.getValue());
-            TestUtils.assertEquals("Model 3 Solution @" + l, baseResult3, tmpResult3);
+            TestUtils.assertEquals("Model 3 Solution @" + l, (Access1D<?>) baseResult3, (Access1D<?>) tmpResult3);
+
         }
 
     }
@@ -1497,7 +1498,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
 
-        TestUtils.assertEquals(tmpExpectedResult, tmpResult);
+        TestUtils.assertStateAndSolution(tmpExpectedResult, tmpResult);
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null, null);
     }

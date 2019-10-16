@@ -48,10 +48,10 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements,
-        Access2D.IndexOf, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N> {
+public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>,
+        Access2D.Elements, Access2D.IndexOf, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N> {
 
-    public static final class Factory<N extends Number> implements Factory2D<Array2D<N>> {
+    public static final class Factory<N extends Comparable<N>> implements Factory2D<Array2D<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
@@ -106,7 +106,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
-        public Array2D<N> columns(final List<? extends Number>... source) {
+        public Array2D<N> columns(final List<? extends Comparable<?>>... source) {
 
             final int tmpColumns = source.length;
             final int tmpRows = source[0].size();
@@ -115,7 +115,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
 
             long tmpIndex = 0L;
             for (int j = 0; j < tmpColumns; j++) {
-                final List<? extends Number> tmpColumn = source[j];
+                final List<? extends Comparable<?>> tmpColumn = source[j];
                 for (int i = 0; i < tmpRows; i++) {
                     tmpDelegate.set(tmpIndex++, tmpColumn.get(i));
                 }
@@ -124,7 +124,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
-        public Array2D<N> columns(final Number[]... source) {
+        public Array2D<N> columns(final Comparable<?>[]... source) {
 
             final int tmpColumns = source.length;
             final int tmpRows = source[0].length;
@@ -133,7 +133,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
 
             long tmpIndex = 0L;
             for (int j = 0; j < tmpColumns; j++) {
-                final Number[] tmpColumn = source[j];
+                final Comparable<?>[] tmpColumn = source[j];
                 for (int i = 0; i < tmpRows; i++) {
                     tmpDelegate.set(tmpIndex++, tmpColumn[i]);
                 }
@@ -217,7 +217,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         }
 
         @SuppressWarnings("unchecked")
-        public Array2D<N> rows(final List<? extends Number>... source) {
+        public Array2D<N> rows(final List<? extends Comparable<?>>... source) {
 
             final int tmpRows = source.length;
             final int tmpColumns = source[0].size();
@@ -225,7 +225,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
             final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             for (int i = 0; i < tmpRows; i++) {
-                final List<? extends Number> tmpRow = source[i];
+                final List<? extends Comparable<?>> tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
                     tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.get(j));
                 }
@@ -234,7 +234,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
-        public Array2D<N> rows(final Number[]... source) {
+        public Array2D<N> rows(final Comparable<?>[]... source) {
 
             final int tmpRows = source.length;
             final int tmpColumns = source[0].length;
@@ -242,7 +242,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
             final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             for (int i = 0; i < tmpRows; i++) {
-                final Number[] tmpRow = source[i];
+                final Comparable<?>[] tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
                     tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
                 }
@@ -267,7 +267,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
     public static final Factory<Quaternion> QUATERNION = new Factory<>(QuaternionArray.FACTORY);
     public static final Factory<RationalNumber> RATIONAL = new Factory<>(RationalArray.FACTORY);
 
-    public static <N extends Number> Array2D.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
+    public static <N extends Comparable<N>> Array2D.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
         return new Array2D.Factory<>(denseArray);
     }
 
@@ -293,11 +293,11 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
     }
 
-    public void add(final long row, final long col, final Number addend) {
+    public void add(final long row, final long col, final Comparable<?> addend) {
         myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
     }
 
-    public void add(final long index, final Number addend) {
+    public void add(final long index, final Comparable<?> addend) {
         myDelegate.add(index, addend);
     }
 
@@ -636,11 +636,11 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
     }
 
-    public void set(final long row, final long col, final Number value) {
+    public void set(final long row, final long col, final Comparable<?> value) {
         myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
     }
 
-    public void set(final long index, final Number value) {
+    public void set(final long index, final Comparable<?> value) {
         myDelegate.set(index, value);
     }
 

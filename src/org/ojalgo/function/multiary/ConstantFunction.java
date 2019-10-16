@@ -36,13 +36,13 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-public final class ConstantFunction<N extends Number> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Constant<N> {
+public final class ConstantFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Constant<N> {
 
     public static ConstantFunction<ComplexNumber> makeComplex(final int arity) {
         return new ConstantFunction<>(arity, GenericDenseStore.COMPLEX);
     }
 
-    public static ConstantFunction<ComplexNumber> makeComplex(final int arity, final Number constant) {
+    public static ConstantFunction<ComplexNumber> makeComplex(final int arity, final Comparable<?> constant) {
         return new ConstantFunction<>(arity, GenericDenseStore.COMPLEX, constant);
     }
 
@@ -50,7 +50,7 @@ public final class ConstantFunction<N extends Number> implements MultiaryFunctio
         return new ConstantFunction<>(arity, PrimitiveDenseStore.FACTORY);
     }
 
-    public static ConstantFunction<Double> makePrimitive(final int arity, final Number constant) {
+    public static ConstantFunction<Double> makePrimitive(final int arity, final Comparable<?> constant) {
         return new ConstantFunction<>(arity, PrimitiveDenseStore.FACTORY, constant);
     }
 
@@ -58,7 +58,7 @@ public final class ConstantFunction<N extends Number> implements MultiaryFunctio
         return new ConstantFunction<>(arity, GenericDenseStore.RATIONAL);
     }
 
-    public static ConstantFunction<RationalNumber> makeRational(final int arity, final Number constant) {
+    public static ConstantFunction<RationalNumber> makeRational(final int arity, final Comparable<?> constant) {
         return new ConstantFunction<>(arity, GenericDenseStore.RATIONAL, constant);
     }
 
@@ -66,7 +66,7 @@ public final class ConstantFunction<N extends Number> implements MultiaryFunctio
     private Scalar<N> myConstant = null;
     private final PhysicalStore.Factory<N, ?> myFactory;
 
-    ConstantFunction(final int arity, final PhysicalStore.Factory<N, ?> factory, final Number constant) {
+    ConstantFunction(final int arity, final PhysicalStore.Factory<N, ?> factory, final Comparable<?> constant) {
 
         this(arity, factory);
 
@@ -105,7 +105,7 @@ public final class ConstantFunction<N extends Number> implements MultiaryFunctio
         return this.getConstant();
     }
 
-    public void setConstant(final Number constant) {
+    public void setConstant(final Comparable<?> constant) {
         myConstant = constant != null ? myFactory.scalar().convert(constant) : null;
     }
 

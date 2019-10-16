@@ -51,7 +51,7 @@ package org.ojalgo.algebra;
  * @see <a href="https://en.wikipedia.org/wiki/Vector_space">Vector space</a>
  * @see <a href="https://en.wikipedia.org/wiki/Examples_of_vector_spaces">Examples of vector spaces</a>
  */
-public interface VectorSpace<V, F extends Number> extends Group.Additive<V>, ScalarOperation.Multiplication<V, F> {
+public interface VectorSpace<V, F extends Comparable<F>> extends Group.Additive<V>, ScalarOperation.Multiplication<V, F> {
 
     /**
      * <p>

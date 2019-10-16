@@ -39,9 +39,9 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
+public interface Hessenberg<N extends Comparable<N>> extends MatrixDecomposition<N> {
 
-    interface Factory<N extends Number> extends MatrixDecomposition.Factory<Hessenberg<N>> {
+    interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<Hessenberg<N>> {
 
     }
 
@@ -53,7 +53,7 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
 
     Factory<RationalNumber> RATIONAL = typical -> new HessenbergDecomposition.Rational();
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Hessenberg<N> decomposition, final NumberContext context) {
+    static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Hessenberg<N> decomposition, final NumberContext context) {
 
         final MatrixStore<N> tmpH = decomposition.getH();
         final MatrixStore<N> tmpQ = decomposition.getQ();
@@ -70,7 +70,7 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
      */
     @Deprecated
     @SuppressWarnings("unchecked")
-    static <N extends Number> Hessenberg<N> make(final Access2D<N> typical) {
+    static <N extends Comparable<N>> Hessenberg<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -91,7 +91,7 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
      * @deprecated v48 Use {@link #reconstruct()} instead
      */
     @Deprecated
-    static <N extends Number> MatrixStore<N> reconstruct(final Hessenberg<N> decomposition) {
+    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final Hessenberg<N> decomposition) {
         return decomposition.reconstruct();
     }
 

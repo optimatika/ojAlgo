@@ -118,7 +118,7 @@ public final class SubstituteForwards implements ArrayOperation {
     /**
      * @see #invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
      */
-    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Access2D<N> body,
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Access2D<N> body,
             final boolean unitDiagonal, final boolean conjugated, final boolean identity, final Scalar.Factory<N> scalar) {
 
         int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());

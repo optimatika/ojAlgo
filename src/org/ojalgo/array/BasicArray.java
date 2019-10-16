@@ -47,10 +47,10 @@ import org.ojalgo.structure.StructureAnyD;
  *
  * @author apete
  */
-public abstract class BasicArray<N extends Number>
+public abstract class BasicArray<N extends Comparable<N>>
         implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N> {
 
-    public static final class Factory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
+    public static final class Factory<N extends Comparable<N>> extends ArrayFactory<N, BasicArray<N>> {
 
         private static final long SPARSE_SEGMENTATION_LIMIT = PowerOf2.powerOfLong2(46);
 

@@ -49,9 +49,9 @@ import org.ojalgo.structure.Mutate1D;
  *
  * @author apete
  */
-public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D, Mutate1D.Mixable<N> {
+public final class NumberList<N extends Comparable<N>> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D, Mutate1D.Mixable<N> {
 
-    public static final class ListFactory<N extends Number> extends StrategyBuilder<N, NumberList<N>, ListFactory<N>> {
+    public static final class ListFactory<N extends Comparable<N>> extends StrategyBuilder<N, NumberList<N>, ListFactory<N>> {
 
         ListFactory(final DenseArray.Factory<N> denseFactory) {
             super(denseFactory);
@@ -64,7 +64,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
 
     }
 
-    public static <N extends Number> Collector<N, NumberList<N>, NumberList<N>> collector(final DenseArray.Factory<N> arrayFactory) {
+    public static <N extends Comparable<N>> Collector<N, NumberList<N>, NumberList<N>> collector(final DenseArray.Factory<N> arrayFactory) {
         final Supplier<NumberList<N>> tmpSupplier = () -> NumberList.factory(arrayFactory).make();
         final BiConsumer<NumberList<N>, N> tmpAccumulator = (list, element) -> list.add(element);
         final BinaryOperator<NumberList<N>> tmpCombiner = (part1, part2) -> {
@@ -75,7 +75,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         return Collector.of(tmpSupplier, tmpAccumulator, tmpCombiner, tmpIdentity, Collector.Characteristics.IDENTITY_FINISH);
     }
 
-    public static <N extends Number> ListFactory<N> factory(final DenseArray.Factory<N> arrayFactory) {
+    public static <N extends Comparable<N>> ListFactory<N> factory(final DenseArray.Factory<N> arrayFactory) {
         return new ListFactory<>(arrayFactory);
     }
 
@@ -132,7 +132,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         }
     }
 
-    public void add(final long index, final Number addend) {
+    public void add(final long index, final Comparable<?> addend) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
@@ -375,7 +375,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         }
     }
 
-    public void set(final long index, final Number value) {
+    public void set(final long index, final Comparable<?> value) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {

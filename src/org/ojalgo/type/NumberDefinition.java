@@ -19,34 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.store;
+package org.ojalgo.type;
 
-import org.ojalgo.scalar.Scalar;
+/**
+ * An interface that defines what is in {@link java.lang.Number}. Hopefully Java itself will one day get an
+ * interface that does this. When/if that happens then this interface AND any/all usage of
+ * <code>extends java.lang.Number</code> will be replaced by that new interface.
+ */
+public interface NumberDefinition {
 
-final class LowerHermitianStore<N extends Comparable<N>> extends ShadingStore<N> {
+    byte byteValue();
 
-    LowerHermitianStore(final MatrixStore<N> base) {
-        super(base, base.countRows(), Math.min(base.countRows(), base.countColumns()));
-    }
+    double doubleValue();
 
-    public double doubleValue(final long row, final long col) {
-        if (row < col) {
-            return this.base().doubleValue(col, row);
-        } else {
-            return this.base().doubleValue(row, col);
-        }
-    }
+    float floatValue();
 
-    public N get(final long row, final long col) {
-        return this.toScalar(row, col).get();
-    }
+    int intValue();
 
-    public Scalar<N> toScalar(final long row, final long col) {
-        if (row < col) {
-            return this.base().toScalar(col, row).conjugate();
-        } else {
-            return this.base().toScalar(row, col);
-        }
-    }
+    long longValue();
+
+    short shortValue();
 
 }

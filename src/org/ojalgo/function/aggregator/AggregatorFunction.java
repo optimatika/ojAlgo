@@ -25,7 +25,7 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.AccessScalar;
 
-public interface AggregatorFunction<N extends Number> extends VoidFunction<N>, AccessScalar<N> {
+public interface AggregatorFunction<N extends Comparable<N>> extends VoidFunction<N>, AccessScalar<N> {
 
     /**
      * @deprecated v48 Merging will no longer be supported
