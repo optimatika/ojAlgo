@@ -24,7 +24,7 @@ package org.ojalgo.algebra;
 /**
  * @author apete
  */
-public interface NormedVectorSpace<V, F extends Comparable<F>> extends VectorSpace<V, F> {
+public interface NormedVectorSpace<T, N extends Comparable<N>> extends VectorSpace<T, N> {
 
     /**
      * @param comparedTo What to compare with
@@ -44,6 +44,6 @@ public interface NormedVectorSpace<V, F extends Comparable<F>> extends VectorSpa
      *
      * @return A unit "vector"
      */
-    V signum();
+    T signum();
 
 }
