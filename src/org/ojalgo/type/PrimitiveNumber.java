@@ -21,6 +21,9 @@
  */
 package org.ojalgo.type;
 
+/**
+ * Intended as a "boxed" version of any/all primitive numeric types.
+ */
 public interface PrimitiveNumber extends NumberDefinition, Comparable<PrimitiveNumber> {
 
 }
