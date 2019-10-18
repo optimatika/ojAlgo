@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,63 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.random;
+package org.ojalgo.netio;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+public abstract class NetioTests {
 
-import org.ojalgo.scalar.Scalar;
-
-/**
- * @author apete
- */
-public class Deterministic extends RandomNumber {
-
-    private static final long serialVersionUID = 6544837857838057678L;
-
-    private final double myValue;
-
-    public Deterministic() {
-
-        super();
-
-        myValue = ZERO;
-    }
-
-    public Deterministic(final double aValue) {
-
-        super();
-
-        myValue = aValue;
-    }
-
-    public Deterministic(final Comparable<?> aValue) {
-
-        super();
-
-        myValue = Scalar.doubleValue(aValue);
-    }
-
-    public double getExpected() {
-        return myValue;
-    }
-
-    @Override
-    public double getStandardDeviation() {
-        return ZERO;
-    }
-
-    @Override
-    public double getVariance() {
-        return ZERO;
-    }
-
-    @Override
-    protected double generate() {
-        return myValue;
-    }
-
-    public int compareTo(Deterministic o) {
-        return Double.compare(myValue, o.myValue);
-    }
+    static final boolean DEBUG = false;
 
 }

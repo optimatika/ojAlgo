@@ -33,7 +33,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
  *
  * @author apete
  */
-public abstract class RandomNumber extends Number implements Distribution, NullaryFunction<Double> {
+public abstract class RandomNumber extends Number implements Distribution, NullaryFunction<Double>, Comparable<RandomNumber> {
 
     private static final long serialVersionUID = -5871398825698010936L;
 
@@ -111,5 +111,9 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
 
     protected final Random random() {
         return myRandom;
+    }
+
+    public int compareTo(RandomNumber o) {
+        return Double.compare(this.getExpected(), o.getExpected());
     }
 }
