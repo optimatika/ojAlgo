@@ -386,6 +386,22 @@ public abstract class TestUtils {
         }
     }
 
+    public static void assertResult(final Optimisation.Result expected, final Optimisation.Result actual) {
+        TestUtils.assertResult(expected, actual, EQUALS);
+    }
+
+    public static void assertResult(final Optimisation.Result expected, final Optimisation.Result actual, final NumberContext context) {
+        TestUtils.assertResult("Optimisation.Result != Optimisation.Result", expected, actual, context);
+    }
+
+    public static void assertResult(final String message, final Optimisation.Result expected, final Optimisation.Result actual) {
+        TestUtils.assertResult(message, expected, actual, EQUALS);
+    }
+
+    public static void assertResult(final String message, final Optimisation.Result expected, final Optimisation.Result actual, final NumberContext context) {
+        TestUtils.assertOptimisationResult(message, expected, actual, context, true, true, true, true);
+    }
+
     public static void assertSolutionFeasible(final ExpressionsBasedModel model, final Optimisation.Result solution) {
         TestUtils.assertSolutionFeasible(model, solution, EQUALS);
     }
