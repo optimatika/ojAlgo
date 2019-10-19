@@ -37,8 +37,8 @@ import org.ojalgo.structure.StructureAnyD;
 /**
  * <p>
  * A BasicArray is 1-dimensional, but designed to easily be extended or encapsulated, and then treated as
- * arbitrary-dimensional. It stores/handles (any subclass of) {@linkplain java.lang.Number} elements depending
- * on the subclass/implementation.
+ * arbitrary-dimensional. It stores/handles (any subclass of) {@linkplain java.lang.Comparable} elements
+ * depending on the subclass/implementation.
  * </p>
  * <p>
  * This abstract class defines a set of methods to access and modify array elements. It does not "know"
