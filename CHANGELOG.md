@@ -23,7 +23,7 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 ### Changed
 
-- Generic declarations interfaces and abstract classes (everywhere) that used to be `<N extends Number>` are now `<N extends Comparable<N>>`.
+- Generic declarations in interfaces and abstract classes (everywhere) that used to be `<N extends Number>` are now `<N extends Comparable<N>>`. Code that extends/implements ojAlgo classes and interaces will most likely need to be updated. Simple usage may not require any changes at all. Please note that `java.lang.Number` is NOT `Comparable` but all the speciic subclasses are.
 
 ## [47.3.1] – 2019-09-29
 
