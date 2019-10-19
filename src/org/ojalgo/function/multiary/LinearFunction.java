@@ -35,7 +35,7 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-public final class LinearFunction<N extends Number> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Linear<N> {
+public final class LinearFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Linear<N> {
 
     public static LinearFunction<ComplexNumber> makeComplex(final Access1D<?> coefficients) {
         return new LinearFunction<>(GenericDenseStore.COMPLEX.rows(coefficients));
@@ -61,7 +61,7 @@ public final class LinearFunction<N extends Number> implements MultiaryFunction.
         return new LinearFunction<>(GenericDenseStore.RATIONAL.make(1, arity));
     }
 
-    public static <N extends Number> LinearFunction<N> wrap(final PhysicalStore<N> coefficients) {
+    public static <N extends Comparable<N>> LinearFunction<N> wrap(final PhysicalStore<N> coefficients) {
         return new LinearFunction<>(coefficients);
     }
 

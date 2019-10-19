@@ -190,7 +190,7 @@ public abstract class MatrixUtils {
      * @deprecated v47 Use {@link Access1D#hashCode()} instead.
      */
     @Deprecated
-    public static <N extends Number> int hashCode(final BasicMatrix<?, ?> matrix) {
+    public static <N extends Comparable<N>> int hashCode(final BasicMatrix<?, ?> matrix) {
         return Access1D.hashCode(matrix);
     }
 
@@ -198,7 +198,7 @@ public abstract class MatrixUtils {
      * @deprecated v47 Use {@link Access1D#hashCode()} instead.
      */
     @Deprecated
-    public static <N extends Number> int hashCode(final MatrixStore<N> matrix) {
+    public static <N extends Comparable<N>> int hashCode(final MatrixStore<N> matrix) {
         return Access1D.hashCode(matrix);
     }
 
@@ -211,7 +211,7 @@ public abstract class MatrixUtils {
         final long tmpRowDim = matrix.countRows();
         final long tmpColDim = matrix.countColumns();
 
-        final Number tmpElement = matrix.get(0L);
+        final Comparable<?> tmpElement = matrix.get(0L);
 
         boolean retVal = tmpRowDim == tmpColDim;
 
@@ -245,7 +245,7 @@ public abstract class MatrixUtils {
      * @deprecated v47 {@link MatrixStore#isNormal()}
      */
     @Deprecated
-    public static <N extends Number> boolean isNormal(final MatrixStore<N> matrix) {
+    public static <N extends Comparable<N>> boolean isNormal(final MatrixStore<N> matrix) {
         return matrix.isNormal();
     }
 

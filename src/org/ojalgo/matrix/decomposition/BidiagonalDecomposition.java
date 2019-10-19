@@ -36,7 +36,7 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 
-abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
+abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
 
     static final class Complex extends BidiagonalDecomposition<ComplexNumber> {
 

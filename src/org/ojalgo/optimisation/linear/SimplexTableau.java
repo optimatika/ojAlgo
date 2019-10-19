@@ -38,6 +38,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexSolver.AlgorithmStore;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView1D;
@@ -304,8 +305,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myTransposed.add(col, DenseTableau.this.countConstraints() + 1, -addend);
                 }
 
-                public void add(final long row, final long col, final Number addend) {
-                    this.add(row, col, addend.doubleValue());
+                public void add(final long row, final long col, final Comparable<?> addend) {
+                    this.add(row, col, Scalar.doubleValue(addend));
                 }
 
                 public long countColumns() {
@@ -323,8 +324,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myTransposed.add(col, DenseTableau.this.countConstraints() + 1, -value);
                 }
 
-                public void set(final long row, final long col, final Number value) {
-                    this.set(row, col, value.doubleValue());
+                public void set(final long row, final long col, final Comparable<?> value) {
+                    this.set(row, col, Scalar.doubleValue(value));
                 }
 
             };
@@ -349,8 +350,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myTransposed.add(col, numbConstr + 1, -addend);
                 }
 
-                public void add(final long index, final Number addend) {
-                    this.add(index, addend.doubleValue());
+                public void add(final long index, final Comparable<?> addend) {
+                    this.add(index, Scalar.doubleValue(addend));
                 }
 
                 public long count() {
@@ -366,8 +367,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myTransposed.add(col, numbConstr + 1, -value);
                 }
 
-                public void set(final long index, final Number value) {
-                    this.set(index, value.doubleValue());
+                public void set(final long index, final Comparable<?> value) {
+                    this.set(index, Scalar.doubleValue(value));
                 }
 
             };
@@ -385,8 +386,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myTransposed.add(index, row, addend);
                 }
 
-                public void add(final long index, final Number addend) {
-                    this.add(index, addend.doubleValue());
+                public void add(final long index, final Comparable<?> addend) {
+                    this.add(index, Scalar.doubleValue(addend));
                 }
 
                 public long count() {
@@ -398,8 +399,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myTransposed.set(index, row, value);
                 }
 
-                public void set(final long index, final Number value) {
-                    this.set(index, value.doubleValue());
+                public void set(final long index, final Comparable<?> value) {
+                    this.set(index, Scalar.doubleValue(value));
                 }
 
             };
@@ -776,8 +777,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myPhase1Weights.add(col, -addend);
                 }
 
-                public void add(final long row, final long col, final Number addend) {
-                    this.add(row, col, addend.doubleValue());
+                public void add(final long row, final long col, final Comparable<?> addend) {
+                    this.add(row, col, Scalar.doubleValue(addend));
                 }
 
                 public long countColumns() {
@@ -793,8 +794,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myPhase1Weights.add(col, -value);
                 }
 
-                public void set(final long row, final long col, final Number value) {
-                    this.set(row, col, value.doubleValue());
+                public void set(final long row, final long col, final Comparable<?> value) {
+                    this.set(row, col, Scalar.doubleValue(value));
                 }
 
             };
@@ -810,8 +811,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myInfeasibility -= addend;
                 }
 
-                public void add(final long index, final Number addend) {
-                    this.add(index, addend.doubleValue());
+                public void add(final long index, final Comparable<?> addend) {
+                    this.add(index, Scalar.doubleValue(addend));
                 }
 
                 public long count() {
@@ -824,8 +825,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myInfeasibility -= value;
                 }
 
-                public void set(final long index, final Number value) {
-                    this.set(index, value.doubleValue());
+                public void set(final long index, final Comparable<?> value) {
+                    this.set(index, Scalar.doubleValue(value));
                 }
 
             };
@@ -839,8 +840,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myObjectiveWeights.add(index, addend);
                 }
 
-                public void add(final long index, final Number addend) {
-                    this.add(index, addend.doubleValue());
+                public void add(final long index, final Comparable<?> addend) {
+                    this.add(index, Scalar.doubleValue(addend));
                 }
 
                 public long count() {
@@ -851,8 +852,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myObjectiveWeights.set(index, value);
                 }
 
-                public void set(final long index, final Number value) {
-                    this.set(index, value.doubleValue());
+                public void set(final long index, final Comparable<?> value) {
+                    this.set(index, Scalar.doubleValue(value));
                 }
 
             };

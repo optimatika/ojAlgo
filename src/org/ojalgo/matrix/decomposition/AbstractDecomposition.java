@@ -30,7 +30,7 @@ import org.ojalgo.scalar.Scalar;
 /**
  * @author apete
  */
-abstract class AbstractDecomposition<N extends Number> implements MatrixDecomposition<N> {
+abstract class AbstractDecomposition<N extends Comparable<N>> implements MatrixDecomposition<N> {
 
     private boolean myComputed = false;
     private Boolean mySolvable = null;

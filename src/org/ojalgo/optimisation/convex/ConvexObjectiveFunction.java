@@ -87,7 +87,7 @@ public final class ConvexObjectiveFunction implements MultiaryFunction.TwiceDiff
         return myPureQuadratic.getConstant();
     }
 
-    public void setConstant(final Number constant) {
+    public void setConstant(final Comparable<?> constant) {
         myPureQuadratic.setConstant(constant);
     }
 

@@ -37,9 +37,9 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-public interface TransformableRegion<N extends Number> extends Mutate2D.ModifiableReceiver<N>, Access2D<N> {
+public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.ModifiableReceiver<N>, Access2D<N> {
 
-    class ColumnsRegion<N extends Number> extends ReceiverRegion<N> {
+    class ColumnsRegion<N extends Comparable<N>> extends ReceiverRegion<N> {
 
         private final TransformableRegion<N> myBase;
         private final int[] myColumns;
@@ -59,7 +59,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.add(row, myColumns[(int) col], addend);
         }
 
-        public void add(final long row, final long col, final Number addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(row, myColumns[(int) col], addend);
         }
 
@@ -115,19 +115,19 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.set(row, myColumns[(int) col], value);
         }
 
-        public void set(final long row, final long col, final Number value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(row, myColumns[(int) col], value);
         }
 
     }
 
-    interface FillByMultiplying<N extends Number> {
+    interface FillByMultiplying<N extends Comparable<N>> {
 
         void invoke(TransformableRegion<N> product, Access1D<N> left, int complexity, Access1D<N> right);
 
     }
 
-    class LimitRegion<N extends Number> extends ReceiverRegion<N> {
+    class LimitRegion<N extends Comparable<N>> extends ReceiverRegion<N> {
 
         private final TransformableRegion<N> myBase;
         private final int myRowLimit, myColumnLimit; // limits
@@ -143,7 +143,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.add(row, col, addend);
         }
 
-        public void add(final long row, final long col, final Number addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(row, col, addend);
         }
 
@@ -183,13 +183,13 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.set(row, col, value);
         }
 
-        public void set(final long row, final long col, final Number value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(row, col, value);
         }
 
     }
 
-    class OffsetRegion<N extends Number> extends ReceiverRegion<N> {
+    class OffsetRegion<N extends Comparable<N>> extends ReceiverRegion<N> {
 
         private final TransformableRegion<N> myBase;
         private final int myRowOffset, myColumnOffset; // origin/offset
@@ -205,7 +205,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.add(myRowOffset + row, myColumnOffset + col, addend);
         }
 
-        public void add(final long row, final long col, final Number addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(myRowOffset + row, myColumnOffset + col, addend);
         }
 
@@ -303,13 +303,13 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.set(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void set(final long row, final long col, final Number value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(myRowOffset + row, myColumnOffset + col, value);
         }
 
     }
 
-    abstract class ReceiverRegion<N extends Number> implements TransformableRegion<N> {
+    abstract class ReceiverRegion<N extends Comparable<N>> implements TransformableRegion<N> {
 
         private final TransformableRegion.FillByMultiplying<N> myMultiplier;
 
@@ -369,7 +369,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
 
     }
 
-    class RowsRegion<N extends Number> extends ReceiverRegion<N> {
+    class RowsRegion<N extends Comparable<N>> extends ReceiverRegion<N> {
 
         private final TransformableRegion<N> myBase;
         private final int[] myRows;
@@ -384,7 +384,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.add(myRows[(int) row], col, addend);
         }
 
-        public void add(final long row, final long col, final Number addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(myRows[(int) row], col, addend);
         }
 
@@ -440,13 +440,13 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.set(myRows[(int) row], col, value);
         }
 
-        public void set(final long row, final long col, final Number value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(myRows[(int) row], col, value);
         }
 
     }
 
-    class TransposedRegion<N extends Number> extends ReceiverRegion<N> {
+    class TransposedRegion<N extends Comparable<N>> extends ReceiverRegion<N> {
 
         private final TransformableRegion<N> myBase;
 
@@ -459,7 +459,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.add(col, row, addend);
         }
 
-        public void add(final long row, final long col, final Number addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(col, row, addend);
         }
 
@@ -540,7 +540,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.set(col, row, value);
         }
 
-        public void set(final long row, final long col, final Number value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(col, row, value);
         }
 

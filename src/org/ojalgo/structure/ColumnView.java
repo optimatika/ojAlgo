@@ -29,7 +29,7 @@ import java.util.stream.StreamSupport;
 
 import org.ojalgo.ProgrammingError;
 
-public class ColumnView<N extends Number>
+public class ColumnView<N extends Comparable<N>>
         implements Access1D<N>, Iterable<ColumnView<N>>, Iterator<ColumnView<N>>, Spliterator<ColumnView<N>>, Comparable<ColumnView<N>> {
 
     static final int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED

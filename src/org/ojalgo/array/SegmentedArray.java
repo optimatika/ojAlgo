@@ -26,6 +26,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.special.PowerOf2;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
 /**
@@ -38,7 +39,7 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-final class SegmentedArray<N extends Number> extends BasicArray<N> {
+final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
 
     private final int myIndexBits;
     private final long myIndexMask;
@@ -109,7 +110,7 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
         mySegments[(int) (index >> myIndexBits)].add(index & myIndexMask, addend);
     }
 
-    public void add(final long index, final Number addend) {
+    public void add(final long index, final Comparable<?> addend) {
         mySegments[(int) (index >> myIndexBits)].add(index & myIndexMask, addend);
     }
 
@@ -243,7 +244,7 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
         mySegments[(int) (index >> myIndexBits)].set(index & myIndexMask, value);
     }
 
-    public void set(final long index, final Number value) {
+    public void set(final long index, final Comparable<?> value) {
         mySegments[(int) (index >> myIndexBits)].set(index & myIndexMask, value);
     }
 
@@ -314,7 +315,7 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
         } else if (this.isPrimitive()) {
 
-            final double tmpValue = value.doubleValue();
+            final double tmpValue = Scalar.doubleValue(value);
             for (long i = first; i < limit; i += step) {
                 this.set(i, tmpValue);
             }

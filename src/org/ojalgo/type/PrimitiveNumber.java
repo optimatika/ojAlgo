@@ -22,22 +22,8 @@
 package org.ojalgo.type;
 
 /**
- * An interface that defines what is in {@link java.lang.Number}. Hopefully Java itself will one day get an
- * interface that does this. When/if that happens then this interface AND any/all usage of
- * <code>extends java.lang.Number</code> will be replaced by that new interface.
+ * Intended as a "boxed" version of any/all primitive numeric types.
  */
-public interface PrimitiveNumber {
-
-    byte byteValue();
-
-    double doubleValue();
-
-    float floatValue();
-
-    int intValue();
-
-    long longValue();
-
-    short shortValue();
+public interface PrimitiveNumber extends NumberDefinition, Comparable<PrimitiveNumber> {
 
 }

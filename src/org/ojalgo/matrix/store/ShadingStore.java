@@ -27,7 +27,7 @@ package org.ojalgo.matrix.store;
  *
  * @author apete
  */
-abstract class ShadingStore<N extends Number> extends LogicalStore<N> {
+abstract class ShadingStore<N extends Comparable<N>> extends LogicalStore<N> {
 
     protected ShadingStore(final MatrixStore<N> base, final int rowsCount, final int columnsCount) {
         super(base, rowsCount, columnsCount);

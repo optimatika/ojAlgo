@@ -36,7 +36,7 @@ import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, Transformation2D<Double>,
+public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, Transformation2D<Double>,
         Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public enum RotationAxis {
@@ -210,20 +210,20 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
 
     public static final Scalar.Factory<Quaternion> FACTORY = new Scalar.Factory<Quaternion>() {
 
+        public Quaternion cast(final Comparable<?> number) {
+            return Quaternion.valueOf(number);
+        }
+
         public Quaternion cast(final double value) {
             return Quaternion.valueOf(value);
         }
 
-        public Quaternion cast(final Number number) {
+        public Quaternion convert(final Comparable<?> number) {
             return Quaternion.valueOf(number);
         }
 
         public Quaternion convert(final double value) {
             return Quaternion.valueOf(value);
-        }
-
-        public Quaternion convert(final Number number) {
-            return Quaternion.valueOf(number);
         }
 
         public Quaternion one() {
@@ -241,6 +241,7 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
     public static final Quaternion INFINITY = Quaternion.makePolar(Double.POSITIVE_INFINITY, IJK.vector().toRawCopy1D(), PrimitiveMath.ZERO);
     public static final Quaternion J = new Versor(PrimitiveMath.ZERO, PrimitiveMath.ONE, PrimitiveMath.ZERO);
     public static final Quaternion K = new Versor(PrimitiveMath.ZERO, PrimitiveMath.ZERO, PrimitiveMath.ONE);
+    public static final Quaternion NaN = new Versor(PrimitiveMath.NaN, PrimitiveMath.NaN, PrimitiveMath.NaN, PrimitiveMath.NaN);
     public static final Quaternion NEG = new Versor(PrimitiveMath.NEG);
     public static final Quaternion ONE = new Versor(PrimitiveMath.ONE);
     public static final Quaternion TWO = new Quaternion(PrimitiveMath.TWO);
@@ -354,32 +355,29 @@ public class Quaternion extends Number implements Scalar<Quaternion>, Enforceabl
         return new Quaternion(scalar, i, j, k);
     }
 
-    public static Quaternion valueOf(final double value) {
-        return new Quaternion(value);
-    }
+    public static Quaternion valueOf(final Comparable<?> number) {
 
-    public static Quaternion valueOf(final Number number) {
+        if (number == null) {
+            return ZERO;
+        }
 
-        if (number != null) {
+        if (number instanceof Quaternion) {
 
-            if (number instanceof Quaternion) {
+            return (Quaternion) number;
 
-                return (Quaternion) number;
+        } else if (number instanceof ComplexNumber) {
 
-            } else if (number instanceof ComplexNumber) {
-
-                final ComplexNumber tmpComplex = (ComplexNumber) number;
-                return new Quaternion(tmpComplex.doubleValue(), tmpComplex.i, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
-
-            } else {
-
-                return new Quaternion(number.doubleValue());
-            }
+            ComplexNumber tmpComplex = (ComplexNumber) number;
+            return new Quaternion(tmpComplex.doubleValue(), tmpComplex.i, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
 
         } else {
 
-            return ZERO;
+            return new Quaternion(Scalar.doubleValue(number));
         }
+    }
+
+    public static Quaternion valueOf(final double value) {
+        return new Quaternion(value);
     }
 
     public final double i;

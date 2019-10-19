@@ -62,10 +62,11 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>,
-        Access2D.Elements, Structure2D.ReducibleTo1D<ElementsSupplier<N>>, NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>> {
+public interface MatrixStore<N extends Comparable<N>>
+        extends ElementsSupplier<N>, Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements,
+        Structure2D.ReducibleTo1D<ElementsSupplier<N>>, NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>> {
 
-    public interface Factory<N extends Number> {
+    public interface Factory<N extends Comparable<N>> {
 
         <D extends Access1D<?>> DiagonalStore.Builder<N, D> makeDiagonal(D mainDiagonal);
 
@@ -98,10 +99,11 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
      *
      * @author apete
      */
-    public static class LogicalBuilder<N extends Number> implements ElementsSupplier<N>, Structure2D.Logical<MatrixStore<N>, MatrixStore.LogicalBuilder<N>> {
+    public static class LogicalBuilder<N extends Comparable<N>>
+            implements ElementsSupplier<N>, Structure2D.Logical<MatrixStore<N>, MatrixStore.LogicalBuilder<N>> {
 
         @SafeVarargs
-        static <N extends Number> MatrixStore<N> buildColumn(final long rowsCount, final MatrixStore<N>... columnStores) {
+        static <N extends Comparable<N>> MatrixStore<N> buildColumn(final long rowsCount, final MatrixStore<N>... columnStores) {
             MatrixStore<N> retVal = columnStores[0];
             for (int i = 1; i < columnStores.length; i++) {
                 retVal = new AboveBelowStore<>(retVal, columnStores[i]);
@@ -113,7 +115,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return retVal;
         }
 
-        static <N extends Number> MatrixStore<N> buildColumn(final long rowsCount, final MatrixStore<N> columnStore) {
+        static <N extends Comparable<N>> MatrixStore<N> buildColumn(final long rowsCount, final MatrixStore<N> columnStore) {
             MatrixStore<N> retVal = columnStore;
             long rowsSoFar = retVal.countRows();
             if (rowsSoFar < rowsCount) {
@@ -123,7 +125,8 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         }
 
         @SafeVarargs
-        static <N extends Number> MatrixStore<N> buildColumn(final PhysicalStore.Factory<N, ?> factory, final long rowsCount, final N... columnElements) {
+        static <N extends Comparable<N>> MatrixStore<N> buildColumn(final PhysicalStore.Factory<N, ?> factory, final long rowsCount,
+                final N... columnElements) {
             MatrixStore<N> retVal = factory.columns(columnElements);
             long rowsSoFar = retVal.countRows();
             if (rowsSoFar < rowsCount) {
@@ -133,7 +136,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         }
 
         @SafeVarargs
-        static <N extends Number> MatrixStore<N> buildRow(final long colsCount, final MatrixStore<N>... rowStores) {
+        static <N extends Comparable<N>> MatrixStore<N> buildRow(final long colsCount, final MatrixStore<N>... rowStores) {
             MatrixStore<N> retVal = rowStores[0];
             for (int j = 1; j < rowStores.length; j++) {
                 retVal = new LeftRightStore<>(retVal, rowStores[j]);
@@ -145,7 +148,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
             return retVal;
         }
 
-        static <N extends Number> MatrixStore<N> buildRow(final long colsCount, final MatrixStore<N> rowStore) {
+        static <N extends Comparable<N>> MatrixStore<N> buildRow(final long colsCount, final MatrixStore<N> rowStore) {
             MatrixStore<N> retVal = rowStore;
             long colsSoFar = retVal.countColumns();
             if (colsSoFar < colsCount) {
@@ -155,7 +158,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         }
 
         @SafeVarargs
-        static <N extends Number> MatrixStore<N> buildRow(final PhysicalStore.Factory<N, ?> factory, final long colsCount, final N... rowElements) {
+        static <N extends Comparable<N>> MatrixStore<N> buildRow(final PhysicalStore.Factory<N, ?> factory, final long colsCount, final N... rowElements) {
             MatrixStore<N> retVal = new TransposedStore<>(factory.columns(rowElements));
             long colsSoFar = retVal.countColumns();
             if (colsSoFar < colsCount) {
@@ -498,7 +501,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
          * @deprecated v48
          */
         @Deprecated
-        public LogicalBuilder<N> superimpose(final int row, final int col, final Number matrix) {
+        public LogicalBuilder<N> superimpose(final int row, final int col, final N matrix) {
             myStore = new SuperimposedStore<>(myStore, row, col, new SingleStore<>(myStore.physical(), matrix));
             return this;
         }
@@ -779,7 +782,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
     }
 
     default double doubleValue(final long row, final long col) {
-        return this.get(row, col).doubleValue();
+        return Scalar.doubleValue(this.get(row, col));
     }
 
     default boolean equals(final MatrixStore<N> other, final NumberContext context) {
@@ -820,7 +823,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         int numberOfRows = Math.toIntExact(this.countRows());
         int numberOfColumns = Math.toIntExact(this.countColumns());
 
-        Number element = this.get(0L);
+        N element = this.get(0L);
 
         boolean retVal = numberOfRows == numberOfColumns;
 
@@ -939,7 +942,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     default double norm() {
 
-        double frobeniusNorm = this.aggregateAll(Aggregator.NORM2).doubleValue();
+        double frobeniusNorm = Scalar.doubleValue(this.aggregateAll(Aggregator.NORM2));
 
         if (this.isVector()) {
             return frobeniusNorm;

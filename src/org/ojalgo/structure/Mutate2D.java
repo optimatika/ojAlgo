@@ -48,7 +48,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     }
 
-    interface Fillable<N extends Number> extends Structure2D, Mutate1D.Fillable<N> {
+    interface Fillable<N extends Comparable<N>> extends Structure2D, Mutate1D.Fillable<N> {
 
         default void fillColumn(final long col, final Access1D<N> values) {
             this.fillColumn(0L, col, values);
@@ -145,7 +145,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     }
 
-    interface Mixable<N extends Number> extends Structure2D, Mutate1D.Mixable<N> {
+    interface Mixable<N extends Comparable<N>> extends Structure2D, Mutate1D.Mixable<N> {
 
         default double mix(final long index, final BinaryFunction<N> mixer, final double addend) {
             long structure = this.countRows();
@@ -162,7 +162,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         N mix(long row, long col, BinaryFunction<N> mixer, N addend);
     }
 
-    interface Modifiable<N extends Number> extends Structure2D, Mutate1D.Modifiable<N> {
+    interface Modifiable<N extends Comparable<N>> extends Structure2D, Mutate1D.Modifiable<N> {
 
         default void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
             this.loopColumn(row, col, (r, c) -> this.modifyOne(r, c, modifier));
@@ -218,13 +218,13 @@ public interface Mutate2D extends Structure2D, Mutate1D {
      *
      * @author apete
      */
-    interface ModifiableReceiver<N extends Number> extends Modifiable<N>, Receiver<N>, Exchangeable {
+    interface ModifiableReceiver<N extends Comparable<N>> extends Modifiable<N>, Receiver<N>, Exchangeable {
 
         void modifyAny(Transformation2D<N> modifier);
 
     }
 
-    interface Receiver<N extends Number> extends Mutate2D, Fillable<N>, Consumer<Access2D<?>> {
+    interface Receiver<N extends Comparable<N>> extends Mutate2D, Fillable<N>, Consumer<Access2D<?>> {
 
         default void accept(final Access2D<?> supplied) {
             if (this.isAcceptable(supplied)) {
@@ -247,9 +247,9 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     void add(long row, long col, double addend);
 
-    void add(long row, long col, Number addend);
+    void add(long row, long col, Comparable<?> addend);
 
-    default void add(final long index, final Number addend) {
+    default void add(final long index, final Comparable<?> addend) {
         long tmpStructure = this.countRows();
         this.add(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), addend);
     }
@@ -261,9 +261,9 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     void set(long row, long col, double value);
 
-    void set(long row, long col, Number value);
+    void set(long row, long col, Comparable<?> value);
 
-    default void set(final long index, final Number addend) {
+    default void set(final long index, final Comparable<?> addend) {
         long tmpStructure = this.countRows();
         this.set(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), addend);
     }

@@ -36,7 +36,7 @@ public final class Money extends ExactDecimal<Money> {
             return Money.valueOf(value);
         }
 
-        public Money cast(final Number number) {
+        public Money cast(final Comparable<?> number) {
             return Money.valueOf(number);
         }
 
@@ -44,7 +44,7 @@ public final class Money extends ExactDecimal<Money> {
             return Money.valueOf(value);
         }
 
-        public Money convert(final Number number) {
+        public Money convert(final Comparable<?> number) {
             return Money.valueOf(number);
         }
 
@@ -90,7 +90,7 @@ public final class Money extends ExactDecimal<Money> {
         return new Money(Math.round(value * DOUBLE_DENOMINATOR));
     }
 
-    public static Money valueOf(final Number number) {
+    public static Money valueOf(final Comparable<?> number) {
 
         if (number != null) {
 
@@ -100,7 +100,7 @@ public final class Money extends ExactDecimal<Money> {
 
             } else {
 
-                return Money.valueOf(number.doubleValue());
+                return Money.valueOf(Scalar.doubleValue(number));
             }
 
         } else {

@@ -25,15 +25,16 @@ import java.util.function.BinaryOperator;
 import java.util.function.DoubleBinaryOperator;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.scalar.Scalar;
 
-public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryOperator<N>, DoubleBinaryOperator {
+public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, BinaryOperator<N>, DoubleBinaryOperator {
 
     /**
      * A {@linkplain BinaryFunction} with a set/fixed first argument.
      *
      * @author apete
      */
-    public static final class FixedFirst<N extends Number> implements UnaryFunction<N> {
+    public static final class FixedFirst<N extends Comparable<N>> implements UnaryFunction<N> {
 
         private final BinaryFunction<N> myFunction;
         private final N myNumber;
@@ -57,7 +58,7 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
             myFunction = function;
 
             myNumber = arg1;
-            myValue = arg1.doubleValue();
+            myValue = Scalar.doubleValue(arg1);
         }
 
         public double doubleValue() {
@@ -87,7 +88,7 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
      *
      * @author apete
      */
-    public static final class FixedSecond<N extends Number> implements UnaryFunction<N> {
+    public static final class FixedSecond<N extends Comparable<N>> implements UnaryFunction<N> {
 
         private final BinaryFunction<N> myFunction;
         private final N myNumber;
@@ -111,7 +112,7 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
             myFunction = function;
 
             myNumber = arg2;
-            myValue = arg2.doubleValue();
+            myValue = Scalar.doubleValue(arg2);
         }
 
         public double doubleValue() {

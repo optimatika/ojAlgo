@@ -54,31 +54,31 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class GenericDenseStore<N extends Number & Scalar<N>> extends ScalarArray<N> implements PhysicalStore<N>, DecompositionStore<N> {
+public final class GenericDenseStore<N extends Scalar<N>> extends ScalarArray<N> implements PhysicalStore<N>, DecompositionStore<N> {
 
-    public interface GenericMultiplyBoth<N extends Number & Scalar<N>> extends TransformableRegion.FillByMultiplying<N> {
+    public interface GenericMultiplyBoth<N extends Scalar<N>> extends TransformableRegion.FillByMultiplying<N> {
 
     }
 
-    public interface GenericMultiplyLeft<N extends Number & Scalar<N>> {
+    public interface GenericMultiplyLeft<N extends Scalar<N>> {
 
         void invoke(N[] product, Access1D<N> left, int complexity, N[] right, Scalar.Factory<N> scalar);
 
     }
 
-    public interface GenericMultiplyNeither<N extends Number & Scalar<N>> {
+    public interface GenericMultiplyNeither<N extends Scalar<N>> {
 
         void invoke(N[] product, N[] left, int complexity, N[] right, Scalar.Factory<N> scalar);
 
     }
 
-    public interface GenericMultiplyRight<N extends Number & Scalar<N>> {
+    public interface GenericMultiplyRight<N extends Scalar<N>> {
 
         void invoke(N[] product, N[] left, int complexity, Access1D<N> right, Scalar.Factory<N> scalar);
 
     }
 
-    static final class Factory<N extends Number & Scalar<N>> implements PhysicalStore.Factory<N, GenericDenseStore<N>> {
+    static final class Factory<N extends Scalar<N>> implements PhysicalStore.Factory<N, GenericDenseStore<N>> {
 
         private final DenseArray.Factory<N> myDenseArrayFactory;
 
@@ -161,14 +161,14 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
-        public GenericDenseStore<N> columns(final List<? extends Number>... source) {
+        public GenericDenseStore<N> columns(final List<? extends Comparable<?>>... source) {
 
             final int tmpRowDim = source[0].size();
             final int tmpColDim = source.length;
 
             final N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
 
-            List<? extends Number> tmpColumn;
+            List<? extends Comparable<?>> tmpColumn;
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
@@ -179,14 +179,14 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
-        public GenericDenseStore<N> columns(final Number[]... source) {
+        public GenericDenseStore<N> columns(final Comparable<?>[]... source) {
 
             final int tmpRowDim = source[0].length;
             final int tmpColDim = source.length;
 
             final N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
 
-            Number[] tmpColumn;
+            Comparable<?>[] tmpColumn;
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
@@ -327,21 +327,21 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast((Number) tmpRow[j]);
+                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpRow[j]);
                 }
             }
 
             return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
-        public GenericDenseStore<N> rows(final List<? extends Number>... source) {
+        public GenericDenseStore<N> rows(final List<? extends Comparable<?>>... source) {
 
             final int tmpRowDim = source.length;
             final int tmpColDim = source[0].size();
 
             final N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
 
-            List<? extends Number> tmpRow;
+            List<? extends Comparable<?>> tmpRow;
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
@@ -352,14 +352,14 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
             return new GenericDenseStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
-        public GenericDenseStore<N> rows(final Number[]... source) {
+        public GenericDenseStore<N> rows(final Comparable<?>[]... source) {
 
             final int tmpRowDim = source.length;
             final int tmpColDim = source[0].length;
 
             final N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
 
-            Number[] tmpRow;
+            Comparable<?>[] tmpRow;
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
@@ -409,11 +409,11 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
     public static final PhysicalStore.Factory<RationalNumber, GenericDenseStore<RationalNumber>> RATIONAL = new GenericDenseStore.Factory<>(
             RationalArray.FACTORY);
 
-    public static <N extends Number & Scalar<N>> GenericDenseStore<N> wrap(final GenericDenseStore.Factory<N> factory, final N... data) {
+    public static <N extends Scalar<N>> GenericDenseStore<N> wrap(final GenericDenseStore.Factory<N> factory, final N... data) {
         return new GenericDenseStore<>(factory, data.length, 1, data);
     }
 
-    public static <N extends Number & Scalar<N>> GenericDenseStore<N> wrap(final GenericDenseStore.Factory<N> factory, final N[] data, final int structure) {
+    public static <N extends Scalar<N>> GenericDenseStore<N> wrap(final GenericDenseStore.Factory<N> factory, final N[] data, final int structure) {
         return new GenericDenseStore<>(factory, structure, data.length / structure, data);
     }
 
@@ -483,7 +483,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         myUtility.add(row, col, addend);
     }
 
-    public void add(final long row, final long col, final Number addend) {
+    public void add(final long row, final long col, final Comparable<?> addend) {
         myUtility.add(row, col, addend);
     }
 
@@ -971,7 +971,7 @@ public final class GenericDenseStore<N extends Number & Scalar<N>> extends Scala
         myUtility.set(row, col, value);
     }
 
-    public void set(final long row, final long col, final Number value) {
+    public void set(final long row, final long col, final Comparable<?> value) {
         myUtility.set(row, col, value);
     }
 

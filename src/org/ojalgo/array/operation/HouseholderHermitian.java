@@ -91,7 +91,7 @@ public final class HouseholderHermitian implements ArrayOperation {
         }
     }
 
-    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final Householder.Generic<N> householder, final N[] worker,
+    public static <N extends Scalar<N>> void invoke(final N[] data, final Householder.Generic<N> householder, final N[] worker,
             final Scalar.Factory<N> scalar) {
 
         final N[] tmpVector = householder.vector;

@@ -49,11 +49,11 @@ import org.ojalgo.structure.TransformationAnyD;
  *
  * @author apete
  */
-public final class ArrayAnyD<N extends Number>
+public final class ArrayAnyD<N extends Comparable<N>>
         implements AccessAnyD<N>, AccessAnyD.Visitable<N>, AccessAnyD.Aggregatable<N>, AccessAnyD.Sliceable<N>, AccessAnyD.Elements, AccessAnyD.IndexOf,
         StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, MutateAnyD.ModifiableReceiver<N>, MutateAnyD.Mixable<N> {
 
-    public static final class Factory<N extends Number> implements FactoryAnyD<ArrayAnyD<N>> {
+    public static final class Factory<N extends Comparable<N>> implements FactoryAnyD<ArrayAnyD<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
@@ -99,7 +99,7 @@ public final class ArrayAnyD<N extends Number>
     public static final Factory<Quaternion> QUATERNION = new Factory<>(QuaternionArray.FACTORY);
     public static final Factory<RationalNumber> RATIONAL = new Factory<>(RationalArray.FACTORY);
 
-    public static <N extends Number> ArrayAnyD.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
+    public static <N extends Comparable<N>> ArrayAnyD.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
         return new ArrayAnyD.Factory<>(denseArray);
     }
 
@@ -123,7 +123,7 @@ public final class ArrayAnyD<N extends Number>
         myDelegate.add(index, addend);
     }
 
-    public void add(final long index, final Number addend) {
+    public void add(final long index, final Comparable<?> addend) {
         myDelegate.add(index, addend);
     }
 
@@ -131,7 +131,7 @@ public final class ArrayAnyD<N extends Number>
         myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
 
-    public void add(final long[] reference, final Number addend) {
+    public void add(final long[] reference, final Comparable<?> addend) {
         myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
 
@@ -141,14 +141,14 @@ public final class ArrayAnyD<N extends Number>
         return visitor.get();
     }
 
-    public Number aggregateSet(final int dimension, final long dimensionalIndex, final Aggregator aggregator) {
+    public N aggregateSet(final int dimension, final long dimensionalIndex, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitSet(dimension, dimensionalIndex, visitor);
         return visitor.get();
     }
 
     @Override
-    public Number aggregateSet(final long[] initial, final int dimension, final Aggregator aggregator) {
+    public N aggregateSet(final long[] initial, final int dimension, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitSet(initial, dimension, visitor);
         return visitor.get();
@@ -396,7 +396,7 @@ public final class ArrayAnyD<N extends Number>
         myDelegate.set(index, value);
     }
 
-    public void set(final long index, final Number value) {
+    public void set(final long index, final Comparable<?> value) {
         myDelegate.set(index, value);
     }
 
@@ -404,7 +404,7 @@ public final class ArrayAnyD<N extends Number>
         myDelegate.set(StructureAnyD.index(myStructure, reference), value);
     }
 
-    public void set(final long[] reference, final Number value) {
+    public void set(final long[] reference, final Comparable<?> value) {
         myDelegate.set(StructureAnyD.index(myStructure, reference), value);
     }
 

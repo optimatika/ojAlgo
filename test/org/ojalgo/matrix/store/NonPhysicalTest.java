@@ -36,7 +36,7 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
 
     private static final NumberContext ACCURACY = StandardType.DECIMAL_032;
 
-    private static <N extends Number> void testAggregation(final MatrixStore<N> anyStore) {
+    private static <N extends Comparable<N>> void testAggregation(final MatrixStore<N> anyStore) {
 
         final PhysicalStore<N> copied = anyStore.copy();
 
@@ -45,8 +45,8 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
             BasicLogger.debug("Copy", copied);
         }
 
-        Number expected;
-        Number actual;
+        N expected;
+        N actual;
 
         for (final Aggregator aggregator : Aggregator.values()) {
 
@@ -75,17 +75,17 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
         }
     }
 
-    private static <N extends Number> void testCopy(final MatrixStore<N> anyStore) {
+    private static <N extends Comparable<N>> void testCopy(final MatrixStore<N> anyStore) {
         TestUtils.assertEquals(anyStore, anyStore.copy(), ACCURACY);
     }
 
-    private static <N extends Number> void testDimensions(final MatrixStore<N> anyStore, final int numberOfRows, final int numberOfColumns) {
+    private static <N extends Comparable<N>> void testDimensions(final MatrixStore<N> anyStore, final int numberOfRows, final int numberOfColumns) {
         TestUtils.assertEquals(numberOfRows, anyStore.countRows());
         TestUtils.assertEquals(numberOfColumns, anyStore.countColumns());
         TestUtils.assertEquals(numberOfRows * numberOfColumns, anyStore.count());
     }
 
-    private static <N extends Number> void testMultiplication(final MatrixStore<N> anyStore) {
+    private static <N extends Comparable<N>> void testMultiplication(final MatrixStore<N> anyStore) {
 
         final PhysicalStore<N> tmpCopy = anyStore.copy();
 

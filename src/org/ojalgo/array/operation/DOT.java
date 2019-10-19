@@ -64,7 +64,7 @@ public final class DOT implements BLAS1 {
         return retVal;
     }
 
-    public static <N extends Number & Scalar<N>> N invoke(final N[] array1, final int offset1, final N[] array2, final int offset2, final int first,
+    public static <N extends Scalar<N>> N invoke(final N[] array1, final int offset1, final N[] array2, final int offset2, final int first,
             final int limit, final Scalar.Factory<N> factory) {
         Scalar<N> retVal = factory.zero();
         for (int i = first; i < limit; i++) {

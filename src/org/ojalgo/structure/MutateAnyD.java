@@ -36,7 +36,7 @@ import org.ojalgo.function.special.MissingMath;
  */
 public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
-    interface Fillable<N extends Number> extends StructureAnyD, Mutate1D.Fillable<N> {
+    interface Fillable<N extends Comparable<N>> extends StructureAnyD, Mutate1D.Fillable<N> {
 
         void fillOne(long[] reference, N value);
 
@@ -52,7 +52,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     }
 
-    interface Mixable<N extends Number> extends StructureAnyD, Mutate1D.Mixable<N> {
+    interface Mixable<N extends Comparable<N>> extends StructureAnyD, Mutate1D.Mixable<N> {
 
         default double mix(final long index, final BinaryFunction<N> mixer, final double addend) {
             return this.mix(StructureAnyD.reference(index, this.shape()), mixer, addend);
@@ -68,7 +68,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     }
 
-    interface Modifiable<N extends Number> extends StructureAnyD, Mutate1D.Modifiable<N> {
+    interface Modifiable<N extends Comparable<N>> extends StructureAnyD, Mutate1D.Modifiable<N> {
 
         void modifyOne(long[] reference, UnaryFunction<N> modifier);
 
@@ -83,13 +83,13 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
      *
      * @author apete
      */
-    interface ModifiableReceiver<N extends Number> extends Modifiable<N>, Receiver<N> {
+    interface ModifiableReceiver<N extends Comparable<N>> extends Modifiable<N>, Receiver<N> {
 
         void modifyAny(TransformationAnyD<N> modifier);
 
     }
 
-    interface Receiver<N extends Number> extends MutateAnyD, Fillable<N>, Consumer<AccessAnyD<?>> {
+    interface Receiver<N extends Comparable<N>> extends MutateAnyD, Fillable<N>, Consumer<AccessAnyD<?>> {
 
         default void accept(final AccessAnyD<?> supplied) {
             if (this.isAcceptable(supplied)) {
@@ -118,24 +118,24 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
         this.add(StructureAnyD.reference(index, this.shape()), addend);
     }
 
-    default void add(final long index, final Number addend) {
+    default void add(final long index, final Comparable<?> addend) {
         this.add(StructureAnyD.reference(index, this.shape()), addend);
     }
 
     void add(long[] reference, double addend);
 
-    void add(long[] reference, Number addend);
+    void add(long[] reference, Comparable<?> addend);
 
     default void set(final long index, final double value) {
         this.set(StructureAnyD.reference(index, this.shape()), value);
     }
 
-    default void set(final long index, final Number value) {
+    default void set(final long index, final Comparable<?> value) {
         this.set(StructureAnyD.reference(index, this.shape()), value);
     }
 
     void set(long[] reference, double value);
 
-    void set(long[] reference, Number value);
+    void set(long[] reference, Comparable<?> value);
 
 }

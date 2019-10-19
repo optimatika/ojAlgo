@@ -36,7 +36,7 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-public final class AffineFunction<N extends Number> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Affine<N> {
+public final class AffineFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Affine<N> {
 
     public static AffineFunction<ComplexNumber> makeComplex(final Access1D<?> coefficients) {
         return new AffineFunction<>(GenericDenseStore.COMPLEX.rows(coefficients));
@@ -62,7 +62,7 @@ public final class AffineFunction<N extends Number> implements MultiaryFunction.
         return new AffineFunction<>(GenericDenseStore.RATIONAL.make(1, arity));
     }
 
-    public static <N extends Number> AffineFunction<N> wrap(final PhysicalStore<N> coefficients) {
+    public static <N extends Comparable<N>> AffineFunction<N> wrap(final PhysicalStore<N> coefficients) {
         return new AffineFunction<>(coefficients);
     }
 
@@ -116,7 +116,7 @@ public final class AffineFunction<N extends Number> implements MultiaryFunction.
         return (PhysicalStore<N>) myCoefficients;
     }
 
-    public void setConstant(final Number constant) {
+    public void setConstant(final Comparable<?> constant) {
         myConstant.setConstant(constant);
     }
 

@@ -28,37 +28,37 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access1D;
 
-public interface MultiaryFunction<N extends Number> extends BasicFunction.PlainUnary<Access1D<N>, N> {
+public interface MultiaryFunction<N extends Comparable<N>> extends BasicFunction.PlainUnary<Access1D<N>, N> {
 
-    public interface Affine<N extends Number> extends Linear<N>, Constant<N> {
+    public interface Affine<N extends Comparable<N>> extends Linear<N>, Constant<N> {
 
     }
 
-    public interface Constant<N extends Number> extends MultiaryFunction<N> {
+    public interface Constant<N extends Comparable<N>> extends MultiaryFunction<N> {
 
         N getConstant();
 
-        void setConstant(Number constant);
+        void setConstant(Comparable<?> constant);
 
     }
 
-    public interface Convex<N extends Number> extends MultiaryFunction<N> {
+    public interface Convex<N extends Comparable<N>> extends MultiaryFunction<N> {
 
     }
 
-    public interface Linear<N extends Number> extends MultiaryFunction<N> {
+    public interface Linear<N extends Comparable<N>> extends MultiaryFunction<N> {
 
         PhysicalStore<N> linear();
 
     }
 
-    public interface PureQuadratic<N extends Number> extends Constant<N> {
+    public interface PureQuadratic<N extends Comparable<N>> extends Constant<N> {
 
         PhysicalStore<N> quadratic();
 
     }
 
-    public interface Quadratic<N extends Number> extends PureQuadratic<N>, Linear<N> {
+    public interface Quadratic<N extends Comparable<N>> extends PureQuadratic<N>, Linear<N> {
 
     }
 
@@ -67,7 +67,7 @@ public interface MultiaryFunction<N extends Number> extends BasicFunction.PlainU
      *
      * @author apete
      */
-    public interface TwiceDifferentiable<N extends Number> extends MultiaryFunction<N> {
+    public interface TwiceDifferentiable<N extends Comparable<N>> extends MultiaryFunction<N> {
 
         /**
          * <p>

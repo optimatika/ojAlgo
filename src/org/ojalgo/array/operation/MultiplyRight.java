@@ -550,7 +550,7 @@ public final class MultiplyRight implements ArrayOperation {
         tmpConquerer.invoke(0, (int) (right.count() / complexity), THRESHOLD);
     };
 
-    public static <N extends Number & Scalar<N>> GenericMultiplyRight<N> getGeneric(final long rows, final long columns) {
+    public static <N extends Scalar<N>> GenericMultiplyRight<N> getGeneric(final long rows, final long columns) {
 
         if (columns > THRESHOLD) {
 
@@ -626,7 +626,7 @@ public final class MultiplyRight implements ArrayOperation {
         }
     }
 
-    static <N extends Number & Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
+    static <N extends Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
             final Access1D<N> right, final Scalar.Factory<N> scalar) {
 
         final int structure = left.length / complexity;

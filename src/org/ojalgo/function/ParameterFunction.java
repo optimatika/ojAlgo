@@ -25,14 +25,14 @@ import java.util.function.BiFunction;
 
 import org.ojalgo.ProgrammingError;
 
-public interface ParameterFunction<N extends Number> extends BasicFunction, BiFunction<N, Integer, N> {
+public interface ParameterFunction<N extends Comparable<N>> extends BasicFunction, BiFunction<N, Integer, N> {
 
     /**
      * A {@linkplain ParameterFunction} with a set/fixed parameter.
      *
      * @author apete
      */
-    public static final class FixedParameter<N extends Number> implements UnaryFunction<N> {
+    public static final class FixedParameter<N extends Comparable<N>> implements UnaryFunction<N> {
 
         private final ParameterFunction<N> myFunction;
         private final int myParameter;

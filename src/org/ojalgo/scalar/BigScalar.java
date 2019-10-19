@@ -34,7 +34,7 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * @deprecated v44 In the future there will only be primitives based implementations of the Scalar interface
  */
 @Deprecated
-public final class BigScalar extends Number implements Scalar<BigDecimal>, Enforceable<BigScalar> {
+public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScalar> {
 
     public static final Scalar.Factory<BigDecimal> FACTORY = new Scalar.Factory<BigDecimal>() {
 
@@ -42,7 +42,7 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
             return new BigDecimal(value);
         }
 
-        public BigDecimal cast(final Number number) {
+        public BigDecimal cast(final Comparable<?> number) {
             return TypeUtils.toBigDecimal(number);
         }
 
@@ -50,7 +50,7 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
             return BigScalar.valueOf(value);
         }
 
-        public BigScalar convert(final Number number) {
+        public BigScalar convert(final Comparable<?> number) {
             return BigScalar.valueOf(number);
         }
 
@@ -87,7 +87,7 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return new BigScalar(BigDecimal.valueOf(value));
     }
 
-    public static BigScalar valueOf(final Number number) {
+    public static BigScalar valueOf(final Comparable<?> number) {
 
         if (number != null) {
 

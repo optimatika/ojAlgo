@@ -29,14 +29,14 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.series.NumberSeries;
 import org.ojalgo.structure.Access1D;
 
-public interface PolynomialFunction<N extends Number>
+public interface PolynomialFunction<N extends Comparable<N>>
         extends UnaryFunction<N>, Access1D<N>, Differentiable<N, PolynomialFunction<N>>, Integratable<N, PolynomialFunction<N>> {
 
     int degree();
 
     void estimate(Access1D<?> x, Access1D<?> y);
 
-    void estimate(List<? extends Number> x, List<? extends Number> y);
+    void estimate(List<? extends N> x, List<? extends N> y);
 
     void estimate(NumberSeries<?> samples);
 

@@ -42,9 +42,9 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.EconomySize<N> {
+public interface Bidiagonal<N extends Comparable<N>> extends MatrixDecomposition<N>, MatrixDecomposition.EconomySize<N> {
 
-    interface Factory<N extends Number> extends MatrixDecomposition.Factory<Bidiagonal<N>> {
+    interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<Bidiagonal<N>> {
 
         default Bidiagonal<N> make(final boolean fullSize) {
             return this.make(TYPICAL, fullSize);
@@ -66,7 +66,7 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
 
     Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new BidiagonalDecomposition.Rational(fullSize);
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Bidiagonal<N> decomposition, final NumberContext context) {
+    static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Bidiagonal<N> decomposition, final NumberContext context) {
 
         final int tmpRowDim = (int) matrix.countRows();
         final int tmpColDim = (int) matrix.countColumns();
@@ -119,7 +119,7 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
      */
     @Deprecated
     @SuppressWarnings("unchecked")
-    static <N extends Number> Bidiagonal<N> make(final Access2D<N> typical) {
+    static <N extends Comparable<N>> Bidiagonal<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -140,7 +140,7 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
      * @deprecated v48 Use {@link #reconstruct()} instead
      */
     @Deprecated
-    static <N extends Number> MatrixStore<N> reconstruct(final Bidiagonal<N> decomposition) {
+    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final Bidiagonal<N> decomposition) {
         return decomposition.reconstruct();
     }
 

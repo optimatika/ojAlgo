@@ -35,9 +35,9 @@ import org.ojalgo.structure.StructureAnyD;
  *
  * @author apete
  */
-public abstract class DenseArray<N extends Number> extends BasicArray<N> {
+public abstract class DenseArray<N extends Comparable<N>> extends BasicArray<N> {
 
-    public static abstract class Factory<N extends Number> extends ArrayFactory<N, DenseArray<N>> {
+    public static abstract class Factory<N extends Comparable<N>> extends ArrayFactory<N, DenseArray<N>> {
 
         @Override
         long getCapacityLimit() {

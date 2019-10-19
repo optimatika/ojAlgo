@@ -44,7 +44,7 @@ public final class HouseholderRight implements ArrayOperation {
         }
     }
 
-    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int first, final int limit, final int tmpColDim,
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int first, final int limit, final int tmpColDim,
             final Householder.Generic<N> householder, final Scalar.Factory<N> scalar) {
 
         final N[] tmpHouseholderVector = householder.vector;

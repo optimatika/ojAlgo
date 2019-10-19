@@ -140,36 +140,36 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public PrimitiveDenseStore columns(final List<? extends Number>... source) {
+        public PrimitiveDenseStore columns(final List<? extends Comparable<?>>... source) {
 
             final int tmpRowDim = source[0].size();
             final int tmpColDim = source.length;
 
             final double[] tmpData = new double[tmpRowDim * tmpColDim];
 
-            List<? extends Number> tmpColumn;
+            List<? extends Comparable<?>> tmpColumn;
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpColumn.get(i).doubleValue();
+                    tmpData[i + (tmpRowDim * j)] = Scalar.doubleValue(tmpColumn.get(i));
                 }
             }
 
             return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public PrimitiveDenseStore columns(final Number[]... source) {
+        public PrimitiveDenseStore columns(final Comparable<?>[]... source) {
 
             final int tmpRowDim = source[0].length;
             final int tmpColDim = source.length;
 
             final double[] tmpData = new double[tmpRowDim * tmpColDim];
 
-            Number[] tmpColumn;
+            Comparable<?>[] tmpColumn;
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpColumn[i].doubleValue();
+                    tmpData[i + (tmpRowDim * j)] = Scalar.doubleValue(tmpColumn[i]);
                 }
             }
 
@@ -289,36 +289,36 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public PrimitiveDenseStore rows(final List<? extends Number>... source) {
+        public PrimitiveDenseStore rows(final List<? extends Comparable<?>>... source) {
 
             final int tmpRowDim = source.length;
             final int tmpColDim = source[0].size();
 
             final double[] tmpData = new double[tmpRowDim * tmpColDim];
 
-            List<? extends Number> tmpRow;
+            List<? extends Comparable<?>> tmpRow;
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpRow.get(j).doubleValue();
+                    tmpData[i + (tmpRowDim * j)] = Scalar.doubleValue(tmpRow.get(j));
                 }
             }
 
             return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public PrimitiveDenseStore rows(final Number[]... source) {
+        public PrimitiveDenseStore rows(final Comparable<?>[]... source) {
 
             final int tmpRowDim = source.length;
             final int tmpColDim = source[0].length;
 
             final double[] tmpData = new double[tmpRowDim * tmpColDim];
 
-            Number[] tmpRow;
+            Comparable<?>[] tmpRow;
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpRow[j].doubleValue();
+                    tmpData[i + (tmpRowDim * j)] = Scalar.doubleValue(tmpRow[j]);
                 }
             }
 
@@ -525,7 +525,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         myUtility.add(row, col, addend);
     }
 
-    public void add(final long row, final long col, final Number addend) {
+    public void add(final long row, final long col, final Comparable<?> addend) {
         myUtility.add(row, col, addend);
     }
 
@@ -1022,7 +1022,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         myUtility.set(row, col, value);
     }
 
-    public void set(final long row, final long col, final Number value) {
+    public void set(final long row, final long col, final Comparable<?> value) {
         myUtility.set(row, col, value);
     }
 

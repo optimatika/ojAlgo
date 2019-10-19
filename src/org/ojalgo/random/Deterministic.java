@@ -23,6 +23,8 @@ package org.ojalgo.random;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import org.ojalgo.scalar.Scalar;
+
 /**
  * @author apete
  */
@@ -46,11 +48,11 @@ public class Deterministic extends RandomNumber {
         myValue = aValue;
     }
 
-    public Deterministic(final Number aValue) {
+    public Deterministic(final Comparable<?> aValue) {
 
         super();
 
-        myValue = aValue.doubleValue();
+        myValue = Scalar.doubleValue(aValue);
     }
 
     public double getExpected() {
@@ -70,6 +72,10 @@ public class Deterministic extends RandomNumber {
     @Override
     protected double generate() {
         return myValue;
+    }
+
+    public int compareTo(Deterministic o) {
+        return Double.compare(myValue, o.myValue);
     }
 
 }

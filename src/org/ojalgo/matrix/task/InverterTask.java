@@ -35,9 +35,9 @@ import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
-public interface InverterTask<N extends Number> extends MatrixTask<N> {
+public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
 
-    public static abstract class Factory<N extends Number> {
+    public static abstract class Factory<N extends Comparable<N>> {
 
         public MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
             return this.make(original, false, false).invert(original);

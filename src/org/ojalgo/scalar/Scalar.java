@@ -27,7 +27,9 @@ import java.math.BigDecimal;
 import org.ojalgo.algebra.Field;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.ScalarOperation;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.AccessScalar;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -48,18 +50,18 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Scalar<N extends Number> extends AccessScalar<N>, Field<Scalar<N>>, NormedVectorSpace<Scalar<N>, N>, ScalarOperation.Addition<Scalar<N>, N>,
-        ScalarOperation.Division<Scalar<N>, N>, ScalarOperation.Subtraction<Scalar<N>, N>, Comparable<N> {
+public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<Scalar<N>>, NormedVectorSpace<Scalar<N>, N>,
+        ScalarOperation.Addition<Scalar<N>, N>, ScalarOperation.Division<Scalar<N>, N>, ScalarOperation.Subtraction<Scalar<N>, N>, Comparable<N> {
 
-    public interface Factory<N extends Number> {
+    public interface Factory<N extends Comparable<N>> {
+
+        N cast(Comparable<?> number);
 
         N cast(double value);
 
-        N cast(Number number);
+        Scalar<N> convert(Comparable<?> number);
 
         Scalar<N> convert(double value);
-
-        Scalar<N> convert(Number number);
 
         @SuppressWarnings("unchecked")
         default N[] newArrayInstance(final int length) {
@@ -76,6 +78,36 @@ public interface Scalar<N extends Number> extends AccessScalar<N>, Field<Scalar<
          */
         Scalar<N> zero();
 
+    }
+
+    static double doubleValue(final Comparable<?> number) {
+
+        if (number == null) {
+            return PrimitiveMath.ZERO;
+        }
+
+        if (number instanceof NumberDefinition) {
+            return ((NumberDefinition) number).doubleValue();
+        } else if (number instanceof Number) {
+            return ((Number) number).doubleValue();
+        } else {
+            return PrimitiveMath.NaN;
+        }
+    }
+
+    static float floatValue(final Comparable<?> number) {
+
+        if (number == null) {
+            return 0F;
+        }
+
+        if (number instanceof NumberDefinition) {
+            return ((NumberDefinition) number).floatValue();
+        } else if (number instanceof Number) {
+            return ((Number) number).floatValue();
+        } else {
+            return Float.NaN;
+        }
     }
 
     default Scalar<N> add(final Scalar<N> addend) {

@@ -51,10 +51,10 @@ import org.ojalgo.structure.Transformation1D;
  *
  * @author apete
  */
-public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Visitable<N>, Access1D.Aggregatable<N>,
+public final class Array1D<N extends Comparable<N>> extends AbstractList<N> implements Access1D<N>, Access1D.Visitable<N>, Access1D.Aggregatable<N>,
         Access1D.Sliceable<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D.ModifiableReceiver<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
 
-    public static final class Factory<N extends Number> implements Factory1D<Array1D<N>> {
+    public static final class Factory<N extends Comparable<N>> implements Factory1D<Array1D<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
@@ -71,11 +71,11 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
             return myDelegate.copy(source).wrapInArray1D();
         }
 
-        public Array1D<N> copy(final List<? extends Number> source) {
+        public Array1D<N> copy(final List<? extends Comparable<?>> source) {
             return myDelegate.copy(source).wrapInArray1D();
         }
 
-        public Array1D<N> copy(final Number... source) {
+        public Array1D<N> copy(final Comparable<?>... source) {
             return myDelegate.copy(source).wrapInArray1D();
         }
 
@@ -238,7 +238,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public static final Factory<Quaternion> QUATERNION = new Factory<>(QuaternionArray.FACTORY);
     public static final Factory<RationalNumber> RATIONAL = new Factory<>(RationalArray.FACTORY);
 
-    public static <N extends Number> Array1D.Factory<N> factory(final DenseArray.Factory<N> denseFactory) {
+    public static <N extends Comparable<N>> Array1D.Factory<N> factory(final DenseArray.Factory<N> denseFactory) {
         return new Array1D.Factory<>(denseFactory);
     }
 
@@ -271,7 +271,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         myDelegate.add(tmpIndex, addend);
     }
 
-    public void add(final long index, final Number addend) {
+    public void add(final long index, final Comparable<?> addend) {
         final long tmpIndex = myFirst + (myStep * index);
         myDelegate.add(tmpIndex, addend);
     }
@@ -545,7 +545,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     }
 
     @Override
-    public N set(final int index, final Number value) {
+    public N set(final int index, final N value) {
         final long tmpIndex = myFirst + (myStep * index);
         final N retVal = myDelegate.get(tmpIndex);
         myDelegate.set(tmpIndex, value);
@@ -556,7 +556,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         myDelegate.set(myFirst + (myStep * index), value);
     }
 
-    public void set(final long index, final Number value) {
+    public void set(final long index, final Comparable<?> value) {
         myDelegate.set(myFirst + (myStep * index), value);
     }
 

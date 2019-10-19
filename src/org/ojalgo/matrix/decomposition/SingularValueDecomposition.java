@@ -46,7 +46,7 @@ import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends GenericDecomposition<N> implements SingularValue<N> {
+abstract class SingularValueDecomposition<N extends Comparable<N>> extends GenericDecomposition<N> implements SingularValue<N> {
 
     static final class Complex extends SingularValueDecomposition<ComplexNumber> {
 

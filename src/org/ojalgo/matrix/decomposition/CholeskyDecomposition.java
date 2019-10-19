@@ -40,7 +40,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 
-abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Cholesky<N> {
+abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Cholesky<N> {
 
     static final class Complex extends CholeskyDecomposition<ComplexNumber> {
 

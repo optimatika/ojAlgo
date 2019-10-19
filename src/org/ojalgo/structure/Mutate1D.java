@@ -42,7 +42,7 @@ public interface Mutate1D extends Structure1D {
      *
      * @author apete
      */
-    interface Fillable<N extends Number> extends Structure1D {
+    interface Fillable<N extends Comparable<N>> extends Structure1D {
 
         default void fillAll(final N value) {
             this.fillRange(0L, this.count(), value);
@@ -93,7 +93,7 @@ public interface Mutate1D extends Structure1D {
      *
      * @author apete
      */
-    interface Mixable<N extends Number> extends Structure1D {
+    interface Mixable<N extends Comparable<N>> extends Structure1D {
 
         /**
          * @return The new/mixed value
@@ -104,7 +104,7 @@ public interface Mutate1D extends Structure1D {
 
     }
 
-    interface Modifiable<N extends Number> extends Structure1D {
+    interface Modifiable<N extends Comparable<N>> extends Structure1D {
 
         default void modifyAll(final UnaryFunction<N> modifier) {
             this.modifyRange(0L, this.count(), modifier);
@@ -131,7 +131,7 @@ public interface Mutate1D extends Structure1D {
      *
      * @author apete
      */
-    interface ModifiableReceiver<N extends Number> extends Modifiable<N>, Receiver<N> {
+    interface ModifiableReceiver<N extends Comparable<N>> extends Modifiable<N>, Receiver<N> {
 
         void modifyAny(Transformation1D<N> modifier);
 
@@ -142,7 +142,7 @@ public interface Mutate1D extends Structure1D {
      *
      * @author apete
      */
-    interface Receiver<N extends Number> extends Mutate1D, Mutate1D.Fillable<N>, Consumer<Access1D<?>> {
+    interface Receiver<N extends Comparable<N>> extends Mutate1D, Mutate1D.Fillable<N>, Consumer<Access1D<?>> {
 
         default void accept(final Access1D<?> supplied) {
             if (this.isAcceptable(supplied)) {
@@ -218,7 +218,7 @@ public interface Mutate1D extends Structure1D {
 
     void add(long index, double addend);
 
-    void add(long index, Number addend);
+    void add(long index, Comparable<?> addend);
 
     /**
      * Reset this mutable structure to some standard (all zeros) initial state. It must still be usuable after
@@ -230,6 +230,6 @@ public interface Mutate1D extends Structure1D {
 
     void set(long index, double value);
 
-    void set(long index, Number value);
+    void set(long index, Comparable<?> value);
 
 }

@@ -33,7 +33,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D.Collectable;
 
-abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
+abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> {
 
     /**
      * Eigenvalues and eigenvectors of a real matrix.

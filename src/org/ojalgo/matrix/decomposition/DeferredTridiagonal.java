@@ -40,7 +40,7 @@ import org.ojalgo.structure.Access2D;
 /**
  * @author apete
  */
-abstract class DeferredTridiagonal<N extends Number> extends TridiagonalDecomposition<N> {
+abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalDecomposition<N> {
 
     static final class Complex extends DeferredTridiagonal<ComplexNumber> {
 

@@ -28,9 +28,9 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
-public abstract class Rotation<N extends Number> {
+public abstract class Rotation<N extends Comparable<N>> {
 
-    public static final class Generic<N extends Number & Scalar<N>> extends Rotation<N> {
+    public static final class Generic<N extends Scalar<N>> extends Rotation<N> {
 
         public final N cos;
         public final N sin;
@@ -151,7 +151,7 @@ public abstract class Rotation<N extends Number> {
 
     }
 
-    public static <N extends Number & Scalar<N>> Generic<N> makeGeneric(final FunctionSet<N> functions, final int aLowerIndex, final int aHigherIndex,
+    public static <N extends Scalar<N>> Generic<N> makeGeneric(final FunctionSet<N> functions, final int aLowerIndex, final int aHigherIndex,
             final N anAngle) {
         return new Generic<>(aLowerIndex, aHigherIndex, functions.cos().invoke(anAngle), functions.sin().invoke(anAngle));
     }

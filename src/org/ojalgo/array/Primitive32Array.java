@@ -433,8 +433,8 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
-    protected void add(final int index, final Number addend) {
-        data[index] += addend.floatValue();
+    protected void add(final int index, final Comparable<?> addend) {
+        data[index] += Scalar.floatValue(addend);
     }
 
     protected final float[] copyOfData() {
@@ -558,8 +558,8 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
-    protected final void set(final int index, final Number value) {
-        data[index] = value.floatValue();
+    protected final void set(final int index, final Comparable<?> value) {
+        data[index] = Scalar.floatValue(value);
     }
 
     @Override

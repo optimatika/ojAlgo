@@ -69,13 +69,13 @@ public final class AXPY implements BLAS1 {
         }
     }
 
-    public static <N extends Number & Scalar<N>> void invoke(final Mutate1D y, final double a, final N[] x) {
+    public static <N extends Scalar<N>> void invoke(final Mutate1D y, final double a, final N[] x) {
         for (int i = 0; i < x.length; i++) {
             y.add(i, x[i].multiply(a).get());
         }
     }
 
-    public static <N extends Number & Scalar<N>> void invoke(final N[] y, final int basey, final N a, final N[] x, final int basex, final int first,
+    public static <N extends Scalar<N>> void invoke(final N[] y, final int basey, final N a, final N[] x, final int basex, final int first,
             final int limit) {
         for (int i = first; i < limit; i++) {
             y[basey + i] = y[basey + i].add(a.multiply(x[basex + i])).get();

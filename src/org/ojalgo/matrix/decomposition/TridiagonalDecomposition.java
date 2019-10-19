@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 
-abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Tridiagonal<N> {
+abstract class TridiagonalDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Tridiagonal<N> {
 
     private transient MatrixStore<N> myD = null;
     private transient DecompositionStore<N> myQ = null;

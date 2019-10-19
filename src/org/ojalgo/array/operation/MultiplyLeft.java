@@ -548,7 +548,7 @@ public final class MultiplyLeft implements ArrayOperation {
         tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
     };
 
-    public static <N extends Number & Scalar<N>> GenericMultiplyLeft<N> getGeneric(final long rows, final long columns) {
+    public static <N extends Scalar<N>> GenericMultiplyLeft<N> getGeneric(final long rows, final long columns) {
 
         if (rows > THRESHOLD) {
 
@@ -627,7 +627,7 @@ public final class MultiplyLeft implements ArrayOperation {
         }
     }
 
-    static <N extends Number & Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final Access1D<N> left,
+    static <N extends Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final Access1D<N> left,
             final int complexity, final N[] right, final Scalar.Factory<N> scalar) {
 
         final int structure = ((int) left.count()) / complexity;

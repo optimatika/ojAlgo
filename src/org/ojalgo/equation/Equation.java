@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 
@@ -63,8 +64,8 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         }
     }
 
-    public void add(final long index, final Number addend) {
-        this.add(index, addend.doubleValue());
+    public void add(final long index, final Comparable<?> addend) {
+        this.add(index, Scalar.doubleValue(addend));
     }
 
     /**
@@ -149,8 +150,8 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         }
     }
 
-    public void set(final long index, final Number value) {
-        this.set(index, value.doubleValue());
+    public void set(final long index, final Comparable<?> value) {
+        this.set(index, Scalar.doubleValue(value));
     }
 
     @Override

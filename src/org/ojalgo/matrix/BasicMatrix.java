@@ -65,11 +65,11 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extends Object implements NormedVectorSpace<M, N>, Operation.Subtraction<M>,
+abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>> implements NormedVectorSpace<M, N>, Operation.Subtraction<M>,
         Operation.Multiplication<M>, ScalarOperation.Addition<M, N>, ScalarOperation.Division<M, N>, ScalarOperation.Subtraction<M, N>, Access2D<N>,
         Access2D.Elements, Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
-    public interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
+    public interface LogicalBuilder<N extends Comparable<N>, M extends BasicMatrix<N, M>>
             extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         default M build() {
@@ -78,7 +78,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     }
 
-    public interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
+    public interface PhysicalReceiver<N extends Comparable<N>, M extends BasicMatrix<N, M>>
             extends Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         default M build() {
@@ -108,7 +108,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
         final long tmpLimit = matrix.countRows();
         for (long i = 0L; i < tmpLimit; i++) {
-            retVal = PrimitiveMath.MAX.invoke(retVal, matrix.aggregateRow(i, Aggregator.NORM1).doubleValue());
+            retVal = PrimitiveMath.MAX.invoke(retVal, Scalar.doubleValue(matrix.aggregateRow(i, Aggregator.NORM1)));
         }
 
         return retVal;
@@ -123,7 +123,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
         final long tmpLimit = matrix.countColumns();
         for (long j = 0L; j < tmpLimit; j++) {
-            retVal = PrimitiveMath.MAX.invoke(retVal, matrix.aggregateColumn(j, Aggregator.NORM1).doubleValue());
+            retVal = PrimitiveMath.MAX.invoke(retVal, Scalar.doubleValue(matrix.aggregateColumn(j, Aggregator.NORM1)));
         }
 
         return retVal;
@@ -173,9 +173,9 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         return this.getFactory().instantiate(retVal);
     }
 
-    public M add(final Number scalarAddend) {
+    public M add(final N scalarAddend) {
 
-        final org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> tmpPhysical = myStore.physical();
+        PhysicalStore.Factory<N, ?> tmpPhysical = myStore.physical();
 
         final PhysicalStore<N> retVal = tmpPhysical.copy(myStore);
 
@@ -234,7 +234,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         return this.getFactory().instantiate(retVal);
     }
 
-    public M divide(final Number scalarDivisor) {
+    public M divide(final N scalarDivisor) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
 
@@ -515,7 +515,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         return this.getFactory().instantiate(myStore.multiply(this.cast(multiplicand).get()));
     }
 
-    public M multiply(final Number scalarMultiplicand) {
+    public M multiply(final N scalarMultiplicand) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
 
@@ -638,7 +638,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         return this.getFactory().instantiate(retVal);
     }
 
-    public M subtract(final Number scalarSubtrahend) {
+    public M subtract(final N scalarSubtrahend) {
 
         final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
 

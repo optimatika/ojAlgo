@@ -48,7 +48,7 @@ public final class RotateLeft implements ArrayOperation {
         }
     }
 
-    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int rowA, final int rowB, final N cos, final N sin) {
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int rowA, final int rowB, final N cos, final N sin) {
 
         N oldA;
         N oldB;

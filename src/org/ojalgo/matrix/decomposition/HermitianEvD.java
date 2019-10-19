@@ -59,7 +59,7 @@ import org.ojalgo.structure.Structure2D;
  * V may be badly conditioned, or even singular, so the validity of the equation A = V*D*inverse(V) depends
  * upon V.cond().
  **/
-public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
+public abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
 
     static final class Complex extends HermitianEvD<ComplexNumber> {
 

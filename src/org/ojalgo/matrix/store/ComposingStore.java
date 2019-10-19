@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-abstract class ComposingStore<N extends Number> extends LogicalStore<N> {
+abstract class ComposingStore<N extends Comparable<N>> extends LogicalStore<N> {
 
     protected ComposingStore(final MatrixStore<N> base, final int rowsCount, final int columnsCount) {
         super(base, rowsCount, columnsCount);

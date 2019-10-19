@@ -33,7 +33,7 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  *
  * @author apete
  */
-public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number implements Scalar<S>, Enforceable<S> {
+public abstract class ExactDecimal<S extends ExactDecimal<S>> implements Scalar<S>, Enforceable<S> {
 
     public static final class Descriptor {
 
