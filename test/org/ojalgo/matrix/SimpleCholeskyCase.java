@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -115,9 +115,9 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
 
         final RationalMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
         final Cholesky<RationalNumber> tmpDecomp = Cholesky.RATIONAL.make();
-        tmpDecomp.decompose(GenericDenseStore.RATIONAL.copy(tmpMtrx));
+        tmpDecomp.decompose(GenericStore.RATIONAL.copy(tmpMtrx));
 
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(tmpMtrx), tmpDecomp, evaluation);
+        TestUtils.assertEquals(GenericStore.RATIONAL.copy(tmpMtrx), tmpDecomp, evaluation);
     }
 
 }

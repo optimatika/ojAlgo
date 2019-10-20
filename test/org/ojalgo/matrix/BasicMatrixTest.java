@@ -37,9 +37,9 @@ import org.ojalgo.matrix.BasicMatrix.PhysicalReceiver;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -454,22 +454,22 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         SingularValue<RationalNumber> rationalSVD = SingularValue.RATIONAL.make(rationalAA);
         rationalSVD.compute(rationalAA);
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(rationalAA), rationalSVD, evaluation);
+        TestUtils.assertEquals(GenericStore.RATIONAL.copy(rationalAA), rationalSVD, evaluation);
         Array1D<Double> expected = rationalSVD.getSingularValues();
 
         SingularValue<ComplexNumber> complexSVD = SingularValue.COMPLEX.make(complexAA);
         complexSVD.compute(complexAA);
-        TestUtils.assertEquals(GenericDenseStore.COMPLEX.copy(complexAA), complexSVD, evaluation);
+        TestUtils.assertEquals(GenericStore.COMPLEX.copy(complexAA), complexSVD, evaluation);
         TestUtils.assertEquals(expected, complexSVD.getSingularValues(), evaluation);
 
         SingularValue<Quaternion> quaternionSVD = SingularValue.QUATERNION.make(quaternionAA);
         quaternionSVD.compute(quaternionAA);
-        TestUtils.assertEquals(GenericDenseStore.QUATERNION.copy(quaternionAA), quaternionSVD, evaluation);
+        TestUtils.assertEquals(GenericStore.QUATERNION.copy(quaternionAA), quaternionSVD, evaluation);
         TestUtils.assertEquals(expected, quaternionSVD.getSingularValues(), evaluation);
 
         for (SingularValue<Double> primitiveSVD : MatrixDecompositionTests.getPrimitiveSingularValue()) {
             primitiveSVD.compute(primitiveAA);
-            TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(primitiveAA), primitiveSVD, evaluation);
+            TestUtils.assertEquals(Primitive64Store.FACTORY.copy(primitiveAA), primitiveSVD, evaluation);
             TestUtils.assertEquals(expected, primitiveSVD.getSingularValues(), evaluation);
         }
     }
@@ -879,13 +879,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToComplexStore() {
 
-        final PhysicalStore<ComplexNumber> tmpExpStore = GenericDenseStore.COMPLEX.copy(rationalAA);
+        final PhysicalStore<ComplexNumber> tmpExpStore = GenericStore.COMPLEX.copy(rationalAA);
         PhysicalStore<ComplexNumber> tmpActStore;
 
-        tmpActStore = GenericDenseStore.COMPLEX.copy(complexAA);
+        tmpActStore = GenericStore.COMPLEX.copy(complexAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, evaluation);
 
-        tmpActStore = GenericDenseStore.COMPLEX.copy(primitiveAA);
+        tmpActStore = GenericStore.COMPLEX.copy(primitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, evaluation);
 
     }
@@ -927,13 +927,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToPrimitiveStore() {
 
-        final PhysicalStore<Double> tmpExpStore = PrimitiveDenseStore.FACTORY.copy(rationalAA);
+        final PhysicalStore<Double> tmpExpStore = Primitive64Store.FACTORY.copy(rationalAA);
         PhysicalStore<Double> tmpActStore;
 
-        tmpActStore = PrimitiveDenseStore.FACTORY.copy(complexAA);
+        tmpActStore = Primitive64Store.FACTORY.copy(complexAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, evaluation);
 
-        tmpActStore = PrimitiveDenseStore.FACTORY.copy(primitiveAA);
+        tmpActStore = Primitive64Store.FACTORY.copy(primitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, evaluation);
 
     }
@@ -941,13 +941,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
     @Test
     public void testToRationalStore() {
 
-        final PhysicalStore<RationalNumber> tmpExpStore = GenericDenseStore.RATIONAL.copy(rationalAA);
+        final PhysicalStore<RationalNumber> tmpExpStore = GenericStore.RATIONAL.copy(rationalAA);
         PhysicalStore<RationalNumber> tmpActStore;
 
-        tmpActStore = GenericDenseStore.RATIONAL.copy(complexAA);
+        tmpActStore = GenericStore.RATIONAL.copy(complexAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, evaluation);
 
-        tmpActStore = GenericDenseStore.RATIONAL.copy(primitiveAA);
+        tmpActStore = GenericStore.RATIONAL.copy(primitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, evaluation);
 
     }

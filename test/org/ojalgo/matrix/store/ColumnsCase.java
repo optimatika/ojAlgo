@@ -41,9 +41,9 @@ public class ColumnsCase extends NonPhysicalTest {
             tmpCols[i] = Uniform.randomInteger(tmpColDim);
         }
 
-        rationalStore = new ColumnsStore<>(GenericDenseStore.RATIONAL.copy(tmpBase), tmpCols);
-        complexStore = new ColumnsStore<>(GenericDenseStore.COMPLEX.copy(tmpBase), tmpCols);
-        primitiveStore = new ColumnsStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), tmpCols);
+        rationalStore = new ColumnsStore<>(GenericStore.RATIONAL.copy(tmpBase), tmpCols);
+        complexStore = new ColumnsStore<>(GenericStore.COMPLEX.copy(tmpBase), tmpCols);
+        primitiveStore = new ColumnsStore<>(Primitive64Store.FACTORY.copy(tmpBase), tmpCols);
 
         numberOfRows = tmpRowDim;
         numberOfColumns = tmpCols.length;

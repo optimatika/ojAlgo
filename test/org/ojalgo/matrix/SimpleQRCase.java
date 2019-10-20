@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
@@ -89,7 +89,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         // QR
 
         final QR<RationalNumber> tmpQR = QR.RATIONAL.make();
-        tmpQR.decompose(GenericDenseStore.RATIONAL.copy(SimpleQRCase.getOriginal()));
+        tmpQR.decompose(GenericStore.RATIONAL.copy(SimpleQRCase.getOriginal()));
 
         final MatrixStore<RationalNumber> tmpQ = tmpQR.getQ();
         final MatrixStore<RationalNumber> tmpR = tmpQR.getR();

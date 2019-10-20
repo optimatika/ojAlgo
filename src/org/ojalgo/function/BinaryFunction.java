@@ -77,6 +77,10 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
             return myFunction.invoke(myValue, arg2);
         }
 
+        public float invoke(final float arg2) {
+            return myFunction.invoke((float) myValue, arg2);
+        }
+
         public N invoke(final N arg2) {
             return myFunction.invoke(myNumber, arg2);
         }
@@ -131,6 +135,10 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
             return myFunction.invoke(arg1, myValue);
         }
 
+        public float invoke(final float arg1) {
+            return myFunction.invoke(arg1, (float) myValue);
+        }
+
         public N invoke(final N arg1) {
             return myFunction.invoke(arg1, myNumber);
         }
@@ -142,6 +150,10 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
         return new BinaryFunction<N>() {
 
             public double invoke(final double arg1, final double arg2) {
+                return after.invoke(BinaryFunction.this.invoke(arg1, arg2));
+            }
+
+            public float invoke(final float arg1, final float arg2) {
                 return after.invoke(BinaryFunction.this.invoke(arg1, arg2));
             }
 
@@ -203,6 +215,8 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
     }
 
     double invoke(double arg1, double arg2);
+
+    float invoke(float arg1, float arg2);
 
     N invoke(N arg1, N arg2);
 

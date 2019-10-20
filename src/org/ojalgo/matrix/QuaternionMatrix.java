@@ -28,7 +28,7 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.SparseStore;
@@ -60,7 +60,7 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
             MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver> {
 
         Factory() {
-            super(QuaternionMatrix.class, GenericDenseStore.QUATERNION);
+            super(QuaternionMatrix.class, GenericStore.QUATERNION);
         }
 
         @Override

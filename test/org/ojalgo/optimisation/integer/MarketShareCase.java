@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -267,7 +267,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
     @Disabled("Underscored before JUnit 5")
     public void testSpecificBranch_20_25() {
 
-        final PrimitiveDenseStore tmpAE = PrimitiveDenseStore.FACTORY.rows(new double[][] {
+        final Primitive64Store tmpAE = Primitive64Store.FACTORY.rows(new double[][] {
                 { 0.88, 0.59, 1.0, 0.16, 0.7, 0.7, 0.12, 0.66, 0.85, 0.68, 0.97, 0.33, 0.87, 0.01, 0.6, 0.5, 0.85, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
                 { 3.0, 0.7, 3.6, 7.3, 1.9, 1.5, 8.1, 5.5, 3.2, 5.3, 4.3, 2.1, 5.9, 5.7, 4.8, 2.8, 9.7, 4.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -315,11 +315,11 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
                 { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 } });
 
-        final PrimitiveDenseStore tmpBE = PrimitiveDenseStore.FACTORY
+        final Primitive64Store tmpBE = Primitive64Store.FACTORY
                 .rows(new double[][] { { 4.49 }, { 18.5 }, { 41.5 }, { 3.44 }, { 33.2 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 },
                         { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
 
-        final PrimitiveDenseStore tmpC = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
+        final Primitive64Store tmpC = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
@@ -345,7 +345,7 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
     @Test
     public void testSpecificBranch_37_8() {
 
-        final PrimitiveDenseStore tmpAE = PrimitiveDenseStore.FACTORY
+        final Primitive64Store tmpAE = Primitive64Store.FACTORY
                 .rows(new double[][] { { 0.87, 0.01, 0.6, 0.5, 0.85, 0.86, 0.09, 0.86, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
                         { 5.9, 5.7, 4.8, 2.8, 9.7, 5.8, 4.4, 3.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
                         { 1.9, 4.6, 3.1, 2.4, 8.5, 8.5, 7.4, 1.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
@@ -360,10 +360,10 @@ public final class MarketShareCase extends OptimisationIntegerTests implements M
                         { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 },
                         { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 } });
 
-        final PrimitiveDenseStore tmpBE = PrimitiveDenseStore.FACTORY.rows(
+        final Primitive64Store tmpBE = Primitive64Store.FACTORY.rows(
                 new double[][] { { 2.24 }, { 20.2 }, { 17.4 }, { 0.73 }, { 25.2 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
 
-        final PrimitiveDenseStore tmpC = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
+        final Primitive64Store tmpC = Primitive64Store.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
         final LinearSolver.Builder tmpBuilder = new LinearSolver.Builder(tmpC);

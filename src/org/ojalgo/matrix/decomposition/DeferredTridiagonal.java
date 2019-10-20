@@ -24,11 +24,11 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.netio.BasicLogger;
@@ -45,7 +45,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
     static final class Complex extends DeferredTridiagonal<ComplexNumber> {
 
         Complex() {
-            super(GenericDenseStore.COMPLEX);
+            super(GenericStore.COMPLEX);
         }
 
         @Override
@@ -81,7 +81,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
     static final class Primitive extends DeferredTridiagonal<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY);
+            super(Primitive64Store.FACTORY);
         }
 
         @Override
@@ -94,7 +94,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
     static final class Quat extends DeferredTridiagonal<Quaternion> {
 
         Quat() {
-            super(GenericDenseStore.QUATERNION);
+            super(GenericStore.QUATERNION);
         }
 
         @Override
@@ -130,7 +130,7 @@ abstract class DeferredTridiagonal<N extends Comparable<N>> extends TridiagonalD
     static final class Rational extends DeferredTridiagonal<RationalNumber> {
 
         Rational() {
-            super(GenericDenseStore.RATIONAL);
+            super(GenericStore.RATIONAL);
         }
 
         @Override

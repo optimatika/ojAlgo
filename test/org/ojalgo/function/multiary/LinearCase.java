@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Uniform;
 
 public class LinearCase extends MultiaryFunctionTests {
@@ -46,8 +46,8 @@ public class LinearCase extends MultiaryFunctionTests {
 
         int arity = 9;
 
-        PhysicalStore<Double> quadratic = PrimitiveDenseStore.FACTORY.make(arity, arity);
-        PhysicalStore<Double> linear = PrimitiveDenseStore.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
+        PhysicalStore<Double> quadratic = Primitive64Store.FACTORY.make(arity, arity);
+        PhysicalStore<Double> linear = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
 
         myLinearFunction1 = LinearFunction.makePrimitive(linear);
         myAffineFunction1 = AffineFunction.makePrimitive(linear);
@@ -57,7 +57,7 @@ public class LinearCase extends MultiaryFunctionTests {
         myAffineFunction2 = AffineFunction.makePrimitive(linear.transpose());
         myQuadraticFunction2 = QuadraticFunction.makePrimitive(quadratic, linear.transpose());
 
-        myArg = PrimitiveDenseStore.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
+        myArg = Primitive64Store.FACTORY.makeFilled(arity, 1, new Uniform(-1, 2));
     }
 
     @Test

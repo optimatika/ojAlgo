@@ -11,7 +11,7 @@ public class Primitive32Vector3 extends GeometryVector {
     public float v0, v1, v2;
 
     public Primitive32Vector3() {
-        super(MultiplyBoth.getPrimitive(3L, 1L), 3L, 1L);
+        super(MultiplyBoth.newPrimitive64(3L, 1L), 3L, 1L);
     }
 
     public Primitive32Vector3(final float v0, final float v1, final float v2) {

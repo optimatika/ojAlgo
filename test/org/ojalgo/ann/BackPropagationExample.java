@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
@@ -35,10 +35,10 @@ abstract class BackPropagationExample extends ANNTest {
 
     static final class Data {
 
-        PrimitiveDenseStore expected = null;
-        PrimitiveDenseStore input = null;
+        Primitive64Store expected = null;
+        Primitive64Store input = null;
         final double rate;
-        PrimitiveDenseStore target = null;
+        Primitive64Store target = null;
 
         Data() {
             this(1.0);
@@ -50,17 +50,17 @@ abstract class BackPropagationExample extends ANNTest {
         }
 
         Data expected(final double... row) {
-            expected = PrimitiveDenseStore.FACTORY.rows(row);
+            expected = Primitive64Store.FACTORY.rows(row);
             return this;
         }
 
         Data input(final double... row) {
-            input = PrimitiveDenseStore.FACTORY.rows(row);
+            input = Primitive64Store.FACTORY.rows(row);
             return this;
         }
 
         Data target(final double... row) {
-            target = PrimitiveDenseStore.FACTORY.rows(row);
+            target = Primitive64Store.FACTORY.rows(row);
             return this;
         }
 
@@ -123,13 +123,13 @@ abstract class BackPropagationExample extends ANNTest {
 
         Structure2D[] structure = builder.structure();
 
-        PrimitiveDenseStore[] weights = new PrimitiveDenseStore[structure.length];
-        PrimitiveDenseStore[] bias = new PrimitiveDenseStore[structure.length];
+        Primitive64Store[] weights = new Primitive64Store[structure.length];
+        Primitive64Store[] bias = new Primitive64Store[structure.length];
 
         for (int layer = 0, limit = structure.length; layer < limit; layer++) {
 
-            PrimitiveDenseStore newWeights = weights[layer] = PrimitiveDenseStore.FACTORY.make(structure[layer]);
-            PrimitiveDenseStore newBias = bias[layer] = PrimitiveDenseStore.FACTORY.make(1, structure[layer].countColumns());
+            Primitive64Store newWeights = weights[layer] = Primitive64Store.FACTORY.make(structure[layer]);
+            Primitive64Store newBias = bias[layer] = Primitive64Store.FACTORY.make(1, structure[layer].countColumns());
 
             for (int output = 0; output < structure[layer].countColumns(); output++) {
                 for (int input = 0; input < structure[layer].countRows(); input++) {
@@ -192,7 +192,7 @@ abstract class BackPropagationExample extends ANNTest {
         for (int layer = 0, limit = structure.length; layer < limit; layer++) {
             for (int output = 0; output < structure[layer].countColumns(); output++) {
                 for (int input = 0; input < structure[layer].countRows(); input++) {
-                    final PrimitiveDenseStore expectedWeights = weights[layer];
+                    final Primitive64Store expectedWeights = weights[layer];
                     TestUtils.assertEquals(builder.toString(), expectedWeights.doubleValue(input, output), builder.getWeight(layer, input, output), precision);
                 }
                 TestUtils.assertEquals(builder.toString(), bias[layer].doubleValue(output), builder.getBias(layer, output), precision);

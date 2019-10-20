@@ -33,9 +33,9 @@ public class ZeroCase extends NonPhysicalTest {
         int tmpRowDim = Uniform.randomInteger(1, 9);
         int tmpColDim = Uniform.randomInteger(1, 9);
 
-        rationalStore = new ZeroStore<>(GenericDenseStore.RATIONAL, tmpRowDim, tmpColDim);
-        complexStore = new ZeroStore<>(GenericDenseStore.COMPLEX, tmpRowDim, tmpColDim);
-        primitiveStore = new ZeroStore<>(PrimitiveDenseStore.FACTORY, tmpRowDim, tmpColDim);
+        rationalStore = new ZeroStore<>(GenericStore.RATIONAL, tmpRowDim, tmpColDim);
+        complexStore = new ZeroStore<>(GenericStore.COMPLEX, tmpRowDim, tmpColDim);
+        primitiveStore = new ZeroStore<>(Primitive64Store.FACTORY, tmpRowDim, tmpColDim);
 
         numberOfRows = tmpRowDim;
         numberOfColumns = tmpColDim;

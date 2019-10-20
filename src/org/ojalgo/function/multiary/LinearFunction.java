@@ -21,11 +21,11 @@
  */
 package org.ojalgo.function.multiary;
 
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
@@ -38,27 +38,27 @@ import org.ojalgo.structure.Access1D;
 public final class LinearFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Linear<N> {
 
     public static LinearFunction<ComplexNumber> makeComplex(final Access1D<?> coefficients) {
-        return new LinearFunction<>(GenericDenseStore.COMPLEX.rows(coefficients));
+        return new LinearFunction<>(GenericStore.COMPLEX.rows(coefficients));
     }
 
     public static LinearFunction<ComplexNumber> makeComplex(final int arity) {
-        return new LinearFunction<>(GenericDenseStore.COMPLEX.make(1, arity));
+        return new LinearFunction<>(GenericStore.COMPLEX.make(1, arity));
     }
 
     public static LinearFunction<Double> makePrimitive(final Access1D<?> coefficients) {
-        return new LinearFunction<>(PrimitiveDenseStore.FACTORY.rows(coefficients));
+        return new LinearFunction<>(Primitive64Store.FACTORY.rows(coefficients));
     }
 
     public static LinearFunction<Double> makePrimitive(final int arity) {
-        return new LinearFunction<>(PrimitiveDenseStore.FACTORY.make(1, arity));
+        return new LinearFunction<>(Primitive64Store.FACTORY.make(1, arity));
     }
 
     public static LinearFunction<RationalNumber> makeRational(final Access1D<?> coefficients) {
-        return new LinearFunction<>(GenericDenseStore.RATIONAL.rows(coefficients));
+        return new LinearFunction<>(GenericStore.RATIONAL.rows(coefficients));
     }
 
     public static LinearFunction<RationalNumber> makeRational(final int arity) {
-        return new LinearFunction<>(GenericDenseStore.RATIONAL.make(1, arity));
+        return new LinearFunction<>(GenericStore.RATIONAL.make(1, arity));
     }
 
     public static <N extends Comparable<N>> LinearFunction<N> wrap(final PhysicalStore<N> coefficients) {

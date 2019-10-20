@@ -35,7 +35,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexSolver.AlgorithmStore;
 import org.ojalgo.scalar.Scalar;
@@ -51,7 +51,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     static final class DenseTableau extends SimplexTableau {
 
         private final int myStructure;
-        private final PrimitiveDenseStore myTransposed;
+        private final Primitive64Store myTransposed;
 
         DenseTableau(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables) {
 
@@ -60,7 +60,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             final int numbRows = numberOfConstraints + 2;
             final int numbCols = numberOfProblemVariables + numberOfSlackVariables + numberOfConstraints + 1;
 
-            myTransposed = PrimitiveDenseStore.FACTORY.makeZero(numbCols, numbRows);
+            myTransposed = Primitive64Store.FACTORY.makeZero(numbCols, numbRows);
             myStructure = (int) myTransposed.countRows();
         }
 
@@ -78,7 +78,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                 tmpTableauBuilder.above(matrices.getAE(), MatrixStore.PRIMITIVE.makeIdentity(tmpConstraintsCount).get(), matrices.getBE());
             }
             tmpTableauBuilder.below(MatrixStore.PRIMITIVE.makeZero(1, tmpVariablesCount).get(),
-                    PrimitiveDenseStore.FACTORY.makeFilled(1, tmpConstraintsCount, new NullaryFunction<Double>() {
+                    Primitive64Store.FACTORY.makeFilled(1, tmpConstraintsCount, new NullaryFunction<Double>() {
 
                         public double doubleValue() {
                             return ONE;
@@ -90,7 +90,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
                     }));
             //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
-            myTransposed = PrimitiveDenseStore.FACTORY.transpose(tmpTableauBuilder.get());
+            myTransposed = Primitive64Store.FACTORY.transpose(tmpTableauBuilder.get());
             myStructure = (int) myTransposed.countRows();
             // myTableau = LinearSolver.make(myTransposedTableau);
 
@@ -859,9 +859,9 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             };
         }
 
-        PrimitiveDenseStore transpose() {
+        Primitive64Store transpose() {
 
-            final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(this.countColumns(), this.countRows());
+            final Primitive64Store retVal = Primitive64Store.FACTORY.makeZero(this.countColumns(), this.countRows());
 
             for (int i = 0; i < myRows.length; i++) {
                 for (final NonzeroView<Double> nz : myRows[i].nonzeros()) {

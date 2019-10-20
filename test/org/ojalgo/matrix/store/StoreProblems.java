@@ -75,9 +75,9 @@ public class StoreProblems extends MatrixStoreTests {
 
         final int tmpDim = 9;
 
-        final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpMtrxB = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpMtrxC = PrimitiveDenseStore.FACTORY.makeZero(tmpDim, tmpDim);
+        final PhysicalStore<Double> tmpMtrxA = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        final PhysicalStore<Double> tmpMtrxB = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        final PhysicalStore<Double> tmpMtrxC = Primitive64Store.FACTORY.makeZero(tmpDim, tmpDim);
 
         PhysicalStore<Double> tmpExpected;
         PhysicalStore<Double> tmpActual;
@@ -108,7 +108,7 @@ public class StoreProblems extends MatrixStoreTests {
     public void testP20180121() {
 
         final SparseStore<Double> m = SparseStore.PRIMITIVE.make(3, 2);
-        final PrimitiveDenseStore mAdd = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 0.0 }, { 0.0, 0.0 } });
+        final Primitive64Store mAdd = Primitive64Store.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 0.0 }, { 0.0, 0.0 } });
         final MatrixStore<Double> n = m.add(mAdd);
 
         final SparseStore<Double> eye = SparseStore.PRIMITIVE.make(2, 2);
@@ -154,14 +154,14 @@ public class StoreProblems extends MatrixStoreTests {
         double[][] _y = { { 0, 0, 0 }, { 1, 1, 1 }, { 2, 2, 2 } };
         double[][] exp = { { 1.0, 2.0, 3.0 }, { 3.0, 4.0, 5.0 }, { 5.0, 6.0, 7.0 } };
 
-        PrimitiveDenseStore x = PrimitiveDenseStore.FACTORY.rows(_x);
-        PrimitiveDenseStore y = PrimitiveDenseStore.FACTORY.rows(_y);
+        Primitive64Store x = Primitive64Store.FACTORY.rows(_x);
+        Primitive64Store y = Primitive64Store.FACTORY.rows(_y);
 
         ElementsSupplier<Double> diff = y.operateOnMatching(x, PrimitiveMath.SUBTRACT);
         ElementsSupplier<Double> transp = diff.transpose();
 
-        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.rows(exp), diff.get());
-        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.columns(exp), transp.get());
+        TestUtils.assertEquals(Primitive64Store.FACTORY.rows(exp), diff.get());
+        TestUtils.assertEquals(Primitive64Store.FACTORY.columns(exp), transp.get());
     }
 
 }

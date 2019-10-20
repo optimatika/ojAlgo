@@ -32,7 +32,7 @@ import org.ojalgo.function.multiary.LinearFunction;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -126,7 +126,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             PhysicalStore<Double> tmpC = null;
 
             if (mtrxC == null) {
-                tmpC = PrimitiveDenseStore.FACTORY.make(this.countVariables(), 1);
+                tmpC = Primitive64Store.FACTORY.make(this.countVariables(), 1);
             } else if (mtrxC instanceof PhysicalStore) {
                 tmpC = (PhysicalStore<Double>) mtrxC;
             } else {

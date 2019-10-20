@@ -31,7 +31,7 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
@@ -124,7 +124,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
-        return this.doGetInverse((PrimitiveDenseStore) preallocated);
+        return this.doGetInverse((Primitive64Store) preallocated);
     }
 
     /**
@@ -211,7 +211,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         rhs.supplyTo(preallocated);
 
-        return this.doSolve((PrimitiveDenseStore) preallocated);
+        return this.doSolve((Primitive64Store) preallocated);
     }
 
     @Override
@@ -267,7 +267,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
             preallocated.fillMatching(rhs);
 
-            return this.doSolve((PrimitiveDenseStore) preallocated);
+            return this.doSolve((Primitive64Store) preallocated);
 
         } else {
 
@@ -324,14 +324,14 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     /**
      * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
      */
-    private MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
+    private MatrixStore<Double> doGetInverse(final Primitive64Store preallocated) {
 
         MatrixStore.PRIMITIVE.makeIdentity(this.getRowDim()).supplyTo(preallocated);
 
         return this.doSolve(preallocated);
     }
 
-    private MatrixStore<Double> doSolve(final PrimitiveDenseStore preallocated) {
+    private MatrixStore<Double> doSolve(final Primitive64Store preallocated) {
 
         final double[] tmpRHSdata = preallocated.data;
 

@@ -29,7 +29,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -159,7 +159,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
             } else {
 
-                myAI = PrimitiveDenseStore.FACTORY.makeRowsSupplier((int) mtrxAI.countColumns());
+                myAI = Primitive64Store.FACTORY.makeRowsSupplier((int) mtrxAI.countColumns());
                 myAI.addRows((int) mtrxAI.countRows());
 
                 if (mtrxAI instanceof SparseStore) {

@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access1D;
@@ -52,8 +52,8 @@ public class BigPolynomial extends AbstractPolynomial<BigDecimal> {
         final int tmpRowDim = (int) Math.min(x.count(), y.count());
         final int tmpColDim = this.size();
 
-        final PhysicalStore<RationalNumber> tmpBody = GenericDenseStore.RATIONAL.makeZero(tmpRowDim, tmpColDim);
-        final PhysicalStore<RationalNumber> tmpRHS = GenericDenseStore.RATIONAL.makeZero(tmpRowDim, 1);
+        final PhysicalStore<RationalNumber> tmpBody = GenericStore.RATIONAL.makeZero(tmpRowDim, tmpColDim);
+        final PhysicalStore<RationalNumber> tmpRHS = GenericStore.RATIONAL.makeZero(tmpRowDim, 1);
 
         for (int i = 0; i < tmpRowDim; i++) {
 

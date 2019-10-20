@@ -21,10 +21,10 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
@@ -37,7 +37,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
     static final class Complex extends HessenbergDecomposition<ComplexNumber> {
 
         Complex() {
-            super(GenericDenseStore.COMPLEX);
+            super(GenericStore.COMPLEX);
         }
 
     }
@@ -45,7 +45,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
     static final class Primitive extends HessenbergDecomposition<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY);
+            super(Primitive64Store.FACTORY);
         }
 
     }
@@ -53,7 +53,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
     static final class Quat extends HessenbergDecomposition<Quaternion> {
 
         Quat() {
-            super(GenericDenseStore.QUATERNION);
+            super(GenericStore.QUATERNION);
         }
 
     }
@@ -61,7 +61,7 @@ abstract class HessenbergDecomposition<N extends Comparable<N>> extends InPlaceD
     static final class Rational extends HessenbergDecomposition<RationalNumber> {
 
         Rational() {
-            super(GenericDenseStore.RATIONAL);
+            super(GenericStore.RATIONAL);
         }
 
     }

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.RationalNumber;
@@ -67,21 +67,21 @@ public class P20050125Case extends BasicMatrixTest {
     public void testData() {
 
         final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
-        tmpDelegate.decompose(GenericDenseStore.RATIONAL.copy(rationalAA));
+        tmpDelegate.decompose(GenericStore.RATIONAL.copy(rationalAA));
 
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(rationalAA), tmpDelegate, evaluation);
+        TestUtils.assertEquals(GenericStore.RATIONAL.copy(rationalAA), tmpDelegate, evaluation);
     }
 
     @Test
     public void testProblem() {
 
         final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
-        tmpDelegate.decompose(GenericDenseStore.RATIONAL.copy(rationalAA));
+        tmpDelegate.decompose(GenericStore.RATIONAL.copy(rationalAA));
 
-        final MatrixStore<RationalNumber> tmpInv = tmpDelegate.getSolution(GenericDenseStore.RATIONAL.copy(rationlI));
+        final MatrixStore<RationalNumber> tmpInv = tmpDelegate.getSolution(GenericStore.RATIONAL.copy(rationlI));
 
-        final MatrixStore<RationalNumber> tmpExpMtrx = GenericDenseStore.RATIONAL.copy(rationlI);
-        final MatrixStore<RationalNumber> tmpActMtrx = GenericDenseStore.RATIONAL.copy(rationalAA).multiply(tmpInv);
+        final MatrixStore<RationalNumber> tmpExpMtrx = GenericStore.RATIONAL.copy(rationlI);
+        final MatrixStore<RationalNumber> tmpActMtrx = GenericStore.RATIONAL.copy(rationalAA).multiply(tmpInv);
 
         TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, evaluation);
     }

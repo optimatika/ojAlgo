@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -77,7 +77,7 @@ public class P20071019Case extends BasicMatrixTest {
         final LU<Double> tmpJamaLU = LU.PRIMITIVE.make();
         final LU<Double> tmpDenseLU = LU.PRIMITIVE.make();
 
-        MatrixStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(P20071019Case.getFatProblematic());
+        MatrixStore<Double> tmpOriginal = Primitive64Store.FACTORY.copy(P20071019Case.getFatProblematic());
 
         tmpJamaLU.decompose(tmpOriginal);
         TestUtils.assertEquals(tmpOriginal, tmpJamaLU, evaluation);
@@ -85,7 +85,7 @@ public class P20071019Case extends BasicMatrixTest {
         tmpDenseLU.decompose(tmpOriginal);
         TestUtils.assertEquals(tmpOriginal, tmpDenseLU, evaluation);
 
-        tmpOriginal = PrimitiveDenseStore.FACTORY.copy(P20071019Case.getTallProblematic());
+        tmpOriginal = Primitive64Store.FACTORY.copy(P20071019Case.getTallProblematic());
 
         tmpJamaLU.decompose(tmpOriginal);
         TestUtils.assertEquals(tmpOriginal, tmpJamaLU, evaluation);

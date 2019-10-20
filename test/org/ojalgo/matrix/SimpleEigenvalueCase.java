@@ -28,7 +28,7 @@ import org.ojalgo.function.constant.RationalMath;
 import org.ojalgo.matrix.BasicMatrix.PhysicalReceiver;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -86,7 +86,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
     public void testProblem() {
 
         final Eigenvalue<Double> tmpEigen = Eigenvalue.PRIMITIVE.make();
-        tmpEigen.decompose(PrimitiveDenseStore.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));
+        tmpEigen.decompose(Primitive64Store.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));
 
         final MatrixStore<Double> tmpV = tmpEigen.getV();
         final MatrixStore<Double> tmpD = tmpEigen.getD();

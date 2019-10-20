@@ -111,7 +111,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         SparseStore<Double> mtrx = SparseStore.PRIMITIVE.make(n, n);
 
-        PrimitiveDenseStore ones = PrimitiveDenseStore.FACTORY.makeZero(n, 1);
+        Primitive64Store ones = Primitive64Store.FACTORY.makeZero(n, 1);
         ones.fillAll(ONE);
 
         Stopwatch clock = new Stopwatch();
@@ -141,7 +141,7 @@ public class SparsePerformance extends MatrixStoreTests {
         int n = 100_000;
 
         SparseStore<Double> mtrx = SparseStore.PRIMITIVE.make(n, n);
-        PrimitiveDenseStore vctr = PrimitiveDenseStore.FACTORY.makeZero(1, n);
+        Primitive64Store vctr = Primitive64Store.FACTORY.makeZero(1, n);
 
         Stopwatch clock = new Stopwatch();
 
@@ -166,7 +166,7 @@ public class SparsePerformance extends MatrixStoreTests {
         int n = 100_000;
 
         SparseStore<Double> mtrx = SparseStore.PRIMITIVE.make(n, n);
-        PrimitiveDenseStore vctr = PrimitiveDenseStore.FACTORY.makeZero(n, 1);
+        Primitive64Store vctr = Primitive64Store.FACTORY.makeZero(n, 1);
 
         Stopwatch clock = new Stopwatch();
 

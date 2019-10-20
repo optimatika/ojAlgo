@@ -27,7 +27,7 @@ import java.math.MathContext;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
@@ -708,14 +708,14 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
     }
 
     public MatrixStore<Double> toMultiplicationMatrix() {
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(this);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.make(this);
         this.supplyTo(retVal);
         return retVal;
     }
 
     public MatrixStore<Double> toMultiplicationVector() {
 
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(2L, 1L);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.make(2L, 1L);
 
         retVal.set(0L, myRealValue);
         retVal.set(1L, i);
@@ -725,7 +725,7 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
 
     public MatrixStore<Double> toRotationMatrix() {
 
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(2L, 2L);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.make(2L, 2L);
 
         final double s = myRealValue;
 

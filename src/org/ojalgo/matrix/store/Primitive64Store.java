@@ -62,35 +62,13 @@ import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * A {@linkplain Double} (actually double) implementation of {@linkplain PhysicalStore}.
+ * A {@linkplain double} implementation of {@linkplain PhysicalStore}.
  *
  * @author apete
  */
-public final class PrimitiveDenseStore extends Primitive64Array implements PhysicalStore<Double>, DecompositionStore<Double> {
+public final class Primitive64Store extends Primitive64Array implements PhysicalStore<Double>, DecompositionStore<Double> {
 
-    public interface PrimitiveMultiplyBoth extends TransformableRegion.FillByMultiplying<Double> {
-
-    }
-
-    public interface PrimitiveMultiplyLeft {
-
-        void invoke(double[] product, Access1D<?> left, int complexity, double[] right);
-
-    }
-
-    public interface PrimitiveMultiplyNeither {
-
-        void invoke(double[] product, double[] left, int complexity, double[] right);
-
-    }
-
-    public interface PrimitiveMultiplyRight {
-
-        void invoke(double[] product, double[] left, int complexity, Access1D<?> right);
-
-    }
-
-    public static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = new PhysicalStore.Factory<Double, PrimitiveDenseStore>() {
+    public static final PhysicalStore.Factory<Double, Primitive64Store> FACTORY = new PhysicalStore.Factory<Double, Primitive64Store>() {
 
         public AggregatorSet<Double> aggregator() {
             return PrimitiveAggregator.getSet();
@@ -104,7 +82,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             return MatrixStore.PRIMITIVE;
         }
 
-        public PrimitiveDenseStore columns(final Access1D<?>... source) {
+        public Primitive64Store columns(final Access1D<?>... source) {
 
             final int tmpRowDim = (int) source[0].count();
             final int tmpColDim = source.length;
@@ -119,46 +97,10 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                 }
             }
 
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public PrimitiveDenseStore columns(final double[]... source) {
-
-            final int tmpRowDim = source[0].length;
-            final int tmpColDim = source.length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            double[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpColumn[i];
-                }
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public PrimitiveDenseStore columns(final List<? extends Comparable<?>>... source) {
-
-            final int tmpRowDim = source[0].size();
-            final int tmpColDim = source.length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            List<? extends Comparable<?>> tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = Scalar.doubleValue(tmpColumn.get(i));
-                }
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public PrimitiveDenseStore columns(final Comparable<?>[]... source) {
+        public Primitive64Store columns(final Comparable<?>[]... source) {
 
             final int tmpRowDim = source[0].length;
             final int tmpColDim = source.length;
@@ -173,19 +115,55 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                 }
             }
 
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public PrimitiveDenseStore conjugate(final Access2D<?> source) {
+        public Primitive64Store columns(final double[]... source) {
+
+            final int tmpRowDim = source[0].length;
+            final int tmpColDim = source.length;
+
+            final double[] tmpData = new double[tmpRowDim * tmpColDim];
+
+            double[] tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = tmpColumn[i];
+                }
+            }
+
+            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public Primitive64Store columns(final List<? extends Comparable<?>>... source) {
+
+            final int tmpRowDim = source[0].size();
+            final int tmpColDim = source.length;
+
+            final double[] tmpData = new double[tmpRowDim * tmpColDim];
+
+            List<? extends Comparable<?>> tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = Scalar.doubleValue(tmpColumn.get(i));
+                }
+            }
+
+            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public Primitive64Store conjugate(final Access2D<?> source) {
             return this.transpose(source);
         }
 
-        public PrimitiveDenseStore copy(final Access2D<?> source) {
+        public Primitive64Store copy(final Access2D<?> source) {
 
             final int tmpRowDim = (int) source.countRows();
             final int tmpColDim = (int) source.countColumns();
 
-            final PrimitiveDenseStore retVal = new PrimitiveDenseStore(tmpRowDim, tmpColDim);
+            final Primitive64Store retVal = new Primitive64Store(tmpRowDim, tmpColDim);
 
             if (tmpColDim > FillMatchingSingle.THRESHOLD) {
 
@@ -212,16 +190,20 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             return PrimitiveFunction.getSet();
         }
 
-        public PrimitiveDenseStore makeEye(final long rows, final long columns) {
+        public Primitive64Store make(final long rows, final long columns) {
+            return new Primitive64Store((int) rows, (int) columns);
+        }
 
-            final PrimitiveDenseStore retVal = this.makeZero(rows, columns);
+        public Primitive64Store makeEye(final long rows, final long columns) {
 
-            retVal.myUtility.fillDiagonal(0, 0, ONE);
+            final Primitive64Store retVal = this.make(rows, columns);
+
+            retVal.fillDiagonal(ONE);
 
             return retVal;
         }
 
-        public PrimitiveDenseStore makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
+        public Primitive64Store makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             final int tmpRowDim = (int) rows;
             final int tmpColDim = (int) columns;
@@ -234,7 +216,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                 tmpData[i] = supplier.doubleValue();
             }
 
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         public Householder.Primitive makeHouseholder(final int length) {
@@ -249,11 +231,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             return this.makeRotation(low, high, cos != null ? cos.doubleValue() : Double.NaN, sin != null ? sin.doubleValue() : Double.NaN);
         }
 
-        public PrimitiveDenseStore make(final long rows, final long columns) {
-            return new PrimitiveDenseStore((int) rows, (int) columns);
-        }
-
-        public PrimitiveDenseStore rows(final Access1D<?>... source) {
+        public Primitive64Store rows(final Access1D<?>... source) {
 
             final int tmpRowDim = source.length;
             final int tmpColDim = (int) source[0].count();
@@ -268,46 +246,10 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                 }
             }
 
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public PrimitiveDenseStore rows(final double[]... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            double[] tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpRow[j];
-                }
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public PrimitiveDenseStore rows(final List<? extends Comparable<?>>... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].size();
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            List<? extends Comparable<?>> tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = Scalar.doubleValue(tmpRow.get(j));
-                }
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public PrimitiveDenseStore rows(final Comparable<?>[]... source) {
+        public Primitive64Store rows(final Comparable<?>[]... source) {
 
             final int tmpRowDim = source.length;
             final int tmpColDim = source[0].length;
@@ -322,16 +264,52 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                 }
             }
 
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public Primitive64Store rows(final double[]... source) {
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = source[0].length;
+
+            final double[] tmpData = new double[tmpRowDim * tmpColDim];
+
+            double[] tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = tmpRow[j];
+                }
+            }
+
+            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public Primitive64Store rows(final List<? extends Comparable<?>>... source) {
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = source[0].size();
+
+            final double[] tmpData = new double[tmpRowDim * tmpColDim];
+
+            List<? extends Comparable<?>> tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = Scalar.doubleValue(tmpRow.get(j));
+                }
+            }
+
+            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         public Scalar.Factory<Double> scalar() {
             return PrimitiveScalar.FACTORY;
         }
 
-        public PrimitiveDenseStore transpose(final Access2D<?> source) {
+        public Primitive64Store transpose(final Access2D<?> source) {
 
-            final PrimitiveDenseStore retVal = new PrimitiveDenseStore((int) source.countColumns(), (int) source.countRows());
+            final Primitive64Store retVal = new Primitive64Store((int) source.countColumns(), (int) source.countRows());
 
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
@@ -361,17 +339,17 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
 
-    static final long SHALLOW_SIZE = MemoryEstimator.estimateObject(PrimitiveDenseStore.class);
+    static final long SHALLOW_SIZE = MemoryEstimator.estimateObject(Primitive64Store.class);
 
     /**
      * Extracts the argument of the ComplexNumber elements to a new primitive double valued matrix.
      */
-    public static PrimitiveDenseStore getComplexArgument(final Access2D<ComplexNumber> arg) {
+    public static Primitive64Store getComplexArgument(final Access2D<ComplexNumber> arg) {
 
         final long numberOfRows = arg.countRows();
         final long numberOfColumns = arg.countColumns();
 
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+        final Primitive64Store retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
 
         Mutate1D.copyComplexArgument(arg, retVal);
 
@@ -381,12 +359,12 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     /**
      * Extracts the imaginary part of the ComplexNumber elements to a new primitive double valued matrix.
      */
-    public static PrimitiveDenseStore getComplexImaginary(final Access2D<ComplexNumber> arg) {
+    public static Primitive64Store getComplexImaginary(final Access2D<ComplexNumber> arg) {
 
         final long numberOfRows = arg.countRows();
         final long numberOfColumns = arg.countColumns();
 
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+        final Primitive64Store retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
 
         Mutate1D.copyComplexImaginary(arg, retVal);
 
@@ -396,12 +374,12 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     /**
      * Extracts the modulus of the ComplexNumber elements to a new primitive double valued matrix.
      */
-    public static PrimitiveDenseStore getComplexModulus(final Access2D<ComplexNumber> arg) {
+    public static Primitive64Store getComplexModulus(final Access2D<ComplexNumber> arg) {
 
         final long numberOfRows = arg.countRows();
         final long numberOfColumns = arg.countColumns();
 
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+        final Primitive64Store retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
 
         Mutate1D.copyComplexModulus(arg, retVal);
 
@@ -411,29 +389,29 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     /**
      * Extracts the real part of the ComplexNumber elements to a new primitive double valued matrix.
      */
-    public static PrimitiveDenseStore getComplexReal(final Access2D<ComplexNumber> arg) {
+    public static Primitive64Store getComplexReal(final Access2D<ComplexNumber> arg) {
 
         final long numberOfRows = arg.countRows();
         final long numberOfColumns = arg.countColumns();
 
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
+        final Primitive64Store retVal = FACTORY.makeZero(numberOfRows, numberOfColumns);
 
         Mutate1D.copyComplexReal(arg, retVal);
 
         return retVal;
     }
 
-    public static PrimitiveDenseStore wrap(final double... data) {
-        return new PrimitiveDenseStore(data);
+    public static Primitive64Store wrap(final double... data) {
+        return new Primitive64Store(data);
     }
 
-    public static PrimitiveDenseStore wrap(final double[] data, final int structure) {
-        return new PrimitiveDenseStore(structure, data.length / structure, data);
+    public static Primitive64Store wrap(final double[] data, final int structure) {
+        return new Primitive64Store(structure, data.length / structure, data);
     }
 
-    static PrimitiveDenseStore cast(final Access1D<Double> matrix) {
-        if (matrix instanceof PrimitiveDenseStore) {
-            return (PrimitiveDenseStore) matrix;
+    static Primitive64Store cast(final Access1D<Double> matrix) {
+        if (matrix instanceof Primitive64Store) {
+            return (Primitive64Store) matrix;
         } else if (matrix instanceof Access2D<?>) {
             return FACTORY.copy((Access2D<?>) matrix);
         } else {
@@ -459,31 +437,26 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         }
     }
 
-    private final PrimitiveMultiplyBoth multiplyBoth;
-    private final PrimitiveMultiplyLeft multiplyLeft;
-    private final PrimitiveMultiplyNeither multiplyNeither;
-
-    private final PrimitiveMultiplyRight multiplyRight;
-
+    private final MultiplyBoth.Primitive64 multiplyBoth;
+    private final MultiplyLeft.Primitive64 multiplyLeft;
+    private final MultiplyNeither.Primitive64 multiplyNeither;
+    private final MultiplyRight.Primitive64 multiplyRight;
     private final int myColDim;
-
     private final int myRowDim;
-
     private final Array2D<Double> myUtility;
-
     private transient double[] myWorkerColumn;
 
     @SuppressWarnings("unused")
-    private PrimitiveDenseStore(final double[] dataArray) {
+    private Primitive64Store(final double[] dataArray) {
         this(dataArray.length, 1, dataArray);
     }
 
     @SuppressWarnings("unused")
-    private PrimitiveDenseStore(final int numbRows) {
+    private Primitive64Store(final int numbRows) {
         this(numbRows, 1);
     }
 
-    PrimitiveDenseStore(final int numbRows, final int numbCols) {
+    Primitive64Store(final int numbRows, final int numbCols) {
 
         super(numbRows * numbCols);
 
@@ -492,13 +465,13 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         myUtility = this.wrapInArray2D(myRowDim);
 
-        multiplyBoth = MultiplyBoth.getPrimitive(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.getPrimitive(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.getPrimitive(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.getPrimitive(myRowDim, myColDim);
+        multiplyBoth = MultiplyBoth.newPrimitive64(myRowDim, myColDim);
+        multiplyLeft = MultiplyLeft.newPrimitive64(myRowDim, myColDim);
+        multiplyRight = MultiplyRight.newPrimitive64(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.newPrimitive64(myRowDim, myColDim);
     }
 
-    PrimitiveDenseStore(final int numbRows, final int numbCols, final double[] dataArray) {
+    Primitive64Store(final int numbRows, final int numbCols, final double[] dataArray) {
 
         super(dataArray);
 
@@ -507,10 +480,10 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         myUtility = this.wrapInArray2D(myRowDim);
 
-        multiplyBoth = MultiplyBoth.getPrimitive(myRowDim, myColDim);
-        multiplyLeft = MultiplyLeft.getPrimitive(myRowDim, myColDim);
-        multiplyRight = MultiplyRight.getPrimitive(myRowDim, myColDim);
-        multiplyNeither = MultiplyNeither.getPrimitive(myRowDim, myColDim);
+        multiplyBoth = MultiplyBoth.newPrimitive64(myRowDim, myColDim);
+        multiplyLeft = MultiplyLeft.newPrimitive64(myRowDim, myColDim);
+        multiplyRight = MultiplyRight.newPrimitive64(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.newPrimitive64(myRowDim, myColDim);
     }
 
     public void accept(final Access2D<?> supplied) {
@@ -521,11 +494,11 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         }
     }
 
-    public void add(final long row, final long col, final double addend) {
+    public void add(final long row, final long col, final Comparable<?> addend) {
         myUtility.add(row, col, addend);
     }
 
-    public void add(final long row, final long col, final Comparable<?> addend) {
+    public void add(final long row, final long col, final double addend) {
         myUtility.add(row, col, addend);
     }
 
@@ -616,7 +589,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         final double[] tmpData = data;
 
-        final double[] tmpCollectorData = ((PrimitiveDenseStore) transformationCollector).data;
+        final double[] tmpCollectorData = ((Primitive64Store) transformationCollector).data;
 
         final double[] tmpVctrWork = new double[this.getMinDim()];
         EvD1D.orthes(tmpData, tmpCollectorData, tmpVctrWork);
@@ -643,8 +616,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return this.transpose();
     }
 
-    public PrimitiveDenseStore copy() {
-        return new PrimitiveDenseStore(myRowDim, myColDim, this.copyOfData());
+    public Primitive64Store copy() {
+        return new Primitive64Store(myRowDim, myColDim, this.copyOfData());
     }
 
     public long countColumns() {
@@ -730,15 +703,15 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
-        if (left instanceof PrimitiveDenseStore) {
-            if (right instanceof PrimitiveDenseStore) {
-                multiplyNeither.invoke(data, PrimitiveDenseStore.cast(left).data, complexity, PrimitiveDenseStore.cast(right).data);
+        if (left instanceof Primitive64Store) {
+            if (right instanceof Primitive64Store) {
+                multiplyNeither.invoke(data, Primitive64Store.cast(left).data, complexity, Primitive64Store.cast(right).data);
             } else {
-                multiplyRight.invoke(data, PrimitiveDenseStore.cast(left).data, complexity, right);
+                multiplyRight.invoke(data, Primitive64Store.cast(left).data, complexity, right);
             }
         } else {
-            if (right instanceof PrimitiveDenseStore) {
-                multiplyLeft.invoke(data, left, complexity, PrimitiveDenseStore.cast(right).data);
+            if (right instanceof Primitive64Store) {
+                multiplyLeft.invoke(data, left, complexity, Primitive64Store.cast(right).data);
             } else {
                 multiplyBoth.invoke(this, left, complexity, right);
             }
@@ -928,7 +901,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    PrimitiveDenseStore.this.modify(numberOfRows * first, numberOfRows * limit, 1, modifier);
+                    Primitive64Store.this.modify(numberOfRows * first, numberOfRows * limit, 1, modifier);
                 }
 
             };
@@ -964,10 +937,10 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public MatrixStore<Double> multiply(final MatrixStore<Double> right) {
 
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
+        final Primitive64Store retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
-        if (right instanceof PrimitiveDenseStore) {
-            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, PrimitiveDenseStore.cast(right).data);
+        if (right instanceof Primitive64Store) {
+            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, Primitive64Store.cast(right).data);
         } else {
             retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
         }
@@ -990,7 +963,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         myUtility.modifyColumn(0, column, PrimitiveMath.NEGATE);
     }
 
-    public PhysicalStore.Factory<Double, PrimitiveDenseStore> physical() {
+    public PhysicalStore.Factory<Double, Primitive64Store> physical() {
         return FACTORY;
     }
 
@@ -1018,11 +991,11 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         RotateRight.invoke(data, myRowDim, low, high, cos, sin);
     }
 
-    public void set(final long row, final long col, final double value) {
+    public void set(final long row, final long col, final Comparable<?> value) {
         myUtility.set(row, col, value);
     }
 
-    public void set(final long row, final long col, final Comparable<?> value) {
+    public void set(final long row, final long col, final double value) {
         myUtility.set(row, col, value);
     }
 
@@ -1058,7 +1031,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    SubstituteBackwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, hermitian);
+                    SubstituteBackwards.invoke(Primitive64Store.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, hermitian);
                 }
 
             };
@@ -1082,7 +1055,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    SubstituteForwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, identity);
+                    SubstituteForwards.invoke(Primitive64Store.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, identity);
                 }
 
             };
@@ -1110,7 +1083,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public void transformLeft(final Householder<Double> transformation, final int firstColumn) {
 
-        final Householder.Primitive tmpTransf = PrimitiveDenseStore.cast(transformation);
+        final Householder.Primitive tmpTransf = Primitive64Store.cast(transformation);
 
         final double[] tmpData = data;
 
@@ -1138,7 +1111,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public void transformLeft(final Rotation<Double> transformation) {
 
-        final Rotation.Primitive tmpTransf = PrimitiveDenseStore.cast(transformation);
+        final Rotation.Primitive tmpTransf = Primitive64Store.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;
@@ -1162,7 +1135,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public void transformRight(final Householder<Double> transformation, final int firstRow) {
 
-        final Householder.Primitive tmpTransf = PrimitiveDenseStore.cast(transformation);
+        final Householder.Primitive tmpTransf = Primitive64Store.cast(transformation);
 
         final double[] tmpData = data;
 
@@ -1192,7 +1165,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public void transformRight(final Rotation<Double> transformation) {
 
-        final Rotation.Primitive tmpTransf = PrimitiveDenseStore.cast(transformation);
+        final Rotation.Primitive tmpTransf = Primitive64Store.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;
@@ -1215,7 +1188,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     public void transformSymmetric(final Householder<Double> transformation) {
-        HouseholderHermitian.invoke(data, PrimitiveDenseStore.cast(transformation), this.getWorkerColumn());
+        HouseholderHermitian.invoke(data, Primitive64Store.cast(transformation), this.getWorkerColumn());
     }
 
     public MatrixStore<Double> transpose() {

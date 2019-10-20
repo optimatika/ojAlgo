@@ -81,6 +81,57 @@ public final class GenerateApplyAndCopyHouseholderRow implements ArrayOperation 
         return retVal;
     }
 
+    public static boolean invoke(final float[] data, final int structure, final int row, final int col, final Householder.Primitive destination) {
+
+        final int tmpColDim = data.length / structure;
+
+        final double[] tmpVector = destination.vector;
+        destination.first = col;
+
+        double tmpNormInf = PrimitiveMath.ZERO; // Copy row and calculate its infinity-norm.
+        for (int j = col; j < tmpColDim; j++) {
+            tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[j] = data[row + (j * structure)]));
+        }
+
+        boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
+        double tmpVal;
+        double tmpNorm2 = PrimitiveMath.ZERO;
+
+        if (retVal) {
+            for (int j = col + 1; j < tmpColDim; j++) {
+                tmpVal = tmpVector[j] /= tmpNormInf;
+                tmpNorm2 += tmpVal * tmpVal;
+            }
+            final double value = tmpNorm2;
+            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
+        }
+
+        if (retVal) {
+
+            double tmpScale = tmpVector[col] / tmpNormInf;
+            tmpNorm2 += tmpScale * tmpScale;
+            tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
+
+            if (tmpScale <= PrimitiveMath.ZERO) {
+                data[(row + (col * structure))] = (float) (tmpNorm2 * tmpNormInf);
+                tmpScale -= tmpNorm2;
+            } else {
+                data[(row + (col * structure))] = (float) (-tmpNorm2 * tmpNormInf);
+                tmpScale += tmpNorm2;
+            }
+
+            tmpVector[col] = PrimitiveMath.ONE;
+
+            for (int j = col + 1; j < tmpColDim; j++) {
+                data[row + (j * structure)] = (float) (tmpVector[j] /= tmpScale);
+            }
+
+            destination.beta = PrimitiveMath.ABS.invoke(tmpScale) / tmpNorm2;
+        }
+
+        return retVal;
+    }
+
     public static <N extends Scalar<N>> boolean invoke(final N[] data, final int structure, final int row, final int col,
             final Householder.Generic<N> destination, final Scalar.Factory<N> scalar) {
 

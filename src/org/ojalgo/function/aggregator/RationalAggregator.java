@@ -40,6 +40,10 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
             this.invoke(RationalNumber.valueOf(anArg));
         }
 
+        public final void invoke(final float anArg) {
+            this.invoke(RationalNumber.valueOf(anArg));
+        }
+
         public final Scalar<RationalNumber> toScalar() {
             return this.get();
         }

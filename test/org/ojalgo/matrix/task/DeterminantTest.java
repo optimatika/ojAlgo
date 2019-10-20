@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Uniform;
 
 public final class DeterminantTest extends MatrixTaskTests {
@@ -104,7 +104,7 @@ public final class DeterminantTest extends MatrixTaskTests {
     }
 
     MatrixStore<Double> makeGeneral(final int dim) {
-        return PrimitiveDenseStore.FACTORY.makeFilled(dim, dim, new Uniform());
+        return Primitive64Store.FACTORY.makeFilled(dim, dim, new Uniform());
     }
 
     MatrixStore<Double> makeSymmetric(final int dim) {

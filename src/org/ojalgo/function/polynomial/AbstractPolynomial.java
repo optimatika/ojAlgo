@@ -105,12 +105,25 @@ abstract class AbstractPolynomial<N extends Comparable<N>> implements Polynomial
 
     public final double invoke(final double arg) {
 
-        int tmpPower = this.degree();
+        int power = this.degree();
 
-        double retVal = this.doubleValue(tmpPower);
+        double retVal = this.doubleValue(power);
 
-        while (--tmpPower >= 0) {
-            retVal = this.doubleValue(tmpPower) + (arg * retVal);
+        while (--power >= 0) {
+            retVal = this.doubleValue(power) + (arg * retVal);
+        }
+
+        return retVal;
+    }
+
+    public final float invoke(final float arg) {
+
+        int power = this.degree();
+
+        float retVal = this.floatValue(power);
+
+        while (--power >= 0) {
+            retVal = this.floatValue(power) + (arg * retVal);
         }
 
         return retVal;

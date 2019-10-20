@@ -24,9 +24,9 @@ package org.ojalgo.array.operation;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.RationalNumber;
@@ -42,11 +42,11 @@ public class SubstitutionTest extends StoreOperationsTests {
         MatrixStore<Double> primitiveBody = MatrixStore.PRIMITIVE.makeIdentity(numbEquations).get();
         MatrixStore<RationalNumber> rationalBody = MatrixStore.RATIONAL.makeIdentity(numbEquations).get();
 
-        PrimitiveDenseStore denseRHS = PrimitiveDenseStore.FACTORY.makeFilled(numbEquations, numbSolutions, new Uniform());
+        Primitive64Store denseRHS = Primitive64Store.FACTORY.makeFilled(numbEquations, numbSolutions, new Uniform());
         RawStore rawRHS = RawStore.FACTORY.copy(denseRHS);
-        GenericDenseStore<RationalNumber> rationalRHS = GenericDenseStore.RATIONAL.copy(denseRHS);
+        GenericStore<RationalNumber> rationalRHS = GenericStore.RATIONAL.copy(denseRHS);
 
-        PrimitiveDenseStore expected = PrimitiveDenseStore.FACTORY.copy(denseRHS);
+        Primitive64Store expected = Primitive64Store.FACTORY.copy(denseRHS);
 
         SubstituteBackwards.invoke(denseRHS.data, numbEquations, 0, numbSolutions, primitiveBody, false, false, false);
         SubstituteBackwards.invoke(rawRHS.data, primitiveBody, false, false, false);
@@ -57,10 +57,10 @@ public class SubstitutionTest extends StoreOperationsTests {
         TestUtils.assertEquals(expected, rationalRHS);
 
         Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(numbEquations, numbEquations);
-        cholesky.decompose(PrimitiveDenseStore.FACTORY.makeSPD(numbEquations));
+        cholesky.decompose(Primitive64Store.FACTORY.makeSPD(numbEquations));
 
         primitiveBody = cholesky.getR();
-        rationalBody = GenericDenseStore.RATIONAL.copy(primitiveBody);
+        rationalBody = GenericStore.RATIONAL.copy(primitiveBody);
 
         SubstituteBackwards.invoke(denseRHS.data, numbEquations, 0, numbSolutions, primitiveBody, true, true, false);
         SubstituteBackwards.invoke(rawRHS.data, primitiveBody, true, true, false);
@@ -87,11 +87,11 @@ public class SubstitutionTest extends StoreOperationsTests {
         MatrixStore<Double> primitiveBody = MatrixStore.PRIMITIVE.makeIdentity(numbEquations).get();
         MatrixStore<RationalNumber> rationalBody = MatrixStore.RATIONAL.makeIdentity(numbEquations).get();
 
-        PrimitiveDenseStore denseRHS = PrimitiveDenseStore.FACTORY.makeFilled(numbEquations, numbSolutions, new Uniform());
+        Primitive64Store denseRHS = Primitive64Store.FACTORY.makeFilled(numbEquations, numbSolutions, new Uniform());
         RawStore rawRHS = RawStore.FACTORY.copy(denseRHS);
-        GenericDenseStore<RationalNumber> rationalRHS = GenericDenseStore.RATIONAL.copy(denseRHS);
+        GenericStore<RationalNumber> rationalRHS = GenericStore.RATIONAL.copy(denseRHS);
 
-        PrimitiveDenseStore expected = PrimitiveDenseStore.FACTORY.copy(denseRHS);
+        Primitive64Store expected = Primitive64Store.FACTORY.copy(denseRHS);
 
         SubstituteForwards.invoke(denseRHS.data, numbEquations, 0, numbSolutions, primitiveBody, false, false, false);
         SubstituteForwards.invoke(rawRHS.data, primitiveBody, false, false, false);
@@ -102,10 +102,10 @@ public class SubstitutionTest extends StoreOperationsTests {
         TestUtils.assertEquals(expected, rationalRHS);
 
         Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(numbEquations, numbEquations);
-        cholesky.decompose(PrimitiveDenseStore.FACTORY.makeSPD(numbEquations));
+        cholesky.decompose(Primitive64Store.FACTORY.makeSPD(numbEquations));
 
         primitiveBody = cholesky.getL();
-        rationalBody = GenericDenseStore.RATIONAL.copy(primitiveBody);
+        rationalBody = GenericStore.RATIONAL.copy(primitiveBody);
 
         SubstituteForwards.invoke(denseRHS.data, numbEquations, 0, numbSolutions, primitiveBody, true, true, false);
         SubstituteForwards.invoke(rawRHS.data, primitiveBody, true, true, false);

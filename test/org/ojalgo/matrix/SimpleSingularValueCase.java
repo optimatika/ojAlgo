@@ -27,7 +27,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -78,11 +78,11 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        final PhysicalStore<Double> tmpExp = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getOriginal())
-                .multiply(PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getMatrixQ2())).copy();
+        final PhysicalStore<Double> tmpExp = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getOriginal())
+                .multiply(Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getMatrixQ2())).copy();
 
-        final PhysicalStore<Double> tmpAct = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getMatrixQ1())
-                .multiply(PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getMatrixD())).copy();
+        final PhysicalStore<Double> tmpAct = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getMatrixQ1())
+                .multiply(Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getMatrixD())).copy();
 
         TestUtils.assertEquals(tmpExp, tmpAct, evaluation);
     }
@@ -90,7 +90,7 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        final MatrixStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getOriginal());
+        final MatrixStore<Double> tmpA = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getOriginal());
 
         final SingularValue<Double> tmpSVD = SingularValue.make(tmpA);
         tmpSVD.decompose(tmpA);

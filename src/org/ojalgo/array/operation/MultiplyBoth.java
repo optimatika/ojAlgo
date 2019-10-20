@@ -26,9 +26,7 @@ import java.lang.reflect.Array;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
 import org.ojalgo.matrix.store.TransformableRegion;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
@@ -36,12 +34,27 @@ import org.ojalgo.structure.Structure2D;
 
 public final class MultiplyBoth implements ArrayOperation {
 
+    @FunctionalInterface
+    public interface Generic<N extends Scalar<N>> extends TransformableRegion.FillByMultiplying<N> {
+
+    }
+
+    @FunctionalInterface
+    public interface Primitive32 extends TransformableRegion.FillByMultiplying<Double> {
+
+    }
+
+    @FunctionalInterface
+    public interface Primitive64 extends TransformableRegion.FillByMultiplying<Double> {
+
+    }
+
     public static int THRESHOLD = 16;
 
-    static final PrimitiveMultiplyBoth PRIMITIVE = (product, left, complexity, right) -> MultiplyBoth.invokePrimitive(product, 0,
+    static final MultiplyBoth.Primitive64 PRIMITIVE = (product, left, complexity, right) -> MultiplyBoth.invokePrimitive(product, 0,
             ((int) left.count()) / complexity, left, complexity, right);
 
-    static final PrimitiveMultiplyBoth PRIMITIVE_0XN = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive64 PRIMITIVE_0XN = (product, left, complexity, right) -> {
 
         left.count();
         final int tmpColDim = (int) (right.count() / complexity);
@@ -87,7 +100,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyBoth PRIMITIVE_1X1 = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive64 PRIMITIVE_1X1 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
 
@@ -98,7 +111,7 @@ public final class MultiplyBoth implements ArrayOperation {
         product.set(0L, 0L, tmp00);
     };
 
-    static final PrimitiveMultiplyBoth PRIMITIVE_1XN = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive64 PRIMITIVE_1XN = (product, left, complexity, right) -> {
 
         final int tmpColDim = (int) (right.count() / complexity);
 
@@ -115,7 +128,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyBoth PRIMITIVE_2X2 = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive64 PRIMITIVE_2X2 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -147,7 +160,7 @@ public final class MultiplyBoth implements ArrayOperation {
         product.set(1, 1, tmp11);
     };
 
-    static final PrimitiveMultiplyBoth PRIMITIVE_3X3 = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive64 PRIMITIVE_3X3 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -199,7 +212,7 @@ public final class MultiplyBoth implements ArrayOperation {
         product.set(2, 2, tmp22);
     };
 
-    static final PrimitiveMultiplyBoth PRIMITIVE_4X4 = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive64 PRIMITIVE_4X4 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -277,7 +290,7 @@ public final class MultiplyBoth implements ArrayOperation {
         product.set(3, 3, tmp33);
     };
 
-    static final PrimitiveMultiplyBoth PRIMITIVE_5X5 = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive64 PRIMITIVE_5X5 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -387,7 +400,7 @@ public final class MultiplyBoth implements ArrayOperation {
         product.set(4, 4, tmp44);
     };
 
-    static final PrimitiveMultiplyBoth PRIMITIVE_6XN = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive64 PRIMITIVE_6XN = (product, left, complexity, right) -> {
 
         final int tmpColDim = (int) (right.count() / complexity);
 
@@ -420,7 +433,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyBoth PRIMITIVE_7XN = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive64 PRIMITIVE_7XN = (product, left, complexity, right) -> {
 
         left.count();
         final int tmpColDim = (int) (right.count() / complexity);
@@ -457,7 +470,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyBoth PRIMITIVE_8XN = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive64 PRIMITIVE_8XN = (product, left, complexity, right) -> {
 
         left.count();
         final int tmpColDim = (int) (right.count() / complexity);
@@ -497,7 +510,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyBoth PRIMITIVE_9XN = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive64 PRIMITIVE_9XN = (product, left, complexity, right) -> {
 
         left.count();
         final int tmpColDim = (int) (right.count() / complexity);
@@ -540,7 +553,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyBoth PRIMITIVE_MT = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive64 PRIMITIVE_MT = (product, left, complexity, right) -> {
 
         final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -553,7 +566,7 @@ public final class MultiplyBoth implements ArrayOperation {
         tmpConquerer.invoke(0, ((int) left.count()) / complexity, THRESHOLD);
     };
 
-    public static <N extends Scalar<N>> GenericMultiplyBoth<N> getGeneric(final long rows, final long columns) {
+    public static <N extends Scalar<N>> MultiplyBoth.Generic<N> newGeneric(final long rows, final long columns) {
 
         if (rows > THRESHOLD) {
 
@@ -576,7 +589,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     }
 
-    public static PrimitiveMultiplyBoth getPrimitive(final long rows, final long columns) {
+    public static MultiplyBoth.Primitive64 newPrimitive64(final long rows, final long columns) {
         if (rows > THRESHOLD) {
             return PRIMITIVE_MT;
         } else if (rows == 10) {
@@ -604,6 +617,10 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     }
 
+    public static MultiplyBoth.Primitive32 newPrimitive32(final int rows, final int columns) {
+        return null;
+    }
+
     static void invoke(final double[] product, final int firstColumn, final int columnLimit, final Access1D<Double> left, final int complexity,
             final Access1D<Double> right) {
 
@@ -629,8 +646,8 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     }
 
-    static <N extends Scalar<N>> void invokeGeneric(final TransformableRegion<N> product, final int firstRow, final int rowLimit,
-            final Access1D<N> left, final int complexity, final Access1D<N> right) {
+    static <N extends Scalar<N>> void invokeGeneric(final TransformableRegion<N> product, final int firstRow, final int rowLimit, final Access1D<N> left,
+            final int complexity, final Access1D<N> right) {
 
         @SuppressWarnings("unchecked")
         final Class<N> componenetType = (Class<N>) left.get(0L).getClass();

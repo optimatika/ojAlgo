@@ -25,7 +25,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D.Collectable;
 
@@ -34,7 +34,7 @@ abstract class DynamicEvD<N extends Comparable<N>> extends EigenvalueDecompositi
     static final class Primitive extends DynamicEvD<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY, new HermitianEvD.Primitive(), new GeneralEvD.Primitive());
+            super(Primitive64Store.FACTORY, new HermitianEvD.Primitive(), new GeneralEvD.Primitive());
         }
 
     }

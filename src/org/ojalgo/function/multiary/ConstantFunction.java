@@ -21,11 +21,11 @@
  */
 package org.ojalgo.function.multiary;
 
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -39,27 +39,27 @@ import org.ojalgo.structure.Access1D;
 public final class ConstantFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Constant<N> {
 
     public static ConstantFunction<ComplexNumber> makeComplex(final int arity) {
-        return new ConstantFunction<>(arity, GenericDenseStore.COMPLEX);
+        return new ConstantFunction<>(arity, GenericStore.COMPLEX);
     }
 
     public static ConstantFunction<ComplexNumber> makeComplex(final int arity, final Comparable<?> constant) {
-        return new ConstantFunction<>(arity, GenericDenseStore.COMPLEX, constant);
+        return new ConstantFunction<>(arity, GenericStore.COMPLEX, constant);
     }
 
     public static ConstantFunction<Double> makePrimitive(final int arity) {
-        return new ConstantFunction<>(arity, PrimitiveDenseStore.FACTORY);
+        return new ConstantFunction<>(arity, Primitive64Store.FACTORY);
     }
 
     public static ConstantFunction<Double> makePrimitive(final int arity, final Comparable<?> constant) {
-        return new ConstantFunction<>(arity, PrimitiveDenseStore.FACTORY, constant);
+        return new ConstantFunction<>(arity, Primitive64Store.FACTORY, constant);
     }
 
     public static ConstantFunction<RationalNumber> makeRational(final int arity) {
-        return new ConstantFunction<>(arity, GenericDenseStore.RATIONAL);
+        return new ConstantFunction<>(arity, GenericStore.RATIONAL);
     }
 
     public static ConstantFunction<RationalNumber> makeRational(final int arity, final Comparable<?> constant) {
-        return new ConstantFunction<>(arity, GenericDenseStore.RATIONAL, constant);
+        return new ConstantFunction<>(arity, GenericStore.RATIONAL, constant);
     }
 
     private final int myArity;

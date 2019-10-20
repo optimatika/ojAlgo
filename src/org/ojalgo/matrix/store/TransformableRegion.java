@@ -23,10 +23,10 @@ package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.MultiplyBoth;
+import org.ojalgo.array.operation.MultiplyBoth.Generic;
+import org.ojalgo.array.operation.MultiplyBoth.Primitive64;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
-import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
@@ -323,10 +323,10 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
 
             super();
 
-            if (multiplier instanceof PrimitiveMultiplyBoth) {
-                myMultiplier = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.getPrimitive(rows, columns);
-            } else if (multiplier instanceof GenericMultiplyBoth) {
-                myMultiplier = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.getGeneric(rows, columns);
+            if (multiplier instanceof MultiplyBoth.Primitive64) {
+                myMultiplier = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newPrimitive64(rows, columns);
+            } else if (multiplier instanceof MultiplyBoth.Generic) {
+                myMultiplier = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newGeneric(rows, columns);
             } else {
                 myMultiplier = multiplier;
             }

@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -74,7 +74,7 @@ public class P20030528Case extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(P20030528Case.getProblematic());
+        final PhysicalStore<Double> tmpA = Primitive64Store.FACTORY.copy(P20030528Case.getProblematic());
 
         final SingularValue<Double> tmpSVD = SingularValue.make(tmpA);
         tmpSVD.decompose(tmpA);

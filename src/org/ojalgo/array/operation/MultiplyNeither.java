@@ -25,22 +25,38 @@ import java.util.Arrays;
 
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyNeither;
-import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyNeither;
 import org.ojalgo.scalar.Scalar;
 
 public final class MultiplyNeither implements ArrayOperation {
 
+    public interface Generic<N extends Scalar<N>> {
+
+        void invoke(N[] product, N[] left, int complexity, N[] right, Scalar.Factory<N> scalar);
+
+    }
+
+    public interface Primitive64 {
+
+        void invoke(double[] product, double[] left, int complexity, double[] right);
+
+    }
+
+    public interface Primitive32 {
+
+        void invoke(float[] product, float[] left, int complexity, float[] right);
+
+    }
+
     public static int THRESHOLD = 32;
 
-    static final PrimitiveMultiplyNeither PRIMITIVE = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE = (product, left, complexity, right) -> {
 
         Arrays.fill(product, 0.0);
 
         MultiplyNeither.invoke(product, 0, right.length / complexity, left, complexity, right);
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE_0XN = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE_0XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 10;
         final int tmpColDim = right.length / complexity;
@@ -86,7 +102,7 @@ public final class MultiplyNeither implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE_1X1 = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE_1X1 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
 
@@ -99,7 +115,7 @@ public final class MultiplyNeither implements ArrayOperation {
         product[0] = tmp00;
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE_1XN = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE_1XN = (product, left, complexity, right) -> {
 
         final int tmpColDim = right.length / complexity;
 
@@ -116,7 +132,7 @@ public final class MultiplyNeither implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE_2X2 = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE_2X2 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -147,7 +163,7 @@ public final class MultiplyNeither implements ArrayOperation {
         product[3] = tmp11;
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE_3X3 = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE_3X3 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -197,7 +213,7 @@ public final class MultiplyNeither implements ArrayOperation {
         product[8] = tmp22;
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE_4X4 = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE_4X4 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -272,7 +288,7 @@ public final class MultiplyNeither implements ArrayOperation {
         product[15] = tmp33;
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE_5X5 = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE_5X5 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -378,7 +394,7 @@ public final class MultiplyNeither implements ArrayOperation {
         product[24] = tmp44;
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE_6XN = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE_6XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 6;
         final int tmpColDim = right.length / complexity;
@@ -412,7 +428,7 @@ public final class MultiplyNeither implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE_7XN = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE_7XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 7;
         final int tmpColDim = right.length / complexity;
@@ -449,7 +465,7 @@ public final class MultiplyNeither implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE_8XN = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE_8XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 8;
         final int tmpColDim = right.length / complexity;
@@ -489,7 +505,7 @@ public final class MultiplyNeither implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE_9XN = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE_9XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 9;
         final int tmpColDim = right.length / complexity;
@@ -532,7 +548,7 @@ public final class MultiplyNeither implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyNeither PRIMITIVE_MT = (product, left, complexity, right) -> {
+    static final MultiplyNeither.Primitive64 PRIMITIVE_MT = (product, left, complexity, right) -> {
 
         Arrays.fill(product, 0.0);
 
@@ -547,7 +563,7 @@ public final class MultiplyNeither implements ArrayOperation {
         tmpConquerer.invoke(0, right.length / complexity, THRESHOLD);
     };
 
-    public static <N extends Scalar<N>> GenericMultiplyNeither<N> getGeneric(final long rows, final long columns) {
+    public static <N extends Scalar<N>> MultiplyNeither.Generic<N> newGeneric(final long rows, final long columns) {
 
         if (rows > THRESHOLD) {
 
@@ -577,7 +593,7 @@ public final class MultiplyNeither implements ArrayOperation {
         }
     }
 
-    public static PrimitiveMultiplyNeither getPrimitive(final long rows, final long columns) {
+    public static MultiplyNeither.Primitive64 newPrimitive64(final long rows, final long columns) {
         if (rows > THRESHOLD) {
             return PRIMITIVE_MT;
         } else if (rows == 10) {
@@ -603,6 +619,10 @@ public final class MultiplyNeither implements ArrayOperation {
         } else {
             return PRIMITIVE;
         }
+    }
+
+    public static MultiplyNeither.Primitive32 newPrimitive32(final long rows, final long columns) {
+        return null;
     }
 
     static void invoke(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {

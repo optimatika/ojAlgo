@@ -30,7 +30,7 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
@@ -59,7 +59,7 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
             extends MatrixFactory<Double, PrimitiveMatrix, PrimitiveMatrix.LogicalBuilder, PrimitiveMatrix.DenseReceiver, PrimitiveMatrix.SparseReceiver> {
 
         Factory() {
-            super(PrimitiveMatrix.class, PrimitiveDenseStore.FACTORY);
+            super(PrimitiveMatrix.class, Primitive64Store.FACTORY);
         }
 
         @Override
@@ -133,9 +133,9 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
 
             return ((PrimitiveMatrix) matrix).getStore();
 
-        } else if (matrix instanceof PrimitiveDenseStore) {
+        } else if (matrix instanceof Primitive64Store) {
 
-            return (PrimitiveDenseStore) matrix;
+            return (Primitive64Store) matrix;
 
         } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof Double)) {
 

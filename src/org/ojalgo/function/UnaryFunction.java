@@ -42,6 +42,10 @@ public interface UnaryFunction<N extends Comparable<N>> extends BasicFunction, U
                 return after.invoke(UnaryFunction.this.invoke(arg));
             }
 
+            public float invoke(final float arg) {
+                return after.invoke(UnaryFunction.this.invoke(arg));
+            }
+
             public N invoke(final N arg) {
                 return after.invoke(UnaryFunction.this.invoke(arg));
             }
@@ -69,10 +73,16 @@ public interface UnaryFunction<N extends Comparable<N>> extends BasicFunction, U
                 return UnaryFunction.this.invoke(before.invoke(arg));
             }
 
+            public float invoke(float arg) {
+                return UnaryFunction.this.invoke(before.invoke(arg));
+            }
+
         };
     }
 
     double invoke(double arg);
+
+    float invoke(float arg);
 
     N invoke(N arg);
 

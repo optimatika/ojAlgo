@@ -34,7 +34,7 @@ import org.ojalgo.matrix.decomposition.MatrixDecomposition.EconomySize;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.Uniform;
@@ -57,7 +57,7 @@ public class DesignCase extends MatrixDecompositionTests {
     public void testCholeskySolveInverse() {
 
         PhysicalStore<ComplexNumber> randomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
-        PhysicalStore<Double> vctrs = PrimitiveDenseStore.FACTORY.copy(randomComplexStore);
+        PhysicalStore<Double> vctrs = Primitive64Store.FACTORY.copy(randomComplexStore);
         MatrixStore<Double> mtrx = vctrs.multiply(vctrs.transpose());
 
         for (Cholesky<Double> decomp : MatrixDecompositionTests.getPrimitiveCholesky()) {
@@ -70,8 +70,8 @@ public class DesignCase extends MatrixDecompositionTests {
 
         NumberContext precision = new NumberContext(12, 8);
 
-        MatrixStore<Double> tall = PrimitiveDenseStore.FACTORY.makeFilled(7, 5, new Uniform());
-        MatrixStore<Double> fat = PrimitiveDenseStore.FACTORY.makeFilled(5, 7, new Uniform());
+        MatrixStore<Double> tall = Primitive64Store.FACTORY.makeFilled(7, 5, new Uniform());
+        MatrixStore<Double> fat = Primitive64Store.FACTORY.makeFilled(5, 7, new Uniform());
 
         @SuppressWarnings("unchecked")
         EconomySize<Double>[] all = (EconomySize<Double>[]) new EconomySize<?>[] { new BidiagonalDecomposition.Primitive(true),
@@ -157,8 +157,8 @@ public class DesignCase extends MatrixDecompositionTests {
     @Test
     public void testRandomUnderdetermined() {
 
-        PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.makeFilled(3, 9, new Normal());
-        PhysicalStore<Double> tmpB = PrimitiveDenseStore.FACTORY.makeFilled(3, 1, new Normal());
+        PhysicalStore<Double> tmpA = Primitive64Store.FACTORY.makeFilled(3, 9, new Normal());
+        PhysicalStore<Double> tmpB = Primitive64Store.FACTORY.makeFilled(3, 1, new Normal());
 
         QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.decompose(tmpA);
@@ -174,7 +174,7 @@ public class DesignCase extends MatrixDecompositionTests {
     @Test
     public void testSolvable() {
 
-        PhysicalStore<Double> matrix = PrimitiveDenseStore.FACTORY.makeSPD(9);
+        PhysicalStore<Double> matrix = Primitive64Store.FACTORY.makeSPD(9);
 
         List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();
         for (MatrixDecomposition.Solver<Double> decomposition : all) {
@@ -189,7 +189,7 @@ public class DesignCase extends MatrixDecompositionTests {
     public void testSolveIdentity() {
 
         Access2D<?> identity = MatrixStore.PRIMITIVE.makeIdentity(9).get();
-        Access2D<?> random = PrimitiveDenseStore.FACTORY.makeFilled(9, 1, new Uniform());
+        Access2D<?> random = Primitive64Store.FACTORY.makeFilled(9, 1, new Uniform());
 
         List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();
         for (Solver<Double> solver : all) {
@@ -205,7 +205,7 @@ public class DesignCase extends MatrixDecompositionTests {
     public void testSolveInverse() {
 
         PhysicalStore<ComplexNumber> randomComplexStore = TestUtils.makeRandomComplexStore(4, 9);
-        PhysicalStore<Double> vectors = PrimitiveDenseStore.FACTORY.copy(randomComplexStore);
+        PhysicalStore<Double> vectors = Primitive64Store.FACTORY.copy(randomComplexStore);
         MatrixStore<Double> matrix = vectors.multiply(vectors.transpose());
 
         List<Solver<Double>> all = MatrixDecompositionTests.getPrimitiveMatrixDecompositionSolver();
@@ -220,7 +220,7 @@ public class DesignCase extends MatrixDecompositionTests {
         Tridiagonal<Double> tmpDecomposition = Tridiagonal.PRIMITIVE.make();
         //  Tridiagonal<Double> tmpDecomposition = new TridiagonalAltDecomp();
 
-        PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
+        PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY
                 .rows(new double[][] { { 4, 2, 2, 1 }, { 2, -3, 1, 1 }, { 2, 1, 3, 1 }, { 1, 1, 1, 2 } });
 
         tmpDecomposition.decompose(tmpOriginalMatrix);
@@ -234,7 +234,7 @@ public class DesignCase extends MatrixDecompositionTests {
     @Test
     public void testWikipediaNullspace() {
 
-        PhysicalStore<Double> mtrxA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2, 3, 5 }, { -4, 2, 3 } });
+        PhysicalStore<Double> mtrxA = Primitive64Store.FACTORY.rows(new double[][] { { 2, 3, 5 }, { -4, 2, 3 } });
         MatrixStore<Double> mtrxAt = mtrxA.transpose();
 
         NumberContext precision = new NumberContext(14, 8);
@@ -260,7 +260,7 @@ public class DesignCase extends MatrixDecompositionTests {
         double scalePriSVD = PrimitiveMath.ABS.invoke(nullspacePriSVD.doubleValue(0));
         nullspacePriSVD.modifyAll(PrimitiveMath.DIVIDE.second(scalePriSVD));
 
-        PrimitiveDenseStore nullspace = PrimitiveDenseStore.FACTORY.columns(new double[] { -1, -26, 16 });
+        Primitive64Store nullspace = Primitive64Store.FACTORY.columns(new double[] { -1, -26, 16 });
 
         TestUtils.assertEquals(nullspace, nullspacePriQR, precision);
         TestUtils.assertEquals(nullspace, nullspacePriSVD, precision);
@@ -272,7 +272,7 @@ public class DesignCase extends MatrixDecompositionTests {
     @Test
     public void testWikipediaSVD() {
 
-        PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
+        PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
         Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
 
@@ -305,7 +305,7 @@ public class DesignCase extends MatrixDecompositionTests {
         TestUtils.assertTrue("Decomposition not solvable", solver.isSolvable());
 
         int dim = MissingMath.toMinIntExact(matrix.countRows(), matrix.countColumns());
-        PhysicalStore<Double> tmpEye = PrimitiveDenseStore.FACTORY.makeEye(dim, dim);
+        PhysicalStore<Double> tmpEye = Primitive64Store.FACTORY.makeEye(dim, dim);
 
         MatrixStore<Double> tmpDirInv = solver.getInverse();
         MatrixStore<Double> tmpSolInv = solver.getSolution(tmpEye);

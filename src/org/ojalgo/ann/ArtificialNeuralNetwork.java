@@ -32,7 +32,7 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
@@ -64,7 +64,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
          * training.
          */
         SOFTMAX(args -> {
-            PrimitiveDenseStore parts = args.copy();
+            Primitive64Store parts = args.copy();
             parts.modifyAll(EXP);
             final double total = parts.aggregateAll(Aggregator.SUM);
             return arg -> EXP.invoke(arg) / total;
@@ -88,7 +88,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
             return myDerivativeInTermsOfOutput;
         }
 
-        PrimitiveFunction.Unary getFunction(final PrimitiveDenseStore arguments) {
+        PrimitiveFunction.Unary getFunction(final Primitive64Store arguments) {
             return myFunction.make(arguments);
         }
 
@@ -138,7 +138,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
 
     interface ActivatorFunctionFactory {
 
-        PrimitiveFunction.Unary make(PrimitiveDenseStore arguments);
+        PrimitiveFunction.Unary make(Primitive64Store arguments);
 
     }
 
@@ -216,7 +216,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return myLayers[index];
     }
 
-    PrimitiveDenseStore getOutput(final int layer) {
+    Primitive64Store getOutput(final int layer) {
         return myLayers[layer].getOutput();
     }
 

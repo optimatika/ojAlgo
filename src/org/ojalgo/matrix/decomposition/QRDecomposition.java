@@ -26,10 +26,10 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
@@ -49,7 +49,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         Complex(final boolean fullSize) {
-            super(GenericDenseStore.COMPLEX, fullSize);
+            super(GenericStore.COMPLEX, fullSize);
         }
 
     }
@@ -61,7 +61,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         Primitive(final boolean fullSize) {
-            super(PrimitiveDenseStore.FACTORY, fullSize);
+            super(Primitive64Store.FACTORY, fullSize);
         }
 
     }
@@ -73,7 +73,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         Quat(final boolean fullSize) {
-            super(GenericDenseStore.QUATERNION, fullSize);
+            super(GenericStore.QUATERNION, fullSize);
         }
 
     }
@@ -85,7 +85,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         }
 
         Rational(final boolean fullSize) {
-            super(GenericDenseStore.RATIONAL, fullSize);
+            super(GenericStore.RATIONAL, fullSize);
         }
 
     }

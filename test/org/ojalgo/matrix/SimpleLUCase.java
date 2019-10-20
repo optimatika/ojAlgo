@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.LU;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -84,9 +84,9 @@ public class SimpleLUCase extends BasicMatrixTest {
         // PLDU
 
         final LU<RationalNumber> tmpLU = LU.RATIONAL.make();
-        tmpLU.decompose(GenericDenseStore.RATIONAL.copy(SimpleLUCase.getOrginal()));
+        tmpLU.decompose(GenericStore.RATIONAL.copy(SimpleLUCase.getOrginal()));
 
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(SimpleLUCase.getOrginal()), tmpLU, evaluation);
+        TestUtils.assertEquals(GenericStore.RATIONAL.copy(SimpleLUCase.getOrginal()), tmpLU, evaluation);
     }
 
 }

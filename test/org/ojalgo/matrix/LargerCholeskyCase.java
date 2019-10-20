@@ -25,10 +25,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
@@ -58,7 +58,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         rationalAB = LargerCholeskyCase.getOriginal();
 
         final Cholesky<RationalNumber> tmpCholesky = Cholesky.RATIONAL.make();
-        tmpCholesky.decompose(GenericDenseStore.RATIONAL.copy(rationalAB));
+        tmpCholesky.decompose(GenericStore.RATIONAL.copy(rationalAB));
 
         rationalAA = RationalMatrix.FACTORY.copy(tmpCholesky.getL());
         rationalAX = rationalAA.transpose();
@@ -72,7 +72,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
-        final MatrixStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY.copy(LargerCholeskyCase.getOriginal());
+        final MatrixStore<Double> tmpMtrx = Primitive64Store.FACTORY.copy(LargerCholeskyCase.getOriginal());
         final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
         tmpDecomp.decompose(tmpMtrx);
         TestUtils.assertEquals(true, tmpDecomp.isSolvable());
@@ -83,9 +83,9 @@ public class LargerCholeskyCase extends BasicMatrixTest {
 
         final RationalMatrix tmpMtrx = LargerCholeskyCase.getOriginal();
         final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
-        tmpDecomp.decompose(PrimitiveDenseStore.FACTORY.copy(tmpMtrx));
+        tmpDecomp.decompose(Primitive64Store.FACTORY.copy(tmpMtrx));
 
-        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpMtrx), tmpDecomp, evaluation);
+        TestUtils.assertEquals(Primitive64Store.FACTORY.copy(tmpMtrx), tmpDecomp, evaluation);
     }
 
 }

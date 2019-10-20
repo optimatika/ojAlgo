@@ -37,7 +37,7 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.CharacterRing;
 import org.ojalgo.netio.CharacterRing.PrinterBuffer;
@@ -488,7 +488,7 @@ public final class IntegerSolver extends GenericSolver {
 
     @Override
     protected MatrixStore<Double> extractSolution() {
-        return PrimitiveDenseStore.FACTORY.columns(this.getBestResultSoFar());
+        return Primitive64Store.FACTORY.columns(this.getBestResultSoFar());
     }
 
     protected Optimisation.Result getBestEstimate() {
