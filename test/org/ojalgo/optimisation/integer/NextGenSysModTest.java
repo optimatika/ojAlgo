@@ -31,7 +31,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -1208,16 +1208,16 @@ public class NextGenSysModTest {
             return myCovarianceMtrx.length;
         }
 
-        public PrimitiveMatrix toCleanedCovariances() {
+        public Primitive64Matrix toCleanedCovariances() {
             return NextGenSysModTest.toCovariances(this.toVolatilities(), this.toCorrelations());
         }
 
-        public PrimitiveMatrix toCorrelations() {
-            return NextGenSysModTest.toCorrelations(PrimitiveMatrix.FACTORY.rows(myCovarianceMtrx), true);
+        public Primitive64Matrix toCorrelations() {
+            return NextGenSysModTest.toCorrelations(Primitive64Matrix.FACTORY.rows(myCovarianceMtrx), true);
         }
 
-        public PrimitiveMatrix toVolatilities() {
-            return NextGenSysModTest.toVolatilities(PrimitiveMatrix.FACTORY.rows(myCovarianceMtrx), true);
+        public Primitive64Matrix toVolatilities() {
+            return NextGenSysModTest.toVolatilities(Primitive64Matrix.FACTORY.rows(myCovarianceMtrx), true);
         }
 
     }
@@ -1248,7 +1248,7 @@ public class NextGenSysModTest {
 
     public static ExpressionsBasedModel buildModel(final CaseData data) {
 
-        PrimitiveMatrix covar = data.toCleanedCovariances();
+        Primitive64Matrix covar = data.toCleanedCovariances();
 
         ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
@@ -1303,7 +1303,7 @@ public class NextGenSysModTest {
 
     public static Optimisation.Result solveSequentially(final CaseData data) {
 
-        PrimitiveMatrix covar = data.toCleanedCovariances();
+        Primitive64Matrix covar = data.toCleanedCovariances();
 
         int numberOfAssets = data.numberOfAssets();
 
@@ -1385,7 +1385,7 @@ public class NextGenSysModTest {
      * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
      * </p>
      */
-    static PrimitiveMatrix toCorrelations(final Access2D<?> covariances, final boolean clean) {
+    static Primitive64Matrix toCorrelations(final Access2D<?> covariances, final boolean clean) {
 
         int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
 
@@ -1411,7 +1411,7 @@ public class NextGenSysModTest {
             covarianceMtrx = mtrxV.multiply(mtrxD).multiply(mtrxV.transpose());
         }
 
-        PrimitiveMatrix.DenseReceiver retVal = PrimitiveMatrix.FACTORY.makeDense(size, size);
+        Primitive64Matrix.DenseReceiver retVal = Primitive64Matrix.FACTORY.makeDense(size, size);
 
         double[] volatilities = new double[size];
         for (int ij = 0; ij < size; ij++) {
@@ -1454,11 +1454,11 @@ public class NextGenSysModTest {
      * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
      * </p>
      */
-    static PrimitiveMatrix toCovariances(final Access1D<?> volatilities, final Access2D<?> correlations) {
+    static Primitive64Matrix toCovariances(final Access1D<?> volatilities, final Access2D<?> correlations) {
 
         int tmpSize = (int) volatilities.count();
 
-        PrimitiveMatrix.DenseReceiver retVal = PrimitiveMatrix.FACTORY.makeDense(tmpSize, tmpSize);
+        Primitive64Matrix.DenseReceiver retVal = Primitive64Matrix.FACTORY.makeDense(tmpSize, tmpSize);
 
         for (int j = 0; j < tmpSize; j++) {
             double tmpColumnVolatility = volatilities.doubleValue(j);
@@ -1482,11 +1482,11 @@ public class NextGenSysModTest {
      * Copied from ojAlgo-finance v2.1.1-SNAPSHOT (2019-05-23) org.ojalgo.finance.FinanceUtils.
      * </p>
      */
-    static PrimitiveMatrix toVolatilities(final Access2D<?> covariances, final boolean clean) {
+    static Primitive64Matrix toVolatilities(final Access2D<?> covariances, final boolean clean) {
 
         int size = Math.toIntExact(Math.min(covariances.countRows(), covariances.countColumns()));
 
-        PrimitiveMatrix.DenseReceiver retVal = PrimitiveMatrix.FACTORY.makeDense(size);
+        Primitive64Matrix.DenseReceiver retVal = Primitive64Matrix.FACTORY.makeDense(size);
 
         if (clean) {
 

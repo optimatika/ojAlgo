@@ -92,7 +92,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
         final MatrixStore<Double> tmpD = tmpEigen.getD();
 
         expMtrx = SimpleEigenvalueCase.getMatrixD();
-        actMtrx = PrimitiveMatrix.FACTORY.copy(tmpD);
+        actMtrx = Primitive64Matrix.FACTORY.copy(tmpD);
 
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 

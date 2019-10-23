@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -102,7 +102,7 @@ public class CaseTridiagonal extends MatrixDecompositionTests {
     @Tag("unstable")
     public void testTypesWithRandom() {
 
-        PrimitiveMatrix tmpSymmetricRandoml = PrimitiveMatrix.FACTORY.makeFilled(9, 9, new Normal());
+        Primitive64Matrix tmpSymmetricRandoml = Primitive64Matrix.FACTORY.makeFilled(9, 9, new Normal());
         tmpSymmetricRandoml = tmpSymmetricRandoml.add(tmpSymmetricRandoml.transpose());
 
         final MatrixStore<Double> primitiveA = Primitive64Store.FACTORY.copy(tmpSymmetricRandoml);

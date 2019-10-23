@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -416,7 +416,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         }
         data[0][1] = 1.01;
 
-        PrimitiveMatrix input = PrimitiveMatrix.FACTORY.rows(data);
+        Primitive64Matrix input = Primitive64Matrix.FACTORY.rows(data);
         try {
             //   SingularValue<Double> svd = SingularValue.make(input);
             SingularValue<Double> svd = new SingularValueDecomposition.Primitive();

@@ -85,11 +85,11 @@ public abstract class BasicMatrixTest extends MatrixTests {
     Comparable<?> expNumber;
     Scalar<?> expScalar;
     double expValue;
-    PrimitiveMatrix primitiveAA;
-    PrimitiveMatrix primitiveAB;
-    PrimitiveMatrix primitiveAX;
-    PrimitiveMatrix primitiveI;
-    PrimitiveMatrix primitiveSafe;
+    Primitive64Matrix primitiveAA;
+    Primitive64Matrix primitiveAB;
+    Primitive64Matrix primitiveAX;
+    Primitive64Matrix primitiveI;
+    Primitive64Matrix primitiveSafe;
     QuaternionMatrix quaternionAA;
     QuaternionMatrix quaternionAB;
     QuaternionMatrix quaternionAX;
@@ -106,11 +106,11 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         TestUtils.minimiseAllBranchLimits();
 
-        primitiveAA = PrimitiveMatrix.FACTORY.copy(rationalAA);
-        primitiveAX = PrimitiveMatrix.FACTORY.copy(rationalAX);
-        primitiveAB = PrimitiveMatrix.FACTORY.copy(rationalAB);
-        primitiveI = PrimitiveMatrix.FACTORY.copy(rationlI);
-        primitiveSafe = PrimitiveMatrix.FACTORY.copy(rationalSafe);
+        primitiveAA = Primitive64Matrix.FACTORY.copy(rationalAA);
+        primitiveAX = Primitive64Matrix.FACTORY.copy(rationalAX);
+        primitiveAB = Primitive64Matrix.FACTORY.copy(rationalAB);
+        primitiveI = Primitive64Matrix.FACTORY.copy(rationlI);
+        primitiveSafe = Primitive64Matrix.FACTORY.copy(rationalSafe);
 
         complexAA = ComplexMatrix.FACTORY.copy(rationalAA);
         complexAX = ComplexMatrix.FACTORY.copy(rationalAX);
@@ -167,7 +167,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        final BasicMatrix.PhysicalReceiver<Double, PrimitiveMatrix> tmpPrimitiveBuilder = primitiveAA.copy();
+        final BasicMatrix.PhysicalReceiver<Double, Primitive64Matrix> tmpPrimitiveBuilder = primitiveAA.copy();
         tmpPrimitiveBuilder.add(tmpRow, tmpCol, bigNumber);
         actMtrx = tmpPrimitiveBuilder.build();
 
@@ -213,7 +213,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         copyRational.modifyMatching(RationalMath.DIVIDE, rationalSafe);
         expMtrx = copyRational.get();
 
-        PhysicalReceiver<Double, PrimitiveMatrix> copyPrimitive = primitiveAA.copy();
+        PhysicalReceiver<Double, Primitive64Matrix> copyPrimitive = primitiveAA.copy();
         copyPrimitive.modifyMatching(PrimitiveMath.DIVIDE, primitiveSafe);
         actMtrx = copyPrimitive.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
@@ -690,7 +690,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
         copyRational.modifyMatching(RationalMath.MULTIPLY, rationalSafe);
         expMtrx = copyRational.get();
 
-        PhysicalReceiver<Double, PrimitiveMatrix> copyPrimitive = primitiveAA.copy();
+        PhysicalReceiver<Double, Primitive64Matrix> copyPrimitive = primitiveAA.copy();
         copyPrimitive.modifyMatching(PrimitiveMath.MULTIPLY, primitiveSafe);
         actMtrx = copyPrimitive.get();
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
@@ -773,7 +773,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
 
-        final BasicMatrix.PhysicalReceiver<Double, PrimitiveMatrix> tmpPrimitiveBuilder = primitiveAA.copy();
+        final BasicMatrix.PhysicalReceiver<Double, Primitive64Matrix> tmpPrimitiveBuilder = primitiveAA.copy();
         tmpPrimitiveBuilder.set(tmpRow, tmpCol, bigNumber);
         actMtrx = tmpPrimitiveBuilder.build();
 

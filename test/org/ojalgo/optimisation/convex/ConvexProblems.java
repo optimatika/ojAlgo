@@ -36,7 +36,7 @@ import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.function.multiary.QuadraticFunction;
-import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -60,12 +60,12 @@ public class ConvexProblems extends OptimisationConvexTests {
     public static ExpressionsBasedModel buildP20080117() {
 
         // create expected returns matrix
-        PrimitiveMatrix tmpReturns = PrimitiveMatrix.FACTORY.rows(new double[][] { { -0.007155942261937039 }, { -0.003665887902733331 },
+        Primitive64Matrix tmpReturns = Primitive64Matrix.FACTORY.rows(new double[][] { { -0.007155942261937039 }, { -0.003665887902733331 },
                 { -0.004130184341000032 }, { -0.005639860515211043 }, { 0.0007211966666666817 }, { 0.0003258225000000077 }, { -0.005754291666666666 },
                 { -0.004264291666666667 }, { -0.0017500000000000003 } });
 
         // create covariance matrix
-        PrimitiveMatrix tmpCovariances = PrimitiveMatrix.FACTORY.rows(new double[][] {
+        Primitive64Matrix tmpCovariances = Primitive64Matrix.FACTORY.rows(new double[][] {
                 { 0.001561410465201063, 0.00006366128201274021, -0.0001323096896759724, 0.0000909074052724909, 0.00003172000033558704, 0.00001955483223848944,
                         -0.00013771504482647386, -0.00004858457275314645, -0.000012954723060403266 },
                 { 0.00006366128201274021, 0.00016419786524761803, -0.00001566288911558343, -0.00008688646089751923, 0.0000027349925543017186,
@@ -339,11 +339,11 @@ public class ConvexProblems extends OptimisationConvexTests {
     public void testP20080118() {
 
         // create expected returns matrix
-        PrimitiveMatrix expectedReturnsMatrix = PrimitiveMatrix.FACTORY.rows(new double[][] { { 10.003264 }, { 9.989771 }, { 9.987513 }, { 9.988449 },
+        Primitive64Matrix expectedReturnsMatrix = Primitive64Matrix.FACTORY.rows(new double[][] { { 10.003264 }, { 9.989771 }, { 9.987513 }, { 9.988449 },
                 { 9.996579 }, { 9.990690 }, { 9.994904 }, { 9.994514 }, { 9.984064 }, { 9.987534 } });
 
         // create covariance matrix
-        PrimitiveMatrix covarianceMatrix = PrimitiveMatrix.FACTORY.rows(new double[][] {
+        Primitive64Matrix covarianceMatrix = Primitive64Matrix.FACTORY.rows(new double[][] {
                 { 6.483565230120298E-4, -1.3344603795915894E-4, -4.610345510893708E-4, -7.334405624030001E-4, 1.1551383115707195E-5, -0.00104145662863434,
                         -1.0725896685568462E-4, -1.221384153392056E-4, -4.173413644389791E-4, -2.4861043894946935E-4 },
                 { -1.3344603795915894E-4, 0.0026045957224784455, 0.0012394355327235707, 9.243919166568456E-4, -8.653805945112411E-5, 8.100239312410631E-4,
@@ -420,10 +420,10 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20080124() {
         // create expected returns matrix
-        PrimitiveMatrix expectedReturnsMatrix = PrimitiveMatrix.FACTORY.rows(new double[][] { { 10.012158 }, { 9.996046 }, { 10.000744 }, { 9.990585 },
+        Primitive64Matrix expectedReturnsMatrix = Primitive64Matrix.FACTORY.rows(new double[][] { { 10.012158 }, { 9.996046 }, { 10.000744 }, { 9.990585 },
                 { 9.998392 }, { 9.996614 }, { 10.010531 }, { 10.001401 }, { 9.997447 }, { 9.993817 }, { 9.998537 }, { 9.995741 }, { 9.987224 }, { 9.992392 } });
         // create covariance matrix
-        PrimitiveMatrix covarianceMatrix = PrimitiveMatrix.FACTORY.rows(new double[][] {
+        Primitive64Matrix covarianceMatrix = Primitive64Matrix.FACTORY.rows(new double[][] {
                 { 0.0013191354374342357, 7.786471466322114E-5, -3.810886655309235E-5, -2.28102405899103E-4, -1.2589115740653127E-4, -1.3247692268411991E-5,
                         1.422624656557158E-4, -2.7176361887359125E-5, 8.675127894495302E-5, -8.116577287090551E-5, -8.468380774247271E-6, 4.930080166695193E-5,
                         -2.774138231533918E-4, -3.148322898570031E-5 },
@@ -526,10 +526,10 @@ public class ConvexProblems extends OptimisationConvexTests {
     public void testP20080204() {
 
         // create expected returns matrix
-        PrimitiveMatrix tmpExpectedReturns = PrimitiveMatrix.FACTORY.rows(new double[][] { { 9.994620 }, { 10.011389 }, { 10.004353 }, { 9.998293 },
+        Primitive64Matrix tmpExpectedReturns = Primitive64Matrix.FACTORY.rows(new double[][] { { 9.994620 }, { 10.011389 }, { 10.004353 }, { 9.998293 },
                 { 10.056851 }, { 9.997920 }, { 9.999011 }, { 10.050971 }, { 9.989124 }, { 9.989912 } });
         // create covariance matrix
-        PrimitiveMatrix tmpCovariances = PrimitiveMatrix.FACTORY.rows(new double[][] {
+        Primitive64Matrix tmpCovariances = Primitive64Matrix.FACTORY.rows(new double[][] {
                 { 0.014531344652473037, 4.444675045533674E-4, 0.007234717654072837, -9.455312097865225E-4, 0.0016345464996349748, 1.5256808879495097E-4,
                         0.00226325818749439, 0.003534367267672946, -4.2669306842991344E-5, 6.902267133060073E-5 },
                 { 4.444675045533674E-4, 0.008511422662647488, 0.0039821105759899845, 5.543408872612397E-4, -0.0015797828516888929, 1.3505400134130176E-4,
@@ -608,11 +608,11 @@ public class ConvexProblems extends OptimisationConvexTests {
     public void testP20080208() {
 
         // create expected returns matrix
-        PrimitiveMatrix tmpExpectedReturns = PrimitiveMatrix.FACTORY.rows(new double[][] { { 9.997829 }, { 10.008909 }, { 10.010849 }, { 9.998919 },
+        Primitive64Matrix tmpExpectedReturns = Primitive64Matrix.FACTORY.rows(new double[][] { { 9.997829 }, { 10.008909 }, { 10.010849 }, { 9.998919 },
                 { 10.055549 }, { 9.999127 }, { 9.999720 }, { 10.049002 }, { 9.988769 }, { 9.990095 } });
 
         // create covariance matrix
-        PrimitiveMatrix tmpCovariances = PrimitiveMatrix.FACTORY.rows(new double[][] {
+        Primitive64Matrix tmpCovariances = Primitive64Matrix.FACTORY.rows(new double[][] {
                 { 0.014661954677318977, 3.459112088561122E-4, 0.007798752920910871, 0.0020921425081866503, 0.001846944297640248, 1.0531906931335766E-4,
                         -2.7515614291198E-4, 0.0034083900074454894, 1.1859491261103433E-4, -0.0027421673864628264 },
                 { 3.459112088561122E-4, 0.008695862475003915, 0.004154360841751649, -2.661685231819661E-4, -0.0015999007544258263, 3.590680217774603E-4,
@@ -695,10 +695,10 @@ public class ConvexProblems extends OptimisationConvexTests {
     @Test
     public void testP20080819() {
 
-        PrimitiveMatrix.Factory tmpMtrxFact = PrimitiveMatrix.FACTORY;
+        Primitive64Matrix.Factory tmpMtrxFact = Primitive64Matrix.FACTORY;
         NumberContext tmpEvalCntxt = StandardType.DECIMAL_032;
 
-        PrimitiveMatrix[] tmpMatrices = new PrimitiveMatrix[8];
+        Primitive64Matrix[] tmpMatrices = new Primitive64Matrix[8];
 
         tmpMatrices[0] = tmpMtrxFact.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0 } });
         tmpMatrices[1] = tmpMtrxFact.rows(new double[][] { { 1.0 } });
@@ -1069,7 +1069,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
             TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-            TestUtils.assertEquals(PrimitiveMatrix.FACTORY.rows(new double[][] { { 0.68888888888888888 }, { 0.311111111111111111 }, { 0.0 } }),
+            TestUtils.assertEquals(Primitive64Matrix.FACTORY.rows(new double[][] { { 0.68888888888888888 }, { 0.311111111111111111 }, { 0.0 } }),
                     RationalMatrix.FACTORY.columns(tmpResult));
         }
     }

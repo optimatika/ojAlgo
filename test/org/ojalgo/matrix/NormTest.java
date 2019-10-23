@@ -45,7 +45,7 @@ public class NormTest extends MatrixTests {
         final double actual1 = svd.getOperatorNorm();
         TestUtils.assertEquals(expected, actual1);
 
-        PrimitiveMatrix copied = PrimitiveMatrix.FACTORY.copy(cmplx);
+        Primitive64Matrix copied = Primitive64Matrix.FACTORY.copy(cmplx);
         final double actual2 = copied.norm();
         TestUtils.assertEquals(expected, actual2);
     }
@@ -64,7 +64,7 @@ public class NormTest extends MatrixTests {
         final double actual1 = svd.getOperatorNorm();
         TestUtils.assertEquals(expected, actual1);
 
-        PrimitiveMatrix copied = PrimitiveMatrix.FACTORY.copy(quat);
+        Primitive64Matrix copied = Primitive64Matrix.FACTORY.copy(quat);
         final double actual2 = copied.norm();
         TestUtils.assertEquals(expected, actual2);
     }

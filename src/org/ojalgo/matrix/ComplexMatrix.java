@@ -125,29 +125,29 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     /**
      * @return A primitive double valued matrix containg this matrix' element arguments
      */
-    public PrimitiveMatrix getArgument() {
-        return PrimitiveMatrix.FACTORY.instantiate(Primitive64Store.getComplexArgument(this.getStore()));
+    public Primitive64Matrix getArgument() {
+        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexArgument(this.getStore()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element imaginary parts
      */
-    public PrimitiveMatrix getImaginary() {
-        return PrimitiveMatrix.FACTORY.instantiate(Primitive64Store.getComplexImaginary(this.getStore()));
+    public Primitive64Matrix getImaginary() {
+        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexImaginary(this.getStore()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element modulus
      */
-    public PrimitiveMatrix getModulus() {
-        return PrimitiveMatrix.FACTORY.instantiate(Primitive64Store.getComplexModulus(this.getStore()));
+    public Primitive64Matrix getModulus() {
+        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexModulus(this.getStore()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element real parts
      */
-    public PrimitiveMatrix getReal() {
-        return PrimitiveMatrix.FACTORY.instantiate(Primitive64Store.getComplexReal(this.getStore()));
+    public Primitive64Matrix getReal() {
+        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexReal(this.getStore()));
     }
 
     @Override
