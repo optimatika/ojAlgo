@@ -55,8 +55,8 @@ public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matr
 
     }
 
-    public static final class Factory
-            extends MatrixFactory<Double, Primitive64Matrix, Primitive64Matrix.LogicalBuilder, Primitive64Matrix.DenseReceiver, Primitive64Matrix.SparseReceiver> {
+    public static final class Factory extends
+            MatrixFactory<Double, Primitive64Matrix, Primitive64Matrix.LogicalBuilder, Primitive64Matrix.DenseReceiver, Primitive64Matrix.SparseReceiver> {
 
         Factory() {
             super(Primitive64Matrix.class, Primitive64Store.FACTORY);

@@ -75,8 +75,7 @@ public final class AXPY implements BLAS1 {
         }
     }
 
-    public static <N extends Scalar<N>> void invoke(final N[] y, final int basey, final N a, final N[] x, final int basex, final int first,
-            final int limit) {
+    public static <N extends Scalar<N>> void invoke(final N[] y, final int basey, final N a, final N[] x, final int basex, final int first, final int limit) {
         for (int i = first; i < limit; i++) {
             y[basey + i] = y[basey + i].add(a.multiply(x[basex + i])).get();
         }

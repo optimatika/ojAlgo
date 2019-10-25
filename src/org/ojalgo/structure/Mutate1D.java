@@ -144,6 +144,7 @@ public interface Mutate1D extends Structure1D {
      */
     interface Receiver<N extends Comparable<N>> extends Mutate1D, Mutate1D.Fillable<N>, Consumer<Access1D<?>> {
 
+        @Override
         default void accept(final Access1D<?> supplied) {
             if (this.isAcceptable(supplied)) {
                 supplied.loopAll(i -> this.set(i, supplied.get(i)));
@@ -218,6 +219,10 @@ public interface Mutate1D extends Structure1D {
 
     void add(long index, double addend);
 
+    default void add(long index, float addend) {
+        this.add(index, (double) addend);
+    }
+
     void add(long index, Comparable<?> addend);
 
     /**
@@ -229,6 +234,10 @@ public interface Mutate1D extends Structure1D {
     }
 
     void set(long index, double value);
+
+    default void set(long index, float value) {
+        this.set(index, (double) value);
+    }
 
     void set(long index, Comparable<?> value);
 

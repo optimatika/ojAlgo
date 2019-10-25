@@ -69,8 +69,8 @@ public final class FillMatchingSingle implements ArrayOperation {
         }
     }
 
-    public static <N extends Scalar<N>> void copy(final N[] data, final int structure, final int firstColumn, final int limitColumn,
-            final Access2D<?> source, final Scalar.Factory<N> scalar) {
+    public static <N extends Scalar<N>> void copy(final N[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source,
+            final Scalar.Factory<N> scalar) {
         int index = structure * firstColumn;
         for (int j = firstColumn; j < limitColumn; j++) {
             for (int i = 0; i < structure; i++) {

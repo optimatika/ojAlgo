@@ -43,7 +43,8 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-public interface ElementsSupplier<N extends Comparable<N>> extends Stream2D<N, MatrixStore<N>, TransformableRegion<N>, ElementsSupplier<N>>, Supplier<MatrixStore<N>> {
+public interface ElementsSupplier<N extends Comparable<N>>
+        extends Stream2D<N, MatrixStore<N>, TransformableRegion<N>, ElementsSupplier<N>>, Supplier<MatrixStore<N>> {
 
     default MatrixStore<N> get() {
         return this.collect(this.physical());

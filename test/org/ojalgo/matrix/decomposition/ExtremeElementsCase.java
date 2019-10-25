@@ -70,8 +70,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
     }
 
-    private static void performSolveTest(final Primitive64Store body, final Primitive64Store rhs, final SolverTask<Double> task,
-            final NumberContext context) {
+    private static void performSolveTest(final Primitive64Store body, final Primitive64Store rhs, final SolverTask<Double> task, final NumberContext context) {
 
         try {
 

@@ -141,12 +141,14 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
         }
     }
 
+    @Override
     public void fillMatching(final Access1D<?> values) {
         for (int i = 0, limit = (int) Math.min(this.count(), values.count()); i < limit; i++) {
             data[i] = this.factory().scalar().cast(values.get(i));
         }
     }
 
+    @Override
     public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
         int limit = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
         for (int i = 0; i < limit; i++) {
@@ -154,6 +156,7 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
         }
     }
 
+    @Override
     public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
         int limit = MissingMath.toMinIntExact(this.count(), arguments.count());
         for (int i = 0; i < limit; i++) {
@@ -276,6 +279,11 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
+    protected final void set(final int index, final float value) {
+        data[index] = this.valueOf(value);
+    }
+
+    @Override
     protected final void set(final int index, final Comparable<?> value) {
         data[index] = this.valueOf(value);
     }
@@ -311,6 +319,10 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     final N valueOf(final double value) {
+        return this.factory().scalar().cast(value);
+    }
+
+    final N valueOf(final float value) {
         return this.factory().scalar().cast(value);
     }
 

@@ -384,8 +384,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     public static final PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> COMPLEX = new GenericStore.Factory<>(ComplexArray.FACTORY);
     public static final PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> QUATERNION = new GenericStore.Factory<>(QuaternionArray.FACTORY);
-    public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> RATIONAL = new GenericStore.Factory<>(
-            RationalArray.FACTORY);
+    public static final PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> RATIONAL = new GenericStore.Factory<>(RationalArray.FACTORY);
 
     public static <N extends Scalar<N>> GenericStore<N> wrap(final GenericStore.Factory<N> factory, final N... data) {
         return new GenericStore<>(factory, data.length, 1, data);
@@ -1010,8 +1009,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteForwards.invoke(GenericStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, identity,
-                            myFactory.scalar());
+                    SubstituteForwards.invoke(GenericStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, identity, myFactory.scalar());
                 }
 
             };

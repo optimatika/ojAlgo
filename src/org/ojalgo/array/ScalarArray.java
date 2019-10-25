@@ -45,6 +45,7 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
         super(factory, data);
     }
 
+    @Override
     public final void axpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
     }
@@ -61,6 +62,11 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
 
     @Override
     protected final void add(final int index, final double addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)).get());
+    }
+
+    @Override
+    protected final void add(final int index, final float addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)).get());
     }
 

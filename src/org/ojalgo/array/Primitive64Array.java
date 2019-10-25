@@ -370,6 +370,7 @@ public class Primitive64Array extends PrimitiveArray {
         data = new double[size];
     }
 
+    @Override
     public void axpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
     }
@@ -395,15 +396,18 @@ public class Primitive64Array extends PrimitiveArray {
         }
     }
 
+    @Override
     public void fillMatching(final Access1D<?> values) {
         Primitive64Array.fill(data, values);
     }
 
+    @Override
     public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
         int limit = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
         Primitive64Array.invoke(data, 0, limit, 1, left, function, right);
     }
 
+    @Override
     public void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
         int limit = MissingMath.toMinIntExact(this.count(), arguments.count());
         Primitive64Array.invoke(data, 0, limit, 1, arguments, function);
@@ -441,6 +445,11 @@ public class Primitive64Array extends PrimitiveArray {
 
     @Override
     protected void add(final int index, final double addend) {
+        data[index] += addend;
+    }
+
+    @Override
+    protected void add(final int index, final float addend) {
         data[index] += addend;
     }
 
@@ -566,6 +575,11 @@ public class Primitive64Array extends PrimitiveArray {
 
     @Override
     protected final void set(final int index, final double value) {
+        data[index] = value;
+    }
+
+    @Override
+    protected final void set(final int index, final float value) {
         data[index] = value;
     }
 

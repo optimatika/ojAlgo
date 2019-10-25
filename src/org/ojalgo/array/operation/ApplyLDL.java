@@ -35,8 +35,8 @@ public final class ApplyLDL implements ArrayOperation {
         }
     }
 
-    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit,
-            final N[] multipliers, final int iterationPoint) {
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit, final N[] multipliers,
+            final int iterationPoint) {
         final Scalar<N> diagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
             AXPY.invoke(data, j * structure, diagVal.multiply(multipliers[j].conjugate()).negate().get(), multipliers, 0, j, structure);

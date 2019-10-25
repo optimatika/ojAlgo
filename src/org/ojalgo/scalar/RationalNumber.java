@@ -34,26 +34,32 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
 
     public static final Scalar.Factory<RationalNumber> FACTORY = new Scalar.Factory<RationalNumber>() {
 
+        @Override
         public RationalNumber cast(final double value) {
             return RationalNumber.valueOf(value);
         }
 
+        @Override
         public RationalNumber cast(final Comparable<?> number) {
             return RationalNumber.valueOf(number);
         }
 
+        @Override
         public RationalNumber convert(final double value) {
             return RationalNumber.valueOf(value);
         }
 
+        @Override
         public RationalNumber convert(final Comparable<?> number) {
             return RationalNumber.valueOf(number);
         }
 
+        @Override
         public RationalNumber one() {
             return ONE;
         }
 
+        @Override
         public RationalNumber zero() {
             return ZERO;
         }
@@ -381,10 +387,12 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         }
     }
 
+    @Override
     public RationalNumber add(final double arg) {
         return this.add(RationalNumber.valueOf(arg));
     }
 
+    @Override
     public RationalNumber add(final RationalNumber arg) {
         if (this.isNaN() || arg.isNaN()) {
             return NaN;
@@ -418,6 +426,7 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         }
     }
 
+    @Override
     public int compareTo(final RationalNumber reference) {
 
         final long refNumer = reference.getNumerator();
@@ -442,14 +451,17 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         }
     }
 
+    @Override
     public RationalNumber conjugate() {
         return this;
     }
 
+    @Override
     public RationalNumber divide(final double arg) {
         return this.divide(RationalNumber.valueOf(arg));
     }
 
+    @Override
     public RationalNumber divide(final RationalNumber arg) {
         if (this.isNaN() || arg.isNaN()) {
             return NaN;
@@ -491,6 +503,7 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         return this.toBigDecimal().doubleValue();
     }
 
+    @Override
     public RationalNumber enforce(final NumberContext context) {
         return RationalNumber.valueOf(this.toBigDecimal(context.getMathContext()));
     }
@@ -521,6 +534,7 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         return this.toBigDecimal().floatValue();
     }
 
+    @Override
     public RationalNumber get() {
         return this;
     }
@@ -539,14 +553,17 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         return this.toBigDecimal().intValue();
     }
 
+    @Override
     public RationalNumber invert() {
         return this.sign() >= 0 ? new RationalNumber(myDenominator, myNumerator) : new RationalNumber(-myDenominator, -myNumerator);
     }
 
+    @Override
     public boolean isAbsolute() {
         return myNumerator >= 0L;
     }
 
+    @Override
     public boolean isSmall(final double comparedTo) {
         return BigScalar.CONTEXT.isSmall(comparedTo, this.doubleValue());
     }
@@ -556,10 +573,12 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         return this.toBigDecimal().longValue();
     }
 
+    @Override
     public RationalNumber multiply(final double arg) {
         return this.multiply(RationalNumber.valueOf(arg));
     }
 
+    @Override
     public RationalNumber multiply(final RationalNumber arg) {
         if (this.isNaN() || arg.isNaN()) {
             return NaN;
@@ -582,14 +601,17 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         }
     }
 
+    @Override
     public RationalNumber negate() {
         return new RationalNumber(-myNumerator, myDenominator);
     }
 
+    @Override
     public double norm() {
         return PrimitiveMath.ABS.invoke(this.doubleValue());
     }
 
+    @Override
     public RationalNumber power(final int power) {
 
         RationalNumber retVal = ONE;
@@ -601,6 +623,7 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         return retVal;
     }
 
+    @Override
     public RationalNumber signum() {
         if (!this.isInfinite() && RationalNumber.isSmall(PrimitiveMath.ONE, this)) {
             return ZERO;
@@ -611,10 +634,12 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         }
     }
 
+    @Override
     public RationalNumber subtract(final double arg) {
         return this.subtract(RationalNumber.valueOf(arg));
     }
 
+    @Override
     public RationalNumber subtract(final RationalNumber arg) {
         if (this.isNaN() || arg.isNaN()) {
             return NaN;
@@ -648,6 +673,7 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         }
     }
 
+    @Override
     public BigDecimal toBigDecimal() {
         if (myDecimal == null) {
             myDecimal = this.toBigDecimal(BigScalar.CONTEXT.getMathContext());
@@ -660,6 +686,7 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         return RationalNumber.toString(this);
     }
 
+    @Override
     public String toString(final NumberContext context) {
         return RationalNumber.toString(this.enforce(context));
     }
@@ -694,6 +721,26 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
 
     long getNumerator() {
         return myNumerator;
+    }
+
+    @Override
+    public RationalNumber add(float scalarAddend) {
+        return this.add((double) scalarAddend);
+    }
+
+    @Override
+    public RationalNumber divide(float scalarDivisor) {
+        return this.divide((double) scalarDivisor);
+    }
+
+    @Override
+    public RationalNumber multiply(float scalarMultiplicand) {
+        return this.multiply((double) scalarMultiplicand);
+    }
+
+    @Override
+    public RationalNumber subtract(float scalarSubtrahend) {
+        return this.subtract((double) scalarSubtrahend);
     }
 
 }

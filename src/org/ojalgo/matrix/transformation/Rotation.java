@@ -151,8 +151,7 @@ public abstract class Rotation<N extends Comparable<N>> {
 
     }
 
-    public static <N extends Scalar<N>> Generic<N> makeGeneric(final FunctionSet<N> functions, final int aLowerIndex, final int aHigherIndex,
-            final N anAngle) {
+    public static <N extends Scalar<N>> Generic<N> makeGeneric(final FunctionSet<N> functions, final int aLowerIndex, final int aHigherIndex, final N anAngle) {
         return new Generic<>(aLowerIndex, aHigherIndex, functions.cos().invoke(anAngle), functions.sin().invoke(anAngle));
     }
 

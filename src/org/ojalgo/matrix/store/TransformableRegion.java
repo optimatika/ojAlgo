@@ -23,8 +23,6 @@ package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.MultiplyBoth;
-import org.ojalgo.array.operation.MultiplyBoth.Generic;
-import org.ojalgo.array.operation.MultiplyBoth.Primitive64;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.structure.Access1D;
