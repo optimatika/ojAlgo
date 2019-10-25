@@ -111,7 +111,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         SparseStore<Double> mtrx = SparseStore.PRIMITIVE.make(n, n);
 
-        Primitive64Store ones = Primitive64Store.FACTORY.makeZero(n, 1);
+        Primitive64Store ones = Primitive64Store.FACTORY.make(n, 1);
         ones.fillAll(ONE);
 
         Stopwatch clock = new Stopwatch();
@@ -126,7 +126,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         SparsePerformance.touchNonzeros(mtrx.multiply(ones));
 
-        TestUtils.assertFasterThan(100, CalendarDateUnit.MILLIS, clock);
+        TestUtils.assertFasterThan(110, CalendarDateUnit.MILLIS, clock);
 
         clock.reset();
 
