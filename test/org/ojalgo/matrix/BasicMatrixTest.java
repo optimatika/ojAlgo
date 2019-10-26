@@ -228,6 +228,8 @@ public abstract class BasicMatrixTest extends MatrixTests {
         actMtrx = p64AA.conjugate();
         TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
 
+        actMtrx = p32AA.conjugate();
+        TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
     }
 
     @Test
@@ -1049,6 +1051,8 @@ public abstract class BasicMatrixTest extends MatrixTests {
         actMtrx = p64AA.transpose();
         TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
 
+        actMtrx = p32AA.transpose();
+        TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
     }
 
 }

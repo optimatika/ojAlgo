@@ -39,7 +39,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class HouseholderHermitian implements ArrayOperation {
 
-    public static void invoke(final double[] data, final Householder.Primitive householder, final double[] worker) {
+    public static void invoke(final double[] data, final Householder.Primitive64 householder, final double[] worker) {
 
         final double[] tmpVector = householder.vector;
         final int tmpFirst = householder.first;

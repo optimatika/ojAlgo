@@ -28,13 +28,27 @@ public final class HouseholderLeft implements ArrayOperation {
 
     public static int THRESHOLD = 128;
 
-    public static void invoke(final double[] data, final int structure, final int first, final int limit, final Householder.Primitive householder) {
+    public static void invoke(final double[] data, final int structure, final int first, final int limit, final Householder.Primitive64 householder) {
 
         final double[] tmpHouseholderVector = householder.vector;
         final int tmpFirstNonZero = householder.first;
         final double tmpBeta = householder.beta;
 
         double tmpScale;
+        for (int j = first; j < limit; j++) {
+            tmpScale = DOT.invoke(data, j * structure, tmpHouseholderVector, 0, tmpFirstNonZero, structure);
+            tmpScale *= tmpBeta;
+            AXPY.invoke(data, j * structure, -tmpScale, tmpHouseholderVector, 0, tmpFirstNonZero, structure);
+        }
+    }
+
+    public static void invoke(final float[] data, final int structure, final int first, final int limit, final Householder.Primitive32 householder) {
+
+        final float[] tmpHouseholderVector = householder.vector;
+        final int tmpFirstNonZero = householder.first;
+        final double tmpBeta = householder.beta;
+
+        float tmpScale;
         for (int j = first; j < limit; j++) {
             tmpScale = DOT.invoke(data, j * structure, tmpHouseholderVector, 0, tmpFirstNonZero, structure);
             tmpScale *= tmpBeta;

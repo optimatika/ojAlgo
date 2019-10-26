@@ -56,8 +56,8 @@ abstract class PrimitiveFactory<I extends PhysicalStore<Double>> implements Phys
         return PrimitiveFunction.getSet();
     }
 
-    public final Householder.Primitive makeHouseholder(final int length) {
-        return new Householder.Primitive(length);
+    public Householder<Double> makeHouseholder(final int length) {
+        return new Householder.Primitive64(length);
     }
 
     public final Rotation.Primitive makeRotation(final int low, final int high, final double cos, final double sin) {

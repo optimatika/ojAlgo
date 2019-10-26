@@ -30,7 +30,7 @@ public final class GenerateApplyAndCopyHouseholderRow implements ArrayOperation 
 
     public static int THRESHOLD = 128;
 
-    public static boolean invoke(final double[] data, final int structure, final int row, final int col, final Householder.Primitive destination) {
+    public static boolean invoke(final double[] data, final int structure, final int row, final int col, final Householder.Primitive64 destination) {
 
         final int tmpColDim = data.length / structure;
 
@@ -81,11 +81,11 @@ public final class GenerateApplyAndCopyHouseholderRow implements ArrayOperation 
         return retVal;
     }
 
-    public static boolean invoke(final float[] data, final int structure, final int row, final int col, final Householder.Primitive destination) {
+    public static boolean invoke(final float[] data, final int structure, final int row, final int col, final Householder.Primitive32 destination) {
 
         final int tmpColDim = data.length / structure;
 
-        final double[] tmpVector = destination.vector;
+        final float[] tmpVector = destination.vector;
         destination.first = col;
 
         double tmpNormInf = PrimitiveMath.ZERO; // Copy row and calculate its infinity-norm.
@@ -120,13 +120,13 @@ public final class GenerateApplyAndCopyHouseholderRow implements ArrayOperation 
                 tmpScale += tmpNorm2;
             }
 
-            tmpVector[col] = PrimitiveMath.ONE;
+            tmpVector[col] = (float) PrimitiveMath.ONE;
 
             for (int j = col + 1; j < tmpColDim; j++) {
-                data[row + (j * structure)] = (float) (tmpVector[j] /= tmpScale);
+                data[row + (j * structure)] = tmpVector[j] /= tmpScale;
             }
 
-            destination.beta = PrimitiveMath.ABS.invoke(tmpScale) / tmpNorm2;
+            destination.beta = (float) (PrimitiveMath.ABS.invoke(tmpScale) / tmpNorm2);
         }
 
         return retVal;

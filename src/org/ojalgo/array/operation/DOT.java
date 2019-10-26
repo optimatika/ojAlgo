@@ -64,6 +64,14 @@ public final class DOT implements BLAS1 {
         return retVal;
     }
 
+    public static float invoke(final float[] array1, final int offset1, final float[] array2, final int offset2, final int first, final int limit) {
+        float retVal = 0F;
+        for (int i = first; i < limit; i++) {
+            retVal += array1[offset1 + i] * array2[offset2 + i];
+        }
+        return retVal;
+    }
+
     public static <N extends Scalar<N>> N invoke(final N[] array1, final int offset1, final N[] array2, final int offset2, final int first, final int limit,
             final Scalar.Factory<N> factory) {
         Scalar<N> retVal = factory.zero();

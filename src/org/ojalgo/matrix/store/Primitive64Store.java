@@ -362,13 +362,13 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         }
     }
 
-    static Householder.Primitive cast(final Householder<Double> transformation) {
-        if (transformation instanceof Householder.Primitive) {
-            return (Householder.Primitive) transformation;
+    static Householder.Primitive64 cast(final Householder<Double> transformation) {
+        if (transformation instanceof Householder.Primitive64) {
+            return (Householder.Primitive64) transformation;
         } else if (transformation instanceof HouseholderReference<?>) {
-            return ((Householder.Primitive) ((HouseholderReference<Double>) transformation).getWorker(FACTORY)).copy(transformation);
+            return ((Householder.Primitive64) ((HouseholderReference<Double>) transformation).getWorker(FACTORY)).copy(transformation);
         } else {
-            return new Householder.Primitive(transformation);
+            return new Householder.Primitive64(transformation);
         }
     }
 
@@ -784,11 +784,11 @@ public final class Primitive64Store extends Primitive64Array implements Physical
     }
 
     public boolean generateApplyAndCopyHouseholderColumn(final int row, final int column, final Householder<Double> destination) {
-        return GenerateApplyAndCopyHouseholderColumn.invoke(data, myRowDim, row, column, (Householder.Primitive) destination);
+        return GenerateApplyAndCopyHouseholderColumn.invoke(data, myRowDim, row, column, (Householder.Primitive64) destination);
     }
 
     public boolean generateApplyAndCopyHouseholderRow(final int row, final int column, final Householder<Double> destination) {
-        return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Primitive) destination);
+        return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Primitive64) destination);
     }
 
     public MatrixStore<Double> get() {
@@ -1026,7 +1026,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
     public void transformLeft(final Householder<Double> transformation, final int firstColumn) {
 
-        final Householder.Primitive tmpTransf = Primitive64Store.cast(transformation);
+        final Householder.Primitive64 tmpTransf = Primitive64Store.cast(transformation);
 
         final double[] tmpData = data;
 
@@ -1078,7 +1078,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
     public void transformRight(final Householder<Double> transformation, final int firstRow) {
 
-        final Householder.Primitive tmpTransf = Primitive64Store.cast(transformation);
+        final Householder.Primitive64 tmpTransf = Primitive64Store.cast(transformation);
 
         final double[] tmpData = data;
 
@@ -1132,10 +1132,6 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
     public void transformSymmetric(final Householder<Double> transformation) {
         HouseholderHermitian.invoke(data, Primitive64Store.cast(transformation), this.getWorkerColumn());
-    }
-
-    public MatrixStore<Double> transpose() {
-        return new TransposedStore<>(this);
     }
 
     public void tred2(final BasicArray<Double> mainDiagonal, final BasicArray<Double> offDiagonal, final boolean yesvecs) {

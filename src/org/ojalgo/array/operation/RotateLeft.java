@@ -48,6 +48,27 @@ public final class RotateLeft implements ArrayOperation {
         }
     }
 
+    public static void invoke(final float[] data, final int structure, final int rowA, final int rowB, final float cos, final float sin) {
+
+        float oldA;
+        float oldB;
+
+        int indexA = rowA;
+        int indexB = rowB;
+
+        for (int j = 0, lim = data.length / structure; j < lim; j++) {
+
+            oldA = data[indexA];
+            oldB = data[indexB];
+
+            data[indexA] = (cos * oldA) + (sin * oldB);
+            data[indexB] = (cos * oldB) - (sin * oldA);
+
+            indexA += structure;
+            indexB += structure;
+        }
+    }
+
     public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int rowA, final int rowB, final N cos, final N sin) {
 
         N oldA;

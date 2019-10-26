@@ -31,18 +31,16 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive32Array;
-import org.ojalgo.array.operation.FillMatchingSingle;
-import org.ojalgo.array.operation.MultiplyBoth;
-import org.ojalgo.array.operation.MultiplyLeft;
-import org.ojalgo.array.operation.MultiplyNeither;
-import org.ojalgo.array.operation.MultiplyRight;
+import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.transformation.Householder;
+import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.*;
@@ -59,6 +57,11 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         @Override
         public DenseArray.Factory<Double> array() {
             return Primitive32Array.FACTORY;
+        }
+
+        @Override
+        public Householder<Double> makeHouseholder(final int length) {
+            return new Householder.Primitive32(length);
         }
 
         @Override
@@ -281,6 +284,34 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
     };
 
+    static Primitive32Store cast(final Access1D<Double> matrix) {
+        if (matrix instanceof Primitive32Store) {
+            return (Primitive32Store) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return FACTORY.copy((Access2D<?>) matrix);
+        } else {
+            return FACTORY.columns(matrix);
+        }
+    }
+
+    static Householder.Primitive32 cast(final Householder<Double> transformation) {
+        if (transformation instanceof Householder.Primitive32) {
+            return (Householder.Primitive32) transformation;
+        } else if (transformation instanceof HouseholderReference<?>) {
+            return ((Householder.Primitive32) ((HouseholderReference<Double>) transformation).getWorker(FACTORY)).copy(transformation);
+        } else {
+            return new Householder.Primitive32(transformation);
+        }
+    }
+
+    static Rotation.Primitive cast(final Rotation<Double> transformation) {
+        if (transformation instanceof Rotation.Primitive) {
+            return (Rotation.Primitive) transformation;
+        } else {
+            return new Rotation.Primitive(transformation);
+        }
+    }
+
     private final MultiplyBoth.Primitive32 multiplyBoth;
     private final MultiplyLeft.Primitive32 multiplyLeft;
     private final MultiplyNeither.Primitive32 multiplyNeither;
@@ -288,6 +319,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     private final int myColDim;
     private final int myRowDim;
     private final Array2D<Double> myUtility;
+
     private transient float[] myWorkerColumn;
 
     Primitive32Store(final int numbRows, final int numbCols) {
@@ -377,6 +409,10 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.columns();
     }
 
+    public MatrixStore<Double> conjugate() {
+        return this.transpose();
+    }
+
     public long countColumns() {
         return myColDim;
     }
@@ -409,16 +445,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
     public void exchangeRows(long rowA, long rowB) {
         myUtility.exchangeRows(rowA, rowB);
-    }
-
-    static Primitive32Store cast(final Access1D<Double> matrix) {
-        if (matrix instanceof Primitive32Store) {
-            return (Primitive32Store) matrix;
-        } else if (matrix instanceof Access2D<?>) {
-            return FACTORY.copy((Access2D<?>) matrix);
-        } else {
-            return FACTORY.columns(matrix);
-        }
     }
 
     public void fillByMultiplying(Access1D<Double> left, Access1D<Double> right) {
@@ -722,29 +748,24 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         myUtility.reduceRows(aggregator, receiver);
     }
 
-    public TransformableRegion<Double> regionByColumns(int... columns) {
-        // TODO Auto-generated method stub
-        return null;
+    public TransformableRegion<Double> regionByColumns(final int... columns) {
+        return new TransformableRegion.ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
-    public TransformableRegion<Double> regionByLimits(int rowLimit, int columnLimit) {
-        // TODO Auto-generated method stub
-        return null;
+    public TransformableRegion<Double> regionByLimits(final int rowLimit, final int columnLimit) {
+        return new TransformableRegion.LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
-    public TransformableRegion<Double> regionByOffsets(int rowOffset, int columnOffset) {
-        // TODO Auto-generated method stub
-        return null;
+    public TransformableRegion<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
+        return new TransformableRegion.OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
-    public TransformableRegion<Double> regionByRows(int... rows) {
-        // TODO Auto-generated method stub
-        return null;
+    public TransformableRegion<Double> regionByRows(final int... rows) {
+        return new TransformableRegion.RowsRegion<>(this, multiplyBoth, rows);
     }
 
     public TransformableRegion<Double> regionByTransposing() {
-        // TODO Auto-generated method stub
-        return null;
+        return new TransformableRegion.TransposedRegion<>(this, multiplyBoth);
     }
 
     public RowView<Double> rows() {
@@ -809,24 +830,110 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.toRawCopy2D();
     }
 
-    public void transformLeft(Householder<Double> transformation, int firstColumn) {
-        // TODO Auto-generated method stub
+    public void transformLeft(final Householder<Double> transformation, final int firstColumn) {
 
+        final Householder.Primitive32 tmpTransf = Primitive32Store.cast(transformation);
+
+        final float[] tmpData = data;
+
+        final int tmpRowDim = myRowDim;
+        final int tmpColDim = myColDim;
+
+        if ((tmpColDim - firstColumn) > HouseholderLeft.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int first, final int limit) {
+                    HouseholderLeft.invoke(tmpData, tmpRowDim, first, limit, tmpTransf);
+                }
+
+            };
+
+            tmpConquerer.invoke(firstColumn, tmpColDim, HouseholderLeft.THRESHOLD);
+
+        } else {
+
+            HouseholderLeft.invoke(tmpData, tmpRowDim, firstColumn, tmpColDim, tmpTransf);
+        }
     }
 
-    public void transformLeft(Rotation<Double> transformation) {
-        // TODO Auto-generated method stub
+    public void transformLeft(final Rotation<Double> transformation) {
 
+        final Rotation.Primitive tmpTransf = Primitive64Store.cast(transformation);
+
+        final int tmpLow = tmpTransf.low;
+        final int tmpHigh = tmpTransf.high;
+
+        if (tmpLow != tmpHigh) {
+            if (!Double.isNaN(tmpTransf.cos) && !Double.isNaN(tmpTransf.sin)) {
+                RotateLeft.invoke(data, myRowDim, tmpLow, tmpHigh, (float) tmpTransf.cos, (float) tmpTransf.sin);
+            } else {
+                myUtility.exchangeRows(tmpLow, tmpHigh);
+            }
+        } else {
+            if (!Double.isNaN(tmpTransf.cos)) {
+                myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
+            } else if (!Double.isNaN(tmpTransf.sin)) {
+                myUtility.modifyRow(tmpLow, 0L, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
+            } else {
+                myUtility.modifyRow(tmpLow, 0, PrimitiveMath.NEGATE);
+            }
+        }
     }
 
-    public void transformRight(Householder<Double> transformation, int firstRow) {
-        // TODO Auto-generated method stub
+    public void transformRight(final Householder<Double> transformation, final int firstRow) {
 
+        final Householder.Primitive32 tmpTransf = Primitive32Store.cast(transformation);
+
+        final float[] tmpData = data;
+
+        final int tmpRowDim = myRowDim;
+        final int tmpColDim = myColDim;
+
+        final float[] tmpWorker = this.getWorkerColumn();
+
+        if ((tmpRowDim - firstRow) > HouseholderRight.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int first, final int limit) {
+                    HouseholderRight.invoke(tmpData, tmpRowDim, first, limit, tmpColDim, tmpTransf, tmpWorker);
+                }
+
+            };
+
+            tmpConquerer.invoke(firstRow, tmpRowDim, HouseholderRight.THRESHOLD);
+
+        } else {
+
+            HouseholderRight.invoke(tmpData, tmpRowDim, firstRow, tmpRowDim, tmpColDim, tmpTransf, tmpWorker);
+        }
     }
 
-    public void transformRight(Rotation<Double> transformation) {
-        // TODO Auto-generated method stub
+    public void transformRight(final Rotation<Double> transformation) {
 
+        final Rotation.Primitive tmpTransf = Primitive64Store.cast(transformation);
+
+        final int tmpLow = tmpTransf.low;
+        final int tmpHigh = tmpTransf.high;
+
+        if (tmpLow != tmpHigh) {
+            if (!Double.isNaN(tmpTransf.cos) && !Double.isNaN(tmpTransf.sin)) {
+                RotateRight.invoke(data, myRowDim, tmpLow, tmpHigh, (float) tmpTransf.cos, (float) tmpTransf.sin);
+            } else {
+                myUtility.exchangeColumns(tmpLow, tmpHigh);
+            }
+        } else {
+            if (!Double.isNaN(tmpTransf.cos)) {
+                myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.MULTIPLY.second(tmpTransf.cos));
+            } else if (!Double.isNaN(tmpTransf.sin)) {
+                myUtility.modifyColumn(0L, tmpHigh, PrimitiveMath.DIVIDE.second(tmpTransf.sin));
+            } else {
+                myUtility.modifyColumn(0, tmpHigh, PrimitiveMath.NEGATE);
+            }
+        }
     }
 
     public void visitColumn(final long row, final long col, final VoidFunction<Double> visitor) {
