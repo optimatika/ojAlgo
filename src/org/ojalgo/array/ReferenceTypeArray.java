@@ -33,6 +33,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 
@@ -67,9 +68,10 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
         }
     }
 
-    protected static <N extends Comparable<N>> void fill(final N[] data, final int first, final int limit, final int step, final NullaryFunction<N> supplier) {
+    protected static <N extends Comparable<N>> void fill(final N[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier,
+            Scalar.Factory<N> scalar) {
         for (int i = first; i < limit; i += step) {
-            data[i] = supplier.invoke();
+            data[i] = scalar.cast(supplier.invoke());
         }
     }
 
@@ -208,8 +210,8 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
-    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<N> supplier) {
-        ReferenceTypeArray.fill(data, first, limit, step, supplier);
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+        ReferenceTypeArray.fill(data, first, limit, step, supplier, this.factory().scalar());
     }
 
     @Override

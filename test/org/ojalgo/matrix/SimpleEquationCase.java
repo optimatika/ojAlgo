@@ -48,18 +48,18 @@ public class SimpleEquationCase extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = new NumberContext(7, 9);
+        // ACCURACY = new NumberContext(7, 9);
 
-        rationalAA = SimpleEquationCase.getBody();
-        rationalAX = SimpleEquationCase.getSolution();
-        rationalAB = SimpleEquationCase.getRHS();
+        rAA = SimpleEquationCase.getBody();
+        rAX = SimpleEquationCase.getSolution();
+        rAB = SimpleEquationCase.getRHS();
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
 }

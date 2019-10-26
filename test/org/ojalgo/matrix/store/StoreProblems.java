@@ -107,11 +107,11 @@ public class StoreProblems extends MatrixStoreTests {
     @Test
     public void testP20180121() {
 
-        final SparseStore<Double> m = SparseStore.PRIMITIVE.make(3, 2);
+        final SparseStore<Double> m = SparseStore.PRIMITIVE64.make(3, 2);
         final Primitive64Store mAdd = Primitive64Store.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 0.0 }, { 0.0, 0.0 } });
         final MatrixStore<Double> n = m.add(mAdd);
 
-        final SparseStore<Double> eye = SparseStore.PRIMITIVE.make(2, 2);
+        final SparseStore<Double> eye = SparseStore.PRIMITIVE64.make(2, 2);
         eye.set(0, 0, 1.0);
         eye.set(1, 1, 1.0);
 
@@ -119,20 +119,20 @@ public class StoreProblems extends MatrixStoreTests {
 
         TestUtils.assertEquals(mAdd, prod);
 
-        final SparseStore<Double> m2 = SparseStore.PRIMITIVE.make(3, 2);
+        final SparseStore<Double> m2 = SparseStore.PRIMITIVE64.make(3, 2);
         m2.set(0, 0, 1.0);
 
         TestUtils.assertEquals(mAdd, m2.multiply(eye));
         TestUtils.assertEquals(mAdd, eye.premultiply(m2).get());
 
-        final SparseStore<Double> a = SparseStore.PRIMITIVE.make(3, 3);
+        final SparseStore<Double> a = SparseStore.PRIMITIVE64.make(3, 3);
         a.set(1, 1, 1.0);
 
-        final SparseStore<Double> b = SparseStore.PRIMITIVE.make(3, 5);
+        final SparseStore<Double> b = SparseStore.PRIMITIVE64.make(3, 5);
         b.set(1, 1, 1.0);
         b.set(0, 3, 1.0);
 
-        final SparseStore<Double> c = SparseStore.PRIMITIVE.make(3, 5);
+        final SparseStore<Double> c = SparseStore.PRIMITIVE64.make(3, 5);
         c.set(1, 1, 1.0);
 
         if (DEBUG) {

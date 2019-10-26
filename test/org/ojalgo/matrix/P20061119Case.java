@@ -61,18 +61,18 @@ public class P20061119Case extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = NumberContext.getGeneral(8).withPrecision(14);
+        // evaluation = NumberContext.getGeneral(8).withPrecision(14);
 
-        rationalAA = P20061119Case.getProblematic();
-        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
-        rationalAB = rationalAA;
+        rAA = P20061119Case.getProblematic();
+        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
+        rAB = rAA;
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
@@ -89,7 +89,7 @@ public class P20061119Case extends BasicMatrixTest {
         final PhysicalStore<Double> tmpPrimitiveStore = Primitive64Store.FACTORY.copy(tmpMatrix);
         tmpEigenvalue.decompose(tmpPrimitiveStore);
 
-        TestUtils.assertEquals(tmpPrimitiveStore, tmpEigenvalue, evaluation);
+        TestUtils.assertEquals(tmpPrimitiveStore, tmpEigenvalue, ACCURACY);
     }
 
 }

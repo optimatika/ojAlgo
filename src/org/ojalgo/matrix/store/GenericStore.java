@@ -655,7 +655,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         myUtility.fillColumn(row, col, value);
     }
 
-    public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+    public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
         myUtility.fillColumn(row, col, supplier);
     }
 
@@ -663,7 +663,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         myUtility.fillDiagonal(row, col, value);
     }
 
-    public void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
+    public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
         myUtility.fillDiagonal(row, col, supplier);
     }
 
@@ -774,7 +774,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         myUtility.fillOne(row, col, value);
     }
 
-    public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
         myUtility.fillOne(row, col, supplier);
     }
 
@@ -786,7 +786,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         myUtility.fillRow(row, col, value);
     }
 
-    public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+    public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
         myUtility.fillRow(row, col, supplier);
     }
 

@@ -71,13 +71,13 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             final int tmpConstraintsCount = this.countConstraints();
             final int tmpVariablesCount = this.countVariables();
 
-            final MatrixStore.LogicalBuilder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE.makeZero(1, 1);
-            tmpTableauBuilder.left(matrices.getC().transpose().logical().right(MatrixStore.PRIMITIVE.makeZero(1, tmpConstraintsCount).get()).get());
+            final MatrixStore.LogicalBuilder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE64.makeZero(1, 1);
+            tmpTableauBuilder.left(matrices.getC().transpose().logical().right(MatrixStore.PRIMITIVE64.makeZero(1, tmpConstraintsCount).get()).get());
 
             if (tmpConstraintsCount >= 1) {
-                tmpTableauBuilder.above(matrices.getAE(), MatrixStore.PRIMITIVE.makeIdentity(tmpConstraintsCount).get(), matrices.getBE());
+                tmpTableauBuilder.above(matrices.getAE(), MatrixStore.PRIMITIVE64.makeIdentity(tmpConstraintsCount).get(), matrices.getBE());
             }
-            tmpTableauBuilder.below(MatrixStore.PRIMITIVE.makeZero(1, tmpVariablesCount).get(),
+            tmpTableauBuilder.below(MatrixStore.PRIMITIVE64.makeZero(1, tmpVariablesCount).get(),
                     Primitive64Store.FACTORY.makeFilled(1, tmpConstraintsCount, new NullaryFunction<Double>() {
 
                         public double doubleValue() {

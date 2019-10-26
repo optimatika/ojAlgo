@@ -27,6 +27,11 @@ import org.ojalgo.function.NullaryFunction;
 
 public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
+    /**
+     * Should only be implemented by factories that always produce dense structures.
+     *
+     * @author apete
+     */
     interface Dense<I extends Structure2D> extends Factory2D<I> {
 
         default I column(final double... elements) {
@@ -62,6 +67,27 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
         I rows(List<? extends Comparable<?>>... source);
 
         I rows(Comparable<?>[]... source);
+
+    }
+
+    /**
+     * For when the structures can be either dense or sparse.
+     *
+     * @author apete
+     */
+    interface MayBeSparse<I extends Structure2D, DR extends Mutate2D.ModifiableReceiver<?>, SR extends Mutate2D.ModifiableReceiver<?>> extends Factory2D<I> {
+
+        DR makeDense(long rows, long columns);
+
+        default DR makeDense(final Structure2D shape) {
+            return this.makeDense(shape.countRows(), shape.countColumns());
+        }
+
+        SR makeSparse(long rows, long columns);
+
+        default SR makeSparse(final Structure2D shape) {
+            return this.makeSparse(shape.countRows(), shape.countColumns());
+        }
 
     }
 

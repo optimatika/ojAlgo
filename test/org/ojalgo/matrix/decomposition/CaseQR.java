@@ -164,7 +164,7 @@ public class CaseQR extends MatrixDecompositionTests {
         ArrayOperation.setThresholdsMinValue(100000);
 
         final int tmpDim = 3;
-        final MatrixStore<Double> tmpA = MatrixUtils.makeSPD(tmpDim).logical().below(MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get()).get();
+        final MatrixStore<Double> tmpA = MatrixUtils.makeSPD(tmpDim).logical().below(MatrixStore.PRIMITIVE64.makeIdentity(tmpDim).get()).get();
 
         final QR<Double> tmpDenseQR = new QRDecomposition.Primitive();
         final QR<Double> tmpRawQR = new RawQR();
@@ -179,7 +179,7 @@ public class CaseQR extends MatrixDecompositionTests {
 
             TestUtils.assertEquals(tmpDenseInv, tmpRawInv);
 
-            final MatrixStore<Double> tmpIdentity = MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get();
+            final MatrixStore<Double> tmpIdentity = MatrixStore.PRIMITIVE64.makeIdentity(tmpDim).get();
             TestUtils.assertEquals(tmpIdentity, tmpDenseInv.multiply(tmpA));
             TestUtils.assertEquals(tmpIdentity, tmpRawInv.multiply(tmpA));
 

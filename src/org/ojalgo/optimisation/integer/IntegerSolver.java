@@ -507,7 +507,7 @@ public final class IntegerSolver extends GenericSolver {
 
             final State tmpSate = State.INVALID;
             final double tmpValue = myMinimisation ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-            final MatrixStore<Double> tmpSolution = MatrixStore.PRIMITIVE.makeZero(this.getIntegerModel().countVariables(), 1).get();
+            final MatrixStore<Double> tmpSolution = MatrixStore.PRIMITIVE64.makeZero(this.getIntegerModel().countVariables(), 1).get();
 
             return new Optimisation.Result(tmpSate, tmpValue, tmpSolution);
         }

@@ -69,6 +69,16 @@ public final class FillMatchingSingle implements ArrayOperation {
         }
     }
 
+    public static void copy(final float[] data, final int structure, final int firstColumn, final int limitColumn,
+            final Access2D<? extends Comparable<?>> source) {
+        int index = structure * firstColumn;
+        for (int j = firstColumn; j < limitColumn; j++) {
+            for (int i = 0; i < structure; i++) {
+                data[index++] = source.floatValue(i, j);
+            }
+        }
+    }
+
     public static <N extends Scalar<N>> void copy(final N[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source,
             final Scalar.Factory<N> scalar) {
         int index = structure * firstColumn;
@@ -93,6 +103,15 @@ public final class FillMatchingSingle implements ArrayOperation {
         for (int j = firstColumn; j < limitColumn; j++) {
             for (int i = 0; i < structure; i++) {
                 data[index++] = source.doubleValue(j, i);
+            }
+        }
+    }
+
+    public static void transpose(final float[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source) {
+        int index = structure * firstColumn;
+        for (int j = firstColumn; j < limitColumn; j++) {
+            for (int i = 0; i < structure; i++) {
+                data[index++] = source.floatValue(j, i);
             }
         }
     }

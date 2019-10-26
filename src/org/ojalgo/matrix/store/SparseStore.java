@@ -59,7 +59,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     public static final SparseStore.Factory<ComplexNumber> COMPLEX = (rowsCount, columnsCount) -> SparseStore.makeComplex((int) rowsCount, (int) columnsCount);
 
-    public static final SparseStore.Factory<Double> PRIMITIVE = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
+    public static final SparseStore.Factory<Double> PRIMITIVE64 = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
 
     public static final SparseStore.Factory<Double> PRIMITIVE32 = (rowsCount, columnsCount) -> SparseStore.makePrimitive32((int) rowsCount, (int) columnsCount);
 
@@ -172,7 +172,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         this.updateNonZeros(row, col);
     }
 
-    public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
         myElements.fillOne(Structure2D.index(myFirsts.length, row, col), supplier);
         this.updateNonZeros(row, col);
     }

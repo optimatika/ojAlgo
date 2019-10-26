@@ -207,7 +207,7 @@ public class Primitive64Array extends PrimitiveArray {
         }
     }
 
-    protected static void fill(final double[] data, final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
+    protected static void fill(final double[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
         for (int i = first; i < limit; i += step) {
             data[i] = supplier.doubleValue();
         }
@@ -494,7 +494,7 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     @Override
-    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
         Primitive64Array.fill(data, first, limit, step, supplier);
     }
 

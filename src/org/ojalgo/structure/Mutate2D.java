@@ -62,7 +62,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.loopColumn(row, col, (r, c) -> this.fillOne(r, c, value));
         }
 
-        default void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+        default void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
             this.loopColumn(row, col, (r, c) -> this.fillOne(r, c, supplier));
         }
 
@@ -70,7 +70,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.fillColumn(0L, col, value);
         }
 
-        default void fillColumn(final long col, final NullaryFunction<N> supplier) {
+        default void fillColumn(final long col, final NullaryFunction<?> supplier) {
             this.fillColumn(0L, col, supplier);
         }
 
@@ -86,7 +86,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.loopDiagonal(row, col, (r, c) -> this.fillOne(r, c, value));
         }
 
-        default void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
+        default void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
             this.loopDiagonal(row, col, (r, c) -> this.fillOne(r, c, supplier));
         }
 
@@ -94,7 +94,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.fillDiagonal(0L, 0L, value);
         }
 
-        default void fillDiagonal(final NullaryFunction<N> supplier) {
+        default void fillDiagonal(final NullaryFunction<?> supplier) {
             this.fillDiagonal(0L, 0L, supplier);
         }
 
@@ -108,7 +108,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
         void fillOne(long row, long col, N value);
 
-        void fillOne(long row, long col, NullaryFunction<N> supplier);
+        void fillOne(long row, long col, NullaryFunction<?> supplier);
 
         @Override
         default void fillOne(final long index, final N value) {
@@ -117,7 +117,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         @Override
-        default void fillOne(final long index, final NullaryFunction<N> supplier) {
+        default void fillOne(final long index, final NullaryFunction<?> supplier) {
             long structure = this.countRows();
             this.fillOne(Structure2D.row(index, structure), Structure2D.column(index, structure), supplier);
         }
@@ -134,7 +134,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.loopRow(row, col, (r, c) -> this.fillOne(r, c, value));
         }
 
-        default void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+        default void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
             this.loopRow(row, col, (r, c) -> this.fillOne(r, c, supplier));
         }
 
@@ -142,7 +142,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.fillRow(row, 0L, value);
         }
 
-        default void fillRow(final long row, final NullaryFunction<N> supplier) {
+        default void fillRow(final long row, final NullaryFunction<?> supplier) {
             this.fillRow(row, 0L, supplier);
         }
 

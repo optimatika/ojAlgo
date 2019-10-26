@@ -139,7 +139,7 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public void fillAll(final NullaryFunction<N> supplier) {
+    public void fillAll(final NullaryFunction<?> supplier) {
         for (final BasicArray<N> tmpSegment : mySegments) {
             tmpSegment.fillAll(supplier);
         }
@@ -156,7 +156,7 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+    public void fillOne(final long index, final NullaryFunction<?> supplier) {
         mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, supplier);
     }
 
@@ -177,7 +177,7 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+    public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
 
         final int tmpFirstSegment = (int) (first / mySegmentSize);
         final int tmpLastSegemnt = (int) ((limit - 1) / mySegmentSize);
@@ -356,7 +356,7 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    protected void fill(final long first, final long limit, final long step, final NullaryFunction<N> supplier) {
+    protected void fill(final long first, final long limit, final long step, final NullaryFunction<?> supplier) {
 
         if (step <= mySegmentSize) {
             // Will use a continuous range of segements

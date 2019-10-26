@@ -81,7 +81,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillColumn(row, myColumns[(int) col], value);
         }
 
-        public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillColumn(row, myColumns[(int) col], supplier);
         }
 
@@ -93,7 +93,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillOne(row, myColumns[(int) col], value);
         }
 
-        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillOne(row, myColumns[(int) col], supplier);
         }
 
@@ -165,7 +165,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillOne(row, col, value);
         }
 
-        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillOne(row, col, supplier);
         }
 
@@ -228,7 +228,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
         }
 
         @Override
-        public void fillAll(final NullaryFunction<N> supplier) {
+        public void fillAll(final NullaryFunction<?> supplier) {
             final long tmpCountColumns = myBase.countColumns();
             for (long j = myColumnOffset; j < tmpCountColumns; j++) {
                 myBase.fillColumn(myRowOffset, j, supplier);
@@ -239,7 +239,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillColumn(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillColumn(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
@@ -247,7 +247,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillDiagonal(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillDiagonal(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
@@ -259,7 +259,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillOne(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillOne(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
@@ -267,7 +267,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillRow(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillRow(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
@@ -406,7 +406,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillOne(myRows[(int) row], col, value);
         }
 
-        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillOne(myRows[(int) row], col, supplier);
         }
 
@@ -418,7 +418,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillRow(myRows[(int) row], col, value);
         }
 
-        public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillRow(myRows[(int) row], col, supplier);
         }
 
@@ -477,7 +477,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillRow(col, row, value);
         }
 
-        public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillRow(col, row, supplier);
         }
 
@@ -485,7 +485,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillDiagonal(col, row, value);
         }
 
-        public void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillRow(col, row, supplier);
         }
 
@@ -497,7 +497,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillOne(col, row, value);
         }
 
-        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillOne(col, row, supplier);
         }
 
@@ -505,7 +505,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.fillDiagonal(col, row, value);
         }
 
-        public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillDiagonal(col, row, supplier);
         }
 

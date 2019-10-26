@@ -343,11 +343,11 @@ public abstract class MatrixUtils {
     }
 
     /**
-     * @deprecated v47 Use {@link MatrixStore#PRIMITIVE} instaed
+     * @deprecated v47 Use {@link MatrixStore#PRIMITIVE64} instaed
      */
     @Deprecated
     public static Access2D<Double> wrapPrimitiveAccess2D(final BasicMatrix<?, ?> matrix) {
-        return MatrixStore.PRIMITIVE.makeWrapper(matrix).get();
+        return MatrixStore.PRIMITIVE64.makeWrapper(matrix).get();
     }
 
     private MatrixUtils() {

@@ -29,8 +29,6 @@ import java.util.AbstractList;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.array.operation.FillMatchingDual;
 import org.ojalgo.array.operation.ModifyAll;
@@ -40,14 +38,11 @@ import org.ojalgo.array.operation.SubstituteBackwards;
 import org.ojalgo.array.operation.SubstituteForwards;
 import org.ojalgo.array.operation.VisitAll;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
@@ -67,19 +62,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class RawStore extends Object implements PhysicalStore<Double> {
 
-    public static final PhysicalStore.Factory<Double, RawStore> FACTORY = new PhysicalStore.Factory<Double, RawStore>() {
-
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
-        }
-
-        public DenseArray.Factory<Double> array() {
-            return Primitive64Array.FACTORY;
-        }
-
-        public MatrixStore.Factory<Double> builder() {
-            return MatrixStore.PRIMITIVE;
-        }
+    public static final PhysicalStore.Factory<Double, RawStore> FACTORY = new PrimitiveFactory<RawStore>() {
 
         public RawStore columns(final Access1D<?>... source) {
 
@@ -153,10 +136,6 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             return new RawStore(retVal);
         }
 
-        public RawStore conjugate(final Access2D<?> source) {
-            return this.transpose(source);
-        }
-
         public RawStore copy(final Access2D<?> source) {
 
             int numbRows = Math.toIntExact(source.countRows());
@@ -171,10 +150,6 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             return new RawStore(retVal, numbRows, numbCols);
         }
 
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
-
         public RawStore make(final long rows, final long columns) {
             return new RawStore(Math.toIntExact(rows), Math.toIntExact(columns));
         }
@@ -186,31 +161,6 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             retVal.fillDiagonal(0, 0, this.scalar().one().get());
 
             return retVal;
-        }
-
-        public RawStore makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
-
-            double[][] retVal = new double[Math.toIntExact(rows)][Math.toIntExact(columns)];
-
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < columns; j++) {
-                    retVal[i][j] = supplier.doubleValue();
-                }
-            }
-
-            return new RawStore(retVal);
-        }
-
-        public Householder<Double> makeHouseholder(final int length) {
-            return new Householder.Primitive(length);
-        }
-
-        public Rotation<Double> makeRotation(final int low, final int high, final double cos, final double sin) {
-            return new Rotation.Primitive(low, high, cos, sin);
-        }
-
-        public Rotation<Double> makeRotation(final int low, final int high, final Double cos, final Double sin) {
-            return new Rotation.Primitive(low, high, cos, sin);
         }
 
         public RawStore rows(final Access1D<?>... source) {
@@ -291,10 +241,6 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             }
 
             return new RawStore(retVal);
-        }
-
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
         }
 
         public RawStore transpose(final Access2D<?> source) {
@@ -766,7 +712,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         FillMatchingDual.fillAll(data, value);
     }
 
-    public void fillAll(final NullaryFunction<Double> supplier) {
+    public void fillAll(final NullaryFunction<?> supplier) {
         FillMatchingDual.fillAll(data, supplier);
     }
 
@@ -787,7 +733,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         FillMatchingDual.fillColumn(data, Math.toIntExact(row), Math.toIntExact(col), value);
     }
 
-    public void fillColumn(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
         FillMatchingDual.fillColumn(data, Math.toIntExact(row), Math.toIntExact(col), supplier);
     }
 
@@ -795,7 +741,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         FillMatchingDual.fillDiagonal(data, Math.toIntExact(row), Math.toIntExact(col), value);
     }
 
-    public void fillDiagonal(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
         FillMatchingDual.fillDiagonal(data, Math.toIntExact(row), Math.toIntExact(col), supplier);
     }
 
@@ -885,7 +831,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         data[Math.toIntExact(row)][Math.toIntExact(col)] = value;
     }
 
-    public void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
         data[Math.toIntExact(row)][Math.toIntExact(col)] = supplier.doubleValue();
     }
 
@@ -893,7 +839,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         FillMatchingDual.fillRange(data, (int) first, (int) limit, value);
     }
 
-    public void fillRange(final long first, final long limit, final NullaryFunction<Double> supplier) {
+    public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
         FillMatchingDual.fillRange(data, (int) first, (int) limit, supplier);
     }
 
@@ -901,7 +847,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         FillMatchingDual.fillRow(data, Math.toIntExact(row), Math.toIntExact(col), value);
     }
 
-    public void fillRow(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
         FillMatchingDual.fillRow(data, Math.toIntExact(row), Math.toIntExact(col), supplier);
     }
 

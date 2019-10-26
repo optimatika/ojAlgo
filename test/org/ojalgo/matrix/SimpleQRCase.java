@@ -58,18 +58,18 @@ public class SimpleQRCase extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = evaluation.withScale(9).withPrecision(15);
+        // ACCURACY = ACCURACY.withScale(9).withPrecision(15);
 
-        rationalAA = SimpleQRCase.getFactorQ();
-        rationalAX = SimpleQRCase.getFactorR();
-        rationalAB = SimpleQRCase.getOriginal();
+        rAA = SimpleQRCase.getFactorQ();
+        rAX = SimpleQRCase.getFactorR();
+        rAB = SimpleQRCase.getOriginal();
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), evaluation);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), evaluation);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), ACCURACY);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), ACCURACY);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
@@ -80,7 +80,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         final RationalMatrix tmpFactorR = SimpleQRCase.getFactorR();
         actMtrx = tmpFactorQ.multiply(tmpFactorR);
 
-        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
+        TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
     }
 
     @Test
@@ -97,7 +97,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         expMtrx = SimpleQRCase.getOriginal();
         actMtrx = RationalMatrix.FACTORY.copy(tmpQ.multiply(tmpR));
 
-        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
+        TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
 
         // Q
 

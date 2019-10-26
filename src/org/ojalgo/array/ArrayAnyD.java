@@ -53,7 +53,7 @@ public final class ArrayAnyD<N extends Comparable<N>>
         implements AccessAnyD<N>, AccessAnyD.Visitable<N>, AccessAnyD.Aggregatable<N>, AccessAnyD.Sliceable<N>, AccessAnyD.Elements, AccessAnyD.IndexOf,
         StructureAnyD.ReducibleTo1D<Array1D<N>>, StructureAnyD.ReducibleTo2D<Array2D<N>>, MutateAnyD.ModifiableReceiver<N>, MutateAnyD.Mixable<N> {
 
-    public static final class Factory<N extends Comparable<N>> implements FactoryAnyD<ArrayAnyD<N>> {
+    public static final class Factory<N extends Comparable<N>> implements FactoryAnyD.MayBeSparse<ArrayAnyD<N>, ArrayAnyD<N>, ArrayAnyD<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
@@ -62,6 +62,10 @@ public final class ArrayAnyD<N extends Comparable<N>>
             myDelegate = new BasicArray.Factory<>(denseArray);
         }
 
+        /**
+         * @deprecated v48 Use {@link ArrayAnyD#fillMatching(Access1D)}
+         */
+        @Deprecated
         public ArrayAnyD<N> copy(final AccessAnyD<?> source) {
             return myDelegate.copy(source).wrapInArrayAnyD(source.shape());
         }
@@ -71,6 +75,10 @@ public final class ArrayAnyD<N extends Comparable<N>>
             return myDelegate.function();
         }
 
+        /**
+         * @deprecated v48 Use {@link ArrayAnyD#fillAll(NullaryFunction)}
+         */
+        @Deprecated
         public ArrayAnyD<N> makeFilled(final long[] structure, final NullaryFunction<?> supplier) {
             return myDelegate.makeFilled(StructureAnyD.count(structure), supplier).wrapInArrayAnyD(structure);
         }
@@ -81,12 +89,16 @@ public final class ArrayAnyD<N extends Comparable<N>>
 
         @Override
         public ArrayAnyD<N> make(final long... structure) {
-            return myDelegate.makeToBeFilled(structure).wrapInArrayAnyD(structure);
+            return this.makeDense(structure);
         }
 
         @Override
         public Scalar.Factory<N> scalar() {
             return myDelegate.scalar();
+        }
+
+        public ArrayAnyD<N> makeDense(long... structure) {
+            return myDelegate.makeToBeFilled(structure).wrapInArrayAnyD(structure);
         }
 
     }
@@ -223,7 +235,7 @@ public final class ArrayAnyD<N extends Comparable<N>>
     }
 
     @Override
-    public void fillAll(final NullaryFunction<N> supplier) {
+    public void fillAll(final NullaryFunction<?> supplier) {
         myDelegate.fill(0L, this.count(), 1L, supplier);
     }
 
@@ -238,7 +250,7 @@ public final class ArrayAnyD<N extends Comparable<N>>
     }
 
     @Override
-    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+    public void fillOne(final long index, final NullaryFunction<?> supplier) {
         myDelegate.fillOne(index, supplier);
     }
 
@@ -248,7 +260,7 @@ public final class ArrayAnyD<N extends Comparable<N>>
     }
 
     @Override
-    public void fillOne(final long[] reference, final NullaryFunction<N> supplier) {
+    public void fillOne(final long[] reference, final NullaryFunction<?> supplier) {
         myDelegate.fillOne(StructureAnyD.index(myStructure, reference), supplier);
     }
 
@@ -258,7 +270,7 @@ public final class ArrayAnyD<N extends Comparable<N>>
     }
 
     @Override
-    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+    public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
         myDelegate.fill(first, limit, 1L, supplier);
     }
 
@@ -268,7 +280,7 @@ public final class ArrayAnyD<N extends Comparable<N>>
     }
 
     @Override
-    public void fillSet(final int dimension, final long dimensionalIndex, final NullaryFunction<N> supplier) {
+    public void fillSet(final int dimension, final long dimensionalIndex, final NullaryFunction<?> supplier) {
         this.loop(dimension, dimensionalIndex, (f, l, s) -> myDelegate.fill(f, l, s, supplier));
     }
 
@@ -278,7 +290,7 @@ public final class ArrayAnyD<N extends Comparable<N>>
     }
 
     @Override
-    public void fillSet(final long[] initial, final int dimension, final NullaryFunction<N> supplier) {
+    public void fillSet(final long[] initial, final int dimension, final NullaryFunction<?> supplier) {
         this.loop(initial, dimension, (f, l, s) -> myDelegate.fill(f, l, s, supplier));
     }
 

@@ -54,7 +54,7 @@ import org.ojalgo.structure.Transformation1D;
 public final class Array1D<N extends Comparable<N>> extends AbstractList<N> implements Access1D<N>, Access1D.Visitable<N>, Access1D.Aggregatable<N>,
         Access1D.Sliceable<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D.ModifiableReceiver<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess {
 
-    public static final class Factory<N extends Comparable<N>> implements Factory1D<Array1D<N>> {
+    public static final class Factory<N extends Comparable<N>> implements Factory1D.MayBeSparse<Array1D<N>, Array1D<N>, Array1D<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
@@ -86,7 +86,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         @Override
         public Array1D<N> make(final long count) {
-            return myDelegate.makeToBeFilled(count).wrapInArray1D();
+            return this.makeDense(count);
         }
 
         public Array1D<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
@@ -104,6 +104,10 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         public Array1D<N> wrap(final BasicArray<N> array) {
             return array.wrapInArray1D();
+        }
+
+        public Array1D<N> makeDense(long count) {
+            return myDelegate.makeToBeFilled(count).wrapInArray1D();
         }
 
     }
@@ -405,7 +409,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
-    public void fillAll(final NullaryFunction<N> supplier) {
+    public void fillAll(final NullaryFunction<?> supplier) {
         myDelegate.fill(myFirst, myLimit, myStep, supplier);
     }
 
@@ -421,7 +425,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
-    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+    public void fillOne(final long index, final NullaryFunction<?> supplier) {
         final long tmpIndex = myFirst + (myStep * index);
         myDelegate.fillOne(tmpIndex, supplier);
     }
@@ -434,7 +438,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
-    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+    public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
         final long tmpFirst = myFirst + (myStep * first);
         final long tmpLimit = myFirst + (myStep * limit);
         myDelegate.fill(tmpFirst, tmpLimit, myStep, supplier);

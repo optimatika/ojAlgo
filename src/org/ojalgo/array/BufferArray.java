@@ -443,7 +443,7 @@ public abstract class BufferArray extends PlainArray<Double> {
     }
 
     @Override
-    protected void fill(final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
+    protected void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
         BufferArray.fill(this, first, limit, step, supplier);
     }
 

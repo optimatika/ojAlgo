@@ -49,41 +49,41 @@ public class P20050125Case extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = new NumberContext(7, 6);
+        // ACCURACY = new NumberContext(7, 6);
 
-        rationalAA = P20050125Case.getProblematic();
-        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
-        rationalAB = rationalAA;
+        rAA = P20050125Case.getProblematic();
+        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
+        rAB = rAA;
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
     public void testData() {
 
         final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
-        tmpDelegate.decompose(GenericStore.RATIONAL.copy(rationalAA));
+        tmpDelegate.decompose(GenericStore.RATIONAL.copy(rAA));
 
-        TestUtils.assertEquals(GenericStore.RATIONAL.copy(rationalAA), tmpDelegate, evaluation);
+        TestUtils.assertEquals(GenericStore.RATIONAL.copy(rAA), tmpDelegate, ACCURACY);
     }
 
     @Test
     public void testProblem() {
 
         final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
-        tmpDelegate.decompose(GenericStore.RATIONAL.copy(rationalAA));
+        tmpDelegate.decompose(GenericStore.RATIONAL.copy(rAA));
 
-        final MatrixStore<RationalNumber> tmpInv = tmpDelegate.getSolution(GenericStore.RATIONAL.copy(rationlI));
+        final MatrixStore<RationalNumber> tmpInv = tmpDelegate.getSolution(GenericStore.RATIONAL.copy(rI));
 
-        final MatrixStore<RationalNumber> tmpExpMtrx = GenericStore.RATIONAL.copy(rationlI);
-        final MatrixStore<RationalNumber> tmpActMtrx = GenericStore.RATIONAL.copy(rationalAA).multiply(tmpInv);
+        final MatrixStore<RationalNumber> tmpExpMtrx = GenericStore.RATIONAL.copy(rI);
+        final MatrixStore<RationalNumber> tmpActMtrx = GenericStore.RATIONAL.copy(rAA).multiply(tmpInv);
 
-        TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, evaluation);
+        TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, ACCURACY);
     }
 
     @Override

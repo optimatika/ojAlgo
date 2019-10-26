@@ -31,18 +31,13 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ComplexArray;
-import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.machine.JavaType;
@@ -68,19 +63,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class Primitive64Store extends Primitive64Array implements PhysicalStore<Double>, DecompositionStore<Double> {
 
-    public static final PhysicalStore.Factory<Double, Primitive64Store> FACTORY = new PhysicalStore.Factory<Double, Primitive64Store>() {
-
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
-        }
-
-        public DenseArray.Factory<Double> array() {
-            return Primitive64Array.FACTORY;
-        }
-
-        public MatrixStore.Factory<Double> builder() {
-            return MatrixStore.PRIMITIVE;
-        }
+    public static final PhysicalStore.Factory<Double, Primitive64Store> FACTORY = new PrimitiveFactory<Primitive64Store>() {
 
         public Primitive64Store columns(final Access1D<?>... source) {
 
@@ -154,10 +137,6 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
         }
 
-        public Primitive64Store conjugate(final Access2D<?> source) {
-            return this.transpose(source);
-        }
-
         public Primitive64Store copy(final Access2D<?> source) {
 
             final int tmpRowDim = (int) source.countRows();
@@ -186,10 +165,6 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             return retVal;
         }
 
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
-
         public Primitive64Store make(final long rows, final long columns) {
             return new Primitive64Store((int) rows, (int) columns);
         }
@@ -201,34 +176,6 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             retVal.fillDiagonal(ONE);
 
             return retVal;
-        }
-
-        public Primitive64Store makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
-
-            final int tmpRowDim = (int) rows;
-            final int tmpColDim = (int) columns;
-
-            final int tmpLength = tmpRowDim * tmpColDim;
-
-            final double[] tmpData = new double[tmpLength];
-
-            for (int i = 0; i < tmpLength; i++) {
-                tmpData[i] = supplier.doubleValue();
-            }
-
-            return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public Householder.Primitive makeHouseholder(final int length) {
-            return new Householder.Primitive(length);
-        }
-
-        public Rotation.Primitive makeRotation(final int low, final int high, final double cos, final double sin) {
-            return new Rotation.Primitive(low, high, cos, sin);
-        }
-
-        public Rotation.Primitive makeRotation(final int low, final int high, final Double cos, final Double sin) {
-            return this.makeRotation(low, high, cos != null ? cos.doubleValue() : Double.NaN, sin != null ? sin.doubleValue() : Double.NaN);
         }
 
         public Primitive64Store rows(final Access1D<?>... source) {
@@ -301,10 +248,6 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             }
 
             return new Primitive64Store(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
         }
 
         public Primitive64Store transpose(final Access2D<?> source) {
@@ -726,7 +669,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         myUtility.fillColumn(row, col, value);
     }
 
-    public void fillColumn(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
         myUtility.fillColumn(row, col, supplier);
     }
 
@@ -734,7 +677,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         myUtility.fillDiagonal(row, col, value);
     }
 
-    public void fillDiagonal(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
         myUtility.fillDiagonal(row, col, supplier);
     }
 
@@ -824,7 +767,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         myUtility.fillOne(row, col, value);
     }
 
-    public void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
         myUtility.fillOne(row, col, supplier);
     }
 
@@ -836,7 +779,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         myUtility.fillRow(row, col, value);
     }
 
-    public void fillRow(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
         myUtility.fillRow(row, col, supplier);
     }
 

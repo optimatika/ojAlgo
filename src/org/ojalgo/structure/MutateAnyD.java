@@ -40,15 +40,15 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
         void fillOne(long[] reference, N value);
 
-        void fillOne(long[] reference, NullaryFunction<N> supplier);
+        void fillOne(long[] reference, NullaryFunction<?> supplier);
 
         void fillSet(int dimension, long dimensionalIndex, N value);
 
-        void fillSet(int dimension, long dimensionalIndex, NullaryFunction<N> supplier);
+        void fillSet(int dimension, long dimensionalIndex, NullaryFunction<?> supplier);
 
         void fillSet(long[] initial, int dimension, N value);
 
-        void fillSet(long[] initial, int dimension, NullaryFunction<N> supplier);
+        void fillSet(long[] initial, int dimension, NullaryFunction<?> supplier);
 
     }
 

@@ -51,7 +51,7 @@ import org.ojalgo.structure.Transformation2D;
 public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>,
         Access2D.Elements, Access2D.IndexOf, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N> {
 
-    public static final class Factory<N extends Comparable<N>> implements Factory2D<Array2D<N>> {
+    public static final class Factory<N extends Comparable<N>> implements Factory2D.MayBeSparse<Array2D<N>, Array2D<N>, Array2D<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
@@ -153,7 +153,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
 
         @Override
         public Array2D<N> make(final long rows, final long columns) {
-            return myDelegate.makeToBeFilled(rows, columns).wrapInArray2D(rows);
+            return this.makeDense(rows, columns);
         }
 
         public Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
@@ -255,6 +255,10 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
         @Override
         public Scalar.Factory<N> scalar() {
             return myDelegate.scalar();
+        }
+
+        public Array2D<N> makeDense(long rows, long columns) {
+            return myDelegate.makeToBeFilled(rows, columns).wrapInArray2D(rows);
         }
 
     }
@@ -411,7 +415,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
     }
 
     @Override
-    public void fillAll(final NullaryFunction<N> supplier) {
+    public void fillAll(final NullaryFunction<?> supplier) {
         myDelegate.fill(0L, this.count(), 1L, supplier);
     }
 
@@ -438,7 +442,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
     }
 
     @Override
-    public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+    public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L, supplier);
     }
 
@@ -449,7 +453,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
     }
 
     @Override
-    public void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
+    public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, supplier);
     }
@@ -470,7 +474,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
     }
 
     @Override
-    public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
         myDelegate.fillOne(Structure2D.index(myRowsCount, row, col), supplier);
     }
 
@@ -480,7 +484,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
     }
 
     @Override
-    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+    public void fillOne(final long index, final NullaryFunction<?> supplier) {
         myDelegate.fillOne(index, supplier);
     }
 
@@ -490,7 +494,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
     }
 
     @Override
-    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+    public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
         myDelegate.fill(first, limit, 1L, supplier);
     }
 
@@ -517,7 +521,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
     }
 
     @Override
-    public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+    public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, supplier);
     }
 

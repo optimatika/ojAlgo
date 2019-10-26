@@ -25,28 +25,26 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive32Array;
+import org.ojalgo.array.operation.FillMatchingSingle;
 import org.ojalgo.array.operation.MultiplyBoth;
 import org.ojalgo.array.operation.MultiplyLeft;
 import org.ojalgo.array.operation.MultiplyNeither;
 import org.ojalgo.array.operation.MultiplyRight;
+import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.*;
 
 /**
@@ -56,52 +54,116 @@ import org.ojalgo.structure.*;
  */
 public final class Primitive32Store extends Primitive32Array implements PhysicalStore<Double> {
 
-    public static final PhysicalStore.Factory<Double, Primitive32Store> FACTORY = new PhysicalStore.Factory<Double, Primitive32Store>() {
+    public static final PhysicalStore.Factory<Double, Primitive32Store> FACTORY = new PrimitiveFactory<Primitive32Store>() {
 
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
-        }
-
+        @Override
         public DenseArray.Factory<Double> array() {
             return Primitive32Array.FACTORY;
         }
 
+        @Override
         public MatrixStore.Factory<Double> builder() {
-            // TODO Auto-generated method stub
-            return null;
+            return MatrixStore.PRIMITIVE32;
         }
 
         public Primitive32Store columns(Access1D<?>... source) {
-            // TODO Auto-generated method stub
-            return null;
+
+            final int tmpRowDim = (int) source[0].count();
+            final int tmpColDim = source.length;
+
+            final float[] tmpData = new float[tmpRowDim * tmpColDim];
+
+            Access1D<?> tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = tmpColumn.floatValue(i);
+                }
+            }
+
+            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         public Primitive32Store columns(Comparable<?>[]... source) {
-            // TODO Auto-generated method stub
-            return null;
+
+            final int tmpRowDim = source[0].length;
+            final int tmpColDim = source.length;
+
+            final float[] tmpData = new float[tmpRowDim * tmpColDim];
+
+            Comparable<?>[] tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = Scalar.floatValue(tmpColumn[i]);
+                }
+            }
+
+            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         public Primitive32Store columns(double[]... source) {
-            // TODO Auto-generated method stub
-            return null;
+
+            final int tmpRowDim = source[0].length;
+            final int tmpColDim = source.length;
+
+            final float[] tmpData = new float[tmpRowDim * tmpColDim];
+
+            double[] tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = (float) tmpColumn[i];
+                }
+            }
+
+            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         public Primitive32Store columns(List<? extends Comparable<?>>... source) {
-            // TODO Auto-generated method stub
-            return null;
-        }
 
-        public Primitive32Store conjugate(Access2D<?> source) {
-            return this.transpose(source);
+            final int tmpRowDim = source[0].size();
+            final int tmpColDim = source.length;
+
+            final float[] tmpData = new float[tmpRowDim * tmpColDim];
+
+            List<? extends Comparable<?>> tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = Scalar.floatValue(tmpColumn.get(i));
+                }
+            }
+
+            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         public Primitive32Store copy(Access2D<?> source) {
-            // TODO Auto-generated method stub
-            return null;
-        }
 
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
+            final int tmpRowDim = (int) source.countRows();
+            final int tmpColDim = (int) source.countColumns();
+
+            final Primitive32Store retVal = new Primitive32Store(tmpRowDim, tmpColDim);
+
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillMatchingSingle.copy(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.copy(retVal.data, tmpRowDim, 0, tmpColDim, source);
+            }
+
+            return retVal;
         }
 
         public Primitive32Store make(long rows, long columns) {
@@ -117,54 +179,104 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             return retVal;
         }
 
-        public Primitive32Store makeFilled(long rows, long columns, NullaryFunction<?> supplier) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public Householder<Double> makeHouseholder(int length) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public Rotation<Double> makeRotation(int low, int high, double cos, double sin) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public Rotation<Double> makeRotation(int low, int high, Double cos, Double sin) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
         public Primitive32Store rows(Access1D<?>... source) {
-            // TODO Auto-generated method stub
-            return null;
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = (int) source[0].count();
+
+            final float[] tmpData = new float[tmpRowDim * tmpColDim];
+
+            Access1D<?> tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = tmpRow.floatValue(j);
+                }
+            }
+
+            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         public Primitive32Store rows(Comparable<?>[]... source) {
-            // TODO Auto-generated method stub
-            return null;
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = source[0].length;
+
+            final float[] tmpData = new float[tmpRowDim * tmpColDim];
+
+            Comparable<?>[] tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = Scalar.floatValue(tmpRow[j]);
+                }
+            }
+
+            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         public Primitive32Store rows(double[]... source) {
-            // TODO Auto-generated method stub
-            return null;
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = source[0].length;
+
+            final float[] tmpData = new float[tmpRowDim * tmpColDim];
+
+            double[] tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = (float) tmpRow[j];
+                }
+            }
+
+            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         public Primitive32Store rows(List<? extends Comparable<?>>... source) {
-            // TODO Auto-generated method stub
-            return null;
-        }
 
-        public org.ojalgo.scalar.Scalar.Factory<Double> scalar() {
-            // TODO Auto-generated method stub
-            return null;
+            final int tmpRowDim = source.length;
+            final int tmpColDim = source[0].size();
+
+            final float[] tmpData = new float[tmpRowDim * tmpColDim];
+
+            List<? extends Comparable<?>> tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = Scalar.floatValue(tmpRow.get(j));
+                }
+            }
+
+            return new Primitive32Store(tmpRowDim, tmpColDim, tmpData);
         }
 
         public Primitive32Store transpose(Access2D<?> source) {
-            // TODO Auto-generated method stub
-            return null;
+
+            final Primitive32Store retVal = new Primitive32Store((int) source.countColumns(), (int) source.countRows());
+
+            final int tmpRowDim = retVal.getRowDim();
+            final int tmpColDim = retVal.getColDim();
+
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        FillMatchingSingle.transpose(retVal.data, tmpRowDim, first, limit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.transpose(retVal.data, tmpRowDim, 0, tmpColDim, source);
+            }
+
+            return retVal;
         }
 
     };
@@ -212,26 +324,12 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         myUtility.accept(supplied);
     }
 
-    @Override
-    public void add(long index, Comparable<?> addend) {
-        myUtility.add(index, addend);
-    }
-
-    @Override
-    public void add(long index, double addend) {
-        myUtility.add(index, addend);
-    }
-
     public void add(long row, long col, Comparable<?> addend) {
         myUtility.add(row, col, addend);
     }
 
     public void add(long row, long col, double addend) {
         myUtility.add(row, col, addend);
-    }
-
-    public Double aggregateAll(Aggregator aggregator) {
-        return myUtility.aggregateAll(aggregator);
     }
 
     public Double aggregateColumn(long col, Aggregator aggregator) {
@@ -262,10 +360,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.aggregateRow(row, col, aggregator);
     }
 
-    public Consumer<Access2D<?>> andThen(Consumer<? super Access2D<?>> after) {
-        return myUtility.andThen(after);
-    }
-
     public <NN extends Comparable<NN>, R extends Mutate2D.Receiver<NN>> Access2D.Collectable<NN, R> asCollectable2D() {
         return myUtility.asCollectable2D();
     }
@@ -273,10 +367,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     public List<Double> asList() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public byte byteValue(long index) {
-        return myUtility.byteValue(index);
     }
 
     public byte byteValue(long row, long col) {
@@ -369,11 +459,11 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         myUtility.fillColumn(row, col, value);
     }
 
-    public void fillColumn(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
         myUtility.fillColumn(row, col, supplier);
     }
 
-    public void fillColumn(long col, NullaryFunction<Double> supplier) {
+    public void fillColumn(long col, NullaryFunction<?> supplier) {
         myUtility.fillColumn(col, supplier);
     }
 
@@ -393,17 +483,12 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         myUtility.fillDiagonal(row, col, value);
     }
 
-    public void fillDiagonal(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
         myUtility.fillDiagonal(row, col, supplier);
     }
 
-    public void fillDiagonal(NullaryFunction<Double> supplier) {
+    public void fillDiagonal(NullaryFunction<?> supplier) {
         myUtility.fillDiagonal(supplier);
-    }
-
-    @Override
-    public void fillMatching(Access1D<?> values) {
-        myUtility.fillMatching(values);
     }
 
     @Override
@@ -416,11 +501,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         myUtility.fillMatching(function, arguments);
     }
 
-    @Override
-    public void fillOne(long index, Double value) {
-        myUtility.fillOne(index, value);
-    }
-
     public void fillOne(long row, long col, Access1D<?> values, long valueIndex) {
         myUtility.fillOne(row, col, values, valueIndex);
     }
@@ -429,13 +509,8 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         myUtility.fillOne(row, col, value);
     }
 
-    public void fillOne(long row, long col, NullaryFunction<Double> supplier) {
+    public void fillOne(long row, long col, NullaryFunction<?> supplier) {
         myUtility.fillOne(row, col, supplier);
-    }
-
-    @Override
-    public void fillOne(long index, NullaryFunction<Double> supplier) {
-        myUtility.fillOne(index, supplier);
     }
 
     public void fillRow(long row, Access1D<Double> values) {
@@ -454,16 +529,12 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         myUtility.fillRow(row, col, value);
     }
 
-    public void fillRow(long row, long col, NullaryFunction<Double> supplier) {
+    public void fillRow(long row, long col, NullaryFunction<?> supplier) {
         myUtility.fillRow(row, col, supplier);
     }
 
-    public void fillRow(long row, NullaryFunction<Double> supplier) {
+    public void fillRow(long row, NullaryFunction<?> supplier) {
         myUtility.fillRow(row, supplier);
-    }
-
-    public float floatValue(long index) {
-        return myUtility.floatValue(index);
     }
 
     public float floatValue(long row, long col) {
@@ -480,11 +551,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.hashCode();
     }
 
-    @Override
-    public long indexOfLargest() {
-        return myUtility.indexOfLargest();
-    }
-
     public long indexOfLargestInColumn(long col) {
         return myUtility.indexOfLargestInColumn(col);
     }
@@ -492,11 +558,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     public long indexOfLargestInColumn(long row, long col) {
         // TODO Auto-generated method stub
         return 0;
-    }
-
-    @Override
-    public long indexOfLargestInRange(long first, long limit) {
-        return myUtility.indexOfLargestInRange(first, limit);
     }
 
     public long indexOfLargestInRow(long row) {
@@ -515,10 +576,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     public long indexOfLargestOnDiagonal(long first) {
         // TODO Auto-generated method stub
         return 0;
-    }
-
-    public int intValue(long index) {
-        return myUtility.intValue(index);
     }
 
     public int intValue(long row, long col) {
@@ -581,10 +638,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.isVector();
     }
 
-    public long longValue(long index) {
-        return myUtility.longValue(index);
-    }
-
     public long longValue(long row, long col) {
         return myUtility.longValue(row, col);
     }
@@ -645,11 +698,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
     }
 
-    @Override
-    public void modifyRange(long first, long limit, UnaryFunction<Double> modifier) {
-        myUtility.modifyRange(first, limit, modifier);
-    }
-
     public void modifyRow(long row, long col, UnaryFunction<Double> modifier) {
         myUtility.modifyRow(row, col, modifier);
     }
@@ -662,9 +710,8 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.nonzeros();
     }
 
-    public org.ojalgo.matrix.store.PhysicalStore.Factory<Double, ?> physical() {
-        // TODO Auto-generated method stub
-        return null;
+    public PhysicalStore.Factory<Double, ?> physical() {
+        return FACTORY;
     }
 
     public void reduceColumns(Aggregator aggregator, Mutate1D receiver) {
@@ -712,17 +759,8 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         myUtility.set(row, col, value);
     }
 
-    public short shortValue(long index) {
-        return myUtility.shortValue(index);
-    }
-
     public short shortValue(long row, long col) {
         return myUtility.shortValue(row, col);
-    }
-
-    @Override
-    public int size() {
-        return myUtility.size();
     }
 
     public Array1D<Double> sliceColumn(long col) {
@@ -739,10 +777,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
     public Array1D<Double> sliceDiagonal(final long row, final long col) {
         return myUtility.sliceDiagonal(row, col);
-    }
-
-    public Array1D<Double> sliceRange(final long first, final long limit) {
-        return myUtility.sliceRange(first, limit);
     }
 
     public Array1D<Double> sliceRow(long row) {
@@ -775,11 +809,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.toRawCopy2D();
     }
 
-    @Override
-    public String toString() {
-        return myUtility.toString();
-    }
-
     public void transformLeft(Householder<Double> transformation, int firstColumn) {
         // TODO Auto-generated method stub
 
@@ -800,11 +829,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
     }
 
-    @Override
-    public void visitAll(VoidFunction<Double> visitor) {
-        myUtility.visitAll(visitor);
-    }
-
     public void visitColumn(final long row, final long col, final VoidFunction<Double> visitor) {
         myUtility.visitColumn(row, col, visitor);
     }
@@ -823,16 +847,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
     public void visitOne(long row, long col, VoidFunction<Double> visitor) {
         myUtility.visitOne(row, col, visitor);
-    }
-
-    @Override
-    public void visitOne(long index, VoidFunction<Double> visitor) {
-        myUtility.visitOne(index, visitor);
-    }
-
-    @Override
-    public void visitRange(long first, long limit, VoidFunction<Double> visitor) {
-        myUtility.visitRange(first, limit, visitor);
     }
 
     public void visitRow(final long row, final long col, final VoidFunction<Double> visitor) {

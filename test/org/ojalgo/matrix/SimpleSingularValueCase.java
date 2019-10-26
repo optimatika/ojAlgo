@@ -61,18 +61,18 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = new NumberContext(7, 9);
+        // ACCURACY = new NumberContext(7, 9);
 
-        rationalAA = SimpleSingularValueCase.getMatrixQ1();
-        rationalAX = SimpleSingularValueCase.getMatrixD();
-        rationalAB = SimpleSingularValueCase.getOriginal();
+        rAA = SimpleSingularValueCase.getMatrixQ1();
+        rAX = SimpleSingularValueCase.getMatrixD();
+        rAB = SimpleSingularValueCase.getOriginal();
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
@@ -84,7 +84,7 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
         final PhysicalStore<Double> tmpAct = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getMatrixQ1())
                 .multiply(Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getMatrixD())).copy();
 
-        TestUtils.assertEquals(tmpExp, tmpAct, evaluation);
+        TestUtils.assertEquals(tmpExp, tmpAct, ACCURACY);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
         tmpSVD.decompose(tmpA);
 
         //tmpSVD.equals(tmpA, EVALUATION);
-        TestUtils.assertEquals(tmpA, tmpSVD, evaluation);
+        TestUtils.assertEquals(tmpA, tmpSVD, ACCURACY);
     }
 
 }

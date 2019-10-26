@@ -51,22 +51,22 @@ public class LargerCholeskyCase extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = new NumberContext(7, 3);
+        // ACCURACY = new NumberContext(7, 3);
 
-        rationalAB = LargerCholeskyCase.getOriginal();
+        rAB = LargerCholeskyCase.getOriginal();
 
         final Cholesky<RationalNumber> tmpCholesky = Cholesky.RATIONAL.make();
-        tmpCholesky.decompose(GenericStore.RATIONAL.copy(rationalAB));
+        tmpCholesky.decompose(GenericStore.RATIONAL.copy(rAB));
 
-        rationalAA = RationalMatrix.FACTORY.copy(tmpCholesky.getL());
-        rationalAX = rationalAA.transpose();
+        rAA = RationalMatrix.FACTORY.copy(tmpCholesky.getL());
+        rAX = rAA.transpose();
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
@@ -85,7 +85,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
         final Cholesky<Double> tmpDecomp = Cholesky.PRIMITIVE.make();
         tmpDecomp.decompose(Primitive64Store.FACTORY.copy(tmpMtrx));
 
-        TestUtils.assertEquals(Primitive64Store.FACTORY.copy(tmpMtrx), tmpDecomp, evaluation);
+        TestUtils.assertEquals(Primitive64Store.FACTORY.copy(tmpMtrx), tmpDecomp, ACCURACY);
     }
 
 }

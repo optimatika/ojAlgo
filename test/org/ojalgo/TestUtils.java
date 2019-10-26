@@ -321,11 +321,11 @@ public abstract class TestUtils {
             ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
             ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
 
-            if (!!precision.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
+            if (precision.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
                 // Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
                 Assertions.assertEquals(expected, actual, () -> message + " (real)" + ": " + expected + " != " + actual);
             }
-            if (!!precision.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
+            if (precision.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
                 // Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
                 Assertions.assertEquals(expected, actual, () -> message + " (imaginary)" + ": " + expected + " != " + actual);
             }

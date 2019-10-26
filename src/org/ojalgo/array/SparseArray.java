@@ -360,7 +360,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public void fillAll(final NullaryFunction<N> supplier) {
+    public void fillAll(final NullaryFunction<?> supplier) {
 
         // Bad idea...
 
@@ -390,7 +390,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+    public void fillOne(final long index, final NullaryFunction<?> supplier) {
         this.set(index, supplier.get());
     }
 
@@ -400,7 +400,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+    public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
         this.fill(first, limit, 1L, supplier);
     }
 
@@ -743,7 +743,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    protected void fill(final long first, final long limit, final long step, final NullaryFunction<N> supplier) {
+    protected void fill(final long first, final long limit, final long step, final NullaryFunction<?> supplier) {
         for (long i = first; i < limit; i += step) {
             this.fillOne(i, supplier);
         }

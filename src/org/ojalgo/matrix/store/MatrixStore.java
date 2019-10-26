@@ -591,34 +591,6 @@ public interface MatrixStore<N extends Comparable<N>>
 
     };
 
-    Factory<Double> PRIMITIVE = new Factory<Double>() {
-
-        public <D extends Access1D<?>> Builder<Double, D> makeDiagonal(final D mainDiagonal) {
-            return DiagonalStore.builder(Primitive64Store.FACTORY, mainDiagonal);
-        }
-
-        public LogicalBuilder<Double> makeIdentity(final int dimension) {
-            return new LogicalBuilder<>(new IdentityStore<>(Primitive64Store.FACTORY, dimension));
-        }
-
-        public LogicalBuilder<Double> makeSingle(final Double element) {
-            return new LogicalBuilder<>(new SingleStore<>(Primitive64Store.FACTORY, element));
-        }
-
-        public SparseStore<Double> makeSparse(final int rowsCount, final int columnsCount) {
-            return SparseStore.PRIMITIVE.make(rowsCount, columnsCount);
-        }
-
-        public LogicalBuilder<Double> makeWrapper(final Access2D<?> access) {
-            return new LogicalBuilder<>(new WrapperStore<>(Primitive64Store.FACTORY, access));
-        }
-
-        public LogicalBuilder<Double> makeZero(final int rowsCount, final int columnsCount) {
-            return new LogicalBuilder<>(new ZeroStore<>(Primitive64Store.FACTORY, rowsCount, columnsCount));
-        }
-
-    };
-
     Factory<Double> PRIMITIVE32 = new Factory<Double>() {
 
         public <D extends Access1D<?>> Builder<Double, D> makeDiagonal(final D mainDiagonal) {
@@ -643,6 +615,34 @@ public interface MatrixStore<N extends Comparable<N>>
 
         public LogicalBuilder<Double> makeZero(final int rowsCount, final int columnsCount) {
             return new LogicalBuilder<>(new ZeroStore<>(Primitive32Store.FACTORY, rowsCount, columnsCount));
+        }
+
+    };
+
+    Factory<Double> PRIMITIVE64 = new Factory<Double>() {
+
+        public <D extends Access1D<?>> Builder<Double, D> makeDiagonal(final D mainDiagonal) {
+            return DiagonalStore.builder(Primitive64Store.FACTORY, mainDiagonal);
+        }
+
+        public LogicalBuilder<Double> makeIdentity(final int dimension) {
+            return new LogicalBuilder<>(new IdentityStore<>(Primitive64Store.FACTORY, dimension));
+        }
+
+        public LogicalBuilder<Double> makeSingle(final Double element) {
+            return new LogicalBuilder<>(new SingleStore<>(Primitive64Store.FACTORY, element));
+        }
+
+        public SparseStore<Double> makeSparse(final int rowsCount, final int columnsCount) {
+            return SparseStore.PRIMITIVE64.make(rowsCount, columnsCount);
+        }
+
+        public LogicalBuilder<Double> makeWrapper(final Access2D<?> access) {
+            return new LogicalBuilder<>(new WrapperStore<>(Primitive64Store.FACTORY, access));
+        }
+
+        public LogicalBuilder<Double> makeZero(final int rowsCount, final int columnsCount) {
+            return new LogicalBuilder<>(new ZeroStore<>(Primitive64Store.FACTORY, rowsCount, columnsCount));
         }
 
     };

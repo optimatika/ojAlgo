@@ -91,11 +91,11 @@ abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double>
         this.set(Structure2D.index(this.structure(), row, col), value.doubleValue());
     }
 
-    public final void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public final void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
         this.set(Structure2D.index(this.structure(), row, col), supplier.doubleValue());
     }
 
-    public final void fillOne(final long index, final NullaryFunction<Double> supplier) {
+    public final void fillOne(final long index, final NullaryFunction<?> supplier) {
         this.set(Structure1D.index(index), supplier.doubleValue());
     }
 

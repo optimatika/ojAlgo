@@ -48,7 +48,7 @@ public interface Mutate1D extends Structure1D {
             this.fillRange(0L, this.count(), value);
         }
 
-        default void fillAll(final NullaryFunction<N> supplier) {
+        default void fillAll(final NullaryFunction<?> supplier) {
             this.fillRange(0L, this.count(), supplier);
         }
 
@@ -75,13 +75,13 @@ public interface Mutate1D extends Structure1D {
 
         void fillOne(long index, N value);
 
-        void fillOne(long index, NullaryFunction<N> supplier);
+        void fillOne(long index, NullaryFunction<?> supplier);
 
         default void fillRange(final long first, final long limit, final N value) {
             Structure1D.loopRange(first, limit, i -> this.fillOne(i, value));
         }
 
-        default void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+        default void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
             Structure1D.loopRange(first, limit, i -> this.fillOne(i, supplier));
         }
     }

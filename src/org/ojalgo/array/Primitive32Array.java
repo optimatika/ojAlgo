@@ -203,7 +203,7 @@ public class Primitive32Array extends PrimitiveArray {
         }
     }
 
-    protected static void fill(final float[] data, final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
+    protected static void fill(final float[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
         for (int i = first; i < limit; i += step) {
             data[i] = (float) supplier.doubleValue();
         }
@@ -482,7 +482,7 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
-    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
         Primitive32Array.fill(data, first, limit, step, supplier);
     }
 
