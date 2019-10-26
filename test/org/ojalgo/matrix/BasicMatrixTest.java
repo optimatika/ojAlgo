@@ -73,14 +73,14 @@ public abstract class BasicMatrixTest extends MatrixTests {
     Comparable<?> actNumber;
     Scalar<?> actScalar;
     double actValue;
-    ComplexMatrix cAA;
 
+    ComplexMatrix cAA;
     ComplexMatrix cAB;
     ComplexMatrix cAX;
     ComplexMatrix cI;
     ComplexMatrix cSafe;
-    boolean expBoolean;
 
+    boolean expBoolean;
     int expInt;
     BasicMatrix<?, ?> expMtrx;
     Comparable<?> expNumber;
