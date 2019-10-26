@@ -396,9 +396,8 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.asCollectable2D();
     }
 
-    public List<Double> asList() {
-        // TODO Auto-generated method stub
-        return null;
+    public Array1D<Double> asList() {
+        return myUtility.asArray1D();
     }
 
     public byte byteValue(long row, long col) {
@@ -568,8 +567,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     }
 
     public Double get(long row, long col) {
-        // TODO Auto-generated method stub
-        return null;
+        return myUtility.get(row, col);
     }
 
     @Override
@@ -582,8 +580,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     }
 
     public long indexOfLargestInColumn(long row, long col) {
-        // TODO Auto-generated method stub
-        return 0;
+        return myUtility.indexOfLargestInColumn(row, col);
     }
 
     public long indexOfLargestInRow(long row) {
@@ -591,8 +588,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     }
 
     public long indexOfLargestInRow(long row, long col) {
-        // TODO Auto-generated method stub
-        return 0;
+        return myUtility.indexOfLargestInRow(row, col);
     }
 
     public long indexOfLargestOnDiagonal() {
@@ -600,8 +596,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     }
 
     public long indexOfLargestOnDiagonal(long first) {
-        // TODO Auto-generated method stub
-        return 0;
+        return myUtility.indexOfLargestOnDiagonal(first);
     }
 
     public int intValue(long row, long col) {
@@ -720,8 +715,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     }
 
     public void modifyOne(long row, long col, UnaryFunction<Double> modifier) {
-        // TODO Auto-generated method stub
-
+        myUtility.modifyOne(row, col, modifier);
     }
 
     public void modifyRow(long row, long col, UnaryFunction<Double> modifier) {
@@ -808,14 +802,52 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         return myUtility.sliceRow(row, col);
     }
 
-    public void substituteBackwards(Access2D<Double> body, boolean unitDiagonal, boolean conjugated, boolean hermitian) {
-        // TODO Auto-generated method stub
+    public void substituteBackwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
 
+        final int tmpRowDim = myRowDim;
+        final int tmpColDim = myColDim;
+
+        if (tmpColDim > SubstituteBackwards.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int first, final int limit) {
+                    SubstituteBackwards.invoke(Primitive32Store.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, hermitian);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, tmpColDim, SubstituteBackwards.THRESHOLD);
+
+        } else {
+
+            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, hermitian);
+        }
     }
 
-    public void substituteForwards(Access2D<Double> body, boolean unitDiagonal, boolean conjugated, boolean identity) {
-        // TODO Auto-generated method stub
+    public void substituteForwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
 
+        final int tmpRowDim = myRowDim;
+        final int tmpColDim = myColDim;
+
+        if (tmpColDim > SubstituteForwards.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                public void conquer(final int first, final int limit) {
+                    SubstituteForwards.invoke(Primitive32Store.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, identity);
+                }
+
+            };
+
+            tmpConquerer.invoke(0, tmpColDim, SubstituteForwards.THRESHOLD);
+
+        } else {
+
+            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
+        }
     }
 
     public void supplyTo(double[] receiver) {
