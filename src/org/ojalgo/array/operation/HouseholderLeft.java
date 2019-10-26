@@ -46,7 +46,7 @@ public final class HouseholderLeft implements ArrayOperation {
 
         final float[] tmpHouseholderVector = householder.vector;
         final int tmpFirstNonZero = householder.first;
-        final double tmpBeta = householder.beta;
+        final float tmpBeta = householder.beta;
 
         float tmpScale;
         for (int j = first; j < limit; j++) {
