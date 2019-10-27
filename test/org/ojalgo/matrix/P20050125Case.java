@@ -88,8 +88,8 @@ public class P20050125Case extends BasicMatrixTest {
 
     @Override
     @Test
-    public void testSolveBasicMatrix() {
-        super.testSolveBasicMatrix();
+    public void testSolveMatrix() {
+        super.testSolveMatrix();
     }
 
 }

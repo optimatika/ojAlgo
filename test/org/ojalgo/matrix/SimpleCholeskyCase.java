@@ -78,6 +78,9 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
         final RationalMatrix tmpL = SimpleCholeskyCase.getFactorL();
         final RationalMatrix tmpR = SimpleCholeskyCase.getFactorR();
 
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
+
         expMtrx = tmpL;
         actMtrx = tmpR.transpose();
 

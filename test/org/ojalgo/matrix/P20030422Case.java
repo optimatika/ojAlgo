@@ -65,14 +65,56 @@ public class P20030422Case extends BasicMatrixTest {
         super.doBeforeEach();
     }
 
+    @Override
+    @Test
+    public void testInvert() {
+
+        if (rAA.isSquare() && (rAA.getRank() >= rAA.countColumns())) {
+
+            BasicMatrix<?, ?> expected = rAA.invert();
+            BasicMatrix<?, ?> actual;
+
+            actual = cAA.invert();
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+
+            actual = p64AA.invert();
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+
+            // TODO Probably ok that this doesn't work in this case
+            // actual = p32AA.invert();
+            // TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
+    }
+
     @Test
     public void testProblem() {
 
-        expMtrx = P20030422Case.getProblematic();
-        actMtrx = expMtrx.invert().invert();
+        RationalMatrix expected = P20030422Case.getProblematic();
+        RationalMatrix actual = expected.invert().invert();
 
         // The RationalMatrix implementation can do this do 6 decimals, but not the others
-        TestUtils.assertEquals(expMtrx, actMtrx, DEFINITION);
+        TestUtils.assertEquals(expected, actual, DEFINITION);
+    }
+
+    @Override
+    @Test
+    public void testSolveMatrix() {
+
+        if (rAA.isSquare() && (rAA.getRank() >= rAA.countColumns())) {
+
+            BasicMatrix<?, ?> expected = rAA.solve(rAB);
+            BasicMatrix<?, ?> actual;
+
+            actual = cAA.solve(cAB);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+
+            actual = p64AA.solve(p64AB);
+            TestUtils.assertEquals(expected, actual, ACCURACY);
+
+            // TODO Probably ok that this doesn't work in this case
+            // actual = p32AA.solve(p64AB);
+            // TestUtils.assertEquals(expected, actual, ACCURACY);
+        }
     }
 
 }

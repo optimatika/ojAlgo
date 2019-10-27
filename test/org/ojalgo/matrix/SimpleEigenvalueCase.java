@@ -75,6 +75,9 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
+
         expMtrx = SimpleEigenvalueCase.getOriginal().multiply(SimpleEigenvalueCase.getMatrixV());
 
         actMtrx = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
@@ -84,6 +87,9 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
 
     @Test
     public void testProblem() {
+
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
 
         final Eigenvalue<Double> tmpEigen = Eigenvalue.PRIMITIVE.make();
         tmpEigen.decompose(Primitive64Store.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));

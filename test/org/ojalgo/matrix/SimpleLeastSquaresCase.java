@@ -82,6 +82,9 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
+
         NumberContext accuracy = new NumberContext(4, 4); // TODO Something must be wrong here!
 
         expMtrx = SimpleLeastSquaresCase.getTransformedRHS();
@@ -92,6 +95,9 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
 
     @Test
     public void testProblem() {
+
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
 
         // Solve
 

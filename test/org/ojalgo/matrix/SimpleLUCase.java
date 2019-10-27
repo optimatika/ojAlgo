@@ -72,6 +72,9 @@ public class SimpleLUCase extends BasicMatrixTest {
     @Test
     public void testData() {
 
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
+
         expMtrx = SimpleLUCase.getOrginal();
         actMtrx = SimpleLUCase.getMtrxL().multiply(SimpleLUCase.getMtrxU());
 
