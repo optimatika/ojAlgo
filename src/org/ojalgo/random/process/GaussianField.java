@@ -35,7 +35,7 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Normal1D;
 import org.ojalgo.type.keyvalue.ComparableToDouble;
 
@@ -70,7 +70,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
     }
 
-    private static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
+    private static final Factory<Double, Primitive64Store> FACTORY = Primitive64Store.FACTORY;
 
     private static <K extends Comparable<? super K>> Mean<K> mean() {
         return new Mean<K>() {
@@ -134,13 +134,13 @@ public final class GaussianField<K extends Comparable<? super K>> {
         final MatrixStore<Double> tmpM1 = this.getM1(evaluationPoint);
         final MatrixStore<Double> tmpM2differenses = this.getM2differenses();
 
-        final PrimitiveDenseStore tmpLocations = FACTORY.makeZero(tmpM1.countRows(), tmpM1.countColumns());
+        final Primitive64Store tmpLocations = FACTORY.makeZero(tmpM1.countRows(), tmpM1.countColumns());
         tmpLocations.fillMatching(tmpM1, PrimitiveMath.ADD, tmpRegCoef.multiply(tmpM2differenses));
 
         final MatrixStore<Double> tmpC11 = this.getC11(evaluationPoint);
         final MatrixStore<Double> tmpC21 = this.getC21(evaluationPoint);
 
-        final PrimitiveDenseStore tmpCovariances = FACTORY.makeZero(tmpC11.countRows(), tmpC11.countColumns());
+        final Primitive64Store tmpCovariances = FACTORY.makeZero(tmpC11.countRows(), tmpC11.countColumns());
         tmpCovariances.fillMatching(tmpC11, PrimitiveMath.SUBTRACT, tmpRegCoef.multiply(tmpC21));
 
         if (cleanCovariances) {
@@ -175,7 +175,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
         final int tmpLength = args.length;
 
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(tmpLength, tmpLength);
+        final Primitive64Store retVal = FACTORY.makeZero(tmpLength, tmpLength);
 
         for (int j = 0; j < tmpLength; j++) {
             for (int i = 0; i < tmpLength; i++) {
@@ -193,7 +193,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
         final int tmpRowDim = args.length;
         final int tmpColDim = tmpObservations.size();
 
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(tmpRowDim, tmpColDim);
+        final Primitive64Store retVal = FACTORY.makeZero(tmpRowDim, tmpColDim);
 
         for (int j = 0; j < tmpColDim; j++) {
             for (int i = 0; i < tmpRowDim; i++) {
@@ -211,7 +211,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
         final int tmpRowDim = tmpObservations.size();
         final int tmpColDim = args.length;
 
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(tmpRowDim, tmpColDim);
+        final Primitive64Store retVal = FACTORY.makeZero(tmpRowDim, tmpColDim);
 
         for (int j = 0; j < tmpColDim; j++) {
             for (int i = 0; i < tmpRowDim; i++) {
@@ -228,7 +228,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
         final int tmpSize = tmpObservations.size();
 
-        final PrimitiveDenseStore tmpMatrix = FACTORY.makeZero(tmpSize, tmpSize);
+        final Primitive64Store tmpMatrix = FACTORY.makeZero(tmpSize, tmpSize);
 
         for (int j = 0; j < tmpSize; j++) {
             final K tmpColumnKey = tmpObservations.get(j).key;
@@ -248,7 +248,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
         final int tmpLength = args.length;
 
-        final PrimitiveDenseStore retVal = FACTORY.make(tmpLength, 1);
+        final Primitive64Store retVal = FACTORY.make(tmpLength, 1);
 
         for (int i = 0; i < tmpLength; i++) {
             retVal.set(i, 0, myMeanFunction.invoke(args[i]));
@@ -263,7 +263,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
         final int tmpSize = tmpObservations.size();
 
-        final PrimitiveDenseStore retVal = FACTORY.make(tmpSize, 1);
+        final Primitive64Store retVal = FACTORY.make(tmpSize, 1);
 
         for (int i = 0; i < tmpSize; i++) {
             retVal.set(i, 0, myMeanFunction.invoke(tmpObservations.get(i).key));
@@ -278,7 +278,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
 
         final int tmpSize = tmpObservations.size();
 
-        final PrimitiveDenseStore retVal = FACTORY.make(tmpSize, 1);
+        final Primitive64Store retVal = FACTORY.make(tmpSize, 1);
 
         ComparableToDouble<K> tmpObservation;
         double tmpDiff;

@@ -50,6 +50,12 @@ public final class AXPY implements BLAS1 {
         }
     }
 
+    public static void invoke(final float[] y, final int basey, final float a, final float[] x, final int basex, final int first, final int limit) {
+        for (int i = first; i < limit; i++) {
+            y[basey + i] += a * x[basex + i];
+        }
+    }
+
     public static void invoke(final Mutate1D y, final double a, final BigDecimal[] x) {
         final BigDecimal tmpA = new BigDecimal(a);
         for (int i = 0; i < x.length; i++) {
@@ -75,8 +81,7 @@ public final class AXPY implements BLAS1 {
         }
     }
 
-    public static <N extends Scalar<N>> void invoke(final N[] y, final int basey, final N a, final N[] x, final int basex, final int first,
-            final int limit) {
+    public static <N extends Scalar<N>> void invoke(final N[] y, final int basey, final N a, final N[] x, final int basex, final int first, final int limit) {
         for (int i = first; i < limit; i++) {
             y[basey + i] = y[basey + i].add(a.multiply(x[basex + i])).get();
         }

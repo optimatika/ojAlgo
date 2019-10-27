@@ -37,10 +37,10 @@ import org.ojalgo.matrix.P20050827Case;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.P20071019Case;
 import org.ojalgo.matrix.RationalMatrix;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.scalar.ComplexNumber;
@@ -116,7 +116,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
     @Test
     public void testComplexNumberVersionOfWikipediaCase() {
 
-        PhysicalStore<Double> tmpBaseMtrx = PrimitiveDenseStore.FACTORY
+        PhysicalStore<Double> tmpBaseMtrx = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
         Array1D<Double> tmpExpectedSingularValues = Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveMath.SQRT.invoke(5.0), 0.0 });
@@ -130,7 +130,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
 
         for (ComplexNumber tmpScale : tmpScales) {
 
-            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericDenseStore.COMPLEX.transpose(tmpBaseMtrx);
+            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericStore.COMPLEX.transpose(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexMath.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx);
@@ -154,7 +154,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
                 BasicLogger.debug("Scale = {}", tmpScale);
             }
 
-            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericDenseStore.COMPLEX.copy(tmpBaseMtrx);
+            PhysicalStore<ComplexNumber> tmpOriginalMtrx = GenericStore.COMPLEX.copy(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexMath.MULTIPLY.first(tmpScale));
 
             tmpBidiagonal.decompose(tmpOriginalMtrx.conjugate());
@@ -180,7 +180,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
     @Test
     public void testGetCovariance() {
 
-        PrimitiveDenseStore original = PrimitiveDenseStore.FACTORY.makeFilled(9, 3, new Normal());
+        Primitive64Store original = Primitive64Store.FACTORY.makeFilled(9, 3, new Normal());
 
         for (SingularValue<Double> decomp : MatrixDecompositionTests.getPrimitiveSingularValue()) {
 
@@ -213,13 +213,13 @@ public class CaseSingularValue extends MatrixDecompositionTests {
                 { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
                 { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 },
                 { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 }, { 1.0, 1.0 } };
-        PrimitiveDenseStore body = PrimitiveDenseStore.FACTORY.rows(olsColumns);
+        Primitive64Store body = Primitive64Store.FACTORY.rows(olsColumns);
 
         double[] observationVector = { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-        PrimitiveDenseStore rhs = PrimitiveDenseStore.FACTORY.column(observationVector);
+        Primitive64Store rhs = Primitive64Store.FACTORY.column(observationVector);
 
         double expected = 0.0161290322580645;
         MatrixStore<Double> actual;
@@ -317,7 +317,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
     @Test
     public void testRecreationFat() {
 
-        PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_FAT);
+        PhysicalStore<Double> tmpOriginal = Primitive64Store.FACTORY.copy(MTRX_FAT);
 
         this.testRecreation(tmpOriginal);
     }
@@ -325,7 +325,7 @@ public class CaseSingularValue extends MatrixDecompositionTests {
     @Test
     public void testRecreationSquare() {
 
-        PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_SQUARE);
+        PhysicalStore<Double> tmpOriginal = Primitive64Store.FACTORY.copy(MTRX_SQUARE);
 
         this.testRecreation(tmpOriginal);
     }
@@ -333,21 +333,21 @@ public class CaseSingularValue extends MatrixDecompositionTests {
     @Test
     public void testRecreationTall() {
 
-        PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_TALL);
+        PhysicalStore<Double> tmpOriginal = Primitive64Store.FACTORY.copy(MTRX_TALL);
 
         this.testRecreation(tmpOriginal);
     }
 
     private void doTestTypes(final RationalMatrix original) {
 
-        PhysicalStore<RationalNumber> tmpBigStore = GenericDenseStore.RATIONAL.copy(original);
-        PhysicalStore<ComplexNumber> tmpComplexStore = GenericDenseStore.COMPLEX.copy(original);
-        PhysicalStore<Double> tmpPrimitiveStore = PrimitiveDenseStore.FACTORY.copy(original);
+        PhysicalStore<RationalNumber> tmpBigStore = GenericStore.RATIONAL.copy(original);
+        PhysicalStore<ComplexNumber> tmpComplexStore = GenericStore.COMPLEX.copy(original);
+        PhysicalStore<Double> tmpPrimitiveStore = Primitive64Store.FACTORY.copy(original);
 
-        IMPL_BIG.decompose(GenericDenseStore.RATIONAL.copy(original));
-        IMPL_COMPLEX.decompose(GenericDenseStore.COMPLEX.copy(original));
-        IMPL_RAW.decompose(PrimitiveDenseStore.FACTORY.copy(original));
-        IMPL_PRIMITIVE.decompose(PrimitiveDenseStore.FACTORY.copy(original));
+        IMPL_BIG.decompose(GenericStore.RATIONAL.copy(original));
+        IMPL_COMPLEX.decompose(GenericStore.COMPLEX.copy(original));
+        IMPL_RAW.decompose(Primitive64Store.FACTORY.copy(original));
+        IMPL_PRIMITIVE.decompose(Primitive64Store.FACTORY.copy(original));
 
         Array1D<Double> tmpBigSingularValues = IMPL_BIG.getSingularValues();
         Array1D<Double> tmpComplexSingularValues = IMPL_COMPLEX.getSingularValues();

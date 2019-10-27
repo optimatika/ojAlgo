@@ -88,7 +88,7 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
         default I makeSPD(final int dim) {
 
             final double[] random = new double[dim];
-            final I retVal = this.makeZero(dim, dim);
+            final I retVal = this.make(dim, dim);
 
             for (int i = 0; i < dim; i++) {
                 random[i] = Math.random();

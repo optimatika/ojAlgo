@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.LineSplittingParser;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
@@ -73,8 +73,8 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
                 double R2C2 = Double.parseDouble(columns[4]);
                 int IsStairs = Integer.parseInt(columns[5]);
 
-                PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
-                PrimitiveDenseStore output_csv = PrimitiveDenseStore.FACTORY.row(IsStairs, ONE - IsStairs);
+                Primitive64Store input_csv = Primitive64Store.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
+                Primitive64Store output_csv = Primitive64Store.FACTORY.row(IsStairs, ONE - IsStairs);
 
                 builder.rate(0.01).train(input_csv, output_csv);
             });
@@ -94,7 +94,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
             double R2C2 = Double.parseDouble(columns[4]);
             int IsStairs = Integer.parseInt(columns[5]);
 
-            PrimitiveDenseStore input_csv = PrimitiveDenseStore.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
+            Primitive64Store input_csv = Primitive64Store.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
 
             Access1D<Double> output_net = network.invoke(input_csv);
 

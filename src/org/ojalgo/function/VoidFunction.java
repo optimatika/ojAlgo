@@ -44,6 +44,10 @@ public interface VoidFunction<N extends Comparable<N>> extends BasicFunction, Co
                 VoidFunction.this.invoke(before.invoke(arg));
             }
 
+            public void invoke(final float arg) {
+                VoidFunction.this.invoke(before.invoke(arg));
+            }
+
             public void invoke(final N arg) {
                 VoidFunction.this.invoke(before.invoke(arg));
             }
@@ -52,6 +56,8 @@ public interface VoidFunction<N extends Comparable<N>> extends BasicFunction, Co
     }
 
     void invoke(double arg);
+
+    void invoke(float arg);
 
     void invoke(N arg);
 

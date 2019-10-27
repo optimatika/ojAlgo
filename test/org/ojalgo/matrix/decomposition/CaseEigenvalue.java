@@ -39,10 +39,10 @@ import org.ojalgo.matrix.P20050125Case;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Generalisation;
 import org.ojalgo.matrix.store.DiagonalStore;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
@@ -71,7 +71,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testP20050125Case() {
 
-        PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.copy(P20050125Case.getProblematic());
+        PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY.copy(P20050125Case.getProblematic());
 
         TestUtils.assertTrue(tmpOriginalMatrix.isHermitian());
 
@@ -89,12 +89,12 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
             BasicLogger.debug("D");
             for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
-                BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + PrimitiveDenseStore.FACTORY.copy(tmpDecomp.getD()));
+                BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + Primitive64Store.FACTORY.copy(tmpDecomp.getD()));
             }
 
             BasicLogger.debug("V");
             for (Eigenvalue<Double> tmpDecomp : tmpDecomps) {
-                BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + PrimitiveDenseStore.FACTORY.copy(tmpDecomp.getV()));
+                BasicLogger.debug(tmpDecomp.getClass().getName() + ": " + Primitive64Store.FACTORY.copy(tmpDecomp.getV()));
             }
         }
 
@@ -106,7 +106,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testP20061119Case() {
 
-        PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.copy(P20061119Case.getProblematic());
+        PhysicalStore<Double> tmpOriginalMatrix = Primitive64Store.FACTORY.copy(P20061119Case.getProblematic());
 
         ComplexNumber tmp00 = ComplexNumber.valueOf(26.14421883828456);
         ComplexNumber tmp11 = ComplexNumber.of(2.727890580857718, 3.6223578444417908);
@@ -152,7 +152,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     public void testPaulsMathNote() {
 
         double[][] tmpData = new double[][] { { 3, -9 }, { 4, -3 } };
-        PrimitiveDenseStore tmpA = PrimitiveDenseStore.FACTORY.rows(tmpData);
+        Primitive64Store tmpA = Primitive64Store.FACTORY.rows(tmpData);
         int tmpLength = tmpData.length;
 
         Array1D<ComplexNumber> tmpExpVals = Array1D.COMPLEX.makeZero(2);
@@ -184,15 +184,15 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             TestUtils.assertEquals(tmpSliceColumn.get(1).multiply(tmpFactor), tmpActual.get(1));
         }
 
-        GenericDenseStore<ComplexNumber> tmpCmplA = GenericDenseStore.COMPLEX.copy(tmpA);
-        GenericDenseStore<ComplexNumber> tmpCmplD = GenericDenseStore.COMPLEX.copy(tmpD);
-        GenericDenseStore<ComplexNumber> tmpCmplV = GenericDenseStore.COMPLEX.copy(tmpV);
+        GenericStore<ComplexNumber> tmpCmplA = GenericStore.COMPLEX.copy(tmpA);
+        GenericStore<ComplexNumber> tmpCmplD = GenericStore.COMPLEX.copy(tmpD);
+        GenericStore<ComplexNumber> tmpCmplV = GenericStore.COMPLEX.copy(tmpV);
 
         MatrixStore<ComplexNumber> tmpExp1 = tmpCmplA.multiply(tmpCmplV);
         MatrixStore<ComplexNumber> tmpAct1 = tmpCmplV.multiply(tmpCmplD);
         TestUtils.assertEquals(tmpExp1, tmpAct1);
 
-        GenericDenseStore<ComplexNumber> tmpComplexD = GenericDenseStore.COMPLEX.makeZero(tmpLength, tmpLength);
+        GenericStore<ComplexNumber> tmpComplexD = GenericStore.COMPLEX.makeZero(tmpLength, tmpLength);
         for (int j = 0; j < tmpLength; j++) {
             tmpComplexD.set(j, j, tmpValues.get(j));
         }
@@ -211,7 +211,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     public void testPrimitiveAsComplex() {
 
         double[][] tmpData = new double[][] { { 1, 0, 3 }, { 0, 4, 1 }, { -5, 1, 0 } };
-        PrimitiveDenseStore tmpA = PrimitiveDenseStore.FACTORY.rows(tmpData);
+        Primitive64Store tmpA = Primitive64Store.FACTORY.rows(tmpData);
 
         int tmpLength = tmpData.length;
 
@@ -225,15 +225,15 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
         Array1D<ComplexNumber> tmpValues = tmpEvD.getEigenvalues();
         MatrixStore<ComplexNumber> tmpVectors = tmpEvD.getEigenvectors();
 
-        GenericDenseStore<ComplexNumber> tmpCmplA = GenericDenseStore.COMPLEX.copy(tmpA);
-        GenericDenseStore<ComplexNumber> tmpCmplD = GenericDenseStore.COMPLEX.copy(tmpD);
-        GenericDenseStore<ComplexNumber> tmpCmplV = GenericDenseStore.COMPLEX.copy(tmpV);
+        GenericStore<ComplexNumber> tmpCmplA = GenericStore.COMPLEX.copy(tmpA);
+        GenericStore<ComplexNumber> tmpCmplD = GenericStore.COMPLEX.copy(tmpD);
+        GenericStore<ComplexNumber> tmpCmplV = GenericStore.COMPLEX.copy(tmpV);
 
         MatrixStore<ComplexNumber> tmpExp1 = tmpCmplA.multiply(tmpCmplV);
         MatrixStore<ComplexNumber> tmpAct1 = tmpCmplV.multiply(tmpCmplD);
         TestUtils.assertEquals(tmpExp1, tmpAct1);
 
-        GenericDenseStore<ComplexNumber> tmpAltD = GenericDenseStore.COMPLEX.makeZero(tmpLength, tmpLength);
+        GenericStore<ComplexNumber> tmpAltD = GenericStore.COMPLEX.makeZero(tmpLength, tmpLength);
         MatrixStore<ComplexNumber> tmpAltV = tmpVectors;
 
         for (int j = 0; j < tmpLength; j++) {
@@ -255,7 +255,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
     @Test
     public void testProblemFoundInTheWild() {
 
-        PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
+        Primitive64Store matrix = Primitive64Store.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
 
         for (Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getPrimitiveEigenvalueGeneral()) {
 
@@ -279,8 +279,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         for (int dim = 2; dim < 10; dim++) {
 
-            PrimitiveDenseStore mtrxA = PrimitiveDenseStore.FACTORY.makeSPD(dim);
-            PrimitiveDenseStore mtrxB = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+            Primitive64Store mtrxA = Primitive64Store.FACTORY.makeSPD(dim);
+            Primitive64Store mtrxB = Primitive64Store.FACTORY.makeSPD(dim);
 
             Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(mtrxB);
             cholesky.decompose(mtrxB);
@@ -326,8 +326,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         for (int dim = 2; dim < 10; dim++) {
 
-            PrimitiveDenseStore mtrxA = PrimitiveDenseStore.FACTORY.makeSPD(dim);
-            PrimitiveDenseStore mtrxB = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+            Primitive64Store mtrxA = Primitive64Store.FACTORY.makeSPD(dim);
+            Primitive64Store mtrxB = Primitive64Store.FACTORY.makeSPD(dim);
 
             Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(mtrxB);
             cholesky.decompose(mtrxB);
@@ -377,8 +377,8 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         for (int dim = 2; dim < 10; dim++) {
 
-            PrimitiveDenseStore mtrxA = PrimitiveDenseStore.FACTORY.makeSPD(dim);
-            PrimitiveDenseStore mtrxB = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+            Primitive64Store mtrxA = Primitive64Store.FACTORY.makeSPD(dim);
+            Primitive64Store mtrxB = Primitive64Store.FACTORY.makeSPD(dim);
 
             Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(mtrxB);
             cholesky.decompose(mtrxB);
@@ -424,7 +424,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         for (int dim = 2; dim < 10; dim++) {
 
-            PrimitiveDenseStore mtrxA = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+            Primitive64Store mtrxA = Primitive64Store.FACTORY.makeSPD(dim);
 
             Eigenvalue<Double> eigenvalue = Eigenvalue.PRIMITIVE.make(mtrxA, true);
             eigenvalue.decompose(mtrxA);
@@ -447,7 +447,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
 
         for (int dim = 1; dim < 10; dim++) {
 
-            PrimitiveDenseStore matrix = MatrixUtils.makeSPD(dim);
+            Primitive64Store matrix = MatrixUtils.makeSPD(dim);
 
             for (Eigenvalue<Double> decomp : MatrixDecompositionTests.getPrimitiveEigenvalueSymmetric()) {
 

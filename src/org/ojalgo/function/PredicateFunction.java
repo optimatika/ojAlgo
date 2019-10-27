@@ -26,6 +26,8 @@ import java.util.function.Predicate;
 
 public interface PredicateFunction<N extends Comparable<N>> extends BasicFunction, Predicate<N>, DoublePredicate {
 
+    boolean invoke(float arg);
+
     boolean invoke(double arg);
 
     boolean invoke(N arg);
@@ -38,6 +40,10 @@ public interface PredicateFunction<N extends Comparable<N>> extends BasicFunctio
             }
 
             public boolean invoke(final N arg) {
+                return !PredicateFunction.this.invoke(arg);
+            }
+
+            public boolean invoke(float arg) {
                 return !PredicateFunction.this.invoke(arg);
             }
 

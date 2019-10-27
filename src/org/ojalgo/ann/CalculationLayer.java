@@ -25,25 +25,25 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
-final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double>, PrimitiveDenseStore> {
+final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double>, Primitive64Store> {
 
     private ArtificialNeuralNetwork.Activator myActivator;
-    private final PrimitiveDenseStore myBias;
-    private final PrimitiveDenseStore myOutput;
-    private final PrimitiveDenseStore myWeights;
+    private final Primitive64Store myBias;
+    private final Primitive64Store myOutput;
+    private final Primitive64Store myWeights;
 
     CalculationLayer(final int numberOfInputs, final int numberOfOutputs, final ArtificialNeuralNetwork.Activator activator) {
 
         super();
 
-        myWeights = PrimitiveDenseStore.FACTORY.make(numberOfInputs, numberOfOutputs);
-        myBias = PrimitiveDenseStore.FACTORY.make(1, numberOfOutputs);
-        myOutput = PrimitiveDenseStore.FACTORY.make(1, numberOfOutputs);
+        myWeights = Primitive64Store.FACTORY.make(numberOfInputs, numberOfOutputs);
+        myBias = Primitive64Store.FACTORY.make(1, numberOfOutputs);
+        myOutput = Primitive64Store.FACTORY.make(1, numberOfOutputs);
 
         myActivator = activator;
 
@@ -92,7 +92,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return result;
     }
 
-    public PrimitiveDenseStore invoke(final Access1D<Double> input) {
+    public Primitive64Store invoke(final Access1D<Double> input) {
         myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
         myOutput.modifyAll(myActivator.getFunction(myOutput));
         return myOutput;
@@ -122,8 +122,8 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         myBias.fillAll(randomiser);
     }
 
-    void adjust(final Access1D<Double> layerInput, final PrimitiveDenseStore downstreamGradient, final double learningRate,
-            final PrimitiveDenseStore upstreamGradient) {
+    void adjust(final Access1D<Double> layerInput, final Primitive64Store downstreamGradient, final double learningRate,
+            final Primitive64Store upstreamGradient) {
 
         downstreamGradient.modifyMatching(MULTIPLY, myOutput.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
 
@@ -150,7 +150,7 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return myWeights.logical().below(myBias).get();
     }
 
-    PrimitiveDenseStore getOutput() {
+    Primitive64Store getOutput() {
         return myOutput;
     }
 

@@ -27,7 +27,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
@@ -53,8 +53,8 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
         final NumberContext tmpEqualsNumberContext = new NumberContext(7, 10);
 
         final int tmpDim = 99;
-        final PhysicalStore<Double> tmpRandom = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpIdentity = PrimitiveDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
+        final PhysicalStore<Double> tmpRandom = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        final PhysicalStore<Double> tmpIdentity = Primitive64Store.FACTORY.makeEye(tmpDim, tmpDim);
 
         final MatrixDecomposition.Solver<Double>[] tmpAllDecomps = TestSolveAndInvert.getAllSquare();
 
@@ -82,9 +82,9 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
     @Test
     public void testSimpleEquationCase() {
 
-        final MatrixStore<Double> tmpBody = PrimitiveDenseStore.FACTORY.copy(SimpleEquationCase.getBody());
-        final MatrixStore<Double> tmpRHS = PrimitiveDenseStore.FACTORY.copy(SimpleEquationCase.getRHS());
-        final MatrixStore<Double> tmpSolution = PrimitiveDenseStore.FACTORY.copy(SimpleEquationCase.getSolution());
+        final MatrixStore<Double> tmpBody = Primitive64Store.FACTORY.copy(SimpleEquationCase.getBody());
+        final MatrixStore<Double> tmpRHS = Primitive64Store.FACTORY.copy(SimpleEquationCase.getRHS());
+        final MatrixStore<Double> tmpSolution = Primitive64Store.FACTORY.copy(SimpleEquationCase.getSolution());
 
         for (final MatrixDecomposition.Solver<Double> tmpDecomp : TestSolveAndInvert.getAllSquare()) {
             this.doTest(tmpDecomp, tmpBody, tmpRHS, tmpSolution, new NumberContext(7, 6));

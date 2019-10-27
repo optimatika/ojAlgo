@@ -21,11 +21,11 @@
  */
 package org.ojalgo.function.multiary;
 
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -40,27 +40,27 @@ import org.ojalgo.structure.Access2D;
 public final class PureQuadraticFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.PureQuadratic<N> {
 
     public static PureQuadraticFunction<ComplexNumber> makeComplex(final Access2D<?> coefficients) {
-        return new PureQuadraticFunction<>(GenericDenseStore.COMPLEX.copy(coefficients));
+        return new PureQuadraticFunction<>(GenericStore.COMPLEX.copy(coefficients));
     }
 
     public static PureQuadraticFunction<ComplexNumber> makeComplex(final int arity) {
-        return new PureQuadraticFunction<>(GenericDenseStore.COMPLEX.make(arity, arity));
+        return new PureQuadraticFunction<>(GenericStore.COMPLEX.make(arity, arity));
     }
 
     public static PureQuadraticFunction<Double> makePrimitive(final Access2D<?> coefficients) {
-        return new PureQuadraticFunction<>(PrimitiveDenseStore.FACTORY.copy(coefficients));
+        return new PureQuadraticFunction<>(Primitive64Store.FACTORY.copy(coefficients));
     }
 
     public static PureQuadraticFunction<Double> makePrimitive(final int arity) {
-        return new PureQuadraticFunction<>(PrimitiveDenseStore.FACTORY.make(arity, arity));
+        return new PureQuadraticFunction<>(Primitive64Store.FACTORY.make(arity, arity));
     }
 
     public static PureQuadraticFunction<RationalNumber> makeRational(final Access2D<?> coefficients) {
-        return new PureQuadraticFunction<>(GenericDenseStore.RATIONAL.copy(coefficients));
+        return new PureQuadraticFunction<>(GenericStore.RATIONAL.copy(coefficients));
     }
 
     public static PureQuadraticFunction<RationalNumber> makeRational(final int arity) {
-        return new PureQuadraticFunction<>(GenericDenseStore.RATIONAL.make(arity, arity));
+        return new PureQuadraticFunction<>(GenericStore.RATIONAL.make(arity, arity));
     }
 
     public static <N extends Comparable<N>> PureQuadraticFunction<N> wrap(final PhysicalStore<N> coefficients) {

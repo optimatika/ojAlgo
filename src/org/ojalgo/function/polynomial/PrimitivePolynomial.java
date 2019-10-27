@@ -25,7 +25,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 
 public class PrimitivePolynomial extends AbstractPolynomial<Double> {
@@ -43,8 +43,8 @@ public class PrimitivePolynomial extends AbstractPolynomial<Double> {
         final int tmpRowDim = (int) Math.min(x.count(), y.count());
         final int tmpColDim = this.size();
 
-        final PhysicalStore<Double> tmpBody = PrimitiveDenseStore.FACTORY.makeZero(tmpRowDim, tmpColDim);
-        final PhysicalStore<Double> tmpRHS = PrimitiveDenseStore.FACTORY.makeZero(tmpRowDim, 1);
+        final PhysicalStore<Double> tmpBody = Primitive64Store.FACTORY.makeZero(tmpRowDim, tmpColDim);
+        final PhysicalStore<Double> tmpRHS = Primitive64Store.FACTORY.makeZero(tmpRowDim, 1);
 
         for (int i = 0; i < tmpRowDim; i++) {
 

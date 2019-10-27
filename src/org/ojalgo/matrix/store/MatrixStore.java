@@ -566,15 +566,15 @@ public interface MatrixStore<N extends Comparable<N>>
     Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         public <D extends Access1D<?>> DiagonalStore.Builder<ComplexNumber, D> makeDiagonal(final D mainDiagonal) {
-            return DiagonalStore.builder(GenericDenseStore.COMPLEX, mainDiagonal);
+            return DiagonalStore.builder(GenericStore.COMPLEX, mainDiagonal);
         }
 
         public LogicalBuilder<ComplexNumber> makeIdentity(final int dimension) {
-            return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.COMPLEX, dimension));
+            return new LogicalBuilder<>(new IdentityStore<>(GenericStore.COMPLEX, dimension));
         }
 
         public LogicalBuilder<ComplexNumber> makeSingle(final ComplexNumber element) {
-            return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.COMPLEX, element));
+            return new LogicalBuilder<>(new SingleStore<>(GenericStore.COMPLEX, element));
         }
 
         public SparseStore<ComplexNumber> makeSparse(final int rowsCount, final int columnsCount) {
@@ -582,39 +582,67 @@ public interface MatrixStore<N extends Comparable<N>>
         }
 
         public LogicalBuilder<ComplexNumber> makeWrapper(final Access2D<?> access) {
-            return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.COMPLEX, access));
+            return new LogicalBuilder<>(new WrapperStore<>(GenericStore.COMPLEX, access));
         }
 
         public LogicalBuilder<ComplexNumber> makeZero(final int rowsCount, final int columnsCount) {
-            return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.COMPLEX, rowsCount, columnsCount));
+            return new LogicalBuilder<>(new ZeroStore<>(GenericStore.COMPLEX, rowsCount, columnsCount));
         }
 
     };
 
-    Factory<Double> PRIMITIVE = new Factory<Double>() {
+    Factory<Double> PRIMITIVE32 = new Factory<Double>() {
 
         public <D extends Access1D<?>> Builder<Double, D> makeDiagonal(final D mainDiagonal) {
-            return DiagonalStore.builder(PrimitiveDenseStore.FACTORY, mainDiagonal);
+            return DiagonalStore.builder(Primitive32Store.FACTORY, mainDiagonal);
         }
 
         public LogicalBuilder<Double> makeIdentity(final int dimension) {
-            return new LogicalBuilder<>(new IdentityStore<>(PrimitiveDenseStore.FACTORY, dimension));
+            return new LogicalBuilder<>(new IdentityStore<>(Primitive32Store.FACTORY, dimension));
         }
 
         public LogicalBuilder<Double> makeSingle(final Double element) {
-            return new LogicalBuilder<>(new SingleStore<>(PrimitiveDenseStore.FACTORY, element));
+            return new LogicalBuilder<>(new SingleStore<>(Primitive32Store.FACTORY, element));
         }
 
         public SparseStore<Double> makeSparse(final int rowsCount, final int columnsCount) {
-            return SparseStore.PRIMITIVE.make(rowsCount, columnsCount);
+            return SparseStore.PRIMITIVE32.make(rowsCount, columnsCount);
         }
 
         public LogicalBuilder<Double> makeWrapper(final Access2D<?> access) {
-            return new LogicalBuilder<>(new WrapperStore<>(PrimitiveDenseStore.FACTORY, access));
+            return new LogicalBuilder<>(new WrapperStore<>(Primitive32Store.FACTORY, access));
         }
 
         public LogicalBuilder<Double> makeZero(final int rowsCount, final int columnsCount) {
-            return new LogicalBuilder<>(new ZeroStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount));
+            return new LogicalBuilder<>(new ZeroStore<>(Primitive32Store.FACTORY, rowsCount, columnsCount));
+        }
+
+    };
+
+    Factory<Double> PRIMITIVE64 = new Factory<Double>() {
+
+        public <D extends Access1D<?>> Builder<Double, D> makeDiagonal(final D mainDiagonal) {
+            return DiagonalStore.builder(Primitive64Store.FACTORY, mainDiagonal);
+        }
+
+        public LogicalBuilder<Double> makeIdentity(final int dimension) {
+            return new LogicalBuilder<>(new IdentityStore<>(Primitive64Store.FACTORY, dimension));
+        }
+
+        public LogicalBuilder<Double> makeSingle(final Double element) {
+            return new LogicalBuilder<>(new SingleStore<>(Primitive64Store.FACTORY, element));
+        }
+
+        public SparseStore<Double> makeSparse(final int rowsCount, final int columnsCount) {
+            return SparseStore.PRIMITIVE64.make(rowsCount, columnsCount);
+        }
+
+        public LogicalBuilder<Double> makeWrapper(final Access2D<?> access) {
+            return new LogicalBuilder<>(new WrapperStore<>(Primitive64Store.FACTORY, access));
+        }
+
+        public LogicalBuilder<Double> makeZero(final int rowsCount, final int columnsCount) {
+            return new LogicalBuilder<>(new ZeroStore<>(Primitive64Store.FACTORY, rowsCount, columnsCount));
         }
 
     };
@@ -622,15 +650,15 @@ public interface MatrixStore<N extends Comparable<N>>
     Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         public <D extends Access1D<?>> Builder<Quaternion, D> makeDiagonal(final D mainDiagonal) {
-            return DiagonalStore.builder(GenericDenseStore.QUATERNION, mainDiagonal);
+            return DiagonalStore.builder(GenericStore.QUATERNION, mainDiagonal);
         }
 
         public LogicalBuilder<Quaternion> makeIdentity(final int dimension) {
-            return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.QUATERNION, dimension));
+            return new LogicalBuilder<>(new IdentityStore<>(GenericStore.QUATERNION, dimension));
         }
 
         public LogicalBuilder<Quaternion> makeSingle(final Quaternion element) {
-            return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.QUATERNION, element));
+            return new LogicalBuilder<>(new SingleStore<>(GenericStore.QUATERNION, element));
         }
 
         public SparseStore<Quaternion> makeSparse(final int rowsCount, final int columnsCount) {
@@ -638,11 +666,11 @@ public interface MatrixStore<N extends Comparable<N>>
         }
 
         public LogicalBuilder<Quaternion> makeWrapper(final Access2D<?> access) {
-            return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.QUATERNION, access));
+            return new LogicalBuilder<>(new WrapperStore<>(GenericStore.QUATERNION, access));
         }
 
         public LogicalBuilder<Quaternion> makeZero(final int rowsCount, final int columnsCount) {
-            return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.QUATERNION, rowsCount, columnsCount));
+            return new LogicalBuilder<>(new ZeroStore<>(GenericStore.QUATERNION, rowsCount, columnsCount));
         }
 
     };
@@ -650,15 +678,15 @@ public interface MatrixStore<N extends Comparable<N>>
     Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         public <D extends Access1D<?>> Builder<RationalNumber, D> makeDiagonal(final D mainDiagonal) {
-            return DiagonalStore.builder(GenericDenseStore.RATIONAL, mainDiagonal);
+            return DiagonalStore.builder(GenericStore.RATIONAL, mainDiagonal);
         }
 
         public LogicalBuilder<RationalNumber> makeIdentity(final int dimension) {
-            return new LogicalBuilder<>(new IdentityStore<>(GenericDenseStore.RATIONAL, dimension));
+            return new LogicalBuilder<>(new IdentityStore<>(GenericStore.RATIONAL, dimension));
         }
 
         public LogicalBuilder<RationalNumber> makeSingle(final RationalNumber element) {
-            return new LogicalBuilder<>(new SingleStore<>(GenericDenseStore.RATIONAL, element));
+            return new LogicalBuilder<>(new SingleStore<>(GenericStore.RATIONAL, element));
         }
 
         public SparseStore<RationalNumber> makeSparse(final int rowsCount, final int columnsCount) {
@@ -666,11 +694,11 @@ public interface MatrixStore<N extends Comparable<N>>
         }
 
         public LogicalBuilder<RationalNumber> makeWrapper(final Access2D<?> access) {
-            return new LogicalBuilder<>(new WrapperStore<>(GenericDenseStore.RATIONAL, access));
+            return new LogicalBuilder<>(new WrapperStore<>(GenericStore.RATIONAL, access));
         }
 
         public LogicalBuilder<RationalNumber> makeZero(final int rowsCount, final int columnsCount) {
-            return new LogicalBuilder<>(new ZeroStore<>(GenericDenseStore.RATIONAL, rowsCount, columnsCount));
+            return new LogicalBuilder<>(new ZeroStore<>(GenericStore.RATIONAL, rowsCount, columnsCount));
         }
 
     };
@@ -949,7 +977,7 @@ public interface MatrixStore<N extends Comparable<N>>
         } else {
             // Bringing it closer to what the operator norm would be
             // In case of representing a ComplexNumber or Quaternion as a matrix this will match their norms
-            return frobeniusNorm / PrimitiveMath.SQRT.invoke(Math.min(this.countRows(), this.countColumns()));
+            return frobeniusNorm / PrimitiveMath.SQRT.invoke((double) Math.min(this.countRows(), this.countColumns()));
         }
     }
 

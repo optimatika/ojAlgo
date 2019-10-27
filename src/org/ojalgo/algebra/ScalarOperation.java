@@ -36,6 +36,13 @@ public interface ScalarOperation {
         /**
          * @return <code>this + scalarAddend</code>.
          */
+        default T add(float scalarAddend) {
+            return this.add((double) scalarAddend);
+        }
+
+        /**
+         * @return <code>this + scalarAddend</code>.
+         */
         T add(N scalarAddend);
 
     }
@@ -46,6 +53,13 @@ public interface ScalarOperation {
          * @return <code>this / scalarDivisor</code>.
          */
         T divide(double scalarDivisor);
+
+        /**
+         * @return <code>this / scalarDivisor</code>.
+         */
+        default T divide(float scalarDivisor) {
+            return this.divide((double) scalarDivisor);
+        }
 
         /**
          * @return <code>this / scalarDivisor</code>.
@@ -62,6 +76,13 @@ public interface ScalarOperation {
         T multiply(double scalarMultiplicand);
 
         /**
+         * @return <code>this * scalarMultiplicand</code>.
+         */
+        default T multiply(float scalarMultiplicand) {
+            return this.multiply((double) scalarMultiplicand);
+        }
+
+        /**
          * @return <code>this * multiplicand</code>.
          */
         T multiply(N scalarMultiplicand);
@@ -74,6 +95,13 @@ public interface ScalarOperation {
          * @return <code>this - scalarSubtrahend</code>.
          */
         T subtract(double scalarSubtrahend);
+
+        /**
+         * @return <code>this - scalarSubtrahend</code>.
+         */
+        default T subtract(float scalarSubtrahend) {
+            return this.subtract((double) scalarSubtrahend);
+        }
 
         /**
          * @return <code>this - scalarSubtrahend</code>.

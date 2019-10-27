@@ -48,7 +48,7 @@ public interface Mutate1D extends Structure1D {
             this.fillRange(0L, this.count(), value);
         }
 
-        default void fillAll(final NullaryFunction<N> supplier) {
+        default void fillAll(final NullaryFunction<?> supplier) {
             this.fillRange(0L, this.count(), supplier);
         }
 
@@ -75,13 +75,13 @@ public interface Mutate1D extends Structure1D {
 
         void fillOne(long index, N value);
 
-        void fillOne(long index, NullaryFunction<N> supplier);
+        void fillOne(long index, NullaryFunction<?> supplier);
 
         default void fillRange(final long first, final long limit, final N value) {
             Structure1D.loopRange(first, limit, i -> this.fillOne(i, value));
         }
 
-        default void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+        default void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
             Structure1D.loopRange(first, limit, i -> this.fillOne(i, supplier));
         }
     }
@@ -144,6 +144,7 @@ public interface Mutate1D extends Structure1D {
      */
     interface Receiver<N extends Comparable<N>> extends Mutate1D, Mutate1D.Fillable<N>, Consumer<Access1D<?>> {
 
+        @Override
         default void accept(final Access1D<?> supplied) {
             if (this.isAcceptable(supplied)) {
                 supplied.loopAll(i -> this.set(i, supplied.get(i)));
@@ -218,6 +219,10 @@ public interface Mutate1D extends Structure1D {
 
     void add(long index, double addend);
 
+    default void add(long index, float addend) {
+        this.add(index, (double) addend);
+    }
+
     void add(long index, Comparable<?> addend);
 
     /**
@@ -229,6 +234,10 @@ public interface Mutate1D extends Structure1D {
     }
 
     void set(long index, double value);
+
+    default void set(long index, float value) {
+        this.set(index, (double) value);
+    }
 
     void set(long index, Comparable<?> value);
 

@@ -30,7 +30,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -94,9 +94,9 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
 
         for (int i = 0; i < errors.length; i++) {
             final Data data = examples.get(i);
-            final PrimitiveDenseStore input = data.input;
+            final Primitive64Store input = data.input;
             final Access1D<Double> actual = network.invoke(input);
-            final PrimitiveDenseStore expected = data.target;
+            final Primitive64Store expected = data.target;
             double error = builder.error(expected, actual);
             errors[i] = error;
         }

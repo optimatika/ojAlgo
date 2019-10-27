@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -149,41 +149,41 @@ public abstract class MatrixUtils {
     /**
      * Extracts the argument of the ComplexNumber elements to a new primitive double valued matrix.
      *
-     * @deprecated v47 Use {@link PrimitiveDenseStore#getComplexArgument(Access2D)} instead
+     * @deprecated v47 Use {@link Primitive64Store#getComplexArgument(Access2D)} instead
      */
     @Deprecated
-    public static PrimitiveDenseStore getComplexArgument(final Access2D<ComplexNumber> arg) {
-        return PrimitiveDenseStore.getComplexArgument(arg);
+    public static Primitive64Store getComplexArgument(final Access2D<ComplexNumber> arg) {
+        return Primitive64Store.getComplexArgument(arg);
     }
 
     /**
      * Extracts the imaginary part of the ComplexNumber elements to a new primitive double valued matrix.
      *
-     * @deprecated v47 Use {@link PrimitiveDenseStore#getComplexImaginary(Access2D)} instead
+     * @deprecated v47 Use {@link Primitive64Store#getComplexImaginary(Access2D)} instead
      */
     @Deprecated
-    public static PrimitiveDenseStore getComplexImaginary(final Access2D<ComplexNumber> arg) {
-        return PrimitiveDenseStore.getComplexImaginary(arg);
+    public static Primitive64Store getComplexImaginary(final Access2D<ComplexNumber> arg) {
+        return Primitive64Store.getComplexImaginary(arg);
     }
 
     /**
      * Extracts the modulus of the ComplexNumber elements to a new primitive double valued matrix.
      *
-     * @deprecated v47 Use {@link PrimitiveDenseStore#getComplexModulus(Access2D)} instead
+     * @deprecated v47 Use {@link Primitive64Store#getComplexModulus(Access2D)} instead
      */
     @Deprecated
-    public static PrimitiveDenseStore getComplexModulus(final Access2D<ComplexNumber> arg) {
-        return PrimitiveDenseStore.getComplexModulus(arg);
+    public static Primitive64Store getComplexModulus(final Access2D<ComplexNumber> arg) {
+        return Primitive64Store.getComplexModulus(arg);
     }
 
     /**
      * Extracts the real part of the ComplexNumber elements to a new primitive double valued matrix.
      *
-     * @deprecated v47 Use {@link PrimitiveDenseStore#getComplexReal(Access2D)} instead
+     * @deprecated v47 Use {@link Primitive64Store#getComplexReal(Access2D)} instead
      */
     @Deprecated
-    public static PrimitiveDenseStore getComplexReal(final Access2D<ComplexNumber> arg) {
-        return PrimitiveDenseStore.getComplexReal(arg);
+    public static Primitive64Store getComplexReal(final Access2D<ComplexNumber> arg) {
+        return Primitive64Store.getComplexReal(arg);
     }
 
     /**
@@ -287,8 +287,8 @@ public abstract class MatrixUtils {
      * @deprecated v47 Use {@link org.ojalgo.matrix.store.PhysicalStore.Factory#makeSPD(int)} instead
      */
     @Deprecated
-    public static PrimitiveDenseStore makeSPD(final int dim) {
-        return PrimitiveDenseStore.FACTORY.makeSPD(dim);
+    public static Primitive64Store makeSPD(final int dim) {
+        return Primitive64Store.FACTORY.makeSPD(dim);
     }
 
     /**
@@ -343,11 +343,11 @@ public abstract class MatrixUtils {
     }
 
     /**
-     * @deprecated v47 Use {@link MatrixStore#PRIMITIVE} instaed
+     * @deprecated v47 Use {@link MatrixStore#PRIMITIVE64} instaed
      */
     @Deprecated
     public static Access2D<Double> wrapPrimitiveAccess2D(final BasicMatrix<?, ?> matrix) {
-        return MatrixStore.PRIMITIVE.makeWrapper(matrix).get();
+        return MatrixStore.PRIMITIVE64.makeWrapper(matrix).get();
     }
 
     private MatrixUtils() {

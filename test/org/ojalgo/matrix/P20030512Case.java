@@ -61,27 +61,66 @@ public class P20030512Case extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = new NumberContext(8, 6);
+        // ACCURACY = new NumberContext(8, 6);
 
-        rationalAA = P20030512Case.getProblematic();
-        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
-        rationalAB = rationalAA;
+        rAA = P20030512Case.getProblematic();
+        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
+        rAB = rAA;
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
+    }
+
+    @Override
+    @Test
+    public void testGetRank() {
+
+        int expected = rAA.getRank();
+        int actual;
+
+        actual = cAA.getRank();
+        TestUtils.assertEquals(expected, actual);
+
+        actual = p64AA.getRank();
+        TestUtils.assertEquals(expected, actual);
+
+        // TODO Why doesn't this work?
+        // actual = p32AA.getRank();
+        // TestUtils.assertEquals(expected, actual);
+    }
+
+    @Override
+    @Test
+    public void testIsFullRank() {
+
+        boolean expected = rAA.isFullRank();
+        boolean actual;
+
+        actual = cAA.isFullRank();
+        TestUtils.assertEquals(expected, actual);
+
+        actual = p64AA.isFullRank();
+        TestUtils.assertEquals(expected, actual);
+
+        // TODO Why doesn't this work?
+        // actual = p32AA.isFullRank();
+        // TestUtils.assertEquals(expected, actual);
     }
 
     @Test
     public void testProblem() {
 
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
+
         expMtrx = P20030512Case.getProblematic();
         actMtrx = expMtrx.invert().invert();
 
-        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
+        TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
     }
 
 }

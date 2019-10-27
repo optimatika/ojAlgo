@@ -66,18 +66,18 @@ public class P20050827Case extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = NumberContext.getGeneral(6).withPrecision(12);
+        // ACCURACY = NumberContext.getGeneral(6).withPrecision(12);
 
-        rationalAA = RationalMatrix.FACTORY.copy(P20050827Case.getProblematic());
-        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
-        rationalAB = rationalAA;
+        rAA = RationalMatrix.FACTORY.copy(P20050827Case.getProblematic());
+        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
+        rAB = rAA;
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
@@ -109,7 +109,7 @@ public class P20050827Case extends BasicMatrixTest {
             TestUtils.assertTrue(tmpBig.toScalar(ij, ij).toString(), tmpBig.get(ij, ij).isReal());
         }
 
-        TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpBigTrace.get(), tmpSmallTrace.get(), evaluation);
+        TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpBigTrace.get(), tmpSmallTrace.get(), ACCURACY);
     }
 
     @Test
@@ -122,8 +122,8 @@ public class P20050827Case extends BasicMatrixTest {
         final ComplexNumber tmpExpected = ComplexMath.ROOT.invoke(tmpVal, 2);
         final ComplexNumber tmpActual = ComplexNumber.valueOf(tmpProblematic.aggregateAll(Aggregator.NORM2));
 
-        TestUtils.assertEquals(tmpExpected.norm(), tmpActual.norm(), evaluation);
-        TestUtils.assertEquals(tmpExpected, tmpActual, evaluation);
+        TestUtils.assertEquals(tmpExpected.norm(), tmpActual.norm(), ACCURACY);
+        TestUtils.assertEquals(tmpExpected, tmpActual, ACCURACY);
 
     }
 

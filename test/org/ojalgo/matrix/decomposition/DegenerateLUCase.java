@@ -26,8 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.SimpleEquationCase;
-import org.ojalgo.matrix.store.GenericDenseStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -55,7 +55,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         final LU<RationalNumber> decomp = LU.RATIONAL.make();
         decomp.decompose(degenerate);
 
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(degenerate), decomp, evaluation);
+        TestUtils.assertEquals(GenericStore.RATIONAL.copy(degenerate), decomp, evaluation);
     }
 
     @Test
@@ -67,9 +67,9 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         final RationalMatrix degenerate = RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get();
 
         final LU<ComplexNumber> decomp = LU.COMPLEX.make();
-        decomp.decompose(GenericDenseStore.COMPLEX.copy(degenerate));
+        decomp.decompose(GenericStore.COMPLEX.copy(degenerate));
 
-        TestUtils.assertEquals(GenericDenseStore.COMPLEX.copy(degenerate), decomp, evaluation);
+        TestUtils.assertEquals(GenericStore.COMPLEX.copy(degenerate), decomp, evaluation);
     }
 
     @Test
@@ -81,9 +81,9 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         final RationalMatrix degenerate = RationalMatrix.FACTORY.make(square).logical().below(square).below(square).get();
 
         final LU<Double> decomp = LU.PRIMITIVE.make();
-        decomp.decompose(PrimitiveDenseStore.FACTORY.copy(degenerate));
+        decomp.decompose(Primitive64Store.FACTORY.copy(degenerate));
 
-        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(degenerate), decomp, evaluation);
+        TestUtils.assertEquals(Primitive64Store.FACTORY.copy(degenerate), decomp, evaluation);
     }
 
     @Test

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.RationalNumber;
@@ -49,47 +49,47 @@ public class P20050125Case extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = new NumberContext(7, 6);
+        // ACCURACY = new NumberContext(7, 6);
 
-        rationalAA = P20050125Case.getProblematic();
-        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
-        rationalAB = rationalAA;
+        rAA = P20050125Case.getProblematic();
+        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
+        rAB = rAA;
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
     public void testData() {
 
         final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
-        tmpDelegate.decompose(GenericDenseStore.RATIONAL.copy(rationalAA));
+        tmpDelegate.decompose(GenericStore.RATIONAL.copy(rAA));
 
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(rationalAA), tmpDelegate, evaluation);
+        TestUtils.assertEquals(GenericStore.RATIONAL.copy(rAA), tmpDelegate, ACCURACY);
     }
 
     @Test
     public void testProblem() {
 
         final Cholesky<RationalNumber> tmpDelegate = Cholesky.RATIONAL.make();
-        tmpDelegate.decompose(GenericDenseStore.RATIONAL.copy(rationalAA));
+        tmpDelegate.decompose(GenericStore.RATIONAL.copy(rAA));
 
-        final MatrixStore<RationalNumber> tmpInv = tmpDelegate.getSolution(GenericDenseStore.RATIONAL.copy(rationlI));
+        final MatrixStore<RationalNumber> tmpInv = tmpDelegate.getSolution(GenericStore.RATIONAL.copy(rI));
 
-        final MatrixStore<RationalNumber> tmpExpMtrx = GenericDenseStore.RATIONAL.copy(rationlI);
-        final MatrixStore<RationalNumber> tmpActMtrx = GenericDenseStore.RATIONAL.copy(rationalAA).multiply(tmpInv);
+        final MatrixStore<RationalNumber> tmpExpMtrx = GenericStore.RATIONAL.copy(rI);
+        final MatrixStore<RationalNumber> tmpActMtrx = GenericStore.RATIONAL.copy(rAA).multiply(tmpInv);
 
-        TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, evaluation);
+        TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, ACCURACY);
     }
 
     @Override
     @Test
-    public void testSolveBasicMatrix() {
-        super.testSolveBasicMatrix();
+    public void testSolveMatrix() {
+        super.testSolveMatrix();
     }
 
 }

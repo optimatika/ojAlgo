@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
@@ -41,7 +41,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
     private final ArtificialNeuralNetwork myANN;
     private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
-    private final PrimitiveDenseStore[] myLayerValues;
+    private final Primitive64Store[] myLayerValues;
     private double myLearningRate = 1.0;
 
     NetworkBuilder(final int numberOfInputNodes, final int... outputNodesPerCalculationLayer) {
@@ -54,10 +54,10 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
         myANN = new ArtificialNeuralNetwork(numberOfInputNodes, outputNodesPerCalculationLayer);
 
-        myLayerValues = new PrimitiveDenseStore[1 + outputNodesPerCalculationLayer.length];
-        myLayerValues[0] = PrimitiveDenseStore.FACTORY.make(numberOfInputNodes, 1);
+        myLayerValues = new Primitive64Store[1 + outputNodesPerCalculationLayer.length];
+        myLayerValues[0] = Primitive64Store.FACTORY.make(numberOfInputNodes, 1);
         for (int l = 0; l < outputNodesPerCalculationLayer.length; l++) {
-            myLayerValues[1 + l] = PrimitiveDenseStore.FACTORY.make(outputNodesPerCalculationLayer[l], 1);
+            myLayerValues[1 + l] = Primitive64Store.FACTORY.make(outputNodesPerCalculationLayer[l], 1);
         }
     }
 

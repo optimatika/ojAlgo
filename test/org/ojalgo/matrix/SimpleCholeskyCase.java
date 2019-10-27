@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -57,36 +57,39 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = new NumberContext(4, 3);
+        rAA = SimpleCholeskyCase.getFactorL();
+        rAX = SimpleCholeskyCase.getFactorR();
+        rAB = SimpleCholeskyCase.getOriginal();
 
-        rationalAA = SimpleCholeskyCase.getFactorL();
-        rationalAX = SimpleCholeskyCase.getFactorR();
-        rationalAB = SimpleCholeskyCase.getOriginal();
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
     public void testData() {
 
+        NumberContext accuracy = new NumberContext(4, 3);
+
         final RationalMatrix tmpA = SimpleCholeskyCase.getOriginal();
         final RationalMatrix tmpL = SimpleCholeskyCase.getFactorL();
         final RationalMatrix tmpR = SimpleCholeskyCase.getFactorR();
 
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
+
         expMtrx = tmpL;
         actMtrx = tmpR.transpose();
 
-        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
+        TestUtils.assertEquals(expMtrx, actMtrx, accuracy);
 
         expMtrx = tmpA;
         actMtrx = tmpL.multiply(tmpR);
 
-        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
+        TestUtils.assertEquals(expMtrx, actMtrx, accuracy);
     }
 
     //    @Test
@@ -115,9 +118,9 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
 
         final RationalMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
         final Cholesky<RationalNumber> tmpDecomp = Cholesky.RATIONAL.make();
-        tmpDecomp.decompose(GenericDenseStore.RATIONAL.copy(tmpMtrx));
+        tmpDecomp.decompose(GenericStore.RATIONAL.copy(tmpMtrx));
 
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(tmpMtrx), tmpDecomp, evaluation);
+        TestUtils.assertEquals(GenericStore.RATIONAL.copy(tmpMtrx), tmpDecomp, ACCURACY);
     }
 
 }

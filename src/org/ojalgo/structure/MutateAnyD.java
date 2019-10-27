@@ -40,24 +40,26 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
         void fillOne(long[] reference, N value);
 
-        void fillOne(long[] reference, NullaryFunction<N> supplier);
+        void fillOne(long[] reference, NullaryFunction<?> supplier);
 
         void fillSet(int dimension, long dimensionalIndex, N value);
 
-        void fillSet(int dimension, long dimensionalIndex, NullaryFunction<N> supplier);
+        void fillSet(int dimension, long dimensionalIndex, NullaryFunction<?> supplier);
 
         void fillSet(long[] initial, int dimension, N value);
 
-        void fillSet(long[] initial, int dimension, NullaryFunction<N> supplier);
+        void fillSet(long[] initial, int dimension, NullaryFunction<?> supplier);
 
     }
 
     interface Mixable<N extends Comparable<N>> extends StructureAnyD, Mutate1D.Mixable<N> {
 
+        @Override
         default double mix(final long index, final BinaryFunction<N> mixer, final double addend) {
             return this.mix(StructureAnyD.reference(index, this.shape()), mixer, addend);
         }
 
+        @Override
         default N mix(final long index, final BinaryFunction<N> mixer, final N addend) {
             return this.mix(StructureAnyD.reference(index, this.shape()), mixer, addend);
         }
@@ -91,6 +93,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     interface Receiver<N extends Comparable<N>> extends MutateAnyD, Fillable<N>, Consumer<AccessAnyD<?>> {
 
+        @Override
         default void accept(final AccessAnyD<?> supplied) {
             if (this.isAcceptable(supplied)) {
                 supplied.loopAll((final long[] ref) -> this.set(ref, supplied.get(ref)));
@@ -114,28 +117,50 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     }
 
-    default void add(final long index, final double addend) {
-        this.add(StructureAnyD.reference(index, this.shape()), addend);
-    }
-
+    @Override
     default void add(final long index, final Comparable<?> addend) {
         this.add(StructureAnyD.reference(index, this.shape()), addend);
     }
 
-    void add(long[] reference, double addend);
+    @Override
+    default void add(final long index, final double addend) {
+        this.add(StructureAnyD.reference(index, this.shape()), addend);
+    }
+
+    @Override
+    default void add(final long index, final float addend) {
+        this.add(StructureAnyD.reference(index, this.shape()), addend);
+    }
 
     void add(long[] reference, Comparable<?> addend);
 
-    default void set(final long index, final double value) {
-        this.set(StructureAnyD.reference(index, this.shape()), value);
+    void add(long[] reference, double addend);
+
+    default void add(long[] reference, float addend) {
+        this.add(reference, (double) addend);
     }
 
+    @Override
     default void set(final long index, final Comparable<?> value) {
         this.set(StructureAnyD.reference(index, this.shape()), value);
     }
 
-    void set(long[] reference, double value);
+    @Override
+    default void set(final long index, final double value) {
+        this.set(StructureAnyD.reference(index, this.shape()), value);
+    }
+
+    @Override
+    default void set(final long index, final float value) {
+        this.set(StructureAnyD.reference(index, this.shape()), value);
+    }
 
     void set(long[] reference, Comparable<?> value);
+
+    void set(long[] reference, double value);
+
+    default void set(long[] reference, float value) {
+        this.set(reference, (double) value);
+    }
 
 }

@@ -44,7 +44,7 @@ import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.PureQuadraticFunction;
 import org.ojalgo.function.multiary.QuadraticFunction;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D;
@@ -295,7 +295,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     public MatrixStore<Double> getAdjustedGradient(final Access1D<?> point) {
 
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(myModel.countVariables(), 1);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.makeZero(myModel.countVariables(), 1);
 
         final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         double tmpAdjustedFactor;
@@ -320,7 +320,7 @@ public final class Expression extends ModelEntity<Expression> {
     public MatrixStore<Double> getAdjustedHessian() {
 
         final int tmpCountVariables = myModel.countVariables();
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpCountVariables, tmpCountVariables);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.makeZero(tmpCountVariables, tmpCountVariables);
 
         final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         UnaryFunction<Double> tmpModFunc;

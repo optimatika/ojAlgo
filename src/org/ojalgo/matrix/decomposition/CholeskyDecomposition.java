@@ -29,10 +29,10 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -45,7 +45,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     static final class Complex extends CholeskyDecomposition<ComplexNumber> {
 
         Complex() {
-            super(GenericDenseStore.COMPLEX);
+            super(GenericStore.COMPLEX);
         }
 
     }
@@ -53,7 +53,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     static final class Primitive extends CholeskyDecomposition<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY);
+            super(Primitive64Store.FACTORY);
         }
 
     }
@@ -61,7 +61,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     static final class Quat extends CholeskyDecomposition<Quaternion> {
 
         Quat() {
-            super(GenericDenseStore.QUATERNION);
+            super(GenericStore.QUATERNION);
         }
 
     }
@@ -69,7 +69,7 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
     static final class Rational extends CholeskyDecomposition<RationalNumber> {
 
         Rational() {
-            super(GenericDenseStore.RATIONAL);
+            super(GenericStore.RATIONAL);
         }
 
     }

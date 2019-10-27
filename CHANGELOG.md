@@ -13,9 +13,20 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 ### Added
 
+- Improved support for float throughout the library, and specifically added matrices with float elements.
+
+#### org.ojalgo.algebra
+
+- ScalarOperation has been extended with support for float arguments.
+
 #### org.ojalgo.function
 
 - New special functions: beta (complete, incomplete and regularized), gamma (logarithmic), Hypergeometric and Pochhammer symbol. Inluding complex valued variants where applicable. The complete gamma function existed previously, and the upper/lower incomplete gamma functions are only implemented for the integer case.
+- All the function interaces now have float specific methods.
+
+#### org.ojalgo.matrix
+
+- There is a new float based matrix store implementation, Primitive32Store.
 
 #### org.ojalgo.random
 
@@ -24,6 +35,16 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 ### Changed
 
 - Generic declarations in interfaces and abstract classes (everywhere) that used to be `<N extends Number>` are now `<N extends Comparable<N>>`. Code that extends/implements ojAlgo classes and interaces will most likely need to be updated. Simple usage may not require any changes at all. Please note that `java.lang.Number` is NOT `Comparable` but all the speciic subclasses are.
+- Everything (classes/interfaces, constants...) named "Primitive" -something now separates between "Primitive32" and "Primitive64".
+
+#### org.ojalgo.matrix
+
+- PrimitiveDenseStore has been renamed Primitive64Store (and there is now also a Primitive32Store). GenericDenseStore was also renamed GenericStore.
+
+#### org.ojalgo.structure
+
+- The methods in the Mutate*D.Fillable interaces that take a NullaryFunction as input has changed the generic declaration from `NullaryFunction<N>` to `NullaryFunction<?>`.
+- Reftactoring of the Factory*D interfaces.
 
 ## [47.3.1] – 2019-09-29
 

@@ -36,12 +36,20 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
             return this.invoke(Quaternion.valueOf(arg1), Quaternion.valueOf(arg2)).doubleValue();
         }
 
+        default float invoke(final float arg1, final float arg2) {
+            return this.invoke(Quaternion.valueOf(arg1), Quaternion.valueOf(arg2)).floatValue();
+        }
+
     }
 
     @FunctionalInterface
     public interface Consumer extends VoidFunction<Quaternion> {
 
         default void invoke(final double arg) {
+            this.invoke(Quaternion.valueOf(arg));
+        }
+
+        default void invoke(final float arg) {
             this.invoke(Quaternion.valueOf(arg));
         }
 
@@ -54,12 +62,20 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
             return this.invoke(Quaternion.valueOf(arg), param).doubleValue();
         }
 
+        default float invoke(final float arg, final int param) {
+            return this.invoke(Quaternion.valueOf(arg), param).floatValue();
+        }
+
     }
 
     @FunctionalInterface
     public interface Predicate extends PredicateFunction<Quaternion> {
 
         default boolean invoke(final double arg) {
+            return this.invoke(Quaternion.valueOf(arg));
+        }
+
+        default boolean invoke(final float arg) {
             return this.invoke(Quaternion.valueOf(arg));
         }
 
@@ -70,6 +86,10 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
         default double invoke(final double arg) {
             return this.invoke(Quaternion.valueOf(arg)).doubleValue();
+        }
+
+        default float invoke(final float arg) {
+            return this.invoke(Quaternion.valueOf(arg)).floatValue();
         }
 
     }

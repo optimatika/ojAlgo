@@ -110,10 +110,12 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
         }
     }
 
+    @Override
     default Scalar<N> add(final Scalar<N> addend) {
         return this.add(addend.get());
     }
 
+    @Override
     default Scalar<N> divide(final Scalar<N> divisor) {
         return this.divide(divisor.get());
     }
@@ -125,10 +127,12 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
      */
     boolean isAbsolute();
 
+    @Override
     default Scalar<N> multiply(final Scalar<N> multiplicand) {
         return this.multiply(multiplicand.get());
     }
 
+    @Override
     default Scalar<N> subtract(final Scalar<N> subtrahend) {
         return this.subtract(subtrahend.get());
     }

@@ -212,7 +212,7 @@ public abstract class BasicArray<N extends Comparable<N>>
 
     protected abstract void fill(long first, long limit, long step, N value);
 
-    protected abstract void fill(long first, long limit, long step, NullaryFunction<N> supplier);
+    protected abstract void fill(long first, long limit, long step, NullaryFunction<?> supplier);
 
     protected long indexOfLargest(final long first, final long limit, final long step) {
         return AMAX.invoke(this, first, limit, step);

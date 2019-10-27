@@ -37,7 +37,7 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.decomposition.Tridiagonal;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
@@ -321,11 +321,11 @@ public abstract class TestUtils {
             ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
             ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
 
-            if (!!precision.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
+            if (precision.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
                 // Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
                 Assertions.assertEquals(expected, actual, () -> message + " (real)" + ": " + expected + " != " + actual);
             }
-            if (!!precision.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
+            if (precision.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
                 // Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
                 Assertions.assertEquals(expected, actual, () -> message + " (imaginary)" + ": " + expected + " != " + actual);
             }
@@ -463,7 +463,7 @@ public abstract class TestUtils {
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {
 
-        PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
+        PhysicalStore<ComplexNumber> retVal = GenericStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
 
         Uniform tmpArgGen = new Uniform(PrimitiveMath.ZERO, PrimitiveMath.TWO_PI);
 

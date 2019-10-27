@@ -11,7 +11,7 @@ public class Primitive64Vector3 extends GeometryVector {
     public double v0, v1, v2;
 
     public Primitive64Vector3() {
-        super(MultiplyBoth.getPrimitive(3L, 1L), 3L, 1L);
+        super(MultiplyBoth.newPrimitive64(3L, 1L), 3L, 1L);
     }
 
     public Primitive64Vector3(final double v0, final double v1, final double v2) {

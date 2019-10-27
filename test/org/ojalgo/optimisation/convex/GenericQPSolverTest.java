@@ -28,7 +28,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -39,15 +39,15 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class GenericQPSolverTest extends OptimisationConvexTests {
 
-    private PrimitiveDenseStore myAE;
-    private PrimitiveDenseStore myAI;
-    private PrimitiveDenseStore myBE;
-    private PrimitiveDenseStore myBI;
-    private PrimitiveDenseStore myC;
+    private Primitive64Store myAE;
+    private Primitive64Store myAI;
+    private Primitive64Store myBE;
+    private Primitive64Store myBI;
+    private Primitive64Store myC;
     private final NumberContext myEvaluationContext = new NumberContext(7, 8);
-    private PrimitiveDenseStore myQ;
-    private PrimitiveDenseStore myXE;
-    private PrimitiveDenseStore myXI;
+    private Primitive64Store myQ;
+    private Primitive64Store myXE;
+    private Primitive64Store myXI;
 
     public final MatrixStore<Double> getSolutionE() {
         return myXE.copy();
@@ -63,42 +63,42 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
         final RationalMatrix[] tmpMatrices = this.getMatrices();
 
         if (tmpMatrices[0] != null) {
-            myAE = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[0]);
+            myAE = Primitive64Store.FACTORY.copy(tmpMatrices[0]);
         } else {
             myAE = null;
         }
         if (tmpMatrices[1] != null) {
-            myBE = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[1]);
+            myBE = Primitive64Store.FACTORY.copy(tmpMatrices[1]);
         } else {
             myBE = null;
         }
         if (tmpMatrices[2] != null) {
-            myQ = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[2]);
+            myQ = Primitive64Store.FACTORY.copy(tmpMatrices[2]);
         } else {
             myQ = null;
         }
         if (tmpMatrices[3] != null) {
-            myC = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[3].negate());
+            myC = Primitive64Store.FACTORY.copy(tmpMatrices[3].negate());
         } else {
             myC = null;
         }
         if (tmpMatrices[4] != null) {
-            myAI = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[4]);
+            myAI = Primitive64Store.FACTORY.copy(tmpMatrices[4]);
         } else {
             myAI = null;
         }
         if (tmpMatrices[5] != null) {
-            myBI = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[5]);
+            myBI = Primitive64Store.FACTORY.copy(tmpMatrices[5]);
         } else {
             myBI = null;
         }
         if (tmpMatrices[6] != null) {
-            myXE = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[6]);
+            myXE = Primitive64Store.FACTORY.copy(tmpMatrices[6]);
         } else {
             myXE = null;
         }
         if (tmpMatrices[7] != null) {
-            myXI = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[7]);
+            myXI = Primitive64Store.FACTORY.copy(tmpMatrices[7]);
         } else {
             myXI = null;
         }
@@ -130,11 +130,11 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
     @Test
     public void testSolverResults() {
 
-        final PrimitiveDenseStore[] tmpMatricesI = new PrimitiveDenseStore[] { myAE, myBE, myQ, myC, myAI, myBI };
+        final Primitive64Store[] tmpMatricesI = new Primitive64Store[] { myAE, myBE, myQ, myC, myAI, myBI };
 
         ConvexProblems.builAndTestModel(tmpMatricesI, myXI, myEvaluationContext, false);
 
-        final PrimitiveDenseStore[] tmpMatricesE = new PrimitiveDenseStore[] { myAE, myBE, myQ, myC, null, null };
+        final Primitive64Store[] tmpMatricesE = new Primitive64Store[] { myAE, myBE, myQ, myC, null, null };
 
         ConvexProblems.builAndTestModel(tmpMatricesE, myXE, myEvaluationContext, false);
     }

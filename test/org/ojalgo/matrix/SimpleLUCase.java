@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.LU;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -55,27 +55,30 @@ public class SimpleLUCase extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = new NumberContext(7, 9);
+        // ACCURACY = new NumberContext(7, 9);
 
-        rationalAA = SimpleLUCase.getMtrxL();
-        rationalAX = SimpleLUCase.getMtrxU();
-        rationalAB = SimpleLUCase.getOrginal();
+        rAA = SimpleLUCase.getMtrxL();
+        rAX = SimpleLUCase.getMtrxU();
+        rAB = SimpleLUCase.getOrginal();
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
     public void testData() {
 
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
+
         expMtrx = SimpleLUCase.getOrginal();
         actMtrx = SimpleLUCase.getMtrxL().multiply(SimpleLUCase.getMtrxU());
 
-        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
+        TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
     }
 
     @Test
@@ -84,9 +87,9 @@ public class SimpleLUCase extends BasicMatrixTest {
         // PLDU
 
         final LU<RationalNumber> tmpLU = LU.RATIONAL.make();
-        tmpLU.decompose(GenericDenseStore.RATIONAL.copy(SimpleLUCase.getOrginal()));
+        tmpLU.decompose(GenericStore.RATIONAL.copy(SimpleLUCase.getOrginal()));
 
-        TestUtils.assertEquals(GenericDenseStore.RATIONAL.copy(SimpleLUCase.getOrginal()), tmpLU, evaluation);
+        TestUtils.assertEquals(GenericStore.RATIONAL.copy(SimpleLUCase.getOrginal()), tmpLU, ACCURACY);
     }
 
 }

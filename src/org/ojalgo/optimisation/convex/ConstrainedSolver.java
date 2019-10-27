@@ -25,12 +25,12 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access2D.Collectable;
 
 abstract class ConstrainedSolver extends ConvexSolver {
 
-    private final PrimitiveDenseStore mySlackE;
+    private final Primitive64Store mySlackE;
 
     protected ConstrainedSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
 
@@ -38,7 +38,7 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
         int numberOfEqualityConstraints = this.countEqualityConstraints();
 
-        mySlackE = PrimitiveDenseStore.FACTORY.make(numberOfEqualityConstraints, 1L);
+        mySlackE = Primitive64Store.FACTORY.make(numberOfEqualityConstraints, 1L);
     }
 
     @Override

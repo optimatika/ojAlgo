@@ -27,10 +27,10 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -217,7 +217,7 @@ public interface Eigenvalue<N extends Comparable<N>>
         @Override
         public Eigenvalue.Generalised<ComplexNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<ComplexNumber, GenericDenseStore<ComplexNumber>> factory = GenericDenseStore.COMPLEX;
+            PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> factory = GenericStore.COMPLEX;
             Cholesky<ComplexNumber> cholesky = Cholesky.COMPLEX.make(typical);
             Eigenvalue<ComplexNumber> eigenvalue = this.make(typical, true);
 
@@ -257,7 +257,7 @@ public interface Eigenvalue<N extends Comparable<N>>
         @Override
         public Eigenvalue.Generalised<Double> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
+            PhysicalStore.Factory<Double, Primitive64Store> factory = Primitive64Store.FACTORY;
             Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(typical);
             Eigenvalue<Double> eigenvalue = this.make(typical, true);
 
@@ -276,7 +276,7 @@ public interface Eigenvalue<N extends Comparable<N>>
         @Override
         public Eigenvalue.Generalised<Quaternion> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<Quaternion, GenericDenseStore<Quaternion>> factory = GenericDenseStore.QUATERNION;
+            PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> factory = GenericStore.QUATERNION;
             Cholesky<Quaternion> cholesky = Cholesky.QUATERNION.make(typical);
             Eigenvalue<Quaternion> eigenvalue = this.make(typical, true);
 
@@ -295,7 +295,7 @@ public interface Eigenvalue<N extends Comparable<N>>
         @Override
         public Eigenvalue.Generalised<RationalNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<RationalNumber, GenericDenseStore<RationalNumber>> factory = GenericDenseStore.RATIONAL;
+            PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> factory = GenericStore.RATIONAL;
             Cholesky<RationalNumber> cholesky = Cholesky.RATIONAL.make(typical);
             Eigenvalue<RationalNumber> eigenvalue = this.make(typical, true);
 
@@ -461,7 +461,7 @@ public interface Eigenvalue<N extends Comparable<N>>
 
         final long tmpDimension = this.getV().countColumns();
 
-        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(tmpDimension, tmpDimension);
+        final GenericStore<ComplexNumber> retVal = GenericStore.COMPLEX.makeZero(tmpDimension, tmpDimension);
 
         for (int j = 0; j < tmpDimension; j++) {
             this.copyEigenvector(j, retVal.sliceColumn(0, j));

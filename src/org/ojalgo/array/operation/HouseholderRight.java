@@ -30,11 +30,26 @@ public final class HouseholderRight implements ArrayOperation {
     public static int THRESHOLD = 512;
 
     public static void invoke(final double[] data, final int structure, final int firstRow, final int rowLimit, final int numberOfColumns,
-            final Householder.Primitive householder, final double[] work) {
+            final Householder.Primitive64 householder, final double[] work) {
 
         final double[] vector = householder.vector;
         final int firstNonZero = householder.first;
         final double beta = householder.beta;
+
+        for (int j = firstNonZero; j < numberOfColumns; j++) {
+            AXPY.invoke(work, 0, beta * vector[j], data, j * structure, firstRow, rowLimit);
+        }
+        for (int j = firstNonZero; j < numberOfColumns; j++) {
+            AXPY.invoke(data, j * structure, -vector[j], work, 0, firstRow, rowLimit);
+        }
+    }
+
+    public static void invoke(final float[] data, final int structure, final int firstRow, final int rowLimit, final int numberOfColumns,
+            final Householder.Primitive32 householder, final float[] work) {
+
+        final float[] vector = householder.vector;
+        final int firstNonZero = householder.first;
+        final float beta = householder.beta;
 
         for (int j = firstNonZero; j < numberOfColumns; j++) {
             AXPY.invoke(work, 0, beta * vector[j], data, j * structure, firstRow, rowLimit);
@@ -71,7 +86,7 @@ public final class HouseholderRight implements ArrayOperation {
         }
     }
 
-    private static void invoke2old(final double[] data, final int first, final int limit, final int tmpColDim, final Householder.Primitive householder) {
+    private static void invoke2old(final double[] data, final int first, final int limit, final int tmpColDim, final Householder.Primitive64 householder) {
 
         final double[] tmpHouseholderVector = householder.vector;
         final int tmpFirstNonZero = householder.first;

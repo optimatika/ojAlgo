@@ -34,8 +34,8 @@ public final class ApplyLU implements ArrayOperation {
         }
     }
 
-    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit,
-            final N[] multipliers, final int iterationPoint) {
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int firstColumn, final int columnLimit, final N[] multipliers,
+            final int iterationPoint) {
         for (int j = firstColumn; j < columnLimit; j++) {
             AXPY.invoke(data, j * structure, data[iterationPoint + (j * structure)].negate().get(), multipliers, 0, iterationPoint + 1, structure);
         }

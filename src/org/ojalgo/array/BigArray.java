@@ -91,6 +91,7 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         super(FACTORY, size);
     }
 
+    @Override
     public final void axpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
     }
@@ -121,6 +122,11 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
 
     @Override
     protected final void add(final int index, final double addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    }
+
+    @Override
+    protected final void add(final int index, final float addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)));
     }
 

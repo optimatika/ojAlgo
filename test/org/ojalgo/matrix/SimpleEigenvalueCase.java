@@ -28,7 +28,7 @@ import org.ojalgo.function.constant.RationalMath;
 import org.ojalgo.matrix.BasicMatrix.PhysicalReceiver;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -58,43 +58,49 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = new NumberContext(7, 3);
+        // ACCURACY = new NumberContext(7, 3);
 
-        rationalAA = SimpleEigenvalueCase.getOriginal();
-        rationalAX = SimpleEigenvalueCase.getMatrixV();
-        rationalAB = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
+        rAA = SimpleEigenvalueCase.getOriginal();
+        rAX = SimpleEigenvalueCase.getMatrixV();
+        rAB = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
     public void testData() {
 
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
+
         expMtrx = SimpleEigenvalueCase.getOriginal().multiply(SimpleEigenvalueCase.getMatrixV());
 
         actMtrx = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
 
-        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
+        TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
     }
 
     @Test
     public void testProblem() {
 
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
+
         final Eigenvalue<Double> tmpEigen = Eigenvalue.PRIMITIVE.make();
-        tmpEigen.decompose(PrimitiveDenseStore.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));
+        tmpEigen.decompose(Primitive64Store.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));
 
         final MatrixStore<Double> tmpV = tmpEigen.getV();
         final MatrixStore<Double> tmpD = tmpEigen.getD();
 
         expMtrx = SimpleEigenvalueCase.getMatrixD();
-        actMtrx = PrimitiveMatrix.FACTORY.copy(tmpD);
+        actMtrx = Primitive64Matrix.FACTORY.copy(tmpD);
 
-        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
+        TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
 
         final RationalMatrix tmpExpV = SimpleEigenvalueCase.getMatrixV();
         final RationalMatrix tmpActV = RationalMatrix.FACTORY.copy(tmpV);
@@ -108,11 +114,11 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
             tmpExp = tmpMtrx.doubleValue(0, j);
             for (int i = 0; i < tmpMtrx.countRows(); i++) {
                 tmpAct = tmpMtrx.doubleValue(i, j);
-                TestUtils.assertEquals(tmpExp, tmpAct, evaluation);
+                TestUtils.assertEquals(tmpExp, tmpAct, ACCURACY);
             }
         }
 
-        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
+        TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
     }
 
 }

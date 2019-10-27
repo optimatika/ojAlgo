@@ -53,50 +53,67 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
         }
     }
 
+    @Override
     public void add(final long index, final double addend) {
         this.add((int) index, addend);
     }
 
+    @Override
+    public void add(final long index, final float addend) {
+        this.add((int) index, addend);
+    }
+
+    @Override
     public void add(final long index, final Comparable<?> addend) {
         this.add((int) index, addend);
     }
 
+    @Override
     public final long count() {
         return this.size();
     }
 
+    @Override
     public final double doubleValue(final long index) {
         return this.doubleValue((int) index);
     }
 
+    @Override
     public final void fillAll(final N number) {
         this.fill(0, this.size(), 1, number);
     }
 
-    public final void fillAll(final NullaryFunction<N> supplier) {
+    @Override
+    public final void fillAll(final NullaryFunction<?> supplier) {
         this.fill(0, this.size(), 1, supplier);
     }
 
+    @Override
     public final void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
         this.fillOne((int) index, values, valueIndex);
     }
 
+    @Override
     public void fillOne(final long index, final N value) {
         this.fillOne((int) index, value);
     }
 
-    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+    @Override
+    public void fillOne(final long index, final NullaryFunction<?> supplier) {
         this.fillOne((int) index, supplier);
     }
 
+    @Override
     public final void fillRange(final long first, final long limit, final N number) {
         this.fill(first, limit, 1L, number);
     }
 
-    public final void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+    @Override
+    public final void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
         this.fill(first, limit, 1L, supplier);
     }
 
+    @Override
     public final N get(final long index) {
         return this.get((int) index);
     }
@@ -104,6 +121,7 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
     /**
      * @see Scalar#isAbsolute()
      */
+    @Override
     public final boolean isAbsolute(final long index) {
         return this.isAbsolute((int) index);
     }
@@ -111,22 +129,32 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
     /**
      * @see Scalar#isSmall(double)
      */
+    @Override
     public final boolean isSmall(final long index, final double comparedTo) {
         return this.isSmall((int) index, comparedTo);
     }
 
+    @Override
     public final void modifyOne(final long index, final UnaryFunction<N> modifier) {
         this.modifyOne((int) index, modifier);
     }
 
+    @Override
     public final void set(final long index, final double value) {
         this.set((int) index, value);
     }
 
+    @Override
+    public final void set(final long index, final float value) {
+        this.set((int) index, value);
+    }
+
+    @Override
     public final void set(final long index, final Comparable<?> number) {
         this.set((int) index, number);
     }
 
+    @Override
     public void visitOne(final long index, final VoidFunction<N> visitor) {
         this.visitOne((int) index, visitor);
     }
@@ -143,6 +171,8 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
     }
 
     protected abstract void add(int index, double addend);
+
+    protected abstract void add(int index, float addend);
 
     protected abstract void add(int index, Comparable<?> addend);
 
@@ -161,7 +191,7 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     protected abstract void fill(int first, int limit, int step, N value);
 
-    protected abstract void fill(int first, int limit, int step, NullaryFunction<N> supplier);
+    protected abstract void fill(int first, int limit, int step, NullaryFunction<?> supplier);
 
     protected abstract void fill(final int first, final int limit, final N left, final BinaryFunction<N> function, final Access1D<N> right);
 
@@ -171,7 +201,7 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
     }
 
     @Override
-    protected final void fill(final long first, final long limit, final long step, final NullaryFunction<N> supplier) {
+    protected final void fill(final long first, final long limit, final long step, final NullaryFunction<?> supplier) {
         this.fill((int) first, (int) limit, (int) step, supplier);
     }
 
@@ -237,6 +267,8 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
     protected abstract int searchAscending(final N number);
 
     protected abstract void set(final int index, final double value);
+
+    protected abstract void set(final int index, final float value);
 
     protected abstract void set(final int index, final Comparable<?> number);
 

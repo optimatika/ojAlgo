@@ -30,7 +30,7 @@ import org.ojalgo.matrix.SimpleLUCase;
 import org.ojalgo.matrix.SimpleQRCase;
 import org.ojalgo.matrix.SimpleSingularValueCase;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -56,7 +56,7 @@ public class TestJama extends MatrixDecompositionTests {
     @Test
     public void testSimpleCholeskyCase() {
 
-        final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleCholeskyCase.getOriginal());
+        final MatrixStore<Double> tmpMtrxA = Primitive64Store.FACTORY.copy(SimpleCholeskyCase.getOriginal());
 
         this.computeAndTest(tmpMtrxA);
     }
@@ -64,7 +64,7 @@ public class TestJama extends MatrixDecompositionTests {
     @Test
     public void testSimpleEigenvalueCase() {
 
-        final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleEigenvalueCase.getOriginal());
+        final MatrixStore<Double> tmpMtrxA = Primitive64Store.FACTORY.copy(SimpleEigenvalueCase.getOriginal());
 
         this.computeAndTest(tmpMtrxA);
     }
@@ -72,7 +72,7 @@ public class TestJama extends MatrixDecompositionTests {
     @Test
     public void testSimpleLUCase() {
 
-        final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleLUCase.getOrginal());
+        final MatrixStore<Double> tmpMtrxA = Primitive64Store.FACTORY.copy(SimpleLUCase.getOrginal());
 
         this.computeAndTest(tmpMtrxA);
     }
@@ -80,7 +80,7 @@ public class TestJama extends MatrixDecompositionTests {
     @Test
     public void testSimpleQRCase() {
 
-        final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleQRCase.getOriginal());
+        final MatrixStore<Double> tmpMtrxA = Primitive64Store.FACTORY.copy(SimpleQRCase.getOriginal());
 
         this.computeAndTest(tmpMtrxA);
     }
@@ -88,7 +88,7 @@ public class TestJama extends MatrixDecompositionTests {
     @Test
     public void testSimpleSingularValueCase() {
 
-        final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getOriginal());
+        final MatrixStore<Double> tmpMtrxA = Primitive64Store.FACTORY.copy(SimpleSingularValueCase.getOriginal());
 
         this.computeAndTest(tmpMtrxA);
     }

@@ -33,6 +33,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 
@@ -67,9 +68,10 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
         }
     }
 
-    protected static <N extends Comparable<N>> void fill(final N[] data, final int first, final int limit, final int step, final NullaryFunction<N> supplier) {
+    protected static <N extends Comparable<N>> void fill(final N[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier,
+            Scalar.Factory<N> scalar) {
         for (int i = first; i < limit; i += step) {
-            data[i] = supplier.invoke();
+            data[i] = scalar.cast(supplier.invoke());
         }
     }
 
@@ -141,12 +143,14 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
         }
     }
 
+    @Override
     public void fillMatching(final Access1D<?> values) {
         for (int i = 0, limit = (int) Math.min(this.count(), values.count()); i < limit; i++) {
             data[i] = this.factory().scalar().cast(values.get(i));
         }
     }
 
+    @Override
     public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
         int limit = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
         for (int i = 0; i < limit; i++) {
@@ -154,6 +158,7 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
         }
     }
 
+    @Override
     public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
         int limit = MissingMath.toMinIntExact(this.count(), arguments.count());
         for (int i = 0; i < limit; i++) {
@@ -205,8 +210,8 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
-    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<N> supplier) {
-        ReferenceTypeArray.fill(data, first, limit, step, supplier);
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+        ReferenceTypeArray.fill(data, first, limit, step, supplier, this.factory().scalar());
     }
 
     @Override
@@ -276,6 +281,11 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
+    protected final void set(final int index, final float value) {
+        data[index] = this.valueOf(value);
+    }
+
+    @Override
     protected final void set(final int index, final Comparable<?> value) {
         data[index] = this.valueOf(value);
     }
@@ -311,6 +321,10 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     final N valueOf(final double value) {
+        return this.factory().scalar().cast(value);
+    }
+
+    final N valueOf(final float value) {
         return this.factory().scalar().cast(value);
     }
 

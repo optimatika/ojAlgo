@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -49,18 +49,18 @@ public class P20071019Case extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = evaluation.withPrecision(14);
+        // ACCURACY = ACCURACY.withPrecision(14);
 
-        rationalAA = P20071019Case.getFatProblematic().multiply(P20071019Case.getTallProblematic()).enforce(DEFINITION);
-        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
-        rationalAB = rationalAA;
+        rAA = P20071019Case.getFatProblematic().multiply(P20071019Case.getTallProblematic()).enforce(DEFINITION);
+        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
+        rAB = rAA;
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
@@ -77,21 +77,21 @@ public class P20071019Case extends BasicMatrixTest {
         final LU<Double> tmpJamaLU = LU.PRIMITIVE.make();
         final LU<Double> tmpDenseLU = LU.PRIMITIVE.make();
 
-        MatrixStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(P20071019Case.getFatProblematic());
+        MatrixStore<Double> tmpOriginal = Primitive64Store.FACTORY.copy(P20071019Case.getFatProblematic());
 
         tmpJamaLU.decompose(tmpOriginal);
-        TestUtils.assertEquals(tmpOriginal, tmpJamaLU, evaluation);
+        TestUtils.assertEquals(tmpOriginal, tmpJamaLU, ACCURACY);
 
         tmpDenseLU.decompose(tmpOriginal);
-        TestUtils.assertEquals(tmpOriginal, tmpDenseLU, evaluation);
+        TestUtils.assertEquals(tmpOriginal, tmpDenseLU, ACCURACY);
 
-        tmpOriginal = PrimitiveDenseStore.FACTORY.copy(P20071019Case.getTallProblematic());
+        tmpOriginal = Primitive64Store.FACTORY.copy(P20071019Case.getTallProblematic());
 
         tmpJamaLU.decompose(tmpOriginal);
-        TestUtils.assertEquals(tmpOriginal, tmpJamaLU, evaluation);
+        TestUtils.assertEquals(tmpOriginal, tmpJamaLU, ACCURACY);
 
         tmpDenseLU.decompose(tmpOriginal);
-        TestUtils.assertEquals(tmpOriginal, tmpDenseLU, evaluation);
+        TestUtils.assertEquals(tmpOriginal, tmpDenseLU, ACCURACY);
 
     }
 

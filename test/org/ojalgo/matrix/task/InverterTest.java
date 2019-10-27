@@ -29,7 +29,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 
 public class InverterTest extends MatrixTaskTests {
 
@@ -82,7 +82,7 @@ public class InverterTest extends MatrixTaskTests {
 
         try {
 
-            MatrixStore<Double> matrix = PrimitiveDenseStore.FACTORY.makeSPD(dimension);
+            MatrixStore<Double> matrix = Primitive64Store.FACTORY.makeSPD(dimension);
 
             MatrixStore<Double> expInv = fixed.invert(matrix);
 

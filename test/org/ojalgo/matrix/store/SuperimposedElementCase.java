@@ -40,17 +40,17 @@ public class SuperimposedElementCase extends NonPhysicalTest {
         int tmpRowIndex = Uniform.randomInteger(tmpRowDim);
         int tmpColumnIndex = Uniform.randomInteger(tmpColDim);
         RationalNumber tmpElement = RationalNumber.valueOf(BigMath.PI);
-        MatrixStore<RationalNumber> aBase = GenericDenseStore.RATIONAL.copy(tmpBase);
+        MatrixStore<RationalNumber> aBase = GenericStore.RATIONAL.copy(tmpBase);
 
         //        myBigStore = new SuperimposedMatrixStore<BigDecimal>(BigDenseStore.FACTORY.copyMatrix(tmpBase), tmpRowIndex, tmpColumnIndex, tmpElement);
         //        myComplexStore = new SuperimposedMatrixStore<ComplexNumber>(ComplexDenseStore.FACTORY.copyMatrix(tmpBase), tmpRowIndex, tmpColumnIndex, ComplexNumber.makeReal(tmpElement.doubleValue()));
         //        myPrimitiveStore = new SuperimposedMatrixStore<Double>(PrimitiveDenseStore.FACTORY.copyMatrix(tmpBase), tmpRowIndex, tmpColumnIndex, tmpElement.doubleValue());
 
         rationalStore = new SuperimposedStore<>(aBase, tmpRowIndex, tmpColumnIndex, new SingleStore<>(aBase.physical(), tmpElement));
-        MatrixStore<ComplexNumber> aBase1 = GenericDenseStore.COMPLEX.copy(tmpBase);
+        MatrixStore<ComplexNumber> aBase1 = GenericStore.COMPLEX.copy(tmpBase);
         complexStore = new SuperimposedStore<>(aBase1, tmpRowIndex, tmpColumnIndex,
                 new SingleStore<>(aBase1.physical(), ComplexNumber.valueOf(tmpElement.doubleValue())));
-        MatrixStore<Double> aBase2 = PrimitiveDenseStore.FACTORY.copy(tmpBase);
+        MatrixStore<Double> aBase2 = Primitive64Store.FACTORY.copy(tmpBase);
         primitiveStore = new SuperimposedStore<>(aBase2, tmpRowIndex, tmpColumnIndex, new SingleStore<>(aBase2.physical(), tmpElement.doubleValue()));
 
         numberOfRows = tmpRowDim;

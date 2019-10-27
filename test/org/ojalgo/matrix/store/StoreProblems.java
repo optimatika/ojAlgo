@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
@@ -39,21 +39,21 @@ public class StoreProblems extends MatrixStoreTests {
     @Test
     public void testP20071210() {
 
-        PrimitiveMatrix A, Bu, K, sx, currentState;
+        Primitive64Matrix A, Bu, K, sx, currentState;
 
         final double[][] a = { { 1, 2 }, { 3, 4 } };
-        A = PrimitiveMatrix.FACTORY.rows(a);
+        A = Primitive64Matrix.FACTORY.rows(a);
         final double[][] bu = { { 1, 0 }, { 0, 1 } };
-        Bu = PrimitiveMatrix.FACTORY.rows(bu);
-        PrimitiveMatrix.FACTORY.makeEye(2, 2);
-        K = PrimitiveMatrix.FACTORY.makeEye(2, 2);
+        Bu = Primitive64Matrix.FACTORY.rows(bu);
+        Primitive64Matrix.FACTORY.makeEye(2, 2);
+        K = Primitive64Matrix.FACTORY.makeEye(2, 2);
         final int hp = 2 * OjAlgoUtils.ENVIRONMENT.threads;
 
-        final PrimitiveMatrix eye = PrimitiveMatrix.FACTORY.makeEye(A);
-        final PrimitiveMatrix Aprime = A.subtract(Bu.multiply(K));
-        PrimitiveMatrix Apow = PrimitiveMatrix.FACTORY.copy(Aprime);
-        final PrimitiveMatrix tmp = Aprime.subtract(eye);
-        sx = PrimitiveMatrix.FACTORY.copy(eye);
+        final Primitive64Matrix eye = Primitive64Matrix.FACTORY.makeEye(A);
+        final Primitive64Matrix Aprime = A.subtract(Bu.multiply(K));
+        Primitive64Matrix Apow = Primitive64Matrix.FACTORY.copy(Aprime);
+        final Primitive64Matrix tmp = Aprime.subtract(eye);
+        sx = Primitive64Matrix.FACTORY.copy(eye);
         sx = sx.logical().below(tmp).get();
 
         //loop runs hp-2 times, which means the first elements of the matrices must be "hardcoded"
@@ -61,7 +61,7 @@ public class StoreProblems extends MatrixStoreTests {
             sx = sx.logical().below(tmp.multiply(Apow)).get();
             Apow = Apow.multiply(Apow);
         }
-        currentState = PrimitiveMatrix.FACTORY.makeZero(A.countRows(), 1);
+        currentState = Primitive64Matrix.FACTORY.makeZero(A.countRows(), 1);
         currentState = currentState.add(1.0);
         sx.multiply(currentState);
     }
@@ -75,9 +75,9 @@ public class StoreProblems extends MatrixStoreTests {
 
         final int tmpDim = 9;
 
-        final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpMtrxB = PrimitiveDenseStore.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
-        final PhysicalStore<Double> tmpMtrxC = PrimitiveDenseStore.FACTORY.makeZero(tmpDim, tmpDim);
+        final PhysicalStore<Double> tmpMtrxA = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        final PhysicalStore<Double> tmpMtrxB = Primitive64Store.FACTORY.copy(TestUtils.makeRandomComplexStore(tmpDim, tmpDim));
+        final PhysicalStore<Double> tmpMtrxC = Primitive64Store.FACTORY.makeZero(tmpDim, tmpDim);
 
         PhysicalStore<Double> tmpExpected;
         PhysicalStore<Double> tmpActual;
@@ -107,11 +107,11 @@ public class StoreProblems extends MatrixStoreTests {
     @Test
     public void testP20180121() {
 
-        final SparseStore<Double> m = SparseStore.PRIMITIVE.make(3, 2);
-        final PrimitiveDenseStore mAdd = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 0.0 }, { 0.0, 0.0 } });
+        final SparseStore<Double> m = SparseStore.PRIMITIVE64.make(3, 2);
+        final Primitive64Store mAdd = Primitive64Store.FACTORY.rows(new double[][] { { 1.0, 0.0 }, { 0.0, 0.0 }, { 0.0, 0.0 } });
         final MatrixStore<Double> n = m.add(mAdd);
 
-        final SparseStore<Double> eye = SparseStore.PRIMITIVE.make(2, 2);
+        final SparseStore<Double> eye = SparseStore.PRIMITIVE64.make(2, 2);
         eye.set(0, 0, 1.0);
         eye.set(1, 1, 1.0);
 
@@ -119,20 +119,20 @@ public class StoreProblems extends MatrixStoreTests {
 
         TestUtils.assertEquals(mAdd, prod);
 
-        final SparseStore<Double> m2 = SparseStore.PRIMITIVE.make(3, 2);
+        final SparseStore<Double> m2 = SparseStore.PRIMITIVE64.make(3, 2);
         m2.set(0, 0, 1.0);
 
         TestUtils.assertEquals(mAdd, m2.multiply(eye));
         TestUtils.assertEquals(mAdd, eye.premultiply(m2).get());
 
-        final SparseStore<Double> a = SparseStore.PRIMITIVE.make(3, 3);
+        final SparseStore<Double> a = SparseStore.PRIMITIVE64.make(3, 3);
         a.set(1, 1, 1.0);
 
-        final SparseStore<Double> b = SparseStore.PRIMITIVE.make(3, 5);
+        final SparseStore<Double> b = SparseStore.PRIMITIVE64.make(3, 5);
         b.set(1, 1, 1.0);
         b.set(0, 3, 1.0);
 
-        final SparseStore<Double> c = SparseStore.PRIMITIVE.make(3, 5);
+        final SparseStore<Double> c = SparseStore.PRIMITIVE64.make(3, 5);
         c.set(1, 1, 1.0);
 
         if (DEBUG) {
@@ -154,14 +154,14 @@ public class StoreProblems extends MatrixStoreTests {
         double[][] _y = { { 0, 0, 0 }, { 1, 1, 1 }, { 2, 2, 2 } };
         double[][] exp = { { 1.0, 2.0, 3.0 }, { 3.0, 4.0, 5.0 }, { 5.0, 6.0, 7.0 } };
 
-        PrimitiveDenseStore x = PrimitiveDenseStore.FACTORY.rows(_x);
-        PrimitiveDenseStore y = PrimitiveDenseStore.FACTORY.rows(_y);
+        Primitive64Store x = Primitive64Store.FACTORY.rows(_x);
+        Primitive64Store y = Primitive64Store.FACTORY.rows(_y);
 
         ElementsSupplier<Double> diff = y.operateOnMatching(x, PrimitiveMath.SUBTRACT);
         ElementsSupplier<Double> transp = diff.transpose();
 
-        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.rows(exp), diff.get());
-        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.columns(exp), transp.get());
+        TestUtils.assertEquals(Primitive64Store.FACTORY.rows(exp), diff.get());
+        TestUtils.assertEquals(Primitive64Store.FACTORY.columns(exp), transp.get());
     }
 
 }

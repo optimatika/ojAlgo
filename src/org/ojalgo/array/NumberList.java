@@ -112,6 +112,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return true;
     }
 
+    @Override
     public void add(final int index, final N element) {
 
         this.ensureCapacity();
@@ -124,6 +125,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         myActualCount++;
     }
 
+    @Override
     public void add(final long index, final double addend) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -132,6 +134,16 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         }
     }
 
+    @Override
+    public void add(final long index, final float addend) {
+        if (index >= myActualCount) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            myStorage.add(index, addend);
+        }
+    }
+
+    @Override
     public void add(final long index, final Comparable<?> addend) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -140,6 +152,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         }
     }
 
+    @Override
     public boolean add(final N element) {
 
         this.ensureCapacity();
@@ -149,6 +162,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return true;
     }
 
+    @Override
     public boolean addAll(final Collection<? extends N> elements) {
         for (final N tmpElement : elements) {
             this.add(tmpElement);
@@ -163,6 +177,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return true;
     }
 
+    @Override
     public boolean addAll(final int index, final Collection<? extends N> elements) {
         int counter = 0;
         for (final N value : elements) {
@@ -185,11 +200,13 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return myStorage.count();
     }
 
+    @Override
     public void clear() {
         myActualCount = 0L;
         myStorage.reset();
     }
 
+    @Override
     public boolean contains(final Object object) {
         if (object instanceof Number) {
             return this.indexOf(object) >= 0;
@@ -198,6 +215,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         }
     }
 
+    @Override
     public boolean containsAll(final Collection<?> c) {
         for (final Object tmpObject : c) {
             if (!this.contains(tmpObject)) {
@@ -207,10 +225,12 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return true;
     }
 
+    @Override
     public long count() {
         return myActualCount;
     }
 
+    @Override
     public double doubleValue(final long index) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -219,6 +239,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         }
     }
 
+    @Override
     public N get(final int index) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -227,6 +248,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         }
     }
 
+    @Override
     public N get(final long index) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -235,6 +257,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         }
     }
 
+    @Override
     public int indexOf(final Object object) {
         final ListIterator<N> tmpIterator = this.listIterator();
         if (object == null) {
@@ -253,14 +276,17 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return -1;
     }
 
+    @Override
     public boolean isEmpty() {
         return myActualCount == 0L;
     }
 
+    @Override
     public Iterator<N> iterator() {
         return new Iterator1D<>(this);
     }
 
+    @Override
     public int lastIndexOf(final Object object) {
         final ListIterator<N> tmpIterator = this.listIterator(this.size());
         if (object == null) {
@@ -279,14 +305,17 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return -1;
     }
 
+    @Override
     public ListIterator<N> listIterator() {
         return new Iterator1D<>(this);
     }
 
+    @Override
     public ListIterator<N> listIterator(final int index) {
         return new Iterator1D<>(this, index);
     }
 
+    @Override
     public double mix(final long index, final BinaryFunction<N> mixer, final double addend) {
         ProgrammingError.throwIfNull(mixer);
         if (index >= myActualCount) {
@@ -301,6 +330,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         }
     }
 
+    @Override
     public N mix(final long index, final BinaryFunction<N> mixer, final N addend) {
         ProgrammingError.throwIfNull(mixer);
         if (index >= myActualCount) {
@@ -315,6 +345,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         }
     }
 
+    @Override
     public N remove(final int index) {
 
         final N oldValue = myStorage.get(index);
@@ -328,6 +359,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return oldValue;
     }
 
+    @Override
     public boolean remove(final Object o) {
         final int index = this.indexOf(o);
         if (index >= 0) {
@@ -338,6 +370,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         }
     }
 
+    @Override
     public boolean removeAll(final Collection<?> c) {
         boolean retVal = false;
         for (final Object o : c) {
@@ -346,6 +379,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return retVal;
     }
 
+    @Override
     public boolean retainAll(final Collection<?> onlyKeep) {
         boolean retVal = false;
         final Object[] values = this.toArray();
@@ -357,6 +391,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return retVal;
     }
 
+    @Override
     public N set(final int index, final N element) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -367,6 +402,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         }
     }
 
+    @Override
     public void set(final long index, final double value) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -375,6 +411,16 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         }
     }
 
+    @Override
+    public void set(final long index, final float value) {
+        if (index >= myActualCount) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            myStorage.set(index, value);
+        }
+    }
+
+    @Override
     public void set(final long index, final Comparable<?> value) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -383,10 +429,12 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         }
     }
 
+    @Override
     public int size() {
         return (int) myActualCount;
     }
 
+    @Override
     public NumberList<N> subList(final int fromIndex, final int toIndex) {
         final NumberList<N> retVal = new NumberList<>(myStrategy);
         if (myStorage instanceof Primitive64Array) {
@@ -401,10 +449,12 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return retVal;
     }
 
+    @Override
     public Object[] toArray() {
         return this.toArray(new Object[this.size()]);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T[] toArray(final T[] array) {
         for (int i = 0; i < array.length; i++) {
@@ -418,6 +468,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
         return Access1D.toString(this);
     }
 
+    @Override
     public void visitOne(final long index, final VoidFunction<N> visitor) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();

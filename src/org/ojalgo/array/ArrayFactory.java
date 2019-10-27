@@ -33,7 +33,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.StructureAnyD;
 
-abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> extends Object implements Factory1D<BasicArray<N>> {
+abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> extends Object implements Factory1D<I> {
 
     public abstract AggregatorSet<N> aggregator();
 

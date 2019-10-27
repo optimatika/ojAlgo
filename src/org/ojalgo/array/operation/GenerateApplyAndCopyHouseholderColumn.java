@@ -30,7 +30,7 @@ public final class GenerateApplyAndCopyHouseholderColumn implements ArrayOperati
 
     public static int THRESHOLD = 128;
 
-    public static boolean invoke(final double[] data, final int structure, final int row, final int col, final Householder.Primitive destination) {
+    public static boolean invoke(final double[] data, final int structure, final int row, final int col, final Householder.Primitive64 destination) {
 
         final int tmpColBase = col * structure;
 
@@ -75,6 +75,56 @@ public final class GenerateApplyAndCopyHouseholderColumn implements ArrayOperati
             }
 
             destination.beta = PrimitiveMath.ABS.invoke(tmpScale) / tmpNorm2;
+        }
+
+        return retVal;
+    }
+
+    public static boolean invoke(final float[] data, final int structure, final int row, final int col, final Householder.Primitive32 destination) {
+
+        final int tmpColBase = col * structure;
+
+        final float[] tmpVector = destination.vector;
+        destination.first = row;
+
+        double tmpNormInf = PrimitiveMath.ZERO; // Copy column and calculate its infinity-norm.
+        for (int i = row; i < structure; i++) {
+            tmpNormInf = PrimitiveMath.MAX.invoke(tmpNormInf, PrimitiveMath.ABS.invoke(tmpVector[i] = data[i + tmpColBase]));
+        }
+
+        boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
+        double tmpVal;
+        double tmpNorm2 = PrimitiveMath.ZERO;
+
+        if (retVal) {
+            for (int i = row + 1; i < structure; i++) {
+                tmpVal = tmpVector[i] /= tmpNormInf;
+                tmpNorm2 += tmpVal * tmpVal;
+            }
+            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpNorm2);
+        }
+
+        if (retVal) {
+
+            double tmpScale = tmpVector[row] / tmpNormInf;
+            tmpNorm2 += tmpScale * tmpScale;
+            tmpNorm2 = PrimitiveMath.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
+
+            if (tmpScale <= PrimitiveMath.ZERO) {
+                data[(row + tmpColBase)] = (float) (tmpNorm2 * tmpNormInf);
+                tmpScale -= tmpNorm2;
+            } else {
+                data[(row + tmpColBase)] = (float) (-tmpNorm2 * tmpNormInf);
+                tmpScale += tmpNorm2;
+            }
+
+            tmpVector[row] = (float) PrimitiveMath.ONE;
+
+            for (int i = row + 1; i < structure; i++) {
+                data[i + tmpColBase] = tmpVector[i] /= tmpScale;
+            }
+
+            destination.beta = (float) (PrimitiveMath.ABS.invoke(tmpScale) / tmpNorm2);
         }
 
         return retVal;

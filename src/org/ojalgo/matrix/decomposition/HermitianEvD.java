@@ -35,10 +35,10 @@ import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -64,7 +64,7 @@ public abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDe
     static final class Complex extends HermitianEvD<ComplexNumber> {
 
         Complex() {
-            super(GenericDenseStore.COMPLEX, new DeferredTridiagonal.Complex());
+            super(GenericStore.COMPLEX, new DeferredTridiagonal.Complex());
         }
 
     }
@@ -72,7 +72,7 @@ public abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDe
     static final class Quat extends HermitianEvD<Quaternion> {
 
         Quat() {
-            super(GenericDenseStore.QUATERNION, new DeferredTridiagonal.Quat());
+            super(GenericStore.QUATERNION, new DeferredTridiagonal.Quat());
         }
 
     }
@@ -80,7 +80,7 @@ public abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDe
     static final class Rational extends HermitianEvD<RationalNumber> {
 
         Rational() {
-            super(GenericDenseStore.RATIONAL, new DeferredTridiagonal.Rational());
+            super(GenericStore.RATIONAL, new DeferredTridiagonal.Rational());
         }
 
     }
@@ -88,7 +88,7 @@ public abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDe
     static final class Primitive extends HermitianEvD<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY, new SimultaneousTridiagonal());
+            super(Primitive64Store.FACTORY, new SimultaneousTridiagonal());
         }
 
     }

@@ -84,6 +84,11 @@ public abstract class BufferArray extends PlainArray<Double> {
             myDoubleBuffer.put(index, value);
         }
 
+        @Override
+        protected void set(final int index, final float value) {
+            myDoubleBuffer.put(index, value);
+        }
+
     }
 
     static final class FloatBufferArray extends BufferArray {
@@ -105,6 +110,11 @@ public abstract class BufferArray extends PlainArray<Double> {
         @Override
         protected void set(final int index, final double value) {
             myFloatBuffer.put(index, (float) value);
+        }
+
+        @Override
+        protected void set(final int index, final float value) {
+            myFloatBuffer.put(index, value);
         }
 
     }
@@ -384,6 +394,11 @@ public abstract class BufferArray extends PlainArray<Double> {
     }
 
     @Override
+    protected void add(final int index, final float addend) {
+        this.set(index, this.floatValue(index) + addend);
+    }
+
+    @Override
     protected void add(final int index, final Comparable<?> addend) {
         this.set(index, this.doubleValue(index) + Scalar.doubleValue(addend));
     }
@@ -428,7 +443,7 @@ public abstract class BufferArray extends PlainArray<Double> {
     }
 
     @Override
-    protected void fill(final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
+    protected void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
         BufferArray.fill(this, first, limit, step, supplier);
     }
 
