@@ -13,6 +13,8 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 ### Added
 
+- Improved support for float throughout the library, and specifically added matrices with float elements.
+
 #### org.ojalgo.algebra
 
 - ScalarOperation has been extended with support for float arguments.
@@ -33,10 +35,11 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 ### Changed
 
 - Generic declarations in interfaces and abstract classes (everywhere) that used to be `<N extends Number>` are now `<N extends Comparable<N>>`. Code that extends/implements ojAlgo classes and interaces will most likely need to be updated. Simple usage may not require any changes at all. Please note that `java.lang.Number` is NOT `Comparable` but all the speciic subclasses are.
+- Everything (classes/interfaces, constants...) named "Primitive" -something now separates between "Primitive32" and "Primitive64".
 
 #### org.ojalgo.matrix
 
-- PrimitiveDenseStore has been renamed Primitive64Store (and there is now also a Primitive32Store). Everything named "Primitive" -something is now separates between "Primitive32" and "Primitive64". GenericDenseStore was also renamed GenericStore.
+- PrimitiveDenseStore has been renamed Primitive64Store (and there is now also a Primitive32Store). GenericDenseStore was also renamed GenericStore.
 
 #### org.ojalgo.structure
 
