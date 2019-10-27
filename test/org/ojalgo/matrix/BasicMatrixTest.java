@@ -424,6 +424,9 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         actValue = BasicMatrix.calculateOneNorm(p64AA);
         TestUtils.assertEquals(expValue, actValue, ACCURACY);
+
+        actValue = BasicMatrix.calculateOneNorm(p32AA);
+        TestUtils.assertEquals(expValue, actValue, ACCURACY);
     }
 
     /**
@@ -440,6 +443,8 @@ public abstract class BasicMatrixTest extends MatrixTests {
         actInt = p64AA.getRank();
         TestUtils.assertEquals(expInt, actInt);
 
+        actInt = p32AA.getRank();
+        TestUtils.assertEquals(expInt, actInt);
     }
 
     /**
@@ -456,6 +461,8 @@ public abstract class BasicMatrixTest extends MatrixTests {
         actInt = (int) p64AA.countRows();
         TestUtils.assertEquals(expBoolean, actBoolean);
 
+        actInt = (int) p32AA.countRows();
+        TestUtils.assertEquals(expBoolean, actBoolean);
     }
 
     @Test
@@ -699,7 +706,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
      * @see org.ojalgo.matrix.BasicMatrix#multiply(org.ojalgo.matrix.BasicMatrix)
      */
     @Test
-    public void testMultiplyBasicMatrix() {
+    public void testMultiplyMatrix() {
 
         expMtrx = rAA.multiply(rAX);
 
@@ -709,6 +716,8 @@ public abstract class BasicMatrixTest extends MatrixTests {
         actMtrx = p64AA.multiply(p64AX);
         TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
 
+        actMtrx = p32AA.multiply(p32AX);
+        TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
     }
 
     @Test

@@ -321,7 +321,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
 
             super();
 
-            if (multiplier instanceof MultiplyBoth.Primitive64) {
+            if (multiplier instanceof MultiplyBoth.Primitive) {
                 myMultiplier = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newPrimitive64(rows, columns);
             } else if (multiplier instanceof MultiplyBoth.Generic) {
                 myMultiplier = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newGeneric(rows, columns);

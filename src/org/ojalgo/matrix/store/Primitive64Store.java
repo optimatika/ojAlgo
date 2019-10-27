@@ -380,7 +380,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         }
     }
 
-    private final MultiplyBoth.Primitive64 multiplyBoth;
+    private final MultiplyBoth.Primitive multiplyBoth;
     private final MultiplyLeft.Primitive64 multiplyLeft;
     private final MultiplyNeither.Primitive64 multiplyNeither;
     private final MultiplyRight.Primitive64 multiplyRight;

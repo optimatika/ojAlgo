@@ -40,21 +40,16 @@ public final class MultiplyBoth implements ArrayOperation {
     }
 
     @FunctionalInterface
-    public interface Primitive32 extends TransformableRegion.FillByMultiplying<Double> {
-
-    }
-
-    @FunctionalInterface
-    public interface Primitive64 extends TransformableRegion.FillByMultiplying<Double> {
+    public interface Primitive extends TransformableRegion.FillByMultiplying<Double> {
 
     }
 
     public static int THRESHOLD = 16;
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE = (product, left, complexity, right) -> MultiplyBoth.invokePrimitive(product, 0,
+    static final MultiplyBoth.Primitive PRIMITIVE = (product, left, complexity, right) -> MultiplyBoth.invokePrimitive64(product, 0,
             ((int) left.count()) / complexity, left, complexity, right);
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE_0XN = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive PRIMITIVE_0XN = (product, left, complexity, right) -> {
 
         left.count();
         final int tmpColDim = (int) (right.count() / complexity);
@@ -100,7 +95,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     };
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE_1X1 = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive PRIMITIVE_1X1 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
 
@@ -111,7 +106,7 @@ public final class MultiplyBoth implements ArrayOperation {
         product.set(0L, 0L, tmp00);
     };
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE_1XN = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive PRIMITIVE_1XN = (product, left, complexity, right) -> {
 
         final int tmpColDim = (int) (right.count() / complexity);
 
@@ -128,7 +123,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     };
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE_2X2 = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive PRIMITIVE_2X2 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -160,7 +155,7 @@ public final class MultiplyBoth implements ArrayOperation {
         product.set(1, 1, tmp11);
     };
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE_3X3 = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive PRIMITIVE_3X3 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -212,7 +207,7 @@ public final class MultiplyBoth implements ArrayOperation {
         product.set(2, 2, tmp22);
     };
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE_4X4 = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive PRIMITIVE_4X4 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -290,7 +285,7 @@ public final class MultiplyBoth implements ArrayOperation {
         product.set(3, 3, tmp33);
     };
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE_5X5 = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive PRIMITIVE_5X5 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -400,7 +395,7 @@ public final class MultiplyBoth implements ArrayOperation {
         product.set(4, 4, tmp44);
     };
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE_6XN = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive PRIMITIVE_6XN = (product, left, complexity, right) -> {
 
         final int tmpColDim = (int) (right.count() / complexity);
 
@@ -433,7 +428,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     };
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE_7XN = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive PRIMITIVE_7XN = (product, left, complexity, right) -> {
 
         left.count();
         final int tmpColDim = (int) (right.count() / complexity);
@@ -470,7 +465,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     };
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE_8XN = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive PRIMITIVE_8XN = (product, left, complexity, right) -> {
 
         left.count();
         final int tmpColDim = (int) (right.count() / complexity);
@@ -510,7 +505,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     };
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE_9XN = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive PRIMITIVE_9XN = (product, left, complexity, right) -> {
 
         left.count();
         final int tmpColDim = (int) (right.count() / complexity);
@@ -553,13 +548,13 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     };
 
-    static final MultiplyBoth.Primitive64 PRIMITIVE_MT = (product, left, complexity, right) -> {
+    static final MultiplyBoth.Primitive PRIMITIVE_MT = (product, left, complexity, right) -> {
 
         final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
             @Override
             public void conquer(final int first, final int limit) {
-                MultiplyBoth.invokePrimitive(product, first, limit, left, complexity, right);
+                MultiplyBoth.invokePrimitive64(product, first, limit, left, complexity, right);
             }
         };
 
@@ -589,7 +584,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     }
 
-    public static MultiplyBoth.Primitive64 newPrimitive64(final long rows, final long columns) {
+    public static MultiplyBoth.Primitive newPrimitive64(final long rows, final long columns) {
         if (rows > THRESHOLD) {
             return PRIMITIVE_MT;
         } else if (rows == 10) {
@@ -617,8 +612,8 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     }
 
-    public static MultiplyBoth.Primitive32 newPrimitive32(final int rows, final int columns) {
-        return null;
+    public static MultiplyBoth.Primitive newPrimitive32(final int rows, final int columns) {
+        return MultiplyBoth.newPrimitive64(rows, columns);
     }
 
     static void invoke(final double[] product, final int firstColumn, final int columnLimit, final Access1D<Double> left, final int complexity,
@@ -693,7 +688,7 @@ public final class MultiplyBoth implements ArrayOperation {
         }
     }
 
-    static void invokePrimitive(final TransformableRegion<Double> product, final int firstRow, final int rowLimit, final Access1D<Double> left,
+    static void invokePrimitive64(final TransformableRegion<Double> product, final int firstRow, final int rowLimit, final Access1D<Double> left,
             final int complexity, final Access1D<Double> right) {
 
         final int tmpRowDim = (int) product.countRows();
@@ -723,6 +718,42 @@ public final class MultiplyBoth implements ArrayOperation {
                 tmpVal = PrimitiveMath.ZERO;
                 for (int c = tmpFirst; c < tmpLimit; c++) {
                     tmpVal += tmpLeftRow[c] * right.doubleValue(c + tmpColBase);
+                }
+                product.set(i, j, tmpVal);
+            }
+        }
+    }
+
+    static void invokePrimitive32(final TransformableRegion<Double> product, final int firstRow, final int rowLimit, final Access1D<Double> left,
+            final int complexity, final Access1D<Double> right) {
+
+        final int tmpRowDim = (int) product.countRows();
+        final int tmpColDim = (int) product.countColumns();
+
+        final float[] tmpLeftRow = new float[complexity];
+        float tmpVal;
+
+        int tmpFirst = 0;
+        int tmpLimit = complexity;
+
+        for (int i = firstRow; i < rowLimit; i++) {
+
+            final int tmpFirstInRow = MatrixStore.firstInRow(left, i, 0);
+            final int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, complexity);
+
+            for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
+                tmpLeftRow[c] = left.floatValue(Structure2D.index(tmpRowDim, i, c));
+            }
+
+            for (int j = 0; j < tmpColDim; j++) {
+                final int tmpColBase = j * complexity;
+
+                tmpFirst = MatrixStore.firstInColumn(right, j, tmpFirstInRow);
+                tmpLimit = MatrixStore.limitOfColumn(right, j, tmpLimitOfRow);
+
+                tmpVal = 0F;
+                for (int c = tmpFirst; c < tmpLimit; c++) {
+                    tmpVal += tmpLeftRow[c] * right.floatValue(c + tmpColBase);
                 }
                 product.set(i, j, tmpVal);
             }

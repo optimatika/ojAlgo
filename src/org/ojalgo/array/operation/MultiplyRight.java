@@ -59,6 +59,13 @@ public final class MultiplyRight implements ArrayOperation {
         MultiplyRight.invoke(product, 0, (int) (right.count() / complexity), left, complexity, right);
     };
 
+    static final MultiplyRight.Primitive32 PRIMITIVE32 = (product, left, complexity, right) -> {
+
+        Arrays.fill(product, 0F);
+
+        MultiplyRight.invoke(product, 0, (int) (right.count() / complexity), left, complexity, right);
+    };
+
     static final MultiplyRight.Primitive64 PRIMITIVE_0XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 10;
@@ -597,7 +604,7 @@ public final class MultiplyRight implements ArrayOperation {
     }
 
     public static MultiplyRight.Primitive32 newPrimitive32(final long rows, final long columns) {
-        return null;
+        return PRIMITIVE32;
     }
 
     public static MultiplyRight.Primitive64 newPrimitive64(final long rows, final long columns) {
@@ -642,6 +649,23 @@ public final class MultiplyRight implements ArrayOperation {
 
             for (int j = firstInRightRow; j < limitOfRightRow; j++) {
                 AXPY.invoke(product, j * structure, right.doubleValue(Structure2D.index(complexity, c, j)), leftColumn, 0, 0, structure);
+            }
+        }
+    }
+
+    static void invoke(final float[] product, final int firstColumn, final int columnLimit, final float[] left, final int complexity, final Access1D<?> right) {
+
+        final int structure = left.length / complexity;
+
+        final float[] leftColumn = new float[structure];
+        for (int c = 0; c < complexity; c++) {
+            System.arraycopy(left, c * structure, leftColumn, 0, structure);
+
+            final int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
+            final int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
+
+            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
+                AXPY.invoke(product, j * structure, right.floatValue(Structure2D.index(complexity, c, j)), leftColumn, 0, 0, structure);
             }
         }
     }

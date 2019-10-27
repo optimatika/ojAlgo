@@ -312,7 +312,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         }
     }
 
-    private final MultiplyBoth.Primitive32 multiplyBoth;
+    private final MultiplyBoth.Primitive multiplyBoth;
     private final MultiplyLeft.Primitive32 multiplyLeft;
     private final MultiplyNeither.Primitive32 multiplyNeither;
     private final MultiplyRight.Primitive32 multiplyRight;

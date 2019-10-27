@@ -59,6 +59,13 @@ public final class MultiplyLeft implements ArrayOperation {
         MultiplyLeft.invoke(product, 0, right.length / complexity, left, complexity, right);
     };
 
+    static final MultiplyLeft.Primitive32 PRIMITIVE32 = (product, left, complexity, right) -> {
+
+        Arrays.fill(product, 0F);
+
+        MultiplyLeft.invoke(product, 0, right.length / complexity, left, complexity, right);
+    };
+
     static final MultiplyLeft.Primitive64 PRIMITIVE_0XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 10;
@@ -595,7 +602,7 @@ public final class MultiplyLeft implements ArrayOperation {
     }
 
     public static MultiplyLeft.Primitive32 newPrimitive32(final long rows, final long columns) {
-        return null;
+        return PRIMITIVE32;
     }
 
     public static MultiplyLeft.Primitive64 newPrimitive64(final long rows, final long columns) {
@@ -639,6 +646,26 @@ public final class MultiplyLeft implements ArrayOperation {
 
             for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
                 leftColumn[i] = left.doubleValue(Structure2D.index(structure, i, c));
+            }
+
+            for (int j = firstColumn; j < columnLimit; j++) {
+                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, firstInLeftColumn, limitOfLeftColumn);
+            }
+        }
+    }
+
+    static void invoke(final float[] product, final int firstColumn, final int columnLimit, final Access1D<?> left, final int complexity, final float[] right) {
+
+        final int structure = ((int) left.count()) / complexity;
+
+        final float[] leftColumn = new float[structure];
+        for (int c = 0; c < complexity; c++) {
+
+            final int firstInLeftColumn = MatrixStore.firstInColumn(left, c, 0);
+            final int limitOfLeftColumn = MatrixStore.limitOfColumn(left, c, structure);
+
+            for (int i = firstInLeftColumn; i < limitOfLeftColumn; i++) {
+                leftColumn[i] = left.floatValue(Structure2D.index(structure, i, c));
             }
 
             for (int j = firstColumn; j < columnLimit; j++) {

@@ -56,6 +56,13 @@ public final class MultiplyNeither implements ArrayOperation {
         MultiplyNeither.invoke(product, 0, right.length / complexity, left, complexity, right);
     };
 
+    static final MultiplyNeither.Primitive32 PRIMITIVE32 = (product, left, complexity, right) -> {
+
+        Arrays.fill(product, 0F);
+
+        MultiplyNeither.invoke(product, 0, right.length / complexity, left, complexity, right);
+    };
+
     static final MultiplyNeither.Primitive64 PRIMITIVE_0XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 10;
@@ -622,7 +629,7 @@ public final class MultiplyNeither implements ArrayOperation {
     }
 
     public static MultiplyNeither.Primitive32 newPrimitive32(final long rows, final long columns) {
-        return null;
+        return PRIMITIVE32;
     }
 
     static void invoke(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {
@@ -630,6 +637,20 @@ public final class MultiplyNeither implements ArrayOperation {
         final int structure = left.length / complexity;
 
         final double[] leftColumn = new double[structure];
+        for (int c = 0; c < complexity; c++) {
+            System.arraycopy(left, c * structure, leftColumn, 0, structure);
+
+            for (int j = firstColumn; j < columnLimit; j++) {
+                AXPY.invoke(product, j * structure, right[c + (j * complexity)], leftColumn, 0, 0, structure);
+            }
+        }
+    }
+
+    static void invoke(final float[] product, final int firstColumn, final int columnLimit, final float[] left, final int complexity, final float[] right) {
+
+        final int structure = left.length / complexity;
+
+        final float[] leftColumn = new float[structure];
         for (int c = 0; c < complexity; c++) {
             System.arraycopy(left, c * structure, leftColumn, 0, structure);
 
