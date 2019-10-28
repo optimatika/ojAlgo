@@ -26,7 +26,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 /**
  * @author apete
  */
-public class ColourData extends Object {
+public class ColourData {
 
     public static final ColourData BLACK = new ColourData(0, 0, 0);
     public static final ColourData WHITE = new ColourData(255, 255, 255);

@@ -60,7 +60,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class RawStore extends Object implements PhysicalStore<Double> {
+public final class RawStore implements PhysicalStore<Double> {
 
     public static final PhysicalStore.Factory<Double, RawStore> FACTORY = new PrimitiveFactory<RawStore>() {
 
