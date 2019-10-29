@@ -208,7 +208,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
 
     @Override
     public boolean contains(final Object object) {
-        if (object instanceof Number) {
+        if (object instanceof Comparable) {
             return this.indexOf(object) >= 0;
         } else {
             return false;

@@ -12,12 +12,13 @@ import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * A {@link SortedMap} with primitive valued long keys and {@link Number} values (incl. possibly primitive
+ * A {@link SortedMap} with primitive valued long keys and {@link Comparable} values (incl. possibly primitive
  * double values). The main benefits of using this class is its use of primitive keys and values, and how it
  * integrates with other parts of ojAlgo. As a general purpose {@link Map} implementation (usage with high
  * frequency of randomly ordered put and remove operations) it is not very efficient.
@@ -77,8 +78,8 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
     }
 
     public boolean containsKey(final Object key) {
-        if (key instanceof Number) {
-            return this.containsKey(((Number) key).longValue());
+        if (key instanceof Comparable) {
+            return this.containsKey(Scalar.longValue((Comparable<?>) key));
         } else {
             return false;
         }
@@ -175,7 +176,7 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
     }
 
     public N get(final Object key) {
-        return key instanceof Number ? this.get(((Number) key).longValue()) : null;
+        return key instanceof Comparable ? this.get(Scalar.longValue((Comparable<?>) key)) : null;
     }
 
     public LongToNumberMap<N> headMap(final long toKey) {
@@ -280,8 +281,8 @@ public final class LongToNumberMap<N extends Comparable<N>> implements SortedMap
     }
 
     public N remove(final Object key) {
-        if (key instanceof Number) {
-            return this.remove(((Number) key).longValue());
+        if (key instanceof Comparable) {
+            return this.remove(Scalar.longValue((Comparable<?>) key));
         } else {
             return null;
         }

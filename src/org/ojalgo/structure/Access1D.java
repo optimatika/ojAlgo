@@ -377,7 +377,8 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
     }
 
     /**
-     * Transforms this {@link Access1D} to a {@link Access1D.Collectable} of a different {@link Number} type.
+     * Transforms this {@link Access1D} to a {@link Access1D.Collectable} of a different {@link Comparable}
+     * type.
      */
     default <NN extends Comparable<NN>, R extends Mutate1D.Receiver<NN>> Collectable<NN, R> asCollectable1D() {
         return new Collectable<NN, R>() {

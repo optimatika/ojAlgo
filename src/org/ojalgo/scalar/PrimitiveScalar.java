@@ -33,23 +33,23 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     public static final Scalar.Factory<Double> FACTORY = new Scalar.Factory<Double>() {
 
         @Override
-        public Double cast(final double value) {
-            return value;
-        }
-
-        @Override
         public Double cast(final Comparable<?> number) {
             return Scalar.doubleValue(number);
         }
 
         @Override
-        public PrimitiveScalar convert(final double value) {
-            return PrimitiveScalar.of(value);
+        public Double cast(final double value) {
+            return value;
         }
 
         @Override
         public PrimitiveScalar convert(final Comparable<?> number) {
             return PrimitiveScalar.valueOf(number);
+        }
+
+        @Override
+        public PrimitiveScalar convert(final double value) {
+            return PrimitiveScalar.of(value);
         }
 
         @Override
@@ -94,12 +94,12 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
         return new PrimitiveScalar(value);
     }
 
-    public static PrimitiveScalar valueOf(final double value) {
-        return PrimitiveScalar.of(value);
-    }
-
     public static PrimitiveScalar valueOf(final Comparable<?> number) {
         return PrimitiveScalar.of(Scalar.doubleValue(number));
+    }
+
+    public static PrimitiveScalar valueOf(final double value) {
+        return PrimitiveScalar.of(value);
     }
 
     private final double myValue;
@@ -129,6 +129,11 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     @Override
+    public PrimitiveScalar add(float scalarAddend) {
+        return this.add((double) scalarAddend);
+    }
+
+    @Override
     public int compareTo(final Double reference) {
         return NumberContext.compare(myValue, reference);
     }
@@ -149,6 +154,11 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     @Override
+    public PrimitiveScalar divide(float scalarDivisor) {
+        return this.divide((double) scalarDivisor);
+    }
+
+    @Override
     public double doubleValue() {
         return myValue;
     }
@@ -159,18 +169,15 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!(obj instanceof PrimitiveScalar)) {
             return false;
         }
-        if (!(obj instanceof Number)) {
-            return false;
-        }
-        final double other = ((Number) obj).doubleValue();
-        if (Double.doubleToLongBits(myValue) != Double.doubleToLongBits(other)) {
+        PrimitiveScalar other = (PrimitiveScalar) obj;
+        if (Double.doubleToLongBits(myValue) != Double.doubleToLongBits(other.myValue)) {
             return false;
         }
         return true;
@@ -232,6 +239,11 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     @Override
+    public PrimitiveScalar multiply(float scalarMultiplicand) {
+        return this.multiply((double) scalarMultiplicand);
+    }
+
+    @Override
     public PrimitiveScalar negate() {
         return new PrimitiveScalar(-myValue);
     }
@@ -269,6 +281,11 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     @Override
+    public PrimitiveScalar subtract(float scalarSubtrahend) {
+        return this.subtract((double) scalarSubtrahend);
+    }
+
+    @Override
     public BigDecimal toBigDecimal() {
         return new BigDecimal(myValue, PrimitiveScalar.CONTEXT.getMathContext());
     }
@@ -281,26 +298,6 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     @Override
     public String toString(final NumberContext context) {
         return context.enforce(this.toBigDecimal()).toString();
-    }
-
-    @Override
-    public PrimitiveScalar add(float scalarAddend) {
-        return this.add((double) scalarAddend);
-    }
-
-    @Override
-    public PrimitiveScalar divide(float scalarDivisor) {
-        return this.divide((double) scalarDivisor);
-    }
-
-    @Override
-    public PrimitiveScalar multiply(float scalarMultiplicand) {
-        return this.multiply((double) scalarMultiplicand);
-    }
-
-    @Override
-    public PrimitiveScalar subtract(float scalarSubtrahend) {
-        return this.subtract((double) scalarSubtrahend);
     }
 
 }

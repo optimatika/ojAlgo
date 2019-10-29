@@ -113,23 +113,23 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
     public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
 
         @Override
-        public ComplexNumber cast(final double value) {
-            return ComplexNumber.valueOf(value);
-        }
-
-        @Override
         public ComplexNumber cast(final Comparable<?> number) {
             return ComplexNumber.valueOf(number);
         }
 
         @Override
-        public ComplexNumber convert(final double value) {
+        public ComplexNumber cast(final double value) {
             return ComplexNumber.valueOf(value);
         }
 
         @Override
         public ComplexNumber convert(final Comparable<?> number) {
             return ComplexNumber.valueOf(number);
+        }
+
+        @Override
+        public ComplexNumber convert(final double value) {
+            return ComplexNumber.valueOf(value);
         }
 
         @Override
@@ -283,23 +283,11 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
     }
 
     /**
-     * Static factory method returning a complex number from a real value
-     *
-     * @param value the complex number's real part
-     * @return a complex number Z = ({@code value} + 0.0i)
-     */
-    public static ComplexNumber valueOf(final double value) {
-        return new ComplexNumber(value);
-    }
-
-    /**
      * Static factory method returning a complex number from arbitrary number
      *
      * @param number a numeric value
      * @return {@link ComplexNumber#ZERO} if {@code number} is null otherwise the double value of
      *         {@code number}
-     * @see Number
-     * @see Number#doubleValue()
      */
     public static ComplexNumber valueOf(final Comparable<?> number) {
 
@@ -315,6 +303,16 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
 
             return new ComplexNumber(Scalar.doubleValue(number));
         }
+    }
+
+    /**
+     * Static factory method returning a complex number from a real value
+     *
+     * @param value the complex number's real part
+     * @return a complex number Z = ({@code value} + 0.0i)
+     */
+    public static ComplexNumber valueOf(final double value) {
+        return new ComplexNumber(value);
     }
 
     public final double i;
@@ -371,6 +369,11 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
     @Override
     public ComplexNumber add(final double arg) {
         return new ComplexNumber(myRealValue + arg, i);
+    }
+
+    @Override
+    public ComplexNumber add(float scalarAddend) {
+        return this.add((double) scalarAddend);
     }
 
     /**
@@ -461,9 +464,11 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
         return new ComplexNumber(myRealValue / arg, i / arg);
     }
 
-    /**
-     * @see java.lang.Number#doubleValue()
-     */
+    @Override
+    public ComplexNumber divide(float scalarDivisor) {
+        return this.divide((double) scalarDivisor);
+    }
+
     @Override
     public double doubleValue() {
         return myRealValue;
@@ -511,17 +516,14 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        }
-        if (obj == null) {
-            return false;
         }
         if (!(obj instanceof ComplexNumber)) {
             return false;
         }
-        final ComplexNumber other = (ComplexNumber) obj;
+        ComplexNumber other = (ComplexNumber) obj;
         if (Double.doubleToLongBits(myRealValue) != Double.doubleToLongBits(other.myRealValue)) {
             return false;
         }
@@ -531,9 +533,6 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
         return true;
     }
 
-    /**
-     * @see java.lang.Number#floatValue()
-     */
     @Override
     public float floatValue() {
         return (float) this.doubleValue();
@@ -575,16 +574,13 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
         final int prime = 31;
         int result = 1;
         long temp;
-        temp = Double.doubleToLongBits(myRealValue);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(i);
+        result = (prime * result) + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(myRealValue);
         result = (prime * result) + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
-    /**
-     * @see java.lang.Number#intValue()
-     */
     @Override
     public int intValue() {
         return (int) this.doubleValue();
@@ -618,9 +614,6 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
         return PrimitiveScalar.CONTEXT.isSmall(comparedTo, this.norm());
     }
 
-    /**
-     * @see java.lang.Number#longValue()
-     */
     @Override
     public long longValue() {
         return (long) this.doubleValue();
@@ -650,6 +643,11 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
     @Override
     public ComplexNumber multiply(final double arg) {
         return new ComplexNumber(myRealValue * arg, i * arg);
+    }
+
+    @Override
+    public ComplexNumber multiply(float scalarMultiplicand) {
+        return this.multiply((double) scalarMultiplicand);
     }
 
     /**
@@ -721,6 +719,11 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
     @Override
     public ComplexNumber subtract(final double arg) {
         return new ComplexNumber(myRealValue - arg, i);
+    }
+
+    @Override
+    public ComplexNumber subtract(float scalarSubtrahend) {
+        return this.subtract((double) scalarSubtrahend);
     }
 
     @Override
@@ -862,26 +865,6 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
 
             throw new ProgrammingError("Only works for 2D stuff!");
         }
-    }
-
-    @Override
-    public ComplexNumber add(float scalarAddend) {
-        return this.add((double) scalarAddend);
-    }
-
-    @Override
-    public ComplexNumber divide(float scalarDivisor) {
-        return this.divide((double) scalarDivisor);
-    }
-
-    @Override
-    public ComplexNumber multiply(float scalarMultiplicand) {
-        return this.multiply((double) scalarMultiplicand);
-    }
-
-    @Override
-    public ComplexNumber subtract(float scalarSubtrahend) {
-        return this.subtract((double) scalarSubtrahend);
     }
 
 }

@@ -197,7 +197,7 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
     }
 
     /**
-     * @see #first(Number)
+     * @see #first(Comparable)
      */
     default UnaryFunction<N> first(final double arg1) {
         return new FixedFirst<>(arg1, this);
@@ -221,7 +221,7 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
     N invoke(N arg1, N arg2);
 
     /**
-     * @see #second(Number)
+     * @see #second(Comparable)
      */
     default UnaryFunction<N> second(final double arg2) {
         return new FixedSecond<>(this, arg2);

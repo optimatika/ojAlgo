@@ -117,8 +117,8 @@ public abstract class TypeUtils {
     }
 
     /**
-     * If the input {@linkplain java.lang.Number} is a {@linkplain java.math.BigDecimal} it is passed through
-     * unaltered. Otherwise an equivalent BigDecimal is created.
+     * If the input {@linkplain java.lang.Comparale} is a {@linkplain java.math.BigDecimal} it is passed
+     * through unaltered. Otherwise an equivalent BigDecimal is created.
      *
      * @param number Any Number
      * @return A corresponding BigDecimal

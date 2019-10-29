@@ -39,23 +39,23 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     public static final Scalar.Factory<BigDecimal> FACTORY = new Scalar.Factory<BigDecimal>() {
 
         @Override
-        public BigDecimal cast(final double value) {
-            return new BigDecimal(value);
-        }
-
-        @Override
         public BigDecimal cast(final Comparable<?> number) {
             return TypeUtils.toBigDecimal(number);
         }
 
         @Override
-        public BigScalar convert(final double value) {
-            return BigScalar.valueOf(value);
+        public BigDecimal cast(final double value) {
+            return new BigDecimal(value);
         }
 
         @Override
         public BigScalar convert(final Comparable<?> number) {
             return BigScalar.valueOf(number);
+        }
+
+        @Override
+        public BigScalar convert(final double value) {
+            return BigScalar.valueOf(value);
         }
 
         @Override
@@ -89,10 +89,6 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
         return new BigScalar(value);
     }
 
-    public static BigScalar valueOf(final double value) {
-        return new BigScalar(BigDecimal.valueOf(value));
-    }
-
     public static BigScalar valueOf(final Comparable<?> number) {
 
         if (number != null) {
@@ -110,6 +106,10 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
 
             return ZERO;
         }
+    }
+
+    public static BigScalar valueOf(final double value) {
+        return new BigScalar(BigDecimal.valueOf(value));
     }
 
     private final BigDecimal myNumber;
@@ -139,6 +139,11 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     }
 
     @Override
+    public BigScalar add(float scalarAddend) {
+        return this.add((double) scalarAddend);
+    }
+
+    @Override
     public int compareTo(final BigDecimal reference) {
         return myNumber.compareTo(reference);
     }
@@ -159,6 +164,11 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     }
 
     @Override
+    public BigScalar divide(float scalarDivisor) {
+        return this.divide((double) scalarDivisor);
+    }
+
+    @Override
     public double doubleValue() {
         return myNumber.doubleValue();
     }
@@ -169,22 +179,19 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!(obj instanceof BigScalar)) {
             return false;
         }
-        if (!(obj instanceof Scalar<?>)) {
-            return false;
-        }
-        final BigDecimal other = ((Scalar<?>) obj).toBigDecimal();
+        BigScalar other = (BigScalar) obj;
         if (myNumber == null) {
-            if (other != null) {
+            if (other.myNumber != null) {
                 return false;
             }
-        } else if (!myNumber.equals(other)) {
+        } else if (!myNumber.equals(other.myNumber)) {
             return false;
         }
         return true;
@@ -244,6 +251,11 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     }
 
     @Override
+    public BigScalar multiply(float scalarMultiplicand) {
+        return this.multiply((double) scalarMultiplicand);
+    }
+
+    @Override
     public BigScalar negate() {
         return new BigScalar(myNumber.negate());
     }
@@ -281,6 +293,11 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     }
 
     @Override
+    public BigScalar subtract(float scalarSubtrahend) {
+        return this.subtract((double) scalarSubtrahend);
+    }
+
+    @Override
     public BigDecimal toBigDecimal() {
         return myNumber;
     }
@@ -293,26 +310,6 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     @Override
     public String toString(final NumberContext context) {
         return context.enforce(myNumber).toString();
-    }
-
-    @Override
-    public BigScalar add(float scalarAddend) {
-        return this.add((double) scalarAddend);
-    }
-
-    @Override
-    public BigScalar divide(float scalarDivisor) {
-        return this.divide((double) scalarDivisor);
-    }
-
-    @Override
-    public BigScalar multiply(float scalarMultiplicand) {
-        return this.multiply((double) scalarMultiplicand);
-    }
-
-    @Override
-    public BigScalar subtract(float scalarSubtrahend) {
-        return this.subtract((double) scalarSubtrahend);
     }
 
 }
