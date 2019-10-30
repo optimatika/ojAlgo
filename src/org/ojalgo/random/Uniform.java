@@ -32,8 +32,6 @@ import org.ojalgo.function.constant.PrimitiveMath;
  */
 public class Uniform extends AbstractContinuous {
 
-    private static final long serialVersionUID = -8198257914507986404L;
-
     public static Uniform of(final double lower, final double range) {
         return new Uniform(lower, range);
     }

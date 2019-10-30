@@ -36,8 +36,6 @@ import org.ojalgo.structure.Access1D;
  */
 public class LogNormal extends AbstractContinuous {
 
-    private static final long serialVersionUID = 2175858399667617840L;
-
     public static LogNormal estimate(final Access1D<?> rawSamples) {
 
         final int size = rawSamples.size();

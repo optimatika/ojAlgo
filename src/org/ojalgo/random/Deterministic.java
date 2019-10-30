@@ -30,8 +30,6 @@ import org.ojalgo.scalar.Scalar;
  */
 public class Deterministic extends RandomNumber {
 
-    private static final long serialVersionUID = 6544837857838057678L;
-
     private final double myValue;
 
     public Deterministic() {

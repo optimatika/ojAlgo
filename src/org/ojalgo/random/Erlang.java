@@ -32,8 +32,6 @@ import org.ojalgo.function.constant.PrimitiveMath;
  */
 public class Erlang extends RandomNumber {
 
-    private static final long serialVersionUID = 6544837857838057678L;
-
     private final int myCount;
     private final double myRate;
 
