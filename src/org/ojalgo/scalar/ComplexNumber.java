@@ -42,73 +42,8 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * @author apete
  * @see org.ojalgo.function.ComplexFunction
  */
-public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, Transformation2D<Double>,
+public final class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, Transformation2D<Double>,
         Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
-
-    public static final class Normalised extends ComplexNumber {
-
-        Normalised(final double real, final double imaginary) {
-            super(real, imaginary);
-        }
-
-        @Override
-        public double norm() {
-            return PrimitiveMath.ONE;
-        }
-
-        @Override
-        public Normalised signum() {
-            return this;
-        }
-
-        @Override
-        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
-
-            final double s = this.doubleValue();
-
-            final double ss = s * s;
-            final double ii = i * i;
-
-            final double r00 = (ii + ss);
-            final double r11 = (ss - ii);
-
-            if (transformable.count() == 2L) {
-
-                final double x = transformable.doubleValue(0);
-                final double y = transformable.doubleValue(1);
-
-                transformable.set(0, r00 * x);
-                transformable.set(1, r11 * y);
-
-            } else if (transformable.countRows() == 2L) {
-
-                for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
-
-                    final double x = transformable.doubleValue(0, c);
-                    final double y = transformable.doubleValue(1, c);
-
-                    transformable.set(0, c, r00 * x);
-                    transformable.set(1, c, r11 * y);
-                }
-
-            } else if (transformable.countColumns() == 2L) {
-
-                for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
-
-                    final double x = transformable.doubleValue(r, 0);
-                    final double y = transformable.doubleValue(r, 1);
-
-                    transformable.set(r, 0, r00 * x);
-                    transformable.set(r, 1, r11 * y);
-                }
-
-            } else {
-
-                throw new ProgrammingError("Only works for 2D stuff!");
-            }
-        }
-
-    }
 
     public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
 
@@ -263,8 +198,8 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
         }
     }
 
-    public static Normalised makeRotation(final double angle) {
-        return new Normalised(PrimitiveMath.COS.invoke(angle), PrimitiveMath.SIN.invoke(angle));
+    public static ComplexNumber makeRotation(final double angle) {
+        return new ComplexNumber(PrimitiveMath.COS.invoke(angle), PrimitiveMath.SIN.invoke(angle));
     }
 
     /**
@@ -691,7 +626,7 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
     }
 
     @Override
-    public ComplexNumber.Normalised signum() {
+    public ComplexNumber signum() {
         if (ComplexNumber.isSmall(PrimitiveMath.ONE, this)) {
             return ComplexNumber.makeRotation(PrimitiveMath.ZERO);
         } else {
@@ -830,6 +765,52 @@ public class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<Complex
 
         final double r00 = (ii + ss) * invs;
         final double r11 = (ss - ii) * invs;
+
+        if (transformable.count() == 2L) {
+
+            final double x = transformable.doubleValue(0);
+            final double y = transformable.doubleValue(1);
+
+            transformable.set(0, r00 * x);
+            transformable.set(1, r11 * y);
+
+        } else if (transformable.countRows() == 2L) {
+
+            for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
+
+                final double x = transformable.doubleValue(0, c);
+                final double y = transformable.doubleValue(1, c);
+
+                transformable.set(0, c, r00 * x);
+                transformable.set(1, c, r11 * y);
+            }
+
+        } else if (transformable.countColumns() == 2L) {
+
+            for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
+
+                final double x = transformable.doubleValue(r, 0);
+                final double y = transformable.doubleValue(r, 1);
+
+                transformable.set(r, 0, r00 * x);
+                transformable.set(r, 1, r11 * y);
+            }
+
+        } else {
+
+            throw new ProgrammingError("Only works for 2D stuff!");
+        }
+    }
+
+    <T extends ModifiableReceiver<Double> & Access2D<Double>> void transformWhenUnit(final T transformable) {
+
+        final double s = this.doubleValue();
+
+        final double ss = s * s;
+        final double ii = i * i;
+
+        final double r00 = (ii + ss);
+        final double r11 = (ss - ii);
 
         if (transformable.count() == 2L) {
 

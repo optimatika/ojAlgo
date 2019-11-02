@@ -79,7 +79,6 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
     private static final String DIVIDE = " / ";
     private static final String LEFT = "(";
     private static final int MAX_BITS = BigInteger.valueOf(Long.MAX_VALUE).bitLength();
-    private static final RationalNumber MINUS_ONE = ONE.negate();
     private static final String RIGHT = ")";
     private static final long SAFE_LIMIT = Math.round(Math.sqrt(Long.MAX_VALUE / 2L));
 
@@ -640,7 +639,7 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         if (!this.isInfinite() && RationalNumber.isSmall(PrimitiveMath.ONE, this)) {
             return ZERO;
         } else if (this.sign() == -1) {
-            return MINUS_ONE;
+            return NEG;
         } else {
             return ONE;
         }

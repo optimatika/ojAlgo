@@ -36,7 +36,7 @@ import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, Transformation2D<Double>,
+public final class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, Transformation2D<Double>,
         Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public enum RotationAxis {
@@ -57,153 +57,6 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
 
         double[] vector() {
             return myVector;
-        }
-
-    }
-
-    public static final class Versor extends Quaternion {
-
-        Versor(final double scalar) {
-            super(scalar);
-        }
-
-        Versor(final double i, final double j, final double k) {
-            super(i, j, k);
-        }
-
-        Versor(final double scalar, final double i, final double j, final double k) {
-            super(scalar, i, j, k);
-        }
-
-        @Override
-        public double norm() {
-            return PrimitiveMath.ONE;
-        }
-
-        @Override
-        public MatrixStore<Double> toRotationMatrix() {
-
-            final Primitive64Store retVal = Primitive64Store.FACTORY.make(3L, 3L);
-
-            final double s = this.doubleValue();
-
-            final double ss = s * s;
-            final double ii = i * i;
-            final double jj = j * j;
-            final double kk = k * k;
-
-            double tmp1;
-            double tmp2;
-
-            final double r00 = ((ii + ss) - (jj + kk));
-            final double r11 = ((jj + ss) - (ii + kk));
-            final double r22 = ((kk + ss) - (ii + jj));
-
-            tmp1 = i * j;
-            tmp2 = k * s;
-            final double r10 = 2.0 * (tmp1 + tmp2);
-            final double r01 = 2.0 * (tmp1 - tmp2);
-
-            tmp1 = i * k;
-            tmp2 = j * s;
-            final double r20 = 2.0 * (tmp1 - tmp2);
-            final double r02 = 2.0 * (tmp1 + tmp2);
-
-            tmp1 = j * k;
-            tmp2 = i * s;
-            final double r21 = 2.0 * (tmp1 + tmp2);
-            final double r12 = 2.0 * (tmp1 - tmp2);
-
-            retVal.set(0L, r00);
-            retVal.set(1L, r10);
-            retVal.set(2L, r20);
-            retVal.set(3L, r01);
-            retVal.set(4L, r11);
-            retVal.set(5L, r21);
-            retVal.set(6L, r02);
-            retVal.set(7L, r12);
-            retVal.set(8L, r22);
-
-            return retVal;
-        }
-
-        @Override
-        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
-
-            final double s = this.doubleValue();
-
-            final double ss = s * s;
-            final double ii = i * i;
-            final double jj = j * j;
-            final double kk = k * k;
-
-            double tmp1;
-            double tmp2;
-
-            final double r00 = ((ii + ss) - (jj + kk));
-            final double r11 = ((jj + ss) - (ii + kk));
-            final double r22 = ((kk + ss) - (ii + jj));
-
-            tmp1 = i * j;
-            tmp2 = k * s;
-            final double r10 = 2.0 * (tmp1 + tmp2);
-            final double r01 = 2.0 * (tmp1 - tmp2);
-
-            tmp1 = i * k;
-            tmp2 = j * s;
-            final double r20 = 2.0 * (tmp1 - tmp2);
-            final double r02 = 2.0 * (tmp1 + tmp2);
-
-            tmp1 = j * k;
-            tmp2 = i * s;
-            final double r21 = 2.0 * (tmp1 + tmp2);
-            final double r12 = 2.0 * (tmp1 - tmp2);
-
-            if (transformable.count() == 3L) {
-
-                final double x = transformable.doubleValue(0);
-                final double y = transformable.doubleValue(1);
-                final double z = transformable.doubleValue(2);
-
-                transformable.set(0, (r00 * x) + (r01 * y) + (r02 * z));
-                transformable.set(1, (r10 * x) + (r11 * y) + (r12 * z));
-                transformable.set(2, (r20 * x) + (r21 * y) + (r22 * z));
-
-            } else if (transformable.countRows() == 3L) {
-
-                for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
-
-                    final double x = transformable.doubleValue(0, c);
-                    final double y = transformable.doubleValue(1, c);
-                    final double z = transformable.doubleValue(2, c);
-
-                    transformable.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
-                    transformable.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
-                    transformable.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
-                }
-
-            } else if (transformable.countColumns() == 3L) {
-
-                for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
-
-                    final double x = transformable.doubleValue(r, 0);
-                    final double y = transformable.doubleValue(r, 1);
-                    final double z = transformable.doubleValue(r, 2);
-
-                    transformable.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
-                    transformable.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
-                    transformable.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
-                }
-
-            } else {
-
-                throw new ProgrammingError("Only works for 3D stuff!");
-            }
-        }
-
-        @Override
-        public Versor versor() {
-            return this;
         }
 
     }
@@ -242,14 +95,14 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
 
     };
 
-    public static final Quaternion I = new Versor(PrimitiveMath.ONE, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
+    public static final Quaternion I = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
     public static final Quaternion IJK = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ONE, PrimitiveMath.ONE).versor();
     public static final Quaternion INFINITY = Quaternion.makePolar(Double.POSITIVE_INFINITY, IJK.vector().toRawCopy1D(), PrimitiveMath.ZERO);
-    public static final Quaternion J = new Versor(PrimitiveMath.ZERO, PrimitiveMath.ONE, PrimitiveMath.ZERO);
-    public static final Quaternion K = new Versor(PrimitiveMath.ZERO, PrimitiveMath.ZERO, PrimitiveMath.ONE);
-    public static final Quaternion NaN = new Versor(PrimitiveMath.NaN, PrimitiveMath.NaN, PrimitiveMath.NaN, PrimitiveMath.NaN);
-    public static final Quaternion NEG = new Versor(PrimitiveMath.NEG);
-    public static final Quaternion ONE = new Versor(PrimitiveMath.ONE);
+    public static final Quaternion J = new Quaternion(PrimitiveMath.ZERO, PrimitiveMath.ONE, PrimitiveMath.ZERO);
+    public static final Quaternion K = new Quaternion(PrimitiveMath.ZERO, PrimitiveMath.ZERO, PrimitiveMath.ONE);
+    public static final Quaternion NaN = new Quaternion(PrimitiveMath.NaN, PrimitiveMath.NaN, PrimitiveMath.NaN, PrimitiveMath.NaN);
+    public static final Quaternion NEG = new Quaternion(PrimitiveMath.NEG);
+    public static final Quaternion ONE = new Quaternion(PrimitiveMath.ONE);
     public static final Quaternion TWO = new Quaternion(PrimitiveMath.TWO);
     public static final Quaternion ZERO = new Quaternion();
 
@@ -320,7 +173,7 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
 
     }
 
-    public static Versor makeRotation(final RotationAxis axis, final double angle) {
+    public static Quaternion makeRotation(final RotationAxis axis, final double angle) {
 
         final double tmpScalar = PrimitiveMath.COS.invoke(angle);
 
@@ -350,7 +203,7 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
             throw new ProgrammingError("How could this happen?");
         }
 
-        return new Versor(tmpScalar, tmpI, tmpJ, tmpK);
+        return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
     }
 
     public static Quaternion of(final double i, final double j, final double k) {
@@ -879,7 +732,7 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
     }
 
     @Override
-    public Versor signum() {
+    public Quaternion signum() {
         return this.versor();
     }
 
@@ -1184,16 +1037,16 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
         return retVal;
     }
 
-    public Versor versor() {
+    public Quaternion versor() {
 
         final double norm = this.norm();
 
         if (this.isReal()) {
-            return new Versor(myScalar / norm);
+            return new Quaternion(myScalar / norm);
         } else if (this.isPure()) {
-            return new Versor(i / norm, j / norm, k / norm);
+            return new Quaternion(i / norm, j / norm, k / norm);
         } else {
-            return new Versor(myScalar / norm, i / norm, j / norm, k / norm);
+            return new Quaternion(myScalar / norm, i / norm, j / norm, k / norm);
         }
     }
 
@@ -1203,6 +1056,125 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
 
     private double calculateSumOfSquaresVector() {
         return (i * i) + (j * j) + (k * k);
+    }
+
+    MatrixStore<Double> toRotationMatrixVersor() {
+
+        final Primitive64Store retVal = Primitive64Store.FACTORY.make(3L, 3L);
+
+        final double s = this.doubleValue();
+
+        final double ss = s * s;
+        final double ii = i * i;
+        final double jj = j * j;
+        final double kk = k * k;
+
+        double tmp1;
+        double tmp2;
+
+        final double r00 = ((ii + ss) - (jj + kk));
+        final double r11 = ((jj + ss) - (ii + kk));
+        final double r22 = ((kk + ss) - (ii + jj));
+
+        tmp1 = i * j;
+        tmp2 = k * s;
+        final double r10 = 2.0 * (tmp1 + tmp2);
+        final double r01 = 2.0 * (tmp1 - tmp2);
+
+        tmp1 = i * k;
+        tmp2 = j * s;
+        final double r20 = 2.0 * (tmp1 - tmp2);
+        final double r02 = 2.0 * (tmp1 + tmp2);
+
+        tmp1 = j * k;
+        tmp2 = i * s;
+        final double r21 = 2.0 * (tmp1 + tmp2);
+        final double r12 = 2.0 * (tmp1 - tmp2);
+
+        retVal.set(0L, r00);
+        retVal.set(1L, r10);
+        retVal.set(2L, r20);
+        retVal.set(3L, r01);
+        retVal.set(4L, r11);
+        retVal.set(5L, r21);
+        retVal.set(6L, r02);
+        retVal.set(7L, r12);
+        retVal.set(8L, r22);
+
+        return retVal;
+    }
+
+    <T extends ModifiableReceiver<Double> & Access2D<Double>> void transformVersor(final T transformable) {
+
+        final double s = this.doubleValue();
+
+        final double ss = s * s;
+        final double ii = i * i;
+        final double jj = j * j;
+        final double kk = k * k;
+
+        double tmp1;
+        double tmp2;
+
+        final double r00 = ((ii + ss) - (jj + kk));
+        final double r11 = ((jj + ss) - (ii + kk));
+        final double r22 = ((kk + ss) - (ii + jj));
+
+        tmp1 = i * j;
+        tmp2 = k * s;
+        final double r10 = 2.0 * (tmp1 + tmp2);
+        final double r01 = 2.0 * (tmp1 - tmp2);
+
+        tmp1 = i * k;
+        tmp2 = j * s;
+        final double r20 = 2.0 * (tmp1 - tmp2);
+        final double r02 = 2.0 * (tmp1 + tmp2);
+
+        tmp1 = j * k;
+        tmp2 = i * s;
+        final double r21 = 2.0 * (tmp1 + tmp2);
+        final double r12 = 2.0 * (tmp1 - tmp2);
+
+        if (transformable.count() == 3L) {
+
+            final double x = transformable.doubleValue(0);
+            final double y = transformable.doubleValue(1);
+            final double z = transformable.doubleValue(2);
+
+            transformable.set(0, (r00 * x) + (r01 * y) + (r02 * z));
+            transformable.set(1, (r10 * x) + (r11 * y) + (r12 * z));
+            transformable.set(2, (r20 * x) + (r21 * y) + (r22 * z));
+
+        } else if (transformable.countRows() == 3L) {
+
+            for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
+
+                final double x = transformable.doubleValue(0, c);
+                final double y = transformable.doubleValue(1, c);
+                final double z = transformable.doubleValue(2, c);
+
+                transformable.set(0, c, (r00 * x) + (r01 * y) + (r02 * z));
+                transformable.set(1, c, (r10 * x) + (r11 * y) + (r12 * z));
+                transformable.set(2, c, (r20 * x) + (r21 * y) + (r22 * z));
+            }
+
+        } else if (transformable.countColumns() == 3L) {
+
+            for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
+
+                final double x = transformable.doubleValue(r, 0);
+                final double y = transformable.doubleValue(r, 1);
+                final double z = transformable.doubleValue(r, 2);
+
+                transformable.set(r, 0, (r00 * x) + (r01 * y) + (r02 * z));
+                transformable.set(r, 1, (r10 * x) + (r11 * y) + (r12 * z));
+                transformable.set(r, 2, (r20 * x) + (r21 * y) + (r22 * z));
+            }
+
+        } else {
+
+            throw new ProgrammingError("Only works for 3D stuff!");
+        }
     }
 
 }
