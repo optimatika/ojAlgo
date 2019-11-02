@@ -38,7 +38,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 
 /**
- * A one- and/or arbitrary-dimensional array of {@linkplain java.lang.Number}.
+ * A one- and/or arbitrary-dimensional array of {@linkplain java.lang.Comparable}.
  *
  * @author apete
  */

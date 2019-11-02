@@ -29,7 +29,7 @@ import org.ojalgo.structure.Access1D;
 
 public interface Householder<N extends Comparable<N>> extends Access1D<N> {
 
-    public static final class Generic<N extends Scalar<N>> extends Object implements Householder<N> {
+    public static final class Generic<N extends Scalar<N>> implements Householder<N> {
 
         public N beta;
         public int first;

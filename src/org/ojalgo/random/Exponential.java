@@ -34,8 +34,6 @@ import org.ojalgo.function.constant.PrimitiveMath;
  */
 public class Exponential extends AbstractContinuous {
 
-    private static final long serialVersionUID = -720007692511649669L;
-
     public static Exponential of(final double rate) {
         return new Exponential(rate);
     }

@@ -37,7 +37,8 @@ package org.ojalgo.algebra;
  * </ul>
  * <p>
  * To enable the use of existing Java classes as scalars this interface declares the scalar type to be a
- * subclass of {@linkplain Number} rather than an implementation of {@linkplain Field}.
+ * subclass of {@linkplain Comparable} (think {@linkplain Number}) rather than an implementation of
+ * {@linkplain Field}.
  * </p>
  * <p>
  * Any field is also a vector space in itself.

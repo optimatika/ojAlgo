@@ -38,13 +38,13 @@ import org.ojalgo.type.context.NumberContext;
  * </p>
  * <ol>
  * <li>An abstraction of a vector/matrix element.</li>
- * <li>A {@linkplain Number} decorator, increasing the number of things you can do with them.</li>
+ * <li>A {@linkplain Comparable} decorator, increasing the number of things you can do with them.</li>
  * </ol>
  * <p>
  * Theoretically it is a Field or at least a Division ring.
  * </p>
  * <p>
- * The intention is that implementors should be final immutable subclasses of {@link Number} and that they
+ * The intention is that implementors should be final immutable subclasses of {@link Comparable} and that they
  * should be inline with the requirements for ValueBased classes.
  * </p>
  *
@@ -107,6 +107,36 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
             return ((Number) number).floatValue();
         } else {
             return Float.NaN;
+        }
+    }
+
+    static int intValue(final Comparable<?> number) {
+
+        if (number == null) {
+            return 0;
+        }
+
+        if (number instanceof NumberDefinition) {
+            return ((NumberDefinition) number).intValue();
+        } else if (number instanceof Number) {
+            return ((Number) number).intValue();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    static long longValue(final Comparable<?> number) {
+
+        if (number == null) {
+            return 0L;
+        }
+
+        if (number instanceof NumberDefinition) {
+            return ((NumberDefinition) number).longValue();
+        } else if (number instanceof Number) {
+            return ((Number) number).longValue();
+        } else {
+            return Long.MIN_VALUE;
         }
     }
 

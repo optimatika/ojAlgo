@@ -31,7 +31,7 @@ import org.ojalgo.netio.ASCII;
  *
  * @author apete
  */
-public final class MapEntry<K extends Comparable<? super K>, V extends Object> implements Map.Entry<K, V>, KeyValue<K, V> {
+public final class MapEntry<K extends Comparable<? super K>, V> implements Map.Entry<K, V>, KeyValue<K, V> {
 
     private final K myKey;
     private final Map<K, V> myMap;

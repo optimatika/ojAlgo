@@ -463,7 +463,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
                     return i;
                 }
             }
-        } else if (obj instanceof Number) {
+        } else if (obj instanceof Comparable) {
             for (int i = 0; i < tmpLength; i++) {
                 if (obj.equals(this.get(i))) {
                     return i;

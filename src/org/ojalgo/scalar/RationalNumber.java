@@ -35,23 +35,23 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
     public static final Scalar.Factory<RationalNumber> FACTORY = new Scalar.Factory<RationalNumber>() {
 
         @Override
-        public RationalNumber cast(final double value) {
-            return RationalNumber.valueOf(value);
-        }
-
-        @Override
         public RationalNumber cast(final Comparable<?> number) {
             return RationalNumber.valueOf(number);
         }
 
         @Override
-        public RationalNumber convert(final double value) {
+        public RationalNumber cast(final double value) {
             return RationalNumber.valueOf(value);
         }
 
         @Override
         public RationalNumber convert(final Comparable<?> number) {
             return RationalNumber.valueOf(number);
+        }
+
+        @Override
+        public RationalNumber convert(final double value) {
+            return RationalNumber.valueOf(value);
         }
 
         @Override
@@ -129,56 +129,6 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
         }
     }
 
-    public static RationalNumber valueOf(final double value) {
-
-        if (Double.isNaN(value)) {
-            return NaN;
-        } else if (value == Double.POSITIVE_INFINITY) {
-            return POSITIVE_INFINITY;
-        } else if (value == Double.NEGATIVE_INFINITY) {
-            return NEGATIVE_INFINITY;
-        }
-
-        final long bits = Double.doubleToLongBits(value);
-
-        // Please refer to {@link Double#doubleToLongBits(long)} javadoc
-        final int s = ((bits >> 63) == 0) ? 1 : -1;
-        final int e = (int) ((bits >> 52) & 0x7ffL);
-        long m = (e == 0) ? (bits & 0xfffffffffffffL) << 1 : (bits & 0xfffffffffffffL) | 0x10000000000000L;
-        // Now we're looking for s * m * 2^{e - 1075}, 1075 being bias of 1023 plus 52 positions of binary fraction
-
-        int exponent = e - 1075;
-
-        if (exponent >= 0) {
-            final long numerator = m << exponent;
-            if ((numerator >> exponent) != m) {
-                return s > 0 ? RationalNumber.POSITIVE_INFINITY : RationalNumber.NEGATIVE_INFINITY;
-            }
-            return new RationalNumber(s * numerator, 1L);
-        }
-
-        // Since denominator is a power of 2, GCD can only be power of two, so we simplify by dividing by 2 repeatedly
-        while (((m & 1) == 0) && (exponent < 0)) {
-            m >>= 1;
-            exponent++;
-        }
-        // Avoiding the the denominator overflow
-        if (-exponent >= MAX_BITS) {
-            final BigInteger denom = BigInteger.ONE.shiftLeft(-exponent);
-            final BigInteger maxlong = BigInteger.valueOf(Long.MAX_VALUE);
-            final BigInteger factor = denom.divide(maxlong);
-            if (factor.compareTo(maxlong) > 0) {
-                return ZERO;
-            }
-            return new RationalNumber((s * m) / factor.longValueExact(), Long.MAX_VALUE);
-        }
-        return new RationalNumber(s * m, 1L << -exponent);
-    }
-
-    public static RationalNumber valueOf(final long value) {
-        return RationalNumber.fromLong(value);
-    }
-
     public static RationalNumber valueOf(final Comparable<?> number) {
 
         if (number == null) {
@@ -230,6 +180,56 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
 
             return new RationalNumber(retNumer.longValue(), retDenom.longValue());
         }
+    }
+
+    public static RationalNumber valueOf(final double value) {
+
+        if (Double.isNaN(value)) {
+            return NaN;
+        } else if (value == Double.POSITIVE_INFINITY) {
+            return POSITIVE_INFINITY;
+        } else if (value == Double.NEGATIVE_INFINITY) {
+            return NEGATIVE_INFINITY;
+        }
+
+        final long bits = Double.doubleToLongBits(value);
+
+        // Please refer to {@link Double#doubleToLongBits(long)} javadoc
+        final int s = ((bits >> 63) == 0) ? 1 : -1;
+        final int e = (int) ((bits >> 52) & 0x7ffL);
+        long m = (e == 0) ? (bits & 0xfffffffffffffL) << 1 : (bits & 0xfffffffffffffL) | 0x10000000000000L;
+        // Now we're looking for s * m * 2^{e - 1075}, 1075 being bias of 1023 plus 52 positions of binary fraction
+
+        int exponent = e - 1075;
+
+        if (exponent >= 0) {
+            final long numerator = m << exponent;
+            if ((numerator >> exponent) != m) {
+                return s > 0 ? RationalNumber.POSITIVE_INFINITY : RationalNumber.NEGATIVE_INFINITY;
+            }
+            return new RationalNumber(s * numerator, 1L);
+        }
+
+        // Since denominator is a power of 2, GCD can only be power of two, so we simplify by dividing by 2 repeatedly
+        while (((m & 1) == 0) && (exponent < 0)) {
+            m >>= 1;
+            exponent++;
+        }
+        // Avoiding the the denominator overflow
+        if (-exponent >= MAX_BITS) {
+            final BigInteger denom = BigInteger.ONE.shiftLeft(-exponent);
+            final BigInteger maxlong = BigInteger.valueOf(Long.MAX_VALUE);
+            final BigInteger factor = denom.divide(maxlong);
+            if (factor.compareTo(maxlong) > 0) {
+                return ZERO;
+            }
+            return new RationalNumber((s * m) / factor.longValueExact(), Long.MAX_VALUE);
+        }
+        return new RationalNumber(s * m, 1L << -exponent);
+    }
+
+    public static RationalNumber valueOf(final long value) {
+        return RationalNumber.fromLong(value);
     }
 
     private static RationalNumber add(final RationalNumber arg1, final RationalNumber arg2) {
@@ -393,6 +393,11 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
     }
 
     @Override
+    public RationalNumber add(float scalarAddend) {
+        return this.add((double) scalarAddend);
+    }
+
+    @Override
     public RationalNumber add(final RationalNumber arg) {
         if (this.isNaN() || arg.isNaN()) {
             return NaN;
@@ -462,6 +467,11 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
     }
 
     @Override
+    public RationalNumber divide(float scalarDivisor) {
+        return this.divide((double) scalarDivisor);
+    }
+
+    @Override
     public RationalNumber divide(final RationalNumber arg) {
         if (this.isNaN() || arg.isNaN()) {
             return NaN;
@@ -509,17 +519,14 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        }
-        if (obj == null) {
-            return false;
         }
         if (!(obj instanceof RationalNumber)) {
             return false;
         }
-        final RationalNumber other = (RationalNumber) obj;
+        RationalNumber other = (RationalNumber) obj;
         if (myDenominator != other.myDenominator) {
             return false;
         }
@@ -576,6 +583,11 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
     @Override
     public RationalNumber multiply(final double arg) {
         return this.multiply(RationalNumber.valueOf(arg));
+    }
+
+    @Override
+    public RationalNumber multiply(float scalarMultiplicand) {
+        return this.multiply((double) scalarMultiplicand);
     }
 
     @Override
@@ -637,6 +649,11 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
     @Override
     public RationalNumber subtract(final double arg) {
         return this.subtract(RationalNumber.valueOf(arg));
+    }
+
+    @Override
+    public RationalNumber subtract(float scalarSubtrahend) {
+        return this.subtract((double) scalarSubtrahend);
     }
 
     @Override
@@ -721,26 +738,6 @@ public final class RationalNumber implements Scalar<RationalNumber>, Enforceable
 
     long getNumerator() {
         return myNumerator;
-    }
-
-    @Override
-    public RationalNumber add(float scalarAddend) {
-        return this.add((double) scalarAddend);
-    }
-
-    @Override
-    public RationalNumber divide(float scalarDivisor) {
-        return this.divide((double) scalarDivisor);
-    }
-
-    @Override
-    public RationalNumber multiply(float scalarMultiplicand) {
-        return this.multiply((double) scalarMultiplicand);
-    }
-
-    @Override
-    public RationalNumber subtract(float scalarSubtrahend) {
-        return this.subtract((double) scalarSubtrahend);
     }
 
 }

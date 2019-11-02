@@ -23,7 +23,7 @@ package org.ojalgo.type.keyvalue;
 
 import org.ojalgo.netio.ASCII;
 
-public final class IntToObject<V extends Object> implements KeyValue<Integer, V> {
+public final class IntToObject<V> implements KeyValue<Integer, V> {
 
     public final int key;
     public final V value;

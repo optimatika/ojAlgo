@@ -50,7 +50,7 @@ public final class FillMatchingSingle implements ArrayOperation {
     }
 
     public static void copy(final BigDecimal[] data, final int structure, final int firstColumn, final int limitColumn,
-            final Access2D<? extends Number> source) {
+            final Access2D<? extends Comparable<?>> source) {
         int index = structure * firstColumn;
         for (int j = firstColumn; j < limitColumn; j++) {
             for (int i = 0; i < structure; i++) {

@@ -489,6 +489,11 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
     }
 
     @Override
+    public Quaternion add(float scalarAddend) {
+        return this.add((double) scalarAddend);
+    }
+
+    @Override
     public Quaternion add(final Quaternion arg) {
 
         if (this.isReal()) {
@@ -580,11 +585,14 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
         }
     }
 
+    @Override
+    public Quaternion divide(float scalarDivisor) {
+        return this.divide((double) scalarDivisor);
+    }
+
     /**
      * Will calculate <code>this * reciprocal(arg)</code> which is <b>not</b> the same as
      * <code>reciprocal(arg) * this</code>.
-     *
-     * @see org.ojalgo.scalar.Scalar#divide(java.lang.Number)
      */
     @Override
     public Quaternion divide(final Quaternion arg) {
@@ -660,17 +668,14 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        }
-        if (obj == null) {
-            return false;
         }
         if (!(obj instanceof Quaternion)) {
             return false;
         }
-        final Quaternion other = (Quaternion) obj;
+        Quaternion other = (Quaternion) obj;
         if (Double.doubleToLongBits(myScalar) != Double.doubleToLongBits(other.myScalar)) {
             return false;
         }
@@ -738,13 +743,13 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
         final int prime = 31;
         int result = 1;
         long temp;
-        temp = Double.doubleToLongBits(myScalar);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(i);
         result = (prime * result) + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(j);
         result = (prime * result) + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(k);
+        result = (prime * result) + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(myScalar);
         result = (prime * result) + (int) (temp ^ (temp >>> 32));
         return result;
     }
@@ -819,6 +824,11 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
     }
 
     @Override
+    public Quaternion multiply(float scalarMultiplicand) {
+        return this.multiply((double) scalarMultiplicand);
+    }
+
+    @Override
     public Quaternion multiply(final Quaternion arg) {
 
         if (this.isReal()) {
@@ -881,6 +891,11 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
         } else {
             return new Quaternion(myScalar - arg, i, j, k);
         }
+    }
+
+    @Override
+    public Quaternion subtract(float scalarSubtrahend) {
+        return this.subtract((double) scalarSubtrahend);
     }
 
     @Override
@@ -1188,26 +1203,6 @@ public class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, 
 
     private double calculateSumOfSquaresVector() {
         return (i * i) + (j * j) + (k * k);
-    }
-
-    @Override
-    public Quaternion add(float scalarAddend) {
-        return this.add((double) scalarAddend);
-    }
-
-    @Override
-    public Quaternion divide(float scalarDivisor) {
-        return this.divide((double) scalarDivisor);
-    }
-
-    @Override
-    public Quaternion multiply(float scalarMultiplicand) {
-        return this.multiply((double) scalarMultiplicand);
-    }
-
-    @Override
-    public Quaternion subtract(float scalarSubtrahend) {
-        return this.subtract((double) scalarSubtrahend);
     }
 
 }

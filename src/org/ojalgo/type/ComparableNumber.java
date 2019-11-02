@@ -21,27 +21,6 @@
  */
 package org.ojalgo.type;
 
-/**
- * An interface that defines what is already in {@link java.lang.Number}. Hopefully Java itself will one day
- * get an interface similar to this. When/if that happens this interface, and possibly some additional usage
- * of <code>extends java.lang.Number</code>, will be replaced by that new interface.
- */
-public interface NumberDefinition {
-
-    default byte byteValue() {
-        return (byte) this.intValue();
-    }
-
-    double doubleValue();
-
-    float floatValue();
-
-    int intValue();
-
-    long longValue();
-
-    default short shortValue() {
-        return (short) this.intValue();
-    }
+public interface ComparableNumber<N extends ComparableNumber<N>> extends NumberDefinition, Comparable<N> {
 
 }
