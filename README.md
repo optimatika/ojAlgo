@@ -16,10 +16,6 @@ ojAlgo is available at [The Central (Maven) Repository](https://search.maven.org
     <version>X.Y.Z</version>
 </dependency>
 ```
-...or download the jar from SourceForge.
-<p align="center">
-<a href="https://sourceforge.net/projects/ojalgo/files/latest/download" rel="nofollow"><img alt="Download oj! Algorithms" src="https://a.fsdn.com/con/app/sf-download-button"></a>
-</p>
 
 ### Documentation and Support
 
@@ -37,3 +33,10 @@ ojAlgo is Open Source, and you are strongly encouraged to clone or fork this rep
 <a href="https://tidelift.com/subscription/pkg/maven-org-ojalgo-ojalgo?utm_source=maven-org-ojalgo-ojalgo&utm_medium=referral&utm_campaign=readme" rel="nofollow"><img alt="Tidelift Subscription" height="100"  src="https://numpy.org/_static/Tidelift_Logos_RGB_Tidelift_Mark_On-White.png"></a>
 
 [Tidelift gives software development teams a single source for purchasing and maintaining their software, with professional grade assurances from the experts who know it best, while seamlessly integrating with existing tools.](https://tidelift.com/subscription/pkg/maven-org-ojalgo-ojalgo?utm_source=maven-org-ojalgo-ojalgo&utm_medium=referral&utm_campaign=readme)
+
+## org.ojalgo:ojalgo for enterprise
+
+Available as part of the Tidelift Subscription
+
+The maintainers of org.ojalgo:ojalgo and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source dependencies you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact dependencies you use. [Learn more.](https://tidelift.com/subscription/pkg/maven-org-ojalgo-ojalgo?utm_source=maven-org-ojalgo-ojalgo&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
+
