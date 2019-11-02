@@ -38,7 +38,7 @@ import org.ojalgo.structure.Access1D;
  */
 public abstract class SeriesFunction<K extends Comparable<? super K>> {
 
-    private final Map<String, ? extends BasicSeries<K, ? extends Number>> myData;
+    private final Map<String, ? extends BasicSeries<K, ? extends Comparable<?>>> myData;
 
     @SuppressWarnings("unused")
     private SeriesFunction() {
@@ -48,14 +48,14 @@ public abstract class SeriesFunction<K extends Comparable<? super K>> {
         myData = null;
     }
 
-    protected SeriesFunction(final BasicSeries<K, ? extends Number> data) {
+    protected SeriesFunction(final BasicSeries<K, ? extends Comparable<?>> data) {
 
         super();
 
         myData = Collections.singletonMap(data.getName(), data);
     }
 
-    protected SeriesFunction(final Map<String, ? extends BasicSeries<K, ? extends Number>> data) {
+    protected SeriesFunction(final Map<String, ? extends BasicSeries<K, ? extends Comparable<?>>> data) {
 
         super();
 
@@ -73,7 +73,7 @@ public abstract class SeriesFunction<K extends Comparable<? super K>> {
         return new ArrayList<>(myData.keySet());
     }
 
-    protected BasicSeries<K, ? extends Number> getSeries(final String name) {
+    protected BasicSeries<K, ? extends Comparable<?>> getSeries(final String name) {
         return myData.get(name);
     }
 
