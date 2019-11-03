@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author apete
  */
-public final class DelimitedData extends Object {
+public final class DelimitedData {
 
     public static DelimitedData makeCommaDelimited() {
         return new DelimitedData(ASCII.COMMA, LineTerminator.WINDOWS);

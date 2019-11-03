@@ -27,7 +27,7 @@ import java.text.ParsePosition;
 
 import org.ojalgo.function.UnaryFunction;
 
-public class TransformationFormat<N extends Number> extends NumberFormat {
+public class TransformationFormat<N extends Number & Comparable<N>> extends NumberFormat {
 
     private final UnaryFunction<N> myTransfoFunc;
     private final UnaryFunction<N> myInverseFunc;

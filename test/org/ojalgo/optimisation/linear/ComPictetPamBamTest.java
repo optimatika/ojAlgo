@@ -28,7 +28,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -94,7 +94,7 @@ public class ComPictetPamBamTest extends OptimisationLinearTests {
             final String message = "State: " + tmpResult.getState() + ", validated: " + validated;
             TestUtils.assertTrue(message, validated);
             if (validated) {
-                return PrimitiveDenseStore.FACTORY.copy(RationalMatrix.FACTORY.columns(tmpResult));
+                return Primitive64Store.FACTORY.copy(RationalMatrix.FACTORY.columns(tmpResult));
             }
         } else {
             final String message = "State: " + tmpResult.getState() + ", validated: " + validated;

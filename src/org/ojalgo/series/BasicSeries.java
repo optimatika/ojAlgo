@@ -61,7 +61,7 @@ import org.ojalgo.type.keyvalue.KeyValue;
  *
  * @author apete
  */
-public interface BasicSeries<K extends Comparable<? super K>, V extends Number> extends SortedMap<K, V> {
+public interface BasicSeries<K extends Comparable<? super K>, V extends Comparable<V>> extends SortedMap<K, V> {
 
     /**
      * A series with naturally sequenced keys - given any key there is a natural "next" key, e.g. with a
@@ -70,7 +70,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
      *
      * @author apete
      */
-    interface NaturallySequenced<K extends Comparable<? super K>, V extends Number> extends BasicSeries<K, V>, Access1D<V> {
+    interface NaturallySequenced<K extends Comparable<? super K>, V extends Comparable<V>> extends BasicSeries<K, V>, Access1D<V> {
 
         default PrimitiveSeries asPrimitive() {
             return PrimitiveSeries.wrap(this);
@@ -139,12 +139,12 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             myTimeIndex = timeIndex;
         }
 
-        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> denseArrayFactory) {
+        public <N extends Comparable<N>> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> denseArrayFactory) {
             ProgrammingError.throwIfNull(denseArrayFactory);
             return this.doBuild(denseArrayFactory, null);
         }
 
-        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> denseArrayFactory,
+        public <N extends Comparable<N>> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> denseArrayFactory,
                 final BinaryFunction<N> accumularor) {
             ProgrammingError.throwIfNull(denseArrayFactory, accumularor);
             return this.doBuild(denseArrayFactory, accumularor);
@@ -160,7 +160,8 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             return this;
         }
 
-        private <N extends Number> BasicSeries.NaturallySequenced<K, N> doBuild(final DenseArray.Factory<N> arrayFactory, final BinaryFunction<N> accumularor) {
+        private <N extends Comparable<N>> BasicSeries.NaturallySequenced<K, N> doBuild(final DenseArray.Factory<N> arrayFactory,
+                final BinaryFunction<N> accumularor) {
             if (myReference != null) {
                 if (myResolution != null) {
                     return new MappedIndexSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution), accumularor);
@@ -264,13 +265,12 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, accumulator);
     }
 
-    static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
-            final Structure1D.IndexMapper<N> indexMapper) {
+    static <N extends Comparable<N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory, final Structure1D.IndexMapper<N> indexMapper) {
         return new MappedIndexSeries<>(arrayFactory, indexMapper, null);
     }
 
-    static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
-            final Structure1D.IndexMapper<N> indexMapper, final BinaryFunction<N> accumulator) {
+    static <N extends Comparable<N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory, final Structure1D.IndexMapper<N> indexMapper,
+            final BinaryFunction<N> accumulator) {
         return new MappedIndexSeries<>(arrayFactory, indexMapper, accumulator);
     }
 

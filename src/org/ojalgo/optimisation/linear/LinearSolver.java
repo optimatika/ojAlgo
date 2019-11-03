@@ -29,10 +29,10 @@ import java.util.List;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.multiary.LinearFunction;
-import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -106,15 +106,15 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
             final StringBuilder retVal = new StringBuilder("<" + simpleName + ">");
 
-            retVal.append("\n[AE] = " + (this.getAE() != null ? PrimitiveMatrix.FACTORY.copy(this.getAE()) : "?"));
+            retVal.append("\n[AE] = " + (this.getAE() != null ? Primitive64Matrix.FACTORY.copy(this.getAE()) : "?"));
 
-            retVal.append("\n[BE] = " + (this.getBE() != null ? PrimitiveMatrix.FACTORY.copy(this.getBE()) : "?"));
+            retVal.append("\n[BE] = " + (this.getBE() != null ? Primitive64Matrix.FACTORY.copy(this.getBE()) : "?"));
 
-            retVal.append("\n[C] = " + (myObjective != null ? PrimitiveMatrix.FACTORY.copy(this.getC()) : "?"));
+            retVal.append("\n[C] = " + (myObjective != null ? Primitive64Matrix.FACTORY.copy(this.getC()) : "?"));
 
-            retVal.append("\n[AI] = " + (this.getAI() != null ? PrimitiveMatrix.FACTORY.copy(this.getAI()) : "?"));
+            retVal.append("\n[AI] = " + (this.getAI() != null ? Primitive64Matrix.FACTORY.copy(this.getAI()) : "?"));
 
-            retVal.append("\n[BI] = " + (this.getBI() != null ? PrimitiveMatrix.FACTORY.copy(this.getBI()) : "?"));
+            retVal.append("\n[BI] = " + (this.getBI() != null ? Primitive64Matrix.FACTORY.copy(this.getBI()) : "?"));
 
             retVal.append("\n</" + simpleName + ">");
 
@@ -126,7 +126,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
             PhysicalStore<Double> tmpC = null;
 
             if (mtrxC == null) {
-                tmpC = PrimitiveDenseStore.FACTORY.make(this.countVariables(), 1);
+                tmpC = Primitive64Store.FACTORY.make(this.countVariables(), 1);
             } else if (mtrxC instanceof PhysicalStore) {
                 tmpC = (PhysicalStore<Double>) mtrxC;
             } else {

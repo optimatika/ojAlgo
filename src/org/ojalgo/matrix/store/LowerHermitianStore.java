@@ -23,7 +23,7 @@ package org.ojalgo.matrix.store;
 
 import org.ojalgo.scalar.Scalar;
 
-final class LowerHermitianStore<N extends Number> extends ShadingStore<N> {
+final class LowerHermitianStore<N extends Comparable<N>> extends ShadingStore<N> {
 
     LowerHermitianStore(final MatrixStore<N> base) {
         super(base, base.countRows(), Math.min(base.countRows(), base.countColumns()));

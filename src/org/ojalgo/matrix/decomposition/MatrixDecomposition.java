@@ -56,9 +56,9 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public interface MatrixDecomposition<N extends Number> extends Structure2D {
+public interface MatrixDecomposition<N extends Comparable<N>> extends Structure2D {
 
-    interface Determinant<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
+    interface Determinant<N extends Comparable<N>> extends MatrixDecomposition<N>, DeterminantTask<N> {
 
         /**
          * <p>
@@ -79,7 +79,7 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
      *
      * @author apete
      */
-    interface EconomySize<N extends Number> extends MatrixDecomposition<N> {
+    interface EconomySize<N extends Comparable<N>> extends MatrixDecomposition<N> {
 
         /**
          * @return True if it will generate a full sized decomposition.
@@ -117,7 +117,7 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
      *
      * @author apete
      */
-    public interface Hermitian<N extends Number> extends MatrixDecomposition<N> {
+    public interface Hermitian<N extends Comparable<N>> extends MatrixDecomposition<N> {
 
         /**
          * Absolutely must check if the matrix is hermitian or not. Then, depending on the result differents
@@ -151,7 +151,7 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
         }
     }
 
-    interface Ordered<N extends Number> extends MatrixDecomposition<N> {
+    interface Ordered<N extends Comparable<N>> extends MatrixDecomposition<N> {
 
         /**
          * This is a property of the algorithm/implementation, not the data. Typically relevant for
@@ -187,7 +187,7 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
      *
      * @author apete
      */
-    interface Pivoting<N extends Number> extends MatrixDecomposition<N> {
+    interface Pivoting<N extends Comparable<N>> extends MatrixDecomposition<N> {
 
         /**
          * The normal {@link #decompose(Access2D.Collectable)} method must handle cases where pivoting is
@@ -230,7 +230,7 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
      * particular implementation.
      * </p>
      */
-    interface RankRevealing<N extends Number> extends Ordered<N> {
+    interface RankRevealing<N extends Comparable<N>> extends Ordered<N> {
 
         /**
          * @param threshold Significance limit
@@ -259,7 +259,7 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
 
     }
 
-    interface Solver<N extends Number> extends MatrixDecomposition<N>, SolverTask<N>, InverterTask<N> {
+    interface Solver<N extends Comparable<N>> extends MatrixDecomposition<N>, SolverTask<N>, InverterTask<N> {
 
         /**
          * @param matrix A matrix to decompose
@@ -340,7 +340,7 @@ public interface MatrixDecomposition<N extends Number> extends Structure2D {
      *
      * @author apete
      */
-    interface Values<N extends Number> extends Ordered<N> {
+    interface Values<N extends Comparable<N>> extends Ordered<N> {
 
         /**
          * @param matrix The matrix to decompose

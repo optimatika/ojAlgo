@@ -29,9 +29,9 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.RationalMatrix;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -158,18 +158,18 @@ public class LinearProblems extends OptimisationLinearTests {
         // A valid solution of 25.8 can be produced with:
         // X1=10, X2=0, X3=8, X4=0, X5=5, X6=23
         BigDecimal tmpClaimedValue = new BigDecimal("25.8");
-        PrimitiveMatrix.DenseReceiver tmpBuilder = PrimitiveMatrix.FACTORY.makeDense(6, 1);
+        Primitive64Matrix.DenseReceiver tmpBuilder = Primitive64Matrix.FACTORY.makeDense(6, 1);
         tmpBuilder.set(0, 0, 10);
         tmpBuilder.set(2, 0, 8);
         tmpBuilder.set(4, 0, 5);
         tmpBuilder.set(5, 0, 23);
-        PrimitiveMatrix tmpFullSolution = tmpBuilder.build();
+        Primitive64Matrix tmpFullSolution = tmpBuilder.build();
         int[] someRows = { 0, 2, 4 };
-        PrimitiveMatrix tmpOddSolution = tmpFullSolution.logical().rows(someRows).get();
+        Primitive64Matrix tmpOddSolution = tmpFullSolution.logical().rows(someRows).get();
         int[] someRows1 = { 1, 3, 5 };
-        PrimitiveMatrix tmpEvenSolution = tmpFullSolution.logical().rows(someRows1).get();
+        Primitive64Matrix tmpEvenSolution = tmpFullSolution.logical().rows(someRows1).get();
         TestUtils.assertEquals("Claimed solution not valid!", true, tmpFullModel.validate(BigArray.FACTORY.copy(tmpFullSolution), new NumberContext(7, 6)));
-        Double tmpActualValue = tmpFullObjective.toFunction().invoke(PrimitiveDenseStore.FACTORY.copy(tmpFullSolution));
+        Double tmpActualValue = tmpFullObjective.toFunction().invoke(Primitive64Store.FACTORY.copy(tmpFullSolution));
         //  BigDecimal tmpActualValue = TypeUtils.toBigDecimal(tmpObjectiveValue);
         //JUnitUtils.assertEquals("Claimed objective value wrong!", 0, tmpClaimedValue.compareTo(tmpActualValue));
         TestUtils.assertEquals(tmpClaimedValue, tmpActualValue, new NumberContext(7, 6));
@@ -193,13 +193,13 @@ public class LinearProblems extends OptimisationLinearTests {
         int[] someRows5 = { 0, 1, 2 };
 
         BigDecimal tmpEvenValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpEvenObjective.toFunction()
-                .invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpEvenResult).logical().rows(someRows5).get()))));
+                .invoke(Primitive64Store.FACTORY.copy(Primitive64Matrix.FACTORY.columns(tmpEvenResult).logical().rows(someRows5).get()))));
         int[] someRows6 = { 0, 1, 2 };
         BigDecimal tmpOddValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpOddObjective.toFunction()
-                .invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpOddResult).logical().rows(someRows6).get()))));
+                .invoke(Primitive64Store.FACTORY.copy(Primitive64Matrix.FACTORY.columns(tmpOddResult).logical().rows(someRows6).get()))));
         int[] someRows7 = { 0, 1, 2, 3, 4, 5 };
         BigDecimal tmpFullValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpFullObjective.toFunction()
-                .invoke(PrimitiveDenseStore.FACTORY.copy(PrimitiveMatrix.FACTORY.columns(tmpFullResult).logical().rows(someRows7).get()))));
+                .invoke(Primitive64Store.FACTORY.copy(Primitive64Matrix.FACTORY.columns(tmpFullResult).logical().rows(someRows7).get()))));
 
         TestUtils.assertEquals(0, tmpFullValue.compareTo(tmpEvenValue.add(tmpOddValue)));
         TestUtils.assertEquals(0, tmpClaimedValue.compareTo(tmpFullValue));
@@ -245,7 +245,7 @@ public class LinearProblems extends OptimisationLinearTests {
         tmpExprC3.set(0, ONE);
         tmpExprC3.set(2, NEG);
 
-        PrimitiveMatrix tmpExpectedSolution = PrimitiveMatrix.FACTORY.makeZero(3, 1);
+        Primitive64Matrix tmpExpectedSolution = Primitive64Matrix.FACTORY.makeZero(3, 1);
 
         Optimisation.Result tmpResult11 = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResult11.getState());

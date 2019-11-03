@@ -25,6 +25,11 @@ import org.ojalgo.function.NullaryFunction;
 
 public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement {
 
+    /**
+     * Should only be implemented by factories that always produce dense structures.
+     *
+     * @author apete
+     */
     interface Dense<I extends StructureAnyD> extends FactoryAnyD<I> {
 
         I copy(AccessAnyD<?> source);
@@ -33,6 +38,28 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
 
         default I makeFilled(final StructureAnyD shape, final NullaryFunction<?> supplier) {
             return this.makeFilled(shape.shape(), supplier);
+        }
+
+    }
+
+    /**
+     * For when the structures can be either dense or sparse.
+     *
+     * @author apete
+     */
+    interface MayBeSparse<I extends StructureAnyD, DR extends MutateAnyD.ModifiableReceiver<?>, SR extends MutateAnyD.ModifiableReceiver<?>>
+            extends FactoryAnyD<I> {
+
+        I makeDense(long... structure);
+
+        default I makeDense(final StructureAnyD shape) {
+            return this.make(shape.shape());
+        }
+
+        I makeSparse(long... structure);
+
+        default I makeSparse(final StructureAnyD shape) {
+            return this.make(shape.shape());
         }
 
     }

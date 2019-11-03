@@ -76,8 +76,7 @@ public final class HermitianRank2Update implements ArrayOperation {
         }
     }
 
-    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int firstColumn, final int columnLimit, final N[] vector1,
-            final N[] vector2) {
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int firstColumn, final int columnLimit, final N[] vector1, final N[] vector2) {
 
         final int structure = vector1.length;
 

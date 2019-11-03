@@ -30,7 +30,7 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.MutableSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -75,7 +75,7 @@ final class IterativeASS extends ActiveSetSolver {
 
             myIterationRows = new Equation[myFullDim];
 
-            myColumnE = PrimitiveDenseStore.FACTORY.make(myCountE, 1);
+            myColumnE = Primitive64Store.FACTORY.make(myCountE, 1);
         }
 
         @Override
@@ -173,7 +173,7 @@ final class IterativeASS extends ActiveSetSolver {
         super(matrices, solverOptions);
 
         myS = new MyIterativeSolver();
-        myColumnS = PrimitiveDenseStore.FACTORY.make(this.countVariables(), 1);
+        myColumnS = Primitive64Store.FACTORY.make(this.countVariables(), 1);
     }
 
     private void addConstraint(final int constrIndex, final Access1D<?> constrBody, final double constrRHS) {
@@ -215,7 +215,7 @@ final class IterativeASS extends ActiveSetSolver {
             this.addConstraint(constrIndex, constrBody, constrRHS);
         }
 
-        final PrimitiveDenseStore iterX = this.getIterationX();
+        final Primitive64Store iterX = this.getIterationX();
 
         if ((this.countIterationConstraints() <= this.countVariables()) && (solved = this.isSolvableQ())) {
             // Q is SPD
@@ -244,7 +244,7 @@ final class IterativeASS extends ActiveSetSolver {
         if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
-            final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.make(this.countVariables() + this.countIterationConstraints(), 1L);
+            final Primitive64Store tmpXL = Primitive64Store.FACTORY.make(this.countVariables() + this.countIterationConstraints(), 1L);
 
             if (solved = this.solveFullKKT(tmpXL)) {
 

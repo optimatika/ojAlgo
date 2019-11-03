@@ -29,7 +29,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class FunctionSet<N extends Number> {
+public abstract class FunctionSet<N extends Comparable<N>> {
 
     protected FunctionSet() {
         super();

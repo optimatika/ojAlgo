@@ -46,7 +46,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class SparseArray<N extends Number> extends BasicArray<N> {
+public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
     @FunctionalInterface
     public interface NonzeroPrimitiveCallback {
@@ -60,7 +60,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @FunctionalInterface
-    public interface NonzeroReferenceTypeCallback<N extends Number> {
+    public interface NonzeroReferenceTypeCallback<N extends Comparable<N>> {
 
         /**
          * @param index Index
@@ -70,7 +70,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     }
 
-    public static final class NonzeroView<N extends Number> implements ElementView1D<N, NonzeroView<N>> {
+    public static final class NonzeroView<N extends Comparable<N>> implements ElementView1D<N, NonzeroView<N>> {
 
         private int myCursor = -1;
         private final long[] myIndices;
@@ -92,14 +92,17 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             this(indices, values, -1, actualLength - 1);
         }
 
+        @Override
         public double doubleValue() {
             return myValues.doubleValue(myCursor);
         }
 
+        @Override
         public long estimateSize() {
             return myLastCursor - myCursor;
         }
 
+        @Override
         public void forEachRemaining(final Consumer<? super NonzeroView<N>> action) {
 
             // BasicLogger.debug("forEachRemaining [{}, {})", myCursor, myLastCursor);
@@ -107,22 +110,27 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             ElementView1D.super.forEachRemaining(action);
         }
 
+        @Override
         public N get() {
             return myValues.get(myCursor);
         }
 
+        @Override
         public boolean hasNext() {
             return myCursor < myLastCursor;
         }
 
+        @Override
         public boolean hasPrevious() {
             return myCursor > 0;
         }
 
+        @Override
         public long index() {
             return myIndices[myCursor];
         }
 
+        @Override
         public NonzeroView<N> iterator() {
             return new NonzeroView<>(myIndices, myValues, -1, myLastCursor);
         }
@@ -143,28 +151,34 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             myValues.set(myCursor, function.invoke(left, myValues.get(myCursor)));
         }
 
+        @Override
         public NonzeroView<N> next() {
             myCursor++;
             return this;
         }
 
+        @Override
         public long nextIndex() {
             return myIndices[myCursor + 1];
         }
 
+        @Override
         public NonzeroView<N> previous() {
             myCursor--;
             return this;
         }
 
+        @Override
         public long previousIndex() {
             return myIndices[myCursor - 1];
         }
 
+        @Override
         public boolean tryAdvance(final Consumer<? super NonzeroView<N>> action) {
             return ElementView1D.super.tryAdvance(action);
         }
 
+        @Override
         public NonzeroView<N> trySplit() {
 
             final int remaining = myLastCursor - myCursor;
@@ -189,7 +203,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     }
 
-    public static final class SparseFactory<N extends Number> extends StrategyBuilder<N, SparseArray<N>, SparseFactory<N>> {
+    public static final class SparseFactory<N extends Comparable<N>> extends StrategyBuilder<N, SparseArray<N>, SparseFactory<N>> {
 
         SparseFactory(final DenseArray.Factory<N> denseFactory) {
             super(denseFactory);
@@ -213,11 +227,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     private static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
-    public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
+    public static <N extends Comparable<N>> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
         return new SparseFactory<>(denseFactory);
     }
 
-    public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory, final long count) {
+    public static <N extends Comparable<N>> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory, final long count) {
         return new SparseFactory<>(denseFactory, count);
     }
 
@@ -246,9 +260,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         myZeroScalar = strategy.scalar().zero();
         myZeroNumber = myZeroScalar.get();
-        myZeroValue = myZeroNumber.doubleValue();
+        myZeroValue = myZeroScalar.doubleValue();
     }
 
+    @Override
     public void add(final long index, final double addend) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
@@ -258,7 +273,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public void add(final long index, final Number addend) {
+    @Override
+    public void add(final long index, final float addend) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
             myValues.add(tmpIndex, addend);
@@ -267,12 +283,24 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    @Override
+    public void add(final long index, final Comparable<?> addend) {
+        final int tmpIndex = this.index(index);
+        if (tmpIndex >= 0) {
+            myValues.add(tmpIndex, addend);
+        } else {
+            this.set(index, addend);
+        }
+    }
+
+    @Override
     public void axpy(final double a, final Mutate1D y) {
         for (int n = 0; n < myActualLength; n++) {
             y.add(myIndices[n], a * myValues.doubleValue(n));
         }
     }
 
+    @Override
     public long count() {
         return myCount;
     }
@@ -285,6 +313,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return myCount - myActualLength;
     }
 
+    @Override
     public double dot(final Access1D<?> vector) {
 
         double retVal = PrimitiveMath.ZERO;
@@ -296,6 +325,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return retVal;
     }
 
+    @Override
     public double doubleValue(final long index) {
 
         final int tmpIndex = this.index(index);
@@ -306,9 +336,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    @Override
     public void fillAll(final N value) {
 
-        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, value.doubleValue())) {
+        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, Scalar.doubleValue(value))) {
 
             myValues.fillAll(myZeroNumber);
 
@@ -328,7 +359,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public void fillAll(final NullaryFunction<N> supplier) {
+    @Override
+    public void fillAll(final NullaryFunction<?> supplier) {
 
         // Bad idea...
 
@@ -343,6 +375,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         myValues.fillAll(supplier);
     }
 
+    @Override
     public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
         if (this.isPrimitive()) {
             this.set(index, values.doubleValue(valueIndex));
@@ -351,19 +384,23 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    @Override
     public void fillOne(final long index, final N value) {
         this.set(index, value);
     }
 
-    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+    @Override
+    public void fillOne(final long index, final NullaryFunction<?> supplier) {
         this.set(index, supplier.get());
     }
 
+    @Override
     public void fillRange(final long first, final long limit, final N value) {
         this.fill(first, limit, 1L, value);
     }
 
-    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+    @Override
+    public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
         this.fill(first, limit, 1L, supplier);
     }
 
@@ -379,6 +416,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    @Override
     public N get(final long index) {
 
         final int tmpIndex = this.index(index);
@@ -389,6 +427,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    @Override
     public boolean isAbsolute(final long index) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
@@ -398,6 +437,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    @Override
     public boolean isSmall(final long index, final double comparedTo) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
@@ -434,19 +474,23 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    @Override
     public void modifyOne(final long index, final UnaryFunction<N> modifier) {
         this.set(index, modifier.invoke(this.get(index)));
     }
 
+    @Override
     public NonzeroView<N> nonzeros() {
         return new NonzeroView<>(myIndices, myValues, myActualLength);
     }
 
+    @Override
     public void reset() {
         myActualLength = 0;
         myValues.reset();
     }
 
+    @Override
     public void set(final long index, final double value) {
 
         final int internalIndex = this.index(index);
@@ -454,7 +498,16 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         this.update(index, internalIndex, value, false);
     }
 
-    public void set(final long index, final Number value) {
+    @Override
+    public void set(final long index, final float value) {
+
+        final int internalIndex = this.index(index);
+
+        this.update(index, internalIndex, value, false);
+    }
+
+    @Override
+    public void set(final long index, final Comparable<?> value) {
 
         final int internalIndex = this.index(index);
 
@@ -473,6 +526,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    @Override
     public void visitOne(final long index, final VoidFunction<N> visitor) {
         if (this.isPrimitive()) {
             visitor.invoke(this.doubleValue(index));
@@ -591,7 +645,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     /**
      * Will never remove anything - just insert or update
      */
-    private void update(final long externalIndex, final int internalIndex, final Number value, final boolean shouldStoreZero) {
+    private void update(final long externalIndex, final int internalIndex, final Comparable<?> value, final boolean shouldStoreZero) {
 
         if (internalIndex >= 0) {
             // Existing value, just update
@@ -689,7 +743,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    protected void fill(final long first, final long limit, final long step, final NullaryFunction<N> supplier) {
+    protected void fill(final long first, final long limit, final long step, final NullaryFunction<?> supplier) {
         for (long i = first; i < limit; i += step) {
             this.fillOne(i, supplier);
         }
@@ -868,14 +922,17 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         return new Access1D<N>() {
 
+            @Override
             public long count() {
                 return limit - first;
             }
 
+            @Override
             public double doubleValue(final long index) {
                 return myValues.doubleValue(first + index);
             }
 
+            @Override
             public N get(final long index) {
                 return myValues.get(first + index);
             }

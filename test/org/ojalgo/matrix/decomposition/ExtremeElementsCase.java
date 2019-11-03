@@ -34,7 +34,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.decomposition.HermitianEvD.Primitive;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.RankRevealing;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.netio.BasicLogger;
@@ -53,13 +53,13 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
      */
     static NumberContext ACCURACY = new NumberContext(12, 146);
 
-    private static void performInvertTest(final PrimitiveDenseStore original, final InverterTask<Double> task, final NumberContext context) {
+    private static void performInvertTest(final Primitive64Store original, final InverterTask<Double> task, final NumberContext context) {
 
         try {
 
             MatrixStore<Double> tmpInverse = task.invert(original);
 
-            MatrixStore<Double> tmpExpected = MatrixStore.PRIMITIVE.makeIdentity((int) original.countRows()).get();
+            MatrixStore<Double> tmpExpected = MatrixStore.PRIMITIVE64.makeIdentity((int) original.countRows()).get();
             MatrixStore<Double> tmpActual = original.multiply(tmpInverse);
 
             TestUtils.assertEquals(task.getClass().toString(), tmpExpected, tmpActual, context);
@@ -70,8 +70,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
     }
 
-    private static void performSolveTest(final PrimitiveDenseStore body, final PrimitiveDenseStore rhs, final SolverTask<Double> task,
-            final NumberContext context) {
+    private static void performSolveTest(final Primitive64Store body, final Primitive64Store rhs, final SolverTask<Double> task, final NumberContext context) {
 
         try {
 
@@ -99,7 +98,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                 for (int exp = 0; exp < 308; exp++) {
                     double tmpScale = POWER.invoke(TEN, large ? exp : -exp);
 
-                    PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+                    Primitive64Store tmpOriginal = Primitive64Store.FACTORY.makeSPD(dim);
                     if (DEBUG) {
                         BasicLogger.debug("Scale exp={} => factor={} and context={}", exp, tmpScale, tmpContext);
                         BasicLogger.debug("Original (unscaled) {}", tmpOriginal.toString());
@@ -132,7 +131,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
             for (int exp = 0; exp < 308; exp++) {
                 double scale = POWER.invoke(TEN, large ? exp : -exp);
 
-                PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.makeSPD(dim);
+                Primitive64Store matrix = Primitive64Store.FACTORY.makeSPD(dim);
                 matrix.modifyAll(MULTIPLY.by(scale));
 
                 SingularValue<Double> reference = SingularValue.PRIMITIVE.make(matrix);
@@ -173,8 +172,8 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                 for (int exp = 0; exp < 308; exp++) {
                     double tmpScale = POWER.invoke(TEN, large ? exp : -exp);
 
-                    PrimitiveDenseStore tmpBody = PrimitiveDenseStore.FACTORY.makeSPD(dim);
-                    PrimitiveDenseStore tmpRHS = PrimitiveDenseStore.FACTORY.makeFilled(dim, 1, new Uniform());
+                    Primitive64Store tmpBody = Primitive64Store.FACTORY.makeSPD(dim);
+                    Primitive64Store tmpRHS = Primitive64Store.FACTORY.makeFilled(dim, 1, new Uniform());
                     if (DEBUG) {
                         BasicLogger.debug("Scale exp={} => factor={} and context={}", exp, tmpScale, tmpContext);
                         BasicLogger.debug("Body (unscaled) {}", tmpBody.toString());
@@ -205,7 +204,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
         long tmpDim = 5L;
 
-        PrimitiveDenseStore tmpRndm = PrimitiveDenseStore.FACTORY.makeZero(tmpDim, tmpDim);
+        Primitive64Store tmpRndm = Primitive64Store.FACTORY.makeZero(tmpDim, tmpDim);
 
         for (long j = 0L; j < tmpDim; j++) {
             for (long i = 0L; i < tmpDim; i++) {
@@ -270,7 +269,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
     @Test
     public void testInvertEvD_10_307_1() {
 
-        PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] {
+        Primitive64Store tmpOriginal = Primitive64Store.FACTORY.rows(new double[][] {
                 { 1.488828119167862, 0.42210916029401624, 0.3090339419657017, 0.31968488522727556, 0.32307269871880584, 0.46899580731023627,
                         0.12091920407255509, 0.03795763520492966, 0.17470282114825963, 0.3946701200769135 },
                 { 0.42210916029401624, 1.8635124366670595, 0.545906918558408, 0.5647217567560566, 0.570706312407284, 0.8284787565954789, 0.21360317145069477,
@@ -303,7 +302,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
     @Test
     public void testInvertEvD_3_155_1() {
 
-        PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.509726074514643, 0.6439543946598099, 1.2096354379603502 },
+        Primitive64Store tmpOriginal = Primitive64Store.FACTORY.rows(new double[][] { { 1.509726074514643, 0.6439543946598099, 1.2096354379603502 },
                 { 0.6439543946598099, 1.134228320145167, 0.8341376835908743 }, { 1.2096354379603502, 0.8341376835908743, 1.6999093634457072 } });
         tmpOriginal.modifyAll(MULTIPLY.second(POWER.invoke(TEN, 155)));
 
@@ -317,7 +316,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
     @Test
     public void testInvertSVD_6_307_2() {
 
-        PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(
+        Primitive64Store tmpOriginal = Primitive64Store.FACTORY.rows(
                 new double[][] { { 1.7951923814808213, 0.659451350679988, 0.7107146253894259, 0.5763579411022435, 0.7199441830503458, 0.6356947473097578 },
                         { 0.659451350679988, 1.829297873115869, 0.7411968989569697, 0.6010777087922337, 0.7508223087524556, 0.6629594475153139 },
                         { 0.7107146253894259, 0.7411968989569697, 1.8937643794649044, 0.6478032355134435, 0.8091884190528792, 0.7144954285155056 },
@@ -336,7 +335,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
     @Test
     public void testInvertSVD_7_307_1() {
 
-        PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] {
+        Primitive64Store tmpOriginal = Primitive64Store.FACTORY.rows(new double[][] {
                 { 1.6630365629391541, 0.5725332799439422, 0.6293312306387542, 0.3255116741968718, 0.16197060952553563, 0.38338065513999414,
                         0.45947212690705896 },
                 { 0.5725332799439422, 1.8635018216883505, 0.8196058776803916, 0.42392824070490653, 0.2109414837777316, 0.4992935723573937, 0.5983908592318098 },
@@ -360,7 +359,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
     @Test
     public void testInvertTask_2_155_1() {
 
-        PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY
+        Primitive64Store tmpOriginal = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.7755876870972727, 0.5243083105843722 }, { 0.5243083105843722, 1.6760142267686806 } });
         tmpOriginal.modifyAll(MULTIPLY.second(POWER.invoke(TEN, 155)));
 
@@ -476,8 +475,8 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
     @Test
     public void testSolveLU_1_16_1() {
 
-        PrimitiveDenseStore tmpBody = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.7259687987824925 } });
-        PrimitiveDenseStore tmpRHS = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.6533251061005759 } });
+        Primitive64Store tmpBody = Primitive64Store.FACTORY.rows(new double[][] { { 1.7259687987824925 } });
+        Primitive64Store tmpRHS = Primitive64Store.FACTORY.rows(new double[][] { { 0.6533251061005759 } });
 
         UnaryFunction<Double> tmpSecond = MULTIPLY.second(POWER.invoke(TEN, -16));
         tmpBody.modifyAll(tmpSecond);

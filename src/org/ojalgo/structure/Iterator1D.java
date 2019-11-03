@@ -25,7 +25,7 @@ import java.util.ListIterator;
 
 import org.ojalgo.ProgrammingError;
 
-public final class Iterator1D<N extends Number> implements ListIterator<N> {
+public final class Iterator1D<N extends Comparable<N>> implements ListIterator<N> {
 
     private final Access1D<? extends N> myAccess;
     private final long myCount;

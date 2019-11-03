@@ -46,28 +46,28 @@ public interface Group {
     /**
      * @see <a href="https://en.wikipedia.org/wiki/Additive_group">Additive group</a>
      */
-    public interface Additive<S> extends Group, Operation.Addition<S> {
+    public interface Additive<T> extends Group, Operation.Addition<T> {
 
         /**
          * The additive inverse of this.
          *
          * @return <code>-this</code>.
          */
-        S negate();
+        T negate();
 
     }
 
     /**
      * @see <a href="https://en.wikipedia.org/wiki/Multiplicative_group">Multiplicative group</a>
      */
-    public interface Multiplicative<S> extends Group, Operation.Multiplication<S> {
+    public interface Multiplicative<T> extends Group, Operation.Multiplication<T> {
 
         /**
          * The multiplicative inverse.
          *
          * @return <code>IDENTITY / this</code>.
          */
-        S invert();
+        T invert();
 
     }
 

@@ -34,8 +34,6 @@ import org.ojalgo.function.special.ErrorFunction;
  */
 public class Normal extends AbstractContinuous {
 
-    private static final long serialVersionUID = 7164712313114018919L;
-
     public static Normal of(final double location, final double scale) {
         return new Normal(location, scale);
     }

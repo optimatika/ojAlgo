@@ -21,43 +21,28 @@
  */
 package org.ojalgo.structure;
 
-import org.ojalgo.type.PrimitiveNumber;
+import org.ojalgo.type.NumberDefinition;
 
-public interface AccessScalar<N> extends PrimitiveNumber {
+public interface AccessScalar<N> extends NumberDefinition {
 
-    /**
-     * @see Number#byteValue()
-     */
     default byte byteValue() {
         return (byte) this.shortValue();
     }
 
-    /**
-     * @see Number#floatValue()
-     */
     default float floatValue() {
         return (float) this.doubleValue();
     }
 
     N get();
 
-    /**
-     * @see Number#intValue()
-     */
     default int intValue() {
         return (int) this.longValue();
     }
 
-    /**
-     * @see Number#longValue()
-     */
     default long longValue() {
         return Math.round(this.doubleValue());
     }
 
-    /**
-     * @see Number#shortValue()
-     */
     default short shortValue() {
         return (short) this.intValue();
     }

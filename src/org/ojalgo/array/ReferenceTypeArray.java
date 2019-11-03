@@ -33,17 +33,18 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 
 /**
- * A one- and/or arbitrary-dimensional array of {@linkplain java.lang.Number}.
+ * A one- and/or arbitrary-dimensional array of {@linkplain java.lang.Comparable}.
  *
  * @author apete
  */
-public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implements Mutate1D.Sortable {
+public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainArray<N> implements Mutate1D.Sortable {
 
-    protected static <N extends Number> void exchange(final N[] data, final int firstA, final int firstB, final int step, final int aCount) {
+    protected static <N extends Comparable<N>> void exchange(final N[] data, final int firstA, final int firstB, final int step, final int aCount) {
 
         int tmpIndexA = firstA;
         int tmpIndexB = firstB;
@@ -61,54 +62,55 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
         }
     }
 
-    protected static <N extends Number> void fill(final N[] data, final int first, final int limit, final int step, final N value) {
+    protected static <N extends Comparable<N>> void fill(final N[] data, final int first, final int limit, final int step, final N value) {
         for (int i = first; i < limit; i += step) {
             data[i] = value;
         }
     }
 
-    protected static <N extends Number> void fill(final N[] data, final int first, final int limit, final int step, final NullaryFunction<N> supplier) {
+    protected static <N extends Comparable<N>> void fill(final N[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier,
+            Scalar.Factory<N> scalar) {
         for (int i = first; i < limit; i += step) {
-            data[i] = supplier.invoke();
+            data[i] = scalar.cast(supplier.invoke());
         }
     }
 
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final Access1D<N> left,
+    protected static <N extends Comparable<N>> void invoke(final N[] data, final int first, final int limit, final int step, final Access1D<N> left,
             final BinaryFunction<N> function, final Access1D<N> right) {
         for (int i = first; i < limit; i += step) {
             data[i] = function.invoke(left.get(i), right.get(i));
         }
     }
 
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final Access1D<N> left,
+    protected static <N extends Comparable<N>> void invoke(final N[] data, final int first, final int limit, final int step, final Access1D<N> left,
             final BinaryFunction<N> function, final N right) {
         for (int i = first; i < limit; i += step) {
             data[i] = function.invoke(left.get(i), right);
         }
     }
 
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final Access1D<N> value,
+    protected static <N extends Comparable<N>> void invoke(final N[] data, final int first, final int limit, final int step, final Access1D<N> value,
             final ParameterFunction<N> function, final int aParam) {
         for (int i = first; i < limit; i += step) {
             data[i] = function.invoke(value.get(i), aParam);
         }
     }
 
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final Access1D<N> value,
+    protected static <N extends Comparable<N>> void invoke(final N[] data, final int first, final int limit, final int step, final Access1D<N> value,
             final UnaryFunction<N> function) {
         for (int i = first; i < limit; i += step) {
             data[i] = function.invoke(value.get(i));
         }
     }
 
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final N left,
+    protected static <N extends Comparable<N>> void invoke(final N[] data, final int first, final int limit, final int step, final N left,
             final BinaryFunction<N> function, final Access1D<N> right) {
         for (int i = first; i < limit; i += step) {
             data[i] = function.invoke(left, right.get(i));
         }
     }
 
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final VoidFunction<N> aVisitor) {
+    protected static <N extends Comparable<N>> void invoke(final N[] data, final int first, final int limit, final int step, final VoidFunction<N> aVisitor) {
         for (int i = first; i < limit; i += step) {
             aVisitor.invoke(data[i]);
         }
@@ -141,12 +143,14 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
         }
     }
 
+    @Override
     public void fillMatching(final Access1D<?> values) {
         for (int i = 0, limit = (int) Math.min(this.count(), values.count()); i < limit; i++) {
             data[i] = this.factory().scalar().cast(values.get(i));
         }
     }
 
+    @Override
     public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
         int limit = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
         for (int i = 0; i < limit; i++) {
@@ -154,6 +158,7 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
         }
     }
 
+    @Override
     public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
         int limit = MissingMath.toMinIntExact(this.count(), arguments.count());
         for (int i = 0; i < limit; i++) {
@@ -185,11 +190,6 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
     }
 
     @Override
-    protected final double doubleValue(final int index) {
-        return data[index].doubleValue();
-    }
-
-    @Override
     protected final void exchange(final int firstA, final int firstB, final int step, final int count) {
         ReferenceTypeArray.exchange(data, firstA, firstB, step, count);
     }
@@ -210,18 +210,13 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
     }
 
     @Override
-    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<N> supplier) {
-        ReferenceTypeArray.fill(data, first, limit, step, supplier);
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+        ReferenceTypeArray.fill(data, first, limit, step, supplier, this.factory().scalar());
     }
 
     @Override
     protected final void fill(final int first, final int limit, final N left, final BinaryFunction<N> function, final Access1D<N> right) {
         ReferenceTypeArray.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        data[index] = this.valueOf(values.get(valueIndex));
     }
 
     @Override
@@ -286,7 +281,12 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
     }
 
     @Override
-    protected final void set(final int index, final Number value) {
+    protected final void set(final int index, final float value) {
+        data[index] = this.valueOf(value);
+    }
+
+    @Override
+    protected final void set(final int index, final Comparable<?> value) {
         data[index] = this.valueOf(value);
     }
 
@@ -324,7 +324,11 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
         return this.factory().scalar().cast(value);
     }
 
-    final N valueOf(final Number number) {
+    final N valueOf(final float value) {
+        return this.factory().scalar().cast(value);
+    }
+
+    final N valueOf(final Comparable<?> number) {
         return this.factory().scalar().cast(number);
     }
 

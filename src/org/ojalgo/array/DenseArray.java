@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.StructureAnyD;
 
 /**
@@ -35,9 +36,9 @@ import org.ojalgo.structure.StructureAnyD;
  *
  * @author apete
  */
-public abstract class DenseArray<N extends Number> extends BasicArray<N> {
+public abstract class DenseArray<N extends Comparable<N>> extends BasicArray<N> {
 
-    public static abstract class Factory<N extends Number> extends ArrayFactory<N, DenseArray<N>> {
+    public static abstract class Factory<N extends Comparable<N>> extends ArrayFactory<N, DenseArray<N>> implements Factory1D.Dense<DenseArray<N>> {
 
         @Override
         long getCapacityLimit() {

@@ -63,7 +63,7 @@ package org.ojalgo.matrix.decomposition;
  *
  * @author apete
  */
-public interface LDU<N extends Number>
+public interface LDU<N extends Comparable<N>>
         extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.RankRevealing<N> {
 
     default boolean isOrdered() {

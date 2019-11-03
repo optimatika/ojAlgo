@@ -47,7 +47,7 @@ public class SeriesInterpolator {
         myContext = context;
     }
 
-    public void addSeries(final Number key, final CalendarDateSeries<Double> series) {
+    public void addSeries(final Comparable<?> key, final CalendarDateSeries<Double> series) {
 
         final BigDecimal tmpKey = TypeUtils.toBigDecimal(key, myContext);
 
@@ -56,7 +56,7 @@ public class SeriesInterpolator {
         myCoordinatedSet = null;
     }
 
-    public CalendarDateSeries<Double> getCombination(final Number inputKey) {
+    public CalendarDateSeries<Double> getCombination(final Comparable<?> inputKey) {
 
         final BigDecimal tmpInputKey = TypeUtils.toBigDecimal(inputKey, myContext);
 

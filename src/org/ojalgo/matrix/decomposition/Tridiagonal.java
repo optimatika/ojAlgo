@@ -37,9 +37,9 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
+public interface Tridiagonal<N extends Comparable<N>> extends MatrixDecomposition<N> {
 
-    interface Factory<N extends Number> extends MatrixDecomposition.Factory<Tridiagonal<N>> {
+    interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<Tridiagonal<N>> {
 
     }
 
@@ -51,7 +51,7 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
 
     Factory<RationalNumber> RATIONAL = typical -> new DeferredTridiagonal.Rational();
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Tridiagonal<N> decomposition, final NumberContext context) {
+    static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Tridiagonal<N> decomposition, final NumberContext context) {
 
         boolean retVal = true;
 
@@ -78,7 +78,7 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
      */
     @Deprecated
     @SuppressWarnings("unchecked")
-    static <N extends Number> Tridiagonal<N> make(final Access2D<N> typical) {
+    static <N extends Comparable<N>> Tridiagonal<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -99,7 +99,7 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
      * @deprecated v48 Use {@link #reconstruct()} instead
      */
     @Deprecated
-    static <N extends Number> MatrixStore<N> reconstruct(final Tridiagonal<N> decomposition) {
+    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final Tridiagonal<N> decomposition) {
         return decomposition.reconstruct();
     }
 

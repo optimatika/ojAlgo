@@ -23,7 +23,7 @@ package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
 
-abstract class TransjugatedStore<N extends Number> extends LogicalStore<N> {
+abstract class TransjugatedStore<N extends Comparable<N>> extends LogicalStore<N> {
 
     private TransjugatedStore(final MatrixStore<N> base, final int rows, final int columns) {
 

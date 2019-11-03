@@ -34,6 +34,7 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.format.NumberStyle;
 
 /**
@@ -52,7 +53,7 @@ import org.ojalgo.type.format.NumberStyle;
  *
  * @author apete
  */
-public final class NumberContext extends FormatContext<Number, NumberFormat> {
+public final class NumberContext extends FormatContext<Comparable<?>, NumberFormat> {
 
     public interface Enforceable<T> {
 
@@ -286,13 +287,13 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
     }
 
     @Override
-    public Number enforce(final Number object) {
+    public Comparable<?> enforce(final Comparable<?> object) {
         if (object instanceof BigDecimal) {
             return this.enforce((BigDecimal) object);
         } else if (object instanceof Enforceable<?>) {
-            return (Number) ((Enforceable<?>) object).enforce(this);
+            return (Comparable<?>) ((Enforceable<?>) object).enforce(this);
         } else {
-            return this.enforce(object.doubleValue());
+            return this.enforce(Scalar.doubleValue(object));
         }
     }
 
@@ -346,7 +347,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
         return this.format().format(number);
     }
 
-    public <N extends Number> UnaryFunction<N> getFunction(final FunctionSet<N> functions) {
+    public <N extends Comparable<N>> UnaryFunction<N> getFunction(final FunctionSet<N> functions) {
         return functions.enforce(this);
     }
 
@@ -562,7 +563,7 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
     }
 
     @Override
-    protected Number handleParseException(final NumberFormat format, final String string) {
+    protected Comparable<?> handleParseException(final NumberFormat format, final String string) {
         return BigMath.ZERO;
     }
 

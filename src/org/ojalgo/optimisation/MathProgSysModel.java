@@ -70,7 +70,7 @@ public final class MathProgSysModel {
         BV(), FR(), FX(), LI(), LO(), MI(), PL(), SC(), UI(), UP();
 
     }
-    final class Column extends Object {
+    final class Column {
 
         private boolean mySemicontinuous = false;
         private final Variable myVariable;
@@ -217,7 +217,7 @@ public final class MathProgSysModel {
 
     }
 
-    final class Row extends Object {
+    final class Row {
 
         private final Expression myExpression;
 

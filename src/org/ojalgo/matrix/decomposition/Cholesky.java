@@ -47,9 +47,9 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.Hermitian<N> {
+public interface Cholesky<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition.Hermitian<N> {
 
-    interface Factory<N extends Number> extends MatrixDecomposition.Factory<Cholesky<N>> {
+    interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<Cholesky<N>> {
 
     }
 
@@ -67,7 +67,7 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
 
     Factory<RationalNumber> RATIONAL = typical -> new CholeskyDecomposition.Rational();
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Cholesky<N> decomposition, final NumberContext context) {
+    static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Cholesky<N> decomposition, final NumberContext context) {
 
         boolean retVal = false;
 
@@ -84,7 +84,7 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
      */
     @Deprecated
     @SuppressWarnings("unchecked")
-    static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {
+    static <N extends Comparable<N>> Cholesky<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -105,7 +105,7 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
      * @deprecated v48 Use {@link #reconstruct()} instead
      */
     @Deprecated
-    static <N extends Number> MatrixStore<N> reconstruct(final Cholesky<N> decomposition) {
+    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final Cholesky<N> decomposition) {
         return decomposition.reconstruct();
     }
 

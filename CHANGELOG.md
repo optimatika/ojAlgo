@@ -7,19 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Added / Changed / Deprecated / Removed / Fixed / Security
 
+
 ## [Unreleased]
 
 > Corresponds to changes in the `develop` branch since the last release
 
 ### Added
 
+- Improved support for float throughout the library, and specifically added matrices with float elements.
+
+#### org.ojalgo.algebra
+
+- ScalarOperation has been extended with support for float arguments.
+
 #### org.ojalgo.function
 
 - New special functions: beta (complete, incomplete and regularized), gamma (logarithmic), Hypergeometric and Pochhammer symbol. Inluding complex valued variants where applicable. The complete gamma function existed previously, and the upper/lower incomplete gamma functions are only implemented for the integer case.
+- All the function interaces now have float specific methods.
+
+#### org.ojalgo.matrix
+
+- There is a new float based matrix store implementation, Primitive32Store.
 
 #### org.ojalgo.random
 
 - The `getDistribution()` method in the TDistribution is now implemented for the general case. Previously it was only implemented for a few distinct degrees of freedom.
+
+### Changed
+
+- Generic declarations in interfaces and abstract classes (everywhere) that used to be `<N extends Number>` are now `<N extends Comparable<N>>`. Code that extends/implements ojAlgo classes and interaces will most likely need to be updated. Simple usage may not require any changes at all. Please note that `java.lang.Number` is NOT `Comparable` but all the speciic subclasses are.
+- Everything (classes/interfaces, constants...) named "Primitive" -something now separates between "Primitive32" and "Primitive64".
+
+#### org.ojalgo.matrix
+
+- PrimitiveDenseStore has been renamed Primitive64Store (and there is now also a Primitive32Store). GenericDenseStore was also renamed GenericStore.
+
+#### org.ojalgo.scalar
+
+- ComplexNumber and Quaternion are now final. That means there are no longer special normalised subclasses (no Versor).
+
+#### org.ojalgo.structure
+
+- The methods in the Mutate*D.Fillable interaces that take a NullaryFunction as input has changed the generic declaration from `NullaryFunction<N>` to `NullaryFunction<?>`.
+- Reftactoring of the Factory*D interfaces.
+
 
 ## [47.3.1] – 2019-09-29
 
@@ -54,6 +85,7 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 ### Fixed
 
 - The compareTo method of CalendarDateDuration didn't work when the unit of either instances was "nanos".
+
 
 ## [47.3.0] – 2019-08-08
 
@@ -118,6 +150,7 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 * Additions to Structure2D.Logical (Moved definitions from MatrixStore.LogicalBuilder to here).
 * Refactoring to Factory1D, Factory2D and FactoryAnyD – makeZero(...) is renamed make(...) and everything else is moved to a nested subinterface Dense.
 
+
 ## [47.2.0] – 2019-05-03
 
 ### Changed
@@ -153,6 +186,7 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 * The Stream2D interface now has methods operateOnColumns(...) and operateOnRows(...)
 
+
 ## [47.1.2] – 2019-04-23
 
 ### Changed
@@ -161,6 +195,7 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 * Fixed bug related to LDL – stackoverflow if you called isSolvable() on some LDL instances.
 * Various tweaks and cleanup with MatrixDecompostion:s
+
 
 ## [47.1.1] – 2019-04-12
 
@@ -183,6 +218,7 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 * The interfaces Mutate1D.Transformable, Mutate2D.Transformable and MutateAnyD.Transformable introduced with v47.1.0 are removed again – bad idea.
 * The Stream1D, Stream2D and StreamAnyD each got a new method named operateOnAny that takes a Transformation?D as input.
 * The Mutate1D.ModifiableReceiver, Mutate2D.ModifiableReceiver and MutateAnyD.ModifiableReceiver each got a new method named modifyAny that takes a Transformation?D as input.
+
 
 ## [47.1.0] – 2019-04-09
 
@@ -238,6 +274,7 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 * Additions to Stopwatch that make it easier to compare with time limits in various forms.
 
+
 ## [47.0.0] – 2018-12-16
 
 ### Changed
@@ -286,6 +323,7 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 * The BasicMatrix interface has been deprecated!!! The various implementations will remain - all of them - but you should use those implementations directly/explicitly rather than the interface.
 
+
 ## [46.2.0] – 2018-10-04
 
 ### Changed
@@ -304,6 +342,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 #### org.ojalgo.structure
 
 * Access1D no longer extends Iterable. To iterate over the elements use `elements()`.
+
 
 ## [46.1.0] – 2018-09-17
 
@@ -329,6 +368,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 
 * Added default methods to get all primitive number types from Access1D, Access2D and AccessAnyD and to somewhat modified the ones in AccessScalar: `byteValue(), shortValue(), intValue(), longValue(), floatValue(), doubleValue()`.
 * AccessAnyD now has a method `matrices()` that return a `Iterable<MatrixView<N>>`. On a multi-dimensional data structure you can iterate over its 2D (sub)matrices. Useful when you have a 3-dimensional (or more) data structure that is actually a collection of 2D matrices.
+
 
 ## [46.0.0] – 2018-08-19
 
@@ -391,6 +431,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 * New class ObjectPool
 * The generics type parameter of NumberContext.Enforceable changed from `<N extends Number>` to `<T>`.
 
+
 ## [45.1.0] – 2018-04-13
 
 ### Changed
@@ -423,6 +464,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 
 * New class LineSplittingParser - a very simple csv parser
 * New class TableData - used to create a "table" of values that can then be exported to a csv file.
+
 
 ## [45.0.0] – 2018-03-30
 
@@ -484,6 +526,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 
 * New TypeContext implementation, named TemporalContext, to handle the classes from Java's new date time API. The older DateContext is still available.
 * Bug fixed in a NumberContext factory method - getPercent(int,Locale)
+
 
 ## [44.0.0] – 2017-09-27
 
@@ -549,6 +592,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 * The CalendarDate constructor with a String argument/parameter now declares to throw a RecoverableCondition.
 * NumberContext now has specific format(double) and format(long) methods, and now formats decimals with a variable number of fraction digits.
 * NumberContext now has new compare(double,double) and compare(float,float) that are alternatives to the compare(...) methods in Double and Float - the only difference is that these return 0 when the two input args are ==.
+
 
 ## [43.0.0] – 2017-04-22
 
@@ -616,6 +660,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 
 * Refactoring and additions to CalendarDate, CalendarDateUnit and CalendarDateDuration. Among other things there is a now an interface CalendarDate.Resolution that both CalendarDateUnit and CalendarDateDuration implement.
 
+
 ## [42.0.0] – 2017-02-03
 
 ### Changed
@@ -663,6 +708,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 
 * All previously existing variations of getXXFunction(...) in NumberContext has been deprecated and are replaced by by 1 new variant that takes a FunctionSet as input.
 * New class NativeMemory used as single point to allocate, read or write native memory.
+
 
 ## [41.0.0] – 2016-11-13
 
@@ -728,6 +774,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 * New builder instances in the BasicSeries interface. If you use them they will return implementations, new to v41, backed by array classes from the org.ojalgo.array package. It is now possible to use just about any date/time related class as a time series key.
 * The methods getDataSeries() and getPrimitiveValues() are deprecated, both replaced by the new method getPrimitiveSeries(). Further the modifyAll(UnaryFunction) method is deprecated. You should do modifications on the series returned by getPrimitiveSeries().
 
+
 ## [40.0.0] – 2016-06-20
 
 ### Changed
@@ -787,6 +834,7 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 * CalendarDate now implements Temporal
 * CalendarDateUnit now implements TemporalUnit
 * CalendarDateDuration now implements TemporalAmount
+
 
 ## [39.0.0] – 2015-11-28
 
@@ -872,11 +920,13 @@ Nothing in ojAlgo implements Serializable - a few odd classes used to declare th
 
 >API-breaking!
 
+
 ## [38.0.0]
 
 ### Changed
 
 The first version to require Java 8!
+
 
 ## [37.0.0] / [37.1.0]
 

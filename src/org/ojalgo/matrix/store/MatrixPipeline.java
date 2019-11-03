@@ -28,9 +28,9 @@ import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Transformation2D;
 
-abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
+abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSupplier<N> {
 
-    static final class BinaryOperatorLeft<N extends Number> extends MatrixPipeline<N> {
+    static final class BinaryOperatorLeft<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         private final MatrixStore<N> myLeft;
         private final BinaryFunction<N> myOperator;
@@ -48,7 +48,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
     }
 
-    static final class BinaryOperatorRight<N extends Number> extends MatrixPipeline<N> {
+    static final class BinaryOperatorRight<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         private final BinaryFunction<N> myOperator;
         private final MatrixStore<N> myRight;
@@ -66,7 +66,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
     }
 
-    static final class ColumnsModifier<N extends Number> extends MatrixPipeline<N> {
+    static final class ColumnsModifier<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         private final BinaryFunction<N> myFunction;
         private final Access1D<N> myRightArgumnts;
@@ -94,7 +94,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
 
     }
 
-    static final class ColumnsReducer<N extends Number> extends MatrixPipeline<N> {
+    static final class ColumnsReducer<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         private final Aggregator myAggregator;
         private final MatrixStore<N> myBase;
@@ -117,7 +117,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
 
     }
 
-    static final class Multiplication<N extends Number> extends MatrixPipeline<N> {
+    static final class Multiplication<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         private final Access1D<N> myLeft;
         private final MatrixStore<N> myRight;
@@ -147,7 +147,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
 
     }
 
-    static final class RowsModifier<N extends Number> extends MatrixPipeline<N> {
+    static final class RowsModifier<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         private final BinaryFunction<N> myFunction;
         private final Access1D<N> myRightArgumnts;
@@ -175,7 +175,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
 
     }
 
-    static final class RowsReducer<N extends Number> extends MatrixPipeline<N> {
+    static final class RowsReducer<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         private final Aggregator myAggregator;
         private final MatrixStore<N> myBase;
@@ -198,7 +198,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
 
     }
 
-    static final class Transformer<N extends Number> extends MatrixPipeline<N> {
+    static final class Transformer<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         private final Transformation2D<N> myTransformer;
 
@@ -214,7 +214,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
     }
 
-    static final class Transpose<N extends Number> extends MatrixPipeline<N> {
+    static final class Transpose<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         Transpose(final ElementsSupplier<N> context) {
             super(context);
@@ -261,7 +261,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
     }
 
-    static final class UnaryOperator<N extends Number> extends MatrixPipeline<N> {
+    static final class UnaryOperator<N extends Comparable<N>> extends MatrixPipeline<N> {
 
         private final UnaryFunction<N> myOperator;
 

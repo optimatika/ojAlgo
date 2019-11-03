@@ -11,9 +11,9 @@ import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.RowView;
 
-public final class RowsSupplier<N extends Number> implements Access2D<N>, ElementsSupplier<N> {
+public final class RowsSupplier<N extends Comparable<N>> implements Access2D<N>, ElementsSupplier<N> {
 
-    static final class ItemView<N extends Number> extends RowView<N> {
+    static final class ItemView<N extends Comparable<N>> extends RowView<N> {
 
         private final RowsSupplier<N> mySupplier;
 
@@ -110,7 +110,7 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
                     receiver.add(row, index, addend);
                 }
 
-                public void add(final long index, final Number addend) {
+                public void add(final long index, final Comparable<?> addend) {
                     receiver.add(row, index, addend);
                 }
 
@@ -122,7 +122,7 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
                     receiver.set(row, index, value);
                 }
 
-                public void set(final long index, final Number value) {
+                public void set(final long index, final Comparable<?> value) {
                     receiver.set(row, index, value);
                 }
 

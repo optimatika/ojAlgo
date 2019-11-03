@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -48,18 +48,18 @@ public class P20030528Case extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = new NumberContext(7, 9);
+        // ACCURACY = new NumberContext(7, 9);
 
-        rationalAA = P20030528Case.getProblematic();
-        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
-        rationalAB = rationalAA;
+        rAA = P20030528Case.getProblematic();
+        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
+        rAB = rAA;
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
@@ -74,13 +74,13 @@ public class P20030528Case extends BasicMatrixTest {
     @Test
     public void testProblem() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(P20030528Case.getProblematic());
+        final PhysicalStore<Double> tmpA = Primitive64Store.FACTORY.copy(P20030528Case.getProblematic());
 
         final SingularValue<Double> tmpSVD = SingularValue.make(tmpA);
         tmpSVD.decompose(tmpA);
 
         // tmpSVD.equals(tmpA, EVALUATION);
-        TestUtils.assertEquals(tmpA, tmpSVD, evaluation);
+        TestUtils.assertEquals(tmpA, tmpSVD, ACCURACY);
     }
 
 }

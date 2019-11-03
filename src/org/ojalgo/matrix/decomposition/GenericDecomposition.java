@@ -39,7 +39,7 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-abstract class GenericDecomposition<N extends Number> extends AbstractDecomposition<N> {
+abstract class GenericDecomposition<N extends Comparable<N>> extends AbstractDecomposition<N> {
 
     private final MatrixStore.Factory<N> myBuilder;
     private final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> myFactory;

@@ -28,12 +28,14 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 import org.ojalgo.netio.ASCII;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.series.primitive.DataSeries;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
 
-abstract class TreeSeries<K extends Comparable<? super K>, N extends Number, I extends TreeSeries<K, N, I>> extends TreeMap<K, N> implements BasicSeries<K, N> {
+abstract class TreeSeries<K extends Comparable<? super K>, N extends Comparable<N>, I extends TreeSeries<K, N, I>> extends TreeMap<K, N>
+        implements BasicSeries<K, N> {
 
     private ColourData myColour = null;
     private String myName = null;
@@ -61,7 +63,7 @@ abstract class TreeSeries<K extends Comparable<? super K>, N extends Number, I e
 
         int i = 0;
         for (final N tmpValue : this.values()) {
-            retVal[i] = tmpValue.doubleValue();
+            retVal[i] = Scalar.doubleValue(tmpValue);
             i++;
         }
 
@@ -75,7 +77,7 @@ abstract class TreeSeries<K extends Comparable<? super K>, N extends Number, I e
     }
 
     public final double doubleValue(final K key) {
-        return this.get(key).doubleValue();
+        return Scalar.doubleValue(this.get(key));
     }
 
     public N firstValue() {

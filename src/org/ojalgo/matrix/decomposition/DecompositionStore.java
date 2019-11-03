@@ -42,7 +42,7 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface DecompositionStore<N extends Number> extends PhysicalStore<N>, RotateRight, ExchangeColumns, NegateColumn {
+public interface DecompositionStore<N extends Comparable<N>> extends PhysicalStore<N>, RotateRight, ExchangeColumns, NegateColumn {
 
     /**
      * Cholesky transformations

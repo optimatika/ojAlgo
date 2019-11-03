@@ -27,10 +27,10 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -61,7 +61,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Eigenvalue<N extends Number>
+public interface Eigenvalue<N extends Comparable<N>>
         extends MatrixDecomposition<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N> {
 
     public static class Eigenpair implements Comparable<Eigenpair> {
@@ -119,7 +119,7 @@ public interface Eigenvalue<N extends Number>
 
     }
 
-    interface Factory<N extends Number> extends MatrixDecomposition.Factory<Eigenvalue<N>> {
+    interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<Eigenvalue<N>> {
 
         default Eigenvalue<N> make(final boolean hermitian) {
             return this.make(TYPICAL, hermitian);
@@ -191,7 +191,7 @@ public interface Eigenvalue<N extends Number>
 
     }
 
-    interface Generalised<N extends Number> extends Eigenvalue<N> {
+    interface Generalised<N extends Comparable<N>> extends Eigenvalue<N> {
 
         default boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA,
                 final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB) {
@@ -217,7 +217,7 @@ public interface Eigenvalue<N extends Number>
         @Override
         public Eigenvalue.Generalised<ComplexNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<ComplexNumber, GenericDenseStore<ComplexNumber>> factory = GenericDenseStore.COMPLEX;
+            PhysicalStore.Factory<ComplexNumber, GenericStore<ComplexNumber>> factory = GenericStore.COMPLEX;
             Cholesky<ComplexNumber> cholesky = Cholesky.COMPLEX.make(typical);
             Eigenvalue<ComplexNumber> eigenvalue = this.make(typical, true);
 
@@ -257,7 +257,7 @@ public interface Eigenvalue<N extends Number>
         @Override
         public Eigenvalue.Generalised<Double> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
+            PhysicalStore.Factory<Double, Primitive64Store> factory = Primitive64Store.FACTORY;
             Cholesky<Double> cholesky = Cholesky.PRIMITIVE.make(typical);
             Eigenvalue<Double> eigenvalue = this.make(typical, true);
 
@@ -276,7 +276,7 @@ public interface Eigenvalue<N extends Number>
         @Override
         public Eigenvalue.Generalised<Quaternion> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<Quaternion, GenericDenseStore<Quaternion>> factory = GenericDenseStore.QUATERNION;
+            PhysicalStore.Factory<Quaternion, GenericStore<Quaternion>> factory = GenericStore.QUATERNION;
             Cholesky<Quaternion> cholesky = Cholesky.QUATERNION.make(typical);
             Eigenvalue<Quaternion> eigenvalue = this.make(typical, true);
 
@@ -295,7 +295,7 @@ public interface Eigenvalue<N extends Number>
         @Override
         public Eigenvalue.Generalised<RationalNumber> makeGeneralised(final Structure2D typical, final Eigenvalue.Generalisation type) {
 
-            PhysicalStore.Factory<RationalNumber, GenericDenseStore<RationalNumber>> factory = GenericDenseStore.RATIONAL;
+            PhysicalStore.Factory<RationalNumber, GenericStore<RationalNumber>> factory = GenericStore.RATIONAL;
             Cholesky<RationalNumber> cholesky = Cholesky.RATIONAL.make(typical);
             Eigenvalue<RationalNumber> eigenvalue = this.make(typical, true);
 
@@ -304,7 +304,7 @@ public interface Eigenvalue<N extends Number>
 
     };
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
+    static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
 
         final MatrixStore<N> tmpD = decomposition.getD();
         final MatrixStore<N> tmpV = decomposition.getV();
@@ -322,7 +322,7 @@ public interface Eigenvalue<N extends Number>
      */
     @Deprecated
     @SuppressWarnings("unchecked")
-    static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical) {
+    static <N extends Comparable<N>> Eigenvalue<N> make(final Access2D<N> typical) {
         return Eigenvalue.make(typical, MatrixUtils.isHermitian(typical));
     }
 
@@ -332,7 +332,7 @@ public interface Eigenvalue<N extends Number>
      */
     @Deprecated
     @SuppressWarnings("unchecked")
-    static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical, final boolean hermitian) {
+    static <N extends Comparable<N>> Eigenvalue<N> make(final Access2D<N> typical, final boolean hermitian) {
 
         final N tmpNumber = typical.get(0L, 0L);
 
@@ -353,7 +353,7 @@ public interface Eigenvalue<N extends Number>
      * @deprecated v48 Use {@link #reconstruct()} instead
      */
     @Deprecated
-    static <N extends Number> MatrixStore<N> reconstruct(final Eigenvalue<N> decomposition) {
+    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final Eigenvalue<N> decomposition) {
         return decomposition.reconstruct();
     }
 
@@ -461,7 +461,7 @@ public interface Eigenvalue<N extends Number>
 
         final long tmpDimension = this.getV().countColumns();
 
-        final GenericDenseStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(tmpDimension, tmpDimension);
+        final GenericStore<ComplexNumber> retVal = GenericStore.COMPLEX.makeZero(tmpDimension, tmpDimension);
 
         for (int j = 0; j < tmpDimension; j++) {
             this.copyEigenvector(j, retVal.sliceColumn(0, j));

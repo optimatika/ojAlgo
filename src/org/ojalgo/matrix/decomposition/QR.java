@@ -51,10 +51,10 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
+public interface QR<N extends Comparable<N>> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
         MatrixDecomposition.Determinant<N>, MatrixDecomposition.RankRevealing<N> {
 
-    interface Factory<N extends Number> extends MatrixDecomposition.Factory<QR<N>> {
+    interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<QR<N>> {
 
         default QR<N> make(final boolean fullSize) {
             return this.make(TYPICAL, fullSize);
@@ -82,7 +82,7 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
 
     Factory<RationalNumber> RATIONAL = (typical, fullSize) -> new QRDecomposition.Rational(fullSize);
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
+    static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
 
         final MatrixStore<N> tmpQ = decomposition.getQ();
         final MatrixStore<N> tmpR = decomposition.getR();
@@ -98,7 +98,7 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
      */
     @Deprecated
     @SuppressWarnings("unchecked")
-    static <N extends Number> QR<N> make(final Access2D<N> typical) {
+    static <N extends Comparable<N>> QR<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -119,7 +119,7 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
      * @deprecated v48 Use {@link #reconstruct()} instead
      */
     @Deprecated
-    static <N extends Number> MatrixStore<N> reconstruct(final QR<N> decomposition) {
+    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final QR<N> decomposition) {
         return decomposition.reconstruct();
     }
 

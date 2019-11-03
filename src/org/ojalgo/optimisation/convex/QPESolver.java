@@ -25,7 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 
@@ -42,13 +42,13 @@ final class QPESolver extends ConstrainedSolver {
 
     private boolean myFeasible = false;
 
-    private final PrimitiveDenseStore myIterationX;
+    private final Primitive64Store myIterationX;
 
     QPESolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
         super(matrices, solverOptions);
 
-        myIterationX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
+        myIterationX = Primitive64Store.FACTORY.makeZero(this.countVariables(), 1L);
     }
 
     private boolean isFeasible() {
@@ -103,8 +103,8 @@ final class QPESolver extends ConstrainedSolver {
 
         boolean solved = false;
 
-        final PrimitiveDenseStore tmpIterX = myIterationX;
-        final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(tmpIterA.countRows(), 1L);
+        final Primitive64Store tmpIterX = myIterationX;
+        final Primitive64Store tmpIterL = Primitive64Store.FACTORY.makeZero(tmpIterA.countRows(), 1L);
 
         if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (solved = this.isSolvableQ())) {
             // Q is SPD
@@ -130,7 +130,7 @@ final class QPESolver extends ConstrainedSolver {
         if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
-            final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
+            final Primitive64Store tmpXL = Primitive64Store.FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
 
             if (solved = this.solveFullKKT(tmpXL)) {
                 tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
@@ -179,7 +179,7 @@ final class QPESolver extends ConstrainedSolver {
     @Override
     MatrixStore<Double> getIterationB() {
         if (myFeasible) {
-            return MatrixStore.PRIMITIVE.makeZero(this.countEqualityConstraints(), 1).get();
+            return MatrixStore.PRIMITIVE64.makeZero(this.countEqualityConstraints(), 1).get();
         } else {
             return this.getMatrixBE();
         }

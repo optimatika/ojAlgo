@@ -203,7 +203,7 @@ public class Primitive32Array extends PrimitiveArray {
         }
     }
 
-    protected static void fill(final float[] data, final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
+    protected static void fill(final float[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
         for (int i = first; i < limit; i += step) {
             data[i] = (float) supplier.doubleValue();
         }
@@ -316,7 +316,7 @@ public class Primitive32Array extends PrimitiveArray {
             Primitive32Array.subtract(data, first, limit, step, left, right);
         } else {
             for (int i = first; i < limit; i += step) {
-                data[i] = (float) function.invoke(left[i], right[i]);
+                data[i] = function.invoke(left[i], right[i]);
             }
         }
     }
@@ -324,7 +324,7 @@ public class Primitive32Array extends PrimitiveArray {
     static void invoke(final float[] data, final int first, final int limit, final int step, final float[] values, final ParameterFunction<Double> function,
             final int aParam) {
         for (int i = first; i < limit; i += step) {
-            data[i] = (float) function.invoke(values[i], aParam);
+            data[i] = function.invoke(values[i], aParam);
         }
     }
 
@@ -342,7 +342,7 @@ public class Primitive32Array extends PrimitiveArray {
             Primitive32Array.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.getParameter());
         } else {
             for (int i = first; i < limit; i += step) {
-                data[i] = (float) function.invoke(values[i]);
+                data[i] = function.invoke(values[i]);
             }
         }
     }
@@ -366,6 +366,7 @@ public class Primitive32Array extends PrimitiveArray {
         data = new float[size];
     }
 
+    @Override
     public void axpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
     }
@@ -391,15 +392,18 @@ public class Primitive32Array extends PrimitiveArray {
         }
     }
 
+    @Override
     public void fillMatching(final Access1D<?> values) {
         Primitive32Array.fill(data, values);
     }
 
+    @Override
     public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
         int limit = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
         Primitive32Array.invoke(data, 0, limit, 1, left, function, right);
     }
 
+    @Override
     public void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
         int limit = MissingMath.toMinIntExact(this.count(), arguments.count());
         Primitive32Array.invoke(data, 0, limit, 1, arguments, function);
@@ -433,8 +437,13 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
-    protected void add(final int index, final Number addend) {
-        data[index] += addend.floatValue();
+    protected void add(final int index, final float addend) {
+        data[index] += addend;
+    }
+
+    @Override
+    protected void add(final int index, final Comparable<?> addend) {
+        data[index] += Scalar.floatValue(addend);
     }
 
     protected final float[] copyOfData() {
@@ -473,7 +482,7 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
-    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
         Primitive32Array.fill(data, first, limit, step, supplier);
     }
 
@@ -544,7 +553,7 @@ public class Primitive32Array extends PrimitiveArray {
 
     @Override
     protected final void modifyOne(final int index, final UnaryFunction<Double> modifier) {
-        data[index] = (float) modifier.invoke(data[index]);
+        data[index] = modifier.invoke(data[index]);
     }
 
     @Override
@@ -558,8 +567,13 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
-    protected final void set(final int index, final Number value) {
-        data[index] = value.floatValue();
+    protected final void set(final int index, final float value) {
+        data[index] = value;
+    }
+
+    @Override
+    protected final void set(final int index, final Comparable<?> value) {
+        data[index] = Scalar.floatValue(value);
     }
 
     @Override
@@ -584,7 +598,7 @@ public class Primitive32Array extends PrimitiveArray {
 
     @Override
     void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
-        data[intIndex] = (float) function.invoke(data[intIndex]);
+        data[intIndex] = function.invoke(data[intIndex]);
     }
 
 }

@@ -44,7 +44,7 @@ import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.PureQuadraticFunction;
 import org.ojalgo.function.multiary.QuadraticFunction;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D;
@@ -63,9 +63,9 @@ import org.ojalgo.type.TypeUtils;
  * </p>
  * <p>
  * An expression is turned into a constraint by setting a lower and/or upper limit. Use
- * {@linkplain Expression#lower(Number)}, {@linkplain Expression#upper(Number)} or
- * {@linkplain Expression#level(Number)}. An expression is made part of (contributing to) the objective
- * function by setting a contribution weight. Use {@linkplain Expression#weight(Number)}. The contribution
+ * {@linkplain Expression#lower(Comparable)}, {@linkplain Expression#upper(Comparable)} or
+ * {@linkplain Expression#level(Comparable)}. An expression is made part of (contributing to) the objective
+ * function by setting a contribution weight. Use {@linkplain Expression#weight(Comparable)}. The contribution
  * weight can be set to anything except zero (0.0). Often you may just want to set it to one (1.0). Other
  * values can be used to balance multiple expressions contributing to the objective function.
  * </p>
@@ -128,7 +128,7 @@ public final class Expression extends ModelEntity<Expression> {
         ProgrammingError.throwIfNull(myModel, myLinear, myQuadratic);
     }
 
-    public Expression add(final IntIndex key, final Number value) {
+    public Expression add(final IntIndex key, final Comparable<?> value) {
 
         final BigDecimal tmpExisting = myLinear.get(key);
 
@@ -141,7 +141,7 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
-    public Expression add(final IntRowColumn key, final Number value) {
+    public Expression add(final IntRowColumn key, final Comparable<?> value) {
 
         final BigDecimal tmpExisting = myQuadratic.get(key);
 
@@ -295,7 +295,7 @@ public final class Expression extends ModelEntity<Expression> {
 
     public MatrixStore<Double> getAdjustedGradient(final Access1D<?> point) {
 
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(myModel.countVariables(), 1);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.makeZero(myModel.countVariables(), 1);
 
         final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         double tmpAdjustedFactor;
@@ -320,7 +320,7 @@ public final class Expression extends ModelEntity<Expression> {
     public MatrixStore<Double> getAdjustedHessian() {
 
         final int tmpCountVariables = myModel.countVariables();
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpCountVariables, tmpCountVariables);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.makeZero(tmpCountVariables, tmpCountVariables);
 
         final BinaryFunction<Double> tmpBaseFunc = PrimitiveMath.ADD;
         UnaryFunction<Double> tmpModFunc;
@@ -425,19 +425,19 @@ public final class Expression extends ModelEntity<Expression> {
         return (myQuadratic.size() == 0) && (myLinear.size() > 0) && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isInteger());
     }
 
-    public Expression set(final int row, final int column, final Number value) {
+    public Expression set(final int row, final int column, final Comparable<?> value) {
         return this.set(new IntRowColumn(row, column), value);
     }
 
-    public Expression set(final int index, final Number value) {
+    public Expression set(final int index, final Comparable<?> value) {
         return this.set(myModel.getVariable(index), value);
     }
 
-    public Expression set(final IntIndex row, final IntIndex column, final Number value) {
+    public Expression set(final IntIndex row, final IntIndex column, final Comparable<?> value) {
         return this.set(new IntRowColumn(row, column), value);
     }
 
-    public Expression set(final IntIndex key, final Number value) {
+    public Expression set(final IntIndex key, final Comparable<?> value) {
 
         if (key != null) {
 
@@ -458,7 +458,7 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
-    public Expression set(final IntRowColumn key, final Number value) {
+    public Expression set(final IntRowColumn key, final Comparable<?> value) {
 
         if (key != null) {
 
@@ -480,11 +480,11 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
-    public Expression set(final Variable variable, final Number value) {
+    public Expression set(final Variable variable, final Comparable<?> value) {
         return this.set(variable.getIndex(), value);
     }
 
-    public Expression set(final Variable variable1, final Variable variable2, final Number value) {
+    public Expression set(final Variable variable1, final Variable variable2, final Comparable<?> value) {
         return this.set(variable1.getIndex().index, variable2.getIndex().index, value);
     }
 

@@ -27,9 +27,10 @@ import java.util.SortedMap;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
-public final class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N, N, NumberSeries<N>> {
+public final class NumberSeries<N extends Comparable<N>> extends TreeSeries<N, N, NumberSeries<N>> {
 
     public NumberSeries() {
         super();
@@ -73,7 +74,7 @@ public final class NumberSeries<N extends Number & Comparable<N>> extends TreeSe
         final Double tmpValue = Double.valueOf(value);
         final N tmpOldValue = super.put(key, (N) tmpValue);
         if (tmpOldValue != null) {
-            return tmpOldValue.doubleValue();
+            return Scalar.doubleValue(tmpOldValue);
         } else {
             return Double.NaN;
         }

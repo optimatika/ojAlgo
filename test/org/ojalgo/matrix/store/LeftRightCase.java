@@ -37,9 +37,9 @@ public class LeftRightCase extends NonPhysicalTest {
         MatrixStore<ComplexNumber> left = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
         MatrixStore<ComplexNumber> right = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        rationalStore = new LeftRightStore<>(GenericDenseStore.RATIONAL.copy(left), GenericDenseStore.RATIONAL.copy(right));
-        complexStore = new LeftRightStore<>(GenericDenseStore.COMPLEX.copy(left), GenericDenseStore.COMPLEX.copy(right));
-        primitiveStore = new LeftRightStore<>(PrimitiveDenseStore.FACTORY.copy(left), PrimitiveDenseStore.FACTORY.copy(right));
+        rationalStore = new LeftRightStore<>(GenericStore.RATIONAL.copy(left), GenericStore.RATIONAL.copy(right));
+        complexStore = new LeftRightStore<>(GenericStore.COMPLEX.copy(left), GenericStore.COMPLEX.copy(right));
+        primitiveStore = new LeftRightStore<>(Primitive64Store.FACTORY.copy(left), Primitive64Store.FACTORY.copy(right));
 
         numberOfRows = tmpRowDim;
         numberOfColumns = tmpColDim + tmpColDim;

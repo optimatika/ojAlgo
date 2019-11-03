@@ -27,9 +27,9 @@ import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.AccessAnyD;
 
-public interface Tensor<N extends Number> extends AccessAnyD<N>, NormedVectorSpace<Tensor<N>, N> {
+public interface Tensor<N extends Comparable<N>> extends AccessAnyD<N>, NormedVectorSpace<Tensor<N>, N> {
 
-    static <N extends Number & Scalar<N>> Tensor<N> make(final DenseArray.Factory<N> arrayFactory, final int rank, final int dimensions) {
+    static <N extends Scalar<N>> Tensor<N> make(final DenseArray.Factory<N> arrayFactory, final int rank, final int dimensions) {
         return new AnyTensor<>(rank, dimensions, arrayFactory);
     }
 

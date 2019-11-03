@@ -32,30 +32,37 @@ public final class Money extends ExactDecimal<Money> {
 
     public static final Scalar.Factory<Money> FACTORY = new ExactDecimal.Factory<Money>() {
 
+        @Override
         public Money cast(final double value) {
             return Money.valueOf(value);
         }
 
-        public Money cast(final Number number) {
+        @Override
+        public Money cast(final Comparable<?> number) {
             return Money.valueOf(number);
         }
 
+        @Override
         public Money convert(final double value) {
             return Money.valueOf(value);
         }
 
-        public Money convert(final Number number) {
+        @Override
+        public Money convert(final Comparable<?> number) {
             return Money.valueOf(number);
         }
 
+        @Override
         public Descriptor descriptor() {
             return DESCRIPTOR;
         }
 
+        @Override
         public Money one() {
             return ONE;
         }
 
+        @Override
         public Money zero() {
             return ZERO;
         }
@@ -90,7 +97,7 @@ public final class Money extends ExactDecimal<Money> {
         return new Money(Math.round(value * DOUBLE_DENOMINATOR));
     }
 
-    public static Money valueOf(final Number number) {
+    public static Money valueOf(final Comparable<?> number) {
 
         if (number != null) {
 
@@ -100,7 +107,7 @@ public final class Money extends ExactDecimal<Money> {
 
             } else {
 
-                return Money.valueOf(number.doubleValue());
+                return Money.valueOf(Scalar.doubleValue(number));
             }
 
         } else {

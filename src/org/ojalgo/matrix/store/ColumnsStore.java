@@ -29,7 +29,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-final class ColumnsStore<N extends Number> extends SelectingStore<N> {
+final class ColumnsStore<N extends Comparable<N>> extends SelectingStore<N> {
 
     private final int[] myColumns;
 

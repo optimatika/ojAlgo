@@ -25,7 +25,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
-final class SingleStore<N extends Number> extends FactoryStore<N> {
+final class SingleStore<N extends Comparable<N>> extends FactoryStore<N> {
 
     private final N myNumber;
     private final double myValue;
@@ -37,12 +37,13 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    SingleStore(final PhysicalStore.Factory<N, ?> factory, final Number element) {
+    SingleStore(final PhysicalStore.Factory<N, ?> factory, final Comparable<N> element) {
 
         super(factory, 1, 1);
 
-        myNumber = factory.scalar().cast(element);
-        myValue = myNumber.doubleValue();
+        Scalar<N> converted = factory.scalar().convert(element);
+        myNumber = converted.get();
+        myValue = converted.doubleValue();
     }
 
     @Override

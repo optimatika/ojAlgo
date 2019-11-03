@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-final class LimitStore<N extends Number> extends SelectingStore<N> {
+final class LimitStore<N extends Comparable<N>> extends SelectingStore<N> {
 
     LimitStore(final int rowsCount, final int columnsCount, final MatrixStore<N> base) {
         super(base, rowsCount, columnsCount);

@@ -23,7 +23,7 @@ package org.ojalgo.matrix.store;
 
 import org.ojalgo.scalar.Scalar;
 
-abstract class FactoryStore<N extends Number> extends AbstractStore<N> {
+abstract class FactoryStore<N extends Comparable<N>> extends AbstractStore<N> {
 
     private final PhysicalStore.Factory<N, ?> myFactory;
     private final Scalar<N> myOne;

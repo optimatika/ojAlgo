@@ -38,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Access1D<N extends Number> extends Structure1D {
+public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
     /**
      * This interface complements {@linkplain Visitable} but does not extend it. It's a feature to be able to
@@ -46,7 +46,7 @@ public interface Access1D<N extends Number> extends Structure1D {
      *
      * @author apete
      */
-    public interface Aggregatable<N extends Number> extends Structure1D {
+    public interface Aggregatable<N extends Comparable<N>> extends Structure1D {
 
         default N aggregateAll(final Aggregator aggregator) {
             return this.aggregateRange(0L, this.count(), aggregator);
@@ -56,7 +56,7 @@ public interface Access1D<N extends Number> extends Structure1D {
 
     }
 
-    public interface Collectable<N extends Number, R extends Mutate1D.Receiver<N>> extends Structure1D {
+    public interface Collectable<N extends Comparable<N>, R extends Mutate1D.Receiver<N>> extends Structure1D {
 
         default <I extends R> I collect(final Factory1D<I> factory) {
 
@@ -106,7 +106,7 @@ public interface Access1D<N extends Number> extends Structure1D {
 
     }
 
-    public static final class ElementView<N extends Number> implements ElementView1D<N, ElementView<N>> {
+    public static final class ElementView<N extends Comparable<N>> implements ElementView1D<N, ElementView<N>> {
 
         private long myCursor;
         private final long myLastCursor;
@@ -208,13 +208,13 @@ public interface Access1D<N extends Number> extends Structure1D {
 
     }
 
-    public interface Sliceable<N extends Number> extends Structure1D {
+    public interface Sliceable<N extends Comparable<N>> extends Structure1D {
 
         Access1D<N> sliceRange(long first, long limit);
 
     }
 
-    public interface Visitable<N extends Number> extends Structure1D {
+    public interface Visitable<N extends Comparable<N>> extends Structure1D {
 
         default void visitAll(final VoidFunction<N> visitor) {
             this.visitRange(0L, this.count(), visitor);
@@ -330,7 +330,7 @@ public interface Access1D<N extends Number> extends Structure1D {
         };
     }
 
-    static <N extends Number> Access1D<N> wrap(final List<? extends N> target) {
+    static <N extends Comparable<N>> Access1D<N> wrap(final List<? extends N> target) {
         return new Access1D<N>() {
 
             public long count() {
@@ -338,7 +338,7 @@ public interface Access1D<N extends Number> extends Structure1D {
             }
 
             public double doubleValue(final long index) {
-                return target.get((int) index).doubleValue();
+                return Scalar.doubleValue(target.get((int) index));
             }
 
             public N get(final long index) {
@@ -353,7 +353,7 @@ public interface Access1D<N extends Number> extends Structure1D {
         };
     }
 
-    static <N extends Number> Access1D<N> wrap(final N[] target) {
+    static <N extends Comparable<N>> Access1D<N> wrap(final N[] target) {
         return new Access1D<N>() {
 
             public long count() {
@@ -361,7 +361,7 @@ public interface Access1D<N extends Number> extends Structure1D {
             }
 
             public double doubleValue(final long index) {
-                return target[(int) index].doubleValue();
+                return Scalar.doubleValue(target[(int) index]);
             }
 
             public N get(final long index) {
@@ -377,9 +377,10 @@ public interface Access1D<N extends Number> extends Structure1D {
     }
 
     /**
-     * Transforms this {@link Access1D} to a {@link Access1D.Collectable} of a different {@link Number} type.
+     * Transforms this {@link Access1D} to a {@link Access1D.Collectable} of a different {@link Comparable}
+     * type.
      */
-    default <NN extends Number, R extends Mutate1D.Receiver<NN>> Collectable<NN, R> asCollectable1D() {
+    default <NN extends Comparable<NN>, R extends Mutate1D.Receiver<NN>> Collectable<NN, R> asCollectable1D() {
         return new Collectable<NN, R>() {
 
             public long count() {

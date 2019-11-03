@@ -32,9 +32,9 @@ public class IdentityCase extends NonPhysicalTest {
 
         int dim = Uniform.randomInteger(1, 9);
 
-        rationalStore = new IdentityStore<>(GenericDenseStore.RATIONAL, dim);
-        complexStore = new IdentityStore<>(GenericDenseStore.COMPLEX, dim);
-        primitiveStore = new IdentityStore<>(PrimitiveDenseStore.FACTORY, dim);
+        rationalStore = new IdentityStore<>(GenericStore.RATIONAL, dim);
+        complexStore = new IdentityStore<>(GenericStore.COMPLEX, dim);
+        primitiveStore = new IdentityStore<>(Primitive64Store.FACTORY, dim);
 
         numberOfRows = dim;
         numberOfColumns = dim;

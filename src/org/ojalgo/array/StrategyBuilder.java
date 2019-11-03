@@ -2,7 +2,7 @@ package org.ojalgo.array;
 
 import org.ojalgo.structure.Access1D;
 
-abstract class StrategyBuilder<N extends Number, I extends Access1D<N>, SB extends StrategyBuilder<N, I, SB>> {
+abstract class StrategyBuilder<N extends Comparable<N>, I extends Access1D<N>, SB extends StrategyBuilder<N, I, SB>> {
 
     private final DenseCapacityStrategy<N> myStrategy;
 

@@ -27,6 +27,7 @@ import java.util.Comparator;
 import org.ojalgo.array.operation.AMAX;
 import org.ojalgo.array.operation.AXPY;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 
 /**
@@ -34,7 +35,7 @@ import org.ojalgo.structure.Mutate1D;
  *
  * @author apete
  */
-public abstract class ScalarArray<N extends Number & Scalar<N>> extends ReferenceTypeArray<N> {
+public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArray<N> {
 
     protected ScalarArray(final DenseArray.Factory<N> factory, final int length) {
         super(factory, length);
@@ -44,6 +45,7 @@ public abstract class ScalarArray<N extends Number & Scalar<N>> extends Referenc
         super(factory, data);
     }
 
+    @Override
     public final void axpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
     }
@@ -64,7 +66,12 @@ public abstract class ScalarArray<N extends Number & Scalar<N>> extends Referenc
     }
 
     @Override
-    protected final void add(final int index, final Number addend) {
+    protected final void add(final int index, final float addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)).get());
+    }
+
+    @Override
+    protected final void add(final int index, final Comparable<?> addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)).get());
     }
 
@@ -81,6 +88,16 @@ public abstract class ScalarArray<N extends Number & Scalar<N>> extends Referenc
     @Override
     protected final boolean isSmall(final int index, final double comparedTo) {
         return data[index].isSmall(comparedTo);
+    }
+
+    @Override
+    protected final double doubleValue(final int index) {
+        return data[index].doubleValue();
+    }
+
+    @Override
+    protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
+        data[index] = this.valueOf(values.get(valueIndex));
     }
 
 }

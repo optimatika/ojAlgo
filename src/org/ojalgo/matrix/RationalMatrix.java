@@ -28,7 +28,7 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.SparseStore;
@@ -60,7 +60,7 @@ public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMa
             extends MatrixFactory<RationalNumber, RationalMatrix, RationalMatrix.LogicalBuilder, RationalMatrix.DenseReceiver, RationalMatrix.SparseReceiver> {
 
         Factory() {
-            super(RationalMatrix.class, GenericDenseStore.RATIONAL);
+            super(RationalMatrix.class, GenericStore.RATIONAL);
         }
 
         @Override

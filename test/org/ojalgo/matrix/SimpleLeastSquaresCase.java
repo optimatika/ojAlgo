@@ -65,38 +65,46 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = new NumberContext(4, 4); // TODO Something must be wrong here!
+        // ACCURACY = new NumberContext(4, 4); // TODO Something must be wrong here!
 
-        rationalAA = SimpleLeastSquaresCase.getFactorR();
-        rationalAX = SimpleLeastSquaresCase.getSolution();
-        rationalAB = SimpleLeastSquaresCase.getTransformedRHS();
+        rAA = SimpleLeastSquaresCase.getFactorR();
+        rAX = SimpleLeastSquaresCase.getSolution();
+        rAB = SimpleLeastSquaresCase.getTransformedRHS();
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
     public void testData() {
 
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
+
+        NumberContext accuracy = new NumberContext(4, 4); // TODO Something must be wrong here!
+
         expMtrx = SimpleLeastSquaresCase.getTransformedRHS();
         actMtrx = SimpleLeastSquaresCase.getFactorR().multiply(SimpleLeastSquaresCase.getSolution());
 
-        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
+        TestUtils.assertEquals(expMtrx, actMtrx, accuracy);
     }
 
     @Test
     public void testProblem() {
+
+        BasicMatrix<?, ?> actMtrx;
+        BasicMatrix<?, ?> expMtrx;
 
         // Solve
 
         expMtrx = SimpleLeastSquaresCase.getSolution();
         actMtrx = SimpleLeastSquaresCase.getBody().solve(SimpleLeastSquaresCase.getRHS());
 
-        TestUtils.assertEquals(expMtrx, actMtrx, evaluation);
+        TestUtils.assertEquals(expMtrx, actMtrx, ACCURACY);
     }
 
 }

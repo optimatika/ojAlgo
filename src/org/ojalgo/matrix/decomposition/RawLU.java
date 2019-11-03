@@ -185,7 +185,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         if (this.isSolvable()) {
 
-            MatrixStore.PRIMITIVE.makeWrapper(rhs).row(myPivot.getOrder()).supplyTo(preallocated);
+            MatrixStore.PRIMITIVE64.makeWrapper(rhs).row(myPivot.getOrder()).supplyTo(preallocated);
 
             return this.doSolve(preallocated);
 

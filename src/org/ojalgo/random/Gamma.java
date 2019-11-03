@@ -32,8 +32,6 @@ import org.ojalgo.scalar.PrimitiveScalar;
  */
 public class Gamma extends RandomNumber {
 
-    private static final long serialVersionUID = 6544837857838057678L;
-
     private final double myShape;
     private final double myRate;
 

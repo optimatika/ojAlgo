@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-final class OffsetStore<N extends Number> extends SelectingStore<N> {
+final class OffsetStore<N extends Comparable<N>> extends SelectingStore<N> {
 
     private final int myRowOffset, myColumnOffset; // origin/offset
 

@@ -77,6 +77,42 @@ public final class SubstituteForwards implements ArrayOperation {
         }
     }
 
+    public static void invoke(final float[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,
+            final boolean conjugated, final boolean identity) {
+
+        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
+        float[] bodyRow = new float[diagDim];
+        float tmpVal;
+        int colBaseIndex;
+
+        for (int i = 0; i < diagDim; i++) {
+
+            for (int j = 0; j <= i; j++) {
+                bodyRow[j] = conjugated ? body.floatValue(j, i) : body.floatValue(i, j);
+            }
+
+            for (int s = first; s < limit; s++) {
+                colBaseIndex = s * structure;
+
+                tmpVal = 0F;
+                for (int j = identity ? s : 0; j < i; j++) {
+                    tmpVal += bodyRow[j] * data[j + colBaseIndex];
+                }
+                if (identity) {
+                    tmpVal = i == s ? 1F - tmpVal : -tmpVal;
+                } else {
+                    tmpVal = data[i + colBaseIndex] - tmpVal;
+                }
+
+                if (!unitDiagonal) {
+                    tmpVal /= bodyRow[i];
+                }
+
+                data[i + colBaseIndex] = tmpVal;
+            }
+        }
+    }
+
     /**
      * @see #invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
      */
@@ -118,7 +154,7 @@ public final class SubstituteForwards implements ArrayOperation {
     /**
      * @see #invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
      */
-    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Access2D<N> body,
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Access2D<N> body,
             final boolean unitDiagonal, final boolean conjugated, final boolean identity, final Scalar.Factory<N> scalar) {
 
         int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());

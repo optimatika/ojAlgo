@@ -31,7 +31,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
 
@@ -53,7 +53,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
     public void testStepByStepBackpropagationExample() {
 
         NumberContext precision = this.precision();
-        Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
+        Factory<Double, Primitive64Store> factory = Primitive64Store.FACTORY;
 
         ArtificialNeuralNetwork.Error errorMeassure = HALF_SQUARED_DIFFERENCE;
 
@@ -63,8 +63,8 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
 
         Data testCase = this.getTestCases().get(0);
 
-        PrimitiveDenseStore givenInput = testCase.input;
-        PrimitiveDenseStore targetOutput = testCase.target;
+        Primitive64Store givenInput = testCase.input;
+        Primitive64Store targetOutput = testCase.target;
         Access1D<Double> expectedOutput = testCase.expected;
         Access1D<Double> actualOutput = network.invoke(givenInput);
 

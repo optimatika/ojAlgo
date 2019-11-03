@@ -28,9 +28,9 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 
-public interface UnaryFunction<N extends Number> extends BasicFunction, UnaryOperator<N>, DoubleUnaryOperator {
+public interface UnaryFunction<N extends Comparable<N>> extends BasicFunction, UnaryOperator<N>, DoubleUnaryOperator {
 
-    static <N extends Number> boolean isZeroModified(final UnaryFunction<N> function) {
+    static <N extends Comparable<N>> boolean isZeroModified(final UnaryFunction<N> function) {
         return !PrimitiveScalar.isSmall(PrimitiveMath.ONE, function.invoke(PrimitiveMath.ZERO));
     }
 
@@ -39,6 +39,10 @@ public interface UnaryFunction<N extends Number> extends BasicFunction, UnaryOpe
         return new UnaryFunction<N>() {
 
             public double invoke(final double arg) {
+                return after.invoke(UnaryFunction.this.invoke(arg));
+            }
+
+            public float invoke(final float arg) {
                 return after.invoke(UnaryFunction.this.invoke(arg));
             }
 
@@ -69,10 +73,16 @@ public interface UnaryFunction<N extends Number> extends BasicFunction, UnaryOpe
                 return UnaryFunction.this.invoke(before.invoke(arg));
             }
 
+            public float invoke(float arg) {
+                return UnaryFunction.this.invoke(before.invoke(arg));
+            }
+
         };
     }
 
     double invoke(double arg);
+
+    float invoke(float arg);
 
     N invoke(N arg);
 

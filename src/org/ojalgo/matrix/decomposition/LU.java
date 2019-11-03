@@ -52,9 +52,9 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface LU<N extends Number> extends LDU<N>, MatrixDecomposition.Pivoting<N> {
+public interface LU<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition.Pivoting<N> {
 
-    interface Factory<N extends Number> extends MatrixDecomposition.Factory<LU<N>> {
+    interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<LU<N>> {
 
     }
 
@@ -73,7 +73,7 @@ public interface LU<N extends Number> extends LDU<N>, MatrixDecomposition.Pivoti
 
     Factory<RationalNumber> RATIONAL = typical -> new LUDecomposition.Rational();
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
+    static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
 
         final MatrixStore<N> tmpL = decomposition.getL();
         final MatrixStore<N> tmpU = decomposition.getU();
@@ -88,7 +88,7 @@ public interface LU<N extends Number> extends LDU<N>, MatrixDecomposition.Pivoti
      */
     @Deprecated
     @SuppressWarnings("unchecked")
-    static <N extends Number> LU<N> make(final Access2D<N> typical) {
+    static <N extends Comparable<N>> LU<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -109,7 +109,7 @@ public interface LU<N extends Number> extends LDU<N>, MatrixDecomposition.Pivoti
      * @deprecated v48 Use {@link #reconstruct()} instead
      */
     @Deprecated
-    static <N extends Number> MatrixStore<N> reconstruct(final LU<N> decomposition) {
+    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final LU<N> decomposition) {
         return decomposition.reconstruct();
     }
 

@@ -38,8 +38,6 @@ import org.ojalgo.function.special.MissingMath;
  */
 public class Poisson extends AbstractDiscrete {
 
-    private static final long serialVersionUID = -5382163736545207782L;
-
     public static Poisson of(final double lambda) {
         return new Poisson(lambda);
     }

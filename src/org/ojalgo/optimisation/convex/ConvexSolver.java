@@ -33,14 +33,14 @@ import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.optimisation.Expression;
@@ -187,17 +187,17 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
             final StringBuilder retVal = new StringBuilder("<" + simpleName + ">");
 
-            retVal.append("\n[AE] = " + (this.getAE() != null ? PrimitiveMatrix.FACTORY.copy(this.getAE()) : "?"));
+            retVal.append("\n[AE] = " + (this.getAE() != null ? Primitive64Matrix.FACTORY.copy(this.getAE()) : "?"));
 
-            retVal.append("\n[BE] = " + (this.getBE() != null ? PrimitiveMatrix.FACTORY.copy(this.getBE()) : "?"));
+            retVal.append("\n[BE] = " + (this.getBE() != null ? Primitive64Matrix.FACTORY.copy(this.getBE()) : "?"));
 
-            retVal.append("\n[Q] = " + (myObjective != null ? PrimitiveMatrix.FACTORY.copy(this.getQ()) : "?"));
+            retVal.append("\n[Q] = " + (myObjective != null ? Primitive64Matrix.FACTORY.copy(this.getQ()) : "?"));
 
-            retVal.append("\n[C] = " + (myObjective != null ? PrimitiveMatrix.FACTORY.copy(this.getC()) : "?"));
+            retVal.append("\n[C] = " + (myObjective != null ? Primitive64Matrix.FACTORY.copy(this.getC()) : "?"));
 
-            retVal.append("\n[AI] = " + (this.getAI() != null ? PrimitiveMatrix.FACTORY.copy(this.getAI()) : "?"));
+            retVal.append("\n[AI] = " + (this.getAI() != null ? Primitive64Matrix.FACTORY.copy(this.getAI()) : "?"));
 
-            retVal.append("\n[BI] = " + (this.getBI() != null ? PrimitiveMatrix.FACTORY.copy(this.getBI()) : "?"));
+            retVal.append("\n[BI] = " + (this.getBI() != null ? Primitive64Matrix.FACTORY.copy(this.getBI()) : "?"));
 
             retVal.append("\n</" + simpleName + ">");
 
@@ -214,7 +214,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             PhysicalStore<Double> tmpC = null;
 
             if (mtrxQ == null) {
-                tmpQ = PrimitiveDenseStore.FACTORY.make(mtrxC.count(), mtrxC.count());
+                tmpQ = Primitive64Store.FACTORY.make(mtrxC.count(), mtrxC.count());
             } else if (mtrxQ instanceof PhysicalStore) {
                 tmpQ = (PhysicalStore<Double>) mtrxQ;
             } else {
@@ -222,7 +222,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             }
 
             if (mtrxC == null) {
-                tmpC = PrimitiveDenseStore.FACTORY.make(mtrxQ.countRows(), 1L);
+                tmpC = Primitive64Store.FACTORY.make(mtrxQ.countRows(), 1L);
             } else if (mtrxC instanceof PhysicalStore) {
                 tmpC = (PhysicalStore<Double>) mtrxC;
             } else {
@@ -296,8 +296,8 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         if (numbEqExpr > 0) {
 
-            final SparseStore<Double> mtrxAE = SparseStore.PRIMITIVE.make(numbEqExpr, numbVars);
-            final PhysicalStore<Double> mtrxBE = PrimitiveDenseStore.FACTORY.make(numbEqExpr, 1);
+            final SparseStore<Double> mtrxAE = SparseStore.PRIMITIVE64.make(numbEqExpr, numbVars);
+            final PhysicalStore<Double> mtrxBE = Primitive64Store.FACTORY.make(numbEqExpr, 1);
 
             for (int i = 0; i < numbEqExpr; i++) {
 
@@ -321,7 +321,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         PhysicalStore<Double> mtrxQ = null;
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
-            mtrxQ = PrimitiveDenseStore.FACTORY.make(numbVars, numbVars);
+            mtrxQ = Primitive64Store.FACTORY.make(numbVars, numbVars);
 
             final BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? SUBTRACT : ADD;
             UnaryFunction<Double> tmpModifier;
@@ -338,7 +338,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         PhysicalStore<Double> mtrxC = null;
         if (tmpObjExpr.isAnyLinearFactorNonZero()) {
-            mtrxC = PrimitiveDenseStore.FACTORY.make(numbVars, 1);
+            mtrxC = Primitive64Store.FACTORY.make(numbVars, 1);
             if (sourceModel.isMinimisation()) {
                 for (final IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
                     final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
@@ -376,8 +376,8 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         if ((numbUpExpr + numbUpVar + numbLoExpr + numbLoVar) > 0) {
 
-            final RowsSupplier<Double> mtrxAI = PrimitiveDenseStore.FACTORY.makeRowsSupplier(numbVars);
-            final PhysicalStore<Double> mtrxBI = PrimitiveDenseStore.FACTORY.make(numbUpExpr + numbUpVar + numbLoExpr + numbLoVar, 1);
+            final RowsSupplier<Double> mtrxAI = Primitive64Store.FACTORY.makeRowsSupplier(numbVars);
+            final PhysicalStore<Double> mtrxBI = Primitive64Store.FACTORY.make(numbUpExpr + numbUpVar + numbLoExpr + numbLoVar, 1);
 
             if (numbUpExpr > 0) {
                 for (int i = 0; i < numbUpExpr; i++) {
@@ -438,7 +438,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
     }
 
     private final ConvexSolver.Builder myMatrices;
-    private final PrimitiveDenseStore mySolutionX;
+    private final Primitive64Store mySolutionX;
     private final MatrixDecomposition.Solver<Double> mySolverGeneral;
     private final Cholesky<Double> mySolverQ;
 
@@ -453,7 +453,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         myMatrices = matrices;
 
-        mySolutionX = PrimitiveDenseStore.FACTORY.make(this.countVariables(), 1L);
+        mySolutionX = Primitive64Store.FACTORY.make(this.countVariables(), 1L);
 
         mySolverQ = Cholesky.PRIMITIVE.make(this.getMatrixQ());
         mySolverGeneral = LU.PRIMITIVE.make(this.getMatrixQ());

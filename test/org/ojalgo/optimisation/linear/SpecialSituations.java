@@ -23,7 +23,7 @@ package org.ojalgo.optimisation.linear;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.linear.LinearSolver.Builder;
@@ -44,11 +44,11 @@ public class SpecialSituations extends OptimisationLinearTests {
     @Test
     public void testDegeneracy() {
 
-        PrimitiveDenseStore c = PrimitiveDenseStore.FACTORY.columns(new double[] { -2, -1, 0, 0, 0 });
-        PrimitiveDenseStore A = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4, 3, 1, 0, 0 }, { 4, 1, 0, 1, 0 }, { 4, 2, 0, 0, 1 } });
-        PrimitiveDenseStore b = PrimitiveDenseStore.FACTORY.columns(new double[] { 12, 8, 8 });
+        Primitive64Store c = Primitive64Store.FACTORY.columns(new double[] { -2, -1, 0, 0, 0 });
+        Primitive64Store A = Primitive64Store.FACTORY.rows(new double[][] { { 4, 3, 1, 0, 0 }, { 4, 1, 0, 1, 0 }, { 4, 2, 0, 0, 1 } });
+        Primitive64Store b = Primitive64Store.FACTORY.columns(new double[] { 12, 8, 8 });
 
-        PrimitiveDenseStore x = PrimitiveDenseStore.FACTORY.columns(new double[] { 2, 0, 4, 0, 0 });
+        Primitive64Store x = Primitive64Store.FACTORY.columns(new double[] { 2, 0, 4, 0, 0 });
 
         final Builder builder = LinearSolver.getBuilder(c).equalities(A, b);
         LinearSolver lp = builder.build();
@@ -112,11 +112,11 @@ public class SpecialSituations extends OptimisationLinearTests {
     @Test
     public void testMultipleOptimalSolutions() {
 
-        PrimitiveDenseStore c = PrimitiveDenseStore.FACTORY.columns(new double[] { -4, -14, 0, 0 });
-        PrimitiveDenseStore A = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2, 7, 1, 0 }, { 7, 2, 0, 1 } });
-        PrimitiveDenseStore b = PrimitiveDenseStore.FACTORY.columns(new double[] { 21, 21 });
+        Primitive64Store c = Primitive64Store.FACTORY.columns(new double[] { -4, -14, 0, 0 });
+        Primitive64Store A = Primitive64Store.FACTORY.rows(new double[][] { { 2, 7, 1, 0 }, { 7, 2, 0, 1 } });
+        Primitive64Store b = Primitive64Store.FACTORY.columns(new double[] { 21, 21 });
 
-        PrimitiveDenseStore x = PrimitiveDenseStore.FACTORY.columns(new double[] { 7.0 / 3.0, 7.0 / 3.0, 0, 0 });
+        Primitive64Store x = Primitive64Store.FACTORY.columns(new double[] { 7.0 / 3.0, 7.0 / 3.0, 0, 0 });
 
         final Builder builder = LinearSolver.getBuilder(c).equalities(A, b);
         LinearSolver lp = builder.build();
@@ -152,11 +152,11 @@ public class SpecialSituations extends OptimisationLinearTests {
     @Test
     public void testUnboundedness() {
 
-        PrimitiveDenseStore c = PrimitiveDenseStore.FACTORY.columns(new double[] { -2, -1, 0, 0 });
-        PrimitiveDenseStore A = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, -1, 1, 0 }, { 2, -1, 0, 1 } });
-        PrimitiveDenseStore b = PrimitiveDenseStore.FACTORY.columns(new double[] { 10, 40 });
+        Primitive64Store c = Primitive64Store.FACTORY.columns(new double[] { -2, -1, 0, 0 });
+        Primitive64Store A = Primitive64Store.FACTORY.rows(new double[][] { { 1, -1, 1, 0 }, { 2, -1, 0, 1 } });
+        Primitive64Store b = Primitive64Store.FACTORY.columns(new double[] { 10, 40 });
 
-        PrimitiveDenseStore x = PrimitiveDenseStore.FACTORY.columns(new double[] { 30, 20, 0, 0 });
+        Primitive64Store x = Primitive64Store.FACTORY.columns(new double[] { 30, 20, 0, 0 });
 
         final Builder builder = LinearSolver.getBuilder(c).equalities(A, b);
         LinearSolver lp = builder.build();

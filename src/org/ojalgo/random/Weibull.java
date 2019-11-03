@@ -33,8 +33,6 @@ import org.ojalgo.function.special.GammaFunction;
  */
 public class Weibull extends RandomNumber {
 
-    private static final long serialVersionUID = 7315696913427382955L;
-
     private final double myShape; // beta
     private final double myRate; // lamda
 

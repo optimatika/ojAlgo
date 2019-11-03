@@ -36,12 +36,20 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
             return this.invoke(ComplexNumber.valueOf(arg1), ComplexNumber.valueOf(arg2)).doubleValue();
         }
 
+        default float invoke(final float arg1, final float arg2) {
+            return this.invoke(ComplexNumber.valueOf(arg1), ComplexNumber.valueOf(arg2)).floatValue();
+        }
+
     }
 
     @FunctionalInterface
     public interface Consumer extends VoidFunction<ComplexNumber> {
 
         default void invoke(final double arg) {
+            this.invoke(ComplexNumber.valueOf(arg));
+        }
+
+        default void invoke(final float arg) {
             this.invoke(ComplexNumber.valueOf(arg));
         }
 
@@ -54,12 +62,20 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
             return this.invoke(ComplexNumber.valueOf(arg), param).doubleValue();
         }
 
+        default float invoke(final float arg, final int param) {
+            return this.invoke(ComplexNumber.valueOf(arg), param).floatValue();
+        }
+
     }
 
     @FunctionalInterface
     public interface Predicate extends PredicateFunction<ComplexNumber> {
 
         default boolean invoke(final double arg) {
+            return this.invoke(ComplexNumber.valueOf(arg));
+        }
+
+        default boolean invoke(final float arg) {
             return this.invoke(ComplexNumber.valueOf(arg));
         }
 
@@ -70,6 +86,10 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         default double invoke(final double arg) {
             return this.invoke(ComplexNumber.valueOf(arg)).doubleValue();
+        }
+
+        default float invoke(final float arg) {
+            return this.invoke(ComplexNumber.valueOf(arg)).floatValue();
         }
 
     }

@@ -33,8 +33,6 @@ import org.ojalgo.function.special.CombinatorialFunctions;
  */
 public class Binomial extends AbstractDiscrete {
 
-    private static final long serialVersionUID = -3146302867013736326L;
-
     public static Binomial of(final int count, final double probability) {
         return new Binomial(count, probability);
     }

@@ -24,10 +24,10 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.DiagonalStore;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
@@ -36,7 +36,7 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 
-abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
+abstract class BidiagonalDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
 
     static final class Complex extends BidiagonalDecomposition<ComplexNumber> {
 
@@ -45,7 +45,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         }
 
         Complex(final boolean fullSize) {
-            super(GenericDenseStore.COMPLEX, fullSize);
+            super(GenericStore.COMPLEX, fullSize);
         }
 
         @Override
@@ -133,7 +133,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         }
 
         Primitive(final boolean fullSize) {
-            super(PrimitiveDenseStore.FACTORY, fullSize);
+            super(Primitive64Store.FACTORY, fullSize);
         }
 
         @Override
@@ -150,7 +150,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         }
 
         Quat(final boolean fullSize) {
-            super(GenericDenseStore.QUATERNION, fullSize);
+            super(GenericStore.QUATERNION, fullSize);
         }
 
         @Override
@@ -168,7 +168,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         }
 
         Rational(final boolean fullSize) {
-            super(GenericDenseStore.RATIONAL, fullSize);
+            super(GenericStore.RATIONAL, fullSize);
         }
 
         @Override

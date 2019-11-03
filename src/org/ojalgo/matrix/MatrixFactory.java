@@ -47,8 +47,8 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B extends BasicMatrix.LogicalBuilder<N, M>, DR extends BasicMatrix.PhysicalReceiver<N, M>, SR extends BasicMatrix.PhysicalReceiver<N, M>>
-        implements Factory2D<M> {
+abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M>, B extends BasicMatrix.LogicalBuilder<N, M>, DR extends BasicMatrix.PhysicalReceiver<N, M>, SR extends BasicMatrix.PhysicalReceiver<N, M>>
+        implements Factory2D.MayBeSparse<M, DR, SR> {
 
     abstract class DenseReceiver extends Physical<PhysicalStore<N>> {
 
@@ -280,7 +280,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
          * @deprecated v48
          */
         @Deprecated
-        public B superimpose(final int row, final int col, final Number matrix) {
+        public B superimpose(final int row, final int col, final N matrix) {
             myDelegate.superimpose(row, col, matrix);
             return this.self();
         }
@@ -376,7 +376,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void add(final long row, final long col, final Number value) {
+        public void add(final long row, final long col, final Comparable<?> value) {
             if (mySafe) {
                 myDelegate.add(row, col, value);
             } else {
@@ -384,7 +384,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void add(final long index, final Number addend) {
+        public void add(final long index, final Comparable<?> addend) {
             if (mySafe) {
                 myDelegate.add(index, addend);
             } else {
@@ -420,7 +420,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillAll(final NullaryFunction<N> supplier) {
+        public void fillAll(final NullaryFunction<?> supplier) {
             if (mySafe) {
                 myDelegate.fillAll(supplier);
             } else {
@@ -428,7 +428,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillAll(final Number value) {
+        public void fillAll(final N value) {
             if (mySafe) {
                 myDelegate.fillAll(myDelegate.physical().scalar().cast(value));
             } else {
@@ -452,7 +452,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
             if (mySafe) {
                 myDelegate.fillColumn(row, col, supplier);
             } else {
@@ -460,7 +460,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillColumn(final long row, final long column, final Number value) {
+        public void fillColumn(final long row, final long column, final N value) {
             if (mySafe) {
                 myDelegate.fillColumn((int) row, (int) column, myDelegate.physical().scalar().cast(value));
             } else {
@@ -476,7 +476,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillColumn(final long col, final NullaryFunction<N> supplier) {
+        public void fillColumn(final long col, final NullaryFunction<?> supplier) {
             if (mySafe) {
                 myDelegate.fillColumn(col, supplier);
             } else {
@@ -500,7 +500,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
             if (mySafe) {
                 myDelegate.fillDiagonal(row, col, supplier);
             } else {
@@ -508,7 +508,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillDiagonal(final long row, final long column, final Number value) {
+        public void fillDiagonal(final long row, final long column, final N value) {
             if (mySafe) {
                 myDelegate.fillDiagonal((int) row, (int) column, myDelegate.physical().scalar().cast(value));
             } else {
@@ -524,7 +524,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillDiagonal(final NullaryFunction<N> supplier) {
+        public void fillDiagonal(final NullaryFunction<?> supplier) {
             if (mySafe) {
                 myDelegate.fillDiagonal(supplier);
             } else {
@@ -580,7 +580,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
             if (mySafe) {
                 myDelegate.fillOne(row, col, supplier);
             } else {
@@ -596,7 +596,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillOne(final long index, final NullaryFunction<N> supplier) {
+        public void fillOne(final long index, final NullaryFunction<?> supplier) {
             if (mySafe) {
                 myDelegate.fillOne(index, supplier);
             } else {
@@ -612,7 +612,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+        public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
             if (mySafe) {
                 myDelegate.fillRange(first, limit, supplier);
             } else {
@@ -636,7 +636,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
             if (mySafe) {
                 myDelegate.fillRow(row, col, supplier);
             } else {
@@ -644,7 +644,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillRow(final long row, final long column, final Number value) {
+        public void fillRow(final long row, final long column, final N value) {
             if (mySafe) {
                 myDelegate.fillRow((int) row, (int) column, myDelegate.physical().scalar().cast(value));
             } else {
@@ -660,7 +660,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void fillRow(final long row, final NullaryFunction<N> supplier) {
+        public void fillRow(final long row, final NullaryFunction<?> supplier) {
             if (mySafe) {
                 myDelegate.fillRow(row, supplier);
             } else {
@@ -834,7 +834,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void set(final long row, final long col, final Number value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             if (mySafe) {
                 myDelegate.set(row, col, value);
             } else {
@@ -842,7 +842,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
             }
         }
 
-        public void set(final long index, final Number value) {
+        public void set(final long index, final Comparable<?> value) {
             if (mySafe) {
                 myDelegate.set(index, myDelegate.physical().scalar().cast(value));
             } else {
@@ -894,11 +894,11 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
     }
 
     @SafeVarargs
-    public final M columns(final List<? extends Number>... source) {
+    public final M columns(final List<? extends Comparable<?>>... source) {
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 
-    public M columns(final Number[]... source) {
+    public M columns(final Comparable<?>[]... source) {
         return this.instantiate(myPhysicalFactory.columns(source));
     }
 
@@ -931,7 +931,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
         return this.makeDense(count, 1);
     }
 
-    public DR makeDense(final int rows, final int columns) {
+    public DR makeDense(final long rows, final long columns) {
         return this.physical(myPhysicalFactory.make(rows, columns));
     }
 
@@ -966,7 +966,7 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
         return this.instantiate(myPhysicalFactory.builder().makeSingle(element).get());
     }
 
-    public SR makeSparse(final int rows, final int columns) {
+    public SR makeSparse(final long rows, final long columns) {
         return this.physical(myPhysicalFactory.builder().makeSparse(rows, columns));
     }
 
@@ -991,11 +991,11 @@ abstract class MatrixFactory<N extends Number, M extends BasicMatrix<N, M>, B ex
     }
 
     @SuppressWarnings("unchecked")
-    public M rows(final List<? extends Number>... source) {
+    public M rows(final List<? extends Comparable<?>>... source) {
         return this.instantiate(myPhysicalFactory.rows(source));
     }
 
-    public M rows(final Number[]... source) {
+    public M rows(final Comparable<?>[]... source) {
         return this.instantiate(myPhysicalFactory.rows(source));
     }
 

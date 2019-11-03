@@ -30,7 +30,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-final class LowerHessenbergStore<N extends Number> extends ShadingStore<N> {
+final class LowerHessenbergStore<N extends Comparable<N>> extends ShadingStore<N> {
 
     LowerHessenbergStore(final MatrixStore<N> base) {
         super(base, base.countRows(), Math.min(base.countRows(), base.countColumns()));

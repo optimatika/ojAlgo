@@ -29,8 +29,6 @@ import java.util.AbstractList;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.array.operation.FillMatchingDual;
 import org.ojalgo.array.operation.ModifyAll;
@@ -40,14 +38,11 @@ import org.ojalgo.array.operation.SubstituteBackwards;
 import org.ojalgo.array.operation.SubstituteForwards;
 import org.ojalgo.array.operation.VisitAll;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
@@ -65,21 +60,9 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class RawStore extends Object implements PhysicalStore<Double> {
+public final class RawStore implements PhysicalStore<Double> {
 
-    public static final PhysicalStore.Factory<Double, RawStore> FACTORY = new PhysicalStore.Factory<Double, RawStore>() {
-
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
-        }
-
-        public DenseArray.Factory<Double> array() {
-            return Primitive64Array.FACTORY;
-        }
-
-        public MatrixStore.Factory<Double> builder() {
-            return MatrixStore.PRIMITIVE;
-        }
+    public static final PhysicalStore.Factory<Double, RawStore> FACTORY = new PrimitiveFactory<RawStore>() {
 
         public RawStore columns(final Access1D<?>... source) {
 
@@ -117,44 +100,40 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             return new RawStore(retVal);
         }
 
-        public RawStore columns(final List<? extends Number>... source) {
+        public RawStore columns(final List<? extends Comparable<?>>... source) {
 
             int tmpRowDim = source[0].size();
             int tmpColDim = source.length;
 
             double[][] retVal = new double[tmpRowDim][tmpColDim];
 
-            List<? extends Number> tmpColumn;
+            List<? extends Comparable<?>> tmpColumn;
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    retVal[i][j] = tmpColumn.get(i).doubleValue();
+                    retVal[i][j] = Scalar.doubleValue(tmpColumn.get(i));
                 }
             }
 
             return new RawStore(retVal);
         }
 
-        public RawStore columns(final Number[]... source) {
+        public RawStore columns(final Comparable<?>[]... source) {
 
             int tmpRowDim = source[0].length;
             int tmpColDim = source.length;
 
             double[][] retVal = new double[tmpRowDim][tmpColDim];
 
-            Number[] tmpColumn;
+            Comparable<?>[] tmpColumn;
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    retVal[i][j] = tmpColumn[i].doubleValue();
+                    retVal[i][j] = Scalar.doubleValue(tmpColumn[i]);
                 }
             }
 
             return new RawStore(retVal);
-        }
-
-        public RawStore conjugate(final Access2D<?> source) {
-            return this.transpose(source);
         }
 
         public RawStore copy(final Access2D<?> source) {
@@ -171,10 +150,6 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             return new RawStore(retVal, numbRows, numbCols);
         }
 
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
-
         public RawStore make(final long rows, final long columns) {
             return new RawStore(Math.toIntExact(rows), Math.toIntExact(columns));
         }
@@ -186,31 +161,6 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             retVal.fillDiagonal(0, 0, this.scalar().one().get());
 
             return retVal;
-        }
-
-        public RawStore makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
-
-            double[][] retVal = new double[Math.toIntExact(rows)][Math.toIntExact(columns)];
-
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < columns; j++) {
-                    retVal[i][j] = supplier.doubleValue();
-                }
-            }
-
-            return new RawStore(retVal);
-        }
-
-        public Householder<Double> makeHouseholder(final int length) {
-            return new Householder.Primitive(length);
-        }
-
-        public Rotation<Double> makeRotation(final int low, final int high, final double cos, final double sin) {
-            return new Rotation.Primitive(low, high, cos, sin);
-        }
-
-        public Rotation<Double> makeRotation(final int low, final int high, final Double cos, final Double sin) {
-            return new Rotation.Primitive(low, high, cos, sin);
         }
 
         public RawStore rows(final Access1D<?>... source) {
@@ -253,48 +203,44 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
             return new RawStore(retVal);
         }
 
-        public RawStore rows(final List<? extends Number>... source) {
+        public RawStore rows(final List<? extends Comparable<?>>... source) {
 
             int tmpRowDim = source.length;
             int tmpColDim = source[0].size();
 
             double[][] retVal = new double[tmpRowDim][tmpColDim];
 
-            List<? extends Number> tmpSource;
+            List<? extends Comparable<?>> tmpSource;
             double[] tmpDestination;
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpSource = source[i];
                 tmpDestination = retVal[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpDestination[j] = tmpSource.get(j).doubleValue();
+                    tmpDestination[j] = Scalar.doubleValue(tmpSource.get(j));
                 }
             }
 
             return new RawStore(retVal);
         }
 
-        public RawStore rows(final Number[]... source) {
+        public RawStore rows(final Comparable<?>[]... source) {
 
             int tmpRowDim = source.length;
             int tmpColDim = source[0].length;
 
             double[][] retVal = new double[tmpRowDim][tmpColDim];
 
-            Number[] tmpSource;
+            Comparable<?>[] tmpSource;
             double[] tmpDestination;
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpSource = source[i];
                 tmpDestination = retVal[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpDestination[j] = tmpSource[j].doubleValue();
+                    tmpDestination[j] = Scalar.doubleValue(tmpSource[j]);
                 }
             }
 
             return new RawStore(retVal);
-        }
-
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
         }
 
         public RawStore transpose(final Access2D<?> source) {
@@ -678,8 +624,8 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         data[Math.toIntExact(row)][Math.toIntExact(col)] += addend;
     }
 
-    public void add(final long row, final long col, final Number addend) {
-        data[Math.toIntExact(row)][Math.toIntExact(col)] += addend.doubleValue();
+    public void add(final long row, final long col, final Comparable<?> addend) {
+        data[Math.toIntExact(row)][Math.toIntExact(col)] += Scalar.doubleValue(addend);
     }
 
     public Double aggregateAll(final Aggregator aggregator) {
@@ -766,7 +712,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         FillMatchingDual.fillAll(data, value);
     }
 
-    public void fillAll(final NullaryFunction<Double> supplier) {
+    public void fillAll(final NullaryFunction<?> supplier) {
         FillMatchingDual.fillAll(data, supplier);
     }
 
@@ -787,7 +733,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         FillMatchingDual.fillColumn(data, Math.toIntExact(row), Math.toIntExact(col), value);
     }
 
-    public void fillColumn(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
         FillMatchingDual.fillColumn(data, Math.toIntExact(row), Math.toIntExact(col), supplier);
     }
 
@@ -795,7 +741,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         FillMatchingDual.fillDiagonal(data, Math.toIntExact(row), Math.toIntExact(col), value);
     }
 
-    public void fillDiagonal(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
         FillMatchingDual.fillDiagonal(data, Math.toIntExact(row), Math.toIntExact(col), supplier);
     }
 
@@ -885,7 +831,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         data[Math.toIntExact(row)][Math.toIntExact(col)] = value;
     }
 
-    public void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
         data[Math.toIntExact(row)][Math.toIntExact(col)] = supplier.doubleValue();
     }
 
@@ -893,7 +839,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         FillMatchingDual.fillRange(data, (int) first, (int) limit, value);
     }
 
-    public void fillRange(final long first, final long limit, final NullaryFunction<Double> supplier) {
+    public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
         FillMatchingDual.fillRange(data, (int) first, (int) limit, supplier);
     }
 
@@ -901,7 +847,7 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
         FillMatchingDual.fillRow(data, Math.toIntExact(row), Math.toIntExact(col), value);
     }
 
-    public void fillRow(final long row, final long col, final NullaryFunction<Double> supplier) {
+    public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
         FillMatchingDual.fillRow(data, Math.toIntExact(row), Math.toIntExact(col), supplier);
     }
 
@@ -1140,31 +1086,31 @@ public final class RawStore extends Object implements PhysicalStore<Double> {
     }
 
     public TransformableRegion<Double> regionByColumns(final int... columns) {
-        return new TransformableRegion.ColumnsRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), columns);
+        return new TransformableRegion.ColumnsRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns), columns);
     }
 
     public TransformableRegion<Double> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new TransformableRegion.LimitRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowLimit, columnLimit);
+        return new TransformableRegion.LimitRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns), rowLimit, columnLimit);
     }
 
     public TransformableRegion<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new TransformableRegion.OffsetRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowOffset, columnOffset);
+        return new TransformableRegion.OffsetRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns), rowOffset, columnOffset);
     }
 
     public TransformableRegion<Double> regionByRows(final int... rows) {
-        return new TransformableRegion.RowsRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rows);
+        return new TransformableRegion.RowsRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns), rows);
     }
 
     public TransformableRegion<Double> regionByTransposing() {
-        return new TransformableRegion.TransposedRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns));
+        return new TransformableRegion.TransposedRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns));
     }
 
     public void set(final long row, final long col, final double value) {
         data[Math.toIntExact(row)][Math.toIntExact(col)] = value;
     }
 
-    public void set(final long row, final long col, final Number value) {
-        data[Math.toIntExact(row)][Math.toIntExact(col)] = value.doubleValue();
+    public void set(final long row, final long col, final Comparable<?> value) {
+        data[Math.toIntExact(row)][Math.toIntExact(col)] = Scalar.doubleValue(value);
     }
 
     public Access1D<Double> sliceRow(final long row) {

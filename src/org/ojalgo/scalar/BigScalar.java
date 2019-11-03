@@ -34,30 +34,36 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * @deprecated v44 In the future there will only be primitives based implementations of the Scalar interface
  */
 @Deprecated
-public final class BigScalar extends Number implements Scalar<BigDecimal>, Enforceable<BigScalar> {
+public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScalar> {
 
     public static final Scalar.Factory<BigDecimal> FACTORY = new Scalar.Factory<BigDecimal>() {
 
+        @Override
+        public BigDecimal cast(final Comparable<?> number) {
+            return TypeUtils.toBigDecimal(number);
+        }
+
+        @Override
         public BigDecimal cast(final double value) {
             return new BigDecimal(value);
         }
 
-        public BigDecimal cast(final Number number) {
-            return TypeUtils.toBigDecimal(number);
+        @Override
+        public BigScalar convert(final Comparable<?> number) {
+            return BigScalar.valueOf(number);
         }
 
+        @Override
         public BigScalar convert(final double value) {
             return BigScalar.valueOf(value);
         }
 
-        public BigScalar convert(final Number number) {
-            return BigScalar.valueOf(number);
-        }
-
+        @Override
         public BigScalar one() {
             return ONE;
         }
 
+        @Override
         public BigScalar zero() {
             return ZERO;
         }
@@ -83,11 +89,7 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return new BigScalar(value);
     }
 
-    public static BigScalar valueOf(final double value) {
-        return new BigScalar(BigDecimal.valueOf(value));
-    }
-
-    public static BigScalar valueOf(final Number number) {
+    public static BigScalar valueOf(final Comparable<?> number) {
 
         if (number != null) {
 
@@ -106,6 +108,10 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         }
     }
 
+    public static BigScalar valueOf(final double value) {
+        return new BigScalar(BigDecimal.valueOf(value));
+    }
+
     private final BigDecimal myNumber;
 
     public BigScalar() {
@@ -122,28 +128,44 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         myNumber = number;
     }
 
+    @Override
     public BigScalar add(final BigDecimal arg) {
         return new BigScalar(myNumber.add(arg));
     }
 
+    @Override
     public BigScalar add(final double arg) {
         return this.add(new BigDecimal(arg));
     }
 
+    @Override
+    public BigScalar add(float scalarAddend) {
+        return this.add((double) scalarAddend);
+    }
+
+    @Override
     public int compareTo(final BigDecimal reference) {
         return myNumber.compareTo(reference);
     }
 
+    @Override
     public BigScalar conjugate() {
         return this;
     }
 
+    @Override
     public BigScalar divide(final BigDecimal arg) {
         return new BigScalar(myNumber.divide(arg, BigScalar.CONTEXT.getMathContext()));
     }
 
+    @Override
     public BigScalar divide(final double arg) {
         return this.divide(new BigDecimal(arg));
+    }
+
+    @Override
+    public BigScalar divide(float scalarDivisor) {
+        return this.divide((double) scalarDivisor);
     }
 
     @Override
@@ -151,27 +173,25 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return myNumber.doubleValue();
     }
 
+    @Override
     public BigScalar enforce(final NumberContext context) {
         return new BigScalar(context.enforce(myNumber));
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!(obj instanceof BigScalar)) {
             return false;
         }
-        if (!(obj instanceof Scalar<?>)) {
-            return false;
-        }
-        final BigDecimal other = ((Scalar<?>) obj).toBigDecimal();
+        BigScalar other = (BigScalar) obj;
         if (myNumber == null) {
-            if (other != null) {
+            if (other.myNumber != null) {
                 return false;
             }
-        } else if (!myNumber.equals(other)) {
+        } else if (!myNumber.equals(other.myNumber)) {
             return false;
         }
         return true;
@@ -182,6 +202,7 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return myNumber.floatValue();
     }
 
+    @Override
     public BigDecimal get() {
         return myNumber;
     }
@@ -199,14 +220,17 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return myNumber.intValueExact();
     }
 
+    @Override
     public BigScalar invert() {
         return ONE.divide(myNumber);
     }
 
+    @Override
     public boolean isAbsolute() {
         return BigScalar.isAbsolute(myNumber);
     }
 
+    @Override
     public boolean isSmall(final double comparedTo) {
         return BigScalar.CONTEXT.isSmall(comparedTo, this.doubleValue());
     }
@@ -216,22 +240,32 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return myNumber.longValueExact();
     }
 
+    @Override
     public BigScalar multiply(final BigDecimal arg) {
         return new BigScalar(myNumber.multiply(arg));
     }
 
+    @Override
     public BigScalar multiply(final double arg) {
         return this.multiply(new BigDecimal(arg));
     }
 
+    @Override
+    public BigScalar multiply(float scalarMultiplicand) {
+        return this.multiply((double) scalarMultiplicand);
+    }
+
+    @Override
     public BigScalar negate() {
         return new BigScalar(myNumber.negate());
     }
 
+    @Override
     public double norm() {
         return PrimitiveMath.ABS.invoke(myNumber.doubleValue());
     }
 
+    @Override
     public BigScalar power(final int power) {
 
         BigScalar retVal = ONE;
@@ -243,18 +277,27 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return retVal;
     }
 
+    @Override
     public BigScalar signum() {
         return new BigScalar(BigMath.SIGNUM.invoke(myNumber));
     }
 
+    @Override
     public BigScalar subtract(final BigDecimal arg) {
         return new BigScalar(myNumber.subtract(arg));
     }
 
+    @Override
     public BigScalar subtract(final double arg) {
         return this.subtract(new BigDecimal(arg));
     }
 
+    @Override
+    public BigScalar subtract(float scalarSubtrahend) {
+        return this.subtract((double) scalarSubtrahend);
+    }
+
+    @Override
     public BigDecimal toBigDecimal() {
         return myNumber;
     }
@@ -264,6 +307,7 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return myNumber.toString();
     }
 
+    @Override
     public String toString(final NumberContext context) {
         return context.enforce(myNumber).toString();
     }

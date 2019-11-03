@@ -29,7 +29,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.context.NumberContext;
@@ -41,10 +41,10 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class ConjugateGradientSolver extends KrylovSubspaceSolver implements IterativeSolverTask.SparseDelegate {
 
-    private transient PrimitiveDenseStore myDirection = null;
-    private transient PrimitiveDenseStore myPreconditioned = null;
-    private transient PrimitiveDenseStore myResidual = null;
-    private transient PrimitiveDenseStore myVector = null;
+    private transient Primitive64Store myDirection = null;
+    private transient Primitive64Store myPreconditioned = null;
+    private transient Primitive64Store myResidual = null;
+    private transient Primitive64Store myVector = null;
 
     public ConjugateGradientSolver() {
         super();
@@ -57,10 +57,10 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         double tmpNormErr = POSITIVE_INFINITY;
         double tmpNormRHS = ONE;
 
-        final PrimitiveDenseStore tmpResidual = this.residual(solution);
-        final PrimitiveDenseStore tmpDirection = this.direction(solution);
-        final PrimitiveDenseStore tmpPreconditioned = this.preconditioned(solution);
-        final PrimitiveDenseStore tmpVector = this.vector(solution);
+        final Primitive64Store tmpResidual = this.residual(solution);
+        final Primitive64Store tmpDirection = this.direction(solution);
+        final Primitive64Store tmpPreconditioned = this.preconditioned(solution);
+        final Primitive64Store tmpVector = this.vector(solution);
 
         double tmpStepLength;
         double tmpGradientCorrectionFactor;
@@ -148,36 +148,36 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         return preallocated;
     }
 
-    private PrimitiveDenseStore direction(final Structure1D structure) {
+    private Primitive64Store direction(final Structure1D structure) {
         if ((myDirection == null) || (myDirection.count() != structure.count())) {
-            myDirection = PrimitiveDenseStore.FACTORY.makeZero(structure.count(), 1L);
+            myDirection = Primitive64Store.FACTORY.makeZero(structure.count(), 1L);
         } else {
             myDirection.fillAll(ZERO);
         }
         return myDirection;
     }
 
-    private PrimitiveDenseStore preconditioned(final Structure1D structure) {
+    private Primitive64Store preconditioned(final Structure1D structure) {
         if ((myPreconditioned == null) || (myPreconditioned.count() != structure.count())) {
-            myPreconditioned = PrimitiveDenseStore.FACTORY.makeZero(structure.count(), 1L);
+            myPreconditioned = Primitive64Store.FACTORY.makeZero(structure.count(), 1L);
         } else {
             myPreconditioned.fillAll(ZERO);
         }
         return myPreconditioned;
     }
 
-    private PrimitiveDenseStore residual(final Structure1D structure) {
+    private Primitive64Store residual(final Structure1D structure) {
         if ((myResidual == null) || (myResidual.count() != structure.count())) {
-            myResidual = PrimitiveDenseStore.FACTORY.makeZero(structure.count(), 1L);
+            myResidual = Primitive64Store.FACTORY.makeZero(structure.count(), 1L);
         } else {
             myResidual.fillAll(ZERO);
         }
         return myResidual;
     }
 
-    private PrimitiveDenseStore vector(final Structure1D structure) {
+    private Primitive64Store vector(final Structure1D structure) {
         if ((myVector == null) || (myVector.count() != structure.count())) {
-            myVector = PrimitiveDenseStore.FACTORY.makeZero(structure.count(), 1L);
+            myVector = Primitive64Store.FACTORY.makeZero(structure.count(), 1L);
         } else {
             myVector.fillAll(ZERO);
         }

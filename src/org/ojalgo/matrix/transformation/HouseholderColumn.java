@@ -5,7 +5,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.ColumnView;
 
-final class HouseholderColumn<N extends Number> extends ColumnView<N> implements HouseholderReference<N> {
+final class HouseholderColumn<N extends Comparable<N>> extends ColumnView<N> implements HouseholderReference<N> {
 
     private int myFirst = 0;
     private final MatrixStore<N> myStore;

@@ -29,25 +29,26 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LDL<N> {
+abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements LDL<N> {
 
     static class Complex extends LDLDecomposition<ComplexNumber> {
 
         Complex() {
-            super(GenericDenseStore.COMPLEX);
+            super(GenericStore.COMPLEX);
         }
 
     }
@@ -55,7 +56,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     static class Primitive extends LDLDecomposition<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY);
+            super(Primitive64Store.FACTORY);
         }
 
     }
@@ -63,7 +64,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     static class Quat extends LDLDecomposition<Quaternion> {
 
         Quat() {
-            super(GenericDenseStore.QUATERNION);
+            super(GenericStore.QUATERNION);
         }
 
     }
@@ -71,7 +72,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     static class Rational extends LDLDecomposition<RationalNumber> {
 
         Rational() {
-            super(GenericDenseStore.RATIONAL);
+            super(GenericStore.RATIONAL);
         }
 
     }
@@ -169,7 +170,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         N largest = this.getInPlace().aggregateDiagonal(Aggregator.LARGEST);
         double epsilon = this.getDimensionalEpsilon();
 
-        return epsilon * Math.max(MACHINE_SMALLEST, largest.doubleValue());
+        return epsilon * Math.max(MACHINE_SMALLEST, Scalar.doubleValue(largest));
     }
 
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {

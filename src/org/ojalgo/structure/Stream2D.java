@@ -4,7 +4,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 
-public interface Stream2D<N extends Number, A extends Access2D<N>, R extends Mutate2D.Receiver<N>, P extends Stream2D<N, A, R, P>>
+public interface Stream2D<N extends Comparable<N>, A extends Access2D<N>, R extends Mutate2D.Receiver<N>, P extends Stream2D<N, A, R, P>>
         extends Access2D.Collectable<N, R> {
 
     default P operateOnAll(final BinaryFunction<N> operator, final double right) {

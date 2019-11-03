@@ -4,7 +4,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 
-public interface StreamAnyD<N extends Number, A extends AccessAnyD<N>, R extends MutateAnyD.Receiver<N>, P extends StreamAnyD<N, A, R, P>>
+public interface StreamAnyD<N extends Comparable<N>, A extends AccessAnyD<N>, R extends MutateAnyD.Receiver<N>, P extends StreamAnyD<N, A, R, P>>
         extends AccessAnyD.Collectable<N, R> {
 
     default P operateOnAll(final BinaryFunction<N> operator, final double right) {

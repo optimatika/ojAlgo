@@ -28,7 +28,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
-final class GeneralisedEvD<N extends Number> extends EigenvalueDecomposition<N> implements Eigenvalue.Generalised<N> {
+final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> implements Eigenvalue.Generalised<N> {
 
     private final Cholesky<N> myCholesky;
     private final Eigenvalue<N> myEigenvalue;

@@ -30,7 +30,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.GaussSeidelSolver;
 import org.ojalgo.matrix.task.iterative.JacobiSolver;
@@ -41,10 +41,10 @@ public class SolverTest extends MatrixTaskTests {
     @Test
     public void testExampleWikipediA() {
 
-        MatrixStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4, 1 }, { 1, 3 } });
-        MatrixStore<Double> tmpB = PrimitiveDenseStore.FACTORY.columns(new double[] { 1, 2 });
+        MatrixStore<Double> tmpA = Primitive64Store.FACTORY.rows(new double[][] { { 4, 1 }, { 1, 3 } });
+        MatrixStore<Double> tmpB = Primitive64Store.FACTORY.columns(new double[] { 1, 2 });
 
-        MatrixStore<Double> tmpExpected = PrimitiveDenseStore.FACTORY.columns(new double[] { 1.0 / 11.0, 7.0 / 11.0 });
+        MatrixStore<Double> tmpExpected = Primitive64Store.FACTORY.columns(new double[] { 1.0 / 11.0, 7.0 / 11.0 });
 
         JacobiSolver tmpJacobiSolver = new JacobiSolver();
         TestUtils.assertEquals(tmpExpected, tmpJacobiSolver.solve(tmpA, tmpB).get());
@@ -79,10 +79,10 @@ public class SolverTest extends MatrixTaskTests {
     @Test
     public void testLinAlg34PDF() {
 
-        MatrixStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4, 2, 3 }, { 3, -5, 2 }, { -2, 3, 8 } });
-        MatrixStore<Double> tmpB = PrimitiveDenseStore.FACTORY.columns(new double[] { 8, -14, 27 });
+        MatrixStore<Double> tmpA = Primitive64Store.FACTORY.rows(new double[][] { { 4, 2, 3 }, { 3, -5, 2 }, { -2, 3, 8 } });
+        MatrixStore<Double> tmpB = Primitive64Store.FACTORY.columns(new double[] { 8, -14, 27 });
 
-        MatrixStore<Double> tmpExpected = PrimitiveDenseStore.FACTORY.columns(new double[] { -1, 3, 2 });
+        MatrixStore<Double> tmpExpected = Primitive64Store.FACTORY.columns(new double[] { -1, 3, 2 });
 
         JacobiSolver tmpJacobiSolver = new JacobiSolver();
         TestUtils.assertEquals(tmpExpected, tmpJacobiSolver.solve(tmpA, tmpB).get());
@@ -123,10 +123,10 @@ public class SolverTest extends MatrixTaskTests {
         int numEqs = 2;
         int numVars = 5;
 
-        PrimitiveDenseStore body = PrimitiveDenseStore.FACTORY.makeZero(numEqs, numVars);
-        PrimitiveDenseStore rhs = PrimitiveDenseStore.FACTORY.makeZero(numEqs, 1);
+        Primitive64Store body = Primitive64Store.FACTORY.makeZero(numEqs, numVars);
+        Primitive64Store rhs = Primitive64Store.FACTORY.makeZero(numEqs, 1);
 
-        PrimitiveDenseStore expected = PrimitiveDenseStore.FACTORY.makeZero(numVars, 1);
+        Primitive64Store expected = Primitive64Store.FACTORY.makeZero(numVars, 1);
 
         Random tmpRandom = new Random();
         for (int i = 0; i < numEqs; i++) {
@@ -153,8 +153,8 @@ public class SolverTest extends MatrixTaskTests {
 
         try {
 
-            MatrixStore<Double> body = PrimitiveDenseStore.FACTORY.makeSPD(dimension);
-            MatrixStore<Double> rhs = PrimitiveDenseStore.FACTORY.makeFilled(dimension, 1L, new Uniform());
+            MatrixStore<Double> body = Primitive64Store.FACTORY.makeSPD(dimension);
+            MatrixStore<Double> rhs = Primitive64Store.FACTORY.makeFilled(dimension, 1L, new Uniform());
 
             MatrixStore<Double> expSol = fixed.solve(body, rhs);
 
