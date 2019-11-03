@@ -19,14 +19,14 @@ ojAlgo is available at [The Central (Maven) Repository](https://search.maven.org
 
 ### Documentation and Support
 
-User documentation wiki with examples is here at GitHub: https://github.com/optimatika/ojAlgo/wiki
+User documentation is available in the form of blog posts at the ojAlgo web site: http://ojalgo.org/
+
+The wiki here at GitHub is in the process of being migrated to the ojAlgo site, but still contains info not available elsewhere: https://github.com/optimatika/ojAlgo/wiki
 
 Programming questions related to ojAlgo are best asked at [stack overflow](https://stackoverflow.com/search?tab=relevance&q=ojalgo). Just remember to actually mention ojAlgo and tag the question using 'ojalgo' and whatever other tags you find suitable.
 
-Bug reports and to some extent feature requests should be posted here at GitHub: https://github.com/optimatika/ojAlgo/issues
+Bug reports, and to some extent feature requests, should be posted here at GitHub: https://github.com/optimatika/ojAlgo/issues
 (Please do not use GitHub Issues for general discussions or user support requests!)
-
-The [ojAlgo-user mailing list](https://sourceforge.net/p/ojalgo/mailman/ojalgo-user/) can be used for just about anything as long as it relates to ojAlgo. (Note that you have to be a member to post to that list!)
 
 ojAlgo is Open Source, and you are strongly encouraged to clone or fork this repository and work directly with the source code. The source code is (part of) the documentation, and you should read it.
 
@@ -36,5 +36,5 @@ Available as part of the Tidelift Subscription
 
 The maintainers of ojAlgo and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source dependencies you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact dependencies you use. [Learn more.](https://tidelift.com/subscription/pkg/maven-org-ojalgo-ojalgo?utm_source=maven-org-ojalgo-ojalgo&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
 
-<a href="https://tidelift.com/subscription/pkg/maven-org-ojalgo-ojalgo?utm_source=maven-org-ojalgo-ojalgo&utm_medium=referral&utm_campaign=readme" rel="nofollow"><img alt="Tidelift Subscription" height="100"  src="https://numpy.org/_static/Tidelift_Logos_RGB_Tidelift_Mark_On-White.png"></a>
+<a href="https://tidelift.com/subscription/pkg/maven-org-ojalgo-ojalgo?utm_source=maven-org-ojalgo-ojalgo&utm_medium=referral&utm_campaign=enterprise&utm_term=repo" rel="nofollow"><img alt="Tidelift Subscription" height="100"  src="https://numpy.org/_static/Tidelift_Logos_RGB_Tidelift_Mark_On-White.png"></a>
 
