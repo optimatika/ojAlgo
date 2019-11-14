@@ -21,9 +21,71 @@
  */
 package org.ojalgo.array.operation;
 
+import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
+
 public final class FillAll implements ArrayOperation {
 
     public static int THRESHOLD = 128;
+
+    public static void fill(final double[] data, final Access1D<?> values) {
+        final int limit = Math.min(data.length, values.size());
+        for (int i = 0; i < limit; i++) {
+            data[i] = values.doubleValue(i);
+        }
+    }
+
+    public static void fill(final double[] data, final int first, final int limit, final int step, final double value) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = value;
+        }
+    }
+
+    public static void fill(final double[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = supplier.doubleValue();
+        }
+    }
+
+    public static void fill(final float[] data, final Access1D<?> values) {
+        final int limit = Math.min(data.length, values.size());
+        for (int i = 0; i < limit; i++) {
+            data[i] = values.floatValue(i);
+        }
+    }
+
+    public static void fill(final float[] data, final int first, final int limit, final int step, final float value) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = value;
+        }
+    }
+
+    public static void fill(final float[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = supplier.floatValue();
+        }
+    }
+
+    public static <N extends Comparable<N>> void fill(final N[] data, final Access1D<?> values, Scalar.Factory<N> scalar) {
+        final int limit = Math.min(data.length, values.size());
+        for (int i = 0; i < limit; i++) {
+            data[i] = scalar.cast(values.get(i));
+        }
+    }
+
+    public static <N extends Comparable<N>> void fill(final N[] data, final int first, final int limit, final int step, final N value) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = value;
+        }
+    }
+
+    public static <N extends Comparable<N>> void fill(final N[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier,
+            Scalar.Factory<N> scalar) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = scalar.cast(supplier.invoke());
+        }
+    }
 
     @Override
     public int threshold() {

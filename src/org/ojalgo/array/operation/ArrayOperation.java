@@ -51,6 +51,7 @@ public interface ArrayOperation {
         ApplyLU.THRESHOLD = Math.min(value, ApplyLU.THRESHOLD);
         ASUM.THRESHOLD = Math.min(value, ASUM.THRESHOLD);
         AXPY.THRESHOLD = Math.min(value, AXPY.THRESHOLD);
+        CorePrimitiveOperation.THRESHOLD = Math.min(value, CorePrimitiveOperation.THRESHOLD);
         CABS1.THRESHOLD = Math.min(value, CABS1.THRESHOLD);
         COPY.THRESHOLD = Math.min(value, COPY.THRESHOLD);
         DOT.THRESHOLD = Math.min(value, DOT.THRESHOLD);
@@ -73,6 +74,10 @@ public interface ArrayOperation {
         MultiplyNeither.THRESHOLD = Math.min(value, MultiplyNeither.THRESHOLD);
         MultiplyRight.THRESHOLD = Math.min(value, MultiplyRight.THRESHOLD);
         NRM2.THRESHOLD = Math.min(value, NRM2.THRESHOLD);
+        OperationBinary.THRESHOLD = Math.min(value, OperationBinary.THRESHOLD);
+        OperationParameter.THRESHOLD = Math.min(value, OperationParameter.THRESHOLD);
+        OperationUnary.THRESHOLD = Math.min(value, OperationUnary.THRESHOLD);
+        OperationVoid.THRESHOLD = Math.min(value, OperationVoid.THRESHOLD);
         ROT.THRESHOLD = Math.min(value, ROT.THRESHOLD);
         RotateLeft.THRESHOLD = Math.min(value, RotateLeft.THRESHOLD);
         RotateRight.THRESHOLD = Math.min(value, RotateRight.THRESHOLD);
@@ -103,6 +108,7 @@ public interface ArrayOperation {
         ApplyLU.THRESHOLD = Math.max(value, ApplyLU.THRESHOLD);
         ASUM.THRESHOLD = Math.max(value, ASUM.THRESHOLD);
         AXPY.THRESHOLD = Math.max(value, AXPY.THRESHOLD);
+        CorePrimitiveOperation.THRESHOLD = Math.max(value, CorePrimitiveOperation.THRESHOLD);
         CABS1.THRESHOLD = Math.max(value, CABS1.THRESHOLD);
         COPY.THRESHOLD = Math.max(value, COPY.THRESHOLD);
         DOT.THRESHOLD = Math.max(value, DOT.THRESHOLD);
@@ -125,6 +131,10 @@ public interface ArrayOperation {
         MultiplyNeither.THRESHOLD = Math.max(value, MultiplyNeither.THRESHOLD);
         MultiplyRight.THRESHOLD = Math.max(value, MultiplyRight.THRESHOLD);
         NRM2.THRESHOLD = Math.max(value, NRM2.THRESHOLD);
+        OperationBinary.THRESHOLD = Math.max(value, OperationBinary.THRESHOLD);
+        OperationParameter.THRESHOLD = Math.max(value, OperationParameter.THRESHOLD);
+        OperationUnary.THRESHOLD = Math.max(value, OperationUnary.THRESHOLD);
+        OperationVoid.THRESHOLD = Math.max(value, OperationVoid.THRESHOLD);
         ROT.THRESHOLD = Math.max(value, ROT.THRESHOLD);
         RotateLeft.THRESHOLD = Math.max(value, RotateLeft.THRESHOLD);
         RotateRight.THRESHOLD = Math.max(value, RotateRight.THRESHOLD);

@@ -25,26 +25,6 @@ import org.ojalgo.type.NumberDefinition;
 
 public interface AccessScalar<N> extends NumberDefinition {
 
-    default byte byteValue() {
-        return (byte) this.shortValue();
-    }
-
-    default float floatValue() {
-        return (float) this.doubleValue();
-    }
-
     N get();
-
-    default int intValue() {
-        return (int) this.longValue();
-    }
-
-    default long longValue() {
-        return Math.round(this.doubleValue());
-    }
-
-    default short shortValue() {
-        return (short) this.intValue();
-    }
 
 }

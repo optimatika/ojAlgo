@@ -25,7 +25,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.*;
+import org.ojalgo.array.Array1D;
+import org.ojalgo.array.Array2D;
+import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.ComplexArray;
+import org.ojalgo.array.DenseArray;
+import org.ojalgo.array.QuaternionArray;
+import org.ojalgo.array.RationalArray;
+import org.ojalgo.array.ScalarArray;
 import org.ojalgo.array.operation.*;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
@@ -729,7 +736,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
                 @Override
                 protected void conquer(final int first, final int limit) {
-                    ReferenceTypeArray.invoke(data, first, limit, 1, left, function, right);
+                    OperationBinary.invoke(data, first, limit, 1, left, function, right);
                 }
 
             };
@@ -738,7 +745,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
         } else {
 
-            ReferenceTypeArray.invoke(data, 0, matchingCount, 1, left, function, right);
+            OperationBinary.invoke(data, 0, matchingCount, 1, left, function, right);
         }
     }
 
@@ -753,7 +760,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
                 @Override
                 protected void conquer(final int first, final int limit) {
-                    ReferenceTypeArray.invoke(data, first, limit, 1, arguments, function);
+                    OperationUnary.invoke(data, first, limit, 1, arguments, function);
                 }
 
             };
@@ -762,7 +769,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
         } else {
 
-            ReferenceTypeArray.invoke(data, 0, matchingCount, 1, arguments, function);
+            OperationUnary.invoke(data, 0, matchingCount, 1, arguments, function);
         }
     }
 
@@ -1020,10 +1027,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity, myFactory.scalar());
         }
-    }
-
-    public void supplyTo(final TransformableRegion<N> receiver) {
-        receiver.fillMatching(this);
     }
 
     public Scalar<N> toScalar(final long row, final long column) {

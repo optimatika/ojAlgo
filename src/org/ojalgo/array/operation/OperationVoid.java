@@ -19,39 +19,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.type;
+package org.ojalgo.array.operation;
 
-/**
- * An interface that defines what is already in {@link java.lang.Number}. Hopefully Java itself will one day
- * get an interface similar to this. When/if that happens this interface, and possibly some additional usage
- * of <code>extends java.lang.Number</code>, will be replaced by that new interface.
- */
-public interface NumberDefinition {
+import org.ojalgo.function.VoidFunction;
 
-    default boolean booleanValue() {
-        return this.intValue() != 0;
+public final class OperationVoid implements ArrayOperation {
+
+    public static int THRESHOLD = 256;
+
+    public static void invoke(final double[] data, final int first, final int limit, final int step, final VoidFunction<Double> aVisitor) {
+        for (int i = first; i < limit; i += step) {
+            aVisitor.invoke(data[i]);
+        }
     }
 
-    default byte byteValue() {
-        return (byte) this.intValue();
+    public static void invoke(final float[] data, final int first, final int limit, final int step, final VoidFunction<Double> aVisitor) {
+        for (int i = first; i < limit; i += step) {
+            aVisitor.invoke(data[i]);
+        }
     }
 
-    double doubleValue();
-
-    default float floatValue() {
-        return (float) this.doubleValue();
+    public static <N extends Comparable<N>> void invoke(final N[] data, final int first, final int limit, final int step, final VoidFunction<N> aVisitor) {
+        for (int i = first; i < limit; i += step) {
+            aVisitor.invoke(data[i]);
+        }
     }
 
-    default int intValue() {
-        return Math.round(this.floatValue());
-    }
-
-    default long longValue() {
-        return Math.round(this.doubleValue());
-    }
-
-    default short shortValue() {
-        return (short) this.intValue();
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

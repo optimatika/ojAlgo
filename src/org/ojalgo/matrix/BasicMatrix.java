@@ -656,7 +656,7 @@ abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>>
         return this.getFactory().instantiate(retVal);
     }
 
-    public void supplyTo(final PhysicalStore<N> receiver) {
+    public final void supplyTo(final PhysicalStore<N> receiver) {
         myStore.supplyTo(receiver);
     }
 

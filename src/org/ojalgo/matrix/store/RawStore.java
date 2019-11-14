@@ -1125,10 +1125,6 @@ public final class RawStore implements PhysicalStore<Double> {
         SubstituteForwards.invoke(data, body, unitDiagonal, conjugated, identity);
     }
 
-    public void supplyTo(final TransformableRegion<Double> receiver) {
-        receiver.fillMatching(this);
-    }
-
     public PrimitiveScalar toScalar(final long row, final long column) {
         return PrimitiveScalar.of(this.doubleValue(row, column));
     }

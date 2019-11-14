@@ -294,7 +294,7 @@ abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M
             return this.self();
         }
 
-        public void supplyTo(final PhysicalStore<N> receiver) {
+        public final void supplyTo(final PhysicalStore<N> receiver) {
             myDelegate.supplyTo(receiver);
         }
 
@@ -850,7 +850,7 @@ abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M
             }
         }
 
-        public void supplyTo(final PhysicalStore<N> receiver) {
+        public final void supplyTo(final PhysicalStore<N> receiver) {
             myDelegate.supplyTo(receiver);
         }
     }

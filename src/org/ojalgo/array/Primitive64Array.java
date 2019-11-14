@@ -29,22 +29,16 @@ import java.util.Spliterators;
 import java.util.stream.DoubleStream;
 import java.util.stream.StreamSupport;
 
-import org.ojalgo.array.operation.AMAX;
-import org.ojalgo.array.operation.AXPY;
-import org.ojalgo.array.operation.COPY;
+import org.ojalgo.array.operation.*;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.BinaryFunction.FixedFirst;
-import org.ojalgo.function.BinaryFunction.FixedSecond;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
-import org.ojalgo.function.ParameterFunction.FixedParameter;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -98,259 +92,6 @@ public class Primitive64Array extends PrimitiveArray {
         return new Primitive64Array(data);
     }
 
-    private static void add(final double[] data, final int first, final int limit, final int step, final double left, final double[] right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = left + right[i];
-        }
-    }
-
-    private static void add(final double[] data, final int first, final int limit, final int step, final double[] left, final double right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = left[i] + right;
-        }
-    }
-
-    private static void add(final double[] data, final int first, final int limit, final int step, final double[] left, final double[] right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = left[i] + right[i];
-        }
-    }
-
-    private static void divide(final double[] data, final int first, final int limit, final int step, final double left, final double[] right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = left / right[i];
-        }
-    }
-
-    private static void divide(final double[] data, final int first, final int limit, final int step, final double[] left, final double right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = left[i] / right;
-        }
-    }
-
-    private static void divide(final double[] data, final int first, final int limit, final int step, final double[] left, final double[] right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = left[i] / right[i];
-        }
-    }
-
-    private static void multiply(final double[] data, final int first, final int limit, final int step, final double left, final double[] right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = left * right[i];
-        }
-    }
-
-    private static void multiply(final double[] data, final int first, final int limit, final int step, final double[] left, final double right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = left[i] * right;
-        }
-    }
-
-    private static void multiply(final double[] data, final int first, final int limit, final int step, final double[] left, final double[] right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = left[i] * right[i];
-        }
-    }
-
-    private static void negate(final double[] data, final int first, final int limit, final int step, final double[] values) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = -values[i];
-        }
-    }
-
-    private static void subtract(final double[] data, final int first, final int limit, final int step, final double left, final double[] right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = left - right[i];
-        }
-    }
-
-    private static void subtract(final double[] data, final int first, final int limit, final int step, final double[] left, final double right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = left[i] - right;
-        }
-    }
-
-    private static void subtract(final double[] data, final int first, final int limit, final int step, final double[] left, final double[] right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = left[i] - right[i];
-        }
-    }
-
-    protected static void exchange(final double[] data, final int firstA, final int firstB, final int step, final int count) {
-
-        int tmpIndexA = firstA;
-        int tmpIndexB = firstB;
-
-        double tmpVal;
-
-        for (int i = 0; i < count; i++) {
-
-            tmpVal = data[tmpIndexA];
-            data[tmpIndexA] = data[tmpIndexB];
-            data[tmpIndexB] = tmpVal;
-
-            tmpIndexA += step;
-            tmpIndexB += step;
-        }
-    }
-
-    protected static void fill(final double[] data, final Access1D<?> values) {
-        final int tmpLimit = (int) Math.min(data.length, values.count());
-        for (int i = 0; i < tmpLimit; i++) {
-            data[i] = values.doubleValue(i);
-        }
-    }
-
-    protected static void fill(final double[] data, final int first, final int limit, final int step, final double value) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = value;
-        }
-    }
-
-    protected static void fill(final double[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = supplier.doubleValue();
-        }
-    }
-
-    protected static void invoke(final double[] data, final int first, final int limit, final int step, final Access1D<Double> left,
-            final BinaryFunction<Double> function, final Access1D<Double> right) {
-        if ((left instanceof Primitive64Array) && (right instanceof Primitive64Array)) {
-            Primitive64Array.invoke(data, first, limit, step, ((Primitive64Array) left).data, function, ((Primitive64Array) right).data);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.doubleValue(i), right.doubleValue(i));
-            }
-        }
-    }
-
-    protected static void invoke(final double[] data, final int first, final int limit, final int step, final Access1D<Double> left,
-            final BinaryFunction<Double> function, final double right) {
-        if (left instanceof Primitive64Array) {
-            Primitive64Array.invoke(data, first, limit, step, ((Primitive64Array) left).data, function, right);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left.doubleValue(i), right);
-            }
-        }
-    }
-
-    protected static void invoke(final double[] data, final int first, final int limit, final int step, final Access1D<Double> values,
-            final ParameterFunction<Double> function, final int aParam) {
-        if (values instanceof Primitive64Array) {
-            Primitive64Array.invoke(data, first, limit, step, ((Primitive64Array) values).data, function, aParam);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values.doubleValue(i), aParam);
-            }
-        }
-    }
-
-    protected static void invoke(final double[] data, final int first, final int limit, final int step, final Access1D<Double> values,
-            final UnaryFunction<Double> function) {
-        if (values instanceof Primitive64Array) {
-            Primitive64Array.invoke(data, first, limit, step, ((Primitive64Array) values).data, function);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values.doubleValue(i));
-            }
-        }
-    }
-
-    protected static void invoke(final double[] data, final int first, final int limit, final int step, final double left,
-            final BinaryFunction<Double> function, final Access1D<Double> right) {
-        if (right instanceof Primitive64Array) {
-            Primitive64Array.invoke(data, first, limit, step, left, function, ((Primitive64Array) right).data);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right.doubleValue(i));
-            }
-        }
-    }
-
-    protected static void invoke(final double[] data, final int first, final int limit, final int step, final VoidFunction<Double> aVisitor) {
-        for (int i = first; i < limit; i += step) {
-            aVisitor.invoke(data[i]);
-        }
-    }
-
-    static void invoke(final double[] data, final int first, final int limit, final int step, final double left, final BinaryFunction<Double> function,
-            final double[] right) {
-        if (function == PrimitiveMath.ADD) {
-            Primitive64Array.add(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.DIVIDE) {
-            Primitive64Array.divide(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.MULTIPLY) {
-            Primitive64Array.multiply(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.SUBTRACT) {
-            Primitive64Array.subtract(data, first, limit, step, left, right);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left, right[i]);
-            }
-        }
-    }
-
-    static void invoke(final double[] data, final int first, final int limit, final int step, final double[] left, final BinaryFunction<Double> function,
-            final double right) {
-        if (function == PrimitiveMath.ADD) {
-            Primitive64Array.add(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.DIVIDE) {
-            Primitive64Array.divide(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.MULTIPLY) {
-            Primitive64Array.multiply(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.SUBTRACT) {
-            Primitive64Array.subtract(data, first, limit, step, left, right);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right);
-            }
-        }
-    }
-
-    static void invoke(final double[] data, final int first, final int limit, final int step, final double[] left, final BinaryFunction<Double> function,
-            final double[] right) {
-        if (function == PrimitiveMath.ADD) {
-            Primitive64Array.add(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.DIVIDE) {
-            Primitive64Array.divide(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.MULTIPLY) {
-            Primitive64Array.multiply(data, first, limit, step, left, right);
-        } else if (function == PrimitiveMath.SUBTRACT) {
-            Primitive64Array.subtract(data, first, limit, step, left, right);
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(left[i], right[i]);
-            }
-        }
-    }
-
-    static void invoke(final double[] data, final int first, final int limit, final int step, final double[] values, final ParameterFunction<Double> function,
-            final int aParam) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(values[i], aParam);
-        }
-    }
-
-    static void invoke(final double[] data, final int first, final int limit, final int step, final double[] values, final UnaryFunction<Double> function) {
-        if (function == PrimitiveMath.NEGATE) {
-            Primitive64Array.negate(data, first, limit, step, values);
-        } else if (function instanceof FixedFirst<?>) {
-            final FixedFirst<Double> tmpFunc = (FixedFirst<Double>) function;
-            Primitive64Array.invoke(data, first, limit, step, tmpFunc.doubleValue(), tmpFunc.getFunction(), values);
-        } else if (function instanceof FixedSecond<?>) {
-            final FixedSecond<Double> tmpFunc = (FixedSecond<Double>) function;
-            Primitive64Array.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.doubleValue());
-        } else if (function instanceof FixedParameter<?>) {
-            final FixedParameter<Double> tmpFunc = (FixedParameter<Double>) function;
-            Primitive64Array.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.getParameter());
-        } else {
-            for (int i = first; i < limit; i += step) {
-                data[i] = function.invoke(values[i]);
-            }
-        }
-    }
-
     public final double[] data;
 
     /**
@@ -398,19 +139,19 @@ public class Primitive64Array extends PrimitiveArray {
 
     @Override
     public void fillMatching(final Access1D<?> values) {
-        Primitive64Array.fill(data, values);
+        FillAll.fill(data, values);
     }
 
     @Override
     public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
         int limit = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
-        Primitive64Array.invoke(data, 0, limit, 1, left, function, right);
+        OperationBinary.invoke(data, 0, limit, 1, left, function, right);
     }
 
     @Override
     public void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
         int limit = MissingMath.toMinIntExact(this.count(), arguments.count());
-        Primitive64Array.invoke(data, 0, limit, 1, arguments, function);
+        OperationUnary.invoke(data, 0, limit, 1, arguments, function);
     }
 
     @Override
@@ -430,9 +171,9 @@ public class Primitive64Array extends PrimitiveArray {
 
     @Override
     public void sortDescending() {
-        Primitive64Array.negate(data, 0, data.length, 1, data);
+        CorePrimitiveOperation.negate(data, 0, data.length, 1, data);
         Arrays.parallelSort(data);
-        Primitive64Array.negate(data, 0, data.length, 1, data);
+        CorePrimitiveOperation.negate(data, 0, data.length, 1, data);
     }
 
     public OfDouble spliterator() {
@@ -469,33 +210,33 @@ public class Primitive64Array extends PrimitiveArray {
 
     @Override
     protected final void exchange(final int firstA, final int firstB, final int step, final int count) {
-        Primitive64Array.exchange(data, firstA, firstB, step, count);
+        Exchange.exchange(data, firstA, firstB, step, count);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function,
             final Access1D<Double> right) {
-        Primitive64Array.invoke(data, first, limit, 1, left, function, right);
+        OperationBinary.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
-        Primitive64Array.invoke(data, first, limit, 1, left, function, right);
+        OperationBinary.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        Primitive64Array.invoke(data, first, limit, 1, left, function, right);
+        OperationBinary.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final int step, final Double value) {
-        Primitive64Array.fill(data, first, limit, step, value);
+        FillAll.fill(data, first, limit, step, value);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
-        Primitive64Array.fill(data, first, limit, step, supplier);
+        FillAll.fill(data, first, limit, step, supplier);
     }
 
     @Override
@@ -535,32 +276,32 @@ public class Primitive64Array extends PrimitiveArray {
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        Primitive64Array.invoke(data, first, limit, step, left, function, this);
+        OperationBinary.invoke(data, first, limit, step, left, function, this);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        Primitive64Array.invoke(data, first, limit, step, this, function, right);
+        OperationBinary.invoke(data, first, limit, step, this, function, right);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Double right) {
-        Primitive64Array.invoke(data, first, limit, step, data, function, right);
+        OperationBinary.invoke(data, first, limit, step, data, function, right);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final Double left, final BinaryFunction<Double> function) {
-        Primitive64Array.invoke(data, first, limit, step, left, function, data);
+        OperationBinary.invoke(data, first, limit, step, left, function, data);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final ParameterFunction<Double> function, final int parameter) {
-        Primitive64Array.invoke(data, first, limit, step, data, function, parameter);
+        OperationParameter.invoke(data, first, limit, step, data, function, parameter);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final UnaryFunction<Double> function) {
-        Primitive64Array.invoke(data, first, limit, step, this, function);
+        OperationUnary.invoke(data, first, limit, step, this, function);
     }
 
     @Override
@@ -590,7 +331,7 @@ public class Primitive64Array extends PrimitiveArray {
 
     @Override
     protected final void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        Primitive64Array.invoke(data, first, limit, step, visitor);
+        OperationVoid.invoke(data, first, limit, step, visitor);
     }
 
     @Override
