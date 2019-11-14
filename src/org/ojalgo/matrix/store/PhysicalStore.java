@@ -30,6 +30,7 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -179,5 +180,13 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
      * @see #transformLeft(Rotation)
      */
     void transformRight(Rotation<N> transformation);
+
+    default void supplyTo(TransformableRegion<N> receiver) {
+        if (this != receiver) {
+            receiver.fillMatching(this);
+        } else {
+            BasicLogger.error("Why do you this!");
+        }
+    }
 
 }

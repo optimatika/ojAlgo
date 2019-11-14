@@ -722,7 +722,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
                 @Override
                 protected void conquer(final int first, final int limit) {
-                    Primitive64Array.invoke(data, first, limit, 1, left, function, right);
+                    OperationBinary.invoke(data, first, limit, 1, left, function, right);
                 }
 
             };
@@ -731,7 +731,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
         } else {
 
-            Primitive64Array.invoke(data, 0, matchingCount, 1, left, function, right);
+            OperationBinary.invoke(data, 0, matchingCount, 1, left, function, right);
         }
     }
 
@@ -746,7 +746,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
                 @Override
                 protected void conquer(final int first, final int limit) {
-                    Primitive64Array.invoke(data, first, limit, 1, arguments, function);
+                    OperationUnary.invoke(data, first, limit, 1, arguments, function);
                 }
 
             };
@@ -755,7 +755,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
         } else {
 
-            Primitive64Array.invoke(data, 0, matchingCount, 1, arguments, function);
+            OperationUnary.invoke(data, 0, matchingCount, 1, arguments, function);
         }
     }
 
@@ -1009,10 +1009,6 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
         }
-    }
-
-    public void supplyTo(final TransformableRegion<Double> receiver) {
-        receiver.fillMatching(this);
     }
 
     public PrimitiveScalar toScalar(final long row, final long column) {

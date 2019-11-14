@@ -60,11 +60,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         }
 
         @Override
-        public Householder<Double> makeHouseholder(final int length) {
-            return new Householder.Primitive32(length);
-        }
-
-        @Override
         public MatrixStore.Factory<Double> builder() {
             return MatrixStore.PRIMITIVE32;
         }
@@ -180,6 +175,11 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             retVal.fillDiagonal(ONE);
 
             return retVal;
+        }
+
+        @Override
+        public Householder<Double> makeHouseholder(final int length) {
+            return new Householder.Primitive32(length);
         }
 
         public Primitive32Store rows(Access1D<?>... source) {
@@ -848,10 +848,6 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
         }
-    }
-
-    public void supplyTo(double[] receiver) {
-        myUtility.supplyTo(receiver);
     }
 
     public double[] toRawCopy1D() {
