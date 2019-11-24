@@ -23,7 +23,7 @@ package org.ojalgo.function.polynomial;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access1D;
@@ -43,8 +43,8 @@ public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
         final int tmpRowDim = (int) Math.min(x.count(), y.count());
         final int tmpColDim = this.size();
 
-        final PhysicalStore<ComplexNumber> tmpBody = GenericDenseStore.COMPLEX.makeZero(tmpRowDim, tmpColDim);
-        final PhysicalStore<ComplexNumber> tmpRHS = GenericDenseStore.COMPLEX.makeZero(tmpRowDim, 1);
+        final PhysicalStore<ComplexNumber> tmpBody = GenericStore.COMPLEX.makeZero(tmpRowDim, tmpColDim);
+        final PhysicalStore<ComplexNumber> tmpRHS = GenericStore.COMPLEX.makeZero(tmpRowDim, 1);
 
         for (int i = 0; i < tmpRowDim; i++) {
 

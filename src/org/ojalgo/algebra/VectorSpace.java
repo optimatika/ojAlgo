@@ -37,21 +37,22 @@ package org.ojalgo.algebra;
  * </ul>
  * <p>
  * To enable the use of existing Java classes as scalars this interface declares the scalar type to be a
- * subclass of {@linkplain Number} rather than an implementation of {@linkplain Field}.
+ * subclass of {@linkplain Comparable} (think {@linkplain Number}) rather than an implementation of
+ * {@linkplain Field}.
  * </p>
  * <p>
  * Any field is also a vector space in itself.
  * </p>
  *
- * @param <V> The vector type
- * @param <F> The scalar type
+ * @param <T> The vector type
+ * @param <N> The scalar type
  * @author apete
  * @see Group.Additive
  * @see Field
  * @see <a href="https://en.wikipedia.org/wiki/Vector_space">Vector space</a>
  * @see <a href="https://en.wikipedia.org/wiki/Examples_of_vector_spaces">Examples of vector spaces</a>
  */
-public interface VectorSpace<V, F extends Number> extends Group.Additive<V>, ScalarOperation.Multiplication<V, F> {
+public interface VectorSpace<T, N extends Comparable<N>> extends Group.Additive<T>, ScalarOperation.Multiplication<T, N> {
 
     /**
      * <p>
@@ -66,6 +67,6 @@ public interface VectorSpace<V, F extends Number> extends Group.Additive<V>, Sca
      * The conjugate transpose of a real matrix is simply its transpose.
      * </p>
      */
-    V conjugate();
+    T conjugate();
 
 }

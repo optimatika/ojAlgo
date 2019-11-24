@@ -33,7 +33,7 @@ public abstract class FunctionUtils {
      * @deprecated v48 Use {@link UnaryFunction#isZeroModified(UnaryFunction<N>)} instead
      */
     @Deprecated
-    public static <N extends Number> boolean isZeroModified(final UnaryFunction<N> function) {
+    public static <N extends Comparable<N>> boolean isZeroModified(final UnaryFunction<N> function) {
         return UnaryFunction.isZeroModified(function);
     }
 

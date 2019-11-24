@@ -34,7 +34,7 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-final class AboveBelowStore<N extends Number> extends ComposingStore<N> {
+final class AboveBelowStore<N extends Comparable<N>> extends ComposingStore<N> {
 
     private final MatrixStore<N> myBelow;
     private final int mySplit;

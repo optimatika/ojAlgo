@@ -171,7 +171,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    public Variable lower(final Number lower) {
+    public Variable lower(final Comparable<?> lower) {
         Variable retVal = super.lower(lower);
         this.assertFixedValue();
         return retVal;
@@ -197,7 +197,7 @@ public final class Variable extends ModelEntity<Variable> {
         myInteger = integer;
     }
 
-    public void setValue(final Number value) {
+    public void setValue(final Comparable<?> value) {
         BigDecimal tmpValue = null;
         if (value != null) {
             tmpValue = TypeUtils.toBigDecimal(value);
@@ -212,7 +212,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    public Variable upper(final Number upper) {
+    public Variable upper(final Comparable<?> upper) {
         Variable retVal = super.upper(upper);
         this.assertFixedValue();
         return retVal;

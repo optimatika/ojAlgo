@@ -26,30 +26,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 final class DaemonFactory implements ThreadFactory {
 
-    private static final String OJALGO_DAEMON_GROUP = "ojAlgo-daemon-group";
-    private static final String PREFIX = "ojAlgo-daemon-";
-    private static final int PRIORITY = Thread.NORM_PRIORITY - 1;
-
     static final DaemonFactory INSTANCE = new DaemonFactory();
 
-    private final AtomicInteger myNextThreadID = new AtomicInteger(1);
+    private final AtomicInteger myLastThreadID = new AtomicInteger();
     private final ThreadGroup myThreadGroup;
 
     private DaemonFactory() {
 
         super();
 
-        myThreadGroup = new ThreadGroup(OJALGO_DAEMON_GROUP);
+        myThreadGroup = new ThreadGroup("ojAlgo-daemon-group");
     }
 
     public Thread newThread(final Runnable runnable) {
 
-        final String tmpName = PREFIX + myNextThreadID.getAndIncrement();
-
-        final Thread retVal = new Thread(myThreadGroup, runnable, tmpName);
+        Thread retVal = new Thread(myThreadGroup, runnable, "ojAlgo-daemon-" + myLastThreadID.incrementAndGet());
 
         retVal.setDaemon(true);
-        retVal.setPriority(PRIORITY);
 
         return retVal;
     }

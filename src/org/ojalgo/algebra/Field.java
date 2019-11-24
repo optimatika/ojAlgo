@@ -37,6 +37,6 @@ package org.ojalgo.algebra;
  * @see <a href="https://en.wikipedia.org/wiki/Field_(mathematics)">Field</a>
  * @see <a href="https://en.wikipedia.org/wiki/Division_ring">Division ring</a>
  */
-public interface Field<S> extends Ring<S>, Group.Multiplicative<S>, Operation.Subtraction<S>, Operation.Division<S> {
+public interface Field<T> extends Ring<T>, Group.Multiplicative<T>, Operation.Subtraction<T>, Operation.Division<T> {
 
 }

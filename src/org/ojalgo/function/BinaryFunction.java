@@ -25,15 +25,16 @@ import java.util.function.BinaryOperator;
 import java.util.function.DoubleBinaryOperator;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.scalar.Scalar;
 
-public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryOperator<N>, DoubleBinaryOperator {
+public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, BinaryOperator<N>, DoubleBinaryOperator {
 
     /**
      * A {@linkplain BinaryFunction} with a set/fixed first argument.
      *
      * @author apete
      */
-    public static final class FixedFirst<N extends Number> implements UnaryFunction<N> {
+    public static final class FixedFirst<N extends Comparable<N>> implements UnaryFunction<N> {
 
         private final BinaryFunction<N> myFunction;
         private final N myNumber;
@@ -57,11 +58,15 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
             myFunction = function;
 
             myNumber = arg1;
-            myValue = arg1.doubleValue();
+            myValue = Scalar.doubleValue(arg1);
         }
 
         public double doubleValue() {
             return myValue;
+        }
+
+        public float floatValue() {
+            return (float) myValue;
         }
 
         public BinaryFunction<N> getFunction() {
@@ -76,6 +81,10 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
             return myFunction.invoke(myValue, arg2);
         }
 
+        public float invoke(final float arg2) {
+            return myFunction.invoke((float) myValue, arg2);
+        }
+
         public N invoke(final N arg2) {
             return myFunction.invoke(myNumber, arg2);
         }
@@ -87,7 +96,7 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
      *
      * @author apete
      */
-    public static final class FixedSecond<N extends Number> implements UnaryFunction<N> {
+    public static final class FixedSecond<N extends Comparable<N>> implements UnaryFunction<N> {
 
         private final BinaryFunction<N> myFunction;
         private final N myNumber;
@@ -111,11 +120,15 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
             myFunction = function;
 
             myNumber = arg2;
-            myValue = arg2.doubleValue();
+            myValue = Scalar.doubleValue(arg2);
         }
 
         public double doubleValue() {
             return myValue;
+        }
+
+        public float floatValue() {
+            return (float) myValue;
         }
 
         public BinaryFunction<N> getFunction() {
@@ -130,6 +143,10 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
             return myFunction.invoke(arg1, myValue);
         }
 
+        public float invoke(final float arg1) {
+            return myFunction.invoke(arg1, (float) myValue);
+        }
+
         public N invoke(final N arg1) {
             return myFunction.invoke(arg1, myNumber);
         }
@@ -141,6 +158,10 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
         return new BinaryFunction<N>() {
 
             public double invoke(final double arg1, final double arg2) {
+                return after.invoke(BinaryFunction.this.invoke(arg1, arg2));
+            }
+
+            public float invoke(final float arg1, final float arg2) {
                 return after.invoke(BinaryFunction.this.invoke(arg1, arg2));
             }
 
@@ -184,7 +205,7 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
     }
 
     /**
-     * @see #first(Number)
+     * @see #first(Comparable)
      */
     default UnaryFunction<N> first(final double arg1) {
         return new FixedFirst<>(arg1, this);
@@ -203,10 +224,12 @@ public interface BinaryFunction<N extends Number> extends BasicFunction, BinaryO
 
     double invoke(double arg1, double arg2);
 
+    float invoke(float arg1, float arg2);
+
     N invoke(N arg1, N arg2);
 
     /**
-     * @see #second(Number)
+     * @see #second(Comparable)
      */
     default UnaryFunction<N> second(final double arg2) {
         return new FixedSecond<>(this, arg2);

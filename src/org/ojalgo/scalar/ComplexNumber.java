@@ -27,7 +27,7 @@ import java.math.MathContext;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
@@ -42,96 +42,37 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * @author apete
  * @see org.ojalgo.function.ComplexFunction
  */
-public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, Transformation2D<Double>,
+public final class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double>, Transformation2D<Double>,
         Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
-
-    public static final class Normalised extends ComplexNumber {
-
-        Normalised(final double real, final double imaginary) {
-            super(real, imaginary);
-        }
-
-        @Override
-        public double norm() {
-            return PrimitiveMath.ONE;
-        }
-
-        @Override
-        public Normalised signum() {
-            return this;
-        }
-
-        @Override
-        public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
-
-            final double s = this.doubleValue();
-
-            final double ss = s * s;
-            final double ii = i * i;
-
-            final double r00 = (ii + ss);
-            final double r11 = (ss - ii);
-
-            if (transformable.count() == 2L) {
-
-                final double x = transformable.doubleValue(0);
-                final double y = transformable.doubleValue(1);
-
-                transformable.set(0, r00 * x);
-                transformable.set(1, r11 * y);
-
-            } else if (transformable.countRows() == 2L) {
-
-                for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
-
-                    final double x = transformable.doubleValue(0, c);
-                    final double y = transformable.doubleValue(1, c);
-
-                    transformable.set(0, c, r00 * x);
-                    transformable.set(1, c, r11 * y);
-                }
-
-            } else if (transformable.countColumns() == 2L) {
-
-                for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
-
-                    final double x = transformable.doubleValue(r, 0);
-                    final double y = transformable.doubleValue(r, 1);
-
-                    transformable.set(r, 0, r00 * x);
-                    transformable.set(r, 1, r11 * y);
-                }
-
-            } else {
-
-                throw new ProgrammingError("Only works for 2D stuff!");
-            }
-        }
-
-    }
 
     public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
 
+        @Override
+        public ComplexNumber cast(final Comparable<?> number) {
+            return ComplexNumber.valueOf(number);
+        }
+
+        @Override
         public ComplexNumber cast(final double value) {
             return ComplexNumber.valueOf(value);
         }
 
-        public ComplexNumber cast(final Number number) {
+        @Override
+        public ComplexNumber convert(final Comparable<?> number) {
             return ComplexNumber.valueOf(number);
         }
 
+        @Override
         public ComplexNumber convert(final double value) {
             return ComplexNumber.valueOf(value);
         }
 
-        public ComplexNumber convert(final Number number) {
-            return ComplexNumber.valueOf(number);
-        }
-
+        @Override
         public ComplexNumber one() {
             return ONE;
         }
 
+        @Override
         public ComplexNumber zero() {
             return ZERO;
         }
@@ -257,8 +198,8 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
     }
 
-    public static Normalised makeRotation(final double angle) {
-        return new Normalised(PrimitiveMath.COS.invoke(angle), PrimitiveMath.SIN.invoke(angle));
+    public static ComplexNumber makeRotation(final double angle) {
+        return new ComplexNumber(PrimitiveMath.COS.invoke(angle), PrimitiveMath.SIN.invoke(angle));
     }
 
     /**
@@ -277,6 +218,29 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     }
 
     /**
+     * Static factory method returning a complex number from arbitrary number
+     *
+     * @param number a numeric value
+     * @return {@link ComplexNumber#ZERO} if {@code number} is null otherwise the double value of
+     *         {@code number}
+     */
+    public static ComplexNumber valueOf(final Comparable<?> number) {
+
+        if (number == null) {
+            return ZERO;
+        }
+
+        if (number instanceof ComplexNumber) {
+
+            return (ComplexNumber) number;
+
+        } else {
+
+            return new ComplexNumber(Scalar.doubleValue(number));
+        }
+    }
+
+    /**
      * Static factory method returning a complex number from a real value
      *
      * @param value the complex number's real part
@@ -284,34 +248,6 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
      */
     public static ComplexNumber valueOf(final double value) {
         return new ComplexNumber(value);
-    }
-
-    /**
-     * Static factory method returning a complex number from arbitrary number
-     *
-     * @param number a numeric value
-     * @return {@link ComplexNumber#ZERO} if {@code number} is null otherwise the double value of
-     *         {@code number}
-     * @see Number
-     * @see Number#doubleValue()
-     */
-    public static ComplexNumber valueOf(final Number number) {
-
-        if (number != null) {
-
-            if (number instanceof ComplexNumber) {
-
-                return (ComplexNumber) number;
-
-            } else {
-
-                return new ComplexNumber(number.doubleValue());
-            }
-
-        } else {
-
-            return ZERO;
-        }
     }
 
     public final double i;
@@ -354,6 +290,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
      * @param arg the complex number to add
      * @return a complex number {@literal Z = ((Re(this) + Re(arg)) + (Im(this) + Im(arg))i)}
      */
+    @Override
     public ComplexNumber add(final ComplexNumber arg) {
         return new ComplexNumber(myRealValue + arg.doubleValue(), i + arg.i);
     }
@@ -364,8 +301,14 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
      * @param arg the real number to add
      * @return a complex number {@literal Z = ((Re(this) + arg) + Im(this)i)}
      */
+    @Override
     public ComplexNumber add(final double arg) {
         return new ComplexNumber(myRealValue + arg, i);
+    }
+
+    @Override
+    public ComplexNumber add(final float scalarAddend) {
+        return this.add((double) scalarAddend);
     }
 
     /**
@@ -377,6 +320,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
      *         {@code reference} are numerically equal or a positive value if {@code reference} is numerically
      *         lesser than this.
      */
+    @Override
     public int compareTo(final ComplexNumber reference) {
 
         int retVal = 0;
@@ -396,18 +340,22 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
      *
      * @return a complex number Z = (Re(this) - Im(this)i)
      */
+    @Override
     public ComplexNumber conjugate() {
         return new ComplexNumber(myRealValue, -i);
     }
 
+    @Override
     public long count() {
         return 4L;
     }
 
+    @Override
     public long countColumns() {
         return 2L;
     }
 
+    @Override
     public long countRows() {
         return 2L;
     }
@@ -418,6 +366,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
      * @param arg the complex number to divide by
      * @return a complex number {@literal Z = this / arg}
      */
+    @Override
     public ComplexNumber divide(final ComplexNumber arg) {
 
         final double tmpRe = arg.doubleValue();
@@ -445,18 +394,22 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
      * @param arg the real number to divide by
      * @return a complex number {@literal Z = ((Re(this) / arg) + (Im(this) / arg)i)}
      */
+    @Override
     public ComplexNumber divide(final double arg) {
         return new ComplexNumber(myRealValue / arg, i / arg);
     }
 
-    /**
-     * @see java.lang.Number#doubleValue()
-     */
+    @Override
+    public ComplexNumber divide(final float scalarDivisor) {
+        return this.divide((double) scalarDivisor);
+    }
+
     @Override
     public double doubleValue() {
         return myRealValue;
     }
 
+    @Override
     public double doubleValue(final long index) {
         switch ((int) index) {
         case 0:
@@ -472,6 +425,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         }
     }
 
+    @Override
     public double doubleValue(final long row, final long col) {
         if (row == col) {
             return myRealValue;
@@ -487,6 +441,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
     /**
      * Will call {@linkplain NumberContext#enforce(double)} on the real and imaginary parts separately.
      */
+    @Override
     public ComplexNumber enforce(final NumberContext context) {
 
         final double tmpRe = context.enforce(myRealValue);
@@ -500,13 +455,10 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
         if (!(obj instanceof ComplexNumber)) {
             return false;
         }
-        final ComplexNumber other = (ComplexNumber) obj;
+        ComplexNumber other = (ComplexNumber) obj;
         if (Double.doubleToLongBits(myRealValue) != Double.doubleToLongBits(other.myRealValue)) {
             return false;
         }
@@ -516,22 +468,22 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return true;
     }
 
-    /**
-     * @see java.lang.Number#floatValue()
-     */
     @Override
     public float floatValue() {
         return (float) this.doubleValue();
     }
 
+    @Override
     public ComplexNumber get() {
         return this;
     }
 
+    @Override
     public Double get(final long index) {
         return this.doubleValue(index);
     }
 
+    @Override
     public Double get(final long row, final long col) {
         return this.doubleValue(row, col);
     }
@@ -557,16 +509,13 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         final int prime = 31;
         int result = 1;
         long temp;
-        temp = Double.doubleToLongBits(myRealValue);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(i);
+        result = (prime * result) + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(myRealValue);
         result = (prime * result) + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
-    /**
-     * @see java.lang.Number#intValue()
-     */
     @Override
     public int intValue() {
         return (int) this.doubleValue();
@@ -582,6 +531,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return ComplexNumber.makePolar(PrimitiveMath.ONE / this.norm(), -this.phase());
     }
 
+    @Override
     public boolean isAbsolute() {
         if (myRealForSure) {
             return myRealValue >= PrimitiveMath.ZERO;
@@ -594,13 +544,11 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return myRealForSure || PrimitiveScalar.CONTEXT.isSmall(myRealValue, i);
     }
 
+    @Override
     public boolean isSmall(final double comparedTo) {
         return PrimitiveScalar.CONTEXT.isSmall(comparedTo, this.norm());
     }
 
-    /**
-     * @see java.lang.Number#longValue()
-     */
     @Override
     public long longValue() {
         return (long) this.doubleValue();
@@ -632,6 +580,11 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return new ComplexNumber(myRealValue * arg, i * arg);
     }
 
+    @Override
+    public ComplexNumber multiply(final float scalarMultiplicand) {
+        return this.multiply((double) scalarMultiplicand);
+    }
+
     /**
      * Performs the unary operation '-'.
      *
@@ -648,6 +601,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
      *
      * @return the norm of this complex number.
      */
+    @Override
     public double norm() {
         return PrimitiveMath.HYPOT.invoke(myRealValue, i);
     }
@@ -662,6 +616,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return Math.atan2(i, myRealValue);
     }
 
+    @Override
     public ComplexNumber power(final int power) {
 
         double norm = Math.pow(this.norm(), power);
@@ -670,7 +625,8 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return ComplexNumber.makePolar(norm, phase);
     }
 
-    public ComplexNumber.Normalised signum() {
+    @Override
+    public ComplexNumber signum() {
         if (ComplexNumber.isSmall(PrimitiveMath.ONE, this)) {
             return ComplexNumber.makeRotation(PrimitiveMath.ZERO);
         } else {
@@ -684,6 +640,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
      * @param arg the complex number to subtract
      * @return a complex number Z = this - {@code arg}
      */
+    @Override
     public ComplexNumber subtract(final ComplexNumber arg) {
         return new ComplexNumber(myRealValue - arg.doubleValue(), i - arg.i);
     }
@@ -699,6 +656,12 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return new ComplexNumber(myRealValue - arg, i);
     }
 
+    @Override
+    public ComplexNumber subtract(final float scalarSubtrahend) {
+        return this.subtract((double) scalarSubtrahend);
+    }
+
+    @Override
     public void supplyTo(final Mutate2D.Receiver<Double> receiver) {
         receiver.set(0L, myRealValue);
         receiver.set(1L, i);
@@ -706,19 +669,20 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         receiver.set(3L, myRealValue);
     }
 
+    @Override
     public BigDecimal toBigDecimal() {
         return new BigDecimal(this.doubleValue(), MathContext.DECIMAL64);
     }
 
     public MatrixStore<Double> toMultiplicationMatrix() {
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(this);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.make(this);
         this.supplyTo(retVal);
         return retVal;
     }
 
     public MatrixStore<Double> toMultiplicationVector() {
 
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(2L, 1L);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.make(2L, 1L);
 
         retVal.set(0L, myRealValue);
         retVal.set(1L, i);
@@ -728,7 +692,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
     public MatrixStore<Double> toRotationMatrix() {
 
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.make(2L, 2L);
+        final Primitive64Store retVal = Primitive64Store.FACTORY.make(2L, 2L);
 
         final double s = myRealValue;
 
@@ -769,6 +733,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return retVal.append(RIGHT).toString();
     }
 
+    @Override
     public String toString(final NumberContext context) {
 
         final StringBuilder retVal = new StringBuilder(LEFT);
@@ -788,6 +753,7 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
         return retVal.append(RIGHT).toString();
     }
 
+    @Override
     public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
 
         final double s = myRealValue;
@@ -799,6 +765,52 @@ public class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enfo
 
         final double r00 = (ii + ss) * invs;
         final double r11 = (ss - ii) * invs;
+
+        if (transformable.count() == 2L) {
+
+            final double x = transformable.doubleValue(0);
+            final double y = transformable.doubleValue(1);
+
+            transformable.set(0, r00 * x);
+            transformable.set(1, r11 * y);
+
+        } else if (transformable.countRows() == 2L) {
+
+            for (long c = 0L, limit = transformable.countColumns(); c < limit; c++) {
+
+                final double x = transformable.doubleValue(0, c);
+                final double y = transformable.doubleValue(1, c);
+
+                transformable.set(0, c, r00 * x);
+                transformable.set(1, c, r11 * y);
+            }
+
+        } else if (transformable.countColumns() == 2L) {
+
+            for (long r = 0L, limit = transformable.countRows(); r < limit; r++) {
+
+                final double x = transformable.doubleValue(r, 0);
+                final double y = transformable.doubleValue(r, 1);
+
+                transformable.set(r, 0, r00 * x);
+                transformable.set(r, 1, r11 * y);
+            }
+
+        } else {
+
+            throw new ProgrammingError("Only works for 2D stuff!");
+        }
+    }
+
+    <T extends ModifiableReceiver<Double> & Access2D<Double>> void transformWhenUnit(final T transformable) {
+
+        final double s = this.doubleValue();
+
+        final double ss = s * s;
+        final double ii = i * i;
+
+        final double r00 = (ii + ss);
+        final double r11 = (ss - ii);
 
         if (transformable.count() == 2L) {
 

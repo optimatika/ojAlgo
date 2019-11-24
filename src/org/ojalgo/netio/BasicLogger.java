@@ -827,7 +827,7 @@ public abstract class BasicLogger {
         final String[][] tmpElements = new String[tmpRowDim][tmpColDim];
 
         int tmpWidth = 0;
-        Number tmpElementNumber;
+        Comparable<?> tmpElementNumber;
         String tmpElementString;
         for (int j = 0; j < tmpColDim; j++) {
             for (int i = 0; i < tmpRowDim; i++) {
@@ -854,18 +854,18 @@ public abstract class BasicLogger {
 
     }
 
-    private static String toString(final Number number, final NumberContext context, final boolean plain) {
+    private static String toString(final Comparable<?> number, final NumberContext context, final boolean plain) {
         if (plain) {
             if (number instanceof Scalar<?>) {
                 return ((Scalar<?>) number).toPlainString(context);
             } else {
-                return context.enforce(new BigDecimal(number.doubleValue())).toPlainString();
+                return context.enforce(new BigDecimal(Scalar.doubleValue(number))).toPlainString();
             }
         } else {
             if (number instanceof Scalar<?>) {
                 return ((Scalar<?>) number).toString(context);
             } else {
-                return context.enforce(new BigDecimal(number.doubleValue())).toString();
+                return context.enforce(new BigDecimal(Scalar.doubleValue(number))).toString();
             }
         }
     }

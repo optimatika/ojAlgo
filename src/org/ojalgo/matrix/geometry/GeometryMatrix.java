@@ -23,7 +23,7 @@ package org.ojalgo.matrix.geometry;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 
 interface GeometryMatrix<MT extends GeometryMatrix<? super MT>> extends MatrixStore<Double> {
 
@@ -64,8 +64,8 @@ interface GeometryMatrix<MT extends GeometryMatrix<? super MT>> extends MatrixSt
         }
     }
 
-    default PhysicalStore.Factory<Double, PrimitiveDenseStore> physical() {
-        return PrimitiveDenseStore.FACTORY;
+    default PhysicalStore.Factory<Double, Primitive64Store> physical() {
+        return Primitive64Store.FACTORY;
     }
 
     @SuppressWarnings("unchecked")

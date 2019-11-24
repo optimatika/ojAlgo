@@ -21,11 +21,11 @@
  */
 package org.ojalgo.function.multiary;
 
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -36,33 +36,33 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-public final class AffineFunction<N extends Number> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Affine<N> {
+public final class AffineFunction<N extends Comparable<N>> implements MultiaryFunction.TwiceDifferentiable<N>, MultiaryFunction.Affine<N> {
 
     public static AffineFunction<ComplexNumber> makeComplex(final Access1D<?> coefficients) {
-        return new AffineFunction<>(GenericDenseStore.COMPLEX.rows(coefficients));
+        return new AffineFunction<>(GenericStore.COMPLEX.rows(coefficients));
     }
 
     public static AffineFunction<ComplexNumber> makeComplex(final int arity) {
-        return new AffineFunction<>(GenericDenseStore.COMPLEX.make(1, arity));
+        return new AffineFunction<>(GenericStore.COMPLEX.make(1, arity));
     }
 
     public static AffineFunction<Double> makePrimitive(final Access1D<?> coefficients) {
-        return new AffineFunction<>(PrimitiveDenseStore.FACTORY.rows(coefficients));
+        return new AffineFunction<>(Primitive64Store.FACTORY.rows(coefficients));
     }
 
     public static AffineFunction<Double> makePrimitive(final int arity) {
-        return new AffineFunction<>(PrimitiveDenseStore.FACTORY.make(1, arity));
+        return new AffineFunction<>(Primitive64Store.FACTORY.make(1, arity));
     }
 
     public static AffineFunction<RationalNumber> makeRational(final Access1D<?> coefficients) {
-        return new AffineFunction<>(GenericDenseStore.RATIONAL.rows(coefficients));
+        return new AffineFunction<>(GenericStore.RATIONAL.rows(coefficients));
     }
 
     public static AffineFunction<RationalNumber> makeRational(final int arity) {
-        return new AffineFunction<>(GenericDenseStore.RATIONAL.make(1, arity));
+        return new AffineFunction<>(GenericStore.RATIONAL.make(1, arity));
     }
 
-    public static <N extends Number> AffineFunction<N> wrap(final PhysicalStore<N> coefficients) {
+    public static <N extends Comparable<N>> AffineFunction<N> wrap(final PhysicalStore<N> coefficients) {
         return new AffineFunction<>(coefficients);
     }
 
@@ -116,7 +116,7 @@ public final class AffineFunction<N extends Number> implements MultiaryFunction.
         return (PhysicalStore<N>) myCoefficients;
     }
 
-    public void setConstant(final Number constant) {
+    public void setConstant(final Comparable<?> constant) {
         myConstant.setConstant(constant);
     }
 

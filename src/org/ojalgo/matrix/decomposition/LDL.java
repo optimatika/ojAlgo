@@ -48,9 +48,9 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Pivoting<N> {
+public interface LDL<N extends Comparable<N>> extends LDU<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Pivoting<N> {
 
-    interface Factory<N extends Number> extends MatrixDecomposition.Factory<LDL<N>> {
+    interface Factory<N extends Comparable<N>> extends MatrixDecomposition.Factory<LDL<N>> {
 
     }
 
@@ -62,7 +62,7 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
 
     Factory<RationalNumber> RATIONAL = typical -> new LDLDecomposition.Rational();
 
-    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
+    static <N extends Comparable<N>> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
         return Access2D.equals(matrix, decomposition.reconstruct(), context);
     }
 
@@ -72,7 +72,7 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
      */
     @Deprecated
     @SuppressWarnings("unchecked")
-    static <N extends Number> LDL<N> make(final Access2D<N> typical) {
+    static <N extends Comparable<N>> LDL<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
@@ -93,7 +93,7 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
      * @deprecated v48 Use {@link #reconstruct()} instead
      */
     @Deprecated
-    static <N extends Number> MatrixStore<N> reconstruct(final LDL<N> decomposition) {
+    static <N extends Comparable<N>> MatrixStore<N> reconstruct(final LDL<N> decomposition) {
         return decomposition.reconstruct();
     }
 

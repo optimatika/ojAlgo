@@ -33,8 +33,6 @@ import org.ojalgo.function.constant.PrimitiveMath;
  */
 public class Geometric extends AbstractDiscrete {
 
-    private static final long serialVersionUID = 1324905651790774444L;
-
     public static Geometric of(final double probability) {
         return new Geometric(probability);
     }

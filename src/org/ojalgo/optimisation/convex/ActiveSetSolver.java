@@ -31,7 +31,7 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.structure.Access1D;
@@ -46,10 +46,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
     private MatrixStore<Double> myInvQC;
-    private final PrimitiveDenseStore myIterationX;
+    private final Primitive64Store myIterationX;
     private boolean myShrinkSwitch = true;
-    private final PrimitiveDenseStore mySlackI;
-    private final PrimitiveDenseStore mySolutionL;
+    private final Primitive64Store mySlackI;
+    private final Primitive64Store mySolutionL;
 
     ActiveSetSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
 
@@ -61,13 +61,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         myActivator = new IndexSelector(numberOfInequalityConstraints);
 
-        mySolutionL = PrimitiveDenseStore.FACTORY.make(numberOfEqualityConstraints + numberOfInequalityConstraints, 1L);
-        myIterationX = PrimitiveDenseStore.FACTORY.make(numberOfVariables, 1L);
+        mySolutionL = Primitive64Store.FACTORY.make(numberOfEqualityConstraints + numberOfInequalityConstraints, 1L);
+        myIterationX = Primitive64Store.FACTORY.make(numberOfVariables, 1L);
 
-        mySlackI = PrimitiveDenseStore.FACTORY.make(numberOfInequalityConstraints, 1L);
+        mySlackI = Primitive64Store.FACTORY.make(numberOfInequalityConstraints, 1L);
     }
 
-    private void handleIterationSolution(final PrimitiveDenseStore iterX, final int[] excluded) {
+    private void handleIterationSolution(final Primitive64Store iterX, final int[] excluded) {
         // Subproblem solved successfully
 
         final PhysicalStore<Double> soluX = this.getSolutionX();
@@ -207,7 +207,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         final int[] incl = myActivator.getIncluded();
 
-        final PrimitiveDenseStore soluL = this.getSolutionL();
+        final Primitive64Store soluL = this.getSolutionL();
         final int numbEqus = this.countEqualityConstraints();
 
         int toExclude = incl[0];
@@ -524,7 +524,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final int numbVars = this.countVariables();
         final int[] incl = myActivator.getIncluded();
 
-        final PhysicalStore<Double> retVal = PrimitiveDenseStore.FACTORY.make(numbEqus + incl.length, numbVars);
+        final PhysicalStore<Double> retVal = Primitive64Store.FACTORY.make(numbEqus + incl.length, numbVars);
 
         if (numbEqus > 0) {
             this.getMatrixAE().supplyTo(retVal.regionByLimits(numbEqus, numbVars));
@@ -542,7 +542,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final int numbEqus = this.countEqualityConstraints();
         final int[] incl = myActivator.getIncluded();
 
-        final PhysicalStore<Double> retVal = PrimitiveDenseStore.FACTORY.make(numbEqus + incl.length, 1);
+        final PhysicalStore<Double> retVal = Primitive64Store.FACTORY.make(numbEqus + incl.length, 1);
 
         for (int i = 0; i < numbEqus; i++) {
             retVal.set(i, this.getMatrixBE().doubleValue(i));
@@ -576,7 +576,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return mySolutionL.logical().limits(tmpCountE, 1).below(tmpLI).get();
     }
 
-    PrimitiveDenseStore getIterationX() {
+    Primitive64Store getIterationX() {
         return myIterationX;
     }
 
@@ -599,11 +599,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return this.getSlackI().logical().row(rows).get();
     }
 
-    PrimitiveDenseStore getSolutionL() {
+    Primitive64Store getSolutionL() {
         return mySolutionL;
     }
 
-    final void handleIterationResults(final boolean solved, final PrimitiveDenseStore iterX, final int[] included, final int[] excluded) {
+    final void handleIterationResults(final boolean solved, final Primitive64Store iterX, final int[] included, final int[] excluded) {
 
         this.incrementIterationsCount();
 
@@ -664,7 +664,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             final MatrixStore<Double> inqSlack = this.getSlackI();
             final int[] excl = this.getExcluded();
 
-            PrimitiveDenseStore lagrange = this.getSolutionL();
+            Primitive64Store lagrange = this.getSolutionL();
             for (int i = 0; i < excl.length; i++) {
                 double slack = inqSlack.doubleValue(excl[i]);
                 if (ACCURACY.isZero(slack) && (this.countIncluded() < maxToInclude)) {

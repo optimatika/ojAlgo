@@ -30,7 +30,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 
-abstract class EigenvalueDecomposition<N extends Number> extends GenericDecomposition<N> implements Eigenvalue<N> {
+abstract class EigenvalueDecomposition<N extends Comparable<N>> extends GenericDecomposition<N> implements Eigenvalue<N> {
 
     /**
      * Sort eigenvalues and corresponding vectors.

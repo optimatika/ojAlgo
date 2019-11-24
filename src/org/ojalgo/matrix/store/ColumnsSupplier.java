@@ -12,9 +12,9 @@ import org.ojalgo.structure.ColumnView;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate1D;
 
-public final class ColumnsSupplier<N extends Number> implements Access2D<N>, ElementsSupplier<N> {
+public final class ColumnsSupplier<N extends Comparable<N>> implements Access2D<N>, ElementsSupplier<N> {
 
-    static final class ItemView<N extends Number> extends ColumnView<N> {
+    static final class ItemView<N extends Comparable<N>> extends ColumnView<N> {
 
         private final ColumnsSupplier<N> mySupplier;
 
@@ -107,11 +107,11 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
 
             myColumns.get(j).supplyNonZerosTo(new Mutate1D() {
 
-                public void add(final long index, final double addend) {
+                public void add(final long index, final Comparable<?> addend) {
                     receiver.add(index, col, addend);
                 }
 
-                public void add(final long index, final Number addend) {
+                public void add(final long index, final double addend) {
                     receiver.add(index, col, addend);
                 }
 
@@ -119,11 +119,11 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
                     return receiver.countRows();
                 }
 
-                public void set(final long index, final double value) {
+                public void set(final long index, final Comparable<?> value) {
                     receiver.set(index, col, value);
                 }
 
-                public void set(final long index, final Number value) {
+                public void set(final long index, final double value) {
                     receiver.set(index, col, value);
                 }
 

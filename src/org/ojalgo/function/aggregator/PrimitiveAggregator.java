@@ -37,8 +37,12 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
             return Double.valueOf(this.doubleValue());
         }
 
-        public final void invoke(final Double anArg) {
-            this.invoke(anArg.doubleValue());
+        public final void invoke(final Double arg) {
+            this.invoke(arg.doubleValue());
+        }
+
+        public final void invoke(final float arg) {
+            this.invoke((double) arg);
         }
 
         public final Scalar<Double> toScalar() {

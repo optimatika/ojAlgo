@@ -29,7 +29,7 @@ import java.util.stream.StreamSupport;
 
 import org.ojalgo.ProgrammingError;
 
-public class ColumnView<N extends Number>
+public class ColumnView<N extends Comparable<N>>
         implements Access1D<N>, Iterable<ColumnView<N>>, Iterator<ColumnView<N>>, Spliterator<ColumnView<N>>, Comparable<ColumnView<N>> {
 
     static final int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED
@@ -115,16 +115,16 @@ public class ColumnView<N extends Number>
         ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
+    public Stream<ColumnView<N>> stream() {
+        return StreamSupport.stream(this, false);
+    }
+
     /**
      * @deprecated v48 Use {@link #stream()} instead
      */
     @Deprecated
     public Stream<ColumnView<N>> stream(final boolean parallel) {
         return this.stream();
-    }
-
-    public Stream<ColumnView<N>> stream() {
-        return StreamSupport.stream(this, false);
     }
 
     @Override

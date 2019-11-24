@@ -46,6 +46,7 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
@@ -65,11 +66,11 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extends Object implements NormedVectorSpace<M, N>, Operation.Subtraction<M>,
+abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>> implements NormedVectorSpace<M, N>, Operation.Subtraction<M>,
         Operation.Multiplication<M>, ScalarOperation.Addition<M, N>, ScalarOperation.Division<M, N>, ScalarOperation.Subtraction<M, N>, Access2D<N>,
         Access2D.Elements, Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
-    public interface LogicalBuilder<N extends Number, M extends BasicMatrix<N, M>>
+    public interface LogicalBuilder<N extends Comparable<N>, M extends BasicMatrix<N, M>>
             extends Structure2D.Logical<M, BasicMatrix.LogicalBuilder<N, M>>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         default M build() {
@@ -78,7 +79,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     }
 
-    public interface PhysicalReceiver<N extends Number, M extends BasicMatrix<N, M>>
+    public interface PhysicalReceiver<N extends Comparable<N>, M extends BasicMatrix<N, M>>
             extends Mutate2D.ModifiableReceiver<N>, Supplier<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 
         default M build() {
@@ -108,7 +109,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
         final long tmpLimit = matrix.countRows();
         for (long i = 0L; i < tmpLimit; i++) {
-            retVal = PrimitiveMath.MAX.invoke(retVal, matrix.aggregateRow(i, Aggregator.NORM1).doubleValue());
+            retVal = PrimitiveMath.MAX.invoke(retVal, Scalar.doubleValue(matrix.aggregateRow(i, Aggregator.NORM1)));
         }
 
         return retVal;
@@ -123,7 +124,7 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
         final long tmpLimit = matrix.countColumns();
         for (long j = 0L; j < tmpLimit; j++) {
-            retVal = PrimitiveMath.MAX.invoke(retVal, matrix.aggregateColumn(j, Aggregator.NORM1).doubleValue());
+            retVal = PrimitiveMath.MAX.invoke(retVal, Scalar.doubleValue(matrix.aggregateColumn(j, Aggregator.NORM1)));
         }
 
         return retVal;
@@ -153,11 +154,13 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     public M add(final double scalarAddend) {
 
-        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+        Factory<N, ?> physical = myStore.physical();
 
-        final N tmpRight = myStore.physical().scalar().cast(scalarAddend);
+        PhysicalStore<N> retVal = physical.copy(myStore);
 
-        retVal.modifyAll(myStore.physical().function().add().second(tmpRight));
+        N right = physical.scalar().cast(scalarAddend);
+
+        retVal.modifyAll(physical.function().add().second(right));
 
         return this.getFactory().instantiate(retVal);
     }
@@ -173,15 +176,13 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         return this.getFactory().instantiate(retVal);
     }
 
-    public M add(final Number scalarAddend) {
+    public M add(final N scalarAddend) {
 
-        final org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> tmpPhysical = myStore.physical();
+        PhysicalStore.Factory<N, ?> physical = myStore.physical();
 
-        final PhysicalStore<N> retVal = tmpPhysical.copy(myStore);
+        PhysicalStore<N> retVal = physical.copy(myStore);
 
-        final N tmpRight = tmpPhysical.scalar().cast(scalarAddend);
-
-        retVal.modifyAll(tmpPhysical.function().add().second(tmpRight));
+        retVal.modifyAll(physical.function().add().second(scalarAddend));
 
         return this.getFactory().instantiate(retVal);
     }
@@ -225,22 +226,24 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     public M divide(final double scalarDivisor) {
 
-        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+        Factory<N, ?> physical = myStore.physical();
 
-        final N tmpRight = myStore.physical().scalar().cast(scalarDivisor);
+        PhysicalStore<N> retVal = physical.copy(myStore);
 
-        retVal.modifyAll(myStore.physical().function().divide().second(tmpRight));
+        N right = physical.scalar().cast(scalarDivisor);
+
+        retVal.modifyAll(physical.function().divide().second(right));
 
         return this.getFactory().instantiate(retVal);
     }
 
-    public M divide(final Number scalarDivisor) {
+    public M divide(final N scalarDivisor) {
 
-        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+        Factory<N, ?> physical = myStore.physical();
 
-        final N tmpRight = myStore.physical().scalar().cast(scalarDivisor);
+        PhysicalStore<N> retVal = physical.copy(myStore);
 
-        retVal.modifyAll(myStore.physical().function().divide().second(tmpRight));
+        retVal.modifyAll(physical.function().divide().second(scalarDivisor));
 
         return this.getFactory().instantiate(retVal);
     }
@@ -499,11 +502,13 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     public M multiply(final double scalarMultiplicand) {
 
-        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+        Factory<N, ?> physical = myStore.physical();
 
-        final N tmpRight = myStore.physical().scalar().cast(scalarMultiplicand);
+        PhysicalStore<N> retVal = physical.copy(myStore);
 
-        retVal.modifyAll(myStore.physical().function().multiply().second(tmpRight));
+        N right = physical.scalar().cast(scalarMultiplicand);
+
+        retVal.modifyAll(physical.function().multiply().second(right));
 
         return this.getFactory().instantiate(retVal);
     }
@@ -515,13 +520,13 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         return this.getFactory().instantiate(myStore.multiply(this.cast(multiplicand).get()));
     }
 
-    public M multiply(final Number scalarMultiplicand) {
+    public M multiply(final N scalarMultiplicand) {
 
-        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+        Factory<N, ?> physical = myStore.physical();
 
-        final N tmpRight = myStore.physical().scalar().cast(scalarMultiplicand);
+        PhysicalStore<N> retVal = physical.copy(myStore);
 
-        retVal.modifyAll(myStore.physical().function().multiply().second(tmpRight));
+        retVal.modifyAll(physical.function().multiply().second(scalarMultiplicand));
 
         return this.getFactory().instantiate(retVal);
     }
@@ -618,11 +623,13 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
 
     public M subtract(final double scalarSubtrahend) {
 
-        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+        Factory<N, ?> physical = myStore.physical();
 
-        final N tmpRight = myStore.physical().scalar().cast(scalarSubtrahend);
+        PhysicalStore<N> retVal = physical.copy(myStore);
 
-        retVal.modifyAll(myStore.physical().function().subtract().second(tmpRight));
+        N right = physical.scalar().cast(scalarSubtrahend);
+
+        retVal.modifyAll(physical.function().subtract().second(right));
 
         return this.getFactory().instantiate(retVal);
     }
@@ -638,18 +645,18 @@ abstract class BasicMatrix<N extends Number, M extends BasicMatrix<N, M>> extend
         return this.getFactory().instantiate(retVal);
     }
 
-    public M subtract(final Number scalarSubtrahend) {
+    public M subtract(final N scalarSubtrahend) {
 
-        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+        Factory<N, ?> physical = myStore.physical();
 
-        final N tmpRight = myStore.physical().scalar().cast(scalarSubtrahend);
+        PhysicalStore<N> retVal = physical.copy(myStore);
 
-        retVal.modifyAll(myStore.physical().function().subtract().second(tmpRight));
+        retVal.modifyAll(physical.function().subtract().second(scalarSubtrahend));
 
         return this.getFactory().instantiate(retVal);
     }
 
-    public void supplyTo(final PhysicalStore<N> receiver) {
+    public final void supplyTo(final PhysicalStore<N> receiver) {
         myStore.supplyTo(receiver);
     }
 

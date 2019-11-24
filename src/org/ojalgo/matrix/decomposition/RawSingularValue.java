@@ -32,7 +32,7 @@ import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
@@ -62,7 +62,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      * Calculation row and column dimensions, possibly transposed from the input
      */
     private int m, n;
-    private transient PrimitiveDenseStore myPseudoinverse = null;
+    private transient Primitive64Store myPseudoinverse = null;
     private boolean myTransposed;
     /**
      * Arrays for internal storage of U and V.
@@ -140,7 +140,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
-        return this.doGetInverse((PrimitiveDenseStore) preallocated);
+        return this.doGetInverse((Primitive64Store) preallocated);
     }
 
     public double getKyFanNorm(final int k) {
@@ -527,7 +527,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.computed(true);
     }
 
-    MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
+    MatrixStore<Double> doGetInverse(final Primitive64Store preallocated) {
 
         if (myPseudoinverse == null) {
 

@@ -25,7 +25,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
@@ -63,9 +63,9 @@ final class DirectASS extends ActiveSetSolver {
         final int numbConstr = this.countIterationConstraints();
         final int numbVars = this.countVariables();
 
-        final PrimitiveDenseStore iterX = this.getIterationX();
-        final PrimitiveDenseStore iterL = PrimitiveDenseStore.FACTORY.makeZero(numbConstr, 1L);
-        final PrimitiveDenseStore soluL = this.getSolutionL();
+        final Primitive64Store iterX = this.getIterationX();
+        final Primitive64Store iterL = Primitive64Store.FACTORY.makeZero(numbConstr, 1L);
+        final Primitive64Store soluL = this.getSolutionL();
 
         if ((numbConstr <= numbVars) && (solved = this.isSolvableQ())) {
             // Q is SPD
@@ -113,7 +113,7 @@ final class DirectASS extends ActiveSetSolver {
         if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
-            final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(numbVars + numbConstr, 1L);
+            final Primitive64Store tmpXL = Primitive64Store.FACTORY.makeZero(numbVars + numbConstr, 1L);
 
             if (solved = this.solveFullKKT(tmpXL)) {
 

@@ -21,6 +21,6 @@
  */
 package org.ojalgo.matrix.task;
 
-public interface MatrixTask<N extends Number> {
+public interface MatrixTask<N extends Comparable<N>> {
 
 }

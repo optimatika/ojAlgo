@@ -28,7 +28,7 @@ import org.ojalgo.structure.Access2D;
 /**
  * @author apete
  */
-final class WrapperStore<N extends Number> extends FactoryStore<N> {
+final class WrapperStore<N extends Comparable<N>> extends FactoryStore<N> {
 
     private final Access2D<?> myAccess;
 

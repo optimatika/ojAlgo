@@ -30,29 +30,6 @@ import org.ojalgo.random.Uniform;
 public class SparseTest extends ArrayTests {
 
     @Test
-    @Tag("slow")
-    @Tag("unstable")
-    public void testRandomAccess() {
-
-        long dim = 100_000L;
-
-        SparseArray<Double> array = SparseArray.factory(Primitive64Array.FACTORY).make(dim * dim);
-
-        for (long i = 0L; i < dim; i++) {
-            array.set(Uniform.randomInteger(dim * dim), 1.0);
-        }
-
-        double sumOfAll = 0D;
-        for (long i = 0L, limit = array.count(); i < limit; i++) {
-            sumOfAll += array.doubleValue(i);
-        }
-
-        // There is of course a chanse the same random index was generated more
-        // than once (when setting the values). In that case the test will fail.
-        TestUtils.assertEquals(dim, sumOfAll);
-    }
-
-    @Test
     public void testAggregateSumDifferentWays() {
 
         long dim = 1000L;
@@ -79,6 +56,29 @@ public class SparseTest extends ArrayTests {
 
         TestUtils.assertEquals(expected, array1D.aggregateAll(Aggregator.SUM).doubleValue());
         TestUtils.assertEquals(expected, array2D.aggregateAll(Aggregator.SUM).doubleValue());
+    }
+
+    @Test
+    @Tag("slow")
+    @Tag("unstable")
+    public void testRandomAccess() {
+
+        long dim = 100_000L;
+
+        SparseArray<Double> array = SparseArray.factory(Primitive64Array.FACTORY).make(dim * dim);
+
+        for (long i = 0L; i < dim; i++) {
+            array.set(Uniform.randomInteger(dim * dim), 1.0);
+        }
+
+        double sumOfAll = 0D;
+        for (long i = 0L, limit = array.count(); i < limit; i++) {
+            sumOfAll += array.doubleValue(i);
+        }
+
+        // There is of course a chanse the same random index was generated more
+        // than once (when setting the values). In that case the test will fail.
+        TestUtils.assertEquals(dim, sumOfAll);
     }
 
 }

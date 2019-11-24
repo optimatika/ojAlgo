@@ -26,8 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.RationalMatrix;
-import org.ojalgo.matrix.store.GenericDenseStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -50,16 +50,16 @@ public class CaseLU extends MatrixDecompositionTests {
         final RationalMatrix tmpProblematic = P20061119Case.getProblematic();
 
         final LU<RationalNumber> tmpBig = LU.RATIONAL.make();
-        tmpBig.decompose(GenericDenseStore.RATIONAL.copy(tmpProblematic));
+        tmpBig.decompose(GenericStore.RATIONAL.copy(tmpProblematic));
 
         final LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
-        tmpComplex.decompose(GenericDenseStore.COMPLEX.copy(tmpProblematic));
+        tmpComplex.decompose(GenericStore.COMPLEX.copy(tmpProblematic));
 
         final LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
-        tmpPrimitive.decompose(PrimitiveDenseStore.FACTORY.copy(tmpProblematic));
+        tmpPrimitive.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
 
         final LU<Double> tmpJama = new RawLU();
-        tmpJama.decompose(PrimitiveDenseStore.FACTORY.copy(tmpProblematic));
+        tmpJama.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
 
         final NumberContext tmpPrintContext = NumberContext.getGeneral(20);
 
@@ -78,7 +78,7 @@ public class CaseLU extends MatrixDecompositionTests {
         }
 
         final SingularValue<Double> tmpSVD = new RawSingularValue();
-        tmpSVD.decompose(PrimitiveDenseStore.FACTORY.copy(tmpProblematic));
+        tmpSVD.decompose(Primitive64Store.FACTORY.copy(tmpProblematic));
 
         TestUtils.assertEquals("LU.rank SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
         TestUtils.assertEquals("LU.rank SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());

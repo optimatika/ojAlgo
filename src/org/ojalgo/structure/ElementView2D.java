@@ -21,7 +21,7 @@
  */
 package org.ojalgo.structure;
 
-public interface ElementView2D<N extends Number, V extends ElementView2D<N, V>> extends ElementView1D<N, V> {
+public interface ElementView2D<N extends Comparable<N>, V extends ElementView2D<N, V>> extends ElementView1D<N, V> {
 
     long column();
 

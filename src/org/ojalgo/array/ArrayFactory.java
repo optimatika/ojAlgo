@@ -33,7 +33,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.StructureAnyD;
 
-abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends Object implements Factory1D<BasicArray<N>> {
+abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> implements Factory1D<I> {
 
     public abstract AggregatorSet<N> aggregator();
 
@@ -41,6 +41,15 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
         final long count = source.count();
         final I retVal = this.makeToBeFilled(count);
         retVal.fillMatching(source);
+        return retVal;
+    }
+
+    public final I copy(final Comparable<?>... source) {
+        final int length = source.length;
+        final I retVal = this.makeToBeFilled(length);
+        for (int i = 0; i < length; i++) {
+            retVal.set(i, source[i]);
+        }
         return retVal;
     }
 
@@ -53,7 +62,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
         return retVal;
     }
 
-    public final I copy(final List<? extends Number> source) {
+    public final I copy(final List<? extends Comparable<?>> source) {
         final int size = source.size();
         final I retVal = this.makeToBeFilled(size);
         for (int i = 0; i < size; i++) {
@@ -62,16 +71,11 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
         return retVal;
     }
 
-    public final I copy(final Number... source) {
-        final int length = source.length;
-        final I retVal = this.makeToBeFilled(length);
-        for (int i = 0; i < length; i++) {
-            retVal.set(i, source[i]);
-        }
-        return retVal;
-    }
-
     public abstract FunctionSet<N> function();
+
+    public final I make(final long count) {
+        return this.makeStructuredZero(count);
+    }
 
     public final I makeFilled(final long count, final NullaryFunction<?> supplier) {
         final I retVal = this.makeToBeFilled(count);
@@ -85,10 +89,6 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
             }
         }
         return retVal;
-    }
-
-    public final I make(final long count) {
-        return this.makeStructuredZero(count);
     }
 
     public abstract Scalar.Factory<N> scalar();

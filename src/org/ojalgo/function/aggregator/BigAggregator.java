@@ -42,6 +42,10 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
             this.invoke(new BigDecimal(anArg));
         }
 
+        public final void invoke(final float anArg) {
+            this.invoke(new BigDecimal(anArg));
+        }
+
         public final Scalar<BigDecimal> toScalar() {
             return BigScalar.of(this.get());
         }

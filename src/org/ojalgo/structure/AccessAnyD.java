@@ -32,13 +32,13 @@ import org.ojalgo.type.context.NumberContext;
  * @see Access1D
  * @author apete
  */
-public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N> {
+public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Access1D<N> {
 
-    public interface Aggregatable<N extends Number> extends StructureAnyD, Access1D.Aggregatable<N> {
+    public interface Aggregatable<N extends Comparable<N>> extends StructureAnyD, Access1D.Aggregatable<N> {
 
-        Number aggregateSet(int dimension, long dimensionalIndex, Aggregator aggregator);
+        N aggregateSet(int dimension, long dimensionalIndex, Aggregator aggregator);
 
-        Number aggregateSet(long[] initial, int dimension, Aggregator aggregator);
+        N aggregateSet(long[] initial, int dimension, Aggregator aggregator);
 
         default void reduce(final int dimension, final Aggregator aggregator, final Mutate1D receiver) {
             final long count1 = this.count(dimension);
@@ -50,7 +50,7 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
-    public interface Collectable<N extends Number, R extends MutateAnyD.Receiver<N>> extends StructureAnyD {
+    public interface Collectable<N extends Comparable<N>, R extends MutateAnyD.Receiver<N>> extends StructureAnyD {
 
         default <I extends R> I collect(final FactoryAnyD<I> factory) {
 
@@ -95,13 +95,13 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
-    public interface Sliceable<N extends Number> extends StructureAnyD, Access1D.Sliceable<N> {
+    public interface Sliceable<N extends Comparable<N>> extends StructureAnyD, Access1D.Sliceable<N> {
 
         Access1D<N> sliceSet(final long[] initial, final int dimension);
 
     }
 
-    public interface Visitable<N extends Number> extends StructureAnyD, Access1D.Visitable<N> {
+    public interface Visitable<N extends Comparable<N>> extends StructureAnyD, Access1D.Visitable<N> {
 
         void visitOne(long[] reference, VoidFunction<N> visitor);
 
@@ -160,7 +160,7 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         return retVal && Access1D.equals(accessA, accessB, context);
     }
 
-    default <NN extends Number, R extends MutateAnyD.Receiver<NN>> Collectable<NN, R> asCollectableAnyD() {
+    default <NN extends Comparable<NN>, R extends MutateAnyD.Receiver<NN>> Collectable<NN, R> asCollectableAnyD() {
         return new Collectable<NN, R>() {
 
             public long count(final int dimension) {

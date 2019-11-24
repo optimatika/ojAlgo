@@ -21,8 +21,6 @@
  */
 package org.ojalgo.function.special;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
-
 /**
  * https://reference.wolfram.com/language/tutorial/CombinatorialFunctions.html
  *
@@ -30,36 +28,36 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
  */
 public abstract class CombinatorialFunctions {
 
+    /**
+     * 13! does not fit in an <code>int</code>, and 21! does not fit in a <code>long</code> - that's why this
+     * method returns a <code>double</code>.
+     *
+     * @deprecated v48 Use {@link MissingMath#factorial(int)} instead
+     */
+    @Deprecated
     public static double factorial(final int arg) {
-
-        double retVal = ONE;
-
-        for (int i = 2; i <= arg; i++) {
-            retVal *= i;
-        }
-
-        return retVal;
+        return MissingMath.factorial(arg);
     }
 
     /**
      * @param n The number of elements in the set
      * @param k A vector of subset sizes the sum of which must equal the size of the full set
-     * @return The number of ways the set can be partioned in to subsets of the given sizes
+     * @return The number of ways the set can be partitioned in to subsets of the given sizes
      */
-    public static int partitions(final int n, final int[] k) {
-        int retVal = (int) CombinatorialFunctions.factorial(n);
-        for (int i = 0; i < k.length; i++) {
-            retVal /= CombinatorialFunctions.factorial(k[i]);
+    public static long partitions(final int n, final int[] k) {
+        double retVal = MissingMath.factorial(n);
+        for (int i = 0, limit = k.length; i < limit; i++) {
+            retVal /= MissingMath.factorial(k[i]);
         }
-        return retVal;
+        return Math.round(retVal);
     }
 
     /**
      * @param n The number of elements in the set
      * @return The number of permutations of the set
      */
-    public static int permutations(final int n) {
-        return (int) CombinatorialFunctions.factorial(n);
+    public static long permutations(final int n) {
+        return Math.round(MissingMath.factorial(n));
     }
 
     /**
@@ -67,8 +65,8 @@ public abstract class CombinatorialFunctions {
      * @param k The number of elements in the subset
      * @return The number of subsets to the set
      */
-    public static int subsets(final int n, final int k) {
-        return (int) (CombinatorialFunctions.factorial(n) / (CombinatorialFunctions.factorial(k) * CombinatorialFunctions.factorial(n - k)));
+    public static long subsets(final int n, final int k) {
+        return Math.round(MissingMath.factorial(n) / (MissingMath.factorial(k) * MissingMath.factorial(n - k)));
     }
 
     /**
@@ -76,11 +74,8 @@ public abstract class CombinatorialFunctions {
      * @param k The size of the tuple
      * @return The number of ordered k-tuples (variations) of the set
      */
-    public static int variations(final int n, final int k) {
-        return (int) (CombinatorialFunctions.factorial(n) / CombinatorialFunctions.factorial(n - k));
-    }
-
-    private CombinatorialFunctions() {
+    public static long variations(final int n, final int k) {
+        return Math.round(MissingMath.factorial(n) / MissingMath.factorial(n - k));
     }
 
 }

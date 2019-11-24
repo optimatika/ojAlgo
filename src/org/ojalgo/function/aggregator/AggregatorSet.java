@@ -29,7 +29,7 @@ package org.ojalgo.function.aggregator;
  *
  * @author apete
  */
-public abstract class AggregatorSet<N extends Number> {
+public abstract class AggregatorSet<N extends Comparable<N>> {
 
     protected AggregatorSet() {
         super();

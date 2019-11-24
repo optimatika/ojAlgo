@@ -26,6 +26,12 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 
 import org.ojalgo.array.operation.COPY;
+import org.ojalgo.array.operation.Exchange;
+import org.ojalgo.array.operation.FillAll;
+import org.ojalgo.array.operation.OperationBinary;
+import org.ojalgo.array.operation.OperationParameter;
+import org.ojalgo.array.operation.OperationUnary;
+import org.ojalgo.array.operation.OperationVoid;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
@@ -37,82 +43,11 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 
 /**
- * A one- and/or arbitrary-dimensional array of {@linkplain java.lang.Number}.
+ * A one- and/or arbitrary-dimensional array of {@linkplain java.lang.Comparable}.
  *
  * @author apete
  */
-public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implements Mutate1D.Sortable {
-
-    protected static <N extends Number> void exchange(final N[] data, final int firstA, final int firstB, final int step, final int aCount) {
-
-        int tmpIndexA = firstA;
-        int tmpIndexB = firstB;
-
-        N tmpVal;
-
-        for (int i = 0; i < aCount; i++) {
-
-            tmpVal = data[tmpIndexA];
-            data[tmpIndexA] = data[tmpIndexB];
-            data[tmpIndexB] = tmpVal;
-
-            tmpIndexA += step;
-            tmpIndexB += step;
-        }
-    }
-
-    protected static <N extends Number> void fill(final N[] data, final int first, final int limit, final int step, final N value) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = value;
-        }
-    }
-
-    protected static <N extends Number> void fill(final N[] data, final int first, final int limit, final int step, final NullaryFunction<N> supplier) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = supplier.invoke();
-        }
-    }
-
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final Access1D<N> left,
-            final BinaryFunction<N> function, final Access1D<N> right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(left.get(i), right.get(i));
-        }
-    }
-
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final Access1D<N> left,
-            final BinaryFunction<N> function, final N right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(left.get(i), right);
-        }
-    }
-
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final Access1D<N> value,
-            final ParameterFunction<N> function, final int aParam) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(value.get(i), aParam);
-        }
-    }
-
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final Access1D<N> value,
-            final UnaryFunction<N> function) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(value.get(i));
-        }
-    }
-
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final N left,
-            final BinaryFunction<N> function, final Access1D<N> right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(left, right.get(i));
-        }
-    }
-
-    protected static <N extends Number> void invoke(final N[] data, final int first, final int limit, final int step, final VoidFunction<N> aVisitor) {
-        for (int i = first; i < limit; i += step) {
-            aVisitor.invoke(data[i]);
-        }
-    }
+public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainArray<N> implements Mutate1D.Sortable {
 
     public final N[] data;
 
@@ -141,12 +76,12 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
         }
     }
 
+    @Override
     public void fillMatching(final Access1D<?> values) {
-        for (int i = 0, limit = (int) Math.min(this.count(), values.count()); i < limit; i++) {
-            data[i] = this.factory().scalar().cast(values.get(i));
-        }
+        FillAll.fill(data, values, this.factory().scalar());
     }
 
+    @Override
     public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
         int limit = MissingMath.toMinIntExact(this.count(), left.count(), right.count());
         for (int i = 0; i < limit; i++) {
@@ -154,6 +89,7 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
         }
     }
 
+    @Override
     public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
         int limit = MissingMath.toMinIntExact(this.count(), arguments.count());
         for (int i = 0; i < limit; i++) {
@@ -185,43 +121,33 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
     }
 
     @Override
-    protected final double doubleValue(final int index) {
-        return data[index].doubleValue();
-    }
-
-    @Override
     protected final void exchange(final int firstA, final int firstB, final int step, final int count) {
-        ReferenceTypeArray.exchange(data, firstA, firstB, step, count);
+        Exchange.exchange(data, firstA, firstB, step, count);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-        ReferenceTypeArray.invoke(data, first, limit, 1, left, function, right);
+        OperationBinary.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final Access1D<N> left, final BinaryFunction<N> function, final N right) {
-        ReferenceTypeArray.invoke(data, first, limit, 1, left, function, right);
+        OperationBinary.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final int step, final N value) {
-        ReferenceTypeArray.fill(data, first, limit, step, value);
+        FillAll.fill(data, first, limit, step, value);
     }
 
     @Override
-    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<N> supplier) {
-        ReferenceTypeArray.fill(data, first, limit, step, supplier);
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+        FillAll.fill(data, first, limit, step, supplier, this.factory().scalar());
     }
 
     @Override
     protected final void fill(final int first, final int limit, final N left, final BinaryFunction<N> function, final Access1D<N> right) {
-        ReferenceTypeArray.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        data[index] = this.valueOf(values.get(valueIndex));
+        OperationBinary.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
@@ -242,32 +168,32 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final Access1D<N> left, final BinaryFunction<N> function) {
-        ReferenceTypeArray.invoke(data, first, limit, step, left, function, this);
+        OperationBinary.invoke(data, first, limit, step, left, function, this);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final BinaryFunction<N> function, final Access1D<N> right) {
-        ReferenceTypeArray.invoke(data, first, limit, step, this, function, right);
+        OperationBinary.invoke(data, first, limit, step, this, function, right);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final BinaryFunction<N> function, final N right) {
-        ReferenceTypeArray.invoke(data, first, limit, step, this, function, right);
+        OperationBinary.invoke(data, first, limit, step, this, function, right);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final N left, final BinaryFunction<N> function) {
-        ReferenceTypeArray.invoke(data, first, limit, step, left, function, this);
+        OperationBinary.invoke(data, first, limit, step, left, function, this);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final ParameterFunction<N> function, final int parameter) {
-        ReferenceTypeArray.invoke(data, first, limit, step, this, function, parameter);
+        OperationParameter.invoke(data, first, limit, step, data, function, parameter);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final UnaryFunction<N> function) {
-        ReferenceTypeArray.invoke(data, first, limit, step, this, function);
+        OperationUnary.invoke(data, first, limit, step, this, function);
     }
 
     @Override
@@ -281,18 +207,23 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
     }
 
     @Override
+    protected final void set(final int index, final Comparable<?> value) {
+        data[index] = this.valueOf(value);
+    }
+
+    @Override
     protected final void set(final int index, final double value) {
         data[index] = this.valueOf(value);
     }
 
     @Override
-    protected final void set(final int index, final Number value) {
+    protected final void set(final int index, final float value) {
         data[index] = this.valueOf(value);
     }
 
     @Override
     protected final void visit(final int first, final int limit, final int step, final VoidFunction<N> visitor) {
-        ReferenceTypeArray.invoke(data, first, limit, step, visitor);
+        OperationVoid.invoke(data, first, limit, step, visitor);
     }
 
     @Override
@@ -320,12 +251,16 @@ public abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N>
         data[intIndex] = function.invoke(data[intIndex]);
     }
 
+    final N valueOf(final Comparable<?> number) {
+        return this.factory().scalar().cast(number);
+    }
+
     final N valueOf(final double value) {
         return this.factory().scalar().cast(value);
     }
 
-    final N valueOf(final Number number) {
-        return this.factory().scalar().cast(number);
+    final N valueOf(final float value) {
+        return this.factory().scalar().cast(value);
     }
 
 }

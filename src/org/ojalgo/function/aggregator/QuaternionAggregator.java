@@ -40,6 +40,10 @@ public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
             this.invoke(Quaternion.valueOf(anArg));
         }
 
+        public final void invoke(final float anArg) {
+            this.invoke(Quaternion.valueOf(anArg));
+        }
+
         public final Scalar<Quaternion> toScalar() {
             return this.get();
         }

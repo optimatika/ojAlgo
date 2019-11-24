@@ -28,10 +28,10 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
@@ -61,7 +61,7 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
             extends MatrixFactory<ComplexNumber, ComplexMatrix, ComplexMatrix.LogicalBuilder, ComplexMatrix.DenseReceiver, ComplexMatrix.SparseReceiver> {
 
         Factory() {
-            super(ComplexMatrix.class, GenericDenseStore.COMPLEX);
+            super(ComplexMatrix.class, GenericStore.COMPLEX);
         }
 
         @Override
@@ -125,29 +125,29 @@ public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatri
     /**
      * @return A primitive double valued matrix containg this matrix' element arguments
      */
-    public PrimitiveMatrix getArgument() {
-        return PrimitiveMatrix.FACTORY.instantiate(PrimitiveDenseStore.getComplexArgument(this.getStore()));
+    public Primitive64Matrix getArgument() {
+        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexArgument(this.getStore()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element imaginary parts
      */
-    public PrimitiveMatrix getImaginary() {
-        return PrimitiveMatrix.FACTORY.instantiate(PrimitiveDenseStore.getComplexImaginary(this.getStore()));
+    public Primitive64Matrix getImaginary() {
+        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexImaginary(this.getStore()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element modulus
      */
-    public PrimitiveMatrix getModulus() {
-        return PrimitiveMatrix.FACTORY.instantiate(PrimitiveDenseStore.getComplexModulus(this.getStore()));
+    public Primitive64Matrix getModulus() {
+        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexModulus(this.getStore()));
     }
 
     /**
      * @return A primitive double valued matrix containg this matrix' element real parts
      */
-    public PrimitiveMatrix getReal() {
-        return PrimitiveMatrix.FACTORY.instantiate(PrimitiveDenseStore.getComplexReal(this.getStore()));
+    public Primitive64Matrix getReal() {
+        return Primitive64Matrix.FACTORY.instantiate(Primitive64Store.getComplexReal(this.getStore()));
     }
 
     @Override

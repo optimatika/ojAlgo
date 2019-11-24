@@ -26,7 +26,7 @@ import java.util.Random;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access2D;
 
 public class Random1D {
@@ -41,7 +41,7 @@ public class Random1D {
         super();
 
         final Cholesky<Double> tmpCholesky = Cholesky.PRIMITIVE.make();
-        tmpCholesky.decompose(MatrixStore.PRIMITIVE.makeWrapper(correlations));
+        tmpCholesky.decompose(MatrixStore.PRIMITIVE64.makeWrapper(correlations));
         myCholeskiedCorrelations = tmpCholesky.getL();
 
         tmpCholesky.reset();
@@ -71,14 +71,14 @@ public class Random1D {
      */
     public Array1D<Double> nextDouble() {
 
-        final PrimitiveDenseStore tmpUncorrelated = PrimitiveDenseStore.FACTORY.make(length, 1);
+        final Primitive64Store tmpUncorrelated = Primitive64Store.FACTORY.make(length, 1);
 
         for (int i = 0; i < length; i++) {
             tmpUncorrelated.set(i, 0, this.random().nextDouble());
         }
 
         if (myCholeskiedCorrelations != null) {
-            return ((PrimitiveDenseStore) myCholeskiedCorrelations.multiply(tmpUncorrelated)).asList();
+            return ((Primitive64Store) myCholeskiedCorrelations.multiply(tmpUncorrelated)).asList();
         } else {
             return tmpUncorrelated.asList();
         }
@@ -89,14 +89,14 @@ public class Random1D {
      */
     public Array1D<Double> nextGaussian() {
 
-        final PrimitiveDenseStore tmpUncorrelated = PrimitiveDenseStore.FACTORY.make(length, 1);
+        final Primitive64Store tmpUncorrelated = Primitive64Store.FACTORY.make(length, 1);
 
         for (int i = 0; i < length; i++) {
             tmpUncorrelated.set(i, 0, this.random().nextGaussian());
         }
 
         if (myCholeskiedCorrelations != null) {
-            return ((PrimitiveDenseStore) myCholeskiedCorrelations.multiply(tmpUncorrelated)).asList();
+            return ((Primitive64Store) myCholeskiedCorrelations.multiply(tmpUncorrelated)).asList();
         } else {
             return tmpUncorrelated.asList();
         }

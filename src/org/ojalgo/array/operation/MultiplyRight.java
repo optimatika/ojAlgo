@@ -25,25 +25,48 @@ import java.util.Arrays;
 
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyRight;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyRight;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
 public final class MultiplyRight implements ArrayOperation {
 
+    public interface Generic<N extends Scalar<N>> {
+
+        void invoke(N[] product, N[] left, int complexity, Access1D<N> right, Scalar.Factory<N> scalar);
+
+    }
+
+    public interface Primitive32 {
+
+        void invoke(float[] product, float[] left, int complexity, Access1D<?> right);
+
+    }
+
+    public interface Primitive64 {
+
+        void invoke(double[] product, double[] left, int complexity, Access1D<?> right);
+
+    }
+
     public static int THRESHOLD = 32;
 
-    static final PrimitiveMultiplyRight PRIMITIVE = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive64 PRIMITIVE = (product, left, complexity, right) -> {
 
         Arrays.fill(product, 0.0);
 
         MultiplyRight.invoke(product, 0, (int) (right.count() / complexity), left, complexity, right);
     };
 
-    static final PrimitiveMultiplyRight PRIMITIVE_0XN = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive32 PRIMITIVE32 = (product, left, complexity, right) -> {
+
+        Arrays.fill(product, 0F);
+
+        MultiplyRight.invoke(product, 0, (int) (right.count() / complexity), left, complexity, right);
+    };
+
+    static final MultiplyRight.Primitive64 PRIMITIVE_0XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 10;
         final int tmpColDim = product.length / tmpRowDim;
@@ -89,7 +112,7 @@ public final class MultiplyRight implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyRight PRIMITIVE_1X1 = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive64 PRIMITIVE_1X1 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
 
@@ -102,7 +125,7 @@ public final class MultiplyRight implements ArrayOperation {
         product[0] = tmp00;
     };
 
-    static final PrimitiveMultiplyRight PRIMITIVE_1XN = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive64 PRIMITIVE_1XN = (product, left, complexity, right) -> {
 
         final int tmpColDim = product.length;
 
@@ -119,7 +142,7 @@ public final class MultiplyRight implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyRight PRIMITIVE_2X2 = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive64 PRIMITIVE_2X2 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -150,7 +173,7 @@ public final class MultiplyRight implements ArrayOperation {
         product[3] = tmp11;
     };
 
-    static final PrimitiveMultiplyRight PRIMITIVE_3X3 = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive64 PRIMITIVE_3X3 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -200,7 +223,7 @@ public final class MultiplyRight implements ArrayOperation {
         product[8] = tmp22;
     };
 
-    static final PrimitiveMultiplyRight PRIMITIVE_4X4 = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive64 PRIMITIVE_4X4 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -275,7 +298,7 @@ public final class MultiplyRight implements ArrayOperation {
         product[15] = tmp33;
     };
 
-    static final PrimitiveMultiplyRight PRIMITIVE_5X5 = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive64 PRIMITIVE_5X5 = (product, left, complexity, right) -> {
 
         double tmp00 = PrimitiveMath.ZERO;
         double tmp10 = PrimitiveMath.ZERO;
@@ -381,7 +404,7 @@ public final class MultiplyRight implements ArrayOperation {
         product[24] = tmp44;
     };
 
-    static final PrimitiveMultiplyRight PRIMITIVE_6XN = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive64 PRIMITIVE_6XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 6;
         final int tmpColDim = product.length / tmpRowDim;
@@ -415,7 +438,7 @@ public final class MultiplyRight implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyRight PRIMITIVE_7XN = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive64 PRIMITIVE_7XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 7;
         final int tmpColDim = product.length / tmpRowDim;
@@ -452,7 +475,7 @@ public final class MultiplyRight implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyRight PRIMITIVE_8XN = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive64 PRIMITIVE_8XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 8;
         final int tmpColDim = product.length / tmpRowDim;
@@ -492,7 +515,7 @@ public final class MultiplyRight implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyRight PRIMITIVE_9XN = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive64 PRIMITIVE_9XN = (product, left, complexity, right) -> {
 
         final int tmpRowDim = 9;
         final int tmpColDim = product.length / tmpRowDim;
@@ -535,7 +558,7 @@ public final class MultiplyRight implements ArrayOperation {
         }
     };
 
-    static final PrimitiveMultiplyRight PRIMITIVE_MT = (product, left, complexity, right) -> {
+    static final MultiplyRight.Primitive64 PRIMITIVE_MT = (product, left, complexity, right) -> {
 
         Arrays.fill(product, 0.0);
 
@@ -550,7 +573,7 @@ public final class MultiplyRight implements ArrayOperation {
         tmpConquerer.invoke(0, (int) (right.count() / complexity), THRESHOLD);
     };
 
-    public static <N extends Number & Scalar<N>> GenericMultiplyRight<N> getGeneric(final long rows, final long columns) {
+    public static <N extends Scalar<N>> MultiplyRight.Generic<N> newGeneric(final long rows, final long columns) {
 
         if (columns > THRESHOLD) {
 
@@ -580,7 +603,11 @@ public final class MultiplyRight implements ArrayOperation {
         }
     }
 
-    public static PrimitiveMultiplyRight getPrimitive(final long rows, final long columns) {
+    public static MultiplyRight.Primitive32 newPrimitive32(final long rows, final long columns) {
+        return PRIMITIVE32;
+    }
+
+    public static MultiplyRight.Primitive64 newPrimitive64(final long rows, final long columns) {
         if (columns > THRESHOLD) {
             return PRIMITIVE_MT;
         } else if (rows == 10) {
@@ -626,7 +653,24 @@ public final class MultiplyRight implements ArrayOperation {
         }
     }
 
-    static <N extends Number & Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
+    static void invoke(final float[] product, final int firstColumn, final int columnLimit, final float[] left, final int complexity, final Access1D<?> right) {
+
+        final int structure = left.length / complexity;
+
+        final float[] leftColumn = new float[structure];
+        for (int c = 0; c < complexity; c++) {
+            System.arraycopy(left, c * structure, leftColumn, 0, structure);
+
+            final int firstInRightRow = MatrixStore.firstInRow(right, c, firstColumn);
+            final int limitOfRightRow = MatrixStore.limitOfRow(right, c, columnLimit);
+
+            for (int j = firstInRightRow; j < limitOfRightRow; j++) {
+                AXPY.invoke(product, j * structure, right.floatValue(Structure2D.index(complexity, c, j)), leftColumn, 0, 0, structure);
+            }
+        }
+    }
+
+    static <N extends Scalar<N>> void invoke(final N[] product, final int firstColumn, final int columnLimit, final N[] left, final int complexity,
             final Access1D<N> right, final Scalar.Factory<N> scalar) {
 
         final int structure = left.length / complexity;

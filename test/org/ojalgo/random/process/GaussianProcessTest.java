@@ -28,7 +28,7 @@ import java.util.Collection;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.process.GaussianField.Mean;
 import org.ojalgo.type.context.NumberContext;
@@ -77,7 +77,7 @@ public class GaussianProcessTest {
         tmpProc.addObservation(-0.25, 0.5);
         tmpProc.addObservation(0.0, 0.8);
 
-        final PrimitiveDenseStore tmpExpected = PrimitiveDenseStore.FACTORY
+        final Primitive64Store tmpExpected = Primitive64Store.FACTORY
                 .rows(new double[][] { { 1.7029, 1.423379254178694, 1.2174807940480699, 0.8807634427271873, 0.7384394292014367, 0.5236319646022823 },
                         { 1.423379254178694, 1.7029, 1.5632762838868954, 1.3472073239852407, 1.2174807940480699, 0.9782733010505065 },
                         { 1.2174807940480699, 1.5632762838868954, 1.7029, 1.5170744874003474, 1.423379254178694, 1.2174807940480699 },

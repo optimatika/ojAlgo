@@ -27,7 +27,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
@@ -363,8 +363,8 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         double tmp34 = source.doubleValue(23L);
         double tmp44 = source.doubleValue(24L);
 
-        final double tmpScale = MissingMath.norm(tmp00, tmp01, tmp02, tmp03, tmp04, tmp10, tmp11, tmp12, tmp13, tmp14, tmp20, tmp21, tmp22, tmp23, tmp24,
-                tmp30, tmp31, tmp32, tmp33, tmp34, tmp40, tmp41, tmp42, tmp43, tmp44);
+        final double tmpScale = MissingMath.norm(tmp00, tmp01, tmp02, tmp03, tmp04, tmp10, tmp11, tmp12, tmp13, tmp14, tmp20, tmp21, tmp22, tmp23, tmp24, tmp30,
+                tmp31, tmp32, tmp33, tmp34, tmp40, tmp41, tmp42, tmp43, tmp44);
 
         tmp00 /= tmpScale;
         tmp10 /= tmpScale;
@@ -739,11 +739,11 @@ public abstract class AbstractInverter implements InverterTask<Double> {
     }
 
     public final MatrixStore<Double> invert(final Access2D<?> original) throws RecoverableCondition {
-        return this.invert(original, PrimitiveDenseStore.FACTORY.makeZero(this.dim(), this.dim()));
+        return this.invert(original, Primitive64Store.FACTORY.makeZero(this.dim(), this.dim()));
     }
 
     public final PhysicalStore<Double> preallocate(final Structure2D template) {
-        return PrimitiveDenseStore.FACTORY.makeZero(this.dim(), this.dim());
+        return Primitive64Store.FACTORY.makeZero(this.dim(), this.dim());
     }
 
     abstract long dim();

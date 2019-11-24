@@ -27,7 +27,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.series.NumberSeries;
 import org.ojalgo.structure.Access1D;
 
-abstract class AbstractPolynomial<N extends Number> implements PolynomialFunction<N> {
+abstract class AbstractPolynomial<N extends Comparable<N>> implements PolynomialFunction<N> {
 
     private final Array1D<N> myCoefficients;
 
@@ -91,7 +91,7 @@ abstract class AbstractPolynomial<N extends Number> implements PolynomialFunctio
         return myCoefficients.doubleValue(power);
     }
 
-    public final void estimate(final List<? extends Number> x, final List<? extends Number> y) {
+    public final void estimate(final List<? extends N> x, final List<? extends N> y) {
         this.estimate(Access1D.wrap(x), Access1D.wrap(y));
     }
 
@@ -105,12 +105,25 @@ abstract class AbstractPolynomial<N extends Number> implements PolynomialFunctio
 
     public final double invoke(final double arg) {
 
-        int tmpPower = this.degree();
+        int power = this.degree();
 
-        double retVal = this.doubleValue(tmpPower);
+        double retVal = this.doubleValue(power);
 
-        while (--tmpPower >= 0) {
-            retVal = this.doubleValue(tmpPower) + (arg * retVal);
+        while (--power >= 0) {
+            retVal = this.doubleValue(power) + (arg * retVal);
+        }
+
+        return retVal;
+    }
+
+    public final float invoke(final float arg) {
+
+        int power = this.degree();
+
+        float retVal = this.floatValue(power);
+
+        while (--power >= 0) {
+            retVal = this.floatValue(power) + (arg * retVal);
         }
 
         return retVal;

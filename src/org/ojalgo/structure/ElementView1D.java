@@ -30,7 +30,7 @@ import java.util.stream.StreamSupport;
 
 import org.ojalgo.ProgrammingError;
 
-public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>>
+public interface ElementView1D<N extends Comparable<N>, V extends ElementView1D<N, V>>
         extends AccessScalar<N>, Iterable<V>, Iterator<V>, Spliterator<V>, Comparable<V> {
 
     int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.SIZED
@@ -81,16 +81,16 @@ public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>>
         }
     }
 
+    default Stream<V> stream() {
+        return StreamSupport.stream(this, false);
+    }
+
     /**
      * @deprecated v48 Use {@link #stream()} instead
      */
     @Deprecated
     default Stream<V> stream(final boolean parallel) {
         return this.stream();
-    }
-
-    default Stream<V> stream() {
-        return StreamSupport.stream(this, false);
     }
 
     default boolean tryAdvance(final Consumer<? super V> action) {

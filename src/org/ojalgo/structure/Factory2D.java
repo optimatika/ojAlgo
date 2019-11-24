@@ -27,6 +27,11 @@ import org.ojalgo.function.NullaryFunction;
 
 public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
+    /**
+     * Should only be implemented by factories that always produce dense structures.
+     *
+     * @author apete
+     */
     interface Dense<I extends Structure2D> extends Factory2D<I> {
 
         default I column(final double... elements) {
@@ -35,12 +40,12 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
         I columns(Access1D<?>... source);
 
+        I columns(Comparable<?>[]... source);
+
         I columns(double[]... source);
 
         @SuppressWarnings("unchecked")
-        I columns(List<? extends Number>... source);
-
-        I columns(Number[]... source);
+        I columns(List<? extends Comparable<?>>... source);
 
         I copy(Access2D<?> source);
 
@@ -56,12 +61,33 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
         I rows(Access1D<?>... source);
 
+        I rows(Comparable<?>[]... source);
+
         I rows(double[]... source);
 
         @SuppressWarnings("unchecked")
-        I rows(List<? extends Number>... source);
+        I rows(List<? extends Comparable<?>>... source);
 
-        I rows(Number[]... source);
+    }
+
+    /**
+     * For when the structures can be either dense or sparse.
+     *
+     * @author apete
+     */
+    interface MayBeSparse<I extends Structure2D, DR extends Mutate2D.ModifiableReceiver<?>, SR extends Mutate2D.ModifiableReceiver<?>> extends Factory2D<I> {
+
+        DR makeDense(long rows, long columns);
+
+        default DR makeDense(final Structure2D shape) {
+            return this.makeDense(shape.countRows(), shape.countColumns());
+        }
+
+        SR makeSparse(long rows, long columns);
+
+        default SR makeSparse(final Structure2D shape) {
+            return this.makeSparse(shape.countRows(), shape.countColumns());
+        }
 
     }
 

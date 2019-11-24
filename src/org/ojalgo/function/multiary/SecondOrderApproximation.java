@@ -26,7 +26,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.structure.Access1D;
 
-public final class SecondOrderApproximation<N extends Number> extends ApproximateFunction<N> {
+public final class SecondOrderApproximation<N extends Comparable<N>> extends ApproximateFunction<N> {
 
     private final QuadraticFunction<N> myDelegate;
 

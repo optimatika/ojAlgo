@@ -108,10 +108,43 @@ public final class SubstituteBackwards implements ArrayOperation {
         }
     }
 
+    public static void invoke(final float[] data, final int structure, final int first, final int limit, final Access2D<?> body, final boolean unitDiagonal,
+            final boolean conjugated, final boolean hermitian) {
+
+        int diagDim = MissingMath.toMinIntExact(body.countRows(), body.countColumns());
+        float[] bodyRow = new float[diagDim];
+        float tmpVal;
+        int colBaseIndex;
+
+        int firstRow = hermitian ? first : 0;
+        for (int i = diagDim - 1; i >= firstRow; i--) {
+
+            for (int j = i; j < diagDim; j++) {
+                bodyRow[j] = conjugated ? body.floatValue(j, i) : body.floatValue(i, j);
+            }
+
+            int columnLimit = hermitian ? Math.min(i + 1, limit) : limit;
+            for (int s = first; s < columnLimit; s++) {
+                colBaseIndex = s * structure;
+
+                tmpVal = 0F;
+                for (int j = i + 1; j < diagDim; j++) {
+                    tmpVal += bodyRow[j] * data[j + colBaseIndex];
+                }
+                tmpVal = data[i + colBaseIndex] - tmpVal;
+                if (!unitDiagonal) {
+                    tmpVal /= bodyRow[i];
+                }
+
+                data[i + colBaseIndex] = tmpVal;
+            }
+        }
+    }
+
     /**
      * @see #invoke(double[], int, int, int, Access2D, boolean, boolean, boolean)
      */
-    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Access2D<N> body,
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int first, final int limit, final Access2D<N> body,
             final boolean unitDiagonal, final boolean conjugated, final boolean hermitian, final Scalar.Factory<N> scalar) {
 
         int diagDim = (int) Math.min(body.countRows(), body.countColumns());

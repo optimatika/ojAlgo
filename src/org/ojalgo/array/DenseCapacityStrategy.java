@@ -12,7 +12,7 @@ import org.ojalgo.scalar.Scalar.Factory;
  *
  * @author apete
  */
-final class DenseCapacityStrategy<N extends Number> {
+final class DenseCapacityStrategy<N extends Comparable<N>> {
 
     /**
      * 512

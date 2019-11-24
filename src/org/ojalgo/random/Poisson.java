@@ -24,7 +24,7 @@ package org.ojalgo.random;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.special.CombinatorialFunctions;
+import org.ojalgo.function.special.MissingMath;
 
 /**
  * The Poisson distribution is a discrete probability distribution that expresses the probability of a given
@@ -37,8 +37,6 @@ import org.ojalgo.function.special.CombinatorialFunctions;
  * @author apete
  */
 public class Poisson extends AbstractDiscrete {
-
-    private static final long serialVersionUID = -5382163736545207782L;
 
     public static Poisson of(final double lambda) {
         return new Poisson(lambda);
@@ -62,7 +60,7 @@ public class Poisson extends AbstractDiscrete {
     }
 
     public double getProbability(final int value) {
-        return (PrimitiveMath.EXP.invoke(-myLambda) * PrimitiveMath.POW.invoke(myLambda, value)) / CombinatorialFunctions.factorial(value);
+        return (PrimitiveMath.EXP.invoke(-myLambda) * PrimitiveMath.POW.invoke(myLambda, value)) / MissingMath.factorial(value);
     }
 
     @Override

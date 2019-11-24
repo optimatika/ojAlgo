@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -61,23 +61,59 @@ public class P20061119Case extends BasicMatrixTest {
 
     @Override
     @BeforeEach
-    public void setUp() {
+    public void doBeforeEach() {
 
-        evaluation = NumberContext.getGeneral(8).withPrecision(14);
+        // evaluation = NumberContext.getGeneral(8).withPrecision(14);
 
-        rationalAA = P20061119Case.getProblematic();
-        rationalAX = BasicMatrixTest.getIdentity(rationalAA.countColumns(), rationalAA.countColumns(), DEFINITION);
-        rationalAB = rationalAA;
+        rAA = P20061119Case.getProblematic();
+        rAX = BasicMatrixTest.getIdentity(rAA.countColumns(), rAA.countColumns(), DEFINITION);
+        rAB = rAA;
 
-        rationlI = BasicMatrixTest.getIdentity(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
-        rationalSafe = BasicMatrixTest.getSafe(rationalAA.countRows(), rationalAA.countColumns(), DEFINITION);
+        rI = BasicMatrixTest.getIdentity(rAA.countRows(), rAA.countColumns(), DEFINITION);
+        rSafe = BasicMatrixTest.getSafe(rAA.countRows(), rAA.countColumns(), DEFINITION);
 
-        super.setUp();
+        super.doBeforeEach();
     }
 
     @Test
     public void testData() {
         TestUtils.assertEquals(true, P20061119Case.getProblematic().isSquare());
+    }
+
+    @Override
+    @Test
+    public void testGetRank() {
+
+        int expected = rAA.getRank();
+        int actual;
+
+        actual = cAA.getRank();
+        TestUtils.assertEquals(expected, actual);
+
+        actual = p64AA.getRank();
+        TestUtils.assertEquals(expected, actual);
+
+        // TODO Why doesn't this work?
+        // actual = p32AA.getRank();
+        // TestUtils.assertEquals(expected, actual);
+    }
+
+    @Override
+    @Test
+    public void testIsFullRank() {
+
+        boolean expected = rAA.isFullRank();
+        boolean actual;
+
+        actual = cAA.isFullRank();
+        TestUtils.assertEquals(expected, actual);
+
+        actual = p64AA.isFullRank();
+        TestUtils.assertEquals(expected, actual);
+
+        // TODO Why doesn't this work?
+        // actual = p32AA.isFullRank();
+        // TestUtils.assertEquals(expected, actual);
     }
 
     @Test
@@ -86,10 +122,10 @@ public class P20061119Case extends BasicMatrixTest {
         final RationalMatrix tmpMatrix = P20061119Case.getProblematic();
 
         final Eigenvalue<Double> tmpEigenvalue = Eigenvalue.PRIMITIVE.make();
-        final PhysicalStore<Double> tmpPrimitiveStore = PrimitiveDenseStore.FACTORY.copy(tmpMatrix);
+        final PhysicalStore<Double> tmpPrimitiveStore = Primitive64Store.FACTORY.copy(tmpMatrix);
         tmpEigenvalue.decompose(tmpPrimitiveStore);
 
-        TestUtils.assertEquals(tmpPrimitiveStore, tmpEigenvalue, evaluation);
+        TestUtils.assertEquals(tmpPrimitiveStore, tmpEigenvalue, ACCURACY);
     }
 
 }

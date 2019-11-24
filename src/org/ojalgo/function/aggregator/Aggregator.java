@@ -25,7 +25,7 @@ public enum Aggregator {
 
     AVERAGE, CARDINALITY, LARGEST, MAXIMUM, MINIMUM, NORM1, NORM2, PRODUCT, PRODUCT2, SMALLEST, SUM, SUM2;
 
-    public final <N extends Number> AggregatorFunction<N> getFunction(final AggregatorSet<N> collection) {
+    public final <N extends Comparable<N>> AggregatorFunction<N> getFunction(final AggregatorSet<N> collection) {
         return collection.get(this);
     }
 

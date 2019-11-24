@@ -48,10 +48,10 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements,
-        Access2D.IndexOf, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N> {
+public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>,
+        Access2D.Elements, Access2D.IndexOf, Structure2D.ReducibleTo1D<Array1D<N>>, Mutate2D.ModifiableReceiver<N>, Mutate2D.Mixable<N> {
 
-    public static final class Factory<N extends Number> implements Factory2D<Array2D<N>> {
+    public static final class Factory<N extends Comparable<N>> implements Factory2D.MayBeSparse<Array2D<N>, Array2D<N>, Array2D<N>> {
 
         private final BasicArray.Factory<N> myDelegate;
 
@@ -88,6 +88,24 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
+        public Array2D<N> columns(final Comparable<?>[]... source) {
+
+            final int tmpColumns = source.length;
+            final int tmpRows = source[0].length;
+
+            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
+
+            long tmpIndex = 0L;
+            for (int j = 0; j < tmpColumns; j++) {
+                final Comparable<?>[] tmpColumn = source[j];
+                for (int i = 0; i < tmpRows; i++) {
+                    tmpDelegate.set(tmpIndex++, tmpColumn[i]);
+                }
+            }
+
+            return tmpDelegate.wrapInArray2D(tmpRows);
+        }
+
         public Array2D<N> columns(final double[]... source) {
 
             final int tmpColumns = source.length;
@@ -106,7 +124,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
-        public Array2D<N> columns(final List<? extends Number>... source) {
+        public Array2D<N> columns(final List<? extends Comparable<?>>... source) {
 
             final int tmpColumns = source.length;
             final int tmpRows = source[0].size();
@@ -115,27 +133,9 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
 
             long tmpIndex = 0L;
             for (int j = 0; j < tmpColumns; j++) {
-                final List<? extends Number> tmpColumn = source[j];
+                final List<? extends Comparable<?>> tmpColumn = source[j];
                 for (int i = 0; i < tmpRows; i++) {
                     tmpDelegate.set(tmpIndex++, tmpColumn.get(i));
-                }
-            }
-
-            return tmpDelegate.wrapInArray2D(tmpRows);
-        }
-
-        public Array2D<N> columns(final Number[]... source) {
-
-            final int tmpColumns = source.length;
-            final int tmpRows = source[0].length;
-
-            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
-
-            long tmpIndex = 0L;
-            for (int j = 0; j < tmpColumns; j++) {
-                final Number[] tmpColumn = source[j];
-                for (int i = 0; i < tmpRows; i++) {
-                    tmpDelegate.set(tmpIndex++, tmpColumn[i]);
                 }
             }
 
@@ -149,6 +149,15 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         @Override
         public FunctionSet<N> function() {
             return myDelegate.function();
+        }
+
+        @Override
+        public Array2D<N> make(final long rows, final long columns) {
+            return this.makeDense(rows, columns);
+        }
+
+        public Array2D<N> makeDense(final long rows, final long columns) {
+            return myDelegate.makeToBeFilled(rows, columns).wrapInArray2D(rows);
         }
 
         public Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
@@ -167,10 +176,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
 
         public Array2D<N> makeSparse(final long rows, final long columns) {
             return myDelegate.makeStructuredZero(rows, columns).wrapInArray2D(rows);
-        }
-
-        public Array2D<N> make(final long rows, final long columns) {
-            return myDelegate.makeToBeFilled(rows, columns).wrapInArray2D(rows);
         }
 
         public Array2D<N> rows(final Access1D<?>... source) {
@@ -199,6 +204,23 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
             return tmpDelegate.wrapInArray2D(tmpRows);
         }
 
+        public Array2D<N> rows(final Comparable<?>[]... source) {
+
+            final int tmpRows = source.length;
+            final int tmpColumns = source[0].length;
+
+            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
+
+            for (int i = 0; i < tmpRows; i++) {
+                final Comparable<?>[] tmpRow = source[i];
+                for (int j = 0; j < tmpColumns; j++) {
+                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
+                }
+            }
+
+            return tmpDelegate.wrapInArray2D(tmpRows);
+        }
+
         public Array2D<N> rows(final double[]... source) {
 
             final int tmpRows = source.length;
@@ -217,7 +239,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         }
 
         @SuppressWarnings("unchecked")
-        public Array2D<N> rows(final List<? extends Number>... source) {
+        public Array2D<N> rows(final List<? extends Comparable<?>>... source) {
 
             final int tmpRows = source.length;
             final int tmpColumns = source[0].size();
@@ -225,26 +247,9 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
             final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             for (int i = 0; i < tmpRows; i++) {
-                final List<? extends Number> tmpRow = source[i];
+                final List<? extends Comparable<?>> tmpRow = source[i];
                 for (int j = 0; j < tmpColumns; j++) {
                     tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow.get(j));
-                }
-            }
-
-            return tmpDelegate.wrapInArray2D(tmpRows);
-        }
-
-        public Array2D<N> rows(final Number[]... source) {
-
-            final int tmpRows = source.length;
-            final int tmpColumns = source[0].length;
-
-            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
-
-            for (int i = 0; i < tmpRows; i++) {
-                final Number[] tmpRow = source[i];
-                for (int j = 0; j < tmpColumns; j++) {
-                    tmpDelegate.set(Structure2D.index(tmpRows, i, j), tmpRow[j]);
                 }
             }
 
@@ -267,7 +272,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
     public static final Factory<Quaternion> QUATERNION = new Factory<>(QuaternionArray.FACTORY);
     public static final Factory<RationalNumber> RATIONAL = new Factory<>(RationalArray.FACTORY);
 
-    public static <N extends Number> Array2D.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
+    public static <N extends Comparable<N>> Array2D.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
         return new Array2D.Factory<>(denseArray);
     }
 
@@ -285,40 +290,58 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         myColumnsCount = structure == 0L ? 0L : delegate.count() / structure;
     }
 
+    @Override
+    public void add(final long index, final Comparable<?> addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
     public void add(final long index, final double addend) {
         myDelegate.add(index, addend);
     }
 
+    @Override
+    public void add(final long index, final float addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
+    public void add(final long row, final long col, final Comparable<?> addend) {
+        myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
+    }
+
+    @Override
     public void add(final long row, final long col, final double addend) {
         myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
     }
 
-    public void add(final long row, final long col, final Number addend) {
+    @Override
+    public void add(final long row, final long col, final float addend) {
         myDelegate.add(Structure2D.index(myRowsCount, row, col), addend);
     }
 
-    public void add(final long index, final Number addend) {
-        myDelegate.add(index, addend);
-    }
-
+    @Override
     public N aggregateColumn(final long row, final long col, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitColumn(row, col, visitor);
         return visitor.get();
     }
 
+    @Override
     public N aggregateDiagonal(final long row, final long col, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitDiagonal(row, col, visitor);
         return visitor.get();
     }
 
+    @Override
     public N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitRange(first, limit, visitor);
         return visitor.get();
     }
 
+    @Override
     public N aggregateRow(final long row, final long col, final Aggregator aggregator) {
         AggregatorFunction<N> visitor = aggregator.getFunction(myDelegate.factory().aggregator());
         this.visitRow(row, col, visitor);
@@ -340,22 +363,27 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         myDelegate.reset();
     }
 
+    @Override
     public long count() {
         return myDelegate.count();
     }
 
+    @Override
     public long countColumns() {
         return myColumnsCount;
     }
 
+    @Override
     public long countRows() {
         return myRowsCount;
     }
 
+    @Override
     public double doubleValue(final long index) {
         return myDelegate.doubleValue(index);
     }
 
+    @Override
     public double doubleValue(final long row, final long col) {
         return myDelegate.doubleValue(Structure2D.index(myRowsCount, row, col));
     }
@@ -371,22 +399,27 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         }
     }
 
+    @Override
     public void exchangeColumns(final long colA, final long colB) {
         myDelegate.exchange(colA * myRowsCount, colB * myRowsCount, 1L, myRowsCount);
     }
 
+    @Override
     public void exchangeRows(final long rowA, final long rowB) {
         myDelegate.exchange(rowA, rowB, myRowsCount, myColumnsCount);
     }
 
+    @Override
     public void fillAll(final N value) {
         myDelegate.fill(0L, this.count(), 1L, value);
     }
 
-    public void fillAll(final NullaryFunction<N> supplier) {
+    @Override
+    public void fillAll(final NullaryFunction<?> supplier) {
         myDelegate.fill(0L, this.count(), 1L, supplier);
     }
 
+    @Override
     public void fillColumn(final long row, final long col, final Access1D<N> values) {
 
         final long offset = Structure2D.index(myRowsCount, row, col);
@@ -403,56 +436,69 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         }
     }
 
+    @Override
     public void fillColumn(final long row, final long col, final N value) {
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L, value);
     }
 
-    public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+    @Override
+    public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L, supplier);
     }
 
+    @Override
     public void fillDiagonal(final long row, final long col, final N value) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, value);
     }
 
-    public void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
+    @Override
+    public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, supplier);
     }
 
+    @Override
     public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
         myDelegate.fillOne(index, values, valueIndex);
     }
 
+    @Override
     public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
         myDelegate.fillOne(Structure2D.index(myRowsCount, row, col), values, valueIndex);
     }
 
+    @Override
     public void fillOne(final long row, final long col, final N value) {
         myDelegate.fillOne(Structure2D.index(myRowsCount, row, col), value);
     }
 
-    public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+    @Override
+    public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
         myDelegate.fillOne(Structure2D.index(myRowsCount, row, col), supplier);
     }
 
+    @Override
     public void fillOne(final long index, final N value) {
         myDelegate.fillOne(index, value);
     }
 
-    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+    @Override
+    public void fillOne(final long index, final NullaryFunction<?> supplier) {
         myDelegate.fillOne(index, supplier);
     }
 
+    @Override
     public void fillRange(final long first, final long limit, final N value) {
         myDelegate.fill(first, limit, 1L, value);
     }
 
-    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+    @Override
+    public void fillRange(final long first, final long limit, final NullaryFunction<?> supplier) {
         myDelegate.fill(first, limit, 1L, supplier);
     }
 
+    @Override
     public void fillRow(final long row, final long col, final Access1D<N> values) {
 
         final long offset = Structure2D.index(myRowsCount, row, col);
@@ -469,18 +515,22 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         }
     }
 
+    @Override
     public void fillRow(final long row, final long col, final N value) {
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, value);
     }
 
-    public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+    @Override
+    public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, supplier);
     }
 
+    @Override
     public N get(final long index) {
         return myDelegate.get(index);
     }
 
+    @Override
     public N get(final long row, final long col) {
         return myDelegate.get(Structure2D.index(myRowsCount, row, col));
     }
@@ -490,6 +540,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         return (int) (myRowsCount * myColumnsCount * myDelegate.hashCode());
     }
 
+    @Override
     public long indexOfLargest() {
         return myDelegate.indexOfLargest();
     }
@@ -497,10 +548,12 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
     /**
      * @return The row-index of the largest absolute value in a column, starting at the specified row.
      */
+    @Override
     public long indexOfLargestInColumn(final long row, final long col) {
         return myDelegate.indexOfLargest(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L) % myRowsCount;
     }
 
+    @Override
     public long indexOfLargestInRange(final long first, final long limit) {
         return myDelegate.indexOfLargestInRange(first, limit);
     }
@@ -508,11 +561,13 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
     /**
      * @return The column-index of the largest absolute value in a row, starting at the specified column.
      */
+    @Override
     public long indexOfLargestInRow(final long row, final long col) {
         return myDelegate.indexOfLargest(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount)
                 / myRowsCount;
     }
 
+    @Override
     public long indexOfLargestOnDiagonal(final long first) {
 
         final long tmpMinCount = Math.min(myRowsCount, myColumnsCount);
@@ -524,6 +579,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         return myDelegate.indexOfLargest(tmpFirst, tmpLimit, tmpStep) / myRowsCount;
     }
 
+    @Override
     public boolean isAbsolute(final long index) {
         return myDelegate.isAbsolute(index);
     }
@@ -531,30 +587,37 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
     /**
      * @see Scalar#isAbsolute()
      */
+    @Override
     public boolean isAbsolute(final long row, final long col) {
         return myDelegate.isAbsolute(Structure2D.index(myRowsCount, row, col));
     }
 
+    @Override
     public boolean isAllSmall(final double comparedTo) {
         return myDelegate.isSmall(0L, this.count(), 1L, comparedTo);
     }
 
+    @Override
     public boolean isColumnSmall(final long row, final long col, final double comparedTo) {
         return myDelegate.isSmall(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L, comparedTo);
     }
 
+    @Override
     public boolean isRowSmall(final long row, final long col, final double comparedTo) {
         return myDelegate.isSmall(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, comparedTo);
     }
 
+    @Override
     public boolean isSmall(final long index, final double comparedTo) {
         return myDelegate.isSmall(index, comparedTo);
     }
 
+    @Override
     public boolean isSmall(final long row, final long col, final double comparedTo) {
         return myDelegate.isSmall(Structure2D.index(myRowsCount, row, col), comparedTo);
     }
 
+    @Override
     public double mix(final long row, final long col, final BinaryFunction<N> mixer, final double addend) {
         ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
@@ -565,6 +628,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         }
     }
 
+    @Override
     public N mix(final long row, final long col, final BinaryFunction<N> mixer, final N addend) {
         ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
@@ -575,97 +639,129 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         }
     }
 
+    @Override
     public void modifyAll(final UnaryFunction<N> modifier) {
         myDelegate.modify(0L, this.count(), 1L, modifier);
     }
 
+    @Override
     public void modifyAny(final Transformation2D<N> modifier) {
         modifier.transform(this);
     }
 
+    @Override
     public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
         myDelegate.modify(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L, modifier);
     }
 
+    @Override
     public void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
         myDelegate.modify(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, modifier);
     }
 
+    @Override
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
         myDelegate.modify(0L, this.count(), 1L, left, function);
     }
 
+    @Override
     public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
         myDelegate.modify(0L, this.count(), 1L, function, right);
     }
 
+    @Override
     public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
         myDelegate.modifyOne(Structure2D.index(myRowsCount, row, col), modifier);
     }
 
+    @Override
     public void modifyOne(final long index, final UnaryFunction<N> modifier) {
         myDelegate.modifyOne(index, modifier);
     }
 
+    @Override
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
         myDelegate.modify(first, limit, 1L, modifier);
     }
 
+    @Override
     public void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
         myDelegate.modify(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, modifier);
     }
 
+    @Override
     public Array1D<N> reduceColumns(final Aggregator aggregator) {
         Array1D<N> retVal = myDelegate.factory().makeZero(myColumnsCount).wrapInArray1D();
         this.reduceColumns(aggregator, retVal);
         return retVal;
     }
 
+    @Override
     public Array1D<N> reduceRows(final Aggregator aggregator) {
         Array1D<N> retVal = myDelegate.factory().makeZero(myRowsCount).wrapInArray1D();
         this.reduceRows(aggregator, retVal);
         return retVal;
     }
 
+    @Override
+    public void set(final long index, final Comparable<?> value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
     public void set(final long index, final double value) {
         myDelegate.set(index, value);
     }
 
+    @Override
+    public void set(final long index, final float value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
+    public void set(final long row, final long col, final Comparable<?> value) {
+        myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
+    }
+
+    @Override
     public void set(final long row, final long col, final double value) {
         myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
     }
 
-    public void set(final long row, final long col, final Number value) {
+    @Override
+    public void set(final long row, final long col, final float value) {
         myDelegate.set(Structure2D.index(myRowsCount, row, col), value);
     }
 
-    public void set(final long index, final Number value) {
-        myDelegate.set(index, value);
-    }
-
+    @Override
     public Array1D<N> sliceColumn(final long col) {
         return this.sliceColumn(0L, col);
     }
 
+    @Override
     public Array1D<N> sliceColumn(final long row, final long col) {
         return new Array1D<>(myDelegate, Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L);
     }
 
+    @Override
     public Array1D<N> sliceDiagonal(final long row, final long col) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
         return new Array1D<>(myDelegate, Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount),
                 1L + myRowsCount);
     }
 
+    @Override
     public Array1D<N> sliceRange(final long first, final long limit) {
         return myDelegate.wrapInArray1D().sliceRange(first, limit);
     }
 
+    @Override
     public Array1D<N> sliceRow(final long row) {
         return this.sliceRow(row, 0L);
     }
 
+    @Override
     public Array1D<N> sliceRow(final long row, final long col) {
         return new Array1D<>(myDelegate, Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount);
     }
@@ -675,31 +771,38 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Vi
         return Access2D.toString(this);
     }
 
+    @Override
     public void visitAll(final VoidFunction<N> visitor) {
         myDelegate.visit(0L, this.count(), 1L, visitor);
     }
 
+    @Override
     public void visitColumn(final long row, final long col, final VoidFunction<N> visitor) {
         myDelegate.visit(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L, visitor);
     }
 
+    @Override
     public void visitDiagonal(final long row, final long col, final VoidFunction<N> visitor) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
         myDelegate.visit(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, visitor);
     }
 
+    @Override
     public void visitOne(final long row, final long col, final VoidFunction<N> visitor) {
         myDelegate.visitOne(Structure2D.index(myRowsCount, row, col), visitor);
     }
 
+    @Override
     public void visitOne(final long index, final VoidFunction<N> visitor) {
         myDelegate.visitOne(index, visitor);
     }
 
+    @Override
     public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
         myDelegate.visit(first, limit, 1L, visitor);
     }
 
+    @Override
     public void visitRow(final long row, final long col, final VoidFunction<N> visitor) {
         myDelegate.visit(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row, myColumnsCount), myRowsCount, visitor);
     }

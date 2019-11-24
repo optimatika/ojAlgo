@@ -50,7 +50,7 @@ public abstract class SeriesForecaster extends SeriesExtrapolator<CalendarDate> 
         myResolution = null;
     }
 
-    private SeriesForecaster(final Map<String, ? extends BasicSeries<CalendarDate, ? extends Number>> data) {
+    private SeriesForecaster(final Map<String, ? extends BasicSeries<CalendarDate, ? extends Comparable<?>>> data) {
 
         super(data);
 
@@ -58,7 +58,7 @@ public abstract class SeriesForecaster extends SeriesExtrapolator<CalendarDate> 
         myResolution = null;
     }
 
-    protected SeriesForecaster(final CalendarDateSeries<? extends Number> data) {
+    protected SeriesForecaster(final CalendarDateSeries<? extends Comparable<?>> data) {
 
         super(data);
 
@@ -66,7 +66,7 @@ public abstract class SeriesForecaster extends SeriesExtrapolator<CalendarDate> 
         myResolution = data.getResolution();
     }
 
-    protected SeriesForecaster(final CoordinationSet<? extends Number> coordinatedHistoricalData) {
+    protected SeriesForecaster(final CoordinationSet<? extends Comparable<?>> coordinatedHistoricalData) {
 
         super(coordinatedHistoricalData);
 

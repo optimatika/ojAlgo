@@ -30,7 +30,7 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive32Store;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
@@ -44,10 +44,10 @@ import org.ojalgo.structure.Structure2D;
  *
  * @author apete
  */
-public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> {
+public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matrix> {
 
     public static final class DenseReceiver extends
-            MatrixFactory<Double, PrimitiveMatrix, PrimitiveMatrix.LogicalBuilder, PrimitiveMatrix.DenseReceiver, PrimitiveMatrix.SparseReceiver>.DenseReceiver {
+            MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver>.DenseReceiver {
 
         DenseReceiver(final Factory enclosing, final PhysicalStore<Double> delegate) {
             enclosing.super(delegate);
@@ -55,32 +55,32 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
 
     }
 
-    public static final class Factory
-            extends MatrixFactory<Double, PrimitiveMatrix, PrimitiveMatrix.LogicalBuilder, PrimitiveMatrix.DenseReceiver, PrimitiveMatrix.SparseReceiver> {
+    public static final class Factory extends
+            MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver> {
 
         Factory() {
-            super(PrimitiveMatrix.class, PrimitiveDenseStore.FACTORY);
+            super(Primitive32Matrix.class, Primitive32Store.FACTORY);
         }
 
         @Override
-        PrimitiveMatrix.LogicalBuilder logical(final MatrixStore<Double> delegate) {
-            return new PrimitiveMatrix.LogicalBuilder(this, delegate);
+        Primitive32Matrix.LogicalBuilder logical(final MatrixStore<Double> delegate) {
+            return new Primitive32Matrix.LogicalBuilder(this, delegate);
         }
 
         @Override
-        PrimitiveMatrix.DenseReceiver physical(final PhysicalStore<Double> delegate) {
-            return new PrimitiveMatrix.DenseReceiver(this, delegate);
+        Primitive32Matrix.DenseReceiver physical(final PhysicalStore<Double> delegate) {
+            return new Primitive32Matrix.DenseReceiver(this, delegate);
         }
 
         @Override
-        PrimitiveMatrix.SparseReceiver physical(final SparseStore<Double> delegate) {
-            return new PrimitiveMatrix.SparseReceiver(this, delegate);
+        Primitive32Matrix.SparseReceiver physical(final SparseStore<Double> delegate) {
+            return new Primitive32Matrix.SparseReceiver(this, delegate);
         }
 
     }
 
     public static final class LogicalBuilder extends
-            MatrixFactory<Double, PrimitiveMatrix, PrimitiveMatrix.LogicalBuilder, PrimitiveMatrix.DenseReceiver, PrimitiveMatrix.SparseReceiver>.Logical {
+            MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver>.Logical {
 
         LogicalBuilder(final Factory enclosing, final MatrixStore.LogicalBuilder<Double> delegate) {
             enclosing.super(delegate);
@@ -98,7 +98,7 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
     }
 
     public static final class SparseReceiver extends
-            MatrixFactory<Double, PrimitiveMatrix, PrimitiveMatrix.LogicalBuilder, PrimitiveMatrix.DenseReceiver, PrimitiveMatrix.SparseReceiver>.SparseReceiver {
+            MatrixFactory<Double, Primitive32Matrix, Primitive32Matrix.LogicalBuilder, Primitive32Matrix.DenseReceiver, Primitive32Matrix.SparseReceiver>.SparseReceiver {
 
         SparseReceiver(final Factory enclosing, final SparseStore<Double> delegate) {
             enclosing.super(delegate);
@@ -111,31 +111,31 @@ public final class PrimitiveMatrix extends BasicMatrix<Double, PrimitiveMatrix> 
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    PrimitiveMatrix(final MatrixStore<Double> aStore) {
+    Primitive32Matrix(final MatrixStore<Double> aStore) {
         super(aStore);
     }
 
     @Override
-    public PrimitiveMatrix.DenseReceiver copy() {
-        return new PrimitiveMatrix.DenseReceiver(FACTORY, this.getStore().copy());
+    public Primitive32Matrix.DenseReceiver copy() {
+        return new Primitive32Matrix.DenseReceiver(FACTORY, this.getStore().copy());
     }
 
     @Override
-    public PrimitiveMatrix.LogicalBuilder logical() {
-        return new PrimitiveMatrix.LogicalBuilder(FACTORY, this.getStore());
+    public Primitive32Matrix.LogicalBuilder logical() {
+        return new Primitive32Matrix.LogicalBuilder(FACTORY, this.getStore());
     }
 
     @SuppressWarnings("unchecked")
     @Override
     ElementsSupplier<Double> cast(final Access1D<?> matrix) {
 
-        if (matrix instanceof PrimitiveMatrix) {
+        if (matrix instanceof Primitive32Matrix) {
 
-            return ((PrimitiveMatrix) matrix).getStore();
+            return ((Primitive32Matrix) matrix).getStore();
 
-        } else if (matrix instanceof PrimitiveDenseStore) {
+        } else if (matrix instanceof Primitive32Store) {
 
-            return (PrimitiveDenseStore) matrix;
+            return (Primitive32Store) matrix;
 
         } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof Double)) {
 

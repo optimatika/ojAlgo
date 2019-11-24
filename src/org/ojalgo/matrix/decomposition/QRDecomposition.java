@@ -26,20 +26,21 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 
-abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N> implements QR<N> {
+abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements QR<N> {
 
     static final class Complex extends QRDecomposition<ComplexNumber> {
 
@@ -48,7 +49,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
 
         Complex(final boolean fullSize) {
-            super(GenericDenseStore.COMPLEX, fullSize);
+            super(GenericStore.COMPLEX, fullSize);
         }
 
     }
@@ -60,7 +61,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
 
         Primitive(final boolean fullSize) {
-            super(PrimitiveDenseStore.FACTORY, fullSize);
+            super(Primitive64Store.FACTORY, fullSize);
         }
 
     }
@@ -72,7 +73,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
 
         Quat(final boolean fullSize) {
-            super(GenericDenseStore.QUATERNION, fullSize);
+            super(GenericStore.QUATERNION, fullSize);
         }
 
     }
@@ -84,7 +85,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
 
         Rational(final boolean fullSize) {
-            super(GenericDenseStore.RATIONAL, fullSize);
+            super(GenericStore.RATIONAL, fullSize);
         }
 
     }
@@ -192,7 +193,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         N largest = this.getInPlace().aggregateDiagonal(Aggregator.LARGEST);
         double epsilon = this.getDimensionalEpsilon();
 
-        return epsilon * Math.max(MACHINE_SMALLEST, largest.doubleValue());
+        return epsilon * Math.max(MACHINE_SMALLEST, Scalar.doubleValue(largest));
     }
 
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {

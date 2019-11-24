@@ -48,7 +48,28 @@ public final class RotateRight implements ArrayOperation {
         }
     }
 
-    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final int structure, final int colA, final int colB, final N cos, final N sin) {
+    public static void invoke(final float[] data, final int structure, final int colA, final int colB, final float cos, final float sin) {
+
+        float oldA;
+        float oldB;
+
+        int indexA = colA * structure;
+        int indexB = colB * structure;
+
+        for (int i = 0; i < structure; i++) {
+
+            oldA = data[indexA];
+            oldB = data[indexB];
+
+            data[indexA] = (cos * oldA) - (sin * oldB);
+            data[indexB] = (cos * oldB) + (sin * oldA);
+
+            indexA++;
+            indexB++;
+        }
+    }
+
+    public static <N extends Scalar<N>> void invoke(final N[] data, final int structure, final int colA, final int colB, final N cos, final N sin) {
 
         N oldA;
         N oldB;

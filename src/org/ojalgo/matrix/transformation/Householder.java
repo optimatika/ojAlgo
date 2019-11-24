@@ -27,9 +27,9 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
-public interface Householder<N extends Number> extends Access1D<N> {
+public interface Householder<N extends Comparable<N>> extends Access1D<N> {
 
-    public static final class Generic<N extends Number & Scalar<N>> extends Object implements Householder<N> {
+    public static final class Generic<N extends Scalar<N>> implements Householder<N> {
 
         public N beta;
         public int first;
@@ -131,20 +131,111 @@ public interface Householder<N extends Number> extends Access1D<N> {
 
     }
 
-    public static final class Primitive extends Object implements Householder<Double> {
+    public static final class Primitive32 implements Householder<Double> {
 
-        public double beta;
+        public float beta;
         public int first;
-        public final double[] vector;
+        public final float[] vector;
 
-        public Primitive(final Householder<Double> aTransf) {
+        public Primitive32(final Householder<Double> aTransf) {
 
             this((int) aTransf.count());
 
             this.copy(aTransf);
         }
 
-        public Primitive(final int aDim) {
+        public Primitive32(final int aDim) {
+
+            super();
+
+            vector = new float[aDim];
+            beta = (float) PrimitiveMath.ZERO;
+            first = 0;
+        }
+
+        public Householder.Primitive32 copy(final Householder<Double> source) {
+
+            first = source.first();
+
+            final float[] tmpVector = vector;
+            float tmpVal, tmpVal2 = (float) PrimitiveMath.ZERO;
+            final int tmpSize = (int) source.count();
+            for (int i = source.first(); i < tmpSize; i++) {
+                tmpVal = source.floatValue(i);
+                tmpVal2 += tmpVal * tmpVal;
+                tmpVector[i] = tmpVal;
+            }
+
+            beta = (float) PrimitiveMath.TWO / tmpVal2;
+
+            return this;
+        }
+
+        public Householder.Primitive32 copy(final Householder<Double> source, final float precalculatedBeta) {
+
+            first = source.first();
+
+            final float[] tmpVector = vector;
+
+            final int tmpSize = (int) source.count();
+            for (int i = source.first(); i < tmpSize; i++) {
+                tmpVector[i] = source.floatValue(i);
+            }
+
+            beta = precalculatedBeta;
+
+            return this;
+        }
+
+        public long count() {
+            return vector.length;
+        }
+
+        public double doubleValue(final long anInd) {
+            return vector[(int) anInd];
+        }
+
+        public int first() {
+            return first;
+        }
+
+        public Double get(final long index) {
+            return Double.valueOf(vector[(int) index]);
+        }
+
+        @Override
+        public String toString() {
+
+            final StringBuilder retVal = new StringBuilder("{ ");
+
+            final int tmpLastIndex = vector.length - 1;
+            for (int i = 0; i < tmpLastIndex; i++) {
+                retVal.append(this.get(i));
+                retVal.append(", ");
+            }
+            retVal.append(this.get(tmpLastIndex));
+
+            retVal.append(" }");
+
+            return retVal.toString();
+        }
+
+    }
+
+    public static final class Primitive64 implements Householder<Double> {
+
+        public double beta;
+        public int first;
+        public final double[] vector;
+
+        public Primitive64(final Householder<Double> aTransf) {
+
+            this((int) aTransf.count());
+
+            this.copy(aTransf);
+        }
+
+        public Primitive64(final int aDim) {
 
             super();
 
@@ -153,7 +244,7 @@ public interface Householder<N extends Number> extends Access1D<N> {
             first = 0;
         }
 
-        public Householder.Primitive copy(final Householder<Double> source) {
+        public Householder.Primitive64 copy(final Householder<Double> source) {
 
             first = source.first();
 
@@ -171,7 +262,7 @@ public interface Householder<N extends Number> extends Access1D<N> {
             return this;
         }
 
-        public Householder.Primitive copy(final Householder<Double> source, final double precalculatedBeta) {
+        public Householder.Primitive64 copy(final Householder<Double> source, final double precalculatedBeta) {
 
             first = source.first();
 

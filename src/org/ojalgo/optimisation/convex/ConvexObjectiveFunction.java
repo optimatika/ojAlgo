@@ -56,6 +56,10 @@ public final class ConvexObjectiveFunction implements MultiaryFunction.TwiceDiff
         return myLinear.arity();
     }
 
+    public Double getConstant() {
+        return myPureQuadratic.getConstant();
+    }
+
     public MatrixStore<Double> getGradient(final Access1D<Double> point) {
         return myPureQuadratic.getGradient(point).operateOnMatching(SUBTRACT, myLinear.getGradient(point)).get();
     }
@@ -83,11 +87,7 @@ public final class ConvexObjectiveFunction implements MultiaryFunction.TwiceDiff
         return myPureQuadratic.quadratic();
     }
 
-    public Double getConstant() {
-        return myPureQuadratic.getConstant();
-    }
-
-    public void setConstant(final Number constant) {
+    public void setConstant(final Comparable<?> constant) {
         myPureQuadratic.setConstant(constant);
     }
 

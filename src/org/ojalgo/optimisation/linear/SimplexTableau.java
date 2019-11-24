@@ -35,9 +35,10 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexSolver.AlgorithmStore;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView1D;
@@ -50,7 +51,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     static final class DenseTableau extends SimplexTableau {
 
         private final int myStructure;
-        private final PrimitiveDenseStore myTransposed;
+        private final Primitive64Store myTransposed;
 
         DenseTableau(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables) {
 
@@ -59,7 +60,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             final int numbRows = numberOfConstraints + 2;
             final int numbCols = numberOfProblemVariables + numberOfSlackVariables + numberOfConstraints + 1;
 
-            myTransposed = PrimitiveDenseStore.FACTORY.makeZero(numbCols, numbRows);
+            myTransposed = Primitive64Store.FACTORY.makeZero(numbCols, numbRows);
             myStructure = (int) myTransposed.countRows();
         }
 
@@ -70,14 +71,14 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             final int tmpConstraintsCount = this.countConstraints();
             final int tmpVariablesCount = this.countVariables();
 
-            final MatrixStore.LogicalBuilder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE.makeZero(1, 1);
-            tmpTableauBuilder.left(matrices.getC().transpose().logical().right(MatrixStore.PRIMITIVE.makeZero(1, tmpConstraintsCount).get()).get());
+            final MatrixStore.LogicalBuilder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE64.makeZero(1, 1);
+            tmpTableauBuilder.left(matrices.getC().transpose().logical().right(MatrixStore.PRIMITIVE64.makeZero(1, tmpConstraintsCount).get()).get());
 
             if (tmpConstraintsCount >= 1) {
-                tmpTableauBuilder.above(matrices.getAE(), MatrixStore.PRIMITIVE.makeIdentity(tmpConstraintsCount).get(), matrices.getBE());
+                tmpTableauBuilder.above(matrices.getAE(), MatrixStore.PRIMITIVE64.makeIdentity(tmpConstraintsCount).get(), matrices.getBE());
             }
-            tmpTableauBuilder.below(MatrixStore.PRIMITIVE.makeZero(1, tmpVariablesCount).get(),
-                    PrimitiveDenseStore.FACTORY.makeFilled(1, tmpConstraintsCount, new NullaryFunction<Double>() {
+            tmpTableauBuilder.below(MatrixStore.PRIMITIVE64.makeZero(1, tmpVariablesCount).get(),
+                    Primitive64Store.FACTORY.makeFilled(1, tmpConstraintsCount, new NullaryFunction<Double>() {
 
                         public double doubleValue() {
                             return ONE;
@@ -89,7 +90,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
                     }));
             //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
-            myTransposed = PrimitiveDenseStore.FACTORY.transpose(tmpTableauBuilder.get());
+            myTransposed = Primitive64Store.FACTORY.transpose(tmpTableauBuilder.get());
             myStructure = (int) myTransposed.countRows();
             // myTableau = LinearSolver.make(myTransposedTableau);
 
@@ -297,15 +298,15 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         Mutate2D newConstraintsBody() {
             return new Mutate2D() {
 
+                public void add(final long row, final long col, final Comparable<?> addend) {
+                    this.add(row, col, Scalar.doubleValue(addend));
+                }
+
                 public void add(final long row, final long col, final double addend) {
                     //                    myRows[(int) row].add(col, addend);
                     //                    myPhase1Weights.add(col, -addend);
                     myTransposed.add(col, row, addend);
                     myTransposed.add(col, DenseTableau.this.countConstraints() + 1, -addend);
-                }
-
-                public void add(final long row, final long col, final Number addend) {
-                    this.add(row, col, addend.doubleValue());
                 }
 
                 public long countColumns() {
@@ -316,15 +317,15 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     return DenseTableau.this.countConstraints();
                 }
 
+                public void set(final long row, final long col, final Comparable<?> value) {
+                    this.set(row, col, Scalar.doubleValue(value));
+                }
+
                 public void set(final long row, final long col, final double value) {
                     //                    myRows[(int) row].set(col, value);
                     //                    myPhase1Weights.add(col, -value);
                     myTransposed.set(col, row, value);
                     myTransposed.add(col, DenseTableau.this.countConstraints() + 1, -value);
-                }
-
-                public void set(final long row, final long col, final Number value) {
-                    this.set(row, col, value.doubleValue());
                 }
 
             };
@@ -340,6 +341,10 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             return new Mutate1D() {
 
+                public void add(final long index, final Comparable<?> addend) {
+                    this.add(index, Scalar.doubleValue(addend));
+                }
+
                 public void add(final long index, final double addend) {
                     //                    myRows[(int) index].set(SparseTableau.this.countVariables() + index, ONE);
                     //                    myRHS.add(index, addend);
@@ -349,12 +354,12 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myTransposed.add(col, numbConstr + 1, -addend);
                 }
 
-                public void add(final long index, final Number addend) {
-                    this.add(index, addend.doubleValue());
-                }
-
                 public long count() {
                     return DenseTableau.this.countConstraints();
+                }
+
+                public void set(final long index, final Comparable<?> value) {
+                    this.set(index, Scalar.doubleValue(value));
                 }
 
                 public void set(final long index, final double value) {
@@ -364,10 +369,6 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     myTransposed.set(numbVar + index, index, ONE);
                     myTransposed.set(col, index, value);
                     myTransposed.add(col, numbConstr + 1, -value);
-                }
-
-                public void set(final long index, final Number value) {
-                    this.set(index, value.doubleValue());
                 }
 
             };
@@ -380,26 +381,26 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             return new Mutate1D() {
 
+                public void add(final long index, final Comparable<?> addend) {
+                    this.add(index, Scalar.doubleValue(addend));
+                }
+
                 public void add(final long index, final double addend) {
                     // myObjectiveWeights.add(index, addend);
                     myTransposed.add(index, row, addend);
-                }
-
-                public void add(final long index, final Number addend) {
-                    this.add(index, addend.doubleValue());
                 }
 
                 public long count() {
                     return DenseTableau.this.countVariables();
                 }
 
+                public void set(final long index, final Comparable<?> value) {
+                    this.set(index, Scalar.doubleValue(value));
+                }
+
                 public void set(final long index, final double value) {
                     // myObjectiveWeights.set(index, value);
                     myTransposed.set(index, row, value);
-                }
-
-                public void set(final long index, final Number value) {
-                    this.set(index, value.doubleValue());
                 }
 
             };
@@ -771,13 +772,13 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         Mutate2D newConstraintsBody() {
             return new Mutate2D() {
 
+                public void add(final long row, final long col, final Comparable<?> addend) {
+                    this.add(row, col, Scalar.doubleValue(addend));
+                }
+
                 public void add(final long row, final long col, final double addend) {
                     myRows[(int) row].add(col, addend);
                     myPhase1Weights.add(col, -addend);
-                }
-
-                public void add(final long row, final long col, final Number addend) {
-                    this.add(row, col, addend.doubleValue());
                 }
 
                 public long countColumns() {
@@ -788,13 +789,13 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                     return SparseTableau.this.countConstraints();
                 }
 
+                public void set(final long row, final long col, final Comparable<?> value) {
+                    this.set(row, col, Scalar.doubleValue(value));
+                }
+
                 public void set(final long row, final long col, final double value) {
                     myRows[(int) row].set(col, value);
                     myPhase1Weights.add(col, -value);
-                }
-
-                public void set(final long row, final long col, final Number value) {
-                    this.set(row, col, value.doubleValue());
                 }
 
             };
@@ -804,28 +805,28 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         Mutate1D newConstraintsRHS() {
             return new Mutate1D() {
 
+                public void add(final long index, final Comparable<?> addend) {
+                    this.add(index, Scalar.doubleValue(addend));
+                }
+
                 public void add(final long index, final double addend) {
                     myRows[(int) index].set(SparseTableau.this.countVariables() + index, ONE);
                     myRHS.add(index, addend);
                     myInfeasibility -= addend;
                 }
 
-                public void add(final long index, final Number addend) {
-                    this.add(index, addend.doubleValue());
-                }
-
                 public long count() {
                     return SparseTableau.this.countConstraints();
+                }
+
+                public void set(final long index, final Comparable<?> value) {
+                    this.set(index, Scalar.doubleValue(value));
                 }
 
                 public void set(final long index, final double value) {
                     myRows[(int) index].set(SparseTableau.this.countVariables() + index, ONE);
                     myRHS.set(index, value);
                     myInfeasibility -= value;
-                }
-
-                public void set(final long index, final Number value) {
-                    this.set(index, value.doubleValue());
                 }
 
             };
@@ -835,32 +836,32 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         Mutate1D newObjective() {
             return new Mutate1D() {
 
-                public void add(final long index, final double addend) {
-                    myObjectiveWeights.add(index, addend);
+                public void add(final long index, final Comparable<?> addend) {
+                    this.add(index, Scalar.doubleValue(addend));
                 }
 
-                public void add(final long index, final Number addend) {
-                    this.add(index, addend.doubleValue());
+                public void add(final long index, final double addend) {
+                    myObjectiveWeights.add(index, addend);
                 }
 
                 public long count() {
                     return SparseTableau.this.countVariables();
                 }
 
-                public void set(final long index, final double value) {
-                    myObjectiveWeights.set(index, value);
+                public void set(final long index, final Comparable<?> value) {
+                    this.set(index, Scalar.doubleValue(value));
                 }
 
-                public void set(final long index, final Number value) {
-                    this.set(index, value.doubleValue());
+                public void set(final long index, final double value) {
+                    myObjectiveWeights.set(index, value);
                 }
 
             };
         }
 
-        PrimitiveDenseStore transpose() {
+        Primitive64Store transpose() {
 
-            final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(this.countColumns(), this.countRows());
+            final Primitive64Store retVal = Primitive64Store.FACTORY.makeZero(this.countColumns(), this.countRows());
 
             for (int i = 0; i < myRows.length; i++) {
                 for (final NonzeroView<Double> nz : myRows[i].nonzeros()) {

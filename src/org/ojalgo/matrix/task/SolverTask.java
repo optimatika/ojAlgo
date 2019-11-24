@@ -35,9 +35,9 @@ import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
-public interface SolverTask<N extends Number> extends MatrixTask<N> {
+public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
-    public static abstract class Factory<N extends Number> {
+    public static abstract class Factory<N extends Comparable<N>> {
 
         public SolverTask<N> make(final int numberOfEquations, final int numberOfVariables, final int numberOfSolutions, final boolean symmetric,
                 final boolean positiveDefinite) {

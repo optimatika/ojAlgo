@@ -37,7 +37,7 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.decomposition.Tridiagonal;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
@@ -47,6 +47,7 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Structure2D;
@@ -66,13 +67,13 @@ public abstract class TestUtils {
 
     private static NumberContext EQUALS = new NumberContext(12, 14, RoundingMode.HALF_EVEN);
 
-    public static void assertBounds(final Number lower, final Access1D<?> values, final Number upper, final NumberContext precision) {
+    public static void assertBounds(final Comparable<?> lower, final Access1D<?> values, final Comparable<?> upper, final NumberContext precision) {
         for (ElementView1D<?, ?> tmpValue : values.elements()) {
             TestUtils.assertBounds(lower, tmpValue.get(), upper, precision);
         }
     }
 
-    public static void assertBounds(final Number lower, final Number value, final Number upper, final NumberContext precision) {
+    public static void assertBounds(final Comparable<?> lower, final Comparable<?> value, final Comparable<?> upper, final NumberContext precision) {
 
         BigDecimal tmpLower = TypeUtils.toBigDecimal(lower, precision);
         BigDecimal tmpValue = TypeUtils.toBigDecimal(value, precision);
@@ -93,6 +94,14 @@ public abstract class TestUtils {
 
     public static void assertEquals(final boolean expected, final boolean actual) {
         Assertions.assertEquals(expected, actual);
+    }
+
+    public static void assertEquals(final Comparable<?> expected, final Comparable<?> actual) {
+        TestUtils.assertEquals(expected, actual, EQUALS);
+    }
+
+    public static void assertEquals(final Comparable<?> expected, final Comparable<?> actual, final NumberContext context) {
+        TestUtils.assertEquals("Number != Number", expected, actual, context);
     }
 
     public static void assertEquals(final ComplexNumber expected, final ComplexNumber actual) {
@@ -142,19 +151,19 @@ public abstract class TestUtils {
         TestUtils.assertEquals(Arrays.toString(expected) + " != " + Arrays.toString(actual), expected, actual);
     }
 
-    public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Bidiagonal<N> actual, final NumberContext context) {
+    public static <N extends Comparable<N>> void assertEquals(final MatrixStore<N> expected, final Bidiagonal<N> actual, final NumberContext context) {
         if (!Bidiagonal.equals(expected, actual, context)) {
             Assertions.fail(() -> "Bidiagonal<N> failed for " + expected);
         }
     }
 
-    public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Cholesky<N> actual, final NumberContext context) {
+    public static <N extends Comparable<N>> void assertEquals(final MatrixStore<N> expected, final Cholesky<N> actual, final NumberContext context) {
         if (!Cholesky.equals(expected, actual, context)) {
             Assertions.fail(() -> "Cholesky<N> failed for " + expected);
         }
     }
 
-    public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Eigenvalue<N> actual, final NumberContext context) {
+    public static <N extends Comparable<N>> void assertEquals(final MatrixStore<N> expected, final Eigenvalue<N> actual, final NumberContext context) {
         if (!Eigenvalue.equals(expected, actual, context)) {
             Assertions.fail(() -> "Eigenvalue<N> failed for " + expected);
         }
@@ -171,42 +180,34 @@ public abstract class TestUtils {
         }
     }
 
-    public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Hessenberg<N> actual, final NumberContext context) {
+    public static <N extends Comparable<N>> void assertEquals(final MatrixStore<N> expected, final Hessenberg<N> actual, final NumberContext context) {
         if (!Hessenberg.equals(expected, actual, context)) {
             Assertions.fail(() -> "Hessenberg<N> failed for " + expected);
         }
     }
 
-    public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final LU<N> actual, final NumberContext context) {
+    public static <N extends Comparable<N>> void assertEquals(final MatrixStore<N> expected, final LU<N> actual, final NumberContext context) {
         if (!LU.equals(expected, actual, context)) {
             Assertions.fail(() -> "LU<N> failed for " + expected);
         }
     }
 
-    public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final QR<N> actual, final NumberContext context) {
+    public static <N extends Comparable<N>> void assertEquals(final MatrixStore<N> expected, final QR<N> actual, final NumberContext context) {
         if (!QR.equals(expected, actual, context)) {
             Assertions.fail(() -> "QR<N> failed for " + expected);
         }
     }
 
-    public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final SingularValue<N> actual, final NumberContext context) {
+    public static <N extends Comparable<N>> void assertEquals(final MatrixStore<N> expected, final SingularValue<N> actual, final NumberContext context) {
         if (!SingularValue.equals(expected, actual, context)) {
             Assertions.fail(() -> "SingularValue<N> failed for " + expected);
         }
     }
 
-    public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Tridiagonal<N> actual, final NumberContext context) {
+    public static <N extends Comparable<N>> void assertEquals(final MatrixStore<N> expected, final Tridiagonal<N> actual, final NumberContext context) {
         if (!Tridiagonal.equals(expected, actual, context)) {
             Assertions.fail(() -> "Tridiagonal<N> failed for " + expected);
         }
-    }
-
-    public static void assertEquals(final Number expected, final Number actual) {
-        TestUtils.assertEquals(expected, actual, EQUALS);
-    }
-
-    public static void assertEquals(final Number expected, final Number actual, final NumberContext context) {
-        TestUtils.assertEquals("Number != Number", expected, actual, context);
     }
 
     public static void assertEquals(final Object expected, final Object actual) {
@@ -245,12 +246,63 @@ public abstract class TestUtils {
                 context.isSmall(tmpFrobNormExpt, tmpFrobNormDiff));
     }
 
+    public static void assertEquals(final String message, final Comparable<?> expected, final Comparable<?> actual) {
+        TestUtils.assertEquals(message, expected, actual, EQUALS);
+    }
+
+    public static void assertEquals(final String message, final Comparable<?> expected, final Comparable<?> actual, final NumberContext precision) {
+
+        if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
+
+            Quaternion tmpExpected = Quaternion.valueOf(expected);
+            Quaternion tmpActual = Quaternion.valueOf(actual);
+
+            if (!!precision.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
+                // Assertions.fail(() -> message + " (scalar)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (scalar)" + ": " + expected + " != " + actual);
+            }
+            if (!!precision.isDifferent(tmpExpected.i, tmpActual.i)) {
+                // Assertions.fail(() -> message + " (i)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (i)" + ": " + expected + " != " + actual);
+            }
+            if (!!precision.isDifferent(tmpExpected.j, tmpActual.j)) {
+                // Assertions.fail(() -> message + " (j)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (j)" + ": " + expected + " != " + actual);
+            }
+            if (!!precision.isDifferent(tmpExpected.k, tmpActual.k)) {
+                // Assertions.fail(() -> message + " (k)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (k)" + ": " + expected + " != " + actual);
+            }
+
+        } else if ((expected instanceof ComplexNumber) || (actual instanceof ComplexNumber)) {
+
+            ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
+            ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
+
+            if (precision.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
+                // Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (real)" + ": " + expected + " != " + actual);
+            }
+            if (precision.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
+                // Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + " (imaginary)" + ": " + expected + " != " + actual);
+            }
+
+        } else {
+
+            if (precision.isDifferent(Scalar.doubleValue(expected), Scalar.doubleValue(actual))) {
+                // Assertions.fail(() -> message + ": " + expected + " != " + actual);
+                Assertions.assertEquals(expected, actual, () -> message + ": " + expected + " != " + actual);
+            }
+        }
+    }
+
     public static void assertEquals(final String message, final ComplexNumber expected, final ComplexNumber actual) {
         TestUtils.assertEquals(message, expected, actual, EQUALS);
     }
 
     public static void assertEquals(final String message, final ComplexNumber expected, final ComplexNumber actual, final NumberContext context) {
-        TestUtils.assertEquals(message, (Number) expected, (Number) actual, context);
+        TestUtils.assertEquals(message, (Comparable<?>) expected, (Comparable<?>) actual, context);
         TestUtils.assertEquals(message, (Access1D<?>) expected, (Access1D<?>) actual, context);
     }
 
@@ -287,57 +339,6 @@ public abstract class TestUtils {
         TestUtils.assertTrue(message, Arrays.equals(expected, actual));
     }
 
-    public static void assertEquals(final String message, final Number expected, final Number actual) {
-        TestUtils.assertEquals(message, expected, actual, EQUALS);
-    }
-
-    public static void assertEquals(final String message, final Number expected, final Number actual, final NumberContext precision) {
-
-        if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
-
-            Quaternion tmpExpected = Quaternion.valueOf(expected);
-            Quaternion tmpActual = Quaternion.valueOf(actual);
-
-            if (!!precision.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
-                // Assertions.fail(() -> message + " (scalar)" + ": " + expected + " != " + actual);
-                Assertions.assertEquals(expected, actual, () -> message + " (scalar)" + ": " + expected + " != " + actual);
-            }
-            if (!!precision.isDifferent(tmpExpected.i, tmpActual.i)) {
-                // Assertions.fail(() -> message + " (i)" + ": " + expected + " != " + actual);
-                Assertions.assertEquals(expected, actual, () -> message + " (i)" + ": " + expected + " != " + actual);
-            }
-            if (!!precision.isDifferent(tmpExpected.j, tmpActual.j)) {
-                // Assertions.fail(() -> message + " (j)" + ": " + expected + " != " + actual);
-                Assertions.assertEquals(expected, actual, () -> message + " (j)" + ": " + expected + " != " + actual);
-            }
-            if (!!precision.isDifferent(tmpExpected.k, tmpActual.k)) {
-                // Assertions.fail(() -> message + " (k)" + ": " + expected + " != " + actual);
-                Assertions.assertEquals(expected, actual, () -> message + " (k)" + ": " + expected + " != " + actual);
-            }
-
-        } else if ((expected instanceof ComplexNumber) || (actual instanceof ComplexNumber)) {
-
-            ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
-            ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
-
-            if (!!precision.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
-                // Assertions.fail(() -> message + " (real)" + ": " + expected + " != " + actual);
-                Assertions.assertEquals(expected, actual, () -> message + " (real)" + ": " + expected + " != " + actual);
-            }
-            if (!!precision.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
-                // Assertions.fail(() -> message + " (imaginary)" + ": " + expected + " != " + actual);
-                Assertions.assertEquals(expected, actual, () -> message + " (imaginary)" + ": " + expected + " != " + actual);
-            }
-
-        } else {
-
-            if (precision.isDifferent(expected.doubleValue(), actual.doubleValue())) {
-                // Assertions.fail(() -> message + ": " + expected + " != " + actual);
-                Assertions.assertEquals(expected, actual, () -> message + ": " + expected + " != " + actual);
-            }
-        }
-    }
-
     public static void assertEquals(final String message, final Object expected, final Object actual) {
         Assertions.assertEquals(expected, actual, message);
 
@@ -348,7 +349,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final String message, final Quaternion expected, final Quaternion actual, final NumberContext context) {
-        TestUtils.assertEquals(message, (Number) expected, (Number) actual, context);
+        TestUtils.assertEquals(message, (Comparable<?>) expected, (Comparable<?>) actual, context);
         TestUtils.assertEquals(message, (Access1D<?>) expected, (Access1D<?>) actual, context);
     }
 
@@ -384,6 +385,22 @@ public abstract class TestUtils {
         if (actual.length() <= 0) {
             TestUtils.fail("Is empty!");
         }
+    }
+
+    public static void assertResult(final Optimisation.Result expected, final Optimisation.Result actual) {
+        TestUtils.assertResult(expected, actual, EQUALS);
+    }
+
+    public static void assertResult(final Optimisation.Result expected, final Optimisation.Result actual, final NumberContext context) {
+        TestUtils.assertResult("Optimisation.Result != Optimisation.Result", expected, actual, context);
+    }
+
+    public static void assertResult(final String message, final Optimisation.Result expected, final Optimisation.Result actual) {
+        TestUtils.assertResult(message, expected, actual, EQUALS);
+    }
+
+    public static void assertResult(final String message, final Optimisation.Result expected, final Optimisation.Result actual, final NumberContext context) {
+        TestUtils.assertOptimisationResult(message, expected, actual, context, true, true, true, true);
     }
 
     public static void assertSolutionFeasible(final ExpressionsBasedModel model, final Optimisation.Result solution) {
@@ -446,7 +463,7 @@ public abstract class TestUtils {
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {
 
-        PhysicalStore<ComplexNumber> retVal = GenericDenseStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
+        PhysicalStore<ComplexNumber> retVal = GenericStore.COMPLEX.makeZero(numberOfRows, numberOfColumns);
 
         Uniform tmpArgGen = new Uniform(PrimitiveMath.ZERO, PrimitiveMath.TWO_PI);
 
@@ -498,7 +515,7 @@ public abstract class TestUtils {
         }
 
         if (solution && expectedState.isFeasible()) {
-            TestUtils.assertEquals(message + " – Solution", expected, actual, context);
+            TestUtils.assertEquals(message + " – Solution", (Access1D<?>) expected, (Access1D<?>) actual, context);
         }
 
         if (multipliers && expected.getMultipliers().isPresent()) {

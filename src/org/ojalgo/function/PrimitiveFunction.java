@@ -43,6 +43,10 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
             return this.invoke(arg1.doubleValue(), arg2.doubleValue());
         }
 
+        default float invoke(final float arg1, final float arg2) {
+            return (float) this.invoke((double) arg1, (double) arg2);
+        }
+
     }
 
     @FunctionalInterface
@@ -50,6 +54,10 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
         default void invoke(final Double arg) {
             this.invoke(arg.doubleValue());
+        }
+
+        default void invoke(final float arg) {
+            this.invoke((double) arg);
         }
 
     }
@@ -61,6 +69,10 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
             return this.invoke(arg.doubleValue(), param);
         }
 
+        default float invoke(final float arg, final int param) {
+            return (float) this.invoke((double) arg, param);
+        }
+
     }
 
     @FunctionalInterface
@@ -70,6 +82,10 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
             return this.invoke(arg.doubleValue());
         }
 
+        default boolean invoke(final float arg) {
+            return this.invoke((double) arg);
+        }
+
     }
 
     @FunctionalInterface
@@ -77,6 +93,10 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
         default Double invoke(final Double arg) {
             return this.invoke(arg.doubleValue());
+        }
+
+        default float invoke(final float arg) {
+            return (float) this.invoke((double) arg);
         }
 
     }

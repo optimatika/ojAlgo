@@ -28,7 +28,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-final class ConjugatedStore<N extends Number> extends TransjugatedStore<N> {
+final class ConjugatedStore<N extends Comparable<N>> extends TransjugatedStore<N> {
 
     ConjugatedStore(final MatrixStore<N> base) {
         super(base);

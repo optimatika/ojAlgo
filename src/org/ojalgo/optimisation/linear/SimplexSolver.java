@@ -31,7 +31,7 @@ import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -211,7 +211,7 @@ public abstract class SimplexSolver extends LinearSolver {
 
         int colRHS = myTableau.countConstraints() + myTableau.countVariables();
 
-        PrimitiveDenseStore solution = PrimitiveDenseStore.FACTORY.makeZero(myTableau.countVariables(), 1);
+        Primitive64Store solution = Primitive64Store.FACTORY.makeZero(myTableau.countVariables(), 1);
 
         int numberOfConstraints = myTableau.countConstraints();
         for (int row = 0; row < numberOfConstraints; row++) {

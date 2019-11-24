@@ -40,6 +40,10 @@ public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
             this.invoke(ComplexNumber.valueOf(anArg));
         }
 
+        public final void invoke(final float anArg) {
+            this.invoke(ComplexNumber.valueOf(anArg));
+        }
+
         public final Scalar<ComplexNumber> toScalar() {
             return this.get();
         }

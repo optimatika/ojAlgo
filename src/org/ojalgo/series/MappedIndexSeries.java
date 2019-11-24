@@ -39,7 +39,8 @@ import org.ojalgo.structure.Structure1D;
 import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
 
-final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number> extends AbstractMap<K, N> implements BasicSeries.NaturallySequenced<K, N> {
+final class MappedIndexSeries<K extends Comparable<? super K>, N extends Comparable<N>> extends AbstractMap<K, N>
+        implements BasicSeries.NaturallySequenced<K, N> {
 
     static final Structure1D.IndexMapper<Double> MAPPER = new Structure1D.IndexMapper<Double>() {
 

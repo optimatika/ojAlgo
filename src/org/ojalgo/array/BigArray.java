@@ -34,6 +34,7 @@ import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
 
 /**
@@ -90,6 +91,7 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         super(FACTORY, size);
     }
 
+    @Override
     public final void axpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
     }
@@ -119,13 +121,28 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
+    protected final void add(final int index, final Comparable<?> addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    }
+
+    @Override
     protected final void add(final int index, final double addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)));
     }
 
     @Override
-    protected final void add(final int index, final Number addend) {
+    protected final void add(final int index, final float addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    }
+
+    @Override
+    protected final double doubleValue(final int index) {
+        return data[index].doubleValue();
+    }
+
+    @Override
+    protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
+        data[index] = this.valueOf(values.get(valueIndex));
     }
 
     @Override

@@ -19,17 +19,17 @@ public class ReductionTest {
     @Test
     public void testReduction() {
 
-        BasicMatrix.PhysicalReceiver<Double, PrimitiveMatrix> builder = PrimitiveMatrix.FACTORY.makeDense(2, 3);
+        BasicMatrix.PhysicalReceiver<Double, Primitive64Matrix> builder = Primitive64Matrix.FACTORY.makeDense(2, 3);
         builder.set(0, 0, 1.0);
         builder.set(0, 1, 2.0);
         builder.set(0, 2, 3.0);
         builder.set(1, 0, 4.0);
         builder.set(1, 1, 5.0);
         builder.set(1, 2, 6.0);
-        PrimitiveMatrix matrix = builder.get();
+        Primitive64Matrix matrix = builder.get();
 
-        PrimitiveMatrix reducedRows = matrix.reduceRows(AVERAGE);
-        PrimitiveMatrix reducedColumns = matrix.reduceColumns(AVERAGE);
+        Primitive64Matrix reducedRows = matrix.reduceRows(AVERAGE);
+        Primitive64Matrix reducedColumns = matrix.reduceColumns(AVERAGE);
 
         TestUtils.assertEquals(2, reducedRows.count());
         TestUtils.assertEquals(2, reducedRows.countRows());

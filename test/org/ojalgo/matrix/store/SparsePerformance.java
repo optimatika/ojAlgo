@@ -56,8 +56,8 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrxA = SparseStore.PRIMITIVE.make(n, n);
-        SparseStore<Double> mtrxB = SparseStore.PRIMITIVE.make(n, n);
+        SparseStore<Double> mtrxA = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrxB = SparseStore.PRIMITIVE64.make(n, n);
 
         Stopwatch clock = new Stopwatch();
 
@@ -76,7 +76,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         SparsePerformance.touchNonzeros(mtrxA);
 
-        TestUtils.assertFasterThan(5, CalendarDateUnit.MILLIS, clock);
+        TestUtils.assertFasterThan(10, CalendarDateUnit.MILLIS, clock);
     }
 
     @Test
@@ -85,8 +85,8 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrxA = SparseStore.PRIMITIVE.make(n, n);
-        SparseStore<Double> mtrxB = SparseStore.PRIMITIVE.make(n, n);
+        SparseStore<Double> mtrxA = SparseStore.PRIMITIVE64.make(n, n);
+        SparseStore<Double> mtrxB = SparseStore.PRIMITIVE64.make(n, n);
 
         Stopwatch clock = new Stopwatch();
 
@@ -109,9 +109,9 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrx = SparseStore.PRIMITIVE.make(n, n);
+        SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
 
-        PrimitiveDenseStore ones = PrimitiveDenseStore.FACTORY.makeZero(n, 1);
+        Primitive64Store ones = Primitive64Store.FACTORY.make(n, 1);
         ones.fillAll(ONE);
 
         Stopwatch clock = new Stopwatch();
@@ -126,7 +126,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         SparsePerformance.touchNonzeros(mtrx.multiply(ones));
 
-        TestUtils.assertFasterThan(100, CalendarDateUnit.MILLIS, clock);
+        TestUtils.assertFasterThan(110, CalendarDateUnit.MILLIS, clock);
 
         clock.reset();
 
@@ -140,8 +140,8 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrx = SparseStore.PRIMITIVE.make(n, n);
-        PrimitiveDenseStore vctr = PrimitiveDenseStore.FACTORY.makeZero(1, n);
+        SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
+        Primitive64Store vctr = Primitive64Store.FACTORY.makeZero(1, n);
 
         Stopwatch clock = new Stopwatch();
 
@@ -165,8 +165,8 @@ public class SparsePerformance extends MatrixStoreTests {
 
         int n = 100_000;
 
-        SparseStore<Double> mtrx = SparseStore.PRIMITIVE.make(n, n);
-        PrimitiveDenseStore vctr = PrimitiveDenseStore.FACTORY.makeZero(n, 1);
+        SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
+        Primitive64Store vctr = Primitive64Store.FACTORY.makeZero(n, 1);
 
         Stopwatch clock = new Stopwatch();
 

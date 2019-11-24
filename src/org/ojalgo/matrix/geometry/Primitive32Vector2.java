@@ -11,7 +11,7 @@ public class Primitive32Vector2 extends GeometryVector {
     public float v0, v1;
 
     public Primitive32Vector2() {
-        super(MultiplyBoth.getPrimitive(2L, 1L), 2L, 1L);
+        super(MultiplyBoth.newPrimitive64(2, 1), 2L, 1L);
     }
 
     public Primitive32Vector2(final float v0, final float v1) {
@@ -80,10 +80,10 @@ public class Primitive32Vector2 extends GeometryVector {
     public final void modifyOne(final int row, final UnaryFunction<Double> modifier) {
         switch (row) {
         case 0:
-            v0 = (float) modifier.invoke(v0);
+            v0 = modifier.invoke(v0);
             break;
         case 1:
-            v1 = (float) modifier.invoke(v1);
+            v1 = modifier.invoke(v1);
             break;
         default:
             throw new IllegalArgumentException();

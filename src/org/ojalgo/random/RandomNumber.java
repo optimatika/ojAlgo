@@ -27,20 +27,23 @@ import java.util.Random;
 
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.type.ComparableNumber;
 
 /**
  * RandomNumber
  *
  * @author apete
  */
-public abstract class RandomNumber extends Number implements Distribution, NullaryFunction<Double> {
-
-    private static final long serialVersionUID = -5871398825698010936L;
+public abstract class RandomNumber implements Distribution, NullaryFunction<Double>, ComparableNumber<RandomNumber> {
 
     private final Random myRandom = new Random();
 
     protected RandomNumber() {
         super();
+    }
+
+    public int compareTo(final RandomNumber o) {
+        return Double.compare(this.getExpected(), o.getExpected());
     }
 
     @Override

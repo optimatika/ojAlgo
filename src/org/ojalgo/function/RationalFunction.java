@@ -41,12 +41,20 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
             return this.invoke(RationalNumber.valueOf(arg1), RationalNumber.valueOf(arg2)).doubleValue();
         }
 
+        default float invoke(final float arg1, final float arg2) {
+            return this.invoke(RationalNumber.valueOf(arg1), RationalNumber.valueOf(arg2)).floatValue();
+        }
+
     }
 
     @FunctionalInterface
     public interface Consumer extends VoidFunction<RationalNumber> {
 
         default void invoke(final double arg) {
+            this.invoke(RationalNumber.valueOf(arg));
+        }
+
+        default void invoke(final float arg) {
             this.invoke(RationalNumber.valueOf(arg));
         }
 
@@ -59,12 +67,20 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
             return this.invoke(RationalNumber.valueOf(arg), param).doubleValue();
         }
 
+        default float invoke(final float arg, final int param) {
+            return this.invoke(RationalNumber.valueOf(arg), param).floatValue();
+        }
+
     }
 
     @FunctionalInterface
     public interface Predicate extends PredicateFunction<RationalNumber> {
 
         default boolean invoke(final double arg) {
+            return this.invoke(RationalNumber.valueOf(arg));
+        }
+
+        default boolean invoke(final float arg) {
             return this.invoke(RationalNumber.valueOf(arg));
         }
 
@@ -75,6 +91,10 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
         default double invoke(final double arg) {
             return this.invoke(RationalNumber.valueOf(arg)).doubleValue();
+        }
+
+        default float invoke(final float arg) {
+            return this.invoke(RationalNumber.valueOf(arg)).floatValue();
         }
 
     }

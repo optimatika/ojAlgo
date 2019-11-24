@@ -38,7 +38,7 @@ import org.ojalgo.type.CalendarDateUnit;
  *
  * @author apete
  */
-public class CoordinationSet<N extends Number> extends HashMap<String, CalendarDateSeries<N>> {
+public class CoordinationSet<N extends Comparable<N>> extends HashMap<String, CalendarDateSeries<N>> {
 
     private CalendarDateUnit myResolution = null;
 

@@ -117,53 +117,55 @@ public abstract class TypeUtils {
     }
 
     /**
-     * If the input {@linkplain java.lang.Number} is a {@linkplain java.math.BigDecimal} it is passed through
-     * unaltered. Otherwise an equivalent BigDecimal is created.
+     * If the input {@linkplain java.lang.Comparale} is a {@linkplain java.math.BigDecimal} it is passed
+     * through unaltered. Otherwise an equivalent BigDecimal is created.
      *
      * @param number Any Number
      * @return A corresponding BigDecimal
      */
-    public static BigDecimal toBigDecimal(final Number number) {
+    public static BigDecimal toBigDecimal(final Comparable<?> number) {
 
-        BigDecimal retVal = BigMath.ZERO;
+        if (number == null) {
+            return BigMath.ZERO;
+        }
 
-        if (number != null) {
+        if (number instanceof BigDecimal) {
 
-            if (number instanceof BigDecimal) {
+            return (BigDecimal) number;
 
-                retVal = (BigDecimal) number;
+        } else if (number instanceof Scalar<?>) {
 
-            } else if (number instanceof Scalar<?>) {
+            return ((Scalar<?>) number).toBigDecimal();
 
-                retVal = ((Scalar<?>) number).toBigDecimal();
+        } else {
 
-            } else {
+            try {
 
-                try {
+                return new BigDecimal(number.toString());
 
-                    retVal = new BigDecimal(number.toString());
+            } catch (final NumberFormatException exception) {
 
-                } catch (final NumberFormatException exception) {
+                double tmpVal = PrimitiveMath.NaN;
+                if (number instanceof NumberDefinition) {
+                    tmpVal = ((NumberDefinition) number).doubleValue();
+                } else if (number instanceof Number) {
+                    tmpVal = ((Number) number).doubleValue();
+                }
 
-                    final double tmpVal = number.doubleValue();
-
-                    if (Double.isNaN(tmpVal)) {
-                        retVal = BigMath.ZERO;
-                    } else if (Double.isInfinite(tmpVal) && (tmpVal > PrimitiveMath.ZERO)) {
-                        retVal = BigMath.VERY_POSITIVE;
-                    } else if (Double.isInfinite(tmpVal) && (tmpVal < PrimitiveMath.ZERO)) {
-                        retVal = BigMath.VERY_NEGATIVE;
-                    } else {
-                        retVal = BigDecimal.valueOf(tmpVal);
-                    }
+                if (Double.isNaN(tmpVal)) {
+                    return BigMath.ZERO;
+                } else if (Double.isInfinite(tmpVal) && (tmpVal > PrimitiveMath.ZERO)) {
+                    return BigMath.VERY_POSITIVE;
+                } else if (Double.isInfinite(tmpVal) && (tmpVal < PrimitiveMath.ZERO)) {
+                    return BigMath.VERY_NEGATIVE;
+                } else {
+                    return BigDecimal.valueOf(tmpVal);
                 }
             }
         }
-
-        return retVal;
     }
 
-    public static BigDecimal toBigDecimal(final Number number, final NumberContext context) {
+    public static BigDecimal toBigDecimal(final Comparable<?> number, final NumberContext context) {
         return context.enforce(TypeUtils.toBigDecimal(number));
     }
 

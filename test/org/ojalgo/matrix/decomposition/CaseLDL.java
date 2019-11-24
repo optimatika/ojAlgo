@@ -88,7 +88,7 @@ public class CaseLDL extends MatrixDecompositionTests {
 
     private void doTest(final MatrixStore<Double> mtrxA, final RawStore mtrxL, final RawStore mtrxD) {
 
-        MatrixStore<Double> mtrxIdentity = MatrixStore.PRIMITIVE.makeIdentity((int) mtrxA.countRows()).get();
+        MatrixStore<Double> mtrxIdentity = MatrixStore.PRIMITIVE64.makeIdentity((int) mtrxA.countRows()).get();
 
         RawStore reconstructed = mtrxL.multiply(mtrxD.multiply(mtrxL.transpose()));
         TestUtils.assertEquals(mtrxA, reconstructed);

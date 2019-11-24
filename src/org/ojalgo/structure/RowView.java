@@ -29,7 +29,8 @@ import java.util.stream.StreamSupport;
 
 import org.ojalgo.ProgrammingError;
 
-public class RowView<N extends Number> implements Access1D<N>, Iterable<RowView<N>>, Iterator<RowView<N>>, Spliterator<RowView<N>>, Comparable<RowView<N>> {
+public class RowView<N extends Comparable<N>>
+        implements Access1D<N>, Iterable<RowView<N>>, Iterator<RowView<N>>, Spliterator<RowView<N>>, Comparable<RowView<N>> {
 
     static final int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED
             | Spliterator.SIZED | Spliterator.SORTED | Spliterator.SUBSIZED;
@@ -114,16 +115,16 @@ public class RowView<N extends Number> implements Access1D<N>, Iterable<RowView<
         return myRow;
     }
 
+    public Stream<RowView<N>> stream() {
+        return StreamSupport.stream(this, false);
+    }
+
     /**
      * @deprecated v48 Use {@link #stream()} instead
      */
     @Deprecated
     public Stream<RowView<N>> stream(final boolean parallel) {
         return this.stream();
-    }
-
-    public Stream<RowView<N>> stream() {
-        return StreamSupport.stream(this, false);
     }
 
     @Override

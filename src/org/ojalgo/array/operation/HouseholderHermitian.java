@@ -39,7 +39,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class HouseholderHermitian implements ArrayOperation {
 
-    public static void invoke(final double[] data, final Householder.Primitive householder, final double[] worker) {
+    public static void invoke(final double[] data, final Householder.Primitive64 householder, final double[] worker) {
 
         final double[] tmpVector = householder.vector;
         final int tmpFirst = householder.first;
@@ -91,7 +91,7 @@ public final class HouseholderHermitian implements ArrayOperation {
         }
     }
 
-    public static <N extends Number & Scalar<N>> void invoke(final N[] data, final Householder.Generic<N> householder, final N[] worker,
+    public static <N extends Scalar<N>> void invoke(final N[] data, final Householder.Generic<N> householder, final N[] worker,
             final Scalar.Factory<N> scalar) {
 
         final N[] tmpVector = householder.vector;

@@ -33,7 +33,7 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  *
  * @author apete
  */
-public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number implements Scalar<S>, Enforceable<S> {
+public abstract class ExactDecimal<S extends ExactDecimal<S>> implements Scalar<S>, Enforceable<S> {
 
     public static final class Descriptor {
 
@@ -106,27 +106,43 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         myNumerator = numerator;
     }
 
+    @Override
     public final S add(final double scalarAddend) {
         return this.wrap(myNumerator + Math.round(scalarAddend * this.descriptor().denominator()));
     }
 
+    @Override
+    public S add(final float scalarAddend) {
+        return this.add((double) scalarAddend);
+    }
+
+    @Override
     public final S add(final S scalarAddend) {
         return this.wrap(myNumerator + scalarAddend.numerator());
     }
 
+    @Override
     public final int compareTo(final S reference) {
         return Long.compare(myNumerator, reference.numerator());
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public final S conjugate() {
         return (S) this;
     }
 
+    @Override
     public final S divide(final double scalarDivisor) {
         return this.wrap(Math.round(myNumerator / scalarDivisor));
     }
 
+    @Override
+    public S divide(final float scalarDivisor) {
+        return this.divide((double) scalarDivisor);
+    }
+
+    @Override
     public final S divide(final S scalarDivisor) {
         return this.wrap((myNumerator * this.descriptor().denominator()) / scalarDivisor.numerator());
     }
@@ -136,6 +152,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         return myNumerator / this.descriptor().denominator();
     }
 
+    @Override
     public final S enforce(final NumberContext context) {
         BigDecimal decimal = this.toBigDecimal(context);
         final NumberContext type = this.descriptor().context();
@@ -148,6 +165,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         return (float) this.doubleValue();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public final S get() {
         return (S) this;
@@ -158,14 +176,17 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         return (int) this.doubleValue();
     }
 
+    @Override
     public final S invert() {
         return this.wrap(Math.round(this.descriptor().denominator() / this.doubleValue()));
     }
 
+    @Override
     public final boolean isAbsolute() {
         return myNumerator >= 0L;
     }
 
+    @Override
     public final boolean isSmall(final double comparedTo) {
         return this.descriptor().context().isSmall(comparedTo, this.doubleValue());
     }
@@ -175,22 +196,32 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         return this.toBigDecimal().longValue();
     }
 
+    @Override
     public final S multiply(final double scalarMultiplicand) {
         return this.wrap(Math.round(myNumerator * scalarMultiplicand));
     }
 
+    @Override
+    public S multiply(final float scalarMultiplicand) {
+        return this.multiply((double) scalarMultiplicand);
+    }
+
+    @Override
     public final S multiply(final S scalarMultiplicand) {
         return this.wrap((myNumerator * scalarMultiplicand.numerator()) / this.descriptor().denominator());
     }
 
+    @Override
     public final S negate() {
         return this.wrap(-myNumerator);
     }
 
+    @Override
     public final double norm() {
         return PrimitiveMath.ABS.invoke(this.doubleValue());
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public S power(final int power) {
 
@@ -211,6 +242,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         }
     }
 
+    @Override
     public final S signum() {
         if (myNumerator == 0L) {
             return this.wrap(0L);
@@ -221,14 +253,22 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         }
     }
 
+    @Override
     public final S subtract(final double scalarSubtrahend) {
         return this.wrap(myNumerator - Math.round(scalarSubtrahend * this.descriptor().denominator()));
     }
 
+    @Override
+    public S subtract(final float scalarSubtrahend) {
+        return this.subtract((double) scalarSubtrahend);
+    }
+
+    @Override
     public final S subtract(final S scalarSubtrahend) {
         return this.wrap(myNumerator - scalarSubtrahend.numerator());
     }
 
+    @Override
     public final BigDecimal toBigDecimal() {
         if (myDecimal == null) {
             myDecimal = new BigDecimal(myNumerator).divide(new BigDecimal(this.descriptor().denominator()), this.descriptor().context().getMathContext());
@@ -241,6 +281,7 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> extends Number imp
         return this.toBigDecimal().toPlainString();
     }
 
+    @Override
     public final String toString(final NumberContext context) {
         return this.toBigDecimal(context).toPlainString();
     }

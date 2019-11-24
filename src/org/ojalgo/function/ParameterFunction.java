@@ -25,14 +25,14 @@ import java.util.function.BiFunction;
 
 import org.ojalgo.ProgrammingError;
 
-public interface ParameterFunction<N extends Number> extends BasicFunction, BiFunction<N, Integer, N> {
+public interface ParameterFunction<N extends Comparable<N>> extends BasicFunction, BiFunction<N, Integer, N> {
 
     /**
      * A {@linkplain ParameterFunction} with a set/fixed parameter.
      *
      * @author apete
      */
-    public static final class FixedParameter<N extends Number> implements UnaryFunction<N> {
+    public static final class FixedParameter<N extends Comparable<N>> implements UnaryFunction<N> {
 
         private final ParameterFunction<N> myFunction;
         private final int myParameter;
@@ -62,6 +62,10 @@ public interface ParameterFunction<N extends Number> extends BasicFunction, BiFu
             return myFunction.invoke(arg, myParameter);
         }
 
+        public float invoke(final float arg) {
+            return myFunction.invoke(arg, myParameter);
+        }
+
         public N invoke(final N arg) {
             return myFunction.invoke(arg, myParameter);
         }
@@ -73,6 +77,10 @@ public interface ParameterFunction<N extends Number> extends BasicFunction, BiFu
         return new ParameterFunction<N>() {
 
             public double invoke(final double arg, final int param) {
+                return after.invoke(ParameterFunction.this.invoke(arg, param));
+            }
+
+            public float invoke(final float arg, final int param) {
                 return after.invoke(ParameterFunction.this.invoke(arg, param));
             }
 
@@ -95,6 +103,10 @@ public interface ParameterFunction<N extends Number> extends BasicFunction, BiFu
                 return ParameterFunction.this.invoke(before.invoke(arg), param);
             }
 
+            public float invoke(final float arg, final int param) {
+                return ParameterFunction.this.invoke(before.invoke(arg), param);
+            }
+
             public N invoke(final N arg, final int param) {
                 return ParameterFunction.this.invoke(before.invoke(arg), param);
             }
@@ -103,6 +115,8 @@ public interface ParameterFunction<N extends Number> extends BasicFunction, BiFu
     }
 
     double invoke(double arg, int param);
+
+    float invoke(float arg, int param);
 
     N invoke(N arg, int param);
 

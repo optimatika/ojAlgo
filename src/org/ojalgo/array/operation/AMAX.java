@@ -40,7 +40,7 @@ public final class AMAX implements BLAS1 {
 
     public static int THRESHOLD = 128;
 
-    public static <N extends Number> long invoke(final BasicArray<N> data, final long first, final long limit, final long step) {
+    public static <N extends Comparable<N>> long invoke(final BasicArray<N> data, final long first, final long limit, final long step) {
 
         long retVal = first;
         double tmpLargest = 0D;
@@ -104,7 +104,7 @@ public final class AMAX implements BLAS1 {
         return retVal;
     }
 
-    public static <N extends Number & Scalar<N>> int invoke(final N[] data, final int first, final int limit, final int step) {
+    public static <N extends Scalar<N>> int invoke(final N[] data, final int first, final int limit, final int step) {
 
         int retVal = first;
         double tmpLargest = 0D;

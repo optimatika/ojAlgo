@@ -33,6 +33,6 @@ package org.ojalgo.algebra;
  * @see <a href="https://en.wikipedia.org/wiki/Distributive_property">Distributive property</a>
  * @see <a href="https://en.wikipedia.org/wiki/Associative_property">Associative property</a>
  */
-public interface Ring<S> extends Group.Additive<S>, Operation.Multiplication<S> {
+public interface Ring<T> extends Group.Additive<T>, Operation.Multiplication<T> {
 
 }

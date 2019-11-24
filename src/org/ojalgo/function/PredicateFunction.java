@@ -24,9 +24,11 @@ package org.ojalgo.function;
 import java.util.function.DoublePredicate;
 import java.util.function.Predicate;
 
-public interface PredicateFunction<N extends Number> extends BasicFunction, Predicate<N>, DoublePredicate {
+public interface PredicateFunction<N extends Comparable<N>> extends BasicFunction, Predicate<N>, DoublePredicate {
 
     boolean invoke(double arg);
+
+    boolean invoke(float arg);
 
     boolean invoke(N arg);
 
@@ -34,6 +36,10 @@ public interface PredicateFunction<N extends Number> extends BasicFunction, Pred
         return new PredicateFunction<N>() {
 
             public boolean invoke(final double arg) {
+                return !PredicateFunction.this.invoke(arg);
+            }
+
+            public boolean invoke(final float arg) {
                 return !PredicateFunction.this.invoke(arg);
             }
 

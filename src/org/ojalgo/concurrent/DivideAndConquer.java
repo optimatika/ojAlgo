@@ -30,7 +30,7 @@ import org.ojalgo.ProgrammingError;
 /**
  * @author apete
  */
-public abstract class DivideAndConquer extends Object {
+public abstract class DivideAndConquer {
 
     public DivideAndConquer() {
         super();

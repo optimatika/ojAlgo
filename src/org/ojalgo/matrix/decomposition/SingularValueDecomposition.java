@@ -31,10 +31,10 @@ import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.DiagonalStore;
-import org.ojalgo.matrix.store.GenericDenseStore;
+import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -46,7 +46,7 @@ import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends GenericDecomposition<N> implements SingularValue<N> {
+abstract class SingularValueDecomposition<N extends Comparable<N>> extends GenericDecomposition<N> implements SingularValue<N> {
 
     static final class Complex extends SingularValueDecomposition<ComplexNumber> {
 
@@ -55,7 +55,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         }
 
         Complex(final boolean fullSize) {
-            super(GenericDenseStore.COMPLEX, new BidiagonalDecomposition.Complex(fullSize), fullSize);
+            super(GenericStore.COMPLEX, new BidiagonalDecomposition.Complex(fullSize), fullSize);
         }
 
     }
@@ -67,7 +67,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         }
 
         Primitive(final boolean fullSize) {
-            super(PrimitiveDenseStore.FACTORY, new BidiagonalDecomposition.Primitive(fullSize), fullSize);
+            super(Primitive64Store.FACTORY, new BidiagonalDecomposition.Primitive(fullSize), fullSize);
         }
 
     }
@@ -79,7 +79,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         }
 
         Quat(final boolean fullSize) {
-            super(GenericDenseStore.QUATERNION, new BidiagonalDecomposition.Quat(fullSize), fullSize);
+            super(GenericStore.QUATERNION, new BidiagonalDecomposition.Quat(fullSize), fullSize);
         }
 
     }
@@ -91,7 +91,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         }
 
         Rational(final boolean fullSize) {
-            super(GenericDenseStore.RATIONAL, new BidiagonalDecomposition.Rational(fullSize), fullSize);
+            super(GenericStore.RATIONAL, new BidiagonalDecomposition.Rational(fullSize), fullSize);
         }
 
     }

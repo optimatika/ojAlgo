@@ -25,8 +25,6 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.MultiplyBoth;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.store.GenericDenseStore.GenericMultiplyBoth;
-import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
@@ -37,9 +35,9 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-public interface TransformableRegion<N extends Number> extends Mutate2D.ModifiableReceiver<N>, Access2D<N> {
+public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.ModifiableReceiver<N>, Access2D<N> {
 
-    class ColumnsRegion<N extends Number> extends ReceiverRegion<N> {
+    class ColumnsRegion<N extends Comparable<N>> extends ReceiverRegion<N> {
 
         private final TransformableRegion<N> myBase;
         private final int[] myColumns;
@@ -55,11 +53,11 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myColumns = columns;
         }
 
-        public void add(final long row, final long col, final double addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(row, myColumns[(int) col], addend);
         }
 
-        public void add(final long row, final long col, final Number addend) {
+        public void add(final long row, final long col, final double addend) {
             myBase.add(row, myColumns[(int) col], addend);
         }
 
@@ -83,7 +81,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillColumn(row, myColumns[(int) col], value);
         }
 
-        public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillColumn(row, myColumns[(int) col], supplier);
         }
 
@@ -95,7 +93,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillOne(row, myColumns[(int) col], value);
         }
 
-        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillOne(row, myColumns[(int) col], supplier);
         }
 
@@ -111,23 +109,23 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.modifyOne(row, myColumns[(int) col], modifier);
         }
 
-        public void set(final long row, final long col, final double value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(row, myColumns[(int) col], value);
         }
 
-        public void set(final long row, final long col, final Number value) {
+        public void set(final long row, final long col, final double value) {
             myBase.set(row, myColumns[(int) col], value);
         }
 
     }
 
-    interface FillByMultiplying<N extends Number> {
+    interface FillByMultiplying<N extends Comparable<N>> {
 
         void invoke(TransformableRegion<N> product, Access1D<N> left, int complexity, Access1D<N> right);
 
     }
 
-    class LimitRegion<N extends Number> extends ReceiverRegion<N> {
+    class LimitRegion<N extends Comparable<N>> extends ReceiverRegion<N> {
 
         private final TransformableRegion<N> myBase;
         private final int myRowLimit, myColumnLimit; // limits
@@ -139,11 +137,11 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myColumnLimit = columnLimit;
         }
 
-        public void add(final long row, final long col, final double addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(row, col, addend);
         }
 
-        public void add(final long row, final long col, final Number addend) {
+        public void add(final long row, final long col, final double addend) {
             myBase.add(row, col, addend);
         }
 
@@ -167,7 +165,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillOne(row, col, value);
         }
 
-        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillOne(row, col, supplier);
         }
 
@@ -179,17 +177,17 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.modifyOne(row, col, modifier);
         }
 
-        public void set(final long row, final long col, final double value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(row, col, value);
         }
 
-        public void set(final long row, final long col, final Number value) {
+        public void set(final long row, final long col, final double value) {
             myBase.set(row, col, value);
         }
 
     }
 
-    class OffsetRegion<N extends Number> extends ReceiverRegion<N> {
+    class OffsetRegion<N extends Comparable<N>> extends ReceiverRegion<N> {
 
         private final TransformableRegion<N> myBase;
         private final int myRowOffset, myColumnOffset; // origin/offset
@@ -201,11 +199,11 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myColumnOffset = columnOffset;
         }
 
-        public void add(final long row, final long col, final double addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(myRowOffset + row, myColumnOffset + col, addend);
         }
 
-        public void add(final long row, final long col, final Number addend) {
+        public void add(final long row, final long col, final double addend) {
             myBase.add(myRowOffset + row, myColumnOffset + col, addend);
         }
 
@@ -230,7 +228,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
         }
 
         @Override
-        public void fillAll(final NullaryFunction<N> supplier) {
+        public void fillAll(final NullaryFunction<?> supplier) {
             final long tmpCountColumns = myBase.countColumns();
             for (long j = myColumnOffset; j < tmpCountColumns; j++) {
                 myBase.fillColumn(myRowOffset, j, supplier);
@@ -241,7 +239,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillColumn(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillColumn(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
@@ -249,7 +247,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillDiagonal(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillDiagonal(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
@@ -261,7 +259,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillOne(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillOne(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
@@ -269,7 +267,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillRow(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillRow(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
@@ -299,17 +297,17 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.modifyRow(myRowOffset + row, myColumnOffset + col, modifier);
         }
 
-        public void set(final long row, final long col, final double value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void set(final long row, final long col, final Number value) {
+        public void set(final long row, final long col, final double value) {
             myBase.set(myRowOffset + row, myColumnOffset + col, value);
         }
 
     }
 
-    abstract class ReceiverRegion<N extends Number> implements TransformableRegion<N> {
+    abstract class ReceiverRegion<N extends Comparable<N>> implements TransformableRegion<N> {
 
         private final TransformableRegion.FillByMultiplying<N> myMultiplier;
 
@@ -323,10 +321,10 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
 
             super();
 
-            if (multiplier instanceof PrimitiveMultiplyBoth) {
-                myMultiplier = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.getPrimitive(rows, columns);
-            } else if (multiplier instanceof GenericMultiplyBoth) {
-                myMultiplier = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.getGeneric(rows, columns);
+            if (multiplier instanceof MultiplyBoth.Primitive) {
+                myMultiplier = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newPrimitive64(Math.toIntExact(rows), Math.toIntExact(columns));
+            } else if (multiplier instanceof MultiplyBoth.Generic) {
+                myMultiplier = (TransformableRegion.FillByMultiplying<N>) MultiplyBoth.newGeneric(Math.toIntExact(rows), Math.toIntExact(columns));
             } else {
                 myMultiplier = multiplier;
             }
@@ -369,7 +367,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
 
     }
 
-    class RowsRegion<N extends Number> extends ReceiverRegion<N> {
+    class RowsRegion<N extends Comparable<N>> extends ReceiverRegion<N> {
 
         private final TransformableRegion<N> myBase;
         private final int[] myRows;
@@ -380,11 +378,11 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myRows = rows;
         }
 
-        public void add(final long row, final long col, final double addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(myRows[(int) row], col, addend);
         }
 
-        public void add(final long row, final long col, final Number addend) {
+        public void add(final long row, final long col, final double addend) {
             myBase.add(myRows[(int) row], col, addend);
         }
 
@@ -408,7 +406,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillOne(myRows[(int) row], col, value);
         }
 
-        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillOne(myRows[(int) row], col, supplier);
         }
 
@@ -420,7 +418,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillRow(myRows[(int) row], col, value);
         }
 
-        public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillRow(myRows[(int) row], col, supplier);
         }
 
@@ -436,17 +434,17 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.modifyRow(myRows[(int) row], col, modifier);
         }
 
-        public void set(final long row, final long col, final double value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(myRows[(int) row], col, value);
         }
 
-        public void set(final long row, final long col, final Number value) {
+        public void set(final long row, final long col, final double value) {
             myBase.set(myRows[(int) row], col, value);
         }
 
     }
 
-    class TransposedRegion<N extends Number> extends ReceiverRegion<N> {
+    class TransposedRegion<N extends Comparable<N>> extends ReceiverRegion<N> {
 
         private final TransformableRegion<N> myBase;
 
@@ -455,11 +453,11 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase = base;
         }
 
-        public void add(final long row, final long col, final double addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(col, row, addend);
         }
 
-        public void add(final long row, final long col, final Number addend) {
+        public void add(final long row, final long col, final double addend) {
             myBase.add(col, row, addend);
         }
 
@@ -479,7 +477,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillRow(col, row, value);
         }
 
-        public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillColumn(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillRow(col, row, supplier);
         }
 
@@ -487,7 +485,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillDiagonal(col, row, value);
         }
 
-        public void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillDiagonal(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillRow(col, row, supplier);
         }
 
@@ -499,7 +497,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillOne(col, row, value);
         }
 
-        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillOne(col, row, supplier);
         }
 
@@ -507,7 +505,7 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             myBase.fillDiagonal(col, row, value);
         }
 
-        public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+        public void fillRow(final long row, final long col, final NullaryFunction<?> supplier) {
             myBase.fillDiagonal(col, row, supplier);
         }
 
@@ -536,11 +534,11 @@ public interface TransformableRegion<N extends Number> extends Mutate2D.Modifiab
             return myBase;
         }
 
-        public void set(final long row, final long col, final double value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(col, row, value);
         }
 
-        public void set(final long row, final long col, final Number value) {
+        public void set(final long row, final long col, final double value) {
             myBase.set(col, row, value);
         }
 
