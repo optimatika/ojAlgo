@@ -115,16 +115,16 @@ public class RowView<N extends Comparable<N>>
         return myRow;
     }
 
+    public Stream<RowView<N>> stream() {
+        return StreamSupport.stream(this, false);
+    }
+
     /**
      * @deprecated v48 Use {@link #stream()} instead
      */
     @Deprecated
     public Stream<RowView<N>> stream(final boolean parallel) {
         return this.stream();
-    }
-
-    public Stream<RowView<N>> stream() {
-        return StreamSupport.stream(this, false);
     }
 
     @Override

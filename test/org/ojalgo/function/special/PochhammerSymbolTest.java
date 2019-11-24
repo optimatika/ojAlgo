@@ -31,11 +31,11 @@ public class PochhammerSymbolTest {
 
     private static final Random RANDOM = new Random();
 
-    private static void compareToGammaImplementation(double x, int n) {
+    private static void compareToGammaImplementation(final double x, final int n) {
         TestUtils.assertEquals("x=" + x + ", n=" + n, GammaFunction.gamma(x + n) / GammaFunction.gamma(x), PochhammerSymbol.pochhammer(x, n));
     }
 
-    static void doTestDefinition(double x) {
+    static void doTestDefinition(final double x) {
         PochhammerSymbolTest.compareToGammaImplementation(x, 0);
         PochhammerSymbolTest.compareToGammaImplementation(x, 1);
         PochhammerSymbolTest.compareToGammaImplementation(x, 2);
@@ -45,7 +45,7 @@ public class PochhammerSymbolTest {
         PochhammerSymbolTest.compareToGammaImplementation(x, 50);
     }
 
-    static void doTestImplementation(double x) {
+    static void doTestImplementation(final double x) {
         TestUtils.assertEquals(1.0, PochhammerSymbol.pochhammer(x, 0));
         TestUtils.assertEquals(x, PochhammerSymbol.pochhammer(x, 1));
         TestUtils.assertEquals((x * x) + x, PochhammerSymbol.pochhammer(x, 2));
@@ -53,7 +53,7 @@ public class PochhammerSymbolTest {
         TestUtils.assertEquals((x * x * x * x) + (6.0 * x * x * x) + (11.0 * x * x) + (6 * x), PochhammerSymbol.pochhammer(x, 4));
     }
 
-    static void performTest(DoubleConsumer testFunction) {
+    static void performTest(final DoubleConsumer testFunction) {
         RANDOM.doubles(10, -1.0, 1.0).forEach(testFunction);
         RANDOM.doubles(10, -2.0, 2.0).forEach(testFunction);
         RANDOM.doubles(10, -5.0, 5.0).forEach(testFunction);

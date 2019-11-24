@@ -67,7 +67,7 @@ public final class FillAll implements ArrayOperation {
         }
     }
 
-    public static <N extends Comparable<N>> void fill(final N[] data, final Access1D<?> values, Scalar.Factory<N> scalar) {
+    public static <N extends Comparable<N>> void fill(final N[] data, final Access1D<?> values, final Scalar.Factory<N> scalar) {
         final int limit = Math.min(data.length, values.size());
         for (int i = 0; i < limit; i++) {
             data[i] = scalar.cast(values.get(i));
@@ -81,7 +81,7 @@ public final class FillAll implements ArrayOperation {
     }
 
     public static <N extends Comparable<N>> void fill(final N[] data, final int first, final int limit, final int step, final NullaryFunction<?> supplier,
-            Scalar.Factory<N> scalar) {
+            final Scalar.Factory<N> scalar) {
         for (int i = first; i < limit; i += step) {
             data[i] = scalar.cast(supplier.invoke());
         }

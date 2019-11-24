@@ -131,97 +131,6 @@ public interface Householder<N extends Comparable<N>> extends Access1D<N> {
 
     }
 
-    public static final class Primitive64 implements Householder<Double> {
-
-        public double beta;
-        public int first;
-        public final double[] vector;
-
-        public Primitive64(final Householder<Double> aTransf) {
-
-            this((int) aTransf.count());
-
-            this.copy(aTransf);
-        }
-
-        public Primitive64(final int aDim) {
-
-            super();
-
-            vector = new double[aDim];
-            beta = PrimitiveMath.ZERO;
-            first = 0;
-        }
-
-        public Householder.Primitive64 copy(final Householder<Double> source) {
-
-            first = source.first();
-
-            final double[] tmpVector = vector;
-            double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
-            final int tmpSize = (int) source.count();
-            for (int i = source.first(); i < tmpSize; i++) {
-                tmpVal = source.doubleValue(i);
-                tmpVal2 += tmpVal * tmpVal;
-                tmpVector[i] = tmpVal;
-            }
-
-            beta = PrimitiveMath.TWO / tmpVal2;
-
-            return this;
-        }
-
-        public Householder.Primitive64 copy(final Householder<Double> source, final double precalculatedBeta) {
-
-            first = source.first();
-
-            final double[] tmpVector = vector;
-
-            final int tmpSize = (int) source.count();
-            for (int i = source.first(); i < tmpSize; i++) {
-                tmpVector[i] = source.doubleValue(i);
-            }
-
-            beta = precalculatedBeta;
-
-            return this;
-        }
-
-        public long count() {
-            return vector.length;
-        }
-
-        public double doubleValue(final long anInd) {
-            return vector[(int) anInd];
-        }
-
-        public int first() {
-            return first;
-        }
-
-        public Double get(final long index) {
-            return vector[(int) index];
-        }
-
-        @Override
-        public String toString() {
-
-            final StringBuilder retVal = new StringBuilder("{ ");
-
-            final int tmpLastIndex = vector.length - 1;
-            for (int i = 0; i < tmpLastIndex; i++) {
-                retVal.append(this.get(i));
-                retVal.append(", ");
-            }
-            retVal.append(this.get(tmpLastIndex));
-
-            retVal.append(" }");
-
-            return retVal.toString();
-        }
-
-    }
-
     public static final class Primitive32 implements Householder<Double> {
 
         public float beta;
@@ -292,6 +201,97 @@ public interface Householder<N extends Comparable<N>> extends Access1D<N> {
 
         public Double get(final long index) {
             return Double.valueOf(vector[(int) index]);
+        }
+
+        @Override
+        public String toString() {
+
+            final StringBuilder retVal = new StringBuilder("{ ");
+
+            final int tmpLastIndex = vector.length - 1;
+            for (int i = 0; i < tmpLastIndex; i++) {
+                retVal.append(this.get(i));
+                retVal.append(", ");
+            }
+            retVal.append(this.get(tmpLastIndex));
+
+            retVal.append(" }");
+
+            return retVal.toString();
+        }
+
+    }
+
+    public static final class Primitive64 implements Householder<Double> {
+
+        public double beta;
+        public int first;
+        public final double[] vector;
+
+        public Primitive64(final Householder<Double> aTransf) {
+
+            this((int) aTransf.count());
+
+            this.copy(aTransf);
+        }
+
+        public Primitive64(final int aDim) {
+
+            super();
+
+            vector = new double[aDim];
+            beta = PrimitiveMath.ZERO;
+            first = 0;
+        }
+
+        public Householder.Primitive64 copy(final Householder<Double> source) {
+
+            first = source.first();
+
+            final double[] tmpVector = vector;
+            double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
+            final int tmpSize = (int) source.count();
+            for (int i = source.first(); i < tmpSize; i++) {
+                tmpVal = source.doubleValue(i);
+                tmpVal2 += tmpVal * tmpVal;
+                tmpVector[i] = tmpVal;
+            }
+
+            beta = PrimitiveMath.TWO / tmpVal2;
+
+            return this;
+        }
+
+        public Householder.Primitive64 copy(final Householder<Double> source, final double precalculatedBeta) {
+
+            first = source.first();
+
+            final double[] tmpVector = vector;
+
+            final int tmpSize = (int) source.count();
+            for (int i = source.first(); i < tmpSize; i++) {
+                tmpVector[i] = source.doubleValue(i);
+            }
+
+            beta = precalculatedBeta;
+
+            return this;
+        }
+
+        public long count() {
+            return vector.length;
+        }
+
+        public double doubleValue(final long anInd) {
+            return vector[(int) anInd];
+        }
+
+        public int first() {
+            return first;
+        }
+
+        public Double get(final long index) {
+            return vector[(int) index];
         }
 
         @Override

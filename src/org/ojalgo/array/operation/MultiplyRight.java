@@ -38,15 +38,15 @@ public final class MultiplyRight implements ArrayOperation {
 
     }
 
-    public interface Primitive64 {
-
-        void invoke(double[] product, double[] left, int complexity, Access1D<?> right);
-
-    }
-
     public interface Primitive32 {
 
         void invoke(float[] product, float[] left, int complexity, Access1D<?> right);
+
+    }
+
+    public interface Primitive64 {
+
+        void invoke(double[] product, double[] left, int complexity, Access1D<?> right);
 
     }
 

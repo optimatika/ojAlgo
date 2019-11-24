@@ -645,7 +645,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          */
         public static float round(final float x, final int scale, final int roundingMethod) {
             final float sign = Math.copySign(1f, x);
-            final float factor = (float) PrimitiveMath.POW.invoke(10.0f, scale) * sign;
+            final float factor = PrimitiveMath.POW.invoke(10.0f, scale) * sign;
             return (float) Precision.roundUnscaled(x * factor, sign, roundingMethod) / factor;
         }
 

@@ -32,13 +32,13 @@ public abstract class PowerOf2 {
         public final int value;
         private final int myModuloMask;
 
-        IntPower(int exponent, int value) {
+        IntPower(final int exponent, final int value) {
             super(exponent);
             this.value = value;
             myModuloMask = value - 1;
         }
 
-        public int divide(int dividend) {
+        public int divide(final int dividend) {
             return dividend >> exponent;
         }
 
@@ -46,7 +46,7 @@ public abstract class PowerOf2 {
             return myModuloMask;
         }
 
-        public int modulo(int dividend) {
+        public int modulo(final int dividend) {
             return dividend & myModuloMask;
         }
 
@@ -57,13 +57,13 @@ public abstract class PowerOf2 {
         public final long value;
         private final long myModuloMask;
 
-        LongPower(int exponent, long value) {
+        LongPower(final int exponent, final long value) {
             super(exponent);
             this.value = value;
             myModuloMask = value - 1L;
         }
 
-        public long divide(long dividend) {
+        public long divide(final long dividend) {
             return dividend >> exponent;
         }
 
@@ -71,7 +71,7 @@ public abstract class PowerOf2 {
             return myModuloMask;
         }
 
-        public long modulo(long dividend) {
+        public long modulo(final long dividend) {
             return dividend & myModuloMask;
         }
 
@@ -112,11 +112,11 @@ public abstract class PowerOf2 {
         return Arrays.binarySearch(LONG_POWERS, value);
     }
 
-    public static IntPower getIntPower(int exponent) {
+    public static IntPower getIntPower(final int exponent) {
         return new IntPower(exponent, INT_POWERS[exponent]);
     }
 
-    public static LongPower getLongPower(int exponent) {
+    public static LongPower getLongPower(final int exponent) {
         return new LongPower(exponent, LONG_POWERS[exponent]);
     }
 
@@ -160,17 +160,17 @@ public abstract class PowerOf2 {
         return index >= 0 ? index : Math.max(-(index + 2), 0);
     }
 
-    public static int powerOfInt2(int exponent) {
+    public static int powerOfInt2(final int exponent) {
         return INT_POWERS[exponent];
     }
 
-    public static long powerOfLong2(int exponent) {
+    public static long powerOfLong2(final int exponent) {
         return LONG_POWERS[exponent];
     }
 
     public final int exponent;
 
-    PowerOf2(int exponent) {
+    PowerOf2(final int exponent) {
         super();
         this.exponent = exponent;
     }

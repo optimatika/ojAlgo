@@ -139,12 +139,12 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
     }
 
-    public void add(final long row, final long col, final double addend) {
+    public void add(final long row, final long col, final Comparable<?> addend) {
         myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
         this.updateNonZeros(row, col);
     }
 
-    public void add(final long row, final long col, final Comparable<?> addend) {
+    public void add(final long row, final long col, final double addend) {
         myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
         this.updateNonZeros(row, col);
     }
@@ -508,12 +508,12 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         Arrays.fill(myLimits, 0);
     }
 
-    public void set(final long row, final long col, final double value) {
+    public void set(final long row, final long col, final Comparable<?> value) {
         myElements.set(Structure2D.index(myFirsts.length, row, col), value);
         this.updateNonZeros(row, col);
     }
 
-    public void set(final long row, final long col, final Comparable<?> value) {
+    public void set(final long row, final long col, final double value) {
         myElements.set(Structure2D.index(myFirsts.length, row, col), value);
         this.updateNonZeros(row, col);
     }

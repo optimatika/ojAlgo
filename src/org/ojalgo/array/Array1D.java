@@ -89,6 +89,10 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
             return this.makeDense(count);
         }
 
+        public Array1D<N> makeDense(final long count) {
+            return myDelegate.makeToBeFilled(count).wrapInArray1D();
+        }
+
         public Array1D<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
             return myDelegate.makeFilled(count, supplier).wrapInArray1D();
         }
@@ -104,10 +108,6 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
         public Array1D<N> wrap(final BasicArray<N> array) {
             return array.wrapInArray1D();
-        }
-
-        public Array1D<N> makeDense(long count) {
-            return myDelegate.makeToBeFilled(count).wrapInArray1D();
         }
 
     }

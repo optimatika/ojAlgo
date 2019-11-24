@@ -42,6 +42,10 @@ public abstract class RandomNumber implements Distribution, NullaryFunction<Doub
         super();
     }
 
+    public int compareTo(final RandomNumber o) {
+        return Double.compare(this.getExpected(), o.getExpected());
+    }
+
     @Override
     public final double doubleValue() {
         return this.generate();
@@ -110,9 +114,5 @@ public abstract class RandomNumber implements Distribution, NullaryFunction<Doub
 
     protected final Random random() {
         return myRandom;
-    }
-
-    public int compareTo(RandomNumber o) {
-        return Double.compare(this.getExpected(), o.getExpected());
     }
 }

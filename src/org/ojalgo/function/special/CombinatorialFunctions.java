@@ -31,7 +31,7 @@ public abstract class CombinatorialFunctions {
     /**
      * 13! does not fit in an <code>int</code>, and 21! does not fit in a <code>long</code> - that's why this
      * method returns a <code>double</code>.
-     * 
+     *
      * @deprecated v48 Use {@link MissingMath#factorial(int)} instead
      */
     @Deprecated

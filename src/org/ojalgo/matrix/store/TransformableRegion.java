@@ -53,11 +53,11 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myColumns = columns;
         }
 
-        public void add(final long row, final long col, final double addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(row, myColumns[(int) col], addend);
         }
 
-        public void add(final long row, final long col, final Comparable<?> addend) {
+        public void add(final long row, final long col, final double addend) {
             myBase.add(row, myColumns[(int) col], addend);
         }
 
@@ -109,11 +109,11 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.modifyOne(row, myColumns[(int) col], modifier);
         }
 
-        public void set(final long row, final long col, final double value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(row, myColumns[(int) col], value);
         }
 
-        public void set(final long row, final long col, final Comparable<?> value) {
+        public void set(final long row, final long col, final double value) {
             myBase.set(row, myColumns[(int) col], value);
         }
 
@@ -137,11 +137,11 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myColumnLimit = columnLimit;
         }
 
-        public void add(final long row, final long col, final double addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(row, col, addend);
         }
 
-        public void add(final long row, final long col, final Comparable<?> addend) {
+        public void add(final long row, final long col, final double addend) {
             myBase.add(row, col, addend);
         }
 
@@ -177,11 +177,11 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.modifyOne(row, col, modifier);
         }
 
-        public void set(final long row, final long col, final double value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(row, col, value);
         }
 
-        public void set(final long row, final long col, final Comparable<?> value) {
+        public void set(final long row, final long col, final double value) {
             myBase.set(row, col, value);
         }
 
@@ -199,11 +199,11 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myColumnOffset = columnOffset;
         }
 
-        public void add(final long row, final long col, final double addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(myRowOffset + row, myColumnOffset + col, addend);
         }
 
-        public void add(final long row, final long col, final Comparable<?> addend) {
+        public void add(final long row, final long col, final double addend) {
             myBase.add(myRowOffset + row, myColumnOffset + col, addend);
         }
 
@@ -297,11 +297,11 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.modifyRow(myRowOffset + row, myColumnOffset + col, modifier);
         }
 
-        public void set(final long row, final long col, final double value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void set(final long row, final long col, final Comparable<?> value) {
+        public void set(final long row, final long col, final double value) {
             myBase.set(myRowOffset + row, myColumnOffset + col, value);
         }
 
@@ -378,11 +378,11 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myRows = rows;
         }
 
-        public void add(final long row, final long col, final double addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(myRows[(int) row], col, addend);
         }
 
-        public void add(final long row, final long col, final Comparable<?> addend) {
+        public void add(final long row, final long col, final double addend) {
             myBase.add(myRows[(int) row], col, addend);
         }
 
@@ -434,11 +434,11 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase.modifyRow(myRows[(int) row], col, modifier);
         }
 
-        public void set(final long row, final long col, final double value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(myRows[(int) row], col, value);
         }
 
-        public void set(final long row, final long col, final Comparable<?> value) {
+        public void set(final long row, final long col, final double value) {
             myBase.set(myRows[(int) row], col, value);
         }
 
@@ -453,11 +453,11 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             myBase = base;
         }
 
-        public void add(final long row, final long col, final double addend) {
+        public void add(final long row, final long col, final Comparable<?> addend) {
             myBase.add(col, row, addend);
         }
 
-        public void add(final long row, final long col, final Comparable<?> addend) {
+        public void add(final long row, final long col, final double addend) {
             myBase.add(col, row, addend);
         }
 
@@ -534,11 +534,11 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             return myBase;
         }
 
-        public void set(final long row, final long col, final double value) {
+        public void set(final long row, final long col, final Comparable<?> value) {
             myBase.set(col, row, value);
         }
 
-        public void set(final long row, final long col, final Comparable<?> value) {
+        public void set(final long row, final long col, final double value) {
             myBase.set(col, row, value);
         }
 

@@ -277,15 +277,6 @@ public final class NumberContext extends FormatContext<Comparable<?>, NumberForm
         return this.scale(tmpDecimal);
     }
 
-    /**
-     * Does not enforce the precision and does not use the specified rounding mode. The precision is given by
-     * the type double and the rounding mode is always "half even" as given by
-     * {@linkplain StrictMath#rint(double)}.
-     */
-    public double enforce(final double number) {
-        return PrimitiveMath.RINT.invoke(myRoundingFactor * number) / myRoundingFactor;
-    }
-
     @Override
     public Comparable<?> enforce(final Comparable<?> object) {
         if (object instanceof BigDecimal) {
@@ -295,6 +286,15 @@ public final class NumberContext extends FormatContext<Comparable<?>, NumberForm
         } else {
             return this.enforce(Scalar.doubleValue(object));
         }
+    }
+
+    /**
+     * Does not enforce the precision and does not use the specified rounding mode. The precision is given by
+     * the type double and the rounding mode is always "half even" as given by
+     * {@linkplain StrictMath#rint(double)}.
+     */
+    public double enforce(final double number) {
+        return PrimitiveMath.RINT.invoke(myRoundingFactor * number) / myRoundingFactor;
     }
 
     /**

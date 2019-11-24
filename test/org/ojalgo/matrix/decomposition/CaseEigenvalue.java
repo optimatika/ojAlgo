@@ -384,7 +384,7 @@ public class CaseEigenvalue extends MatrixDecompositionTests {
             cholesky.decompose(mtrxB);
 
             MatrixStore<Double> compL = cholesky.getL();
-            MatrixStore<Double> compU = cholesky.getR();
+            cholesky.getR();
 
             MatrixStore<Double> mtrxC = compL.transpose().multiply(mtrxA).multiply(compL);
 

@@ -61,18 +61,6 @@ public class LinearCase extends MultiaryFunctionTests {
     }
 
     @Test
-    public void testInvoke() {
-
-        TestUtils.assertEquals(myLinearFunction1.invoke(myArg), myLinearFunction2.invoke(myArg));
-        TestUtils.assertEquals(myAffineFunction1.invoke(myArg), myAffineFunction2.invoke(myArg));
-        TestUtils.assertEquals(myQuadraticFunction1.invoke(myArg), myQuadraticFunction2.invoke(myArg));
-
-        TestUtils.assertEquals(myLinearFunction1.invoke(myArg), myAffineFunction1.invoke(myArg));
-        TestUtils.assertEquals(myAffineFunction2.invoke(myArg), myQuadraticFunction2.invoke(myArg));
-        TestUtils.assertEquals(myQuadraticFunction1.invoke(myArg), myLinearFunction2.invoke(myArg));
-    }
-
-    @Test
     public void testGetGradient() {
 
         TestUtils.assertEquals(myLinearFunction1.getGradient(myArg), myLinearFunction2.getGradient(myArg));
@@ -106,6 +94,18 @@ public class LinearCase extends MultiaryFunctionTests {
         TestUtils.assertEquals(myLinearFunction1.getLinearFactors(), myAffineFunction1.getLinearFactors());
         TestUtils.assertEquals(myAffineFunction2.getLinearFactors(), myQuadraticFunction2.getLinearFactors());
         TestUtils.assertEquals(myQuadraticFunction1.getLinearFactors(), myLinearFunction2.getLinearFactors());
+    }
+
+    @Test
+    public void testInvoke() {
+
+        TestUtils.assertEquals(myLinearFunction1.invoke(myArg), myLinearFunction2.invoke(myArg));
+        TestUtils.assertEquals(myAffineFunction1.invoke(myArg), myAffineFunction2.invoke(myArg));
+        TestUtils.assertEquals(myQuadraticFunction1.invoke(myArg), myQuadraticFunction2.invoke(myArg));
+
+        TestUtils.assertEquals(myLinearFunction1.invoke(myArg), myAffineFunction1.invoke(myArg));
+        TestUtils.assertEquals(myAffineFunction2.invoke(myArg), myQuadraticFunction2.invoke(myArg));
+        TestUtils.assertEquals(myQuadraticFunction1.invoke(myArg), myLinearFunction2.invoke(myArg));
     }
 
 }

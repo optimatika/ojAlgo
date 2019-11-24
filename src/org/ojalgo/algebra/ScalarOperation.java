@@ -36,7 +36,7 @@ public interface ScalarOperation {
         /**
          * @return <code>this + scalarAddend</code>.
          */
-        default T add(float scalarAddend) {
+        default T add(final float scalarAddend) {
             return this.add((double) scalarAddend);
         }
 
@@ -57,7 +57,7 @@ public interface ScalarOperation {
         /**
          * @return <code>this / scalarDivisor</code>.
          */
-        default T divide(float scalarDivisor) {
+        default T divide(final float scalarDivisor) {
             return this.divide((double) scalarDivisor);
         }
 
@@ -78,7 +78,7 @@ public interface ScalarOperation {
         /**
          * @return <code>this * scalarMultiplicand</code>.
          */
-        default T multiply(float scalarMultiplicand) {
+        default T multiply(final float scalarMultiplicand) {
             return this.multiply((double) scalarMultiplicand);
         }
 
@@ -99,7 +99,7 @@ public interface ScalarOperation {
         /**
          * @return <code>this - scalarSubtrahend</code>.
          */
-        default T subtract(float scalarSubtrahend) {
+        default T subtract(final float scalarSubtrahend) {
             return this.subtract((double) scalarSubtrahend);
         }
 

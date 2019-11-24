@@ -107,11 +107,11 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements Access2D<
 
             myColumns.get(j).supplyNonZerosTo(new Mutate1D() {
 
-                public void add(final long index, final double addend) {
+                public void add(final long index, final Comparable<?> addend) {
                     receiver.add(index, col, addend);
                 }
 
-                public void add(final long index, final Comparable<?> addend) {
+                public void add(final long index, final double addend) {
                     receiver.add(index, col, addend);
                 }
 
@@ -119,11 +119,11 @@ public final class ColumnsSupplier<N extends Comparable<N>> implements Access2D<
                     return receiver.countRows();
                 }
 
-                public void set(final long index, final double value) {
+                public void set(final long index, final Comparable<?> value) {
                     receiver.set(index, col, value);
                 }
 
-                public void set(final long index, final Comparable<?> value) {
+                public void set(final long index, final double value) {
                     receiver.set(index, col, value);
                 }
 

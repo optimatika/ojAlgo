@@ -126,6 +126,15 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
     }
 
     @Override
+    public void add(final long index, final Comparable<?> addend) {
+        if (index >= myActualCount) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            myStorage.add(index, addend);
+        }
+    }
+
+    @Override
     public void add(final long index, final double addend) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -136,15 +145,6 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
 
     @Override
     public void add(final long index, final float addend) {
-        if (index >= myActualCount) {
-            throw new ArrayIndexOutOfBoundsException();
-        } else {
-            myStorage.add(index, addend);
-        }
-    }
-
-    @Override
-    public void add(final long index, final Comparable<?> addend) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
@@ -403,6 +403,15 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
     }
 
     @Override
+    public void set(final long index, final Comparable<?> value) {
+        if (index >= myActualCount) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            myStorage.set(index, value);
+        }
+    }
+
+    @Override
     public void set(final long index, final double value) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -413,15 +422,6 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
 
     @Override
     public void set(final long index, final float value) {
-        if (index >= myActualCount) {
-            throw new ArrayIndexOutOfBoundsException();
-        } else {
-            myStorage.set(index, value);
-        }
-    }
-
-    @Override
-    public void set(final long index, final Comparable<?> value) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {

@@ -41,8 +41,8 @@ public class TDistributionTest {
         TDistribution s4 = new TDistribution.Degree4();
         TDistribution g4 = new TDistribution(4);
 
-        TDistribution sInf = new TDistribution.DegreeInfinity();
-        TDistribution gInf = new TDistribution(Integer.MAX_VALUE);
+        new TDistribution.DegreeInfinity();
+        new TDistribution(Integer.MAX_VALUE);
 
         for (int x = -5; x <= 5; x++) {
 

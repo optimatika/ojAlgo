@@ -307,7 +307,7 @@ public final class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<C
     }
 
     @Override
-    public ComplexNumber add(float scalarAddend) {
+    public ComplexNumber add(final float scalarAddend) {
         return this.add((double) scalarAddend);
     }
 
@@ -400,7 +400,7 @@ public final class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<C
     }
 
     @Override
-    public ComplexNumber divide(float scalarDivisor) {
+    public ComplexNumber divide(final float scalarDivisor) {
         return this.divide((double) scalarDivisor);
     }
 
@@ -451,7 +451,7 @@ public final class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<C
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -581,7 +581,7 @@ public final class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<C
     }
 
     @Override
-    public ComplexNumber multiply(float scalarMultiplicand) {
+    public ComplexNumber multiply(final float scalarMultiplicand) {
         return this.multiply((double) scalarMultiplicand);
     }
 
@@ -657,7 +657,7 @@ public final class ComplexNumber implements Scalar<ComplexNumber>, Enforceable<C
     }
 
     @Override
-    public ComplexNumber subtract(float scalarSubtrahend) {
+    public ComplexNumber subtract(final float scalarSubtrahend) {
         return this.subtract((double) scalarSubtrahend);
     }
 

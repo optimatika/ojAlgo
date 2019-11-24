@@ -75,6 +75,15 @@ public final class ArrayAnyD<N extends Comparable<N>>
             return myDelegate.function();
         }
 
+        @Override
+        public ArrayAnyD<N> make(final long... structure) {
+            return this.makeDense(structure);
+        }
+
+        public ArrayAnyD<N> makeDense(final long... structure) {
+            return myDelegate.makeToBeFilled(structure).wrapInArrayAnyD(structure);
+        }
+
         /**
          * @deprecated v48 Use {@link ArrayAnyD#fillAll(NullaryFunction)}
          */
@@ -88,17 +97,8 @@ public final class ArrayAnyD<N extends Comparable<N>>
         }
 
         @Override
-        public ArrayAnyD<N> make(final long... structure) {
-            return this.makeDense(structure);
-        }
-
-        @Override
         public Scalar.Factory<N> scalar() {
             return myDelegate.scalar();
-        }
-
-        public ArrayAnyD<N> makeDense(long... structure) {
-            return myDelegate.makeToBeFilled(structure).wrapInArrayAnyD(structure);
         }
 
     }
@@ -133,6 +133,11 @@ public final class ArrayAnyD<N extends Comparable<N>>
     }
 
     @Override
+    public void add(final long index, final Comparable<?> addend) {
+        myDelegate.add(index, addend);
+    }
+
+    @Override
     public void add(final long index, final double addend) {
         myDelegate.add(index, addend);
     }
@@ -143,8 +148,8 @@ public final class ArrayAnyD<N extends Comparable<N>>
     }
 
     @Override
-    public void add(final long index, final Comparable<?> addend) {
-        myDelegate.add(index, addend);
+    public void add(final long[] reference, final Comparable<?> addend) {
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
 
     @Override
@@ -154,11 +159,6 @@ public final class ArrayAnyD<N extends Comparable<N>>
 
     @Override
     public void add(final long[] reference, final float addend) {
-        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
-    }
-
-    @Override
-    public void add(final long[] reference, final Comparable<?> addend) {
         myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
 
@@ -456,6 +456,11 @@ public final class ArrayAnyD<N extends Comparable<N>>
     }
 
     @Override
+    public void set(final long index, final Comparable<?> value) {
+        myDelegate.set(index, value);
+    }
+
+    @Override
     public void set(final long index, final double value) {
         myDelegate.set(index, value);
     }
@@ -466,8 +471,8 @@ public final class ArrayAnyD<N extends Comparable<N>>
     }
 
     @Override
-    public void set(final long index, final Comparable<?> value) {
-        myDelegate.set(index, value);
+    public void set(final long[] reference, final Comparable<?> value) {
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
     }
 
     @Override
@@ -477,11 +482,6 @@ public final class ArrayAnyD<N extends Comparable<N>>
 
     @Override
     public void set(final long[] reference, final float value) {
-        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
-    }
-
-    @Override
-    public void set(final long[] reference, final Comparable<?> value) {
         myDelegate.set(StructureAnyD.index(myStructure, reference), value);
     }
 

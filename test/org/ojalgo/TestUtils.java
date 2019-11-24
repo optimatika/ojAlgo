@@ -96,6 +96,14 @@ public abstract class TestUtils {
         Assertions.assertEquals(expected, actual);
     }
 
+    public static void assertEquals(final Comparable<?> expected, final Comparable<?> actual) {
+        TestUtils.assertEquals(expected, actual, EQUALS);
+    }
+
+    public static void assertEquals(final Comparable<?> expected, final Comparable<?> actual, final NumberContext context) {
+        TestUtils.assertEquals("Number != Number", expected, actual, context);
+    }
+
     public static void assertEquals(final ComplexNumber expected, final ComplexNumber actual) {
         TestUtils.assertEquals(expected, actual, EQUALS);
     }
@@ -202,14 +210,6 @@ public abstract class TestUtils {
         }
     }
 
-    public static void assertEquals(final Comparable<?> expected, final Comparable<?> actual) {
-        TestUtils.assertEquals(expected, actual, EQUALS);
-    }
-
-    public static void assertEquals(final Comparable<?> expected, final Comparable<?> actual, final NumberContext context) {
-        TestUtils.assertEquals("Number != Number", expected, actual, context);
-    }
-
     public static void assertEquals(final Object expected, final Object actual) {
         Assertions.assertEquals(expected, actual);
     }
@@ -244,48 +244,6 @@ public abstract class TestUtils {
         }
         TestUtils.assertTrue(message + ", large norm differences " + tmpFrobNormDiff + " !<< " + tmpFrobNormExpt,
                 context.isSmall(tmpFrobNormExpt, tmpFrobNormDiff));
-    }
-
-    public static void assertEquals(final String message, final ComplexNumber expected, final ComplexNumber actual) {
-        TestUtils.assertEquals(message, expected, actual, EQUALS);
-    }
-
-    public static void assertEquals(final String message, final ComplexNumber expected, final ComplexNumber actual, final NumberContext context) {
-        TestUtils.assertEquals(message, (Comparable<?>) expected, (Comparable<?>) actual, context);
-        TestUtils.assertEquals(message, (Access1D<?>) expected, (Access1D<?>) actual, context);
-    }
-
-    public static void assertEquals(final String message, final double expected, final double actual) {
-        TestUtils.assertEquals(message, expected, actual, EQUALS);
-    }
-
-    public static void assertEquals(final String message, final double expected, final double actual, final double delta) {
-        Assertions.assertEquals(expected, actual, delta, message);
-    }
-
-    public static void assertEquals(final String message, final double expected, final double actual, final NumberContext context) {
-        // TestUtils.assertEquals(message, Double.valueOf(expected), Double.valueOf(actual), context);
-        if (Double.isNaN(expected) && Double.isNaN(actual)) {
-
-        } else if (context.isDifferent(expected, actual)) {
-            Assertions.fail(() -> message + ": " + expected + " != " + actual);
-        }
-    }
-
-    public static void assertEquals(final String message, final int expected, final int actual) {
-        Assertions.assertEquals(expected, actual, message);
-    }
-
-    public static void assertEquals(final String message, final int[] expected, final int[] actual) {
-        TestUtils.assertTrue(message, Arrays.equals(expected, actual));
-    }
-
-    public static void assertEquals(final String message, final long expected, final long actual) {
-        Assertions.assertEquals(expected, actual, message);
-    }
-
-    public static void assertEquals(final String message, final long[] expected, final long[] actual) {
-        TestUtils.assertTrue(message, Arrays.equals(expected, actual));
     }
 
     public static void assertEquals(final String message, final Comparable<?> expected, final Comparable<?> actual) {
@@ -337,6 +295,48 @@ public abstract class TestUtils {
                 Assertions.assertEquals(expected, actual, () -> message + ": " + expected + " != " + actual);
             }
         }
+    }
+
+    public static void assertEquals(final String message, final ComplexNumber expected, final ComplexNumber actual) {
+        TestUtils.assertEquals(message, expected, actual, EQUALS);
+    }
+
+    public static void assertEquals(final String message, final ComplexNumber expected, final ComplexNumber actual, final NumberContext context) {
+        TestUtils.assertEquals(message, (Comparable<?>) expected, (Comparable<?>) actual, context);
+        TestUtils.assertEquals(message, (Access1D<?>) expected, (Access1D<?>) actual, context);
+    }
+
+    public static void assertEquals(final String message, final double expected, final double actual) {
+        TestUtils.assertEquals(message, expected, actual, EQUALS);
+    }
+
+    public static void assertEquals(final String message, final double expected, final double actual, final double delta) {
+        Assertions.assertEquals(expected, actual, delta, message);
+    }
+
+    public static void assertEquals(final String message, final double expected, final double actual, final NumberContext context) {
+        // TestUtils.assertEquals(message, Double.valueOf(expected), Double.valueOf(actual), context);
+        if (Double.isNaN(expected) && Double.isNaN(actual)) {
+
+        } else if (context.isDifferent(expected, actual)) {
+            Assertions.fail(() -> message + ": " + expected + " != " + actual);
+        }
+    }
+
+    public static void assertEquals(final String message, final int expected, final int actual) {
+        Assertions.assertEquals(expected, actual, message);
+    }
+
+    public static void assertEquals(final String message, final int[] expected, final int[] actual) {
+        TestUtils.assertTrue(message, Arrays.equals(expected, actual));
+    }
+
+    public static void assertEquals(final String message, final long expected, final long actual) {
+        Assertions.assertEquals(expected, actual, message);
+    }
+
+    public static void assertEquals(final String message, final long[] expected, final long[] actual) {
+        TestUtils.assertTrue(message, Arrays.equals(expected, actual));
     }
 
     public static void assertEquals(final String message, final Object expected, final Object actual) {

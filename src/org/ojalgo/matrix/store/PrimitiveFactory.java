@@ -36,10 +36,6 @@ import org.ojalgo.structure.Access2D;
 
 abstract class PrimitiveFactory<I extends PhysicalStore<Double>> implements PhysicalStore.Factory<Double, I> {
 
-    public MatrixStore.Factory<Double> builder() {
-        return MatrixStore.PRIMITIVE64;
-    }
-
     public final AggregatorSet<Double> aggregator() {
         return PrimitiveAggregator.getSet();
     }
@@ -48,12 +44,25 @@ abstract class PrimitiveFactory<I extends PhysicalStore<Double>> implements Phys
         return Primitive64Array.FACTORY;
     }
 
+    public MatrixStore.Factory<Double> builder() {
+        return MatrixStore.PRIMITIVE64;
+    }
+
     public final I conjugate(final Access2D<?> source) {
         return this.transpose(source);
     }
 
     public final FunctionSet<Double> function() {
         return PrimitiveFunction.getSet();
+    }
+
+    public final I makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
+
+        I retVal = this.make(rows, columns);
+
+        retVal.fillAll(supplier);
+
+        return retVal;
     }
 
     public Householder<Double> makeHouseholder(final int length) {
@@ -70,15 +79,6 @@ abstract class PrimitiveFactory<I extends PhysicalStore<Double>> implements Phys
 
     public final Scalar.Factory<Double> scalar() {
         return PrimitiveScalar.FACTORY;
-    }
-
-    public final I makeFilled(long rows, long columns, NullaryFunction<?> supplier) {
-
-        I retVal = this.make(rows, columns);
-
-        retVal.fillAll(supplier);
-
-        return retVal;
     }
 
 }

@@ -41,38 +41,31 @@ public class PrimalDualTest extends OptimisationLinearTests {
         super();
     }
 
+    /**
+     * https://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15859-f11/www/notes/lecture05.pdf
+     */
     @Test
-    public void testP20080117() {
+    public void testCaseCMU() {
 
-        ExpressionsBasedModel model = ConvexProblems.buildP20080117();
+        ExpressionsBasedModel primModel = new ExpressionsBasedModel();
+        Variable x1 = primModel.addVariable("X1").lower(0).weight(2);
+        Variable x2 = primModel.addVariable("X2").lower(0).weight(3);
+        primModel.addExpression().set(x1, 4).set(x2, 8).upper(12);
+        primModel.addExpression().set(x1, 2).set(x2, 1).upper(3);
+        primModel.addExpression().set(x1, 3).set(x2, 2).upper(4);
 
-        this.doEvaluate(model, true);
-    }
+        ExpressionsBasedModel dualModel = new ExpressionsBasedModel();
+        Variable y1 = dualModel.addVariable("Y1").lower(0).weight(12);
+        Variable y2 = dualModel.addVariable("Y2").lower(0).weight(3);
+        Variable y3 = dualModel.addVariable("Y3").lower(0).weight(4);
+        dualModel.addExpression().set(y1, 4).set(y2, 2).set(y3, 3).lower(2);
+        dualModel.addExpression().set(y1, 8).set(y2, 1).set(y3, 2).lower(3);
 
-    private void doEvaluate(final ExpressionsBasedModel model, final boolean minimise) {
+        double optimalValue = 4.75;
+        DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 0.5, 1.25 });
+        DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 5.0 / 16.0, 0.0, 0.25 });
 
-        Result modResult = minimise ? model.minimise() : model.maximise();
-
-        ConvexSolver.Builder convex = ConvexSolver.getBuilder();
-        ConvexSolver.copy(model, convex);
-
-        Result primResult = PrimalSimplex.solve(convex, model.options);
-        Result dualResult = DualSimplex.solve(convex, model.options);
-
-        if (DEBUG) {
-
-            BasicLogger.debug(modResult);
-            BasicLogger.debug(primResult);
-            BasicLogger.debug(dualResult);
-
-            BasicLogger.debug(primResult.getMultipliers().get());
-            BasicLogger.debug(dualResult.getMultipliers().get());
-        }
-
-        TestUtils.assertStateAndSolution(modResult, primResult);
-        TestUtils.assertStateAndSolution(modResult, dualResult);
-
-        TestUtils.assertEquals(primResult.getMultipliers().get(), dualResult.getMultipliers().get());
+        this.doCompare(primModel, dualModel, optimalValue, optimalX, optimalY);
     }
 
     /**
@@ -103,33 +96,6 @@ public class PrimalDualTest extends OptimisationLinearTests {
     }
 
     /**
-     * https://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15859-f11/www/notes/lecture05.pdf
-     */
-    @Test
-    public void testCaseCMU() {
-
-        ExpressionsBasedModel primModel = new ExpressionsBasedModel();
-        Variable x1 = primModel.addVariable("X1").lower(0).weight(2);
-        Variable x2 = primModel.addVariable("X2").lower(0).weight(3);
-        primModel.addExpression().set(x1, 4).set(x2, 8).upper(12);
-        primModel.addExpression().set(x1, 2).set(x2, 1).upper(3);
-        primModel.addExpression().set(x1, 3).set(x2, 2).upper(4);
-
-        ExpressionsBasedModel dualModel = new ExpressionsBasedModel();
-        Variable y1 = dualModel.addVariable("Y1").lower(0).weight(12);
-        Variable y2 = dualModel.addVariable("Y2").lower(0).weight(3);
-        Variable y3 = dualModel.addVariable("Y3").lower(0).weight(4);
-        dualModel.addExpression().set(y1, 4).set(y2, 2).set(y3, 3).lower(2);
-        dualModel.addExpression().set(y1, 8).set(y2, 1).set(y3, 2).lower(3);
-
-        double optimalValue = 4.75;
-        DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 0.5, 1.25 });
-        DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 5.0 / 16.0, 0.0, 0.25 });
-
-        this.doCompare(primModel, dualModel, optimalValue, optimalX, optimalY);
-    }
-
-    /**
      * http://web.mit.edu/15.053/www/AMP-Chapter-04.pdf
      */
     @Test
@@ -154,6 +120,14 @@ public class PrimalDualTest extends OptimisationLinearTests {
         DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 11, 0.5 });
 
         this.doCompare(primModel, dualModel, optimalValue, optimalX, optimalY);
+    }
+
+    @Test
+    public void testP20080117() {
+
+        ExpressionsBasedModel model = ConvexProblems.buildP20080117();
+
+        this.doEvaluate(model, true);
     }
 
     @Test
@@ -242,6 +216,32 @@ public class PrimalDualTest extends OptimisationLinearTests {
 
         TestUtils.assertEquals(primModelPrimSolver.getMultipliers().get(), primModelDualSolver.getMultipliers().get());
         TestUtils.assertEquals(dualModelPrimSolver.getMultipliers().get(), dualModelDualSolver.getMultipliers().get());
+    }
+
+    private void doEvaluate(final ExpressionsBasedModel model, final boolean minimise) {
+
+        Result modResult = minimise ? model.minimise() : model.maximise();
+
+        ConvexSolver.Builder convex = ConvexSolver.getBuilder();
+        ConvexSolver.copy(model, convex);
+
+        Result primResult = PrimalSimplex.solve(convex, model.options);
+        Result dualResult = DualSimplex.solve(convex, model.options);
+
+        if (DEBUG) {
+
+            BasicLogger.debug(modResult);
+            BasicLogger.debug(primResult);
+            BasicLogger.debug(dualResult);
+
+            BasicLogger.debug(primResult.getMultipliers().get());
+            BasicLogger.debug(dualResult.getMultipliers().get());
+        }
+
+        TestUtils.assertStateAndSolution(modResult, primResult);
+        TestUtils.assertStateAndSolution(modResult, dualResult);
+
+        TestUtils.assertEquals(primResult.getMultipliers().get(), dualResult.getMultipliers().get());
     }
 
 }

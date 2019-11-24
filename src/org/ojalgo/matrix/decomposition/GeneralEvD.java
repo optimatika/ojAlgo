@@ -60,6 +60,10 @@ abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecompositi
         super(factory);
     }
 
+    public boolean checkAndDecompose(final MatrixStore<N> matrix) {
+        return this.decompose(matrix);
+    }
+
     public final N getDeterminant() {
 
         final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().product();
@@ -67,10 +71,6 @@ abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecompositi
         this.getEigenvalues().visitAll(tmpVisitor);
 
         return this.scalar().cast(tmpVisitor.get());
-    }
-
-    public boolean checkAndDecompose(final MatrixStore<N> matrix) {
-        return this.decompose(matrix);
     }
 
     public MatrixStore<N> getInverse() {

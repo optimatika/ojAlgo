@@ -169,7 +169,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         SingularValue<Double> tmpSVD = SingularValue.PRIMITIVE.make(tmpOriginal);
         tmpSVD.decompose(tmpOriginal);
         Primitive64Store rhs = Primitive64Store.FACTORY.column(observationVector);
-        MatrixStore<Double> solution = tmpSVD.getSolution(rhs, tmpSVD.preallocate(tmpOriginal, rhs));
+        tmpSVD.getSolution(rhs, tmpSVD.preallocate(tmpOriginal, rhs));
 
         // Simply test that we can run this program without getting an exception
     }

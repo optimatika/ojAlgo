@@ -185,6 +185,11 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     @Override
+    protected void add(final int index, final Comparable<?> addend) {
+        data[index] += Scalar.doubleValue(addend);
+    }
+
+    @Override
     protected void add(final int index, final double addend) {
         data[index] += addend;
     }
@@ -192,11 +197,6 @@ public class Primitive64Array extends PrimitiveArray {
     @Override
     protected void add(final int index, final float addend) {
         data[index] += addend;
-    }
-
-    @Override
-    protected void add(final int index, final Comparable<?> addend) {
-        data[index] += Scalar.doubleValue(addend);
     }
 
     protected final double[] copyOfData() {
@@ -315,6 +315,11 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     @Override
+    protected final void set(final int index, final Comparable<?> value) {
+        data[index] = Scalar.doubleValue(value);
+    }
+
+    @Override
     protected final void set(final int index, final double value) {
         data[index] = value;
     }
@@ -322,11 +327,6 @@ public class Primitive64Array extends PrimitiveArray {
     @Override
     protected final void set(final int index, final float value) {
         data[index] = value;
-    }
-
-    @Override
-    protected final void set(final int index, final Comparable<?> value) {
-        data[index] = Scalar.doubleValue(value);
     }
 
     @Override

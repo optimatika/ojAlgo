@@ -156,6 +156,10 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
             return this.makeDense(rows, columns);
         }
 
+        public Array2D<N> makeDense(final long rows, final long columns) {
+            return myDelegate.makeToBeFilled(rows, columns).wrapInArray2D(rows);
+        }
+
         public Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(rows, columns);
@@ -255,10 +259,6 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
         @Override
         public Scalar.Factory<N> scalar() {
             return myDelegate.scalar();
-        }
-
-        public Array2D<N> makeDense(long rows, long columns) {
-            return myDelegate.makeToBeFilled(rows, columns).wrapInArray2D(rows);
         }
 
     }

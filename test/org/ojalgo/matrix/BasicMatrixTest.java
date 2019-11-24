@@ -98,6 +98,11 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     BigDecimal scalar;
 
+    @AfterEach
+    public void doAfterEach() {
+        // ACCURACY = NumberContext.getGeneral(9);
+    }
+
     @BeforeEach
     public void doBeforeEach() {
 
@@ -128,11 +133,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         qSafe = QuaternionMatrix.FACTORY.copy(rSafe);
 
         scalar = new BigDecimal(Math.random());
-    }
-
-    @AfterEach
-    public void doAfterEach() {
-        // ACCURACY = NumberContext.getGeneral(9);
     }
 
     /**
@@ -231,6 +231,60 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     @Test
+    public void testCount() {
+
+        long expected = rAA.count();
+        long actual;
+
+        actual = cAA.count();
+        TestUtils.assertEquals(expected, actual);
+
+        actual = p64AA.count();
+        TestUtils.assertEquals(expected, actual);
+
+        actual = p32AA.count();
+        TestUtils.assertEquals(expected, actual);
+    }
+
+    /**
+     * @see org.ojalgo.matrix.BasicMatrix#countColumns()
+     */
+    @Test
+    public void testCountColumns() {
+
+        long expected = rAA.countColumns();
+        long actual;
+
+        actual = cAA.countColumns();
+        TestUtils.assertEquals(expected, actual);
+
+        actual = p64AA.countColumns();
+        TestUtils.assertEquals(expected, actual);
+
+        actual = p32AA.countColumns();
+        TestUtils.assertEquals(expected, actual);
+    }
+
+    /**
+     * @see org.ojalgo.matrix.BasicMatrix#countRows()
+     */
+    @Test
+    public void testCountRows() {
+
+        long expected = rAA.countRows();
+        long actual;
+
+        actual = cAA.countRows();
+        TestUtils.assertEquals(expected, actual);
+
+        actual = p64AA.countRows();
+        TestUtils.assertEquals(expected, actual);
+
+        actual = p32AA.countRows();
+        TestUtils.assertEquals(expected, actual);
+    }
+
+    @Test
     public void testDivideElementsBasicMatrix() {
 
         BasicMatrix<?, ?> actual;
@@ -315,25 +369,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         actual = p64AA.doubleValue(tmpRow, tmpCol);
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#countColumns()
-     */
-    @Test
-    public void testCountColumns() {
-
-        long expected = rAA.countColumns();
-        long actual;
-
-        actual = cAA.countColumns();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p64AA.countColumns();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p32AA.countColumns();
-        TestUtils.assertEquals(expected, actual);
     }
 
     @Test
@@ -475,25 +510,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         TestUtils.assertEquals(expected, actual);
 
         actual = p32AA.getRank();
-        TestUtils.assertEquals(expected, actual);
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#countRows()
-     */
-    @Test
-    public void testCountRows() {
-
-        long expected = rAA.countRows();
-        long actual;
-
-        actual = cAA.countRows();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p64AA.countRows();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p32AA.countRows();
         TestUtils.assertEquals(expected, actual);
     }
 
@@ -773,27 +789,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#multiply(org.ojalgo.matrix.BasicMatrix)
-     */
-    @Test
-    public void testMultiplyMatrix() {
-
-        BasicMatrix<?, ?> actual;
-        BasicMatrix<?, ?> expected;
-
-        expected = rAA.multiply(rAX);
-
-        actual = cAA.multiply(cAX);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
-
-        actual = p64AA.multiply(p64AX);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
-
-        actual = p32AA.multiply(p32AX);
-        TestUtils.assertEquals(expected, actual, ACCURACY);
-    }
-
     @Test
     public void testMultiplyElementsBasicMatrix() {
 
@@ -817,6 +812,27 @@ public abstract class BasicMatrixTest extends MatrixTests {
         PhysicalReceiver<Quaternion, QuaternionMatrix> copyQuaternion = qAA.copy();
         copyQuaternion.modifyMatching(QuaternionMath.MULTIPLY, qSafe);
         actual = copyQuaternion.get();
+        TestUtils.assertEquals(expected, actual, ACCURACY);
+    }
+
+    /**
+     * @see org.ojalgo.matrix.BasicMatrix#multiply(org.ojalgo.matrix.BasicMatrix)
+     */
+    @Test
+    public void testMultiplyMatrix() {
+
+        BasicMatrix<?, ?> actual;
+        BasicMatrix<?, ?> expected;
+
+        expected = rAA.multiply(rAX);
+
+        actual = cAA.multiply(cAX);
+        TestUtils.assertEquals(expected, actual, ACCURACY);
+
+        actual = p64AA.multiply(p64AX);
+        TestUtils.assertEquals(expected, actual, ACCURACY);
+
+        actual = p32AA.multiply(p32AX);
         TestUtils.assertEquals(expected, actual, ACCURACY);
     }
 
@@ -907,22 +923,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         p32Builder.set(tmpRow, tmpCol, scalar);
         actual = p32Builder.build();
         TestUtils.assertEquals(expected, actual, ACCURACY);
-    }
-
-    @Test
-    public void testCount() {
-
-        long expected = rAA.count();
-        long actual;
-
-        actual = cAA.count();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p64AA.count();
-        TestUtils.assertEquals(expected, actual);
-
-        actual = p32AA.count();
-        TestUtils.assertEquals(expected, actual);
     }
 
     /**

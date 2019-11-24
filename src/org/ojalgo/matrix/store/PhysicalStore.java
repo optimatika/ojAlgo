@@ -143,6 +143,14 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 
+    default void supplyTo(final TransformableRegion<N> receiver) {
+        if (this != receiver) {
+            receiver.fillMatching(this);
+        } else {
+            BasicLogger.error("Why do you this!");
+        }
+    }
+
     void transformLeft(Householder<N> transformation, int firstColumn);
 
     /**
@@ -180,13 +188,5 @@ public interface PhysicalStore<N extends Comparable<N>> extends MatrixStore<N>, 
      * @see #transformLeft(Rotation)
      */
     void transformRight(Rotation<N> transformation);
-
-    default void supplyTo(TransformableRegion<N> receiver) {
-        if (this != receiver) {
-            receiver.fillMatching(this);
-        } else {
-            BasicLogger.error("Why do you this!");
-        }
-    }
 
 }

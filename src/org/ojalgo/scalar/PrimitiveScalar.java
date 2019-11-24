@@ -129,7 +129,7 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     @Override
-    public PrimitiveScalar add(float scalarAddend) {
+    public PrimitiveScalar add(final float scalarAddend) {
         return this.add((double) scalarAddend);
     }
 
@@ -154,7 +154,7 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     @Override
-    public PrimitiveScalar divide(float scalarDivisor) {
+    public PrimitiveScalar divide(final float scalarDivisor) {
         return this.divide((double) scalarDivisor);
     }
 
@@ -169,7 +169,7 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -239,7 +239,7 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     @Override
-    public PrimitiveScalar multiply(float scalarMultiplicand) {
+    public PrimitiveScalar multiply(final float scalarMultiplicand) {
         return this.multiply((double) scalarMultiplicand);
     }
 
@@ -281,7 +281,7 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     @Override
-    public PrimitiveScalar subtract(float scalarSubtrahend) {
+    public PrimitiveScalar subtract(final float scalarSubtrahend) {
         return this.subtract((double) scalarSubtrahend);
     }
 

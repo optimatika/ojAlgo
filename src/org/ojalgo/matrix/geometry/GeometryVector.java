@@ -37,20 +37,20 @@ abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double>
 
     public abstract void add(int row, double addend);
 
-    public final void add(final long index, final double addend) {
-        this.add(Structure1D.index(index), addend);
+    public final void add(final long index, final Comparable<?> addend) {
+        this.add(Structure1D.index(index), Scalar.doubleValue(addend));
     }
 
-    public final void add(final long row, final long col, final double addend) {
-        this.add(Structure2D.index(this.structure(), row, col), addend);
+    public final void add(final long index, final double addend) {
+        this.add(Structure1D.index(index), addend);
     }
 
     public final void add(final long row, final long col, final Comparable<?> addend) {
         this.add(Structure2D.index(this.structure(), row, col), Scalar.doubleValue(addend));
     }
 
-    public final void add(final long index, final Comparable<?> addend) {
-        this.add(Structure1D.index(index), Scalar.doubleValue(addend));
+    public final void add(final long row, final long col, final double addend) {
+        this.add(Structure2D.index(this.structure(), row, col), addend);
     }
 
     public final long count() {
@@ -119,20 +119,20 @@ abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double>
 
     public abstract void set(int row, double value);
 
-    public final void set(final long index, final double addend) {
-        this.set(Structure1D.index(index), addend);
+    public final void set(final long index, final Comparable<?> value) {
+        this.set(Structure1D.index(index), Scalar.doubleValue(value));
     }
 
-    public final void set(final long row, final long col, final double value) {
-        this.set(Structure2D.index(this.structure(), row, col), value);
+    public final void set(final long index, final double addend) {
+        this.set(Structure1D.index(index), addend);
     }
 
     public final void set(final long row, final long col, final Comparable<?> value) {
         this.set(Structure2D.index(this.structure(), row, col), Scalar.doubleValue(value));
     }
 
-    public final void set(final long index, final Comparable<?> value) {
-        this.set(Structure1D.index(index), Scalar.doubleValue(value));
+    public final void set(final long row, final long col, final double value) {
+        this.set(Structure2D.index(this.structure(), row, col), value);
     }
 
     public final int size() {

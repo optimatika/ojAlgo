@@ -40,12 +40,12 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
         I columns(Access1D<?>... source);
 
+        I columns(Comparable<?>[]... source);
+
         I columns(double[]... source);
 
         @SuppressWarnings("unchecked")
         I columns(List<? extends Comparable<?>>... source);
-
-        I columns(Comparable<?>[]... source);
 
         I copy(Access2D<?> source);
 
@@ -61,12 +61,12 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
         I rows(Access1D<?>... source);
 
+        I rows(Comparable<?>[]... source);
+
         I rows(double[]... source);
 
         @SuppressWarnings("unchecked")
         I rows(List<? extends Comparable<?>>... source);
-
-        I rows(Comparable<?>[]... source);
 
     }
 

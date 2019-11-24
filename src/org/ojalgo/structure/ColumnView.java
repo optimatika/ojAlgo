@@ -115,16 +115,16 @@ public class ColumnView<N extends Comparable<N>>
         ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
+    public Stream<ColumnView<N>> stream() {
+        return StreamSupport.stream(this, false);
+    }
+
     /**
      * @deprecated v48 Use {@link #stream()} instead
      */
     @Deprecated
     public Stream<ColumnView<N>> stream(final boolean parallel) {
         return this.stream();
-    }
-
-    public Stream<ColumnView<N>> stream() {
-        return StreamSupport.stream(this, false);
     }
 
     @Override

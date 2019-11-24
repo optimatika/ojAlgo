@@ -57,15 +57,15 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         myRHS = rhs;
     }
 
+    public void add(final long index, final Comparable<?> addend) {
+        this.add(index, Scalar.doubleValue(addend));
+    }
+
     public void add(final long index, final double addend) {
         myElements.add(index, addend);
         if (index == this.index) {
             myPivot = myElements.doubleValue(index);
         }
-    }
-
-    public void add(final long index, final Comparable<?> addend) {
-        this.add(index, Scalar.doubleValue(addend));
     }
 
     /**
@@ -143,15 +143,15 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         this.calculate(x, ZERO, ONE);
     }
 
+    public void set(final long index, final Comparable<?> value) {
+        this.set(index, Scalar.doubleValue(value));
+    }
+
     public void set(final long index, final double value) {
         myElements.set(index, value);
         if (index == this.index) {
             myPivot = value;
         }
-    }
-
-    public void set(final long index, final Comparable<?> value) {
-        this.set(index, Scalar.doubleValue(value));
     }
 
     @Override

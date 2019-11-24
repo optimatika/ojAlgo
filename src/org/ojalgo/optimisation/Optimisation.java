@@ -517,7 +517,7 @@ public interface Optimisation {
          */
         VALID(4);
 
-        private final int myValue;
+        private int myValue;
 
         State(final int aValue) {
             myValue = aValue;

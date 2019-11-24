@@ -217,13 +217,13 @@ public interface Mutate1D extends Structure1D {
         });
     }
 
+    void add(long index, Comparable<?> addend);
+
     void add(long index, double addend);
 
-    default void add(long index, float addend) {
+    default void add(final long index, final float addend) {
         this.add(index, (double) addend);
     }
-
-    void add(long index, Comparable<?> addend);
 
     /**
      * Reset this mutable structure to some standard (all zeros) initial state. It must still be usuable after
@@ -233,12 +233,12 @@ public interface Mutate1D extends Structure1D {
         this.loopAll(i -> this.set(i, PrimitiveMath.ZERO));
     }
 
+    void set(long index, Comparable<?> value);
+
     void set(long index, double value);
 
-    default void set(long index, float value) {
+    default void set(final long index, final float value) {
         this.set(index, (double) value);
     }
-
-    void set(long index, Comparable<?> value);
 
 }

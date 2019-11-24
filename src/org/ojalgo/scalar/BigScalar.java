@@ -139,7 +139,7 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     }
 
     @Override
-    public BigScalar add(float scalarAddend) {
+    public BigScalar add(final float scalarAddend) {
         return this.add((double) scalarAddend);
     }
 
@@ -164,7 +164,7 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     }
 
     @Override
-    public BigScalar divide(float scalarDivisor) {
+    public BigScalar divide(final float scalarDivisor) {
         return this.divide((double) scalarDivisor);
     }
 
@@ -179,7 +179,7 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -251,7 +251,7 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     }
 
     @Override
-    public BigScalar multiply(float scalarMultiplicand) {
+    public BigScalar multiply(final float scalarMultiplicand) {
         return this.multiply((double) scalarMultiplicand);
     }
 
@@ -293,7 +293,7 @@ public final class BigScalar implements Scalar<BigDecimal>, Enforceable<BigScala
     }
 
     @Override
-    public BigScalar subtract(float scalarSubtrahend) {
+    public BigScalar subtract(final float scalarSubtrahend) {
         return this.subtract((double) scalarSubtrahend);
     }
 

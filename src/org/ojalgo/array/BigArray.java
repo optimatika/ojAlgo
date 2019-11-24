@@ -121,6 +121,11 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
+    protected final void add(final int index, final Comparable<?> addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    }
+
+    @Override
     protected final void add(final int index, final double addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)));
     }
@@ -131,8 +136,13 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    protected final void add(final int index, final Comparable<?> addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    protected final double doubleValue(final int index) {
+        return data[index].doubleValue();
+    }
+
+    @Override
+    protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
+        data[index] = this.valueOf(values.get(valueIndex));
     }
 
     @Override
@@ -148,16 +158,6 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
         return BigScalar.isSmall(comparedTo, data[index]);
-    }
-
-    @Override
-    protected final double doubleValue(final int index) {
-        return data[index].doubleValue();
-    }
-
-    @Override
-    protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        data[index] = this.valueOf(values.get(valueIndex));
     }
 
 }

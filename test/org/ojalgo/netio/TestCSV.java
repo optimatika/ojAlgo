@@ -45,6 +45,38 @@ public class TestCSV extends NetioTests {
     }
 
     @Test
+    public void testFast() {
+
+        final File tmpFile = new File("./rsrc/csv/fast.csv");
+        final EnumeratedColumnsParser tmpParser = EnumeratedColumnsParser.make(10).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.FAST).get();
+
+        final AtomicInteger tmpCounter = new AtomicInteger(0);
+        tmpParser.parse(tmpFile, t -> {
+            final int tmpRowIndex = tmpCounter.getAndIncrement();
+            for (int i = 0; i < 5; i++) {
+                TestUtils.assertEquals(EXPECTED[tmpRowIndex][i], t.get(i));
+            }
+        });
+        TestUtils.assertEquals(22, tmpCounter.get());
+    }
+
+    @Test
+    public void testQuoted() {
+
+        final File tmpFile = new File("./rsrc/csv/quoted.csv");
+        final EnumeratedColumnsParser tmpParser = EnumeratedColumnsParser.make(10).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.QUOTED).get();
+
+        final AtomicInteger tmpCounter = new AtomicInteger(0);
+        tmpParser.parse(tmpFile, t -> {
+            final int tmpRowIndex = tmpCounter.getAndIncrement();
+            for (int i = 0; i < 5; i++) {
+                TestUtils.assertEquals(EXPECTED[tmpRowIndex][i], t.get(i));
+            }
+        });
+        TestUtils.assertEquals(22, tmpCounter.get());
+    }
+
+    @Test
     public void testRFC4180() {
 
         final AtomicInteger tmpCounter = new AtomicInteger(0);
@@ -94,38 +126,6 @@ public class TestCSV extends NetioTests {
             }
         });
         TestUtils.assertEquals(6, tmpCounter.get());
-    }
-
-    @Test
-    public void testFast() {
-
-        final File tmpFile = new File("./rsrc/csv/fast.csv");
-        final EnumeratedColumnsParser tmpParser = EnumeratedColumnsParser.make(10).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.FAST).get();
-
-        final AtomicInteger tmpCounter = new AtomicInteger(0);
-        tmpParser.parse(tmpFile, t -> {
-            final int tmpRowIndex = tmpCounter.getAndIncrement();
-            for (int i = 0; i < 5; i++) {
-                TestUtils.assertEquals(EXPECTED[tmpRowIndex][i], t.get(i));
-            }
-        });
-        TestUtils.assertEquals(22, tmpCounter.get());
-    }
-
-    @Test
-    public void testQuoted() {
-
-        final File tmpFile = new File("./rsrc/csv/quoted.csv");
-        final EnumeratedColumnsParser tmpParser = EnumeratedColumnsParser.make(10).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.QUOTED).get();
-
-        final AtomicInteger tmpCounter = new AtomicInteger(0);
-        tmpParser.parse(tmpFile, t -> {
-            final int tmpRowIndex = tmpCounter.getAndIncrement();
-            for (int i = 0; i < 5; i++) {
-                TestUtils.assertEquals(EXPECTED[tmpRowIndex][i], t.get(i));
-            }
-        });
-        TestUtils.assertEquals(22, tmpCounter.get());
     }
 
 }

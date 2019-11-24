@@ -107,17 +107,17 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
+    public void add(final long index, final Comparable<?> addend) {
+        mySegments[(int) (index >> myIndexBits)].add(index & myIndexMask, addend);
+    }
+
+    @Override
     public void add(final long index, final double addend) {
         mySegments[(int) (index >> myIndexBits)].add(index & myIndexMask, addend);
     }
 
     @Override
     public void add(final long index, final float addend) {
-        mySegments[(int) (index >> myIndexBits)].add(index & myIndexMask, addend);
-    }
-
-    @Override
-    public void add(final long index, final Comparable<?> addend) {
         mySegments[(int) (index >> myIndexBits)].add(index & myIndexMask, addend);
     }
 
@@ -260,17 +260,17 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
+    public void set(final long index, final Comparable<?> value) {
+        mySegments[(int) (index >> myIndexBits)].set(index & myIndexMask, value);
+    }
+
+    @Override
     public void set(final long index, final double value) {
         mySegments[(int) (index >> myIndexBits)].set(index & myIndexMask, value);
     }
 
     @Override
     public void set(final long index, final float value) {
-        mySegments[(int) (index >> myIndexBits)].set(index & myIndexMask, value);
-    }
-
-    @Override
-    public void set(final long index, final Comparable<?> value) {
         mySegments[(int) (index >> myIndexBits)].set(index & myIndexMask, value);
     }
 

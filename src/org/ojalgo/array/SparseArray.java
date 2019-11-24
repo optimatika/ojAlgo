@@ -264,6 +264,16 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
+    public void add(final long index, final Comparable<?> addend) {
+        final int tmpIndex = this.index(index);
+        if (tmpIndex >= 0) {
+            myValues.add(tmpIndex, addend);
+        } else {
+            this.set(index, addend);
+        }
+    }
+
+    @Override
     public void add(final long index, final double addend) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
@@ -275,16 +285,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
     @Override
     public void add(final long index, final float addend) {
-        final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            myValues.add(tmpIndex, addend);
-        } else {
-            this.set(index, addend);
-        }
-    }
-
-    @Override
-    public void add(final long index, final Comparable<?> addend) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
             myValues.add(tmpIndex, addend);
@@ -491,6 +491,14 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
+    public void set(final long index, final Comparable<?> value) {
+
+        final int internalIndex = this.index(index);
+
+        this.update(index, internalIndex, value, false);
+    }
+
+    @Override
     public void set(final long index, final double value) {
 
         final int internalIndex = this.index(index);
@@ -500,14 +508,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
 
     @Override
     public void set(final long index, final float value) {
-
-        final int internalIndex = this.index(index);
-
-        this.update(index, internalIndex, value, false);
-    }
-
-    @Override
-    public void set(final long index, final Comparable<?> value) {
 
         final int internalIndex = this.index(index);
 
@@ -591,60 +591,6 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     /**
      * Will never remove anything - just insert or update
      */
-    private void update(final long externalIndex, final int internalIndex, final double value, final boolean shouldStoreZero) {
-
-        if (internalIndex >= 0) {
-            // Existing value, just update
-
-            myValues.set(internalIndex, value);
-
-        } else if (shouldStoreZero || (NumberContext.compare(value, PrimitiveMath.ZERO) != 0)) {
-            // Not existing value, insert new
-            final int tmpInsInd = -(internalIndex + 1);
-
-            if ((myActualLength + 1) <= myIndices.length) {
-                // No need to grow the backing arrays
-
-                for (int i = myActualLength; i > tmpInsInd; i--) {
-                    myIndices[i] = myIndices[i - 1];
-                    myValues.set(i, myValues.doubleValue(i - 1));
-                }
-                myIndices[tmpInsInd] = externalIndex;
-                myValues.set(tmpInsInd, value);
-
-                myActualLength++;
-
-            } else {
-                // Needs to grow the backing arrays
-
-                final int tmpCapacity = myStrategy.grow(myIndices.length);
-                final long[] tmpIndices = new long[tmpCapacity];
-                final DenseArray<N> tmpValues = myStrategy.make(tmpCapacity);
-
-                for (int i = 0; i < tmpInsInd; i++) {
-                    tmpIndices[i] = myIndices[i];
-                    tmpValues.set(i, myValues.doubleValue(i));
-                }
-                tmpIndices[tmpInsInd] = externalIndex;
-                tmpValues.set(tmpInsInd, value);
-                for (int i = tmpInsInd; i < myIndices.length; i++) {
-                    tmpIndices[i + 1] = myIndices[i];
-                    tmpValues.set(i + 1, myValues.doubleValue(i));
-                }
-                for (int i = myIndices.length + 1; i < tmpIndices.length; i++) {
-                    tmpIndices[i] = Long.MAX_VALUE;
-                }
-
-                myIndices = tmpIndices;
-                myValues = tmpValues;
-                myActualLength++;
-            }
-        }
-    }
-
-    /**
-     * Will never remove anything - just insert or update
-     */
     private void update(final long externalIndex, final int internalIndex, final Comparable<?> value, final boolean shouldStoreZero) {
 
         if (internalIndex >= 0) {
@@ -684,6 +630,60 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
                 for (int i = tmpInsInd; i < myIndices.length; i++) {
                     tmpIndices[i + 1] = myIndices[i];
                     tmpValues.set(i + 1, myValues.get(i));
+                }
+                for (int i = myIndices.length + 1; i < tmpIndices.length; i++) {
+                    tmpIndices[i] = Long.MAX_VALUE;
+                }
+
+                myIndices = tmpIndices;
+                myValues = tmpValues;
+                myActualLength++;
+            }
+        }
+    }
+
+    /**
+     * Will never remove anything - just insert or update
+     */
+    private void update(final long externalIndex, final int internalIndex, final double value, final boolean shouldStoreZero) {
+
+        if (internalIndex >= 0) {
+            // Existing value, just update
+
+            myValues.set(internalIndex, value);
+
+        } else if (shouldStoreZero || (NumberContext.compare(value, PrimitiveMath.ZERO) != 0)) {
+            // Not existing value, insert new
+            final int tmpInsInd = -(internalIndex + 1);
+
+            if ((myActualLength + 1) <= myIndices.length) {
+                // No need to grow the backing arrays
+
+                for (int i = myActualLength; i > tmpInsInd; i--) {
+                    myIndices[i] = myIndices[i - 1];
+                    myValues.set(i, myValues.doubleValue(i - 1));
+                }
+                myIndices[tmpInsInd] = externalIndex;
+                myValues.set(tmpInsInd, value);
+
+                myActualLength++;
+
+            } else {
+                // Needs to grow the backing arrays
+
+                final int tmpCapacity = myStrategy.grow(myIndices.length);
+                final long[] tmpIndices = new long[tmpCapacity];
+                final DenseArray<N> tmpValues = myStrategy.make(tmpCapacity);
+
+                for (int i = 0; i < tmpInsInd; i++) {
+                    tmpIndices[i] = myIndices[i];
+                    tmpValues.set(i, myValues.doubleValue(i));
+                }
+                tmpIndices[tmpInsInd] = externalIndex;
+                tmpValues.set(tmpInsInd, value);
+                for (int i = tmpInsInd; i < myIndices.length; i++) {
+                    tmpIndices[i + 1] = myIndices[i];
+                    tmpValues.set(i + 1, myValues.doubleValue(i));
                 }
                 for (int i = myIndices.length + 1; i < tmpIndices.length; i++) {
                     tmpIndices[i] = Long.MAX_VALUE;

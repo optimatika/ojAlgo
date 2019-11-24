@@ -381,6 +381,10 @@ public final class Expression extends ModelEntity<Expression> {
         return myQuadratic.size() > 0;
     }
 
+    public boolean isFunctionConstant() {
+        return !this.isAnyQuadraticFactorNonZero() && !this.isAnyLinearFactorNonZero();
+    }
+
     public boolean isFunctionLinear() {
         return !this.isAnyQuadraticFactorNonZero() && this.isAnyLinearFactorNonZero();
     }
@@ -391,10 +395,6 @@ public final class Expression extends ModelEntity<Expression> {
 
     public boolean isFunctionQuadratic() {
         return this.isAnyQuadraticFactorNonZero() && this.isAnyLinearFactorNonZero();
-    }
-
-    public boolean isFunctionConstant() {
-        return !this.isAnyQuadraticFactorNonZero() && !this.isAnyLinearFactorNonZero();
     }
 
     /**
@@ -425,15 +425,11 @@ public final class Expression extends ModelEntity<Expression> {
         return (myQuadratic.size() == 0) && (myLinear.size() > 0) && myLinear.keySet().stream().anyMatch(i -> myModel.getVariable(i).isInteger());
     }
 
-    public Expression set(final int row, final int column, final Comparable<?> value) {
-        return this.set(new IntRowColumn(row, column), value);
-    }
-
     public Expression set(final int index, final Comparable<?> value) {
         return this.set(myModel.getVariable(index), value);
     }
 
-    public Expression set(final IntIndex row, final IntIndex column, final Comparable<?> value) {
+    public Expression set(final int row, final int column, final Comparable<?> value) {
         return this.set(new IntRowColumn(row, column), value);
     }
 
@@ -456,6 +452,10 @@ public final class Expression extends ModelEntity<Expression> {
         }
 
         return this;
+    }
+
+    public Expression set(final IntIndex row, final IntIndex column, final Comparable<?> value) {
+        return this.set(new IntRowColumn(row, column), value);
     }
 
     public Expression set(final IntRowColumn key, final Comparable<?> value) {

@@ -35,15 +35,15 @@ public final class MultiplyNeither implements ArrayOperation {
 
     }
 
-    public interface Primitive64 {
-
-        void invoke(double[] product, double[] left, int complexity, double[] right);
-
-    }
-
     public interface Primitive32 {
 
         void invoke(float[] product, float[] left, int complexity, float[] right);
+
+    }
+
+    public interface Primitive64 {
+
+        void invoke(double[] product, double[] left, int complexity, double[] right);
 
     }
 
@@ -600,6 +600,10 @@ public final class MultiplyNeither implements ArrayOperation {
         }
     }
 
+    public static MultiplyNeither.Primitive32 newPrimitive32(final long rows, final long columns) {
+        return PRIMITIVE32;
+    }
+
     public static MultiplyNeither.Primitive64 newPrimitive64(final long rows, final long columns) {
         if (rows > THRESHOLD) {
             return PRIMITIVE_MT;
@@ -626,10 +630,6 @@ public final class MultiplyNeither implements ArrayOperation {
         } else {
             return PRIMITIVE;
         }
-    }
-
-    public static MultiplyNeither.Primitive32 newPrimitive32(final long rows, final long columns) {
-        return PRIMITIVE32;
     }
 
     static void invoke(final double[] product, final int firstColumn, final int columnLimit, final double[] left, final int complexity, final double[] right) {

@@ -207,17 +207,17 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
+    protected final void set(final int index, final Comparable<?> value) {
+        data[index] = this.valueOf(value);
+    }
+
+    @Override
     protected final void set(final int index, final double value) {
         data[index] = this.valueOf(value);
     }
 
     @Override
     protected final void set(final int index, final float value) {
-        data[index] = this.valueOf(value);
-    }
-
-    @Override
-    protected final void set(final int index, final Comparable<?> value) {
         data[index] = this.valueOf(value);
     }
 
@@ -251,16 +251,16 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
         data[intIndex] = function.invoke(data[intIndex]);
     }
 
+    final N valueOf(final Comparable<?> number) {
+        return this.factory().scalar().cast(number);
+    }
+
     final N valueOf(final double value) {
         return this.factory().scalar().cast(value);
     }
 
     final N valueOf(final float value) {
         return this.factory().scalar().cast(value);
-    }
-
-    final N valueOf(final Comparable<?> number) {
-        return this.factory().scalar().cast(number);
     }
 
 }

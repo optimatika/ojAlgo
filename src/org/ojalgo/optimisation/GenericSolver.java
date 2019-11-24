@@ -117,10 +117,6 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return myAI;
         }
 
-        protected SparseArray<Double> getAI(final int row) {
-            return myAI.getRow(row);
-        }
-
         /**
          * [AE][X] == [BE]
          */
@@ -248,6 +244,10 @@ public abstract class GenericSolver implements Optimisation.Solver {
 
         protected double evaluate(final Access1D<Double> arg) {
             return myObjective.invoke(arg);
+        }
+
+        protected SparseArray<Double> getAI(final int row) {
+            return myAI.getRow(row);
         }
 
         protected void setObjective(final MultiaryFunction.TwiceDifferentiable<Double> objective) {

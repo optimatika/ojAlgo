@@ -44,6 +44,15 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
         return retVal;
     }
 
+    public final I copy(final Comparable<?>... source) {
+        final int length = source.length;
+        final I retVal = this.makeToBeFilled(length);
+        for (int i = 0; i < length; i++) {
+            retVal.set(i, source[i]);
+        }
+        return retVal;
+    }
+
     public final I copy(final double... source) {
         final int length = source.length;
         final I retVal = this.makeToBeFilled(length);
@@ -62,16 +71,11 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
         return retVal;
     }
 
-    public final I copy(final Comparable<?>... source) {
-        final int length = source.length;
-        final I retVal = this.makeToBeFilled(length);
-        for (int i = 0; i < length; i++) {
-            retVal.set(i, source[i]);
-        }
-        return retVal;
-    }
-
     public abstract FunctionSet<N> function();
+
+    public final I make(final long count) {
+        return this.makeStructuredZero(count);
+    }
 
     public final I makeFilled(final long count, final NullaryFunction<?> supplier) {
         final I retVal = this.makeToBeFilled(count);
@@ -85,10 +89,6 @@ abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> im
             }
         }
         return retVal;
-    }
-
-    public final I make(final long count) {
-        return this.makeStructuredZero(count);
     }
 
     public abstract Scalar.Factory<N> scalar();

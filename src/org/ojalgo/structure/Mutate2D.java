@@ -269,7 +269,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     void add(long row, long col, double addend);
 
-    default void add(long row, long col, float addend) {
+    default void add(final long row, final long col, final float addend) {
         this.add(row, col, (double) addend);
     }
 
@@ -295,7 +295,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     void set(long row, long col, double value);
 
-    default void set(long row, long col, float value) {
+    default void set(final long row, final long col, final float value) {
         this.set(row, col, (double) value);
     }
 

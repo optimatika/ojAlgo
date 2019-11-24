@@ -82,6 +82,24 @@ public final class RawStore implements PhysicalStore<Double> {
             return new RawStore(retVal);
         }
 
+        public RawStore columns(final Comparable<?>[]... source) {
+
+            int tmpRowDim = source[0].length;
+            int tmpColDim = source.length;
+
+            double[][] retVal = new double[tmpRowDim][tmpColDim];
+
+            Comparable<?>[] tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    retVal[i][j] = Scalar.doubleValue(tmpColumn[i]);
+                }
+            }
+
+            return new RawStore(retVal);
+        }
+
         public RawStore columns(final double[]... source) {
 
             int tmpRowDim = source[0].length;
@@ -112,24 +130,6 @@ public final class RawStore implements PhysicalStore<Double> {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
                     retVal[i][j] = Scalar.doubleValue(tmpColumn.get(i));
-                }
-            }
-
-            return new RawStore(retVal);
-        }
-
-        public RawStore columns(final Comparable<?>[]... source) {
-
-            int tmpRowDim = source[0].length;
-            int tmpColDim = source.length;
-
-            double[][] retVal = new double[tmpRowDim][tmpColDim];
-
-            Comparable<?>[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    retVal[i][j] = Scalar.doubleValue(tmpColumn[i]);
                 }
             }
 
@@ -183,6 +183,26 @@ public final class RawStore implements PhysicalStore<Double> {
             return new RawStore(retVal);
         }
 
+        public RawStore rows(final Comparable<?>[]... source) {
+
+            int tmpRowDim = source.length;
+            int tmpColDim = source[0].length;
+
+            double[][] retVal = new double[tmpRowDim][tmpColDim];
+
+            Comparable<?>[] tmpSource;
+            double[] tmpDestination;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpSource = source[i];
+                tmpDestination = retVal[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpDestination[j] = Scalar.doubleValue(tmpSource[j]);
+                }
+            }
+
+            return new RawStore(retVal);
+        }
+
         public RawStore rows(final double[]... source) {
 
             int tmpRowDim = source.length;
@@ -217,26 +237,6 @@ public final class RawStore implements PhysicalStore<Double> {
                 tmpDestination = retVal[i];
                 for (int j = 0; j < tmpColDim; j++) {
                     tmpDestination[j] = Scalar.doubleValue(tmpSource.get(j));
-                }
-            }
-
-            return new RawStore(retVal);
-        }
-
-        public RawStore rows(final Comparable<?>[]... source) {
-
-            int tmpRowDim = source.length;
-            int tmpColDim = source[0].length;
-
-            double[][] retVal = new double[tmpRowDim][tmpColDim];
-
-            Comparable<?>[] tmpSource;
-            double[] tmpDestination;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpSource = source[i];
-                tmpDestination = retVal[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpDestination[j] = Scalar.doubleValue(tmpSource[j]);
                 }
             }
 
@@ -620,12 +620,12 @@ public final class RawStore implements PhysicalStore<Double> {
         }
     }
 
-    public void add(final long row, final long col, final double addend) {
-        data[Math.toIntExact(row)][Math.toIntExact(col)] += addend;
-    }
-
     public void add(final long row, final long col, final Comparable<?> addend) {
         data[Math.toIntExact(row)][Math.toIntExact(col)] += Scalar.doubleValue(addend);
+    }
+
+    public void add(final long row, final long col, final double addend) {
+        data[Math.toIntExact(row)][Math.toIntExact(col)] += addend;
     }
 
     public Double aggregateAll(final Aggregator aggregator) {
@@ -1105,12 +1105,12 @@ public final class RawStore implements PhysicalStore<Double> {
         return new TransformableRegion.TransposedRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns));
     }
 
-    public void set(final long row, final long col, final double value) {
-        data[Math.toIntExact(row)][Math.toIntExact(col)] = value;
-    }
-
     public void set(final long row, final long col, final Comparable<?> value) {
         data[Math.toIntExact(row)][Math.toIntExact(col)] = Scalar.doubleValue(value);
+    }
+
+    public void set(final long row, final long col, final double value) {
+        data[Math.toIntExact(row)][Math.toIntExact(col)] = value;
     }
 
     public Access1D<Double> sliceRow(final long row) {

@@ -69,6 +69,14 @@ public abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDe
 
     }
 
+    static final class Primitive extends HermitianEvD<Double> {
+
+        Primitive() {
+            super(Primitive64Store.FACTORY, new SimultaneousTridiagonal());
+        }
+
+    }
+
     static final class Quat extends HermitianEvD<Quaternion> {
 
         Quat() {
@@ -81,14 +89,6 @@ public abstract class HermitianEvD<N extends Comparable<N>> extends EigenvalueDe
 
         Rational() {
             super(GenericStore.RATIONAL, new DeferredTridiagonal.Rational());
-        }
-
-    }
-
-    static final class Primitive extends HermitianEvD<Double> {
-
-        Primitive() {
-            super(Primitive64Store.FACTORY, new SimultaneousTridiagonal());
         }
 
     }

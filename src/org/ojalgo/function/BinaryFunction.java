@@ -61,12 +61,12 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
             myValue = Scalar.doubleValue(arg1);
         }
 
-        public float floatValue() {
-            return (float) myValue;
-        }
-
         public double doubleValue() {
             return myValue;
+        }
+
+        public float floatValue() {
+            return (float) myValue;
         }
 
         public BinaryFunction<N> getFunction() {
@@ -123,12 +123,12 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
             myValue = Scalar.doubleValue(arg2);
         }
 
-        public float floatValue() {
-            return (float) myValue;
-        }
-
         public double doubleValue() {
             return myValue;
+        }
+
+        public float floatValue() {
+            return (float) myValue;
         }
 
         public BinaryFunction<N> getFunction() {

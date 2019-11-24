@@ -29,12 +29,12 @@ public abstract class BetaFunction {
 
     public static abstract class Incomplete extends BetaFunction {
 
-        public static ComplexNumber beta(double limit, ComplexNumber a, ComplexNumber b) {
+        public static ComplexNumber beta(final double limit, final ComplexNumber a, final ComplexNumber b) {
             // TODO Implement it!
             return ComplexNumber.NaN;
         }
 
-        public static double beta(double limit, double a, double b) {
+        public static double beta(final double limit, final double a, final double b) {
 
             double tmp = ONE;
             double sum = tmp / a;
@@ -50,7 +50,7 @@ public abstract class BetaFunction {
             return Math.exp((a * Math.log(limit)) + Math.log(sum));
         }
 
-        public static double beta(double limit, int a, int b) {
+        public static double beta(final double limit, final int a, final int b) {
             return Incomplete.beta(limit, (double) a, (double) b);
         }
 
@@ -58,29 +58,29 @@ public abstract class BetaFunction {
 
     public static abstract class Regularized extends BetaFunction {
 
-        public static ComplexNumber beta(double limit, ComplexNumber a, ComplexNumber b) {
+        public static ComplexNumber beta(final double limit, final ComplexNumber a, final ComplexNumber b) {
             return BetaFunction.Incomplete.beta(limit, a, b).divide(BetaFunction.beta(a, b));
         }
 
-        public static double beta(double limit, double a, double b) {
+        public static double beta(final double limit, final double a, final double b) {
             return BetaFunction.Incomplete.beta(limit, a, b) / BetaFunction.beta(a, b);
         }
 
-        public static double beta(double limit, int a, int b) {
+        public static double beta(final double limit, final int a, final int b) {
             return BetaFunction.Incomplete.beta(limit, a, b) / BetaFunction.beta(a, b);
         }
 
     }
 
-    public static ComplexNumber beta(ComplexNumber a, ComplexNumber b) {
+    public static ComplexNumber beta(final ComplexNumber a, final ComplexNumber b) {
         return GammaFunction.gamma(a).multiply(GammaFunction.gamma(b)).divide(GammaFunction.gamma(a.add(b)));
     }
 
-    public static double beta(double a, double b) {
+    public static double beta(final double a, final double b) {
         return (GammaFunction.gamma(a) * GammaFunction.gamma(b)) / GammaFunction.gamma(a + b);
     }
 
-    public static double beta(int a, int b) {
+    public static double beta(final int a, final int b) {
         return (GammaFunction.gamma(a) * GammaFunction.gamma(b)) / GammaFunction.gamma(a + b);
     }
 

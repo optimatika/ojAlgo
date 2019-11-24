@@ -61,6 +61,11 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
+    protected final void add(final int index, final Comparable<?> addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)).get());
+    }
+
+    @Override
     protected final void add(final int index, final double addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)).get());
     }
@@ -71,8 +76,13 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
-    protected final void add(final int index, final Comparable<?> addend) {
-        this.fillOne(index, this.get(index).add(this.valueOf(addend)).get());
+    protected final double doubleValue(final int index) {
+        return data[index].doubleValue();
+    }
+
+    @Override
+    protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
+        data[index] = this.valueOf(values.get(valueIndex));
     }
 
     @Override
@@ -88,16 +98,6 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     @Override
     protected final boolean isSmall(final int index, final double comparedTo) {
         return data[index].isSmall(comparedTo);
-    }
-
-    @Override
-    protected final double doubleValue(final int index) {
-        return data[index].doubleValue();
-    }
-
-    @Override
-    protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        data[index] = this.valueOf(values.get(valueIndex));
     }
 
 }

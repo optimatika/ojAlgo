@@ -389,6 +389,11 @@ public abstract class BufferArray extends PlainArray<Double> {
     }
 
     @Override
+    protected void add(final int index, final Comparable<?> addend) {
+        this.set(index, this.doubleValue(index) + Scalar.doubleValue(addend));
+    }
+
+    @Override
     protected void add(final int index, final double addend) {
         this.set(index, this.doubleValue(index) + addend);
     }
@@ -396,11 +401,6 @@ public abstract class BufferArray extends PlainArray<Double> {
     @Override
     protected void add(final int index, final float addend) {
         this.set(index, this.floatValue(index) + addend);
-    }
-
-    @Override
-    protected void add(final int index, final Comparable<?> addend) {
-        this.set(index, this.doubleValue(index) + Scalar.doubleValue(addend));
     }
 
     @Override

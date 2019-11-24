@@ -128,6 +128,24 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
         }
 
+        public GenericStore<N> columns(final Comparable<?>[]... source) {
+
+            final int tmpRowDim = source[0].length;
+            final int tmpColDim = source.length;
+
+            final N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
+
+            Comparable<?>[] tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpColumn[i]);
+                }
+            }
+
+            return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
+        }
+
         public GenericStore<N> columns(final double[]... source) {
 
             final int tmpRowDim = source[0].length;
@@ -158,24 +176,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
                     tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpColumn.get(i));
-                }
-            }
-
-            return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public GenericStore<N> columns(final Comparable<?>[]... source) {
-
-            final int tmpRowDim = source[0].length;
-            final int tmpColDim = source.length;
-
-            final N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
-
-            Comparable<?>[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpColumn[i]);
                 }
             }
 
@@ -242,6 +242,10 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             return myDenseArrayFactory.function();
         }
 
+        public GenericStore<N> make(final long rows, final long columns) {
+            return new GenericStore<>(this, (int) rows, (int) columns);
+        }
+
         public GenericStore<N> makeEye(final long rows, final long columns) {
 
             final GenericStore<N> retVal = this.makeZero(rows, columns);
@@ -279,10 +283,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
             return new Rotation.Generic<>(low, high, cos, sin);
         }
 
-        public GenericStore<N> make(final long rows, final long columns) {
-            return new GenericStore<>(this, (int) rows, (int) columns);
-        }
-
         public GenericStore<N> rows(final Access1D<?>... source) {
 
             final int tmpRowDim = source.length;
@@ -295,6 +295,24 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
                     tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpRow.get(j));
+                }
+            }
+
+            return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public GenericStore<N> rows(final Comparable<?>[]... source) {
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = source[0].length;
+
+            final N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
+
+            Comparable<?>[] tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpRow[j]);
                 }
             }
 
@@ -331,24 +349,6 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
                     tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpRow.get(j));
-                }
-            }
-
-            return new GenericStore<>(this, tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public GenericStore<N> rows(final Comparable<?>[]... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].length;
-
-            final N[] tmpData = myDenseArrayFactory.scalar().newArrayInstance(tmpRowDim * tmpColDim);
-
-            Comparable<?>[] tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = myDenseArrayFactory.scalar().cast(tmpRow[j]);
                 }
             }
 
@@ -463,11 +463,11 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         }
     }
 
-    public void add(final long row, final long col, final double addend) {
+    public void add(final long row, final long col, final Comparable<?> addend) {
         myUtility.add(row, col, addend);
     }
 
-    public void add(final long row, final long col, final Comparable<?> addend) {
+    public void add(final long row, final long col, final double addend) {
         myUtility.add(row, col, addend);
     }
 
@@ -951,11 +951,11 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         RotateRight.invoke(data, myRowDim, low, high, myFactory.scalar().cast(cos), myFactory.scalar().cast(sin));
     }
 
-    public void set(final long row, final long col, final double value) {
+    public void set(final long row, final long col, final Comparable<?> value) {
         myUtility.set(row, col, value);
     }
 
-    public void set(final long row, final long col, final Comparable<?> value) {
+    public void set(final long row, final long col, final double value) {
         myUtility.set(row, col, value);
     }
 

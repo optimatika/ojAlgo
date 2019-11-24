@@ -342,7 +342,7 @@ public final class Quaternion implements Scalar<Quaternion>, Enforceable<Quatern
     }
 
     @Override
-    public Quaternion add(float scalarAddend) {
+    public Quaternion add(final float scalarAddend) {
         return this.add((double) scalarAddend);
     }
 
@@ -439,7 +439,7 @@ public final class Quaternion implements Scalar<Quaternion>, Enforceable<Quatern
     }
 
     @Override
-    public Quaternion divide(float scalarDivisor) {
+    public Quaternion divide(final float scalarDivisor) {
         return this.divide((double) scalarDivisor);
     }
 
@@ -521,7 +521,7 @@ public final class Quaternion implements Scalar<Quaternion>, Enforceable<Quatern
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -677,7 +677,7 @@ public final class Quaternion implements Scalar<Quaternion>, Enforceable<Quatern
     }
 
     @Override
-    public Quaternion multiply(float scalarMultiplicand) {
+    public Quaternion multiply(final float scalarMultiplicand) {
         return this.multiply((double) scalarMultiplicand);
     }
 
@@ -747,7 +747,7 @@ public final class Quaternion implements Scalar<Quaternion>, Enforceable<Quatern
     }
 
     @Override
-    public Quaternion subtract(float scalarSubtrahend) {
+    public Quaternion subtract(final float scalarSubtrahend) {
         return this.subtract((double) scalarSubtrahend);
     }
 

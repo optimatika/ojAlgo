@@ -136,7 +136,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     void add(long[] reference, double addend);
 
-    default void add(long[] reference, float addend) {
+    default void add(final long[] reference, final float addend) {
         this.add(reference, (double) addend);
     }
 
@@ -159,7 +159,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     void set(long[] reference, double value);
 
-    default void set(long[] reference, float value) {
+    default void set(final long[] reference, final float value) {
         this.set(reference, (double) value);
     }
 

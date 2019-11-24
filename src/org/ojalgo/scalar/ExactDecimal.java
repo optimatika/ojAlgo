@@ -112,6 +112,11 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements Scalar<
     }
 
     @Override
+    public S add(final float scalarAddend) {
+        return this.add((double) scalarAddend);
+    }
+
+    @Override
     public final S add(final S scalarAddend) {
         return this.wrap(myNumerator + scalarAddend.numerator());
     }
@@ -130,6 +135,11 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements Scalar<
     @Override
     public final S divide(final double scalarDivisor) {
         return this.wrap(Math.round(myNumerator / scalarDivisor));
+    }
+
+    @Override
+    public S divide(final float scalarDivisor) {
+        return this.divide((double) scalarDivisor);
     }
 
     @Override
@@ -192,6 +202,11 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements Scalar<
     }
 
     @Override
+    public S multiply(final float scalarMultiplicand) {
+        return this.multiply((double) scalarMultiplicand);
+    }
+
+    @Override
     public final S multiply(final S scalarMultiplicand) {
         return this.wrap((myNumerator * scalarMultiplicand.numerator()) / this.descriptor().denominator());
     }
@@ -244,6 +259,11 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements Scalar<
     }
 
     @Override
+    public S subtract(final float scalarSubtrahend) {
+        return this.subtract((double) scalarSubtrahend);
+    }
+
+    @Override
     public final S subtract(final S scalarSubtrahend) {
         return this.wrap(myNumerator - scalarSubtrahend.numerator());
     }
@@ -276,26 +296,6 @@ public abstract class ExactDecimal<S extends ExactDecimal<S>> implements Scalar<
 
     final long numerator() {
         return myNumerator;
-    }
-
-    @Override
-    public S add(float scalarAddend) {
-        return this.add((double) scalarAddend);
-    }
-
-    @Override
-    public S divide(float scalarDivisor) {
-        return this.divide((double) scalarDivisor);
-    }
-
-    @Override
-    public S multiply(float scalarMultiplicand) {
-        return this.multiply((double) scalarMultiplicand);
-    }
-
-    @Override
-    public S subtract(float scalarSubtrahend) {
-        return this.subtract((double) scalarSubtrahend);
     }
 
 }

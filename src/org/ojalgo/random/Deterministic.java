@@ -39,6 +39,13 @@ public class Deterministic extends RandomNumber {
         myValue = ZERO;
     }
 
+    public Deterministic(final Comparable<?> aValue) {
+
+        super();
+
+        myValue = Scalar.doubleValue(aValue);
+    }
+
     public Deterministic(final double aValue) {
 
         super();
@@ -46,11 +53,8 @@ public class Deterministic extends RandomNumber {
         myValue = aValue;
     }
 
-    public Deterministic(final Comparable<?> aValue) {
-
-        super();
-
-        myValue = Scalar.doubleValue(aValue);
+    public int compareTo(final Deterministic o) {
+        return Double.compare(myValue, o.myValue);
     }
 
     public double getExpected() {
@@ -70,10 +74,6 @@ public class Deterministic extends RandomNumber {
     @Override
     protected double generate() {
         return myValue;
-    }
-
-    public int compareTo(Deterministic o) {
-        return Double.compare(myValue, o.myValue);
     }
 
 }

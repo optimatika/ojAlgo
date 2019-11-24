@@ -54,17 +54,17 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
     }
 
     @Override
+    public void add(final long index, final Comparable<?> addend) {
+        this.add((int) index, addend);
+    }
+
+    @Override
     public void add(final long index, final double addend) {
         this.add((int) index, addend);
     }
 
     @Override
     public void add(final long index, final float addend) {
-        this.add((int) index, addend);
-    }
-
-    @Override
-    public void add(final long index, final Comparable<?> addend) {
         this.add((int) index, addend);
     }
 
@@ -140,6 +140,11 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
     }
 
     @Override
+    public final void set(final long index, final Comparable<?> number) {
+        this.set((int) index, number);
+    }
+
+    @Override
     public final void set(final long index, final double value) {
         this.set((int) index, value);
     }
@@ -147,11 +152,6 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
     @Override
     public final void set(final long index, final float value) {
         this.set((int) index, value);
-    }
-
-    @Override
-    public final void set(final long index, final Comparable<?> number) {
-        this.set((int) index, number);
     }
 
     @Override
@@ -170,11 +170,11 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
         return retVal;
     }
 
+    protected abstract void add(int index, Comparable<?> addend);
+
     protected abstract void add(int index, double addend);
 
     protected abstract void add(int index, float addend);
-
-    protected abstract void add(int index, Comparable<?> addend);
 
     protected abstract double doubleValue(final int index);
 
@@ -266,11 +266,11 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     protected abstract int searchAscending(final N number);
 
+    protected abstract void set(final int index, final Comparable<?> number);
+
     protected abstract void set(final int index, final double value);
 
     protected abstract void set(final int index, final float value);
-
-    protected abstract void set(final int index, final Comparable<?> number);
 
     protected abstract void sortAscending();
 

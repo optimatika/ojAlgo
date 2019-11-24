@@ -72,21 +72,21 @@ public class BetaFunctionTest {
     }
 
     @Test
-    public void testRegularizedReducesToTheUsualBetaFunction() {
-        int lim = 15;
-        for (int a = 1; a < lim; a++) {
-            for (int b = 1; b < lim; b++) {
-                TestUtils.assertEquals("a=" + a + ", b=" + b, ONE, BetaFunction.Regularized.beta(ONE, a, b), StandardType.MATH_032);
-            }
-        }
-    }
-
-    @Test
     public void testIncompleteZeroIntegral() {
         int lim = 50;
         for (int a = 1; a < lim; a++) {
             for (int b = 1; b < lim; b++) {
                 TestUtils.assertEquals("a=" + a + ", b=" + b, ZERO, BetaFunction.Incomplete.beta(ZERO, a, b));
+            }
+        }
+    }
+
+    @Test
+    public void testRegularizedReducesToTheUsualBetaFunction() {
+        int lim = 15;
+        for (int a = 1; a < lim; a++) {
+            for (int b = 1; b < lim; b++) {
+                TestUtils.assertEquals("a=" + a + ", b=" + b, ONE, BetaFunction.Regularized.beta(ONE, a, b), StandardType.MATH_032);
             }
         }
     }

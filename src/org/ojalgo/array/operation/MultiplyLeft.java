@@ -38,15 +38,15 @@ public final class MultiplyLeft implements ArrayOperation {
 
     }
 
-    public interface Primitive64 {
-
-        void invoke(double[] product, Access1D<?> left, int complexity, double[] right);
-
-    }
-
     public interface Primitive32 {
 
         void invoke(float[] product, Access1D<?> left, int complexity, float[] right);
+
+    }
+
+    public interface Primitive64 {
+
+        void invoke(double[] product, Access1D<?> left, int complexity, double[] right);
 
     }
 

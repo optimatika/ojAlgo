@@ -30,17 +30,17 @@ public abstract class GammaFunction {
 
     public static abstract class Incomplete extends GammaFunction {
 
-        public static ComplexNumber lower(final ComplexNumber z, double limit) {
+        public static ComplexNumber lower(final ComplexNumber z, final double limit) {
             // TODO Implement it!
             return ComplexNumber.NaN;
         }
 
-        public static double lower(final double x, double limit) {
+        public static double lower(final double x, final double limit) {
             // TODO Implement it!
             return NaN;
         }
 
-        public static double lower(final int n, double limit) {
+        public static double lower(final int n, final double limit) {
 
             double incr = ONE, sum = ONE;
             for (int k = 1; k < n; k++) {
@@ -51,17 +51,17 @@ public abstract class GammaFunction {
             return (ONE - (sum * Math.exp(-limit))) * MissingMath.factorial(n - 1);
         }
 
-        public static ComplexNumber upper(final ComplexNumber z, double limit) {
+        public static ComplexNumber upper(final ComplexNumber z, final double limit) {
             // TODO Implement it!
             return ComplexNumber.NaN;
         }
 
-        public static double upper(final double x, double limit) {
+        public static double upper(final double x, final double limit) {
             // TODO Implement it!
             return NaN;
         }
 
-        public static double upper(final int n, double limit) {
+        public static double upper(final int n, final double limit) {
 
             double incr = ONE, sum = ONE;
             for (int k = 1; k < n; k++) {
@@ -76,15 +76,15 @@ public abstract class GammaFunction {
 
     public static abstract class Logarithmic extends GammaFunction {
 
-        public static ComplexNumber gamma(ComplexNumber z) {
+        public static ComplexNumber gamma(final ComplexNumber z) {
             return GammaFunction.LanczosApproximation.logarithmic(z);
         }
 
-        public static double gamma(double x) {
+        public static double gamma(final double x) {
             return GammaFunction.LanczosApproximation.logarithmic(x);
         }
 
-        public static double gamma(int n) {
+        public static double gamma(final int n) {
             return Math.log(GammaFunction.gamma(n));
         }
 
@@ -92,27 +92,27 @@ public abstract class GammaFunction {
 
     public static abstract class Regularized extends GammaFunction {
 
-        public static ComplexNumber lower(final ComplexNumber z, double limit) {
+        public static ComplexNumber lower(final ComplexNumber z, final double limit) {
             return GammaFunction.Incomplete.lower(z, limit).divide(GammaFunction.gamma(z));
         }
 
-        public static double lower(final double x, double limit) {
+        public static double lower(final double x, final double limit) {
             return GammaFunction.Incomplete.lower(x, limit) / GammaFunction.gamma(x);
         }
 
-        public static double lower(final int n, double limit) {
+        public static double lower(final int n, final double limit) {
             return GammaFunction.Incomplete.lower(n, limit) / GammaFunction.gamma(n);
         }
 
-        public static ComplexNumber upper(final ComplexNumber z, double limit) {
+        public static ComplexNumber upper(final ComplexNumber z, final double limit) {
             return GammaFunction.Incomplete.upper(z, limit).divide(GammaFunction.gamma(z));
         }
 
-        public static double upper(final double x, double limit) {
+        public static double upper(final double x, final double limit) {
             return GammaFunction.Incomplete.upper(x, limit) / GammaFunction.gamma(x);
         }
 
-        public static double upper(final int n, double limit) {
+        public static double upper(final int n, final double limit) {
             return GammaFunction.Incomplete.upper(n, limit) / GammaFunction.gamma(n);
         }
 
@@ -197,7 +197,7 @@ public abstract class GammaFunction {
             }
         }
 
-        static ComplexNumber logarithmic(ComplexNumber z) {
+        static ComplexNumber logarithmic(final ComplexNumber z) {
 
             final ComplexNumber z1 = z.subtract(ONE);
             final ComplexNumber za = z1.add(A + HALF);
@@ -210,7 +210,7 @@ public abstract class GammaFunction {
             return z1.add(HALF).multiply(ComplexMath.LOG.invoke(za)).add(LOG_SQRT_TWO_PI).subtract(za).add(ComplexMath.LOG.invoke(zs));
         }
 
-        static double logarithmic(double x) {
+        static double logarithmic(final double x) {
 
             final double x1 = x - ONE;
             final double xa = x1 + (A + HALF);
