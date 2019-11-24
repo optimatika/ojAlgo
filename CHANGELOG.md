@@ -40,7 +40,7 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 #### org.ojalgo.matrix
 
-- PrimitiveDenseStore has been renamed Primitive64Store (and there is now also a Primitive32Store). GenericDenseStore was also renamed GenericStore.
+- PrimitiveDenseStore has been renamed Primitive64Store (and there is now also a Primitive32Store). GenericDenseStore was also renamed GenericStore. Likewise PrimitiveMatrix is repalced by Primitive64Matrix and Primitive32Matrix.
 
 #### org.ojalgo.scalar
 
