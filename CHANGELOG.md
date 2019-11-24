@@ -12,6 +12,9 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+
+## [48.0.0] – 2019-11-24
+
 ### Added
 
 - Improved support for float throughout the library, and specifically added matrices with float elements.
