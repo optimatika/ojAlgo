@@ -160,8 +160,8 @@
                     </includes>
                     <excludedGroups>slow,unstable</excludedGroups>
                 </configuration>
-                <dependencies>
-                </dependencies>
+                <dependencies />
+
             </plugin>
         </plugins>
     </build>
