@@ -28,9 +28,8 @@ import java.math.MathContext;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class RationalNumber implements Scalar<RationalNumber>, Enforceable<RationalNumber> {
+public final class RationalNumber implements SelfDeclaringScalar<RationalNumber> {
 
     public static final Scalar.Factory<RationalNumber> FACTORY = new Scalar.Factory<RationalNumber>() {
 

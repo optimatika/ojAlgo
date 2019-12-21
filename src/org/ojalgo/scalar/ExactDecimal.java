@@ -26,14 +26,13 @@ import java.math.BigDecimal;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.context.NumberContext.Enforceable;
 
 /**
  * To help implement exact decimal numbers with a fixed number of decimal places (fixed scale).
  *
  * @author apete
  */
-public abstract class ExactDecimal<S extends ExactDecimal<S>> implements Scalar<S>, Enforceable<S> {
+public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDeclaringScalar<S> {
 
     public static final class Descriptor {
 
