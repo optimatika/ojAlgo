@@ -23,7 +23,7 @@ package org.ojalgo.random;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-abstract class AbstractContinuous extends RandomNumber implements ContinuousDistribution {
+public abstract class AbstractContinuous extends RandomNumber implements ContinuousDistribution {
 
     AbstractContinuous() {
         super();

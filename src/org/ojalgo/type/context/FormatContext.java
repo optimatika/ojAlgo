@@ -32,7 +32,7 @@ import org.ojalgo.netio.ASCII;
  *
  * @author apete
  */
-abstract class FormatContext<T, F extends Format> implements TypeContext<T> {
+public abstract class FormatContext<T, F extends Format> implements TypeContext<T> {
 
     /**
      * Use 'Non-Breaking SPace' character instead of ardinary 'space' character.
