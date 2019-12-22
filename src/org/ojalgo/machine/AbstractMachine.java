@@ -23,7 +23,7 @@ package org.ojalgo.machine;
 
 import org.ojalgo.type.IntCount;
 
-abstract class AbstractMachine extends BasicMachine {
+public abstract class AbstractMachine extends BasicMachine {
 
     static final long K = 1024L;
 

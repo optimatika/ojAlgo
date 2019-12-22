@@ -33,7 +33,7 @@ import org.ojalgo.random.ContinuousDistribution;
 import org.ojalgo.random.Distribution;
 import org.ojalgo.type.keyvalue.ComparableToDouble;
 
-abstract class AbstractProcess<D extends Distribution> implements RandomProcess<D> {
+public abstract class AbstractProcess<D extends Distribution> implements RandomProcess<D> {
 
     private final TreeSet<ComparableToDouble<Double>> myObservations = new TreeSet<>();
 

@@ -25,7 +25,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access2D;
 
-abstract class RandomNumber1D {
+public abstract class RandomNumber1D {
 
     private final Random1D myRandom;
 
