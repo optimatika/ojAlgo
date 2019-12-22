@@ -31,7 +31,7 @@ import org.ojalgo.random.process.RandomProcess.SimulationResults;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 
-abstract class Process1D<D extends ContinuousDistribution, P extends AbstractProcess<D>> {
+public abstract class Process1D<D extends ContinuousDistribution, P extends AbstractProcess<D>> {
 
     private final Random1D myGenerator;
     private final AbstractProcess<? extends D>[] myProcesses;

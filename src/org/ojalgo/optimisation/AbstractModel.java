@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
-abstract class AbstractModel implements Optimisation.Model {
+public abstract class AbstractModel implements Optimisation.Model {
 
     public final Optimisation.Options options;
 

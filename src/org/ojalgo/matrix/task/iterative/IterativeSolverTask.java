@@ -42,7 +42,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class IterativeSolverTask implements SolverTask<Double> {
+public abstract class IterativeSolverTask implements SolverTask<Double> {
 
     public static final class Configurator {
 
@@ -88,7 +88,7 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
 
     }
 
-    interface SparseDelegate {
+    public interface SparseDelegate {
 
         double resolve(List<Equation> equations, final PhysicalStore<Double> solution);
 

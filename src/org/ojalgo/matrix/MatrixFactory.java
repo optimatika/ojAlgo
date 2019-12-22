@@ -47,7 +47,7 @@ import org.ojalgo.structure.Transformation2D;
  *
  * @author apete
  */
-abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M>, B extends BasicMatrix.LogicalBuilder<N, M>, DR extends BasicMatrix.PhysicalReceiver<N, M>, SR extends BasicMatrix.PhysicalReceiver<N, M>>
+public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M>, B extends BasicMatrix.LogicalBuilder<N, M>, DR extends BasicMatrix.PhysicalReceiver<N, M>, SR extends BasicMatrix.PhysicalReceiver<N, M>>
         implements Factory2D.MayBeSparse<M, DR, SR> {
 
     abstract class DenseReceiver extends Physical<PhysicalStore<N>> {
@@ -59,7 +59,7 @@ abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatrix<N, M
     }
 
     @SuppressWarnings("unchecked")
-    abstract class Logical implements BasicMatrix.LogicalBuilder<N, M> {
+    public abstract class Logical implements BasicMatrix.LogicalBuilder<N, M> {
 
         private final MatrixStore.LogicalBuilder<N> myDelegate;
 
