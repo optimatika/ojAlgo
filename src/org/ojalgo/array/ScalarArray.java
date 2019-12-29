@@ -86,6 +86,11 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
+    protected final float floatValue(final int index) {
+        return data[index].floatValue();
+    }
+
+    @Override
     protected final int indexOfLargest(final int first, final int limit, final int step) {
         return AMAX.invoke(data, first, limit, step);
     }

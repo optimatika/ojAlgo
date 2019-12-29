@@ -54,18 +54,18 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
     }
 
     @Override
-    public void add(final long index, final Comparable<?> addend) {
-        this.add((int) index, addend);
+    public final void add(final long index, final Comparable<?> addend) {
+        this.add(Math.toIntExact(index), addend);
     }
 
     @Override
-    public void add(final long index, final double addend) {
-        this.add((int) index, addend);
+    public final void add(final long index, final double addend) {
+        this.add(Math.toIntExact(index), addend);
     }
 
     @Override
-    public void add(final long index, final float addend) {
-        this.add((int) index, addend);
+    public final void add(final long index, final float addend) {
+        this.add(Math.toIntExact(index), addend);
     }
 
     @Override
@@ -75,7 +75,7 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     @Override
     public final double doubleValue(final long index) {
-        return this.doubleValue((int) index);
+        return this.doubleValue(Math.toIntExact(index));
     }
 
     @Override
@@ -90,17 +90,17 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     @Override
     public final void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        this.fillOne((int) index, values, valueIndex);
+        this.fillOne(Math.toIntExact(index), values, valueIndex);
     }
 
     @Override
-    public void fillOne(final long index, final N value) {
-        this.fillOne((int) index, value);
+    public final void fillOne(final long index, final N value) {
+        this.fillOne(Math.toIntExact(index), value);
     }
 
     @Override
-    public void fillOne(final long index, final NullaryFunction<?> supplier) {
-        this.fillOne((int) index, supplier);
+    public final void fillOne(final long index, final NullaryFunction<?> supplier) {
+        this.fillOne(Math.toIntExact(index), supplier);
     }
 
     @Override
@@ -114,8 +114,13 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
     }
 
     @Override
+    public final float floatValue(final long index) {
+        return this.floatValue(Math.toIntExact(index));
+    }
+
+    @Override
     public final N get(final long index) {
-        return this.get((int) index);
+        return this.get(Math.toIntExact(index));
     }
 
     /**
@@ -123,7 +128,7 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
      */
     @Override
     public final boolean isAbsolute(final long index) {
-        return this.isAbsolute((int) index);
+        return this.isAbsolute(Math.toIntExact(index));
     }
 
     /**
@@ -131,32 +136,32 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
      */
     @Override
     public final boolean isSmall(final long index, final double comparedTo) {
-        return this.isSmall((int) index, comparedTo);
+        return this.isSmall(Math.toIntExact(index), comparedTo);
     }
 
     @Override
     public final void modifyOne(final long index, final UnaryFunction<N> modifier) {
-        this.modifyOne((int) index, modifier);
+        this.modifyOne(Math.toIntExact(index), modifier);
     }
 
     @Override
     public final void set(final long index, final Comparable<?> number) {
-        this.set((int) index, number);
+        this.set(Math.toIntExact(index), number);
     }
 
     @Override
     public final void set(final long index, final double value) {
-        this.set((int) index, value);
+        this.set(Math.toIntExact(index), value);
     }
 
     @Override
     public final void set(final long index, final float value) {
-        this.set((int) index, value);
+        this.set(Math.toIntExact(index), value);
     }
 
     @Override
-    public void visitOne(final long index, final VoidFunction<N> visitor) {
-        this.visitOne((int) index, visitor);
+    public final void visitOne(final long index, final VoidFunction<N> visitor) {
+        this.visitOne(Math.toIntExact(index), visitor);
     }
 
     private final boolean isSmall(final int first, final int limit, final int step, final double comparedTo) {
@@ -182,7 +187,7 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     @Override
     protected final void exchange(final long firstA, final long firstB, final long step, final long count) {
-        this.exchange((int) firstA, (int) firstB, (int) step, (int) count);
+        this.exchange(Math.toIntExact(firstA), Math.toIntExact(firstB), Math.toIntExact(step), Math.toIntExact(count));
     }
 
     protected abstract void fill(final int first, final int limit, final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right);
@@ -197,12 +202,12 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     @Override
     protected final void fill(final long first, final long limit, final long step, final N value) {
-        this.fill((int) first, (int) limit, (int) step, value);
+        this.fill(Math.toIntExact(first), Math.toIntExact(limit), Math.toIntExact(step), value);
     }
 
     @Override
     protected final void fill(final long first, final long limit, final long step, final NullaryFunction<?> supplier) {
-        this.fill((int) first, (int) limit, (int) step, supplier);
+        this.fill(Math.toIntExact(first), Math.toIntExact(limit), Math.toIntExact(step), supplier);
     }
 
     protected abstract void fillOne(final int index, final Access1D<?> values, final long valueIndex);
@@ -211,13 +216,15 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     protected abstract void fillOne(int index, NullaryFunction<?> supplier);
 
+    protected abstract float floatValue(final int index);
+
     protected abstract N get(final int index);
 
     protected abstract int indexOfLargest(int first, int limit, int step);
 
     @Override
     protected final long indexOfLargest(final long first, final long limit, final long step) {
-        return this.indexOfLargest((int) first, (int) limit, (int) step);
+        return this.indexOfLargest(Math.toIntExact(first), Math.toIntExact(limit), Math.toIntExact(step));
     }
 
     /**
@@ -232,7 +239,7 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     @Override
     protected final boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
-        return this.isSmall((int) first, (int) limit, (int) step, comparedTo);
+        return this.isSmall(Math.toIntExact(first), Math.toIntExact(limit), Math.toIntExact(step), comparedTo);
     }
 
     protected abstract void modify(int first, int limit, int step, Access1D<N> left, BinaryFunction<N> function);
@@ -249,17 +256,17 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     @Override
     protected final void modify(final long first, final long limit, final long step, final Access1D<N> left, final BinaryFunction<N> function) {
-        this.modify((int) first, (int) limit, (int) step, left, function);
+        this.modify(Math.toIntExact(first), Math.toIntExact(limit), Math.toIntExact(step), left, function);
     }
 
     @Override
     protected final void modify(final long first, final long limit, final long step, final BinaryFunction<N> function, final Access1D<N> right) {
-        this.modify((int) first, (int) limit, (int) step, function, right);
+        this.modify(Math.toIntExact(first), Math.toIntExact(limit), Math.toIntExact(step), function, right);
     }
 
     @Override
     protected final void modify(final long first, final long limit, final long step, final UnaryFunction<N> function) {
-        this.modify((int) first, (int) limit, (int) step, function);
+        this.modify(Math.toIntExact(first), Math.toIntExact(limit), Math.toIntExact(step), function);
     }
 
     protected abstract void modifyOne(final int index, final UnaryFunction<N> modifier);
@@ -280,7 +287,7 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     @Override
     protected final void visit(final long first, final long limit, final long step, final VoidFunction<N> visitor) {
-        this.visit((int) first, (int) limit, (int) step, visitor);
+        this.visit(Math.toIntExact(first), Math.toIntExact(limit), Math.toIntExact(step), visitor);
     }
 
     protected abstract void visitOne(final int index, final VoidFunction<N> visitor);

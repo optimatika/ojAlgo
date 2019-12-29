@@ -1,5 +1,0 @@
-com.github.spotbugs.plugin.eclipse.findbugsMarkerOfConcern=Info
-com.github.spotbugs.plugin.eclipse.findbugsMarkerScariest=Error
-com.github.spotbugs.plugin.eclipse.findbugsMarkerTroubling=Info
-disableProjectProps=true
-eclipse.preferences.version=1
