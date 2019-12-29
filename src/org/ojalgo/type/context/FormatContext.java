@@ -88,8 +88,12 @@ public abstract class FormatContext<T, F extends Format> implements TypeContext<
         return (F) this.format().clone();
     }
 
+    /**
+     * @deprecated v49 Use {@link #withFormat(F)} instead
+     */
+    @Deprecated
     public final <G> TypeContext<G> newFormat(final F format) {
-        return new GenericContext<>(this, format);
+        return this.withFormat(format);
     }
 
     /**
@@ -111,6 +115,10 @@ public abstract class FormatContext<T, F extends Format> implements TypeContext<
 
             return null;
         }
+    }
+
+    public final <G> TypeContext<G> withFormat(final F format) {
+        return new GenericContext<>(this, format);
     }
 
     protected abstract void configureFormat(F format, Object object);
