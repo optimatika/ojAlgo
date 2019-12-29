@@ -250,8 +250,8 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     @Override
-    protected void fillOne(final int index, final NullaryFunction<Double> supplier) {
-        data[index] = supplier.doubleValue();
+    protected void fillOne(final int index, final NullaryFunction<?> supplier) {
+        data[index] = supplier.floatValue();
     }
 
     @Override

@@ -157,8 +157,8 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
-    protected final void fillOne(final int index, final NullaryFunction<N> supplier) {
-        data[index] = supplier.get();
+    protected final void fillOne(final int index, final NullaryFunction<?> supplier) {
+        data[index] = this.valueOf(supplier.get());
     }
 
     @Override

@@ -209,7 +209,7 @@ abstract class PlainArray<N extends Comparable<N>> extends DenseArray<N> impleme
 
     protected abstract void fillOne(int index, N value);
 
-    protected abstract void fillOne(int index, NullaryFunction<N> supplier);
+    protected abstract void fillOne(int index, NullaryFunction<?> supplier);
 
     protected abstract N get(final int index);
 
