@@ -33,10 +33,10 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 
 /**
- * <p>
  * Array class limited by integer (int, not long) indices. Typically this will be a plain java array as in
- * <code>double[]</code>. The long indices from the various method arguments are cast to int.
- * </p>
+ * <code>double[]</code>. This class terminates/implements all methods with long argumants, casts the long
+ * arguments to int and delegates to new protected abstract methods with the int arguments. No new public
+ * methods are declared here, and this class is package private.
  *
  * @author apete
  */
