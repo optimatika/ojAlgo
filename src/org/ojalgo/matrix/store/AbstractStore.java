@@ -22,10 +22,8 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
-import org.ojalgo.type.context.NumberContext;
 
 abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> {
 
@@ -61,14 +59,29 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
         return myRowDim;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public final boolean equals(final Object someObj) {
-        if (someObj instanceof MatrixStore) {
-            return this.equals((MatrixStore<N>) someObj, NumberContext.getGeneral(6));
-        } else {
-            return super.equals(someObj);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
+        if (!(obj instanceof AbstractStore)) {
+            return false;
+        }
+        AbstractStore other = (AbstractStore) obj;
+        if (myColDim != other.myColDim) {
+            return false;
+        }
+        if (myComponentType == null) {
+            if (other.myComponentType != null) {
+                return false;
+            }
+        } else if (!myComponentType.equals(other.myComponentType)) {
+            return false;
+        }
+        if (myRowDim != other.myRowDim) {
+            return false;
+        }
+        return true;
     }
 
     public final MatrixStore<N> get() {
@@ -76,8 +89,13 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
     }
 
     @Override
-    public final int hashCode() {
-        return MatrixUtils.hashCode(this);
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + myColDim;
+        result = (prime * result) + ((myComponentType == null) ? 0 : myComponentType.hashCode());
+        result = (prime * result) + myRowDim;
+        return result;
     }
 
     public int limitOfColumn(final int col) {

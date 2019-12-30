@@ -21,8 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.util.Arrays;
-
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.RationalFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -83,20 +81,6 @@ public class RationalArray extends ScalarArray<RationalNumber> {
 
     protected RationalArray(final RationalNumber[] data) {
         super(FACTORY, data);
-    }
-
-    @Override
-    public boolean equals(final Object anObj) {
-        if (anObj instanceof RationalArray) {
-            return Arrays.equals(data, ((RationalArray) anObj).data);
-        } else {
-            return super.equals(anObj);
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(data);
     }
 
 }

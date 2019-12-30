@@ -42,7 +42,6 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.machine.MemoryEstimator;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.decomposition.EvD1D;
 import org.ojalgo.matrix.transformation.Householder;
@@ -54,7 +53,6 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * A {@linkplain double} implementation of {@linkplain PhysicalStore}.
@@ -590,14 +588,25 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         return myUtility.doubleValue(row, col);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public boolean equals(final Object anObj) {
-        if (anObj instanceof MatrixStore) {
-            return this.equals((MatrixStore<Double>) anObj, NumberContext.getGeneral(6));
-        } else {
-            return super.equals(anObj);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof Primitive64Store)) {
+            return false;
+        }
+        Primitive64Store other = (Primitive64Store) obj;
+        if (myColDim != other.myColDim) {
+            return false;
+        }
+        if (myRowDim != other.myRowDim) {
+            return false;
+        }
+        return true;
     }
 
     public void exchangeColumns(final long colA, final long colB) {
@@ -801,7 +810,11 @@ public final class Primitive64Store extends Primitive64Array implements Physical
 
     @Override
     public int hashCode() {
-        return MatrixUtils.hashCode(this);
+        final int prime = 31;
+        int result = super.hashCode();
+        result = (prime * result) + myColDim;
+        result = (prime * result) + myRowDim;
+        return result;
     }
 
     public long indexOfLargestInColumn(final long row, final long col) {

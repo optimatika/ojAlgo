@@ -68,12 +68,21 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
-    public boolean equals(final Object anObj) {
-        if (anObj instanceof ReferenceTypeArray) {
-            return Arrays.equals(data, ((ReferenceTypeArray<?>) anObj).data);
-        } else {
-            return super.equals(anObj);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof ReferenceTypeArray)) {
+            return false;
+        }
+        ReferenceTypeArray other = (ReferenceTypeArray) obj;
+        if (!Arrays.equals(data, other.data)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -99,7 +108,10 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(data);
+        final int prime = 31;
+        int result = super.hashCode();
+        result = (prime * result) + Arrays.hashCode(data);
+        return result;
     }
 
     @Override

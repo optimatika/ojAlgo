@@ -405,8 +405,8 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
         };
     }
 
-    static boolean equals(final Access2D<?> accessA, final Access2D<?> accessB, final NumberContext context) {
-        return (accessA.countRows() == accessB.countRows()) && (accessA.countColumns() == accessB.countColumns()) && Access1D.equals(accessA, accessB, context);
+    static boolean equals(final Access2D<?> accessA, final Access2D<?> accessB, final NumberContext accuracy) {
+        return (accessA.countRows() == accessB.countRows()) && (accessA.countColumns() == accessB.countColumns()) && Access1D.equals(accessA, accessB, accuracy);
     }
 
     static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> newPrimitiveColumnCollectable(final Access1D<?> anything1D) {
