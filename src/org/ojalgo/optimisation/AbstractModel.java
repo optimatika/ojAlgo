@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
-public abstract class AbstractModel implements Optimisation.Model {
+abstract class AbstractModel implements Optimisation.Model {
 
     public final Optimisation.Options options;
 
@@ -41,18 +41,30 @@ public abstract class AbstractModel implements Optimisation.Model {
         options = someOptions;
     }
 
+    /**
+     * @deprected v49 Will be removed or at least made private
+     */
     public final boolean isMaximisation() {
         return !this.isMinimisation();
     }
 
+    /**
+     * @deprected v49 Will be removed or at least made private
+     */
     public final boolean isMinimisation() {
         return myMinimisation;
     }
 
+    /**
+     * @deprected v49 Will be removed or at least made private
+     */
     public final void setMaximisation() {
         this.setMaximisation(true);
     }
 
+    /**
+     * @deprected v49 Will be removed or at least made private
+     */
     public final void setMinimisation() {
         this.setMinimisation(true);
     }
