@@ -38,7 +38,7 @@ import org.ojalgo.type.format.DateStyle;
  *
  * @author apete
  */
-public final class DateContext extends FormatContext<Date, Format> {
+public final class DateContext extends FormatContext<Date> {
 
     private static final DatePart DEFAULT_PART = DatePart.DATETIME;
     private static final DateStyle DEFAULT_STYLE = DateStyle.SHORT;

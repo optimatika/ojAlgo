@@ -21,8 +21,6 @@
  */
 package org.ojalgo.type.context;
 
-import java.text.Format;
-
 /**
  * A type context provides two basic services:
  * <ol>
@@ -30,7 +28,7 @@ import java.text.Format;
  * useful when writing data to a database where attributes are often very specifically typed. "enforcing" is
  * typically a one-way operation that cannot be undone.</li>
  * <li>It translates back and forth between some specific type and {@linkplain String} - essentially a
- * {@linkplain Format}.</li>
+ * formatter.</li>
  * </ol>
  *
  * @author apete
@@ -38,7 +36,8 @@ import java.text.Format;
 public interface TypeContext<T> {
 
     /**
-     * Will force the object to conform to the context's specification.
+     * Will force the object to conform to the context's specification. The default implementation formats a
+     * {@link String} and then parses that back to an object (of the original type).
      */
     default T enforce(final T object) {
         return this.parse(this.format(object));
