@@ -347,6 +347,11 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return this.format().format(number);
     }
 
+    @Override
+    public NumberFormat getFormat() {
+        return (NumberFormat) super.getFormat();
+    }
+
     public <N extends Comparable<N>> UnaryFunction<N> getFunction(final FunctionSet<N> functions) {
         return functions.enforce(this);
     }

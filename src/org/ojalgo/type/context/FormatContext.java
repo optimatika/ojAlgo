@@ -82,7 +82,7 @@ public abstract class FormatContext<T> implements TypeContext<T> {
         }
     }
 
-    public final Format getFormat() {
+    public Format getFormat() {
         return (Format) this.format().clone();
     }
 
