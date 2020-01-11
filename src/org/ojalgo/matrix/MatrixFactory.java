@@ -59,7 +59,7 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
     }
 
     @SuppressWarnings("unchecked")
-    public abstract class Logical implements BasicMatrix.LogicalBuilder<N, M> {
+    abstract class Logical implements BasicMatrix.LogicalBuilder<N, M> {
 
         private final MatrixStore.LogicalBuilder<N> myDelegate;
 

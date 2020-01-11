@@ -58,11 +58,9 @@ import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * <p>
- * This interface declares a limited set of high level methods for linear algebra. If this is not enough for
- * your use case, then look at the various interfaces/classes in the {@linkplain org.ojalgo.matrix.store}
+ * This abstract class declares a limited set of high level methods for linear algebra. If this is not enough
+ * for your use case, then look at the various interfaces/classes in the {@linkplain org.ojalgo.matrix.store}
  * and/or {@linkplain org.ojalgo.matrix.decomposition} packages.
- * </p>
  *
  * @author apete
  */
