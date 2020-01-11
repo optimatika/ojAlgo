@@ -21,6 +21,8 @@
  */
 package org.ojalgo.random;
 
+import static org.ojalgo.function.constant.PrimitiveMath.*;
+
 public interface ContinuousDistribution extends Distribution {
 
     /**
@@ -49,6 +51,10 @@ public interface ContinuousDistribution extends Distribution {
      */
     double getDistribution(double value);
 
+    default double getLowerConfidenceQuantile(final double confidence) {
+        return this.getQuantile((ONE - confidence) / TWO);
+    }
+
     /**
      * In probability theory, a probability density function (pdf), or density of a continuous random variable
      * is a function that describes the relative likelihood for this random variable to occur at a given
@@ -76,5 +82,9 @@ public interface ContinuousDistribution extends Distribution {
      * @return x
      */
     double getQuantile(double probability);
+
+    default double getUpperConfidenceQuantile(final double confidence) {
+        return this.getQuantile(ONE - ((ONE - confidence) / TWO));
+    }
 
 }

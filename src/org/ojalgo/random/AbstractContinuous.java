@@ -21,20 +21,10 @@
  */
 package org.ojalgo.random;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
-
-public abstract class AbstractContinuous extends RandomNumber implements ContinuousDistribution {
+abstract class AbstractContinuous extends RandomNumber implements ContinuousDistribution {
 
     AbstractContinuous() {
         super();
-    }
-
-    public final double getLowerConfidenceQuantile(final double confidence) {
-        return this.getQuantile((ONE - confidence) / TWO);
-    }
-
-    public final double getUpperConfidenceQuantile(final double confidence) {
-        return this.getQuantile(ONE - ((ONE - confidence) / TWO));
     }
 
     @Override

@@ -50,7 +50,7 @@ public abstract class RandomNumber1D {
 
         final int tmpLength = tmpVar.size();
 
-        final Array1D<Double> retVal = Array1D.PRIMITIVE64.makeZero(tmpLength);
+        final Array1D<Double> retVal = Array1D.PRIMITIVE64.make(tmpLength);
 
         for (int i = 0; i < tmpLength; i++) {
             retVal.set(i, PrimitiveMath.SQRT.invoke(tmpVar.doubleValue(i)));
@@ -71,7 +71,7 @@ public abstract class RandomNumber1D {
 
         final int tmpLength = tmpStdDev.size();
 
-        final Array1D<Double> retVal = Array1D.PRIMITIVE64.makeZero(tmpLength);
+        final Array1D<Double> retVal = Array1D.PRIMITIVE64.make(tmpLength);
 
         double tmpVal;
         for (int i = 0; i < tmpLength; i++) {
