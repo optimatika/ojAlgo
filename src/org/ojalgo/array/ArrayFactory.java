@@ -33,18 +33,26 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Factory1D;
 import org.ojalgo.structure.StructureAnyD;
 
-public abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> implements Factory1D<I> {
+abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray<N>> implements Factory1D<I> {
 
-    public abstract AggregatorSet<N> aggregator();
+    public abstract FunctionSet<N> function();
 
-    public final I copy(final Access1D<?> source) {
+    public final I make(final long count) {
+        return this.makeStructuredZero(count);
+    }
+
+    public abstract Scalar.Factory<N> scalar();
+
+    abstract AggregatorSet<N> aggregator();
+
+    I copy(final Access1D<?> source) {
         final long count = source.count();
         final I retVal = this.makeToBeFilled(count);
         retVal.fillMatching(source);
         return retVal;
     }
 
-    public final I copy(final Comparable<?>... source) {
+    I copy(final Comparable<?>... source) {
         final int length = source.length;
         final I retVal = this.makeToBeFilled(length);
         for (int i = 0; i < length; i++) {
@@ -53,7 +61,7 @@ public abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray
         return retVal;
     }
 
-    public final I copy(final double... source) {
+    I copy(final double... source) {
         final int length = source.length;
         final I retVal = this.makeToBeFilled(length);
         for (int i = 0; i < length; i++) {
@@ -62,7 +70,7 @@ public abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray
         return retVal;
     }
 
-    public final I copy(final List<? extends Comparable<?>> source) {
+    I copy(final List<? extends Comparable<?>> source) {
         final int size = source.size();
         final I retVal = this.makeToBeFilled(size);
         for (int i = 0; i < size; i++) {
@@ -71,13 +79,9 @@ public abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray
         return retVal;
     }
 
-    public abstract FunctionSet<N> function();
+    abstract long getCapacityLimit();
 
-    public final I make(final long count) {
-        return this.makeStructuredZero(count);
-    }
-
-    public final I makeFilled(final long count, final NullaryFunction<?> supplier) {
+    I makeFilled(final long count, final NullaryFunction<?> supplier) {
         final I retVal = this.makeToBeFilled(count);
         if (retVal.isPrimitive()) {
             for (long i = 0L; i < count; i++) {
@@ -90,10 +94,6 @@ public abstract class ArrayFactory<N extends Comparable<N>, I extends BasicArray
         }
         return retVal;
     }
-
-    public abstract Scalar.Factory<N> scalar();
-
-    abstract long getCapacityLimit();
 
     final SegmentedArray<N> makeSegmented(final long... structure) {
 

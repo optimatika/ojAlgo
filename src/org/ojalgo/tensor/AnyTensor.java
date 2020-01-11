@@ -128,7 +128,7 @@ final class AnyTensor<N extends Comparable<N>> implements Tensor<N> {
     }
 
     public double norm() {
-        final AggregatorFunction<N> tmpNorm2 = myArrayFactory.aggregator().norm2();
+        final AggregatorFunction<N> tmpNorm2 = myArrayFactory.function().aggregator().norm2();
         myArray.visitAll(tmpNorm2);
         return tmpNorm2.doubleValue();
     }

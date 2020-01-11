@@ -71,7 +71,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         }
 
         public AggregatorSet<N> aggregator() {
-            return myDenseArrayFactory.aggregator();
+            return myDenseArrayFactory.function().aggregator();
         }
 
         public DenseArray.Factory<N> array() {
