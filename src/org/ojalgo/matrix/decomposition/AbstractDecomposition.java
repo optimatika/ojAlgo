@@ -30,7 +30,7 @@ import org.ojalgo.scalar.Scalar;
 /**
  * @author apete
  */
-public abstract class AbstractDecomposition<N extends Comparable<N>> implements MatrixDecomposition<N> {
+abstract class AbstractDecomposition<N extends Comparable<N>> implements MatrixDecomposition<N> {
 
     private boolean myComputed = false;
     private Boolean mySolvable = null;
@@ -49,17 +49,6 @@ public abstract class AbstractDecomposition<N extends Comparable<N>> implements 
 
     public final boolean isComputed() {
         return myComputed;
-    }
-
-    public final boolean isSolvable() {
-        if (myComputed && (mySolvable == null)) {
-            if (this instanceof MatrixDecomposition.Solver) {
-                mySolvable = Boolean.valueOf(this.checkSolvability());
-            } else {
-                mySolvable = Boolean.FALSE;
-            }
-        }
-        return myComputed && (mySolvable != null) && mySolvable.booleanValue();
     }
 
     public void reset() {
@@ -100,5 +89,16 @@ public abstract class AbstractDecomposition<N extends Comparable<N>> implements 
     }
 
     protected abstract Scalar.Factory<N> scalar();
+
+    boolean isSolvable() {
+        if (myComputed && (mySolvable == null)) {
+            if (this instanceof MatrixDecomposition.Solver) {
+                mySolvable = Boolean.valueOf(this.checkSolvability());
+            } else {
+                mySolvable = Boolean.FALSE;
+            }
+        }
+        return myComputed && (mySolvable != null) && mySolvable.booleanValue();
+    }
 
 }

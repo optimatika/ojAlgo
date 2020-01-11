@@ -166,6 +166,11 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return myPivot.isModified();
     }
 
+    @Override
+    public boolean isSolvable() {
+        return super.isSolvable();
+    }
+
     public PhysicalStore<Double> preallocate(final Structure2D template) {
         return this.allocate(template.countRows(), template.countRows());
     }

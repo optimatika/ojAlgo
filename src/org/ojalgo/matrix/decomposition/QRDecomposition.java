@@ -266,6 +266,11 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         return myFullSize;
     }
 
+    @Override
+    public boolean isSolvable() {
+        return super.isSolvable();
+    }
+
     public PhysicalStore<N> preallocate(final Structure2D template) {
         final long tmpCountRows = template.countRows();
         return this.allocate(tmpCountRows, tmpCountRows);

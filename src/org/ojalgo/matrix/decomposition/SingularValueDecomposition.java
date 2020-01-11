@@ -551,6 +551,11 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
         return true;
     }
 
+    @Override
+    public boolean isSolvable() {
+        return super.isSolvable();
+    }
+
     public PhysicalStore<N> preallocate(final Structure2D template) {
         return this.allocate(template.countColumns(), template.countRows());
     }

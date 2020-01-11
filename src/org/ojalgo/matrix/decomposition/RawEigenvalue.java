@@ -139,6 +139,11 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             return true;
         }
 
+        @Override
+        public boolean isSolvable() {
+            return super.isSolvable();
+        }
+
         public PhysicalStore<Double> preallocate(final Structure2D template) {
             final long numberOfEquations = template.countRows();
             return this.allocate(numberOfEquations, numberOfEquations);
