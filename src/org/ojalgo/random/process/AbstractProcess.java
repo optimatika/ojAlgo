@@ -33,6 +33,11 @@ import org.ojalgo.random.ContinuousDistribution;
 import org.ojalgo.random.Distribution;
 import org.ojalgo.type.keyvalue.ComparableToDouble;
 
+/**
+ * @deprecated Don't reference this class directly. Use the superinterface {@link RandomProcess} or one of the
+ *             subclasses instead. This class will be refactored and/or made private.
+ */
+@Deprecated
 public abstract class AbstractProcess<D extends Distribution> implements RandomProcess<D> {
 
     private final TreeSet<ComparableToDouble<Double>> myObservations = new TreeSet<>();
@@ -108,7 +113,7 @@ public abstract class AbstractProcess<D extends Distribution> implements RandomP
         final List<ComparableToDouble<Double>> tmpInitialState = new ArrayList<>(myObservations);
         final double tmpInitialValue = this.getValue();
 
-        final Array2D<Double> tmpRealisationValues = Array2D.PRIMITIVE64.makeZero(numberOfRealisations, numberOfSteps);
+        final Array2D<Double> tmpRealisationValues = Array2D.PRIMITIVE64.make(numberOfRealisations, numberOfSteps);
 
         for (int r = 0; r < numberOfRealisations; r++) {
             double tmpCurrentValue = tmpInitialValue;

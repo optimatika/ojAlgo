@@ -25,18 +25,16 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access2D;
 
-public abstract class RandomNumber1D {
+abstract class AbstractDistribution1D implements Distribution1D {
 
     private final Random1D myRandom;
 
-    protected RandomNumber1D(final Access2D<?> correlations) {
+    protected AbstractDistribution1D(final Access2D<?> correlations) {
 
         super();
 
         myRandom = new Random1D(correlations);
     }
-
-    public abstract Array1D<Double> getExpected();
 
     /**
      * Subclasses must override either getStandardDeviation() or getVariance()!

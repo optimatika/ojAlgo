@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,24 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.random.process;
+package org.ojalgo.random;
 
-import java.util.List;
+import org.ojalgo.array.Array1D;
 
-import org.ojalgo.structure.Access2D;
+public interface Distribution1D {
 
-/**
- * @deprecated v49 Use the superclass {@link Process1D} instead.
- */
-@Deprecated
-public class GeometricBrownian1D extends Process1D<GeometricBrownianMotion> {
+    Array1D<Double> getExpected();
 
-    public GeometricBrownian1D(final Access2D<?> correlations, final List<? extends GeometricBrownianMotion> processes) {
-        super(correlations, processes);
-    }
+    Array1D<Double> getStandardDeviation();
 
-    public GeometricBrownian1D(final List<? extends GeometricBrownianMotion> processes) {
-        super(processes);
-    }
+    Array1D<Double> getVariance();
 
 }

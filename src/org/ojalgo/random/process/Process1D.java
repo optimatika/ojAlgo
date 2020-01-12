@@ -25,34 +25,51 @@ import java.util.List;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.random.ContinuousDistribution;
 import org.ojalgo.random.Random1D;
 import org.ojalgo.random.process.RandomProcess.SimulationResults;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 
-public abstract class Process1D<D extends ContinuousDistribution, P extends AbstractProcess<D>> {
+/**
+ * Drive a set of processes simultaneously – correlated or uncorrelated.
+ *
+ * @author apete
+ */
+public class Process1D<P extends AbstractProcess<?>> {
+
+    /**
+     * Correlated processes
+     */
+    public static <P extends AbstractProcess<?>> Process1D of(final Access2D<?> correlations, final P... processes) {
+        return new Process1D<>(new Random1D(correlations), processes);
+    }
+
+    /**
+     * Uncorrelated processes
+     */
+    public static <P extends AbstractProcess<?>> Process1D of(final P... processes) {
+        return new Process1D<>(new Random1D(processes.length), processes);
+    }
 
     private final Random1D myGenerator;
-    private final AbstractProcess<? extends D>[] myProcesses;
+    private final P[] myProcesses;
 
     @SuppressWarnings("unchecked")
     protected Process1D(final Access2D<?> correlations, final List<? extends P> processes) {
-
-        super();
-
-        myGenerator = new Random1D(correlations);
-        myProcesses = processes.toArray(new AbstractProcess[processes.size()]);
+        this(new Random1D(correlations), (P[]) processes.toArray(new AbstractProcess[processes.size()]));
     }
 
     @SuppressWarnings("unchecked")
     protected Process1D(final List<? extends P> processes) {
+        this(new Random1D(processes.size()), (P[]) processes.toArray(new AbstractProcess[processes.size()]));
+    }
+
+    Process1D(final Random1D generator, final P... processes) {
 
         super();
 
-        final int tmpSize = processes.size();
-        myGenerator = new Random1D(tmpSize);
-        myProcesses = processes.toArray(new AbstractProcess[tmpSize]);
+        myGenerator = generator;
+        myProcesses = processes;
     }
 
     public double getValue(final int index) {
@@ -96,12 +113,8 @@ public abstract class Process1D<D extends ContinuousDistribution, P extends Abst
         return retVal;
     }
 
-    protected AbstractProcess<?> getProcess(final int index) {
+    protected P getProcess(final int index) {
         return myProcesses[index];
-    }
-
-    D getDistribution(final int index, final double stepSize) {
-        return myProcesses[index].getDistribution(stepSize);
     }
 
     double getExpected(final int index, final double stepSize) {
