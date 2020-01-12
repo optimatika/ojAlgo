@@ -25,18 +25,16 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access2D;
 
-abstract class RandomNumber1D {
+abstract class AbstractDistribution1D implements Distribution1D {
 
     private final Random1D myRandom;
 
-    protected RandomNumber1D(final Access2D<?> correlations) {
+    protected AbstractDistribution1D(final Access2D<?> correlations) {
 
         super();
 
         myRandom = new Random1D(correlations);
     }
-
-    public abstract Array1D<Double> getExpected();
 
     /**
      * Subclasses must override either getStandardDeviation() or getVariance()!
@@ -50,7 +48,7 @@ abstract class RandomNumber1D {
 
         final int tmpLength = tmpVar.size();
 
-        final Array1D<Double> retVal = Array1D.PRIMITIVE64.makeZero(tmpLength);
+        final Array1D<Double> retVal = Array1D.PRIMITIVE64.make(tmpLength);
 
         for (int i = 0; i < tmpLength; i++) {
             retVal.set(i, PrimitiveMath.SQRT.invoke(tmpVar.doubleValue(i)));
@@ -71,7 +69,7 @@ abstract class RandomNumber1D {
 
         final int tmpLength = tmpStdDev.size();
 
-        final Array1D<Double> retVal = Array1D.PRIMITIVE64.makeZero(tmpLength);
+        final Array1D<Double> retVal = Array1D.PRIMITIVE64.make(tmpLength);
 
         double tmpVal;
         for (int i = 0; i < tmpLength; i++) {

@@ -434,8 +434,24 @@ public final class Primitive32Store extends Primitive32Array implements Physical
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        return myUtility.equals(obj);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof Primitive32Store)) {
+            return false;
+        }
+        Primitive32Store other = (Primitive32Store) obj;
+        if (myColDim != other.myColDim) {
+            return false;
+        }
+        if (myRowDim != other.myRowDim) {
+            return false;
+        }
+        return true;
     }
 
     public void exchangeColumns(final long colA, final long colB) {
@@ -572,7 +588,11 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
     @Override
     public int hashCode() {
-        return myUtility.hashCode();
+        final int prime = 31;
+        int result = super.hashCode();
+        result = (prime * result) + myColDim;
+        result = (prime * result) + myRowDim;
+        return result;
     }
 
     public long indexOfLargestInColumn(final long col) {

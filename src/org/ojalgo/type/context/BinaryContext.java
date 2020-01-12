@@ -26,7 +26,10 @@ import java.text.Format;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.type.format.BinaryFormat;
 
-public final class BinaryContext extends FormatContext<byte[], Format> {
+/**
+ * @author apete
+ */
+public final class BinaryContext extends FormatContext<byte[]> {
 
     private static final Format DEFAULT_FORMAT = new BinaryFormat();
 

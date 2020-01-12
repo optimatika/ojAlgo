@@ -21,8 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.util.Arrays;
-
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -83,20 +81,6 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
 
     protected ComplexArray(final int size) {
         super(FACTORY, size);
-    }
-
-    @Override
-    public boolean equals(final Object anObj) {
-        if (anObj instanceof ComplexArray) {
-            return Arrays.equals(data, ((ComplexArray) anObj).data);
-        } else {
-            return super.equals(anObj);
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(data);
     }
 
 }

@@ -31,7 +31,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
  * @see <a href="https://mathworld.wolfram.com/StationaryIterativeMethod.html">StationaryIterativeMethod</a>
  * @author apete
  */
-abstract class StationaryIterativeSolver extends IterativeSolverTask {
+public abstract class StationaryIterativeSolver extends IterativeSolverTask {
 
     private double myRelaxationFactor = ONE;
 

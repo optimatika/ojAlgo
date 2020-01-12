@@ -27,11 +27,9 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.type.format.BooleanFormat;
 
 /**
- * BooleanContext
- *
  * @author apete
  */
-public final class BooleanContext extends FormatContext<Boolean, Format> {
+public final class BooleanContext extends FormatContext<Boolean> {
 
     private static final Format DEFAULT_FORMAT = new BooleanFormat();
 

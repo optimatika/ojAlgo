@@ -200,6 +200,11 @@ abstract class CholeskyDecomposition<N extends Comparable<N>> extends InPlaceDec
         return true;
     }
 
+    @Override
+    public boolean isSolvable() {
+        return super.isSolvable();
+    }
+
     public boolean isSPD() {
         return mySPD;
     }

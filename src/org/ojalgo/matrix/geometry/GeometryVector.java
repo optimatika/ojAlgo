@@ -29,7 +29,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure2D;
 
-abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double> {
+public abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double> {
 
     GeometryVector(final FillByMultiplying<Double> multiplier, final long rows, final long columns) {
         super(multiplier, rows, columns);

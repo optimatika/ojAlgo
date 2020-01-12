@@ -23,10 +23,13 @@ package org.ojalgo.random.process;
 
 import java.util.List;
 
-import org.ojalgo.random.LogNormal;
 import org.ojalgo.structure.Access2D;
 
-public class GeometricBrownian1D extends Process1D<LogNormal, GeometricBrownianMotion> {
+/**
+ * @deprecated v49 Use the superclass {@link Process1D} instead.
+ */
+@Deprecated
+public class GeometricBrownian1D extends Process1D<GeometricBrownianMotion> {
 
     public GeometricBrownian1D(final Access2D<?> correlations, final List<? extends GeometricBrownianMotion> processes) {
         super(correlations, processes);

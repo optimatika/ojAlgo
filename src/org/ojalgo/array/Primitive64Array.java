@@ -129,12 +129,18 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     @Override
-    public boolean equals(final Object anObj) {
-        if (anObj instanceof Primitive64Array) {
-            return Arrays.equals(data, ((Primitive64Array) anObj).data);
-        } else {
-            return super.equals(anObj);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
+        if (!(obj instanceof Primitive64Array)) {
+            return false;
+        }
+        Primitive64Array other = (Primitive64Array) obj;
+        if (!Arrays.equals(data, other.data)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -156,7 +162,10 @@ public class Primitive64Array extends PrimitiveArray {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(data);
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + Arrays.hashCode(data);
+        return result;
     }
 
     @Override
@@ -250,8 +259,13 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     @Override
-    protected void fillOne(final int index, final NullaryFunction<Double> supplier) {
+    protected void fillOne(final int index, final NullaryFunction<?> supplier) {
         data[index] = supplier.doubleValue();
+    }
+
+    @Override
+    protected float floatValue(int index) {
+        return (float) data[index];
     }
 
     @Override

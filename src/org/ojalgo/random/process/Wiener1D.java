@@ -23,10 +23,13 @@ package org.ojalgo.random.process;
 
 import java.util.List;
 
-import org.ojalgo.random.Normal;
 import org.ojalgo.structure.Access2D;
 
-public class Wiener1D extends Process1D<Normal, WienerProcess> {
+/**
+ * @deprecated v49 Use the superclass {@link Process1D} instead.
+ */
+@Deprecated
+public class Wiener1D extends Process1D<WienerProcess> {
 
     public Wiener1D(final Access2D<?> correlations, final List<? extends WienerProcess> processes) {
         super(correlations, processes);

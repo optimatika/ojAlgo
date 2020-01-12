@@ -19,28 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo;
+package org.ojalgo.random;
 
-import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.array.Array1D;
 
-public class SymmetricEigenvalueProfiling {
+public interface Distribution1D {
 
-    public static void main(final String[] args) {
+    Array1D<Double> getExpected();
 
-        final Primitive64Store tmpOrg = MatrixUtils.makeSPD(200);
-        //final Eigenvalue<Double> tmpEvD = new RawEigenvalue.Symmetric();
-        final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(tmpOrg, true);
+    Array1D<Double> getStandardDeviation();
 
-        for (int l = 0; l < 1000000; l++) {
-            tmpEvD.decompose(tmpOrg);
-        }
-
-    }
-
-    public SymmetricEigenvalueProfiling() {
-        super();
-    }
+    Array1D<Double> getVariance();
 
 }

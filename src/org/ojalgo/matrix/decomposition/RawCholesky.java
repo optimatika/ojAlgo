@@ -158,6 +158,11 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         }
     }
 
+    @Override
+    public boolean isSolvable() {
+        return super.isSolvable();
+    }
+
     public boolean isSPD() {
         return mySPD;
     }

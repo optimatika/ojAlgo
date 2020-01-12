@@ -169,6 +169,33 @@ public abstract class BasicArray<N extends Comparable<N>>
         myFactory = factory;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof BasicArray)) {
+            return false;
+        }
+        BasicArray other = (BasicArray) obj;
+        if (myFactory == null) {
+            if (other.myFactory != null) {
+                return false;
+            }
+        } else if (!myFactory.equals(other.myFactory)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+        return result;
+    }
+
     public long indexOfLargest() {
         return this.indexOfLargest(0L, this.count(), 1L);
     }

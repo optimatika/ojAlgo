@@ -51,7 +51,7 @@ import org.ojalgo.netio.ASCII;
  *
  * @author apete
  */
-public final class Hardware extends AbstractMachine implements Comparable<Hardware> {
+public final class Hardware extends CommonMachine implements Comparable<Hardware> {
 
     /**
      * Cache-line size is (typically) 64 bytes
@@ -231,7 +231,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
-     * <li>MacBookPro14,2
+     * <li>MacBookPro14,2 (oyster)
      * <ul>
      * <li>1 processors</li>
      * <li>2 cores per processor</li>

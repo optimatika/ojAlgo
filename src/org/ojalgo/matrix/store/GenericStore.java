@@ -42,7 +42,6 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.special.MissingMath;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.matrix.transformation.Householder;
@@ -54,7 +53,6 @@ import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * A generic implementation of {@linkplain PhysicalStore}.
@@ -73,7 +71,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         }
 
         public AggregatorSet<N> aggregator() {
-            return myDenseArrayFactory.aggregator();
+            return myDenseArrayFactory.function().aggregator();
         }
 
         public DenseArray.Factory<N> array() {
@@ -585,14 +583,32 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
         return this.doubleValue(row + (col * myRowDim));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public boolean equals(final Object anObj) {
-        if (anObj instanceof MatrixStore) {
-            return this.equals((MatrixStore<N>) anObj, NumberContext.getGeneral(6));
-        } else {
-            return super.equals(anObj);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof GenericStore)) {
+            return false;
+        }
+        GenericStore other = (GenericStore) obj;
+        if (myColDim != other.myColDim) {
+            return false;
+        }
+        if (myFactory == null) {
+            if (other.myFactory != null) {
+                return false;
+            }
+        } else if (!myFactory.equals(other.myFactory)) {
+            return false;
+        }
+        if (myRowDim != other.myRowDim) {
+            return false;
+        }
+        return true;
     }
 
     public void exchangeColumns(final long colA, final long colB) {
@@ -815,7 +831,12 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
 
     @Override
     public int hashCode() {
-        return MatrixUtils.hashCode(this);
+        final int prime = 31;
+        int result = super.hashCode();
+        result = (prime * result) + myColDim;
+        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+        result = (prime * result) + myRowDim;
+        return result;
     }
 
     public long indexOfLargestInColumn(final long row, final long col) {

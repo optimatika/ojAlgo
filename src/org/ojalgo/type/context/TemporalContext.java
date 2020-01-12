@@ -34,7 +34,7 @@ import java.time.temporal.TemporalAdjuster;
 public final class TemporalContext<T extends Temporal> implements TypeContext<T> {
 
     public static <T extends Temporal> TemporalContext<T> of(final DateTimeFormatter formatter) {
-        return new TemporalContext<>(formatter);
+        return new TemporalContext<>(formatter, null);
     }
 
     public static <T extends Temporal> TemporalContext<T> of(final DateTimeFormatter formatter, final TemporalAdjuster adjuster) {
@@ -43,12 +43,6 @@ public final class TemporalContext<T extends Temporal> implements TypeContext<T>
 
     private final TemporalAdjuster myAdjuster;
     private final DateTimeFormatter myFormatter;
-
-    TemporalContext(final DateTimeFormatter formatter) {
-        super();
-        myFormatter = formatter;
-        myAdjuster = null;
-    }
 
     TemporalContext(final DateTimeFormatter formatter, final TemporalAdjuster adjuster) {
         super();
@@ -69,17 +63,33 @@ public final class TemporalContext<T extends Temporal> implements TypeContext<T>
         return myFormatter.format((Temporal) object);
     }
 
+    /**
+     * @deprecated v49 Use {@link #withAdjuster(TemporalAdjuster)} instead
+     */
+    @Deprecated
     public TemporalContext<T> newAdjuster(final TemporalAdjuster adjuster) {
-        return new TemporalContext<>(myFormatter, adjuster);
+        return this.withAdjuster(adjuster);
     }
 
+    /**
+     * @deprecated v49 Use {@link #withFormatter(DateTimeFormatter)} instead
+     */
+    @Deprecated
     public TemporalContext<T> newFormatter(final DateTimeFormatter formatter) {
-        return new TemporalContext<>(formatter, myAdjuster);
+        return this.withFormatter(formatter);
     }
 
     @SuppressWarnings("unchecked")
     public T parse(final CharSequence text) {
         return (T) myFormatter.parse(text);
+    }
+
+    public TemporalContext<T> withAdjuster(final TemporalAdjuster adjuster) {
+        return new TemporalContext<>(myFormatter, adjuster);
+    }
+
+    public TemporalContext<T> withFormatter(final DateTimeFormatter formatter) {
+        return new TemporalContext<>(formatter, myAdjuster);
     }
 
 }

@@ -51,17 +51,6 @@ abstract class AbstractDecomposition<N extends Comparable<N>> implements MatrixD
         return myComputed;
     }
 
-    public final boolean isSolvable() {
-        if (myComputed && (mySolvable == null)) {
-            if (this instanceof MatrixDecomposition.Solver) {
-                mySolvable = Boolean.valueOf(this.checkSolvability());
-            } else {
-                mySolvable = Boolean.FALSE;
-            }
-        }
-        return myComputed && (mySolvable != null) && mySolvable.booleanValue();
-    }
-
     public void reset() {
         myComputed = false;
         mySolvable = null;
@@ -100,5 +89,16 @@ abstract class AbstractDecomposition<N extends Comparable<N>> implements MatrixD
     }
 
     protected abstract Scalar.Factory<N> scalar();
+
+    boolean isSolvable() {
+        if (myComputed && (mySolvable == null)) {
+            if (this instanceof MatrixDecomposition.Solver) {
+                mySolvable = Boolean.valueOf(this.checkSolvability());
+            } else {
+                mySolvable = Boolean.FALSE;
+            }
+        }
+        return myComputed && (mySolvable != null) && mySolvable.booleanValue();
+    }
 
 }

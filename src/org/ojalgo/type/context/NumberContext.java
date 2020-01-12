@@ -53,7 +53,7 @@ import org.ojalgo.type.format.NumberStyle;
  *
  * @author apete
  */
-public final class NumberContext extends FormatContext<Comparable<?>, NumberFormat> {
+public final class NumberContext extends FormatContext<Comparable<?>> {
 
     public interface Enforceable<T> {
 
@@ -347,6 +347,11 @@ public final class NumberContext extends FormatContext<Comparable<?>, NumberForm
         return this.format().format(number);
     }
 
+    @Override
+    public NumberFormat getFormat() {
+        return (NumberFormat) super.getFormat();
+    }
+
     public <N extends Comparable<N>> UnaryFunction<N> getFunction(final FunctionSet<N> functions) {
         return functions.enforce(this);
     }
@@ -502,27 +507,27 @@ public final class NumberContext extends FormatContext<Comparable<?>, NumberForm
     }
 
     public NumberContext withMathContext(final MathContext context) {
-        return new NumberContext(this.format(), context.getPrecision(), this.getScale(), context.getRoundingMode());
+        return new NumberContext((NumberFormat) this.format(), context.getPrecision(), this.getScale(), context.getRoundingMode());
     }
 
     public NumberContext withoutPrecision() {
-        return new NumberContext(this.format(), 0, this.getScale(), this.getRoundingMode());
+        return new NumberContext((NumberFormat) this.format(), 0, this.getScale(), this.getRoundingMode());
     }
 
     public NumberContext withoutScale() {
-        return new NumberContext(this.format(), this.getPrecision(), DEFAULT_SCALE, this.getRoundingMode());
+        return new NumberContext((NumberFormat) this.format(), this.getPrecision(), DEFAULT_SCALE, this.getRoundingMode());
     }
 
     public NumberContext withPrecision(final int precision) {
-        return new NumberContext(this.format(), precision, this.getScale(), this.getRoundingMode());
+        return new NumberContext((NumberFormat) this.format(), precision, this.getScale(), this.getRoundingMode());
     }
 
     public NumberContext withRoundingMode(final RoundingMode mode) {
-        return new NumberContext(this.format(), this.getPrecision(), this.getScale(), mode);
+        return new NumberContext((NumberFormat) this.format(), this.getPrecision(), this.getScale(), mode);
     }
 
     public NumberContext withScale(final int scale) {
-        return new NumberContext(this.format(), this.getPrecision(), scale, this.getRoundingMode());
+        return new NumberContext((NumberFormat) this.format(), this.getPrecision(), scale, this.getRoundingMode());
     }
 
     private BigDecimal scale(final BigDecimal number) {
@@ -538,7 +543,7 @@ public final class NumberContext extends FormatContext<Comparable<?>, NumberForm
     }
 
     @Override
-    protected void configureFormat(final NumberFormat format, final Object object) {
+    protected void configureFormat(final Format format, final Object object) {
 
         if (format instanceof DecimalFormat) {
 
@@ -558,12 +563,12 @@ public final class NumberContext extends FormatContext<Comparable<?>, NumberForm
     }
 
     @Override
-    protected String handleFormatException(final NumberFormat format, final Object object) {
+    protected String handleFormatException(final Format format, final Object object) {
         return "";
     }
 
     @Override
-    protected Comparable<?> handleParseException(final NumberFormat format, final String string) {
+    protected Comparable<?> handleParseException(final Format format, final String string) {
         return BigMath.ZERO;
     }
 

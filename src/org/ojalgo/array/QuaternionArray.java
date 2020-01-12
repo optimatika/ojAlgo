@@ -21,8 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.util.Arrays;
-
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.QuaternionFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -83,20 +81,6 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
 
     protected QuaternionArray(final Quaternion[] data) {
         super(FACTORY, data);
-    }
-
-    @Override
-    public boolean equals(final Object anObj) {
-        if (anObj instanceof QuaternionArray) {
-            return Arrays.equals(data, ((QuaternionArray) anObj).data);
-        } else {
-            return super.equals(anObj);
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(data);
     }
 
 }

@@ -29,7 +29,7 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 
-public final class Normal1D extends RandomNumber1D {
+public final class Normal1D extends AbstractDistribution1D {
 
     static Access2D<?> correlations(final Access2D<?> covariances) {
 
@@ -69,7 +69,7 @@ public final class Normal1D extends RandomNumber1D {
         final int tmpDim = (int) covariances.countRows();
 
         myLocations = Array1D.PRIMITIVE64.copy(locations);
-        myScales = Array1D.PRIMITIVE64.makeZero(tmpDim);
+        myScales = Array1D.PRIMITIVE64.make(tmpDim);
         for (int ij = 0; ij < tmpDim; ij++) {
             myScales.set(ij, PrimitiveMath.SQRT.invoke(covariances.doubleValue(ij, ij)));
         }

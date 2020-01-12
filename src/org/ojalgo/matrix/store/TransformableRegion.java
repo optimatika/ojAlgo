@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.store;
 
+import java.util.Arrays;
+
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.operation.MultiplyBoth;
 import org.ojalgo.function.NullaryFunction;
@@ -73,6 +75,28 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             return myBase.doubleValue(row, myColumns[(int) col]);
         }
 
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof ColumnsRegion)) {
+                return false;
+            }
+            ColumnsRegion other = (ColumnsRegion) obj;
+            if (myBase == null) {
+                if (other.myBase != null) {
+                    return false;
+                }
+            } else if (!myBase.equals(other.myBase)) {
+                return false;
+            }
+            if (!Arrays.equals(myColumns, other.myColumns)) {
+                return false;
+            }
+            return true;
+        }
+
         public void fillColumn(final long row, final long col, final Access1D<N> values) {
             myBase.fillColumn(row, myColumns[(int) col], values);
         }
@@ -99,6 +123,15 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
 
         public N get(final long row, final long col) {
             return myBase.get(row, myColumns[(int) col]);
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + ((myBase == null) ? 0 : myBase.hashCode());
+            result = (prime * result) + Arrays.hashCode(myColumns);
+            return result;
         }
 
         public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -157,6 +190,31 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             return myBase.doubleValue(row, col);
         }
 
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof LimitRegion)) {
+                return false;
+            }
+            LimitRegion other = (LimitRegion) obj;
+            if (myBase == null) {
+                if (other.myBase != null) {
+                    return false;
+                }
+            } else if (!myBase.equals(other.myBase)) {
+                return false;
+            }
+            if (myColumnLimit != other.myColumnLimit) {
+                return false;
+            }
+            if (myRowLimit != other.myRowLimit) {
+                return false;
+            }
+            return true;
+        }
+
         public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
             myBase.fillOne(row, col, values, valueIndex);
         }
@@ -171,6 +229,16 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
 
         public N get(final long row, final long col) {
             return myBase.get(row, col);
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + ((myBase == null) ? 0 : myBase.hashCode());
+            result = (prime * result) + myColumnLimit;
+            result = (prime * result) + myRowLimit;
+            return result;
         }
 
         public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -217,6 +285,31 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
 
         public double doubleValue(final long row, final long col) {
             return myBase.doubleValue(myRowOffset + row, myColumnOffset + col);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof OffsetRegion)) {
+                return false;
+            }
+            OffsetRegion other = (OffsetRegion) obj;
+            if (myBase == null) {
+                if (other.myBase != null) {
+                    return false;
+                }
+            } else if (!myBase.equals(other.myBase)) {
+                return false;
+            }
+            if (myColumnOffset != other.myColumnOffset) {
+                return false;
+            }
+            if (myRowOffset != other.myRowOffset) {
+                return false;
+            }
+            return true;
         }
 
         @Override
@@ -273,6 +366,16 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
 
         public N get(final long row, final long col) {
             return myBase.get(myRowOffset + row, myColumnOffset + col);
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + ((myBase == null) ? 0 : myBase.hashCode());
+            result = (prime * result) + myColumnOffset;
+            result = (prime * result) + myRowOffset;
+            return result;
         }
 
         public void modifyAll(final UnaryFunction<N> modifier) {
@@ -398,6 +501,28 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             return myBase.doubleValue(myRows[(int) row], col);
         }
 
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof RowsRegion)) {
+                return false;
+            }
+            RowsRegion other = (RowsRegion) obj;
+            if (myBase == null) {
+                if (other.myBase != null) {
+                    return false;
+                }
+            } else if (!myBase.equals(other.myBase)) {
+                return false;
+            }
+            if (!Arrays.equals(myRows, other.myRows)) {
+                return false;
+            }
+            return true;
+        }
+
         public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
             myBase.fillOne(myRows[(int) row], col, values, valueIndex);
         }
@@ -424,6 +549,15 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
 
         public N get(final long row, final long col) {
             return myBase.get(myRows[(int) row], col);
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + ((myBase == null) ? 0 : myBase.hashCode());
+            result = (prime * result) + Arrays.hashCode(myRows);
+            return result;
         }
 
         public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -473,6 +607,25 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
             return myBase.doubleValue(col, row);
         }
 
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof TransposedRegion)) {
+                return false;
+            }
+            TransposedRegion other = (TransposedRegion) obj;
+            if (myBase == null) {
+                if (other.myBase != null) {
+                    return false;
+                }
+            } else if (!myBase.equals(other.myBase)) {
+                return false;
+            }
+            return true;
+        }
+
         public void fillColumn(final long row, final long col, final N value) {
             myBase.fillRow(col, row, value);
         }
@@ -511,6 +664,14 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
 
         public N get(final long row, final long col) {
             return myBase.get(col, row);
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + ((myBase == null) ? 0 : myBase.hashCode());
+            return result;
         }
 
         public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {

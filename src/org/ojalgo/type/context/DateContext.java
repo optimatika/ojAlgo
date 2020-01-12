@@ -38,7 +38,7 @@ import org.ojalgo.type.format.DateStyle;
  *
  * @author apete
  */
-public final class DateContext extends FormatContext<Date, Format> {
+public final class DateContext extends FormatContext<Date> {
 
     private static final DatePart DEFAULT_PART = DatePart.DATETIME;
     private static final DateStyle DEFAULT_STYLE = DateStyle.SHORT;
@@ -112,13 +112,21 @@ public final class DateContext extends FormatContext<Date, Format> {
         }
     }
 
+    /**
+     * @deprecated v49 Use {@link #withFormat(DatePart,DateStyle,Locale)} instead
+     */
+    @Deprecated
     public TypeContext<Date> newFormat(final DatePart part, final DateStyle style, final Locale locale) {
+        return this.withFormat(part, style, locale);
+    }
+
+    public TypeContext<Date> withFormat(final DatePart part, final DateStyle style, final Locale locale) {
 
         final DatePart tmpPart = part != null ? part : this.getPart();
         final DateStyle tmpStyle = style != null ? style : this.getStyle();
         final Locale tmpLocale = locale != null ? locale : Locale.getDefault();
 
-        return this.newFormat(DateContext.toFormat(tmpPart, tmpStyle, tmpLocale));
+        return this.withFormat(DateContext.toFormat(tmpPart, tmpStyle, tmpLocale));
     }
 
     @Override

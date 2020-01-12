@@ -224,6 +224,11 @@ abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecompos
         return myPivot.isModified();
     }
 
+    @Override
+    public boolean isSolvable() {
+        return super.isSolvable();
+    }
+
     public PhysicalStore<N> preallocate(final Structure2D template) {
         long tmpCountRows = template.countRows();
         return this.allocate(tmpCountRows, tmpCountRows);

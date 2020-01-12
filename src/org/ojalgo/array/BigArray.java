@@ -97,20 +97,6 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    public boolean equals(final Object other) {
-        if (other instanceof BigArray) {
-            return Arrays.equals(data, ((BigArray) other).data);
-        } else {
-            return super.equals(other);
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(data);
-    }
-
-    @Override
     public final void sortAscending() {
         Arrays.parallelSort(data);
     }
@@ -143,6 +129,11 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     @Override
     protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
         data[index] = this.valueOf(values.get(valueIndex));
+    }
+
+    @Override
+    protected final float floatValue(final int index) {
+        return data[index].floatValue();
     }
 
     @Override
