@@ -356,9 +356,21 @@ public final class Hardware extends CommonMachine implements Comparable<Hardware
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
+     * <li>OCTOPUS / MacBookPro16,1
+     * <ul>
+     * <li>1 processors</li>
+     * <li>8 cores per processor (8 cores in total)</li>
+     * <li>2 threads per core (16 threads in total)</li>
+     * <li>===</li>
+     * <li>64GB system RAM</li>
+     * <li>16MB L3 cache per processor</li>
+     * <li>256kB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
      * </ul>
      */
-    static final Hardware X86_64__16 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(12L * K * K * K, 16), new BasicMachine(8L * K * K, 8),
+    static final Hardware X86_64__16 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(64L * K * K * K, 16), new BasicMachine(8L * K * K, 16),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     /**
