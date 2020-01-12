@@ -104,7 +104,7 @@ public abstract class OjAlgoUtils {
 
         String manifestValue = OjAlgoUtils.class.getPackage().getImplementationVersion();
 
-        return manifestValue != null ? manifestValue : "X.X";
+        return manifestValue != null ? manifestValue : "X.Y.Z";
     }
 
     /**
@@ -144,7 +144,7 @@ public abstract class OjAlgoUtils {
     public static void main(final String[] args) {
         BasicLogger.debug();
         BasicLogger.debug("####################################################################");
-        BasicLogger.debug("#################### Welcome to oj! Algorithms! ####################");
+        BasicLogger.debug("#################### Welcome to oj! Algorithms #####################");
         BasicLogger.debug("####################################################################");
         BasicLogger.debug("{} version {} built by {}.", OjAlgoUtils.getTitle(), OjAlgoUtils.getVersion(), OjAlgoUtils.getVendor());
         BasicLogger.debug("####################################################################");

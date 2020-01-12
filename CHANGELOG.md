@@ -15,6 +15,20 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 ## [48.1.0] – 2020-01-??
 
+### Changed
+
+- A number of minor changes to improve interoperability with other JVM languages. Essentially tried to remove all cases with public methods declared in non-public abstract classes.
+
+#### org.ojalgo.array
+
+- Reviewed equals() and hashCode() implementations for most classes
+- Explicitly/correctly implemented doubleValue(long) and floatValue(long) methods in more classes
+
+### Fixed
+
+#### org.ojalgo.array
+
+- A case of infinitite loop with (some) fillOne(...) methods
 
 
 ## [48.0.0] – 2019-11-24
