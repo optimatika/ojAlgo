@@ -126,7 +126,7 @@ public class TestHardware {
 
         final int tmpThreads = 16;
         final int tmpCores = 8;
-        final int tmpUnits = 2;
+        final int tmpUnits = 1;
 
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
     }
