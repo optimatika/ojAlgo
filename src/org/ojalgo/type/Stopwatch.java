@@ -131,6 +131,29 @@ public class Stopwatch {
     }
 
     /**
+     * Will reset the start-instant and return duration since it was last reset in the specified unit.
+     */
+    public long reset(CalendarDateUnit unit) {
+        long now = System.nanoTime();
+        long nanos = now - myStart;
+        myStart = now;
+        return nanos / unit.toDurationInNanos();
+    }
+
+    /**
+     * Does {@link #stop()} AND {@link #reset()}
+     */
+    public CalendarDateDuration restart() {
+        long nanos = this.countNanos();
+        this.reset();
+        return CalendarDateDuration.of(nanos);
+    }
+
+    public CalendarDateDuration restart(final CalendarDateUnit unit) {
+        return this.restart().convertTo(unit);
+    }
+
+    /**
      * This method can be called repeatedly without resetting (doesn't actually stop the timing process)
      *
      * @return The duration since instantiation or reset.

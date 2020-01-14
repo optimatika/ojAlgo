@@ -24,6 +24,10 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 - Reviewed equals() and hashCode() implementations for most classes
 - Explicitly/correctly implemented doubleValue(long) and floatValue(long) methods in more classes
 
+#### org.ojalgo.type
+
+- It is now possible to "stop" and "reset" the Stopwatch with a single method call.
+
 ### Fixed
 
 #### org.ojalgo.array
