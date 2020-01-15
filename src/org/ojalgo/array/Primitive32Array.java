@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -125,12 +125,21 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
-    public boolean equals(final Object anObj) {
-        if (anObj instanceof Primitive32Array) {
-            return Arrays.equals(data, ((Primitive32Array) anObj).data);
-        } else {
-            return super.equals(anObj);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof Primitive32Array)) {
+            return false;
+        }
+        Primitive32Array other = (Primitive32Array) obj;
+        if (!Arrays.equals(data, other.data)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -152,7 +161,10 @@ public class Primitive32Array extends PrimitiveArray {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(data);
+        final int prime = 31;
+        int result = super.hashCode();
+        result = (prime * result) + Arrays.hashCode(data);
+        return result;
     }
 
     @Override
@@ -238,8 +250,13 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
-    protected void fillOne(final int index, final NullaryFunction<Double> supplier) {
-        data[index] = (float) supplier.doubleValue();
+    protected void fillOne(final int index, final NullaryFunction<?> supplier) {
+        data[index] = supplier.floatValue();
+    }
+
+    @Override
+    protected float floatValue(int index) {
+        return data[index];
     }
 
     @Override

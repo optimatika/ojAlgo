@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,6 @@
  * SOFTWARE.
  */
 package org.ojalgo.array;
-
-import java.util.Arrays;
 
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.FunctionSet;
@@ -83,20 +81,6 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
 
     protected ComplexArray(final int size) {
         super(FACTORY, size);
-    }
-
-    @Override
-    public boolean equals(final Object anObj) {
-        if (anObj instanceof ComplexArray) {
-            return Arrays.equals(data, ((ComplexArray) anObj).data);
-        } else {
-            return super.equals(anObj);
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(data);
     }
 
 }

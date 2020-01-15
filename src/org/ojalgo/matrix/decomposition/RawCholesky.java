@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -156,6 +156,11 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         } else {
             throw RecoverableCondition.newMatrixNotInvertible();
         }
+    }
+
+    @Override
+    public boolean isSolvable() {
+        return super.isSolvable();
     }
 
     public boolean isSPD() {

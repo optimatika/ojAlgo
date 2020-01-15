@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,12 @@ import org.ojalgo.random.ContinuousDistribution;
 import org.ojalgo.random.Distribution;
 import org.ojalgo.type.keyvalue.ComparableToDouble;
 
-abstract class AbstractProcess<D extends Distribution> implements RandomProcess<D> {
+/**
+ * @deprecated Don't reference this class directly. Use the superinterface {@link RandomProcess} or one of the
+ *             subclasses instead. This class will be refactored and/or made private.
+ */
+@Deprecated
+public abstract class AbstractProcess<D extends Distribution> implements RandomProcess<D> {
 
     private final TreeSet<ComparableToDouble<Double>> myObservations = new TreeSet<>();
 
@@ -108,7 +113,7 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
         final List<ComparableToDouble<Double>> tmpInitialState = new ArrayList<>(myObservations);
         final double tmpInitialValue = this.getValue();
 
-        final Array2D<Double> tmpRealisationValues = Array2D.PRIMITIVE64.makeZero(numberOfRealisations, numberOfSteps);
+        final Array2D<Double> tmpRealisationValues = Array2D.PRIMITIVE64.make(numberOfRealisations, numberOfSteps);
 
         for (int r = 0; r < numberOfRealisations; r++) {
             double tmpCurrentValue = tmpInitialValue;

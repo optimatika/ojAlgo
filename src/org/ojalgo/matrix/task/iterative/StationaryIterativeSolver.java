@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
  * @see <a href="https://mathworld.wolfram.com/StationaryIterativeMethod.html">StationaryIterativeMethod</a>
  * @author apete
  */
-abstract class StationaryIterativeSolver extends IterativeSolverTask {
+public abstract class StationaryIterativeSolver extends IterativeSolverTask {
 
     private double myRelaxationFactor = ONE;
 

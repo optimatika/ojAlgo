@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 package org.ojalgo.random;
+
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 public interface ContinuousDistribution extends Distribution {
 
@@ -49,6 +51,10 @@ public interface ContinuousDistribution extends Distribution {
      */
     double getDistribution(double value);
 
+    default double getLowerConfidenceQuantile(final double confidence) {
+        return this.getQuantile((ONE - confidence) / TWO);
+    }
+
     /**
      * In probability theory, a probability density function (pdf), or density of a continuous random variable
      * is a function that describes the relative likelihood for this random variable to occur at a given
@@ -76,5 +82,9 @@ public interface ContinuousDistribution extends Distribution {
      * @return x
      */
     double getQuantile(double probability);
+
+    default double getUpperConfidenceQuantile(final double confidence) {
+        return this.getQuantile(ONE - ((ONE - confidence) / TWO));
+    }
 
 }

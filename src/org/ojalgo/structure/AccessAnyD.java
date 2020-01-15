@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -145,7 +145,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
         };
     }
 
-    static boolean equals(final AccessAnyD<?> accessA, final AccessAnyD<?> accessB, final NumberContext context) {
+    static boolean equals(final AccessAnyD<?> accessA, final AccessAnyD<?> accessB, final NumberContext accuracy) {
 
         boolean retVal = true;
         int d = 0;
@@ -157,7 +157,7 @@ public interface AccessAnyD<N extends Comparable<N>> extends StructureAnyD, Acce
             d++;
         } while (retVal && ((d <= 3) || (tmpCount > 1)));
 
-        return retVal && Access1D.equals(accessA, accessB, context);
+        return retVal && Access1D.equals(accessA, accessB, accuracy);
     }
 
     default <NN extends Comparable<NN>, R extends MutateAnyD.Receiver<NN>> Collectable<NN, R> asCollectableAnyD() {

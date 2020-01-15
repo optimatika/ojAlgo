@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,10 +34,9 @@ import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
 import org.ojalgo.structure.Transformation2D;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class Quaternion implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, Transformation2D<Double>,
-        Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
+public final class Quaternion
+        implements SelfDeclaringScalar<Quaternion>, Access2D<Double>, Transformation2D<Double>, Access2D.Collectable<Double, Mutate2D.Receiver<Double>> {
 
     public enum RotationAxis {
 

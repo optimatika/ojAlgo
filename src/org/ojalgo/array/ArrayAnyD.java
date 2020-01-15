@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -218,15 +218,26 @@ public final class ArrayAnyD<N extends Comparable<N>>
         return myDelegate.doubleValue(StructureAnyD.index(myStructure, ref));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public boolean equals(final Object obj) {
-        if (obj instanceof ArrayAnyD) {
-            final ArrayAnyD<N> tmpObj = (ArrayAnyD<N>) obj;
-            return Arrays.equals(myStructure, tmpObj.shape()) && myDelegate.equals(tmpObj.getDelegate());
-        } else {
-            return super.equals(obj);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
+        if (!(obj instanceof ArrayAnyD)) {
+            return false;
+        }
+        ArrayAnyD<?> other = (ArrayAnyD<?>) obj;
+        if (!Arrays.equals(myStructure, other.myStructure)) {
+            return false;
+        }
+        if (myDelegate == null) {
+            if (other.myDelegate != null) {
+                return false;
+            }
+        } else if (!myDelegate.equals(other.myDelegate)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -306,7 +317,11 @@ public final class ArrayAnyD<N extends Comparable<N>>
 
     @Override
     public int hashCode() {
-        return myDelegate.hashCode();
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + ((myDelegate == null) ? 0 : myDelegate.hashCode());
+        result = (prime * result) + Arrays.hashCode(myStructure);
+        return result;
     }
 
     @Override

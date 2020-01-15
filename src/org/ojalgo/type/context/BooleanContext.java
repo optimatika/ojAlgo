@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,11 +27,9 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.type.format.BooleanFormat;
 
 /**
- * BooleanContext
- *
  * @author apete
  */
-public final class BooleanContext extends FormatContext<Boolean, Format> {
+public final class BooleanContext extends FormatContext<Boolean> {
 
     private static final Format DEFAULT_FORMAT = new BooleanFormat();
 

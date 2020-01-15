@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicLogger;
 
-public final class VirtualMachine extends AbstractMachine {
+public final class VirtualMachine extends CommonMachine {
 
     private static final String AMD64 = "amd64";
     private static final String I386 = "i386";
@@ -117,11 +117,11 @@ public final class VirtualMachine extends AbstractMachine {
     }
 
     public int getAvailableDim1D(final long elementSize) {
-        return (int) AbstractMachine.elements(this.getAvailableMemory(), elementSize);
+        return (int) CommonMachine.elements(this.getAvailableMemory(), elementSize);
     }
 
     public int getAvailableDim2D(final long elementSize) {
-        return (int) PrimitiveMath.SQRT.invoke(AbstractMachine.elements(this.getAvailableMemory(), elementSize));
+        return (int) PrimitiveMath.SQRT.invoke(CommonMachine.elements(this.getAvailableMemory(), elementSize));
     }
 
     public long getAvailableMemory() {

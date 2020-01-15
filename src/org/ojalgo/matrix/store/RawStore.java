@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import java.io.BufferedReader;
 import java.io.StreamTokenizer;
 import java.util.AbstractList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
@@ -53,7 +54,6 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Uses double[][] internally.
@@ -692,12 +692,21 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     @Override
-    public boolean equals(final Object other) {
-        if (other instanceof Access2D<?>) {
-            return Access2D.equals(this, (Access2D<?>) other, NumberContext.getGeneral(6));
-        } else {
-            return super.equals(other);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
+        if (!(obj instanceof RawStore)) {
+            return false;
+        }
+        RawStore other = (RawStore) obj;
+        if (myNumberOfColumns != other.myNumberOfColumns) {
+            return false;
+        }
+        if (!Arrays.deepEquals(data, other.data)) {
+            return false;
+        }
+        return true;
     }
 
     public void exchangeColumns(final long colA, final long colB) {
@@ -861,7 +870,11 @@ public final class RawStore implements PhysicalStore<Double> {
 
     @Override
     public int hashCode() {
-        return Access1D.hashCode(this);
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + Arrays.deepHashCode(data);
+        result = (prime * result) + myNumberOfColumns;
+        return result;
     }
 
     public long indexOfLargest() {

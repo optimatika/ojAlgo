@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -388,15 +388,29 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
         return myDelegate.doubleValue(Structure2D.index(myRowsCount, row, col));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public boolean equals(final Object obj) {
-        if (obj instanceof Array2D) {
-            final Array2D<N> tmpObj = (Array2D<N>) obj;
-            return (myRowsCount == tmpObj.countRows()) && (myColumnsCount == tmpObj.countColumns()) && myDelegate.equals(tmpObj.getDelegate());
-        } else {
-            return super.equals(obj);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
+        if (!(obj instanceof Array2D)) {
+            return false;
+        }
+        Array2D<?> other = (Array2D<?>) obj;
+        if (myRowsCount != other.myRowsCount) {
+            return false;
+        }
+        if (myColumnsCount != other.myColumnsCount) {
+            return false;
+        }
+        if (myDelegate == null) {
+            if (other.myDelegate != null) {
+                return false;
+            }
+        } else if (!myDelegate.equals(other.myDelegate)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -537,7 +551,12 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
 
     @Override
     public int hashCode() {
-        return (int) (myRowsCount * myColumnsCount * myDelegate.hashCode());
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + (int) (myColumnsCount ^ (myColumnsCount >>> 32));
+        result = (prime * result) + ((myDelegate == null) ? 0 : myDelegate.hashCode());
+        result = (prime * result) + (int) (myRowsCount ^ (myRowsCount >>> 32));
+        return result;
     }
 
     @Override

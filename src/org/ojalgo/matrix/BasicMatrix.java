@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -58,15 +58,13 @@ import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * <p>
- * This interface declares a limited set of high level methods for linear algebra. If this is not enough for
- * your use case, then look at the various interfaces/classes in the {@linkplain org.ojalgo.matrix.store}
+ * This abstract class declares a limited set of high level methods for linear algebra. If this is not enough
+ * for your use case, then look at the various interfaces/classes in the {@linkplain org.ojalgo.matrix.store}
  * and/or {@linkplain org.ojalgo.matrix.decomposition} packages.
- * </p>
  *
  * @author apete
  */
-abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>> implements NormedVectorSpace<M, N>, Operation.Subtraction<M>,
+public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix<N, M>> implements NormedVectorSpace<M, N>, Operation.Subtraction<M>,
         Operation.Multiplication<M>, ScalarOperation.Addition<M, N>, ScalarOperation.Division<M, N>, ScalarOperation.Subtraction<M, N>, Access2D<N>,
         Access2D.Elements, Access2D.Aggregatable<N>, Structure2D.ReducibleTo1D<M>, NumberContext.Enforceable<M>, Access2D.Collectable<N, PhysicalStore<N>> {
 

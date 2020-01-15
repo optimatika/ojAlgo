@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,9 +59,9 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     public static final SparseStore.Factory<ComplexNumber> COMPLEX = (rowsCount, columnsCount) -> SparseStore.makeComplex((int) rowsCount, (int) columnsCount);
 
-    public static final SparseStore.Factory<Double> PRIMITIVE64 = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
-
     public static final SparseStore.Factory<Double> PRIMITIVE32 = (rowsCount, columnsCount) -> SparseStore.makePrimitive32((int) rowsCount, (int) columnsCount);
+
+    public static final SparseStore.Factory<Double> PRIMITIVE64 = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
 
     public static final SparseStore.Factory<Quaternion> QUATERNION = (rowsCount, columnsCount) -> SparseStore.makeQuaternion((int) rowsCount,
             (int) columnsCount);
@@ -153,6 +153,34 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         return myElements.doubleValue(Structure2D.index(myFirsts.length, row, col));
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof SparseStore)) {
+            return false;
+        }
+        SparseStore<?> other = (SparseStore<?>) obj;
+        if (myElements == null) {
+            if (other.myElements != null) {
+                return false;
+            }
+        } else if (!myElements.equals(other.myElements)) {
+            return false;
+        }
+        if (!Arrays.equals(myFirsts, other.myFirsts)) {
+            return false;
+        }
+        if (!Arrays.equals(myLimits, other.myLimits)) {
+            return false;
+        }
+        return true;
+    }
+
     public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
 
         final int complexity = Math.toIntExact(left.count() / this.countRows());
@@ -199,6 +227,16 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
     public N get(final long row, final long col) {
         return myElements.get(Structure2D.index(myFirsts.length, row, col));
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = (prime * result) + ((myElements == null) ? 0 : myElements.hashCode());
+        result = (prime * result) + Arrays.hashCode(myFirsts);
+        result = (prime * result) + Arrays.hashCode(myLimits);
+        return result;
     }
 
     @Override
@@ -373,7 +411,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         } else {
 
-            final PhysicalStore<N> retVal = this.physical().makeZero(numberOfRows, numberOfColumns);
+            final PhysicalStore<N> retVal = this.physical().make(numberOfRows, numberOfColumns);
 
             this.multiply(right, retVal);
 

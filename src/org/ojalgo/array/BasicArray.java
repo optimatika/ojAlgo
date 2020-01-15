@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -167,6 +167,33 @@ public abstract class BasicArray<N extends Comparable<N>>
     protected BasicArray(final ArrayFactory<N, ?> factory) {
         super();
         myFactory = factory;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof BasicArray)) {
+            return false;
+        }
+        BasicArray other = (BasicArray) obj;
+        if (myFactory == null) {
+            if (other.myFactory != null) {
+                return false;
+            }
+        } else if (!myFactory.equals(other.myFactory)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+        return result;
     }
 
     public long indexOfLargest() {

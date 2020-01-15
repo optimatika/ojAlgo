@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -128,7 +128,7 @@ final class AnyTensor<N extends Comparable<N>> implements Tensor<N> {
     }
 
     public double norm() {
-        final AggregatorFunction<N> tmpNorm2 = myArrayFactory.aggregator().norm2();
+        final AggregatorFunction<N> tmpNorm2 = myArrayFactory.function().aggregator().norm2();
         myArray.visitAll(tmpNorm2);
         return tmpNorm2.doubleValue();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class IterativeSolverTask implements SolverTask<Double> {
+public abstract class IterativeSolverTask implements SolverTask<Double> {
 
     public static final class Configurator {
 
@@ -88,7 +88,7 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
 
     }
 
-    interface SparseDelegate {
+    public interface SparseDelegate {
 
         double resolve(List<Equation> equations, final PhysicalStore<Double> solution);
 

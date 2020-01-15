@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -128,6 +128,29 @@ public class Stopwatch {
      */
     public void reset() {
         myStart = System.nanoTime();
+    }
+
+    /**
+     * Will reset the start-instant and return duration since it was last reset in the specified unit.
+     */
+    public long reset(CalendarDateUnit unit) {
+        long now = System.nanoTime();
+        long nanos = now - myStart;
+        myStart = now;
+        return nanos / unit.toDurationInNanos();
+    }
+
+    /**
+     * Does {@link #stop()} AND {@link #reset()}
+     */
+    public CalendarDateDuration restart() {
+        long nanos = this.countNanos();
+        this.reset();
+        return CalendarDateDuration.of(nanos);
+    }
+
+    public CalendarDateDuration restart(final CalendarDateUnit unit) {
+        return this.restart().convertTo(unit);
     }
 
     /**

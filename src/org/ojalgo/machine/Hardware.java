@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ import org.ojalgo.netio.ASCII;
  *
  * @author apete
  */
-public final class Hardware extends AbstractMachine implements Comparable<Hardware> {
+public final class Hardware extends CommonMachine implements Comparable<Hardware> {
 
     /**
      * Cache-line size is (typically) 64 bytes
@@ -231,7 +231,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
-     * <li>MacBookPro14,2
+     * <li>MacBookPro14,2 (oyster)
      * <ul>
      * <li>1 processors</li>
      * <li>2 cores per processor</li>
@@ -356,9 +356,21 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
+     * <li>OCTOPUS / MacBookPro16,1
+     * <ul>
+     * <li>1 processors</li>
+     * <li>8 cores per processor (8 cores in total)</li>
+     * <li>2 threads per core (16 threads in total)</li>
+     * <li>===</li>
+     * <li>64GB system RAM</li>
+     * <li>16MB L3 cache per processor</li>
+     * <li>256kB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
      * </ul>
      */
-    static final Hardware X86_64__16 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(12L * K * K * K, 16), new BasicMachine(8L * K * K, 8),
+    static final Hardware X86_64__16 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(64L * K * K * K, 16), new BasicMachine(8L * K * K, 16),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     /**

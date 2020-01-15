@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,12 @@ package org.ojalgo.machine;
 
 import org.ojalgo.type.IntCount;
 
-abstract class AbstractMachine extends BasicMachine {
+/**
+ * Stuff common to {@link Hardware} and {@link VirtualMachine}.
+ *
+ * @author apete
+ */
+public abstract class CommonMachine extends BasicMachine {
 
     static final long K = 1024L;
 
@@ -47,7 +52,7 @@ abstract class AbstractMachine extends BasicMachine {
      */
     public final int units;
 
-    protected AbstractMachine(final Hardware hardware, final Runtime runtime) {
+    protected CommonMachine(final Hardware hardware, final Runtime runtime) {
 
         super(Math.min(hardware.memory, runtime.maxMemory()), Math.min(hardware.threads, runtime.availableProcessors()));
 
@@ -64,7 +69,7 @@ abstract class AbstractMachine extends BasicMachine {
      * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or in worst case
      * <code>new MemoryThreads[] { SYSTEM, L1 }</code>
      */
-    protected AbstractMachine(final String architecture, final BasicMachine[] levels) {
+    protected CommonMachine(final String architecture, final BasicMachine[] levels) {
 
         super(levels[0].memory, levels[0].threads);
 
@@ -75,7 +80,7 @@ abstract class AbstractMachine extends BasicMachine {
         units = threads / levels[1].threads;
     }
 
-    AbstractMachine(final VirtualMachine base, final int modUnits, final int modCores, final int modThreads) {
+    CommonMachine(final VirtualMachine base, final int modUnits, final int modCores, final int modThreads) {
         super(base.memory, modThreads);
         architecture = base.architecture;
         cache = base.cache;
@@ -83,15 +88,15 @@ abstract class AbstractMachine extends BasicMachine {
         units = modUnits;
     }
 
-    public IntCount countCores() {
+    public final IntCount countCores() {
         return new IntCount(cores);
     }
 
-    public IntCount countThreads() {
+    public final IntCount countThreads() {
         return new IntCount(threads);
     }
 
-    public IntCount countUnits() {
+    public final IntCount countUnits() {
         return new IntCount(units);
     }
 
@@ -103,10 +108,10 @@ abstract class AbstractMachine extends BasicMachine {
         if (!super.equals(obj)) {
             return false;
         }
-        if (!(obj instanceof AbstractMachine)) {
+        if (!(obj instanceof CommonMachine)) {
             return false;
         }
-        AbstractMachine other = (AbstractMachine) obj;
+        CommonMachine other = (CommonMachine) obj;
         if (architecture == null) {
             if (other.architecture != null) {
                 return false;
@@ -126,12 +131,12 @@ abstract class AbstractMachine extends BasicMachine {
         return true;
     }
 
-    public long getCacheElements(final long elementSize) {
-        return AbstractMachine.elements(cache, elementSize);
+    public final long getCacheElements(final long elementSize) {
+        return CommonMachine.elements(cache, elementSize);
     }
 
-    public long getMemoryElements(final long elementSize) {
-        return AbstractMachine.elements(memory, elementSize);
+    public final long getMemoryElements(final long elementSize) {
+        return CommonMachine.elements(memory, elementSize);
     }
 
     @Override
@@ -145,15 +150,15 @@ abstract class AbstractMachine extends BasicMachine {
         return result;
     }
 
-    public boolean isMultiCore() {
+    public final boolean isMultiCore() {
         return cores > 1;
     }
 
-    public boolean isMultiThread() {
+    public final boolean isMultiThread() {
         return threads > 1;
     }
 
-    public boolean isMultiUnit() {
+    public final boolean isMultiUnit() {
         return units > 1;
     }
 

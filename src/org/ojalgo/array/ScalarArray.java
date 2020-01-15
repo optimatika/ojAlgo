@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -83,6 +83,11 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     @Override
     protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
         data[index] = this.valueOf(values.get(valueIndex));
+    }
+
+    @Override
+    protected final float floatValue(final int index) {
+        return data[index].floatValue();
     }
 
     @Override

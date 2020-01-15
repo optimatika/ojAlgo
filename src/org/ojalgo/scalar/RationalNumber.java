@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,9 +28,8 @@ import java.math.MathContext;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class RationalNumber implements Scalar<RationalNumber>, Enforceable<RationalNumber> {
+public final class RationalNumber implements SelfDeclaringScalar<RationalNumber> {
 
     public static final Scalar.Factory<RationalNumber> FACTORY = new Scalar.Factory<RationalNumber>() {
 

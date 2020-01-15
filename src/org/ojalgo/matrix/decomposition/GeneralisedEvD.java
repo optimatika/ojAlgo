@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,12 +33,12 @@ final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposit
     private final Cholesky<N> myCholesky;
     private final Eigenvalue<N> myEigenvalue;
     private final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> myFactory;
-    private final Eigenvalue.Generalisation myType;
     private transient PhysicalStore<N> myRecovered = null;
     /**
      * C
      */
     private transient PhysicalStore<N> myReduced = null;
+    private final Eigenvalue.Generalisation myType;
 
     GeneralisedEvD(final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory, final Cholesky<N> cholesky, final Eigenvalue<N> eigenvalue,
             final Eigenvalue.Generalisation type) {

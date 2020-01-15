@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -404,6 +404,40 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof Array1D)) {
+            return false;
+        }
+        Array1D<?> other = (Array1D<?>) obj;
+        if (length != other.length) {
+            return false;
+        }
+        if (myFirst != other.myFirst) {
+            return false;
+        }
+        if (myLimit != other.myLimit) {
+            return false;
+        }
+        if (myStep != other.myStep) {
+            return false;
+        }
+        if (myDelegate == null) {
+            if (other.myDelegate != null) {
+                return false;
+            }
+        } else if (!myDelegate.equals(other.myDelegate)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public void fillAll(final N value) {
         myDelegate.fill(myFirst, myLimit, myStep, value);
     }
@@ -452,6 +486,18 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     @Override
     public N get(final long index) {
         return myDelegate.get(myFirst + (myStep * index));
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = (prime * result) + (int) (length ^ (length >>> 32));
+        result = (prime * result) + ((myDelegate == null) ? 0 : myDelegate.hashCode());
+        result = (prime * result) + (int) (myFirst ^ (myFirst >>> 32));
+        result = (prime * result) + (int) (myLimit ^ (myLimit >>> 32));
+        result = (prime * result) + (int) (myStep ^ (myStep >>> 32));
+        return result;
     }
 
     @Override

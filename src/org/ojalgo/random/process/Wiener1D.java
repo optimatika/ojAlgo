@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,10 +23,13 @@ package org.ojalgo.random.process;
 
 import java.util.List;
 
-import org.ojalgo.random.Normal;
 import org.ojalgo.structure.Access2D;
 
-public class Wiener1D extends Process1D<Normal, WienerProcess> {
+/**
+ * @deprecated v49 Use the superclass {@link Process1D} instead.
+ */
+@Deprecated
+public class Wiener1D extends Process1D<WienerProcess> {
 
     public Wiener1D(final Access2D<?> correlations, final List<? extends WienerProcess> processes) {
         super(correlations, processes);

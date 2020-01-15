@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,14 +26,13 @@ import java.math.BigDecimal;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.type.context.NumberContext;
-import org.ojalgo.type.context.NumberContext.Enforceable;
 
 /**
  * To help implement exact decimal numbers with a fixed number of decimal places (fixed scale).
  *
  * @author apete
  */
-public abstract class ExactDecimal<S extends ExactDecimal<S>> implements Scalar<S>, Enforceable<S> {
+public abstract class ExactDecimal<S extends ExactDecimal<S>> implements SelfDeclaringScalar<S> {
 
     public static final class Descriptor {
 

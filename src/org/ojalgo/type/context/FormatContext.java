@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,23 +32,22 @@ import org.ojalgo.netio.ASCII;
  *
  * @author apete
  */
-abstract class FormatContext<T, F extends Format> implements TypeContext<T> {
+public abstract class FormatContext<T> implements TypeContext<T> {
 
     /**
      * Use 'Non-Breaking SPace' character instead of ardinary 'space' character.
      */
     public static final boolean NBSP = true;
     private boolean myConfigured = false;
-    private final F myFormat;
+    private final Format myFormat;
 
-    @SuppressWarnings("unchecked")
-    FormatContext(final F format) {
+    FormatContext(final Format format) {
 
         super();
 
         ProgrammingError.throwIfNull(format);
 
-        myFormat = (F) format.clone();
+        myFormat = (Format) format.clone();
     }
 
     /**
@@ -83,13 +82,16 @@ abstract class FormatContext<T, F extends Format> implements TypeContext<T> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public final F getFormat() {
-        return (F) this.format().clone();
+    public Format getFormat() {
+        return (Format) this.format().clone();
     }
 
-    public final <G> TypeContext<G> newFormat(final F format) {
-        return new GenericContext<>(this, format);
+    /**
+     * @deprecated v49 Use {@link #withFormat(F)} instead
+     */
+    @Deprecated
+    public final <G> TypeContext<G> newFormat(final Format format) {
+        return this.withFormat(format);
     }
 
     /**
@@ -113,13 +115,17 @@ abstract class FormatContext<T, F extends Format> implements TypeContext<T> {
         }
     }
 
-    protected abstract void configureFormat(F format, Object object);
+    public final <G> TypeContext<G> withFormat(final Format format) {
+        return new GenericContext<>(this, format);
+    }
 
-    protected abstract String handleFormatException(F format, Object object);
+    protected abstract void configureFormat(Format format, Object object);
 
-    protected abstract T handleParseException(F format, String string);
+    protected abstract String handleFormatException(Format format, Object object);
 
-    final F format() {
+    protected abstract T handleParseException(Format format, String string);
+
+    final Format format() {
         return myFormat;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2019 Optimatika
+ * Copyright 1997-2020 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.DoubleAdder;
 
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -251,35 +250,29 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         };
     }
 
-    @SuppressWarnings("unchecked")
-    static boolean equals(final Access1D<?> accessA, final Access1D<?> accessB, final NumberContext context) {
+    /**
+     * Tests if the two data strauctures are numerically equal to the given accuracy. (Only works with real
+     * numbers, and can't handle more than "double precision".)
+     */
+    static boolean equals(final Access1D<?> accessA, final Access1D<?> accessB, final NumberContext accuracy) {
 
-        final long tmpLength = accessA.count();
+        long length = accessA.count();
 
-        boolean retVal = tmpLength == accessB.count();
+        boolean retVal = length == accessB.count();
 
-        if ((accessA.get(0) instanceof ComplexNumber) && (accessB.get(0) instanceof ComplexNumber)) {
-
-            final Access1D<ComplexNumber> tmpAccessA = (Access1D<ComplexNumber>) accessA;
-            final Access1D<ComplexNumber> tmpAccessB = (Access1D<ComplexNumber>) accessB;
-
-            for (int i = 0; retVal && (i < tmpLength); i++) {
-                retVal &= !context.isDifferent(tmpAccessA.get(i).getReal(), tmpAccessB.get(i).getReal());
-                retVal &= !context.isDifferent(tmpAccessA.get(i).i, tmpAccessB.get(i).i);
-            }
-
-        } else {
-
-            for (int i = 0; retVal && (i < tmpLength); i++) {
-                retVal &= !context.isDifferent(accessA.doubleValue(i), accessB.doubleValue(i));
-            }
+        for (int i = 0; retVal && (i < length); i++) {
+            retVal &= !accuracy.isDifferent(accessA.doubleValue(i), accessB.doubleValue(i));
         }
 
         return retVal;
     }
 
+    /**
+     * @deprecated v49 Implement your own
+     */
+    @Deprecated
     static int hashCode(final Access1D<?> access) {
-        final int limit = (int) access.count();
+        final int limit = access.size();
         int retVal = limit + 31;
         for (int ij = 0; ij < limit; ij++) {
             retVal *= access.intValue(ij);
