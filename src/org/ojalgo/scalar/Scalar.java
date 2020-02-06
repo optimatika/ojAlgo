@@ -27,7 +27,6 @@ import java.math.BigDecimal;
 import org.ojalgo.algebra.Field;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.ScalarOperation;
-import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.structure.AccessScalar;
 import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
@@ -81,63 +80,19 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
     }
 
     static double doubleValue(final Comparable<?> number) {
-
-        if (number == null) {
-            return PrimitiveMath.ZERO;
-        }
-
-        if (number instanceof NumberDefinition) {
-            return ((NumberDefinition) number).doubleValue();
-        } else if (number instanceof Number) {
-            return ((Number) number).doubleValue();
-        } else {
-            return PrimitiveMath.NaN;
-        }
+        return NumberDefinition.doubleValue(number);
     }
 
     static float floatValue(final Comparable<?> number) {
-
-        if (number == null) {
-            return 0F;
-        }
-
-        if (number instanceof NumberDefinition) {
-            return ((NumberDefinition) number).floatValue();
-        } else if (number instanceof Number) {
-            return ((Number) number).floatValue();
-        } else {
-            return Float.NaN;
-        }
+        return NumberDefinition.floatValue(number);
     }
 
     static int intValue(final Comparable<?> number) {
-
-        if (number == null) {
-            return 0;
-        }
-
-        if (number instanceof NumberDefinition) {
-            return ((NumberDefinition) number).intValue();
-        } else if (number instanceof Number) {
-            return ((Number) number).intValue();
-        } else {
-            return Integer.MIN_VALUE;
-        }
+        return NumberDefinition.intValue(number);
     }
 
     static long longValue(final Comparable<?> number) {
-
-        if (number == null) {
-            return 0L;
-        }
-
-        if (number instanceof NumberDefinition) {
-            return ((NumberDefinition) number).longValue();
-        } else if (number instanceof Number) {
-            return ((Number) number).longValue();
-        } else {
-            return Long.MIN_VALUE;
-        }
+        return NumberDefinition.longValue(number);
     }
 
     @Override

@@ -35,10 +35,10 @@ import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Access2D.Collectable;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.NumberDefinition;
 
 abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements QR<N> {
 
@@ -193,7 +193,7 @@ abstract class QRDecomposition<N extends Comparable<N>> extends InPlaceDecomposi
         N largest = this.getInPlace().aggregateDiagonal(Aggregator.LARGEST);
         double epsilon = this.getDimensionalEpsilon();
 
-        return epsilon * Math.max(MACHINE_SMALLEST, Scalar.doubleValue(largest));
+        return epsilon * Math.max(MACHINE_SMALLEST, NumberDefinition.doubleValue(largest));
     }
 
     public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {

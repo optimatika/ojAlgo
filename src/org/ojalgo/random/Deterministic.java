@@ -23,7 +23,7 @@ package org.ojalgo.random;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.NumberDefinition;
 
 /**
  * @author apete
@@ -43,7 +43,7 @@ public class Deterministic extends RandomNumber {
 
         super();
 
-        myValue = Scalar.doubleValue(aValue);
+        myValue = NumberDefinition.doubleValue(aValue);
     }
 
     public Deterministic(final double aValue) {

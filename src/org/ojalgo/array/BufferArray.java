@@ -52,6 +52,7 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.StructureAnyD;
+import org.ojalgo.type.NumberDefinition;
 
 /**
  * <p>
@@ -410,7 +411,7 @@ public abstract class BufferArray extends PlainArray<Double> {
 
     @Override
     protected void add(final int index, final Comparable<?> addend) {
-        this.set(index, this.doubleValue(index) + Scalar.doubleValue(addend));
+        this.set(index, this.doubleValue(index) + NumberDefinition.doubleValue(addend));
     }
 
     @Override
@@ -553,7 +554,7 @@ public abstract class BufferArray extends PlainArray<Double> {
 
     @Override
     protected void set(final int index, final Comparable<?> value) {
-        this.set(index, Scalar.doubleValue(value));
+        this.set(index, NumberDefinition.doubleValue(value));
     }
 
     @Override

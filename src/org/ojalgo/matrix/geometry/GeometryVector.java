@@ -24,10 +24,10 @@ package org.ojalgo.matrix.geometry;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.TransformableRegion;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.NumberDefinition;
 
 public abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double> {
 
@@ -38,7 +38,7 @@ public abstract class GeometryVector extends TransformableRegion.ReceiverRegion<
     public abstract void add(int row, double addend);
 
     public final void add(final long index, final Comparable<?> addend) {
-        this.add(Structure1D.index(index), Scalar.doubleValue(addend));
+        this.add(Structure1D.index(index), NumberDefinition.doubleValue(addend));
     }
 
     public final void add(final long index, final double addend) {
@@ -46,7 +46,7 @@ public abstract class GeometryVector extends TransformableRegion.ReceiverRegion<
     }
 
     public final void add(final long row, final long col, final Comparable<?> addend) {
-        this.add(Structure2D.index(this.structure(), row, col), Scalar.doubleValue(addend));
+        this.add(Structure2D.index(this.structure(), row, col), NumberDefinition.doubleValue(addend));
     }
 
     public final void add(final long row, final long col, final double addend) {
@@ -120,7 +120,7 @@ public abstract class GeometryVector extends TransformableRegion.ReceiverRegion<
     public abstract void set(int row, double value);
 
     public final void set(final long index, final Comparable<?> value) {
-        this.set(Structure1D.index(index), Scalar.doubleValue(value));
+        this.set(Structure1D.index(index), NumberDefinition.doubleValue(value));
     }
 
     public final void set(final long index, final double addend) {
@@ -128,7 +128,7 @@ public abstract class GeometryVector extends TransformableRegion.ReceiverRegion<
     }
 
     public final void set(final long row, final long col, final Comparable<?> value) {
-        this.set(Structure2D.index(this.structure(), row, col), Scalar.doubleValue(value));
+        this.set(Structure2D.index(this.structure(), row, col), NumberDefinition.doubleValue(value));
     }
 
     public final void set(final long row, final long col, final double value) {

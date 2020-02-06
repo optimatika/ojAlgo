@@ -23,6 +23,10 @@ package org.ojalgo.type.keyvalue;
 
 import org.ojalgo.netio.ASCII;
 
+/**
+ * @deprecated v49
+ */
+@Deprecated
 public final class StringToInt implements KeyValue<String, Integer> {
 
     public final String key;

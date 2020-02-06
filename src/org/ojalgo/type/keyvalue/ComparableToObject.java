@@ -23,6 +23,10 @@ package org.ojalgo.type.keyvalue;
 
 import org.ojalgo.netio.ASCII;
 
+/**
+ * @deprecated v49
+ */
+@Deprecated
 public final class ComparableToObject<K extends Comparable<? super K>, V> implements KeyValue<K, V> {
 
     public final K key;

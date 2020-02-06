@@ -34,7 +34,7 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.format.NumberStyle;
 
 /**
@@ -284,7 +284,7 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         } else if (object instanceof Enforceable<?>) {
             return (Comparable<?>) ((Enforceable<?>) object).enforce(this);
         } else {
-            return this.enforce(Scalar.doubleValue(object));
+            return this.enforce(NumberDefinition.doubleValue(object));
         }
     }
 

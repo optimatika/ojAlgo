@@ -34,7 +34,7 @@ import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -215,7 +215,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         if (lower != null) {
             if (lower instanceof BigDecimal) {
                 myLowerLimit = (BigDecimal) lower;
-            } else if (Double.isFinite(Scalar.doubleValue(lower))) {
+            } else if (Double.isFinite(NumberDefinition.doubleValue(lower))) {
                 BigDecimal limit = TypeUtils.toBigDecimal(lower);
                 final BigDecimal magnitude = limit.abs();
                 if (magnitude.compareTo(LARGEST) >= 0) {
@@ -250,7 +250,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         if (upper != null) {
             if (upper instanceof BigDecimal) {
                 myUpperLimit = (BigDecimal) upper;
-            } else if (Double.isFinite(Scalar.doubleValue(upper))) {
+            } else if (Double.isFinite(NumberDefinition.doubleValue(upper))) {
                 BigDecimal limit = TypeUtils.toBigDecimal(upper);
                 final BigDecimal magnitude = limit.abs();
                 if (magnitude.compareTo(LARGEST) >= 0) {
@@ -274,7 +274,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
             BigDecimal tmpWeight = null;
             if (weight instanceof BigDecimal) {
                 tmpWeight = (BigDecimal) weight;
-            } else if (Double.isFinite(Scalar.doubleValue(weight))) {
+            } else if (Double.isFinite(NumberDefinition.doubleValue(weight))) {
                 tmpWeight = TypeUtils.toBigDecimal(weight);
             }
             if ((tmpWeight != null) && (tmpWeight.signum() != 0)) {

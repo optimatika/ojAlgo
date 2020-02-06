@@ -29,11 +29,11 @@ import java.util.SortedMap;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.netio.ASCII;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.series.primitive.ExplicitTimeSeries;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDate.Resolution;
 import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.NumberDefinition;
 
 public final class CalendarDateSeries<N extends Comparable<N>> extends TreeSeries<CalendarDate, N, CalendarDateSeries<N>>
         implements BasicSeries.NaturallySequenced<CalendarDate, N> {
@@ -172,7 +172,7 @@ public final class CalendarDateSeries<N extends Comparable<N>> extends TreeSerie
         final Double tmpValue = Double.valueOf(value);
         final N tmpOldValue = super.put(key.filter(myResolution), (N) tmpValue);
         if (tmpOldValue != null) {
-            return Scalar.doubleValue(tmpOldValue);
+            return NumberDefinition.doubleValue(tmpOldValue);
         } else {
             return Double.NaN;
         }

@@ -25,8 +25,45 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.netio.BasicLogger;
 
 public class MissingMathTest {
+
+    @Test
+    public void testAtan2() {
+
+        double max = 0.0;
+        double ye = Double.NaN;
+        double xe = Double.NaN;
+
+        for (int yi = -999; yi <= 999; yi++) {
+            double y = yi / 100D;
+
+            for (int xi = -999; xi <= 999; xi++) {
+                double x = xi / 100D;
+
+                double expected = Math.atan2(y, x);
+                double actual = MissingMath.atan2(y, x);
+
+                double absErr = Math.abs(actual - expected);
+                double relErr = absErr / Math.abs(expected);
+
+                if (absErr > max) {
+                    max = absErr;
+                    ye = y;
+                    xe = x;
+                }
+                if (relErr > max) {
+                    max = relErr;
+                    ye = y;
+                    xe = x;
+                }
+            }
+        }
+
+        BasicLogger.DEBUG.println("Max error: {} @ y={}, x={}", max, ye, xe);
+        TestUtils.assertTrue(max < 3E-4);
+    }
 
     @Test
     public void testMax() {
