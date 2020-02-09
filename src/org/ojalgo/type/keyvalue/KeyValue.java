@@ -22,7 +22,7 @@
 package org.ojalgo.type.keyvalue;
 
 /**
- * @deprecated v49
+ * @deprecated v49 Use {@link EntryPair} instead.
  */
 @Deprecated
 public interface KeyValue<K, V> extends Comparable<KeyValue<K, ?>> {
