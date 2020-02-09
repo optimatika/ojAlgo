@@ -26,7 +26,7 @@ import java.util.Map;
 import org.ojalgo.netio.ASCII;
 
 /**
- * @deprecated v49
+ * @deprecated v49 Use {@link EntryPair.ObjectObject} instead.
  */
 @Deprecated
 public final class MapEntry<K extends Comparable<? super K>, V> implements Map.Entry<K, V>, KeyValue<K, V> {
