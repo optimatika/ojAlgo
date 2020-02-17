@@ -26,6 +26,10 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.type.context.NumberContext;
 
+/**
+ * @deprecated v49
+ */
+@Deprecated
 public final class IntToDouble implements KeyValue<Integer, Double> {
 
     public final int key;

@@ -55,6 +55,7 @@ import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -107,7 +108,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         final long tmpLimit = matrix.countRows();
         for (long i = 0L; i < tmpLimit; i++) {
-            retVal = PrimitiveMath.MAX.invoke(retVal, Scalar.doubleValue(matrix.aggregateRow(i, Aggregator.NORM1)));
+            retVal = PrimitiveMath.MAX.invoke(retVal, NumberDefinition.doubleValue(matrix.aggregateRow(i, Aggregator.NORM1)));
         }
 
         return retVal;
@@ -122,7 +123,7 @@ public abstract class BasicMatrix<N extends Comparable<N>, M extends BasicMatrix
 
         final long tmpLimit = matrix.countColumns();
         for (long j = 0L; j < tmpLimit; j++) {
-            retVal = PrimitiveMath.MAX.invoke(retVal, Scalar.doubleValue(matrix.aggregateColumn(j, Aggregator.NORM1)));
+            retVal = PrimitiveMath.MAX.invoke(retVal, NumberDefinition.doubleValue(matrix.aggregateColumn(j, Aggregator.NORM1)));
         }
 
         return retVal;

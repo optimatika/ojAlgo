@@ -50,10 +50,10 @@ import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.NumberDefinition;
 
 /**
  * Uses double[][] internally.
@@ -93,7 +93,7 @@ public final class RawStore implements PhysicalStore<Double> {
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    retVal[i][j] = Scalar.doubleValue(tmpColumn[i]);
+                    retVal[i][j] = NumberDefinition.doubleValue(tmpColumn[i]);
                 }
             }
 
@@ -129,7 +129,7 @@ public final class RawStore implements PhysicalStore<Double> {
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    retVal[i][j] = Scalar.doubleValue(tmpColumn.get(i));
+                    retVal[i][j] = NumberDefinition.doubleValue(tmpColumn.get(i));
                 }
             }
 
@@ -196,7 +196,7 @@ public final class RawStore implements PhysicalStore<Double> {
                 tmpSource = source[i];
                 tmpDestination = retVal[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpDestination[j] = Scalar.doubleValue(tmpSource[j]);
+                    tmpDestination[j] = NumberDefinition.doubleValue(tmpSource[j]);
                 }
             }
 
@@ -236,7 +236,7 @@ public final class RawStore implements PhysicalStore<Double> {
                 tmpSource = source[i];
                 tmpDestination = retVal[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpDestination[j] = Scalar.doubleValue(tmpSource.get(j));
+                    tmpDestination[j] = NumberDefinition.doubleValue(tmpSource.get(j));
                 }
             }
 
@@ -621,7 +621,7 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     public void add(final long row, final long col, final Comparable<?> addend) {
-        data[Math.toIntExact(row)][Math.toIntExact(col)] += Scalar.doubleValue(addend);
+        data[Math.toIntExact(row)][Math.toIntExact(col)] += NumberDefinition.doubleValue(addend);
     }
 
     public void add(final long row, final long col, final double addend) {
@@ -1119,7 +1119,7 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     public void set(final long row, final long col, final Comparable<?> value) {
-        data[Math.toIntExact(row)][Math.toIntExact(col)] = Scalar.doubleValue(value);
+        data[Math.toIntExact(row)][Math.toIntExact(col)] = NumberDefinition.doubleValue(value);
     }
 
     public void set(final long row, final long col, final double value) {

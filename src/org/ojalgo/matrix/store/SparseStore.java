@@ -43,6 +43,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ElementView2D;
 import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> implements TransformableRegion<N> {
@@ -425,7 +426,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
 
         if (this.isPrimitive()) {
 
-            final double sclr = Scalar.doubleValue(scalar);
+            final double sclr = NumberDefinition.doubleValue(scalar);
 
             for (final ElementView2D<N, ?> nonzero : this.nonzeros()) {
                 retVal.set(nonzero.index(), nonzero.doubleValue() * sclr);

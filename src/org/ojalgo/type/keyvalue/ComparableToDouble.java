@@ -23,6 +23,10 @@ package org.ojalgo.type.keyvalue;
 
 import org.ojalgo.netio.ASCII;
 
+/**
+ * @deprecated v49 Use {@link EntryPair.KeyedPrimitive} instead.
+ */
+@Deprecated
 public final class ComparableToDouble<K extends Comparable<? super K>> implements KeyValue<K, Double> {
 
     public final K key;

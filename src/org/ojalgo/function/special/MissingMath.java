@@ -36,6 +36,40 @@ public abstract class MissingMath {
         return Math.log(arg + Math.sqrt((arg * arg) + 1.0));
     }
 
+    /**
+     * <p>
+     * https://math.stackexchange.com/questions/1098487/atan2-faster-approximation/1105038
+     * <p>
+     * </p>
+     * This is about 10x faster than {@link Math#atan2(double, double)}
+     * </p>
+     */
+    public static double atan2(double y, double x) {
+
+        if ((y == 0.0) && (x == 0.0)) {
+            return 0.0;
+        }
+
+        double ay = Math.abs(y);
+        double ax = Math.abs(x);
+        double a = Math.min(ay, ax) / Math.max(ay, ax);
+        double s = a * a;
+
+        double retVal = (((((-0.0464964749 * s) + 0.15931422) * s) - 0.327622764) * s * a) + a;
+
+        if (ay > ax) {
+            retVal = 1.570796326794897 - retVal;
+        }
+        if (x < 0.0) {
+            retVal = 3.141592653589793 - retVal;
+        }
+        if (y < 0.0) {
+            retVal = -retVal;
+        }
+
+        return retVal;
+    }
+
     public static double atanh(final double arg) {
         return Math.log((1.0 + arg) / (1.0 - arg)) / 2.0;
     }

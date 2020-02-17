@@ -41,6 +41,7 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.NumberDefinition;
 
 /**
  * A one- and/or arbitrary-dimensional array of double.
@@ -186,7 +187,7 @@ public class Primitive32Array extends PrimitiveArray {
 
     @Override
     protected void add(final int index, final Comparable<?> addend) {
-        data[index] += Scalar.floatValue(addend);
+        data[index] += NumberDefinition.floatValue(addend);
     }
 
     @Override
@@ -321,7 +322,7 @@ public class Primitive32Array extends PrimitiveArray {
 
     @Override
     protected final void set(final int index, final Comparable<?> value) {
-        data[index] = Scalar.floatValue(value);
+        data[index] = NumberDefinition.floatValue(value);
     }
 
     @Override

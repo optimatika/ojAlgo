@@ -22,20 +22,9 @@
 package org.ojalgo.type.keyvalue;
 
 /**
- * <p>
- * A key-value pair or key-to-value map. The intention is that {@linkplain java.lang.Object#equals(Object)},
- * {@linkplain java.lang.Object#hashCode()} and {@linkplain java.lang.Comparable#compareTo(Object)} operates
- * on the key part only.
- * </p>
- * <p>
- * This is NOT compatible with how for instance {@linkplain java.util.Map.Entry} implements those methods.
- * </p>
- * <p>
- * Further it is indented that implementations should be immutable.
- * </p>
- *
- * @author apete
+ * @deprecated v49 Use {@link EntryPair} instead.
  */
+@Deprecated
 public interface KeyValue<K, V> extends Comparable<KeyValue<K, ?>> {
 
     K getKey();

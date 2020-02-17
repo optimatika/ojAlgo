@@ -26,8 +26,8 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.special.PowerOf2;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.type.NumberDefinition;
 
 /**
  * <p>
@@ -342,7 +342,7 @@ final class SegmentedArray<N extends Comparable<N>> extends BasicArray<N> {
 
         } else if (this.isPrimitive()) {
 
-            final double tmpValue = Scalar.doubleValue(value);
+            final double tmpValue = NumberDefinition.doubleValue(value);
             for (long i = first; i < limit; i += step) {
                 this.set(i, tmpValue);
             }

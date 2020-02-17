@@ -23,6 +23,10 @@ package org.ojalgo.type.keyvalue;
 
 import org.ojalgo.netio.ASCII;
 
+/**
+ * @deprecated v49
+ */
+@Deprecated
 public final class IntToObject<V> implements KeyValue<Integer, V> {
 
     public final int key;

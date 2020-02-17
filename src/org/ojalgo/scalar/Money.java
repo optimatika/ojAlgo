@@ -21,6 +21,8 @@
  */
 package org.ojalgo.scalar;
 
+import org.ojalgo.type.NumberDefinition;
+
 /**
  * An example {@link ExactDecimal} implementation corresponding to the SQL data type MONEY or DECIMAL(19,4).
  *
@@ -103,7 +105,7 @@ public final class Money extends ExactDecimal<Money> {
 
             } else {
 
-                return Money.valueOf(Scalar.doubleValue(number));
+                return Money.valueOf(NumberDefinition.doubleValue(number));
             }
 
         } else {

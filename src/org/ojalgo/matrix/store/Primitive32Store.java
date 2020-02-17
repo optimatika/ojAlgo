@@ -42,8 +42,8 @@ import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.*;
+import org.ojalgo.type.NumberDefinition;
 
 /**
  * A {@linkplain float} implementation of {@linkplain PhysicalStore}.
@@ -93,7 +93,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = Scalar.floatValue(tmpColumn[i]);
+                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.floatValue(tmpColumn[i]);
                 }
             }
 
@@ -129,7 +129,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = Scalar.floatValue(tmpColumn.get(i));
+                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.floatValue(tmpColumn.get(i));
                 }
             }
 
@@ -211,7 +211,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = Scalar.floatValue(tmpRow[j]);
+                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.floatValue(tmpRow[j]);
                 }
             }
 
@@ -247,7 +247,7 @@ public final class Primitive32Store extends Primitive32Array implements Physical
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = Scalar.floatValue(tmpRow.get(j));
+                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.floatValue(tmpRow.get(j));
                 }
             }
 

@@ -26,6 +26,10 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.ASCII;
 
+/**
+ * @deprecated v49
+ */
+@Deprecated
 public final class LongToDouble implements KeyValue<Long, Double> {
 
     public final long key;

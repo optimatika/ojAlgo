@@ -23,6 +23,10 @@ package org.ojalgo.type.keyvalue;
 
 import org.ojalgo.netio.ASCII;
 
+/**
+ * @deprecated v49 Use {@link EntryPair.KeyedPrimitive} instead.
+ */
+@Deprecated
 public final class StringToDouble implements KeyValue<String, Double> {
 
     public final String key;
