@@ -32,6 +32,7 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
 import org.ojalgo.structure.Transformation2D;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -235,7 +236,7 @@ public final class ComplexNumber
 
         } else {
 
-            return new ComplexNumber(Scalar.doubleValue(number));
+            return new ComplexNumber(NumberDefinition.doubleValue(number));
         }
     }
 

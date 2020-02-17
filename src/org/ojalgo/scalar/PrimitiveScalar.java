@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -34,7 +35,7 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
 
         @Override
         public Double cast(final Comparable<?> number) {
-            return Scalar.doubleValue(number);
+            return NumberDefinition.doubleValue(number);
         }
 
         @Override
@@ -95,7 +96,7 @@ public final class PrimitiveScalar implements Scalar<Double>, Enforceable<Primit
     }
 
     public static PrimitiveScalar valueOf(final Comparable<?> number) {
-        return PrimitiveScalar.of(Scalar.doubleValue(number));
+        return PrimitiveScalar.of(NumberDefinition.doubleValue(number));
     }
 
     public static PrimitiveScalar valueOf(final double value) {

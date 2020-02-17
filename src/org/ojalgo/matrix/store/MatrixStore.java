@@ -38,6 +38,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -810,7 +811,7 @@ public interface MatrixStore<N extends Comparable<N>>
     }
 
     default double doubleValue(final long row, final long col) {
-        return Scalar.doubleValue(this.get(row, col));
+        return NumberDefinition.doubleValue(this.get(row, col));
     }
 
     default boolean equals(final MatrixStore<N> other, final NumberContext context) {
@@ -970,7 +971,7 @@ public interface MatrixStore<N extends Comparable<N>>
 
     default double norm() {
 
-        double frobeniusNorm = Scalar.doubleValue(this.aggregateAll(Aggregator.NORM2));
+        double frobeniusNorm = NumberDefinition.doubleValue(this.aggregateAll(Aggregator.NORM2));
 
         if (this.isVector()) {
             return frobeniusNorm;

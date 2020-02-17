@@ -26,11 +26,9 @@ import java.util.Map;
 import org.ojalgo.netio.ASCII;
 
 /**
- * This class is primarily an implementation of {@linkplain java.util.Map.Entry}, but also implemnts
- * {@linkplain KeyValue}.
- *
- * @author apete
+ * @deprecated v49 Use {@link EntryPair.ObjectObject} instead.
  */
+@Deprecated
 public final class MapEntry<K extends Comparable<? super K>, V> implements Map.Entry<K, V>, KeyValue<K, V> {
 
     private final K myKey;

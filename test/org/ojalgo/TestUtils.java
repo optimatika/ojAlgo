@@ -47,13 +47,13 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.structure.StructureAnyD;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.Stopwatch;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -290,7 +290,7 @@ public abstract class TestUtils {
 
         } else {
 
-            if (precision.isDifferent(Scalar.doubleValue(expected), Scalar.doubleValue(actual))) {
+            if (precision.isDifferent(NumberDefinition.doubleValue(expected), NumberDefinition.doubleValue(actual))) {
                 // Assertions.fail(() -> message + ": " + expected + " != " + actual);
                 Assertions.assertEquals(expected, actual, () -> message + ": " + expected + " != " + actual);
             }

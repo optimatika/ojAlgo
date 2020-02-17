@@ -36,6 +36,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.ElementView1D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -339,7 +340,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     @Override
     public void fillAll(final N value) {
 
-        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, Scalar.doubleValue(value))) {
+        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, NumberDefinition.doubleValue(value))) {
 
             myValues.fillAll(myZeroNumber);
 

@@ -25,7 +25,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.DoubleBinaryOperator;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.NumberDefinition;
 
 public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, BinaryOperator<N>, DoubleBinaryOperator {
 
@@ -58,7 +58,7 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
             myFunction = function;
 
             myNumber = arg1;
-            myValue = Scalar.doubleValue(arg1);
+            myValue = NumberDefinition.doubleValue(arg1);
         }
 
         public double doubleValue() {
@@ -120,7 +120,7 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
             myFunction = function;
 
             myNumber = arg2;
-            myValue = Scalar.doubleValue(arg2);
+            myValue = NumberDefinition.doubleValue(arg2);
         }
 
         public double doubleValue() {

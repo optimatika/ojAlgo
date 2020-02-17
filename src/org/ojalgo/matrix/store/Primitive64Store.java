@@ -49,10 +49,10 @@ import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.NumberDefinition;
 
 /**
  * A {@linkplain double} implementation of {@linkplain PhysicalStore}.
@@ -92,7 +92,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = Scalar.doubleValue(tmpColumn[i]);
+                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.doubleValue(tmpColumn[i]);
                 }
             }
 
@@ -128,7 +128,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = Scalar.doubleValue(tmpColumn.get(i));
+                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.doubleValue(tmpColumn.get(i));
                 }
             }
 
@@ -205,7 +205,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = Scalar.doubleValue(tmpRow[j]);
+                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.doubleValue(tmpRow[j]);
                 }
             }
 
@@ -241,7 +241,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = Scalar.doubleValue(tmpRow.get(j));
+                    tmpData[i + (tmpRowDim * j)] = NumberDefinition.doubleValue(tmpRow.get(j));
                 }
             }
 

@@ -28,6 +28,96 @@ package org.ojalgo.type;
  */
 public interface NumberDefinition {
 
+    static byte byteValue(final Comparable<?> number) {
+
+        if (number == null) {
+            return 0;
+        }
+
+        if (number instanceof NumberDefinition) {
+            return ((NumberDefinition) number).byteValue();
+        } else if (number instanceof Number) {
+            return ((Number) number).byteValue();
+        } else {
+            return Byte.MIN_VALUE;
+        }
+    }
+
+    static double doubleValue(final Comparable<?> number) {
+
+        if (number == null) {
+            return 0D;
+        }
+
+        if (number instanceof NumberDefinition) {
+            return ((NumberDefinition) number).doubleValue();
+        } else if (number instanceof Number) {
+            return ((Number) number).doubleValue();
+        } else {
+            return Double.NaN;
+        }
+    }
+
+    static float floatValue(final Comparable<?> number) {
+
+        if (number == null) {
+            return 0F;
+        }
+
+        if (number instanceof NumberDefinition) {
+            return ((NumberDefinition) number).floatValue();
+        } else if (number instanceof Number) {
+            return ((Number) number).floatValue();
+        } else {
+            return Float.NaN;
+        }
+    }
+
+    static int intValue(final Comparable<?> number) {
+
+        if (number == null) {
+            return 0;
+        }
+
+        if (number instanceof NumberDefinition) {
+            return ((NumberDefinition) number).intValue();
+        } else if (number instanceof Number) {
+            return ((Number) number).intValue();
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    static long longValue(final Comparable<?> number) {
+
+        if (number == null) {
+            return 0L;
+        }
+
+        if (number instanceof NumberDefinition) {
+            return ((NumberDefinition) number).longValue();
+        } else if (number instanceof Number) {
+            return ((Number) number).longValue();
+        } else {
+            return Long.MIN_VALUE;
+        }
+    }
+
+    static short shortValue(final Comparable<?> number) {
+
+        if (number == null) {
+            return 0;
+        }
+
+        if (number instanceof NumberDefinition) {
+            return ((NumberDefinition) number).shortValue();
+        } else if (number instanceof Number) {
+            return ((Number) number).shortValue();
+        } else {
+            return Short.MIN_VALUE;
+        }
+    }
+
     default boolean booleanValue() {
         return this.intValue() != 0;
     }

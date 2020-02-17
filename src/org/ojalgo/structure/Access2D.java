@@ -24,6 +24,7 @@ package org.ojalgo.structure;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -534,11 +535,11 @@ public interface Access2D<N extends Comparable<N>> extends Structure2D, Access1D
             }
 
             public double doubleValue(final long index) {
-                return Scalar.doubleValue(this.get(index));
+                return NumberDefinition.doubleValue(this.get(index));
             }
 
             public double doubleValue(final long row, final long col) {
-                return Scalar.doubleValue(this.get(row, col));
+                return NumberDefinition.doubleValue(this.get(row, col));
             }
 
             public N get(final long row, final long col) {

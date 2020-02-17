@@ -32,6 +32,7 @@ import org.ojalgo.matrix.ComplexMatrix;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.structure.Access2D;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -859,13 +860,13 @@ public abstract class BasicLogger {
             if (number instanceof Scalar<?>) {
                 return ((Scalar<?>) number).toPlainString(context);
             } else {
-                return context.enforce(new BigDecimal(Scalar.doubleValue(number))).toPlainString();
+                return context.enforce(new BigDecimal(NumberDefinition.doubleValue(number))).toPlainString();
             }
         } else {
             if (number instanceof Scalar<?>) {
                 return ((Scalar<?>) number).toString(context);
             } else {
-                return context.enforce(new BigDecimal(Scalar.doubleValue(number))).toString();
+                return context.enforce(new BigDecimal(NumberDefinition.doubleValue(number))).toString();
             }
         }
     }

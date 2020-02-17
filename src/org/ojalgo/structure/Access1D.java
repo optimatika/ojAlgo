@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.DoubleAdder;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -331,7 +332,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
             }
 
             public double doubleValue(final long index) {
-                return Scalar.doubleValue(target.get((int) index));
+                return NumberDefinition.doubleValue(target.get((int) index));
             }
 
             public N get(final long index) {
@@ -354,7 +355,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
             }
 
             public double doubleValue(final long index) {
-                return Scalar.doubleValue(target[(int) index]);
+                return NumberDefinition.doubleValue(target[(int) index]);
             }
 
             public N get(final long index) {
