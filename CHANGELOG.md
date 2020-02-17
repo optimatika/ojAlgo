@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Added / Changed / Deprecated / Removed / Fixed / Security
+Added / Changed / Deprecated / Fixed / Removed / Security
 
 
 ## [Unreleased]
@@ -14,9 +14,17 @@ Added / Changed / Deprecated / Removed / Fixed / Security
 
 ### Deprecated
 
+#### org.ojalgo.function
+
+- New atan2 approximation that is about 10x faster
+
+### Deprecated
+
 #### org.ojalgo.type
 
-- Everything, previously existing, in the org.ojalgo.type.keyvalue has been deprecated and to some extent replaced by the new interface EntryPair (and its implementations).
+- Everything, previously existing, in the org.ojalgo.type.keyvalue package has been deprecated. Instead there is a new interface EntryPair, as well as a collection of implementations, that replace it. The functionality of the old and new stuff only partially overlap.
+
+ and to some extent replaced by the new interface EntryPair (and its implementations).
 
 
 ## [48.1.0] – 2020-01-??

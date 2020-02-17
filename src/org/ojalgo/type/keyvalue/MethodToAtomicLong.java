@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.ojalgo.netio.ASCII;
 
 /**
- * @deprecated v49
+ * @deprecated v49 Use {@link EntryPair.ObjectObject} instead.
  */
 @Deprecated
 public final class MethodToAtomicLong implements KeyValue<Method, AtomicLong> {
