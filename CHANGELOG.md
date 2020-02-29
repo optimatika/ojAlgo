@@ -12,11 +12,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
-### Deprecated
+### Added
 
 #### org.ojalgo.function
 
-- New atan2 approximation that is about 10x faster
+- New atan2 approximation that is about 10x faster than the ordinary Math.atan2
 
 ### Deprecated
 
@@ -24,10 +24,8 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Everything, previously existing, in the org.ojalgo.type.keyvalue package has been deprecated. Instead there is a new interface EntryPair, as well as a collection of implementations, that replace it. The functionality of the old and new stuff only partially overlap.
 
- and to some extent replaced by the new interface EntryPair (and its implementations).
 
-
-## [48.1.0] – 2020-01-??
+## [48.1.0] – 2020-01-15
 
 ### Changed
 
