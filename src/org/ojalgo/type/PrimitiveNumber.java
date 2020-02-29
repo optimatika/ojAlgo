@@ -26,4 +26,202 @@ package org.ojalgo.type;
  */
 public interface PrimitiveNumber extends ComparableNumber<PrimitiveNumber> {
 
+    class BoxedByte implements PrimitiveNumber {
+
+        public final byte value;
+
+        BoxedByte(byte value) {
+            super();
+            this.value = value;
+        }
+
+        public byte byteValue() {
+            return value;
+        }
+
+        public int compareTo(PrimitiveNumber other) {
+            return Byte.compare(value, other.byteValue());
+        }
+
+        public double doubleValue() {
+            return value;
+        }
+
+        public float floatValue() {
+            return value;
+        }
+
+        public int intValue() {
+            return value;
+        }
+
+        public long longValue() {
+            return value;
+        }
+
+        public short shortValue() {
+            return value;
+        }
+
+    }
+
+    class BoxedDouble implements PrimitiveNumber {
+
+        public final double value;
+
+        BoxedDouble(double value) {
+            super();
+            this.value = value;
+        }
+
+        public int compareTo(PrimitiveNumber other) {
+            return Double.compare(value, other.doubleValue());
+        }
+
+        public double doubleValue() {
+            return value;
+        }
+
+    }
+
+    class BoxedFloat implements PrimitiveNumber {
+
+        public final float value;
+
+        BoxedFloat(float value) {
+            super();
+            this.value = value;
+        }
+
+        public int compareTo(PrimitiveNumber other) {
+            return Float.compare(value, other.floatValue());
+        }
+
+        public double doubleValue() {
+            return value;
+        }
+
+        public float floatValue() {
+            return value;
+        }
+
+    }
+
+    class BoxedInt implements PrimitiveNumber {
+
+        public final int value;
+
+        BoxedInt(int value) {
+            super();
+            this.value = value;
+        }
+
+        public int compareTo(PrimitiveNumber other) {
+            return Integer.compare(value, other.intValue());
+        }
+
+        public double doubleValue() {
+            return value;
+        }
+
+        public float floatValue() {
+            return value;
+        }
+
+        public int intValue() {
+            return value;
+        }
+
+        public long longValue() {
+            return value;
+        }
+
+    }
+
+    class BoxedLong implements PrimitiveNumber {
+
+        public final long value;
+
+        BoxedLong(long value) {
+            super();
+            this.value = value;
+        }
+
+        public int compareTo(PrimitiveNumber other) {
+            return Long.compare(value, other.longValue());
+        }
+
+        public double doubleValue() {
+            return value;
+        }
+
+        public float floatValue() {
+            return value;
+        }
+
+        public long longValue() {
+            return value;
+        }
+
+    }
+
+    class BoxedShort implements PrimitiveNumber {
+
+        public final short value;
+
+        BoxedShort(short value) {
+            super();
+            this.value = value;
+        }
+
+        public int compareTo(PrimitiveNumber other) {
+            return Short.compare(value, other.shortValue());
+        }
+
+        public double doubleValue() {
+            return value;
+        }
+
+        public float floatValue() {
+            return value;
+        }
+
+        public int intValue() {
+            return value;
+        }
+
+        public long longValue() {
+            return value;
+        }
+
+        public short shortValue() {
+            return value;
+        }
+
+    }
+
+    static PrimitiveNumber of(byte value) {
+        return new BoxedByte(value);
+    }
+
+    static PrimitiveNumber of(double value) {
+        return new BoxedDouble(value);
+    }
+
+    static PrimitiveNumber of(float value) {
+        return new BoxedFloat(value);
+    }
+
+    static PrimitiveNumber of(int value) {
+        return new BoxedInt(value);
+    }
+
+    static PrimitiveNumber of(long value) {
+        return new BoxedLong(value);
+    }
+
+    static PrimitiveNumber of(short value) {
+        return new BoxedShort(value);
+    }
+
 }
