@@ -25,6 +25,11 @@ import java.util.AbstractMap;
 
 import org.ojalgo.type.PrimitiveNumber;
 
+/**
+ * A variation of {@link FakeSet}.
+ *
+ * @author apete
+ */
 public final class FakeMap<K, V> extends AbstractMap<K, V> {
 
     public static <K> FakeMap<K, PrimitiveNumber> of(K[] keys, byte[] values) {

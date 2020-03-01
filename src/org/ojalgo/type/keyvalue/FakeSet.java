@@ -29,6 +29,15 @@ import java.util.Map.Entry;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.PrimitiveNumber;
 
+/**
+ * You have the keys and values (in ordered arrays) but you need the mapped pairs. This class allows you to
+ * simply put them together, without copying, as a <code> Set<Map.Entry<K, V>> </code> and still have direct
+ * access to the individual keys and values. The "fake" part of the name refers to the fact that this
+ * implementation does not in anyway chech or enforce uniqueness. There can be multiple equal entries, if that
+ * what you feed it.
+ *
+ * @author apete
+ */
 public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
 
     static final class EntryView<K, V> implements Map.Entry<K, V> {
@@ -397,7 +406,7 @@ public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
         myKeys = keys;
     }
 
-    public final Map<K, V> asMap() {
+    public final FakeMap<K, V> asMap() {
         return new FakeMap<>(this);
     }
 
