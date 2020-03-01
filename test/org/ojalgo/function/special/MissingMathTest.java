@@ -25,7 +25,6 @@ import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.netio.BasicLogger;
 
 public class MissingMathTest {
 
@@ -61,7 +60,7 @@ public class MissingMathTest {
             }
         }
 
-        BasicLogger.DEBUG.println("Max error: {} @ y={}, x={}", max, ye, xe);
+        // BasicLogger.DEBUG.println("Max error: {} @ y={}, x={}", max, ye, xe);
         TestUtils.assertTrue(max < 3E-4);
     }
 
