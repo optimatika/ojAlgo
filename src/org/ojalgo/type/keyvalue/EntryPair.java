@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.ojalgo.type.NumberDefinition;
+import org.ojalgo.type.PrimitiveNumber;
 
 /**
  * Singleton (immutable) {@link Map}:s with primitive valued specialisations.
@@ -36,17 +37,17 @@ import org.ojalgo.type.NumberDefinition;
  */
 public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
 
-    interface KeyedPrimitive<K> extends EntryPair<K, NumberDefinition>, NumberDefinition {
+    interface KeyedPrimitive<K> extends EntryPair<K, PrimitiveNumber>, PrimitiveNumber {
 
-        default Set<Entry<K, NumberDefinition>> entrySet() {
+        default Set<Entry<K, PrimitiveNumber>> entrySet() {
             return Collections.singleton(this);
         }
 
-        default NumberDefinition getValue() {
+        default PrimitiveNumber getValue() {
             return this;
         }
 
-        default Collection<NumberDefinition> values() {
+        default Collection<PrimitiveNumber> values() {
             return Collections.singleton(this);
         }
     }
@@ -64,6 +65,10 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
 
         public byte byteValue() {
             return myValue;
+        }
+
+        public int compareTo(PrimitiveNumber other) {
+            return Byte.compare(myValue, other.byteValue());
         }
 
         public boolean containsKey(Object key) {
@@ -104,7 +109,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             return true;
         }
 
-        public NumberDefinition get(Object key) {
+        public PrimitiveNumber get(Object key) {
             if (myKey.equals(key)) {
                 return this;
             } else {
@@ -150,6 +155,10 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             myValue = value;
         }
 
+        public int compareTo(PrimitiveNumber other) {
+            return Double.compare(myValue, other.doubleValue());
+        }
+
         public boolean containsKey(Object key) {
             return myKey.equals(key);
         }
@@ -188,7 +197,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             return true;
         }
 
-        public NumberDefinition get(Object key) {
+        public PrimitiveNumber get(Object key) {
             if (myKey.equals(key)) {
                 return this;
             } else {
@@ -226,6 +235,10 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             super();
             myKey = Objects.requireNonNull(key);
             myValue = value;
+        }
+
+        public int compareTo(PrimitiveNumber other) {
+            return Float.compare(myValue, other.floatValue());
         }
 
         public boolean containsKey(Object key) {
@@ -270,7 +283,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             return myValue;
         }
 
-        public NumberDefinition get(Object key) {
+        public PrimitiveNumber get(Object key) {
             if (myKey.equals(key)) {
                 return this;
             } else {
@@ -306,6 +319,10 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             super();
             myKey = Objects.requireNonNull(key);
             myValue = value;
+        }
+
+        public int compareTo(PrimitiveNumber other) {
+            return Integer.compare(myValue, other.intValue());
         }
 
         public boolean containsKey(Object key) {
@@ -346,7 +363,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             return true;
         }
 
-        public NumberDefinition get(Object key) {
+        public PrimitiveNumber get(Object key) {
             if (myKey.equals(key)) {
                 return this;
             } else {
@@ -392,6 +409,10 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             myValue = value;
         }
 
+        public int compareTo(PrimitiveNumber other) {
+            return Long.compare(myValue, other.longValue());
+        }
+
         public boolean containsKey(Object key) {
             return myKey.equals(key);
         }
@@ -430,7 +451,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             return true;
         }
 
-        public NumberDefinition get(Object key) {
+        public PrimitiveNumber get(Object key) {
             if (myKey.equals(key)) {
                 return this;
             } else {
@@ -525,6 +546,10 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             myValue = value;
         }
 
+        public int compareTo(PrimitiveNumber other) {
+            return Short.compare(myValue, other.shortValue());
+        }
+
         public boolean containsKey(Object key) {
             return myKey.equals(key);
         }
@@ -563,7 +588,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
             return true;
         }
 
-        public NumberDefinition get(Object key) {
+        public PrimitiveNumber get(Object key) {
             if (myKey.equals(key)) {
                 return this;
             } else {
