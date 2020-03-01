@@ -27,9 +27,10 @@ import java.util.List;
 import org.ojalgo.structure.Access1D;
 
 /**
- * An array (double[] or float[]) builder. The arrays are built by prepending/appending segements of anything
- * that can be converted to either double[] or float[] arrays. The total/aggregated arrays are extracted by
- * calling {@link #supplyTo(double[])} or {@link #supplyTo(float[])}.
+ * An array (double[] or float[]) builder/converter. The arrays are built by prepending/appending segements of
+ * anything that can be converted to either double[] or float[] arrays. The total/aggregated arrays are
+ * extracted by calling {@link #supplyTo(double[])} or {@link #supplyTo(float[])}. This also serves as a type
+ * converter from any number type to double or float.
  *
  * @author apete
  */
