@@ -42,6 +42,7 @@ import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.multiary.MultiaryFunction;
+import org.ojalgo.machine.VirtualMachine;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
@@ -241,6 +242,8 @@ public final class IntegerSolver extends GenericSolver {
 
         if (EXECUTOR == null) {
 
+            VirtualMachine envm = OjAlgoUtils.ENVIRONMENT;
+
             try {
 
                 /**
@@ -253,7 +256,7 @@ public final class IntegerSolver extends GenericSolver {
                  * parallelism the parallelism level. For default value, use
                  * java.lang.Runtime.availableProcessors.
                  */
-                int parallelism = OjAlgoUtils.ENVIRONMENT.threads;
+                int parallelism = envm.cores;
                 /**
                  * factory the factory for creating new threads. For default value, use
                  * defaultForkJoinWorkerThreadFactory.
@@ -288,7 +291,7 @@ public final class IntegerSolver extends GenericSolver {
                  * the implementation's total thread limit has the same effect as using this limit (which is
                  * the default).
                  */
-                int maximumPoolSize = 2 * OjAlgoUtils.ENVIRONMENT.threads;
+                int maximumPoolSize = envm.cores + envm.threads;
                 /**
                  * minimumRunnable the minimum allowed number of core threads not blocked by a join or
                  * ManagedBlocker. To ensure progress, when too few unblocked threads exist and unexecuted
@@ -298,7 +301,7 @@ public final class IntegerSolver extends GenericSolver {
                  * may be acceptable when submitted tasks cannot have dependencies requiring additional
                  * threads.
                  */
-                int minimumRunnable = 1;
+                int minimumRunnable = envm.units;
                 /**
                  * saturate if non-null, a predicate invoked upon attempts to create more than the maximum
                  * total allowed threads. By default, when a thread is about to block on a join or
@@ -307,7 +310,7 @@ public final class IntegerSolver extends GenericSolver {
                  * is thrown, so the pool continues to operate with fewer than the target number of runnable
                  * threads, which might not ensure progress.
                  */
-                Predicate<? super ForkJoinPool> saturate = null;
+                Predicate<? super ForkJoinPool> saturate = fjp -> true;
                 /**
                  * keepAliveTime the elapsed time since last use before a thread is terminated (and then later
                  * replaced if needed). For the default value, use 60, TimeUnit.SECONDS.
@@ -328,7 +331,7 @@ public final class IntegerSolver extends GenericSolver {
             }
 
             if (EXECUTOR == null) {
-                EXECUTOR = new ForkJoinPool(OjAlgoUtils.ENVIRONMENT.threads);
+                EXECUTOR = new ForkJoinPool(envm.threads);
             }
         }
 
