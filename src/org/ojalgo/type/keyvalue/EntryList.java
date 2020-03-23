@@ -19,34 +19,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.type.keyvalue;
 
-import org.ojalgo.function.VoidFunction;
+import java.util.List;
+import java.util.Map;
 
-public final class OperationVoid implements ArrayOperation {
+import org.ojalgo.type.PrimitiveNumber;
 
-    public static int THRESHOLD = 256;
+public interface EntryList<K, V> extends List<Map.Entry<K, V>>, Paired<K, V> {
 
-    public static void invoke(final double[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
-        }
+    static <K> EntryList<K, PrimitiveNumber> wrap(K[] keys, byte[] values) {
+        return new EntrySet.ObjectByte<>(keys, values);
     }
 
-    public static void invoke(final float[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
-        }
+    static <K> EntryList<K, PrimitiveNumber> wrap(K[] keys, double[] values) {
+        return new EntrySet.ObjectDouble<>(keys, values);
     }
 
-    public static <N extends Comparable<N>> void invoke(final N[] data, final int first, final int limit, final int step, final VoidFunction<N> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
-        }
+    static <K> EntryList<K, PrimitiveNumber> wrap(K[] keys, float[] values) {
+        return new EntrySet.ObjectFloat<>(keys, values);
     }
 
-    public int threshold() {
-        return THRESHOLD;
+    static <K> EntryList<K, PrimitiveNumber> wrap(K[] keys, int[] values) {
+        return new EntrySet.ObjectInt<>(keys, values);
+    }
+
+    static <K> EntryList<K, PrimitiveNumber> wrap(K[] keys, long[] values) {
+        return new EntrySet.ObjectLong<>(keys, values);
+    }
+
+    static <K> EntryList<K, PrimitiveNumber> wrap(K[] keys, short[] values) {
+        return new EntrySet.ObjectShort<>(keys, values);
+    }
+
+    static <K, V> EntryList<K, V> wrap(K[] keys, V[] values) {
+        return new EntrySet.ObjectObject<>(keys, values);
     }
 
 }
