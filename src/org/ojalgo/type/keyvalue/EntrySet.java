@@ -21,31 +21,33 @@
  */
 package org.ojalgo.type.keyvalue;
 
-import java.util.AbstractSet;
+import java.util.AbstractList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Spliterator;
 
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.PrimitiveNumber;
 
 /**
- * You have the keys and values (in ordered arrays) but you need the mapped pairs. This class allows you to
- * simply put them together, without copying, as a <code> Set<Map.Entry<K, V>> </code> and still have direct
- * access to the individual keys and values. The "fake" part of the name refers to the fact that this
- * implementation does not in anyway chech or enforce uniqueness. There can be multiple equal entries, if that
- * what you feed it.
+ * Allows you to wrap and treat two arrays as a {@link Collection} of key-value pairs. Implements both
+ * {@link List} and {@link Set} but does not in anyway test or enforce uniqueness – that's up to the user of
+ * this class.
  *
  * @author apete
  */
-public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
+public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> implements EntryList<K, V>, Set<Map.Entry<K, V>> {
 
     static final class EntryView<K, V> implements Map.Entry<K, V> {
 
-        private final FakeSet<K, V> mySet;
+        private final EntrySet<K, V> mySet;
         int index = 0;
 
-        EntryView(FakeSet<K, V> set) {
+        EntryView(EntrySet<K, V> set) {
             super();
             mySet = set;
         }
@@ -66,7 +68,7 @@ public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
 
     }
 
-    static abstract class KeyedPrimitives<K> extends FakeSet<K, PrimitiveNumber> implements Access1D<PrimitiveNumber> {
+    static abstract class KeyedPrimitives<K> extends EntrySet<K, PrimitiveNumber> implements Access1D<PrimitiveNumber> {
 
         KeyedPrimitives(K[] keys) {
             super(keys);
@@ -82,7 +84,7 @@ public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
 
     }
 
-    static class ObjectByte<K> extends KeyedPrimitives<K> {
+    static final class ObjectByte<K> extends KeyedPrimitives<K> {
 
         private final byte[] myValues;
 
@@ -132,7 +134,7 @@ public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
 
     }
 
-    static class ObjectDouble<K> extends KeyedPrimitives<K> {
+    static final class ObjectDouble<K> extends KeyedPrimitives<K> {
 
         private final double[] myValues;
 
@@ -162,7 +164,7 @@ public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
 
     }
 
-    static class ObjectFloat<K> extends KeyedPrimitives<K> {
+    static final class ObjectFloat<K> extends KeyedPrimitives<K> {
 
         private final float[] myValues;
 
@@ -196,7 +198,7 @@ public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
 
     }
 
-    static class ObjectInt<K> extends KeyedPrimitives<K> {
+    static final class ObjectInt<K> extends KeyedPrimitives<K> {
 
         private final int[] myValues;
 
@@ -238,7 +240,7 @@ public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
 
     }
 
-    static class ObjectLong<K> extends KeyedPrimitives<K> {
+    static final class ObjectLong<K> extends KeyedPrimitives<K> {
 
         private final long[] myValues;
 
@@ -276,7 +278,7 @@ public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
 
     }
 
-    static final class ObjectObject<K, V> extends FakeSet<K, V> {
+    static final class ObjectObject<K, V> extends EntrySet<K, V> {
 
         private final V[] myValues;
 
@@ -302,7 +304,7 @@ public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
 
     }
 
-    static class ObjectShort<K> extends KeyedPrimitives<K> {
+    static final class ObjectShort<K> extends KeyedPrimitives<K> {
 
         private final short[] myValues;
 
@@ -353,7 +355,7 @@ public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
         private final int myLastIndex;
         private final EntryView<K, V> myView;
 
-        ViewingIterator(FakeSet<K, V> set) {
+        ViewingIterator(EntrySet<K, V> set) {
             super();
             myView = new EntryView<>(set);
             myView.index = -1;
@@ -371,49 +373,22 @@ public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
 
     }
 
-    public static <K> FakeSet<K, PrimitiveNumber> of(K[] keys, byte[] values) {
-        return new FakeSet.ObjectByte<>(keys, values);
-    }
-
-    public static <K> FakeSet<K, PrimitiveNumber> of(K[] keys, double[] values) {
-        return new FakeSet.ObjectDouble<>(keys, values);
-    }
-
-    public static <K> FakeSet<K, PrimitiveNumber> of(K[] keys, float[] values) {
-        return new FakeSet.ObjectFloat<>(keys, values);
-    }
-
-    public static <K> FakeSet<K, PrimitiveNumber> of(K[] keys, int[] values) {
-        return new FakeSet.ObjectInt<>(keys, values);
-    }
-
-    public static <K> FakeSet<K, PrimitiveNumber> of(K[] keys, long[] values) {
-        return new FakeSet.ObjectLong<>(keys, values);
-    }
-
-    public static <K> FakeSet<K, PrimitiveNumber> of(K[] keys, short[] values) {
-        return new FakeSet.ObjectShort<>(keys, values);
-    }
-
-    public static <K, V> FakeSet<K, V> of(K[] keys, V[] values) {
-        return new FakeSet.ObjectObject<>(keys, values);
-    }
-
     private final K[] myKeys;
 
-    FakeSet(K[] keys) {
+    EntrySet(K[] keys) {
         super();
         myKeys = keys;
     }
 
-    public final FakeMap<K, V> asMap() {
-        return new FakeMap<>(this);
-    }
-
+    @Override
     public abstract EntryPair<K, V> get(int index);
 
     public final K getKey(int index) {
         return myKeys[index];
+    }
+
+    public final EntryPair<K, V> getPair(int index) {
+        return this.get(index);
     }
 
     public abstract V getValue(int index);
@@ -428,6 +403,10 @@ public abstract class FakeSet<K, V> extends AbstractSet<Map.Entry<K, V>> {
     @Override
     public final int size() {
         return myKeys.length;
+    }
+
+    public Spliterator<Entry<K, V>> spliterator() {
+        return super.spliterator();
     }
 
 }
