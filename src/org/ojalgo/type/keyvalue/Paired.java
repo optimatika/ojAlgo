@@ -19,34 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array.operation;
+package org.ojalgo.type.keyvalue;
 
-import org.ojalgo.function.VoidFunction;
+interface Paired<K, V> {
 
-public final class OperationVoid implements ArrayOperation {
+    K getKey(int index);
 
-    public static int THRESHOLD = 256;
+    EntryPair<K, V> getPair(int index);
 
-    public static void invoke(final double[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
-        }
-    }
-
-    public static void invoke(final float[] data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
-        }
-    }
-
-    public static <N extends Comparable<N>> void invoke(final N[] data, final int first, final int limit, final int step, final VoidFunction<N> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
-        }
-    }
-
-    public int threshold() {
-        return THRESHOLD;
-    }
+    V getValue(int index);
 
 }

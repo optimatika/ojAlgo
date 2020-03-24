@@ -175,7 +175,7 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     @Override
-    public final void sortAscending() {
+    public void sortAscending() {
         Arrays.parallelSort(data);
     }
 
