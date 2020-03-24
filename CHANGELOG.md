@@ -22,7 +22,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New array builder and (type) converter class named NumberReceptacle.
 - PrimitiveNumber implementations for all primitive number types.
-- New classes EntryPair, FakeSet and FakeMap to deal with key value pairs in various ways.
+- New classes EntryPair, EntryList and IndexedMap to deal with key-value pairs in various ways.
 
 ### Deprecated
 
