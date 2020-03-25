@@ -25,14 +25,8 @@ import java.lang.reflect.Array;
 import java.util.AbstractMap;
 import java.util.Map;
 
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.PrimitiveNumber;
-import org.ojalgo.type.keyvalue.EntrySet.ObjectByte;
-import org.ojalgo.type.keyvalue.EntrySet.ObjectDouble;
-import org.ojalgo.type.keyvalue.EntrySet.ObjectFloat;
-import org.ojalgo.type.keyvalue.EntrySet.ObjectInt;
-import org.ojalgo.type.keyvalue.EntrySet.ObjectLong;
-import org.ojalgo.type.keyvalue.EntrySet.ObjectObject;
-import org.ojalgo.type.keyvalue.EntrySet.ObjectShort;
 
 /**
  * Wrap two arrays (of keys and values) and treat the result as a {@link Map}. There is no check that the
@@ -40,26 +34,69 @@ import org.ojalgo.type.keyvalue.EntrySet.ObjectShort;
  *
  * @author apete
  */
-public final class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> {
+public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> {
 
-    public static <K extends Enum<K>> IndexedMap<K, PrimitiveNumber> of(Class<K> keyType, byte defaultValue) {
-    
+    public static final class MappedPrimitives<K> extends IndexedMap<K, PrimitiveNumber> implements Access1D<PrimitiveNumber> {
+
+        private final EntrySet.KeyedPrimitives<K> myEntries;
+
+        MappedPrimitives(EntrySet.KeyedPrimitives<K> entries) {
+            super(entries);
+            myEntries = entries;
+        }
+
+        public byte byteValue(long index) {
+            return myEntries.byteValue(index);
+        }
+
+        public long count() {
+            return myEntries.count();
+        }
+
+        public double doubleValue(long index) {
+            return myEntries.doubleValue(index);
+        }
+
+        public float floatValue(long index) {
+            return myEntries.floatValue(index);
+        }
+
+        public PrimitiveNumber get(long index) {
+            return myEntries.get(index);
+        }
+
+        public int intValue(long index) {
+            return myEntries.intValue(index);
+        }
+
+        public long longValue(long index) {
+            return myEntries.longValue(index);
+        }
+
+        public short shortValue(long index) {
+            return myEntries.shortValue(index);
+        }
+
+    }
+
+    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(Class<K> keyType, byte defaultValue) {
+
         K[] keys = keyType.getEnumConstants();
         byte[] values = new byte[keys.length];
-    
+
         for (int i = 0; i < values.length; i++) {
             values[i] = defaultValue;
         }
-    
-        return new IndexedMap<>(new EntrySet.ObjectByte<>(keys, values));
+
+        return new IndexedMap.MappedPrimitives<>(new EntrySet.ObjectByte<>(keys, values));
     }
 
     public static <K extends Enum<K>, V> IndexedMap<K, V> of(Class<K> keyType, Class<V> valueType) {
-    
+
         K[] keys = keyType.getEnumConstants();
         @SuppressWarnings("unchecked")
         V[] values = (V[]) Array.newInstance(valueType, keys.length);
-    
+
         for (int i = 0; i < values.length; i++) {
             try {
                 values[i] = valueType.newInstance();
@@ -67,80 +104,80 @@ public final class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<
                 values[i] = null;
             }
         }
-    
+
         return new IndexedMap<>(new EntrySet.ObjectObject<>(keys, values));
     }
 
-    public static <K extends Enum<K>> IndexedMap<K, PrimitiveNumber> of(Class<K> keyType, double defaultValue) {
-    
+    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(Class<K> keyType, double defaultValue) {
+
         K[] keys = keyType.getEnumConstants();
         double[] values = new double[keys.length];
-    
+
         for (int i = 0; i < values.length; i++) {
             values[i] = defaultValue;
         }
-    
-        return new IndexedMap<>(new EntrySet.ObjectDouble<>(keys, values));
+
+        return new IndexedMap.MappedPrimitives<>(new EntrySet.ObjectDouble<>(keys, values));
     }
 
-    public static <K extends Enum<K>> IndexedMap<K, PrimitiveNumber> of(Class<K> keyType, float defaultValue) {
-    
+    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(Class<K> keyType, float defaultValue) {
+
         K[] keys = keyType.getEnumConstants();
         float[] values = new float[keys.length];
-    
+
         for (int i = 0; i < values.length; i++) {
             values[i] = defaultValue;
         }
-    
-        return new IndexedMap<>(new EntrySet.ObjectFloat<>(keys, values));
+
+        return new IndexedMap.MappedPrimitives<>(new EntrySet.ObjectFloat<>(keys, values));
     }
 
-    public static <K extends Enum<K>> IndexedMap<K, PrimitiveNumber> of(Class<K> keyType, int defaultValue) {
-    
+    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(Class<K> keyType, int defaultValue) {
+
         K[] keys = keyType.getEnumConstants();
         int[] values = new int[keys.length];
-    
+
         for (int i = 0; i < values.length; i++) {
             values[i] = defaultValue;
         }
-    
-        return new IndexedMap<>(new EntrySet.ObjectInt<>(keys, values));
+
+        return new IndexedMap.MappedPrimitives<>(new EntrySet.ObjectInt<>(keys, values));
     }
 
-    public static <K extends Enum<K>> IndexedMap<K, PrimitiveNumber> of(Class<K> keyType, long defaultValue) {
-    
+    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(Class<K> keyType, long defaultValue) {
+
         K[] keys = keyType.getEnumConstants();
         long[] values = new long[keys.length];
-    
+
         for (int i = 0; i < values.length; i++) {
             values[i] = defaultValue;
         }
-    
-        return new IndexedMap<>(new EntrySet.ObjectLong<>(keys, values));
+
+        return new IndexedMap.MappedPrimitives<>(new EntrySet.ObjectLong<>(keys, values));
     }
 
-    public static <K extends Enum<K>> IndexedMap<K, PrimitiveNumber> of(Class<K> keyType, short defaultValue) {
-    
+    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(Class<K> keyType, short defaultValue) {
+
         K[] keys = keyType.getEnumConstants();
         short[] values = new short[keys.length];
-    
+
         for (int i = 0; i < values.length; i++) {
             values[i] = defaultValue;
         }
-    
-        return new IndexedMap<>(new EntrySet.ObjectShort<>(keys, values));
+
+        return new IndexedMap.MappedPrimitives<>(new EntrySet.ObjectShort<>(keys, values));
     }
 
     public static <K extends Enum<K>, V> IndexedMap<K, V> of(Class<K> keyType, V defaultValue) {
-    
+
         K[] keys = keyType.getEnumConstants();
         @SuppressWarnings("unchecked")
         V[] values = (V[]) Array.newInstance(defaultValue.getClass(), keys.length);
-    
+
         for (int i = 0; i < values.length; i++) {
             values[i] = defaultValue;
         }
-    
+
         return new IndexedMap<>(new EntrySet.ObjectObject<>(keys, values));
     }
 
