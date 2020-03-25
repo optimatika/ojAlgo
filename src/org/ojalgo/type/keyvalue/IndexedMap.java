@@ -26,6 +26,7 @@ import java.util.AbstractMap;
 import java.util.Map;
 
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate1D;
 import org.ojalgo.type.PrimitiveNumber;
 
 /**
@@ -36,13 +37,25 @@ import org.ojalgo.type.PrimitiveNumber;
  */
 public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> {
 
-    public static final class MappedPrimitives<K> extends IndexedMap<K, PrimitiveNumber> implements Access1D<PrimitiveNumber> {
+    public static final class MappedPrimitives<K> extends IndexedMap<K, PrimitiveNumber> implements Access1D<PrimitiveNumber>, Mutate1D {
 
         private final EntrySet.KeyedPrimitives<K> myEntries;
 
         MappedPrimitives(EntrySet.KeyedPrimitives<K> entries) {
             super(entries);
             myEntries = entries;
+        }
+
+        public void add(long index, Comparable<?> addend) {
+            myEntries.add(index, addend);
+        }
+
+        public void add(long index, double addend) {
+            myEntries.add(index, addend);
+        }
+
+        public void add(long index, float addend) {
+            myEntries.add(index, addend);
         }
 
         public byte byteValue(long index) {
@@ -71,6 +84,18 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
 
         public long longValue(long index) {
             return myEntries.longValue(index);
+        }
+
+        public void set(long index, Comparable<?> value) {
+            myEntries.set(index, value);
+        }
+
+        public void set(long index, double value) {
+            myEntries.set(index, value);
+        }
+
+        public void set(long index, float value) {
+            myEntries.set(index, value);
         }
 
         public short shortValue(long index) {

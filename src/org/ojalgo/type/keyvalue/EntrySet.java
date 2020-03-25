@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.Spliterator;
 
 import org.ojalgo.structure.Access1D;
+import org.ojalgo.structure.Mutate1D;
+import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.PrimitiveNumber;
 
 /**
@@ -68,7 +70,7 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
 
     }
 
-    static abstract class KeyedPrimitives<K> extends EntrySet<K, PrimitiveNumber> implements Access1D<PrimitiveNumber> {
+    static abstract class KeyedPrimitives<K> extends EntrySet<K, PrimitiveNumber> implements Access1D<PrimitiveNumber>, Mutate1D {
 
         KeyedPrimitives(K[] keys) {
             super(keys);
@@ -91,6 +93,18 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         ObjectByte(K[] keys, byte[] values) {
             super(keys);
             myValues = values;
+        }
+
+        public void add(long index, Comparable<?> addend) {
+            myValues[Math.toIntExact(index)] += NumberDefinition.byteValue(addend);
+        }
+
+        public void add(long index, double addend) {
+            myValues[Math.toIntExact(index)] += (byte) addend;
+        }
+
+        public void add(long index, float addend) {
+            myValues[Math.toIntExact(index)] += addend;
         }
 
         public byte byteValue(long index) {
@@ -123,6 +137,18 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
             return myValues[Math.toIntExact(index)];
         }
 
+        public void set(long index, Comparable<?> value) {
+            myValues[Math.toIntExact(index)] = NumberDefinition.byteValue(value);
+        }
+
+        public void set(long index, double value) {
+            myValues[Math.toIntExact(index)] = (byte) value;
+        }
+
+        public void set(long index, float value) {
+            myValues[Math.toIntExact(index)] = (byte) value;
+        }
+
         @Override
         public void setValue(int index, PrimitiveNumber value) {
             myValues[index] = value.byteValue();
@@ -143,6 +169,18 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
             myValues = values;
         }
 
+        public void add(long index, Comparable<?> addend) {
+            myValues[Math.toIntExact(index)] += NumberDefinition.doubleValue(addend);
+        }
+
+        public void add(long index, double addend) {
+            myValues[Math.toIntExact(index)] += addend;
+        }
+
+        public void add(long index, float addend) {
+            myValues[Math.toIntExact(index)] += addend;
+        }
+
         public double doubleValue(long index) {
             return myValues[Math.toIntExact(index)];
         }
@@ -155,6 +193,18 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         @Override
         public PrimitiveNumber getValue(int index) {
             return PrimitiveNumber.of(myValues[index]);
+        }
+
+        public void set(long index, Comparable<?> value) {
+            myValues[Math.toIntExact(index)] = NumberDefinition.doubleValue(value);
+        }
+
+        public void set(long index, double value) {
+            myValues[Math.toIntExact(index)] = value;
+        }
+
+        public void set(long index, float value) {
+            myValues[Math.toIntExact(index)] = value;
         }
 
         @Override
@@ -171,6 +221,18 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         ObjectFloat(K[] keys, float[] values) {
             super(keys);
             myValues = values;
+        }
+
+        public void add(long index, Comparable<?> addend) {
+            myValues[Math.toIntExact(index)] += NumberDefinition.floatValue(addend);
+        }
+
+        public void add(long index, double addend) {
+            myValues[Math.toIntExact(index)] += (float) addend;
+        }
+
+        public void add(long index, float addend) {
+            myValues[Math.toIntExact(index)] += addend;
         }
 
         public double doubleValue(long index) {
@@ -191,6 +253,18 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
             return PrimitiveNumber.of(myValues[index]);
         }
 
+        public void set(long index, Comparable<?> value) {
+            myValues[Math.toIntExact(index)] = NumberDefinition.floatValue(value);
+        }
+
+        public void set(long index, double value) {
+            myValues[Math.toIntExact(index)] = (float) value;
+        }
+
+        public void set(long index, float value) {
+            myValues[Math.toIntExact(index)] = value;
+        }
+
         @Override
         public void setValue(int index, PrimitiveNumber value) {
             myValues[index] = value.floatValue();
@@ -205,6 +279,18 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         ObjectInt(K[] keys, int[] values) {
             super(keys);
             myValues = values;
+        }
+
+        public void add(long index, Comparable<?> addend) {
+            myValues[Math.toIntExact(index)] += NumberDefinition.intValue(addend);
+        }
+
+        public void add(long index, double addend) {
+            myValues[Math.toIntExact(index)] += (int) addend;
+        }
+
+        public void add(long index, float addend) {
+            myValues[Math.toIntExact(index)] += addend;
         }
 
         public double doubleValue(long index) {
@@ -233,6 +319,18 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
             return myValues[Math.toIntExact(index)];
         }
 
+        public void set(long index, Comparable<?> value) {
+            myValues[Math.toIntExact(index)] = NumberDefinition.intValue(value);
+        }
+
+        public void set(long index, double value) {
+            myValues[Math.toIntExact(index)] = (int) value;
+        }
+
+        public void set(long index, float value) {
+            myValues[Math.toIntExact(index)] = (int) value;
+        }
+
         @Override
         public void setValue(int index, PrimitiveNumber value) {
             myValues[index] = value.intValue();
@@ -247,6 +345,18 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         ObjectLong(K[] keys, long[] values) {
             super(keys);
             myValues = values;
+        }
+
+        public void add(long index, Comparable<?> addend) {
+            myValues[Math.toIntExact(index)] += NumberDefinition.longValue(addend);
+        }
+
+        public void add(long index, double addend) {
+            myValues[Math.toIntExact(index)] += (long) addend;
+        }
+
+        public void add(long index, float addend) {
+            myValues[Math.toIntExact(index)] += addend;
         }
 
         public double doubleValue(long index) {
@@ -269,6 +379,18 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
 
         public long longValue(long index) {
             return myValues[Math.toIntExact(index)];
+        }
+
+        public void set(long index, Comparable<?> value) {
+            myValues[Math.toIntExact(index)] = NumberDefinition.longValue(value);
+        }
+
+        public void set(long index, double value) {
+            myValues[Math.toIntExact(index)] = (long) value;
+        }
+
+        public void set(long index, float value) {
+            myValues[Math.toIntExact(index)] = (long) value;
         }
 
         @Override
@@ -313,6 +435,18 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
             myValues = values;
         }
 
+        public void add(long index, Comparable<?> addend) {
+            myValues[Math.toIntExact(index)] += NumberDefinition.shortValue(addend);
+        }
+
+        public void add(long index, double addend) {
+            myValues[Math.toIntExact(index)] += (short) addend;
+        }
+
+        public void add(long index, float addend) {
+            myValues[Math.toIntExact(index)] += addend;
+        }
+
         public double doubleValue(long index) {
             return myValues[Math.toIntExact(index)];
         }
@@ -337,6 +471,18 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
 
         public long longValue(long index) {
             return myValues[Math.toIntExact(index)];
+        }
+
+        public void set(long index, Comparable<?> value) {
+            myValues[Math.toIntExact(index)] = NumberDefinition.shortValue(value);
+        }
+
+        public void set(long index, double value) {
+            myValues[Math.toIntExact(index)] = (short) value;
+        }
+
+        public void set(long index, float value) {
+            myValues[Math.toIntExact(index)] = (short) value;
         }
 
         @Override
