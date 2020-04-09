@@ -318,7 +318,7 @@ public abstract class GenericSolver implements Optimisation.Solver {
      */
     protected final int incrementIterationsCount() {
         int iterationsDone = myIterationsCount.incrementAndGet();
-        if (this.isLogProgress() && ((iterationsDone % 1000) == 0)) {
+        if (this.isLogProgress() && ((iterationsDone % 100_000) == 0)) {
             this.log("Done {} {} iterations after {}.", iterationsDone, this.getClass().getSimpleName(), myStopwatch.stop(CalendarDateUnit.SECOND));
         }
         return iterationsDone;
