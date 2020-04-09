@@ -23,19 +23,26 @@ package org.ojalgo.optimisation.integer;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinPool.ForkJoinWorkerThreadFactory;
 import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.multiary.MultiaryFunction;
+import org.ojalgo.machine.VirtualMachine;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
@@ -232,9 +239,102 @@ public final class IntegerSolver extends GenericSolver {
     }
 
     private static ForkJoinPool executor() {
+
         if (EXECUTOR == null) {
-            EXECUTOR = new ForkJoinPool(OjAlgoUtils.ENVIRONMENT.threads);
+
+            VirtualMachine envm = OjAlgoUtils.ENVIRONMENT;
+
+            try {
+
+                /**
+                 * This constructor only available with Java 9 and onwards.
+                 */
+                Constructor<ForkJoinPool> java9constructor = ForkJoinPool.class.getConstructor(int.class, ForkJoinWorkerThreadFactory.class,
+                        UncaughtExceptionHandler.class, boolean.class, int.class, int.class, int.class, Predicate.class, long.class, TimeUnit.class);
+
+                /**
+                 * parallelism the parallelism level. For default value, use
+                 * java.lang.Runtime.availableProcessors.
+                 */
+                int parallelism = envm.cores;
+                /**
+                 * factory the factory for creating new threads. For default value, use
+                 * defaultForkJoinWorkerThreadFactory.
+                 */
+                ForkJoinWorkerThreadFactory factory = ForkJoinPool.defaultForkJoinWorkerThreadFactory;
+                /**
+                 * handler the handler for internal worker threads that terminate due to unrecoverable errors
+                 * encountered while executing tasks. For default value, use null.
+                 */
+                UncaughtExceptionHandler handler = null;
+                /**
+                 * asyncMode if true, establishes local first-in-first-out scheduling mode for forked tasks
+                 * that are never joined. This mode may be more appropriate than default locally stack-based
+                 * mode in applications in which worker threads only process event-style asynchronous tasks.
+                 * For default value, use false.
+                 */
+                boolean asyncMode = false;
+                /**
+                 * corePoolSize the number of threads to keep in the pool (unless timed out after an elapsed
+                 * keep-alive). Normally (and by default) this is the same value as the parallelism level, but
+                 * may be set to a larger value to reduce dynamic overhead if tasks regularly block. Using a
+                 * smaller value (for example 0) has the same effect as the default.
+                 */
+                int corePoolSize = 0;
+                /**
+                 * maximumPoolSize the maximum number of threads allowed. When the maximum is reached,
+                 * attempts to replace blocked threads fail. (However, because creation and termination of
+                 * different threads may overlap, and may be managed by the given thread factory, this value
+                 * may be transiently exceeded.) To arrange the same value as is used by default for the
+                 * common pool, use 256 plus the parallelism level. (By default, the common pool allows a
+                 * maximum of 256 spare threads.) Using a value (for example Integer.MAX_VALUE) larger than
+                 * the implementation's total thread limit has the same effect as using this limit (which is
+                 * the default).
+                 */
+                int maximumPoolSize = envm.cores + envm.threads;
+                /**
+                 * minimumRunnable the minimum allowed number of core threads not blocked by a join or
+                 * ManagedBlocker. To ensure progress, when too few unblocked threads exist and unexecuted
+                 * tasks may exist, new threads are constructed, up to the given maximumPoolSize. For the
+                 * default value, use 1, that ensures liveness. A larger value might improve throughput in the
+                 * presence of blocked activities, but might not, due to increased overhead. A value of zero
+                 * may be acceptable when submitted tasks cannot have dependencies requiring additional
+                 * threads.
+                 */
+                int minimumRunnable = envm.units;
+                /**
+                 * saturate if non-null, a predicate invoked upon attempts to create more than the maximum
+                 * total allowed threads. By default, when a thread is about to block on a join or
+                 * ManagedBlocker, but cannot be replaced because the maximumPoolSize would be exceeded, a
+                 * RejectedExecutionException is thrown. But if this predicate returns true, then no exception
+                 * is thrown, so the pool continues to operate with fewer than the target number of runnable
+                 * threads, which might not ensure progress.
+                 */
+                Predicate<? super ForkJoinPool> saturate = fjp -> true;
+                /**
+                 * keepAliveTime the elapsed time since last use before a thread is terminated (and then later
+                 * replaced if needed). For the default value, use 60, TimeUnit.SECONDS.
+                 */
+                long keepAliveTime = 60;
+                /**
+                 * unit the time unit for the keepAliveTime argument
+                 */
+                TimeUnit unit = TimeUnit.SECONDS;
+
+                EXECUTOR = java9constructor.newInstance(parallelism, factory, handler, asyncMode, corePoolSize, maximumPoolSize, minimumRunnable, saturate,
+                        keepAliveTime, unit);
+
+            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException exception) {
+
+                EXECUTOR = null;
+            }
+
+            if (EXECUTOR == null) {
+                EXECUTOR = new ForkJoinPool(envm.threads);
+            }
         }
+
         return EXECUTOR;
     }
 
