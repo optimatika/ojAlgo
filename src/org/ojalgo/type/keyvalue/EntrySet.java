@@ -104,7 +104,8 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         }
 
         public void add(long index, float addend) {
-            myValues[Math.toIntExact(index)] += addend;
+            int intIndex = Math.toIntExact(index);
+            myValues[intIndex] = (byte) (myValues[intIndex] + addend);
         }
 
         public byte byteValue(long index) {
@@ -290,7 +291,8 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         }
 
         public void add(long index, float addend) {
-            myValues[Math.toIntExact(index)] += addend;
+            int intIndex = Math.toIntExact(index);
+            myValues[intIndex] = (int) (myValues[intIndex] + addend);
         }
 
         public double doubleValue(long index) {
