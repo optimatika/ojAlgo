@@ -21,6 +21,8 @@
  */
 package org.ojalgo.type;
 
+import java.util.Objects;
+
 /**
  * An interface that defines what is already in {@link java.lang.Number}. Hopefully Java itself will one day
  * get an interface similar to this. When/if that happens this interface, and possibly some additional usage
@@ -28,11 +30,16 @@ package org.ojalgo.type;
  */
 public interface NumberDefinition {
 
+    static boolean booleanValue(final Comparable<?> number) {
+
+        Objects.requireNonNull(number);
+
+        return NumberDefinition.intValue(number) == 0 ? false : true;
+    }
+
     static byte byteValue(final Comparable<?> number) {
 
-        if (number == null) {
-            return 0;
-        }
+        Objects.requireNonNull(number);
 
         if (number instanceof NumberDefinition) {
             return ((NumberDefinition) number).byteValue();
@@ -45,9 +52,7 @@ public interface NumberDefinition {
 
     static double doubleValue(final Comparable<?> number) {
 
-        if (number == null) {
-            return 0D;
-        }
+        Objects.requireNonNull(number);
 
         if (number instanceof NumberDefinition) {
             return ((NumberDefinition) number).doubleValue();
@@ -60,9 +65,7 @@ public interface NumberDefinition {
 
     static float floatValue(final Comparable<?> number) {
 
-        if (number == null) {
-            return 0F;
-        }
+        Objects.requireNonNull(number);
 
         if (number instanceof NumberDefinition) {
             return ((NumberDefinition) number).floatValue();
@@ -75,9 +78,7 @@ public interface NumberDefinition {
 
     static int intValue(final Comparable<?> number) {
 
-        if (number == null) {
-            return 0;
-        }
+        Objects.requireNonNull(number);
 
         if (number instanceof NumberDefinition) {
             return ((NumberDefinition) number).intValue();
@@ -90,9 +91,7 @@ public interface NumberDefinition {
 
     static long longValue(final Comparable<?> number) {
 
-        if (number == null) {
-            return 0L;
-        }
+        Objects.requireNonNull(number);
 
         if (number instanceof NumberDefinition) {
             return ((NumberDefinition) number).longValue();
@@ -105,9 +104,7 @@ public interface NumberDefinition {
 
     static short shortValue(final Comparable<?> number) {
 
-        if (number == null) {
-            return 0;
-        }
+        Objects.requireNonNull(number);
 
         if (number instanceof NumberDefinition) {
             return ((NumberDefinition) number).shortValue();

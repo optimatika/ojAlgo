@@ -79,20 +79,60 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
 
     }
 
+    static boolean booleanValue(final Comparable<?> number) {
+        if (number != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    static byte byteValue(final Comparable<?> number) {
+        if (number != null) {
+            return NumberDefinition.byteValue(number);
+        } else {
+            return 0;
+        }
+    }
+
     static double doubleValue(final Comparable<?> number) {
-        return NumberDefinition.doubleValue(number);
+        if (number != null) {
+            return NumberDefinition.doubleValue(number);
+        } else {
+            return 0D;
+        }
     }
 
     static float floatValue(final Comparable<?> number) {
-        return NumberDefinition.floatValue(number);
+        if (number != null) {
+            return NumberDefinition.floatValue(number);
+        } else {
+            return 0F;
+        }
     }
 
     static int intValue(final Comparable<?> number) {
-        return NumberDefinition.intValue(number);
+        if (number != null) {
+            return NumberDefinition.intValue(number);
+        } else {
+            return 0;
+        }
     }
 
     static long longValue(final Comparable<?> number) {
-        return NumberDefinition.longValue(number);
+        if (number != null) {
+            return NumberDefinition.longValue(number);
+        } else {
+            return 0L;
+        }
+    }
+
+    static short shortValue(final Comparable<?> number) {
+        if (number != null) {
+            return NumberDefinition.shortValue(number);
+        } else {
+            return 0;
+        }
     }
 
     @Override
