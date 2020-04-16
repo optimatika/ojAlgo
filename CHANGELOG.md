@@ -22,13 +22,19 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New array builder and (type) converter class named NumberReceptacle.
 - PrimitiveNumber implementations for all primitive number types.
-- New classes EntryPair, EntryList and IndexedMap to deal with key-value pairs in various ways.
+- New classes EntryPair, EntryList, EntrySet and IndexedMap to deal with key-value pairs in various ways.
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- Changed how the IntegerSolver instantiates its ForkJoinPool; using Java 9's more expressive constructor if it's available.
 
 ### Deprecated
 
 #### org.ojalgo.type
 
-- Everything, previously existing, in the org.ojalgo.type.keyvalue package has been deprecated. Instead there is a new interface EntryPair, as well as a collection of implementations, that replace it. The functionality of the old and new stuff only partially overlap.
+- Everything, previously existing, in the org.ojalgo.type.keyvalue package has been deprecated. Instead there is a new interface EntryPair, as well as a collection of implementations, that replace it. The functionality of the old and new stuff only partially overlap. There are also matching classes EntryList, EntrySet and others.
 
 
 ## [48.1.0] – 2020-01-15
