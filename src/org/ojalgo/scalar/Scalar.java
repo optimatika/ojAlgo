@@ -81,7 +81,7 @@ public interface Scalar<N extends Comparable<N>> extends AccessScalar<N>, Field<
 
     static boolean booleanValue(final Comparable<?> number) {
         if (number != null) {
-            return true;
+            return NumberDefinition.booleanValue(number);
         } else {
             return false;
         }
