@@ -141,12 +141,16 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     public void add(final long row, final long col, final Comparable<?> addend) {
-        myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
+        synchronized (myElements) {
+            myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
+        }
         this.updateNonZeros(row, col);
     }
 
     public void add(final long row, final long col, final double addend) {
-        myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
+        synchronized (myElements) {
+            myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
+        }
         this.updateNonZeros(row, col);
     }
 
@@ -197,12 +201,16 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     public void fillOne(final long row, final long col, final N value) {
-        myElements.fillOne(Structure2D.index(myFirsts.length, row, col), value);
+        synchronized (myElements) {
+            myElements.fillOne(Structure2D.index(myFirsts.length, row, col), value);
+        }
         this.updateNonZeros(row, col);
     }
 
     public void fillOne(final long row, final long col, final NullaryFunction<?> supplier) {
-        myElements.fillOne(Structure2D.index(myFirsts.length, row, col), supplier);
+        synchronized (myElements) {
+            myElements.fillOne(Structure2D.index(myFirsts.length, row, col), supplier);
+        }
         this.updateNonZeros(row, col);
     }
 
@@ -548,12 +556,16 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     public void set(final long row, final long col, final Comparable<?> value) {
-        myElements.set(Structure2D.index(myFirsts.length, row, col), value);
+        synchronized (myElements) {
+            myElements.set(Structure2D.index(myFirsts.length, row, col), value);
+        }
         this.updateNonZeros(row, col);
     }
 
     public void set(final long row, final long col, final double value) {
-        myElements.set(Structure2D.index(myFirsts.length, row, col), value);
+        synchronized (myElements) {
+            myElements.set(Structure2D.index(myFirsts.length, row, col), value);
+        }
         this.updateNonZeros(row, col);
     }
 
