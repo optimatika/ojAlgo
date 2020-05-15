@@ -643,7 +643,7 @@ public final class MultiplyBoth implements ArrayOperation {
     }
 
     static <N extends Scalar<N>> void invokeGeneric(final TransformableRegion<N> product, final int firstRow, final int rowLimit, final Access1D<N> left,
-            final int complexity, final Access1D<N> right) {
+            final long complexity, final Access1D<N> right) {
 
         @SuppressWarnings("unchecked")
         final Class<N> componenetType = (Class<N>) left.get(0L).getClass();
@@ -657,25 +657,26 @@ public final class MultiplyBoth implements ArrayOperation {
 
         final int tmpRowDim = Math.toIntExact(left.count() / complexity);
         final int tmpColDim = Math.toIntExact(right.count() / complexity);
+        final int tmpPlxDim = Math.toIntExact(complexity);
 
         @SuppressWarnings("unchecked")
-        final N[] tmpLeftRow = (N[]) Array.newInstance(componenetType, complexity);
+        final N[] tmpLeftRow = (N[]) Array.newInstance(componenetType, tmpPlxDim);
         N tmpVal;
 
         int tmpFirst = 0;
-        int tmpLimit = complexity;
+        int tmpLimit = tmpPlxDim;
 
         for (int i = firstRow; i < rowLimit; i++) {
 
             final int tmpFirstInRow = MatrixStore.firstInRow(left, i, 0);
-            final int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, complexity);
+            final int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, tmpPlxDim);
 
             for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
                 tmpLeftRow[c] = left.get(Structure2D.index(tmpRowDim, i, c));
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                final int tmpColBase = j * complexity;
+                final long tmpColBase = j * complexity;
 
                 tmpFirst = MatrixStore.firstInColumn(right, j, tmpFirstInRow);
                 tmpLimit = MatrixStore.limitOfColumn(right, j, tmpLimitOfRow);
@@ -690,28 +691,29 @@ public final class MultiplyBoth implements ArrayOperation {
     }
 
     static void invokePrimitive32(final TransformableRegion<Double> product, final int firstRow, final int rowLimit, final Access1D<Double> left,
-            final int complexity, final Access1D<Double> right) {
+            final long complexity, final Access1D<Double> right) {
 
         final int tmpRowDim = Math.toIntExact(product.countRows());
         final int tmpColDim = Math.toIntExact(product.countColumns());
+        final int tmpPlxDim = Math.toIntExact(complexity);
 
-        final float[] tmpLeftRow = new float[complexity];
+        final float[] tmpLeftRow = new float[tmpPlxDim];
         float tmpVal;
 
         int tmpFirst = 0;
-        int tmpLimit = complexity;
+        int tmpLimit = tmpPlxDim;
 
         for (int i = firstRow; i < rowLimit; i++) {
 
             final int tmpFirstInRow = MatrixStore.firstInRow(left, i, 0);
-            final int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, complexity);
+            final int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, tmpPlxDim);
 
             for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
                 tmpLeftRow[c] = left.floatValue(Structure2D.index(tmpRowDim, i, c));
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                final int tmpColBase = j * complexity;
+                final long tmpColBase = j * complexity;
 
                 tmpFirst = MatrixStore.firstInColumn(right, j, tmpFirstInRow);
                 tmpLimit = MatrixStore.limitOfColumn(right, j, tmpLimitOfRow);
@@ -726,28 +728,29 @@ public final class MultiplyBoth implements ArrayOperation {
     }
 
     static void invokePrimitive64(final TransformableRegion<Double> product, final int firstRow, final int rowLimit, final Access1D<Double> left,
-            final int complexity, final Access1D<Double> right) {
+            final long complexity, final Access1D<Double> right) {
 
         final int tmpRowDim = Math.toIntExact(product.countRows());
         final int tmpColDim = Math.toIntExact(product.countColumns());
+        final int tmpPlxDim = Math.toIntExact(complexity);
 
-        final double[] tmpLeftRow = new double[complexity];
+        final double[] tmpLeftRow = new double[tmpPlxDim];
         double tmpVal;
 
         int tmpFirst = 0;
-        int tmpLimit = complexity;
+        int tmpLimit = tmpPlxDim;
 
         for (int i = firstRow; i < rowLimit; i++) {
 
             final int tmpFirstInRow = MatrixStore.firstInRow(left, i, 0);
-            final int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, complexity);
+            final int tmpLimitOfRow = MatrixStore.limitOfRow(left, i, tmpPlxDim);
 
             for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
                 tmpLeftRow[c] = left.doubleValue(Structure2D.index(tmpRowDim, i, c));
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                final int tmpColBase = j * complexity;
+                final long tmpColBase = j * complexity;
 
                 tmpFirst = MatrixStore.firstInColumn(right, j, tmpFirstInRow);
                 tmpLimit = MatrixStore.limitOfColumn(right, j, tmpLimitOfRow);
