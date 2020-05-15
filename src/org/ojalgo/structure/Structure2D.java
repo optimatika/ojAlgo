@@ -476,10 +476,6 @@ public interface Structure2D extends Structure1D {
         return numberOfRows * numberOfColumnns;
     }
 
-    static int index(final int structure, final int row, final int column) {
-        return row + (column * structure);
-    }
-
     static long index(final long structure, final long row, final long column) {
         return row + (column * structure);
     }

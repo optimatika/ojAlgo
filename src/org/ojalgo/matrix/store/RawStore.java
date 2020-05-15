@@ -510,7 +510,7 @@ public final class RawStore implements PhysicalStore<Double> {
 
         for (int i = 0; i < structure; i++) {
             for (int j = 0; j < myNumberOfColumns; j++) {
-                data[i][j] = elements[Structure2D.index(structure, i, j)];
+                data[i][j] = elements[Math.toIntExact(Structure2D.index(structure, i, j))];
             }
         }
 
@@ -881,7 +881,7 @@ public final class RawStore implements PhysicalStore<Double> {
 
         int tmpRowDim = data.length;
 
-        int retVal = 0;
+        long retVal = 0;
         double tmpLargest = ZERO;
         double tmpValue;
         double[] tmpRow;
