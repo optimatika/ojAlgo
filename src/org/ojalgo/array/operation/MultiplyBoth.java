@@ -558,7 +558,7 @@ public final class MultiplyBoth implements ArrayOperation {
             }
         };
 
-        tmpConquerer.invoke(0, ((int) left.count()) / complexity, THRESHOLD);
+        tmpConquerer.invoke(0, Math.toIntExact(left.count() / complexity), THRESHOLD);
     };
 
     public static <N extends Scalar<N>> MultiplyBoth.Generic<N> newGeneric(final int rows, final int columns) {
@@ -575,7 +575,7 @@ public final class MultiplyBoth implements ArrayOperation {
                     }
                 };
 
-                tmpConquerer.invoke(0, ((int) left.count()) / complexity, THRESHOLD);
+                tmpConquerer.invoke(0, Math.toIntExact(left.count() / complexity), THRESHOLD);
             };
 
         } else {

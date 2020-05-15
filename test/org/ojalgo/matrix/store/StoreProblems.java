@@ -24,12 +24,96 @@ package org.ojalgo.matrix.store;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
 public class StoreProblems extends MatrixStoreTests {
+
+    static class EyeStore implements MatrixStore<Double> {
+
+        private final long myCountRows, myCountColumns;
+
+        EyeStore(long countRows, long countColumns) {
+            super();
+            myCountRows = countRows;
+            myCountColumns = countColumns;
+        }
+
+        public long countColumns() {
+            return myCountColumns;
+        }
+
+        public long countRows() {
+            return myCountRows;
+        }
+
+        public double doubleValue(long row, long col) {
+            return row == col ? 1D : 0D;
+        }
+
+        public int firstInColumn(int col) {
+            return col;
+        }
+
+        public int firstInRow(int row) {
+            return row;
+        }
+
+        public Double get(long row, long col) {
+            return this.doubleValue(row, col);
+        }
+
+        public int limitOfColumn(int col) {
+            return col + 1;
+        }
+
+        public int limitOfRow(int row) {
+            return row + 1;
+        }
+
+        public org.ojalgo.matrix.store.PhysicalStore.Factory<Double, ?> physical() {
+            return Primitive64Store.FACTORY;
+        }
+
+        public void supplyTo(TransformableRegion<Double> receiver) {
+            receiver.reset();
+            receiver.fillDiagonal(1D);
+        }
+
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/252 <br>
+     * <br>
+     * Test that the multiplication logic works when there are more elements that an int can count.
+     */
+    @Test
+    public void testGitHubIssue252() {
+
+        //int c = Integer.MAX_VALUE - 2;
+        int c = 46_340;
+
+        for (int m = 1; m < 10; m++) {
+            for (int n = 1; n < 10; n++) {
+
+                MatrixStore<Double> left = new EyeStore(m, c);
+                MatrixStore<Double> right = new EyeStore(c, n);
+
+                MatrixStore<Double> product = left.multiply(right);
+
+                TestUtils.assertEquals(m, product.countRows());
+                TestUtils.assertEquals(n, product.countColumns());
+
+                int sum = product.aggregateAll(Aggregator.SUM).intValue();
+
+                TestUtils.assertEquals(MissingMath.min(m, c, n), sum);
+            }
+        }
+    }
 
     /**
      * Problem with LogicalStore and multi-threading. The MinBatchSize#EXECUTOR was designed to have a fixed

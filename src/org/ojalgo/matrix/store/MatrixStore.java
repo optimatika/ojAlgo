@@ -932,9 +932,9 @@ public interface MatrixStore<N extends Comparable<N>>
     default MatrixStore<N> multiply(final MatrixStore<N> right) {
 
         long tmpCountRows = this.countRows();
-        long tmpCountColumns = right.count() / this.countColumns();
+        long tmpCountColumns = right.countColumns();
 
-        PhysicalStore<N> retVal = this.physical().makeZero(tmpCountRows, tmpCountColumns);
+        PhysicalStore<N> retVal = this.physical().make(tmpCountRows, tmpCountColumns);
 
         this.multiply(right, retVal);
 
