@@ -95,7 +95,7 @@ public class StoreProblems extends MatrixStoreTests {
     public void testGitHubIssue252() {
 
         //int c = Integer.MAX_VALUE - 2;
-        int c = 46_340;
+        int c = 50_000;
 
         for (int m = 1; m < 10; m++) {
             for (int n = 1; n < 10; n++) {
@@ -104,23 +104,20 @@ public class StoreProblems extends MatrixStoreTests {
                 MatrixStore<Double> left = new EyeStore(m, c);
                 MatrixStore<Double> right = new EyeStore(c, n);
 
-                MatrixStore<Double> product1 = left.multiply(right);
+                MatrixStore<Double> denseProduct = left.multiply(right);
 
-                TestUtils.assertEquals(m, product1.countRows());
-                TestUtils.assertEquals(n, product1.countColumns());
+                TestUtils.assertEquals(m, denseProduct.countRows());
+                TestUtils.assertEquals(n, denseProduct.countColumns());
 
-                int sum1 = product1.aggregateAll(Aggregator.SUM).intValue();
-                TestUtils.assertEquals(min, sum1);
+                TestUtils.assertEquals(min, denseProduct.aggregateAll(Aggregator.SUM).intValue());
 
-                SparseStore<Double> product2 = SparseStore.PRIMITIVE64.make(m, n);
-                product2.fillByMultiplying(left, right);
+                SparseStore<Double> sparseProduct = SparseStore.PRIMITIVE64.make(m, n);
+                sparseProduct.fillByMultiplying(left, right);
 
-                TestUtils.assertEquals(m, product2.countRows());
-                TestUtils.assertEquals(n, product2.countColumns());
+                TestUtils.assertEquals(m, sparseProduct.countRows());
+                TestUtils.assertEquals(n, sparseProduct.countColumns());
 
-                int sum2 = product2.aggregateAll(Aggregator.SUM).intValue();
-                TestUtils.assertEquals(min, sum2);
-
+                TestUtils.assertEquals(min, sparseProduct.aggregateAll(Aggregator.SUM).intValue());
             }
         }
     }
