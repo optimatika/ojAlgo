@@ -47,12 +47,12 @@ public final class MultiplyBoth implements ArrayOperation {
     public static int THRESHOLD = 16;
 
     static final MultiplyBoth.Primitive PRIMITIVE = (product, left, complexity, right) -> MultiplyBoth.invokePrimitive64(product, 0,
-            ((int) left.count()) / complexity, left, complexity, right);
+            Math.toIntExact(left.count() / complexity), left, complexity, right);
 
     static final MultiplyBoth.Primitive PRIMITIVE_0XN = (product, left, complexity, right) -> {
 
         left.count();
-        final int tmpColDim = (int) (right.count() / complexity);
+        final int tmpColDim = Math.toIntExact(right.count() / complexity);
 
         for (int j = 0; j < tmpColDim; j++) {
 
@@ -108,7 +108,7 @@ public final class MultiplyBoth implements ArrayOperation {
 
     static final MultiplyBoth.Primitive PRIMITIVE_1XN = (product, left, complexity, right) -> {
 
-        final int tmpColDim = (int) (right.count() / complexity);
+        final int tmpColDim = Math.toIntExact(right.count() / complexity);
 
         for (int j = 0; j < tmpColDim; j++) {
 
@@ -397,7 +397,7 @@ public final class MultiplyBoth implements ArrayOperation {
 
     static final MultiplyBoth.Primitive PRIMITIVE_6XN = (product, left, complexity, right) -> {
 
-        final int tmpColDim = (int) (right.count() / complexity);
+        final int tmpColDim = Math.toIntExact(right.count() / complexity);
 
         for (int j = 0; j < tmpColDim; j++) {
 
@@ -431,7 +431,7 @@ public final class MultiplyBoth implements ArrayOperation {
     static final MultiplyBoth.Primitive PRIMITIVE_7XN = (product, left, complexity, right) -> {
 
         left.count();
-        final int tmpColDim = (int) (right.count() / complexity);
+        final int tmpColDim = Math.toIntExact(right.count() / complexity);
 
         for (int j = 0; j < tmpColDim; j++) {
 
@@ -468,7 +468,7 @@ public final class MultiplyBoth implements ArrayOperation {
     static final MultiplyBoth.Primitive PRIMITIVE_8XN = (product, left, complexity, right) -> {
 
         left.count();
-        final int tmpColDim = (int) (right.count() / complexity);
+        final int tmpColDim = Math.toIntExact(right.count() / complexity);
 
         for (int j = 0; j < tmpColDim; j++) {
 
@@ -508,7 +508,7 @@ public final class MultiplyBoth implements ArrayOperation {
     static final MultiplyBoth.Primitive PRIMITIVE_9XN = (product, left, complexity, right) -> {
 
         left.count();
-        final int tmpColDim = (int) (right.count() / complexity);
+        final int tmpColDim = Math.toIntExact(right.count() / complexity);
 
         for (int j = 0; j < tmpColDim; j++) {
 
@@ -580,7 +580,8 @@ public final class MultiplyBoth implements ArrayOperation {
 
         } else {
 
-            return (product, left, complexity, right) -> MultiplyBoth.invokeGeneric(product, 0, ((int) left.count()) / complexity, left, complexity, right);
+            return (product, left, complexity, right) -> MultiplyBoth.invokeGeneric(product, 0, Math.toIntExact(left.count() / complexity), left, complexity,
+                    right);
         }
     }
 
@@ -619,7 +620,7 @@ public final class MultiplyBoth implements ArrayOperation {
     static void invoke(final double[] product, final int firstColumn, final int columnLimit, final Access1D<Double> left, final int complexity,
             final Access1D<Double> right) {
 
-        final int structure = ((int) left.count()) / complexity;
+        final int structure = Math.toIntExact(left.count() / complexity);
 
         final double[] leftColumn = new double[structure];
         for (int c = 0; c < complexity; c++) {
@@ -654,8 +655,8 @@ public final class MultiplyBoth implements ArrayOperation {
             throw new ProgrammingError(exception);
         }
 
-        final int tmpRowDim = (int) (left.count() / complexity);
-        final int tmpColDim = (int) (right.count() / complexity);
+        final int tmpRowDim = Math.toIntExact(left.count() / complexity);
+        final int tmpColDim = Math.toIntExact(right.count() / complexity);
 
         @SuppressWarnings("unchecked")
         final N[] tmpLeftRow = (N[]) Array.newInstance(componenetType, complexity);
@@ -691,8 +692,8 @@ public final class MultiplyBoth implements ArrayOperation {
     static void invokePrimitive32(final TransformableRegion<Double> product, final int firstRow, final int rowLimit, final Access1D<Double> left,
             final int complexity, final Access1D<Double> right) {
 
-        final int tmpRowDim = (int) product.countRows();
-        final int tmpColDim = (int) product.countColumns();
+        final int tmpRowDim = Math.toIntExact(product.countRows());
+        final int tmpColDim = Math.toIntExact(product.countColumns());
 
         final float[] tmpLeftRow = new float[complexity];
         float tmpVal;
@@ -727,8 +728,8 @@ public final class MultiplyBoth implements ArrayOperation {
     static void invokePrimitive64(final TransformableRegion<Double> product, final int firstRow, final int rowLimit, final Access1D<Double> left,
             final int complexity, final Access1D<Double> right) {
 
-        final int tmpRowDim = (int) product.countRows();
-        final int tmpColDim = (int) product.countColumns();
+        final int tmpRowDim = Math.toIntExact(product.countRows());
+        final int tmpColDim = Math.toIntExact(product.countColumns());
 
         final double[] tmpLeftRow = new double[complexity];
         double tmpVal;

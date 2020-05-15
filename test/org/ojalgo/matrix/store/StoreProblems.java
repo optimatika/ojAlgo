@@ -99,18 +99,28 @@ public class StoreProblems extends MatrixStoreTests {
 
         for (int m = 1; m < 10; m++) {
             for (int n = 1; n < 10; n++) {
+                int min = MissingMath.min(m, c, n);
 
                 MatrixStore<Double> left = new EyeStore(m, c);
                 MatrixStore<Double> right = new EyeStore(c, n);
 
-                MatrixStore<Double> product = left.multiply(right);
+                MatrixStore<Double> product1 = left.multiply(right);
 
-                TestUtils.assertEquals(m, product.countRows());
-                TestUtils.assertEquals(n, product.countColumns());
+                TestUtils.assertEquals(m, product1.countRows());
+                TestUtils.assertEquals(n, product1.countColumns());
 
-                int sum = product.aggregateAll(Aggregator.SUM).intValue();
+                int sum1 = product1.aggregateAll(Aggregator.SUM).intValue();
+                TestUtils.assertEquals(min, sum1);
 
-                TestUtils.assertEquals(MissingMath.min(m, c, n), sum);
+                SparseStore<Double> product2 = SparseStore.PRIMITIVE64.make(m, n);
+                product2.fillByMultiplying(left, right);
+
+                TestUtils.assertEquals(m, product2.countRows());
+                TestUtils.assertEquals(n, product2.countColumns());
+
+                int sum2 = product2.aggregateAll(Aggregator.SUM).intValue();
+                TestUtils.assertEquals(min, sum2);
+
             }
         }
     }

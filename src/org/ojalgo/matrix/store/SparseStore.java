@@ -189,7 +189,7 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
             ProgrammingError.throwForMultiplicationNotPossible();
         }
 
-        myMultiplyer.invoke(this, left, (int) (left.count() / this.countRows()), right);
+        myMultiplyer.invoke(this, left, complexity, right);
     }
 
     public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
