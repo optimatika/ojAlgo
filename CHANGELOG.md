@@ -36,6 +36,18 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Everything, previously existing, in the org.ojalgo.type.keyvalue package has been deprecated. Instead there is a new interface EntryPair, as well as a collection of implementations, that replace it. The functionality of the old and new stuff only partially overlap. There are also matching classes EntryList, EntrySet and others.
 
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Fixed a problem in SparseStore when concurrently adding different elements
+- Reviewed and potentially fixed various problems regarding matrix multiplication with more Than `Integer.MAX_VALUE` elements.
+
+### Removed
+
+#### org.ojalgo.structure
+
+- The all `int` version of the `Structure2D.index(...)` method. With larger 2D structures this would overflow.
 
 ## [48.1.0] – 2020-01-15
 

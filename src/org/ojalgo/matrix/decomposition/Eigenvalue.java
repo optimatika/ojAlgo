@@ -193,11 +193,23 @@ public interface Eigenvalue<N extends Comparable<N>>
 
     interface Generalised<N extends Comparable<N>> extends Eigenvalue<N> {
 
+        /**
+         * Corresponding to {@link #computeValuesOnly(org.ojalgo.structure.Access2D.Collectable)} but for the
+         * generalised case.
+         *
+         * @see #computeValuesOnly(org.ojalgo.structure.Access2D.Collectable)
+         */
         default boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA,
                 final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB) {
             return this.prepare(matrixB) && this.computeValuesOnly(matrixA);
         }
 
+        /**
+         * Corresponding to {@link #decompose(org.ojalgo.structure.Access2D.Collectable)} but for the
+         * generalised case.
+         *
+         * @see #decompose(org.ojalgo.structure.Access2D.Collectable)
+         */
         default boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA,
                 final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB) {
             return this.prepare(matrixB) && this.decompose(matrixA);
