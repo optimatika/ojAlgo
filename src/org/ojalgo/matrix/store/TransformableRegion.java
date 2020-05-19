@@ -154,7 +154,7 @@ public interface TransformableRegion<N extends Comparable<N>> extends Mutate2D.M
 
     interface FillByMultiplying<N extends Comparable<N>> {
 
-        void invoke(TransformableRegion<N> product, Access1D<N> left, int complexity, Access1D<N> right);
+        void invoke(TransformableRegion<N> product, Access1D<N> left, long complexity, Access1D<N> right);
 
     }
 
