@@ -18,6 +18,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New atan2 approximation that is about 10x faster than the ordinary Math.atan2
 
+#### org.ojalgo.structure
+
+- New method repeat(int,int) in Structure2D.Logical implemented in MatrixStore.LogicalBuilder and BasicMatrix.LogicalBuilder.
+
 #### org.ojalgo.type
 
 - New array builder and (type) converter class named NumberReceptacle.
