@@ -21,7 +21,9 @@
  */
 package org.ojalgo.type;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 
 import org.ojalgo.structure.Access1D;
@@ -34,61 +36,48 @@ import org.ojalgo.structure.Access1D;
  *
  * @author apete
  */
-public final class NumberReceptacle {
+public final class FloatingPointReceptacle {
 
-    static final class Placeholder {
-
-        final int count;
-        final double value;
-
-        Placeholder(int count, double value) {
-            super();
-            this.count = count;
-            this.value = value;
-        }
-
-    }
-
-    public static NumberReceptacle of(Access1D<?> values) {
-        NumberReceptacle retVal = new NumberReceptacle();
+    public static FloatingPointReceptacle of(Access1D<?> values) {
+        FloatingPointReceptacle retVal = new FloatingPointReceptacle();
         retVal.append(values);
         return retVal;
     }
 
-    public static NumberReceptacle of(double... values) {
-        NumberReceptacle retVal = new NumberReceptacle();
+    public static FloatingPointReceptacle of(double... values) {
+        FloatingPointReceptacle retVal = new FloatingPointReceptacle();
         retVal.append(values);
         return retVal;
     }
 
-    public static NumberReceptacle of(float... values) {
-        NumberReceptacle retVal = new NumberReceptacle();
+    public static FloatingPointReceptacle of(float... values) {
+        FloatingPointReceptacle retVal = new FloatingPointReceptacle();
         retVal.append(values);
         return retVal;
     }
 
-    public static NumberReceptacle of(int count, double value) {
-        NumberReceptacle retVal = new NumberReceptacle();
+    public static FloatingPointReceptacle of(int count, double value) {
+        FloatingPointReceptacle retVal = new FloatingPointReceptacle();
         retVal.append(count, value);
         return retVal;
     }
 
-    public static NumberReceptacle of(int count, float value) {
-        NumberReceptacle retVal = new NumberReceptacle();
+    public static FloatingPointReceptacle of(int count, float value) {
+        FloatingPointReceptacle retVal = new FloatingPointReceptacle();
         retVal.append(count, value);
         return retVal;
     }
 
-    public static NumberReceptacle of(List<? extends Comparable<?>> values) {
-        NumberReceptacle retVal = new NumberReceptacle();
+    public static FloatingPointReceptacle of(List<? extends Comparable<?>> values) {
+        FloatingPointReceptacle retVal = new FloatingPointReceptacle();
         retVal.append(values);
         return retVal;
     }
 
-    private final LinkedList<Object> myContents = new LinkedList<>();
+    private final Deque<Object> myContents = new ArrayDeque<>();
     private int mySize = 0;
 
-    public NumberReceptacle() {
+    public FloatingPointReceptacle() {
         super();
     }
 
@@ -98,8 +87,7 @@ public final class NumberReceptacle {
     }
 
     public void append(double value) {
-        myContents.addLast(new double[] { value });
-        mySize++;
+        this.append(new double[] { value });
     }
 
     public void append(double[] part) {
@@ -108,8 +96,7 @@ public final class NumberReceptacle {
     }
 
     public void append(float value) {
-        myContents.addLast(new float[] { value });
-        mySize++;
+        this.append(new float[] { value });
     }
 
     public void append(float[] part) {
@@ -117,22 +104,24 @@ public final class NumberReceptacle {
         mySize += part.length;
     }
 
-    public void append(int count, double value) {
-        myContents.addLast(new Placeholder(count, value));
-        mySize += count;
-    }
-
-    public void append(int count, float value) {
-        myContents.addLast(new Placeholder(count, value));
-        mySize += count;
-    }
-
-    public void append(List<? extends Comparable<?>> part) {
+    public void append(FloatingPointReceptacle part) {
         myContents.addLast(part);
         mySize += part.size();
     }
 
-    public void append(NumberReceptacle part) {
+    public void append(int count, double value) {
+        double[] part = new double[count];
+        Arrays.fill(part, value);
+        this.append(part);
+    }
+
+    public void append(int count, float value) {
+        float[] part = new float[count];
+        Arrays.fill(part, value);
+        this.append(part);
+    }
+
+    public void append(List<? extends Comparable<?>> part) {
         myContents.addLast(part);
         mySize += part.size();
     }
@@ -148,8 +137,7 @@ public final class NumberReceptacle {
     }
 
     public void prepend(double value) {
-        myContents.addFirst(new double[] { value });
-        mySize++;
+        this.prepend(new double[] { value });
     }
 
     public void prepend(double[] part) {
@@ -158,8 +146,7 @@ public final class NumberReceptacle {
     }
 
     public void prepend(float value) {
-        myContents.addFirst(new float[] { value });
-        mySize++;
+        this.prepend(new float[] { value });
     }
 
     public void prepend(float[] part) {
@@ -167,22 +154,24 @@ public final class NumberReceptacle {
         mySize += part.length;
     }
 
-    public void prepend(int count, double value) {
-        myContents.addFirst(new Placeholder(count, value));
-        mySize += count;
-    }
-
-    public void prepend(int count, float value) {
-        myContents.addFirst(new Placeholder(count, value));
-        mySize += count;
-    }
-
-    public void prepend(List<? extends Comparable<?>> part) {
+    public void prepend(FloatingPointReceptacle part) {
         myContents.addFirst(part);
         mySize += part.size();
     }
 
-    public void prepend(NumberReceptacle part) {
+    public void prepend(int count, double value) {
+        double[] part = new double[count];
+        Arrays.fill(part, value);
+        this.prepend(part);
+    }
+
+    public void prepend(int count, float value) {
+        float[] part = new float[count];
+        Arrays.fill(part, value);
+        this.prepend(part);
+    }
+
+    public void prepend(List<? extends Comparable<?>> part) {
         myContents.addFirst(part);
         mySize += part.size();
     }
@@ -283,22 +272,6 @@ public final class NumberReceptacle {
         return offset + limit;
     }
 
-    private int copy(final Placeholder source, final double[] destination, final int offset) {
-        int limit = Math.min(source.count, destination.length - offset);
-        for (int s = 0; s < limit; s++) {
-            destination[offset + s] = source.value;
-        }
-        return offset + limit;
-    }
-
-    private int copy(final Placeholder source, final float[] destination, final int offset) {
-        int limit = Math.min(source.count, destination.length - offset);
-        for (int s = 0; s < limit; s++) {
-            destination[offset + s] = (float) source.value;
-        }
-        return offset + limit;
-    }
-
     @SuppressWarnings("unchecked")
     private int supplyTo(final double[] destination, int offset) {
         for (Object source : myContents) {
@@ -310,10 +283,8 @@ public final class NumberReceptacle {
                 offset = this.copy((Access1D<?>) source, destination, offset);
             } else if (source instanceof List) {
                 offset = this.copy((List<? extends Comparable<?>>) source, destination, offset);
-            } else if (source instanceof NumberReceptacle) {
-                offset = ((NumberReceptacle) source).supplyTo(destination, offset);
-            } else if (source instanceof Placeholder) {
-                offset = this.copy((Placeholder) source, destination, offset);
+            } else if (source instanceof FloatingPointReceptacle) {
+                offset = ((FloatingPointReceptacle) source).supplyTo(destination, offset);
             } else {
                 throw new IllegalArgumentException();
             }
@@ -332,10 +303,8 @@ public final class NumberReceptacle {
                 offset = this.copy((Access1D<?>) source, destination, offset);
             } else if (source instanceof List) {
                 offset = this.copy((List<? extends Comparable<?>>) source, destination, offset);
-            } else if (source instanceof NumberReceptacle) {
-                offset = ((NumberReceptacle) source).supplyTo(destination, offset);
-            } else if (source instanceof Placeholder) {
-                offset = this.copy((Placeholder) source, destination, offset);
+            } else if (source instanceof FloatingPointReceptacle) {
+                offset = ((FloatingPointReceptacle) source).supplyTo(destination, offset);
             } else {
                 throw new IllegalArgumentException();
             }
