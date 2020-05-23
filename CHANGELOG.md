@@ -24,7 +24,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.type
 
-- New array builder and (type) converter class named NumberReceptacle.
+- New array builder and (type) converter class named FloatingPointReceptacle.
 - PrimitiveNumber implementations for all primitive number types.
 - New classes EntryPair, EntryList, EntrySet and IndexedMap to deal with key-value pairs in various ways.
 
