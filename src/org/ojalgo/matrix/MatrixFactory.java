@@ -63,6 +63,11 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
 
         private final MatrixStore.LogicalBuilder<N> myDelegate;
 
+        public B repeat(int rowsRepetitions, int columnsRepetitions) {
+            myDelegate.repeat(rowsRepetitions, columnsRepetitions);
+            return this.self();
+        }
+
         Logical(final MatrixStore.LogicalBuilder<N> delegate) {
             super();
             myDelegate = delegate;
