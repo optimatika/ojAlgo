@@ -86,20 +86,12 @@ public final class FloatingPointReceptacle {
         mySize += part.size();
     }
 
-    public void append(double value) {
-        this.append(new double[] { value });
-    }
-
-    public void append(double[] part) {
+    public void append(double... part) {
         myContents.addLast(part);
         mySize += part.length;
     }
 
-    public void append(float value) {
-        this.append(new float[] { value });
-    }
-
-    public void append(float[] part) {
+    public void append(float... part) {
         myContents.addLast(part);
         mySize += part.length;
     }
@@ -136,20 +128,12 @@ public final class FloatingPointReceptacle {
         mySize += part.size();
     }
 
-    public void prepend(double value) {
-        this.prepend(new double[] { value });
-    }
-
-    public void prepend(double[] part) {
+    public void prepend(double... part) {
         myContents.addFirst(part);
         mySize += part.length;
     }
 
-    public void prepend(float value) {
-        this.prepend(new float[] { value });
-    }
-
-    public void prepend(float[] part) {
+    public void prepend(float... part) {
         myContents.addFirst(part);
         mySize += part.length;
     }
