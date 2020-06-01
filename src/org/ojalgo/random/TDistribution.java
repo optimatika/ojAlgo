@@ -166,6 +166,10 @@ public class TDistribution extends AbstractContinuous {
         }
     }
 
+    public static TDistribution ofInfinity() {
+        return TDistribution.of(Integer.MAX_VALUE);
+    }
+
     /**
      * The density and distribution functions share a common constant factor
      */
