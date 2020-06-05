@@ -47,6 +47,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Fixed a problem in SparseStore when concurrently adding different elements
 - Reviewed and potentially fixed various problems regarding matrix multiplication with more Than `Integer.MAX_VALUE` elements.
 
+#### org.ojalgo.optimisation
+
+- Fixed a problem where `time_abort` would be ignored if the solver had found a feasible solution. (In that case it would only check `time_suffice`.)
+
 ### Removed
 
 #### org.ojalgo.structure
