@@ -26,6 +26,13 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.BigAggregator;
+import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.TypeUtils;
@@ -264,6 +271,44 @@ public final class Variable extends ModelEntity<Variable> {
     @Override
     protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender) {
         return this.validate(value, context, appender, false);
+    }
+
+    @Override
+    int deriveAdjustmentExponent() {
+
+        int retVal = 0;
+
+        final AggregatorSet<BigDecimal> aggregators = BigAggregator.getSet();
+
+        final AggregatorFunction<BigDecimal> largest = aggregators.largest();
+        final AggregatorFunction<BigDecimal> smallest = aggregators.smallest();
+
+        largest.invoke(BigMath.ONE);
+        smallest.invoke(BigMath.ONE);
+        if (this.isLowerLimitSet()) {
+            largest.invoke(this.getLowerLimit());
+            smallest.invoke(this.getLowerLimit());
+        }
+        if (this.isUpperLimitSet()) {
+            largest.invoke(this.getUpperLimit());
+            smallest.invoke(this.getUpperLimit());
+        }
+
+        double expL = MissingMath.log10(largest.doubleValue(), PrimitiveMath.ZERO);
+
+        if (expL > 32) {
+
+            retVal = 0;
+
+        } else {
+
+            double expS = Math.max(MissingMath.log10(smallest.doubleValue(), -16), expL - 8);
+
+            double negatedAverage = (expL + expS) / (-PrimitiveMath.TWO);
+
+            retVal = MissingMath.roundToInt(negatedAverage);
+        }
+        return retVal;
     }
 
     IntIndex getIndex() {
