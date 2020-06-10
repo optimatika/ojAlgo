@@ -26,9 +26,9 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -44,6 +44,26 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     private static final BigDecimal SMALLEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_SMALLEST), new MathContext(8, RoundingMode.UP));
 
     static final NumberContext DISPLAY = NumberContext.getGeneral(6);
+
+    static BigDecimal toBigDecimal(final Comparable<?> number) {
+
+        if (number == null) {
+            return null;
+        }
+
+        if (number instanceof BigDecimal) {
+            return (BigDecimal) number;
+        }
+
+        BigDecimal candidate = TypeUtils.toBigDecimal(number);
+        final BigDecimal magnitude = candidate.abs();
+        if (magnitude.compareTo(LARGEST) >= 0) {
+            candidate = null;
+        } else if (magnitude.compareTo(SMALLEST) <= 0) {
+            candidate = BigMath.ZERO;
+        }
+        return candidate;
+    }
 
     private transient int myAdjustmentExponent = Integer.MIN_VALUE;
     private BigDecimal myContributionWeight = null;
@@ -177,7 +197,8 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
      * @see #getUpperLimit()
      */
     public final ME level(final Comparable<?> level) {
-        return this.lower(level).upper(level);
+        BigDecimal value = ModelEntity.toBigDecimal(level);
+        return this.lower(value).upper(value);
     }
 
     /**
@@ -187,21 +208,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
      */
     @SuppressWarnings("unchecked")
     public ME lower(final Comparable<?> lower) {
-        myLowerLimit = null;
-        if (lower != null) {
-            if (lower instanceof BigDecimal) {
-                myLowerLimit = (BigDecimal) lower;
-            } else if (Double.isFinite(NumberDefinition.doubleValue(lower))) {
-                BigDecimal limit = TypeUtils.toBigDecimal(lower);
-                final BigDecimal magnitude = limit.abs();
-                if (magnitude.compareTo(LARGEST) >= 0) {
-                    limit = null;
-                } else if (magnitude.compareTo(SMALLEST) <= 0) {
-                    limit = org.ojalgo.function.constant.BigMath.ZERO;
-                }
-                myLowerLimit = limit;
-            }
-        }
+        myLowerLimit = ModelEntity.toBigDecimal(lower);
         return (ME) this;
     }
 
@@ -222,21 +229,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
      */
     @SuppressWarnings("unchecked")
     public ME upper(final Comparable<?> upper) {
-        myUpperLimit = null;
-        if (upper != null) {
-            if (upper instanceof BigDecimal) {
-                myUpperLimit = (BigDecimal) upper;
-            } else if (Double.isFinite(NumberDefinition.doubleValue(upper))) {
-                BigDecimal limit = TypeUtils.toBigDecimal(upper);
-                final BigDecimal magnitude = limit.abs();
-                if (magnitude.compareTo(LARGEST) >= 0) {
-                    limit = null;
-                } else if (magnitude.compareTo(SMALLEST) <= 0) {
-                    limit = org.ojalgo.function.constant.BigMath.ZERO;
-                }
-                myUpperLimit = limit;
-            }
-        }
+        myUpperLimit = ModelEntity.toBigDecimal(upper);
         return (ME) this;
     }
 
@@ -245,17 +238,9 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
      */
     @SuppressWarnings("unchecked")
     public final ME weight(final Comparable<?> weight) {
-        myContributionWeight = null;
-        if (weight != null) {
-            BigDecimal tmpWeight = null;
-            if (weight instanceof BigDecimal) {
-                tmpWeight = (BigDecimal) weight;
-            } else if (Double.isFinite(NumberDefinition.doubleValue(weight))) {
-                tmpWeight = TypeUtils.toBigDecimal(weight);
-            }
-            if ((tmpWeight != null) && (tmpWeight.signum() != 0)) {
-                myContributionWeight = tmpWeight;
-            }
+        myContributionWeight = ModelEntity.toBigDecimal(weight);
+        if ((myContributionWeight != null) && (myContributionWeight.signum() == 0)) {
+            myContributionWeight = null;
         }
         return (ME) this;
     }
