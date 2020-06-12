@@ -307,6 +307,7 @@ public final class Variable extends ModelEntity<Variable> {
 
             retVal = MissingMath.roundToInt(negatedAverage);
         }
+
         return retVal;
     }
 
