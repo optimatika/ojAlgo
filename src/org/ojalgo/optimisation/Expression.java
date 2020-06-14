@@ -45,7 +45,6 @@ import org.ojalgo.function.multiary.LinearFunction;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.PureQuadraticFunction;
 import org.ojalgo.function.multiary.QuadraticFunction;
-import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
@@ -778,51 +777,33 @@ public final class Expression extends ModelEntity<Expression> {
     @Override
     int deriveAdjustmentExponent() {
 
-        int retVal = 0;
+        AggregatorSet<BigDecimal> aggregators = BigAggregator.getSet();
 
-        final AggregatorSet<BigDecimal> aggregators = BigAggregator.getSet();
-
-        final AggregatorFunction<BigDecimal> largest = aggregators.largest();
-        final AggregatorFunction<BigDecimal> smallest = aggregators.smallest();
+        AggregatorFunction<BigDecimal> largest = aggregators.largest();
+        AggregatorFunction<BigDecimal> smallest = aggregators.smallest();
 
         if (this.isAnyQuadraticFactorNonZero()) {
-            for (final BigDecimal quadraticFactor : myQuadratic.values()) {
+
+            for (BigDecimal quadraticFactor : myQuadratic.values()) {
                 largest.invoke(quadraticFactor);
                 smallest.invoke(quadraticFactor);
             }
+
+            return ModelEntity.deriveAdjustmentExponent(largest, smallest, 6);
+
         } else if (this.isAnyLinearFactorNonZero()) {
-            for (final BigDecimal linearFactor : myLinear.values()) {
+
+            for (BigDecimal linearFactor : myLinear.values()) {
                 largest.invoke(linearFactor);
                 smallest.invoke(linearFactor);
             }
-        } else {
-            largest.invoke(BigMath.ONE);
-            smallest.invoke(BigMath.ONE);
-            if (this.isLowerLimitSet()) {
-                largest.invoke(this.getLowerLimit());
-                smallest.invoke(this.getLowerLimit());
-            }
-            if (this.isUpperLimitSet()) {
-                largest.invoke(this.getUpperLimit());
-                smallest.invoke(this.getUpperLimit());
-            }
-        }
 
-        double expL = MissingMath.log10(largest.doubleValue(), PrimitiveMath.ZERO);
-
-        if (expL > 32) {
-
-            retVal = 0;
+            return ModelEntity.deriveAdjustmentExponent(largest, smallest, 16);
 
         } else {
 
-            double expS = Math.max(MissingMath.log10(smallest.doubleValue(), -16), expL - 8);
-
-            double negatedAverage = (expL + expS) / (-PrimitiveMath.TWO);
-
-            retVal = MissingMath.roundToInt(negatedAverage);
+            return 0;
         }
-        return retVal;
     }
 
     Expression doMixedIntegerRounding() {

@@ -29,9 +29,6 @@ import java.math.RoundingMode;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.BigAggregator;
-import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.TypeUtils;
@@ -275,40 +272,28 @@ public final class Variable extends ModelEntity<Variable> {
     @Override
     int deriveAdjustmentExponent() {
 
-        int retVal = 0;
-
-        final AggregatorSet<BigDecimal> aggregators = BigAggregator.getSet();
-
-        final AggregatorFunction<BigDecimal> largest = aggregators.largest();
-        final AggregatorFunction<BigDecimal> smallest = aggregators.smallest();
-
-        largest.invoke(BigMath.ONE);
-        smallest.invoke(BigMath.ONE);
-        if (this.isLowerLimitSet()) {
-            largest.invoke(this.getLowerLimit());
-            smallest.invoke(this.getLowerLimit());
-        }
-        if (this.isUpperLimitSet()) {
-            largest.invoke(this.getUpperLimit());
-            smallest.invoke(this.getUpperLimit());
+        if (!this.isConstraint()) {
+            return 0;
         }
 
-        double expL = MissingMath.log10(largest.doubleValue(), PrimitiveMath.ZERO);
+        AggregatorSet<BigDecimal> aggregators = BigAggregator.getSet();
 
-        if (expL > 32) {
+        AggregatorFunction<BigDecimal> largest = aggregators.largest();
+        AggregatorFunction<BigDecimal> smallest = aggregators.smallest();
 
-            retVal = 0;
-
-        } else {
-
-            double expS = Math.max(MissingMath.log10(smallest.doubleValue(), -16), expL - 8);
-
-            double negatedAverage = (expL + expS) / (-PrimitiveMath.TWO);
-
-            retVal = MissingMath.roundToInt(negatedAverage);
+        BigDecimal lowerLimit = this.getLowerLimit();
+        if (lowerLimit != null) {
+            largest.invoke(lowerLimit);
+            smallest.invoke(lowerLimit);
         }
 
-        return retVal;
+        BigDecimal upperLimit = this.getUpperLimit();
+        if (upperLimit != null) {
+            largest.invoke(upperLimit);
+            smallest.invoke(upperLimit);
+        }
+
+        return ModelEntity.deriveAdjustmentExponent(largest, smallest, 12);
     }
 
     IntIndex getIndex() {

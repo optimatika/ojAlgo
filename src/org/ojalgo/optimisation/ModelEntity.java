@@ -26,8 +26,10 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -44,6 +46,26 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     private static final BigDecimal SMALLEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_SMALLEST), new MathContext(8, RoundingMode.UP));
 
     static final NumberContext DISPLAY = NumberContext.getGeneral(6);
+
+    static int deriveAdjustmentExponent(final AggregatorFunction<BigDecimal> largest, final AggregatorFunction<BigDecimal> smallest, int range) {
+
+        double expL = MissingMath.log10(largest.doubleValue(), PrimitiveMath.ZERO);
+
+        int doubleRange = 2 * range;
+
+        if (expL > doubleRange) {
+
+            return 0;
+
+        } else {
+
+            double expS = Math.max(MissingMath.log10(smallest.doubleValue(), -doubleRange), expL - range);
+
+            double negatedAverage = (expL + expS) / (-PrimitiveMath.TWO);
+
+            return MissingMath.roundToInt(negatedAverage);
+        }
+    }
 
     static BigDecimal toBigDecimal(final Comparable<?> number) {
 
@@ -69,6 +91,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     private BigDecimal myContributionWeight = null;
     private BigDecimal myLowerLimit = null;
     private final String myName;
+
     private BigDecimal myUpperLimit = null;
 
     @SuppressWarnings("unused")

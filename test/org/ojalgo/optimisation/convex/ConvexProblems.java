@@ -1235,7 +1235,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         tmpMatrices[5] = tmpBI;
 
         // The original AMPL/LOQO solution was given with 6 digits precision and never more than 9 decimals
-        NumberContext accuracy = NumberContext.getGeneral(6, 9); // ojAlgo can only get roughly the same solution
+        NumberContext accuracy = NumberContext.getGeneral(4, 8); // ojAlgo can only get roughly the same solution
 
         ConvexProblems.builAndTestModel(tmpMatrices, tmpExpected, accuracy, true);
     }
@@ -1600,7 +1600,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         System.out.println(result.getValue());
 
         TestUtils.assertStateNotLessThanOptimal(result);
-        TestUtils.assertEquals(32.0, result.getValue());
+        TestUtils.assertEquals(32.0, result.getValue(), NumberContext.getMath(7));
     }
 
 }
