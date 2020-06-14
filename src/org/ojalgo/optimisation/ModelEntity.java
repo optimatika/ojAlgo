@@ -91,7 +91,6 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     private BigDecimal myContributionWeight = null;
     private BigDecimal myLowerLimit = null;
     private final String myName;
-
     private BigDecimal myUpperLimit = null;
 
     @SuppressWarnings("unused")

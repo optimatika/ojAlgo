@@ -1558,7 +1558,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        model.options.debug(ConvexSolver.class);
+        // model.options.debug(ConvexSolver.class);
 
         // Create the variables
         model.addVariable(Variable.make("w0"));

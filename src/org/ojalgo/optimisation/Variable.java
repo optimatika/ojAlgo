@@ -52,7 +52,6 @@ public final class Variable extends ModelEntity<Variable> {
     private IntIndex myIndex = null;
     private boolean myInteger = false;
     private transient boolean myUnbounded = false;
-
     private BigDecimal myValue = null;
 
     public Variable(final String name) {
