@@ -330,13 +330,16 @@ public abstract class GenericSolver implements Optimisation.Solver {
      * respective limits.
      */
     protected final boolean isIterationAllowed() {
+
         if (myState.isFailure()) {
             return false;
-        } else if (myState.isFeasible()) {
-            return (this.countTime() < options.time_suffice) && (this.countIterations() < options.iterations_suffice);
-        } else {
-            return (this.countTime() < options.time_abort) && (this.countIterations() < options.iterations_abort);
         }
+
+        if (myState.isFeasible()) {
+            return (this.countTime() < options.time_suffice) && (this.countIterations() < options.iterations_suffice);
+        }
+
+        return (this.countTime() < options.time_abort) && (this.countIterations() < options.iterations_abort);
     }
 
     /**
