@@ -26,6 +26,9 @@ import static org.ojalgo.function.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.type.TypeUtils;
@@ -49,7 +52,6 @@ public final class Variable extends ModelEntity<Variable> {
     private IntIndex myIndex = null;
     private boolean myInteger = false;
     private transient boolean myUnbounded = false;
-
     private BigDecimal myValue = null;
 
     public Variable(final String name) {
@@ -264,6 +266,33 @@ public final class Variable extends ModelEntity<Variable> {
     @Override
     protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender) {
         return this.validate(value, context, appender, false);
+    }
+
+    @Override
+    int deriveAdjustmentExponent() {
+
+        if (!this.isConstraint()) {
+            return 0;
+        }
+
+        AggregatorSet<BigDecimal> aggregators = BigAggregator.getSet();
+
+        AggregatorFunction<BigDecimal> largest = aggregators.largest();
+        AggregatorFunction<BigDecimal> smallest = aggregators.smallest();
+
+        BigDecimal lowerLimit = this.getLowerLimit();
+        if (lowerLimit != null) {
+            largest.invoke(lowerLimit);
+            smallest.invoke(lowerLimit);
+        }
+
+        BigDecimal upperLimit = this.getUpperLimit();
+        if (upperLimit != null) {
+            largest.invoke(upperLimit);
+            smallest.invoke(upperLimit);
+        }
+
+        return ModelEntity.deriveAdjustmentExponent(largest, smallest, 12);
     }
 
     IntIndex getIndex() {

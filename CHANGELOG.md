@@ -33,6 +33,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - Changed how the IntegerSolver instantiates its ForkJoinPool; using Java 9's more expressive constructor if it's available.
+- Modifications to the parameter scaling functionality of ExpressionsBasedModel
 
 ### Deprecated
 

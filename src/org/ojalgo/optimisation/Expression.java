@@ -35,7 +35,9 @@ import java.util.Set;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.multiary.ConstantFunction;
@@ -50,7 +52,6 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 import org.ojalgo.structure.Structure2D.IntRowColumn;
-import org.ojalgo.type.TypeUtils;
 
 /**
  * <p>
@@ -133,7 +134,7 @@ public final class Expression extends ModelEntity<Expression> {
         final BigDecimal tmpExisting = myLinear.get(key);
 
         if (tmpExisting != null) {
-            this.set(key, TypeUtils.toBigDecimal(value).add(tmpExisting));
+            this.set(key, ModelEntity.toBigDecimal(value).add(tmpExisting));
         } else {
             this.set(key, value);
         }
@@ -146,7 +147,7 @@ public final class Expression extends ModelEntity<Expression> {
         final BigDecimal tmpExisting = myQuadratic.get(key);
 
         if (tmpExisting != null) {
-            this.set(key, TypeUtils.toBigDecimal(value).add(tmpExisting));
+            this.set(key, ModelEntity.toBigDecimal(value).add(tmpExisting));
         } else {
             this.set(key, value);
         }
@@ -437,7 +438,7 @@ public final class Expression extends ModelEntity<Expression> {
 
         if (key != null) {
 
-            final BigDecimal tmpValue = TypeUtils.toBigDecimal(value);
+            final BigDecimal tmpValue = ModelEntity.toBigDecimal(value);
 
             if (tmpValue.signum() != 0) {
                 myLinear.put(key, tmpValue);
@@ -462,7 +463,7 @@ public final class Expression extends ModelEntity<Expression> {
 
         if (key != null) {
 
-            final BigDecimal tmpValue = TypeUtils.toBigDecimal(value);
+            final BigDecimal tmpValue = ModelEntity.toBigDecimal(value);
 
             if (tmpValue.signum() != 0) {
                 myQuadratic.put(key, tmpValue);
@@ -510,7 +511,7 @@ public final class Expression extends ModelEntity<Expression> {
         for (int ij = 0; ij < tmpLength; ij++) {
 
             tmpVariable = variables.get(ij);
-            tmpVal = TypeUtils.toBigDecimal(point.get(ij));
+            tmpVal = ModelEntity.toBigDecimal(point.get(ij));
 
             this.set(tmpVariable, tmpVariable, BigMath.ONE);
 
@@ -773,6 +774,38 @@ public final class Expression extends ModelEntity<Expression> {
         return myQuadratic.size();
     }
 
+    @Override
+    int deriveAdjustmentExponent() {
+
+        AggregatorSet<BigDecimal> aggregators = BigAggregator.getSet();
+
+        AggregatorFunction<BigDecimal> largest = aggregators.largest();
+        AggregatorFunction<BigDecimal> smallest = aggregators.smallest();
+
+        if (this.isAnyQuadraticFactorNonZero()) {
+
+            for (BigDecimal quadraticFactor : myQuadratic.values()) {
+                largest.invoke(quadraticFactor);
+                smallest.invoke(quadraticFactor);
+            }
+
+            return ModelEntity.deriveAdjustmentExponent(largest, smallest, 6);
+
+        } else if (this.isAnyLinearFactorNonZero()) {
+
+            for (BigDecimal linearFactor : myLinear.values()) {
+                largest.invoke(linearFactor);
+                smallest.invoke(linearFactor);
+            }
+
+            return ModelEntity.deriveAdjustmentExponent(largest, smallest, 16);
+
+        } else {
+
+            return 0;
+        }
+    }
+
     Expression doMixedIntegerRounding() {
 
         if (!this.isEqualityConstraint()) {
@@ -932,24 +965,6 @@ public final class Expression extends ModelEntity<Expression> {
 
     void setRedundant() {
         myRedundant = true;
-    }
-
-    @Override
-    void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
-
-        if (this.isAnyQuadraticFactorNonZero()) {
-            for (final BigDecimal quadraticFactor : myQuadratic.values()) {
-                largest.invoke(quadraticFactor);
-                smallest.invoke(quadraticFactor);
-            }
-        } else if (this.isAnyLinearFactorNonZero()) {
-            for (final BigDecimal linearFactor : myLinear.values()) {
-                largest.invoke(linearFactor);
-                smallest.invoke(linearFactor);
-            }
-        } else {
-            super.visitAllParameters(largest, smallest);
-        }
     }
 
 }
