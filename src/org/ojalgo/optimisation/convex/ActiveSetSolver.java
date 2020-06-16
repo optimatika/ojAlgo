@@ -668,9 +668,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             for (int i = 0; i < excl.length; i++) {
                 double slack = inqSlack.doubleValue(excl[i]);
                 if (ACCURACY.isZero(slack) && (this.countIncluded() < maxToInclude)) {
-                    if (!useLagrange || !ACCURACY.isZero(lagrange.doubleValue(numbEqus + excl[i]))) {
+                    double lagr = lagrange.doubleValue(numbEqus + excl[i]);
+                    if (!useLagrange || ((lagr != ZERO) && !ACCURACY.isZero(lagr))) {
                         if (this.isLogDebug()) {
-                            this.log("Will inlcude ineq {} with slack={} L={}", i, slack, lagrange.doubleValue(numbEqus + excl[i]));
+                            this.log("Will inlcude ineq {} with slack={} L={}", i, slack, lagr);
                         }
                         this.include(excl[i]);
                     }

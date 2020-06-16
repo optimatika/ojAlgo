@@ -41,22 +41,23 @@ public class ExtensionsSolverProblem {
     @Test
     public void testCompensate() {
 
-        final ExpressionsBasedModel test = new ExpressionsBasedModel();
-        test.addVariable(Variable.make("X1").lower(0).upper(5).weight(1));
-        test.addVariable(Variable.make("X2").lower(0).upper(5).weight(1));
-        test.addVariable(Variable.make("X3").level(4).weight(1));
-        final Expression expressions = test.addExpression("1").upper(5);
-        expressions.set(0, 1).set(1, 1).set(2, 1);
-        final Optimisation.Result result = test.maximise();
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+        model.addVariable(Variable.make("X1").lower(0).upper(5).weight(1));
+        model.addVariable(Variable.make("X2").lower(0).upper(5).weight(1));
+        model.addVariable(Variable.make("X3").level(4).weight(1));
 
-        TestUtils.assertTrue(test.validate(result));
+        Expression expression = model.addExpression("MAX5").upper(5);
+        expression.set(0, 1).set(1, 1).set(2, 1);
+
+        Optimisation.Result result = model.maximise();
+
+        TestUtils.assertTrue(model.validate(result));
 
         TestUtils.assertTrue(result.getState().isOptimal());
 
         TestUtils.assertEquals(5.0, result.getValue(), PrimitiveMath.MACHINE_EPSILON);
 
-        TestUtils.assertEquals(0.0, result.doubleValue(0), PrimitiveMath.MACHINE_EPSILON);
-        TestUtils.assertEquals(1.0, result.doubleValue(1), PrimitiveMath.MACHINE_EPSILON);
+        TestUtils.assertEquals(1.0, result.doubleValue(0) + result.doubleValue(1), PrimitiveMath.MACHINE_EPSILON);
         TestUtils.assertEquals(4.0, result.doubleValue(2), PrimitiveMath.MACHINE_EPSILON);
     }
 

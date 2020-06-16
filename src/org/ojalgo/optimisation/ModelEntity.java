@@ -26,15 +26,11 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -51,22 +47,44 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
     static final NumberContext DISPLAY = NumberContext.getGeneral(6);
 
-    static int getAdjustmentExponent(final double largest, final double smallest) {
+    static int deriveAdjustmentExponent(final AggregatorFunction<BigDecimal> largest, final AggregatorFunction<BigDecimal> smallest, int range) {
 
-        double expL = MissingMath.log10(largest, PrimitiveMath.ZERO);
+        double expL = MissingMath.log10(largest.doubleValue(), PrimitiveMath.ZERO);
 
-        if (expL > 32) {
+        int doubleRange = 2 * range;
+
+        if (expL > doubleRange) {
 
             return 0;
 
         } else {
 
-            double expS = Math.max(MissingMath.log10(smallest, -16), expL - 8);
+            double expS = Math.max(MissingMath.log10(smallest.doubleValue(), -doubleRange), expL - range);
 
             double negatedAverage = (expL + expS) / (-PrimitiveMath.TWO);
 
             return MissingMath.roundToInt(negatedAverage);
         }
+    }
+
+    static BigDecimal toBigDecimal(final Comparable<?> number) {
+
+        if (number == null) {
+            return null;
+        }
+
+        if (number instanceof BigDecimal) {
+            return (BigDecimal) number;
+        }
+
+        BigDecimal candidate = TypeUtils.toBigDecimal(number);
+        final BigDecimal magnitude = candidate.abs();
+        if (magnitude.compareTo(LARGEST) >= 0) {
+            candidate = null;
+        } else if (magnitude.compareTo(SMALLEST) <= 0) {
+            candidate = BigMath.ZERO;
+        }
+        return candidate;
     }
 
     private transient int myAdjustmentExponent = Integer.MIN_VALUE;
@@ -201,7 +219,8 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
      * @see #getUpperLimit()
      */
     public final ME level(final Comparable<?> level) {
-        return this.lower(level).upper(level);
+        BigDecimal value = ModelEntity.toBigDecimal(level);
+        return this.lower(value).upper(value);
     }
 
     /**
@@ -211,21 +230,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
      */
     @SuppressWarnings("unchecked")
     public ME lower(final Comparable<?> lower) {
-        myLowerLimit = null;
-        if (lower != null) {
-            if (lower instanceof BigDecimal) {
-                myLowerLimit = (BigDecimal) lower;
-            } else if (Double.isFinite(NumberDefinition.doubleValue(lower))) {
-                BigDecimal limit = TypeUtils.toBigDecimal(lower);
-                final BigDecimal magnitude = limit.abs();
-                if (magnitude.compareTo(LARGEST) >= 0) {
-                    limit = null;
-                } else if (magnitude.compareTo(SMALLEST) <= 0) {
-                    limit = org.ojalgo.function.constant.BigMath.ZERO;
-                }
-                myLowerLimit = limit;
-            }
-        }
+        myLowerLimit = ModelEntity.toBigDecimal(lower);
         return (ME) this;
     }
 
@@ -246,21 +251,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
      */
     @SuppressWarnings("unchecked")
     public ME upper(final Comparable<?> upper) {
-        myUpperLimit = null;
-        if (upper != null) {
-            if (upper instanceof BigDecimal) {
-                myUpperLimit = (BigDecimal) upper;
-            } else if (Double.isFinite(NumberDefinition.doubleValue(upper))) {
-                BigDecimal limit = TypeUtils.toBigDecimal(upper);
-                final BigDecimal magnitude = limit.abs();
-                if (magnitude.compareTo(LARGEST) >= 0) {
-                    limit = null;
-                } else if (magnitude.compareTo(SMALLEST) <= 0) {
-                    limit = org.ojalgo.function.constant.BigMath.ZERO;
-                }
-                myUpperLimit = limit;
-            }
-        }
+        myUpperLimit = ModelEntity.toBigDecimal(upper);
         return (ME) this;
     }
 
@@ -269,17 +260,9 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
      */
     @SuppressWarnings("unchecked")
     public final ME weight(final Comparable<?> weight) {
-        myContributionWeight = null;
-        if (weight != null) {
-            BigDecimal tmpWeight = null;
-            if (weight instanceof BigDecimal) {
-                tmpWeight = (BigDecimal) weight;
-            } else if (Double.isFinite(NumberDefinition.doubleValue(weight))) {
-                tmpWeight = TypeUtils.toBigDecimal(weight);
-            }
-            if ((tmpWeight != null) && (tmpWeight.signum() != 0)) {
-                myContributionWeight = tmpWeight;
-            }
+        myContributionWeight = ModelEntity.toBigDecimal(weight);
+        if ((myContributionWeight != null) && (myContributionWeight.signum() == 0)) {
+            myContributionWeight = null;
         }
         return (ME) this;
     }
@@ -360,19 +343,9 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     protected abstract void doIntegerRounding();
 
     protected final int getAdjustmentExponent() {
-
         if (myAdjustmentExponent == Integer.MIN_VALUE) {
-
-            final AggregatorSet<BigDecimal> tmpSet = BigAggregator.getSet();
-
-            final AggregatorFunction<BigDecimal> tmpLargest = tmpSet.largest();
-            final AggregatorFunction<BigDecimal> tmpSmallest = tmpSet.smallest();
-
-            this.visitAllParameters(tmpLargest, tmpSmallest);
-
-            myAdjustmentExponent = ModelEntity.getAdjustmentExponent(tmpLargest.doubleValue(), tmpSmallest.doubleValue());
+            myAdjustmentExponent = this.deriveAdjustmentExponent();
         }
-
         return myAdjustmentExponent;
     }
 
@@ -433,6 +406,8 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         this.appendRightPart(builder);
     }
 
+    abstract int deriveAdjustmentExponent();
+
     final BigDecimal getCompensatedLowerLimit(final BigDecimal compensation) {
         return myLowerLimit != null ? myLowerLimit.subtract(compensation) : null;
     }
@@ -459,19 +434,6 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
     boolean isInfeasible() {
         return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0);
-    }
-
-    void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
-        largest.invoke(BigMath.ONE);
-        smallest.invoke(BigMath.ONE);
-        if (myLowerLimit != null) {
-            largest.invoke(myLowerLimit);
-            smallest.invoke(myLowerLimit);
-        }
-        if (myUpperLimit != null) {
-            largest.invoke(myUpperLimit);
-            smallest.invoke(myUpperLimit);
-        }
     }
 
 }

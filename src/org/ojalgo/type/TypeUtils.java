@@ -118,7 +118,9 @@ public abstract class TypeUtils {
 
     /**
      * If the input {@linkplain java.lang.Comparale} is a {@linkplain java.math.BigDecimal} it is passed
-     * through unaltered. Otherwise an equivalent BigDecimal is created.
+     * through unaltered. Otherwise an equivalent BigDecimal is created. ALWAYS returns a valid
+     * {@link BigDecimal} instance - which, among other things, means that null and NaN are replaced by 0.0
+     * (zero).
      *
      * @param number Any Number
      * @return A corresponding BigDecimal
@@ -143,23 +145,23 @@ public abstract class TypeUtils {
 
                 return new BigDecimal(number.toString());
 
-            } catch (final NumberFormatException exception) {
+            } catch (final NumberFormatException cause) {
 
-                double tmpVal = PrimitiveMath.NaN;
+                double value = PrimitiveMath.NaN;
                 if (number instanceof NumberDefinition) {
-                    tmpVal = ((NumberDefinition) number).doubleValue();
+                    value = ((NumberDefinition) number).doubleValue();
                 } else if (number instanceof Number) {
-                    tmpVal = ((Number) number).doubleValue();
+                    value = ((Number) number).doubleValue();
                 }
 
-                if (Double.isNaN(tmpVal)) {
+                if (Double.isNaN(value)) {
                     return BigMath.ZERO;
-                } else if (Double.isInfinite(tmpVal) && (tmpVal > PrimitiveMath.ZERO)) {
+                } else if (value == Double.POSITIVE_INFINITY) {
                     return BigMath.VERY_POSITIVE;
-                } else if (Double.isInfinite(tmpVal) && (tmpVal < PrimitiveMath.ZERO)) {
+                } else if (value == Double.NEGATIVE_INFINITY) {
                     return BigMath.VERY_NEGATIVE;
                 } else {
-                    return BigDecimal.valueOf(tmpVal);
+                    return BigDecimal.valueOf(value);
                 }
             }
         }
