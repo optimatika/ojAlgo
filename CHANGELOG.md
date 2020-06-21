@@ -17,6 +17,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.function
 
 - New atan2 approximation that is about 10x faster than the ordinary Math.atan2
+- The lower/upper incomplete Gamma functions
 
 #### org.ojalgo.random
 
