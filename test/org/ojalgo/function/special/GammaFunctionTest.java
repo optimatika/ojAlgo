@@ -133,6 +133,56 @@ public class GammaFunctionTest {
         }
     }
 
+    /**
+     * https://keisan.casio.com/exec/system/1180573447
+     */
+    @Test
+    public void testRealIncompleteSpecific() {
+
+        NumberContext accuracy = StandardType.MATH_032;
+
+        TestUtils.assertEquals(0, GammaFunction.Incomplete.lower(0.1, 0), accuracy);
+        TestUtils.assertEquals(7.87292003586684463, GammaFunction.Incomplete.lower(0.1, 0.1), accuracy);
+        TestUtils.assertEquals(9.24338976700103295, GammaFunction.Incomplete.lower(0.1, 0.9), accuracy);
+        TestUtils.assertEquals(9.3175220365756059, GammaFunction.Incomplete.lower(0.1, 1.1), accuracy);
+        TestUtils.assertEquals(9.45172201500053164, GammaFunction.Incomplete.lower(0.1, 1.9), accuracy);
+        TestUtils.assertEquals(0.933474570590967605, GammaFunction.Incomplete.lower(0.9, 1.9), accuracy);
+        TestUtils.assertEquals(0.958776516878572364, GammaFunction.Incomplete.lower(0.9, 2.1), accuracy);
+        TestUtils.assertEquals(1.02046590958725702, GammaFunction.Incomplete.lower(0.9, 2.9), accuracy);
+        TestUtils.assertEquals(0.888458960465114828, GammaFunction.Incomplete.lower(1.1, 2.9), accuracy);
+        TestUtils.assertEquals(0.774968113665282324, GammaFunction.Incomplete.lower(1.9, 2.9), accuracy);
+        TestUtils.assertEquals(0.80174979131974618, GammaFunction.Incomplete.lower(1.9, 3.1), accuracy);
+        TestUtils.assertEquals(0.877296872539556581, GammaFunction.Incomplete.lower(1.9, 3.9), accuracy);
+        TestUtils.assertEquals(0.929972799769569735, GammaFunction.Incomplete.lower(2.1, 3.9), accuracy);
+        TestUtils.assertEquals(0.946816930796101455, GammaFunction.Incomplete.lower(2.1, 4.1), accuracy);
+        TestUtils.assertEquals(1.44919630678464887, GammaFunction.Incomplete.lower(2.9, 4.1), accuracy);
+        TestUtils.assertEquals(1.60501627193664795, GammaFunction.Incomplete.lower(2.9, 4.9), accuracy);
+        TestUtils.assertEquals(1.87768751008573734, GammaFunction.Incomplete.lower(3.1, 4.9), accuracy);
+        TestUtils.assertEquals(3.90719438037731354, GammaFunction.Incomplete.lower(3.9, 4.9), accuracy);
+        TestUtils.assertEquals(157190.141528116394, GammaFunction.Incomplete.lower(9.9, 9.9), accuracy);
+
+        TestUtils.assertEquals(9.51350769866873184, GammaFunction.Incomplete.upper(0.1, 0), accuracy);
+        TestUtils.assertEquals(1.64058766280188721, GammaFunction.Incomplete.upper(0.1, 0.1), accuracy);
+        TestUtils.assertEquals(0.27011793166769889, GammaFunction.Incomplete.upper(0.1, 0.9), accuracy);
+        TestUtils.assertEquals(0.195985662093125936, GammaFunction.Incomplete.upper(0.1, 1.1), accuracy);
+        TestUtils.assertEquals(0.0617856836682001938, GammaFunction.Incomplete.upper(0.1, 1.9), accuracy);
+        TestUtils.assertEquals(0.13515413152835175, GammaFunction.Incomplete.upper(0.9, 1.9), accuracy);
+        TestUtils.assertEquals(0.109852185240746991, GammaFunction.Incomplete.upper(0.9, 2.1), accuracy);
+        TestUtils.assertEquals(0.0481627925320623315, GammaFunction.Incomplete.upper(0.9, 2.9), accuracy);
+        TestUtils.assertEquals(0.0628918094017583553, GammaFunction.Incomplete.upper(1.1, 2.9), accuracy);
+        TestUtils.assertEquals(0.186797718242105096, GammaFunction.Incomplete.upper(1.9, 2.9), accuracy);
+        TestUtils.assertEquals(0.160016040587641239, GammaFunction.Incomplete.upper(1.9, 3.1), accuracy);
+        TestUtils.assertEquals(0.0844689593678308382, GammaFunction.Incomplete.upper(1.9, 3.9), accuracy);
+        TestUtils.assertEquals(0.116513047083990767, GammaFunction.Incomplete.upper(2.1, 3.9), accuracy);
+        TestUtils.assertEquals(0.0996689160574590466, GammaFunction.Incomplete.upper(2.1, 4.1), accuracy);
+        TestUtils.assertEquals(0.37815877383938723, GammaFunction.Incomplete.upper(2.9, 4.1), accuracy);
+        TestUtils.assertEquals(0.222338808687388152, GammaFunction.Incomplete.upper(2.9, 4.9), accuracy);
+        TestUtils.assertEquals(0.31993276830673972, GammaFunction.Incomplete.upper(3.1, 4.9), accuracy);
+        TestUtils.assertEquals(1.39213535343239114, GammaFunction.Incomplete.upper(3.9, 4.9), accuracy);
+        TestUtils.assertEquals(132677.562311993013, GammaFunction.Incomplete.upper(9.9, 9.9), accuracy);
+
+    }
+
     @Test
     public void testIntIncompleteSteps() {
 
@@ -172,7 +222,7 @@ public class GammaFunctionTest {
     }
 
     @Test
-    public void testSpecialCeseLimitZero() {
+    public void testSpecialCaseLimitZero() {
 
         double x = ZERO;
 
@@ -191,7 +241,7 @@ public class GammaFunctionTest {
     }
 
     @Test
-    public void testSpecialCeseValueOne() {
+    public void testSpecialCaseValueOne() {
 
         int n = 1;
 

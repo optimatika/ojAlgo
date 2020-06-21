@@ -36,8 +36,24 @@ public abstract class GammaFunction {
         }
 
         public static double lower(final double x, final double limit) {
-            // TODO Implement it!
-            return NaN;
+
+            double base = Math.exp(-limit) * Math.pow(limit, x);
+
+            if (Math.abs(base) < MACHINE_EPSILON) {
+                return ZERO;
+            }
+
+            double numerator = ONE, denominator = x;
+
+            double sum = numerator / denominator;
+            for (int i = 1; i < 100; i++) {
+                numerator *= limit;
+                denominator *= (x + i);
+                sum += (numerator / denominator);
+            }
+
+            return base * sum;
+
         }
 
         public static double lower(final int n, final double limit) {
@@ -58,7 +74,7 @@ public abstract class GammaFunction {
 
         public static double upper(final double x, final double limit) {
             // TODO Implement it!
-            return NaN;
+            return GammaFunction.gamma(x) - Incomplete.lower(x, limit);
         }
 
         public static double upper(final int n, final double limit) {
