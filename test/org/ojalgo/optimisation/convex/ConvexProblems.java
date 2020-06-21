@@ -1597,7 +1597,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         // Result on 47.0 is 32.0
         // Result on 48.1 is 8095.995340354874
-        System.out.println(result.getValue());
+        // System.out.println(result.getValue());
 
         TestUtils.assertStateNotLessThanOptimal(result);
         TestUtils.assertEquals(32.0, result.getValue(), NumberContext.getMath(7));

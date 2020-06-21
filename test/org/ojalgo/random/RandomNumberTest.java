@@ -409,18 +409,21 @@ public class RandomNumberTest extends RandomTests {
         RandomNumberTest.compareDensity(new TDistribution.Degree2(), new TDistribution(TWO));
         RandomNumberTest.compareDensity(new TDistribution.Degree3(), new TDistribution(THREE));
         RandomNumberTest.compareDensity(new TDistribution.Degree4(), new TDistribution(FOUR));
+        RandomNumberTest.compareDensity(new TDistribution.Degree5(), new TDistribution(FIVE));
         //        RandomNumberTest.compareDensity(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE));
 
         //        RandomNumberTest.compareDistribution(new TDistribution.Degree1(), new TDistribution(ONE));
         //        RandomNumberTest.compareDistribution(new TDistribution.Degree2(), new TDistribution(TWO));
         //        RandomNumberTest.compareDistribution(new TDistribution.Degree3(), new TDistribution(THREE));
         //        RandomNumberTest.compareDistribution(new TDistribution.Degree4(), new TDistribution(FOUR));
+        //        RandomNumberTest.compareDistribution(new TDistribution.Degree5(), new TDistribution(FIVE));
         //        RandomNumberTest.compareDistribution(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE));
 
         //        RandomNumberTest.compareQuantile(new TDistribution.Degree1(), new TDistribution(ONE));
         //        RandomNumberTest.compareQuantile(new TDistribution.Degree2(), new TDistribution(TWO));
         //        RandomNumberTest.compareQuantile(new TDistribution.Degree3(), new TDistribution(THREE));
         //        RandomNumberTest.compareQuantile(new TDistribution.Degree4(), new TDistribution(FOUR));
+        //        RandomNumberTest.compareQuantile(new TDistribution.Degree5(), new TDistribution(FIVE));
         //        RandomNumberTest.compareQuantile(new TDistribution.DegreeInfinity(), new TDistribution(Double.MAX_VALUE));
     }
 
