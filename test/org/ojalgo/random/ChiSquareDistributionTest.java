@@ -30,7 +30,7 @@ import org.ojalgo.type.context.NumberContext;
 
 public class ChiSquareDistributionTest {
 
-    private static final NumberContext ACCURACY_2_3 = StandardType.MATH_032.withPrecision(2).withScale(3);
+    private static final NumberContext ACCURACY = StandardType.MATH_032.withPrecision(2).withScale(3);
 
     static void doTestLowerTail(int degreesOfFreedom, double[] criticalValues) {
 
@@ -40,7 +40,7 @@ public class ChiSquareDistributionTest {
 
         for (int i = 0; i < probabilities.length; i++) {
             // BasicLogger.debug("Degree {} ({}): {} <=> {}", degreesOfFreedom, probabilities[i], criticalValues[i], distribution.getQuantile(probabilities[i]));
-            TestUtils.assertEquals(criticalValues[i], distribution.getQuantile(probabilities[i]), ACCURACY_2_3);
+            TestUtils.assertEquals(criticalValues[i], distribution.getQuantile(probabilities[i]), ACCURACY);
         }
     }
 
@@ -52,7 +52,7 @@ public class ChiSquareDistributionTest {
 
         for (int i = 0; i < probabilities.length; i++) {
             // BasicLogger.debug("Degree {} ({}): {} <=> {}", degreesOfFreedom, probabilities[i], criticalValues[i], distribution.getQuantile(probabilities[i]));
-            TestUtils.assertEquals(criticalValues[i], distribution.getQuantile(probabilities[i]), ACCURACY_2_3);
+            TestUtils.assertEquals(criticalValues[i], distribution.getQuantile(probabilities[i]), ACCURACY);
         }
     }
 

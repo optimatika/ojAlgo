@@ -18,6 +18,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - New atan2 approximation that is about 10x faster than the ordinary Math.atan2
 
+#### org.ojalgo.random
+
+- Implemented the ChiSquare distribution
+- Implemented the T distribution
+
 #### org.ojalgo.structure
 
 - New method repeat(int,int) in Structure2D.Logical implemented in MatrixStore.LogicalBuilder and BasicMatrix.LogicalBuilder.
