@@ -12,6 +12,9 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+
+## [48.2.0] – 2020-06-22
+
 ### Added
 
 #### org.ojalgo.function
