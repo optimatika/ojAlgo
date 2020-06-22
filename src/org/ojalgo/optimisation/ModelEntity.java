@@ -47,7 +47,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
     static final NumberContext DISPLAY = NumberContext.getGeneral(6);
 
-    static int deriveAdjustmentExponent(final AggregatorFunction<BigDecimal> largest, final AggregatorFunction<BigDecimal> smallest, int range) {
+    static int deriveAdjustmentExponent(final AggregatorFunction<BigDecimal> largest, final AggregatorFunction<BigDecimal> smallest, final int range) {
 
         double expL = MissingMath.log10(largest.doubleValue(), PrimitiveMath.ZERO);
 

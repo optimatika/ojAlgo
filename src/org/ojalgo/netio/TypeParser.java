@@ -6,28 +6,10 @@ import java.util.function.ToLongFunction;
 
 public class TypeParser {
 
-    public static ToDoubleFunction<CharSequence> DOUBLE = new ToDoubleFunction<CharSequence>() {
+    public static ToDoubleFunction<CharSequence> DOUBLE = value -> Double.parseDouble(value.toString());
 
-        public double applyAsDouble(final CharSequence value) {
-            return Double.parseDouble(value.toString());
-        }
+    public static ToIntFunction<CharSequence> INT = value -> Integer.parseInt(value.toString());
 
-    };
-
-    public static ToIntFunction<CharSequence> INT = new ToIntFunction<CharSequence>() {
-
-        public int applyAsInt(final CharSequence value) {
-            return Integer.parseInt(value.toString());
-        }
-
-    };
-
-    public static ToLongFunction<CharSequence> LONG = new ToLongFunction<CharSequence>() {
-
-        public long applyAsLong(final CharSequence value) {
-            return Long.parseLong(value.toString());
-        }
-
-    };
+    public static ToLongFunction<CharSequence> LONG = value -> Long.parseLong(value.toString());
 
 }

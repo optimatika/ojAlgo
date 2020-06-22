@@ -32,6 +32,8 @@ import org.ojalgo.type.NumberDefinition;
 
 public final class NumberSeries<N extends Comparable<N>> extends TreeSeries<N, N, NumberSeries<N>> {
 
+    private static final long serialVersionUID = 1L;
+
     public NumberSeries() {
         super();
     }

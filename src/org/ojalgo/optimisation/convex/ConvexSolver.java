@@ -360,7 +360,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
         // AI & BI
 
-        final List<Expression> tmpUpExpr = sourceModel.constraints().filter((e) -> e.isUpperConstraint() && !e.isAnyQuadraticFactorNonZero())
+        final List<Expression> tmpUpExpr = sourceModel.constraints().filter(e -> e.isUpperConstraint() && !e.isAnyQuadraticFactorNonZero())
                 .collect(Collectors.toList());
         final int numbUpExpr = tmpUpExpr.size();
 

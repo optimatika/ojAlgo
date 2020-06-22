@@ -37,7 +37,7 @@ public class StoreProblems extends MatrixStoreTests {
 
         private final long myCountRows, myCountColumns;
 
-        EyeStore(long countRows, long countColumns) {
+        EyeStore(final long countRows, final long countColumns) {
             super();
             myCountRows = countRows;
             myCountColumns = countColumns;
@@ -51,27 +51,27 @@ public class StoreProblems extends MatrixStoreTests {
             return myCountRows;
         }
 
-        public double doubleValue(long row, long col) {
+        public double doubleValue(final long row, final long col) {
             return row == col ? 1D : 0D;
         }
 
-        public int firstInColumn(int col) {
+        public int firstInColumn(final int col) {
             return col;
         }
 
-        public int firstInRow(int row) {
+        public int firstInRow(final int row) {
             return row;
         }
 
-        public Double get(long row, long col) {
+        public Double get(final long row, final long col) {
             return this.doubleValue(row, col);
         }
 
-        public int limitOfColumn(int col) {
+        public int limitOfColumn(final int col) {
             return col + 1;
         }
 
-        public int limitOfRow(int row) {
+        public int limitOfRow(final int row) {
             return row + 1;
         }
 
@@ -79,7 +79,7 @@ public class StoreProblems extends MatrixStoreTests {
             return Primitive64Store.FACTORY;
         }
 
-        public void supplyTo(TransformableRegion<Double> receiver) {
+        public void supplyTo(final TransformableRegion<Double> receiver) {
             receiver.reset();
             receiver.fillDiagonal(1D);
         }

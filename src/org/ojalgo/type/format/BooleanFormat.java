@@ -35,6 +35,8 @@ import org.ojalgo.type.context.BooleanContext;
  */
 public final class BooleanFormat extends Format {
 
+    private static final long serialVersionUID = 1L;
+
     private final String myFalseValue;
     private final String myNullValue;
     private final String myTrueValue;

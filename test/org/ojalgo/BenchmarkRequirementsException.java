@@ -23,6 +23,8 @@ package org.ojalgo;
 
 public class BenchmarkRequirementsException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     public BenchmarkRequirementsException() {
         super();
     }

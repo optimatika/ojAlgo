@@ -31,6 +31,8 @@ import org.ojalgo.type.TypeUtils;
  */
 public final class RecoverableCondition extends Exception implements EffectiveThrowable {
 
+    private static final long serialVersionUID = 1L;
+
     public static RecoverableCondition newEquationSystemNotSolvable() {
         return new RecoverableCondition("Equation System Not Solvable!");
     }

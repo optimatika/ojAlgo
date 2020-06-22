@@ -133,6 +133,44 @@ public class GammaFunctionTest {
         }
     }
 
+    @Test
+    public void testIntIncompleteSteps() {
+
+        NumberContext accuracy = StandardType.MATH_032;
+
+        int lim = 5;
+        for (int n = 1; n < lim; n++) {
+
+            for (int e = -1; e <= 1; e++) {
+                double x = Math.pow(TEN, e);
+
+                double lowExp = (n * GammaFunction.Incomplete.lower(n, x)) - (Math.pow(x, n) * Math.exp(-x));
+                double lowAct = GammaFunction.Incomplete.lower(n + 1, x);
+
+                TestUtils.assertEquals(lowExp, lowAct, accuracy);
+
+                double uppExp = (n * GammaFunction.Incomplete.upper(n, x)) + (Math.pow(x, n) * Math.exp(-x));
+                double uppAct = GammaFunction.Incomplete.upper(n + 1, x);
+
+                TestUtils.assertEquals(uppExp, uppAct, accuracy);
+            }
+        }
+    }
+
+    @Test
+    public void testLogarithmic() {
+
+        int lim = 50;
+        for (int a = 1; a < lim; a++) {
+            double x = a / TEN;
+
+            double expected = Math.log(GammaFunction.gamma(x));
+            double actual = GammaFunction.Logarithmic.gamma(x);
+
+            TestUtils.assertEquals(expected, actual);
+        }
+    }
+
     /**
      * https://keisan.casio.com/exec/system/1180573447
      */
@@ -181,44 +219,6 @@ public class GammaFunctionTest {
         TestUtils.assertEquals(1.39213535343239114, GammaFunction.Incomplete.upper(3.9, 4.9), accuracy);
         TestUtils.assertEquals(132677.562311993013, GammaFunction.Incomplete.upper(9.9, 9.9), accuracy);
 
-    }
-
-    @Test
-    public void testIntIncompleteSteps() {
-
-        NumberContext accuracy = StandardType.MATH_032;
-
-        int lim = 5;
-        for (int n = 1; n < lim; n++) {
-
-            for (int e = -1; e <= 1; e++) {
-                double x = Math.pow(TEN, e);
-
-                double lowExp = (n * GammaFunction.Incomplete.lower(n, x)) - (Math.pow(x, n) * Math.exp(-x));
-                double lowAct = GammaFunction.Incomplete.lower(n + 1, x);
-
-                TestUtils.assertEquals(lowExp, lowAct, accuracy);
-
-                double uppExp = (n * GammaFunction.Incomplete.upper(n, x)) + (Math.pow(x, n) * Math.exp(-x));
-                double uppAct = GammaFunction.Incomplete.upper(n + 1, x);
-
-                TestUtils.assertEquals(uppExp, uppAct, accuracy);
-            }
-        }
-    }
-
-    @Test
-    public void testLogarithmic() {
-
-        int lim = 50;
-        for (int a = 1; a < lim; a++) {
-            double x = a / TEN;
-
-            double expected = Math.log(GammaFunction.gamma(x));
-            double actual = GammaFunction.Logarithmic.gamma(x);
-
-            TestUtils.assertEquals(expected, actual);
-        }
     }
 
     @Test

@@ -108,10 +108,10 @@ public abstract class BigMath {
      * org.ojalgo.function.special.MissingMath.
      */
 
-    public static final BigFunction.Unary ABS = arg -> arg.abs();
+    public static final BigFunction.Unary ABS = BigDecimal::abs;
     public static final BigFunction.Unary ACOS = arg -> BigDecimal.valueOf(Math.acos(arg.doubleValue()));
     public static final BigFunction.Unary ACOSH = arg -> BigDecimal.valueOf(MissingMath.acosh(arg.doubleValue()));
-    public static final BigFunction.Binary ADD = (arg1, arg2) -> arg1.add(arg2);
+    public static final BigFunction.Binary ADD = BigDecimal::add;
     public static final BigFunction.Unary ASIN = arg -> BigDecimal.valueOf(Math.asin(arg.doubleValue()));
     public static final BigFunction.Unary ASINH = arg -> BigDecimal.valueOf(MissingMath.asinh(arg.doubleValue()));
     public static final BigFunction.Unary ATAN = arg -> BigDecimal.valueOf(Math.atan(arg.doubleValue()));
@@ -123,32 +123,32 @@ public abstract class BigMath {
     public static final BigFunction.Unary CONJUGATE = arg -> arg;
     public static final BigFunction.Unary COS = arg -> BigDecimal.valueOf(Math.cos(arg.doubleValue()));
     public static final BigFunction.Unary COSH = arg -> BigDecimal.valueOf(Math.cosh(arg.doubleValue()));
-    public static final BigFunction.Binary DIVIDE = (arg1, arg2) -> MissingMath.divide(arg1, arg2);
+    public static final BigFunction.Binary DIVIDE = MissingMath::divide;
     public static final BigFunction.Unary EXP = arg -> BigDecimal.valueOf(Math.exp(arg.doubleValue()));
     public static final BigFunction.Unary EXPM1 = arg -> BigDecimal.valueOf(Math.expm1(arg.doubleValue()));
     public static final BigFunction.Unary FLOOR = arg -> arg.setScale(0, RoundingMode.FLOOR);
-    public static final BigFunction.Binary HYPOT = (arg1, arg2) -> MissingMath.hypot(arg1, arg2);
+    public static final BigFunction.Binary HYPOT = MissingMath::hypot;
     public static final BigFunction.Unary INVERT = arg -> MissingMath.divide(ONE, arg);
     public static final BigFunction.Unary LOG = arg -> BigDecimal.valueOf(Math.log(arg.doubleValue()));
     public static final BigFunction.Unary LOG10 = arg -> BigDecimal.valueOf(Math.log10(arg.doubleValue()));
     public static final BigFunction.Unary LOG1P = arg -> BigDecimal.valueOf(Math.log1p(arg.doubleValue()));
     public static final BigFunction.Unary LOGISTIC = arg -> BigDecimal.valueOf(MissingMath.logistic(arg.doubleValue()));
     public static final BigFunction.Unary LOGIT = arg -> BigDecimal.valueOf(MissingMath.logit(arg.doubleValue()));
-    public static final BigFunction.Binary MAX = (arg1, arg2) -> arg1.max(arg2);
-    public static final BigFunction.Binary MIN = (arg1, arg2) -> arg1.min(arg2);
-    public static final BigFunction.Binary MULTIPLY = (arg1, arg2) -> arg1.multiply(arg2);
-    public static final BigFunction.Unary NEGATE = arg -> arg.negate();
-    public static final BigFunction.Binary POW = (arg1, arg2) -> MissingMath.pow(arg1, arg2);
-    public static final BigFunction.Parameter POWER = (arg, param) -> MissingMath.power(arg, param);
+    public static final BigFunction.Binary MAX = BigDecimal::max;
+    public static final BigFunction.Binary MIN = BigDecimal::min;
+    public static final BigFunction.Binary MULTIPLY = BigDecimal::multiply;
+    public static final BigFunction.Unary NEGATE = BigDecimal::negate;
+    public static final BigFunction.Binary POW = MissingMath::pow;
+    public static final BigFunction.Parameter POWER = MissingMath::power;
     public static final BigFunction.Unary RINT = arg -> arg.setScale(0, RoundingMode.HALF_EVEN);
-    public static final BigFunction.Parameter ROOT = (arg, param) -> MissingMath.root(arg, param);
+    public static final BigFunction.Parameter ROOT = MissingMath::root;
     public static final BigFunction.Parameter SCALE = (arg, param) -> arg.setScale(param, RoundingMode.HALF_EVEN);
-    public static final BigFunction.Unary SIGNUM = arg -> MissingMath.signum(arg);
+    public static final BigFunction.Unary SIGNUM = MissingMath::signum;
     public static final BigFunction.Unary SIN = arg -> BigDecimal.valueOf(Math.sin(arg.doubleValue()));
     public static final BigFunction.Unary SINH = arg -> BigDecimal.valueOf(Math.sinh(arg.doubleValue()));
     public static final BigFunction.Unary SQRT = arg -> MissingMath.root(arg, 2);
     public static final BigFunction.Unary SQRT1PX2 = arg -> MissingMath.root(ONE.add(arg.multiply(arg)), 2);
-    public static final BigFunction.Binary SUBTRACT = (arg1, arg2) -> arg1.subtract(arg2);
+    public static final BigFunction.Binary SUBTRACT = BigDecimal::subtract;
     public static final BigFunction.Unary TAN = arg -> BigDecimal.valueOf(Math.tan(arg.doubleValue()));
     public static final BigFunction.Unary TANH = arg -> BigDecimal.valueOf(Math.tanh(arg.doubleValue()));
     public static final BigFunction.Unary VALUE = arg -> arg;

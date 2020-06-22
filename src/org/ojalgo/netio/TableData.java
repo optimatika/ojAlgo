@@ -27,7 +27,7 @@ public final class TableData<R> {
     }
 
     public double doubleValue(final R row, final String col) {
-        return myColumns.computeIfAbsent(col, (c) -> COLUMN_FACTORY.make()).doubleValue(myRowIndexMapper.toIndex(row));
+        return myColumns.computeIfAbsent(col, c -> COLUMN_FACTORY.make()).doubleValue(myRowIndexMapper.toIndex(row));
     }
 
     public CharSequence print() {
@@ -61,7 +61,7 @@ public final class TableData<R> {
 
     public void put(final R row, final String col, final double value) {
         myRows.add(row);
-        myColumns.computeIfAbsent(col, (c) -> COLUMN_FACTORY.make()).put(myRowIndexMapper.toIndex(row), value);
+        myColumns.computeIfAbsent(col, c -> COLUMN_FACTORY.make()).put(myRowIndexMapper.toIndex(row), value);
     }
 
 }

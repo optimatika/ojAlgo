@@ -763,7 +763,7 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     long countIntegerFactors() {
-        return myLinear.keySet().stream().map(this::resolve).filter(v -> v.isInteger()).count();
+        return myLinear.keySet().stream().map(this::resolve).filter(Variable::isInteger).count();
     }
 
     int countLinearFactors() {
@@ -892,9 +892,8 @@ public final class Expression extends ModelEntity<Expression> {
 
     boolean includes(final Variable variable) {
         final IntIndex tmpVarInd = variable.getIndex();
-        return myLinear.containsKey(tmpVarInd) || ((myQuadratic.size() > 0) && myQuadratic.keySet().stream().anyMatch(k -> {
-            return (k.row == tmpVarInd.index) || (k.column == tmpVarInd.index);
-        }));
+        return myLinear.containsKey(tmpVarInd)
+                || ((myQuadratic.size() > 0) && myQuadratic.keySet().stream().anyMatch(k -> ((k.row == tmpVarInd.index) || (k.column == tmpVarInd.index))));
     }
 
     @Override

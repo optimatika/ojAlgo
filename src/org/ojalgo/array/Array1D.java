@@ -114,6 +114,8 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
 
     static final class QuickAscendingSorter extends RecursiveAction {
 
+        private static final long serialVersionUID = 1L;
+
         private final long high;
         private final long low;
         private final Array1D<?> myArray;
@@ -174,6 +176,8 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     static final class QuickDescendingSorter extends RecursiveAction {
+
+        private static final long serialVersionUID = 1L;
 
         private final long high;
         private final long low;
@@ -404,7 +408,7 @@ public final class Array1D<N extends Comparable<N>> extends AbstractList<N> impl
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

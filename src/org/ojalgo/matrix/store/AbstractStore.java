@@ -60,7 +60,7 @@ abstract class AbstractStore<N extends Comparable<N>> implements MatrixStore<N> 
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

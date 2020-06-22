@@ -35,12 +35,12 @@ public class ChiSquareDistribution extends AbstractContinuous {
         }
 
         @Override
-        public double getDistribution(double value) {
+        public double getDistribution(final double value) {
             return -Math.expm1(-value / TWO);
         }
 
         @Override
-        double calculateDensity(double value) {
+        double calculateDensity(final double value) {
             return Math.exp(-value / TWO) / TWO;
         }
 
@@ -50,7 +50,7 @@ public class ChiSquareDistribution extends AbstractContinuous {
 
         private final Normal myApproximation;
 
-        NormalApproximation(double degreesOfFreedom) {
+        NormalApproximation(final double degreesOfFreedom) {
 
             super(degreesOfFreedom);
 
@@ -58,7 +58,7 @@ public class ChiSquareDistribution extends AbstractContinuous {
         }
 
         @Override
-        public double getDistribution(double value) {
+        public double getDistribution(final double value) {
             return myApproximation.getDistribution(value);
         }
 
@@ -68,7 +68,7 @@ public class ChiSquareDistribution extends AbstractContinuous {
         }
 
         @Override
-        public double getQuantile(double probability) {
+        public double getQuantile(final double probability) {
             return myApproximation.getQuantile(probability);
         }
 
@@ -83,7 +83,7 @@ public class ChiSquareDistribution extends AbstractContinuous {
         }
 
         @Override
-        double calculateDensity(double value) {
+        double calculateDensity(final double value) {
             return myApproximation.getDensity(value);
         }
 
@@ -105,13 +105,13 @@ public class ChiSquareDistribution extends AbstractContinuous {
 
     private final double myDegreesOfFreedom;
 
-    ChiSquareDistribution(double degreesOfFreedom) {
+    ChiSquareDistribution(final double degreesOfFreedom) {
         super();
         myDegreesOfFreedom = degreesOfFreedom;
     }
 
     @Override
-    public final double getDensity(double value) {
+    public final double getDensity(final double value) {
         if (value <= ZERO) {
             return ZERO;
         } else {
@@ -119,7 +119,7 @@ public class ChiSquareDistribution extends AbstractContinuous {
         }
     }
 
-    public double getDistribution(double value) {
+    public double getDistribution(final double value) {
         return GammaFunction.Regularized.lower(myDegreesOfFreedom / TWO, value / TWO);
     }
 
@@ -127,7 +127,7 @@ public class ChiSquareDistribution extends AbstractContinuous {
         return myDegreesOfFreedom;
     }
 
-    public double getQuantile(double probability) {
+    public double getQuantile(final double probability) {
 
         double retVal = this.approximateQuantile(probability);
 
@@ -169,11 +169,11 @@ public class ChiSquareDistribution extends AbstractContinuous {
         return TWO * myDegreesOfFreedom;
     }
 
-    private double approximateQuantile(double probability) {
+    private double approximateQuantile(final double probability) {
         return MissingMath.power(NORMAL.getQuantile(probability) + Math.sqrt((TWO * myDegreesOfFreedom) - ONE), 2) / TWO;
     }
 
-    double calculateDensity(double value) {
+    double calculateDensity(final double value) {
 
         double halfFreedom = myDegreesOfFreedom / TWO;
 

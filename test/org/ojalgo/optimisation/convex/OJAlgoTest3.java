@@ -30,7 +30,7 @@ public class OJAlgoTest3 {
         constraintsProduct.put("PRODUCT_3", 636_000);
         constraintsProduct.put("PRODUCT_4", 220_000);
         constraintsProduct.put("PRODUCT_5", 0);
-        final double stockTotal = constraintsProduct.values().stream().mapToDouble(e -> e.doubleValue()).sum();
+        final double stockTotal = constraintsProduct.values().stream().mapToDouble(Integer::doubleValue).sum();
         BasicLogger.debug("STOCK_TOTAL " + stockTotal);
 
         /*
@@ -64,7 +64,7 @@ public class OJAlgoTest3 {
         constraintsCustomer.put("CUSTOMER_J_1", 16_000);
         constraintsCustomer.put("CUSTOMER_K_1", 24_000);
         constraintsCustomer.put("CUSTOMER_L_1", 56_000);
-        final double demandTotal = constraintsCustomer.values().stream().mapToDouble(e -> e.doubleValue()).sum();
+        final double demandTotal = constraintsCustomer.values().stream().mapToDouble(Integer::doubleValue).sum();
         BasicLogger.debug("DEMAND_TOTAL " + demandTotal);
 
         /*

@@ -106,22 +106,22 @@ public class TDistribution extends AbstractContinuous {
         }
 
         @Override
+        public double getDensity(final double value) {
+            return THREE / (EIGHT * POW.invoke(ONE + ((value * value) / FOUR), FIVE / TWO));
+        }
+
+        @Override
+        public double getDistribution(final double value) {
+            double x = ONE + ((value * value) / FOUR);
+            return HALF + (((THREE / EIGHT) * (value / SQRT.invoke(x))) * (ONE - (TWELFTH * ((value * value) / x))));
+        }
+
+        @Override
         public double getQuantile(final double probability) {
             double alpha = FOUR * probability * (ONE - probability);
             double sqrt = Math.sqrt(alpha);
             double q = Math.cos(THIRD * Math.acos(sqrt)) / sqrt;
             return Math.signum(probability - HALF) * TWO * Math.sqrt(q - ONE);
-        }
-
-        @Override
-        public double getDensity(double value) {
-            return THREE / (EIGHT * POW.invoke(ONE + ((value * value) / FOUR), FIVE / TWO));
-        }
-
-        @Override
-        public double getDistribution(double value) {
-            double x = ONE + ((value * value) / FOUR);
-            return HALF + (((THREE / EIGHT) * (value / SQRT.invoke(x))) * (ONE - (TWELFTH * ((value * value) / x))));
         }
 
     }
@@ -135,12 +135,12 @@ public class TDistribution extends AbstractContinuous {
         }
 
         @Override
-        public double getDensity(double value) {
+        public double getDensity(final double value) {
             return EIGHT / (THREE * PI * SQRT5 * POW.invoke(ONE + ((value * value) / FIVE), THREE));
         }
 
         @Override
-        public double getDistribution(double value) {
+        public double getDistribution(final double value) {
             double x = ONE + ((value * value) / FIVE);
             return HALF + ((((value / (SQRT5 * x)) * (ONE + (TWO / (THREE * x)))) + ATAN.invoke(value / SQRT5)) / PI);
         }
@@ -302,7 +302,7 @@ public class TDistribution extends AbstractContinuous {
         }
     }
 
-    private double approximateQuantile(double probability) {
+    private double approximateQuantile(final double probability) {
         return NORMAL.getQuantile(probability);
     }
 

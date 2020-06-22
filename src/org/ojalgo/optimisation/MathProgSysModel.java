@@ -653,7 +653,7 @@ public final class MathProgSysModel {
 
                 this.extractFields(line, myRows);
 
-                final Column tmpColumn = myColumns.computeIfAbsent(myFields[1], key -> new Column(key));
+                final Column tmpColumn = myColumns.computeIfAbsent(myFields[1], Column::new);
 
                 tmpColumn.setRowValue(myFields[2], new BigDecimal(myFields[3]));
                 if (myFields[4] != null) {

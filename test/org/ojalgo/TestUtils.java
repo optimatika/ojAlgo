@@ -257,19 +257,19 @@ public abstract class TestUtils {
             Quaternion tmpExpected = Quaternion.valueOf(expected);
             Quaternion tmpActual = Quaternion.valueOf(actual);
 
-            if (!!precision.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
+            if (precision.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
                 // Assertions.fail(() -> message + " (scalar)" + ": " + expected + " != " + actual);
                 Assertions.assertEquals(expected, actual, () -> message + " (scalar)" + ": " + expected + " != " + actual);
             }
-            if (!!precision.isDifferent(tmpExpected.i, tmpActual.i)) {
+            if (precision.isDifferent(tmpExpected.i, tmpActual.i)) {
                 // Assertions.fail(() -> message + " (i)" + ": " + expected + " != " + actual);
                 Assertions.assertEquals(expected, actual, () -> message + " (i)" + ": " + expected + " != " + actual);
             }
-            if (!!precision.isDifferent(tmpExpected.j, tmpActual.j)) {
+            if (precision.isDifferent(tmpExpected.j, tmpActual.j)) {
                 // Assertions.fail(() -> message + " (j)" + ": " + expected + " != " + actual);
                 Assertions.assertEquals(expected, actual, () -> message + " (j)" + ": " + expected + " != " + actual);
             }
-            if (!!precision.isDifferent(tmpExpected.k, tmpActual.k)) {
+            if (precision.isDifferent(tmpExpected.k, tmpActual.k)) {
                 // Assertions.fail(() -> message + " (k)" + ": " + expected + " != " + actual);
                 Assertions.assertEquals(expected, actual, () -> message + " (k)" + ": " + expected + " != " + actual);
             }
@@ -493,9 +493,7 @@ public abstract class TestUtils {
 
             if (expectedState == actualState) {
 
-            } else if (expectedState.isDistinct() && !actualState.isDistinct()) {
-                failed = true;
-            } else if (expectedState.isOptimal() && !actualState.isOptimal()) {
+            } else if ((expectedState.isDistinct() && !actualState.isDistinct()) || (expectedState.isOptimal() && !actualState.isOptimal())) {
                 failed = true;
             } else if (expectedState.isFeasible() && !actualState.isFeasible()) {
                 failed = true;

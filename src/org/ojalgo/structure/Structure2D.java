@@ -202,7 +202,7 @@ public interface Structure2D extends Structure1D {
 
         /**
          * Will repeat this structure creating a new structure with a multiple of rows and columns.
-         * 
+         *
          * @param rowsRepetitions The number of times to repeat the rows
          * @param columnsRepetitions The number of times to repeat the columns
          * @return The builder

@@ -444,7 +444,7 @@ public interface MatrixStore<N extends Comparable<N>>
             return myStore.physical();
         }
 
-        public LogicalBuilder<N> repeat(int rowsRepetitions, int columnsRepetitions) {
+        public LogicalBuilder<N> repeat(final int rowsRepetitions, final int columnsRepetitions) {
 
             if (rowsRepetitions > 1) {
                 myStore = new RepeatedRowsStore<>(myStore, rowsRepetitions);

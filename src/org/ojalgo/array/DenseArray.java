@@ -43,27 +43,27 @@ public abstract class DenseArray<N extends Comparable<N>> extends BasicArray<N> 
     public static abstract class Factory<N extends Comparable<N>> extends ArrayFactory<N, DenseArray<N>> implements Factory1D.Dense<DenseArray<N>> {
 
         @Override
-        public DenseArray<N> copy(Access1D<?> source) {
+        public DenseArray<N> copy(final Access1D<?> source) {
             return super.copy(source);
         }
 
         @Override
-        public DenseArray<N> copy(Comparable<?>... source) {
+        public DenseArray<N> copy(final Comparable<?>... source) {
             return super.copy(source);
         }
 
         @Override
-        public DenseArray<N> copy(double... source) {
+        public DenseArray<N> copy(final double... source) {
             return super.copy(source);
         }
 
         @Override
-        public DenseArray<N> copy(List<? extends Comparable<?>> source) {
+        public DenseArray<N> copy(final List<? extends Comparable<?>> source) {
             return super.copy(source);
         }
 
         @Override
-        public DenseArray<N> makeFilled(long count, NullaryFunction<?> supplier) {
+        public DenseArray<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
             return super.makeFilled(count, supplier);
         }
 

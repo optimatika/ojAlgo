@@ -133,7 +133,7 @@ public class Stopwatch {
     /**
      * Will reset the start-instant and return duration since it was last reset in the specified unit.
      */
-    public long reset(CalendarDateUnit unit) {
+    public long reset(final CalendarDateUnit unit) {
         long now = System.nanoTime();
         long nanos = now - myStart;
         myStart = now;

@@ -584,7 +584,7 @@ public final class GenericStore<N extends Scalar<N>> extends ScalarArray<N> impl
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

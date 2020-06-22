@@ -35,6 +35,8 @@ import org.ojalgo.type.TypeUtils;
  */
 public class ProgrammingError extends RuntimeException implements EffectiveThrowable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * For hidden, not-to-be-used, constructors and methods.
      */

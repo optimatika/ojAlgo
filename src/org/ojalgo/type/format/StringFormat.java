@@ -27,6 +27,8 @@ import java.text.ParsePosition;
 
 public final class StringFormat extends Format {
 
+    private static final long serialVersionUID = 1L;
+
     public StringFormat() {
         super();
     }

@@ -589,7 +589,7 @@ public final class Primitive64Store extends Primitive64Array implements Physical
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

@@ -303,6 +303,59 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
+     * https://github.com/vagmcs/Optimus/pull/33
+     */
+    @Test
+    public void testOptimusPull33() {
+
+        ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        // model.options.debug(ConvexSolver.class);
+
+        // Create the variables
+        model.addVariable(Variable.make("w0"));
+        model.getVariable(0).lower(null);
+        model.getVariable(0).upper(null);
+
+        model.addVariable(Variable.make("w1"));
+        model.getVariable(1).lower(null);
+        model.getVariable(1).upper(null);
+
+        model.addVariable(Variable.make("w2"));
+        model.getVariable(2).lower(null);
+        model.getVariable(2).upper(null);
+
+        model.addVariable(Variable.make("slack"));
+        model.getVariable(3).lower(0);
+        model.getVariable(3).upper(null);
+
+        // Add the objective: 0.5 * w0 * w0 + 0.5 * w1 * w1 + 0.5 * w2 * w2 + 1000 * slack
+        Expression objectiveFunction = model.addExpression();
+        objectiveFunction.weight(BigMath.ONE);
+
+        objectiveFunction.set(model.getVariable(0), model.getVariable(0), 0.5);
+        objectiveFunction.set(model.getVariable(1), model.getVariable(1), 0.5);
+        objectiveFunction.set(model.getVariable(2), model.getVariable(2), 0.5);
+        objectiveFunction.set(model.getVariable(3), 1000);
+
+        // Add the constraint: -2 * w2 + slack >:= 16
+        Expression constraint = model.addExpression();
+        constraint.set(model.getVariable(2), -2);
+        constraint.set(model.getVariable(3), 1);
+        constraint.lower(16);
+
+        // Minimize
+        Optimisation.Result result = model.minimise();
+
+        // Result on 47.0 is 32.0
+        // Result on 48.1 is 8095.995340354874
+        // System.out.println(result.getValue());
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(32.0, result.getValue(), NumberContext.getMath(7));
+    }
+
+    /**
      * The ActiveSetSolver ended up in a loop activating/deactivating constraints. Eventually it returned
      * null, and that eventually resulted in a NullPointerException. Since Q is not positive semidefinite
      * validation has to be turned off
@@ -1548,59 +1601,6 @@ public class ConvexProblems extends OptimisationConvexTests {
         }
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(myBuilderI, null, null);
-    }
-
-    /**
-     * https://github.com/vagmcs/Optimus/pull/33
-     */
-    @Test
-    public void testOptimusPull33() {
-
-        ExpressionsBasedModel model = new ExpressionsBasedModel();
-
-        // model.options.debug(ConvexSolver.class);
-
-        // Create the variables
-        model.addVariable(Variable.make("w0"));
-        model.getVariable(0).lower(null);
-        model.getVariable(0).upper(null);
-
-        model.addVariable(Variable.make("w1"));
-        model.getVariable(1).lower(null);
-        model.getVariable(1).upper(null);
-
-        model.addVariable(Variable.make("w2"));
-        model.getVariable(2).lower(null);
-        model.getVariable(2).upper(null);
-
-        model.addVariable(Variable.make("slack"));
-        model.getVariable(3).lower(0);
-        model.getVariable(3).upper(null);
-
-        // Add the objective: 0.5 * w0 * w0 + 0.5 * w1 * w1 + 0.5 * w2 * w2 + 1000 * slack
-        Expression objectiveFunction = model.addExpression();
-        objectiveFunction.weight(BigMath.ONE);
-
-        objectiveFunction.set(model.getVariable(0), model.getVariable(0), 0.5);
-        objectiveFunction.set(model.getVariable(1), model.getVariable(1), 0.5);
-        objectiveFunction.set(model.getVariable(2), model.getVariable(2), 0.5);
-        objectiveFunction.set(model.getVariable(3), 1000);
-
-        // Add the constraint: -2 * w2 + slack >:= 16
-        Expression constraint = model.addExpression();
-        constraint.set(model.getVariable(2), -2);
-        constraint.set(model.getVariable(3), 1);
-        constraint.lower(16);
-
-        // Minimize
-        Optimisation.Result result = model.minimise();
-
-        // Result on 47.0 is 32.0
-        // Result on 48.1 is 8095.995340354874
-        // System.out.println(result.getValue());
-
-        TestUtils.assertStateNotLessThanOptimal(result);
-        TestUtils.assertEquals(32.0, result.getValue(), NumberContext.getMath(7));
     }
 
 }

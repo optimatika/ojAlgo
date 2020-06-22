@@ -66,7 +66,7 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
 
     public static <N extends Comparable<N>> Collector<N, NumberList<N>, NumberList<N>> collector(final DenseArray.Factory<N> arrayFactory) {
         final Supplier<NumberList<N>> tmpSupplier = () -> NumberList.factory(arrayFactory).make();
-        final BiConsumer<NumberList<N>, N> tmpAccumulator = (list, element) -> list.add(element);
+        final BiConsumer<NumberList<N>, N> tmpAccumulator = NumberList::add;
         final BinaryOperator<NumberList<N>> tmpCombiner = (part1, part2) -> {
             part1.addAll(part2);
             return part1;
