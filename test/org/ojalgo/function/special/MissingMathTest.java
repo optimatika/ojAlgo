@@ -32,9 +32,6 @@ public class MissingMathTest {
     public void testAtan2() {
 
         double max = 0.0;
-        double ye = Double.NaN;
-        double xe = Double.NaN;
-
         for (int yi = -999; yi <= 999; yi++) {
             double y = yi / 100D;
 
@@ -49,13 +46,9 @@ public class MissingMathTest {
 
                 if (absErr > max) {
                     max = absErr;
-                    ye = y;
-                    xe = x;
                 }
                 if (relErr > max) {
                     max = relErr;
-                    ye = y;
-                    xe = x;
                 }
             }
         }

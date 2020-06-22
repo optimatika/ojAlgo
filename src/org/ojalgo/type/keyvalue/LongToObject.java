@@ -44,12 +44,12 @@ public final class LongToObject<V> implements KeyValue<Long, V> {
 
         super();
 
-        key = aKey != null ? aKey : 0l;
+        key = aKey != null ? aKey : 0L;
         value = aValue;
     }
 
     LongToObject() {
-        this(0l, null);
+        this(0L, null);
     }
 
     public int compareTo(final KeyValue<Long, ?> aReference) {

@@ -86,6 +86,8 @@ public final class IntegerSolver extends GenericSolver {
 
     final class BranchAndBoundNodeTask extends RecursiveTask<Boolean> {
 
+        private static final long serialVersionUID = 1L;
+
         private final NodeKey myKey;
         private final PrinterBuffer myPrinter = (IntegerSolver.this.options.validate || IntegerSolver.this.isLogProgress()) ? new CharacterRing().asPrinter()
                 : null;
@@ -682,11 +684,8 @@ public final class IntegerSolver extends GenericSolver {
             myBestResultSoFar = result;
             this.setState(Optimisation.State.FEASIBLE);
 
-        } else if (myMinimisation && (result.getValue() < currentlyTheBest.getValue())) {
-
-            myBestResultSoFar = result;
-
-        } else if (!myMinimisation && (result.getValue() > currentlyTheBest.getValue())) {
+        } else if ((myMinimisation && (result.getValue() < currentlyTheBest.getValue()))
+                || (!myMinimisation && (result.getValue() > currentlyTheBest.getValue()))) {
 
             myBestResultSoFar = result;
 

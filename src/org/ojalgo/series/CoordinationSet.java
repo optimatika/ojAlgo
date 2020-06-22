@@ -40,6 +40,8 @@ import org.ojalgo.type.CalendarDateUnit;
  */
 public class CoordinationSet<N extends Comparable<N>> extends HashMap<String, CalendarDateSeries<N>> {
 
+    private static final long serialVersionUID = 1L;
+
     private CalendarDateUnit myResolution = null;
 
     public CoordinationSet() {

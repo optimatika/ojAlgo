@@ -177,7 +177,7 @@ public final class ResourceLocator {
         }
 
         public Collection<String> values() {
-            return myValues.values().stream().map(v -> v.toString()).collect(Collectors.toList());
+            return myValues.values().stream().map(Object::toString).collect(Collectors.toList());
         }
 
         Set<String> getOrderedKeys() {

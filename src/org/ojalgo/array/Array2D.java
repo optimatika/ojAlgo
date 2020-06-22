@@ -389,7 +389,7 @@ public final class Array2D<N extends Comparable<N>> implements Access2D<N>, Acce
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

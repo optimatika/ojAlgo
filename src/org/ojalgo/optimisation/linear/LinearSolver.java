@@ -168,7 +168,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         }
 
         public boolean isCapable(final ExpressionsBasedModel model) {
-            return !(model.isAnyVariableInteger() || model.isAnyExpressionQuadratic());
+            return (!model.isAnyVariableInteger() && !model.isAnyExpressionQuadratic());
         }
 
         @Override

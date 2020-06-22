@@ -37,6 +37,8 @@ import org.ojalgo.type.TypeUtils;
 abstract class TreeSeries<K extends Comparable<? super K>, N extends Comparable<N>, I extends TreeSeries<K, N, I>> extends TreeMap<K, N>
         implements BasicSeries<K, N> {
 
+    private static final long serialVersionUID = 1L;
+
     private ColourData myColour = null;
     private String myName = null;
 

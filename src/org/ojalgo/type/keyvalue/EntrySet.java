@@ -49,7 +49,7 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         private final EntrySet<K, V> mySet;
         int index = 0;
 
-        EntryView(EntrySet<K, V> set) {
+        EntryView(final EntrySet<K, V> set) {
             super();
             mySet = set;
         }
@@ -62,7 +62,7 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
             return mySet.getValue(index);
         }
 
-        public V setValue(V value) {
+        public V setValue(final V value) {
             V old = mySet.getValue(index);
             mySet.setValue(index, value);
             return old;
@@ -72,7 +72,7 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
 
     static abstract class KeyedPrimitives<K> extends EntrySet<K, PrimitiveNumber> implements Access1D<PrimitiveNumber>, Mutate1D {
 
-        KeyedPrimitives(K[] keys) {
+        KeyedPrimitives(final K[] keys) {
             super(keys);
         }
 
@@ -80,7 +80,7 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
             return this.size();
         }
 
-        public final PrimitiveNumber get(long index) {
+        public final PrimitiveNumber get(final long index) {
             return this.getValue(Math.toIntExact(index));
         }
 
@@ -90,72 +90,72 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
 
         private final byte[] myValues;
 
-        ObjectByte(K[] keys, byte[] values) {
+        ObjectByte(final K[] keys, final byte[] values) {
             super(keys);
             myValues = values;
         }
 
-        public void add(long index, Comparable<?> addend) {
+        public void add(final long index, final Comparable<?> addend) {
             myValues[Math.toIntExact(index)] += NumberDefinition.byteValue(addend);
         }
 
-        public void add(long index, double addend) {
+        public void add(final long index, final double addend) {
             myValues[Math.toIntExact(index)] += (byte) addend;
         }
 
-        public void add(long index, float addend) {
+        public void add(final long index, final float addend) {
             int intIndex = Math.toIntExact(index);
             myValues[intIndex] = (byte) (myValues[intIndex] + addend);
         }
 
-        public byte byteValue(long index) {
+        public byte byteValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public double doubleValue(long index) {
+        public double doubleValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public float floatValue(long index) {
+        public float floatValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
         @Override
-        public EntryPair<K, PrimitiveNumber> get(int index) {
+        public EntryPair<K, PrimitiveNumber> get(final int index) {
             return EntryPair.of(this.getKey(index), myValues[index]);
         }
 
         @Override
-        public PrimitiveNumber getValue(int index) {
+        public PrimitiveNumber getValue(final int index) {
             return PrimitiveNumber.of(myValues[index]);
         }
 
-        public int intValue(long index) {
+        public int intValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public long longValue(long index) {
+        public long longValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public void set(long index, Comparable<?> value) {
+        public void set(final long index, final Comparable<?> value) {
             myValues[Math.toIntExact(index)] = NumberDefinition.byteValue(value);
         }
 
-        public void set(long index, double value) {
+        public void set(final long index, final double value) {
             myValues[Math.toIntExact(index)] = (byte) value;
         }
 
-        public void set(long index, float value) {
+        public void set(final long index, final float value) {
             myValues[Math.toIntExact(index)] = (byte) value;
         }
 
         @Override
-        public void setValue(int index, PrimitiveNumber value) {
+        public void setValue(final int index, final PrimitiveNumber value) {
             myValues[index] = value.byteValue();
         }
 
-        public short shortValue(long index) {
+        public short shortValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
@@ -165,51 +165,51 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
 
         private final double[] myValues;
 
-        ObjectDouble(K[] keys, double[] values) {
+        ObjectDouble(final K[] keys, final double[] values) {
             super(keys);
             myValues = values;
         }
 
-        public void add(long index, Comparable<?> addend) {
+        public void add(final long index, final Comparable<?> addend) {
             myValues[Math.toIntExact(index)] += NumberDefinition.doubleValue(addend);
         }
 
-        public void add(long index, double addend) {
+        public void add(final long index, final double addend) {
             myValues[Math.toIntExact(index)] += addend;
         }
 
-        public void add(long index, float addend) {
+        public void add(final long index, final float addend) {
             myValues[Math.toIntExact(index)] += addend;
         }
 
-        public double doubleValue(long index) {
+        public double doubleValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
         @Override
-        public EntryPair<K, PrimitiveNumber> get(int index) {
+        public EntryPair<K, PrimitiveNumber> get(final int index) {
             return EntryPair.of(this.getKey(index), myValues[index]);
         }
 
         @Override
-        public PrimitiveNumber getValue(int index) {
+        public PrimitiveNumber getValue(final int index) {
             return PrimitiveNumber.of(myValues[index]);
         }
 
-        public void set(long index, Comparable<?> value) {
+        public void set(final long index, final Comparable<?> value) {
             myValues[Math.toIntExact(index)] = NumberDefinition.doubleValue(value);
         }
 
-        public void set(long index, double value) {
+        public void set(final long index, final double value) {
             myValues[Math.toIntExact(index)] = value;
         }
 
-        public void set(long index, float value) {
+        public void set(final long index, final float value) {
             myValues[Math.toIntExact(index)] = value;
         }
 
         @Override
-        public void setValue(int index, PrimitiveNumber value) {
+        public void setValue(final int index, final PrimitiveNumber value) {
             myValues[index] = value.doubleValue();
         }
 
@@ -219,55 +219,55 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
 
         private final float[] myValues;
 
-        ObjectFloat(K[] keys, float[] values) {
+        ObjectFloat(final K[] keys, final float[] values) {
             super(keys);
             myValues = values;
         }
 
-        public void add(long index, Comparable<?> addend) {
+        public void add(final long index, final Comparable<?> addend) {
             myValues[Math.toIntExact(index)] += NumberDefinition.floatValue(addend);
         }
 
-        public void add(long index, double addend) {
+        public void add(final long index, final double addend) {
             myValues[Math.toIntExact(index)] += (float) addend;
         }
 
-        public void add(long index, float addend) {
+        public void add(final long index, final float addend) {
             myValues[Math.toIntExact(index)] += addend;
         }
 
-        public double doubleValue(long index) {
+        public double doubleValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public float floatValue(long index) {
+        public float floatValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
         @Override
-        public EntryPair<K, PrimitiveNumber> get(int index) {
+        public EntryPair<K, PrimitiveNumber> get(final int index) {
             return EntryPair.of(this.getKey(index), myValues[index]);
         }
 
         @Override
-        public PrimitiveNumber getValue(int index) {
+        public PrimitiveNumber getValue(final int index) {
             return PrimitiveNumber.of(myValues[index]);
         }
 
-        public void set(long index, Comparable<?> value) {
+        public void set(final long index, final Comparable<?> value) {
             myValues[Math.toIntExact(index)] = NumberDefinition.floatValue(value);
         }
 
-        public void set(long index, double value) {
+        public void set(final long index, final double value) {
             myValues[Math.toIntExact(index)] = (float) value;
         }
 
-        public void set(long index, float value) {
+        public void set(final long index, final float value) {
             myValues[Math.toIntExact(index)] = value;
         }
 
         @Override
-        public void setValue(int index, PrimitiveNumber value) {
+        public void setValue(final int index, final PrimitiveNumber value) {
             myValues[index] = value.floatValue();
         }
 
@@ -277,64 +277,64 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
 
         private final int[] myValues;
 
-        ObjectInt(K[] keys, int[] values) {
+        ObjectInt(final K[] keys, final int[] values) {
             super(keys);
             myValues = values;
         }
 
-        public void add(long index, Comparable<?> addend) {
+        public void add(final long index, final Comparable<?> addend) {
             myValues[Math.toIntExact(index)] += NumberDefinition.intValue(addend);
         }
 
-        public void add(long index, double addend) {
+        public void add(final long index, final double addend) {
             myValues[Math.toIntExact(index)] += (int) addend;
         }
 
-        public void add(long index, float addend) {
+        public void add(final long index, final float addend) {
             int intIndex = Math.toIntExact(index);
             myValues[intIndex] = (int) (myValues[intIndex] + addend);
         }
 
-        public double doubleValue(long index) {
+        public double doubleValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public float floatValue(long index) {
+        public float floatValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
         @Override
-        public EntryPair<K, PrimitiveNumber> get(int index) {
+        public EntryPair<K, PrimitiveNumber> get(final int index) {
             return EntryPair.of(this.getKey(index), myValues[index]);
         }
 
         @Override
-        public PrimitiveNumber getValue(int index) {
+        public PrimitiveNumber getValue(final int index) {
             return PrimitiveNumber.of(myValues[index]);
         }
 
-        public int intValue(long index) {
+        public int intValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public long longValue(long index) {
+        public long longValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public void set(long index, Comparable<?> value) {
+        public void set(final long index, final Comparable<?> value) {
             myValues[Math.toIntExact(index)] = NumberDefinition.intValue(value);
         }
 
-        public void set(long index, double value) {
+        public void set(final long index, final double value) {
             myValues[Math.toIntExact(index)] = (int) value;
         }
 
-        public void set(long index, float value) {
+        public void set(final long index, final float value) {
             myValues[Math.toIntExact(index)] = (int) value;
         }
 
         @Override
-        public void setValue(int index, PrimitiveNumber value) {
+        public void setValue(final int index, final PrimitiveNumber value) {
             myValues[index] = value.intValue();
         }
 
@@ -344,60 +344,60 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
 
         private final long[] myValues;
 
-        ObjectLong(K[] keys, long[] values) {
+        ObjectLong(final K[] keys, final long[] values) {
             super(keys);
             myValues = values;
         }
 
-        public void add(long index, Comparable<?> addend) {
+        public void add(final long index, final Comparable<?> addend) {
             myValues[Math.toIntExact(index)] += NumberDefinition.longValue(addend);
         }
 
-        public void add(long index, double addend) {
+        public void add(final long index, final double addend) {
             myValues[Math.toIntExact(index)] += (long) addend;
         }
 
-        public void add(long index, float addend) {
+        public void add(final long index, final float addend) {
             int intIndex = Math.toIntExact(index);
             myValues[intIndex] = (long) (myValues[intIndex] + addend);
         }
 
-        public double doubleValue(long index) {
+        public double doubleValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public float floatValue(long index) {
+        public float floatValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
         @Override
-        public EntryPair<K, PrimitiveNumber> get(int index) {
+        public EntryPair<K, PrimitiveNumber> get(final int index) {
             return EntryPair.of(this.getKey(index), myValues[index]);
         }
 
         @Override
-        public PrimitiveNumber getValue(int index) {
+        public PrimitiveNumber getValue(final int index) {
             return PrimitiveNumber.of(myValues[index]);
         }
 
-        public long longValue(long index) {
+        public long longValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public void set(long index, Comparable<?> value) {
+        public void set(final long index, final Comparable<?> value) {
             myValues[Math.toIntExact(index)] = NumberDefinition.longValue(value);
         }
 
-        public void set(long index, double value) {
+        public void set(final long index, final double value) {
             myValues[Math.toIntExact(index)] = (long) value;
         }
 
-        public void set(long index, float value) {
+        public void set(final long index, final float value) {
             myValues[Math.toIntExact(index)] = (long) value;
         }
 
         @Override
-        public void setValue(int index, PrimitiveNumber value) {
+        public void setValue(final int index, final PrimitiveNumber value) {
             myValues[index] = value.longValue();
         }
 
@@ -407,23 +407,23 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
 
         private final V[] myValues;
 
-        ObjectObject(K[] keys, V[] values) {
+        ObjectObject(final K[] keys, final V[] values) {
             super(keys);
             myValues = values;
         }
 
         @Override
-        public EntryPair<K, V> get(int index) {
+        public EntryPair<K, V> get(final int index) {
             return EntryPair.of(this.getKey(index), myValues[index]);
         }
 
         @Override
-        public V getValue(int index) {
+        public V getValue(final int index) {
             return myValues[index];
         }
 
         @Override
-        public void setValue(int index, V value) {
+        public void setValue(final int index, final V value) {
             myValues[index] = value;
         }
 
@@ -433,68 +433,68 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
 
         private final short[] myValues;
 
-        ObjectShort(K[] keys, short[] values) {
+        ObjectShort(final K[] keys, final short[] values) {
             super(keys);
             myValues = values;
         }
 
-        public void add(long index, Comparable<?> addend) {
+        public void add(final long index, final Comparable<?> addend) {
             myValues[Math.toIntExact(index)] += NumberDefinition.shortValue(addend);
         }
 
-        public void add(long index, double addend) {
+        public void add(final long index, final double addend) {
             myValues[Math.toIntExact(index)] += (short) addend;
         }
 
-        public void add(long index, float addend) {
+        public void add(final long index, final float addend) {
             int intIndex = Math.toIntExact(index);
             myValues[intIndex] = (short) (myValues[intIndex] + addend);
         }
 
-        public double doubleValue(long index) {
+        public double doubleValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public float floatValue(long index) {
+        public float floatValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
         @Override
-        public EntryPair<K, PrimitiveNumber> get(int index) {
+        public EntryPair<K, PrimitiveNumber> get(final int index) {
             return EntryPair.of(this.getKey(index), myValues[index]);
         }
 
         @Override
-        public PrimitiveNumber getValue(int index) {
+        public PrimitiveNumber getValue(final int index) {
             return PrimitiveNumber.of(myValues[index]);
         }
 
-        public int intValue(long index) {
+        public int intValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public long longValue(long index) {
+        public long longValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
-        public void set(long index, Comparable<?> value) {
+        public void set(final long index, final Comparable<?> value) {
             myValues[Math.toIntExact(index)] = NumberDefinition.shortValue(value);
         }
 
-        public void set(long index, double value) {
+        public void set(final long index, final double value) {
             myValues[Math.toIntExact(index)] = (short) value;
         }
 
-        public void set(long index, float value) {
+        public void set(final long index, final float value) {
             myValues[Math.toIntExact(index)] = (short) value;
         }
 
         @Override
-        public void setValue(int index, PrimitiveNumber value) {
+        public void setValue(final int index, final PrimitiveNumber value) {
             myValues[index] = value.shortValue();
         }
 
-        public short shortValue(long index) {
+        public short shortValue(final long index) {
             return myValues[Math.toIntExact(index)];
         }
 
@@ -505,7 +505,7 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
         private final int myLastIndex;
         private final EntryView<K, V> myView;
 
-        ViewingIterator(EntrySet<K, V> set) {
+        ViewingIterator(final EntrySet<K, V> set) {
             super();
             myView = new EntryView<>(set);
             myView.index = -1;
@@ -525,7 +525,7 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
 
     private final K[] myKeys;
 
-    EntrySet(K[] keys) {
+    EntrySet(final K[] keys) {
         super();
         myKeys = keys;
     }
@@ -533,11 +533,11 @@ public abstract class EntrySet<K, V> extends AbstractList<Map.Entry<K, V>> imple
     @Override
     public abstract EntryPair<K, V> get(int index);
 
-    public final K getKey(int index) {
+    public final K getKey(final int index) {
         return myKeys[index];
     }
 
-    public final EntryPair<K, V> getPair(int index) {
+    public final EntryPair<K, V> getPair(final int index) {
         return this.get(index);
     }
 

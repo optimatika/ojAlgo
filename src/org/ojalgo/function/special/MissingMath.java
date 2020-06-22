@@ -44,7 +44,7 @@ public abstract class MissingMath {
      * This is about 10x faster than {@link Math#atan2(double, double)}
      * </p>
      */
-    public static double atan2(double y, double x) {
+    public static double atan2(final double y, final double x) {
 
         if ((y == 0.0) && (x == 0.0)) {
             return 0.0;

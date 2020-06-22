@@ -41,24 +41,24 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
 
         private final EntrySet.KeyedPrimitives<K> myEntries;
 
-        MappedPrimitives(EntrySet.KeyedPrimitives<K> entries) {
+        MappedPrimitives(final EntrySet.KeyedPrimitives<K> entries) {
             super(entries);
             myEntries = entries;
         }
 
-        public void add(long index, Comparable<?> addend) {
+        public void add(final long index, final Comparable<?> addend) {
             myEntries.add(index, addend);
         }
 
-        public void add(long index, double addend) {
+        public void add(final long index, final double addend) {
             myEntries.add(index, addend);
         }
 
-        public void add(long index, float addend) {
+        public void add(final long index, final float addend) {
             myEntries.add(index, addend);
         }
 
-        public byte byteValue(long index) {
+        public byte byteValue(final long index) {
             return myEntries.byteValue(index);
         }
 
@@ -66,45 +66,45 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
             return myEntries.count();
         }
 
-        public double doubleValue(long index) {
+        public double doubleValue(final long index) {
             return myEntries.doubleValue(index);
         }
 
-        public float floatValue(long index) {
+        public float floatValue(final long index) {
             return myEntries.floatValue(index);
         }
 
-        public PrimitiveNumber get(long index) {
+        public PrimitiveNumber get(final long index) {
             return myEntries.get(index);
         }
 
-        public int intValue(long index) {
+        public int intValue(final long index) {
             return myEntries.intValue(index);
         }
 
-        public long longValue(long index) {
+        public long longValue(final long index) {
             return myEntries.longValue(index);
         }
 
-        public void set(long index, Comparable<?> value) {
+        public void set(final long index, final Comparable<?> value) {
             myEntries.set(index, value);
         }
 
-        public void set(long index, double value) {
+        public void set(final long index, final double value) {
             myEntries.set(index, value);
         }
 
-        public void set(long index, float value) {
+        public void set(final long index, final float value) {
             myEntries.set(index, value);
         }
 
-        public short shortValue(long index) {
+        public short shortValue(final long index) {
             return myEntries.shortValue(index);
         }
 
     }
 
-    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(Class<K> keyType, byte defaultValue) {
+    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(final Class<K> keyType, final byte defaultValue) {
 
         K[] keys = keyType.getEnumConstants();
         byte[] values = new byte[keys.length];
@@ -116,7 +116,7 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
         return new IndexedMap.MappedPrimitives<>(new EntrySet.ObjectByte<>(keys, values));
     }
 
-    public static <K extends Enum<K>, V> IndexedMap<K, V> of(Class<K> keyType, Class<V> valueType) {
+    public static <K extends Enum<K>, V> IndexedMap<K, V> of(final Class<K> keyType, final Class<V> valueType) {
 
         K[] keys = keyType.getEnumConstants();
         @SuppressWarnings("unchecked")
@@ -133,7 +133,7 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
         return new IndexedMap<>(new EntrySet.ObjectObject<>(keys, values));
     }
 
-    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(Class<K> keyType, double defaultValue) {
+    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(final Class<K> keyType, final double defaultValue) {
 
         K[] keys = keyType.getEnumConstants();
         double[] values = new double[keys.length];
@@ -145,7 +145,7 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
         return new IndexedMap.MappedPrimitives<>(new EntrySet.ObjectDouble<>(keys, values));
     }
 
-    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(Class<K> keyType, float defaultValue) {
+    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(final Class<K> keyType, final float defaultValue) {
 
         K[] keys = keyType.getEnumConstants();
         float[] values = new float[keys.length];
@@ -157,7 +157,7 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
         return new IndexedMap.MappedPrimitives<>(new EntrySet.ObjectFloat<>(keys, values));
     }
 
-    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(Class<K> keyType, int defaultValue) {
+    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(final Class<K> keyType, final int defaultValue) {
 
         K[] keys = keyType.getEnumConstants();
         int[] values = new int[keys.length];
@@ -169,7 +169,7 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
         return new IndexedMap.MappedPrimitives<>(new EntrySet.ObjectInt<>(keys, values));
     }
 
-    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(Class<K> keyType, long defaultValue) {
+    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(final Class<K> keyType, final long defaultValue) {
 
         K[] keys = keyType.getEnumConstants();
         long[] values = new long[keys.length];
@@ -181,7 +181,7 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
         return new IndexedMap.MappedPrimitives<>(new EntrySet.ObjectLong<>(keys, values));
     }
 
-    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(Class<K> keyType, short defaultValue) {
+    public static <K extends Enum<K>> IndexedMap.MappedPrimitives<K> of(final Class<K> keyType, final short defaultValue) {
 
         K[] keys = keyType.getEnumConstants();
         short[] values = new short[keys.length];
@@ -193,7 +193,7 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
         return new IndexedMap.MappedPrimitives<>(new EntrySet.ObjectShort<>(keys, values));
     }
 
-    public static <K extends Enum<K>, V> IndexedMap<K, V> of(Class<K> keyType, V defaultValue) {
+    public static <K extends Enum<K>, V> IndexedMap<K, V> of(final Class<K> keyType, final V defaultValue) {
 
         K[] keys = keyType.getEnumConstants();
         @SuppressWarnings("unchecked")
@@ -208,7 +208,7 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
 
     private final EntrySet<K, V> myEntrySet;
 
-    IndexedMap(EntrySet<K, V> entries) {
+    IndexedMap(final EntrySet<K, V> entries) {
         super();
         myEntrySet = entries;
     }
@@ -218,15 +218,15 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
         return myEntrySet;
     }
 
-    public K getKey(int index) {
+    public K getKey(final int index) {
         return myEntrySet.getKey(index);
     }
 
-    public EntryPair<K, V> getPair(int index) {
+    public EntryPair<K, V> getPair(final int index) {
         return myEntrySet.getPair(index);
     }
 
-    public V getValue(int index) {
+    public V getValue(final int index) {
         return myEntrySet.getValue(index);
     }
 

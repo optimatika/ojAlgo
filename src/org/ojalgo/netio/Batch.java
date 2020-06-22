@@ -26,6 +26,8 @@ import java.util.Collection;
 
 public class Batch extends ArrayList<Message> {
 
+    private static final long serialVersionUID = 1L;
+
     public Batch() {
         super();
     }

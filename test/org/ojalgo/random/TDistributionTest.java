@@ -30,7 +30,7 @@ public class TDistributionTest {
 
     private static final NumberContext ACCURACY = StandardType.MATH_032.withPrecision(2).withScale(3);
 
-    static void doTableTest(int degreesOfFreedom, double[] values) {
+    static void doTableTest(final int degreesOfFreedom, final double[] values) {
 
         double[] probabilities = new double[] { 0.90, 0.95, 0.975, 0.99, 0.995, 0.999, 0.9995 };
 

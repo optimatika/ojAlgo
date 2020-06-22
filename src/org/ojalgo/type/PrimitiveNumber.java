@@ -30,7 +30,7 @@ public interface PrimitiveNumber extends ComparableNumber<PrimitiveNumber> {
 
         public final byte value;
 
-        BoxedByte(byte value) {
+        BoxedByte(final byte value) {
             super();
             this.value = value;
         }
@@ -39,7 +39,7 @@ public interface PrimitiveNumber extends ComparableNumber<PrimitiveNumber> {
             return value;
         }
 
-        public int compareTo(PrimitiveNumber other) {
+        public int compareTo(final PrimitiveNumber other) {
             return Byte.compare(value, other.byteValue());
         }
 
@@ -69,12 +69,12 @@ public interface PrimitiveNumber extends ComparableNumber<PrimitiveNumber> {
 
         public final double value;
 
-        BoxedDouble(double value) {
+        BoxedDouble(final double value) {
             super();
             this.value = value;
         }
 
-        public int compareTo(PrimitiveNumber other) {
+        public int compareTo(final PrimitiveNumber other) {
             return Double.compare(value, other.doubleValue());
         }
 
@@ -88,12 +88,12 @@ public interface PrimitiveNumber extends ComparableNumber<PrimitiveNumber> {
 
         public final float value;
 
-        BoxedFloat(float value) {
+        BoxedFloat(final float value) {
             super();
             this.value = value;
         }
 
-        public int compareTo(PrimitiveNumber other) {
+        public int compareTo(final PrimitiveNumber other) {
             return Float.compare(value, other.floatValue());
         }
 
@@ -111,12 +111,12 @@ public interface PrimitiveNumber extends ComparableNumber<PrimitiveNumber> {
 
         public final int value;
 
-        BoxedInt(int value) {
+        BoxedInt(final int value) {
             super();
             this.value = value;
         }
 
-        public int compareTo(PrimitiveNumber other) {
+        public int compareTo(final PrimitiveNumber other) {
             return Integer.compare(value, other.intValue());
         }
 
@@ -142,12 +142,12 @@ public interface PrimitiveNumber extends ComparableNumber<PrimitiveNumber> {
 
         public final long value;
 
-        BoxedLong(long value) {
+        BoxedLong(final long value) {
             super();
             this.value = value;
         }
 
-        public int compareTo(PrimitiveNumber other) {
+        public int compareTo(final PrimitiveNumber other) {
             return Long.compare(value, other.longValue());
         }
 
@@ -169,12 +169,12 @@ public interface PrimitiveNumber extends ComparableNumber<PrimitiveNumber> {
 
         public final short value;
 
-        BoxedShort(short value) {
+        BoxedShort(final short value) {
             super();
             this.value = value;
         }
 
-        public int compareTo(PrimitiveNumber other) {
+        public int compareTo(final PrimitiveNumber other) {
             return Short.compare(value, other.shortValue());
         }
 
@@ -200,27 +200,27 @@ public interface PrimitiveNumber extends ComparableNumber<PrimitiveNumber> {
 
     }
 
-    static PrimitiveNumber of(byte value) {
+    static PrimitiveNumber of(final byte value) {
         return new BoxedByte(value);
     }
 
-    static PrimitiveNumber of(double value) {
+    static PrimitiveNumber of(final double value) {
         return new BoxedDouble(value);
     }
 
-    static PrimitiveNumber of(float value) {
+    static PrimitiveNumber of(final float value) {
         return new BoxedFloat(value);
     }
 
-    static PrimitiveNumber of(int value) {
+    static PrimitiveNumber of(final int value) {
         return new BoxedInt(value);
     }
 
-    static PrimitiveNumber of(long value) {
+    static PrimitiveNumber of(final long value) {
         return new BoxedLong(value);
     }
 
-    static PrimitiveNumber of(short value) {
+    static PrimitiveNumber of(final short value) {
         return new BoxedShort(value);
     }
 

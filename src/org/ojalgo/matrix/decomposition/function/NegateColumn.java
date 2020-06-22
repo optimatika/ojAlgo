@@ -23,11 +23,7 @@ package org.ojalgo.matrix.decomposition.function;
 
 public interface NegateColumn {
 
-    NegateColumn NULL = new NegateColumn() {
-
-        public void negateColumn(final int col) {
-
-        }
+    NegateColumn NULL = col -> {
 
     };
 

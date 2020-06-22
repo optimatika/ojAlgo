@@ -7,7 +7,7 @@ import org.ojalgo.scalar.ComplexNumber;
 
 public class RepeatCase extends NonPhysicalTest {
 
-    static public Primitive64Matrix repmat(Primitive64Matrix X, int m, long n) {
+    static public Primitive64Matrix repmat(final Primitive64Matrix X, final int m, final long n) {
 
         Primitive64Matrix.LogicalBuilder builder = X.logical();
 

@@ -28,31 +28,31 @@ import org.ojalgo.type.PrimitiveNumber;
 
 public interface EntryList<K, V> extends List<Map.Entry<K, V>>, Paired<K, V> {
 
-    static <K> EntryList<K, PrimitiveNumber> wrap(K[] keys, byte[] values) {
+    static <K> EntryList<K, PrimitiveNumber> wrap(final K[] keys, final byte[] values) {
         return new EntrySet.ObjectByte<>(keys, values);
     }
 
-    static <K> EntryList<K, PrimitiveNumber> wrap(K[] keys, double[] values) {
+    static <K> EntryList<K, PrimitiveNumber> wrap(final K[] keys, final double[] values) {
         return new EntrySet.ObjectDouble<>(keys, values);
     }
 
-    static <K> EntryList<K, PrimitiveNumber> wrap(K[] keys, float[] values) {
+    static <K> EntryList<K, PrimitiveNumber> wrap(final K[] keys, final float[] values) {
         return new EntrySet.ObjectFloat<>(keys, values);
     }
 
-    static <K> EntryList<K, PrimitiveNumber> wrap(K[] keys, int[] values) {
+    static <K> EntryList<K, PrimitiveNumber> wrap(final K[] keys, final int[] values) {
         return new EntrySet.ObjectInt<>(keys, values);
     }
 
-    static <K> EntryList<K, PrimitiveNumber> wrap(K[] keys, long[] values) {
+    static <K> EntryList<K, PrimitiveNumber> wrap(final K[] keys, final long[] values) {
         return new EntrySet.ObjectLong<>(keys, values);
     }
 
-    static <K> EntryList<K, PrimitiveNumber> wrap(K[] keys, short[] values) {
+    static <K> EntryList<K, PrimitiveNumber> wrap(final K[] keys, final short[] values) {
         return new EntrySet.ObjectShort<>(keys, values);
     }
 
-    static <K, V> EntryList<K, V> wrap(K[] keys, V[] values) {
+    static <K, V> EntryList<K, V> wrap(final K[] keys, final V[] values) {
         return new EntrySet.ObjectObject<>(keys, values);
     }
 

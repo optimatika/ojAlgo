@@ -86,7 +86,7 @@ public abstract class BufferArray extends PlainArray<Double> {
         }
 
         @Override
-        protected float floatValue(int index) {
+        protected float floatValue(final int index) {
             return (float) myDoubleBuffer.get(index);
         }
 
@@ -124,7 +124,7 @@ public abstract class BufferArray extends PlainArray<Double> {
         }
 
         @Override
-        protected float floatValue(int index) {
+        protected float floatValue(final int index) {
             return myFloatBuffer.get(index);
         }
 

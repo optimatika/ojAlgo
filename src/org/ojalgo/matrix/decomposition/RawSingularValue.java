@@ -452,79 +452,59 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             }
         }
 
-        final RotateRight q1RotR = factors ? new RotateRight() {
-
-            public void rotateRight(final int low, final int high, final double cos, final double sin) {
-                final double[] colLow = myUt[low];
-                final double[] colHigh = myUt[high];
-                double valLow;
-                double valHigh;
-                for (int i = 0; i < m; i++) {
-                    valLow = colLow[i];
-                    valHigh = colHigh[i];
-                    colLow[i] = (-sin * valHigh) + (cos * valLow);
-                    colHigh[i] = (cos * valHigh) + (sin * valLow);
-                }
+        final RotateRight q1RotR = factors ? (low, high, cos, sin) -> {
+            final double[] colLow = myUt[low];
+            final double[] colHigh = myUt[high];
+            double valLow;
+            double valHigh;
+            for (int i = 0; i < m; i++) {
+                valLow = colLow[i];
+                valHigh = colHigh[i];
+                colLow[i] = (-sin * valHigh) + (cos * valLow);
+                colHigh[i] = (cos * valHigh) + (sin * valLow);
             }
-
         } : RotateRight.NULL;
 
-        final RotateRight q2RotR = factors ? new RotateRight() {
-
-            public void rotateRight(final int low, final int high, final double cos, final double sin) {
-                final double[] colLow = myVt[low];
-                final double[] colHigh = myVt[high];
-                double valLow;
-                double valHigh;
-                for (int i = 0; i < n; i++) {
-                    valLow = colLow[i];
-                    valHigh = colHigh[i];
-                    colLow[i] = (-sin * valHigh) + (cos * valLow);
-                    colHigh[i] = (cos * valHigh) + (sin * valLow);
-                }
+        final RotateRight q2RotR = factors ? (low, high, cos, sin) -> {
+            final double[] colLow = myVt[low];
+            final double[] colHigh = myVt[high];
+            double valLow;
+            double valHigh;
+            for (int i = 0; i < n; i++) {
+                valLow = colLow[i];
+                valHigh = colHigh[i];
+                colLow[i] = (-sin * valHigh) + (cos * valLow);
+                colHigh[i] = (cos * valHigh) + (sin * valLow);
             }
-
         } : RotateRight.NULL;
 
-        final ExchangeColumns q1XchgCols = factors ? new ExchangeColumns() {
-
-            public void exchangeColumns(final int colA, final int colB) {
-                final double[] col1 = myUt[colA];
-                final double[] col2 = myUt[colB];
-                double tmp;
-                for (int i = 0; i < m; i++) {
-                    tmp = col1[i];
-                    col1[i] = col2[i];
-                    col2[i] = tmp;
-                }
+        final ExchangeColumns q1XchgCols = factors ? (colA, colB) -> {
+            final double[] col1 = myUt[colA];
+            final double[] col2 = myUt[colB];
+            double tmp;
+            for (int i = 0; i < m; i++) {
+                tmp = col1[i];
+                col1[i] = col2[i];
+                col2[i] = tmp;
             }
-
         } : ExchangeColumns.NULL;
 
-        final ExchangeColumns q2XchgCols = factors ? new ExchangeColumns() {
-
-            public void exchangeColumns(final int colA, final int colB) {
-                final double[] col1 = myVt[colA];
-                final double[] col2 = myVt[colB];
-                double tmp;
-                for (int i = 0; i < n; i++) {
-                    tmp = col1[i];
-                    col1[i] = col2[i];
-                    col2[i] = tmp;
-                }
+        final ExchangeColumns q2XchgCols = factors ? (colA, colB) -> {
+            final double[] col1 = myVt[colA];
+            final double[] col2 = myVt[colB];
+            double tmp;
+            for (int i = 0; i < n; i++) {
+                tmp = col1[i];
+                col1[i] = col2[i];
+                col2[i] = tmp;
             }
-
         } : ExchangeColumns.NULL;
 
-        final NegateColumn q2NegCol = factors ? new NegateColumn() {
-
-            public void negateColumn(final int col) {
-                final double[] column = myVt[col];
-                for (int i = 0; i < column.length; i++) {
-                    column[i] = -column[i];
-                }
+        final NegateColumn q2NegCol = factors ? col -> {
+            final double[] column = myVt[col];
+            for (int i = 0; i < column.length; i++) {
+                column[i] = -column[i];
             }
-
         } : NegateColumn.NULL;
 
         SingularValueDecomposition.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);

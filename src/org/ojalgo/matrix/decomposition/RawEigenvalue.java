@@ -544,38 +544,32 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         // Tridiagonalize > Diagonalize
 
-        final RotateRight tmpRotateRight = valuesOnly ? RotateRight.NULL : new RotateRight() {
+        final RotateRight tmpRotateRight = valuesOnly ? RotateRight.NULL : (low, high, cos, sin) -> {
+            final double[] tmpVi0 = data[low];
+            double tmpVi0k;
+            final double[] tmpVi1 = data[high];
+            double tmpVi1k;
 
-            public void rotateRight(final int low, final int high, final double cos, final double sin) {
-                final double[] tmpVi0 = data[low];
-                double tmpVi0k;
-                final double[] tmpVi1 = data[high];
-                double tmpVi1k;
+            for (int k = 0; k < size; k++) {
 
-                for (int k = 0; k < size; k++) {
+                tmpVi0k = tmpVi0[k];
+                tmpVi1k = tmpVi1[k];
 
-                    tmpVi0k = tmpVi0[k];
-                    tmpVi1k = tmpVi1[k];
-
-                    tmpVi0[k] = (cos * tmpVi0k) - (sin * tmpVi1k);
-                    tmpVi1[k] = (sin * tmpVi0k) + (cos * tmpVi1k);
-                }
-
+                tmpVi0[k] = (cos * tmpVi0k) - (sin * tmpVi1k);
+                tmpVi1[k] = (sin * tmpVi0k) + (cos * tmpVi1k);
             }
+
         };
         HermitianEvD.tql2(d, e, tmpRotateRight);
 
         // Diagonalize > Sort
 
         if (this.isOrdered()) {
-            final ExchangeColumns tmpExchangeColumns = valuesOnly ? ExchangeColumns.NULL : new ExchangeColumns() {
+            final ExchangeColumns tmpExchangeColumns = valuesOnly ? ExchangeColumns.NULL : (colA, colB) -> {
+                final double[] tmp = data[colA];
+                data[colA] = data[colB];
+                data[colB] = tmp;
 
-                public void exchangeColumns(final int colA, final int colB) {
-                    final double[] tmp = data[colA];
-                    data[colA] = data[colB];
-                    data[colB] = tmp;
-
-                }
             };
             EigenvalueDecomposition.sort(d, tmpExchangeColumns);
         }

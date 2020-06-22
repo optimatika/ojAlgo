@@ -117,15 +117,15 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
                     if (!tmpVectorRHS) {
                         return positiveDefinite ? Cholesky.PRIMITIVE.make(templateBody) : LU.PRIMITIVE.make(templateBody);
-                    } else if (tmpColDim == 1l) {
+                    } else if (tmpColDim == 1L) {
                         return AbstractSolver.FULL_1X1;
-                    } else if (tmpColDim == 2l) {
+                    } else if (tmpColDim == 2L) {
                         return AbstractSolver.SYMMETRIC_2X2;
-                    } else if (tmpColDim == 3l) {
+                    } else if (tmpColDim == 3L) {
                         return AbstractSolver.SYMMETRIC_3X3;
-                    } else if (tmpColDim == 4l) {
+                    } else if (tmpColDim == 4L) {
                         return AbstractSolver.SYMMETRIC_4X4;
-                    } else if (tmpColDim == 5l) {
+                    } else if (tmpColDim == 5L) {
                         return AbstractSolver.SYMMETRIC_5X5;
                     } else {
                         return positiveDefinite ? Cholesky.PRIMITIVE.make(templateBody) : LU.PRIMITIVE.make(templateBody);
@@ -135,15 +135,15 @@ public interface SolverTask<N extends Comparable<N>> extends MatrixTask<N> {
 
                     if (!tmpVectorRHS) {
                         return LU.PRIMITIVE.make(templateBody);
-                    } else if (tmpColDim == 1l) {
+                    } else if (tmpColDim == 1L) {
                         return AbstractSolver.FULL_1X1;
-                    } else if (tmpColDim == 2l) {
+                    } else if (tmpColDim == 2L) {
                         return AbstractSolver.FULL_2X2;
-                    } else if (tmpColDim == 3l) {
+                    } else if (tmpColDim == 3L) {
                         return AbstractSolver.FULL_3X3;
-                    } else if (tmpColDim == 4l) {
+                    } else if (tmpColDim == 4L) {
                         return AbstractSolver.FULL_4X4;
-                    } else if (tmpColDim == 5l) {
+                    } else if (tmpColDim == 5L) {
                         return AbstractSolver.FULL_5X5;
                     } else {
                         return LU.PRIMITIVE.make(templateBody);

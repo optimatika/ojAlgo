@@ -29,6 +29,8 @@ import org.ojalgo.function.UnaryFunction;
 
 public class TransformationFormat<N extends Number & Comparable<N>> extends NumberFormat {
 
+    private static final long serialVersionUID = 1L;
+
     private final UnaryFunction<N> myTransfoFunc;
     private final UnaryFunction<N> myInverseFunc;
     private final NumberFormat myFormat;

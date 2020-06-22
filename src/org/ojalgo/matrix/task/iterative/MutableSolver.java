@@ -71,7 +71,7 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
     }
 
     public double[] getRHS() {
-        return myRows.stream().mapToDouble(e -> e.getRHS()).toArray();
+        return myRows.stream().mapToDouble(Equation::getRHS).toArray();
     }
 
     public boolean remove(final Equation row) {

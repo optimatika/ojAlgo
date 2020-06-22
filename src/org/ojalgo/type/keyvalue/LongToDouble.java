@@ -63,7 +63,7 @@ public final class LongToDouble implements KeyValue<Long, Double> {
 
         super();
 
-        key = aKey != null ? aKey : 0l;
+        key = aKey != null ? aKey : 0L;
         value = aValue;
     }
 
@@ -71,12 +71,12 @@ public final class LongToDouble implements KeyValue<Long, Double> {
 
         super();
 
-        key = aKey != null ? aKey : 0l;
+        key = aKey != null ? aKey : 0L;
         value = aValue != null ? aValue : ZERO;
     }
 
     LongToDouble() {
-        this(0l, ZERO);
+        this(0L, ZERO);
     }
 
     public int compareTo(final KeyValue<Long, ?> aReference) {

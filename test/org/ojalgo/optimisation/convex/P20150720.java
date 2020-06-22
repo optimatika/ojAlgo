@@ -58,7 +58,7 @@ public abstract class P20150720 {
         constraintsCustomer.put("CUSTOMER_4", 5_000);
         constraintsCustomer.put("CUSTOMER_5", 2_000);
 
-        final double demandTotal = constraintsCustomer.values().stream().mapToDouble(e -> e.doubleValue()).sum();
+        final double demandTotal = constraintsCustomer.values().stream().mapToDouble(Integer::doubleValue).sum();
 
         /*
          * Constraits for each product type = Stock per product type. Sum of all variable linked to this
@@ -70,7 +70,7 @@ public abstract class P20150720 {
         constraintsProduct.put("PRODUCT_TYPE_3", 0);
         constraintsProduct.put("PRODUCT_TYPE_4", 0);
         constraintsProduct.put("PRODUCT_TYPE_5", 0);
-        final double stockTotal = constraintsProduct.values().stream().mapToDouble(e -> e.doubleValue()).sum();
+        final double stockTotal = constraintsProduct.values().stream().mapToDouble(Integer::doubleValue).sum();
 
         /*
          *
@@ -171,7 +171,7 @@ public abstract class P20150720 {
         constraintsCustomer.put("CUSTOMER_4", 5_000);
         constraintsCustomer.put("CUSTOMER_5", 2_000);
 
-        final double demandTotal = constraintsCustomer.values().stream().mapToDouble(e -> e.doubleValue()).sum();
+        final double demandTotal = constraintsCustomer.values().stream().mapToDouble(Integer::doubleValue).sum();
 
         /*
          * Constraits for each product type = Stock per product type. Sum of all variable linked to this
@@ -183,7 +183,7 @@ public abstract class P20150720 {
         constraintsProduct.put("PRODUCT_TYPE_3", 0);
         constraintsProduct.put("PRODUCT_TYPE_4", 0);
         constraintsProduct.put("PRODUCT_TYPE_5", 0);
-        final double stockTotal = constraintsProduct.values().stream().mapToDouble(e -> e.doubleValue()).sum();
+        final double stockTotal = constraintsProduct.values().stream().mapToDouble(Integer::doubleValue).sum();
 
         /*
          *
@@ -265,7 +265,7 @@ public abstract class P20150720 {
         constraintsProduct.put("PRODUCT_3", 636_000);
         constraintsProduct.put("PRODUCT_4", 220_000);
         constraintsProduct.put("PRODUCT_5", 0);
-        final double stockTotal = constraintsProduct.values().stream().mapToDouble(e -> e.doubleValue()).sum();
+        final double stockTotal = constraintsProduct.values().stream().mapToDouble(Integer::doubleValue).sum();
         // BasicLogger.debug("STOCK_TOTAL " + stockTotal);
 
         /*
@@ -299,7 +299,7 @@ public abstract class P20150720 {
         constraintsCustomer.put("CUSTOMER_J_1", 16_000);
         constraintsCustomer.put("CUSTOMER_K_1", 24_000);
         constraintsCustomer.put("CUSTOMER_L_1", 56_000);
-        final double demandTotal = constraintsCustomer.values().stream().mapToDouble(e -> e.doubleValue()).sum();
+        final double demandTotal = constraintsCustomer.values().stream().mapToDouble(Integer::doubleValue).sum();
         // BasicLogger.debug("DEMAND_TOTAL " + demandTotal);
 
         /*

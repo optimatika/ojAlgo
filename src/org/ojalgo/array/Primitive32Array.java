@@ -126,7 +126,7 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -256,7 +256,7 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
-    protected float floatValue(int index) {
+    protected float floatValue(final int index) {
         return data[index];
     }
 

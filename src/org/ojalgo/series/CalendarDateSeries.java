@@ -38,6 +38,8 @@ import org.ojalgo.type.NumberDefinition;
 public final class CalendarDateSeries<N extends Comparable<N>> extends TreeSeries<CalendarDate, N, CalendarDateSeries<N>>
         implements BasicSeries.NaturallySequenced<CalendarDate, N> {
 
+    private static final long serialVersionUID = 1L;
+
     private final IndexMapper<CalendarDate> myMapper;
     private final CalendarDateUnit myResolution;
 

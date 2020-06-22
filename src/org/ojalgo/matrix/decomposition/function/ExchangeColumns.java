@@ -23,11 +23,7 @@ package org.ojalgo.matrix.decomposition.function;
 
 public interface ExchangeColumns {
 
-    ExchangeColumns NULL = new ExchangeColumns() {
-
-        public void exchangeColumns(final int colA, final int colB) {
-
-        }
+    ExchangeColumns NULL = (colA, colB) -> {
 
     };
 

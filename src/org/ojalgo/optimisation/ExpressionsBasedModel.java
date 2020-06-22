@@ -1001,7 +1001,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
     }
 
     public boolean isAnyVariableFixed() {
-        return myVariables.stream().anyMatch(v -> v.isFixed());
+        return myVariables.stream().anyMatch(Variable::isFixed);
     }
 
     public boolean isAnyVariableInteger() {
@@ -1398,7 +1398,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
     }
 
     boolean isFixed() {
-        return myVariables.stream().allMatch(v -> v.isFixed());
+        return myVariables.stream().allMatch(Variable::isFixed);
     }
 
     boolean isInfeasible() {
@@ -1423,7 +1423,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
     }
 
     boolean isUnbounded() {
-        return myVariables.stream().anyMatch(v -> v.isUnbounded());
+        return myVariables.stream().anyMatch(Variable::isUnbounded);
     }
 
     Optimisation.Result optimise() {

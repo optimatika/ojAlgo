@@ -68,7 +68,7 @@ public abstract class ReferenceTypeArray<N extends Comparable<N>> extends PlainA
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

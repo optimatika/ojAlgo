@@ -44,7 +44,7 @@ abstract class FactoryStore<N extends Comparable<N>> extends AbstractStore<N> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

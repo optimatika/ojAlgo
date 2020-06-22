@@ -38,37 +38,37 @@ import org.ojalgo.structure.Access1D;
  */
 public final class FloatingPointReceptacle {
 
-    public static FloatingPointReceptacle of(Access1D<?> values) {
+    public static FloatingPointReceptacle of(final Access1D<?> values) {
         FloatingPointReceptacle retVal = new FloatingPointReceptacle();
         retVal.append(values);
         return retVal;
     }
 
-    public static FloatingPointReceptacle of(double... values) {
+    public static FloatingPointReceptacle of(final double... values) {
         FloatingPointReceptacle retVal = new FloatingPointReceptacle();
         retVal.append(values);
         return retVal;
     }
 
-    public static FloatingPointReceptacle of(float... values) {
+    public static FloatingPointReceptacle of(final float... values) {
         FloatingPointReceptacle retVal = new FloatingPointReceptacle();
         retVal.append(values);
         return retVal;
     }
 
-    public static FloatingPointReceptacle of(int count, double value) {
+    public static FloatingPointReceptacle of(final int count, final double value) {
         FloatingPointReceptacle retVal = new FloatingPointReceptacle();
         retVal.append(count, value);
         return retVal;
     }
 
-    public static FloatingPointReceptacle of(int count, float value) {
+    public static FloatingPointReceptacle of(final int count, final float value) {
         FloatingPointReceptacle retVal = new FloatingPointReceptacle();
         retVal.append(count, value);
         return retVal;
     }
 
-    public static FloatingPointReceptacle of(List<? extends Comparable<?>> values) {
+    public static FloatingPointReceptacle of(final List<? extends Comparable<?>> values) {
         FloatingPointReceptacle retVal = new FloatingPointReceptacle();
         retVal.append(values);
         return retVal;
@@ -81,39 +81,39 @@ public final class FloatingPointReceptacle {
         super();
     }
 
-    public void append(Access1D<?> part) {
+    public void append(final Access1D<?> part) {
         myContents.addLast(part);
         mySize += part.size();
     }
 
-    public void append(double... part) {
+    public void append(final double... part) {
         myContents.addLast(part);
         mySize += part.length;
     }
 
-    public void append(float... part) {
+    public void append(final float... part) {
         myContents.addLast(part);
         mySize += part.length;
     }
 
-    public void append(FloatingPointReceptacle part) {
+    public void append(final FloatingPointReceptacle part) {
         myContents.addLast(part);
         mySize += part.size();
     }
 
-    public void append(int count, double value) {
+    public void append(final int count, final double value) {
         double[] part = new double[count];
         Arrays.fill(part, value);
         this.append(part);
     }
 
-    public void append(int count, float value) {
+    public void append(final int count, final float value) {
         float[] part = new float[count];
         Arrays.fill(part, value);
         this.append(part);
     }
 
-    public void append(List<? extends Comparable<?>> part) {
+    public void append(final List<? extends Comparable<?>> part) {
         myContents.addLast(part);
         mySize += part.size();
     }
@@ -123,39 +123,39 @@ public final class FloatingPointReceptacle {
         mySize = 0;
     }
 
-    public void prepend(Access1D<?> part) {
+    public void prepend(final Access1D<?> part) {
         myContents.addFirst(part);
         mySize += part.size();
     }
 
-    public void prepend(double... part) {
+    public void prepend(final double... part) {
         myContents.addFirst(part);
         mySize += part.length;
     }
 
-    public void prepend(float... part) {
+    public void prepend(final float... part) {
         myContents.addFirst(part);
         mySize += part.length;
     }
 
-    public void prepend(FloatingPointReceptacle part) {
+    public void prepend(final FloatingPointReceptacle part) {
         myContents.addFirst(part);
         mySize += part.size();
     }
 
-    public void prepend(int count, double value) {
+    public void prepend(final int count, final double value) {
         double[] part = new double[count];
         Arrays.fill(part, value);
         this.prepend(part);
     }
 
-    public void prepend(int count, float value) {
+    public void prepend(final int count, final float value) {
         float[] part = new float[count];
         Arrays.fill(part, value);
         this.prepend(part);
     }
 
-    public void prepend(List<? extends Comparable<?>> part) {
+    public void prepend(final List<? extends Comparable<?>> part) {
         myContents.addFirst(part);
         mySize += part.size();
     }
@@ -164,11 +164,11 @@ public final class FloatingPointReceptacle {
         return mySize;
     }
 
-    public void supplyTo(double[] destination) {
+    public void supplyTo(final double[] destination) {
         this.supplyTo(destination, 0);
     }
 
-    public void supplyTo(float[] destination) {
+    public void supplyTo(final float[] destination) {
         this.supplyTo(destination, 0);
     }
 

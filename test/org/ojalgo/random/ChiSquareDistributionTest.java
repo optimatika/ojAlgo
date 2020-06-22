@@ -32,7 +32,7 @@ public class ChiSquareDistributionTest {
 
     private static final NumberContext ACCURACY = StandardType.MATH_032.withPrecision(2).withScale(3);
 
-    static void doTestLowerTail(int degreesOfFreedom, double[] criticalValues) {
+    static void doTestLowerTail(final int degreesOfFreedom, final double[] criticalValues) {
 
         double[] probabilities = new double[] { 0.10, 0.05, 0.025, 0.01, 0.001 };
 
@@ -44,7 +44,7 @@ public class ChiSquareDistributionTest {
         }
     }
 
-    static void doTestUpperTail(int degreesOfFreedom, double[] criticalValues) {
+    static void doTestUpperTail(final int degreesOfFreedom, final double[] criticalValues) {
 
         double[] probabilities = new double[] { 0.90, 0.95, 0.975, 0.99, 0.999 };
 
