@@ -142,6 +142,10 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         }
     }
 
+    ArtificialNeuralNetwork.Activator getActivator() {
+        return myActivator;
+    }
+
     double getBias(final int output) {
         return myBias.doubleValue(output);
     }

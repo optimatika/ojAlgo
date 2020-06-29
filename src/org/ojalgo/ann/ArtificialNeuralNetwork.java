@@ -23,6 +23,10 @@ package org.ojalgo.ann;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -146,6 +150,35 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return new NetworkBuilder(numberOfInputNodes, nodesPerCalculationLayer);
     }
 
+    /**
+     * Read (reconstruct) an ANN from the specified input previously written by {@link #writeTo(DataOutput)}.
+     */
+    public static ArtificialNeuralNetwork from(DataInput input) throws IOException {
+        return FileFormat.read(input);
+    }
+
+    /**
+     * @see #from(DataInput)
+     */
+    public static ArtificialNeuralNetwork from(File file) {
+        try (DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
+            return ArtificialNeuralNetwork.from(input);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    /**
+     * @see #from(DataInput)
+     */
+    public static ArtificialNeuralNetwork from(Path path, OpenOption... options) {
+        try (DataInputStream input = new DataInputStream(new BufferedInputStream(Files.newInputStream(path, options)))) {
+            return ArtificialNeuralNetwork.from(input);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
     private final CalculationLayer[] myLayers;
 
     ArtificialNeuralNetwork(final int inputs, final int[] layers) {
@@ -204,8 +237,42 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return tmpBuilder.toString();
     }
 
+    /**
+     * Will write (save) the ANN to the specified output. Can then later be read back by using
+     * {@link #from(DataInput)}.
+     */
+    public void writeTo(DataOutput output) throws IOException {
+        FileFormat.write(this, 1, output);
+    }
+
+    /**
+     * @see #writeTo(DataOutput)
+     */
+    public void writeTo(File file) {
+        try (DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
+            this.writeTo(output);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    /**
+     * @see #writeTo(DataOutput)
+     */
+    public void writeTo(Path path, OpenOption... options) {
+        try (DataOutputStream output = new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(path, options)))) {
+            this.writeTo(output);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
     int countCalculationLayers() {
         return myLayers.length;
+    }
+
+    Activator getActivator(final int layer) {
+        return myLayers[layer].getActivator();
     }
 
     double getBias(final int layer, final int output) {
