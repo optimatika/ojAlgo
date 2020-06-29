@@ -81,15 +81,15 @@ abstract class FileFormat {
 
             output.writeInt(structure.length);
 
-            for (int i = 0; i < structure.length; i++) {
-                output.writeInt(Math.toIntExact(structure[0].countColumns()));
+            for (int l = 0; l < structure.length; l++) {
+                output.writeInt(Math.toIntExact(structure[l].countColumns()));
             }
 
             int numberofInputs, numberofOutputs;
 
             for (int l = 0; l < structure.length; l++) {
-                numberofInputs = Math.toIntExact(structure[0].countRows());
-                numberofOutputs = Math.toIntExact(structure[0].countColumns());
+                numberofInputs = Math.toIntExact(structure[l].countRows());
+                numberofOutputs = Math.toIntExact(structure[l].countColumns());
 
                 for (int j = 0; j < numberofOutputs; j++) {
 
@@ -134,6 +134,7 @@ abstract class FileFormat {
         switch (version) {
         case Version1.ID:
             Version1.write(network, output);
+            break;
         default:
             throw new IOException("Unsupported version!");
         }

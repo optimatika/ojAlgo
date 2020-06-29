@@ -211,6 +211,18 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return true;
     }
 
+    public Activator getActivator(final int layer) {
+        return myLayers[layer].getActivator();
+    }
+
+    public double getBias(final int layer, final int output) {
+        return myLayers[layer].getBias(output);
+    }
+
+    public double getWeight(final int layer, final int input, final int output) {
+        return myLayers[layer].getWeight(input, output);
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -271,24 +283,12 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return myLayers.length;
     }
 
-    Activator getActivator(final int layer) {
-        return myLayers[layer].getActivator();
-    }
-
-    double getBias(final int layer, final int output) {
-        return myLayers[layer].getBias(output);
-    }
-
     CalculationLayer getLayer(final int index) {
         return myLayers[index];
     }
 
     Primitive64Store getOutput(final int layer) {
         return myLayers[layer].getOutput();
-    }
-
-    double getWeight(final int layer, final int input, final int output) {
-        return myLayers[layer].getWeight(input, output);
     }
 
     List<MatrixStore<Double>> getWeights() {
