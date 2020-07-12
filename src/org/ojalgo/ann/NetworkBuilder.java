@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
@@ -38,21 +38,21 @@ import org.ojalgo.structure.Structure2D;
 public final class NetworkBuilder extends NetworkUser {
 
     private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
-    private final Primitive64Store[] myGradients;
+    private final PhysicalStore<Double>[] myGradients;
     private double myLearningRate = 1.0;
 
-    NetworkBuilder(final int numberOfInputNodes, final int... outputNodesPerCalculationLayer) {
+    NetworkBuilder(PhysicalStore.Factory<Double, ?> factory, final int numberOfInputNodes, final int... outputNodesPerCalculationLayer) {
 
-        super(new ArtificialNeuralNetwork(numberOfInputNodes, outputNodesPerCalculationLayer));
+        super(new ArtificialNeuralNetwork(factory, numberOfInputNodes, outputNodesPerCalculationLayer));
 
         if (outputNodesPerCalculationLayer.length < 1) {
             ProgrammingError.throwWithMessage("There must be at least 1 layer!");
         }
 
-        myGradients = new Primitive64Store[1 + outputNodesPerCalculationLayer.length];
-        myGradients[0] = Primitive64Store.FACTORY.make(numberOfInputNodes, 1);
+        myGradients = (PhysicalStore<Double>[]) new PhysicalStore<?>[1 + outputNodesPerCalculationLayer.length];
+        myGradients[0] = factory.make(numberOfInputNodes, 1);
         for (int l = 0; l < outputNodesPerCalculationLayer.length; l++) {
-            myGradients[1 + l] = Primitive64Store.FACTORY.make(outputNodesPerCalculationLayer[l], 1);
+            myGradients[1 + l] = factory.make(outputNodesPerCalculationLayer[l], 1);
         }
     }
 
@@ -160,10 +160,10 @@ public final class NetworkBuilder extends NetworkUser {
             CalculationLayer layer = this.getLayer(k);
 
             Access1D<Double> input = k == 0 ? givenInput : this.getOutput(k - 1);
-            Primitive64Store output = this.getOutput(k);
+            PhysicalStore<Double> output = this.getOutput(k);
 
-            Primitive64Store upstreamGradient = myGradients[k];
-            Primitive64Store downstreamGradient = myGradients[k + 1];
+            PhysicalStore<Double> upstreamGradient = myGradients[k];
+            PhysicalStore<Double> downstreamGradient = myGradients[k + 1];
 
             layer.adjust(input, downstreamGradient, -myLearningRate, upstreamGradient, output);
         }

@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.LineSplittingParser;
 import org.ojalgo.structure.Access1D;
@@ -58,7 +59,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
     @Test
     public void testTraining() {
 
-        NetworkBuilder builder = this.getInitialNetwork();
+        NetworkBuilder builder = this.getInitialNetwork(Primitive64Store.FACTORY);
 
         LineSplittingParser parser = new LineSplittingParser(",", true);
 
@@ -111,9 +112,9 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
     }
 
     @Override
-    protected NetworkBuilder getInitialNetwork() {
+    protected NetworkBuilder getInitialNetwork(Factory<Double, ?> factory) {
 
-        NetworkBuilder builder = ArtificialNeuralNetwork.builder(4, 2, 2);
+        NetworkBuilder builder = ArtificialNeuralNetwork.builder(factory, 4, 2, 2);
 
         builder.activators(SIGMOID, SOFTMAX).error(CROSS_ENTROPY);
 

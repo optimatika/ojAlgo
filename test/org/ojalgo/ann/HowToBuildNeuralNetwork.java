@@ -27,6 +27,7 @@ import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -72,9 +73,9 @@ public class HowToBuildNeuralNetwork extends BackPropagationExample {
     }
 
     @Override
-    protected NetworkBuilder getInitialNetwork() {
+    protected NetworkBuilder getInitialNetwork(Factory<Double, ?> factory) {
 
-        NetworkBuilder builder = ArtificialNeuralNetwork.builder(2, 3, 1);
+        NetworkBuilder builder = ArtificialNeuralNetwork.builder(factory, 2, 3, 1);
 
         builder.activators(SIGMOID, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
 

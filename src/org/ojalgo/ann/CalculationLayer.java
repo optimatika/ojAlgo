@@ -24,7 +24,7 @@ package org.ojalgo.ann;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
@@ -32,15 +32,16 @@ import org.ojalgo.structure.Structure2D;
 final class CalculationLayer {
 
     private ArtificialNeuralNetwork.Activator myActivator;
-    private final Primitive64Store myBias;
-    private final Primitive64Store myWeights;
+    private final PhysicalStore<Double> myBias;
+    private final PhysicalStore<Double> myWeights;
 
-    CalculationLayer(final int numberOfInputs, final int numberOfOutputs, final ArtificialNeuralNetwork.Activator activator) {
+    CalculationLayer(PhysicalStore.Factory<Double, ?> factory, final int numberOfInputs, final int numberOfOutputs,
+            final ArtificialNeuralNetwork.Activator activator) {
 
         super();
 
-        myWeights = Primitive64Store.FACTORY.make(numberOfInputs, numberOfOutputs);
-        myBias = Primitive64Store.FACTORY.make(1, numberOfOutputs);
+        myWeights = factory.make(numberOfInputs, numberOfOutputs);
+        myBias = factory.make(1, numberOfOutputs);
 
         myActivator = activator;
 
@@ -113,8 +114,8 @@ final class CalculationLayer {
         myBias.fillAll(randomiser);
     }
 
-    void adjust(final Access1D<Double> layerInput, final Primitive64Store downstreamGradient, final double learningRate,
-            final Primitive64Store upstreamGradient, Primitive64Store layerOutput) {
+    void adjust(final Access1D<Double> layerInput, final PhysicalStore<Double> downstreamGradient, final double learningRate,
+            final PhysicalStore<Double> upstreamGradient, PhysicalStore<Double> layerOutput) {
 
         downstreamGradient.modifyMatching(MULTIPLY, layerOutput.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
 
@@ -161,7 +162,7 @@ final class CalculationLayer {
         return myWeights.doubleValue(input, output);
     }
 
-    Primitive64Store invoke(final Access1D<Double> input, Primitive64Store output) {
+    PhysicalStore<Double> invoke(final Access1D<Double> input, PhysicalStore<Double> output) {
         myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(output);
         output.modifyAll(myActivator.getFunction(output));
         return output;

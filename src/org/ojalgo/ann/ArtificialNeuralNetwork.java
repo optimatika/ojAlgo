@@ -36,6 +36,8 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.Primitive32Store;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
@@ -68,11 +70,12 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
          * training.
          */
         SOFTMAX(args -> {
-            Primitive64Store parts = args.copy();
+            PhysicalStore<Double> parts = args.copy();
             parts.modifyAll(EXP);
             final double total = parts.aggregateAll(Aggregator.SUM);
             return arg -> EXP.invoke(arg) / total;
         }, arg -> ONE, false),
+
         /**
          * [-1,1]
          */
@@ -92,7 +95,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
             return myDerivativeInTermsOfOutput;
         }
 
-        PrimitiveFunction.Unary getFunction(final Primitive64Store arguments) {
+        PrimitiveFunction.Unary getFunction(final PhysicalStore<Double> arguments) {
             return myFunction.make(arguments);
         }
 
@@ -142,12 +145,16 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
 
     interface ActivatorFunctionFactory {
 
-        PrimitiveFunction.Unary make(Primitive64Store arguments);
+        PrimitiveFunction.Unary make(PhysicalStore<Double> arguments);
 
     }
 
     public static NetworkBuilder builder(final int numberOfInputNodes, final int... nodesPerCalculationLayer) {
-        return new NetworkBuilder(numberOfInputNodes, nodesPerCalculationLayer);
+        return ArtificialNeuralNetwork.builder(Primitive64Store.FACTORY, numberOfInputNodes, nodesPerCalculationLayer);
+    }
+
+    public static NetworkBuilder builder(PhysicalStore.Factory<Double, ?> factory, final int numberOfInputNodes, final int... nodesPerCalculationLayer) {
+        return new NetworkBuilder(factory, numberOfInputNodes, nodesPerCalculationLayer);
     }
 
     /**
@@ -179,19 +186,21 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
     }
 
+    private final PhysicalStore.Factory<Double, ?> myFactory;
     private final CalculationLayer[] myLayers;
 
-    ArtificialNeuralNetwork(final int inputs, final int[] layers) {
+    ArtificialNeuralNetwork(PhysicalStore.Factory<Double, ?> factory, final int inputs, final int[] layers) {
 
         super();
 
+        myFactory = factory;
         myLayers = new CalculationLayer[layers.length];
         int tmpIn = inputs;
         int tmpOut = inputs;
         for (int i = 0; i < layers.length; i++) {
             tmpIn = tmpOut;
             tmpOut = layers[i];
-            myLayers[i] = new CalculationLayer(tmpIn, tmpOut, ArtificialNeuralNetwork.Activator.SIGMOID);
+            myLayers[i] = new CalculationLayer(factory, tmpIn, tmpOut, ArtificialNeuralNetwork.Activator.SIGMOID);
         }
     }
 
@@ -248,6 +257,10 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return this.newInvoker().invoke(input);
     }
 
+    /**
+     * If you create multiple invokers you can use them in different threads simutaneously - the invoker
+     * contains any/all invocation specific state.
+     */
     public NetworkInvoker newInvoker() {
         return new NetworkInvoker(this);
     }
@@ -277,7 +290,8 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
      * {@link #from(DataInput)}.
      */
     public void writeTo(DataOutput output) throws IOException {
-        FileFormat.write(this, 1, output);
+        int version = (myFactory == Primitive32Store.FACTORY) ? 2 : 1;
+        FileFormat.write(this, version, output);
     }
 
     /**
@@ -314,8 +328,12 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return retVal;
     }
 
-    Primitive64Store invoke(int layer, Access1D<Double> input, Primitive64Store output) {
+    PhysicalStore<Double> invoke(int layer, Access1D<Double> input, PhysicalStore<Double> output) {
         return myLayers[layer].invoke(input, output);
+    }
+
+    PhysicalStore<Double> newStore(int rows, int columns) {
+        return myFactory.make(rows, columns);
     }
 
     Structure2D[] structure() {
