@@ -25,14 +25,14 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
 abstract class NetworkUser implements Supplier<ArtificialNeuralNetwork> {
 
     private final ArtificialNeuralNetwork myNetwork;
-    private final Primitive64Store[] myOutputs;
+    private final PhysicalStore<Double>[] myOutputs;
 
     NetworkUser(ArtificialNeuralNetwork network) {
 
@@ -40,9 +40,9 @@ abstract class NetworkUser implements Supplier<ArtificialNeuralNetwork> {
 
         myNetwork = network;
 
-        myOutputs = new Primitive64Store[network.depth()];
+        myOutputs = (PhysicalStore<Double>[]) new PhysicalStore<?>[network.depth()];
         for (int i = 0; i < myOutputs.length; i++) {
-            myOutputs[i] = Primitive64Store.FACTORY.make(1, this.getLayer(i).countOutputNodes());
+            myOutputs[i] = network.newStore(1, this.getLayer(i).countOutputNodes());
         }
     }
 
@@ -98,7 +98,7 @@ abstract class NetworkUser implements Supplier<ArtificialNeuralNetwork> {
     }
 
     MatrixStore<Double> invoke(Access1D<Double> input) {
-        Primitive64Store retVal = null;
+        PhysicalStore<Double> retVal = null;
         for (int i = 0, limit = this.depth(); i < limit; i++) {
             retVal = myNetwork.getLayer(i).invoke(input, myOutputs[i]);
             input = retVal;
@@ -110,7 +110,7 @@ abstract class NetworkUser implements Supplier<ArtificialNeuralNetwork> {
         return myNetwork.structure();
     }
 
-    Primitive64Store getOutput(int layer) {
+    PhysicalStore<Double> getOutput(int layer) {
         return myOutputs[layer];
     }
 

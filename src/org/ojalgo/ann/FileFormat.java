@@ -26,6 +26,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
+import org.ojalgo.matrix.store.Primitive32Store;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Structure2D;
 
 abstract class FileFormat {
@@ -48,7 +50,7 @@ abstract class FileFormat {
                 layerOutputs[i] = input.readInt();
             }
 
-            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(numberOfInputs, layerOutputs);
+            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(Primitive64Store.FACTORY, numberOfInputs, layerOutputs);
 
             int numberOfOutputs;
             for (int l = 0; l < numberOfLayers; l++) {
@@ -106,6 +108,82 @@ abstract class FileFormat {
 
     }
 
+    /**
+     * Same as v1 but for float rather than double
+     */
+    abstract static class Version2 {
+
+        static final int ID = 2;
+
+        static ArtificialNeuralNetwork read(DataInput input) throws IOException {
+
+            int numberOfInputs = input.readInt();
+
+            int numberOfLayers = input.readInt();
+
+            int[] layerOutputs = new int[numberOfLayers];
+            for (int i = 0; i < numberOfLayers; i++) {
+                layerOutputs[i] = input.readInt();
+            }
+
+            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(Primitive32Store.FACTORY, numberOfInputs, layerOutputs);
+
+            int numberOfOutputs;
+            for (int l = 0; l < numberOfLayers; l++) {
+                numberOfOutputs = layerOutputs[l];
+
+                CalculationLayer layer = retVal.getLayer(l);
+
+                for (int j = 0; j < numberOfOutputs; j++) {
+
+                    layer.setBias(j, input.readFloat());
+
+                    for (int i = 0; i < numberOfInputs; i++) {
+                        layer.setWeight(i, j, input.readFloat());
+                    }
+                }
+
+                layer.setActivator(Activator.valueOf(input.readUTF()));
+
+                numberOfInputs = numberOfOutputs;
+            }
+
+            return retVal;
+        }
+
+        static void write(ArtificialNeuralNetwork network, DataOutput output) throws IOException {
+
+            Structure2D[] structure = network.structure();
+
+            output.writeInt(Math.toIntExact(structure[0].countRows()));
+
+            output.writeInt(structure.length);
+
+            for (int l = 0; l < structure.length; l++) {
+                output.writeInt(Math.toIntExact(structure[l].countColumns()));
+            }
+
+            int numberofInputs, numberofOutputs;
+
+            for (int l = 0; l < structure.length; l++) {
+                numberofInputs = Math.toIntExact(structure[l].countRows());
+                numberofOutputs = Math.toIntExact(structure[l].countColumns());
+
+                for (int j = 0; j < numberofOutputs; j++) {
+
+                    output.writeFloat((float) network.getBias(l, j));
+
+                    for (int i = 0; i < numberofInputs; i++) {
+                        output.writeFloat((float) network.getWeight(l, i, j));
+                    }
+                }
+
+                output.writeUTF(network.getActivator(l).name());
+            }
+        }
+
+    }
+
     private static final String FORMAT = "ojAlgo ANN";
 
     static ArtificialNeuralNetwork read(DataInput input) throws IOException {
@@ -120,6 +198,8 @@ abstract class FileFormat {
         switch (version) {
         case Version1.ID:
             return Version1.read(input);
+        case Version2.ID:
+            return Version2.read(input);
         default:
             throw new IOException("Unsupported version!");
         }
@@ -134,6 +214,9 @@ abstract class FileFormat {
         switch (version) {
         case Version1.ID:
             Version1.write(network, output);
+            break;
+        case Version2.ID:
+            Version2.write(network, output);
             break;
         default:
             throw new IOException("Unsupported version!");

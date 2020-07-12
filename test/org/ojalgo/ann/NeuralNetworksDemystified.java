@@ -30,6 +30,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
@@ -50,7 +51,7 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
     }
 
     @Override
-    public void testFeedForward() {
+    public void doTestFeedForward(Factory<Double, ?> factory) {
         // No example output
 
     }
@@ -61,7 +62,7 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
     @Test
     public void testTraining() {
 
-        final NetworkBuilder builder = this.getInitialNetwork();
+        final NetworkBuilder builder = this.getInitialNetwork(Primitive64Store.FACTORY);
 
         List<Data> examples = this.getTestCases();
 
@@ -105,8 +106,8 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
     }
 
     @Override
-    protected NetworkBuilder getInitialNetwork() {
-        return ArtificialNeuralNetwork.builder(2, 3, 1).activators(SIGMOID, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
+    protected NetworkBuilder getInitialNetwork(Factory<Double, ?> factory) {
+        return ArtificialNeuralNetwork.builder(factory, 2, 3, 1).activators(SIGMOID, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
 
     }
 

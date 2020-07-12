@@ -31,6 +31,9 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.Primitive32Store;
+import org.ojalgo.matrix.store.Primitive64Store;
 
 public class FileFormatTest extends ANNTest {
 
@@ -66,11 +69,20 @@ public class FileFormatTest extends ANNTest {
     }
 
     @Test
-    public void testWriteAndReadBack() {
+    public void testWriteAndReadBack32() {
+        this.doTestWriteAndReadBack(Primitive32Store.FACTORY);
+    }
 
-        File file = new File(invocationDir, "ojalgo.ann");
+    @Test
+    public void testWriteAndReadBack64() {
+        this.doTestWriteAndReadBack(Primitive64Store.FACTORY);
+    }
 
-        NetworkBuilder builder = ArtificialNeuralNetwork.builder(5, 6, 3, 9, 2).activators(Activator.IDENTITY, Activator.RECTIFIER, Activator.SIGMOID,
+    private void doTestWriteAndReadBack(PhysicalStore.Factory<Double, ?> factory) {
+
+        File file = new File(invocationDir, "ojAlgo.ann");
+
+        NetworkBuilder builder = ArtificialNeuralNetwork.builder(factory, 5, 6, 3, 9, 2).activators(Activator.IDENTITY, Activator.RECTIFIER, Activator.SIGMOID,
                 Activator.TANH);
 
         ArtificialNeuralNetwork ann1 = builder.get();

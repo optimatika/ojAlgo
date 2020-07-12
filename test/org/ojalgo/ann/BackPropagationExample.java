@@ -26,6 +26,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
+import org.ojalgo.matrix.store.Primitive32Store;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Structure2D;
@@ -79,7 +81,7 @@ abstract class BackPropagationExample extends ANNTest {
 
         for (Data triplet : this.getTestCases()) {
             if ((triplet.input != null) && (triplet.target != null)) {
-                this.deriveTheHardWay(this.getInitialNetwork(), triplet, this.precision());
+                this.deriveTheHardWay(this.getInitialNetwork(Primitive64Store.FACTORY), triplet, this.precision());
                 counter++;
             }
         }
@@ -90,22 +92,13 @@ abstract class BackPropagationExample extends ANNTest {
     }
 
     @Test
-    public void testFeedForward() {
+    public void testFeedForward32() {
+        this.doTestFeedForward(Primitive32Store.FACTORY);
+    }
 
-        int counter = 0;
-
-        ArtificialNeuralNetwork network = this.getInitialNetwork().get();
-
-        for (Data triplet : this.getTestCases()) {
-            if ((triplet.input != null) && (triplet.expected != null)) {
-                TestUtils.assertEquals(triplet.expected, network.invoke(triplet.input), this.precision());
-                counter++;
-            }
-        }
-
-        if (counter == 0) {
-            TestUtils.fail(TEST_DID_NOT_DO_ANYTHING);
-        }
+    @Test
+    public void testFeedForward64() {
+        this.doTestFeedForward(Primitive64Store.FACTORY);
     }
 
     protected void deriveTheHardWay(final NetworkBuilder builder, final Data triplet, final NumberContext precision) {
@@ -200,10 +193,28 @@ abstract class BackPropagationExample extends ANNTest {
         }
     }
 
-    protected abstract NetworkBuilder getInitialNetwork();
+    protected abstract NetworkBuilder getInitialNetwork(Factory<Double, ?> factory);
 
     protected abstract List<Data> getTestCases();
 
     protected abstract NumberContext precision();
+
+    void doTestFeedForward(Factory<Double, ?> factory) {
+
+        int counter = 0;
+
+        ArtificialNeuralNetwork network = this.getInitialNetwork(factory).get();
+
+        for (Data triplet : this.getTestCases()) {
+            if ((triplet.input != null) && (triplet.expected != null)) {
+                TestUtils.assertEquals(triplet.expected, network.invoke(triplet.input), this.precision());
+                counter++;
+            }
+        }
+
+        if (counter == 0) {
+            TestUtils.fail(TEST_DID_NOT_DO_ANYTHING);
+        }
+    }
 
 }
