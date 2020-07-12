@@ -39,7 +39,7 @@ abstract class FileFormat {
 
         static ArtificialNeuralNetwork read(DataInput input) throws IOException {
 
-            int numberofInputs = input.readInt();
+            int numberOfInputs = input.readInt();
 
             int numberOfLayers = input.readInt();
 
@@ -48,26 +48,26 @@ abstract class FileFormat {
                 layerOutputs[i] = input.readInt();
             }
 
-            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(numberofInputs, layerOutputs);
+            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(numberOfInputs, layerOutputs);
 
-            int numberofOutputs;
+            int numberOfOutputs;
             for (int l = 0; l < numberOfLayers; l++) {
-                numberofOutputs = layerOutputs[l];
+                numberOfOutputs = layerOutputs[l];
 
                 CalculationLayer layer = retVal.getLayer(l);
 
-                for (int j = 0; j < numberofOutputs; j++) {
+                for (int j = 0; j < numberOfOutputs; j++) {
 
                     layer.setBias(j, input.readDouble());
 
-                    for (int i = 0; i < numberofInputs; i++) {
+                    for (int i = 0; i < numberOfInputs; i++) {
                         layer.setWeight(i, j, input.readDouble());
                     }
                 }
 
                 layer.setActivator(Activator.valueOf(input.readUTF()));
 
-                numberofInputs = numberofOutputs;
+                numberOfInputs = numberOfOutputs;
             }
 
             return retVal;

@@ -31,7 +31,6 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.netio.BasicLogger;
 
 public class FileFormatTest extends ANNTest {
 
@@ -83,8 +82,8 @@ public class FileFormatTest extends ANNTest {
         MatrixStore<Double> expected = ann1.invoke(input);
         MatrixStore<Double> actual = ann2.invoke(input);
 
-        BasicLogger.debug("Expected", expected);
-        BasicLogger.debug("Actual", actual);
+        // BasicLogger.debug("Expected", expected);
+        // BasicLogger.debug("Actual", actual);
 
         TestUtils.assertEquals(expected, actual);
     }

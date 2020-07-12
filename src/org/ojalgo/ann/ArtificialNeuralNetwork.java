@@ -182,7 +182,9 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     private final CalculationLayer[] myLayers;
 
     ArtificialNeuralNetwork(final int inputs, final int[] layers) {
+
         super();
+
         myLayers = new CalculationLayer[layers.length];
         int tmpIn = inputs;
         int tmpOut = inputs;
@@ -191,6 +193,13 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
             tmpOut = layers[i];
             myLayers[i] = new CalculationLayer(tmpIn, tmpOut, ArtificialNeuralNetwork.Activator.SIGMOID);
         }
+    }
+
+    /**
+     * @return The number of calculation layers
+     */
+    public int depth() {
+        return myLayers.length;
     }
 
     @Override
@@ -231,13 +240,16 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return result;
     }
 
+    /**
+     * @deprecated v49 Use {@link #newInvoker()} and then {@link NetworkInvoker#invoke(Access1D)} instead
+     */
+    @Deprecated
     public MatrixStore<Double> invoke(Access1D<Double> input) {
-        MatrixStore<Double> retVal = null;
-        for (int i = 0, limit = myLayers.length; i < limit; i++) {
-            retVal = myLayers[i].invoke(input);
-            input = retVal;
-        }
-        return retVal;
+        return this.newInvoker().invoke(input);
+    }
+
+    public NetworkInvoker newInvoker() {
+        return new NetworkInvoker(this);
     }
 
     @Override
@@ -247,6 +259,17 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         tmpBuilder.append(Arrays.toString(myLayers));
         tmpBuilder.append("]");
         return tmpBuilder.toString();
+    }
+
+    /**
+     * @return The max number of nodes in any layer
+     */
+    public int width() {
+        int retVal = myLayers[0].countInputNodes();
+        for (CalculationLayer layer : myLayers) {
+            retVal = Math.max(retVal, layer.countOutputNodes());
+        }
+        return retVal;
     }
 
     /**
@@ -279,16 +302,8 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
     }
 
-    int countCalculationLayers() {
-        return myLayers.length;
-    }
-
     CalculationLayer getLayer(final int index) {
         return myLayers[index];
-    }
-
-    Primitive64Store getOutput(final int layer) {
-        return myLayers[layer].getOutput();
     }
 
     List<MatrixStore<Double>> getWeights() {
@@ -297,6 +312,10 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
             retVal.add(myLayers[i].getLogicalWeights());
         }
         return retVal;
+    }
+
+    Primitive64Store invoke(int layer, Access1D<Double> input, Primitive64Store output) {
+        return myLayers[layer].invoke(input, output);
     }
 
     Structure2D[] structure() {
