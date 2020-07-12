@@ -23,18 +23,16 @@ package org.ojalgo.ann;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.BasicFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
-final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double>, Primitive64Store> {
+final class CalculationLayer {
 
     private ArtificialNeuralNetwork.Activator myActivator;
     private final Primitive64Store myBias;
-    private final Primitive64Store myOutput;
     private final Primitive64Store myWeights;
 
     CalculationLayer(final int numberOfInputs, final int numberOfOutputs, final ArtificialNeuralNetwork.Activator activator) {
@@ -43,7 +41,6 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
 
         myWeights = Primitive64Store.FACTORY.make(numberOfInputs, numberOfOutputs);
         myBias = Primitive64Store.FACTORY.make(1, numberOfOutputs);
-        myOutput = Primitive64Store.FACTORY.make(1, numberOfOutputs);
 
         myActivator = activator;
 
@@ -92,12 +89,6 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return result;
     }
 
-    public Primitive64Store invoke(final Access1D<Double> input) {
-        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
-        myOutput.modifyAll(myActivator.getFunction(myOutput));
-        return myOutput;
-    }
-
     @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
@@ -123,9 +114,9 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
     }
 
     void adjust(final Access1D<Double> layerInput, final Primitive64Store downstreamGradient, final double learningRate,
-            final Primitive64Store upstreamGradient) {
+            final Primitive64Store upstreamGradient, Primitive64Store layerOutput) {
 
-        downstreamGradient.modifyMatching(MULTIPLY, myOutput.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
+        downstreamGradient.modifyMatching(MULTIPLY, layerOutput.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
 
         if (upstreamGradient != null) {
             // No need to do this multiplication for the input layer
@@ -142,6 +133,14 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         }
     }
 
+    int countInputNodes() {
+        return Math.toIntExact(myWeights.countRows());
+    }
+
+    int countOutputNodes() {
+        return Math.toIntExact(myWeights.countColumns());
+    }
+
     ArtificialNeuralNetwork.Activator getActivator() {
         return myActivator;
     }
@@ -154,16 +153,18 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return myWeights.logical().below(myBias).get();
     }
 
-    Primitive64Store getOutput() {
-        return myOutput;
-    }
-
     Structure2D getStructure() {
         return myWeights;
     }
 
     double getWeight(final int input, final int output) {
         return myWeights.doubleValue(input, output);
+    }
+
+    Primitive64Store invoke(final Access1D<Double> input, Primitive64Store output) {
+        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(output);
+        output.modifyAll(myActivator.getFunction(output));
+        return output;
     }
 
     void setActivator(final ArtificialNeuralNetwork.Activator activator) {

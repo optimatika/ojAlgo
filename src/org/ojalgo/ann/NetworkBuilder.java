@@ -21,43 +21,38 @@
  */
 package org.ojalgo.ann;
 
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
-import java.util.function.Supplier;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * An artificial neural network builder/trainer.
+ * An Artificial Neural Network (ANN) builder/trainer.
  *
  * @author apete
  */
-public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
+public final class NetworkBuilder extends NetworkUser {
 
-    private final ArtificialNeuralNetwork myANN;
     private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
-    private final Primitive64Store[] myLayerValues;
+    private final Primitive64Store[] myGradients;
     private double myLearningRate = 1.0;
 
     NetworkBuilder(final int numberOfInputNodes, final int... outputNodesPerCalculationLayer) {
 
-        super();
+        super(new ArtificialNeuralNetwork(numberOfInputNodes, outputNodesPerCalculationLayer));
 
         if (outputNodesPerCalculationLayer.length < 1) {
             ProgrammingError.throwWithMessage("There must be at least 1 layer!");
         }
 
-        myANN = new ArtificialNeuralNetwork(numberOfInputNodes, outputNodesPerCalculationLayer);
-
-        myLayerValues = new Primitive64Store[1 + outputNodesPerCalculationLayer.length];
-        myLayerValues[0] = Primitive64Store.FACTORY.make(numberOfInputNodes, 1);
+        myGradients = new Primitive64Store[1 + outputNodesPerCalculationLayer.length];
+        myGradients[0] = Primitive64Store.FACTORY.make(numberOfInputNodes, 1);
         for (int l = 0; l < outputNodesPerCalculationLayer.length; l++) {
-            myLayerValues[1 + l] = Primitive64Store.FACTORY.make(outputNodesPerCalculationLayer[l], 1);
+            myGradients[1 + l] = Primitive64Store.FACTORY.make(outputNodesPerCalculationLayer[l], 1);
         }
     }
 
@@ -66,49 +61,45 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
      * @param activator The activator function to use
      */
     public NetworkBuilder activator(final int layer, final ArtificialNeuralNetwork.Activator activator) {
-        myANN.getLayer(layer).setActivator(activator);
+        this.getLayer(layer).setActivator(activator);
         return this;
     }
 
     public NetworkBuilder activators(final ArtificialNeuralNetwork.Activator activator) {
-        for (int i = 0, limit = myANN.countCalculationLayers(); i < limit; i++) {
-            myANN.getLayer(i).setActivator(activator);
+        for (int i = 0, limit = this.depth(); i < limit; i++) {
+            this.getLayer(i).setActivator(activator);
         }
         return this;
     }
 
     public NetworkBuilder activators(final ArtificialNeuralNetwork.Activator... activators) {
         for (int i = 0, limit = activators.length; i < limit; i++) {
-            myANN.getLayer(i).setActivator(activators[i]);
+            this.getLayer(i).setActivator(activators[i]);
         }
         return this;
     }
 
     public NetworkBuilder bias(final int layer, final int output, final double bias) {
-        myANN.getLayer(layer).setBias(output, bias);
+        this.getLayer(layer).setBias(output, bias);
         return this;
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (this.getClass() != obj.getClass()) {
+        if (!(obj instanceof NetworkBuilder)) {
             return false;
         }
         NetworkBuilder other = (NetworkBuilder) obj;
-        if (myANN == null) {
-            if (other.myANN != null) {
-                return false;
-            }
-        } else if (!myANN.equals(other.myANN)) {
+        if (myError != other.myError) {
             return false;
         }
-        if (myError != other.myError) {
+        if (!Arrays.equals(myGradients, other.myGradients)) {
             return false;
         }
         if (Double.doubleToLongBits(myLearningRate) != Double.doubleToLongBits(other.myLearningRate)) {
@@ -122,17 +113,12 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return this;
     }
 
-    public ArtificialNeuralNetwork get() {
-        return myANN;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
-        result = (prime * result) + ((myANN == null) ? 0 : myANN.hashCode());
+        int result = super.hashCode();
         result = (prime * result) + ((myError == null) ? 0 : myError.hashCode());
-
+        result = (prime * result) + Arrays.hashCode(myGradients);
         long temp;
         temp = Double.doubleToLongBits(myLearningRate);
         result = (prime * result) + (int) (temp ^ (temp >>> 32));
@@ -144,26 +130,42 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         return this;
     }
 
+    @Override
     public Structure2D[] structure() {
-        return myANN.structure();
+        return super.structure();
     }
 
     @Override
     public String toString() {
-        StringBuilder tmpBuilder = new StringBuilder();
-        tmpBuilder.append("NetworkBuilder [ANN=").append(myANN).append(", Error=").append(myError).append(", LearningRate=").append(myLearningRate).append("]");
-        return tmpBuilder.toString();
+        StringBuilder builder = new StringBuilder();
+        builder.append("NetworkBuilder [structure()=");
+        builder.append(Arrays.toString(this.structure()));
+        builder.append(", Error=");
+        builder.append(myError);
+        builder.append(", LearningRate=");
+        builder.append(myLearningRate);
+        builder.append("]");
+        return builder.toString();
     }
 
     public void train(final Access1D<Double> givenInput, final Access1D<Double> targetOutput) {
 
-        Access1D<Double> current = myANN.invoke(givenInput);
+        Access1D<Double> current = this.invoke(givenInput);
 
-        myLayerValues[0].fillMatching(givenInput);
-        myLayerValues[myLayerValues.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
+        myGradients[0].fillMatching(givenInput);
+        myGradients[myGradients.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
 
-        for (int k = myANN.countCalculationLayers() - 1; k >= 0; k--) {
-            myANN.getLayer(k).adjust(k == 0 ? givenInput : myANN.getLayer(k - 1).getOutput(), myLayerValues[k + 1], -myLearningRate, myLayerValues[k]);
+        for (int k = this.depth() - 1; k >= 0; k--) {
+
+            CalculationLayer layer = this.getLayer(k);
+
+            Access1D<Double> input = k == 0 ? givenInput : this.getOutput(k - 1);
+            Primitive64Store output = this.getOutput(k);
+
+            Primitive64Store upstreamGradient = myGradients[k];
+            Primitive64Store downstreamGradient = myGradients[k + 1];
+
+            layer.adjust(input, downstreamGradient, -myLearningRate, upstreamGradient, output);
         }
     }
 
@@ -182,24 +184,12 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
     }
 
     public NetworkBuilder weight(final int layer, final int input, final int output, final double weight) {
-        myANN.getLayer(layer).setWeight(input, output, weight);
+        this.getLayer(layer).setWeight(input, output, weight);
         return this;
     }
 
     double error(final Access1D<?> target, final Access1D<?> current) {
         return myError.invoke(target, current);
-    }
-
-    double getBias(final int layer, final int output) {
-        return myANN.getBias(layer, output);
-    }
-
-    double getWeight(final int layer, final int input, final int output) {
-        return myANN.getWeight(layer, input, output);
-    }
-
-    List<MatrixStore<Double>> getWeights() {
-        return myANN.getWeights();
     }
 
 }
