@@ -41,7 +41,8 @@ public final class NetworkBuilder extends NetworkUser {
     private final PhysicalStore<Double>[] myGradients;
     private double myLearningRate = 1.0;
 
-    NetworkBuilder(PhysicalStore.Factory<Double, ?> factory, final int numberOfInputNodes, final int... outputNodesPerCalculationLayer) {
+    @SuppressWarnings("unchecked")
+    NetworkBuilder(final PhysicalStore.Factory<Double, ?> factory, final int numberOfInputNodes, final int... outputNodesPerCalculationLayer) {
 
         super(new ArtificialNeuralNetwork(factory, numberOfInputNodes, outputNodesPerCalculationLayer));
 
@@ -54,6 +55,8 @@ public final class NetworkBuilder extends NetworkUser {
         for (int l = 0; l < outputNodesPerCalculationLayer.length; l++) {
             myGradients[1 + l] = factory.make(outputNodesPerCalculationLayer[l], 1);
         }
+
+        this.randomise();
     }
 
     /**
@@ -61,31 +64,31 @@ public final class NetworkBuilder extends NetworkUser {
      * @param activator The activator function to use
      */
     public NetworkBuilder activator(final int layer, final ArtificialNeuralNetwork.Activator activator) {
-        this.getLayer(layer).setActivator(activator);
+        this.setActivator(layer, activator);
         return this;
     }
 
     public NetworkBuilder activators(final ArtificialNeuralNetwork.Activator activator) {
         for (int i = 0, limit = this.depth(); i < limit; i++) {
-            this.getLayer(i).setActivator(activator);
+            this.activator(i, activator);
         }
         return this;
     }
 
     public NetworkBuilder activators(final ArtificialNeuralNetwork.Activator... activators) {
         for (int i = 0, limit = activators.length; i < limit; i++) {
-            this.getLayer(i).setActivator(activators[i]);
+            this.activator(i, activators[i]);
         }
         return this;
     }
 
     public NetworkBuilder bias(final int layer, final int output, final double bias) {
-        this.getLayer(layer).setBias(output, bias);
+        this.setBias(layer, output, bias);
         return this;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -157,15 +160,13 @@ public final class NetworkBuilder extends NetworkUser {
 
         for (int k = this.depth() - 1; k >= 0; k--) {
 
-            CalculationLayer layer = this.getLayer(k);
-
             Access1D<Double> input = k == 0 ? givenInput : this.getOutput(k - 1);
             PhysicalStore<Double> output = this.getOutput(k);
 
             PhysicalStore<Double> upstreamGradient = myGradients[k];
             PhysicalStore<Double> downstreamGradient = myGradients[k + 1];
 
-            layer.adjust(input, downstreamGradient, -myLearningRate, upstreamGradient, output);
+            this.adjust(k, input, downstreamGradient, -myLearningRate, upstreamGradient, output);
         }
     }
 
@@ -184,7 +185,7 @@ public final class NetworkBuilder extends NetworkUser {
     }
 
     public NetworkBuilder weight(final int layer, final int input, final int output, final double weight) {
-        this.getLayer(layer).setWeight(input, output, weight);
+        this.setWeight(layer, input, output, weight);
         return this;
     }
 

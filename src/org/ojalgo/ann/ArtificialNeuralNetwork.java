@@ -153,21 +153,21 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return ArtificialNeuralNetwork.builder(Primitive64Store.FACTORY, numberOfInputNodes, nodesPerCalculationLayer);
     }
 
-    public static NetworkBuilder builder(PhysicalStore.Factory<Double, ?> factory, final int numberOfInputNodes, final int... nodesPerCalculationLayer) {
+    public static NetworkBuilder builder(final PhysicalStore.Factory<Double, ?> factory, final int numberOfInputNodes, final int... nodesPerCalculationLayer) {
         return new NetworkBuilder(factory, numberOfInputNodes, nodesPerCalculationLayer);
     }
 
     /**
      * Read (reconstruct) an ANN from the specified input previously written by {@link #writeTo(DataOutput)}.
      */
-    public static ArtificialNeuralNetwork from(DataInput input) throws IOException {
+    public static ArtificialNeuralNetwork from(final DataInput input) throws IOException {
         return FileFormat.read(input);
     }
 
     /**
      * @see #from(DataInput)
      */
-    public static ArtificialNeuralNetwork from(File file) {
+    public static ArtificialNeuralNetwork from(final File file) {
         try (DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
             return ArtificialNeuralNetwork.from(input);
         } catch (IOException cause) {
@@ -178,7 +178,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     /**
      * @see #from(DataInput)
      */
-    public static ArtificialNeuralNetwork from(Path path, OpenOption... options) {
+    public static ArtificialNeuralNetwork from(final Path path, final OpenOption... options) {
         try (DataInputStream input = new DataInputStream(new BufferedInputStream(Files.newInputStream(path, options)))) {
             return ArtificialNeuralNetwork.from(input);
         } catch (IOException cause) {
@@ -189,7 +189,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     private final PhysicalStore.Factory<Double, ?> myFactory;
     private final CalculationLayer[] myLayers;
 
-    ArtificialNeuralNetwork(PhysicalStore.Factory<Double, ?> factory, final int inputs, final int[] layers) {
+    ArtificialNeuralNetwork(final PhysicalStore.Factory<Double, ?> factory, final int inputs, final int[] layers) {
 
         super();
 
@@ -253,7 +253,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
      * @deprecated v49 Use {@link #newInvoker()} and then {@link NetworkInvoker#invoke(Access1D)} instead
      */
     @Deprecated
-    public MatrixStore<Double> invoke(Access1D<Double> input) {
+    public MatrixStore<Double> invoke(final Access1D<Double> input) {
         return this.newInvoker().invoke(input);
     }
 
@@ -289,7 +289,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
      * Will write (save) the ANN to the specified output. Can then later be read back by using
      * {@link #from(DataInput)}.
      */
-    public void writeTo(DataOutput output) throws IOException {
+    public void writeTo(final DataOutput output) throws IOException {
         int version = (myFactory == Primitive32Store.FACTORY) ? 2 : 1;
         FileFormat.write(this, version, output);
     }
@@ -297,7 +297,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     /**
      * @see #writeTo(DataOutput)
      */
-    public void writeTo(File file) {
+    public void writeTo(final File file) {
         try (DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
             this.writeTo(output);
         } catch (IOException cause) {
@@ -308,7 +308,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     /**
      * @see #writeTo(DataOutput)
      */
-    public void writeTo(Path path, OpenOption... options) {
+    public void writeTo(final Path path, final OpenOption... options) {
         try (DataOutputStream output = new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(path, options)))) {
             this.writeTo(output);
         } catch (IOException cause) {
@@ -316,8 +316,17 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
     }
 
-    CalculationLayer getLayer(final int index) {
-        return myLayers[index];
+    void adjust(final int layer, final Access1D<Double> input, final PhysicalStore<Double> downstreamGradient, final double learningRate,
+            final PhysicalStore<Double> upstreamGradient, final PhysicalStore<Double> output) {
+        myLayers[layer].adjust(input, downstreamGradient, learningRate, upstreamGradient, output);
+    }
+
+    int countInputNodes(final int layer) {
+        return myLayers[layer].countInputNodes();
+    }
+
+    int countOutputNodes(final int layer) {
+        return myLayers[layer].countOutputNodes();
     }
 
     List<MatrixStore<Double>> getWeights() {
@@ -328,12 +337,30 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return retVal;
     }
 
-    PhysicalStore<Double> invoke(int layer, Access1D<Double> input, PhysicalStore<Double> output) {
+    PhysicalStore<Double> invoke(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output) {
         return myLayers[layer].invoke(input, output);
     }
 
-    PhysicalStore<Double> newStore(int rows, int columns) {
+    PhysicalStore<Double> newStore(final int rows, final int columns) {
         return myFactory.make(rows, columns);
+    }
+
+    void randomise() {
+        for (int l = 0; l < myLayers.length; l++) {
+            myLayers[l].randomise();
+        }
+    }
+
+    void setActivator(final int layer, final Activator activator) {
+        myLayers[layer].setActivator(activator);
+    }
+
+    void setBias(final int layer, final int output, final double bias) {
+        myLayers[layer].setBias(output, bias);
+    }
+
+    void setWeight(final int layer, final int input, final int output, final double weight) {
+        myLayers[layer].setWeight(input, output, weight);
     }
 
     Structure2D[] structure() {

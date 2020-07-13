@@ -35,7 +35,7 @@ final class CalculationLayer {
     private final PhysicalStore<Double> myBias;
     private final PhysicalStore<Double> myWeights;
 
-    CalculationLayer(PhysicalStore.Factory<Double, ?> factory, final int numberOfInputs, final int numberOfOutputs,
+    CalculationLayer(final PhysicalStore.Factory<Double, ?> factory, final int numberOfInputs, final int numberOfOutputs,
             final ArtificialNeuralNetwork.Activator activator) {
 
         super();
@@ -44,8 +44,6 @@ final class CalculationLayer {
         myBias = factory.make(1, numberOfOutputs);
 
         myActivator = activator;
-
-        this.randomise(numberOfInputs);
     }
 
     @Override
@@ -103,21 +101,10 @@ final class CalculationLayer {
         return tmpBuilder.toString();
     }
 
-    private void randomise(final double numberOfInputs) {
+    void adjust(final Access1D<Double> input, final PhysicalStore<Double> downstreamGradient, final double learningRate,
+            final PhysicalStore<Double> upstreamGradient, final PhysicalStore<Double> output) {
 
-        double magnitude = ONE / Math.sqrt(numberOfInputs);
-
-        Uniform randomiser = new Uniform(-magnitude, 2 * magnitude);
-
-        myWeights.fillAll(randomiser);
-
-        myBias.fillAll(randomiser);
-    }
-
-    void adjust(final Access1D<Double> layerInput, final PhysicalStore<Double> downstreamGradient, final double learningRate,
-            final PhysicalStore<Double> upstreamGradient, PhysicalStore<Double> layerOutput) {
-
-        downstreamGradient.modifyMatching(MULTIPLY, layerOutput.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
+        downstreamGradient.modifyMatching(MULTIPLY, output.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
 
         if (upstreamGradient != null) {
             // No need to do this multiplication for the input layer
@@ -128,7 +115,7 @@ final class CalculationLayer {
         for (long j = 0L, numbOutput = myWeights.countColumns(); j < numbOutput; j++) {
             final double grad = downstreamGradient.doubleValue(j);
             for (long i = 0L, numbInput = myWeights.countRows(); i < numbInput; i++) {
-                myWeights.add(i, j, learningRate * layerInput.doubleValue(i) * grad);
+                myWeights.add(i, j, learningRate * input.doubleValue(i) * grad);
             }
             myBias.add(j, learningRate * grad);
         }
@@ -162,10 +149,21 @@ final class CalculationLayer {
         return myWeights.doubleValue(input, output);
     }
 
-    PhysicalStore<Double> invoke(final Access1D<Double> input, PhysicalStore<Double> output) {
+    PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output) {
         myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(output);
         output.modifyAll(myActivator.getFunction(output));
         return output;
+    }
+
+    void randomise() {
+
+        double magnitude = ONE / Math.sqrt(this.countInputNodes());
+
+        Uniform randomiser = new Uniform(-magnitude, 2 * magnitude);
+
+        myWeights.fillAll(randomiser);
+
+        myBias.fillAll(randomiser);
     }
 
     void setActivator(final ArtificialNeuralNetwork.Activator activator) {
