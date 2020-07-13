@@ -27,12 +27,12 @@ import org.ojalgo.structure.Access1D;
 
 public class NetworkInvoker extends NetworkUser implements BasicFunction.PlainUnary<Access1D<Double>, MatrixStore<Double>> {
 
-    NetworkInvoker(ArtificialNeuralNetwork network) {
+    NetworkInvoker(final ArtificialNeuralNetwork network) {
         super(network);
     }
 
     @Override
-    public MatrixStore<Double> invoke(Access1D<Double> input) {
+    public MatrixStore<Double> invoke(final Access1D<Double> input) {
         return super.invoke(input);
     }
 

@@ -24,6 +24,7 @@ package org.ojalgo.ann;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access1D;
@@ -34,20 +35,21 @@ abstract class NetworkUser implements Supplier<ArtificialNeuralNetwork> {
     private final ArtificialNeuralNetwork myNetwork;
     private final PhysicalStore<Double>[] myOutputs;
 
-    NetworkUser(ArtificialNeuralNetwork network) {
+    @SuppressWarnings("unchecked")
+    NetworkUser(final ArtificialNeuralNetwork network) {
 
         super();
 
         myNetwork = network;
 
         myOutputs = (PhysicalStore<Double>[]) new PhysicalStore<?>[network.depth()];
-        for (int i = 0; i < myOutputs.length; i++) {
-            myOutputs[i] = network.newStore(1, this.getLayer(i).countOutputNodes());
+        for (int l = 0; l < myOutputs.length; l++) {
+            myOutputs[l] = network.newStore(1, network.countOutputNodes(l));
         }
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -77,16 +79,25 @@ abstract class NetworkUser implements Supplier<ArtificialNeuralNetwork> {
         return result;
     }
 
+    void adjust(final int layer, final Access1D<Double> input, final PhysicalStore<Double> downstreamGradient, final double learningRate,
+            final PhysicalStore<Double> upstreamGradient, final PhysicalStore<Double> output) {
+        myNetwork.adjust(layer, input, downstreamGradient, learningRate, upstreamGradient, output);
+    }
+
     int depth() {
         return myNetwork.depth();
+    }
+
+    Activator getActivator(final int layer) {
+        return myNetwork.getActivator(layer);
     }
 
     double getBias(final int layer, final int output) {
         return myNetwork.getBias(layer, output);
     }
 
-    CalculationLayer getLayer(int index) {
-        return myNetwork.getLayer(index);
+    PhysicalStore<Double> getOutput(final int layer) {
+        return myOutputs[layer];
     }
 
     double getWeight(final int layer, final int input, final int output) {
@@ -99,19 +110,31 @@ abstract class NetworkUser implements Supplier<ArtificialNeuralNetwork> {
 
     MatrixStore<Double> invoke(Access1D<Double> input) {
         PhysicalStore<Double> retVal = null;
-        for (int i = 0, limit = this.depth(); i < limit; i++) {
-            retVal = myNetwork.getLayer(i).invoke(input, myOutputs[i]);
+        for (int l = 0, limit = this.depth(); l < limit; l++) {
+            retVal = myNetwork.invoke(l, input, myOutputs[l]);
             input = retVal;
         }
         return retVal;
     }
 
-    Structure2D[] structure() {
-        return myNetwork.structure();
+    void randomise() {
+        myNetwork.randomise();
     }
 
-    PhysicalStore<Double> getOutput(int layer) {
-        return myOutputs[layer];
+    void setActivator(final int layer, final Activator activator) {
+        myNetwork.setActivator(layer, activator);
+    }
+
+    void setBias(final int layer, final int output, final double bias) {
+        myNetwork.setBias(layer, output, bias);
+    }
+
+    void setWeight(final int layer, final int input, final int output, final double weight) {
+        myNetwork.setWeight(layer, input, output, weight);
+    }
+
+    Structure2D[] structure() {
+        return myNetwork.structure();
     }
 
 }

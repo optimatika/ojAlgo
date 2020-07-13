@@ -39,7 +39,7 @@ abstract class FileFormat {
 
         static final int ID = 1;
 
-        static ArtificialNeuralNetwork read(DataInput input) throws IOException {
+        static ArtificialNeuralNetwork read(final DataInput input) throws IOException {
 
             int numberOfInputs = input.readInt();
 
@@ -56,18 +56,16 @@ abstract class FileFormat {
             for (int l = 0; l < numberOfLayers; l++) {
                 numberOfOutputs = layerOutputs[l];
 
-                CalculationLayer layer = retVal.getLayer(l);
-
                 for (int j = 0; j < numberOfOutputs; j++) {
 
-                    layer.setBias(j, input.readDouble());
+                    retVal.setBias(l, j, input.readDouble());
 
                     for (int i = 0; i < numberOfInputs; i++) {
-                        layer.setWeight(i, j, input.readDouble());
+                        retVal.setWeight(l, i, j, input.readDouble());
                     }
                 }
 
-                layer.setActivator(Activator.valueOf(input.readUTF()));
+                retVal.setActivator(l, Activator.valueOf(input.readUTF()));
 
                 numberOfInputs = numberOfOutputs;
             }
@@ -75,7 +73,7 @@ abstract class FileFormat {
             return retVal;
         }
 
-        static void write(ArtificialNeuralNetwork network, DataOutput output) throws IOException {
+        static void write(final ArtificialNeuralNetwork network, final DataOutput output) throws IOException {
 
             Structure2D[] structure = network.structure();
 
@@ -115,7 +113,7 @@ abstract class FileFormat {
 
         static final int ID = 2;
 
-        static ArtificialNeuralNetwork read(DataInput input) throws IOException {
+        static ArtificialNeuralNetwork read(final DataInput input) throws IOException {
 
             int numberOfInputs = input.readInt();
 
@@ -132,18 +130,16 @@ abstract class FileFormat {
             for (int l = 0; l < numberOfLayers; l++) {
                 numberOfOutputs = layerOutputs[l];
 
-                CalculationLayer layer = retVal.getLayer(l);
-
                 for (int j = 0; j < numberOfOutputs; j++) {
 
-                    layer.setBias(j, input.readFloat());
+                    retVal.setBias(l, j, input.readFloat());
 
                     for (int i = 0; i < numberOfInputs; i++) {
-                        layer.setWeight(i, j, input.readFloat());
+                        retVal.setWeight(l, i, j, input.readFloat());
                     }
                 }
 
-                layer.setActivator(Activator.valueOf(input.readUTF()));
+                retVal.setActivator(l, Activator.valueOf(input.readUTF()));
 
                 numberOfInputs = numberOfOutputs;
             }
@@ -151,7 +147,7 @@ abstract class FileFormat {
             return retVal;
         }
 
-        static void write(ArtificialNeuralNetwork network, DataOutput output) throws IOException {
+        static void write(final ArtificialNeuralNetwork network, final DataOutput output) throws IOException {
 
             Structure2D[] structure = network.structure();
 
@@ -186,7 +182,7 @@ abstract class FileFormat {
 
     private static final String FORMAT = "ojAlgo ANN";
 
-    static ArtificialNeuralNetwork read(DataInput input) throws IOException {
+    static ArtificialNeuralNetwork read(final DataInput input) throws IOException {
 
         String format = input.readUTF();
         if (!FORMAT.equals(format)) {
@@ -205,7 +201,7 @@ abstract class FileFormat {
         }
     }
 
-    static void write(ArtificialNeuralNetwork network, int version, DataOutput output) throws IOException {
+    static void write(final ArtificialNeuralNetwork network, final int version, final DataOutput output) throws IOException {
 
         output.writeUTF(FORMAT);
 
