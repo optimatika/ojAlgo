@@ -21,19 +21,29 @@
  */
 package org.ojalgo.ann;
 
-import org.ojalgo.function.BasicFunction;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.structure.Access1D;
+import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-public class NetworkInvoker extends NetworkUser implements BasicFunction.PlainUnary<Access1D<Double>, MatrixStore<Double>> {
+import java.util.concurrent.ThreadLocalRandom;
 
-    NetworkInvoker(final ArtificialNeuralNetwork network) {
-        super(network);
+import org.ojalgo.function.PrimitiveFunction;
+
+final class NodeDroppingActivatorFunction implements PrimitiveFunction.Unary {
+
+    private final PrimitiveFunction.Unary myActivator;
+    private final double myProbabilityToKeep;
+
+    NodeDroppingActivatorFunction(final double probabilityToKeep, final PrimitiveFunction.Unary activator) {
+        super();
+        myProbabilityToKeep = probabilityToKeep;
+        myActivator = activator;
     }
 
-    @Override
-    public MatrixStore<Double> invoke(final Access1D<Double> input) {
-        return super.invoke(input, false);
+    public double invoke(final double arg) {
+        if (ThreadLocalRandom.current().nextDouble() <= myProbabilityToKeep) {
+            return myActivator.invoke(arg);
+        } else {
+            return ZERO;
+        }
     }
 
 }

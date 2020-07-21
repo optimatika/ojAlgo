@@ -108,10 +108,10 @@ abstract class NetworkUser implements Supplier<ArtificialNeuralNetwork> {
         return myNetwork.getWeights();
     }
 
-    MatrixStore<Double> invoke(Access1D<Double> input) {
+    MatrixStore<Double> invoke(Access1D<Double> input, final boolean training) {
         PhysicalStore<Double> retVal = null;
         for (int l = 0, limit = this.depth(); l < limit; l++) {
-            retVal = myNetwork.invoke(l, input, myOutputs[l]);
+            retVal = myNetwork.invoke(l, input, myOutputs[l], training);
             input = retVal;
         }
         return retVal;
@@ -127,6 +127,16 @@ abstract class NetworkUser implements Supplier<ArtificialNeuralNetwork> {
 
     void setBias(final int layer, final int output, final double bias) {
         myNetwork.setBias(layer, output, bias);
+    }
+
+    void setDropouts(final boolean dropouts) {
+        if (myNetwork.isDropouts() && !dropouts) {
+            for (int l = 1, limit = this.depth(); l < limit; l++) {
+                double factor = myNetwork.factor(l);
+                myNetwork.scale(l, factor);
+            }
+        }
+        myNetwork.setDropouts(dropouts);
     }
 
     void setWeight(final int layer, final int input, final int output, final double weight) {

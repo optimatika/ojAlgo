@@ -34,6 +34,7 @@ import java.util.List;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.special.MissingMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -79,7 +80,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         /**
          * [-1,1]
          */
-        TANH(args -> (org.ojalgo.function.constant.PrimitiveMath.TANH), arg -> ONE - (arg * arg), true);
+        TANH(args -> PrimitiveMath.TANH, arg -> ONE - (arg * arg), true);
 
         private final PrimitiveFunction.Unary myDerivativeInTermsOfOutput;
         private final ActivatorFunctionFactory myFunction;
@@ -99,9 +100,18 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
             return myFunction.make(arguments);
         }
 
+        PrimitiveFunction.Unary getFunction(final PhysicalStore<Double> arguments, final double probabilityToKeep) {
+            if ((ZERO < probabilityToKeep) && (probabilityToKeep <= ONE)) {
+                return new NodeDroppingActivatorFunction(probabilityToKeep, this.getFunction(arguments));
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
+
         boolean isSingleFolded() {
             return mySingleFolded;
         }
+
     }
 
     public enum Error implements PrimitiveFunction.Binary {
@@ -186,6 +196,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
     }
 
+    private boolean myDropouts = false;
     private final PhysicalStore.Factory<Double, ?> myFactory;
     private final CalculationLayer[] myLayers;
 
@@ -329,6 +340,14 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return myLayers[layer].countOutputNodes();
     }
 
+    /**
+     * @param layer
+     * @return The probabilityToKeep (as in not drop) the input nodes of this layer
+     */
+    double factor(final int layer) {
+        return layer == 0 ? ZERO : HALF;
+    }
+
     List<MatrixStore<Double>> getWeights() {
         final ArrayList<MatrixStore<Double>> retVal = new ArrayList<>();
         for (int i = 0; i < myLayers.length; i++) {
@@ -337,8 +356,16 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return retVal;
     }
 
-    PhysicalStore<Double> invoke(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output) {
-        return myLayers[layer].invoke(input, output);
+    PhysicalStore<Double> invoke(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output, final boolean training) {
+        if (training && myDropouts && (layer < (this.depth() - 1))) {
+            return myLayers[layer].invoke(input, output, HALF);
+        } else {
+            return myLayers[layer].invoke(input, output, ONE);
+        }
+    }
+
+    boolean isDropouts() {
+        return myDropouts;
     }
 
     PhysicalStore<Double> newStore(final int rows, final int columns) {
@@ -351,12 +378,20 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
     }
 
+    void scale(final int layer, final double factor) {
+        myLayers[layer].scale(factor);
+    }
+
     void setActivator(final int layer, final Activator activator) {
         myLayers[layer].setActivator(activator);
     }
 
     void setBias(final int layer, final int output, final double bias) {
         myLayers[layer].setBias(output, bias);
+    }
+
+    void setDropouts(final boolean dropouts) {
+        myDropouts = dropouts;
     }
 
     void setWeight(final int layer, final int input, final int output, final double weight) {
