@@ -149,9 +149,13 @@ final class CalculationLayer {
         return myWeights.doubleValue(input, output);
     }
 
-    PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output) {
+    PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output, final double probabilityToKeep) {
         myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(output);
-        output.modifyAll(myActivator.getFunction(output));
+        if (probabilityToKeep < ONE) {
+            output.modifyAll(myActivator.getFunction(output, probabilityToKeep));
+        } else {
+            output.modifyAll(myActivator.getFunction(output));
+        }
         return output;
     }
 
@@ -164,6 +168,10 @@ final class CalculationLayer {
         myWeights.fillAll(randomiser);
 
         myBias.fillAll(randomiser);
+    }
+
+    void scale(final double factor) {
+        myWeights.modifyAll(MULTIPLY.second(factor));
     }
 
     void setActivator(final ArtificialNeuralNetwork.Activator activator) {

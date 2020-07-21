@@ -87,6 +87,11 @@ public final class NetworkBuilder extends NetworkUser {
         return this;
     }
 
+    public NetworkBuilder dropouts() {
+        this.setDropouts(true);
+        return this;
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -114,6 +119,12 @@ public final class NetworkBuilder extends NetworkUser {
     public NetworkBuilder error(final ArtificialNeuralNetwork.Error error) {
         myError = error;
         return this;
+    }
+
+    @Override
+    public ArtificialNeuralNetwork get() {
+        this.setDropouts(false);
+        return super.get();
     }
 
     @Override
@@ -153,7 +164,7 @@ public final class NetworkBuilder extends NetworkUser {
 
     public void train(final Access1D<Double> givenInput, final Access1D<Double> targetOutput) {
 
-        Access1D<Double> current = this.invoke(givenInput);
+        Access1D<Double> current = this.invoke(givenInput, true);
 
         myGradients[0].fillMatching(givenInput);
         myGradients[myGradients.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
