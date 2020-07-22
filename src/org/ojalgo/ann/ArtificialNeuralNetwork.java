@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.PrimitiveFunction;
@@ -83,10 +84,11 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         TANH(args -> PrimitiveMath.TANH, arg -> ONE - (arg * arg), true);
 
         private final PrimitiveFunction.Unary myDerivativeInTermsOfOutput;
-        private final ActivatorFunctionFactory myFunction;
+        private final Function<PhysicalStore<Double>, PrimitiveFunction.Unary> myFunction;
         private final boolean mySingleFolded;
 
-        Activator(final ActivatorFunctionFactory function, final PrimitiveFunction.Unary derivativeInTermsOfOutput, final boolean singleFolded) {
+        Activator(final Function<PhysicalStore<Double>, PrimitiveFunction.Unary> function, final PrimitiveFunction.Unary derivativeInTermsOfOutput,
+                final boolean singleFolded) {
             myFunction = function;
             myDerivativeInTermsOfOutput = derivativeInTermsOfOutput;
             mySingleFolded = singleFolded;
@@ -97,7 +99,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
 
         PrimitiveFunction.Unary getFunction(final PhysicalStore<Double> arguments) {
-            return myFunction.make(arguments);
+            return myFunction.apply(arguments);
         }
 
         PrimitiveFunction.Unary getFunction(final PhysicalStore<Double> arguments, final double probabilityToKeep) {
@@ -153,18 +155,32 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
 
     }
 
-    interface ActivatorFunctionFactory {
-
-        PrimitiveFunction.Unary make(PhysicalStore<Double> arguments);
-
+    public static NetworkBuilder builder(final int numberOfNetworkInputNodes) {
+        return ArtificialNeuralNetwork.builder(Primitive64Store.FACTORY, numberOfNetworkInputNodes);
     }
 
-    public static NetworkBuilder builder(final int numberOfInputNodes, final int... nodesPerCalculationLayer) {
+    /**
+     * @deprecated Use {@link #builder(int)} instead
+     */
+    @Deprecated
+    public static NetworkTrainer builder(final int numberOfInputNodes, final int... nodesPerCalculationLayer) {
         return ArtificialNeuralNetwork.builder(Primitive64Store.FACTORY, numberOfInputNodes, nodesPerCalculationLayer);
     }
 
-    public static NetworkBuilder builder(final PhysicalStore.Factory<Double, ?> factory, final int numberOfInputNodes, final int... nodesPerCalculationLayer) {
-        return new NetworkBuilder(factory, numberOfInputNodes, nodesPerCalculationLayer);
+    public static NetworkBuilder builder(final PhysicalStore.Factory<Double, ?> factory, final int numberOfNetworkInputNodes) {
+        return new NetworkBuilder(factory, numberOfNetworkInputNodes);
+    }
+
+    /**
+     * @deprecated Use {@link #builder(org.ojalgo.matrix.store.PhysicalStore.Factory, int)} instead
+     */
+    @Deprecated
+    public static NetworkTrainer builder(final PhysicalStore.Factory<Double, ?> factory, final int numberOfInputNodes, final int... nodesPerCalculationLayer) {
+        NetworkBuilder builder = ArtificialNeuralNetwork.builder(factory, numberOfInputNodes);
+        for (int i = 0; i < nodesPerCalculationLayer.length; i++) {
+            builder.layer(nodesPerCalculationLayer[i]);
+        }
+        return builder.get().newTrainer();
     }
 
     /**
@@ -199,6 +215,19 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     private boolean myDropouts = false;
     private final PhysicalStore.Factory<Double, ?> myFactory;
     private final CalculationLayer[] myLayers;
+
+    ArtificialNeuralNetwork(final NetworkBuilder builder) {
+
+        super();
+
+        myFactory = builder.getFactory();
+
+        List<LayerTemplate> templates = builder.getLayers();
+        myLayers = new CalculationLayer[templates.size()];
+        for (int i = 0; i < myLayers.length; i++) {
+            myLayers[i] = new CalculationLayer(myFactory, templates.get(i));
+        }
+    }
 
     ArtificialNeuralNetwork(final PhysicalStore.Factory<Double, ?> factory, final int inputs, final int[] layers) {
 
@@ -276,6 +305,16 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return new NetworkInvoker(this);
     }
 
+    public NetworkTrainer newTrainer() {
+        NetworkTrainer trainer = new NetworkTrainer(this);
+        if (this.getOutputActivator() == Activator.SOFTMAX) {
+            trainer.error(Error.CROSS_ENTROPY);
+        } else {
+            trainer.error(Error.HALF_SQUARED_DIFFERENCE);
+        }
+        return trainer;
+    }
+
     @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
@@ -346,6 +385,10 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
      */
     double factor(final int layer) {
         return layer == 0 ? ZERO : HALF;
+    }
+
+    Activator getOutputActivator() {
+        return myLayers[myLayers.length - 1].getActivator();
     }
 
     List<MatrixStore<Double>> getWeights() {

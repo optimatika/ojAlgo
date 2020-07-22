@@ -30,13 +30,13 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
-abstract class NetworkUser implements Supplier<ArtificialNeuralNetwork> {
+abstract class WrappedANN implements Supplier<ArtificialNeuralNetwork> {
 
     private final ArtificialNeuralNetwork myNetwork;
     private final PhysicalStore<Double>[] myOutputs;
 
     @SuppressWarnings("unchecked")
-    NetworkUser(final ArtificialNeuralNetwork network) {
+    WrappedANN(final ArtificialNeuralNetwork network) {
 
         super();
 
@@ -53,10 +53,10 @@ abstract class NetworkUser implements Supplier<ArtificialNeuralNetwork> {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof NetworkUser)) {
+        if (!(obj instanceof WrappedANN)) {
             return false;
         }
-        NetworkUser other = (NetworkUser) obj;
+        WrappedANN other = (WrappedANN) obj;
         if (myNetwork == null) {
             if (other.myNetwork != null) {
                 return false;
@@ -145,6 +145,10 @@ abstract class NetworkUser implements Supplier<ArtificialNeuralNetwork> {
 
     Structure2D[] structure() {
         return myNetwork.structure();
+    }
+
+    Activator getOutputActivator() {
+        return myNetwork.getOutputActivator();
     }
 
 }

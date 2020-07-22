@@ -44,9 +44,9 @@ public class BackPropagationIsVerySimple extends BackPropagationExample {
     }
 
     @Override
-    protected NetworkBuilder getInitialNetwork(Factory<Double, ?> factory) {
+    protected NetworkTrainer getInitialNetwork(Factory<Double, ?> factory) {
 
-        NetworkBuilder builder = ArtificialNeuralNetwork.builder(factory, 3, 3, 3, 3);
+        NetworkTrainer builder = ArtificialNeuralNetwork.builder(factory, 3, 3, 3, 3);
 
         builder.activator(0, RECTIFIER).activator(1, SIGMOID).activator(2, SOFTMAX).error(CROSS_ENTROPY);
 

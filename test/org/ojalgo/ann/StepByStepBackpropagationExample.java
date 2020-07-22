@@ -57,7 +57,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
 
         ArtificialNeuralNetwork.Error errorMeassure = HALF_SQUARED_DIFFERENCE;
 
-        NetworkBuilder builder = this.getInitialNetwork(Primitive64Store.FACTORY);
+        NetworkTrainer builder = this.getInitialNetwork(Primitive64Store.FACTORY);
 
         ArtificialNeuralNetwork network = builder.get();
 
@@ -104,7 +104,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
         TestUtils.assertTrue(actualError > actualErrorAfterTraining);
 
         // Create a larger, more complex network, to make sure there are no IndexOutOfRangeExceptions or similar..
-        NetworkBuilder largerBuilder = ArtificialNeuralNetwork.builder(2, 5, 3, 4, 2);
+        NetworkTrainer largerBuilder = ArtificialNeuralNetwork.builder(2, 5, 3, 4, 2);
         ArtificialNeuralNetwork largerANN = largerBuilder.get();
 
         Access1D<Double> preTrainingOutput = factory.rows(largerANN.invoke(givenInput));
@@ -116,9 +116,9 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
     }
 
     @Override
-    protected NetworkBuilder getInitialNetwork(Factory<Double, ?> factory) {
+    protected NetworkTrainer getInitialNetwork(Factory<Double, ?> factory) {
 
-        NetworkBuilder builder = ArtificialNeuralNetwork.builder(factory, 2, 2, 2);
+        NetworkTrainer builder = ArtificialNeuralNetwork.builder(factory, 2, 2, 2);
 
         builder.activator(0, SIGMOID).activator(1, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
 

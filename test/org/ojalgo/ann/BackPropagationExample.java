@@ -101,7 +101,7 @@ abstract class BackPropagationExample extends ANNTest {
         this.doTestFeedForward(Primitive64Store.FACTORY);
     }
 
-    protected void deriveTheHardWay(final NetworkBuilder builder, final Data triplet, final NumberContext precision) {
+    protected void deriveTheHardWay(final NetworkTrainer builder, final Data triplet, final NumberContext precision) {
 
         if (DEBUG) {
             BasicLogger.debug("Weights before training");
@@ -193,7 +193,7 @@ abstract class BackPropagationExample extends ANNTest {
         }
     }
 
-    protected abstract NetworkBuilder getInitialNetwork(Factory<Double, ?> factory);
+    protected abstract NetworkTrainer getInitialNetwork(Factory<Double, ?> factory);
 
     protected abstract List<Data> getTestCases();
 
