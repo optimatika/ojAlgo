@@ -73,9 +73,9 @@ public class HowToBuildNeuralNetwork extends BackPropagationExample {
     }
 
     @Override
-    protected NetworkBuilder getInitialNetwork(Factory<Double, ?> factory) {
+    protected NetworkTrainer getInitialNetwork(Factory<Double, ?> factory) {
 
-        NetworkBuilder builder = ArtificialNeuralNetwork.builder(factory, 2, 3, 1);
+        NetworkTrainer builder = ArtificialNeuralNetwork.builder(factory, 2, 3, 1);
 
         builder.activators(SIGMOID, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
 

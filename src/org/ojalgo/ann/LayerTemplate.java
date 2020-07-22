@@ -21,20 +21,19 @@
  */
 package org.ojalgo.ann;
 
-import org.ojalgo.function.BasicFunction;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.structure.Access1D;
+import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 
-public class NetworkInvoker extends WrappedANN implements BasicFunction.PlainUnary<Access1D<Double>, MatrixStore<Double>> {
+final class LayerTemplate {
 
-    NetworkInvoker(final ArtificialNeuralNetwork network) {
-        super(network);
-    }
+    final int inputs;
+    final int outputs;
+    final ArtificialNeuralNetwork.Activator activator;
 
-    @Override
-    public MatrixStore<Double> invoke(final Access1D<Double> input) {
-        this.setDropouts(false);
-        return super.invoke(input, false);
+    LayerTemplate(final int inputs, final int outputs, final Activator activator) {
+        super();
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.activator = activator;
     }
 
 }

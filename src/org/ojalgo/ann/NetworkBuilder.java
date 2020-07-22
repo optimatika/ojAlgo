@@ -21,75 +21,28 @@
  */
 package org.ojalgo.ann;
 
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
-import org.ojalgo.ProgrammingError;
+import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure2D;
 
 /**
- * An Artificial Neural Network (ANN) builder/trainer.
+ * An Artificial Neural Network (ANN) builder.
  *
  * @author apete
  */
-public final class NetworkBuilder extends NetworkUser {
+public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
-    private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
-    private final PhysicalStore<Double>[] myGradients;
-    private double myLearningRate = 1.0;
+    private final PhysicalStore.Factory<Double, ?> myFactory;
+    private final List<LayerTemplate> myLayers = new ArrayList<>();
+    private int myNextInputs = 0;
 
-    @SuppressWarnings("unchecked")
-    NetworkBuilder(final PhysicalStore.Factory<Double, ?> factory, final int numberOfInputNodes, final int... outputNodesPerCalculationLayer) {
-
-        super(new ArtificialNeuralNetwork(factory, numberOfInputNodes, outputNodesPerCalculationLayer));
-
-        if (outputNodesPerCalculationLayer.length < 1) {
-            ProgrammingError.throwWithMessage("There must be at least 1 layer!");
-        }
-
-        myGradients = (PhysicalStore<Double>[]) new PhysicalStore<?>[1 + outputNodesPerCalculationLayer.length];
-        myGradients[0] = factory.make(numberOfInputNodes, 1);
-        for (int l = 0; l < outputNodesPerCalculationLayer.length; l++) {
-            myGradients[1 + l] = factory.make(outputNodesPerCalculationLayer[l], 1);
-        }
-
-        this.randomise();
-    }
-
-    /**
-     * @param layer 0-based index among the calculation layers (excluding the input layer)
-     * @param activator The activator function to use
-     */
-    public NetworkBuilder activator(final int layer, final ArtificialNeuralNetwork.Activator activator) {
-        this.setActivator(layer, activator);
-        return this;
-    }
-
-    public NetworkBuilder activators(final ArtificialNeuralNetwork.Activator activator) {
-        for (int i = 0, limit = this.depth(); i < limit; i++) {
-            this.activator(i, activator);
-        }
-        return this;
-    }
-
-    public NetworkBuilder activators(final ArtificialNeuralNetwork.Activator... activators) {
-        for (int i = 0, limit = activators.length; i < limit; i++) {
-            this.activator(i, activators[i]);
-        }
-        return this;
-    }
-
-    public NetworkBuilder bias(final int layer, final int output, final double bias) {
-        this.setBias(layer, output, bias);
-        return this;
-    }
-
-    public NetworkBuilder dropouts() {
-        this.setDropouts(true);
-        return this;
+    NetworkBuilder(final PhysicalStore.Factory<Double, ?> factory, final int networkInputs) {
+        super();
+        myFactory = factory;
+        myNextInputs = networkInputs;
     }
 
     @Override
@@ -97,111 +50,60 @@ public final class NetworkBuilder extends NetworkUser {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
         if (!(obj instanceof NetworkBuilder)) {
             return false;
         }
         NetworkBuilder other = (NetworkBuilder) obj;
-        if (myError != other.myError) {
+        if (myNextInputs != other.myNextInputs) {
             return false;
         }
-        if (!Arrays.equals(myGradients, other.myGradients)) {
+        if (myFactory == null) {
+            if (other.myFactory != null) {
+                return false;
+            }
+        } else if (!myFactory.equals(other.myFactory)) {
             return false;
         }
-        if (Double.doubleToLongBits(myLearningRate) != Double.doubleToLongBits(other.myLearningRate)) {
+        if (myLayers == null) {
+            if (other.myLayers != null) {
+                return false;
+            }
+        } else if (!myLayers.equals(other.myLayers)) {
             return false;
         }
         return true;
     }
 
-    public NetworkBuilder error(final ArtificialNeuralNetwork.Error error) {
-        myError = error;
-        return this;
-    }
-
-    @Override
     public ArtificialNeuralNetwork get() {
-        this.setDropouts(false);
-        return super.get();
+        return new ArtificialNeuralNetwork(this);
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = super.hashCode();
-        result = (prime * result) + ((myError == null) ? 0 : myError.hashCode());
-        result = (prime * result) + Arrays.hashCode(myGradients);
-        long temp;
-        temp = Double.doubleToLongBits(myLearningRate);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
+        int result = 1;
+        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+        result = (prime * result) + ((myLayers == null) ? 0 : myLayers.hashCode());
+        result = (prime * result) + myNextInputs;
         return result;
     }
 
-    public NetworkBuilder rate(final double rate) {
-        myLearningRate = rate;
+    public NetworkBuilder layer(final int outputs) {
+        return this.layer(outputs, ArtificialNeuralNetwork.Activator.SIGMOID);
+    }
+
+    public NetworkBuilder layer(final int outputs, final Activator activator) {
+        myLayers.add(new LayerTemplate(myNextInputs, outputs, activator));
+        myNextInputs = outputs;
         return this;
     }
 
-    @Override
-    public Structure2D[] structure() {
-        return super.structure();
+    PhysicalStore.Factory<Double, ?> getFactory() {
+        return myFactory;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("NetworkBuilder [structure()=");
-        builder.append(Arrays.toString(this.structure()));
-        builder.append(", Error=");
-        builder.append(myError);
-        builder.append(", LearningRate=");
-        builder.append(myLearningRate);
-        builder.append("]");
-        return builder.toString();
-    }
-
-    public void train(final Access1D<Double> givenInput, final Access1D<Double> targetOutput) {
-
-        Access1D<Double> current = this.invoke(givenInput, true);
-
-        myGradients[0].fillMatching(givenInput);
-        myGradients[myGradients.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
-
-        for (int k = this.depth() - 1; k >= 0; k--) {
-
-            Access1D<Double> input = k == 0 ? givenInput : this.getOutput(k - 1);
-            PhysicalStore<Double> output = this.getOutput(k);
-
-            PhysicalStore<Double> upstreamGradient = myGradients[k];
-            PhysicalStore<Double> downstreamGradient = myGradients[k + 1];
-
-            this.adjust(k, input, downstreamGradient, -myLearningRate, upstreamGradient, output);
-        }
-    }
-
-    /**
-     * Note that the required {@link Iterable}:s can be obtained from calling {@link Access2D#rows()} or
-     * {@link Access2D#columns()} on anything "2D".
-     */
-    public void train(final Iterable<? extends Access1D<Double>> givenInputs, final Iterable<? extends Access1D<Double>> targetOutputs) {
-
-        Iterator<? extends Access1D<Double>> iterI = givenInputs.iterator();
-        Iterator<? extends Access1D<Double>> iterO = targetOutputs.iterator();
-
-        while (iterI.hasNext() && iterO.hasNext()) {
-            this.train(iterI.next(), iterO.next());
-        }
-    }
-
-    public NetworkBuilder weight(final int layer, final int input, final int output, final double weight) {
-        this.setWeight(layer, input, output, weight);
-        return this;
-    }
-
-    double error(final Access1D<?> target, final Access1D<?> current) {
-        return myError.invoke(target, current);
+    List<LayerTemplate> getLayers() {
+        return myLayers;
     }
 
 }

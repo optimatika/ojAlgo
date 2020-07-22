@@ -59,7 +59,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
     @Test
     public void testTraining() {
 
-        NetworkBuilder builder = this.getInitialNetwork(Primitive64Store.FACTORY);
+        NetworkTrainer builder = this.getInitialNetwork(Primitive64Store.FACTORY);
 
         LineSplittingParser parser = new LineSplittingParser(",", true);
 
@@ -112,9 +112,9 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
     }
 
     @Override
-    protected NetworkBuilder getInitialNetwork(Factory<Double, ?> factory) {
+    protected NetworkTrainer getInitialNetwork(Factory<Double, ?> factory) {
 
-        NetworkBuilder builder = ArtificialNeuralNetwork.builder(factory, 4, 2, 2);
+        NetworkTrainer builder = ArtificialNeuralNetwork.builder(factory, 4, 2, 2);
 
         builder.activators(SIGMOID, SOFTMAX).error(CROSS_ENTROPY);
 

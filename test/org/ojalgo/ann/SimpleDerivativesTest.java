@@ -65,14 +65,14 @@ public class SimpleDerivativesTest extends BackPropagationExample {
 
         for (Data triplet : this.getTestCases()) {
 
-            NetworkBuilder builder = this.getInitialNetwork(Primitive64Store.FACTORY).activators(activator).error(error);
+            NetworkTrainer builder = this.getInitialNetwork(Primitive64Store.FACTORY).activators(activator).error(error);
 
             this.deriveTheHardWay(builder, triplet, this.precision());
         }
     }
 
     @Override
-    protected NetworkBuilder getInitialNetwork(Factory<Double, ?> factory) {
+    protected NetworkTrainer getInitialNetwork(Factory<Double, ?> factory) {
         return ArtificialNeuralNetwork.builder(factory, 3, 3);
     }
 

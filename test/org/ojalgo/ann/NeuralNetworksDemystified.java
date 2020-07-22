@@ -62,7 +62,7 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
     @Test
     public void testTraining() {
 
-        final NetworkBuilder builder = this.getInitialNetwork(Primitive64Store.FACTORY);
+        final NetworkTrainer builder = this.getInitialNetwork(Primitive64Store.FACTORY);
 
         List<Data> examples = this.getTestCases();
 
@@ -85,7 +85,7 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
         TestUtils.assertTrue(initialError >= trainedError);
     }
 
-    private double[] getErrors(final NetworkBuilder builder) {
+    private double[] getErrors(final NetworkTrainer builder) {
 
         ArtificialNeuralNetwork network = builder.get();
 
@@ -106,7 +106,7 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
     }
 
     @Override
-    protected NetworkBuilder getInitialNetwork(Factory<Double, ?> factory) {
+    protected NetworkTrainer getInitialNetwork(Factory<Double, ?> factory) {
         return ArtificialNeuralNetwork.builder(factory, 2, 3, 1).activators(SIGMOID, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
 
     }
