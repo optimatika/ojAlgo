@@ -64,11 +64,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         } else if (!myFactory.equals(other.myFactory)) {
             return false;
         }
-        if (myLayers == null) {
-            if (other.myLayers != null) {
-                return false;
-            }
-        } else if (!myLayers.equals(other.myLayers)) {
+        if (!myLayers.equals(other.myLayers)) {
             return false;
         }
         return true;
@@ -83,7 +79,7 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         final int prime = 31;
         int result = 1;
         result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
-        result = (prime * result) + ((myLayers == null) ? 0 : myLayers.hashCode());
+        result = (prime * result) + myLayers.hashCode();
         result = (prime * result) + myNextInputs;
         return result;
     }

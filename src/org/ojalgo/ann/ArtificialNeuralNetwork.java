@@ -246,7 +246,8 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         List<LayerTemplate> templates = builder.getLayers();
         myLayers = new CalculationLayer[templates.size()];
         for (int i = 0; i < myLayers.length; i++) {
-            myLayers[i] = new CalculationLayer(myFactory, templates.get(i));
+            LayerTemplate layerTemplate = templates.get(i);
+            myLayers[i] = new CalculationLayer(myFactory, layerTemplate.inputs, layerTemplate.outputs, layerTemplate.activator);
         }
     }
 
