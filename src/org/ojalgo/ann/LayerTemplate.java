@@ -25,15 +25,46 @@ import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
 
 final class LayerTemplate {
 
+    final ArtificialNeuralNetwork.Activator activator;
     final int inputs;
     final int outputs;
-    final ArtificialNeuralNetwork.Activator activator;
 
     LayerTemplate(final int inputs, final int outputs, final Activator activator) {
         super();
         this.inputs = inputs;
         this.outputs = outputs;
         this.activator = activator;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof LayerTemplate)) {
+            return false;
+        }
+        LayerTemplate other = (LayerTemplate) obj;
+        if (activator != other.activator) {
+            return false;
+        }
+        if (inputs != other.inputs) {
+            return false;
+        }
+        if (outputs != other.outputs) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + ((activator == null) ? 0 : activator.hashCode());
+        result = (prime * result) + inputs;
+        result = (prime * result) + outputs;
+        return result;
     }
 
 }

@@ -187,15 +187,36 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
      * Read (reconstruct) an ANN from the specified input previously written by {@link #writeTo(DataOutput)}.
      */
     public static ArtificialNeuralNetwork from(final DataInput input) throws IOException {
-        return FileFormat.read(input);
+        return FileFormat.read(null, input);
     }
 
     /**
      * @see #from(DataInput)
      */
     public static ArtificialNeuralNetwork from(final File file) {
+        return ArtificialNeuralNetwork.from(null, file);
+    }
+
+    /**
+     * @see #from(DataInput)
+     */
+    public static ArtificialNeuralNetwork from(final Path path, final OpenOption... options) {
+        return ArtificialNeuralNetwork.from(null, path, options);
+    }
+
+    /**
+     * Read (reconstruct) an ANN from the specified input previously written by {@link #writeTo(DataOutput)}.
+     */
+    public static ArtificialNeuralNetwork from(final PhysicalStore.Factory<Double, ?> factory, final DataInput input) throws IOException {
+        return FileFormat.read(factory, input);
+    }
+
+    /**
+     * @see #from(DataInput)
+     */
+    public static ArtificialNeuralNetwork from(final PhysicalStore.Factory<Double, ?> factory, final File file) {
         try (DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
-            return ArtificialNeuralNetwork.from(input);
+            return ArtificialNeuralNetwork.from(factory, input);
         } catch (IOException cause) {
             throw new RuntimeException(cause);
         }
@@ -204,9 +225,9 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     /**
      * @see #from(DataInput)
      */
-    public static ArtificialNeuralNetwork from(final Path path, final OpenOption... options) {
+    public static ArtificialNeuralNetwork from(final PhysicalStore.Factory<Double, ?> factory, final Path path, final OpenOption... options) {
         try (DataInputStream input = new DataInputStream(new BufferedInputStream(Files.newInputStream(path, options)))) {
-            return ArtificialNeuralNetwork.from(input);
+            return ArtificialNeuralNetwork.from(factory, input);
         } catch (IOException cause) {
             throw new RuntimeException(cause);
         }

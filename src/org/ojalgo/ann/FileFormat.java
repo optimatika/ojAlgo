@@ -26,6 +26,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive32Store;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Structure2D;
@@ -39,7 +40,7 @@ abstract class FileFormat {
 
         static final int ID = 1;
 
-        static ArtificialNeuralNetwork read(final DataInput input) throws IOException {
+        static ArtificialNeuralNetwork read(final PhysicalStore.Factory<Double, ?> factory, final DataInput input) throws IOException {
 
             int numberOfInputs = input.readInt();
 
@@ -50,7 +51,7 @@ abstract class FileFormat {
                 layerOutputs[i] = input.readInt();
             }
 
-            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(Primitive64Store.FACTORY, numberOfInputs, layerOutputs);
+            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(factory != null ? factory : Primitive64Store.FACTORY, numberOfInputs, layerOutputs);
 
             int numberOfOutputs;
             for (int l = 0; l < numberOfLayers; l++) {
@@ -113,7 +114,7 @@ abstract class FileFormat {
 
         static final int ID = 2;
 
-        static ArtificialNeuralNetwork read(final DataInput input) throws IOException {
+        static ArtificialNeuralNetwork read(final PhysicalStore.Factory<Double, ?> factory, final DataInput input) throws IOException {
 
             int numberOfInputs = input.readInt();
 
@@ -124,7 +125,7 @@ abstract class FileFormat {
                 layerOutputs[i] = input.readInt();
             }
 
-            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(Primitive32Store.FACTORY, numberOfInputs, layerOutputs);
+            ArtificialNeuralNetwork retVal = new ArtificialNeuralNetwork(factory != null ? factory : Primitive32Store.FACTORY, numberOfInputs, layerOutputs);
 
             int numberOfOutputs;
             for (int l = 0; l < numberOfLayers; l++) {
@@ -182,7 +183,7 @@ abstract class FileFormat {
 
     private static final String FORMAT = "ojAlgo ANN";
 
-    static ArtificialNeuralNetwork read(final DataInput input) throws IOException {
+    static ArtificialNeuralNetwork read(final PhysicalStore.Factory<Double, ?> factory, final DataInput input) throws IOException {
 
         String format = input.readUTF();
         if (!FORMAT.equals(format)) {
@@ -193,9 +194,9 @@ abstract class FileFormat {
 
         switch (version) {
         case Version1.ID:
-            return Version1.read(input);
+            return Version1.read(factory, input);
         case Version2.ID:
-            return Version2.read(input);
+            return Version2.read(factory, input);
         default:
             throw new IOException("Unsupported version!");
         }
