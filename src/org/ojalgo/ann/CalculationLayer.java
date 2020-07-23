@@ -35,16 +35,6 @@ final class CalculationLayer {
     private final PhysicalStore<Double> myBias;
     private final PhysicalStore<Double> myWeights;
 
-    CalculationLayer(final PhysicalStore.Factory<Double, ?> factory, final LayerTemplate template) {
-
-        super();
-
-        myWeights = factory.make(template.inputs, template.outputs);
-        myBias = factory.make(1, template.outputs);
-
-        myActivator = template.activator;
-    }
-
     CalculationLayer(final PhysicalStore.Factory<Double, ?> factory, final int numberOfInputs, final int numberOfOutputs,
             final ArtificialNeuralNetwork.Activator activator) {
 
