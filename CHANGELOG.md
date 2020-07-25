@@ -12,6 +12,29 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.ann
+
+- Support for `float`.
+- Possible to "get" all individual parameters of the network
+- Possibility to save trained networks to disk (and then later read them back)
+- Separate between building, training and invoking the network - 3 different classes to do that.
+- Possible to have several network invokers used in different threads.
+- Support for `dropouts` when training the network.
+
+### Changed
+
+#### org.ojalgo.ann
+
+- The NetworkBuilder has been split into a NetworkBuilder and a NetworkTrainer. Most of the previous API is still in place, but deprecated, and in many of those cases old code referencing NetworkBuilder needs to instead use the new NetworkTrainer. The new NetworkBuilder primarily enables a better way to construct the network. Most of the previously existing stuff is in the new NetworkTrainer;
+
+### Deprecated
+
+#### org.ojalgo.ann
+
+- Several things regarding how to build/train and invoke a neural network has been redesigned resulting in deprecations of specific methods.
+
 
 ## [48.2.0] – 2020-06-22
 
@@ -66,6 +89,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.structure
 
 - The all `int` version of the `Structure2D.index(...)` method. With larger 2D structures this would overflow.
+
 
 ## [48.1.0] – 2020-01-15
 
