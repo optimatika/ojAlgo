@@ -390,7 +390,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
 
     void adjust(final int layer, final Access1D<Double> input, final PhysicalStore<Double> downstreamGradient, final double learningRate,
             final PhysicalStore<Double> upstreamGradient, final PhysicalStore<Double> output) {
-        myLayers[layer].adjust(input, downstreamGradient, learningRate, upstreamGradient, output);
+        myLayers[layer].adjust(input, downstreamGradient, learningRate, upstreamGradient, output, this.factor(layer));
     }
 
     int countInputNodes(final int layer) {
@@ -402,11 +402,17 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
     }
 
     /**
+     * Used to scale the weights after training with dropouts, and also to adjut the learning rate
+     *
      * @param layer
      * @return The probabilityToKeep (as in not drop) the input nodes of this layer
      */
     double factor(final int layer) {
-        return layer == 0 ? ZERO : HALF;
+        if (myDropouts && (layer != 0)) {
+            return HALF;
+        } else {
+            return ONE;
+        }
     }
 
     Activator getOutputActivator() {
