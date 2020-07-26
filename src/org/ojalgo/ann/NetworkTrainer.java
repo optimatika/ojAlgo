@@ -56,7 +56,6 @@ public final class NetworkTrainer extends WrappedANN {
             myGradients[1 + l] = network.newStore(network.countOutputNodes(l), 1);
         }
 
-        this.randomise();
     }
 
     @SuppressWarnings("unchecked")
@@ -74,7 +73,6 @@ public final class NetworkTrainer extends WrappedANN {
             myGradients[1 + l] = factory.make(outputNodesPerCalculationLayer[l], 1);
         }
 
-        this.randomise();
     }
 
     /**

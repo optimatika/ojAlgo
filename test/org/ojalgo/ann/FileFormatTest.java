@@ -44,7 +44,7 @@ public class FileFormatTest extends ANNTest {
         FileFormatTest.delete(TEST_ROOT);
     }
 
-    static void delete(File file) throws IOException {
+    static void delete(final File file) throws IOException {
 
         if (file.isDirectory()) {
             File[] listFiles = file.listFiles();
@@ -78,21 +78,23 @@ public class FileFormatTest extends ANNTest {
         this.doTestWriteAndReadBack(Primitive64Store.FACTORY);
     }
 
-    private void doTestWriteAndReadBack(PhysicalStore.Factory<Double, ?> factory) {
+    private void doTestWriteAndReadBack(final PhysicalStore.Factory<Double, ?> factory) {
 
         File file = new File(invocationDir, "ojAlgo.ann");
 
-        NetworkTrainer builder = ArtificialNeuralNetwork.builder(factory, 5, 6, 3, 9, 2).activators(Activator.IDENTITY, Activator.RECTIFIER, Activator.SIGMOID,
-                Activator.TANH);
+        ArtificialNeuralNetwork network1 = ArtificialNeuralNetwork.builder(factory, 5).layer(6, Activator.IDENTITY).layer(3, Activator.RECTIFIER)
+                .layer(9, Activator.SIGMOID).layer(2, Activator.TANH).get();
 
-        ArtificialNeuralNetwork ann1 = builder.get();
-        ann1.writeTo(file);
-        ArtificialNeuralNetwork ann2 = ArtificialNeuralNetwork.from(file);
+        network1.writeTo(file);
+        ArtificialNeuralNetwork network2 = ArtificialNeuralNetwork.from(file);
 
         Primitive64Array input = Primitive64Array.wrap(0.1, 0.2, 0.3, 0.4, 0.5);
 
-        MatrixStore<Double> expected = ann1.invoke(input);
-        MatrixStore<Double> actual = ann2.invoke(input);
+        NetworkInvoker invoker1 = network1.newInvoker();
+        NetworkInvoker invoker2 = network2.newInvoker();
+
+        MatrixStore<Double> expected = invoker1.invoke(input);
+        MatrixStore<Double> actual = invoker2.invoke(input);
 
         // BasicLogger.debug("Expected", expected);
         // BasicLogger.debug("Actual", actual);

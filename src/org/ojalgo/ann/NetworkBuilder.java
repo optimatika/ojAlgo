@@ -71,7 +71,9 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
     }
 
     public ArtificialNeuralNetwork get() {
-        return new ArtificialNeuralNetwork(this);
+        ArtificialNeuralNetwork network = new ArtificialNeuralNetwork(this);
+        network.randomise();
+        return network;
     }
 
     @Override
