@@ -102,7 +102,7 @@ final class CalculationLayer {
     }
 
     void adjust(final Access1D<Double> input, final PhysicalStore<Double> downstreamGradient, final double learningRate,
-            final PhysicalStore<Double> upstreamGradient, final PhysicalStore<Double> output) {
+            final PhysicalStore<Double> upstreamGradient, final PhysicalStore<Double> output, final double dropoutsFactor) {
 
         downstreamGradient.modifyMatching(MULTIPLY, output.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
 
@@ -115,7 +115,7 @@ final class CalculationLayer {
         for (long j = 0L, numbOutput = myWeights.countColumns(); j < numbOutput; j++) {
             final double grad = downstreamGradient.doubleValue(j);
             for (long i = 0L, numbInput = myWeights.countRows(); i < numbInput; i++) {
-                myWeights.add(i, j, learningRate * input.doubleValue(i) * grad);
+                myWeights.add(i, j, (learningRate * input.doubleValue(i) * grad) / dropoutsFactor);
             }
             myBias.add(j, learningRate * grad);
         }
