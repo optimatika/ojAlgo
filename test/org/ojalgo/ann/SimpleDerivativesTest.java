@@ -56,7 +56,7 @@ public class SimpleDerivativesTest extends BackPropagationExample {
     }
 
     @Override
-    public void doTestFeedForward(Factory<Double, ?> factory) {
+    public void doTestFeedForward(final Factory<Double, ?> factory) {
         // Not possible to test for this case
 
     }
@@ -65,15 +65,22 @@ public class SimpleDerivativesTest extends BackPropagationExample {
 
         for (Data triplet : this.getTestCases()) {
 
-            NetworkTrainer builder = this.getInitialNetwork(Primitive64Store.FACTORY).activators(activator).error(error);
+            ArtificialNeuralNetwork network = this.getInitialNetwork(Primitive64Store.FACTORY);
 
-            this.deriveTheHardWay(builder, triplet, this.precision());
+            network.setActivator(0, activator);
+
+            network.newTrainer().error(error);
+
+            this.deriveTheHardWay(network, triplet, this.precision());
         }
     }
 
     @Override
-    protected NetworkTrainer getInitialNetwork(Factory<Double, ?> factory) {
-        return ArtificialNeuralNetwork.builder(factory, 3, 3);
+    protected ArtificialNeuralNetwork getInitialNetwork(final Factory<Double, ?> factory) {
+
+        ArtificialNeuralNetwork network = ArtificialNeuralNetwork.builder(factory, 3).layer(3).get();
+
+        return network;
     }
 
     @Override

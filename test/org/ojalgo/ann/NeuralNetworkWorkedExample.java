@@ -22,7 +22,6 @@
 package org.ojalgo.ann;
 
 import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
 import java.util.ArrayList;
@@ -59,7 +58,10 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
     @Test
     public void testTraining() {
 
-        NetworkTrainer builder = this.getInitialNetwork(Primitive64Store.FACTORY);
+        ArtificialNeuralNetwork network = this.getInitialNetwork(Primitive64Store.FACTORY);
+
+        NetworkTrainer trainer = network.newTrainer();
+        NetworkInvoker invoker = network.newInvoker();
 
         LineSplittingParser parser = new LineSplittingParser(",", true);
 
@@ -77,12 +79,11 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
                 Primitive64Store input_csv = Primitive64Store.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
                 Primitive64Store output_csv = Primitive64Store.FACTORY.row(IsStairs, ONE - IsStairs);
 
-                builder.rate(0.01).train(input_csv, output_csv);
+                trainer.rate(0.01).train(input_csv, output_csv);
             });
 
         }
 
-        ArtificialNeuralNetwork network = builder.get();
         AtomicInteger correct = new AtomicInteger();
         AtomicInteger wrong = new AtomicInteger();
 
@@ -97,7 +98,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
 
             Primitive64Store input_csv = Primitive64Store.FACTORY.row(R1C1 / _255_0, R1C2 / _255_0, R2C1 / _255_0, R2C2 / _255_0);
 
-            Access1D<Double> output_net = network.invoke(input_csv);
+            Access1D<Double> output_net = invoker.invoke(input_csv);
 
             if (IsStairs == Math.round(output_net.doubleValue(0))) {
                 correct.incrementAndGet();
@@ -112,31 +113,31 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
     }
 
     @Override
-    protected NetworkTrainer getInitialNetwork(Factory<Double, ?> factory) {
+    protected ArtificialNeuralNetwork getInitialNetwork(final Factory<Double, ?> factory) {
 
-        NetworkTrainer builder = ArtificialNeuralNetwork.builder(factory, 4, 2, 2);
+        ArtificialNeuralNetwork network = ArtificialNeuralNetwork.builder(factory, 4).layer(2, SIGMOID).layer(2, SOFTMAX).get();
 
-        builder.activators(SIGMOID, SOFTMAX).error(CROSS_ENTROPY);
+        NetworkTrainer trainer = network.newTrainer();
 
-        builder.bias(0, 0, -0.00469);
-        builder.bias(0, 1, 0.00797);
-        builder.weight(0, 0, 0, -0.00256);
-        builder.weight(0, 0, 1, 0.00889);
-        builder.weight(0, 1, 0, 0.00146);
-        builder.weight(0, 1, 1, 0.00322);
-        builder.weight(0, 2, 0, 0.00816);
-        builder.weight(0, 2, 1, 0.00258);
-        builder.weight(0, 3, 0, -0.00597);
-        builder.weight(0, 3, 1, -0.00876);
+        trainer.bias(0, 0, -0.00469);
+        trainer.bias(0, 1, 0.00797);
+        trainer.weight(0, 0, 0, -0.00256);
+        trainer.weight(0, 0, 1, 0.00889);
+        trainer.weight(0, 1, 0, 0.00146);
+        trainer.weight(0, 1, 1, 0.00322);
+        trainer.weight(0, 2, 0, 0.00816);
+        trainer.weight(0, 2, 1, 0.00258);
+        trainer.weight(0, 3, 0, -0.00597);
+        trainer.weight(0, 3, 1, -0.00876);
 
-        builder.bias(1, 0, -0.00588);
-        builder.bias(1, 1, -0.00232);
-        builder.weight(1, 0, 0, -0.00647);
-        builder.weight(1, 0, 1, 0.00540);
-        builder.weight(1, 1, 0, 0.00347);
-        builder.weight(1, 1, 1, -0.00005);
+        trainer.bias(1, 0, -0.00588);
+        trainer.bias(1, 1, -0.00232);
+        trainer.weight(1, 0, 0, -0.00647);
+        trainer.weight(1, 0, 1, 0.00540);
+        trainer.weight(1, 1, 0, 0.00347);
+        trainer.weight(1, 1, 1, -0.00005);
 
-        return builder;
+        return network;
     }
 
     @Override

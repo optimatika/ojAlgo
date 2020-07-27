@@ -57,16 +57,17 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
 
         ArtificialNeuralNetwork.Error errorMeassure = HALF_SQUARED_DIFFERENCE;
 
-        NetworkTrainer builder = this.getInitialNetwork(Primitive64Store.FACTORY);
+        ArtificialNeuralNetwork network = this.getInitialNetwork(Primitive64Store.FACTORY);
 
-        ArtificialNeuralNetwork network = builder.get();
+        NetworkTrainer trainer = network.newTrainer();
+        NetworkInvoker invoker = network.newInvoker();
 
         Data testCase = this.getTestCases().get(0);
 
         Primitive64Store givenInput = testCase.input;
         Primitive64Store targetOutput = testCase.target;
         Access1D<Double> expectedOutput = testCase.expected;
-        Access1D<Double> actualOutput = network.invoke(givenInput);
+        Access1D<Double> actualOutput = invoker.invoke(givenInput);
 
         TestUtils.assertEquals(expectedOutput, actualOutput, precision);
 
@@ -75,7 +76,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
 
         TestUtils.assertEquals(expectedError, actualError, precision);
 
-        builder.rate(HALF).train(givenInput, targetOutput);
+        trainer.rate(HALF).train(givenInput, targetOutput);
 
         // 0.40 w5
         TestUtils.assertEquals(0.35891648, network.getWeight(1, 0, 0), precision);
@@ -96,7 +97,7 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
         TestUtils.assertEquals(0.29950229, network.getWeight(0, 1, 1), precision);
 
         double expectedErrorAfterTraining = 0.291027924;
-        double actualErrorAfterTraining = errorMeassure.invoke(targetOutput, network.invoke(givenInput));
+        double actualErrorAfterTraining = errorMeassure.invoke(targetOutput, invoker.invoke(givenInput));
 
         // In the example the bias are not updated, ojAlgo does update them
         // This should give more aggressive learning in this single step
@@ -104,41 +105,43 @@ public class StepByStepBackpropagationExample extends BackPropagationExample {
         TestUtils.assertTrue(actualError > actualErrorAfterTraining);
 
         // Create a larger, more complex network, to make sure there are no IndexOutOfRangeExceptions or similar..
-        NetworkTrainer largerBuilder = ArtificialNeuralNetwork.builder(2, 5, 3, 4, 2);
-        ArtificialNeuralNetwork largerANN = largerBuilder.get();
+        ArtificialNeuralNetwork largerNetwork = ArtificialNeuralNetwork.builder(2).layer(5).layer(3).layer(4).layer(2).get();
 
-        Access1D<Double> preTrainingOutput = factory.rows(largerANN.invoke(givenInput));
-        largerBuilder.rate(HALF).train(givenInput, targetOutput);
-        Access1D<Double> postTrainingOutput = factory.rows(largerANN.invoke(givenInput));
+        NetworkTrainer largerTrainer = largerNetwork.newTrainer();
+        NetworkInvoker largerInvoker = largerNetwork.newInvoker();
+
+        Access1D<Double> preTrainingOutput = factory.rows(largerInvoker.invoke(givenInput));
+        largerTrainer.rate(HALF).train(givenInput, targetOutput);
+        Access1D<Double> postTrainingOutput = factory.rows(largerInvoker.invoke(givenInput));
 
         // Even in this case training should reduce the error
         TestUtils.assertTrue(errorMeassure.invoke(targetOutput, preTrainingOutput) > errorMeassure.invoke(targetOutput, postTrainingOutput));
     }
 
     @Override
-    protected NetworkTrainer getInitialNetwork(Factory<Double, ?> factory) {
+    protected ArtificialNeuralNetwork getInitialNetwork(final Factory<Double, ?> factory) {
 
-        NetworkTrainer builder = ArtificialNeuralNetwork.builder(factory, 2, 2, 2);
+        ArtificialNeuralNetwork network = ArtificialNeuralNetwork.builder(factory, 2).layer(2, SIGMOID).layer(2, SIGMOID).get();
 
-        builder.activator(0, SIGMOID).activator(1, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
+        NetworkTrainer trainer = network.newTrainer();
 
-        builder.weight(0, 0, 0, 0.15);
-        builder.weight(0, 1, 0, 0.20);
-        builder.weight(0, 0, 1, 0.25);
-        builder.weight(0, 1, 1, 0.30);
+        trainer.weight(0, 0, 0, 0.15);
+        trainer.weight(0, 1, 0, 0.20);
+        trainer.weight(0, 0, 1, 0.25);
+        trainer.weight(0, 1, 1, 0.30);
 
-        builder.bias(0, 0, 0.35);
-        builder.bias(0, 1, 0.35);
+        trainer.bias(0, 0, 0.35);
+        trainer.bias(0, 1, 0.35);
 
-        builder.weight(1, 0, 0, 0.40);
-        builder.weight(1, 1, 0, 0.45);
-        builder.weight(1, 0, 1, 0.50);
-        builder.weight(1, 1, 1, 0.55);
+        trainer.weight(1, 0, 0, 0.40);
+        trainer.weight(1, 1, 0, 0.45);
+        trainer.weight(1, 0, 1, 0.50);
+        trainer.weight(1, 1, 1, 0.55);
 
-        builder.bias(1, 0, 0.60);
-        builder.bias(1, 1, 0.60);
+        trainer.bias(1, 0, 0.60);
+        trainer.bias(1, 1, 0.60);
 
-        return builder;
+        return network;
     }
 
     @Override
