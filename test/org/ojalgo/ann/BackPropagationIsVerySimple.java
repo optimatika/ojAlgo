@@ -22,7 +22,6 @@
 package org.ojalgo.ann;
 
 import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,55 +43,55 @@ public class BackPropagationIsVerySimple extends BackPropagationExample {
     }
 
     @Override
-    protected NetworkTrainer getInitialNetwork(Factory<Double, ?> factory) {
+    protected ArtificialNeuralNetwork getInitialNetwork(final Factory<Double, ?> factory) {
 
-        NetworkTrainer builder = ArtificialNeuralNetwork.builder(factory, 3, 3, 3, 3);
+        ArtificialNeuralNetwork network = ArtificialNeuralNetwork.builder(factory, 3).layer(3, RECTIFIER).layer(3, SIGMOID).layer(3, SOFTMAX).get();
 
-        builder.activator(0, RECTIFIER).activator(1, SIGMOID).activator(2, SOFTMAX).error(CROSS_ENTROPY);
+        NetworkTrainer trainer = network.newTrainer();
 
-        builder.weight(0, 0, 0, 0.1);
-        builder.weight(0, 1, 0, 0.3);
-        builder.weight(0, 2, 0, 0.4);
-        builder.weight(0, 0, 1, 0.2);
-        builder.weight(0, 1, 1, 0.2);
-        builder.weight(0, 2, 1, 0.3);
-        builder.weight(0, 0, 2, 0.3);
-        builder.weight(0, 1, 2, 0.7);
-        builder.weight(0, 2, 2, 0.9);
+        trainer.weight(0, 0, 0, 0.1);
+        trainer.weight(0, 1, 0, 0.3);
+        trainer.weight(0, 2, 0, 0.4);
+        trainer.weight(0, 0, 1, 0.2);
+        trainer.weight(0, 1, 1, 0.2);
+        trainer.weight(0, 2, 1, 0.3);
+        trainer.weight(0, 0, 2, 0.3);
+        trainer.weight(0, 1, 2, 0.7);
+        trainer.weight(0, 2, 2, 0.9);
 
-        builder.bias(0, 0, 1.0);
-        builder.bias(0, 1, 1.0);
-        builder.bias(0, 2, 1.0);
+        trainer.bias(0, 0, 1.0);
+        trainer.bias(0, 1, 1.0);
+        trainer.bias(0, 2, 1.0);
 
-        builder.weight(1, 0, 0, 0.2);
-        builder.weight(1, 1, 0, 0.3);
-        builder.weight(1, 2, 0, 0.6);
-        builder.weight(1, 0, 1, 0.3);
-        builder.weight(1, 1, 1, 0.5);
-        builder.weight(1, 2, 1, 0.4);
-        builder.weight(1, 0, 2, 0.5);
-        builder.weight(1, 1, 2, 0.7);
-        builder.weight(1, 2, 2, 0.8);
+        trainer.weight(1, 0, 0, 0.2);
+        trainer.weight(1, 1, 0, 0.3);
+        trainer.weight(1, 2, 0, 0.6);
+        trainer.weight(1, 0, 1, 0.3);
+        trainer.weight(1, 1, 1, 0.5);
+        trainer.weight(1, 2, 1, 0.4);
+        trainer.weight(1, 0, 2, 0.5);
+        trainer.weight(1, 1, 2, 0.7);
+        trainer.weight(1, 2, 2, 0.8);
 
-        builder.bias(1, 0, 1.0);
-        builder.bias(1, 1, 1.0);
-        builder.bias(1, 2, 1.0);
+        trainer.bias(1, 0, 1.0);
+        trainer.bias(1, 1, 1.0);
+        trainer.bias(1, 2, 1.0);
 
-        builder.weight(2, 0, 0, 0.1);
-        builder.weight(2, 1, 0, 0.3);
-        builder.weight(2, 2, 0, 0.5);
-        builder.weight(2, 0, 1, 0.4);
-        builder.weight(2, 1, 1, 0.7);
-        builder.weight(2, 2, 1, 0.2);
-        builder.weight(2, 0, 2, 0.8);
-        builder.weight(2, 1, 2, 0.2);
-        builder.weight(2, 2, 2, 0.9);
+        trainer.weight(2, 0, 0, 0.1);
+        trainer.weight(2, 1, 0, 0.3);
+        trainer.weight(2, 2, 0, 0.5);
+        trainer.weight(2, 0, 1, 0.4);
+        trainer.weight(2, 1, 1, 0.7);
+        trainer.weight(2, 2, 1, 0.2);
+        trainer.weight(2, 0, 2, 0.8);
+        trainer.weight(2, 1, 2, 0.2);
+        trainer.weight(2, 2, 2, 0.9);
 
-        builder.bias(2, 0, 1.0);
-        builder.bias(2, 1, 1.0);
-        builder.bias(2, 2, 1.0);
+        trainer.bias(2, 0, 1.0);
+        trainer.bias(2, 1, 1.0);
+        trainer.bias(2, 2, 1.0);
 
-        return builder;
+        return network;
     }
 
     @Override
