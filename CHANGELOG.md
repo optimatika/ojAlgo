@@ -21,7 +21,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Possibility to save trained networks to disk (and then later read them back)
 - Separate between building, training and invoking the network - 3 different classes to do that.
 - Possible to have several network invokers used in different threads.
-- Support for `dropouts` when training the network.
+- Support for `dropouts` as well as `L1` and `L2` regularisation when training the network.
 
 ### Changed
 
