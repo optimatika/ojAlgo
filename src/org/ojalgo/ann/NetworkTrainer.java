@@ -23,6 +23,7 @@ package org.ojalgo.ann;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
@@ -39,9 +40,8 @@ import org.ojalgo.structure.Structure2D;
  */
 public final class NetworkTrainer extends WrappedANN {
 
-    private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
+    private final TrainingConfiguration myConfiguration = new TrainingConfiguration();
     private final PhysicalStore<Double>[] myGradients;
-    private double myLearningRate = 1.0;
 
     @SuppressWarnings("unchecked")
     NetworkTrainer(final ArtificialNeuralNetwork network) {
@@ -114,7 +114,7 @@ public final class NetworkTrainer extends WrappedANN {
     }
 
     public NetworkTrainer dropouts() {
-        this.setDropouts(true);
+        myConfiguration.dropouts = true;
         return this;
     }
 
@@ -130,16 +130,8 @@ public final class NetworkTrainer extends WrappedANN {
             return false;
         }
         NetworkTrainer other = (NetworkTrainer) obj;
-        if (myError != other.myError) {
-            return false;
-        }
-        if (!Arrays.equals(myGradients, other.myGradients)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(myLearningRate) != Double.doubleToLongBits(other.myLearningRate)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(myConfiguration, other.myConfiguration) && Arrays.equals(myGradients, other.myGradients)
+                && (Double.doubleToLongBits(myConfiguration.learningRate) == Double.doubleToLongBits(other.myConfiguration.learningRate));
     }
 
     public NetworkTrainer error(final ArtificialNeuralNetwork.Error error) {
@@ -152,30 +144,39 @@ public final class NetworkTrainer extends WrappedANN {
                 throw new IllegalArgumentException();
             }
         }
-        myError = error;
+        myConfiguration.error = error;
         return this;
-    }
-
-    @Override
-    public ArtificialNeuralNetwork get() {
-        this.setDropouts(false);
-        return super.get();
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + ((myError == null) ? 0 : myError.hashCode());
         result = (prime * result) + Arrays.hashCode(myGradients);
-        long temp;
-        temp = Double.doubleToLongBits(myLearningRate);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
+        result = (prime * result) + Objects.hash(myConfiguration, myConfiguration.learningRate);
         return result;
     }
 
+    /**
+     * L1 lasso regularisation
+     */
+    public NetworkTrainer lasso(final double factor) {
+        myConfiguration.regularisationL1 = true;
+        myConfiguration.regularisationL1Factor = factor;
+        return this;
+    }
+
     public NetworkTrainer rate(final double rate) {
-        myLearningRate = rate;
+        myConfiguration.learningRate = rate;
+        return this;
+    }
+
+    /**
+     * L2 ridge regularisation
+     */
+    public NetworkTrainer ridge(final double factor) {
+        myConfiguration.regularisationL2 = true;
+        myConfiguration.regularisationL2Factor = factor;
         return this;
     }
 
@@ -190,19 +191,19 @@ public final class NetworkTrainer extends WrappedANN {
         builder.append("NetworkBuilder [structure()=");
         builder.append(Arrays.toString(this.structure()));
         builder.append(", Error=");
-        builder.append(myError);
+        builder.append(myConfiguration.error);
         builder.append(", LearningRate=");
-        builder.append(myLearningRate);
+        builder.append(myConfiguration.learningRate);
         builder.append("]");
         return builder.toString();
     }
 
     public void train(final Access1D<Double> givenInput, final Access1D<Double> targetOutput) {
 
-        Access1D<Double> current = this.invoke(givenInput, true);
+        Access1D<Double> current = this.invoke(givenInput, myConfiguration);
 
         myGradients[0].fillMatching(givenInput);
-        myGradients[myGradients.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
+        myGradients[myGradients.length - 1].fillMatching(targetOutput, myConfiguration.error.getDerivative(), current);
 
         for (int k = this.depth() - 1; k >= 0; k--) {
 
@@ -212,7 +213,7 @@ public final class NetworkTrainer extends WrappedANN {
             PhysicalStore<Double> upstreamGradient = myGradients[k];
             PhysicalStore<Double> downstreamGradient = myGradients[k + 1];
 
-            this.adjust(k, input, downstreamGradient, -myLearningRate, upstreamGradient, output);
+            this.adjust(k, input, output, upstreamGradient, downstreamGradient, myConfiguration);
         }
     }
 
@@ -236,7 +237,7 @@ public final class NetworkTrainer extends WrappedANN {
     }
 
     double error(final Access1D<?> target, final Access1D<?> current) {
-        return myError.invoke(target, current);
+        return myConfiguration.error.invoke(target, current);
     }
 
 }

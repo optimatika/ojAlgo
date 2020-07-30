@@ -233,7 +233,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
     }
 
-    private boolean myDropouts = false;
+    private transient TrainingConfiguration myConfiguration = null;
     private final PhysicalStore.Factory<Double, ?> myFactory;
     private final CalculationLayer[] myLayers;
 
@@ -388,9 +388,10 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         }
     }
 
-    void adjust(final int layer, final Access1D<Double> input, final PhysicalStore<Double> downstreamGradient, final double learningRate,
-            final PhysicalStore<Double> upstreamGradient, final PhysicalStore<Double> output) {
-        myLayers[layer].adjust(input, downstreamGradient, learningRate, upstreamGradient, output, this.factor(layer));
+    void adjust(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
+            final PhysicalStore<Double> downstreamGradient) {
+        myLayers[layer].adjust(input, output, layer == 0 ? null : upstreamGradient, downstreamGradient, -myConfiguration.learningRate,
+                myConfiguration.probabilityDidKeepInput(layer), myConfiguration.regularisation());
     }
 
     int countInputNodes(final int layer) {
@@ -399,20 +400,6 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
 
     int countOutputNodes(final int layer) {
         return myLayers[layer].countOutputNodes();
-    }
-
-    /**
-     * Used to scale the weights after training with dropouts, and also to adjut the learning rate
-     *
-     * @param layer
-     * @return The probabilityToKeep (as in not drop) the input nodes of this layer
-     */
-    double factor(final int layer) {
-        if (myDropouts && (layer != 0)) {
-            return HALF;
-        } else {
-            return ONE;
-        }
     }
 
     Activator getOutputActivator() {
@@ -427,16 +414,12 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         return retVal;
     }
 
-    PhysicalStore<Double> invoke(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output, final boolean training) {
-        if (training && myDropouts && (layer < (this.depth() - 1))) {
-            return myLayers[layer].invoke(input, output, HALF);
+    PhysicalStore<Double> invoke(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output) {
+        if (myConfiguration != null) {
+            return myLayers[layer].invoke(input, output, myConfiguration.probabilityWillKeepOutput(layer, this.depth()));
         } else {
-            return myLayers[layer].invoke(input, output, ONE);
+            return myLayers[layer].invoke(input, output);
         }
-    }
-
-    boolean isDropouts() {
-        return myDropouts;
     }
 
     PhysicalStore<Double> newStore(final int rows, final int columns) {
@@ -461,8 +444,13 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         myLayers[layer].setBias(output, bias);
     }
 
-    void setDropouts(final boolean dropouts) {
-        myDropouts = dropouts;
+    void setConfiguration(final TrainingConfiguration configuration) {
+        if ((myConfiguration != null) && (configuration == null)) {
+            for (int l = 1, limit = this.depth(); l < limit; l++) {
+                this.scale(l, myConfiguration.probabilityDidKeepInput(l));
+            }
+        }
+        myConfiguration = configuration;
     }
 
     void setWeight(final int layer, final int input, final int output, final double weight) {

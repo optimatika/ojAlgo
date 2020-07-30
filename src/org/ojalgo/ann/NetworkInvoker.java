@@ -33,8 +33,7 @@ public class NetworkInvoker extends WrappedANN implements BasicFunction.PlainUna
 
     @Override
     public MatrixStore<Double> invoke(final Access1D<Double> input) {
-        this.setDropouts(false);
-        return super.invoke(input, false);
+        return super.invoke(input, null);
     }
 
 }
