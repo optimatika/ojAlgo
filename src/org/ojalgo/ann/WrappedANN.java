@@ -79,9 +79,9 @@ abstract class WrappedANN implements Supplier<ArtificialNeuralNetwork> {
         return result;
     }
 
-    void adjust(final int layer, final Access1D<Double> input, final PhysicalStore<Double> downstreamGradient, final double learningRate,
-            final PhysicalStore<Double> upstreamGradient, final PhysicalStore<Double> output) {
-        myNetwork.adjust(layer, input, downstreamGradient, learningRate, upstreamGradient, output);
+    void adjust(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
+            final PhysicalStore<Double> downstreamGradient, final TrainingConfiguration configuration) {
+        myNetwork.adjust(layer, input, output, upstreamGradient, downstreamGradient);
     }
 
     int depth() {
@@ -108,10 +108,11 @@ abstract class WrappedANN implements Supplier<ArtificialNeuralNetwork> {
         return myNetwork.getWeights();
     }
 
-    MatrixStore<Double> invoke(Access1D<Double> input, final boolean training) {
+    MatrixStore<Double> invoke(Access1D<Double> input, final TrainingConfiguration configuration) {
+        myNetwork.setConfiguration(configuration);
         PhysicalStore<Double> retVal = null;
         for (int l = 0, limit = this.depth(); l < limit; l++) {
-            retVal = myNetwork.invoke(l, input, myOutputs[l], training);
+            retVal = myNetwork.invoke(l, input, myOutputs[l]);
             input = retVal;
         }
         return retVal;
@@ -127,16 +128,6 @@ abstract class WrappedANN implements Supplier<ArtificialNeuralNetwork> {
 
     void setBias(final int layer, final int output, final double bias) {
         myNetwork.setBias(layer, output, bias);
-    }
-
-    void setDropouts(final boolean dropouts) {
-        if (myNetwork.isDropouts() && !dropouts) {
-            for (int l = 1, limit = this.depth(); l < limit; l++) {
-                double factor = myNetwork.factor(l);
-                myNetwork.scale(l, factor);
-            }
-        }
-        myNetwork.setDropouts(dropouts);
     }
 
     void setWeight(final int layer, final int input, final int output, final double weight) {

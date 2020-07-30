@@ -29,6 +29,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive32Store;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.structure.Structure2D;
 import org.ojalgo.type.context.NumberContext;
@@ -92,13 +93,18 @@ abstract class BackPropagationExample extends ANNTest {
     }
 
     @Test
-    public void testFeedForward32() {
+    public void testFeedForwardPrimitive32() {
         this.doTestFeedForward(Primitive32Store.FACTORY);
     }
 
     @Test
-    public void testFeedForward64() {
+    public void testFeedForwardPrimitive64() {
         this.doTestFeedForward(Primitive64Store.FACTORY);
+    }
+
+    @Test
+    public void testFeedForwardRaw() {
+        this.doTestFeedForward(RawStore.FACTORY);
     }
 
     protected void deriveTheHardWay(final ArtificialNeuralNetwork network, final Data triplet, final NumberContext precision) {
@@ -133,10 +139,11 @@ abstract class BackPropagationExample extends ANNTest {
                     double orgWeight = trainer.getWeight(layer, input, output);
 
                     trainer.weight(layer, input, output, orgWeight + delta);
-
                     double upperError = trainer.error(triplet.target, invoker.invoke(triplet.input));
+
                     trainer.weight(layer, input, output, orgWeight - delta);
                     double lowerError = trainer.error(triplet.target, invoker.invoke(triplet.input));
+
                     trainer.weight(layer, input, output, orgWeight);
 
                     final double derivative = (upperError - lowerError) / (delta + delta);

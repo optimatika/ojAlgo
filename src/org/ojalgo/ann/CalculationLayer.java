@@ -23,6 +23,8 @@ package org.ojalgo.ann;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.function.DoubleUnaryOperator;
+
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.random.Uniform;
@@ -101,8 +103,8 @@ final class CalculationLayer {
         return tmpBuilder.toString();
     }
 
-    void adjust(final Access1D<Double> input, final PhysicalStore<Double> downstreamGradient, final double learningRate,
-            final PhysicalStore<Double> upstreamGradient, final PhysicalStore<Double> output, final double dropoutsFactor) {
+    void adjust(final Access1D<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
+            final PhysicalStore<Double> downstreamGradient, final double learningRate, final double dropoutsFactor, final DoubleUnaryOperator regularisation) {
 
         downstreamGradient.modifyMatching(MULTIPLY, output.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
 
@@ -113,11 +115,15 @@ final class CalculationLayer {
         }
 
         for (long j = 0L, numbOutput = myWeights.countColumns(); j < numbOutput; j++) {
-            final double grad = downstreamGradient.doubleValue(j);
+            final double gradient = downstreamGradient.doubleValue(j);
+            double ratedGradient = learningRate * gradient;
             for (long i = 0L, numbInput = myWeights.countRows(); i < numbInput; i++) {
-                myWeights.add(i, j, (learningRate * input.doubleValue(i) * grad) / dropoutsFactor);
+                if (regularisation != null) {
+                    myWeights.add(i, j, learningRate * regularisation.applyAsDouble(myWeights.doubleValue(i, j)));
+                }
+                myWeights.add(i, j, ratedGradient * (input.doubleValue(i) / dropoutsFactor));
             }
-            myBias.add(j, learningRate * grad);
+            myBias.add(j, ratedGradient);
         }
     }
 
@@ -149,13 +155,15 @@ final class CalculationLayer {
         return myWeights.doubleValue(input, output);
     }
 
+    PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output) {
+        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(output);
+        output.modifyAll(myActivator.getFunction(output));
+        return output;
+    }
+
     PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output, final double probabilityToKeep) {
         myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(output);
-        if (probabilityToKeep < ONE) {
-            output.modifyAll(myActivator.getFunction(output, probabilityToKeep));
-        } else {
-            output.modifyAll(myActivator.getFunction(output));
-        }
+        output.modifyAll(myActivator.getFunction(output, probabilityToKeep));
         return output;
     }
 
