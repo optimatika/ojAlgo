@@ -147,7 +147,7 @@ public class DataProcessors {
             throw new ProgrammingError("There must be more than 1 sample!");
         }
 
-        M retVal = factory.makeZero(numberOfVariables, numberOfVariables);
+        M retVal = factory.make(numberOfVariables, numberOfVariables);
 
         int limit = Math.min(complexity, svd.getRank());
         if (limit > 0) {
