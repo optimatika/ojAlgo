@@ -1340,10 +1340,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         for (final Variable tmpVar : myVariables) {
             Presolvers.UNREFERENCED.simplify(tmpVar, this);
-            if (tmpVar.isConstraint()) {
-                if (anyVarInt) {
-                    Presolvers.INTEGER_VARIABLE_ROUNDING.simplify(tmpVar, this);
-                }
+            if (anyVarInt && tmpVar.isConstraint()) {
+                Presolvers.INTEGER_VARIABLE_ROUNDING.simplify(tmpVar, this);
             }
         }
     }

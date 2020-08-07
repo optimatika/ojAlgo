@@ -693,7 +693,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                 final double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
                 if (fraction > 0.5) {
                     unscaled = PrimitiveMath.CEIL.invoke(unscaled);
-                } else if ((fraction < 0.5) || ((PrimitiveMath.FLOOR.invoke(unscaled) / 2.0) == PrimitiveMath.FLOOR.invoke(PrimitiveMath.FLOOR.invoke(unscaled) / 2.0))) {
+                } else if ((fraction < 0.5)
+                        || ((PrimitiveMath.FLOOR.invoke(unscaled) / 2.0) == PrimitiveMath.FLOOR.invoke(PrimitiveMath.FLOOR.invoke(unscaled) / 2.0))) {
                     unscaled = PrimitiveMath.FLOOR.invoke(unscaled);
                 } else { // odd
                     unscaled = PrimitiveMath.CEIL.invoke(unscaled);
