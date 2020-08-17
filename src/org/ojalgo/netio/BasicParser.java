@@ -46,27 +46,27 @@ public interface BasicParser<T> {
 
         if (file.exists() && file.isFile() && file.canRead()) {
 
-            final String path = file.getPath();
-            if (path.endsWith(".gz")) {
-                try (InputStreamReader reader = new InputStreamReader(new GZIPInputStream(new FileInputStream(file)))) {
-                    this.parse(reader, skipHeader, consumer);
-                } catch (IOException exception) {
-                    exception.printStackTrace();
-                }
-            } else if (path.endsWith(".zip")) {
-                try (InputStreamReader reader = new InputStreamReader(new ZipInputStream(new FileInputStream(file)))) {
-                    this.parse(reader, skipHeader, consumer);
-                } catch (IOException exception) {
-                    exception.printStackTrace();
-                }
-            } else {
-                try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file))) {
-                    this.parse(reader, skipHeader, consumer);
-                } catch (IOException exception) {
-                    exception.printStackTrace();
-                }
-            }
+            try (FileInputStream fileInputStream = new FileInputStream(file)) {
 
+                final String path = file.getPath();
+
+                if (path.endsWith(".zip")) {
+                    try (InputStreamReader reader = new InputStreamReader(new ZipInputStream(fileInputStream))) {
+                        this.parse(reader, skipHeader, consumer);
+                    }
+                } else if (path.endsWith(".gz")) {
+                    try (InputStreamReader reader = new InputStreamReader(new GZIPInputStream(fileInputStream))) {
+                        this.parse(reader, skipHeader, consumer);
+                    }
+                } else {
+                    try (InputStreamReader reader = new InputStreamReader(fileInputStream)) {
+                        this.parse(reader, skipHeader, consumer);
+                    }
+                }
+
+            } catch (IOException cause) {
+                throw new RuntimeException(cause);
+            }
         }
     }
 
