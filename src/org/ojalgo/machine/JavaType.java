@@ -21,6 +21,25 @@
  */
 package org.ojalgo.machine;
 
+/**
+ * <pre>
+  B   byte       signed byte
+  C   char       Unicode character code point in the Basic Multilingual Plane,
+                 encoded with UTF-16
+  D   double     double-precision floating-point value
+  F   float      single-precision floating-point value
+  I   int        integer
+  J   long       long integer
+  L ClassName ;  reference             an instance of class ClassName
+  S   short      signed short
+  Z   boolean    true or false
+  [   reference  one array dimension
+ * </pre>
+ *
+ * https://stackoverflow.com/questions/32768036/why-is-l-the-prefix-for-reference-types-instead-of-some-other-letter
+ *
+ * @author apete
+ */
 public enum JavaType {
 
     BOOLEAN(boolean.class, 1, 1L), BYTE(byte.class, 8, 1L), CHAR(char.class, 16, 2L), DOUBLE(double.class, 64, 8L), FLOAT(float.class, 32, 4L), INT(int.class,
