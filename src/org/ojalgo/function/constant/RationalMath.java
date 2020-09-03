@@ -184,7 +184,7 @@ public abstract class RationalMath {
 
         return RationalNumber.valueOf(tmpRet);
     };
-    public static final RationalFunction.Unary CONJUGATE = arg -> arg.conjugate();
+    public static final RationalFunction.Unary CONJUGATE = RationalNumber::conjugate;
     public static final RationalFunction.Unary COS = arg -> {
 
         final BigDecimal tmpArg = arg.toBigDecimal();
@@ -229,7 +229,7 @@ public abstract class RationalMath {
 
         return RationalNumber.valueOf(tmpResult);
     };
-    public static final RationalFunction.Unary INVERT = arg -> arg.invert();
+    public static final RationalFunction.Unary INVERT = RationalNumber::invert;
     public static final RationalFunction.Unary LOG = arg -> {
 
         final BigDecimal tmpArg = arg.toBigDecimal();
@@ -281,7 +281,7 @@ public abstract class RationalMath {
         return retVal;
     };
     public static final RationalFunction.Binary MULTIPLY = (arg1, arg2) -> arg1.multiply(arg2);
-    public static final RationalFunction.Unary NEGATE = arg -> arg.negate();
+    public static final RationalFunction.Unary NEGATE = RationalNumber::negate;
     public static final RationalFunction.Binary POW = (arg1, arg2) -> EXP.invoke(LOG.invoke(arg1).multiply(arg2));
     public static final RationalFunction.Parameter POWER = (arg, param) -> {
 
@@ -315,7 +315,7 @@ public abstract class RationalMath {
 
         return RationalNumber.valueOf(tmpRet);
     };
-    public static final RationalFunction.Unary SIGNUM = arg -> arg.signum();
+    public static final RationalFunction.Unary SIGNUM = RationalNumber::signum;
     public static final RationalFunction.Unary SIN = arg -> {
 
         final BigDecimal tmpArg = arg.toBigDecimal();
