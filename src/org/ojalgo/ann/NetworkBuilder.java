@@ -21,72 +21,28 @@
  */
 package org.ojalgo.ann;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure2D;
+import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
+import org.ojalgo.matrix.store.PhysicalStore;
 
 /**
- * An artificial neural network builder/trainer.
+ * An Artificial Neural Network (ANN) builder.
  *
  * @author apete
  */
 public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
 
-    private final ArtificialNeuralNetwork myANN;
-    private ArtificialNeuralNetwork.Error myError = ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE;
-    private final Primitive64Store[] myLayerValues;
-    private double myLearningRate = 1.0;
+    private final PhysicalStore.Factory<Double, ?> myFactory;
+    private final List<LayerTemplate> myLayers = new ArrayList<>();
+    private int myNextInputs = 0;
 
-    NetworkBuilder(final int numberOfInputNodes, final int... outputNodesPerCalculationLayer) {
-
+    NetworkBuilder(final PhysicalStore.Factory<Double, ?> factory, final int networkInputs) {
         super();
-
-        if (outputNodesPerCalculationLayer.length < 1) {
-            ProgrammingError.throwWithMessage("There must be at least 1 layer!");
-        }
-
-        myANN = new ArtificialNeuralNetwork(numberOfInputNodes, outputNodesPerCalculationLayer);
-
-        myLayerValues = new Primitive64Store[1 + outputNodesPerCalculationLayer.length];
-        myLayerValues[0] = Primitive64Store.FACTORY.make(numberOfInputNodes, 1);
-        for (int l = 0; l < outputNodesPerCalculationLayer.length; l++) {
-            myLayerValues[1 + l] = Primitive64Store.FACTORY.make(outputNodesPerCalculationLayer[l], 1);
-        }
-    }
-
-    /**
-     * @param layer 0-based index among the calculation layers (excluding the input layer)
-     * @param activator The activator function to use
-     */
-    public NetworkBuilder activator(final int layer, final ArtificialNeuralNetwork.Activator activator) {
-        myANN.getLayer(layer).setActivator(activator);
-        return this;
-    }
-
-    public NetworkBuilder activators(final ArtificialNeuralNetwork.Activator activator) {
-        for (int i = 0, limit = myANN.countCalculationLayers(); i < limit; i++) {
-            myANN.getLayer(i).setActivator(activator);
-        }
-        return this;
-    }
-
-    public NetworkBuilder activators(final ArtificialNeuralNetwork.Activator... activators) {
-        for (int i = 0, limit = activators.length; i < limit; i++) {
-            myANN.getLayer(i).setActivator(activators[i]);
-        }
-        return this;
-    }
-
-    public NetworkBuilder bias(final int layer, final int output, final double bias) {
-        myANN.getLayer(layer).setBias(output, bias);
-        return this;
+        myFactory = factory;
+        myNextInputs = networkInputs;
     }
 
     @Override
@@ -94,112 +50,58 @@ public final class NetworkBuilder implements Supplier<ArtificialNeuralNetwork> {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (this.getClass() != obj.getClass()) {
+        if (!(obj instanceof NetworkBuilder)) {
             return false;
         }
         NetworkBuilder other = (NetworkBuilder) obj;
-        if (myANN == null) {
-            if (other.myANN != null) {
+        if (myNextInputs != other.myNextInputs) {
+            return false;
+        }
+        if (myFactory == null) {
+            if (other.myFactory != null) {
                 return false;
             }
-        } else if (!myANN.equals(other.myANN)) {
+        } else if (!myFactory.equals(other.myFactory)) {
             return false;
         }
-        if (myError != other.myError) {
-            return false;
-        }
-        if (Double.doubleToLongBits(myLearningRate) != Double.doubleToLongBits(other.myLearningRate)) {
+        if (!myLayers.equals(other.myLayers)) {
             return false;
         }
         return true;
     }
 
-    public NetworkBuilder error(final ArtificialNeuralNetwork.Error error) {
-        myError = error;
-        return this;
-    }
-
     public ArtificialNeuralNetwork get() {
-        return myANN;
+        ArtificialNeuralNetwork network = new ArtificialNeuralNetwork(this);
+        network.randomise();
+        return network;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((myANN == null) ? 0 : myANN.hashCode());
-        result = (prime * result) + ((myError == null) ? 0 : myError.hashCode());
-
-        long temp;
-        temp = Double.doubleToLongBits(myLearningRate);
-        result = (prime * result) + (int) (temp ^ (temp >>> 32));
+        result = (prime * result) + ((myFactory == null) ? 0 : myFactory.hashCode());
+        result = (prime * result) + myLayers.hashCode();
+        result = (prime * result) + myNextInputs;
         return result;
     }
 
-    public NetworkBuilder rate(final double rate) {
-        myLearningRate = rate;
+    public NetworkBuilder layer(final int outputs) {
+        return this.layer(outputs, ArtificialNeuralNetwork.Activator.SIGMOID);
+    }
+
+    public NetworkBuilder layer(final int outputs, final Activator activator) {
+        myLayers.add(new LayerTemplate(myNextInputs, outputs, activator));
+        myNextInputs = outputs;
         return this;
     }
 
-    public Structure2D[] structure() {
-        return myANN.structure();
+    PhysicalStore.Factory<Double, ?> getFactory() {
+        return myFactory;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder tmpBuilder = new StringBuilder();
-        tmpBuilder.append("NetworkBuilder [ANN=").append(myANN).append(", Error=").append(myError).append(", LearningRate=").append(myLearningRate).append("]");
-        return tmpBuilder.toString();
-    }
-
-    public void train(final Access1D<Double> givenInput, final Access1D<Double> targetOutput) {
-
-        Access1D<Double> current = myANN.invoke(givenInput);
-
-        myLayerValues[0].fillMatching(givenInput);
-        myLayerValues[myLayerValues.length - 1].fillMatching(targetOutput, myError.getDerivative(), current);
-
-        for (int k = myANN.countCalculationLayers() - 1; k >= 0; k--) {
-            myANN.getLayer(k).adjust(k == 0 ? givenInput : myANN.getLayer(k - 1).getOutput(), myLayerValues[k + 1], -myLearningRate, myLayerValues[k]);
-        }
-    }
-
-    /**
-     * Note that the required {@link Iterable}:s can be obtained from calling {@link Access2D#rows()} or
-     * {@link Access2D#columns()} on anything "2D".
-     */
-    public void train(final Iterable<? extends Access1D<Double>> givenInputs, final Iterable<? extends Access1D<Double>> targetOutputs) {
-
-        Iterator<? extends Access1D<Double>> iterI = givenInputs.iterator();
-        Iterator<? extends Access1D<Double>> iterO = targetOutputs.iterator();
-
-        while (iterI.hasNext() && iterO.hasNext()) {
-            this.train(iterI.next(), iterO.next());
-        }
-    }
-
-    public NetworkBuilder weight(final int layer, final int input, final int output, final double weight) {
-        myANN.getLayer(layer).setWeight(input, output, weight);
-        return this;
-    }
-
-    double error(final Access1D<?> target, final Access1D<?> current) {
-        return myError.invoke(target, current);
-    }
-
-    double getBias(final int layer, final int output) {
-        return myANN.getBias(layer, output);
-    }
-
-    double getWeight(final int layer, final int input, final int output) {
-        return myANN.getWeight(layer, input, output);
-    }
-
-    List<MatrixStore<Double>> getWeights() {
-        return myANN.getWeights();
+    List<LayerTemplate> getLayers() {
+        return myLayers;
     }
 
 }

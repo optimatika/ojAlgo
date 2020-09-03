@@ -22,11 +22,11 @@
 package org.ojalgo.ann;
 
 import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -72,31 +72,31 @@ public class HowToBuildNeuralNetwork extends BackPropagationExample {
     }
 
     @Override
-    protected NetworkBuilder getInitialNetwork() {
+    protected ArtificialNeuralNetwork getInitialNetwork(final Factory<Double, ?> factory) {
 
-        NetworkBuilder builder = ArtificialNeuralNetwork.builder(2, 3, 1);
+        ArtificialNeuralNetwork network = ArtificialNeuralNetwork.builder(factory, 2).layer(3, SIGMOID).layer(1, SIGMOID).get();
 
-        builder.activators(SIGMOID, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
+        NetworkTrainer trainer = network.newTrainer();
 
-        builder.weight(0, 0, 0, 0.8);
-        builder.weight(0, 0, 1, 0.4);
-        builder.weight(0, 0, 2, 0.3);
+        trainer.weight(0, 0, 0, 0.8);
+        trainer.weight(0, 0, 1, 0.4);
+        trainer.weight(0, 0, 2, 0.3);
 
-        builder.weight(0, 1, 0, 0.2);
-        builder.weight(0, 1, 1, 0.9);
-        builder.weight(0, 1, 2, 0.5);
+        trainer.weight(0, 1, 0, 0.2);
+        trainer.weight(0, 1, 1, 0.9);
+        trainer.weight(0, 1, 2, 0.5);
 
-        builder.bias(0, 0, 0.0);
-        builder.bias(0, 1, 0.0);
-        builder.bias(0, 2, 0.0);
+        trainer.bias(0, 0, 0.0);
+        trainer.bias(0, 1, 0.0);
+        trainer.bias(0, 2, 0.0);
 
-        builder.weight(1, 0, 0, 0.3);
-        builder.weight(1, 1, 0, 0.5);
-        builder.weight(1, 2, 0, 0.9);
+        trainer.weight(1, 0, 0, 0.3);
+        trainer.weight(1, 1, 0, 0.5);
+        trainer.weight(1, 2, 0, 0.9);
 
-        builder.bias(1, 0, 0.0);
+        trainer.bias(1, 0, 0.0);
 
-        return builder;
+        return network;
     }
 
     @Override

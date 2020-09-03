@@ -22,7 +22,6 @@
 package org.ojalgo.ann;
 
 import static org.ojalgo.ann.ArtificialNeuralNetwork.Activator.*;
-import static org.ojalgo.ann.ArtificialNeuralNetwork.Error.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.context.NumberContext;
@@ -50,7 +50,7 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
     }
 
     @Override
-    public void testFeedForward() {
+    public void doTestFeedForward(final Factory<Double, ?> factory) {
         // No example output
 
     }
@@ -61,19 +61,19 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
     @Test
     public void testTraining() {
 
-        final NetworkBuilder builder = this.getInitialNetwork();
+        final NetworkTrainer trainer = this.getInitialNetwork(Primitive64Store.FACTORY).newTrainer();
 
         List<Data> examples = this.getTestCases();
 
-        double[] initialErrors = this.getErrors(builder);
+        double[] initialErrors = this.getErrors(trainer);
 
         for (int iter = 0; iter < TRAINING_ITERATIONS; iter++) {
             for (Data data : examples) {
-                builder.rate(LEARNING_RATE).train(data.input, data.target);
+                trainer.rate(LEARNING_RATE).train(data.input, data.target);
             }
         }
 
-        double[] trainedErrors = this.getErrors(builder);
+        double[] trainedErrors = this.getErrors(trainer);
 
         double initialError = 0.0, trainedError = 0.0;
         for (int i = 0; i < trainedErrors.length; i++) {
@@ -84,9 +84,10 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
         TestUtils.assertTrue(initialError >= trainedError);
     }
 
-    private double[] getErrors(final NetworkBuilder builder) {
+    private double[] getErrors(final NetworkTrainer trainer) {
 
-        ArtificialNeuralNetwork network = builder.get();
+        ArtificialNeuralNetwork network = trainer.get();
+        NetworkInvoker invoker = network.newInvoker();
 
         List<Data> examples = this.getTestCases();
 
@@ -95,9 +96,9 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
         for (int i = 0; i < errors.length; i++) {
             final Data data = examples.get(i);
             final Primitive64Store input = data.input;
-            final Access1D<Double> actual = network.invoke(input);
+            final Access1D<Double> actual = invoker.invoke(input);
             final Primitive64Store expected = data.target;
-            double error = builder.error(expected, actual);
+            double error = trainer.error(expected, actual);
             errors[i] = error;
         }
 
@@ -105,8 +106,11 @@ public class NeuralNetworksDemystified extends BackPropagationExample {
     }
 
     @Override
-    protected NetworkBuilder getInitialNetwork() {
-        return ArtificialNeuralNetwork.builder(2, 3, 1).activators(SIGMOID, SIGMOID).error(HALF_SQUARED_DIFFERENCE);
+    protected ArtificialNeuralNetwork getInitialNetwork(final Factory<Double, ?> factory) {
+
+        ArtificialNeuralNetwork network = ArtificialNeuralNetwork.builder(factory, 2).layer(3, SIGMOID).layer(1, SIGMOID).get();
+
+        return network;
 
     }
 

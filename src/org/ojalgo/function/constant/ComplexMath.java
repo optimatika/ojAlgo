@@ -46,7 +46,7 @@ public abstract class ComplexMath {
         return tmpLog.multiply(ComplexNumber.I).negate();
     };
     public static final ComplexFunction.Unary ACOSH = arg -> ComplexMath.LOG.invoke(arg.add(ComplexMath.SQRT.invoke(arg.multiply(arg).subtract(ONE))));
-    public static final ComplexFunction.Binary ADD = (arg1, arg2) -> arg1.add(arg2);
+    public static final ComplexFunction.Binary ADD = ComplexNumber::add;
     public static final ComplexFunction.Unary ASIN = arg -> {
 
         ComplexNumber tmpNmbr = ComplexMath.SQRT.invoke(ComplexNumber.ONE.subtract(ComplexMath.POWER.invoke(arg, 2)));
@@ -88,10 +88,10 @@ public abstract class ComplexMath {
         final double tmpIm = PrimitiveMath.CEIL.invoke(arg.i);
         return ComplexNumber.of(tmpRe, tmpIm);
     };
-    public static final ComplexFunction.Unary CONJUGATE = arg -> arg.conjugate();
+    public static final ComplexFunction.Unary CONJUGATE = ComplexNumber::conjugate;
     public static final ComplexFunction.Unary COS = arg -> ComplexMath.COSH.invoke(arg.multiply(ComplexNumber.I));
     public static final ComplexFunction.Unary COSH = arg -> (ComplexMath.EXP.invoke(arg).add(ComplexMath.EXP.invoke(arg.negate()))).divide(TWO);
-    public static final ComplexFunction.Binary DIVIDE = (arg1, arg2) -> arg1.divide(arg2);
+    public static final ComplexFunction.Binary DIVIDE = ComplexNumber::divide;
     public static final ComplexFunction.Unary EXP = arg -> {
 
         final double tmpNorm = PrimitiveMath.EXP.invoke(arg.doubleValue());
@@ -160,8 +160,8 @@ public abstract class ComplexMath {
 
         return retVal;
     };
-    public static final ComplexFunction.Binary MULTIPLY = (arg1, arg2) -> arg1.multiply(arg2);
-    public static final ComplexFunction.Unary NEGATE = arg -> arg.negate();
+    public static final ComplexFunction.Binary MULTIPLY = ComplexNumber::multiply;
+    public static final ComplexFunction.Unary NEGATE = ComplexNumber::negate;
     public static final ComplexFunction.Binary POW = (arg1, arg2) -> EXP.invoke(LOG.invoke(arg1).multiply(arg2));
     public static final ComplexFunction.Parameter POWER = (arg, param) -> {
 
@@ -196,7 +196,7 @@ public abstract class ComplexMath {
         final double tmpIm = PrimitiveMath.SCALE.invoke(arg.i, param);
         return ComplexNumber.of(tmpRe, tmpIm);
     };
-    public static final ComplexFunction.Unary SIGNUM = arg -> arg.signum();
+    public static final ComplexFunction.Unary SIGNUM = ComplexNumber::signum;
     public static final ComplexFunction.Unary SIN = arg -> ComplexMath.SINH.invoke(arg.multiply(ComplexNumber.I)).multiply(ComplexNumber.I.negate());
     public static final ComplexFunction.Unary SINH = arg -> (EXP.invoke(arg).subtract(EXP.invoke(arg.negate()))).divide(TWO);
     public static final ComplexFunction.Unary SQRT = arg -> {
@@ -207,7 +207,7 @@ public abstract class ComplexMath {
         return ComplexNumber.makePolar(retMod, retArg);
     };
     public static final ComplexFunction.Unary SQRT1PX2 = arg -> SQRT.invoke(ComplexNumber.ONE.add(arg.multiply(arg)));
-    public static final ComplexFunction.Binary SUBTRACT = (arg1, arg2) -> arg1.subtract(arg2);
+    public static final ComplexFunction.Binary SUBTRACT = ComplexNumber::subtract;
     public static final ComplexFunction.Unary TAN = arg -> ComplexMath.TANH.invoke(arg.multiply(ComplexNumber.I)).multiply(ComplexNumber.I.negate());
     public static final ComplexFunction.Unary TANH = arg -> {
 

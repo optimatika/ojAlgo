@@ -23,31 +23,29 @@ package org.ojalgo.ann;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.BasicFunction;
+import java.util.function.DoubleUnaryOperator;
+
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Structure2D;
 
-final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double>, Primitive64Store> {
+final class CalculationLayer {
 
     private ArtificialNeuralNetwork.Activator myActivator;
-    private final Primitive64Store myBias;
-    private final Primitive64Store myOutput;
-    private final Primitive64Store myWeights;
+    private final PhysicalStore<Double> myBias;
+    private final PhysicalStore<Double> myWeights;
 
-    CalculationLayer(final int numberOfInputs, final int numberOfOutputs, final ArtificialNeuralNetwork.Activator activator) {
+    CalculationLayer(final PhysicalStore.Factory<Double, ?> factory, final int numberOfInputs, final int numberOfOutputs,
+            final ArtificialNeuralNetwork.Activator activator) {
 
         super();
 
-        myWeights = Primitive64Store.FACTORY.make(numberOfInputs, numberOfOutputs);
-        myBias = Primitive64Store.FACTORY.make(1, numberOfOutputs);
-        myOutput = Primitive64Store.FACTORY.make(1, numberOfOutputs);
+        myWeights = factory.make(numberOfInputs, numberOfOutputs);
+        myBias = factory.make(1, numberOfOutputs);
 
         myActivator = activator;
-
-        this.randomise(numberOfInputs);
     }
 
     @Override
@@ -92,12 +90,6 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return result;
     }
 
-    public Primitive64Store invoke(final Access1D<Double> input) {
-        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(myOutput);
-        myOutput.modifyAll(myActivator.getFunction(myOutput));
-        return myOutput;
-    }
-
     @Override
     public String toString() {
         StringBuilder tmpBuilder = new StringBuilder();
@@ -111,21 +103,10 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return tmpBuilder.toString();
     }
 
-    private void randomise(final double numberOfInputs) {
+    void adjust(final Access1D<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
+            final PhysicalStore<Double> downstreamGradient, final double learningRate, final double dropoutsFactor, final DoubleUnaryOperator regularisation) {
 
-        double magnitude = ONE / Math.sqrt(numberOfInputs);
-
-        Uniform randomiser = new Uniform(-magnitude, 2 * magnitude);
-
-        myWeights.fillAll(randomiser);
-
-        myBias.fillAll(randomiser);
-    }
-
-    void adjust(final Access1D<Double> layerInput, final Primitive64Store downstreamGradient, final double learningRate,
-            final Primitive64Store upstreamGradient) {
-
-        downstreamGradient.modifyMatching(MULTIPLY, myOutput.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
+        downstreamGradient.modifyMatching(MULTIPLY, output.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
 
         if (upstreamGradient != null) {
             // No need to do this multiplication for the input layer
@@ -134,12 +115,28 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         }
 
         for (long j = 0L, numbOutput = myWeights.countColumns(); j < numbOutput; j++) {
-            final double grad = downstreamGradient.doubleValue(j);
+            final double gradient = downstreamGradient.doubleValue(j);
+            double ratedGradient = learningRate * gradient;
             for (long i = 0L, numbInput = myWeights.countRows(); i < numbInput; i++) {
-                myWeights.add(i, j, learningRate * layerInput.doubleValue(i) * grad);
+                if (regularisation != null) {
+                    myWeights.add(i, j, learningRate * regularisation.applyAsDouble(myWeights.doubleValue(i, j)));
+                }
+                myWeights.add(i, j, ratedGradient * (input.doubleValue(i) / dropoutsFactor));
             }
-            myBias.add(j, learningRate * grad);
+            myBias.add(j, ratedGradient);
         }
+    }
+
+    int countInputNodes() {
+        return Math.toIntExact(myWeights.countRows());
+    }
+
+    int countOutputNodes() {
+        return Math.toIntExact(myWeights.countColumns());
+    }
+
+    ArtificialNeuralNetwork.Activator getActivator() {
+        return myActivator;
     }
 
     double getBias(final int output) {
@@ -150,16 +147,39 @@ final class CalculationLayer implements BasicFunction.PlainUnary<Access1D<Double
         return myWeights.logical().below(myBias).get();
     }
 
-    Primitive64Store getOutput() {
-        return myOutput;
-    }
-
     Structure2D getStructure() {
         return myWeights;
     }
 
     double getWeight(final int input, final int output) {
         return myWeights.doubleValue(input, output);
+    }
+
+    PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output) {
+        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(output);
+        output.modifyAll(myActivator.getFunction(output));
+        return output;
+    }
+
+    PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output, final double probabilityToKeep) {
+        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(output);
+        output.modifyAll(myActivator.getFunction(output, probabilityToKeep));
+        return output;
+    }
+
+    void randomise() {
+
+        double magnitude = ONE / Math.sqrt(this.countInputNodes());
+
+        Uniform randomiser = new Uniform(-magnitude, 2 * magnitude);
+
+        myWeights.fillAll(randomiser);
+
+        myBias.fillAll(randomiser);
+    }
+
+    void scale(final double factor) {
+        myWeights.modifyAll(MULTIPLY.second(factor));
     }
 
     void setActivator(final ArtificialNeuralNetwork.Activator activator) {

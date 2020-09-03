@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
+import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -38,6 +40,12 @@ public class SimpleDerivativesTest extends BackPropagationExample {
 
     public SimpleDerivativesTest() {
         super();
+    }
+
+    @Override
+    public void doTestFeedForward(final Factory<Double, ?> factory) {
+        // Not possible to test for this case
+
     }
 
     @Test
@@ -53,25 +61,26 @@ public class SimpleDerivativesTest extends BackPropagationExample {
         }
     }
 
-    @Override
-    public void testFeedForward() {
-        // Not possible to test for this case
-
-    }
-
     private void doTestDerivatives(final ArtificialNeuralNetwork.Activator activator, final ArtificialNeuralNetwork.Error error) {
 
         for (Data triplet : this.getTestCases()) {
 
-            NetworkBuilder builder = this.getInitialNetwork().activators(activator).error(error);
+            ArtificialNeuralNetwork network = this.getInitialNetwork(Primitive64Store.FACTORY);
 
-            this.deriveTheHardWay(builder, triplet, this.precision());
+            network.setActivator(0, activator);
+
+            network.newTrainer().error(error);
+
+            this.deriveTheHardWay(network, triplet, this.precision());
         }
     }
 
     @Override
-    protected NetworkBuilder getInitialNetwork() {
-        return ArtificialNeuralNetwork.builder(3, 3);
+    protected ArtificialNeuralNetwork getInitialNetwork(final Factory<Double, ?> factory) {
+
+        ArtificialNeuralNetwork network = ArtificialNeuralNetwork.builder(factory, 3).layer(3).get();
+
+        return network;
     }
 
     @Override
