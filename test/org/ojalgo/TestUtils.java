@@ -495,9 +495,7 @@ public abstract class TestUtils {
 
             } else if ((expectedState.isDistinct() && !actualState.isDistinct()) || (expectedState.isOptimal() && !actualState.isOptimal())) {
                 failed = true;
-            } else if (expectedState.isFeasible() && !actualState.isFeasible()) {
-                failed = true;
-            } else if (expectedState.isApproximate() && !actualState.isApproximate()) {
+            } else if ((expectedState.isFeasible() && !actualState.isFeasible()) || (expectedState.isApproximate() && !actualState.isApproximate())) {
                 failed = true;
             }
 

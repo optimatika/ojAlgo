@@ -42,6 +42,12 @@ public class SimpleDerivativesTest extends BackPropagationExample {
         super();
     }
 
+    @Override
+    public void doTestFeedForward(final Factory<Double, ?> factory) {
+        // Not possible to test for this case
+
+    }
+
     @Test
     public void testDerivatives() {
 
@@ -53,12 +59,6 @@ public class SimpleDerivativesTest extends BackPropagationExample {
                 this.doTestDerivatives(activator, ArtificialNeuralNetwork.Error.HALF_SQUARED_DIFFERENCE);
             }
         }
-    }
-
-    @Override
-    public void doTestFeedForward(final Factory<Double, ?> factory) {
-        // Not possible to test for this case
-
     }
 
     private void doTestDerivatives(final ArtificialNeuralNetwork.Activator activator, final ArtificialNeuralNetwork.Error error) {

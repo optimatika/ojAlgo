@@ -100,6 +100,10 @@ abstract class WrappedANN implements Supplier<ArtificialNeuralNetwork> {
         return myOutputs[layer];
     }
 
+    Activator getOutputActivator() {
+        return myNetwork.getOutputActivator();
+    }
+
     double getWeight(final int layer, final int input, final int output) {
         return myNetwork.getWeight(layer, input, output);
     }
@@ -136,10 +140,6 @@ abstract class WrappedANN implements Supplier<ArtificialNeuralNetwork> {
 
     Structure2D[] structure() {
         return myNetwork.structure();
-    }
-
-    Activator getOutputActivator() {
-        return myNetwork.getOutputActivator();
     }
 
 }
