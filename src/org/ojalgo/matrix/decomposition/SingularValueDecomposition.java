@@ -260,11 +260,8 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
                 kase = 4;
             } else {
                 int ks;
-                for (ks = p - 1; ks >= k; ks--) {
-                    if (ks == k) {
-                        break;
-                    }
-                    final double t = (ks != p ? ABS.invoke(e[ks]) : ZERO) + (ks != (k + 1) ? ABS.invoke(e[ks - 1]) : ZERO);
+                for (ks = p - 1; ks > k; ks--) {
+                    final double t = ABS.invoke(e[ks]) + (ks != (k + 1) ? ABS.invoke(e[ks - 1]) : ZERO);
                     if (ABS.invoke(s[ks]) <= (TINY + (MACHINE_EPSILON * t))) {
                         s[ks] = ZERO;
                         break;
