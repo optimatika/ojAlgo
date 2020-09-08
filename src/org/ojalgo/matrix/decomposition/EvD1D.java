@@ -131,10 +131,9 @@ public abstract class EvD1D {
                 x = mtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)];
                 y = ZERO;
                 w = ZERO;
-                if (l < tmpMainIterIndex) {
-                    y = mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))];
-                    w = mtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))] * mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * tmpMainIterIndex)];
-                }
+
+                y = mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))];
+                w = mtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))] * mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * tmpMainIterIndex)];
 
                 // Wilkinson's original ad hoc shift
                 if (tmpIterCount == 10) {
