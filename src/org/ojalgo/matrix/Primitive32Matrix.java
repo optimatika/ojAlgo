@@ -41,7 +41,8 @@ import org.ojalgo.structure.Structure2D;
 
 /**
  * PrimitiveMatrix
- *
+ *32 means it's primitive float as element,as of v48.3.0 by xwaeaewcrhomesysplug.
+ ^
  * @author apete
  */
 public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matrix> {
