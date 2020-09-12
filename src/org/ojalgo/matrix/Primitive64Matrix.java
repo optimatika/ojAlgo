@@ -42,7 +42,7 @@ import org.ojalgo.structure.Structure2D;
 /**
  * PrimitiveMatrix
  *<pre>
- *64 means it's primitive float as element,as of v48.3.0 by xwaeaewcrhomesysplug.</pre>
+ *64 means it's primitive double as element,as of v48.3.0 by xwaeaewcrhomesysplug.</pre>
  *
  * @author apete
  */
