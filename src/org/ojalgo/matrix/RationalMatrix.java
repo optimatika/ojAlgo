@@ -41,8 +41,9 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * RationalMatrix
+ * A matrix (linear algebra) with {@link RationalNumber} elements.
  *
+ * @see BasicMatrix
  * @author apete
  */
 public final class RationalMatrix extends BasicMatrix<RationalNumber, RationalMatrix> {
