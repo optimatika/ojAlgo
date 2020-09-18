@@ -41,8 +41,9 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * QuaternionMatrix
+ * A matrix (linear algebra) with {@link Quaternion} elements.
  *
+ * @see BasicMatrix
  * @author apete
  */
 public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMatrix> {

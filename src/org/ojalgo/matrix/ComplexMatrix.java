@@ -42,8 +42,9 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * ComplexMatrix
+ * A matrix (linear algebra) with {@link ComplexNumber} elements.
  *
+ * @see BasicMatrix
  * @author apete
  */
 public final class ComplexMatrix extends BasicMatrix<ComplexNumber, ComplexMatrix> {

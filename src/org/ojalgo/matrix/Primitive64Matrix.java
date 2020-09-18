@@ -40,10 +40,9 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * PrimitiveMatrix
- *<pre>
- *64 means it's primitive double as element,as of v48.3.0 by xwaeaewcrhomesysplug.</pre>
+ * A matrix (linear algebra) with 64-bit primitive double elements.
  *
+ * @see BasicMatrix
  * @author apete
  */
 public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matrix> {
