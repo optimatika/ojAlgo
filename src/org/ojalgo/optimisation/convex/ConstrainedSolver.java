@@ -31,14 +31,27 @@ import org.ojalgo.structure.Access2D.Collectable;
 abstract class ConstrainedSolver extends ConvexSolver {
 
     private final Primitive64Store mySlackE;
+    private final Primitive64Store mySolutionL;
 
     protected ConstrainedSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
 
         super(matrices, solverOptions);
 
         int numberOfEqualityConstraints = this.countEqualityConstraints();
+        int numberOfInequalityConstraints = this.countInequalityConstraints();
 
         mySlackE = Primitive64Store.FACTORY.make(numberOfEqualityConstraints, 1L);
+        mySolutionL = Primitive64Store.FACTORY.make(numberOfEqualityConstraints + numberOfInequalityConstraints, 1L);
+    }
+
+    @Override
+    protected Result buildResult() {
+
+        Result result = super.buildResult();
+
+        result.multipliers(mySolutionL);
+
+        return result;
     }
 
     @Override
@@ -96,6 +109,15 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
     abstract MatrixStore<Double> getIterationC();
 
+    MatrixStore<Double> getIterationL(final int[] included) {
+
+        final int tmpCountE = this.countEqualityConstraints();
+
+        final MatrixStore<Double> tmpLI = mySolutionL.logical().offsets(tmpCountE, 0).row(included).get();
+
+        return mySolutionL.logical().limits(tmpCountE, 1).below(tmpLI).get();
+    }
+
     final PhysicalStore<Double> getIterationQ() {
         return this.getMatrixQ();
     }
@@ -111,6 +133,10 @@ abstract class ConstrainedSolver extends ConvexSolver {
         }
 
         return mySlackE;
+    }
+
+    Primitive64Store getSolutionL() {
+        return mySolutionL;
     }
 
 }
