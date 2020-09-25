@@ -79,7 +79,7 @@ public abstract class NonPhysicalTest extends MatrixStoreTests {
         TestUtils.assertEquals(anyStore, anyStore.copy(), ACCURACY);
     }
 
-    private static <N extends Comparable<N>> void testDimensions(final MatrixStore<N> anyStore, final int numberOfRows, final int numberOfColumns) {
+    private static <N extends Comparable<N>> void testDimensions(final MatrixStore<N> anyStore, final long numberOfRows, final long numberOfColumns) {
         TestUtils.assertEquals(numberOfRows, anyStore.countRows());
         TestUtils.assertEquals(numberOfColumns, anyStore.countColumns());
         TestUtils.assertEquals(numberOfRows * numberOfColumns, anyStore.count());
