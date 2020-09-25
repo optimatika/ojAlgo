@@ -1652,10 +1652,10 @@ public class ConvexProblems extends OptimisationConvexTests {
       Optional<Access1D<?>> multipliers = result.getMultipliers();
       TestUtils.assertTrue(" No multipliers present", multipliers.isPresent());
       Primitive64Store expectedDual = Primitive64Store.FACTORY.rows(new double[][]{
-         {3}, {-2}
+         {-3}, {2}
       });
-// [Q][x] - [A]<sup>T</sup>[L] = - [C]
-      MatrixStore<Double> computedC = Q.multiply(expectedX).subtract(AE.transpose().multiply(expectedDual)).negate();
+// [Q][x] + [A]<sup>T</sup>[L] = - [C]
+      MatrixStore<Double> computedC = Q.multiply(expectedX).add(AE.transpose().multiply(expectedDual)).negate();
       TestUtils.assertEquals(C, computedC, accuracy);
 // [A][x] = [b]
       MatrixStore<Double> computedB = AE.multiply(expectedX);
