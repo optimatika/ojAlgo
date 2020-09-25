@@ -80,6 +80,19 @@ public class LagrangeTest extends OptimisationConvexTests {
 
         TestUtils.assertEquals(inequalityX, inequalitySolution, accuracy);
         TestUtils.assertEquals(inequalityL, inequalityMultipliers, accuracy);
+
+        // The first constraint is active, and the second is not
+        // Setting the first as an equality constraint, and only the other as an
+        // inequality should give the same result.
+
+        ConvexSolver mixConstrainedSolver = ConvexSolver.getBuilder(mtrxQ, mtrxC).equalities(mtrxAI.logical().row(0).get(), mtrxBI.logical().row(0).get())
+                .inequalities(mtrxAI.logical().row(1).get(), mtrxBI.logical().row(1).get()).build();
+
+        Result mixSolution = mixConstrainedSolver.solve();
+        Access1D<?> mixMultipliers = mixSolution.getMultipliers().get();
+
+        TestUtils.assertEquals(inequalityX, mixSolution, accuracy);
+        TestUtils.assertEquals(inequalityL, mixMultipliers, accuracy);
     }
 
     /**
