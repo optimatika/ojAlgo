@@ -131,7 +131,7 @@ public class LagrangeTest extends OptimisationConvexTests {
         MatrixStore<Double> computedB = AE.multiply(expectedX);
         TestUtils.assertEquals(BE, computedB, accuracy);
 
-        // [Q][x] - [A]<sup>T</sup>[L] = - [C]
+        // [Q][x] + [A]<sup>T</sup>[L] = - [C]
         MatrixStore<Double> computedC = Q.multiply(expectedX).add(AE.transpose().multiply(expectedDual)).negate();
         TestUtils.assertEquals(C, computedC, accuracy);
 
