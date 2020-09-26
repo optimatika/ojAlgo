@@ -71,7 +71,10 @@ public abstract class SimplexSolver extends LinearSolver {
 
     }
 
-    private static final NumberContext PHASE1 = ACCURACY.withScale(8);
+    /**
+     * 2020-09-26: Changed from 8 to 7
+     */
+    private static final NumberContext PHASE1 = ACCURACY.withScale(7);
     private static final NumberContext RATIO = ACCURACY.withScale(8);
 
     private LongToNumberMap<Double> myFixedVariables = null;
@@ -447,9 +450,11 @@ public abstract class SimplexSolver extends LinearSolver {
             double tmpMinVal = tmpMinAggr.doubleValue();
 
             if ((tmpMinVal < ZERO) && !GenericSolver.ACCURACY.isZero(tmpMinVal)) {
-                this.log("\nNegative RHS! {}", tmpMinVal);
+                this.log();
+                this.log("Negative RHS! {}", tmpMinVal);
                 if (this.isLogDebug()) {
-                    this.log("Entire RHS columns: {}\n", tmpRHS);
+                    this.log("Entire RHS columns: {}", tmpRHS);
+                    this.log();
                 }
             }
 
