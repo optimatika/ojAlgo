@@ -49,7 +49,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private final Primitive64Store myIterationX;
     private boolean myShrinkSwitch = true;
     private final Primitive64Store mySlackI;
-    private final Primitive64Store mySolutionL;
 
     ActiveSetSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
 
@@ -61,7 +60,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         myActivator = new IndexSelector(numberOfInequalityConstraints);
 
-        mySolutionL = Primitive64Store.FACTORY.make(numberOfEqualityConstraints + numberOfInequalityConstraints, 1L);
         myIterationX = Primitive64Store.FACTORY.make(numberOfVariables, 1L);
 
         mySlackI = Primitive64Store.FACTORY.make(numberOfInequalityConstraints, 1L);
@@ -567,15 +565,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return this.getMatrixC();
     }
 
-    MatrixStore<Double> getIterationL(final int[] included) {
-
-        final int tmpCountE = this.countEqualityConstraints();
-
-        final MatrixStore<Double> tmpLI = mySolutionL.logical().offsets(tmpCountE, 0).row(included).get();
-
-        return mySolutionL.logical().limits(tmpCountE, 1).below(tmpLI).get();
-    }
-
     Primitive64Store getIterationX() {
         return myIterationX;
     }
@@ -597,10 +586,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     MatrixStore<Double> getSlackI(final int[] rows) {
         return this.getSlackI().logical().row(rows).get();
-    }
-
-    Primitive64Store getSolutionL() {
-        return mySolutionL;
     }
 
     final void handleIterationResults(final boolean solved, final Primitive64Store iterX, final int[] included, final int[] excluded) {
