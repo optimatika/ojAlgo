@@ -239,7 +239,8 @@ public abstract class SimplexSolver extends LinearSolver {
     protected boolean needsAnotherIteration() {
 
         if (this.isLogDebug()) {
-            this.log("\nNeeds Another Iteration? Phase={} Artificials={} Objective={}", this.phase(), myTableau.countBasisDeficit(), this.objective());
+            this.log();
+            this.log("Needs Another Iteration? Phase={} Artificials={} Objective={}", this.phase(), myTableau.countBasisDeficit(), this.objective());
         }
 
         boolean retVal = false;
@@ -252,7 +253,10 @@ public abstract class SimplexSolver extends LinearSolver {
             if (!myTableau.isBasicArtificials() || PHASE1.isZero(phaseOneValue)) {
 
                 if (this.isLogDebug()) {
-                    this.log("\nSwitching to Phase2 with {} artificial variable(s) still in the basis.\n", myTableau.countBasicArtificials());
+                    this.log();
+                    this.log("Switching to Phase2 with {} artificial variable(s) still in the basis and infeasibility {}.", myTableau.countBasicArtificials(),
+                            phaseOneValue);
+                    this.log();
                 }
 
                 myPoint.switchToPhase2();

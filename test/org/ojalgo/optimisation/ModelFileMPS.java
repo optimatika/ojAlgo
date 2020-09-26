@@ -28,6 +28,7 @@ import java.util.Map;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
 
@@ -43,6 +44,9 @@ public interface ModelFileMPS {
 
     static void assertValues(final ExpressionsBasedModel model, final BigDecimal expMinVal, final BigDecimal expMaxVal, final Map<String, BigDecimal> solution,
             final NumberContext precision) {
+
+        model.options.debug(LinearSolver.class);
+        model.options.mip_defer = 0.0;
 
         TestUtils.assertTrue(model.validate());
 

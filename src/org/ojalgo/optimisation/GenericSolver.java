@@ -363,6 +363,12 @@ public abstract class GenericSolver implements Optimisation.Solver {
         return (options.logger_appender != null) && (options.logger_solver.isAssignableFrom(this.getClass()));
     }
 
+    protected final void log() {
+        if (options.logger_appender != null) {
+            options.logger_appender.println();
+        }
+    }
+
     protected final void log(final String descripttion, final Access2D<?> matrix) {
         if (options.logger_appender != null) {
             options.logger_appender.printmtrx(descripttion, matrix, options.print);
