@@ -12,6 +12,17 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Changed
+
+#### org.ojalgo.optimisation
+
+- Minor internal change to SimplexSolver regarding when phase 1 is regarded done.
+
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- ConvexSolver results now include the Lagrange multipliers.
 
 ## [48.3.0] – 2020-09-03
 
