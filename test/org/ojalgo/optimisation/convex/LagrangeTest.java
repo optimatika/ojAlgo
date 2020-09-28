@@ -154,27 +154,21 @@ public class LagrangeTest extends OptimisationConvexTests {
         
 //  Test similar system where each equality constraint are converted into two inequality constraints.
 //  The result should be the same.
-       Builder ieBuilder = ConvexSolver.getBuilder();
-       ieBuilder.objective(Q, C.negate());
-       MatrixStore<Double> AI = AE.logical().below(AE.negate()).get();
-       MatrixStore<Double> BI = BE.logical().below(BE.negate()).get();
-       ieBuilder.inequalities(AI, BI);
-       ConvexSolver ieSolver = ieBuilder.build();
-       
-       Result ieResult = ieSolver.solve();
-       Optional<Access1D<?>> ieMultipliers = ieResult.getMultipliers();
-       TestUtils.assertTrue("No multipliers present", ieMultipliers.isPresent());
+        Builder ieBuilder = ConvexSolver.getBuilder();
+        ieBuilder.objective(Q, C.negate());
+        MatrixStore<Double> AI = AE.logical().below(AE.negate()).get();
+        MatrixStore<Double> BI = BE.logical().below(BE.negate()).get();
+        ieBuilder.inequalities(AI, BI);
+        ConvexSolver ieSolver = ieBuilder.build();
+        Result ieResult = ieSolver.solve();
+        TestUtils.assertEquals(expectedX, result, accuracy);
 
-       int greaterThanCount = 0;
-       int greaterThanOrEqualCount = 0;
-       for (double v : ieMultipliers.get().toRawCopy1D()) {
-          if (v == 0)greaterThanOrEqualCount++;
-          if (v > 0) greaterThanCount++;
-       }
-// Test that two multipliers are greater than zero and two are zero.
-       TestUtils.assertTrue(greaterThanOrEqualCount == 2);
-       TestUtils.assertTrue(greaterThanCount == 2);
-       
+        Optional<Access1D<?>> ieMultipliers = ieResult.getMultipliers();
+        TestUtils.assertTrue("No multipliers present", ieMultipliers.isPresent());
+        
+        Primitive64Store expectedInequalityDual = FACTORY.column(0, 2, 3, 0);
+        TestUtils.assertEquals(expectedInequalityDual, ieMultipliers.get(), accuracy);
+ 
     }
 
 }
