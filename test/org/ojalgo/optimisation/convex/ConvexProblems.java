@@ -1016,7 +1016,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         TestUtils.assertBounds(BigMath.ZERO, (Access1D<?>) tmpResult, BigMath.ONE, StandardType.PERCENT);
 
-        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null, null);
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, NumberContext.getMath(8), null);
     }
 
     /**
@@ -1508,27 +1508,34 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         NumberContext precision = new NumberContext(11, 14, RoundingMode.HALF_EVEN);
 
-        Primitive64Array tmpExpectedSolution = Primitive64Array.wrap(new double[] { 0.12, -0.05, 0.08, 0.07 });
-        Primitive64Array tmpBoundedSolution = Primitive64Array.wrap(new double[] { 99999, -99999, 99999, 99999 });
+        /*
+         * Same as the "c" vector
+         */
+        Primitive64Array centeredSolution = Primitive64Array.wrap(new double[] { 0.12, -0.05, 0.08, 0.07 });
 
-        ConvexSolver tmpSolver = P20150809.buildModel(true, false);
-        Result tmpResult = tmpSolver.solve();
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertEquals(tmpExpectedSolution, tmpResult, precision);
+        /*
+         * Magnitude 99999 and same the sign as the elements of the centered solution
+         */
+        Primitive64Array boundedSolution = Primitive64Array.wrap(new double[] { 99999, -99999, 99999, 99999 });
 
-        tmpSolver = P20150809.buildModel(true, true);
-        tmpResult = tmpSolver.solve();
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertEquals(tmpExpectedSolution, tmpResult, precision);
+        ConvexSolver solver = P20150809.buildModel(true, false);
+        Result result = solver.solve();
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(centeredSolution, result, precision);
 
-        tmpSolver = P20150809.buildModel(false, false);
-        tmpResult = tmpSolver.solve();
-        TestUtils.assertEquals(Optimisation.State.UNBOUNDED, tmpResult.getState());
+        solver = P20150809.buildModel(true, true);
+        result = solver.solve(); // Adding the constraints should not matter
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(centeredSolution, result, precision);
 
-        tmpSolver = P20150809.buildModel(false, true);
-        tmpResult = tmpSolver.solve();
-        TestUtils.assertStateNotLessThanOptimal(tmpResult); // Since it is now constrained, the solver should be able find the optimal solution.
-        TestUtils.assertEquals(tmpBoundedSolution, tmpResult, precision);
+        solver = P20150809.buildModel(false, false);
+        result = solver.solve(); // No constraint, mix sign in "C" and no "Q" - it has to be UNBOUNDED
+        TestUtils.assertEquals(Optimisation.State.UNBOUNDED, result.getState());
+
+        solver = P20150809.buildModel(false, true);
+        result = solver.solve(); // Since it is now constrained, the solver should be able find an optimal solution
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(boundedSolution, result, precision);
     }
 
     /**
@@ -1604,64 +1611,44 @@ public class ConvexProblems extends OptimisationConvexTests {
         OptimisationConvexTests.assertDirectAndIterativeEquals(myBuilderI, null, null);
     }
 
-/**
+    /**
      * Test for https://github.com/optimatika/ojAlgo/issues/280.
      * <p>
      * 2020-09-24: No multipliers was returned by org.ojalgo.optimisation.convex classes :
      * </p>
-     * 
-     * Test from 'Numerical Optimization', 2ed, (2006), Jorge Nocedal and Stephen J. Wright.
-     * QP Example 16.2 p453
-     * minimize function F(x1,x2,x3) = 3*x1*x1 + 2*x1*x2 + x1*x3 + 2.5*x2*x2 + 2*x2*x3 + 2*x3*x3 - 8*x1 - 3*x2 - 3*x3
-     * constraints x1 + x3 = 3, x2 + x3 = 0
-     * result:
-     * x = [2, -1, 1]'
-     * multipliers = [3, -2]'
+     * Test from 'Numerical Optimization', 2ed, (2006), Jorge Nocedal and Stephen J. Wright. QP Example 16.2
+     * p453 minimize function F(x1,x2,x3) = 3*x1*x1 + 2*x1*x2 + x1*x3 + 2.5*x2*x2 + 2*x2*x3 + 2*x3*x3 - 8*x1 -
+     * 3*x2 - 3*x3 constraints x1 + x3 = 3, x2 + x3 = 0 result: x = [2, -1, 1]' multipliers = [3, -2]'
      */
-   @Test
-   public void testP20200924() {
-      Primitive64Store C = Primitive64Store.FACTORY.rows(new double[][]{
-         {-8}, {-3}, {-3}
-      });
-      Primitive64Store Q = Primitive64Store.FACTORY.rows(new double[][]{
-         {6, 2, 1},
-         {2, 5, 2},
-         {1, 2, 4}
-      });
-      Primitive64Store AE = Primitive64Store.FACTORY.rows(new double[][]{
-         {1, 0, 1},
-         {0, 1, 1}
-      });
-      Primitive64Store BE = Primitive64Store.FACTORY.rows(new double[][]{
-         {3}, {0}
-      });
+    @Test
+    public void testP20200924() {
+        Primitive64Store C = Primitive64Store.FACTORY.rows(new double[][] { { -8 }, { -3 }, { -3 } });
+        Primitive64Store Q = Primitive64Store.FACTORY.rows(new double[][] { { 6, 2, 1 }, { 2, 5, 2 }, { 1, 2, 4 } });
+        Primitive64Store AE = Primitive64Store.FACTORY.rows(new double[][] { { 1, 0, 1 }, { 0, 1, 1 } });
+        Primitive64Store BE = Primitive64Store.FACTORY.rows(new double[][] { { 3 }, { 0 } });
 
-      Builder builder = ConvexSolver.getBuilder();
-      builder.objective(Q, C.negate());
-      builder.equalities(AE, BE);
-      ConvexSolver solver = builder.build();
+        Builder builder = ConvexSolver.getBuilder();
+        builder.objective(Q, C.negate());
+        builder.equalities(AE, BE);
+        ConvexSolver solver = builder.build();
 
-      Result result = solver.solve();
+        Result result = solver.solve();
 
-      NumberContext accuracy = NumberContext.getGeneral(12, 12);
-      Primitive64Store expectedX = Primitive64Store.FACTORY.rows(new double[][]{
-         {2}, {-1}, {1}
-      });
-      TestUtils.assertEquals(expectedX, result, accuracy);
+        NumberContext accuracy = NumberContext.getGeneral(12, 12);
+        Primitive64Store expectedX = Primitive64Store.FACTORY.rows(new double[][] { { 2 }, { -1 }, { 1 } });
+        TestUtils.assertEquals(expectedX, result, accuracy);
 
-      Optional<Access1D<?>> multipliers = result.getMultipliers();
-      TestUtils.assertTrue(" No multipliers present", multipliers.isPresent());
-      Primitive64Store expectedDual = Primitive64Store.FACTORY.rows(new double[][]{
-         {-3}, {2}
-      });
-// [Q][x] + [A]<sup>T</sup>[L] = - [C]
-      MatrixStore<Double> computedC = Q.multiply(expectedX).add(AE.transpose().multiply(expectedDual)).negate();
-      TestUtils.assertEquals(C, computedC, accuracy);
-// [A][x] = [b]
-      MatrixStore<Double> computedB = AE.multiply(expectedX);
-      TestUtils.assertEquals(BE, computedB,accuracy);
+        Optional<Access1D<?>> multipliers = result.getMultipliers();
+        TestUtils.assertTrue(" No multipliers present", multipliers.isPresent());
+        Primitive64Store expectedDual = Primitive64Store.FACTORY.rows(new double[][] { { -3 }, { 2 } });
+        // [Q][x] + [A]<sup>T</sup>[L] = - [C]
+        MatrixStore<Double> computedC = Q.multiply(expectedX).add(AE.transpose().multiply(expectedDual)).negate();
+        TestUtils.assertEquals(C, computedC, accuracy);
+        // [A][x] = [b]
+        MatrixStore<Double> computedB = AE.multiply(expectedX);
+        TestUtils.assertEquals(BE, computedB, accuracy);
 
-      TestUtils.assertEquals(" Lagrangian Multipliers differ ", expectedDual, multipliers.get(), accuracy);
-   }    
-    
+        TestUtils.assertEquals(" Lagrangian Multipliers differ ", expectedDual, multipliers.get(), accuracy);
+    }
+
 }

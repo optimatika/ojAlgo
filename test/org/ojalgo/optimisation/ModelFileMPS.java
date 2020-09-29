@@ -55,9 +55,9 @@ public interface ModelFileMPS {
 
             TestUtils.assertStateNotLessThanFeasible(result);
 
-            TestUtils.assertEquals(expMinVal, result.getValue(), precision);
-
             TestUtils.assertTrue(ModelFileMPS.SOLUTION_NOT_VALID, model.validate(result, precision));
+
+            TestUtils.assertEquals(expMinVal, result.getValue(), precision);
         }
 
         if (expMaxVal != null) {
@@ -66,9 +66,9 @@ public interface ModelFileMPS {
 
             TestUtils.assertStateNotLessThanFeasible(result);
 
-            TestUtils.assertEquals(expMaxVal, result.getValue(), precision);
-
             TestUtils.assertTrue(ModelFileMPS.SOLUTION_NOT_VALID, model.validate(result, precision));
+
+            TestUtils.assertEquals(expMaxVal, result.getValue(), precision);
         }
 
         if (solution != null) {
