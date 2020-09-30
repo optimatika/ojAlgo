@@ -181,7 +181,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
         protected AggregatorFunction<Double> initialValue() {
             return new PrimitiveAggregatorFunction() {
 
-                private double myValue = ZERO;
+                private double myValue = NEGATIVE_INFINITY;
 
                 public double doubleValue() {
                     return myValue;
@@ -200,7 +200,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 }
 
                 public AggregatorFunction<Double> reset() {
-                    myValue = ZERO;
+                    myValue = NEGATIVE_INFINITY;
                     return this;
                 }
 

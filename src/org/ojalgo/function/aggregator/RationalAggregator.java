@@ -181,7 +181,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
         protected AggregatorFunction<RationalNumber> initialValue() {
             return new RationalAggregatorFunction() {
 
-                private RationalNumber myNumber = RationalNumber.ZERO;
+                private RationalNumber myNumber = RationalNumber.NEGATIVE_INFINITY;
 
                 public RationalNumber get() {
                     return myNumber;
@@ -200,7 +200,7 @@ public final class RationalAggregator extends AggregatorSet<RationalNumber> {
                 }
 
                 public AggregatorFunction<RationalNumber> reset() {
-                    myNumber = RationalNumber.ZERO;
+                    myNumber = RationalNumber.NEGATIVE_INFINITY;
                     return this;
                 }
 
