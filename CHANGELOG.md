@@ -20,6 +20,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Fixed
 
+#### org.ojalgo.function
+
+- Aggregator.MAXIMUM was initialised/reset incorrectly whicj caused wrong results with negative numbers
+
 #### org.ojalgo.optimisation
 
 - ConvexSolver results now include the Lagrange multipliers.
