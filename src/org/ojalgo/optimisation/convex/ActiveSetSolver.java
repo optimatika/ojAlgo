@@ -86,9 +86,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             if (includedChange.count() > 0) {
                 this.log("Included-change: {}", includedChange.asList());
-                double minI = includedChange.aggregateAll(Aggregator.MINIMUM);
-                if (!options.feasibility.isZero(minI)) {
-                    this.log("Nonzero Included-change! {}", minI);
+                double introducedError = includedChange.aggregateAll(Aggregator.LARGEST);
+                if (!options.feasibility.isZero(introducedError)) {
+                    this.log("Nonzero Included-change! {}", introducedError);
                 }
             }
 
@@ -307,7 +307,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
         }
 
-        boolean initWithLP = false;
+        boolean didInitWithLP = false;
 
         if (!feasible) {
 
@@ -320,7 +320,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final Optional<Access1D<?>> tmpMultipliers = resultLP.getMultipliers();
                 if (tmpMultipliers.isPresent()) {
                     this.getSolutionL().fillMatching(tmpMultipliers.get());
-                    initWithLP = true;
+                    // Somewhat confused about what sign the Lagrange multipliers should have here
+                    // It works best to always initiate the solver with mon-negative values
+                    this.getSolutionL().modifyAll(ABS);
+                    didInitWithLP = true;
                 } else {
                     this.getSolutionL().fillAll(ZERO);
                 }
@@ -331,7 +334,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             this.setState(State.FEASIBLE);
 
-            this.resetActivator(initWithLP);
+            this.resetActivator(didInitWithLP);
 
         } else {
 

@@ -33,6 +33,7 @@ import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -40,6 +41,7 @@ import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
+import org.ojalgo.structure.Access1D;
 import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure1D.IntIndex;
 
@@ -259,19 +261,22 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
 
         Optimisation.Result primRes = PrimalSimplex.solve(convex, options);
 
-        //        Optimisation.Result dualRes = DualSimplex.solve(convex, options);
-        //
-        //        if (primRes.getMultipliers().isPresent()
-        //                && !Access1D.equals(primRes.getMultipliers().get(), dualRes.getMultipliers().get(), ACCURACY.withPrecision(8).withScale(6))) {
-        //
-        //            BasicLogger.debug();
-        //            BasicLogger.debug("Prim sol: {}", primRes);
-        //            BasicLogger.debug("Dual sol: {}", dualRes);
-        //
-        //            BasicLogger.debug("Prim mul: {}", primRes.getMultipliers().get());
-        //            BasicLogger.debug("Dual mul: {}", dualRes.getMultipliers().get());
-        //            BasicLogger.debug();
-        //        }
+        if (options.validate) {
+
+            Optimisation.Result dualRes = DualSimplex.solve(convex, options);
+
+            if (primRes.getMultipliers().isPresent()
+                    && !Access1D.equals(primRes.getMultipliers().get(), dualRes.getMultipliers().get(), ACCURACY.withPrecision(8).withScale(6))) {
+
+                BasicLogger.error();
+                BasicLogger.error("Prim sol: {}", primRes);
+                BasicLogger.error("Dual sol: {}", dualRes);
+
+                BasicLogger.error("Prim mul: {}", primRes.getMultipliers().get());
+                BasicLogger.error("Dual mul: {}", dualRes.getMultipliers().get());
+                BasicLogger.error();
+            }
+        }
 
         return primRes;
     }
