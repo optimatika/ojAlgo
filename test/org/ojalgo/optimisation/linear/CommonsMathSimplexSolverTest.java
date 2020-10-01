@@ -695,8 +695,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                         || ((PrimitiveMath.FLOOR.invoke(unscaled) / 2.0) == PrimitiveMath.FLOOR.invoke(PrimitiveMath.FLOOR.invoke(unscaled) / 2.0)))) {
                     unscaled = PrimitiveMath.CEIL.invoke(unscaled);
                 } else {
-               unscaled = PrimitiveMath.FLOOR.invoke(unscaled);
-            }
+                    unscaled = PrimitiveMath.FLOOR.invoke(unscaled);
+                }
                 break;
             }
             case BigDecimal.ROUND_HALF_UP: {
