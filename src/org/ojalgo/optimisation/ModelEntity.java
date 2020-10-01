@@ -234,6 +234,40 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return (ME) this;
     }
 
+    /**
+     * Purely the reverse scaling part of {@link #toUnadjusted(double, NumberContext)}
+     */
+    public final BigDecimal reverseAdjustment(final BigDecimal adjusted) {
+
+        if (myAdjustmentExponent != 0) {
+            return adjusted.movePointLeft(myAdjustmentExponent);
+        }
+
+        return adjusted;
+    }
+
+    /**
+     * Will convert a {@link BigDecimal} model parameter to a corresponing {@link double} solver parameter, in
+     * the process scaling it. This operation is reversed by {@link #toUnadjusted(double, NumberContext)}
+     * and/or {@link #reverseAdjustment(BigDecimal)}.
+     */
+    public final double toAdjusted(final BigDecimal unadjusted) {
+
+        if (unadjusted == null) {
+            return Double.NaN;
+        }
+
+        if (unadjusted.signum() == 0) {
+            return PrimitiveMath.ZERO;
+        }
+
+        if (myAdjustmentExponent == 0) {
+            return unadjusted.doubleValue();
+        }
+
+        return unadjusted.movePointRight(myAdjustmentExponent).doubleValue();
+    }
+
     @Override
     public final String toString() {
 
@@ -242,6 +276,30 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         this.appendToString(retVal);
 
         return retVal.toString();
+    }
+
+    /**
+     * The inverse of {@link #toAdjusted(BigDecimal)}. This will also enforce the lower and upper limits as
+     * well as the {@link NumberContext}. To "only" do the reverse adjustment call
+     * {@link #reverseAdjustment(BigDecimal)}.
+     */
+    public final BigDecimal toUnadjusted(final double adjusted, final NumberContext context) {
+
+        BigDecimal retVal = new BigDecimal(adjusted, context.getMathContext());
+
+        retVal = this.reverseAdjustment(retVal);
+
+        retVal = context.enforce(retVal);
+
+        if (myLowerLimit != null) {
+            retVal = retVal.max(myLowerLimit);
+        }
+
+        if (myUpperLimit != null) {
+            retVal = retVal.min(myUpperLimit);
+        }
+
+        return retVal;
     }
 
     /**
@@ -434,64 +492,6 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
     boolean isInfeasible() {
         return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0);
-    }
-
-    /**
-     * Purely the reverse scaling part of {@link #toUnadjusted(double, NumberContext)}
-     */
-    final BigDecimal reverseAdjustment(final BigDecimal adjusted) {
-
-        if (myAdjustmentExponent != 0) {
-            return adjusted.movePointLeft(myAdjustmentExponent);
-        }
-
-        return adjusted;
-    }
-
-    /**
-     * Will convert a {@link BigDecimal} model parameter to a corresponing {@link double} solver parameter, in
-     * the process scaling it. This operation is reversed by {@link #toUnadjusted(double, NumberContext)}
-     * and/or {@link #reverseAdjustment(BigDecimal)}.
-     */
-    final double toAdjusted(final BigDecimal unadjusted) {
-
-        if (unadjusted == null) {
-            return Double.NaN;
-        }
-
-        if (unadjusted.signum() == 0) {
-            return PrimitiveMath.ZERO;
-        }
-
-        if (myAdjustmentExponent == 0) {
-            return unadjusted.doubleValue();
-        }
-
-        return unadjusted.movePointRight(myAdjustmentExponent).doubleValue();
-    }
-
-    /**
-     * The inverse of {@link #toAdjusted(BigDecimal)}. This will also enforce the lower and upper limits as
-     * well as the {@link NumberContext}. To "only" do the reverse adjustment call
-     * {@link #reverseAdjustment(BigDecimal)}.
-     */
-    final BigDecimal toUnadjusted(final double adjusted, final NumberContext context) {
-
-        BigDecimal retVal = new BigDecimal(adjusted, context.getMathContext());
-
-        retVal = this.reverseAdjustment(retVal);
-
-        retVal = context.enforce(retVal);
-
-        if (myLowerLimit != null) {
-            retVal = retVal.max(myLowerLimit);
-        }
-
-        if (myUpperLimit != null) {
-            retVal = retVal.min(myUpperLimit);
-        }
-
-        return retVal;
     }
 
 }
