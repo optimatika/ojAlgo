@@ -40,8 +40,9 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * PrimitiveMatrix
+ * A matrix (linear algebra) with 32-bit primitive float elements.
  *
+ * @see BasicMatrix
  * @author apete
  */
 public final class Primitive32Matrix extends BasicMatrix<Double, Primitive32Matrix> {

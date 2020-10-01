@@ -59,9 +59,10 @@ import org.ojalgo.type.NumberDefinition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * This abstract class declares a limited set of high level methods for linear algebra. If this is not enough
- * for your use case, then look at the various interfaces/classes in the {@linkplain org.ojalgo.matrix.store}
- * and/or {@linkplain org.ojalgo.matrix.decomposition} packages.
+ * A base class for, easy to use, immutable (thread safe) matrices with a rich feature set. This class handles
+ * a lot of complexity, and makes choices, for you. If you want more control, and to be exposed to all the
+ * implementation details, then look at the various interfaces/classes in the
+ * {@linkplain org.ojalgo.matrix.store} and {@linkplain org.ojalgo.matrix.decomposition} packages.
  *
  * @author apete
  */

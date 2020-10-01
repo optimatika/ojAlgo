@@ -1350,6 +1350,22 @@ public final class ExpressionsBasedModel extends AbstractModel {
         myReferences.add(index);
     }
 
+    int deriveAdjustmentRange(final Expression expression) {
+
+        int retVal = 0;
+
+        for (IntIndex linear : expression.getLinearKeySet()) {
+            retVal = Math.max(retVal, Math.abs(myVariables.get(linear.index).getAdjustmentExponent()));
+        }
+
+        for (IntRowColumn quadratic : expression.getQuadraticKeySet()) {
+            retVal = Math.max(retVal, Math.abs(myVariables.get(quadratic.row).getAdjustmentExponent()));
+            retVal = Math.max(retVal, Math.abs(myVariables.get(quadratic.column).getAdjustmentExponent()));
+        }
+
+        return retVal;
+    }
+
     Stream<Expression> expressions() {
         return myExpressions.values().stream();
     }

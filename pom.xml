@@ -6,14 +6,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>48.3.0</version>
+    <version>48.3.1</version>
     <packaging>jar</packaging>
     <name>ojAlgo</name>
     <url>http://ojalgo.org</url>
     <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.jupiter.version>5.6.2</junit.jupiter.version>
+        <junit.jupiter.version>5.7.0</junit.jupiter.version>
     </properties>
     <organization>
         <name>Optimatika</name>

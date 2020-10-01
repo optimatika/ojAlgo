@@ -12,6 +12,23 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+## [48.3.1] – 2020-10-01
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- Minor internal change to SimplexSolver regarding when phase 1 is regarded done.
+
+### Fixed
+
+#### org.ojalgo.function
+
+- Aggregator.MAXIMUM was initialised/reset incorrectly whicj caused wrong results with negative numbers
+
+#### org.ojalgo.optimisation
+
+- ConvexSolver results now include the Lagrange multipliers.
 
 ## [48.3.0] – 2020-09-03
 

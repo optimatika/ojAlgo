@@ -49,7 +49,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private final Primitive64Store myIterationX;
     private boolean myShrinkSwitch = true;
     private final Primitive64Store mySlackI;
-    private final Primitive64Store mySolutionL;
 
     ActiveSetSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
 
@@ -61,7 +60,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         myActivator = new IndexSelector(numberOfInequalityConstraints);
 
-        mySolutionL = Primitive64Store.FACTORY.make(numberOfEqualityConstraints + numberOfInequalityConstraints, 1L);
         myIterationX = Primitive64Store.FACTORY.make(numberOfVariables, 1L);
 
         mySlackI = Primitive64Store.FACTORY.make(numberOfInequalityConstraints, 1L);
@@ -88,9 +86,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             if (includedChange.count() > 0) {
                 this.log("Included-change: {}", includedChange.asList());
-                double minI = includedChange.aggregateAll(Aggregator.MINIMUM);
-                if (!options.feasibility.isZero(minI)) {
-                    this.log("Nonzero Included-change! {}", minI);
+                double introducedError = includedChange.aggregateAll(Aggregator.LARGEST);
+                if (!options.feasibility.isZero(introducedError)) {
+                    this.log("Nonzero Included-change! {}", introducedError);
                 }
             }
 
@@ -309,7 +307,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
         }
 
-        boolean initWithLP = false;
+        boolean didInitWithLP = false;
 
         if (!feasible) {
 
@@ -322,7 +320,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final Optional<Access1D<?>> tmpMultipliers = resultLP.getMultipliers();
                 if (tmpMultipliers.isPresent()) {
                     this.getSolutionL().fillMatching(tmpMultipliers.get());
-                    initWithLP = true;
+                    // Somewhat confused about what sign the Lagrange multipliers should have here
+                    // It works best to always initiate the solver with mon-negative values
+                    this.getSolutionL().modifyAll(ABS);
+                    didInitWithLP = true;
                 } else {
                     this.getSolutionL().fillAll(ZERO);
                 }
@@ -333,7 +334,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             this.setState(State.FEASIBLE);
 
-            this.resetActivator(initWithLP);
+            this.resetActivator(didInitWithLP);
 
         } else {
 
@@ -567,15 +568,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return this.getMatrixC();
     }
 
-    MatrixStore<Double> getIterationL(final int[] included) {
-
-        final int tmpCountE = this.countEqualityConstraints();
-
-        final MatrixStore<Double> tmpLI = mySolutionL.logical().offsets(tmpCountE, 0).row(included).get();
-
-        return mySolutionL.logical().limits(tmpCountE, 1).below(tmpLI).get();
-    }
-
     Primitive64Store getIterationX() {
         return myIterationX;
     }
@@ -597,10 +589,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     MatrixStore<Double> getSlackI(final int[] rows) {
         return this.getSlackI().logical().row(rows).get();
-    }
-
-    Primitive64Store getSolutionL() {
-        return mySolutionL;
     }
 
     final void handleIterationResults(final boolean solved, final Primitive64Store iterX, final int[] included, final int[] excluded) {

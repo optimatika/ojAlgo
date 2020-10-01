@@ -40,8 +40,9 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.Structure2D;
 
 /**
- * PrimitiveMatrix
+ * A matrix (linear algebra) with 64-bit primitive double elements.
  *
+ * @see BasicMatrix
  * @author apete
  */
 public final class Primitive64Matrix extends BasicMatrix<Double, Primitive64Matrix> {

@@ -182,7 +182,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
         protected AggregatorFunction<BigDecimal> initialValue() {
             return new BigAggregatorFunction() {
 
-                private BigDecimal myNumber = ZERO;
+                private BigDecimal myNumber = VERY_NEGATIVE;
 
                 public BigDecimal get() {
                     return myNumber;
@@ -201,7 +201,7 @@ public final class BigAggregator extends AggregatorSet<BigDecimal> {
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
-                    myNumber = ZERO;
+                    myNumber = VERY_NEGATIVE;
                     return this;
                 }
 

@@ -250,10 +250,7 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
             // kase = 3     if e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible    => perform QR-step
             // kase = 4     if e[p-1] is negligible                                             => convergence
 
-            for (k = p - 2; k >= -1; k--) {
-                if (k == -1) {
-                    break;
-                }
+            for (k = p - 2; k >= 0; k--) {
                 if (ABS.invoke(e[k]) <= (TINY + (MACHINE_EPSILON * (ABS.invoke(s[k]) + ABS.invoke(s[k + 1]))))) {
                     e[k] = ZERO;
                     break;
@@ -263,11 +260,8 @@ abstract class SingularValueDecomposition<N extends Comparable<N>> extends Gener
                 kase = 4;
             } else {
                 int ks;
-                for (ks = p - 1; ks >= k; ks--) {
-                    if (ks == k) {
-                        break;
-                    }
-                    final double t = (ks != p ? ABS.invoke(e[ks]) : ZERO) + (ks != (k + 1) ? ABS.invoke(e[ks - 1]) : ZERO);
+                for (ks = p - 1; ks > k; ks--) {
+                    final double t = ABS.invoke(e[ks]) + (ks != (k + 1) ? ABS.invoke(e[ks - 1]) : ZERO);
                     if (ABS.invoke(s[ks]) <= (TINY + (MACHINE_EPSILON * t))) {
                         s[ks] = ZERO;
                         break;

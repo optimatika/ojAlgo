@@ -36,5 +36,5 @@ Available as part of the Tidelift Subscription
 
 The maintainers of ojAlgo and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source dependencies you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact dependencies you use. [Learn more.](https://tidelift.com/subscription/pkg/maven-org-ojalgo-ojalgo?utm_source=maven-org-ojalgo-ojalgo&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
 
-<a href="https://tidelift.com/subscription/pkg/maven-org-ojalgo-ojalgo?utm_source=maven-org-ojalgo-ojalgo&utm_medium=referral&utm_campaign=enterprise&utm_term=repo" rel="nofollow"><img alt="Tidelift Subscription" height="100"  src="https://numpy.org/_static/Tidelift_Logos_RGB_Tidelift_Mark_On-White.png"></a>
+<a href="https://tidelift.com/subscription/pkg/maven-org-ojalgo-ojalgo?utm_source=maven-org-ojalgo-ojalgo&utm_medium=referral&utm_campaign=enterprise&utm_term=repo" rel="nofollow"><img alt="Tidelift Subscription" height="100"  src="https://www.ojalgo.org/wp-content/uploads/2019/07/Tidelift_Logos_RGB_Tidelift_Mark_On-White-300x100.png"></a>
 
