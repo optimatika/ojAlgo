@@ -23,6 +23,7 @@ package org.ojalgo.optimisation;
 
 import static org.ojalgo.function.constant.BigMath.*;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Stream;
@@ -465,6 +466,22 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     public static void clearPresolvers() {
         PRESOLVERS.clear();
+    }
+
+    public static ExpressionsBasedModel parse(final File file) {
+
+        String path = file.getPath().toLowerCase();
+
+        if (path.endsWith("mps") || path.endsWith("sif")) {
+
+            MathProgSysModel mps = MathProgSysModel.make(file);
+
+            return mps.getExpressionsBasedModel();
+
+        } else {
+
+            throw new IllegalArgumentException();
+        }
     }
 
     public static boolean removeIntegration(final Integration<?> integration) {
