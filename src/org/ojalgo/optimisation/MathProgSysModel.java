@@ -40,7 +40,9 @@ import org.ojalgo.type.context.NumberContext;
  * Mathematical Programming System (MPS) Model
  *
  * @author apete
+ * @deprecated Use {@link ExpressionsBasedModel#parse(File)} instead
  */
+@Deprecated
 public final class MathProgSysModel {
 
     /**
@@ -382,6 +384,11 @@ public final class MathProgSysModel {
     private static final String MAX = "MAX";
     private static final String SPACE = " ";
 
+    /**
+     * @param file
+     * @deprecated Use {@link ExpressionsBasedModel#parse(File)} instead
+     */
+    @Deprecated
     public static MathProgSysModel make(final File file) {
 
         final MathProgSysModel retVal = new MathProgSysModel();

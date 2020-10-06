@@ -105,16 +105,18 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
     }
 
+    /**
+     * @deprecated v49
+     */
+    @Deprecated
     public static NumberContext getGeneral(final int scale) {
-
-        final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
-        final int tmpPrecision = DEFAULT_MATH.getPrecision();
-        final int tmpScale = scale;
-        final RoundingMode tmpRoundingMode = DEFAULT_MATH.getRoundingMode();
-
-        return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
+        return NumberContext.ofScale(scale);
     }
 
+    /**
+     * @deprecated v49
+     */
+    @Deprecated
     public static NumberContext getGeneral(final int precision, final int scale) {
 
         final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
@@ -125,19 +127,20 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
     }
 
+    /**
+     * @deprecated v49
+     */
+    @Deprecated
     public static NumberContext getGeneral(final int scale, final RoundingMode roundingMode) {
-
-        final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
-        final int tmpPrecision = DEFAULT_MATH.getPrecision();
-        final int tmpScale = scale;
-        final RoundingMode tmpRoundingMode = roundingMode;
-
-        return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
+        return NumberContext.ofScale(scale).withMode(roundingMode);
     }
 
     /**
      * The scale will be set to half the precision.
+     *
+     * @deprecated v49
      */
+    @Deprecated
     public static NumberContext getGeneral(final MathContext context) {
 
         final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
@@ -158,31 +161,30 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
     }
 
+    /**
+     * @deprecated v49
+     */
+    @Deprecated
     public static NumberContext getMath(final int precisionAndScale) {
-        return NumberContext.getMath(precisionAndScale, DEFAULT_MATH.getRoundingMode());
+        return NumberContext.of(precisionAndScale);
     }
 
+    /**
+     * @deprecated v49
+     */
+    @Deprecated
     public static NumberContext getMath(final int precisionAndScale, final RoundingMode roundingMode) {
-
-        final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
-        final int tmpPrecision = precisionAndScale;
-        final int tmpScale = precisionAndScale;
-        final RoundingMode tmpRoundingMode = roundingMode;
-
-        return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
+        return NumberContext.of(precisionAndScale).withMode(roundingMode);
     }
 
     /**
      * The scale will be undefined/unlimited.
+     *
+     * @deprecated v49
      */
+    @Deprecated
     public static NumberContext getMath(final MathContext context) {
-
-        final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
-        final int tmpPrecision = context.getPrecision();
-        final int tmpScale = DEFAULT_SCALE;
-        final RoundingMode tmpRoundingMode = context.getRoundingMode();
-
-        return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
+        return NumberContext.ofMath(context);
     }
 
     public static NumberContext getPercent(final int scale, final Locale locale) {
@@ -199,6 +201,28 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return NumberContext.getPercent(4, locale);
     }
 
+    public static NumberContext of(final int precisionAndScale) {
+        NumberFormat format = NumberStyle.GENERAL.getFormat();
+        MathContext math = new MathContext(precisionAndScale, DEFAULT_MATH.getRoundingMode());
+        return new NumberContext(format, math, precisionAndScale);
+    }
+
+    public static NumberContext ofMath(final MathContext math) {
+        NumberFormat format = NumberStyle.GENERAL.getFormat();
+        return new NumberContext(format, math, DEFAULT_SCALE);
+    }
+
+    public static NumberContext ofPrecision(final int precision) {
+        NumberFormat format = NumberStyle.GENERAL.getFormat();
+        MathContext math = new MathContext(precision, DEFAULT_MATH.getRoundingMode());
+        return new NumberContext(format, math, DEFAULT_SCALE);
+    }
+
+    public static NumberContext ofScale(final int scale) {
+        NumberFormat format = NumberStyle.GENERAL.getFormat();
+        return new NumberContext(format, DEFAULT_MATH, scale);
+    }
+
     public static Format toFormat(final NumberStyle style, final Locale locale) {
         return style != null ? style.getFormat(locale) : DEFAULT_STYLE.getFormat(locale);
     }
@@ -213,30 +237,71 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     private final int myScale;
     private final double myZeroError;
 
+    /**
+     * @deprecated v49
+     */
+    @Deprecated
     public NumberContext() {
         this(DEFAULT_STYLE.getFormat(), DEFAULT_MATH.getPrecision(), DEFAULT_SCALE, DEFAULT_MATH.getRoundingMode());
     }
 
+    /**
+     * @deprecated v49
+     */
+    @Deprecated
     public NumberContext(final int precision, final int scale) {
         this(DEFAULT_STYLE.getFormat(), precision, scale, DEFAULT_MATH.getRoundingMode());
     }
 
+    /**
+     * @deprecated v49
+     */
+    @Deprecated
     public NumberContext(final int precision, final int scale, final RoundingMode mode) {
         this(DEFAULT_STYLE.getFormat(), precision, scale, mode);
     }
 
+    /**
+     * @deprecated v49
+     */
+    @Deprecated
     public NumberContext(final int scale, final RoundingMode mode) {
         this(DEFAULT_STYLE.getFormat(), DEFAULT_MATH.getPrecision(), scale, mode);
     }
 
+    /**
+     * @deprecated v49
+     */
+    @Deprecated
     public NumberContext(final NumberFormat format, final int precision, final int scale, final RoundingMode mode) {
+        this(format, new MathContext(precision, mode), scale);
+    }
+
+    /**
+     * @deprecated v49
+     */
+    @Deprecated
+    public NumberContext(final RoundingMode mode) {
+        this(DEFAULT_STYLE.getFormat(), DEFAULT_MATH.getPrecision(), DEFAULT_SCALE, mode);
+    }
+
+    /**
+     * @deprecated v49
+     */
+    @Deprecated
+    private NumberContext(final NumberFormat format) {
+        this(format, DEFAULT_MATH.getPrecision(), DEFAULT_SCALE, DEFAULT_MATH.getRoundingMode());
+        ProgrammingError.throwForIllegalInvocation();
+    }
+
+    NumberContext(final NumberFormat format, final MathContext math, final int scale) {
 
         super(format);
 
-        myMathContext = new MathContext(precision, mode);
+        myMathContext = math;
 
-        if (precision > 0) {
-            myEpsilon = PrimitiveMath.MAX.invoke(PrimitiveMath.MACHINE_EPSILON, PrimitiveMath.POW.invoke(PrimitiveMath.TEN, 1 - precision));
+        if (math.getPrecision() > 0) {
+            myEpsilon = PrimitiveMath.MAX.invoke(PrimitiveMath.MACHINE_EPSILON, PrimitiveMath.POW.invoke(PrimitiveMath.TEN, 1 - math.getPrecision()));
         } else {
             myEpsilon = PrimitiveMath.MACHINE_EPSILON;
         }
@@ -250,16 +315,6 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
             myZeroError = PrimitiveMath.MACHINE_SMALLEST;
             myRoundingFactor = PrimitiveMath.ONE;
         }
-
-    }
-
-    public NumberContext(final RoundingMode mode) {
-        this(DEFAULT_STYLE.getFormat(), DEFAULT_MATH.getPrecision(), DEFAULT_SCALE, mode);
-    }
-
-    private NumberContext(final NumberFormat format) {
-        this(format, DEFAULT_MATH.getPrecision(), DEFAULT_SCALE, DEFAULT_MATH.getRoundingMode());
-        ProgrammingError.throwForIllegalInvocation();
     }
 
     /**
@@ -422,11 +477,11 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     /**
-     * @deprecated v48 Use {@link #withMathContext(MathContext)} instead
+     * @deprecated v48 Use {@link #withMath(MathContext)} instead
      */
     @Deprecated
     public NumberContext newMathContext(final MathContext context) {
-        return this.withMathContext(context);
+        return this.withMath(context);
     }
 
     /**
@@ -438,11 +493,11 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     /**
-     * @deprecated v48 Use {@link #withRoundingMode(RoundingMode)} instead
+     * @deprecated v48 Use {@link #withMode(RoundingMode)} instead
      */
     @Deprecated
     public NumberContext newRoundingMode(final RoundingMode mode) {
-        return this.withRoundingMode(mode);
+        return this.withMode(mode);
     }
 
     /**
@@ -503,31 +558,57 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
     }
 
     public NumberContext withFormat(final NumberStyle style, final Locale locale) {
-        return new NumberContext(style.getFormat(locale));
+        NumberFormat format = style.getFormat(locale);
+        return new NumberContext(format, myMathContext, myScale);
     }
 
+    public NumberContext withMath(final MathContext math) {
+        NumberFormat format = (NumberFormat) this.format();
+        return new NumberContext(format, math, myScale);
+    }
+
+    /**
+     * @deprecated Use {@link #withMath(MathContext)} instead
+     */
+    @Deprecated
     public NumberContext withMathContext(final MathContext context) {
-        return new NumberContext((NumberFormat) this.format(), context.getPrecision(), this.getScale(), context.getRoundingMode());
+        return this.withMath(context);
+    }
+
+    public NumberContext withMode(final RoundingMode mode) {
+        NumberFormat format = (NumberFormat) this.format();
+        MathContext math = new MathContext(myMathContext.getPrecision(), mode);
+        return new NumberContext(format, math, myScale);
     }
 
     public NumberContext withoutPrecision() {
-        return new NumberContext((NumberFormat) this.format(), 0, this.getScale(), this.getRoundingMode());
+        NumberFormat format = (NumberFormat) this.format();
+        MathContext math = new MathContext(0, myMathContext.getRoundingMode());
+        return new NumberContext(format, math, myScale);
     }
 
     public NumberContext withoutScale() {
-        return new NumberContext((NumberFormat) this.format(), this.getPrecision(), DEFAULT_SCALE, this.getRoundingMode());
+        NumberFormat format = (NumberFormat) this.format();
+        return new NumberContext(format, myMathContext, DEFAULT_SCALE);
     }
 
     public NumberContext withPrecision(final int precision) {
-        return new NumberContext((NumberFormat) this.format(), precision, this.getScale(), this.getRoundingMode());
+        NumberFormat format = (NumberFormat) this.format();
+        MathContext math = new MathContext(precision, myMathContext.getRoundingMode());
+        return new NumberContext(format, math, myScale);
     }
 
+    /**
+     * @deprecated Use {@link #withMode(RoundingMode)} instead
+     */
+    @Deprecated
     public NumberContext withRoundingMode(final RoundingMode mode) {
-        return new NumberContext((NumberFormat) this.format(), this.getPrecision(), this.getScale(), mode);
+        return this.withMode(mode);
     }
 
     public NumberContext withScale(final int scale) {
-        return new NumberContext((NumberFormat) this.format(), this.getPrecision(), scale, this.getRoundingMode());
+        NumberFormat format = (NumberFormat) this.format();
+        return new NumberContext(format, myMathContext, scale);
     }
 
     private BigDecimal scale(final BigDecimal number) {

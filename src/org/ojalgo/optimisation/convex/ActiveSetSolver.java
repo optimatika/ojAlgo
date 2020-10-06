@@ -657,7 +657,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 double slack = inqSlack.doubleValue(excl[i]);
                 if (ACCURACY.isZero(slack) && (this.countIncluded() < maxToInclude)) {
                     double lagr = lagrange.doubleValue(numbEqus + excl[i]);
-                    if (!useLagrange || ((lagr != ZERO) && !ACCURACY.isZero(lagr))) {
+                    if (!useLagrange || (lagr > 1E-4)) {
                         if (this.isLogDebug()) {
                             this.log("Will inlcude ineq {} with slack={} L={}", i, slack, lagr);
                         }

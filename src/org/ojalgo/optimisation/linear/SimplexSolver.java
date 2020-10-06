@@ -29,8 +29,6 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray.NonzeroView;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
@@ -443,17 +441,23 @@ public abstract class SimplexSolver extends LinearSolver {
         if (options.validate) {
 
             // Right-most column of the tableau
-            Array1D<Double> tmpRHS = myTableau.sliceConstraintsRHS();
+            Array1D<Double> colRHS = myTableau.sliceConstraintsRHS();
 
-            AggregatorFunction<Double> tmpMinAggr = PrimitiveAggregator.getSet().minimum();
-            tmpRHS.visitAll(tmpMinAggr);
-            double tmpMinVal = tmpMinAggr.doubleValue();
+            double tmpRHS;
+            double minRHS = Double.MAX_VALUE;
+            for (int i = 0; i < colRHS.size(); i++) {
+                tmpRHS = colRHS.doubleValue(i);
+                if (tmpRHS < minRHS) {
+                    minRHS = tmpRHS;
+                    if (minRHS < ZERO) {
+                        this.log("Negative RHS {} @ Row: {}", minRHS, i);
+                    }
+                }
+            }
 
-            if ((tmpMinVal < ZERO) && !GenericSolver.ACCURACY.isZero(tmpMinVal)) {
-                this.log();
-                this.log("Negative RHS! {}", tmpMinVal);
+            if ((minRHS < ZERO) && !GenericSolver.ACCURACY.isZero(minRHS)) {
                 if (this.isLogDebug()) {
-                    this.log("Entire RHS columns: {}", tmpRHS);
+                    this.log("Entire RHS columns: {}", colRHS);
                     this.log();
                 }
             }

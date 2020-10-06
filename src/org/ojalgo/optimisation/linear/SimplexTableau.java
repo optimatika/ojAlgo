@@ -228,11 +228,14 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             final int col = iterationPoint.col;
 
             final double pivotElement = myTransposed.doubleValue(col, row);
-            if (ABS.invoke(pivotElement) < ONE) {
+            if (pivotElement != ONE) {
                 myTransposed.modifyColumn(0, row, DIVIDE.second(pivotElement));
-            } else if (pivotElement != ONE) {
-                myTransposed.modifyColumn(0, row, MULTIPLY.second(ONE / pivotElement));
             }
+            //            if (ABS.invoke(pivotElement) < ONE) {
+            //                myTransposed.modifyColumn(0, row, DIVIDE.second(pivotElement));
+            //            } else if (pivotElement != ONE) {
+            //                myTransposed.modifyColumn(0, row, MULTIPLY.second(ONE / pivotElement));
+            //            }
 
             int structure = (int) myTransposed.countRows();
             final double[] dataX = myTransposed.data;
@@ -579,17 +582,25 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             double pivotElement = pivotBody.doubleValue(pivotCol);
 
-            if (ABS.invoke(pivotElement) < ONE) {
-                final UnaryFunction<Double> tmpModifier = DIVIDE.second(pivotElement);
-                pivotBody.modifyAll(tmpModifier);
-                return tmpModifier.invoke(pivotRHS);
-            } else if (pivotElement != ONE) {
-                final UnaryFunction<Double> tmpModifier = MULTIPLY.second(ONE / pivotElement);
-                pivotBody.modifyAll(tmpModifier);
-                return tmpModifier.invoke(pivotRHS);
+            if (pivotElement != ONE) {
+                final UnaryFunction<Double> modifier = DIVIDE.second(pivotElement);
+                pivotBody.modifyAll(modifier);
+                return modifier.invoke(pivotRHS);
             } else {
                 return pivotRHS;
             }
+
+            //            if (ABS.invoke(pivotElement) < ONE) {
+            //                final UnaryFunction<Double> tmpModifier = DIVIDE.second(pivotElement);
+            //                pivotBody.modifyAll(tmpModifier);
+            //                return tmpModifier.invoke(pivotRHS);
+            //            } else if (pivotElement != ONE) {
+            //                final UnaryFunction<Double> tmpModifier = MULTIPLY.second(ONE / pivotElement);
+            //                pivotBody.modifyAll(tmpModifier);
+            //                return tmpModifier.invoke(pivotRHS);
+            //            } else {
+            //                return pivotRHS;
+            //            }
         }
 
         @Override

@@ -12,6 +12,23 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Deprecated
+
+#### org.ojalgo.optimisation
+
+- Slight changes to parameter scaling (presolver functionality in ExpressionsBasedModel)
+- Minor numerical tweaks to both LinearSolver and ConvexSolver
+
+### Deprecated
+
+#### org.ojalgo.optimisation
+
+- MathProgSysModel is deprecated - direct usage of that class. Instead there is a `parse(File)` method in ExpressionsBasedModel
+
+#### org.ojalgo.type.context
+
+- Clean up of constructors and factories in NumberContext. Almost all of them are deprecated and replaced by new alternatives.
+
 ## [48.3.1] – 2020-10-01
 
 ### Changed
@@ -24,7 +41,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.function
 
-- Aggregator.MAXIMUM was initialised/reset incorrectly whicj caused wrong results with negative numbers
+- Aggregator.MAXIMUM was initialised/reset incorrectly which caused wrong results with negative numbers
 
 #### org.ojalgo.optimisation
 

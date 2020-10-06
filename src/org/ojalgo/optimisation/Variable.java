@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -282,14 +283,24 @@ public final class Variable extends ModelEntity<Variable> {
 
         BigDecimal lowerLimit = this.getLowerLimit();
         if (lowerLimit != null) {
-            largest.invoke(lowerLimit);
-            smallest.invoke(lowerLimit);
+            if (lowerLimit.signum() == 0) {
+                largest.invoke(ONE);
+                smallest.invoke(ONE);
+            } else {
+                largest.invoke(lowerLimit);
+                smallest.invoke(lowerLimit);
+            }
         }
 
         BigDecimal upperLimit = this.getUpperLimit();
         if (upperLimit != null) {
-            largest.invoke(upperLimit);
-            smallest.invoke(upperLimit);
+            if (upperLimit.signum() == 0) {
+                largest.invoke(ONE);
+                smallest.invoke(ONE);
+            } else {
+                largest.invoke(upperLimit);
+                smallest.invoke(upperLimit);
+            }
         }
 
         return ModelEntity.deriveAdjustmentExponent(largest, smallest, 12);
@@ -312,9 +323,8 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     void setIndex(final IntIndex index) {
-        if (index == null) {
-            throw new IllegalArgumentException("The index cannot be null!");
-        } else if ((myIndex != null) && (myIndex.index != index.index)) {
+        Objects.requireNonNull(index, "The index cannot be null!");
+        if ((myIndex != null) && (myIndex.index != index.index)) {
             throw new IllegalStateException("Cannot change a variable's index, or add a variable to more than one model!");
         }
         myIndex = index;
