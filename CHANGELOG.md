@@ -16,11 +16,18 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.optimisation
 
+- Slight changes to parameter scaling (presolver functionality in ExpressionsBasedModel)
+- Minor numerical tweaks to both LinearSolver and ConvexSolver
+
+### Deprecated
+
+#### org.ojalgo.optimisation
+
 - MathProgSysModel is deprecated - direct usage of that class. Instead there is a `parse(File)` method in ExpressionsBasedModel
 
 #### org.ojalgo.type.context
 
-- Clean up of constructors and factories in NumberContext. Almost everything is deprecated an replaced by new alternatives.
+- Clean up of constructors and factories in NumberContext. Almost all of them are deprecated and replaced by new alternatives.
 
 ## [48.3.1] – 2020-10-01
 
