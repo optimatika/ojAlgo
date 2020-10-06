@@ -127,7 +127,7 @@ public class PrimalDualTest extends OptimisationLinearTests {
 
         ExpressionsBasedModel model = ConvexProblems.buildP20080117();
 
-        this.doEvaluate(model, true);
+        PrimalDualTest.doEvaluate(model, true);
     }
 
     @Test
@@ -218,7 +218,7 @@ public class PrimalDualTest extends OptimisationLinearTests {
         TestUtils.assertEquals(dualModelPrimSolver.getMultipliers().get(), dualModelDualSolver.getMultipliers().get());
     }
 
-    private void doEvaluate(final ExpressionsBasedModel model, final boolean minimise) {
+    private static void doEvaluate(final ExpressionsBasedModel model, final boolean minimise) {
 
         Result modResult = minimise ? model.minimise() : model.maximise();
 
