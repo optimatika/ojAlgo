@@ -25,6 +25,7 @@ import static org.ojalgo.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -322,9 +323,8 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     void setIndex(final IntIndex index) {
-        if (index == null) {
-            throw new IllegalArgumentException("The index cannot be null!");
-        } else if ((myIndex != null) && (myIndex.index != index.index)) {
+        Objects.requireNonNull(index, "The index cannot be null!");
+        if ((myIndex != null) && (myIndex.index != index.index)) {
             throw new IllegalStateException("Cannot change a variable's index, or add a variable to more than one model!");
         }
         myIndex = index;
