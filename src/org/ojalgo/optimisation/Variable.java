@@ -282,14 +282,24 @@ public final class Variable extends ModelEntity<Variable> {
 
         BigDecimal lowerLimit = this.getLowerLimit();
         if (lowerLimit != null) {
-            largest.invoke(lowerLimit);
-            smallest.invoke(lowerLimit);
+            if (lowerLimit.signum() == 0) {
+                largest.invoke(ONE);
+                smallest.invoke(ONE);
+            } else {
+                largest.invoke(lowerLimit);
+                smallest.invoke(lowerLimit);
+            }
         }
 
         BigDecimal upperLimit = this.getUpperLimit();
         if (upperLimit != null) {
-            largest.invoke(upperLimit);
-            smallest.invoke(upperLimit);
+            if (upperLimit.signum() == 0) {
+                largest.invoke(ONE);
+                smallest.invoke(ONE);
+            } else {
+                largest.invoke(upperLimit);
+                smallest.invoke(upperLimit);
+            }
         }
 
         return ModelEntity.deriveAdjustmentExponent(largest, smallest, 12);
