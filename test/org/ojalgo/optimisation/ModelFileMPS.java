@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
@@ -55,7 +56,7 @@ public interface ModelFileMPS {
 
             TestUtils.assertStateNotLessThanFeasible(result);
 
-            TestUtils.assertTrue(ModelFileMPS.SOLUTION_NOT_VALID, model.validate(result, precision));
+            TestUtils.assertTrue(ModelFileMPS.SOLUTION_NOT_VALID, model.validate(result, precision, BasicLogger.DEBUG));
 
             TestUtils.assertEquals(expMinVal, result.getValue(), precision);
         }
