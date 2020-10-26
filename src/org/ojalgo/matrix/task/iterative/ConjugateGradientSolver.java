@@ -150,7 +150,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
     private Primitive64Store direction(final Structure1D structure) {
         if ((myDirection == null) || (myDirection.count() != structure.count())) {
-            myDirection = Primitive64Store.FACTORY.makeZero(structure.count(), 1L);
+            myDirection = Primitive64Store.FACTORY.make(structure.count(), 1L);
         } else {
             myDirection.fillAll(ZERO);
         }
@@ -159,7 +159,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
     private Primitive64Store preconditioned(final Structure1D structure) {
         if ((myPreconditioned == null) || (myPreconditioned.count() != structure.count())) {
-            myPreconditioned = Primitive64Store.FACTORY.makeZero(structure.count(), 1L);
+            myPreconditioned = Primitive64Store.FACTORY.make(structure.count(), 1L);
         } else {
             myPreconditioned.fillAll(ZERO);
         }
@@ -168,7 +168,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
     private Primitive64Store residual(final Structure1D structure) {
         if ((myResidual == null) || (myResidual.count() != structure.count())) {
-            myResidual = Primitive64Store.FACTORY.makeZero(structure.count(), 1L);
+            myResidual = Primitive64Store.FACTORY.make(structure.count(), 1L);
         } else {
             myResidual.fillAll(ZERO);
         }
@@ -177,7 +177,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
     private Primitive64Store vector(final Structure1D structure) {
         if ((myVector == null) || (myVector.count() != structure.count())) {
-            myVector = Primitive64Store.FACTORY.makeZero(structure.count(), 1L);
+            myVector = Primitive64Store.FACTORY.make(structure.count(), 1L);
         } else {
             myVector.fillAll(ZERO);
         }
