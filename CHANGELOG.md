@@ -12,7 +12,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
-### Deprecated
+### Changed
+
+#### org.ojalgo.matrix
+
+- Improved the copying to internal representation for iterative equation system solvers (IterativeSolverTask).
 
 #### org.ojalgo.optimisation
 
