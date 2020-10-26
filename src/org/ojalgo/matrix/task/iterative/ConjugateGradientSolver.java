@@ -52,98 +52,93 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
     public double resolve(final List<Equation> equations, final PhysicalStore<Double> solution) {
 
-        final int tmpCountRows = equations.size();
+        int numbEquations = equations.size();
 
-        double tmpNormErr = POSITIVE_INFINITY;
-        double tmpNormRHS = ONE;
+        double normErr = POSITIVE_INFINITY;
+        double normRHS = ONE;
 
-        final Primitive64Store tmpResidual = this.residual(solution);
-        final Primitive64Store tmpDirection = this.direction(solution);
-        final Primitive64Store tmpPreconditioned = this.preconditioned(solution);
-        final Primitive64Store tmpVector = this.vector(solution);
+        Primitive64Store residual = this.residual(solution);
+        Primitive64Store direction = this.direction(solution);
+        Primitive64Store preconditioned = this.preconditioned(solution);
+        Primitive64Store vector = this.vector(solution);
 
-        double tmpStepLength;
-        double tmpGradientCorrectionFactor;
+        double stepLength;
+        double gradientCorrectionFactor;
 
         double zr0 = 1;
         double zr1 = 1;
         double pAp0 = 0;
 
-        for (int r = 0; r < tmpCountRows; r++) {
-            final Equation tmpRow = equations.get(r);
-            double tmpVal = tmpRow.getRHS();
-            tmpNormRHS = HYPOT.invoke(tmpNormRHS, tmpVal);
-            tmpVal -= tmpRow.dot(solution);
-            tmpResidual.set(tmpRow.index, tmpVal);
-            tmpPreconditioned.set(tmpRow.index, tmpVal / tmpRow.getPivot()); // precondition
+        for (int r = 0; r < numbEquations; r++) {
+            Equation row = equations.get(r);
+            double tmpVal = row.getRHS();
+            normRHS = HYPOT.invoke(normRHS, tmpVal);
+            tmpVal -= row.dot(solution);
+            residual.set(row.index, tmpVal);
+            preconditioned.set(row.index, tmpVal / row.getPivot()); // precondition
         }
 
-        tmpDirection.fillMatching(tmpPreconditioned); // tmpPreconditioned.supplyNonZerosTo(tmpDirection);
+        direction.fillMatching(preconditioned);
 
-        int tmpIterations = 0;
-        final int tmpLimit = this.getIterationsLimit();
-        final NumberContext tmpCntxt = this.getAccuracyContext();
+        int iterations = 0;
+        int limit = this.getIterationsLimit();
+        NumberContext accuracy = this.getAccuracyContext();
 
-        // zr1 = tmpPreconditioned.transpose().multiply(tmpResidual).doubleValue(0L);
-        zr1 = tmpPreconditioned.dot(tmpResidual);
+        zr1 = preconditioned.dot(residual);
 
         do {
 
             zr0 = zr1;
 
-            for (int i = 0; i < tmpCountRows; i++) {
-                final Equation tmpRow = equations.get(i);
-                final double tmpVal = tmpRow.dot(tmpDirection);
-                tmpVector.set(tmpRow.index, tmpVal);
+            for (int i = 0; i < numbEquations; i++) {
+                Equation row = equations.get(i);
+                vector.set(row.index, row.dot(direction));
             }
 
-            // pAp0 = tmpVector.multiplyLeft(tmpDirection.transpose()).get().doubleValue(0L);
-            pAp0 = tmpDirection.dot(tmpVector);
+            pAp0 = direction.dot(vector);
 
-            tmpStepLength = zr0 / pAp0;
+            stepLength = zr0 / pAp0;
 
-            if (!Double.isNaN(tmpStepLength)) {
+            if (!Double.isNaN(stepLength)) {
 
-                // solution.maxpy(tmpStepLength, tmpDirection);
-                tmpDirection.axpy(tmpStepLength, solution);
+                direction.axpy(stepLength, solution);
 
-                // tmpResidual.maxpy(-tmpStepLength, tmpVector);
-                tmpVector.axpy(-tmpStepLength, tmpResidual);
+                vector.axpy(-stepLength, residual);
             }
 
-            tmpNormErr = ZERO;
+            normErr = ZERO;
 
-            for (int r = 0; r < tmpCountRows; r++) {
-                final Equation tmpRow = equations.get(r);
-                final double tmpValue = tmpResidual.doubleValue(tmpRow.index);
-                tmpNormErr = HYPOT.invoke(tmpNormErr, tmpValue);
-                tmpPreconditioned.set(tmpRow.index, tmpValue / tmpRow.getPivot());
+            for (int r = 0; r < numbEquations; r++) {
+                Equation row = equations.get(r);
+                double tmpVal = residual.doubleValue(row.index);
+                normErr = HYPOT.invoke(normErr, tmpVal);
+                preconditioned.set(row.index, tmpVal / row.getPivot());
             }
 
-            zr1 = tmpPreconditioned.dot(tmpResidual);
-            tmpGradientCorrectionFactor = zr1 / zr0;
+            zr1 = preconditioned.dot(residual);
+            gradientCorrectionFactor = zr1 / zr0;
 
-            tmpDirection.modifyAll(MULTIPLY.second(tmpGradientCorrectionFactor));
-            tmpDirection.modifyMatching(ADD, tmpPreconditioned);
+            direction.modifyAll(MULTIPLY.second(gradientCorrectionFactor));
+            direction.modifyMatching(ADD, preconditioned);
 
-            tmpIterations++;
+            iterations++;
 
             if (this.isDebugPrinterSet()) {
-                this.debug(tmpIterations, tmpNormErr / tmpNormRHS, solution);
+                this.debug(iterations, normErr / normRHS, solution);
             }
 
-        } while ((tmpIterations < tmpLimit) && !Double.isNaN(tmpNormErr) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
+        } while ((iterations < limit) && !Double.isNaN(normErr) && !accuracy.isSmall(normRHS, normErr));
 
-        // BasicLogger.debug("Done in {} iterations on problem size {}", tmpIterations, current.count());
+        // BasicLogger.debug("Done in {} iterations on problem size {}", iterations, solution.count());
 
-        return tmpNormErr / tmpNormRHS;
+        return normErr / normRHS;
     }
 
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
-        final List<Equation> tmpRows = IterativeSolverTask.toListOfRows(body, rhs);
+        List<Equation> equations = IterativeSolverTask.toListOfRows(body, rhs);
 
-        this.resolve(tmpRows, preallocated);
+        this.resolve(equations, preallocated);
 
         return preallocated;
     }
