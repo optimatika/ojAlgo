@@ -74,9 +74,9 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
 
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> current) throws RecoverableCondition {
 
-        final List<Equation> tmpRows = IterativeSolverTask.toListOfRows(body, rhs);
+        final List<Equation> equations = IterativeSolverTask.toListOfRows(body, rhs);
 
-        this.resolve(tmpRows, current);
+        this.resolve(equations, current);
 
         return current;
     }

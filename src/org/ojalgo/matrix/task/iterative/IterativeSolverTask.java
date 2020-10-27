@@ -34,6 +34,7 @@ import org.ojalgo.equation.Equation;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
+import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -94,33 +95,41 @@ public abstract class IterativeSolverTask implements SolverTask<Double> {
 
     }
 
-    static final NumberContext DEFAULT = NumberContext.getMath(MathContext.DECIMAL128);
+    static final NumberContext DEFAULT = NumberContext.ofMath(MathContext.DECIMAL128);
 
     static List<Equation> toListOfRows(final Access2D<?> body, final Access2D<?> rhs) {
 
-        final int numbEquations = (int) body.countRows();
-        final int numbVariables = (int) body.countColumns();
+        int numbEquations = (int) body.countRows();
+        int numbVariables = (int) body.countColumns();
 
-        final List<Equation> retVal = new ArrayList<>(numbEquations);
-
+        List<Equation> retVal = new ArrayList<>(numbEquations);
         for (int i = 0; i < numbEquations; i++) {
-            final Equation tmpRow = new Equation(i, numbVariables, rhs.doubleValue(i));
-            for (int j = 0; j < numbVariables; j++) {
-                final double tmpVal = body.doubleValue(i, j);
-                if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
-                    tmpRow.set(j, tmpVal);
+            retVal.add(new Equation(i, numbVariables, rhs.doubleValue(i)));
+        }
+
+        if (body instanceof SparseStore) {
+
+            ((SparseStore<?>) body).nonzeros().forEach(view -> retVal.get(Math.toIntExact(view.row())).set(view.column(), view.doubleValue()));
+
+        } else {
+
+            for (int i = 0; i < numbEquations; i++) {
+                final Equation row = retVal.get(i);
+                for (int j = 0; j < numbVariables; j++) {
+                    final double tmpVal = body.doubleValue(i, j);
+                    if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
+                        row.set(j, tmpVal);
+                    }
                 }
             }
-            retVal.add(tmpRow);
         }
 
         return retVal;
     }
 
-    private BasicLogger.Printer myDebugPrinter = null;
-
-    private int myIterationsLimit = Integer.MAX_VALUE;
     private NumberContext myAccuracyContext = DEFAULT;
+    private BasicLogger.Printer myDebugPrinter = null;
+    private int myIterationsLimit = Integer.MAX_VALUE;
 
     IterativeSolverTask() {
         super();
