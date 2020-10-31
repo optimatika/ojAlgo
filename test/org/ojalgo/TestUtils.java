@@ -250,6 +250,10 @@ public abstract class TestUtils {
         TestUtils.assertEquals(message, expected, actual, EQUALS);
     }
 
+    public static void assertNotEquals(final Object unexpected, final Object actual) {
+        Assertions.assertNotEquals(unexpected, actual);
+    }
+
     public static void assertEquals(final String message, final Comparable<?> expected, final Comparable<?> actual, final NumberContext precision) {
 
         if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
