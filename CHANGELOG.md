@@ -18,6 +18,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Improved the copying to internal representation for iterative equation system solvers (IterativeSolverTask).
 
+#### org.ojalgo.netio
+
+- Password now encrypts using SHA-512 rather than MD5 (existing passwords need to be reset)
+
 #### org.ojalgo.optimisation
 
 - Slight changes to parameter scaling (presolver functionality in ExpressionsBasedModel)
