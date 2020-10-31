@@ -124,7 +124,7 @@ public class Password {
 
         if (INSTANCE == null) {
             try {
-                INSTANCE = MessageDigest.getInstance("MD5");
+                INSTANCE = MessageDigest.getInstance("SHA-512");
             } catch (final NoSuchAlgorithmException anE) {
                 BasicLogger.error(anE.toString());
             }
