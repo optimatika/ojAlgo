@@ -322,12 +322,12 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
     private transient float[] myWorkerColumn;
 
-    Primitive32Store(final int numbRows, final int numbCols) {
+    Primitive32Store(final long numbRows, final long numbCols) {
 
-        super(numbRows * numbCols);
+        super(Math.toIntExact(numbRows * numbCols));
 
-        myRowDim = numbRows;
-        myColDim = numbCols;
+        myRowDim = Math.toIntExact(numbRows);
+        myColDim = Math.toIntExact(numbCols);
 
         myUtility = this.wrapInArray2D(myRowDim);
 

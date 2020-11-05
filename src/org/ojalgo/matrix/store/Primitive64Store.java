@@ -397,12 +397,12 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         this(numbRows, 1);
     }
 
-    Primitive64Store(final int numbRows, final int numbCols) {
+    Primitive64Store(final long numbRows, final long numbCols) {
 
-        super(numbRows * numbCols);
+        super(Math.toIntExact(numbRows * numbCols));
 
-        myRowDim = numbRows;
-        myColDim = numbCols;
+        myRowDim = Math.toIntExact(numbRows);
+        myColDim = Math.toIntExact(numbCols);
 
         myUtility = this.wrapInArray2D(myRowDim);
 
