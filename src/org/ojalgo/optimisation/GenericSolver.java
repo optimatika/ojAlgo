@@ -335,6 +335,10 @@ public abstract class GenericSolver implements Optimisation.Solver {
             return false;
         }
 
+        if (Thread.currentThread().isInterrupted()) {
+            return false;
+        }
+
         if (myState.isFeasible()) {
             return (this.countTime() < options.time_suffice) && (this.countIterations() < options.iterations_suffice);
         }
