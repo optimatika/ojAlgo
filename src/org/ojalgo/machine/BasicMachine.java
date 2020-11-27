@@ -66,7 +66,7 @@ public class BasicMachine {
     public String toString() {
 
         int tmpPrefix = 1;
-        int tmpMeasure = (int) (memory / CommonMachine.K);
+        int tmpMeasure = Math.toIntExact(memory / CommonMachine.K);
 
         while ((tmpMeasure / 1024) > 0) {
             tmpPrefix++;

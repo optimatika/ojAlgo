@@ -29,6 +29,79 @@ import org.ojalgo.function.special.PowerOf2.LongPower;
 public class PowerOf2Test {
 
     @Test
+    public void testAdjustDown() {
+
+        TestUtils.assertEquals(1, PowerOf2.adjustDown(1));
+        TestUtils.assertEquals(2, PowerOf2.adjustDown(2));
+        TestUtils.assertEquals(4, PowerOf2.adjustDown(4));
+        TestUtils.assertEquals(8, PowerOf2.adjustDown(8));
+        TestUtils.assertEquals(16, PowerOf2.adjustDown(16));
+        TestUtils.assertEquals(32, PowerOf2.adjustDown(32));
+        TestUtils.assertEquals(64, PowerOf2.adjustDown(64));
+        TestUtils.assertEquals(128, PowerOf2.adjustDown(128));
+        TestUtils.assertEquals(256, PowerOf2.adjustDown(256));
+        TestUtils.assertEquals(512, PowerOf2.adjustDown(512));
+        TestUtils.assertEquals(1024, PowerOf2.adjustDown(1024));
+
+        TestUtils.assertEquals(2, PowerOf2.adjustDown(3));
+        TestUtils.assertEquals(4, PowerOf2.adjustDown(5));
+        TestUtils.assertEquals(4, PowerOf2.adjustDown(6));
+        TestUtils.assertEquals(4, PowerOf2.adjustDown(7));
+        TestUtils.assertEquals(512, PowerOf2.adjustDown(747));
+    }
+
+    @Test
+    public void testAdjustUp() {
+
+        TestUtils.assertEquals(1, PowerOf2.adjustUp(1));
+        TestUtils.assertEquals(2, PowerOf2.adjustUp(2));
+        TestUtils.assertEquals(4, PowerOf2.adjustUp(4));
+        TestUtils.assertEquals(8, PowerOf2.adjustUp(8));
+        TestUtils.assertEquals(16, PowerOf2.adjustUp(16));
+        TestUtils.assertEquals(32, PowerOf2.adjustUp(32));
+        TestUtils.assertEquals(64, PowerOf2.adjustUp(64));
+        TestUtils.assertEquals(128, PowerOf2.adjustUp(128));
+        TestUtils.assertEquals(256, PowerOf2.adjustUp(256));
+        TestUtils.assertEquals(512, PowerOf2.adjustUp(512));
+        TestUtils.assertEquals(1024, PowerOf2.adjustUp(1024));
+
+        TestUtils.assertEquals(1, PowerOf2.adjustUp(0));
+        TestUtils.assertEquals(4, PowerOf2.adjustUp(3));
+        TestUtils.assertEquals(8, PowerOf2.adjustUp(5));
+        TestUtils.assertEquals(8, PowerOf2.adjustUp(6));
+        TestUtils.assertEquals(8, PowerOf2.adjustUp(7));
+        TestUtils.assertEquals(1024, PowerOf2.adjustUp(747));
+    }
+
+    @Test
+    public void testIsPowerOf2() {
+
+        TestUtils.assertEquals(true, PowerOf2.isPowerOf2(1));
+        TestUtils.assertEquals(true, PowerOf2.isPowerOf2(2));
+        TestUtils.assertEquals(true, PowerOf2.isPowerOf2(4));
+        TestUtils.assertEquals(true, PowerOf2.isPowerOf2(8));
+        TestUtils.assertEquals(true, PowerOf2.isPowerOf2(16));
+        TestUtils.assertEquals(true, PowerOf2.isPowerOf2(32));
+        TestUtils.assertEquals(true, PowerOf2.isPowerOf2(64));
+        TestUtils.assertEquals(true, PowerOf2.isPowerOf2(128));
+        TestUtils.assertEquals(true, PowerOf2.isPowerOf2(256));
+        TestUtils.assertEquals(true, PowerOf2.isPowerOf2(512));
+        TestUtils.assertEquals(true, PowerOf2.isPowerOf2(1024));
+
+        TestUtils.assertEquals(false, PowerOf2.isPowerOf2(0));
+        TestUtils.assertEquals(false, PowerOf2.isPowerOf2(3));
+        TestUtils.assertEquals(false, PowerOf2.isPowerOf2(5));
+        TestUtils.assertEquals(false, PowerOf2.isPowerOf2(6));
+        TestUtils.assertEquals(false, PowerOf2.isPowerOf2(7));
+        TestUtils.assertEquals(false, PowerOf2.isPowerOf2(747));
+
+        TestUtils.assertEquals(false, PowerOf2.isPowerOf2(-1));
+        TestUtils.assertEquals(false, PowerOf2.isPowerOf2(-2));
+        TestUtils.assertEquals(false, PowerOf2.isPowerOf2(-4));
+        TestUtils.assertEquals(false, PowerOf2.isPowerOf2(-8));
+    }
+
+    @Test
     public void testPowerOfInt2() {
 
         int value = 1;

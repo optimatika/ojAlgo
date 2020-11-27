@@ -12,6 +12,16 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.concurrent
+
+- New set of standard levels of parallelism defined in enum Parallelism.
+
+#### org.ojalgo.function
+
+- Additions to PowerOf2 utilities
+
 ### Changed
 
 #### org.ojalgo.matrix
