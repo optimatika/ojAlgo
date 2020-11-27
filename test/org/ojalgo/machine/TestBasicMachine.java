@@ -68,5 +68,7 @@ public class TestBasicMachine {
         TestUtils.assertEquals("0kB/1thread", new BasicMachine(0L, 1).toString());
         TestUtils.assertEquals("2GB/1thread", new BasicMachine(3_000_000_737L, 1).toString());
         TestUtils.assertEquals("2GB/17threads", new BasicMachine(3_000_000_737L, 17).toString());
+        TestUtils.assertEquals("10737418291776bytes/1thread", new BasicMachine(10_737_418_291_776L, 1).toString());
+        TestUtils.assertEquals("10737418291776bytes/9threads", new BasicMachine(10_737_418_291_776L, 9).toString());
     }
 }
