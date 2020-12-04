@@ -47,6 +47,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Clean up of constructors and factories in NumberContext. Almost all of them are deprecated and replaced by new alternatives.
 
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- GitHUb Issue 300: https://github.com/optimatika/ojAlgo/issues/300
+
 ## [48.3.1] – 2020-10-01
 
 ### Changed
