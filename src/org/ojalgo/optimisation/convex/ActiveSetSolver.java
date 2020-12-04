@@ -47,6 +47,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private int myConstraintToInclude = -1;
     private MatrixStore<Double> myInvQC;
     private final Primitive64Store myIterationX;
+    private int myShrinkCounter = 0;
     private boolean myShrinkSwitch = true;
     private final Primitive64Store mySlackI;
 
@@ -609,7 +610,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     this.log("Constraints problem!");
                 }
 
-                if (included.length >= 1) {
+                if ((included.length >= 1) && (myShrinkCounter++ < this.countInequalityConstraints())) {
                     // At least 1 active inequality
 
                     this.shrink();
