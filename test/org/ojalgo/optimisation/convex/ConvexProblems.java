@@ -914,7 +914,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         // Compare to MatLab using 2 digits and 6 decimal places
         NumberContext accuracy = NumberContext.getGeneral(2, 6);
 
-        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, accuracy, true);
+        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, accuracy, false);
     }
 
     /**

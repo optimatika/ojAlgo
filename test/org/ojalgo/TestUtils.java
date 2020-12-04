@@ -250,10 +250,6 @@ public abstract class TestUtils {
         TestUtils.assertEquals(message, expected, actual, EQUALS);
     }
 
-    public static void assertNotEquals(final Object unexpected, final Object actual) {
-        Assertions.assertNotEquals(unexpected, actual);
-    }
-
     public static void assertEquals(final String message, final Comparable<?> expected, final Comparable<?> actual, final NumberContext precision) {
 
         if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
@@ -382,6 +378,10 @@ public abstract class TestUtils {
         }
     }
 
+    public static void assertNotEquals(final Object unexpected, final Object actual) {
+        Assertions.assertNotEquals(unexpected, actual);
+    }
+
     public static void assertNotNullOrEmpty(final String actual) {
         if (actual == null) {
             TestUtils.fail("Is null!");
@@ -447,6 +447,10 @@ public abstract class TestUtils {
 
     public static void assertTrue(final boolean condition) {
         Assertions.assertTrue(condition);
+    }
+
+    public static void assertTrue(final boolean condition, final String message) {
+        TestUtils.assertTrue(message, condition);
     }
 
     public static void assertTrue(final String message, final boolean condition) {
