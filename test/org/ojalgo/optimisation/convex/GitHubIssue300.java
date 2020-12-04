@@ -5,11 +5,11 @@ import java.math.BigDecimal;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Expression;
@@ -79,17 +79,11 @@ public class GitHubIssue300 extends OptimisationConvexTests {
     }
 
     private MatrixStore<Double> ai;
-
     private MatrixStore<Double> bi;
-
     private MatrixStore<Double> c;
-
     private MatrixStore<Double> lModel;
-
     private MatrixStore<Double> q;
-
     private MatrixStore<Double> qModel;
-
     private MatrixStore<Double> qRegul;
     private Access1D<BigDecimal> someProfile;
 
@@ -107,16 +101,16 @@ public class GitHubIssue300 extends OptimisationConvexTests {
     @Test
     public void resultShouldHonorInequalities() {
 
-        final ConvexSolver solve = ConvexSolver.getBuilder(q, c).inequalities(ai, bi).build();
+        ConvexSolver solve = ConvexSolver.getBuilder(q, c).inequalities(ai, bi).build();
 
         solve.options.debug(ConvexSolver.class);
 
-        final Result result = solve.solve();
-        Assertions.assertEquals(Optimisation.State.OPTIMAL, result.getState());
+        Result result = solve.solve();
+        TestUtils.assertEquals(Optimisation.State.OPTIMAL, result.getState());
 
-        final double[] data = result.toRawCopy1D();
+        double[] data = result.toRawCopy1D();
         for (int i = 0; i < data.length; i++) {
-            Assertions.assertTrue(data[i] >= 0, "Element at index '" + i + "' should be positive");
+            TestUtils.assertTrue("Element at index '" + i + "' should be positive", data[i] >= 0);
         }
 
     }
@@ -124,21 +118,21 @@ public class GitHubIssue300 extends OptimisationConvexTests {
     @ParameterizedTest
     @MethodSource("alphaValues")
     public void solutionShouldBeBetterThanSomeProfile(final double alpha) {
-        final Optimisation.State state;
-        final double objectiveOfMinimum;
-        final double objectiveOfSomeProfile;
+        Optimisation.State state;
+        double objectiveOfMinimum;
+        double objectiveOfSomeProfile;
 
         {
-            final long nbVariables = Math.toIntExact(lModel.count());
-            final ExpressionsBasedModel model = new ExpressionsBasedModel();
+            long nbVariables = Math.toIntExact(lModel.count());
+            ExpressionsBasedModel model = new ExpressionsBasedModel();
 
             //all variables must be positive
             for (int i = 0; i < nbVariables; i++) {
                 model.addVariable().lower(0);
             }
 
-            final Expression residual = model.addExpression();
-            final Expression regularisation = model.addExpression();
+            Expression residual = model.addExpression();
+            Expression regularisation = model.addExpression();
 
             residual.setQuadraticFactors(model.getVariables(), qModel);
             residual.setLinearFactors(model.getVariables(), lModel);
@@ -149,16 +143,16 @@ public class GitHubIssue300 extends OptimisationConvexTests {
 
             model.options.debug(ConvexSolver.class);
 
-            final Optimisation.Result result = model.minimise();
+            Optimisation.Result result = model.minimise();
             state = result.getState();
             objectiveOfMinimum = result.getValue();
             objectiveOfSomeProfile = model.objective().evaluate(someProfile).doubleValue();
         }
 
-        final double relativeError = Math.abs(1 - (objectiveOfMinimum / objectiveOfSomeProfile));
+        double relativeError = Math.abs(1 - (objectiveOfMinimum / objectiveOfSomeProfile));
 
-        Assertions.assertEquals(Optimisation.State.OPTIMAL, state);
-        Assertions.assertTrue(relativeError <= 1, "relative error " + relativeError + "<= 1");
+        TestUtils.assertEquals(Optimisation.State.OPTIMAL, state);
+        TestUtils.assertTrue("relative error " + relativeError + "<= 1", relativeError <= 1);
 
     }
 
