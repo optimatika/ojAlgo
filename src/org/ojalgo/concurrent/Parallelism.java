@@ -42,13 +42,13 @@ public enum Parallelism implements IntSupplier {
      *
      * @return The number of cores adjusted upwards to be power of 2
      */
-    HIGHER(() -> Parallelism.higher()),
+    HIGHER(Parallelism::higher),
     /**
      * If the number of cores is a power of 2, then {@link #LOWER} and {@link #HIGHER)} will be equal.
      *
      * @return The number of cores adjusted downwards to be power of 2
      */
-    LOWER(() -> Parallelism.lower()),
+    LOWER(Parallelism::lower),
     /**
      * Half the {@link #LOWER} parallelism
      */

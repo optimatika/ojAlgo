@@ -397,12 +397,12 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         this(numbRows, 1);
     }
 
-    Primitive64Store(final long numbRows, final long numbCols) {
+    Primitive64Store(final int numbRows, final int numbCols, final double[] dataArray) {
 
-        super(Math.toIntExact(numbRows * numbCols));
+        super(dataArray);
 
-        myRowDim = Math.toIntExact(numbRows);
-        myColDim = Math.toIntExact(numbCols);
+        myRowDim = numbRows;
+        myColDim = numbCols;
 
         myUtility = this.wrapInArray2D(myRowDim);
 
@@ -412,12 +412,12 @@ public final class Primitive64Store extends Primitive64Array implements Physical
         multiplyNeither = MultiplyNeither.newPrimitive64(myRowDim, myColDim);
     }
 
-    Primitive64Store(final int numbRows, final int numbCols, final double[] dataArray) {
+    Primitive64Store(final long numbRows, final long numbCols) {
 
-        super(dataArray);
+        super(Math.toIntExact(numbRows * numbCols));
 
-        myRowDim = numbRows;
-        myColDim = numbCols;
+        myRowDim = Math.toIntExact(numbRows);
+        myColDim = Math.toIntExact(numbCols);
 
         myUtility = this.wrapInArray2D(myRowDim);
 

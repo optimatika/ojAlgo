@@ -44,6 +44,58 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
             64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99 };
     public static final String INT_PATH = ModelFileMPS.OPTIMISATION_RSRC + "miplib/";
 
+    private static void doTestNode(final String modelPath, final int[] index, final int[] lower, final int[] upper, final Optimisation.State expectedState) {
+
+        File modelFile = new File(SpecificBranchCase.INT_PATH + modelPath);
+
+        ExpressionsBasedModel modelMIP = ExpressionsBasedModel.parse(modelFile);
+
+        TestUtils.assertTrue(modelMIP.validate());
+
+        // Assert that the branch node is valid
+        for (int i = 0; i < index.length; i++) {
+            Variable variable = modelMIP.getVariable(index[i]);
+            BigDecimal lowerBound = new BigDecimal(lower[i]);
+            BigDecimal upperBound = new BigDecimal(upper[i]);
+            if (variable.isLowerLimitSet()) {
+                BigDecimal lowerLimit = variable.getLowerLimit();
+                TestUtils.assertFalse(lowerBound.compareTo(lowerLimit) == -1);
+                TestUtils.assertFalse(upperBound.compareTo(lowerLimit) == -1);
+            }
+            if (variable.isUpperLimitSet()) {
+                BigDecimal upperLimit = variable.getUpperLimit();
+                TestUtils.assertFalse(lowerBound.compareTo(upperLimit) == 1);
+                TestUtils.assertFalse(upperBound.compareTo(upperLimit) == 1);
+            }
+        }
+
+        ExpressionsBasedModel relaxedModel = modelMIP.copy().relax(false);
+
+        for (int i = 0; i < index.length; i++) { // Set up the node
+            relaxedModel.getVariable(index[i]).lower(lower[i]).upper(upper[i]);
+        }
+
+        Optimisation.Result result = relaxedModel.minimise();
+
+        if (DEBUG) {
+            BasicLogger.debug(result);
+        }
+
+        if (expectedState != null) {
+            if (expectedState.isFeasible()) {
+                TestUtils.assertStateNotLessThanFeasible(result);
+            }
+            if (expectedState.isOptimal()) {
+                TestUtils.assertStateNotLessThanOptimal(result);
+            }
+        }
+
+        if (result.getState().isFeasible()) {
+            TestUtils.assertTrue(relaxedModel.validate(result, ACCURACY, BasicLogger.DEBUG));
+            // TestUtils.assertTrue(modelMIP.validate(result, ACCURACY, BasicLogger.DEBUG));
+        }
+    }
+
     /**
      * ojAlgo (at some point) had problems with this node – returning an infeasible node solution marked as
      * OPTIMAL. CPLEX finds an integer solution.
@@ -147,58 +199,6 @@ public class SpecificBranchCase extends OptimisationIntegerTests implements Mode
 
         if (tmpUpperState.isFeasible() && !tmpUpperBranchModel.validate(new NumberContext(7, 6))) {
             TestUtils.fail(ModelFileMPS.SOLUTION_NOT_VALID);
-        }
-    }
-
-    private static void doTestNode(final String modelPath, final int[] index, final int[] lower, final int[] upper, final Optimisation.State expectedState) {
-
-        File modelFile = new File(SpecificBranchCase.INT_PATH + modelPath);
-
-        ExpressionsBasedModel modelMIP = ExpressionsBasedModel.parse(modelFile);
-
-        TestUtils.assertTrue(modelMIP.validate());
-
-        // Assert that the branch node is valid
-        for (int i = 0; i < index.length; i++) {
-            Variable variable = modelMIP.getVariable(index[i]);
-            BigDecimal lowerBound = new BigDecimal(lower[i]);
-            BigDecimal upperBound = new BigDecimal(upper[i]);
-            if (variable.isLowerLimitSet()) {
-                BigDecimal lowerLimit = variable.getLowerLimit();
-                TestUtils.assertFalse(lowerBound.compareTo(lowerLimit) == -1);
-                TestUtils.assertFalse(upperBound.compareTo(lowerLimit) == -1);
-            }
-            if (variable.isUpperLimitSet()) {
-                BigDecimal upperLimit = variable.getUpperLimit();
-                TestUtils.assertFalse(lowerBound.compareTo(upperLimit) == 1);
-                TestUtils.assertFalse(upperBound.compareTo(upperLimit) == 1);
-            }
-        }
-
-        ExpressionsBasedModel relaxedModel = modelMIP.copy().relax(false);
-
-        for (int i = 0; i < index.length; i++) { // Set up the node
-            relaxedModel.getVariable(index[i]).lower(lower[i]).upper(upper[i]);
-        }
-
-        Optimisation.Result result = relaxedModel.minimise();
-
-        if (DEBUG) {
-            BasicLogger.debug(result);
-        }
-
-        if (expectedState != null) {
-            if (expectedState.isFeasible()) {
-                TestUtils.assertStateNotLessThanFeasible(result);
-            }
-            if (expectedState.isOptimal()) {
-                TestUtils.assertStateNotLessThanOptimal(result);
-            }
-        }
-
-        if (result.getState().isFeasible()) {
-            TestUtils.assertTrue(relaxedModel.validate(result, ACCURACY, BasicLogger.DEBUG));
-            // TestUtils.assertTrue(modelMIP.validate(result, ACCURACY, BasicLogger.DEBUG));
         }
     }
 
