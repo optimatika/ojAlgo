@@ -203,7 +203,7 @@ public class SparsePerformance extends MatrixStoreTests {
         clock.reset();
         mtrx.reset();
         SparsePerformance.touchNonzeros(mtrx);
-        TestUtils.assertFasterThan(1, CalendarDateUnit.MILLIS, clock);
+        TestUtils.assertFasterThan(3, CalendarDateUnit.MILLIS, clock);
     }
 
 }

@@ -7,10 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Added / Changed / Deprecated / Fixed / Removed / Security
 
-
 ## [Unreleased]
 
 > Corresponds to changes in the `develop` branch since the last release
+
+
+[48.3.2] – 2020-12-05
 
 ### Added
 
@@ -47,6 +49,13 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Clean up of constructors and factories in NumberContext. Almost all of them are deprecated and replaced by new alternatives.
 
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- GitHUb Issue 300: https://github.com/optimatika/ojAlgo/issues/300
+
+
 ## [48.3.1] – 2020-10-01
 
 ### Changed
@@ -64,6 +73,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 #### org.ojalgo.optimisation
 
 - ConvexSolver results now include the Lagrange multipliers.
+
 
 ## [48.3.0] – 2020-09-03
 

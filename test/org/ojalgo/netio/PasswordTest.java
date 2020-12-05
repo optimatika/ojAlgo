@@ -26,11 +26,6 @@ import org.ojalgo.TestUtils;
 
 public class PasswordTest extends NetioTests {
 
-    @Test
-    public void testEncryption() {
-        PasswordTest.doTestPassword("secret");
-    }
-
     private static void doTestPassword(final String original) {
 
         String encrypted = Password.encrypt(original);
@@ -40,6 +35,11 @@ public class PasswordTest extends NetioTests {
         TestUtils.assertNotEquals(original, encrypted);
 
         TestUtils.assertEquals(encrypted, Password.encrypt(original));
+    }
+
+    @Test
+    public void testEncryption() {
+        PasswordTest.doTestPassword("secret");
     }
 
     @Test

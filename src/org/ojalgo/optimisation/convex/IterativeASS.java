@@ -235,9 +235,13 @@ final class IterativeASS extends ActiveSetSolver {
                     this.log("Relative error {} in solution for L={}", relativeError, Arrays.toString(this.getIterationL(incl).toRawCopy1D()));
                 }
 
-                final ElementsSupplier<Double> tmpRHS = this.getIterationL(incl).premultiply(this.getIterationA().transpose())
-                        .operateOnMatching(this.getIterationC(), SUBTRACT);
-                this.getSolutionQ(tmpRHS, iterX);
+                if (solved = ACCURACY.isZero(relativeError)) {
+
+                    ElementsSupplier<Double> rhs = this.getIterationL(incl).premultiply(this.getIterationA().transpose())
+                            .operateOnMatching(this.getIterationC(), SUBTRACT);
+
+                    this.getSolutionQ(rhs, iterX);
+                }
             }
         }
 

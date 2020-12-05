@@ -23,6 +23,8 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.function.constant.PrimitiveMath.*;
 
+import java.util.Arrays;
+
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -101,7 +103,7 @@ final class DirectASS extends ActiveSetSolver {
 
                     if (this.isLogDebug()) {
                         this.log("RHS={}", rhs.get().toRawCopy1D());
-                        this.log("Relative error {} in solution for L={}", NaN, iterL.toRawCopy1D());
+                        this.log("Relative error {} in solution for L={}", NaN, Arrays.toString(iterL.toRawCopy1D()));
                     }
 
                     final ElementsSupplier<Double> tmpRHS = iterL.premultiply(iterA.transpose()).operateOnMatching(iterC, SUBTRACT);
