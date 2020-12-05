@@ -185,4 +185,25 @@ public class SparsePerformance extends MatrixStoreTests {
         TestUtils.assertFasterThan(1, CalendarDateUnit.SECOND, clock);
     }
 
+    @Test
+    public void testReset() {
+
+        int n = 100_000;
+
+        SparseStore<Double> mtrx = SparseStore.PRIMITIVE64.make(n, n);
+
+        Stopwatch clock = new Stopwatch();
+        mtrx.reset();
+        SparsePerformance.touchNonzeros(mtrx);
+        TestUtils.assertFasterThan(5, CalendarDateUnit.MILLIS, clock);
+
+        SparsePerformance.fill(mtrx);
+        SparsePerformance.touchNonzeros(mtrx);
+
+        clock.reset();
+        mtrx.reset();
+        SparsePerformance.touchNonzeros(mtrx);
+        TestUtils.assertFasterThan(3, CalendarDateUnit.MILLIS, clock);
+    }
+
 }

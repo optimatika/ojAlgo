@@ -35,6 +35,32 @@ import org.ojalgo.optimisation.convex.ConvexSolver;
 
 public class PrimalDualTest extends OptimisationLinearTests {
 
+    private static void doEvaluate(final ExpressionsBasedModel model, final boolean minimise) {
+
+        Result modResult = minimise ? model.minimise() : model.maximise();
+
+        ConvexSolver.Builder convex = ConvexSolver.getBuilder();
+        ConvexSolver.copy(model, convex);
+
+        Result primResult = PrimalSimplex.solve(convex, model.options);
+        Result dualResult = DualSimplex.solve(convex, model.options);
+
+        if (DEBUG) {
+
+            BasicLogger.debug(modResult);
+            BasicLogger.debug(primResult);
+            BasicLogger.debug(dualResult);
+
+            BasicLogger.debug(primResult.getMultipliers().get());
+            BasicLogger.debug(dualResult.getMultipliers().get());
+        }
+
+        TestUtils.assertStateAndSolution(modResult, primResult);
+        TestUtils.assertStateAndSolution(modResult, dualResult);
+
+        TestUtils.assertEquals(primResult.getMultipliers().get(), dualResult.getMultipliers().get());
+    }
+
     LinearSolver.ModelIntegration LINEAR_INTEGRATION = new LinearSolver.ModelIntegration();
 
     public PrimalDualTest() {
@@ -127,7 +153,7 @@ public class PrimalDualTest extends OptimisationLinearTests {
 
         ExpressionsBasedModel model = ConvexProblems.buildP20080117();
 
-        this.doEvaluate(model, true);
+        PrimalDualTest.doEvaluate(model, true);
     }
 
     @Test
@@ -216,32 +242,6 @@ public class PrimalDualTest extends OptimisationLinearTests {
 
         TestUtils.assertEquals(primModelPrimSolver.getMultipliers().get(), primModelDualSolver.getMultipliers().get());
         TestUtils.assertEquals(dualModelPrimSolver.getMultipliers().get(), dualModelDualSolver.getMultipliers().get());
-    }
-
-    private void doEvaluate(final ExpressionsBasedModel model, final boolean minimise) {
-
-        Result modResult = minimise ? model.minimise() : model.maximise();
-
-        ConvexSolver.Builder convex = ConvexSolver.getBuilder();
-        ConvexSolver.copy(model, convex);
-
-        Result primResult = PrimalSimplex.solve(convex, model.options);
-        Result dualResult = DualSimplex.solve(convex, model.options);
-
-        if (DEBUG) {
-
-            BasicLogger.debug(modResult);
-            BasicLogger.debug(primResult);
-            BasicLogger.debug(dualResult);
-
-            BasicLogger.debug(primResult.getMultipliers().get());
-            BasicLogger.debug(dualResult.getMultipliers().get());
-        }
-
-        TestUtils.assertStateAndSolution(modResult, primResult);
-        TestUtils.assertStateAndSolution(modResult, dualResult);
-
-        TestUtils.assertEquals(primResult.getMultipliers().get(), dualResult.getMultipliers().get());
     }
 
 }

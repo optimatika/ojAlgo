@@ -25,8 +25,10 @@ import static org.ojalgo.function.constant.BigMath.*;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,7 +42,9 @@ import org.ojalgo.type.context.NumberContext;
  * Mathematical Programming System (MPS) Model
  *
  * @author apete
+ * @deprecated Use {@link ExpressionsBasedModel#parse(File)} instead
  */
+@Deprecated
 public final class MathProgSysModel {
 
     /**
@@ -382,14 +386,27 @@ public final class MathProgSysModel {
     private static final String MAX = "MAX";
     private static final String SPACE = " ";
 
+    /**
+     * @param file
+     * @deprecated Use {@link ExpressionsBasedModel#parse(File)} instead
+     */
+    @Deprecated
     public static MathProgSysModel make(final File file) {
+        try (FileInputStream input = new FileInputStream(file)) {
+            return MathProgSysModel.parse(input);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public static MathProgSysModel parse(final InputStream input) {
 
         final MathProgSysModel retVal = new MathProgSysModel();
 
         String line;
         FileSection section = null;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
 
             // Returns the content of a line MINUS the newline.
             // Returns null only for the END of the stream.

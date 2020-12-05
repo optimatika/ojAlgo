@@ -7,10 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Added / Changed / Deprecated / Fixed / Removed / Security
 
-
 ## [Unreleased]
 
 > Corresponds to changes in the `develop` branch since the last release
+
+
+[48.3.2] – 2020-12-05
+
+### Added
+
+#### org.ojalgo.concurrent
+
+- New set of standard levels of parallelism defined in enum Parallelism.
+
+#### org.ojalgo.function
+
+- Additions to PowerOf2 utilities
+
+### Changed
+
+#### org.ojalgo.matrix
+
+- Improved the copying to internal representation for iterative equation system solvers (IterativeSolverTask).
+
+#### org.ojalgo.netio
+
+- Password now encrypts using SHA-512 rather than MD5 (existing passwords need to be reset)
+
+#### org.ojalgo.optimisation
+
+- Slight changes to parameter scaling (presolver functionality in ExpressionsBasedModel)
+- Minor numerical tweaks to both LinearSolver and ConvexSolver
+
+### Deprecated
+
+#### org.ojalgo.optimisation
+
+- MathProgSysModel is deprecated - direct usage of that class. Instead there is a `parse(File)` method in ExpressionsBasedModel
+
+#### org.ojalgo.type.context
+
+- Clean up of constructors and factories in NumberContext. Almost all of them are deprecated and replaced by new alternatives.
+
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- GitHUb Issue 300: https://github.com/optimatika/ojAlgo/issues/300
+
 
 ## [48.3.1] – 2020-10-01
 
@@ -24,11 +68,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 #### org.ojalgo.function
 
-- Aggregator.MAXIMUM was initialised/reset incorrectly whicj caused wrong results with negative numbers
+- Aggregator.MAXIMUM was initialised/reset incorrectly which caused wrong results with negative numbers
 
 #### org.ojalgo.optimisation
 
 - ConvexSolver results now include the Lagrange multipliers.
+
 
 ## [48.3.0] – 2020-09-03
 

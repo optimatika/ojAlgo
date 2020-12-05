@@ -65,27 +65,27 @@ public class BasicMachine {
     @Override
     public String toString() {
 
-        int tmpPrefix = 1;
-        int tmpMeasure = (int) (memory / CommonMachine.K);
+        int prefix = 1;
+        long measure = memory / CommonMachine.K;
 
-        while ((tmpMeasure / 1024) > 0) {
-            tmpPrefix++;
-            tmpMeasure /= 1024;
+        while ((measure / CommonMachine.K) > 0) {
+            prefix++;
+            measure /= CommonMachine.K;
         }
 
-        switch (tmpPrefix) {
+        switch (prefix) {
 
         case 1:
 
-            return tmpMeasure + KILO + threads + ((threads == 1) ? THREAD : THREADS);
+            return measure + KILO + threads + ((threads == 1) ? THREAD : THREADS);
 
         case 2:
 
-            return tmpMeasure + MEGA + threads + ((threads == 1) ? THREAD : THREADS);
+            return measure + MEGA + threads + ((threads == 1) ? THREAD : THREADS);
 
         case 3:
 
-            return tmpMeasure + GIGA + threads + ((threads == 1) ? THREAD : THREADS);
+            return measure + GIGA + threads + ((threads == 1) ? THREAD : THREADS);
 
         default:
 

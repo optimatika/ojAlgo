@@ -33,7 +33,7 @@ import org.ojalgo.structure.Mutate2D;
 import org.ojalgo.structure.Transformation2D;
 
 /**
- * Primarily this represents something that can be fille and/or modified
+ * Primarily this represents something that can be filled and/or modified
  *
  * @author apete
  */

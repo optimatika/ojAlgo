@@ -691,8 +691,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
             }
             case BigDecimal.ROUND_HALF_EVEN: {
                 final double fraction = unscaled - PrimitiveMath.FLOOR.invoke(unscaled);
-                if ((fraction > 0.5) || !((fraction < 0.5)
-                        || ((PrimitiveMath.FLOOR.invoke(unscaled) / 2.0) == PrimitiveMath.FLOOR.invoke(PrimitiveMath.FLOOR.invoke(unscaled) / 2.0)))) {
+                if ((fraction > 0.5) || ((fraction >= 0.5) && ((PrimitiveMath.FLOOR.invoke(unscaled) / 2.0) != PrimitiveMath.FLOOR.invoke(PrimitiveMath.FLOOR.invoke(unscaled) / 2.0)))) {
                     unscaled = PrimitiveMath.CEIL.invoke(unscaled);
                 } else {
                     unscaled = PrimitiveMath.FLOOR.invoke(unscaled);

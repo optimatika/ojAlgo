@@ -23,6 +23,10 @@ package org.ojalgo.optimisation;
 
 import static org.ojalgo.function.constant.BigMath.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Stream;
@@ -97,6 +101,10 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public final class ExpressionsBasedModel extends AbstractModel {
+
+    public enum FileFormat {
+        MPS;
+    }
 
     public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<ExpressionsBasedModel, S> {
 
@@ -465,6 +473,30 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
     public static void clearPresolvers() {
         PRESOLVERS.clear();
+    }
+
+    public static ExpressionsBasedModel parse(final File file) {
+
+        String lowerCasePath = file.getPath().toLowerCase();
+
+        if (lowerCasePath.endsWith("mps") || lowerCasePath.endsWith("sif")) {
+            try (FileInputStream input = new FileInputStream(file)) {
+                return ExpressionsBasedModel.parse(input, FileFormat.MPS);
+            } catch (IOException cause) {
+                throw new RuntimeException(cause);
+            }
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static ExpressionsBasedModel parse(final InputStream input, final FileFormat format) {
+        switch (format) {
+        case MPS:
+            return MathProgSysModel.parse(input).getExpressionsBasedModel();
+        default:
+            throw new IllegalArgumentException();
+        }
     }
 
     public static boolean removeIntegration(final Integration<?> integration) {

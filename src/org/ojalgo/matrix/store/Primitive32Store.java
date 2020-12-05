@@ -322,9 +322,9 @@ public final class Primitive32Store extends Primitive32Array implements Physical
 
     private transient float[] myWorkerColumn;
 
-    Primitive32Store(final int numbRows, final int numbCols) {
+    Primitive32Store(final int numbRows, final int numbCols, final float[] dataArray) {
 
-        super(numbRows * numbCols);
+        super(dataArray);
 
         myRowDim = numbRows;
         myColDim = numbCols;
@@ -337,12 +337,12 @@ public final class Primitive32Store extends Primitive32Array implements Physical
         multiplyNeither = MultiplyNeither.newPrimitive32(myRowDim, myColDim);
     }
 
-    Primitive32Store(final int numbRows, final int numbCols, final float[] dataArray) {
+    Primitive32Store(final long numbRows, final long numbCols) {
 
-        super(dataArray);
+        super(Math.toIntExact(numbRows * numbCols));
 
-        myRowDim = numbRows;
-        myColDim = numbCols;
+        myRowDim = Math.toIntExact(numbRows);
+        myColDim = Math.toIntExact(numbCols);
 
         myUtility = this.wrapInArray2D(myRowDim);
 
