@@ -72,3 +72,4 @@ cleanup_settings_version=2
 eclipse.preferences.version=1
 formatter_profile=_Optimatika
 formatter_settings_version=19
+org.eclipse.jdt.ui.text.custom_code_templates=
