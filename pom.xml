@@ -70,6 +70,7 @@
                     <compilerVersion>15</compilerVersion>
                     <source>15</source>
                     <target>15</target>
+                    <compilerArgs>--enable-preview</compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -159,6 +160,7 @@
                         <include>**/*.java</include>
                     </includes>
                     <excludedGroups>slow,unstable</excludedGroups>
+                    <argLine>--enable-preview</argLine>
                 </configuration>
                 <dependencies />
 
