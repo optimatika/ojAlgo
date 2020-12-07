@@ -42,6 +42,10 @@ public class Password {
      */
     public static String encrypt(final String plainTextPassword) {
 
+        if (plainTextPassword == null) {
+            return plainTextPassword.toLowerCase();
+        }
+
         String retVal = null;
         final MessageDigest digest = Password.getInstance();
 
@@ -132,7 +136,7 @@ public class Password {
 
         if (INSTANCE == null) {
             try {
-                INSTANCE = MessageDigest.getInstance("SHA-512");
+                INSTANCE = MessageDigest.getInstance("MD5");
             } catch (final NoSuchAlgorithmException cause) {
                 BasicLogger.error(cause.toString());
             }

@@ -1,0 +1,4 @@
+name: ojAlgo-custom-queries
+version: 1.0.0
+libraryPathDependencies: codeql-java
+extractor: java
