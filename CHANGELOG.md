@@ -12,7 +12,7 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 > Corresponds to changes in the `develop` branch since the last release
 
 
-[48.3.2] – 2020-12-05
+## [48.3.2] – 2020-12-05
 
 ### Added
 
