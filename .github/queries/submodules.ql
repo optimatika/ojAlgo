@@ -13,7 +13,7 @@ where i.getCompilationUnit() = c.getCompilationUnit()
   and (
     (c.getPackage().getName().matches("org.ojalgo.array.%") and i.getImportedType().getPackage().getName().matches("org.ojalgo.algebra.%"))
     or
-    (c.getPackage().getName().matches("org.ojalgo.matrix.%") and i.getImportedType().getPackage().getName().matches("org.ojalgo.array.%"))
+    (c.getPackage().getName().matches("org.ojalgo.array.%") and i.getImportedType().getPackage().getName().matches("org.ojalgo.matrix.%"))
   )
 select i, "Illegal import"
 
