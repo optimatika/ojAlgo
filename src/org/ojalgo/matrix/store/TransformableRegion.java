@@ -23,14 +23,14 @@ package org.ojalgo.matrix.store;
 
 import java.util.Arrays;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.operation.MultiplyBoth;
-import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Mutate2D;
-import org.ojalgo.structure.Transformation2D;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.function.NullaryFunction;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Mutate2D;
+import org.ojalgo.core.structure.Transformation2D;
+import org.ojalgo.matrix.operation.MultiplyBoth;
 
 /**
  * Primarily this represents something that can be filled and/or modified

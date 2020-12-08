@@ -21,11 +21,11 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
 
 /**
  * IdentityStore

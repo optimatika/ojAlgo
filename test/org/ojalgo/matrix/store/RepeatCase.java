@@ -1,9 +1,9 @@
 package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.ojalgo.core.random.Uniform;
+import org.ojalgo.core.scalar.ComplexNumber;
 import org.ojalgo.matrix.Primitive64Matrix;
-import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.ComplexNumber;
 
 public class RepeatCase extends NonPhysicalTest {
 

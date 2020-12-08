@@ -25,13 +25,13 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
-import org.ojalgo.array.operation.COPY;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.core.array.operation.COPY;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ExpressionsBasedModel.Intermediate;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.type.context.NumberContext;
 
 final class NodeKey implements Comparable<NodeKey> {
 

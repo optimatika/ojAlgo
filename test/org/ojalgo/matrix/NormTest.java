@@ -24,10 +24,10 @@ package org.ojalgo.matrix;
 import java.util.Random;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.Quaternion;
 import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
 
 public class NormTest extends MatrixTests {
 

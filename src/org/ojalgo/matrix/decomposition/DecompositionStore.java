@@ -21,14 +21,14 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.BasicArray;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.array.BasicArray;
+import org.ojalgo.core.scalar.ComplexNumber;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.transformation.Householder;
-import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * <p>

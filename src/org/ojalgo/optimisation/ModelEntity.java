@@ -25,14 +25,14 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.special.MissingMath;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.type.TypeUtils;
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.function.aggregator.AggregatorFunction;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.function.special.MissingMath;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.type.TypeUtils;
+import org.ojalgo.core.type.context.NumberContext;
 
 /**
  * Model entities are identified and compared by their names only. Any/all other members/attributes are NOT

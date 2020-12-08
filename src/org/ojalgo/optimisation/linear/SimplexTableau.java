@@ -21,30 +21,30 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.array.SparseArray;
-import org.ojalgo.array.SparseArray.NonzeroView;
-import org.ojalgo.array.operation.AXPY;
-import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.machine.JavaType;
+import org.ojalgo.core.OjAlgoUtils;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.array.BasicArray;
+import org.ojalgo.core.array.DenseArray;
+import org.ojalgo.core.array.Primitive64Array;
+import org.ojalgo.core.array.SparseArray;
+import org.ojalgo.core.array.SparseArray.NonzeroView;
+import org.ojalgo.core.array.operation.AXPY;
+import org.ojalgo.core.function.NullaryFunction;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.machine.JavaType;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.ElementView1D;
+import org.ojalgo.core.structure.Mutate1D;
+import org.ojalgo.core.structure.Mutate2D;
+import org.ojalgo.core.type.IndexSelector;
+import org.ojalgo.core.type.NumberDefinition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexSolver.AlgorithmStore;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.ElementView1D;
-import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.structure.Mutate2D;
-import org.ojalgo.type.IndexSelector;
-import org.ojalgo.type.NumberDefinition;
 
 abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
@@ -1022,7 +1022,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     }
 
     protected int getBasisRowIndex(final int basisColumnIndex) {
-        return org.ojalgo.array.operation.IndexOf.indexOf(myBasis, basisColumnIndex);
+        return org.ojalgo.core.array.operation.IndexOf.indexOf(myBasis, basisColumnIndex);
     }
 
     protected final int[] getExcluded() {

@@ -9,14 +9,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.structure.Access1D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
-import org.ojalgo.structure.Access1D;
 
 /**
  * @see https://github.com/optimatika/ojAlgo/issues/300

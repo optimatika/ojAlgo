@@ -21,18 +21,18 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.core.array.DenseArray;
+import org.ojalgo.core.array.Primitive64Array;
+import org.ojalgo.core.function.FunctionSet;
+import org.ojalgo.core.function.NullaryFunction;
+import org.ojalgo.core.function.PrimitiveFunction;
+import org.ojalgo.core.function.aggregator.AggregatorSet;
+import org.ojalgo.core.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.core.scalar.PrimitiveScalar;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access2D;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access2D;
 
 abstract class PrimitiveFactory<I extends PhysicalStore<Double>> implements PhysicalStore.Factory<Double, I> {
 

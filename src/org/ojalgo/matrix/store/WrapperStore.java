@@ -21,9 +21,9 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
 
 /**
  * @author apete

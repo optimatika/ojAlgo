@@ -27,17 +27,17 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.multiary.MultiaryFunction;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.function.multiary.MultiaryFunction;
+import org.ojalgo.core.structure.Access1D;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.structure.Access1D;
 
 /**
  * Contains the same test cases found in: org.apache.commons.math3.optimization.linear.SimplexSolverTest

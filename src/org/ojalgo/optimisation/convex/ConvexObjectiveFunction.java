@@ -21,14 +21,14 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.multiary.LinearFunction;
-import org.ojalgo.function.multiary.MultiaryFunction;
-import org.ojalgo.function.multiary.PureQuadraticFunction;
+import org.ojalgo.core.function.multiary.LinearFunction;
+import org.ojalgo.core.function.multiary.MultiaryFunction;
+import org.ojalgo.core.function.multiary.PureQuadraticFunction;
+import org.ojalgo.core.structure.Access1D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.structure.Access1D;
 
 /**
  * [x]<sup>T</sup>[Q][x] - [l]<sup>T</sup>[x]

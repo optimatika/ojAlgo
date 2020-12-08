@@ -28,10 +28,12 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.structure.Structure1D.IntIndex;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileMPS;
@@ -39,8 +41,6 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver;
-import org.ojalgo.structure.Structure1D.IntIndex;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Detailed testing of models and solvers using the markshare 5 0 model.

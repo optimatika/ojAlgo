@@ -21,14 +21,14 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.DenseArray;
+import org.ojalgo.core.array.DenseArray;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.Quaternion;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * QR: [A] = [Q][R] Decomposes [this] into [Q] and [R] where:

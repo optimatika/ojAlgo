@@ -21,14 +21,16 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.core.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.array.BigArray;
-import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.array.BigArray;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.type.TypeUtils;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.Primitive64Store;
@@ -40,8 +42,6 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.integer.OptimisationIntegerData;
 import org.ojalgo.optimisation.integer.P20150127b;
-import org.ojalgo.type.TypeUtils;
-import org.ojalgo.type.context.NumberContext;
 
 public class LinearProblems extends OptimisationLinearTests {
 

@@ -25,10 +25,10 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.special.MissingMath;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.function.special.MissingMath;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access1D;
 
 public final class DiagonalStore<N extends Comparable<N>, D extends Access1D<?>> extends FactoryStore<N> {
 

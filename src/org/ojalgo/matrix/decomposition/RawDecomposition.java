@@ -21,20 +21,20 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.core.function.FunctionSet;
+import org.ojalgo.core.function.PrimitiveFunction;
+import org.ojalgo.core.scalar.PrimitiveScalar;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Access2D.Collectable;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.DiagonalStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * In many ways similar to InPlaceDecomposition but this class is hardwired to work with double[][] data. Most

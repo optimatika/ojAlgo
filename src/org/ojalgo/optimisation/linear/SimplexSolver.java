@@ -21,21 +21,21 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.LongToNumberMap;
-import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.array.SparseArray.NonzeroView;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.array.LongToNumberMap;
+import org.ojalgo.core.array.Primitive64Array;
+import org.ojalgo.core.array.SparseArray.NonzeroView;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.SimplexTableau.IterationPoint;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * LinearSolver solves optimisation problems of the (LP standard) form:

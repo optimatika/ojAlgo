@@ -21,19 +21,19 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.operation.AXPY;
-import org.ojalgo.array.operation.SWAP;
-import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.array.operation.AXPY;
+import org.ojalgo.core.array.operation.SWAP;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Access2D.Collectable;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.context.NumberContext;
 
 final class RawLU extends RawDecomposition implements LU<Double> {
 

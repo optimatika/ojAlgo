@@ -21,21 +21,22 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.Optional;
 
-import org.ojalgo.array.SparseArray;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.core.array.SparseArray;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.function.aggregator.AggregatorFunction;
+import org.ojalgo.core.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.type.IndexSelector;
+import org.ojalgo.core.type.TypeUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.GenericSolver;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.type.IndexSelector;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
 

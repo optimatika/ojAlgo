@@ -21,27 +21,27 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.array.BasicArray;
+import org.ojalgo.core.function.BinaryFunction;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.function.aggregator.AggregatorFunction;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.Quaternion;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Access2D.Collectable;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.type.NumberDefinition;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.NumberDefinition;
-import org.ojalgo.type.context.NumberContext;
 
 abstract class LDLDecomposition<N extends Comparable<N>> extends InPlaceDecomposition<N> implements LDL<N> {
 

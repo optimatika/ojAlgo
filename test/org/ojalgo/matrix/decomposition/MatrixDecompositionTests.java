@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
 
 /**
  * @author apete

@@ -22,14 +22,14 @@
 package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.core.OjAlgoUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.function.special.MissingMath;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.Primitive64Matrix;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.type.context.NumberContext;
 
 public class StoreProblems extends MatrixStoreTests {
 

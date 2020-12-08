@@ -23,7 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.SimpleCholeskyCase;
 import org.ojalgo.matrix.SimpleEigenvalueCase;
 import org.ojalgo.matrix.SimpleLUCase;
@@ -31,7 +32,6 @@ import org.ojalgo.matrix.SimpleQRCase;
 import org.ojalgo.matrix.SimpleSingularValueCase;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * SimpleDecompositionCases

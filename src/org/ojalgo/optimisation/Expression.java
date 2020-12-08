@@ -32,26 +32,26 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.BigAggregator;
-import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.multiary.ConstantFunction;
-import org.ojalgo.function.multiary.LinearFunction;
-import org.ojalgo.function.multiary.MultiaryFunction;
-import org.ojalgo.function.multiary.PureQuadraticFunction;
-import org.ojalgo.function.multiary.QuadraticFunction;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.function.BinaryFunction;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.function.aggregator.AggregatorFunction;
+import org.ojalgo.core.function.aggregator.AggregatorSet;
+import org.ojalgo.core.function.aggregator.BigAggregator;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.function.multiary.ConstantFunction;
+import org.ojalgo.core.function.multiary.LinearFunction;
+import org.ojalgo.core.function.multiary.MultiaryFunction;
+import org.ojalgo.core.function.multiary.PureQuadraticFunction;
+import org.ojalgo.core.function.multiary.QuadraticFunction;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Structure1D;
+import org.ojalgo.core.structure.Structure1D.IntIndex;
+import org.ojalgo.core.structure.Structure2D.IntRowColumn;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure1D;
-import org.ojalgo.structure.Structure1D.IntIndex;
-import org.ojalgo.structure.Structure2D.IntRowColumn;
 
 /**
  * <p>

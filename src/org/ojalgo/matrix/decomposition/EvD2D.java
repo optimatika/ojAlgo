@@ -1,8 +1,8 @@
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.core.type.context.NumberContext;
 
 public abstract class EvD2D {
 

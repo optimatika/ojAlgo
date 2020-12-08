@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.core.function.constant.BigMath.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,9 +34,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ojalgo.netio.ASCII;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.core.netio.ASCII;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.type.context.NumberContext;
 
 /**
  * Mathematical Programming System (MPS) Model
@@ -540,8 +540,8 @@ public final class MathProgSysModel {
     }
 
     /**
-     * @see org.ojalgo.optimisation.ExpressionsBasedModel#validate(org.ojalgo.structure.Access1D,
-     *      org.ojalgo.type.context.NumberContext)
+     * @see org.ojalgo.optimisation.ExpressionsBasedModel#validate(org.ojalgo.core.structure.Access1D,
+     *      org.ojalgo.core.type.context.NumberContext)
      */
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context) {
         return myDelegate.validate(solution, context);

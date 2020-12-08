@@ -27,24 +27,24 @@ import java.math.RoundingMode;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.random.SampleSet;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.random.SampleSet;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.type.context.NumberContext;
 
 public class NextGenSysModTest {
 

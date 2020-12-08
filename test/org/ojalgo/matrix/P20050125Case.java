@@ -23,13 +23,13 @@ package org.ojalgo.matrix;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.random.Uniform;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * There was a problem with the solve() method in the Jama Cholesky decomposition - it simply wasn't correct.

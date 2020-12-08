@@ -21,15 +21,15 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.core.function.special.MissingMath;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Access2D.Collectable;
+import org.ojalgo.core.structure.Structure2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure2D;
 
 /**
  * Notation used to describe the various matrix decompositions:

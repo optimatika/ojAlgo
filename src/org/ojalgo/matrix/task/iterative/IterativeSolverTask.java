@@ -21,27 +21,27 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.equation.Equation;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.equation.Equation;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.scalar.PrimitiveScalar;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.context.NumberContext;
 
 public abstract class IterativeSolverTask implements SolverTask<Double> {
 

@@ -22,8 +22,8 @@
 package org.ojalgo.optimisation.integer;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ExpressionsBasedModel.Intermediate;

@@ -22,7 +22,7 @@
 package org.ojalgo.matrix;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.core.type.context.NumberContext;
 
 /**
  * @author apete

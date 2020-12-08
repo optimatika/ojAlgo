@@ -21,25 +21,25 @@
  */
 package org.ojalgo.data;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.function.Function;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.random.SampleSet;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.ColumnView;
+import org.ojalgo.core.structure.Factory2D;
+import org.ojalgo.core.structure.Mutate2D;
+import org.ojalgo.core.structure.Mutate2D.ModifiableReceiver;
+import org.ojalgo.core.structure.Transformation2D;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.random.SampleSet;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.ColumnView;
-import org.ojalgo.structure.Factory2D;
-import org.ojalgo.structure.Mutate2D;
-import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
-import org.ojalgo.structure.Transformation2D;
 
 /**
  * Various data processors that could be useful when doing data science or similar. With ojAlgo it is highly

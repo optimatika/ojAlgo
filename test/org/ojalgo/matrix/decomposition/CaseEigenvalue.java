@@ -21,19 +21,23 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.math.MathContext;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.TestUtils;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Array2D;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.array.Array2D;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20050125Case;
 import org.ojalgo.matrix.P20061119Case;
@@ -44,10 +48,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete

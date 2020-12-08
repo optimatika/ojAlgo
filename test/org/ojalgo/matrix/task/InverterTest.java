@@ -24,8 +24,8 @@ package org.ojalgo.matrix.task;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.TestUtils;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStore;

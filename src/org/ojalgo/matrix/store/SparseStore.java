@@ -21,30 +21,30 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.SparseArray;
-import org.ojalgo.array.SparseArray.NonzeroView;
-import org.ojalgo.array.operation.MultiplyBoth;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.ElementView2D;
-import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.NumberDefinition;
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.array.SparseArray;
+import org.ojalgo.core.array.SparseArray.NonzeroView;
+import org.ojalgo.core.function.BinaryFunction;
+import org.ojalgo.core.function.NullaryFunction;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.function.VoidFunction;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.Quaternion;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.ElementView2D;
+import org.ojalgo.core.structure.Mutate1D;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.type.NumberDefinition;
+import org.ojalgo.core.type.context.NumberContext;
+import org.ojalgo.matrix.operation.MultiplyBoth;
 
 public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> implements TransformableRegion<N> {
 

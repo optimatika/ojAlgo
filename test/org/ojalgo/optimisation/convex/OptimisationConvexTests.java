@@ -21,10 +21,10 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete

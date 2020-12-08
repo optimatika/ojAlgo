@@ -23,8 +23,8 @@ package org.ojalgo.matrix;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.type.context.NumberContext;
 
 /**
  * An overdetermined equation system described in Scientific Computing An Introductory Survey II By Micheal T.

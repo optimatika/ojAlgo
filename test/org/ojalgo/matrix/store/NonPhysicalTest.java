@@ -23,14 +23,14 @@ package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.type.StandardType;
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.random.Uniform;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.type.StandardType;
+import org.ojalgo.core.type.context.NumberContext;
 
 public abstract class NonPhysicalTest extends MatrixStoreTests {
 

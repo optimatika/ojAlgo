@@ -21,29 +21,33 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.core.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.BigArray;
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.function.BigFunction;
-import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
-import org.ojalgo.function.multiary.QuadraticFunction;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.array.BigArray;
+import org.ojalgo.core.array.DenseArray;
+import org.ojalgo.core.array.Primitive64Array;
+import org.ojalgo.core.function.BigFunction;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.function.multiary.MultiaryFunction.TwiceDifferentiable;
+import org.ojalgo.core.function.multiary.QuadraticFunction;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.type.StandardType;
+import org.ojalgo.core.type.TypeUtils;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -51,10 +55,6 @@ import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.type.StandardType;
-import org.ojalgo.type.TypeUtils;
-import org.ojalgo.type.context.NumberContext;
 
 public class ConvexProblems extends OptimisationConvexTests {
 

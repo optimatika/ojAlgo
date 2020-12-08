@@ -25,21 +25,21 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.function.BinaryFunction;
+import org.ojalgo.core.function.FunctionSet;
+import org.ojalgo.core.function.NullaryFunction;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Factory2D;
+import org.ojalgo.core.structure.Mutate2D;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.structure.Transformation2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.SparseStore;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Factory2D;
-import org.ojalgo.structure.Mutate2D;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.structure.Transformation2D;
 
 /**
  * MatrixFactory creates instances of classes that implement the {@linkplain org.ojalgo.matrix.BasicMatrix}

@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.io.BufferedReader;
 import java.io.StreamTokenizer;
@@ -29,31 +29,31 @@ import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.operation.COPY;
-import org.ojalgo.array.operation.FillMatchingDual;
-import org.ojalgo.array.operation.ModifyAll;
-import org.ojalgo.array.operation.MultiplyBoth;
-import org.ojalgo.array.operation.SWAP;
-import org.ojalgo.array.operation.SubstituteBackwards;
-import org.ojalgo.array.operation.SubstituteForwards;
-import org.ojalgo.array.operation.VisitAll;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.array.operation.COPY;
+import org.ojalgo.core.array.operation.FillMatchingDual;
+import org.ojalgo.core.array.operation.ModifyAll;
+import org.ojalgo.core.array.operation.SWAP;
+import org.ojalgo.core.array.operation.SubstituteBackwards;
+import org.ojalgo.core.array.operation.SubstituteForwards;
+import org.ojalgo.core.array.operation.VisitAll;
+import org.ojalgo.core.function.BinaryFunction;
+import org.ojalgo.core.function.NullaryFunction;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.function.VoidFunction;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.function.aggregator.AggregatorFunction;
+import org.ojalgo.core.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.function.special.MissingMath;
+import org.ojalgo.core.scalar.PrimitiveScalar;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.type.NumberDefinition;
+import org.ojalgo.matrix.operation.MultiplyBoth;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.NumberDefinition;
 
 /**
  * Uses double[][] internally.

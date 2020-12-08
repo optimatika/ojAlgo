@@ -1,6 +1,6 @@
 package org.ojalgo.matrix.geometry;
 
-import org.ojalgo.structure.Access2D;
+import org.ojalgo.core.structure.Access2D;
 
 public class Primitive32Matrix3 implements GeometryMatrix<Primitive32Matrix3> {
 

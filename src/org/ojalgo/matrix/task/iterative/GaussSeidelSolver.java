@@ -21,16 +21,16 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.List;
 
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.equation.Equation;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.equation.Equation;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.type.context.NumberContext;
 
 public final class GaussSeidelSolver extends StationaryIterativeSolver implements IterativeSolverTask.SparseDelegate {
 

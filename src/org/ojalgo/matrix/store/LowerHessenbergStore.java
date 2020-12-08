@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.scalar.Scalar;
 
 /**
  * A Hessenberg matrix is one that is "almost" triangular. A lower Hessenberg matrix has zero entries above

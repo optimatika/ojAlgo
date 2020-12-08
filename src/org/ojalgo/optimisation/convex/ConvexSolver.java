@@ -21,18 +21,23 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.SparseArray;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.array.SparseArray;
+import org.ojalgo.core.function.BinaryFunction;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D.Collectable;
+import org.ojalgo.core.structure.Structure1D.IntIndex;
+import org.ojalgo.core.structure.Structure2D.IntRowColumn;
 import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -50,11 +55,6 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure1D.IntIndex;
-import org.ojalgo.structure.Structure2D.IntRowColumn;
 
 /**
  * ConvexSolver solves optimisation problems of the form:

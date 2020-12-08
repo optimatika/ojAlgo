@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.core.function.UnaryFunction;
 
 final class UnaryOperatoStore<N extends Comparable<N>> extends LogicalStore<N> {
 

@@ -23,12 +23,18 @@ package org.ojalgo.matrix.decomposition;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.constant.ComplexMath;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.function.PrimitiveFunction;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.function.constant.ComplexMath;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.random.Normal;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.P20030422Case;
 import org.ojalgo.matrix.P20030512Case;
 import org.ojalgo.matrix.P20030528Case;
@@ -41,12 +47,6 @@ import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.random.Normal;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.type.context.NumberContext;
 
 public class CaseSingularValue extends MatrixDecompositionTests {
 

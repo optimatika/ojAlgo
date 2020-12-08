@@ -23,12 +23,12 @@ package org.ojalgo.matrix;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Gilbert Strang, Linear Algebra and its Applications III, Example 1 in Appendix A

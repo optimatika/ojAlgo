@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 

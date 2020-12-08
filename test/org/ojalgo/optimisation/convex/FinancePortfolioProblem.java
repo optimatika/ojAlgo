@@ -21,21 +21,21 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.core.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.Primitive64Matrix;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.type.context.NumberContext;
 
 public class FinancePortfolioProblem extends OptimisationConvexTests {
 

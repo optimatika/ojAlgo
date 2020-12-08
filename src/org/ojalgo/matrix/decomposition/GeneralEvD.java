@@ -21,17 +21,17 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.ComplexAggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.function.BinaryFunction;
+import org.ojalgo.core.function.aggregator.AggregatorFunction;
+import org.ojalgo.core.function.aggregator.ComplexAggregator;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.structure.Access2D.Collectable;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.structure.Access2D.Collectable;
 
 abstract class GeneralEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> {
 

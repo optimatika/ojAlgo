@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.optimisation.ModelFileMPS;
-import org.ojalgo.type.context.NumberContext;
 
 public class RelaxedMIPCase extends OptimisationIntegerTests implements ModelFileMPS {
 

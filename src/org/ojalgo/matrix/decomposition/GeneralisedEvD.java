@@ -21,12 +21,12 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.Array1D;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Access2D.Collectable;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Access2D.Collectable;
 
 final class GeneralisedEvD<N extends Comparable<N>> extends EigenvalueDecomposition<N> implements Eigenvalue.Generalised<N> {
 

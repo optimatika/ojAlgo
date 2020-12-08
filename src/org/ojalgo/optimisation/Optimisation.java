@@ -25,15 +25,15 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.BigArray;
-import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.array.BigArray;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.type.CalendarDateDuration;
+import org.ojalgo.core.type.CalendarDateUnit;
+import org.ojalgo.core.type.TypeUtils;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.optimisation.integer.IntegerSolver;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.type.CalendarDateDuration;
-import org.ojalgo.type.CalendarDateUnit;
-import org.ojalgo.type.TypeUtils;
-import org.ojalgo.type.context.NumberContext;
 
 public interface Optimisation {
 
@@ -175,7 +175,7 @@ public interface Optimisation {
 
         /**
          * If this is null nothing is printed, if it is not null then progress/debug messages are printed to
-         * that {@linkplain org.ojalgo.netio.BasicLogger.Printer}.
+         * that {@linkplain org.ojalgo.core.netio.BasicLogger.Printer}.
          */
         public BasicLogger.Printer logger_appender = null;
 

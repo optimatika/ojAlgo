@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.core.scalar.Scalar;
 
 abstract class FactoryStore<N extends Comparable<N>> extends AbstractStore<N> {
 

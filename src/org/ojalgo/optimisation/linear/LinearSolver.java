@@ -21,19 +21,22 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.function.multiary.LinearFunction;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.array.Primitive64Array;
+import org.ojalgo.core.function.multiary.LinearFunction;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Structure1D.IntIndex;
 import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -41,9 +44,6 @@ import org.ojalgo.optimisation.UpdatableSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure1D.IntIndex;
 
 public abstract class LinearSolver extends GenericSolver implements UpdatableSolver {
 
@@ -81,7 +81,7 @@ public abstract class LinearSolver extends GenericSolver implements UpdatableSol
         /**
          * Setting inequalities here is not yet supported. (You have to convert the LP to standard form.)
          *
-         * @see org.ojalgo.optimisation.GenericSolver.Builder#inequalities(org.ojalgo.structure.Access2D,
+         * @see org.ojalgo.optimisation.GenericSolver.Builder#inequalities(org.ojalgo.core.structure.Access2D,
          *      org.ojalgo.matrix.store.MatrixStore)
          */
         @Override

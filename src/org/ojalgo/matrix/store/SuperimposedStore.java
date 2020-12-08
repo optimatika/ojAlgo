@@ -21,8 +21,8 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access1D;
 
 /**
  * SuperimposedStore

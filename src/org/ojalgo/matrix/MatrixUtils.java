@@ -23,16 +23,16 @@ package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.PrimitiveScalar;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Mutate1D;
+import org.ojalgo.core.type.TypeUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.type.TypeUtils;
 
 /**
  * @deprecated v47

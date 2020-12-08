@@ -21,15 +21,20 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.array.SparseArray;
-import org.ojalgo.machine.JavaType;
+import org.ojalgo.core.OjAlgoUtils;
+import org.ojalgo.core.array.SparseArray;
+import org.ojalgo.core.machine.JavaType;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Mutate1D;
+import org.ojalgo.core.structure.Mutate2D;
+import org.ojalgo.core.structure.Structure1D.IntIndex;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.Expression;
@@ -37,11 +42,6 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Mutate1D;
-import org.ojalgo.structure.Mutate2D;
-import org.ojalgo.structure.Structure1D.IntIndex;
-import org.ojalgo.type.context.NumberContext;
 
 final class PrimalSimplex extends SimplexSolver {
 

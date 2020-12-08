@@ -23,21 +23,21 @@ package org.ojalgo.matrix.decomposition;
 
 import java.util.Optional;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.DenseArray;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.array.DenseArray;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.Quaternion;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * [A] = [V][D][V]<sup>-1</sup> ([A][V] = [V][D])
@@ -194,10 +194,10 @@ public interface Eigenvalue<N extends Comparable<N>>
     interface Generalised<N extends Comparable<N>> extends Eigenvalue<N> {
 
         /**
-         * Corresponding to {@link #computeValuesOnly(org.ojalgo.structure.Access2D.Collectable)} but for the
+         * Corresponding to {@link #computeValuesOnly(org.ojalgo.core.structure.Access2D.Collectable)} but for the
          * generalised case.
          *
-         * @see #computeValuesOnly(org.ojalgo.structure.Access2D.Collectable)
+         * @see #computeValuesOnly(org.ojalgo.core.structure.Access2D.Collectable)
          */
         default boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA,
                 final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB) {
@@ -205,10 +205,10 @@ public interface Eigenvalue<N extends Comparable<N>>
         }
 
         /**
-         * Corresponding to {@link #decompose(org.ojalgo.structure.Access2D.Collectable)} but for the
+         * Corresponding to {@link #decompose(org.ojalgo.core.structure.Access2D.Collectable)} but for the
          * generalised case.
          *
-         * @see #decompose(org.ojalgo.structure.Access2D.Collectable)
+         * @see #decompose(org.ojalgo.core.structure.Access2D.Collectable)
          */
         default boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixA,
                 final Access2D.Collectable<N, ? super PhysicalStore<N>> matrixB) {

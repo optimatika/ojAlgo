@@ -25,8 +25,9 @@ import java.util.List;
 import java.util.Random;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.random.Uniform;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -34,7 +35,6 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.GaussSeidelSolver;
 import org.ojalgo.matrix.task.iterative.JacobiSolver;
-import org.ojalgo.random.Uniform;
 
 public class SolverTest extends MatrixTaskTests {
 

@@ -23,9 +23,9 @@ package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.random.Uniform;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.random.Uniform;
 
 public class SparseCase extends NonPhysicalTest {
 

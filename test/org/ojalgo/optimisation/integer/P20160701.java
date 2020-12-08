@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;

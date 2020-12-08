@@ -24,8 +24,8 @@ package org.ojalgo.optimisation.integer;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.optimisation.ModelFileMPS;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Some test cases from MIPLIB added a long time ago. These tests are typically a bit harder than

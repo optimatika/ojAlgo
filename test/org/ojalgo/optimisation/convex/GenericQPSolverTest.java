@@ -23,14 +23,14 @@ package org.ojalgo.optimisation.convex;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.RationalMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * GenericQPSolverTest

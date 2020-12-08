@@ -21,10 +21,10 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
+import org.ojalgo.core.function.VoidFunction;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access1D;
 
 final class TransposedStore<N extends Comparable<N>> extends TransjugatedStore<N> {
 

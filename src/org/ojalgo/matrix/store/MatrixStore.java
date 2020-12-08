@@ -21,25 +21,25 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.algebra.NormedVectorSpace;
-import org.ojalgo.algebra.Operation;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.algebra.NormedVectorSpace;
+import org.ojalgo.core.algebra.Operation;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.function.VoidFunction;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.function.aggregator.AggregatorFunction;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.PrimitiveScalar;
+import org.ojalgo.core.scalar.Quaternion;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.type.NumberDefinition;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.DiagonalStore.Builder;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.NumberDefinition;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
@@ -47,8 +47,8 @@ import org.ojalgo.type.context.NumberContext;
  * </p>
  * <p>
  * A {@linkplain MatrixStore} extends {@linkplain Access2D} (as well as
- * {@linkplain org.ojalgo.structure.Access2D.Visitable} and
- * {@linkplain org.ojalgo.structure.Access2D.Elements}) and defines some futher funtionality - mainly matrix
+ * {@linkplain org.ojalgo.core.structure.Access2D.Visitable} and
+ * {@linkplain org.ojalgo.core.structure.Access2D.Elements}) and defines some futher funtionality - mainly matrix
  * multiplication.
  * </p>
  * <p>
@@ -803,7 +803,7 @@ public interface MatrixStore<N extends Comparable<N>>
      * matrix, adjugate matrix, hermitian adjoint or hermitian transpose. (The conjugate matrix is the complex
      * conjugate of each element. This NOT what is returned here!)
      *
-     * @see org.ojalgo.algebra.VectorSpace#conjugate()
+     * @see org.ojalgo.core.algebra.VectorSpace#conjugate()
      */
     default MatrixStore<N> conjugate() {
         return new ConjugatedStore<>(this);

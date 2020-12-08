@@ -22,10 +22,10 @@
 package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.random.Uniform;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.RationalNumber;
 
 public class SuperimposedElementCase extends NonPhysicalTest {
 

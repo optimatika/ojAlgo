@@ -24,17 +24,17 @@ package org.ojalgo.matrix.decomposition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.random.Normal;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.Primitive64Matrix;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.random.Normal;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete

@@ -23,20 +23,20 @@ package org.ojalgo.matrix.store;
 
 import java.util.List;
 
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.operation.SubstituteBackwards;
-import org.ojalgo.array.operation.SubstituteForwards;
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.core.array.DenseArray;
+import org.ojalgo.core.array.operation.SubstituteBackwards;
+import org.ojalgo.core.array.operation.SubstituteForwards;
+import org.ojalgo.core.function.FunctionSet;
+import org.ojalgo.core.function.aggregator.AggregatorSet;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Factory2D;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.structure.Transformation2D;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Factory2D;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.structure.Transformation2D;
 
 /**
  * <p>

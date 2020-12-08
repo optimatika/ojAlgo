@@ -21,9 +21,14 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.array.BasicArray;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.Quaternion;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.structure.Access2D;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
@@ -31,11 +36,6 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.structure.Access2D;
 
 /**
  * @author apete

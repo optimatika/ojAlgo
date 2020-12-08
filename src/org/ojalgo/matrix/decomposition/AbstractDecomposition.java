@@ -21,11 +21,11 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.FunctionSet;
+import org.ojalgo.core.function.FunctionSet;
+import org.ojalgo.core.scalar.Scalar;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.scalar.Scalar;
 
 /**
  * @author apete

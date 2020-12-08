@@ -21,12 +21,12 @@
  */
 package org.ojalgo.matrix.transformation;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.function.FunctionSet;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.scalar.PrimitiveScalar;
+import org.ojalgo.core.scalar.Scalar;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Scalar;
 
 public abstract class Rotation<N extends Comparable<N>> {
 

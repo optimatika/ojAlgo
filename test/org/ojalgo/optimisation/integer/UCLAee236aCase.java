@@ -21,19 +21,19 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.core.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * http://www.ee.ucla.edu/ee236a/lectures/intlp.pdf (UCLAee236aCase.pdf)

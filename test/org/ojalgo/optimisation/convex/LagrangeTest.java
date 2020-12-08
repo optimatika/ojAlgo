@@ -26,15 +26,15 @@ import static org.ojalgo.matrix.store.Primitive64Store.*;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.type.context.NumberContext;
 
 public class LagrangeTest extends OptimisationConvexTests {
 

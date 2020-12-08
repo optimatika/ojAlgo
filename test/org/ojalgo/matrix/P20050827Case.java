@@ -23,14 +23,14 @@ package org.ojalgo.matrix;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.array.Array2D;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.ComplexMath;
-import org.ojalgo.random.Normal;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.array.Array2D;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.function.constant.ComplexMath;
+import org.ojalgo.core.random.Normal;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.type.context.NumberContext;
 
 /**
  * Found a problem with calculating the Frobenius norm for complex matrices.

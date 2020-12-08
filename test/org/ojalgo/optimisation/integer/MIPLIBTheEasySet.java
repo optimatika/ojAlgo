@@ -23,8 +23,8 @@ package org.ojalgo.optimisation.integer;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.optimisation.ModelFileMPS;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Problems/models from "The Easy Set" - instances that can be solved in less than 1h (by top tier native code

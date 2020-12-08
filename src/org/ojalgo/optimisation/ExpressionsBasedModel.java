@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.core.function.constant.BigMath.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,20 +31,20 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Stream;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.array.Primitive64Array;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.netio.BasicLogger.Printer;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Structure1D.IntIndex;
+import org.ojalgo.core.structure.Structure2D.IntRowColumn;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.linear.LinearSolver;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Structure1D.IntIndex;
-import org.ojalgo.structure.Structure2D.IntRowColumn;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>

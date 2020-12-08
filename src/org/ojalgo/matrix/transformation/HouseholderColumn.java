@@ -1,9 +1,9 @@
 package org.ojalgo.matrix.transformation;
 
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.structure.ColumnView;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.structure.ColumnView;
 
 final class HouseholderColumn<N extends Comparable<N>> extends ColumnView<N> implements HouseholderReference<N> {
 

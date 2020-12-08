@@ -21,13 +21,13 @@
  */
 package org.ojalgo.matrix.geometry;
 
-import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.core.function.NullaryFunction;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Structure1D;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.type.NumberDefinition;
 import org.ojalgo.matrix.store.TransformableRegion;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Structure1D;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.NumberDefinition;
 
 public abstract class GeometryVector extends TransformableRegion.ReceiverRegion<Double> {
 

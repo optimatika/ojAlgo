@@ -1,11 +1,11 @@
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.NullaryFunction;
 
 public class ComposingStoreTest extends MatrixStoreTests {
 

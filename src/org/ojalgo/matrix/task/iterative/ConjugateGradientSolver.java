@@ -21,18 +21,18 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.List;
 
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.equation.Equation;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.equation.Equation;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Structure1D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure1D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * A (Jacobi) preconditioned conjugate gradient solver.

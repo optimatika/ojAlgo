@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.core.scalar.Scalar;
 
 /**
  * ConjugatedStore

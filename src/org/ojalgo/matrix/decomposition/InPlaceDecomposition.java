@@ -21,10 +21,10 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.ProgrammingError;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.structure.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.structure.Access2D;
 
 abstract class InPlaceDecomposition<N extends Comparable<N>> extends GenericDecomposition<N> {
 

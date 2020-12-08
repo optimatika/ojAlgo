@@ -25,19 +25,19 @@ import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.SparseArray;
-import org.ojalgo.function.multiary.MultiaryFunction;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.array.SparseArray;
+import org.ojalgo.core.function.multiary.MultiaryFunction;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.type.CalendarDateUnit;
+import org.ojalgo.core.type.Stopwatch;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.type.CalendarDateUnit;
-import org.ojalgo.type.Stopwatch;
-import org.ojalgo.type.context.NumberContext;
 
 public abstract class GenericSolver implements Optimisation.Solver {
 

@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.ojalgo.random.Uniform;
+import org.ojalgo.core.random.Uniform;
 
 public class IdentityCase extends NonPhysicalTest {
 

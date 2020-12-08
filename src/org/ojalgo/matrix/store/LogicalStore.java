@@ -23,9 +23,9 @@ package org.ojalgo.matrix.store;
 
 import java.util.concurrent.Future;
 
-import org.ojalgo.concurrent.DaemonPoolExecutor;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
+import org.ojalgo.core.concurrent.DaemonPoolExecutor;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access1D;
 
 /**
  * Logical stores are (intended to be) immutable.

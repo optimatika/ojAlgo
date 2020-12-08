@@ -23,8 +23,8 @@ package org.ojalgo.optimisation.linear;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.optimisation.ModelFileMPS;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * A collection of datasets found here: http://www.numerical.rl.ac.uk/cute/netlib.html

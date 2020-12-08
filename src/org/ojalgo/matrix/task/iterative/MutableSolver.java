@@ -25,13 +25,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.equation.Equation;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.equation.Equation;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete

@@ -21,12 +21,12 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.core.array.BasicArray;
+import org.ojalgo.core.array.Primitive64Array;
+import org.ojalgo.core.structure.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.structure.Access2D;
 
 /**
  * Computes Q while decomposing.

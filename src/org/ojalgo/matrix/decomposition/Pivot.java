@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.array.BasicArray;
+import org.ojalgo.core.array.BasicArray;
 
 final class Pivot {
 

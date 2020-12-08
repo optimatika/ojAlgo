@@ -26,10 +26,10 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.MathProgSysModel;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * A collection of datasets found here: http://lpsolve.sourceforge.net/5.5/semi-cont.htm Semicontinous

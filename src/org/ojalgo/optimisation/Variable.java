@@ -21,19 +21,19 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.core.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
 
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.BigAggregator;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.structure.Structure1D.IntIndex;
-import org.ojalgo.type.TypeUtils;
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.core.function.aggregator.AggregatorFunction;
+import org.ojalgo.core.function.aggregator.AggregatorSet;
+import org.ojalgo.core.function.aggregator.BigAggregator;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.structure.Structure1D.IntIndex;
+import org.ojalgo.core.type.TypeUtils;
+import org.ojalgo.core.type.context.NumberContext;
 
 /**
  * Variable

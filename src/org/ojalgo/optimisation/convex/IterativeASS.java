@@ -21,12 +21,16 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
-import org.ojalgo.array.SparseArray;
-import org.ojalgo.equation.Equation;
+import org.ojalgo.core.array.SparseArray;
+import org.ojalgo.core.equation.Equation;
+import org.ojalgo.core.scalar.PrimitiveScalar;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -34,10 +38,6 @@ import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.MutableSolver;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Solves optimisation problems of the form:

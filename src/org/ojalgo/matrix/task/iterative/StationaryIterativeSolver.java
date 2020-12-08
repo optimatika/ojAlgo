@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 /**
  * StationaryIterativeSolver

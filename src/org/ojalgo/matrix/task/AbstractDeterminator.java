@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.task;
 
-import org.ojalgo.structure.Access2D;
+import org.ojalgo.core.structure.Access2D;
 
 abstract class AbstractDeterminator implements DeterminantTask<Double> {
 

@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
+import org.ojalgo.core.ProgrammingError;
 
 abstract class TransjugatedStore<N extends Comparable<N>> extends LogicalStore<N> {
 

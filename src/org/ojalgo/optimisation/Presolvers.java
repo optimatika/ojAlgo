@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.core.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -30,9 +30,9 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.structure.Structure1D.IntIndex;
-import org.ojalgo.type.context.NumberContext;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.structure.Structure1D.IntIndex;
+import org.ojalgo.core.type.context.NumberContext;
 
 public abstract class Presolvers {
 

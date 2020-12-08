@@ -23,10 +23,10 @@ package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.random.Normal;
+import org.ojalgo.core.random.Uniform;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.random.Normal;
-import org.ojalgo.random.Uniform;
 
 public class MultiplicationTest extends MatrixStoreTests {
 

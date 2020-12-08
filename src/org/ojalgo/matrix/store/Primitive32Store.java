@@ -21,29 +21,35 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Array2D;
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive32Array;
-import org.ojalgo.array.operation.*;
-import org.ojalgo.concurrent.DivideAndConquer;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.array.Array2D;
+import org.ojalgo.core.array.DenseArray;
+import org.ojalgo.core.array.Primitive32Array;
+import org.ojalgo.core.array.operation.*;
+import org.ojalgo.core.concurrent.DivideAndConquer;
+import org.ojalgo.core.function.BinaryFunction;
+import org.ojalgo.core.function.NullaryFunction;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.function.VoidFunction;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.structure.*;
+import org.ojalgo.core.type.NumberDefinition;
+import org.ojalgo.matrix.operation.HouseholderLeft;
+import org.ojalgo.matrix.operation.HouseholderRight;
+import org.ojalgo.matrix.operation.MultiplyBoth;
+import org.ojalgo.matrix.operation.MultiplyLeft;
+import org.ojalgo.matrix.operation.MultiplyNeither;
+import org.ojalgo.matrix.operation.MultiplyRight;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.structure.*;
-import org.ojalgo.type.NumberDefinition;
 
 /**
  * A {@linkplain float} implementation of {@linkplain PhysicalStore}.

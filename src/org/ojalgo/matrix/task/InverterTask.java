@@ -21,7 +21,12 @@
  */
 package org.ojalgo.matrix.task;
 
-import org.ojalgo.RecoverableCondition;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.Quaternion;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.LU;
@@ -29,11 +34,6 @@ import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure2D;
 
 public interface InverterTask<N extends Comparable<N>> extends MatrixTask<N> {
 

@@ -21,6 +21,9 @@
  */
 package org.ojalgo.matrix;
 
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Structure2D;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LDL;
@@ -35,9 +38,6 @@ import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure2D;
 
 /**
  * A matrix (linear algebra) with 64-bit primitive double elements.

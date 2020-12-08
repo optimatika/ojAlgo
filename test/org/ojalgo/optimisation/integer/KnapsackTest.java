@@ -21,18 +21,18 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.core.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Here is a junit test. Currently, tests 1 and 4 fail and the others pass. I don't understand what is causing

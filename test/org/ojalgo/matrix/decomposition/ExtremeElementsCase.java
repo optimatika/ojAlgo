@@ -21,27 +21,27 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.random.Uniform;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.decomposition.HermitianEvD.Primitive;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.RankRevealing;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete

@@ -21,9 +21,9 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access1D;
 
 final class SingleStore<N extends Comparable<N>> extends FactoryStore<N> {
 

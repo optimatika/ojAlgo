@@ -25,12 +25,12 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.BigMath;
-import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.type.CalendarDateUnit;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.optimisation.Optimisation.Result;
-import org.ojalgo.type.CalendarDateUnit;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Base class for MPS-file based tests.

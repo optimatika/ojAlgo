@@ -23,11 +23,11 @@ package org.ojalgo.matrix;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.GenericStore;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * This problem is taken from example 2.21 of the Scientific Computing, An Introductory Survey.

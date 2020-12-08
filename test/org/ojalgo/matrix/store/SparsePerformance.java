@@ -21,18 +21,18 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.random.Uniform;
-import org.ojalgo.structure.ElementView1D;
-import org.ojalgo.structure.Mutate2D;
-import org.ojalgo.type.CalendarDateUnit;
-import org.ojalgo.type.Stopwatch;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.random.Uniform;
+import org.ojalgo.core.structure.ElementView1D;
+import org.ojalgo.core.structure.Mutate2D;
+import org.ojalgo.core.type.CalendarDateUnit;
+import org.ojalgo.core.type.Stopwatch;
 
 public class SparsePerformance extends MatrixStoreTests {
 

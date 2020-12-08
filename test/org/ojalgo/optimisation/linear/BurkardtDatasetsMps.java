@@ -21,19 +21,19 @@
  */
 package org.ojalgo.optimisation.linear;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.core.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.constant.BigMath;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.ModelFileMPS;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * A small collection of datasets found here: http://people.sc.fsu.edu/~jburkardt/datasets/mps/maros.mps

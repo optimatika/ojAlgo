@@ -21,30 +21,30 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.array.operation.AXPY;
-import org.ojalgo.array.operation.COPY;
-import org.ojalgo.array.operation.DOT;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.ComplexAggregator;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.array.Primitive64Array;
+import org.ojalgo.core.array.operation.AXPY;
+import org.ojalgo.core.array.operation.COPY;
+import org.ojalgo.core.array.operation.DOT;
+import org.ojalgo.core.function.aggregator.AggregatorFunction;
+import org.ojalgo.core.function.aggregator.ComplexAggregator;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.PrimitiveScalar;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Access2D.Collectable;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Access2D.Collectable;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Eigenvalues and eigenvectors of a real matrix.

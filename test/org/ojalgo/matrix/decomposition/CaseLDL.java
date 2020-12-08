@@ -26,10 +26,10 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.netio.BasicLogger;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.netio.BasicLogger;
 
 /**
  * @author apete

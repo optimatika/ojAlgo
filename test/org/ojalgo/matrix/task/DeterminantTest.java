@@ -24,11 +24,11 @@ package org.ojalgo.matrix.task;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.random.Uniform;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.random.Uniform;
 
 public final class DeterminantTest extends MatrixTaskTests {
 

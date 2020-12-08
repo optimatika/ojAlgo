@@ -22,11 +22,11 @@
 package org.ojalgo.optimisation.linear;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.array.DenseArray;
-import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.array.DenseArray;
+import org.ojalgo.core.array.Primitive64Array;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.netio.BasicLogger;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;

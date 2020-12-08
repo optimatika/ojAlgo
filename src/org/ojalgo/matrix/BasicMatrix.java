@@ -26,14 +26,21 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.algebra.NormedVectorSpace;
-import org.ojalgo.algebra.Operation;
-import org.ojalgo.algebra.ScalarOperation;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.core.ProgrammingError;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.algebra.NormedVectorSpace;
+import org.ojalgo.core.algebra.Operation;
+import org.ojalgo.core.algebra.ScalarOperation;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.function.aggregator.AggregatorFunction;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Mutate2D;
+import org.ojalgo.core.structure.Structure2D;
+import org.ojalgo.core.type.NumberDefinition;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
@@ -50,13 +57,6 @@ import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Mutate2D;
-import org.ojalgo.structure.Structure2D;
-import org.ojalgo.type.NumberDefinition;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * A base class for, easy to use, immutable (thread safe) matrices with a rich feature set. This class handles

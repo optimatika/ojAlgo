@@ -21,15 +21,15 @@
  */
 package org.ojalgo.matrix.task;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.function.special.MissingMath;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.structure.Structure2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.structure.Structure2D;
 
 public abstract class AbstractInverter implements InverterTask<Double> {
 

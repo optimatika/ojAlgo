@@ -21,14 +21,14 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.constant.BigMath.*;
+import static org.ojalgo.core.function.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.function.constant.BigMath;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.function.constant.BigMath;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;

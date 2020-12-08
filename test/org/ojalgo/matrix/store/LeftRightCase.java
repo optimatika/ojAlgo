@@ -22,8 +22,8 @@
 package org.ojalgo.matrix.store;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.core.random.Uniform;
+import org.ojalgo.core.scalar.ComplexNumber;
 
 public class LeftRightCase extends NonPhysicalTest {
 

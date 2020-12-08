@@ -21,12 +21,12 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.core.function.BinaryFunction;
+import org.ojalgo.core.function.UnaryFunction;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.structure.Transformation2D;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.structure.Transformation2D;
 
 abstract class MatrixPipeline<N extends Comparable<N>> implements ElementsSupplier<N> {
 

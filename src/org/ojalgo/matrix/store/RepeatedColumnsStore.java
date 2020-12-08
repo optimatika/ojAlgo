@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.structure.Access1D;
+import org.ojalgo.core.structure.Access1D;
 
 final class RepeatedColumnsStore<N extends Comparable<N>> extends ComposingStore<N> {
 

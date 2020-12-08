@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
-import static org.ojalgo.function.constant.PrimitiveMath.*;
+import static org.ojalgo.core.function.constant.PrimitiveMath.*;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Constructor;
@@ -38,22 +38,22 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
-import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.multiary.MultiaryFunction;
-import org.ojalgo.machine.VirtualMachine;
+import org.ojalgo.core.OjAlgoUtils;
+import org.ojalgo.core.function.aggregator.Aggregator;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.function.multiary.MultiaryFunction;
+import org.ojalgo.core.machine.VirtualMachine;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.netio.CharacterRing;
+import org.ojalgo.core.netio.CharacterRing.PrinterBuffer;
+import org.ojalgo.core.structure.Access1D;
+import org.ojalgo.core.type.TypeUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.netio.CharacterRing;
-import org.ojalgo.netio.CharacterRing.PrinterBuffer;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.structure.Access1D;
-import org.ojalgo.type.TypeUtils;
 
 public final class IntegerSolver extends GenericSolver {
 

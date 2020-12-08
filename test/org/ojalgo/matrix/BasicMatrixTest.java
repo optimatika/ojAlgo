@@ -27,12 +27,20 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.TestUtils;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.function.constant.ComplexMath;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.constant.QuaternionMath;
-import org.ojalgo.function.constant.RationalMath;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.function.constant.ComplexMath;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.function.constant.QuaternionMath;
+import org.ojalgo.core.function.constant.RationalMath;
+import org.ojalgo.core.random.Uniform;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.scalar.Quaternion;
+import org.ojalgo.core.scalar.RationalNumber;
+import org.ojalgo.core.scalar.Scalar;
+import org.ojalgo.core.structure.ColumnView;
+import org.ojalgo.core.structure.RowView;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.BasicMatrix.PhysicalReceiver;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
@@ -40,14 +48,6 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.GenericStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.scalar.Scalar;
-import org.ojalgo.structure.ColumnView;
-import org.ojalgo.structure.RowView;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete
@@ -926,7 +926,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#solve(org.ojalgo.structure.Access2D)
+     * @see org.ojalgo.matrix.BasicMatrix#solve(org.ojalgo.core.structure.Access2D)
      */
     @Test
     public void testSolveMatrix() {

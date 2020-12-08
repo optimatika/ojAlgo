@@ -25,22 +25,22 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ojalgo.RecoverableCondition;
-import org.ojalgo.TestUtils;
-import org.ojalgo.array.Array1D;
-import org.ojalgo.function.constant.PrimitiveMath;
-import org.ojalgo.function.special.MissingMath;
+import org.ojalgo.core.RecoverableCondition;
+import org.ojalgo.core.TestUtils;
+import org.ojalgo.core.array.Array1D;
+import org.ojalgo.core.function.constant.PrimitiveMath;
+import org.ojalgo.core.function.special.MissingMath;
+import org.ojalgo.core.netio.BasicLogger;
+import org.ojalgo.core.random.Normal;
+import org.ojalgo.core.random.Uniform;
+import org.ojalgo.core.scalar.ComplexNumber;
+import org.ojalgo.core.structure.Access2D;
+import org.ojalgo.core.type.context.NumberContext;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.EconomySize;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.Primitive64Store;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.random.Normal;
-import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.structure.Access2D;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete
