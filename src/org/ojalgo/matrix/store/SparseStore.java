@@ -505,24 +505,26 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void reduceColumns(final Aggregator aggregator, final Mutate1D receiver) {
-        if (aggregator == Aggregator.SUM) {
+        if ((aggregator == Aggregator.SUM) && (receiver instanceof Mutate1D.Modifiable)) {
             if (this.isPrimitive()) {
-                this.nonzeros().forEach(element -> receiver.add(element.column(), element.doubleValue()));
+                this.nonzeros().forEach(element -> ((Modifiable<?>) receiver).add(element.column(), element.doubleValue()));
             } else {
-                this.nonzeros().forEach(element -> receiver.add(element.column(), element.get()));
+                this.nonzeros().forEach(element -> ((Modifiable<N>) receiver).add(element.column(), element.get()));
             }
         } else {
             super.reduceColumns(aggregator, receiver);
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void reduceRows(final Aggregator aggregator, final Mutate1D receiver) {
-        if (aggregator == Aggregator.SUM) {
+        if ((aggregator == Aggregator.SUM) && (receiver instanceof Mutate1D.Modifiable)) {
             if (this.isPrimitive()) {
-                this.nonzeros().forEach(element -> receiver.add(element.row(), element.doubleValue()));
+                this.nonzeros().forEach(element -> ((Modifiable<?>) receiver).add(element.row(), element.doubleValue()));
             } else {
-                this.nonzeros().forEach(element -> receiver.add(element.row(), element.get()));
+                this.nonzeros().forEach(element -> ((Modifiable<N>) receiver).add(element.row(), element.get()));
             }
         } else {
             super.reduceColumns(aggregator, receiver);

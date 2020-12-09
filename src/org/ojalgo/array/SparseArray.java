@@ -295,7 +295,7 @@ public final class SparseArray<N extends Comparable<N>> extends BasicArray<N> {
     }
 
     @Override
-    public void axpy(final double a, final Mutate1D y) {
+    public void axpy(final double a, final Mutate1D.Modifiable<?> y) {
         for (int n = 0; n < myActualLength; n++) {
             y.add(myIndices[n], a * myValues.doubleValue(n));
         }

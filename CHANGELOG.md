@@ -11,6 +11,23 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Changed
+
+#### org.ojalgo.structure
+
+- The `add` methods of the `Mutate1D`, `Mutate2D` and `MutateAnyD` interfaces have been moved to `Mutate1D.Modifiable`, `Mutate2D.Modifiable` and `MutateAnyD.Modifiable` respectively. With most hgher level interfaces or implemenattions this makes no difference as they typically extend or implement both these interfaces.
+- In `Access1D` the `axpy` method had an element of its signture (one of the input parameters) changed from `Mutate1D` to `Mutate1D.Modifiable<?>`.
+
+### Removed
+
+#### org.ojalgo.array
+
+- The `NumberList` class had the `add` methods (the ones with a `long` index parameter) previously specified in the `Mutate1D` removed.
+
+#### org.ojalgo.type
+
+- The `IndexedMap` class had the `add` methods previously specified in the `Mutate1D` removed.
+
 
 ## [48.3.2] – 2020-12-05
 
