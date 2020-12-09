@@ -169,6 +169,32 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     interface Modifiable<N extends Comparable<N>> extends Structure2D, Mutate1D.Modifiable<N> {
 
+        @Override
+        default void add(final long index, final Comparable<?> addend) {
+            long structure = this.countRows();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        @Override
+        default void add(final long index, final double addend) {
+            long structure = this.countRows();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        @Override
+        default void add(final long index, final float addend) {
+            long structure = this.countRows();
+            this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
+        }
+
+        void add(long row, long col, Comparable<?> addend);
+
+        void add(long row, long col, double addend);
+
+        default void add(final long row, final long col, final float addend) {
+            this.add(row, col, (double) addend);
+        }
+
         default void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
             this.loopColumn(row, col, (r, c) -> this.modifyOne(r, c, modifier));
         }
@@ -245,32 +271,6 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             return (this.countRows() >= supplier.countRows()) && (this.countColumns() >= supplier.countColumns());
         }
 
-    }
-
-    @Override
-    default void add(final long index, final Comparable<?> addend) {
-        long structure = this.countRows();
-        this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
-    }
-
-    @Override
-    default void add(final long index, final double addend) {
-        long structure = this.countRows();
-        this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
-    }
-
-    @Override
-    default void add(final long index, final float addend) {
-        long structure = this.countRows();
-        this.add(Structure2D.row(index, structure), Structure2D.column(index, structure), addend);
-    }
-
-    void add(long row, long col, Comparable<?> addend);
-
-    void add(long row, long col, double addend);
-
-    default void add(final long row, final long col, final float addend) {
-        this.add(row, col, (double) addend);
     }
 
     @Override

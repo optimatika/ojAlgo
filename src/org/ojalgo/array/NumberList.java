@@ -126,33 +126,6 @@ public final class NumberList<N extends Comparable<N>> implements List<N>, Rando
     }
 
     @Override
-    public void add(final long index, final Comparable<?> addend) {
-        if (index >= myActualCount) {
-            throw new ArrayIndexOutOfBoundsException();
-        } else {
-            myStorage.add(index, addend);
-        }
-    }
-
-    @Override
-    public void add(final long index, final double addend) {
-        if (index >= myActualCount) {
-            throw new ArrayIndexOutOfBoundsException();
-        } else {
-            myStorage.add(index, addend);
-        }
-    }
-
-    @Override
-    public void add(final long index, final float addend) {
-        if (index >= myActualCount) {
-            throw new ArrayIndexOutOfBoundsException();
-        } else {
-            myStorage.add(index, addend);
-        }
-    }
-
-    @Override
     public boolean add(final N element) {
 
         this.ensureCapacity();

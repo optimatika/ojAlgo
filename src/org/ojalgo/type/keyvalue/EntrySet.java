@@ -37,7 +37,7 @@ import org.ojalgo.type.PrimitiveNumber;
 
 /**
  * Allows you to wrap and treat two arrays as a {@link Collection} of key-value pairs. Implements both
- * {@link List} and {@link Set} but does not in anyway test or enforce uniqueness – that's up to the user of
+ * {@link List} and {@link Set} but does not in any way test or enforce uniqueness – that's up to the user of
  * this class.
  *
  * @author apete

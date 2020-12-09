@@ -46,7 +46,7 @@ public abstract class ScalarArray<N extends Scalar<N>> extends ReferenceTypeArra
     }
 
     @Override
-    public final void axpy(final double a, final Mutate1D y) {
+    public final void axpy(final double a, final Mutate1D.Modifiable<?> y) {
         AXPY.invoke(y, a, data);
     }
 
