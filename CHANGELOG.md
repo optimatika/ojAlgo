@@ -18,6 +18,12 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - The `add` methods of the `Mutate1D`, `Mutate2D` and `MutateAnyD` interfaces have been moved to `Mutate1D.Modifiable`, `Mutate2D.Modifiable` and `MutateAnyD.Modifiable` respectively. With most hgher level interfaces or implemenattions this makes no difference as they typically extend or implement both these interfaces.
 - In `Access1D` the `axpy` method had an element of its signture (one of the input parameters) changed from `Mutate1D` to `Mutate1D.Modifiable<?>`.
 
+### Deprecated
+
+#### org.ojalgo.equation
+
+- The public constructors of `Equation` are replaced by various factory methods.
+
 ### Removed
 
 #### org.ojalgo.array
