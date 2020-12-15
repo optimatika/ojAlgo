@@ -570,7 +570,11 @@ public final class IntegerSolver extends GenericSolver {
             }
 
             nodeModel.dispose();
-            return true;
+            if ((nodeKey.sequence == 0) && (nodeResult.getState().isUnexplored() || !nodeResult.getState().isValid())) {
+                return false;
+            } else {
+                return true;
+            }
         }
 
     }

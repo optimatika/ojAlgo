@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.integer;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.ojalgo.array.operation.COPY;
 import org.ojalgo.function.constant.PrimitiveMath;
@@ -41,7 +40,6 @@ final class NodeKey implements Comparable<NodeKey> {
      * half its precision.
      */
     private static final NumberContext FEASIBILITY = new NumberContext(7, 6);
-    private static final AtomicLong GENERATOR = new AtomicLong();
 
     private final int[] myLowerBounds;
     private final boolean mySignChanged;
@@ -67,12 +65,14 @@ final class NodeKey implements Comparable<NodeKey> {
     /**
      * Node sequennce number to keep track of in which order the nodes were created.
      */
-    final long sequence = GENERATOR.getAndIncrement();
+    final long sequence;
 
-    private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int integerIndexBranchedOn,
-            final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean signChanged) {
+    private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final long sequenceIncr,
+            final int integerIndexBranchedOn, final double branchVariableDisplacement, final double parentObjectiveFunctionValue, final boolean signChanged) {
 
         super();
+
+        sequence = parentSequenceNumber + sequenceIncr;
 
         myLowerBounds = lowerBounds;
         myUpperBounds = upperBounds;
@@ -88,6 +88,8 @@ final class NodeKey implements Comparable<NodeKey> {
     NodeKey(final ExpressionsBasedModel integerModel) {
 
         super();
+
+        sequence = 0;
 
         final List<Variable> integerVariables = integerModel.getIntegerVariables();
         final int numberOfIntegerVariables = integerVariables.size();
@@ -265,7 +267,7 @@ final class NodeKey implements Comparable<NodeKey> {
 
         final boolean changed = (oldVal > 0) && (newVal <= 0);
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, value - tmpFloor, objective, changed);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, 1L, branchIntegerIndex, value - tmpFloor, objective, changed);
     }
 
     NodeKey createUpperBranch(final int branchIntegerIndex, final double value, final double objective) {
@@ -289,7 +291,7 @@ final class NodeKey implements Comparable<NodeKey> {
 
         final boolean changed = (oldVal < 0) && (newVal >= 0);
 
-        return new NodeKey(tmpLBs, tmpUBs, sequence, branchIntegerIndex, tmpCeil - value, objective, changed);
+        return new NodeKey(tmpLBs, tmpUBs, sequence, 2L, branchIntegerIndex, tmpCeil - value, objective, changed);
     }
 
     void enforceBounds(final ExpressionsBasedModel model, final int integerIndex, final int[] integerToGlobalTranslator) {

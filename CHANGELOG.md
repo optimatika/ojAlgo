@@ -20,6 +20,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 ### Changed
 
+#### org.ojalgo.optimisation
+
+- Changed the default mip_gap from 1E-4 to 1E-6
+- Major rewrite/update to the presolver functionality of `ExpressionsBasedModel` which greatly affects the `IntegerSolver`.
+
 #### org.ojalgo.structure
 
 - The `add` methods of the `Mutate1D`, `Mutate2D` and `MutateAnyD` interfaces have been moved to `Mutate1D.Modifiable`, `Mutate2D.Modifiable` and `MutateAnyD.Modifiable` respectively. With most hgher level interfaces or implemenattions this makes no difference as they typically extend or implement both these interfaces.

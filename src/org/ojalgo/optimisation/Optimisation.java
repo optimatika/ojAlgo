@@ -209,7 +209,7 @@ public interface Optimisation {
          * than this value, then the corresponding branch is terminated as it is deemed unlikely or too
          * "expensive" to find better integer solutions there.
          */
-        public double mip_gap = 1.0E-4;
+        public double mip_gap = 1.0E-6;
 
         /**
          * For display only!
