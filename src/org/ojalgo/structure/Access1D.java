@@ -301,7 +301,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         }
     }
 
-    static Access1D<Double> wrap(final double[] target) {
+    static Access1D<Double> wrap(final double... target) {
         return new Access1D<Double>() {
 
             public long count() {

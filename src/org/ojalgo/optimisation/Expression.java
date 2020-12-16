@@ -430,8 +430,24 @@ public final class Expression extends ModelEntity<Expression> {
         return this.set(myModel.getVariable(index), value);
     }
 
+    public Expression set(final int index, final double value) {
+        return this.set(index, BigDecimal.valueOf(value));
+    }
+
     public Expression set(final int row, final int column, final Comparable<?> value) {
         return this.set(new IntRowColumn(row, column), value);
+    }
+
+    public Expression set(final int row, final int column, final double value) {
+        return this.set(row, column, BigDecimal.valueOf(value));
+    }
+
+    public Expression set(final int row, final int column, final long value) {
+        return this.set(row, column, BigDecimal.valueOf(value));
+    }
+
+    public Expression set(final int index, final long value) {
+        return this.set(index, BigDecimal.valueOf(value));
     }
 
     public Expression set(final IntIndex key, final Comparable<?> value) {
@@ -455,8 +471,24 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
+    public Expression set(final IntIndex key, final double value) {
+        return this.set(key, BigDecimal.valueOf(value));
+    }
+
     public Expression set(final IntIndex row, final IntIndex column, final Comparable<?> value) {
         return this.set(new IntRowColumn(row, column), value);
+    }
+
+    public Expression set(final IntIndex row, final IntIndex column, final double value) {
+        return this.set(row, column, BigDecimal.valueOf(value));
+    }
+
+    public Expression set(final IntIndex row, final IntIndex column, final long value) {
+        return this.set(row, column, BigDecimal.valueOf(value));
+    }
+
+    public Expression set(final IntIndex key, final long value) {
+        return this.set(key, BigDecimal.valueOf(value));
     }
 
     public Expression set(final IntRowColumn key, final Comparable<?> value) {
@@ -467,8 +499,8 @@ public final class Expression extends ModelEntity<Expression> {
 
             if (tmpValue.signum() != 0) {
                 myQuadratic.put(key, tmpValue);
-                myModel.addReference(key.getRow());
-                myModel.addReference(key.getColumn());
+                myModel.addReference(key.row());
+                myModel.addReference(key.column());
             } else {
                 myQuadratic.remove(key);
             }
@@ -481,12 +513,36 @@ public final class Expression extends ModelEntity<Expression> {
         return this;
     }
 
+    public Expression set(final IntRowColumn key, final double value) {
+        return this.set(key, BigDecimal.valueOf(value));
+    }
+
+    public Expression set(final IntRowColumn key, final long value) {
+        return this.set(key, BigDecimal.valueOf(value));
+    }
+
     public Expression set(final Variable variable, final Comparable<?> value) {
         return this.set(variable.getIndex(), value);
     }
 
+    public Expression set(final Variable variable, final double value) {
+        return this.set(variable, BigDecimal.valueOf(value));
+    }
+
+    public Expression set(final Variable variable, final long value) {
+        return this.set(variable, BigDecimal.valueOf(value));
+    }
+
     public Expression set(final Variable variable1, final Variable variable2, final Comparable<?> value) {
         return this.set(variable1.getIndex().index, variable2.getIndex().index, value);
+    }
+
+    public Expression set(final Variable variable1, final Variable variable2, final double value) {
+        return this.set(variable1, variable2, BigDecimal.valueOf(value));
+    }
+
+    public Expression set(final Variable variable1, final Variable variable2, final long value) {
+        return this.set(variable1, variable2, BigDecimal.valueOf(value));
     }
 
     /**
@@ -735,20 +791,20 @@ public final class Expression extends ModelEntity<Expression> {
 
         if (subset.size() > 0) {
 
-            for (final IntIndex linKey : myLinear.keySet()) {
+            for (IntIndex linKey : myLinear.keySet()) {
                 if (subset.contains(linKey)) {
-                    final BigDecimal coefficient = this.get(linKey);
-                    final BigDecimal value = myModel.getVariable(linKey.index).getValue();
+                    BigDecimal coefficient = this.get(linKey);
+                    BigDecimal value = myModel.getVariable(linKey.index).getValue();
                     retVal = retVal.add(coefficient.multiply(value));
                 }
             }
 
-            for (final IntRowColumn quadKey : myQuadratic.keySet()) {
-                if (subset.contains(new IntIndex(quadKey.row))) {
-                    if (subset.contains(new IntIndex(quadKey.column))) {
-                        final BigDecimal coefficient = this.get(quadKey);
-                        final BigDecimal rowValue = myModel.getVariable(quadKey.row).getValue();
-                        final BigDecimal colValue = myModel.getVariable(quadKey.column).getValue();
+            for (IntRowColumn quadKey : myQuadratic.keySet()) {
+                if (subset.contains(quadKey.row())) {
+                    if (subset.contains(quadKey.column())) {
+                        BigDecimal coefficient = this.get(quadKey);
+                        BigDecimal rowValue = myModel.getVariable(quadKey.row).getValue();
+                        BigDecimal colValue = myModel.getVariable(quadKey.column).getValue();
                         retVal = retVal.add(coefficient.multiply(rowValue).multiply(colValue));
                     }
                 }

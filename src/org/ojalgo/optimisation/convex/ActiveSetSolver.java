@@ -36,7 +36,6 @@ import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.structure.Access1D;
 import org.ojalgo.type.IndexSelector;
-import org.ojalgo.type.TypeUtils;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
 
@@ -80,7 +79,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.log("Step: {} - {}", normStepX, iterX.asList());
         }
 
-        if (this.isLogDebug() || options.validate) {
+        if (this.isLogDebug() && options.validate) {
 
             final PhysicalStore<Double> includedChange = this.getMatrixAI(this.getIncluded()).get().multiply(iterX).copy();
 
@@ -481,8 +480,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 retVal = false;
                 if (this.isLogDebug()) {
                     this.log(NONZERO_E_SLACK, largestE);
-                } else if (options.validate) {
-                    throw new IllegalStateException(TypeUtils.format(NONZERO_E_SLACK, largestE));
                 }
             }
         }
@@ -496,8 +493,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 retVal = false;
                 if (this.isLogDebug()) {
                     this.log(NEGATIVE_I_SLACK, minimumI);
-                } else if (options.validate) {
-                    throw new IllegalStateException(TypeUtils.format(NEGATIVE_I_SLACK, minimumI));
                 }
             }
         }

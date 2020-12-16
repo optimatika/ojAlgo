@@ -207,6 +207,12 @@ public final class NumberContext extends FormatContext<Comparable<?>> {
         return new NumberContext(format, math, precisionAndScale);
     }
 
+    public static NumberContext of(final int precision, final int scale) {
+        NumberFormat format = NumberStyle.GENERAL.getFormat();
+        MathContext math = new MathContext(precision, DEFAULT_MATH.getRoundingMode());
+        return new NumberContext(format, math, scale);
+    }
+
     public static NumberContext ofMath(final MathContext math) {
         NumberFormat format = NumberStyle.GENERAL.getFormat();
         return new NumberContext(format, math, DEFAULT_SCALE);

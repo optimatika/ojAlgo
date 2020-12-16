@@ -358,6 +358,15 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
             }
         }
 
+        if ((mtrxQ == null) && (mtrxC == null)) {
+            // In some very rare case the model was verified to be a quadratic
+            // problem, but then the presolver eliminated/fixed all variables
+            // part of the objective function - then we would end up here.
+            // Rather than always having to do very expensive checks we simply
+            // generate a well-behaved objective function here.
+            mtrxQ = Primitive64Store.FACTORY.makeEye(numbVars, numbVars);
+        }
+
         destinationBuilder.objective(mtrxQ, mtrxC);
 
         // AI & BI

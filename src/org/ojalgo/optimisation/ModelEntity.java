@@ -223,6 +223,14 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return this.lower(value).upper(value);
     }
 
+    public final ME level(final double level) {
+        return this.level(BigDecimal.valueOf(level));
+    }
+
+    public final ME level(final long level) {
+        return this.level(BigDecimal.valueOf(level));
+    }
+
     /**
      * Extremely large (absolute value) values are treated as "no limit" (null) and extremely small values are
      * treated as exactly 0.0, unless the input number type is {@link BigDecimal}. {@link BigDecimal} values
@@ -232,6 +240,14 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     public ME lower(final Comparable<?> lower) {
         myLowerLimit = ModelEntity.toBigDecimal(lower);
         return (ME) this;
+    }
+
+    public final ME lower(final double lower) {
+        return this.lower(BigDecimal.valueOf(lower));
+    }
+
+    public final ME lower(final long lower) {
+        return this.lower(BigDecimal.valueOf(lower));
     }
 
     /**
@@ -313,6 +329,14 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return (ME) this;
     }
 
+    public final ME upper(final double upper) {
+        return this.upper(BigDecimal.valueOf(upper));
+    }
+
+    public final ME upper(final long upper) {
+        return this.upper(BigDecimal.valueOf(upper));
+    }
+
     /**
      * @see #getContributionWeight()
      */
@@ -323,6 +347,14 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
             myContributionWeight = null;
         }
         return (ME) this;
+    }
+
+    public final ME weight(final double weight) {
+        return this.weight(BigDecimal.valueOf(weight));
+    }
+
+    public final ME weight(final long weight) {
+        return this.weight(BigDecimal.valueOf(weight));
     }
 
     private double toLowerValue(final boolean adjusted) {
