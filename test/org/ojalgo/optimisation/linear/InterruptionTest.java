@@ -33,7 +33,7 @@ public class InterruptionTest {
     public static final int TIMEOUT_DURATION = 4;
 
     private void launchSlowMinimization() {
-        final ExpressionsBasedModel model = ModelFileMPS.makeModel("netlib", "25FV47.SIF", false);
+        ExpressionsBasedModel model = ModelFileMPS.makeModel("netlib", "25FV47.SIF", false);
         model.minimise();
     }
 

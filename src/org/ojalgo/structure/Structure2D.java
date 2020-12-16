@@ -61,6 +61,13 @@ public interface Structure2D extends Structure1D {
             this(-1, -1);
         }
 
+        public IntIndex column() {
+            if (myColumn == null) {
+                myColumn = IntIndex.of(column);
+            }
+            return myColumn;
+        }
+
         public int compareTo(final IntRowColumn ref) {
 
             if (column == ref.column) {
@@ -94,18 +101,20 @@ public interface Structure2D extends Structure1D {
             return true;
         }
 
+        /**
+         * @deprecated v49 Use {@link #column()} instead
+         */
+        @Deprecated
         public IntIndex getColumn() {
-            if (myColumn == null) {
-                myColumn = IntIndex.of(column);
-            }
-            return myColumn;
+            return this.column();
         }
 
+        /**
+         * @deprecated v49 Use {@link #row()} instead
+         */
+        @Deprecated
         public IntIndex getRow() {
-            if (myRow == null) {
-                myRow = IntIndex.of(row);
-            }
-            return myRow;
+            return this.row();
         }
 
         @Override
@@ -115,6 +124,13 @@ public interface Structure2D extends Structure1D {
             result = (prime * result) + column;
             result = (prime * result) + row;
             return result;
+        }
+
+        public IntIndex row() {
+            if (myRow == null) {
+                myRow = IntIndex.of(row);
+            }
+            return myRow;
         }
 
         @Override
@@ -282,6 +298,13 @@ public interface Structure2D extends Structure1D {
             this(-1L, -1L);
         }
 
+        public LongIndex column() {
+            if (myColumn == null) {
+                myColumn = LongIndex.of(column);
+            }
+            return myColumn;
+        }
+
         public int compareTo(final LongRowColumn ref) {
 
             if (column == ref.column) {
@@ -315,18 +338,20 @@ public interface Structure2D extends Structure1D {
             return true;
         }
 
+        /**
+         * @deprecated v49 Use {@link #column()} instead
+         */
+        @Deprecated
         public LongIndex getColumn() {
-            if (myColumn == null) {
-                myColumn = LongIndex.of(column);
-            }
-            return myColumn;
+            return this.column();
         }
 
+        /**
+         * @deprecated v49 Use {@link #row()} instead
+         */
+        @Deprecated
         public LongIndex getRow() {
-            if (myRow == null) {
-                myRow = LongIndex.of(row);
-            }
-            return myRow;
+            return this.row();
         }
 
         @Override
@@ -336,6 +361,13 @@ public interface Structure2D extends Structure1D {
             result = (prime * result) + (int) (column ^ (column >>> 32));
             result = (prime * result) + (int) (row ^ (row >>> 32));
             return result;
+        }
+
+        public LongIndex row() {
+            if (myRow == null) {
+                myRow = LongIndex.of(row);
+            }
+            return myRow;
         }
 
         @Override

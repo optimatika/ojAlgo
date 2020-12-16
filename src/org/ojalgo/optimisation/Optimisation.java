@@ -315,6 +315,10 @@ public interface Optimisation {
 
     public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result> {
 
+        public static Result of(final double value, final Optimisation.State state, final double... solution) {
+            return new Result(state, value, Access1D.wrap(solution));
+        }
+
         private transient Access1D<?> myMultipliers = null;
         private final Access1D<?> mySolution;
         private final Optimisation.State myState;

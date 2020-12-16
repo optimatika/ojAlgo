@@ -11,6 +11,13 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.optimisation
+
+- Better support for building optimisation model with primitive valued parameters - overloaded methods for `long` and `double` values.
+- Various minor additions and changes.
+
 ### Changed
 
 #### org.ojalgo.structure
