@@ -70,15 +70,13 @@ public class PrimalDualTest extends OptimisationLinearTests {
         ConvexSolver.Builder primConvex = ConvexSolver.getBuilder();
         ConvexSolver.copy(primModel, primConvex);
 
+        Result primModelPrimSolver = PrimalSimplex.solve(primConvex, primModel.options);
+        Result primModelDualSolver = DualSimplex.solve(primConvex, dualModel.options);
+
         ConvexSolver.Builder dualConvex = ConvexSolver.getBuilder();
         ConvexSolver.copy(dualModel, dualConvex);
 
-        Result primModelPrimSolver = PrimalSimplex.solve(primConvex, primModel.options);
-
-        Result primModelDualSolver = DualSimplex.solve(primConvex, dualModel.options);
-
         Result dualModelPrimSolver = PrimalSimplex.solve(dualConvex, dualModel.options);
-
         Result dualModelDualSolver = DualSimplex.solve(dualConvex, primModel.options);
 
         if (DEBUG) {
@@ -257,6 +255,42 @@ public class PrimalDualTest extends OptimisationLinearTests {
         double optimalValue = 14.0 / 3.0;
         DenseArray<Double> optimalX = Primitive64Array.FACTORY.copy(new double[] { 0.0, 7.0 / 6.0 });
         DenseArray<Double> optimalY = Primitive64Array.FACTORY.copy(new double[] { 4.0 / 6.0 });
+
+        ConvexSolver.Builder primConvex = ConvexSolver.getBuilder();
+        ConvexSolver.copy(primModel, primConvex);
+
+        TestUtils.assertEquals(2, primConvex.countVariables());
+        TestUtils.assertEquals(3, primConvex.countConstraints());
+        TestUtils.assertEquals(1, primConvex.countEqualityConstraints());
+        TestUtils.assertEquals(2, primConvex.countInequalityConstraints());
+
+        Result primModelPrimSolver = PrimalSimplex.solve(primConvex, primModel.options);
+
+        TestUtils.assertEquals(2, primModelPrimSolver.size());
+        TestUtils.assertEquals(3, primModelPrimSolver.getMultipliers().get().size());
+
+        Result primModelDualSolver = DualSimplex.solve(primConvex, dualModel.options);
+
+        TestUtils.assertEquals(2, primModelDualSolver.size());
+        TestUtils.assertEquals(3, primModelDualSolver.getMultipliers().get().size());
+
+        ConvexSolver.Builder dualConvex = ConvexSolver.getBuilder();
+        ConvexSolver.copy(dualModel, dualConvex);
+
+        TestUtils.assertEquals(1, dualConvex.countVariables());
+        TestUtils.assertEquals(2, dualConvex.countConstraints());
+        TestUtils.assertEquals(0, dualConvex.countEqualityConstraints());
+        TestUtils.assertEquals(2, dualConvex.countInequalityConstraints());
+
+        Result dualModelPrimSolver = PrimalSimplex.solve(dualConvex, dualModel.options);
+
+        TestUtils.assertEquals(1, dualModelPrimSolver.size());
+        TestUtils.assertEquals(2, dualModelPrimSolver.getMultipliers().get().size());
+
+        Result dualModelDualSolver = DualSimplex.solve(dualConvex, primModel.options);
+
+        TestUtils.assertEquals(1, dualModelDualSolver.size());
+        TestUtils.assertEquals(2, dualModelDualSolver.getMultipliers().get().size());
 
         PrimalDualTest.doCompare(primModel, dualModel, optimalValue, optimalX, optimalY);
     }
