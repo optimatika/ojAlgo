@@ -184,9 +184,9 @@ public final class Variable extends ModelEntity<Variable> {
 
         BigDecimal retVal = ZERO;
 
-        final BigDecimal tmpContributionWeight = this.getContributionWeight();
-        if ((tmpContributionWeight != null) && (myValue != null)) {
-            retVal = tmpContributionWeight.multiply(myValue);
+        BigDecimal contributionWeight = this.getContributionWeight();
+        if ((contributionWeight != null) && (myValue != null)) {
+            retVal = contributionWeight.multiply(myValue);
         }
 
         return retVal;
