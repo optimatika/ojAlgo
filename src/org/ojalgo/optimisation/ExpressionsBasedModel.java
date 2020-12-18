@@ -233,7 +233,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         public Optimisation.Result solve(final Optimisation.Result candidate) {
 
-            if (mySolver == null) {
+            if ((mySolver == null) && (PRESOLVERS.size() > 0)) {
                 myModel.presolve();
             }
 
