@@ -1504,16 +1504,15 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         boolean needToRepeat = false;
 
+        BigDecimal compensatedLowerLimit;
+        BigDecimal compensatedUpperLimit;
+
         do {
 
-            final Set<IntIndex> fixedVariables = this.getFixedVariables();
-
-            BigDecimal compensatedLowerLimit;
-            BigDecimal compensatedUpperLimit;
-
+            Set<IntIndex> fixedVariables = this.getFixedVariables();
             needToRepeat = false;
 
-            for (final Expression expr : this.getExpressions()) {
+            for (Expression expr : this.getExpressions()) {
                 if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
 
                     BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
@@ -1525,15 +1524,37 @@ public final class ExpressionsBasedModel extends AbstractModel {
                     myTemporary.addAll(expr.getLinearKeySet());
                     myTemporary.removeAll(fixedVariables);
 
-                    for (final Presolver presolver : PRESOLVERS) {
+                    for (Presolver presolver : PRESOLVERS) {
                         if (!needToRepeat) {
                             needToRepeat |= presolver.simplify(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility, myRelaxed);
                         }
                     }
+
                 }
             }
 
         } while (needToRepeat);
+
+        if (!this.isInfeasible()) {
+            Set<IntIndex> fixedVariables = this.getFixedVariables();
+            for (Expression expr : this.getExpressions()) {
+                if (expr.isConstraint() && expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
+                    // Specifically need to check if constraints that have been determined redundant
+                    // are not infeasible
+
+                    BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
+
+                    compensatedLowerLimit = expr.getCompensatedLowerLimit(calculateSetValue);
+                    compensatedUpperLimit = expr.getCompensatedUpperLimit(calculateSetValue);
+
+                    myTemporary.clear();
+                    myTemporary.addAll(expr.getLinearKeySet());
+                    myTemporary.removeAll(fixedVariables);
+
+                    Presolvers.checkFeasibility(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility, myRelaxed);
+                }
+            }
+        }
 
         this.categoriseVariables();
     }

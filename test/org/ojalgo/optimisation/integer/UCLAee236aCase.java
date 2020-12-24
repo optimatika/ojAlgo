@@ -27,10 +27,10 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.store.Primitive64Store;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
@@ -43,27 +43,31 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class UCLAee236aCase extends OptimisationIntegerTests {
 
-    private static final NumberContext PRECISION = new NumberContext(2, 2);
+    private static final Optimisation.Result EXPECTED_MIP = Result.of(-10.0, State.OPTIMAL, 2.0, 2.0);
+    /**
+     * Solutions in the pdf are given with 2 decimals (3 digits).
+     */
+    private static final NumberContext PRECISION = NumberContext.of(2);
 
     private static ExpressionsBasedModel makeOriginalRootModel() {
 
-        final Variable[] tmpVariables = new Variable[] { new Variable("X1").lower(ZERO).weight(TWO.negate()).integer(true),
+        Variable[] tmpVariables = new Variable[] { new Variable("X1").lower(ZERO).weight(TWO.negate()).integer(true),
                 new Variable("X2").lower(ZERO).weight(THREE.negate()).integer(true) };
 
-        final ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
+        ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
         retVal.setMinimisation();
 
-        final Expression tmpExprC1 = retVal.addExpression("C1");
+        Expression exprC1 = retVal.addExpression("C1");
         for (int i = 0; i < retVal.countVariables(); i++) {
-            tmpExprC1.set(i, new BigDecimal[] { TWO.multiply(NINTH), QUARTER }[i]);
+            exprC1.set(i, new BigDecimal[] { TWO.multiply(NINTH), QUARTER }[i]);
         }
-        tmpExprC1.upper(ONE);
+        exprC1.upper(ONE);
 
-        final Expression tmpExprC2 = retVal.addExpression("C2");
+        Expression exprC2 = retVal.addExpression("C2");
         for (int i = 0; i < retVal.countVariables(); i++) {
-            tmpExprC2.set(i, new BigDecimal[] { SEVENTH, THIRD }[i]);
+            exprC2.set(i, new BigDecimal[] { SEVENTH, THIRD }[i]);
         }
-        tmpExprC2.upper(ONE);
+        exprC2.upper(ONE);
 
         return retVal;
     }
@@ -74,35 +78,31 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testFullMIP() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel();
+        Result expected = EXPECTED_MIP;
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel();
 
-        TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        Optimisation.Result result = model.minimise();
 
-        final Primitive64Store tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 2.0 }, { 2.0 } });
-
-        TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
+        TestUtils.assertStateAndSolution(expected, result, PRECISION);
+        TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
     }
 
     @Test
     public void testRelaxedButConstrainedToOptimalMIP() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        Result expected = EXPECTED_MIP;
 
-        tmpModel.getVariable(0).lower(TWO);
-        tmpModel.getVariable(0).upper(TWO);
-        tmpModel.getVariable(1).lower(TWO);
-        tmpModel.getVariable(1).upper(TWO);
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        model.getVariable(0).lower(TWO);
+        model.getVariable(0).upper(TWO);
+        model.getVariable(1).lower(TWO);
+        model.getVariable(1).upper(TWO);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        Optimisation.Result result = model.minimise();
 
-        //TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
-
-        final Primitive64Store tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 2.0 }, { 2.0 } });
-
-        TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
+        TestUtils.assertStateAndSolution(expected, result, PRECISION);
+        TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
     }
 
     /**
@@ -111,18 +111,14 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP00() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        Result expected = Result.of(-10.56, Optimisation.State.OPTIMAL, 2.17, 2.07);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
 
-        TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        Optimisation.Result result = model.minimise();
 
-        final Primitive64Store tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 2.17 }, { 2.07 } });
-
-        TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
-
-        // The lecture notes states -10.56, but I get -10.55. One of us is rounding incorrectly...
-        TestUtils.assertEquals(-10.55, tmpModel.minimise().getValue(), PRECISION);
+        TestUtils.assertStateAndSolution(expected, result, PRECISION);
+        TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
     }
 
     /**
@@ -131,18 +127,15 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP01() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
-        tmpModel.getVariable(0).upper(TWO);
+        Result expected = Result.of(-10.43, Optimisation.State.OPTIMAL, 2.00, 2.14);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        model.getVariable(0).upper(TWO);
 
-        TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        Optimisation.Result result = model.minimise();
 
-        final Primitive64Store tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 2.00 }, { 2.14 } });
-
-        TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
-
-        TestUtils.assertEquals(-10.43, tmpModel.minimise().getValue(), PRECISION);
+        TestUtils.assertStateAndSolution(expected, result, PRECISION);
+        TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
     }
 
     /**
@@ -151,18 +144,15 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP02() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
-        tmpModel.getVariable(0).lower(THREE);
+        Optimisation.Result expected = Result.of(-10.0, State.OPTIMAL, 3.00, 1.33);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        model.getVariable(0).lower(THREE);
 
-        TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        Optimisation.Result result = model.minimise();
 
-        final Primitive64Store tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 3.00 }, { 1.33 } });
-
-        TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
-
-        TestUtils.assertEquals(-10.00, tmpModel.minimise().getValue(), PRECISION);
+        TestUtils.assertStateAndSolution(expected, result, PRECISION);
+        TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
     }
 
     /**
@@ -171,19 +161,16 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP03() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
-        tmpModel.getVariable(0).upper(TWO);
-        tmpModel.getVariable(1).upper(TWO);
+        Result expected = Result.of(-10.00, Optimisation.State.OPTIMAL, 2.00, 2.00);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        model.getVariable(0).upper(TWO);
+        model.getVariable(1).upper(TWO);
 
-        TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        Optimisation.Result result = model.minimise();
 
-        final Primitive64Store tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 2.00 }, { 2.00 } });
-
-        TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
-
-        TestUtils.assertEquals(-10.00, tmpModel.minimise().getValue(), PRECISION);
+        TestUtils.assertStateAndSolution(expected, result, PRECISION);
+        TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
     }
 
     /**
@@ -192,23 +179,16 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP04() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
-        tmpModel.getVariable(0).upper(TWO);
-        tmpModel.getVariable(1).lower(THREE);
+        Result expected = Result.of(-9.00, Optimisation.State.OPTIMAL, 0.00, 3.00);
 
-        //        tmpModel.options.debug_stream = BasicLogger.DEBUG;
-        //        tmpModel.options.debug_solver = LinearSolver.class;
-        //        tmpModel.options.validate = true;
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        model.getVariable(0).upper(TWO);
+        model.getVariable(1).lower(THREE);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        Optimisation.Result result = model.minimise();
 
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
-
-        final Primitive64Store tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 0.00 }, { 3.00 } });
-
-        TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
-
-        TestUtils.assertEquals(-9.00, tmpModel.minimise().getValue(), PRECISION);
+        TestUtils.assertStateAndSolution(expected, result, PRECISION);
+        TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
     }
 
     /**
@@ -217,19 +197,16 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP05() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
-        tmpModel.getVariable(0).lower(THREE);
-        tmpModel.getVariable(1).upper(ONE);
+        Result expected = Result.of(-9.75, Optimisation.State.OPTIMAL, 3.38, 1.00);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        model.getVariable(0).lower(THREE);
+        model.getVariable(1).upper(ONE);
 
-        TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        Optimisation.Result result = model.minimise();
 
-        final Primitive64Store tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 3.38 }, { 1.00 } });
-
-        TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
-
-        TestUtils.assertEquals(-9.75, tmpModel.minimise().getValue(), PRECISION);
+        TestUtils.assertStateAndSolution(expected, result, PRECISION);
+        TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
     }
 
     /**
@@ -238,13 +215,15 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP06() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
-        tmpModel.getVariable(0).lower(THREE);
-        tmpModel.getVariable(1).lower(TWO);
+        Result expected = Result.of(Double.NaN, State.INFEASIBLE, 0.0, 0.0);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        model.getVariable(0).lower(THREE);
+        model.getVariable(1).lower(TWO);
 
-        TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
+        Optimisation.Result result = model.minimise();
+
+        TestUtils.assertEquals(expected.getState(), result.getState());
     }
 
     /**
@@ -253,20 +232,17 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP07() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
-        tmpModel.getVariable(0).lower(THREE);
-        tmpModel.getVariable(1).upper(ONE);
-        tmpModel.getVariable(0).upper(THREE);
+        Result expected = Result.of(-9.00, Optimisation.State.OPTIMAL, 3.00, 1.00);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        model.getVariable(0).lower(THREE);
+        model.getVariable(1).upper(ONE);
+        model.getVariable(0).upper(THREE);
 
-        TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        Optimisation.Result result = model.minimise();
 
-        final Primitive64Store tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 3.00 }, { 1.00 } });
-
-        TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
-
-        TestUtils.assertEquals(-9.00, tmpModel.minimise().getValue(), PRECISION);
+        TestUtils.assertStateAndSolution(expected, result, PRECISION);
+        TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
     }
 
     /**
@@ -275,20 +251,17 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP08() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
-        tmpModel.getVariable(0).lower(THREE);
-        tmpModel.getVariable(1).upper(ONE);
-        tmpModel.getVariable(0).lower(FOUR);
+        Result expected = Result.of(-9.33, Optimisation.State.OPTIMAL, 4.00, 0.44);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        model.getVariable(0).lower(THREE);
+        model.getVariable(1).upper(ONE);
+        model.getVariable(0).lower(FOUR);
 
-        TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        Optimisation.Result result = model.minimise();
 
-        final Primitive64Store tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 4.00 }, { 0.44 } });
-
-        TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
-
-        TestUtils.assertEquals(-9.33, tmpModel.minimise().getValue(), PRECISION);
+        TestUtils.assertStateAndSolution(expected, result, PRECISION);
+        TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
     }
 
     /**
@@ -297,29 +270,18 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP09() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(false);
-        /*
-         * Some time after v47 the relaxing and presolver functionality of ExpressionsBasedModel was changed
-         * so that the model/presolver maintains info about which variables are integer. The model just knows
-         * that it is relaxed and wont call the integer solver. This resulted in this node actually finding
-         * the optimal integer solution (and set state DISTINCT rather than OPTIMAL). To get the "old" relaxed
-         * LP solution back it was necessary to explicitly set integer==false on the varibales.
-         */
-        tmpModel.getVariable(0).lower(THREE).integer(false);
-        tmpModel.getVariable(1).upper(ONE).integer(false);
-        tmpModel.getVariable(0).lower(FOUR).integer(false);
-        tmpModel.getVariable(1).upper(ZERO).integer(false);
+        Result expected = Result.of(-9.00, Optimisation.State.OPTIMAL, 4.50, 0.00);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(false);
+        model.getVariable(0).lower(THREE);
+        model.getVariable(1).upper(ONE);
+        model.getVariable(0).lower(FOUR);
+        model.getVariable(1).upper(ZERO);
 
-        //TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
+        Optimisation.Result result = model.minimise();
 
-        final Primitive64Store tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 4.50 }, { 0.00 } });
-
-        TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
-
-        TestUtils.assertEquals(-9.00, tmpModel.minimise().getValue(), PRECISION);
+        TestUtils.assertStateAndSolution(expected, result, PRECISION);
+        TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
     }
 
     /**
@@ -328,15 +290,17 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP10() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
-        tmpModel.getVariable(0).lower(THREE);
-        tmpModel.getVariable(1).upper(ONE);
-        tmpModel.getVariable(0).lower(FOUR);
-        tmpModel.getVariable(1).lower(ONE);
+        Result expected = Result.of(Double.NaN, State.INFEASIBLE, 0.0, 0.0);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        model.getVariable(0).lower(THREE);
+        model.getVariable(1).upper(ONE);
+        model.getVariable(0).lower(FOUR);
+        model.getVariable(1).lower(ONE);
 
-        TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
+        Optimisation.Result result = model.minimise();
+
+        TestUtils.assertEquals(expected.getState(), result.getState());
     }
 
     /**
@@ -345,23 +309,19 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP11() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
-        tmpModel.getVariable(0).lower(THREE);
-        tmpModel.getVariable(1).upper(ONE);
-        tmpModel.getVariable(0).lower(FOUR);
-        tmpModel.getVariable(1).upper(ZERO);
-        tmpModel.getVariable(0).upper(FOUR);
+        Result expected = Result.of(-8.00, State.OPTIMAL, 4.00, 0.00);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        model.getVariable(0).lower(THREE);
+        model.getVariable(1).upper(ONE);
+        model.getVariable(0).lower(FOUR);
+        model.getVariable(1).upper(ZERO);
+        model.getVariable(0).upper(FOUR);
 
-        //TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
+        Optimisation.Result result = model.minimise();
 
-        final Primitive64Store tmpExpX = Primitive64Store.FACTORY.rows(new double[][] { { 4.00 }, { 0.00 } });
-
-        TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
-
-        TestUtils.assertEquals(-8.00, tmpModel.minimise().getValue(), PRECISION);
+        TestUtils.assertStateAndSolution(expected, result, PRECISION);
+        TestUtils.assertEquals(expected.getValue(), result.getValue(), PRECISION);
     }
 
     /**
@@ -370,16 +330,18 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
     @Test
     public void testRelaxedNodeP12() {
 
-        final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
-        tmpModel.getVariable(0).lower(THREE);
-        tmpModel.getVariable(1).upper(ONE);
-        tmpModel.getVariable(0).lower(FOUR);
-        tmpModel.getVariable(1).upper(ZERO);
-        tmpModel.getVariable(0).lower(FIVE);
+        Result expected = Result.of(Double.NaN, State.INFEASIBLE, 0.0, 0.0);
 
-        final Optimisation.Result tmpResult = tmpModel.minimise();
+        ExpressionsBasedModel model = UCLAee236aCase.makeOriginalRootModel().relax(true);
+        model.getVariable(0).lower(THREE);
+        model.getVariable(1).upper(ONE);
+        model.getVariable(0).lower(FOUR);
+        model.getVariable(1).upper(ZERO);
+        model.getVariable(0).lower(FIVE);
 
-        TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
+        Optimisation.Result result = model.minimise();
+
+        TestUtils.assertEquals(expected.getState(), result.getState());
     }
 
 }
