@@ -440,6 +440,12 @@ public abstract class TestUtils {
         TestUtils.assertTrue(model.validate(solution, accuracy, BasicLogger.DEBUG));
     }
 
+    public static void assertSolutionValid(final ExpressionsBasedModel model, final Access1D<BigDecimal> solution) {
+        if (!model.validate(solution, BasicLogger.ERROR)) {
+            Assertions.fail("Solution not valid!");
+        }
+    }
+
     public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual) {
         TestUtils.assertStateAndSolution(expected, actual, EQUALS);
     }
@@ -479,12 +485,6 @@ public abstract class TestUtils {
 
     public static void assertTrue(final String message, final boolean condition) {
         Assertions.assertTrue(condition, message);
-    }
-
-    public static void assertSolutionValid(final ExpressionsBasedModel model, final Access1D<BigDecimal> solution) {
-        if (!model.validate(solution, BasicLogger.ERROR)) {
-            Assertions.fail("Solution not valid!");
-        }
     }
 
     public static void fail() {

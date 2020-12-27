@@ -178,11 +178,11 @@ public class RationalNumberTest extends ScalarTests {
 
     @ParameterizedTest(name = "#{index} valueOf({arguments})")
     @ValueSource(doubles = { 0.3, 0.25, 1e7, 5e8, -25.22e-4, 0.04919653065050689, 1.2325077080153841
-            //                ,
-            //                4223372036854775807.0,
-            //                -4223372036854775808.0,
-            //                9223372036854775807.0,
-            //                -9223372036854775808.0
+    //                ,
+    //                4223372036854775807.0,
+    //                -4223372036854775808.0,
+    //                9223372036854775807.0,
+    //                -9223372036854775808.0
     })
     public void testValueOf(final double d) {
 
