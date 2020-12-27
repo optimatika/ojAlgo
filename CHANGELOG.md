@@ -11,6 +11,9 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+
+## [48.4.0] – 2020-12-27
+
 ### Added
 
 #### org.ojalgo.optimisation
