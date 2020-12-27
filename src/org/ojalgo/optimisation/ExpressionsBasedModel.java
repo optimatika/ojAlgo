@@ -233,7 +233,7 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         public Optimisation.Result solve(final Optimisation.Result candidate) {
 
-            if (mySolver == null) {
+            if ((mySolver == null) && (PRESOLVERS.size() > 0)) {
                 myModel.presolve();
             }
 
@@ -343,10 +343,12 @@ public final class ExpressionsBasedModel extends AbstractModel {
          * @param remaining TODO
          * @param lower TODO
          * @param upper TODO
+         * @param relaxed TODO
          * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
          *         typically when/if a variable was fixed.
          */
-        public abstract boolean simplify(Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, NumberContext precision);
+        public abstract boolean simplify(Expression expression, Set<IntIndex> remaining, BigDecimal lower, BigDecimal upper, NumberContext precision,
+                boolean relaxed);
 
         @Override
         boolean isApplicable(final Expression target) {
@@ -1360,12 +1362,12 @@ public final class ExpressionsBasedModel extends AbstractModel {
             BigDecimal upper = tmpExpr.getUpperLimit();
 
             if (tmpExpr.isObjective()) {
-                Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+                Presolvers.LINEAR_OBJECTIVE.simplify(tmpExpr, allVars, lower, upper, options.feasibility, !anyVarInt);
             }
             if (tmpExpr.isConstraint()) {
-                Presolvers.ZERO_ONE_TWO.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+                Presolvers.ZERO_ONE_TWO.simplify(tmpExpr, allVars, lower, upper, options.feasibility, !anyVarInt);
                 if (anyVarInt) {
-                    Presolvers.INTEGER_EXPRESSION_ROUNDING.simplify(tmpExpr, allVars, lower, upper, options.feasibility);
+                    Presolvers.INTEGER_EXPRESSION_ROUNDING.simplify(tmpExpr, allVars, lower, upper, options.feasibility, !anyVarInt);
                 }
             }
         }
@@ -1502,16 +1504,15 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         boolean needToRepeat = false;
 
+        BigDecimal compensatedLowerLimit;
+        BigDecimal compensatedUpperLimit;
+
         do {
 
-            final Set<IntIndex> fixedVariables = this.getFixedVariables();
-
-            BigDecimal compensatedLowerLimit;
-            BigDecimal compensatedUpperLimit;
-
+            Set<IntIndex> fixedVariables = this.getFixedVariables();
             needToRepeat = false;
 
-            for (final Expression expr : this.getExpressions()) {
+            for (Expression expr : this.getExpressions()) {
                 if (!needToRepeat && expr.isConstraint() && !expr.isInfeasible() && !expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
 
                     BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
@@ -1523,15 +1524,37 @@ public final class ExpressionsBasedModel extends AbstractModel {
                     myTemporary.addAll(expr.getLinearKeySet());
                     myTemporary.removeAll(fixedVariables);
 
-                    for (final Presolver presolver : PRESOLVERS) {
+                    for (Presolver presolver : PRESOLVERS) {
                         if (!needToRepeat) {
-                            needToRepeat |= presolver.simplify(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility);
+                            needToRepeat |= presolver.simplify(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility, myRelaxed);
                         }
                     }
+
                 }
             }
 
         } while (needToRepeat);
+
+        if (!this.isInfeasible()) {
+            Set<IntIndex> fixedVariables = this.getFixedVariables();
+            for (Expression expr : this.getExpressions()) {
+                if (expr.isConstraint() && expr.isRedundant() && (expr.countQuadraticFactors() == 0)) {
+                    // Specifically need to check if constraints that have been determined redundant
+                    // are not infeasible
+
+                    BigDecimal calculateSetValue = expr.calculateSetValue(fixedVariables);
+
+                    compensatedLowerLimit = expr.getCompensatedLowerLimit(calculateSetValue);
+                    compensatedUpperLimit = expr.getCompensatedUpperLimit(calculateSetValue);
+
+                    myTemporary.clear();
+                    myTemporary.addAll(expr.getLinearKeySet());
+                    myTemporary.removeAll(fixedVariables);
+
+                    Presolvers.checkFeasibility(expr, myTemporary, compensatedLowerLimit, compensatedUpperLimit, options.feasibility, myRelaxed);
+                }
+            }
+        }
 
         this.categoriseVariables();
     }

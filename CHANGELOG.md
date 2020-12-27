@@ -12,7 +12,45 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 > Corresponds to changes in the `develop` branch since the last release
 
 
-[48.3.2] – 2020-12-05
+## [48.4.0] – 2020-12-27
+
+### Added
+
+#### org.ojalgo.optimisation
+
+- Better support for building optimisation model with primitive valued parameters - overloaded methods for `long` and `double` values.
+- Various minor additions and changes.
+
+### Changed
+
+#### org.ojalgo.optimisation
+
+- Changed the default mip_gap from 1E-4 to 1E-6
+- Major rewrite/update to the presolver functionality of `ExpressionsBasedModel` which greatly affects the `IntegerSolver`.
+
+#### org.ojalgo.structure
+
+- The `add` methods of the `Mutate1D`, `Mutate2D` and `MutateAnyD` interfaces have been moved to `Mutate1D.Modifiable`, `Mutate2D.Modifiable` and `MutateAnyD.Modifiable` respectively. With most hgher level interfaces or implemenattions this makes no difference as they typically extend or implement both these interfaces.
+- In `Access1D` the `axpy` method had an element of its signture (one of the input parameters) changed from `Mutate1D` to `Mutate1D.Modifiable<?>`.
+
+### Deprecated
+
+#### org.ojalgo.equation
+
+- The public constructors of `Equation` are replaced by various factory methods.
+
+### Removed
+
+#### org.ojalgo.array
+
+- The `NumberList` class had the `add` methods (the ones with a `long` index parameter) previously specified in the `Mutate1D` removed.
+
+#### org.ojalgo.type
+
+- The `IndexedMap` class had the `add` methods previously specified in the `Mutate1D` removed.
+
+
+## [48.3.2] – 2020-12-05
 
 ### Added
 

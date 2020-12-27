@@ -1223,14 +1223,12 @@ public class NextGenSysModTest {
     }
 
     public static final Case010A CASE_010A = new Case010A();
-
     public static final Case020A CASE_020A = new Case020A();
-
     public static final Case030B CASE_030B = new Case030B();
-
     public static final Case040B CASE_040B = new Case040B();
     public static final Case050B CASE_050B = new Case050B();
-    private static final NumberContext SOLUTION_ACCURACY = new NumberContext(7, 6, RoundingMode.HALF_DOWN);
+
+    private static final NumberContext SOLUTION_ACCURACY = NumberContext.of(7, 6).withMode(RoundingMode.HALF_DOWN);
     private static final NumberContext VALIDATION_ACCURACY = SOLUTION_ACCURACY.withPrecision(5);
 
     public static void assertSolution(final ExpressionsBasedModel model, final double[] expected, final Optimisation.Result actual,

@@ -378,8 +378,32 @@ public abstract class TestUtils {
         }
     }
 
+    public static void assertLessThan(final double reference, final double actual) {
+        if (actual >= reference) {
+            Assertions.fail(actual + " !< " + reference);
+        }
+    }
+
+    public static void assertMoreThan(final double reference, final double actual) {
+        if (actual <= reference) {
+            Assertions.fail(actual + " !> " + reference);
+        }
+    }
+
     public static void assertNotEquals(final Object unexpected, final Object actual) {
         Assertions.assertNotEquals(unexpected, actual);
+    }
+
+    public static void assertNotLessThan(final double reference, final double actual) {
+        if (actual < reference) {
+            Assertions.fail(actual + " !>= " + reference);
+        }
+    }
+
+    public static void assertNotMoreThan(final double reference, final double actual) {
+        if (actual > reference) {
+            Assertions.fail(actual + " !<= " + reference);
+        }
     }
 
     public static void assertNotNullOrEmpty(final String actual) {
@@ -414,6 +438,12 @@ public abstract class TestUtils {
     public static void assertSolutionFeasible(final ExpressionsBasedModel model, final Optimisation.Result solution, final NumberContext accuracy) {
         TestUtils.assertStateNotLessThanFeasible(solution);
         TestUtils.assertTrue(model.validate(solution, accuracy, BasicLogger.DEBUG));
+    }
+
+    public static void assertSolutionValid(final ExpressionsBasedModel model, final Access1D<BigDecimal> solution) {
+        if (!model.validate(solution, BasicLogger.ERROR)) {
+            Assertions.fail("Solution not valid!");
+        }
     }
 
     public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual) {

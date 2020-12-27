@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>48.3.2</version>
+    <version>48.4.0</version>
     <packaging>jar</packaging>
     <name>ojAlgo</name>
     <url>http://ojalgo.org</url>

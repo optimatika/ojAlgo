@@ -209,7 +209,7 @@ public interface Optimisation {
          * than this value, then the corresponding branch is terminated as it is deemed unlikely or too
          * "expensive" to find better integer solutions there.
          */
-        public double mip_gap = 1.0E-4;
+        public double mip_gap = 1.0E-6;
 
         /**
          * For display only!
@@ -314,6 +314,10 @@ public interface Optimisation {
     }
 
     public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result> {
+
+        public static Result of(final double value, final Optimisation.State state, final double... solution) {
+            return new Result(state, value, Access1D.wrap(solution));
+        }
 
         private transient Access1D<?> myMultipliers = null;
         private final Access1D<?> mySolution;

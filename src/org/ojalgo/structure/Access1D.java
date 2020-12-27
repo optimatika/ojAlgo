@@ -301,7 +301,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
         }
     }
 
-    static Access1D<Double> wrap(final double[] target) {
+    static Access1D<Double> wrap(final double... target) {
         return new Access1D<Double>() {
 
             public long count() {
@@ -396,7 +396,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
      * @param a The scale
      * @param y The "vector" to update
      */
-    default void axpy(final double a, final Mutate1D y) {
+    default void axpy(final double a, final Mutate1D.Modifiable<?> y) {
         Structure1D.loopMatching(this, y, i -> y.add(i, a * this.doubleValue(i)));
     }
 

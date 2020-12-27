@@ -106,6 +106,14 @@ public interface Mutate1D extends Structure1D {
 
     interface Modifiable<N extends Comparable<N>> extends Structure1D {
 
+        void add(long index, Comparable<?> addend);
+
+        void add(long index, double addend);
+
+        default void add(final long index, final float addend) {
+            this.add(index, (double) addend);
+        }
+
         default void modifyAll(final UnaryFunction<N> modifier) {
             this.modifyRange(0L, this.count(), modifier);
         }
@@ -215,14 +223,6 @@ public interface Mutate1D extends Structure1D {
             realDest.set(i, cmplx.getReal());
             imagDest.set(i, cmplx.getImaginary());
         });
-    }
-
-    void add(long index, Comparable<?> addend);
-
-    void add(long index, double addend);
-
-    default void add(final long index, final float addend) {
-        this.add(index, (double) addend);
     }
 
     /**

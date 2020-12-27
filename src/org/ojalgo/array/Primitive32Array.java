@@ -109,7 +109,7 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
-    public void axpy(final double a, final Mutate1D y) {
+    public void axpy(final double a, final Mutate1D.Modifiable<?> y) {
         AXPY.invoke(y, a, data);
     }
 

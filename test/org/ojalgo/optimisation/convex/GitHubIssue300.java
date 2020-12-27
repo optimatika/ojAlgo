@@ -103,7 +103,7 @@ public class GitHubIssue300 extends OptimisationConvexTests {
 
         ConvexSolver solve = ConvexSolver.getBuilder(q, c).inequalities(ai, bi).build();
 
-        solve.options.debug(ConvexSolver.class);
+        // solve.options.debug(ConvexSolver.class);
 
         Result result = solve.solve();
         TestUtils.assertEquals(Optimisation.State.OPTIMAL, result.getState());
@@ -141,7 +141,7 @@ public class GitHubIssue300 extends OptimisationConvexTests {
             regularisation.setQuadraticFactors(model.getVariables(), qRegul);
             regularisation.weight(alpha * alpha);
 
-            model.options.debug(ConvexSolver.class);
+            // model.options.debug(ConvexSolver.class);
 
             Optimisation.Result result = model.minimise();
             state = result.getState();

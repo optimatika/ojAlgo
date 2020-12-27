@@ -442,11 +442,12 @@ public class LinearProblems extends OptimisationLinearTests {
         model.addExpression().set(x, 1).set(y, 2).lower(-5);
         model.addExpression().set(x, 3).set(y, 1).upper(2);
 
-        BigArray expected = BigArray.wrap(BigMath.TWO.multiply(BigMath.THIRD), BigMath.ZERO);
+        BigArray expected = BigArray.wrap(DIVIDE.invoke(TWO, THREE), ZERO);
         TestUtils.assertTrue(model.validate(expected));
 
         Optimisation.Result solution = model.maximise();
         TestUtils.assertTrue(model.validate(solution));
+        TestUtils.assertEquals(expected, solution);
 
         TestUtils.assertStateNotLessThanOptimal(solution);
     }

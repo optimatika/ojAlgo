@@ -46,18 +46,6 @@ public class IndexedMap<K, V> extends AbstractMap<K, V> implements Paired<K, V> 
             myEntries = entries;
         }
 
-        public void add(final long index, final Comparable<?> addend) {
-            myEntries.add(index, addend);
-        }
-
-        public void add(final long index, final double addend) {
-            myEntries.add(index, addend);
-        }
-
-        public void add(final long index, final float addend) {
-            myEntries.add(index, addend);
-        }
-
         public byte byteValue(final long index) {
             return myEntries.byteValue(index);
         }

@@ -92,7 +92,7 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    public final void axpy(final double a, final Mutate1D y) {
+    public final void axpy(final double a, final Mutate1D.Modifiable<?> y) {
         AXPY.invoke(y, a, data);
     }
 

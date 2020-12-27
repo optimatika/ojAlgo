@@ -72,6 +72,29 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     interface Modifiable<N extends Comparable<N>> extends StructureAnyD, Mutate1D.Modifiable<N> {
 
+        @Override
+        default void add(final long index, final Comparable<?> addend) {
+            this.add(StructureAnyD.reference(index, this.shape()), addend);
+        }
+
+        @Override
+        default void add(final long index, final double addend) {
+            this.add(StructureAnyD.reference(index, this.shape()), addend);
+        }
+
+        @Override
+        default void add(final long index, final float addend) {
+            this.add(StructureAnyD.reference(index, this.shape()), addend);
+        }
+
+        void add(long[] reference, Comparable<?> addend);
+
+        void add(long[] reference, double addend);
+
+        default void add(final long[] reference, final float addend) {
+            this.add(reference, (double) addend);
+        }
+
         void modifyOne(long[] reference, UnaryFunction<N> modifier);
 
         void modifySet(int dimension, long dimensionalIndex, UnaryFunction<N> modifier);
@@ -115,29 +138,6 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
             return retVal;
         }
 
-    }
-
-    @Override
-    default void add(final long index, final Comparable<?> addend) {
-        this.add(StructureAnyD.reference(index, this.shape()), addend);
-    }
-
-    @Override
-    default void add(final long index, final double addend) {
-        this.add(StructureAnyD.reference(index, this.shape()), addend);
-    }
-
-    @Override
-    default void add(final long index, final float addend) {
-        this.add(StructureAnyD.reference(index, this.shape()), addend);
-    }
-
-    void add(long[] reference, Comparable<?> addend);
-
-    void add(long[] reference, double addend);
-
-    default void add(final long[] reference, final float addend) {
-        this.add(reference, (double) addend);
     }
 
     @Override
