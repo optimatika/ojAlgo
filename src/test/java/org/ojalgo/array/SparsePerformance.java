@@ -19,30 +19,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo;
+package org.ojalgo.array;
 
-public class BenchmarkRequirementsException extends Exception {
+import org.ojalgo.BenchmarkUtils;
+import org.ojalgo.random.Uniform;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.runner.RunnerException;
 
-    private static final long serialVersionUID = 1L;
+@State(Scope.Benchmark)
+public class SparsePerformance {
 
-    public BenchmarkRequirementsException() {
-        super();
+    public static void main(final String[] args) throws RunnerException {
+        BenchmarkUtils.run(SparsePerformance.class);
     }
 
-    public BenchmarkRequirementsException(final String message) {
-        super(message);
+    long DIM = 10_000L;
+
+    SparseArray<Double> array;
+
+    @Benchmark
+    public double doTest() {
+
+        double retVal = 0D;
+
+        for (long i = 0L, limit = array.count(); i < limit; i++) {
+            retVal += array.doubleValue(i);
+        }
+
+        return retVal;
     }
 
-    public BenchmarkRequirementsException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+    @Setup
+    public void setup() {
 
-    public BenchmarkRequirementsException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
+        array = SparseArray.factory(Primitive64Array.FACTORY).make(DIM * DIM);
 
-    public BenchmarkRequirementsException(final Throwable cause) {
-        super(cause);
+        for (long i = 0L; i < DIM; i++) {
+            array.set(Uniform.randomInteger(DIM * DIM), 1.0);
+        }
+
     }
 
 }
