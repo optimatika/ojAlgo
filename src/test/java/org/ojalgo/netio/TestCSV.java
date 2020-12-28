@@ -47,7 +47,7 @@ public class TestCSV extends NetioTests {
     @Test
     public void testFast() {
 
-        final File tmpFile = new File("./rsrc/csv/fast.csv");
+        final File tmpFile = new File("./src/test/resources/csv/fast.csv");
         final EnumeratedColumnsParser tmpParser = EnumeratedColumnsParser.make(10).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.FAST).get();
 
         final AtomicInteger tmpCounter = new AtomicInteger(0);
@@ -63,7 +63,7 @@ public class TestCSV extends NetioTests {
     @Test
     public void testQuoted() {
 
-        final File tmpFile = new File("./rsrc/csv/quoted.csv");
+        final File tmpFile = new File("./src/test/resources/csv/quoted.csv");
         final EnumeratedColumnsParser tmpParser = EnumeratedColumnsParser.make(10).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.QUOTED).get();
 
         final AtomicInteger tmpCounter = new AtomicInteger(0);
@@ -88,9 +88,9 @@ public class TestCSV extends NetioTests {
         final EnumeratedColumnsParser tmpParserRFC4180 = EnumeratedColumnsParser.make(5).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.RFC4180)
                 .get();
 
-        final File tmpFileFast = new File("./rsrc/csv/fast.csv");
-        final File tmpFileQuoted = new File("./rsrc/csv/quoted.csv");
-        final File tmpFileExample = new File("./rsrc/csv/example.csv");
+        final File tmpFileFast = new File("./src/test/resources/csv/fast.csv");
+        final File tmpFileQuoted = new File("./src/test/resources/csv/quoted.csv");
+        final File tmpFileExample = new File("./src/test/resources/csv/example.csv");
 
         tmpCounter.set(0);
         tmpParserFast.parse(tmpFileFast, t -> {

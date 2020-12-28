@@ -67,7 +67,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
 
         for (int i = 0; i < 1000; i++) {
 
-            parser.parse("./test/org/ojalgo/ann/train.csv", true, columns -> {
+            parser.parse("./src/test/resources/org/ojalgo/ann/train.csv", true, columns -> {
 
                 // R1C1,R1C2,R2C1,R2C2,IsStairs
                 double R1C1 = Double.parseDouble(columns[1]);
@@ -87,7 +87,7 @@ public class NeuralNetworkWorkedExample extends BackPropagationExample {
         AtomicInteger correct = new AtomicInteger();
         AtomicInteger wrong = new AtomicInteger();
 
-        parser.parse("./test/org/ojalgo/ann/test.csv", true, columns -> {
+        parser.parse("./src/test/resources/org/ojalgo/ann/test.csv", true, columns -> {
 
             // R1C1,R1C2,R2C1,R2C2,IsStairs
             double R1C1 = Double.parseDouble(columns[1]);

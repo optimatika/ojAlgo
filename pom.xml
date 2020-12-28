@@ -54,13 +54,6 @@
         <developerConnection>https://github.com/optimatika/ojAlgo.git</developerConnection>
     </scm>
     <build>
-        <sourceDirectory>src</sourceDirectory>
-        <testSourceDirectory>test</testSourceDirectory>
-        <testResources>
-            <testResource>
-                <directory>rsrc</directory>
-            </testResource>
-        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

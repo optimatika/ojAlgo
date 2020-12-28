@@ -39,7 +39,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface ModelFileMPS {
 
-    String OPTIMISATION_RSRC = "./rsrc/optimisation/";
+    String OPTIMISATION_RSRC = "./src/test/resources/optimisation/";
     String SOLUTION_NOT_VALID = "Solution not valid!";
 
     static void assertValues(final ExpressionsBasedModel model, final BigDecimal expMinVal, final BigDecimal expMaxVal, final Map<String, BigDecimal> solution,
