@@ -21,26 +21,24 @@
  */
 package org.ojalgo;
 
-import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.store.Primitive64Store;
+import java.util.concurrent.TimeUnit;
 
-public class SymmetricEigenvalueProfiling {
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
-    public static void main(final String[] args) {
+public abstract class BenchmarkUtils {
 
-        final Primitive64Store tmpOrg = MatrixUtils.makeSPD(200);
-        //final Eigenvalue<Double> tmpEvD = new RawEigenvalue.Symmetric();
-        final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(tmpOrg, true);
-
-        for (int l = 0; l < 1000000; l++) {
-            tmpEvD.decompose(tmpOrg);
-        }
-
+    public static ChainedOptionsBuilder options() {
+        return new OptionsBuilder().forks(1).measurementIterations(3).warmupIterations(7).mode(Mode.Throughput).timeUnit(TimeUnit.MINUTES)
+                .timeout(new TimeValue(1L, TimeUnit.HOURS)).jvmArgs("-Xmx6g");
     }
 
-    public SymmetricEigenvalueProfiling() {
-        super();
+    public static void run(final Class<?> clazz) throws RunnerException {
+        new Runner(BenchmarkUtils.options().include(clazz.getSimpleName()).build()).run();
     }
 
 }
