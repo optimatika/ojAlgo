@@ -21,13 +21,12 @@
  */
 package org.ojalgo;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.ojalgo.array.operation.ArrayOperation;
 import org.ojalgo.machine.Hardware;
 import org.ojalgo.machine.VirtualMachine;
 import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.type.StandardType;
 
 public abstract class OjAlgoUtils {
 
@@ -74,7 +73,7 @@ public abstract class OjAlgoUtils {
 
         String manifestValue = OjAlgoUtils.class.getPackage().getSpecificationVersion();
 
-        return manifestValue != null ? manifestValue : StandardType.SQL_DATE.format(new Date());
+        return manifestValue != null ? manifestValue : LocalDate.now().toString();
     }
 
     /**
