@@ -916,22 +916,6 @@ public abstract class MatrixFactory<N extends Comparable<N>, M extends BasicMatr
         return myPhysicalFactory.function();
     }
 
-    /**
-     * @deprecated v47 Use {@link #makeDense(int)} instead
-     */
-    @Deprecated
-    public DR getBuilder(final int count) {
-        return this.makeDense(count);
-    }
-
-    /**
-     * @deprecated v47 Use {@link #makeDense(int,int)} instead
-     */
-    @Deprecated
-    public DR getBuilder(final int rows, final int columns) {
-        return this.makeDense(rows, columns);
-    }
-
     public M make(final long rows, final long columns) {
         return this.instantiate(myPhysicalFactory.builder().makeZero((int) rows, (int) columns).get());
     }

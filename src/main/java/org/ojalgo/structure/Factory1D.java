@@ -57,16 +57,16 @@ public interface Factory1D<I extends Structure1D> extends FactorySupplement {
      */
     interface MayBeSparse<I extends Structure1D, DR extends Mutate1D.ModifiableReceiver<?>, SR extends Mutate1D.ModifiableReceiver<?>> extends Factory1D<I> {
 
-        I makeDense(long count);
+        DR makeDense(long count);
 
-        default I makeDense(final Structure1D shape) {
-            return this.make(shape.count());
+        default DR makeDense(final Structure1D shape) {
+            return this.makeDense(shape.count());
         }
 
-        I makeSparse(long count);
+        SR makeSparse(long count);
 
-        default I makeSparse(final Structure1D shape) {
-            return this.make(shape.count());
+        default SR makeSparse(final Structure1D shape) {
+            return this.makeSparse(shape.count());
         }
 
     }

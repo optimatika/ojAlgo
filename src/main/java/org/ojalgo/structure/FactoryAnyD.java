@@ -50,16 +50,16 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
     interface MayBeSparse<I extends StructureAnyD, DR extends MutateAnyD.ModifiableReceiver<?>, SR extends MutateAnyD.ModifiableReceiver<?>>
             extends FactoryAnyD<I> {
 
-        I makeDense(long... structure);
+        DR makeDense(long... structure);
 
-        default I makeDense(final StructureAnyD shape) {
-            return this.make(shape.shape());
+        default DR makeDense(final StructureAnyD shape) {
+            return this.makeDense(shape.shape());
         }
 
-        I makeSparse(long... structure);
+        SR makeSparse(long... structure);
 
-        default I makeSparse(final StructureAnyD shape) {
-            return this.make(shape.shape());
+        default SR makeSparse(final StructureAnyD shape) {
+            return this.makeSparse(shape.shape());
         }
 
     }
