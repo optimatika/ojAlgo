@@ -23,7 +23,6 @@ package org.ojalgo.ann;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Objects;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.ann.ArtificialNeuralNetwork.Activator;
@@ -130,8 +129,17 @@ public final class NetworkTrainer extends WrappedANN {
             return false;
         }
         NetworkTrainer other = (NetworkTrainer) obj;
-        return Objects.equals(myConfiguration, other.myConfiguration) && Arrays.equals(myGradients, other.myGradients)
-                && (Double.doubleToLongBits(myConfiguration.learningRate) == Double.doubleToLongBits(other.myConfiguration.learningRate));
+        if (myConfiguration == null) {
+            if (other.myConfiguration != null) {
+                return false;
+            }
+        } else if (!myConfiguration.equals(other.myConfiguration)) {
+            return false;
+        }
+        if (!Arrays.equals(myGradients, other.myGradients)) {
+            return false;
+        }
+        return true;
     }
 
     public NetworkTrainer error(final ArtificialNeuralNetwork.Error error) {
@@ -152,8 +160,8 @@ public final class NetworkTrainer extends WrappedANN {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
+        result = (prime * result) + ((myConfiguration == null) ? 0 : myConfiguration.hashCode());
         result = (prime * result) + Arrays.hashCode(myGradients);
-        result = (prime * result) + Objects.hash(myConfiguration, myConfiguration.learningRate);
         return result;
     }
 
@@ -213,7 +221,7 @@ public final class NetworkTrainer extends WrappedANN {
             PhysicalStore<Double> upstreamGradient = myGradients[k];
             PhysicalStore<Double> downstreamGradient = myGradients[k + 1];
 
-            this.adjust(k, input, output, upstreamGradient, downstreamGradient, myConfiguration);
+            this.adjust(k, input, output, upstreamGradient, downstreamGradient);
         }
     }
 

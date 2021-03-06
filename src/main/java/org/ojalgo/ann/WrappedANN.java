@@ -80,7 +80,7 @@ abstract class WrappedANN implements Supplier<ArtificialNeuralNetwork> {
     }
 
     void adjust(final int layer, final Access1D<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
-            final PhysicalStore<Double> downstreamGradient, final TrainingConfiguration configuration) {
+            final PhysicalStore<Double> downstreamGradient) {
         myNetwork.adjust(layer, input, output, upstreamGradient, downstreamGradient);
     }
 
@@ -112,12 +112,13 @@ abstract class WrappedANN implements Supplier<ArtificialNeuralNetwork> {
         return myNetwork.getWeights();
     }
 
-    MatrixStore<Double> invoke(Access1D<Double> input, final TrainingConfiguration configuration) {
+    MatrixStore<Double> invoke(final Access1D<Double> input, final TrainingConfiguration configuration) {
         myNetwork.setConfiguration(configuration);
+        Access1D<Double> argVal = input;
         PhysicalStore<Double> retVal = null;
         for (int l = 0, limit = this.depth(); l < limit; l++) {
-            retVal = myNetwork.invoke(l, input, myOutputs[l]);
-            input = retVal;
+            retVal = myNetwork.invoke(l, argVal, myOutputs[l]);
+            argVal = retVal;
         }
         return retVal;
     }

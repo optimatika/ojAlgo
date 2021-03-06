@@ -29,11 +29,11 @@ final class LayerTemplate {
     final int inputs;
     final int outputs;
 
-    LayerTemplate(final int inputs, final int outputs, final Activator activator) {
+    LayerTemplate(final int pInputs, final int pOutputs, final Activator pActivator) {
         super();
-        this.inputs = inputs;
-        this.outputs = outputs;
-        this.activator = activator;
+        inputs = pInputs;
+        outputs = pOutputs;
+        activator = pActivator;
     }
 
     @Override

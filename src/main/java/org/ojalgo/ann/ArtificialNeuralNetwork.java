@@ -74,7 +74,7 @@ public final class ArtificialNeuralNetwork implements BasicFunction.PlainUnary<A
         SOFTMAX(args -> {
             PhysicalStore<Double> parts = args.copy();
             parts.modifyAll(EXP);
-            final double total = parts.aggregateAll(Aggregator.SUM);
+            double total = parts.aggregateAll(Aggregator.SUM).doubleValue();
             return arg -> EXP.invoke(arg) / total;
         }, arg -> ONE, false),
 
