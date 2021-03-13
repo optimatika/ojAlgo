@@ -11,6 +11,15 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+- Added (moved here) JMH benchmarks
+
+### Changed
+
+- Project layout change to match standard Maven
+- Update copyright statement to cover 2021
+
 
 ## [48.4.0] – 2020-12-27
 
