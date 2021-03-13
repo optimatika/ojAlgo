@@ -22,7 +22,6 @@
 package org.ojalgo;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Assertions;
@@ -65,7 +64,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class TestUtils {
 
-    private static NumberContext EQUALS = new NumberContext(12, 14, RoundingMode.HALF_EVEN);
+    private static final NumberContext EQUALS = NumberContext.of(12, 14);
 
     public static void assertBounds(final Comparable<?> lower, final Access1D<?> values, final Comparable<?> upper, final NumberContext precision) {
         for (ElementView1D<?, ?> tmpValue : values.elements()) {
@@ -102,6 +101,10 @@ public abstract class TestUtils {
 
     public static void assertEquals(final Comparable<?> expected, final Comparable<?> actual, final NumberContext context) {
         TestUtils.assertEquals("Number != Number", expected, actual, context);
+    }
+
+    public static void assertEquals(final Comparable<?> expected, final double actual, final NumberContext context) {
+        TestUtils.assertEquals(expected, Double.valueOf(actual), context);
     }
 
     public static void assertEquals(final ComplexNumber expected, final ComplexNumber actual) {
@@ -495,8 +498,12 @@ public abstract class TestUtils {
         Assertions.fail(message);
     }
 
-    public static void fail(final Throwable problem) {
-        Assertions.fail(problem.getMessage(), problem);
+    public static void fail(final String message, final Throwable cause) {
+        Assertions.fail(message, cause);
+    }
+
+    public static void fail(final Throwable cause) {
+        Assertions.fail(cause.getMessage(), cause);
     }
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int numberOfRows, final int numberOfColumns) {

@@ -77,6 +77,15 @@ public interface Optimisation {
 
     }
 
+    /**
+     * An {@link Optimisation.Model} implementation should not depend on any specific
+     * {@link Optimisation.Solver}, and {@link Optimisation.Solver} implementations should be usable
+     * independently of any {@link Optimisation.Model}. For every specific combination of
+     * {@link Optimisation.Model} and {@link Optimisation.Solver} (that should function together) there needs
+     * to be an {@link Optimisation.Integration}.
+     *
+     * @author apete
+     */
     public interface Integration<M extends Optimisation.Model, S extends Optimisation.Solver> extends Optimisation {
 
         /**
@@ -113,10 +122,10 @@ public interface Optimisation {
     public interface Model extends Optimisation {
 
         /**
-         * Cleanup when a model instance is no longer needed. The default implementation does nothing,
+         * Cleanup when a model instance is no longer needed.
          */
         default void dispose() {
-
+            // The default implementation does nothing.
         }
 
         Optimisation.Result maximise();
@@ -453,10 +462,10 @@ public interface Optimisation {
     public interface Solver extends Optimisation {
 
         /**
-         * Cleanup when a solver instance is no longer needed. The default implementation does nothing,
+         * Cleanup when a solver instance is no longer needed.
          */
         default void dispose() {
-
+            // The default implementation does nothing.
         }
 
         default Optimisation.Result solve() {
