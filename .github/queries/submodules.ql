@@ -1,5 +1,5 @@
 /**
- * @id ojAlgo-submodules
+ * @id ojalgo-submodules
  * @name ojAlgo submodules
  * @description Checks import statements to enforce an internal (sub)module structure
  * @kind problem
