@@ -42,7 +42,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class BurkardtDatasetsMps extends OptimisationLinearTests implements ModelFileMPS {
 
-    static NumberContext PRECISION = new NumberContext(11, 9);
+    private static final NumberContext PRECISION = NumberContext.of(11, 9);
 
     static ExpressionsBasedModel doTest(final String modelName, final String expMinValString, final String expMaxValString) {
         return ModelFileMPS.makeAndAssert("burkardt", modelName, expMinValString, expMaxValString, false, BurkardtDatasetsMps.PRECISION, null);
@@ -113,27 +113,27 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
 
         ExpressionsBasedModel parsedModel = BurkardtDatasetsMps.doTest("testprob.mps", "54", "80");
 
-        final Variable tmpXONE = new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
-        final Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
-        final Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
+        Variable tmpXONE = new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
+        Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
+        Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
 
-        final Variable[] tmpVariables = new Variable[] { tmpXONE, tmpYTWO, tmpZTHREE };
+        Variable[] tmpVariables = new Variable[] { tmpXONE, tmpYTWO, tmpZTHREE };
 
-        final ExpressionsBasedModel reimplementedModel = new ExpressionsBasedModel(tmpVariables);
+        ExpressionsBasedModel reimplementedModel = new ExpressionsBasedModel(tmpVariables);
 
-        final Expression tmpLIM1 = reimplementedModel.addExpression("LIM1");
+        Expression tmpLIM1 = reimplementedModel.addExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM1.set(v, new BigDecimal[] { ONE, ONE, ZERO }[v]);
         }
         tmpLIM1.upper(FIVE);
 
-        final Expression tmpLIM2 = reimplementedModel.addExpression("LIM2");
+        Expression tmpLIM2 = reimplementedModel.addExpression("LIM2");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpLIM2.set(v, new BigDecimal[] { ONE, ZERO, ONE }[v]);
         }
         tmpLIM2.lower(TEN);
 
-        final Expression tmpMYEQN = reimplementedModel.addExpression("MYEQN");
+        Expression tmpMYEQN = reimplementedModel.addExpression("MYEQN");
         for (int v = 0; v < tmpVariables.length; v++) {
             tmpMYEQN.set(v, new BigDecimal[] { ZERO, ONE.negate(), ONE }[v]);
         }
@@ -142,8 +142,8 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests implements Mode
         TestUtils.assertTrue(reimplementedModel.validate());
         TestUtils.assertTrue(parsedModel.validate());
 
-        final Result tmpExpMinRes = reimplementedModel.minimise();
-        final Result tmpActMinRes = parsedModel.minimise();
+        Result tmpExpMinRes = reimplementedModel.minimise();
+        Result tmpActMinRes = parsedModel.minimise();
 
         TestUtils.assertEquals(tmpExpMinRes.getValue(), tmpActMinRes.getValue(), BurkardtDatasetsMps.PRECISION);
 

@@ -20,6 +20,13 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Project layout change to match standard Maven
 - Update copyright statement to cover 2021
 
+### Fixed
+
+#### org.ojalgo.optimisation
+
+- ExpressionsBasedModel now calls `dispose` on solvers it created, when done
+- Optimisation model on file, for test, are now loaded using `getResourceAsStream` which makes it easier these from the ojAlgo-test jar
+
 
 ## [48.4.0] – 2020-12-27
 

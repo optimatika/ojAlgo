@@ -106,6 +106,12 @@ public final class ExpressionsBasedModel extends AbstractModel {
         MPS;
     }
 
+    /**
+     * {@link Optimisation.Solver}:s that should be usabale from {@link ExpressionsBasedModel} needs to
+     * implement a subclass of this.
+     *
+     * @author apete
+     */
     public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<ExpressionsBasedModel, S> {
 
         /**
@@ -204,19 +210,11 @@ public final class ExpressionsBasedModel extends AbstractModel {
             mySolver = null;
         }
 
-        /**
-         * Force re-generation of any cached/transient data
-         */
         public void dispose() {
 
             Solver.super.dispose();
 
-            if (mySolver != null) {
-                mySolver.dispose();
-                mySolver = null;
-            }
-
-            myIntegration = null;
+            this.reset();
         }
 
         public ExpressionsBasedModel getModel() {
@@ -229,6 +227,19 @@ public final class ExpressionsBasedModel extends AbstractModel {
 
         public Variable getVariable(final IntIndex globalIndex) {
             return myModel.getVariable(globalIndex);
+        }
+
+        /**
+         * Force re-generation of cached/transient data
+         */
+        public void reset() {
+
+            if (mySolver != null) {
+                mySolver.dispose();
+                mySolver = null;
+            }
+
+            myIntegration = null;
         }
 
         public Optimisation.Result solve(final Optimisation.Result candidate) {
@@ -292,10 +303,10 @@ public final class ExpressionsBasedModel extends AbstractModel {
         public void update(final Variable variable) {
 
             if (myInPlaceUpdatesOK && (mySolver != null) && (mySolver instanceof UpdatableSolver) && variable.isFixed()) {
-                final UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
+                UpdatableSolver updatableSolver = (UpdatableSolver) mySolver;
 
-                final int indexInSolver = this.getIntegration().getIndexInSolver(myModel, variable);
-                final double fixedValue = variable.getValue().doubleValue();
+                int indexInSolver = this.getIntegration().getIndexInSolver(myModel, variable);
+                double fixedValue = variable.getValue().doubleValue();
 
                 if (updatableSolver.fixVariable(indexInSolver, fixedValue)) {
                     // Solver updated in-place
@@ -1009,7 +1020,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
     /**
      * Objective or any constraint has quadratic part.
      *
-     * @deprecated v45 Use {@link #isAnyConstraintQuadratic()} or {@link #isAnyObjectiveQuadratic()} instead
+     * @deprecated v45 Use {@link #isAnyConstraintQuadratic()} and/or {@link #isAnyObjectiveQuadratic()}
+     *             instead
      */
     @Deprecated
     public boolean isAnyExpressionQuadratic() {
@@ -1494,6 +1506,8 @@ public final class ExpressionsBasedModel extends AbstractModel {
         Result retSolution = this.getVariableValues();
         double retValue = this.objective().evaluate(retSolution).doubleValue();
         Optimisation.State retState = result.getState();
+
+        prepared.dispose();
 
         return new Optimisation.Result(retState, retValue, retSolution);
     }

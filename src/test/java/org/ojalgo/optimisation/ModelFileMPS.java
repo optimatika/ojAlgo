@@ -21,13 +21,15 @@
  */
 package org.ojalgo.optimisation;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Map;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.constant.BigMath;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.ExpressionsBasedModel.FileFormat;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
@@ -39,7 +41,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface ModelFileMPS {
 
-    String OPTIMISATION_RSRC = "./src/test/resources/optimisation/";
+    String OPTIMISATION_RSRC = "/optimisation/";
     String SOLUTION_NOT_VALID = "Solution not valid!";
 
     static void assertValues(final ExpressionsBasedModel model, final BigDecimal expMinVal, final BigDecimal expMaxVal, final Map<String, BigDecimal> solution,
@@ -73,8 +75,8 @@ public interface ModelFileMPS {
         }
 
         if (solution != null) {
-            for (final Variable tmpVariable : model.getVariables()) {
-                final BigDecimal tmpValue = solution.get(tmpVariable.getName());
+            for (Variable tmpVariable : model.getVariables()) {
+                BigDecimal tmpValue = solution.get(tmpVariable.getName());
                 if (tmpValue != null) {
                     tmpVariable.setValue(tmpValue);
                 } else {
@@ -90,7 +92,7 @@ public interface ModelFileMPS {
     static ExpressionsBasedModel makeAndAssert(final String dataset, final String modelName, final String expMinValString, final String expMaxValString,
             final boolean relax, final NumberContext precision, final Map<String, BigDecimal> solution) {
 
-        final ExpressionsBasedModel model = ModelFileMPS.makeModel(dataset, modelName, relax);
+        ExpressionsBasedModel model = ModelFileMPS.makeModel(dataset, modelName, relax);
 
         BigDecimal expMinVal = expMinValString != null ? new BigDecimal(expMinValString) : null;
         BigDecimal expMaxVal = expMaxValString != null ? new BigDecimal(expMaxValString) : null;
@@ -102,31 +104,37 @@ public interface ModelFileMPS {
 
     static ExpressionsBasedModel makeModel(final String dataset, final String name, final boolean relax) {
 
-        final File file = new File(OPTIMISATION_RSRC + dataset + "/" + name);
-        final ExpressionsBasedModel model = MathProgSysModel.make(file).getExpressionsBasedModel();
+        try (InputStream input = ExpressionsBasedModel.class.getResourceAsStream(OPTIMISATION_RSRC + dataset + "/" + name)) {
 
-        TestUtils.assertTrue(model.validate());
+            ExpressionsBasedModel model = ExpressionsBasedModel.parse(input, FileFormat.MPS);
 
-        if (relax) {
+            TestUtils.assertTrue(model.validate());
 
-            model.relax(true);
+            if (relax) {
 
-            for (Variable tmpVar : model.getVariables()) {
-                tmpVar.relax();
+                model.relax(true);
+
+                for (Variable tmpVar : model.getVariables()) {
+                    tmpVar.relax();
+                }
             }
+
+            model.options.time_suffice = 5L * CalendarDateUnit.MINUTE.toDurationInMillis();
+            model.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
+
+            // model.options.debug(IntegerSolver.class);
+            // model.options.progress(IntegerSolver.class);
+            // model.options.progress(LinearSolver.class);
+            // model.options.validate = false;
+
+            TestUtils.assertTrue(model.validate());
+
+            return model;
+
+        } catch (IOException cause) {
+            TestUtils.fail(cause);
+            return null;
         }
-
-        model.options.time_suffice = 5L * CalendarDateUnit.MINUTE.toDurationInMillis();
-        model.options.time_abort = 15L * CalendarDateUnit.MINUTE.toDurationInMillis();
-
-        // model.options.debug(IntegerSolver.class);
-        // model.options.progress(IntegerSolver.class);
-        // model.options.progress(LinearSolver.class);
-        // model.options.validate = false;
-
-        TestUtils.assertTrue(model.validate());
-
-        return model;
     }
 
 }
