@@ -11,6 +11,9 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+
+## [48.4.1] – 2021-03-18
+
 ### Added
 
 - Added (moved here) JMH benchmarks
