@@ -129,11 +129,7 @@ public final class NetworkTrainer extends WrappedANN {
             return false;
         }
         NetworkTrainer other = (NetworkTrainer) obj;
-        if (myConfiguration == null) {
-            if (other.myConfiguration != null) {
-                return false;
-            }
-        } else if (!myConfiguration.equals(other.myConfiguration)) {
+        if (!myConfiguration.equals(other.myConfiguration)) {
             return false;
         }
         if (!Arrays.equals(myGradients, other.myGradients)) {
@@ -160,7 +156,7 @@ public final class NetworkTrainer extends WrappedANN {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result) + ((myConfiguration == null) ? 0 : myConfiguration.hashCode());
+        result = (prime * result) + myConfiguration.hashCode();
         result = (prime * result) + Arrays.hashCode(myGradients);
         return result;
     }
