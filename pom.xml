@@ -9,11 +9,8 @@
     <version>48.4.1</version>
     <packaging>jar</packaging>
     <name>ojAlgo</name>
-    <url>http://ojalgo.org</url>
     <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.</description>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <url>http://ojalgo.org</url>
     <organization>
         <name>Optimatika</name>
         <url>http://optimatika.se</url>
@@ -33,6 +30,15 @@
             <url>https://github.com/optimatika/ojAlgo/blob/master/LICENSE</url>
         </license>
     </licenses>
+    <issueManagement>
+        <url>https://github.com/optimatika/ojAlgo/issues</url>
+        <system>GitHub</system>
+    </issueManagement>
+    <scm>
+        <url>https://github.com/optimatika/ojAlgo</url>
+        <connection>https://github.com/optimatika/ojAlgo.git</connection>
+        <developerConnection>git@github.com:optimatika/ojAlgo.git</developerConnection>
+    </scm>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -43,15 +49,43 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-    <issueManagement>
-        <url>https://github.com/optimatika/ojAlgo/issues</url>
-        <system>GitHub</system>
-    </issueManagement>
-    <scm>
-        <url>https://github.com/optimatika/ojAlgo</url>
-        <connection>https://github.com/optimatika/ojAlgo.git</connection>
-        <developerConnection>https://github.com/optimatika/ojAlgo.git</developerConnection>
-    </scm>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.7.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.7.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.7.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>1.28</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>1.28</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -119,6 +153,18 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <excludedGroups>slow,unstable</excludedGroups>
+                </configuration>
+                <dependencies />
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
                 <executions>
@@ -142,51 +188,6 @@
                     <autoReleaseAfterClose>false</autoReleaseAfterClose>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-                <configuration>
-                    <includes>
-                        <include>**/*.java</include>
-                    </includes>
-                    <excludedGroups>slow,unstable</excludedGroups>
-                </configuration>
-                <dependencies />
-
-            </plugin>
         </plugins>
     </build>
-    <dependencies>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.7.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.7.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>5.7.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-core</artifactId>
-            <version>1.28</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-generator-annprocess</artifactId>
-            <version>1.28</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 </project>
