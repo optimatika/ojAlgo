@@ -11,6 +11,11 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 > Corresponds to changes in the `develop` branch since the last release
 
+### Added
+
+#### org.ojalgo.function
+
+- Additional default methods for primitive arguments
 
 ## [48.4.1] – 2021-03-18
 

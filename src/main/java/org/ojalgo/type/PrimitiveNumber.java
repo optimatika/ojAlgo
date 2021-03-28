@@ -224,4 +224,28 @@ public interface PrimitiveNumber extends ComparableNumber<PrimitiveNumber> {
         return new BoxedShort(value);
     }
 
+    static PrimitiveNumber valueOf(final byte value) {
+        return PrimitiveNumber.of(value);
+    }
+
+    static PrimitiveNumber valueOf(final double value) {
+        return PrimitiveNumber.of(value);
+    }
+
+    static PrimitiveNumber valueOf(final float value) {
+        return PrimitiveNumber.of(value);
+    }
+
+    static PrimitiveNumber valueOf(final int value) {
+        return PrimitiveNumber.of(value);
+    }
+
+    static PrimitiveNumber valueOf(final long value) {
+        return PrimitiveNumber.of(value);
+    }
+
+    static PrimitiveNumber valueOf(final short value) {
+        return PrimitiveNumber.of(value);
+    }
+
 }

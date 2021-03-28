@@ -144,7 +144,7 @@ public interface EntryPair<K, V> extends Map<K, V>, Map.Entry<K, V> {
 
     }
 
-    class ObjectDouble<K> implements KeyedPrimitive<K> {
+    final class ObjectDouble<K> implements KeyedPrimitive<K> {
 
         private final K myKey;
         private final double myValue;
