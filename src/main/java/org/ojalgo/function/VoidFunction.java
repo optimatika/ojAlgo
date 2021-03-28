@@ -55,10 +55,28 @@ public interface VoidFunction<N extends Comparable<N>> extends BasicFunction, Co
         };
     }
 
+    default void invoke(final byte arg) {
+        this.invoke((double) arg);
+    }
+
     void invoke(double arg);
 
-    void invoke(float arg);
+    default void invoke(final float arg) {
+        this.invoke((double) arg);
+    }
+
+    default void invoke(final int arg) {
+        this.invoke((double) arg);
+    }
+
+    default void invoke(final long arg) {
+        this.invoke((double) arg);
+    }
 
     void invoke(N arg);
+
+    default void invoke(final short arg) {
+        this.invoke((double) arg);
+    }
 
 }

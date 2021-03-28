@@ -222,11 +222,29 @@ public interface BinaryFunction<N extends Comparable<N>> extends BasicFunction, 
         return new FixedFirst<>(arg1, this);
     }
 
+    default byte invoke(final byte arg1, final byte arg2) {
+        return (byte) this.invoke((double) arg1, (double) arg2);
+    }
+
     double invoke(double arg1, double arg2);
 
-    float invoke(float arg1, float arg2);
+    default float invoke(final float arg1, final float arg2) {
+        return (float) this.invoke((double) arg1, (double) arg2);
+    }
+
+    default int invoke(final int arg1, final int arg2) {
+        return NumberDefinition.toInt(this.invoke((double) arg1, (double) arg2));
+    }
+
+    default long invoke(final long arg1, final long arg2) {
+        return NumberDefinition.toLong(this.invoke((double) arg1, (double) arg2));
+    }
 
     N invoke(N arg1, N arg2);
+
+    default short invoke(final short arg1, final short arg2) {
+        return (short) this.invoke((double) arg1, (double) arg2);
+    }
 
     /**
      * @see #second(Comparable)

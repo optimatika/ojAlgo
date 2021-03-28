@@ -24,6 +24,7 @@ package org.ojalgo.function;
 import java.util.function.BiFunction;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.type.NumberDefinition;
 
 public interface ParameterFunction<N extends Comparable<N>> extends BasicFunction, BiFunction<N, Integer, N> {
 
@@ -92,7 +93,7 @@ public interface ParameterFunction<N extends Comparable<N>> extends BasicFunctio
     }
 
     default N apply(final N arg, final Integer param) {
-        return this.invoke(arg, param);
+        return this.invoke(arg, param.intValue());
     }
 
     default ParameterFunction<N> compose(final UnaryFunction<N> before) {
@@ -114,11 +115,29 @@ public interface ParameterFunction<N extends Comparable<N>> extends BasicFunctio
         };
     }
 
+    default byte invoke(final byte arg, final int param) {
+        return (byte) this.invoke((double) arg, param);
+    }
+
     double invoke(double arg, int param);
 
-    float invoke(float arg, int param);
+    default float invoke(final float arg, final int param) {
+        return (float) this.invoke((double) arg, param);
+    }
+
+    default int invoke(final int arg, final int param) {
+        return NumberDefinition.toInt(this.invoke((double) arg, param));
+    }
+
+    default long invoke(final long arg, final int param) {
+        return NumberDefinition.toLong(this.invoke((double) arg, param));
+    }
 
     N invoke(N arg, int param);
+
+    default short invoke(final short arg, final int param) {
+        return (short) this.invoke((double) arg, param);
+    }
 
     /**
      * Turns this parameter function into a unary function with the parameter fixed/locked to the specified

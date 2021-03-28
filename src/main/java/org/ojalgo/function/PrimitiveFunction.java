@@ -40,11 +40,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     public interface Binary extends BinaryFunction<Double> {
 
         default Double invoke(final Double arg1, final Double arg2) {
-            return this.invoke(arg1.doubleValue(), arg2.doubleValue());
-        }
-
-        default float invoke(final float arg1, final float arg2) {
-            return (float) this.invoke((double) arg1, (double) arg2);
+            return Double.valueOf(this.invoke(arg1.doubleValue(), arg2.doubleValue()));
         }
 
     }
@@ -56,21 +52,13 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
             this.invoke(arg.doubleValue());
         }
 
-        default void invoke(final float arg) {
-            this.invoke((double) arg);
-        }
-
     }
 
     @FunctionalInterface
     public interface Parameter extends ParameterFunction<Double> {
 
         default Double invoke(final Double arg, final int param) {
-            return this.invoke(arg.doubleValue(), param);
-        }
-
-        default float invoke(final float arg, final int param) {
-            return (float) this.invoke((double) arg, param);
+            return Double.valueOf(this.invoke(arg.doubleValue(), param));
         }
 
     }
@@ -82,21 +70,13 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
             return this.invoke(arg.doubleValue());
         }
 
-        default boolean invoke(final float arg) {
-            return this.invoke((double) arg);
-        }
-
     }
 
     @FunctionalInterface
     public interface Unary extends UnaryFunction<Double> {
 
         default Double invoke(final Double arg) {
-            return this.invoke(arg.doubleValue());
-        }
-
-        default float invoke(final float arg) {
-            return (float) this.invoke((double) arg);
+            return Double.valueOf(this.invoke(arg.doubleValue()));
         }
 
     }

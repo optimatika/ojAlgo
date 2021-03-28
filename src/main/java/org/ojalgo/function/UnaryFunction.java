@@ -27,6 +27,7 @@ import java.util.function.UnaryOperator;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.type.NumberDefinition;
 
 public interface UnaryFunction<N extends Comparable<N>> extends BasicFunction, UnaryOperator<N>, DoubleUnaryOperator {
 
@@ -80,10 +81,28 @@ public interface UnaryFunction<N extends Comparable<N>> extends BasicFunction, U
         };
     }
 
+    default byte invoke(final byte arg) {
+        return (byte) this.invoke((double) arg);
+    }
+
     double invoke(double arg);
 
-    float invoke(float arg);
+    default float invoke(final float arg) {
+        return (float) this.invoke((double) arg);
+    }
+
+    default int invoke(final int arg) {
+        return NumberDefinition.toInt(this.invoke((double) arg));
+    }
+
+    default long invoke(final long arg) {
+        return NumberDefinition.toLong(this.invoke((double) arg));
+    }
 
     N invoke(N arg);
+
+    default short invoke(final short arg) {
+        return (short) this.invoke((double) arg);
+    }
 
 }
