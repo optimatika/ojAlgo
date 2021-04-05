@@ -22,6 +22,10 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 - Possibility to read the QPS file format (QP related extensions to the MPS file format). More precisely added the ability to parse QUADOBJ and QMATRIX sections in "MPS" files.
 - A bunch of convex test cases from https://www.cuter.rl.ac.uk/Problems/marmes.shtml
 
+#### org.ojalgo.random
+
+- New `FrequencyMap` class as well as a factory method in `SampleSet` that counts occurrences of different values.
+
 #### org.ojalgo.structure
 
 - Added a `nonzeros()` method to `Access2D` that returns a `ElementView2D<N, ?>`.
