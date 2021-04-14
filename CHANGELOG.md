@@ -17,6 +17,13 @@ Added / Changed / Deprecated / Fixed / Removed / Security
 
 - Additional default methods for primitive arguments
 
+### Fixed
+
+#### org.ojalgo.matrix
+
+- Fixed bug in LowerTriangularStore and UpperTriangularStore regarding shape/range information: https://github.com/optimatika/ojAlgo/issues/330
+- Fixed problem regarding extraction of the Q and R matrices from QR decomposition for fat matrices. (One of the QR decomposition implementations had this problem.)
+
 ## [48.4.1] – 2021-03-18
 
 ### Added

@@ -134,20 +134,21 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      */
     public RawStore getQ() {
 
-        final int m = this.getRowDim();
-        final int n = this.getColDim();
+        int m = this.getRowDim();
+        int n = this.getColDim();
+        int r = Math.min(m, n);
 
-        final double[][] tmpData = this.getInternalData();
+        double[][] tmpData = this.getInternalData();
 
-        final RawStore retVal = new RawStore(m, n);
-        final double[][] retData = retVal.data;
+        RawStore retVal = new RawStore(m, r);
+        double[][] retData = retVal.data;
 
-        for (int k = n - 1; k >= 0; k--) {
+        for (int k = r - 1; k >= 0; k--) {
             for (int i = 0; i < m; i++) {
                 retData[i][k] = ZERO;
             }
             retData[k][k] = ONE;
-            for (int j = k; j < n; j++) {
+            for (int j = k; j < r; j++) {
                 if (tmpData[k][k] != 0) {
                     double s = ZERO;
                     for (int i = k; i < m; i++) {
@@ -170,18 +171,20 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      */
     public MatrixStore<Double> getR() {
 
-        final int tmpColDim = this.getColDim();
+        int m = this.getRowDim();
+        int n = this.getColDim();
+        int r = Math.min(m, n);
 
-        final double[][] tmpData = this.getInternalData();
+        double[][] tmpData = this.getInternalData();
 
-        final RawStore retVal = new RawStore(tmpColDim, tmpColDim);
-        final double[][] retData = retVal.data;
+        RawStore retVal = new RawStore(r, n);
+        double[][] retData = retVal.data;
 
         double[] tmpRow;
-        for (int i = 0; i < tmpColDim; i++) {
+        for (int i = 0; i < r; i++) {
             tmpRow = retData[i];
             tmpRow[i] = myDiagonalR[i];
-            for (int j = i + 1; j < tmpColDim; j++) {
+            for (int j = i + 1; j < n; j++) {
                 tmpRow[j] = tmpData[j][i];
             }
         }
