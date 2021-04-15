@@ -61,7 +61,7 @@ final class UpperTriangularStore<N extends Comparable<N>> extends ShadingStore<N
 
     @Override
     public int limitOfColumn(final int col) {
-        return col + 1;
+        return Math.min(col + 1, this.getRowDim());
     }
 
     public Scalar<N> toScalar(final long row, final long col) {
