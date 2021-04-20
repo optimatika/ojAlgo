@@ -68,7 +68,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
         final double tmpRelaxation = this.getRelaxationFactor();
         do {
 
-            current.premultiply(tmpBody).operateOnMatching(tmpRHS, SUBTRACT).supplyTo(incremetReceiver);
+            current.premultiply(tmpBody).onMatching(tmpRHS, SUBTRACT).supplyTo(incremetReceiver);
             tmpNormErr = tmpIncrement.aggregateAll(Aggregator.NORM2);
             tmpIncrement.modifyMatching(DIVIDE, tmpBodyDiagonal);
 

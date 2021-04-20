@@ -61,7 +61,7 @@ public final class ConvexObjectiveFunction implements MultiaryFunction.TwiceDiff
     }
 
     public MatrixStore<Double> getGradient(final Access1D<Double> point) {
-        return myPureQuadratic.getGradient(point).operateOnMatching(SUBTRACT, myLinear.getGradient(point)).get();
+        return myPureQuadratic.getGradient(point).onMatching(SUBTRACT, myLinear.getGradient(point)).get();
     }
 
     public MatrixStore<Double> getHessian(final Access1D<Double> point) {

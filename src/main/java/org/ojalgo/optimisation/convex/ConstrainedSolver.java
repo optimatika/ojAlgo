@@ -129,7 +129,7 @@ abstract class ConstrainedSolver extends ConvexSolver {
         PhysicalStore<Double> mtrxX = this.getSolutionX();
 
         if ((mtrxAE != null) && (mtrxAE.count() != 0L)) {
-            mtrxX.premultiply(mtrxAE).operateOnMatching(mtrxBE, SUBTRACT).supplyTo(mySlackE);
+            mtrxX.premultiply(mtrxAE).onMatching(mtrxBE, SUBTRACT).supplyTo(mySlackE);
         }
 
         return mySlackE;
