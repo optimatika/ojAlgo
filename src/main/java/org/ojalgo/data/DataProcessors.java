@@ -160,7 +160,7 @@ public class DataProcessors {
                 vectors = vectors.get().logical().limits(-1, limit);
             }
 
-            MatrixStore<Double> scaledV = vectors.operateOnColumns(MULTIPLY, values).get();
+            MatrixStore<Double> scaledV = vectors.onColumns(MULTIPLY, values).get();
 
             retVal.fillByMultiplying(scaledV, scaledV.transpose());
 

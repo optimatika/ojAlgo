@@ -61,7 +61,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         Stopwatch clock = new Stopwatch();
 
-        mtrxA.operateOnMatching(PrimitiveMath.MULTIPLY, mtrxB);
+        mtrxA.onMatching(PrimitiveMath.MULTIPLY, mtrxB);
 
         SparsePerformance.touchNonzeros(mtrxA);
 
@@ -72,7 +72,7 @@ public class SparsePerformance extends MatrixStoreTests {
 
         clock.reset();
 
-        mtrxA.operateOnMatching(PrimitiveMath.MULTIPLY, mtrxB);
+        mtrxA.onMatching(PrimitiveMath.MULTIPLY, mtrxB);
 
         SparsePerformance.touchNonzeros(mtrxA);
 

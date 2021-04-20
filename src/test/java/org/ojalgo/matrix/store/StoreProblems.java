@@ -281,7 +281,7 @@ public class StoreProblems extends MatrixStoreTests {
         Primitive64Store x = Primitive64Store.FACTORY.rows(_x);
         Primitive64Store y = Primitive64Store.FACTORY.rows(_y);
 
-        ElementsSupplier<Double> diff = y.operateOnMatching(x, PrimitiveMath.SUBTRACT);
+        ElementsSupplier<Double> diff = y.onMatching(x, PrimitiveMath.SUBTRACT);
         ElementsSupplier<Double> transp = diff.transpose();
 
         TestUtils.assertEquals(Primitive64Store.FACTORY.rows(exp), diff.get());

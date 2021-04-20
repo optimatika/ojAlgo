@@ -106,7 +106,7 @@ final class CalculationLayer {
     void adjust(final Access1D<Double> input, final PhysicalStore<Double> output, final PhysicalStore<Double> upstreamGradient,
             final PhysicalStore<Double> downstreamGradient, final double learningRate, final double dropoutsFactor, final DoubleUnaryOperator regularisation) {
 
-        downstreamGradient.modifyMatching(MULTIPLY, output.operateOnAll(myActivator.getDerivativeInTermsOfOutput()));
+        downstreamGradient.modifyMatching(MULTIPLY, output.onAll(myActivator.getDerivativeInTermsOfOutput()));
 
         if (upstreamGradient != null) {
             // No need to do this multiplication for the input layer
@@ -156,13 +156,13 @@ final class CalculationLayer {
     }
 
     PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output) {
-        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(output);
+        myWeights.premultiply(input).onMatching(ADD, myBias).supplyTo(output);
         output.modifyAll(myActivator.getFunction(output));
         return output;
     }
 
     PhysicalStore<Double> invoke(final Access1D<Double> input, final PhysicalStore<Double> output, final double probabilityToKeep) {
-        myWeights.premultiply(input).operateOnMatching(ADD, myBias).supplyTo(output);
+        myWeights.premultiply(input).onMatching(ADD, myBias).supplyTo(output);
         output.modifyAll(myActivator.getFunction(output, probabilityToKeep));
         return output;
     }

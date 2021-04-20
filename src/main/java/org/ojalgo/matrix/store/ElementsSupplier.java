@@ -50,27 +50,27 @@ public interface ElementsSupplier<N extends Comparable<N>>
         return this.collect(this.physical());
     }
 
-    default ElementsSupplier<N> operateOnAll(final UnaryFunction<N> operator) {
+    default ElementsSupplier<N> onAll(final UnaryFunction<N> operator) {
         return new MatrixPipeline.UnaryOperator<>(this, operator);
     }
 
-    default ElementsSupplier<N> operateOnAny(final Transformation2D<N> operator) {
+    default ElementsSupplier<N> onAny(final Transformation2D<N> operator) {
         return new MatrixPipeline.Transformer<>(this, operator);
     }
 
-    default ElementsSupplier<N> operateOnColumns(final BinaryFunction<N> operator, final Access1D<N> right) {
+    default ElementsSupplier<N> onColumns(final BinaryFunction<N> operator, final Access1D<N> right) {
         return new MatrixPipeline.ColumnsModifier<>(this, operator, right);
     }
 
-    default ElementsSupplier<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
+    default ElementsSupplier<N> onMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
         return new MatrixPipeline.BinaryOperatorRight<>(this, operator, right);
     }
 
-    default ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
+    default ElementsSupplier<N> onMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
         return new MatrixPipeline.BinaryOperatorLeft<>(left, operator, this);
     }
 
-    default ElementsSupplier<N> operateOnRows(final BinaryFunction<N> operator, final Access1D<N> right) {
+    default ElementsSupplier<N> onRows(final BinaryFunction<N> operator, final Access1D<N> right) {
         return new MatrixPipeline.RowsModifier<>(this, operator, right);
     }
 

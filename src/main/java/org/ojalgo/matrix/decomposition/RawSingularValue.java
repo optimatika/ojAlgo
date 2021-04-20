@@ -112,7 +112,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         int rank = this.getRank();
 
-        MatrixStore<Double> tmp = v.logical().limits(-1, rank).operateOnColumns(DIVIDE, values).get();
+        MatrixStore<Double> tmp = v.logical().limits(-1, rank).onColumns(DIVIDE, values).get();
 
         return tmp.multiply(tmp.transpose());
     }
