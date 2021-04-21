@@ -56,7 +56,7 @@ public interface Access1D<N extends Comparable<N>> extends Structure1D {
 
     }
 
-    public interface Collectable<N extends Comparable<N>, R extends Mutate1D.Receiver<N>> extends Structure1D {
+    public interface Collectable<N extends Comparable<N>, R extends Mutate1D> extends Structure1D {
 
         default <I extends R> I collect(final Factory1D<I> factory) {
 

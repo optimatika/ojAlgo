@@ -33,7 +33,6 @@ import org.ojalgo.function.constant.ComplexMath;
 import org.ojalgo.function.constant.PrimitiveMath;
 import org.ojalgo.function.constant.QuaternionMath;
 import org.ojalgo.function.constant.RationalMath;
-import org.ojalgo.matrix.BasicMatrix.PhysicalReceiver;
 import org.ojalgo.matrix.decomposition.Eigenvalue.Eigenpair;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.decomposition.SingularValue;
@@ -147,21 +146,21 @@ public abstract class BasicMatrixTest extends MatrixTests {
         long row = Uniform.randomInteger(rAA.countRows());
         long col = Uniform.randomInteger(rAA.countColumns());
 
-        BasicMatrix.PhysicalReceiver<RationalNumber, RationalMatrix> rBuilder = rAA.copy();
+        RationalMatrix.DenseReceiver rBuilder = rAA.copy();
         rBuilder.add(row, col, scalar);
         expected = rBuilder.build();
 
-        BasicMatrix.PhysicalReceiver<ComplexNumber, ComplexMatrix> cBuilder = cAA.copy();
+        ComplexMatrix.DenseReceiver cBuilder = cAA.copy();
         cBuilder.add(row, col, scalar);
         actual = cBuilder.build();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        BasicMatrix.PhysicalReceiver<Double, Primitive64Matrix> p64Builder = p64AA.copy();
+        Primitive64Matrix.DenseReceiver p64Builder = p64AA.copy();
         p64Builder.add(row, col, scalar);
         actual = p64Builder.build();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        BasicMatrix.PhysicalReceiver<Double, Primitive32Matrix> p32Builder = p32AA.copy();
+        Primitive32Matrix.DenseReceiver p32Builder = p32AA.copy();
         p32Builder.add(row, col, scalar);
         actual = p32Builder.build();
         TestUtils.assertEquals(expected, actual, ACCURACY);
@@ -290,21 +289,21 @@ public abstract class BasicMatrixTest extends MatrixTests {
         BasicMatrix<?, ?> actual;
         BasicMatrix<?, ?> expected;
 
-        PhysicalReceiver<RationalNumber, RationalMatrix> copyRational = rAA.copy();
+        RationalMatrix.DenseReceiver copyRational = rAA.copy();
         copyRational.modifyMatching(RationalMath.DIVIDE, rSafe);
         expected = copyRational.get();
 
-        PhysicalReceiver<Double, Primitive64Matrix> copyPrimitive = p64AA.copy();
+        Primitive64Matrix.DenseReceiver copyPrimitive = p64AA.copy();
         copyPrimitive.modifyMatching(PrimitiveMath.DIVIDE, p64Safe);
         actual = copyPrimitive.get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        PhysicalReceiver<ComplexNumber, ComplexMatrix> copyComplex = cAA.copy();
+        ComplexMatrix.DenseReceiver copyComplex = cAA.copy();
         copyComplex.modifyMatching(ComplexMath.DIVIDE, cSafe);
         actual = copyComplex.get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        PhysicalReceiver<Quaternion, QuaternionMatrix> copyQuaternion = qAA.copy();
+        QuaternionMatrix.DenseReceiver copyQuaternion = qAA.copy();
         copyQuaternion.modifyMatching(QuaternionMath.DIVIDE, qSafe);
         actual = copyQuaternion.get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
@@ -795,21 +794,21 @@ public abstract class BasicMatrixTest extends MatrixTests {
         BasicMatrix<?, ?> actual;
         BasicMatrix<?, ?> expected;
 
-        PhysicalReceiver<RationalNumber, RationalMatrix> copyRational = rAA.copy();
+        RationalMatrix.DenseReceiver copyRational = rAA.copy();
         copyRational.modifyMatching(RationalMath.MULTIPLY, rSafe);
         expected = copyRational.get();
 
-        PhysicalReceiver<Double, Primitive64Matrix> copyPrimitive = p64AA.copy();
+        Primitive64Matrix.DenseReceiver copyPrimitive = p64AA.copy();
         copyPrimitive.modifyMatching(PrimitiveMath.MULTIPLY, p64Safe);
         actual = copyPrimitive.get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        PhysicalReceiver<ComplexNumber, ComplexMatrix> copyComplex = cAA.copy();
+        ComplexMatrix.DenseReceiver copyComplex = cAA.copy();
         copyComplex.modifyMatching(ComplexMath.MULTIPLY, cSafe);
         actual = copyComplex.get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        PhysicalReceiver<Quaternion, QuaternionMatrix> copyQuaternion = qAA.copy();
+        QuaternionMatrix.DenseReceiver copyQuaternion = qAA.copy();
         copyQuaternion.modifyMatching(QuaternionMath.MULTIPLY, qSafe);
         actual = copyQuaternion.get();
         TestUtils.assertEquals(expected, actual, ACCURACY);
@@ -904,22 +903,22 @@ public abstract class BasicMatrixTest extends MatrixTests {
         long tmpRow = Uniform.randomInteger(rAA.countRows());
         long tmpCol = Uniform.randomInteger(rAA.countColumns());
 
-        BasicMatrix.PhysicalReceiver<RationalNumber, RationalMatrix> rBuilder = rAA.copy();
+        RationalMatrix.DenseReceiver rBuilder = rAA.copy();
         rBuilder.set(tmpRow, tmpCol, scalar);
         BasicMatrix<?, ?> expected = rBuilder.build();
         BasicMatrix<?, ?> actual;
 
-        BasicMatrix.PhysicalReceiver<ComplexNumber, ComplexMatrix> cBuilder = cAA.copy();
+        ComplexMatrix.DenseReceiver cBuilder = cAA.copy();
         cBuilder.set(tmpRow, tmpCol, scalar);
         actual = cBuilder.build();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        BasicMatrix.PhysicalReceiver<Double, Primitive64Matrix> p64Builder = p64AA.copy();
+        Primitive64Matrix.DenseReceiver p64Builder = p64AA.copy();
         p64Builder.set(tmpRow, tmpCol, scalar);
         actual = p64Builder.build();
         TestUtils.assertEquals(expected, actual, ACCURACY);
 
-        BasicMatrix.PhysicalReceiver<Double, Primitive32Matrix> p32Builder = p32AA.copy();
+        Primitive32Matrix.DenseReceiver p32Builder = p32AA.copy();
         p32Builder.set(tmpRow, tmpCol, scalar);
         actual = p32Builder.build();
         TestUtils.assertEquals(expected, actual, ACCURACY);

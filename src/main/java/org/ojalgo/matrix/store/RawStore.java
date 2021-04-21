@@ -1099,23 +1099,23 @@ public final class RawStore implements PhysicalStore<Double> {
     }
 
     public TransformableRegion<Double> regionByColumns(final int... columns) {
-        return new TransformableRegion.ColumnsRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns), columns);
+        return new Subregion2D.ColumnsRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns), columns);
     }
 
     public TransformableRegion<Double> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new TransformableRegion.LimitRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns), rowLimit, columnLimit);
+        return new Subregion2D.LimitRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns), rowLimit, columnLimit);
     }
 
     public TransformableRegion<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new TransformableRegion.OffsetRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns), rowOffset, columnOffset);
+        return new Subregion2D.OffsetRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns), rowOffset, columnOffset);
     }
 
     public TransformableRegion<Double> regionByRows(final int... rows) {
-        return new TransformableRegion.RowsRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns), rows);
+        return new Subregion2D.RowsRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns), rows);
     }
 
     public TransformableRegion<Double> regionByTransposing() {
-        return new TransformableRegion.TransposedRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns));
+        return new Subregion2D.TransposedRegion<>(this, MultiplyBoth.newPrimitive64(data.length, myNumberOfColumns));
     }
 
     public void set(final long row, final long col, final Comparable<?> value) {

@@ -38,7 +38,6 @@ import org.ojalgo.structure.Access2D;
 import org.ojalgo.structure.ColumnView;
 import org.ojalgo.structure.Factory2D;
 import org.ojalgo.structure.Mutate2D;
-import org.ojalgo.structure.Mutate2D.ModifiableReceiver;
 import org.ojalgo.structure.Transformation2D;
 
 /**
@@ -173,7 +172,7 @@ public class DataProcessors {
     public static Transformation2D<Double> newTransformation2D(final Function<SampleSet, UnaryFunction<Double>> definition) {
         return new Transformation2D<Double>() {
 
-            public <T extends ModifiableReceiver<Double> & Access2D<Double>> void transform(final T transformable) {
+            public <T extends Mutate2D.ModifiableReceiver<Double>> void transform(final T transformable) {
                 SampleSet sampleSet = SampleSet.make();
                 for (ColumnView<Double> view : transformable.columns()) {
                     sampleSet.swap(view);

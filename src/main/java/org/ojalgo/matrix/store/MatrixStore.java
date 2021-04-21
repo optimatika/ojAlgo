@@ -22,13 +22,12 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.algebra.NormedVectorSpace;
-import org.ojalgo.algebra.Operation;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.constant.PrimitiveMath;
+import org.ojalgo.matrix.Matrix2D;
 import org.ojalgo.matrix.store.DiagonalStore.Builder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -63,9 +62,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface MatrixStore<N extends Comparable<N>>
-        extends ElementsSupplier<N>, Access2D<N>, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>, Access2D.Elements,
-        Structure2D.ReducibleTo1D<ElementsSupplier<N>>, NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>> {
+public interface MatrixStore<N extends Comparable<N>> extends Matrix2D<N, MatrixStore<N>>, ElementsSupplier<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>,
+        Access2D.Elements, Structure2D.ReducibleTo1D<ElementsSupplier<N>> {
 
     public interface Factory<N extends Comparable<N>> {
 
@@ -749,8 +747,16 @@ public interface MatrixStore<N extends Comparable<N>>
         return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
     }
 
+    default MatrixStore<N> add(final double scalarAddend) {
+        return this.add(this.physical().scalar().cast(scalarAddend));
+    }
+
     default MatrixStore<N> add(final MatrixStore<N> addend) {
         return this.onMatching(this.physical().function().add(), addend).get();
+    }
+
+    default MatrixStore<N> add(final N scalarAddend) {
+        return this.onAll(this.physical().function().add().second(scalarAddend)).get();
     }
 
     default N aggregateAll(final Aggregator aggregator) {
@@ -821,6 +827,14 @@ public interface MatrixStore<N extends Comparable<N>>
         this.supplyTo(retVal);
 
         return retVal;
+    }
+
+    default MatrixStore<N> divide(final double scalarDivisor) {
+        return this.divide(this.physical().scalar().cast(scalarDivisor));
+    }
+
+    default MatrixStore<N> divide(final N scalarDivisor) {
+        return this.onAll(this.physical().function().divide().second(scalarDivisor)).get();
     }
 
     default double doubleValue(final long row, final long col) {
@@ -938,8 +952,8 @@ public interface MatrixStore<N extends Comparable<N>>
         target.fillByMultiplying(this, right);
     }
 
-    default MatrixStore<N> multiply(final double scalar) {
-        return this.multiply(this.physical().scalar().cast(scalar));
+    default MatrixStore<N> multiply(final double scalarMultiplicand) {
+        return this.multiply(this.physical().scalar().cast(scalarMultiplicand));
     }
 
     default MatrixStore<N> multiply(final MatrixStore<N> right) {
@@ -954,8 +968,8 @@ public interface MatrixStore<N extends Comparable<N>>
         return retVal;
     }
 
-    default MatrixStore<N> multiply(final N scalar) {
-        return this.onAll(this.physical().function().multiply().second(scalar)).get();
+    default MatrixStore<N> multiply(final N scalarMultiplicand) {
+        return this.onAll(this.physical().function().multiply().second(scalarMultiplicand)).get();
     }
 
     /**
@@ -1174,8 +1188,16 @@ public interface MatrixStore<N extends Comparable<N>>
         };
     }
 
+    default MatrixStore<N> subtract(final double scalarSubtrahend) {
+        return this.subtract(this.physical().scalar().cast(scalarSubtrahend));
+    }
+
     default MatrixStore<N> subtract(final MatrixStore<N> subtrahend) {
         return this.onMatching(this.physical().function().subtract(), subtrahend).get();
+    }
+
+    default MatrixStore<N> subtract(final N scalarSubtrahend) {
+        return this.onAll(this.physical().function().subtract().second(scalarSubtrahend)).get();
     }
 
     default void supplyTo(final TransformableRegion<N> receiver) {

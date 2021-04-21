@@ -532,23 +532,23 @@ public final class SparseStore<N extends Comparable<N>> extends FactoryStore<N> 
     }
 
     public TransformableRegion<N> regionByColumns(final int... columns) {
-        return new TransformableRegion.ColumnsRegion<>(this, myMultiplyer, columns);
+        return new Subregion2D.ColumnsRegion<>(this, myMultiplyer, columns);
     }
 
     public TransformableRegion<N> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new TransformableRegion.LimitRegion<>(this, myMultiplyer, rowLimit, columnLimit);
+        return new Subregion2D.LimitRegion<>(this, myMultiplyer, rowLimit, columnLimit);
     }
 
     public TransformableRegion<N> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new TransformableRegion.OffsetRegion<>(this, myMultiplyer, rowOffset, columnOffset);
+        return new Subregion2D.OffsetRegion<>(this, myMultiplyer, rowOffset, columnOffset);
     }
 
     public TransformableRegion<N> regionByRows(final int... rows) {
-        return new TransformableRegion.RowsRegion<>(this, myMultiplyer, rows);
+        return new Subregion2D.RowsRegion<>(this, myMultiplyer, rows);
     }
 
     public TransformableRegion<N> regionByTransposing() {
-        return new TransformableRegion.TransposedRegion<>(this, myMultiplyer);
+        return new Subregion2D.TransposedRegion<>(this, myMultiplyer);
     }
 
     public void reset() {

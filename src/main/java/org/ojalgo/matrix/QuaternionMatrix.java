@@ -49,7 +49,7 @@ import org.ojalgo.structure.Structure2D;
 public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMatrix> {
 
     public static final class DenseReceiver extends
-            MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver>.DenseReceiver {
+            MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver>.Mutator<PhysicalStore<Quaternion>> {
 
         DenseReceiver(final Factory enclosing, final PhysicalStore<Quaternion> delegate) {
             enclosing.super(delegate);
@@ -100,7 +100,7 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
     }
 
     public static final class SparseReceiver extends
-            MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver>.SparseReceiver {
+            MatrixFactory<Quaternion, QuaternionMatrix, QuaternionMatrix.LogicalBuilder, QuaternionMatrix.DenseReceiver, QuaternionMatrix.SparseReceiver>.Mutator<SparseStore<Quaternion>> {
 
         SparseReceiver(final Factory enclosing, final SparseStore<Quaternion> delegate) {
             enclosing.super(delegate);
@@ -117,6 +117,7 @@ public final class QuaternionMatrix extends BasicMatrix<Quaternion, QuaternionMa
         super(aStore);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public QuaternionMatrix.DenseReceiver copy() {
         return new QuaternionMatrix.DenseReceiver(FACTORY, this.getStore().copy());

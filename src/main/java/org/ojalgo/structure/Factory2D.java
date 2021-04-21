@@ -75,7 +75,7 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
      *
      * @author apete
      */
-    interface MayBeSparse<I extends Structure2D, DR extends Mutate2D.ModifiableReceiver<?>, SR extends Mutate2D.ModifiableReceiver<?>> extends Factory2D<I> {
+    interface MayBeSparse<I extends Structure2D, DR extends Mutate2D.ModifiableReceiver<?>, SR extends Mutate2D.Receiver<?>> extends Factory2D<I> {
 
         DR makeDense(long rows, long columns);
 
